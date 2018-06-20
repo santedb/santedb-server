@@ -1,0 +1,322 @@
+﻿/*
+ * Copyright 2015-2018 Mohawk College of Applied Arts and Technology
+ *
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you 
+ * may not use this file except in compliance with the License. You may 
+ * obtain a copy of the License at 
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0 
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ * License for the specific language governing permissions and limitations under 
+ * the License.
+ * 
+ * User: fyfej
+ * Date: 2017-9-1
+ */
+using MARC.HI.EHRS.SVC.Core;
+using MARC.HI.EHRS.SVC.Core.Data;
+using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Security;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+
+namespace SanteDB.Core.Services.Impl
+{
+	/// <summary>
+	/// Represents an act repository service.
+	/// </summary>
+	public partial class LocalActRepositoryService : IRepositoryService<QuantityObservation>,
+        IRepositoryService<CodedObservation>,
+        IRepositoryService<TextObservation>,
+        IRepositoryService<Observation>
+    {
+
+        /// <summary>
+        /// Finds the specified data.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <returns>Returns a list of identified data.</returns>
+        public IEnumerable<QuantityObservation> Find(Expression<Func<QuantityObservation, bool>> query)
+		{
+			int tr = 0;
+			return this.Find<QuantityObservation>(query, 0, null, out tr);
+		}
+
+		/// <summary>
+		/// Finds the specified data.
+		/// </summary>
+		/// <param name="query">The query.</param>
+		/// <param name="offset">The offset.</param>
+		/// <param name="count">The count.</param>
+		/// <param name="totalResults">The total results.</param>
+		/// <returns>Returns a list of identified data.</returns>
+		public IEnumerable<QuantityObservation> Find(Expression<Func<QuantityObservation, bool>> query, int offset, int? count, out int totalResults)
+		{
+			return this.Find<QuantityObservation>(query, offset, count, out totalResults);
+		}
+
+		/// <summary>
+		/// Finds the specified data.
+		/// </summary>
+		/// <param name="query">The query.</param>
+		/// <returns>Returns a list of identified data.</returns>
+		public IEnumerable<CodedObservation> Find(Expression<Func<CodedObservation, bool>> query)
+		{
+			int tr = 0;
+			return this.Find<CodedObservation>(query, 0, null, out tr);
+		}
+
+		/// <summary>
+		/// Finds the specified data.
+		/// </summary>
+		/// <param name="query">The query.</param>
+		/// <param name="offset">The offset.</param>
+		/// <param name="count">The count.</param>
+		/// <param name="totalResults">The total results.</param>
+		/// <returns>Returns a list of identified data.</returns>
+		public IEnumerable<CodedObservation> Find(Expression<Func<CodedObservation, bool>> query, int offset, int? count, out int totalResults)
+		{
+			return this.Find<CodedObservation>(query, offset, count, out totalResults);
+		}
+
+		/// <summary>
+		/// Finds the specified data.
+		/// </summary>
+		/// <param name="query">The query.</param>
+		/// <returns>Returns a list of identified data.</returns>
+		public IEnumerable<TextObservation> Find(Expression<Func<TextObservation, bool>> query)
+		{
+			int tr = 0;
+			return this.Find<TextObservation>(query, 0, null, out tr);
+		}
+
+		/// <summary>
+		/// Finds the specified data.
+		/// </summary>
+		/// <param name="query">The query.</param>
+		/// <param name="offset">The offset.</param>
+		/// <param name="count">The count.</param>
+		/// <param name="totalResults">The total results.</param>
+		/// <returns>Returns a list of identified data.</returns>
+		public IEnumerable<TextObservation> Find(Expression<Func<TextObservation, bool>> query, int offset, int? count, out int totalResults)
+		{
+			return this.Find<TextObservation>(query, offset, count, out totalResults);
+		}
+
+		/// <summary>
+		/// Gets the specified model.
+		/// </summary>
+		/// <param name="key">The key.</param>
+		/// <returns>Returns the model.</returns>
+		QuantityObservation IRepositoryService<QuantityObservation>.Get(Guid key)
+		{
+			return this.Get<QuantityObservation>(key, Guid.Empty);
+		}
+
+		/// <summary>
+		/// Gets the specified model.
+		/// </summary>
+		/// <param name="key">The key.</param>
+		/// <returns>Returns the model.</returns>
+		CodedObservation IRepositoryService<CodedObservation>.Get(Guid key)
+		{
+			return this.Get<CodedObservation>(key, Guid.Empty);
+		}
+
+		/// <summary>
+		/// Gets the specified model.
+		/// </summary>
+		/// <param name="key">The key.</param>
+		/// <returns>Returns the model.</returns>
+		TextObservation IRepositoryService<TextObservation>.Get(Guid key)
+		{
+			return this.Get<TextObservation>(key, Guid.Empty);
+		}
+
+        /// <summary>
+		/// Gets the specified model.
+		/// </summary>
+		/// <param name="key">The key.</param>
+		/// <returns>Returns the model.</returns>
+		QuantityObservation IRepositoryService<QuantityObservation>.Get(Guid key, Guid versionKey)
+        {
+            return this.Get<QuantityObservation>(key, versionKey);
+        }
+
+        /// <summary>
+        /// Gets the specified model.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns>Returns the model.</returns>
+        CodedObservation IRepositoryService<CodedObservation>.Get(Guid key, Guid versionKey)
+        {
+            return this.Get<CodedObservation>(key, versionKey);
+        }
+
+        /// <summary>
+        /// Gets the specified model.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns>Returns the model.</returns>
+        TextObservation IRepositoryService<TextObservation>.Get(Guid key, Guid versionKey)
+        {
+            return this.Get<TextObservation>(key, versionKey);
+        }
+
+        /// <summary>
+        /// Inserts the specified data.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <returns>TModel.</returns>
+        public QuantityObservation Insert(QuantityObservation data)
+		{
+			return this.Insert<QuantityObservation>(data);
+		}
+
+		/// <summary>
+		/// Inserts the specified data.
+		/// </summary>
+		/// <param name="data">The data.</param>
+		/// <returns>TModel.</returns>
+		public CodedObservation Insert(CodedObservation data)
+		{
+			return this.Insert<CodedObservation>(data);
+		}
+
+		/// <summary>
+		/// Inserts the specified data.
+		/// </summary>
+		/// <param name="data">The data.</param>
+		/// <returns>TModel.</returns>
+		public TextObservation Insert(TextObservation data)
+		{
+			return this.Insert<TextObservation>(data);
+		}
+
+		/// <summary>
+		/// Obsoletes the specified data.
+		/// </summary>
+		/// <param name="key">The key.</param>
+		/// <returns>Returns the model.</returns>
+		QuantityObservation IRepositoryService<QuantityObservation>.Obsolete(Guid key)
+		{
+			return this.Obsolete<QuantityObservation>(key);
+		}
+
+		/// <summary>
+		/// Obsoletes the specified data.
+		/// </summary>
+		/// <param name="key">The key.</param>
+		/// <returns>Returns the model.</returns>
+		CodedObservation IRepositoryService<CodedObservation>.Obsolete(Guid key)
+		{
+			return this.Obsolete<CodedObservation>(key);
+		}
+
+		/// <summary>
+		/// Obsoletes the specified data.
+		/// </summary>
+		/// <param name="key">The key.</param>
+		/// <returns>Returns the model.</returns>
+		TextObservation IRepositoryService<TextObservation>.Obsolete(Guid key)
+		{
+			return this.Obsolete<TextObservation>(key);
+		}
+
+		/// <summary>
+		/// Saves the specified data.
+		/// </summary>
+		/// <param name="data">The data.</param>
+		/// <returns>Returns the model.</returns>
+		public QuantityObservation Save(QuantityObservation data)
+		{
+			return this.Save<QuantityObservation>(data);
+		}
+
+		/// <summary>
+		/// Saves the specified data.
+		/// </summary>
+		/// <param name="data">The data.</param>
+		/// <returns>Returns the model.</returns>
+		public CodedObservation Save(CodedObservation data)
+		{
+			return this.Save<CodedObservation>(data);
+		}
+
+		/// <summary>
+		/// Saves the specified data.
+		/// </summary>
+		/// <param name="data">The data.</param>
+		/// <returns>Returns the model.</returns>
+		public TextObservation Save(TextObservation data)
+		{
+			return this.Save<TextObservation>(data);
+		}
+
+        /// <summary>
+        /// Get the observation
+        /// </summary>
+        Observation IRepositoryService<Observation>.Get(Guid key)
+        {
+            return this.Get<Observation>(key, Guid.Empty);
+        }
+
+        /// <summary>
+        /// Get the observation version
+        /// </summary>
+        Observation IRepositoryService<Observation>.Get(Guid key, Guid versionKey)
+        {
+            return this.Get<Observation>(key, versionKey);
+        }
+
+        /// <summary>
+        /// Find the specified observation
+        /// </summary>
+        public IEnumerable<Observation> Find(Expression<Func<Observation, bool>> query)
+        {
+            int tr = 0;
+            return this.Find<Observation>(query, 0, null, out tr);
+        }
+
+        /// <summary>
+        /// Find the specified observation with the specified objects
+        /// </summary>
+        public IEnumerable<Observation> Find(Expression<Func<Observation, bool>> query, int offset, int? count, out int totalResults)
+        {
+            return this.Find<Observation>(query, offset, count, out totalResults);
+        }
+
+        /// <summary>
+        /// Insert the specified observation
+        /// </summary>
+        public Observation Insert(Observation data)
+        {
+            return this.Insert<Observation>(data);
+        }
+
+        /// <summary>
+        /// Save the specified data
+        /// </summary>
+        public Observation Save(Observation data)
+        {
+            return this.Save<Observation>(data);
+        }
+
+        /// <summary>
+        /// Obsolete the specified data
+        /// </summary>
+        Observation IRepositoryService<Observation>.Obsolete(Guid key)
+        {
+            return this.Obsolete<Observation>(key);
+        }
+    }
+}

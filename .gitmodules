@@ -1,0 +1,15 @@
+[submodule "santedb-api"]
+	path = santedb-api
+	url = https://github.com/santedb/santedb-api
+[submodule "santedb-model"]
+	path = santedb-model
+	url = https://github.com/santedb/santedb-model
+[submodule "santedb-applets"]
+	path = santedb-applets
+	url = https://github.com/santedb/santedb-applets
+[submodule "santedb-bre-js"]
+	path = santedb-bre-js
+	url = https://github.com/santedb/santedb-bre-js.git
+[submodule "santedb-orm"]
+	path = santedb-orm
+	url = https://github.com/santedb/santedb-orm.git

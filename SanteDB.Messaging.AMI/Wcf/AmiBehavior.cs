@@ -1,0 +1,317 @@
+﻿/*
+ * Copyright 2015-2018 Mohawk College of Applied Arts and Technology
+ *
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ * User: khannan
+ * Date: 2017-9-1
+ */
+
+using MARC.HI.EHRS.SVC.Core;
+using MARC.HI.EHRS.SVC.Core.Services;
+using MARC.HI.EHRS.SVC.Core.Services.Security;
+using SanteDB.Core.Interop;
+using SanteDB.Core.Model;
+using SanteDB.Core.Model.AMI.Auth;
+using SanteDB.Core.Model.AMI.Diagnostics;
+using SanteDB.Core.Model.AMI.Logging;
+using SanteDB.Core.Model.AMI.Security;
+using SanteDB.Core.Model.Query;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Security.Claims;
+using SanteDB.Core.Services;
+using SanteDB.Core.Wcf;
+using SanteDB.Messaging.AMI.Configuration;
+using SwaggerWcf.Attributes;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Reflection;
+using System.Security.Permissions;
+using System.ServiceModel;
+using System.ServiceModel.Web;
+using System.Xml.Schema;
+using System.Xml.Serialization;
+
+namespace SanteDB.Messaging.AMI.Wcf
+{
+	/// <summary>
+	/// Represents the administrative contract interface.
+	/// </summary>
+	[ServiceBehavior(ConfigurationName = "AMI", InstanceContextMode = InstanceContextMode.PerCall)]
+	[Description("Administrative Management Interface")]
+	public partial class AmiBehavior : IAmiContract
+	{
+		// Trace source
+		private TraceSource traceSource = new TraceSource("SanteDB.Messaging.AMI");
+
+		/// <summary>
+		/// Create a diagnostic report
+		/// </summary>
+		[PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.Login)]
+		public DiagnosticReport CreateDiagnosticReport(DiagnosticReport report)
+		{
+			var persister = ApplicationContext.Current.GetService<IDataPersistenceService<DiagnosticReport>>();
+			if (persister == null)
+				throw new InvalidOperationException("Cannot find appriopriate persister");
+			return persister.Insert(report, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+		}
+
+		/// <summary>
+		/// Gets a specific log file.
+		/// </summary>
+		/// <param name="logId">The log identifier.</param>
+		/// <returns>Returns the log file information.</returns>
+		[PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
+		public LogFileInfo GetLog(string logId)
+		{
+			var logFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), logId + ".log");
+			var retVal = new AmiCollection<LogFileInfo>();
+			var fi = new FileInfo(logFile);
+			return new LogFileInfo()
+			{
+				LastWrite = fi.LastWriteTime,
+				Name = fi.Name,
+				Size = fi.Length,
+				Contents = File.ReadAllBytes(logFile)
+			};
+		}
+
+		/// <summary>
+		/// Get log files on the server and their sizes.
+		/// </summary>
+		/// <returns>Returns a collection of log files.</returns>
+		[PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
+		public AmiCollection<LogFileInfo> GetLogs()
+		{
+			var logDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+			var retVal = new AmiCollection<LogFileInfo>();
+			foreach (var itm in Directory.GetFiles(logDirectory, "*.log"))
+			{
+				var fi = new FileInfo(itm);
+				retVal.CollectionItem.Add(new LogFileInfo()
+				{
+					LastWrite = fi.LastWriteTime,
+					Name = Path.GetFileNameWithoutExtension(fi.Name),
+					Size = fi.Length
+				});
+			}
+			return retVal;
+		}
+
+		/// <summary>
+		/// Gets the schema for the administrative interface.
+		/// </summary>
+		/// <param name="schemaId">The id of the schema to be retrieved.</param>
+		/// <returns>Returns the administrative interface schema.</returns>
+		[SwaggerWcfHidden]
+		public XmlSchema GetSchema(int schemaId)
+		{
+			try
+			{
+				XmlSchemas schemaCollection = new XmlSchemas();
+
+				XmlReflectionImporter importer = new XmlReflectionImporter("http://santedb.org/ami");
+				XmlSchemaExporter exporter = new XmlSchemaExporter(schemaCollection);
+
+				foreach (var cls in typeof(IAmiContract).GetCustomAttributes<ServiceKnownTypeAttribute>().Select(o => o.Type))
+					exporter.ExportTypeMapping(importer.ImportTypeMapping(cls, "http://santedb.org/ami"));
+
+				if (schemaId > schemaCollection.Count)
+				{
+					WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
+					return null;
+				}
+				else
+				{
+					WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
+					WebOperationContext.Current.OutgoingResponse.ContentType = "text/xml";
+					return schemaCollection[schemaId];
+				}
+			}
+			catch (Exception e)
+			{
+				WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.InternalServerError;
+				this.traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Gets a server diagnostic report.
+		/// </summary>
+		/// <returns>Returns the created diagnostic report.</returns>
+		[PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
+		public DiagnosticReport GetServerDiagnosticReport()
+		{
+			var retVal = new DiagnosticReport();
+			retVal.ApplicationInfo = new DiagnosticApplicationInfo(Assembly.GetEntryAssembly());
+			retVal.CreatedByKey = Guid.Parse(AuthenticationContext.SystemUserSid);
+			retVal.Threads = new List<DiagnosticThreadInfo>();
+			foreach (ProcessThread thd in Process.GetCurrentProcess().Threads)
+				retVal.Threads.Add(new DiagnosticThreadInfo()
+				{
+					Name = thd.Id.ToString(),
+					CpuTime = thd.UserProcessorTime,
+					WaitReason = null,
+					State = thd.ThreadState.ToString()
+				});
+			retVal.ApplicationInfo.Assemblies = AppDomain.CurrentDomain.GetAssemblies().Select(o => new DiagnosticVersionInfo(o)).ToList();
+			retVal.ApplicationInfo.EnvironmentInfo = new DiagnosticEnvironmentInfo()
+			{
+				Is64Bit = Environment.Is64BitOperatingSystem && Environment.Is64BitProcess,
+				OSVersion = String.Format("{0} v{1}", System.Environment.OSVersion.Platform, System.Environment.OSVersion.Version),
+				ProcessorCount = Environment.ProcessorCount,
+				UsedMemory = GC.GetTotalMemory(false),
+				Version = Environment.Version.ToString(),
+			};
+			retVal.ApplicationInfo.ServiceInfo = ApplicationContext.Current.GetServices().OfType<IDaemonService>().Select(o => new DiagnosticServiceInfo(o)).ToList();
+			return retVal;
+		}
+
+		/// <summary>
+		/// Get a list of TFA mechanisms
+		/// </summary>
+		/// <returns>Returns a list of TFA mechanisms.</returns>
+		public AmiCollection<TfaMechanismInfo> GetTfaMechanisms()
+		{
+			var tfaRelay = ApplicationContext.Current.GetService<ITfaRelayService>();
+			if (tfaRelay == null)
+				throw new InvalidOperationException("TFA Relay missing");
+			return new AmiCollection<TfaMechanismInfo>()
+			{
+				CollectionItem = tfaRelay.Mechanisms.Select(o => new TfaMechanismInfo()
+				{
+					Id = o.Id,
+					Name = o.Name,
+					ChallengeText = o.Challenge
+				}).ToList()
+			};
+		}
+
+		/// <summary>
+		/// Gets options for the AMI service.
+		/// </summary>
+		/// <returns>Returns options for the AMI service.</returns>
+		public IdentifiedData Options()
+		{
+			WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.OK;
+			WebOperationContext.Current.OutgoingResponse.Headers.Add("Allow", $"GET, PUT, POST, OPTIONS, HEAD, DELETE{(ApplicationContext.Current.GetService<IPatchService>() != null ? ", PATCH" : null)}");
+
+			if (ApplicationContext.Current.GetService<IPatchService>() != null)
+			{
+				WebOperationContext.Current.OutgoingResponse.Headers.Add("Accept-Patch", "application/xml+oiz-patch");
+			}
+
+			var serviceOptions = new ServiceOptions
+			{
+				InterfaceVersion = "1.0.0.0",
+				Services = new List<ServiceResourceOptions>
+				{
+					new ServiceResourceOptions
+					{
+						ResourceName = "time",
+						Capabilities = ResourceCapability.Get
+					}
+				},
+				Endpoints = ApplicationContext.Current.GetServices().OfType<IApiEndpointProvider>().Select(o =>
+					new ServiceEndpointOptions
+					{
+						BaseUrl = o.Url,
+						ServiceType = o.ApiType,
+						Capabilities = o.Capabilities
+					}
+				).ToList()
+			};
+
+			// Get endpoints
+
+			var config = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("SanteDB.messaging.ami") as AmiConfiguration;
+
+			if (config?.Endpoints != null)
+				serviceOptions.Endpoints.AddRange(config.Endpoints);
+
+			return serviceOptions;
+		}
+
+		/// <summary>
+		/// Perform a ping
+		/// </summary>
+		[SwaggerWcfHidden]
+		public void Ping()
+		{
+			WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.NoContent;
+		}
+
+		/// <summary>
+		/// Creates security reset information
+		/// </summary>
+		public void SendTfaSecret(TfaRequestInfo resetInfo)
+		{
+			var securityRepository = ApplicationContext.Current.GetService<ISecurityRepositoryService>();
+
+			var securityUser = securityRepository.GetUser(resetInfo.UserName);
+
+			// don't throw an error if the user is not found, just act as if we sent it.
+			// this is to make sure that people cannot guess users
+			if (securityUser == null)
+			{
+				this.traceSource.TraceEvent(TraceEventType.Warning, 0, "Attempt to get TFA reset code for {0} which is not a valid user", resetInfo.UserName);
+				WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NoContent;
+				return;
+			}
+
+			// Identity provider
+			var identityProvider = ApplicationContext.Current.GetService<IIdentityProviderService>();
+			var tfaSecret = identityProvider.GenerateTfaSecret(securityUser.UserName);
+
+			// Add a claim
+			if (resetInfo.Purpose == "PasswordReset")
+			{
+				new PolicyPermission(PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService);
+				identityProvider.AddClaim(securityUser.UserName, new System.Security.Claims.Claim(SanteDBClaimTypes.SanteDBPasswordlessAuth, "true"));
+			}
+
+			var tfaRelay = ApplicationContext.Current.GetService<ITfaRelayService>();
+			if (tfaRelay == null)
+				throw new InvalidOperationException("TFA relay not specified");
+
+			// Now issue the TFA secret
+			tfaRelay.SendSecret(resetInfo.ResetMechanism, securityUser, resetInfo.Verification, tfaSecret);
+			WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NoContent;
+		}
+
+		/// <summary>
+		/// Creates a query
+		/// </summary>
+		/// <param name="nvc">The name value collection to use to create the query.</param>
+		/// <returns>Returns the created query.</returns>
+		private NameValueCollection CreateQuery(System.Collections.Specialized.NameValueCollection nvc)
+		{
+			var retVal = new NameValueCollection();
+
+			foreach (var k in nvc.AllKeys)
+			{
+				retVal.Add(k, new List<string>(nvc.GetValues(k)));
+			}
+
+			return retVal;
+		}
+	}
+}

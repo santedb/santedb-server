@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<dataset xmlns="http://santedb.org/data" id="GS1 Extensions">
+  <update insertIfNotExists="true">
+    <ExtensionType xmlns="http://santedb.org/model">
+      <id>6b2ae7b5-158f-46d0-9ff9-0e3fa999dcaa</id>
+      <handlerClass>SanteDB.Core.Extensions.DateExtensionHandler, SanteDB.Core.Model, Version=1.1.0.0</handlerClass>
+      <name>http://santedb.org/extensions/stock/contrib/gs1/estimatedDeliveryDate</name>
+    </ExtensionType>
+  </update>
+  <update insertIfNotExists="true">
+    <ExtensionType xmlns="http://santedb.org/model">
+      <id>34073745-018b-48d1-82da-c545391d294a</id>
+      <handlerClass>SanteDB.Core.Extensions.DateExtensionHandler, SanteDB.Core.Model, Version=1.1.0.0</handlerClass>
+      <name>http://santedb.org/extensions/stock/contrib/gs1/shipmentDate</name>
+    </ExtensionType>
+  </update>
+  <update insertIfNotExists="true">
+    <ExtensionType xmlns="http://santedb.org/model">
+      <id>4F417368-1C96-4F5E-BDAC-CA51C4BABF3B</id>
+      <handlerClass>SanteDB.Core.Extensions.StringExtensionHandler, SanteDB.Core.Model, Version=1.1.0.0</handlerClass>
+      <name>http://santedb.org/extensions/stock/contrib/gs1/packagingType</name>
+    </ExtensionType>
+  </update>
+</dataset>
