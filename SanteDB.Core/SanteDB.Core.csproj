@@ -32,7 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0" />
+       <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0" />
     <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.0" />
     <PackageReference Include="MARC.HI.EHRS.SVC.Core.Timer">
       <Version>2.0.0</Version>
@@ -50,6 +50,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.IdentityModel" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="4.0.4.403061554" />
+
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
@@ -95,6 +96,8 @@
     <Compile Include="Persistence\DatasetInstall.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Query\MemoryQueryPersistenceService.cs" />
+    <Compile Include="ResultsDetails\UnrecognizedSenderResultDetail.cs" />
+    <Compile Include="ResultsDetails\UnrecognizedTargetDomainResultDetail.cs" />
     <Compile Include="Security\ApplicationPrincipal.cs" />
     <Compile Include="Security\Audit\AuditDaemonService.cs" />
     <Compile Include="Security\Audit\AuditUtil.cs" />
@@ -103,6 +106,7 @@
     <Compile Include="Security\DefaultTfaRelayService.cs" />
     <Compile Include="Security\DeviceIdentity.cs" />
     <Compile Include="Security\DevicePrincipal.cs" />
+    <Compile Include="Security\ISession.cs" />
     <Compile Include="Security\LocalPasswordValidationService.cs" />
     <Compile Include="Security\Permission\PolicyPermissionAttribute.cs" />
     <Compile Include="Security\AuthenticationContext.cs" />
@@ -119,7 +123,6 @@
     <Compile Include="Services\IApplicationIdentityProviderService.cs" />
     <Compile Include="Services\IFastQueryDataPersistenceService.cs" />
     <Compile Include="Services\IDeviceIdentityProviderService.cs" />
-    <Compile Include="Services\IIdentityRefreshProviderService.cs" />
     <Compile Include="Services\Impl\FileSystemQueueService.cs" />
     <Compile Include="Services\Impl\LocalActRepositoryService.PatientEncounter.cs" />
     <Compile Include="Services\Impl\LocalActRepositoryService.Observation.cs" />
@@ -147,6 +150,8 @@
     <Compile Include="Services\Impl\FileConfigurationService.cs" />
     <Compile Include="Services\Impl\ThreadPoolService.cs" />
     <Compile Include="Services\IPersistentQueueService.cs" />
+    <Compile Include="Services\ISessionIdentityProviderService.cs" />
+    <Compile Include="Services\ISessionProviderService.cs" />
     <Compile Include="Services\IStoredQueryDataPersistenceService.cs" />
     <Compile Include="Services\ITfaRelayService.cs" />
     <Compile Include="Wcf\Behavior\WcfErrorEndpointBehavior.cs" />
@@ -160,8 +165,8 @@
     <Compile Include="Wcf\IApiEndpointProvider.cs" />
     <Compile Include="Wcf\Security\BasicAuthorizationAccessPolicy.cs" />
     <Compile Include="Wcf\Security\BasicAuthorizationCredentialValidator.cs" />
-    <Compile Include="Wcf\Security\JwtTokenAuthorizationPolicy.cs" />
-    <Compile Include="Wcf\Security\JwtTokenServiceAuthorizationManager.cs" />
+    <Compile Include="Wcf\Security\TokenAuthorizationPolicy.cs" />
+    <Compile Include="Wcf\Security\TokenServiceAuthorizationManager.cs" />
     <Compile Include="Services\Impl\LocalConceptRepositoryService.cs" />
     <Compile Include="Services\Impl\LocalSecurityRepositoryService.cs" />
     <Compile Include="Wcf\Serialization\WcfErrorHandler.cs" />
@@ -174,15 +179,15 @@
   <ItemGroup>
     <None Include="..\SanteDB.licenseheader">
       <Link>SanteDB.licenseheader</Link>
-    </None>
-    <None Include="packages.config" />
+    </None>    
+	<None Include="packages.config" />
     <None Include="Schema\SanteDBDataSet.xsd">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\santedb-applets\SanteDB.Core.Applets\SanteDB.Core.Applets.csproj">
+<ProjectReference Include="..\santedb-applets\SanteDB.Core.Applets\SanteDB.Core.Applets.csproj">
       <Project>{39E61451-F4FE-493D-B754-5F06EB284AAC}</Project>
       <Name>SanteDB.Core.Applets</Name>
     </ProjectReference>

@@ -40,6 +40,12 @@ namespace SanteDB.Authentication.OAuth2.Model
         public String AccessToken { get; set; }
 
         /// <summary>
+        /// Gets or sets the identity token
+        /// </summary>
+        [JsonProperty("id_token")]
+        public String IdentityToken { get; set; }
+
+        /// <summary>
         /// Token type
         /// </summary>
         [JsonProperty("token_type")]

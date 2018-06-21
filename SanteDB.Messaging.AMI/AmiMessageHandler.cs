@@ -97,7 +97,7 @@ namespace SanteDB.Messaging.AMI
 				var caps = ServiceEndpointCapabilities.Compression;
 				if (this.m_webHost.Description.Behaviors.OfType<ServiceCredentials>().Any(o => o.UserNameAuthentication?.CustomUserNamePasswordValidator != null))
 					caps |= ServiceEndpointCapabilities.BasicAuth;
-				if (this.m_webHost.Description.Behaviors.OfType<ServiceAuthorizationBehavior>().Any(o => o.ServiceAuthorizationManager is JwtTokenServiceAuthorizationManager))
+				if (this.m_webHost.Description.Behaviors.OfType<ServiceAuthorizationBehavior>().Any(o => o.ServiceAuthorizationManager is TokenServiceAuthorizationManager))
 					caps |= ServiceEndpointCapabilities.BearerAuth;
 
 				return caps;

@@ -91,7 +91,7 @@ namespace SanteDB.Authentication.OAuth2
                 var caps = ServiceEndpointCapabilities.None;
                 if (this.m_serviceHost.Description.Behaviors.OfType<ServiceCredentials>().Any(o => o.UserNameAuthentication?.CustomUserNamePasswordValidator != null))
                     caps |= ServiceEndpointCapabilities.BasicAuth;
-                if (this.m_serviceHost.Description.Behaviors.OfType<ServiceAuthorizationBehavior>().Any(o => o.ServiceAuthorizationManager is JwtTokenServiceAuthorizationManager))
+                if (this.m_serviceHost.Description.Behaviors.OfType<ServiceAuthorizationBehavior>().Any(o => o.ServiceAuthorizationManager is TokenServiceAuthorizationManager))
                     caps |= ServiceEndpointCapabilities.BearerAuth;
 
                 return caps;

@@ -213,7 +213,7 @@ namespace SanteDB.Core.Wcf.Serialization
                             JsonSerializer jsz = new JsonSerializer()
                             {
                                 SerializationBinder = new ModelSerializationBinder(),
-                                TypeNameAssemblyFormatHandling = 0,
+                                TypeNameAssemblyFormat = 0,
                                 TypeNameHandling = TypeNameHandling.All
                             };
                             jsz.Converters.Add(new StringEnumConverter());

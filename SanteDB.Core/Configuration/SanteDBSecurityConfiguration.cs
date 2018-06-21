@@ -17,7 +17,9 @@
  * User: fyfej
  * Date: 2017-9-1
  */
+using System;
 using System.Collections.ObjectModel;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SanteDB.Core.Configuration
 {
@@ -51,5 +53,20 @@ namespace SanteDB.Core.Configuration
         /// Trusted publishers
         /// </summary>
         public ObservableCollection<string> TrustedPublishers { get; set; }
+
+        /// <summary>
+        /// Signing certificate
+        /// </summary>
+        public X509Certificate2 SigningCertificate { get; set; }
+
+        /// <summary>
+        /// When using HMAC256 signing this represents the server's secret
+        /// </summary>
+        public String ServerSigningSecret { get; set; }
+
+        /// <summary>
+        /// Raw server key
+        /// </summary>
+        public byte[] ServerSigningKey { get; internal set; }
     }
 }

@@ -17,6 +17,7 @@
  * User: fyfej
  * Date: 2017-9-1
  */
+using MARC.Everest.DataTypes.Primitives;
 using MARC.HI.EHRS.SVC.Core;
 using SanteDB.Core.Services;
 using System;

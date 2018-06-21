@@ -1,0 +1,69 @@
+<Plugin xmlns="http://santedb.org/package">
+	<meta>
+		<group>Security</group>
+		<name>OAuth 2.0 Token Service</name>
+		<description>Represents a OAUTH 2.0 Token Service which uses the SanteDB authentication directory</description>
+		<author>Mohawk College of Applied Arts and Technology</author>
+		<version>1.1.0</version>
+		<default>true</true>
+	</meta>
+	<files>
+		<add>SanteDB.Authentication.OAuth2.dll</add>
+		<add>System.IdentityModel.Tokens.Jwt.dll</add>
+		<add>SwaggerWcf.dll</add>
+		<add>Newtonsoft.Json.dll</add>
+	</files>
+	<services>
+		<add>
+			<class>SanteDB.Authentication.OAuth2.OAuthMessageHandler, SanteDB.Authentication.OAuth2</class>
+			<configuration sectionName="santedb.authentication.oauth2" handler="SanteDB.Authentication.OAuth2.Configuration.ConfigurationSectionHandler, SanteDB.Authentication.OAuth2">
+				<group name="token" required="true" maxOccurs="1">
+					<label>OAuth2 Token Settings</label>
+					<setting name="expiry" type="time" required="true" minValue="0:0:0:30" maxValue="1:0:0:0">
+						<label>Validity Time</label>
+						<description>Sets the validity time of the OAuth2 Token</description>
+					</setting>
+					<setting name="issuer" type="url" required="true">
+						<label>Issuer</label>
+						<description>The URL to the issuer which this token is issued for</description>
+					</setting>
+				</group>
+				<group name="signature" required="true" maxOccurs="1">
+					<label>Token Signing</label>
+					<choice name="certificate">
+						<label>RSA256 Digital Certificate</label>
+						<setting name="." type="certificate" required="true">
+							<label>Certificate</label>
+							<description>The X.509 Certificate used to sign JWT tokens issued from this service</description>
+							<icon>certificate</icon>
+						</setting>
+					</choice>
+					<choice name="symmetricKey">
+						<label>HMAC256 Symmetric Key</label>
+						<setting name="secret" type="password" required="true">
+							<label>Secret Key</label>
+							<description>The symmetric key that will be used to sign the JWT tokens issued by this service</description>
+							<icon>asterisk</icon>
+						</setting>
+					</choice>
+				</group>
+				<group name="claims" required="true" maxOccurs="*">
+					<label>Allowed Client Claims</label>
+					<description>Identifies the type of client claims which are permitted to be used for this claim</description>
+					<setting name="claimType" type="list" required="true">
+						<label>Claim Type</label>
+						<description>The type of claim</description>
+						<list>
+							<add value="http://santedb.org/claims/device-id">Device Identifier</add>
+							<add value="urn:oasis:names:tc:xacml:2.0:resource:resource-id">Request Resource</add>
+							<add value="urn:oasis:names:tc:xacml:2.0:action:purpose">Purpose of Use</add>
+							<add value="urn:oasis:names:tc:xspa:1.0:subject:facility">Facility Id</add>
+							<add value="urn:oasis:names:tc:xspa:1.0:subject:organization-id">Organization ID</add>
+							<add value="urn:oasis:names:tc:xacml:1.0:subject:subject-id">Subject ID</add>
+						</list>
+					</setting>
+				</group>
+			</configuration>
+		</add>
+	</services>
+</Plugin>

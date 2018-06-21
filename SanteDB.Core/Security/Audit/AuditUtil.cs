@@ -435,7 +435,7 @@ namespace SanteDB.Core.Security.Audit
                 NetworkAccessPointId = Dns.GetHostName(),
                 UserName = principal?.Identity?.Name ?? identityName,
                 UserIsRequestor = true,
-                ActorRoleCode = principal == null ? new List<AuditCode>() : ApplicationContext.Current.GetService<IRoleProviderService>()?.GetAllRoles(principal.Identity.Name).Select(o =>
+                ActorRoleCode = principal == null || principal is ApplicationPrincipal  ? new List<AuditCode>() : ApplicationContext.Current.GetService<IRoleProviderService>()?.GetAllRoles(principal.Identity.Name).Select(o =>
                     new AuditCode(o, null)
                 ).ToList()
             });

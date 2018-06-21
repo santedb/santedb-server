@@ -47,11 +47,20 @@ namespace SanteDB.Authentication.OAuth2
         /// </summary>
         public const string GrantNameRefresh = "refresh_token";
 
+        /// <summary>
+        /// Grant name for client credentials
+        /// </summary>
+        public const string GrantNameClientCredentials = "client_credentials";
 
         /// <summary>
         /// JWT token type
         /// </summary>
         public const string JwtTokenType = "urn:ietf:params:oauth:token-type:jwt";
+
+        /// <summary>
+        /// Bearer token type
+        /// </summary>
+        public const string BearerTokenType = "bearer";
 
         /// <summary>
         /// Configuration section name

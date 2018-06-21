@@ -18,16 +18,22 @@
  * Date: 2017-9-1
  */
 using MARC.HI.EHRS.SVC.Core;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IdentityModel.Claims;
 using System.IdentityModel.Policy;
 using System.Linq;
 using System.Security.Principal;
+using System.ServiceModel;
+using System.ServiceModel.Channels;
+using System.ServiceModel.Web;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace SanteDB.Authentication.OAuth2.Wcf
 {
@@ -41,6 +47,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
 
         // Trace source
         private TraceSource m_traceSource = new TraceSource(OAuthConstants.TraceSourceName);
+        private NameValueCollection tokenRequest;
 
         /// <summary>
         /// Return ID
@@ -76,20 +83,28 @@ namespace SanteDB.Authentication.OAuth2.Wcf
 
                 object obj;
                 if (!evaluationContext.Properties.TryGetValue("Identities", out obj))
-                    throw new Exception("No Identity found");
-                IList<IIdentity> identities = obj as IList<IIdentity>;
-                if (identities == null || identities.Count <= 0)
-                    throw new Exception("No Identity found");
+                {
+                    evaluationContext.Properties["Principal"] = AuthenticationContext.AnonymousPrincipal;
 
-                // Add SID claim
-                var principal = new GenericPrincipal(identities[0], null);
-                var applicationProvider = ApplicationContext.Current.GetService<IApplicationIdentityProviderService>();
-                var applicationPrincipal = applicationProvider.GetIdentity(principal.Identity.Name);
-                principal.AddIdentity(applicationPrincipal as Core.Security.ApplicationIdentity);
-                evaluationContext.Properties["Principal"] = principal;
+                    return true;
+                }
+                else
+                {
+                    IList<IIdentity> identities = obj as IList<IIdentity>;
+                    if (identities == null || identities.Count <= 0)
+                        throw new Exception("No Identity found");
+
+                    // Add SID claim
+                    var principal = new GenericPrincipal(identities[0], null);
+                    var applicationProvider = ApplicationContext.Current.GetService<IApplicationIdentityProviderService>();
+                    var applicationPrincipal = applicationProvider.GetIdentity(principal.Identity.Name);
+                    principal.AddIdentity(applicationPrincipal as Core.Security.ApplicationIdentity);
+                    evaluationContext.Properties["Principal"] = principal;
+                }
                 return true;
+
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
                 throw;

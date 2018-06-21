@@ -118,6 +118,11 @@ namespace SanteDB.Core.Security.Claims
         public const string SanteDBPasswordlessAuth = "http://santedb.org/claims/auth-nopassword";
 
         /// <summary>
+        /// Session id claim
+        /// </summary>
+        public const string SanteDBSessionIdClaim = "http://santedb.org/claims/session-id";
+
+        /// <summary>
         /// Gets the specified claim type handler
         /// </summary>
         public static IClaimTypeHandler GetHandler(String claimType)

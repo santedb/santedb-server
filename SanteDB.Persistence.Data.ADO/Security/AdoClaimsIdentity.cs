@@ -56,7 +56,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
     /// <summary>
     /// Represents a user prinicpal based on a SecurityUser domain model 
     /// </summary>
-    public class AdoClaimsIdentity : IIdentity
+    public class AdoClaimsIdentity : IIdentity, ISession
     {
         // Trace source
         private static TraceSource s_traceSource = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
@@ -72,6 +72,8 @@ namespace SanteDB.Persistence.Data.ADO.Security
         private String m_authenticationType;
         // Issued on
         private DateTimeOffset m_issuedOn = DateTimeOffset.Now;
+        // Expiration time
+        private DateTimeOffset? m_expires = null;
         // Roles
         private List<DbSecurityRole> m_roles = null;
 
@@ -79,14 +81,29 @@ namespace SanteDB.Persistence.Data.ADO.Security
         private static AdoConfiguration s_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(AdoDataConstants.ConfigurationSectionName) as AdoConfiguration;
 
         /// <summary>
-        /// Gets the time of issuance
+        /// Gets the internal session id
         /// </summary>
-        public DateTimeOffset IssuedOn { get { return this.m_issuedOn; } }
+        internal byte[] SessionToken { get; set; }
+        
+        /// <summary>
+        /// Gets the identifier of the session
+        /// </summary>
+        byte[] ISession.Id { get { return this.SessionToken; } }
+
+        /// <summary>
+        /// Gets the 
+        /// </summary>
+        public byte[] RefreshToken { get; internal set; }
 
         /// <summary>
         /// Gets the time of issuance
         /// </summary>
-        public DateTimeOffset Expiry { get { return this.m_issuedOn.AddMinutes(30); } }
+        public DateTimeOffset NotBefore { get { return this.m_issuedOn; } }
+
+        /// <summary>
+        /// Gets the time of issuance
+        /// </summary>
+        public DateTimeOffset NotAfter { get { return this.m_expires ?? this.m_issuedOn.AddMinutes(30); } }
 
         /// <summary>
         /// Creates a principal based on username and password
@@ -167,106 +184,23 @@ namespace SanteDB.Persistence.Data.ADO.Security
                 throw new Exception("Creating identity failed", e);
             }
         }
-
-        /// <summary>
-        /// Creates a principal based on username and password
-        /// </summary>
-        internal static AdoClaimsIdentity Create(byte[] refreshToken)
-        {
-            try
-            {
-
-                Guid? userId = Guid.Empty;
-
-                using (var dataContext = s_configuration.Provider.GetWriteConnection())
-                {
-                    dataContext.Open();
-
-                    // Attempt to get a user
-                    var cvalue = BitConverter.ToString(refreshToken).Replace("-", "");
-                    DbUserClaim secretClaim = dataContext.FirstOrDefault<DbUserClaim>(o => o.ClaimType == AdoDataConstants.RefreshSecretClaimType && o.ClaimValue == cvalue);
-                    if (secretClaim == null) throw new SecurityException("Invalid refresh token");
-                    DbUserClaim expiryClaim = dataContext.FirstOrDefault<DbUserClaim>(o => o.ClaimType == AdoDataConstants.RefreshExpiryClaimType && o.SourceKey == secretClaim.SourceKey);
-
-                    if (expiryClaim == null || DateTimeOffset.Parse(expiryClaim.ClaimValue) < DateTimeOffset.Now)
-                        throw new SecurityException($"Token expired {expiryClaim?.ClaimValue}");
-
-                    // Grab the user and re-authenticate them
-                    var user = dataContext.SingleOrDefault<DbSecurityUser>(u => u.Key == secretClaim.SourceKey);
-                    var roles = dataContext.Query<DbSecurityRole>(dataContext.CreateSqlStatement<DbSecurityRole>().SelectFrom()
-                        .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
-                        .Where<DbSecurityUserRole>(o => o.UserKey == user.Key));
-
-                    if (user.ObsoletionTime.HasValue)
-                        throw new AuthenticationException("Security user is not active");
-                    var userIdentity = new AdoClaimsIdentity(user, roles, true) { m_authenticationType = "Refresh" };
-
-                    // Is user allowed to login?
-                    if (user.UserClass == UserClassKeys.HumanUser)
-                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.Login, new GenericPrincipal(userIdentity, null)).Demand();
-                    else if (user.UserClass == UserClassKeys.ApplicationUser)
-                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService, new GenericPrincipal(userIdentity, null)).Demand();
-
-                    return userIdentity;
-                }
-            }
-            catch (AuthenticationException)
-            {
-                // TODO: Audit this
-                throw;
-            }
-            catch (SecurityException)
-            {
-                // TODO: Audit this
-                throw;
-            }
-            catch (SqlException e)
-            {
-                switch (e.Number)
-                {
-                    case 51900:
-                        throw new AuthenticationException("Account is locked");
-                    case 51901:
-                        throw new AuthenticationException("Invalid username/password");
-                    case 51902:
-                        throw new AuthenticationException("User requires two-factor authentication");
-                    default:
-                        throw e;
-                }
-            }
-            catch (Exception e)
-            {
-                s_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
-                throw new Exception("Creating identity failed", e);
-            }
-        }
-
-        /// <summary>
-        /// Create a identity from certificate file
-        /// </summary>
-        internal static AdoClaimsIdentity Create(X509Certificate2 userCertificate)
-        {
-            throw new NotSupportedException();
-        }
-
-        /// <summary>
-        /// Create a identity from certificate + password = TFA (ex: Smart Card)
-        /// </summary>
-        internal static AdoClaimsIdentity Create(String userName, String password, X509Certificate2 userCertificate)
-        {
-            throw new NotSupportedException();
-        }
-
+        
         /// <summary>
         /// Create a claims identity from a data context user
         /// </summary>
-        internal static AdoClaimsIdentity Create(DbSecurityUser user, bool isAuthenticated = false, String authenticationMethod = null)
+        internal static AdoClaimsIdentity Create(DbSecurityUser user, bool isAuthenticated = false, String authenticationMethod = null, ISession session = null)
         {
 
             var roles = user.Context.Query<DbSecurityRole>(user.Context.CreateSqlStatement<DbSecurityRole>().SelectFrom()
                         .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
                         .Where<DbSecurityUserRole>(o => o.UserKey == user.Key));
-            return new AdoClaimsIdentity(user, roles, isAuthenticated) { m_authenticationType = authenticationMethod };
+
+            return new AdoClaimsIdentity(user, roles, isAuthenticated)
+            {
+                m_authenticationType = authenticationMethod,
+                m_issuedOn = session?.NotBefore ?? DateTimeOffset.Now,
+                m_expires = session?.NotAfter ?? DateTimeOffset.Now.AddMinutes(10)
+            };
 
 
         }
@@ -372,9 +306,9 @@ namespace SanteDB.Persistence.Data.ADO.Security
                 {
                     new Claim(ClaimTypes.Authentication, nameof(AdoClaimsIdentity)),
                     new Claim(ClaimTypes.AuthorizationDecision, this.m_isAuthenticated ? "GRANT" : "DENY"),
-                    new Claim(ClaimTypes.AuthenticationInstant, this.IssuedOn.ToString("o")), // TODO: Fix this
-                    new Claim(ClaimTypes.AuthenticationMethod, this.m_authenticationType),
-                    new Claim(ClaimTypes.Expiration, this.Expiry.ToString("o")), // TODO: Move this to configuration
+                    new Claim(ClaimTypes.AuthenticationInstant, this.NotBefore.ToString("o")), // TODO: Fix this
+                    new Claim(ClaimTypes.AuthenticationMethod, this.m_authenticationType ?? "LOCAL"),
+                    new Claim(ClaimTypes.Expiration, this.NotAfter.ToString("o")), // TODO: Move this to configuration
                     new Claim(ClaimTypes.Name, this.m_securityUser.UserName),
                     new Claim(ClaimTypes.Sid, this.m_securityUser.Key.ToString()),
                     new Claim(ClaimTypes.NameIdentifier, this.m_securityUser.Key.ToString()),

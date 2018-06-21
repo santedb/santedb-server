@@ -92,7 +92,7 @@ namespace SanteDB.Messaging.RISI
 				var caps = ServiceEndpointCapabilities.None;
 				if (this.webHost.Description.Behaviors.OfType<ServiceCredentials>().Any(o => o.UserNameAuthentication?.CustomUserNamePasswordValidator != null))
 					caps |= ServiceEndpointCapabilities.BasicAuth;
-				if (this.webHost.Description.Behaviors.OfType<ServiceAuthorizationBehavior>().Any(o => o.ServiceAuthorizationManager is JwtTokenServiceAuthorizationManager))
+				if (this.webHost.Description.Behaviors.OfType<ServiceAuthorizationBehavior>().Any(o => o.ServiceAuthorizationManager is TokenServiceAuthorizationManager))
 					caps |= ServiceEndpointCapabilities.BearerAuth;
 
 				return caps;

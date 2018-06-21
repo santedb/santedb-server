@@ -47,13 +47,14 @@ using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Services.Persistence;
+using SanteDB.Core.Diagnostics;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
     /// <summary>
     /// Identity provider service
     /// </summary>
-    public sealed class AdoIdentityProvider : IIdentityRefreshProviderService
+    public sealed class AdoIdentityProvider : ISessionIdentityProviderService
     {
 
         // Sync lock
@@ -88,6 +89,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             try
             {
                 var principal = AdoClaimsIdentity.Create(userName, password).CreateClaimsPrincipal();
+
                 this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, principal, true));
                 return principal;
             }
@@ -506,66 +508,39 @@ namespace SanteDB.Persistence.Data.ADO.Services
         }
 
         /// <summary>
-        /// Create and register a refresh token for the specified principal
+        /// Authenticate this user based on the session
         /// </summary>
-        public byte[] CreateRefreshToken(IPrincipal principal, DateTimeOffset expiry)
+        /// <param name="session">The session for which authentication is being saught</param>
+        /// <returns>The authenticated principal</returns>
+        public IPrincipal Authenticate(ISession session)
         {
-            if (principal == null)
-                throw new ArgumentNullException(nameof(principal));
-            else if (!principal.Identity.IsAuthenticated)
-                throw new SecurityException("Can only generate refresh tokens for authenticated principals");
-
-            var sid = (principal as ClaimsPrincipal).FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (sid == null)
-                throw new InvalidOperationException("Cannot generate refresh claim for this principal");
-
-            byte[] secret = new byte[32];
-
-            // First we shall set the refresh claim
-            byte[] refreshSecret = Guid.NewGuid().ToByteArray(),
-                userSid = Guid.Parse(sid).ToByteArray();
-
-            // Now interlace them
-            for (var i = 0; i < refreshSecret.Length; i++)
-            {
-                secret[i * 2] = refreshSecret[i];
-                secret[(i * 2) + 1] = userSid[i];
-            }
-            this.AddClaim(principal.Identity.Name, new Claim(AdoDataConstants.RefreshSecretClaimType, BitConverter.ToString(secret).Replace("-", "")));
-            this.AddClaim(principal.Identity.Name, new Claim(AdoDataConstants.RefreshExpiryClaimType, expiry.ToString("o")));
-            return secret;
-        }
-
-        /// <summary>
-        /// Authenticate using a refresh token
-        /// </summary>
-        public IPrincipal Authenticate(byte[] refreshToken)
-        {
-            if (refreshToken == null)
-                throw new ArgumentNullException(nameof(refreshToken));
-            else if (refreshToken.Length != 32)
-                throw new ArgumentOutOfRangeException(nameof(refreshToken), "Invalid refresh token");
-
-
-            string trokenName = BitConverter.ToString(refreshToken).Replace("-", "");
-            var evt = new AuthenticatingEventArgs(trokenName);
-            this.Authenticating?.Invoke(this, evt);
-            if (evt.Cancel)
-                throw new SecurityException("Authentication cancelled");
-
             try
             {
-                var principal = AdoClaimsIdentity.Create(refreshToken).CreateClaimsPrincipal();
-                this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(trokenName, principal, true));
-                return principal;
-            }
-            catch (SecurityException e)
-            {
-                this.m_traceSource.TraceEvent(TraceEventType.Verbose, e.HResult, "Invalid credentials : {0}", refreshToken);
+                using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+                {
+                    context.Open();
+                    var sessionId = new Guid(session.Id.Take(16).ToArray());
 
+                    var sql = context.CreateSqlStatement<DbSession>().SelectFrom()
+                        .InnerJoin<DbSecurityApplication>(o => o.ApplicationKey, o => o.Key)
+                        .Join<DbSession, DbSecurityUser>("LEFT", o => o.UserKey, o => o.Key)
+                        .Where<DbSession>(s => s.Key == sessionId && s.NotAfter > DateTimeOffset.Now);
+
+                    var auth = context.FirstOrDefault<CompositeResult<DbSession, DbSecurityApplication, DbSecurityUser>>(sql);
+
+                    var principal = auth.Object1.UserKey == Guid.Empty ?
+                        new ApplicationPrincipal(new SanteDB.Core.Security.ApplicationIdentity(auth.Object2.Key, auth.Object2.PublicId, true))
+                        : AdoClaimsIdentity.Create(auth.Object3, true).CreateClaimsPrincipal();
+
+                    // TODO: Load additional claims made about the user on the session
+                    return principal;
+                }
+            }
+            catch (Exception e)
+            {
+                this.m_traceSource.TraceEvent(TraceEventType.Verbose, e.HResult, "Invalid session auth: {0}", e.Message);
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
-                this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(trokenName, null, false));
+                this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(null, null, false));
                 throw;
             }
         }

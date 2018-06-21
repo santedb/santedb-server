@@ -1,0 +1,47 @@
+<Plugin xmlns="http://santedb.org/package">
+	<meta>
+		<group>Performance</group>
+		<name>REDIS Memory Cache</name>
+		<description>Provides shared memory caching using a REDIS server</description>
+		<author>Mohawk College of Applied Arts and Technology</author>
+		<version>1.1.0</version>
+		<default>false</true>
+	</meta>
+	<files>
+		<add>SanteDB.Caching.Redis.dll</add>
+		<add>StackExchange.Redis.dll</add>
+	</files>
+	<services>
+		<add>
+			<class>SanteDB.Caching.Redis.RedisCacheService, SanteDB.Caching.Redis</class>
+			<provides>IDataCachingService</provides>
+			<configuration sectionName="santedb.caching.redis" handler="SanteDB.Caching.Redis.Configuration.RedisConfigurationHandler, SanteDB.Caching.Redis">
+				<group name="server" maxOccurs="*"  required="true">
+					<label>REDIS Server</label>
+					<setting name="host" type="text" default="localhost" required="true">
+						<label>Server Address</label>
+						<description>The location where the REDIS server is running</description>
+					</setting>
+					<setting name="port" type="integer" minValue="10" maxValue="65536" default="6739" required="true">
+						<label>Server Port</label>
+						<description>The port on which the server is listening</description>
+					</setting>
+				</group>
+				<group name="authentication" maxOccurs="1" required="true">
+					<label>Authentication</label>
+					<setting name="username" type="text" required="true">
+						<label>Username</label>
+						<description>The name of the user to connect to the REDIS server</description>
+						<icon>user</icon>
+					</setting>
+					<setting name="password" type="password" required="true">
+						<label>Password</label>
+						<description>The password to connect to the REDIS server</description>
+						<icon>asterisk</icon>
+					</setting>
+				</group>
+			</configuration>
+		</add>
+	</services>
+
+</Plugin>

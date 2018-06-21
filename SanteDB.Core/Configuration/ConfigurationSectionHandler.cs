@@ -53,6 +53,12 @@ namespace SanteDB.Core.Configuration
     ///             </issuers>
     ///         </token>
     ///     </security>
+    ///     <signing>
+    ///         <!-- If using X509 RSA certificates -->
+    ///         <certificate storeLocation="" storeName="" x509FindType="" findValue=""/>
+    ///         <!-- If using symmetric key -->
+    ///         <symmetric secret=""/>
+    ///     </signing>
     /// </SanteDB.core>
     /// ]]>
     /// </remarks>
@@ -69,6 +75,7 @@ namespace SanteDB.Core.Configuration
             XmlElement securityNode = section.SelectSingleNode("./security") as XmlElement,
                 threadingNode = section.SelectSingleNode("./threading") as XmlElement;
 
+
             retVal.ThreadPoolSize = Int32.Parse(threadingNode?.Attributes["poolSize"].Value ?? Environment.ProcessorCount.ToString());
             // Security?
             if (securityNode != null)
@@ -77,10 +84,31 @@ namespace SanteDB.Core.Configuration
 
                 XmlElement basicSecurityNode = securityNode.SelectSingleNode("./basic") as XmlElement,
                     tokenSecurityNode = securityNode.SelectSingleNode("./token") as XmlElement,
-                    appletSecurityNode = securityNode.SelectSingleNode("./applet") as XmlElement;
+                    appletSecurityNode = securityNode.SelectSingleNode("./applet") as XmlElement,
+                    x509Signature = securityNode.SelectSingleNode("./signing/certificate") as XmlElement,
+                    symmSignature = securityNode.SelectSingleNode("./signing/symmetric") as XmlElement;
+
 
                 retVal.Security.AllowUnsignedApplets = Boolean.Parse(appletSecurityNode?.Attributes["allowUnsignedApplets"]?.Value ?? "false");
                 retVal.Security.TrustedPublishers = new System.Collections.ObjectModel.ObservableCollection<string>(appletSecurityNode?.SelectNodes("./trustedPublishers/add")?.OfType<XmlElement>().Select(o => o.InnerText).ToArray());
+
+                if (x509Signature != null)
+                {
+                    retVal.Security.SigningCertificate = SecurityUtils.FindCertificate(x509Signature.Attributes["storeLocation"]?.Value,
+                        x509Signature.Attributes["storeName"]?.Value,
+                        x509Signature.Attributes["x509FindType"]?.Value,
+                        x509Signature.Attributes["findValue"]?.Value);
+                }
+                else if (symmSignature != null)
+                {
+                    retVal.Security.ServerSigningSecret = symmSignature.Attributes["secret"]?.Value;
+                    if (symmSignature.Attributes["key"] != null)
+                        retVal.Security.ServerSigningKey = Convert.FromBase64String(symmSignature.Attributes["key"].Value);
+
+                }
+                else
+                    throw new ConfigurationErrorsException("One of certificate or symmetric key must be selected", null, section);
+
 
                 if (tokenSecurityNode != null)
                 {

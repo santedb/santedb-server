@@ -17,6 +17,7 @@
  * User: fyfej
  * Date: 2017-9-1
  */
+using MARC.Everest.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,7 +50,7 @@ namespace SanteDB.Core.Security
                 // Now find the certificate
                 var matches = store.Certificates.Find((X509FindType)Enum.Parse(typeof(X509FindType), x509FindType ?? "FindByThumbprint"), findValue, false);
                 if (matches.Count > 1)
-                    throw new InvalidOperationException("More than one candidate certificate found");
+                    throw new DuplicateItemException("More than one candidate certificate found");
                 else if (matches.Count == 0)
                     throw new KeyNotFoundException("No matching certificates found");
                 else

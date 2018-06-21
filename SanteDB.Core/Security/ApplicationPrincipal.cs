@@ -17,6 +17,7 @@
  * User: fyfej
  * Date: 2017-9-1
  */
+using SanteDB.Core.Security.Claims;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,6 +46,7 @@ namespace SanteDB.Core.Security
             this.m_name = name.ToString();
             this.m_isAuthenticated = isAuthenticated;
             this.AddClaim(new Claim(ClaimTypes.Sid, sid.ToString()));
+            this.AddClaim(new Claim(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim, sid.ToString()));
         }
 
         /// <summary>

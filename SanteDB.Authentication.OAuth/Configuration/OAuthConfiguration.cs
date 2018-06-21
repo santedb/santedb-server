@@ -43,11 +43,6 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         }
 
         /// <summary>
-        /// Signing certificate
-        /// </summary>
-        public X509Certificate2 Certificate { get; set; }
-
-        /// <summary>
         /// Gets or sets the expiry time
         /// </summary>
         public TimeSpan ValidityTime { get; set; }
@@ -61,10 +56,7 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         /// Issuer name
         /// </summary>
         public String IssuerName { get; set; }
-        /// <summary>
-        /// When using HMAC256 signing this represents the server's secret
-        /// </summary>
-        public String ServerSecret { get; set; }
+
 
         /// <summary>
         /// The scopes that are permitted for granting on this endpoint
@@ -72,19 +64,9 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         public List<String> AllowedScopes { get; set; }
 
         /// <summary>
-        /// Raw server key
+        /// Gets or sets the token type to use
         /// </summary>
-        public byte[] ServerKey { get; internal set; }
+        public string TokenType { get; internal set; }
 
-        /// <summary>
-        /// Validate
-        /// </summary>
-        internal void Validate()
-        {
-            if (String.IsNullOrEmpty(this.ServerSecret) && this.ServerKey == null &&
-                this.Certificate == null)
-                throw new ConfigurationErrorsException("Configuration must use symmetric key or certificate");
-
-        }
     }
 }
