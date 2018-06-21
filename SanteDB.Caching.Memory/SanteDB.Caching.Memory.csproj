@@ -35,15 +35,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Solution Items\MARC.Everest.dll</HintPath>
     </Reference>
-    <Reference Include="MARC.HI.EHRS.SVC.Configuration, Version=2.0.0.26281, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MARC.HI.EHRS.SVC.Configuration.2.0.0\lib\net45\MARC.HI.EHRS.SVC.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="MARC.HI.EHRS.SVC.Core, Version=2.0.0.26010, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MARC.HI.EHRS.SVC.Core.2.0.0.1\lib\net45\MARC.HI.EHRS.SVC.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="MARC.HI.EHRS.SVC.Core.Timer, Version=2.0.0.26710, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MARC.HI.EHRS.SVC.Core.Timer.2.0.0\lib\net45\MARC.HI.EHRS.SVC.Core.Timer.dll</HintPath>
-    </Reference>
+    <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0"/>
+    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.0"/>
+    <PackageReference Include="MARC.HI.EHRS.SVC.Core.Timer" Version="2.0.0"/>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

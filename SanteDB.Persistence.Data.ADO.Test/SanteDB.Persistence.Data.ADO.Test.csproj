@@ -36,22 +36,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FirebirdSql.Data.FirebirdClient, Version=5.12.1.0, Culture=neutral, PublicKeyToken=3750abcc3150b00c, processorArchitecture=MSIL">
-      <HintPath>..\packages\FirebirdSql.Data.FirebirdClient.5.12.1\lib\net452\FirebirdSql.Data.FirebirdClient.dll</HintPath>
-    </Reference>
-    <Reference Include="MARC.HI.EHRS.SVC.Configuration, Version=2.0.0.26281, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MARC.HI.EHRS.SVC.Configuration.2.0.0\lib\net45\MARC.HI.EHRS.SVC.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="MARC.HI.EHRS.SVC.Core, Version=2.0.0.26010, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MARC.HI.EHRS.SVC.Core.2.0.0.1\lib\net45\MARC.HI.EHRS.SVC.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Npgsql, Version=3.2.7.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
-      <HintPath>..\packages\Npgsql.3.2.7\lib\net451\Npgsql.dll</HintPath>
-    </Reference>
+
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.12.1"/>
+    <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0"/>
+    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.0"/>
+    <PackageReference Include="Npgsql" Version="3.2.7"/>
     <Reference Include="System" />
-    <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.3.0\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
-    </Reference>
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.1.0"/>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">

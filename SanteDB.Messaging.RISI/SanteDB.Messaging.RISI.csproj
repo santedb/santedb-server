@@ -32,18 +32,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MARC.HI.EHRS.SVC.Configuration, Version=2.0.0.26281, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MARC.HI.EHRS.SVC.Configuration.2.0.0\lib\net45\MARC.HI.EHRS.SVC.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="MARC.HI.EHRS.SVC.Core, Version=2.0.0.26010, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MARC.HI.EHRS.SVC.Core.2.0.0.1\lib\net45\MARC.HI.EHRS.SVC.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="SwaggerWcf, Version=0.2.9.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SwaggerWcf.MEDIC.0.2.9\lib\net45\SwaggerWcf.dll</HintPath>
-    </Reference>
+
+    <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0"/>
+    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.0"/>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2"/>
+    <PackageReference Include="SwaggerWcf.MEDIC" Version="0.2.9"/>
+    
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />

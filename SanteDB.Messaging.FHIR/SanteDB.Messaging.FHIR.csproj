@@ -31,30 +31,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Hl7.Fhir.STU3.Core, Version=0.93.4.0, Culture=neutral, PublicKeyToken=d706911480550fc3, processorArchitecture=MSIL">
-      <HintPath>..\packages\MARC.HI.EHRS.SVC.Messaging.FHIR.2.0.0\lib\net45\Hl7.Fhir.STU3.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="MARC.Everest, Version=1.5.0.0, Culture=neutral, PublicKeyToken=ba5b2480018546af, processorArchitecture=MSIL">
-      <HintPath>..\packages\MARC.HI.EHRS.SVC.Messaging.FHIR.2.0.0\lib\net45\MARC.Everest.dll</HintPath>
-    </Reference>
-    <Reference Include="MARC.HI.EHRS.SVC.Auditing.Core, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MARC.HI.EHRS.SVC.Auditing.Core.2.0.0\lib\portable45-net45+win8\MARC.HI.EHRS.SVC.Auditing.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="MARC.HI.EHRS.SVC.Configuration, Version=2.0.0.25526, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MARC.HI.EHRS.SVC.Core.2.0.0\lib\net45\MARC.HI.EHRS.SVC.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="MARC.HI.EHRS.SVC.Core, Version=2.0.0.25526, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MARC.HI.EHRS.SVC.Core.2.0.0\lib\net45\MARC.HI.EHRS.SVC.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="MARC.HI.EHRS.SVC.Messaging.FHIR, Version=2.0.0.29017, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MARC.HI.EHRS.SVC.Messaging.FHIR.2.0.0\lib\net45\MARC.HI.EHRS.SVC.Messaging.FHIR.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="SwaggerWcf, Version=0.2.9.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SwaggerWcf.MEDIC.0.2.9\lib\net45\SwaggerWcf.dll</HintPath>
-    </Reference>
+    <PackageReference Include="MARC.HI.EHRS.SVC.Auditing.Core" Version="2.0.0"/>
+    <PackageReference Include="MARC.HI.EHRS.SVC.Messaging.FHIR" Version="2.0.0"/>
+    <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0"/>
+    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.0"/>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2"/>
+    <PackageReference Include="SwaggerWcf.MEDIC" Version="0.2.9"/>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
