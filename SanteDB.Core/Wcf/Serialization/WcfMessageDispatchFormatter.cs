@@ -76,9 +76,13 @@ namespace SanteDB.Core.Wcf.Serialization
             m_defaultViewModel = ViewModelDescription.Load(typeof(RawBodyWriter).Assembly.GetManifestResourceStream("SanteDB.Core.Resources.ViewModel.xml"));
 
             foreach (var s in s_knownTypes)
-                s_serializers.Add(s, new XmlSerializer(s,  s.GetCustomAttributes<XmlIncludeAttribute>().Select(o => o.Type).ToArray()));
+                if(!s_serializers.ContainsKey(s))
+                    s_serializers.Add(s, new XmlSerializer(s,  s.GetCustomAttributes<XmlIncludeAttribute>().Select(o => o.Type).ToArray()));
         }
 
+        /// <summary>
+        /// Default CTOR for dispatcher
+        /// </summary>
         public WcfMessageDispatchFormatter()
         {
 

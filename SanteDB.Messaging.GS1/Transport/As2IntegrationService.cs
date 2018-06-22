@@ -48,7 +48,7 @@ namespace SanteDB.Messaging.GS1.Transport.AS2
         private TraceSource m_tracer = new TraceSource("SanteDB.Messaging.GS1");
 
         // Configuration
-        private Gs1ConfigurationSection m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("SanteDB.messaging.gs1") as Gs1ConfigurationSection;
+        private Gs1ConfigurationSection m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.messaging.gs1") as Gs1ConfigurationSection;
 
 
         /// <summary>

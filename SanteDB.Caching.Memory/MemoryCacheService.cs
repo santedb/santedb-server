@@ -55,7 +55,7 @@ namespace SanteDB.Caching.Memory
         private EventHandler<ModelMapEventArgs> m_mappedHandler = null;
 
         // Memory cache configuration
-        private MemoryCacheConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("SanteDB.caching.memory") as MemoryCacheConfiguration;
+        private MemoryCacheConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.caching.memory") as MemoryCacheConfiguration;
         private TraceSource m_tracer = new TraceSource("SanteDB.Caching.Memory");
 	    private static object s_lock = new object();
 

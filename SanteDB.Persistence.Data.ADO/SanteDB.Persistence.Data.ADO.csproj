@@ -31,6 +31,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient">
+      <Version>5.12.1</Version>
+    </PackageReference>
+    <PackageReference Include="Npgsql">
+      <Version>3.2.7</Version>
+    </PackageReference>
     <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0" />
     <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt">
@@ -255,7 +261,7 @@
     <EmbeddedResource Include="Data\SQL\FBSQL\santedb-fn.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <Content Include="Data\SQL\PSQL\SanteDB-vws.sql" />
+    <Content Include="Data\SQL\FBSQL\santedb-init.sql" />
     <Content Include="Data\SQL\Updates\20180126-PSQL.sql" />
     <Content Include="Data\SQL\Updates\20180211-PSQL.sql" />
     <Content Include="Data\SQL\Updates\20180131-PSQL.sql" />

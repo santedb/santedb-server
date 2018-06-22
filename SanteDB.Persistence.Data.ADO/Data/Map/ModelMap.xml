@@ -21,7 +21,7 @@
 <modelMap xmlns="http://santedb.org/model/map">
   
   <!-- Alerts -->
-  <class modelClass="SanteDB.Alerting.Alerting.AlertMessage, SanteDB.Alerting, Version=0.6.0.0"
+  <class modelClass="SanteDB.Core.Alerting.AlertMessage, SanteDB.Core.Api, Version=0.6.0.0"
   domainClass="SanteDB.Persistence.Data.ADO.Data.Model.Alerts.DbAlertMessage, SanteDB.Persistence.Data.ADO, Version=0.6.0.0">
     <property modelName="Key" domainName="Key"/>
     <property modelName="CreationTime" domainName="CreationTime" />

@@ -58,32 +58,32 @@ namespace SanteDB.Core.Security.Claims
         /// <summary>
         /// Granted policy claim
         /// </summary>
-        public const string SanteDBGrantedPolicyClaim = "http://santedb.org/claims/grant";
+        public const string SanteDBGrantedPolicyClaim = "grant";
 
         /// <summary>
         /// Device identifier claim
         /// </summary>
-        public const string SanteDBDeviceIdentifierClaim = "http://santedb.org/claims/device-id";
+        public const string SanteDBDeviceIdentifierClaim = "devid";
 
         /// <summary>
         /// Identifier of the application
         /// </summary>
-        public const string SanteDBApplicationIdentifierClaim = "http://santedb.org/claims/application-id";
+        public const string SanteDBApplicationIdentifierClaim = "appid";
 
         /// <summary>
         /// Secret claim
         /// </summary>
-        public const string SanteDBTfaSecretClaim = "http://santedb.org/claims/tfa-secret";
+        public const string SanteDBTfaSecretClaim = "tfa";
 
         /// <summary>
         /// TFA secret expiry
         /// </summary>
-        public const string SanteDBTfaSecretExpiry = "http://santedb.org/claims/tfa-secret-expiry";
+        public const string SanteDBTfaSecretExpiry = "tfa-exp";
 
         /// <summary>
         /// TFA secret expiry
         /// </summary>
-        public const string SanteDBScopeClaim = "http://santedb.org/claims/scope";
+        public const string SanteDBScopeClaim = "scope";
 
 
         /// <summary>

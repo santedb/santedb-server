@@ -61,15 +61,20 @@ namespace SanteDB.Persistence.Data.ADO.Data.SQL
                 "SanteDB-ddl.sql",
                 "SanteDB-fn.sql"
             };
+            StringBuilder sql = new StringBuilder();
 
             // Build sql
             switch (invariantName.ToLower())
             {
                 case "npgsql":
-                    StringBuilder sql = new StringBuilder();
 
                     foreach (var itm in resource)
                         using (var streamReader = new StreamReader(typeof(AdoCoreDataFeature).Assembly.GetManifestResourceStream($"SanteDB.Persistence.Data.ADO.Data.SQL.PSQL.{itm}")))
+                            sql.Append(streamReader.ReadToEnd());
+                    return sql.ToString();
+                case "fbsql":
+                    foreach (var itm in resource)
+                        using (var streamReader = new StreamReader(typeof(AdoCoreDataFeature).Assembly.GetManifestResourceStream($"SanteDB.Persistence.Data.ADO.Data.SQL.FBSQL.{itm}")))
                             sql.Append(streamReader.ReadToEnd());
                     return sql.ToString();
                 default:

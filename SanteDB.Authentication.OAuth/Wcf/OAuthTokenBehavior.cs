@@ -281,9 +281,17 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                 else
                     claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyDecisionOutcomeType.Grant).Select(o => new Claim(SanteDBClaimTypes.SanteDBGrantedPolicyClaim, o.Policy.Oid)));
 
-                // Is the user elevated? If so, add claims for those policies
+                // Is the user elevated? If so, add claims for those policies in scope
                 if (claims.Exists(o => o.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim))
                     claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyDecisionOutcomeType.Elevate).Select(o => new Claim(SanteDBClaimTypes.SanteDBGrantedPolicyClaim, o.Policy.Oid)));
+
+                // Now restrict down to claimed scope
+                if (scope != "*")
+                {
+                    var scopes = scope.Split(';');
+                    claims.RemoveAll(o => o.Type == SanteDBClaimTypes.SanteDBGrantedPolicyClaim && !scopes.Contains(o.Value));
+                }
+                claims.Add(new Claim(SanteDBClaimTypes.SanteDBScopeClaim, String.Join(";", claims.Where(o => o.Type == SanteDBClaimTypes.SanteDBGrantedPolicyClaim).Select(o => o.Value).ToArray())));
 
                 // Add Email address from idp
                 claims.AddRange((oizPrincipal as ClaimsPrincipal).Claims.Where(o => o.Type == ClaimTypes.Email));
@@ -325,7 +333,8 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                 audience: aud,
                 notBefore: issued,
                 expires: expires,
-                claims: claims
+                claims: claims,
+                issuer: this.m_configuration.IssuerName
             );
 
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
