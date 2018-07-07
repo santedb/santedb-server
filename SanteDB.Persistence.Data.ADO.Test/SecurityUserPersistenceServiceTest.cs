@@ -41,7 +41,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             {
                 Email = "admin@test.com",
                 EmailConfirmed = true,
-                PasswordHash = "test_user_hash_store",
+                Password = "test_user_hash_store",
                 SecurityHash = "test_security_hash",
                 UserName = "admin",
                 UserClass = UserClassKeys.HumanUser
@@ -64,7 +64,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             {
                 Email = "update@test.com",
                 EmailConfirmed = false,
-                PasswordHash = hashingService.EncodePassword("password"),
+                Password = hashingService.EncodePassword("password"),
                 SecurityHash = "cert",
                 UserName = "updateTest",
                 UserClass = UserClassKeys.HumanUser
@@ -96,7 +96,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             {
                 Email = "query@test.com",
                 EmailConfirmed = false,
-                PasswordHash = hashingService.EncodePassword("password"),
+                Password = hashingService.EncodePassword("password"),
                 SecurityHash = securityHash,
                 UserName = "queryTest",
                 UserClass = UserClassKeys.HumanUser
@@ -122,7 +122,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             {
                 Email = "query@test.com",
                 EmailConfirmed = false,
-                PasswordHash = hashingService.EncodePassword("password"),
+                Password = hashingService.EncodePassword("password"),
                 SecurityHash = securityHash,
                 UserName = "delayLoadTest",
                 UserClass = UserClassKeys.HumanUser

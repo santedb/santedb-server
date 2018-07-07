@@ -86,7 +86,7 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
         /// <summary>
         /// Get not supported
         /// </summary>
-        public Object Get(Guid id, Guid versionId)
+        public Object Get(object id, object versionId)
         {
             throw new NotImplementedException();
         }
@@ -94,7 +94,7 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
         /// <summary>
         /// Obsolete not supported
         /// </summary>
-        public Object Obsolete(Guid  key)
+        public Object Obsolete(object  key)
         {
             throw new NotImplementedException();
         }

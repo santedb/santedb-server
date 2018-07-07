@@ -55,7 +55,7 @@ namespace SanteDB.Messaging.AMI.Wcf.Behavior
 		/// <param name="dispatchOperation">The dispatch description.</param>
 		public void ApplyDispatchBehavior(OperationDescription operationDescription, DispatchOperation dispatchOperation)
 		{
-			dispatchOperation.Formatter = new WcfMessageDispatchFormatter<IAmiContract>(operationDescription);
+			dispatchOperation.Formatter = new WcfMessageDispatchFormatter<IAmiServiceContract>(operationDescription);
 		}
 
 		/// <summary>

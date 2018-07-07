@@ -1864,11 +1864,11 @@ namespace SanteDB.Core.Model.Json.Formatter {
                     context.JsonContext.WritePropertyUtil(w, "lockout", _strong.LockoutXml, context);
                 }
             }
-            if (context.ShouldSerialize("passwordHash")) {
-                if ((_strong.PasswordHash == null)) {
+            if (context.ShouldSerialize("password")) {
+                if ((_strong.Password == null)) {
                 }
                 else {
-                    context.JsonContext.WritePropertyUtil(w, "passwordHash", _strong.PasswordHash, context);
+                    context.JsonContext.WritePropertyUtil(w, "password", _strong.Password, context);
                 }
             }
             if (context.ShouldSerialize("securityStamp")) {
@@ -2159,11 +2159,11 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                                                                 }
                                                                                             }
                                                                                             else {
-                                                                                                if ("passwordHash".Equals(r.Value)) {
+                                                                                                if ("password".Equals(r.Value)) {
                                                                                                     r.Read();
                                                                                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(string), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("passwordHash", context.JsonContext, _retVal, context));
                                                                                                     if ((_instance != null)) {
-                                                                                                        _retVal.PasswordHash = ((string)(_instance));
+                                                                                                        _retVal.Password = ((string)(_instance));
                                                                                                     }
                                                                                                 }
                                                                                                 else {

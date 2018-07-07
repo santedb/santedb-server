@@ -54,18 +54,18 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
         /// Gets the specified user 
         /// </summary>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
-        public override Object Get(Guid id, Guid versionId)
+        public override Object Get(object id, object versionId)
         {
-            return base.Get(id, versionId);
+            return base.Get((Guid)id, (Guid)versionId);
         }
 
         /// <summary>
         /// Obsolete
         /// </summary>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedMetadata)]
-        public override Object Obsolete(Guid key)
+        public override Object Obsolete(object key)
         {
-            return base.Obsolete(key);
+            return base.Obsolete((Guid)key);
         }
 
         /// <summary>

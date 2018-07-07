@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using SanteDB.Core.Model;
+using SanteDB.Core.Security.Attribute;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -39,7 +40,8 @@ namespace SanteDB.Core.Services.Impl
 		/// </summary>
 		/// <param name="query">The query to use to find the assigning authorities.</param>
 		/// <returns>Returns a list of assigning authorities.</returns>
-		public IEnumerable<AssigningAuthority> Find(Expression<Func<AssigningAuthority, bool>> query)
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
+        public IEnumerable<AssigningAuthority> Find(Expression<Func<AssigningAuthority, bool>> query)
 		{
 			int totalCount = 0;
 			return this.Find(query, 0, null, out totalCount);
@@ -53,7 +55,8 @@ namespace SanteDB.Core.Services.Impl
 		/// <param name="count">The count of the query.</param>
 		/// <param name="totalCount">The total count of the query.</param>
 		/// <returns>Returns a list of assigning authorities.</returns>
-		public IEnumerable<AssigningAuthority> Find(Expression<Func<AssigningAuthority, bool>> query, int offSet, int? count, out int totalCount)
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
+        public IEnumerable<AssigningAuthority> Find(Expression<Func<AssigningAuthority, bool>> query, int offSet, int? count, out int totalCount)
 		{
             return this.Find<AssigningAuthority>(query, offSet, count, out totalCount, Guid.Empty);
 		}
@@ -61,6 +64,7 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Find specified assigning authority
         /// </summary>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         public IEnumerable<TEntity> Find<TEntity>(Expression<Func<TEntity, bool>> query, int offset, int? count, out int totalResults, Guid queryId) where TEntity : IdentifiedData
         {
             var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TEntity>>();
@@ -81,6 +85,7 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         /// <param name="key">The key of the assigning authority to be retrieved.</param>
         /// <returns>Returns an assigning authority.</returns>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         public AssigningAuthority Get(Guid key)
 		{
 			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>();
@@ -98,7 +103,8 @@ namespace SanteDB.Core.Services.Impl
 		/// </summary>
 		/// <param name="assigningAuthority">The assigning authority to be inserted.</param>
 		/// <returns>Returns the inserted assigning authority.</returns>
-		public AssigningAuthority Insert(AssigningAuthority assigningAuthority)
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedMetadata)]
+        public AssigningAuthority Insert(AssigningAuthority assigningAuthority)
 		{
 			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>();
 
@@ -115,7 +121,8 @@ namespace SanteDB.Core.Services.Impl
 		/// </summary>
 		/// <param name="key">The key of the assigning authority to be obsoleted.</param>
 		/// <returns>Returns the obsoleted assigning authority.</returns>
-		public AssigningAuthority Obsolete(Guid key)
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedMetadata)]
+        public AssigningAuthority Obsolete(Guid key)
 		{
 			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>();
 
@@ -132,6 +139,7 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         /// <param name="assigningAuthority">The assigning authority to be saved.</param>
         /// <returns>Returns the saved assigning authority.</returns>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedMetadata)]
         public AssigningAuthority Save(AssigningAuthority assigningAuthority)
 		{
 			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>();

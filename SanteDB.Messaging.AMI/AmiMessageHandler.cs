@@ -139,7 +139,7 @@ namespace SanteDB.Messaging.AMI
             {
 				this.Starting?.Invoke(this, EventArgs.Empty);
 
-				this.m_webHost = new WebServiceHost(typeof(AmiBehavior));
+				this.m_webHost = new WebServiceHost(typeof(AmiServiceBehavior));
 
 				foreach (ServiceEndpoint endpoint in this.m_webHost.Description.Endpoints)
 				{

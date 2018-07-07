@@ -68,7 +68,7 @@ namespace SanteDB.Messaging.HDSI.Test
 		[TestMethod]
 		public void TestBuildSimpleAndLinqMethod()
 		{
-			Expression<Func<SecurityUser, bool>> expected = (o => o.UserName == "Charles" && o.PasswordHash == "20329132");
+			Expression<Func<SecurityUser, bool>> expected = (o => o.UserName == "Charles" && o.Password == "20329132");
 
 			NameValueCollection httpQueryParameters = new NameValueCollection();
 			httpQueryParameters.Add("userName", "Charles");
@@ -84,7 +84,7 @@ namespace SanteDB.Messaging.HDSI.Test
 		public void TestBuildSimpleAndOrLinqMethod()
 		{
 			var dtString = DateTime.Now;
-			Expression<Func<SecurityUser, bool>> expected = (o => (o.UserName == "Charles" || o.UserName == "Charles2") && o.PasswordHash == "XXX");
+			Expression<Func<SecurityUser, bool>> expected = (o => (o.UserName == "Charles" || o.UserName == "Charles2") && o.Password == "XXX");
 
 			NameValueCollection httpQueryParameters = new NameValueCollection();
 			httpQueryParameters.Add("userName", "Charles");

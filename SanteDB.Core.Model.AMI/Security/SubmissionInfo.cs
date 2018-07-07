@@ -19,6 +19,8 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Xml.Serialization;
 
 namespace SanteDB.Core.Model.AMI.Security
@@ -120,5 +122,20 @@ namespace SanteDB.Core.Model.AMI.Security
 		/// </summary>
 		[XmlAttribute("status")]
 		public SubmissionStatus XmlStatusCode { get; set; }
-	}
+
+        /// <summary>
+        /// Create new submission info from attributes
+        /// </summary>
+        public static SubmissionInfo FromAttributes(List<KeyValuePair<String, String>> certAttrs)
+        {
+            var retVal = new SubmissionInfo();
+            foreach (var kv in certAttrs)
+            {
+                var key = kv.Key.Replace("Request.", "");
+                var pi = typeof(SubmissionInfo).GetRuntimeProperty(key);
+                pi?.SetValue(retVal, kv.Value, null);
+            }
+            return retVal;
+        }
+    }
 }

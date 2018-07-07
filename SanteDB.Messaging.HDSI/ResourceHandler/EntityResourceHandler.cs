@@ -59,7 +59,7 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
         /// <param name="versionId">The version id of the entity.</param>
         /// <returns>Returns the entity.</returns>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadClinicalData)]
-        public override Object Get(Guid id, Guid versionId)
+        public override Object Get(object id, object versionId)
         {
             return base.Get(id, versionId);
         }
@@ -70,7 +70,7 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
         /// <param name="key">The key of the entity to be obsoleted.</param>
         /// <returns>Returns the obsoleted entity.</returns>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.DeleteClinicalData)]
-        public override Object Obsolete(Guid key)
+        public override Object Obsolete(object key)
         {
             return base.Obsolete(key);
         }

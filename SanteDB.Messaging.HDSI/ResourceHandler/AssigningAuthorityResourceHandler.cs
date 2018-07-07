@@ -37,11 +37,11 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
 	public class AssigningAuthorityResourceHandler : IResourceHandler
 	{
 		// repository
-		private IMetadataRepositoryService m_repository;
+		private IAssigningAuthorityRepositoryService m_repository;
 
 		public AssigningAuthorityResourceHandler()
 		{
-			ApplicationContext.Current.Started += (o, e) => this.m_repository = ApplicationContext.Current.GetService<IMetadataRepositoryService>();
+			ApplicationContext.Current.Started += (o, e) => this.m_repository = ApplicationContext.Current.GetService<IAssigningAuthorityRepositoryService>();
                 
 		}
 
@@ -89,33 +89,34 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
 		/// </summary>
 		public Object Create(Object data, bool updateIfExists)
 		{
-			throw new NotSupportedException();
+			throw new NotSupportedException("Assigning Authorities cannot be created on HDSI use AMI");
 		}
 
 		/// <summary>
 		/// Get the assigning authority
 		/// </summary>
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
-		public Object Get(Guid id, Guid versionId)
+		public Object Get(object id, object versionId)
 		{
-			return this.m_repository.GetAssigningAuthority(id);
+			return this.m_repository.Get((Guid)id);
 		}
 
 		/// <summary>
 		/// Obsoletes an assigning authority
 		/// </summary>
-		public Object Obsolete(Guid  key)
+		public Object Obsolete(object key)
 		{
-			throw new NotSupportedException();
-		}
+            throw new NotSupportedException("Assigning Authorities cannot be obsoleted on HDSI use AMI");
 
-		/// <summary>
-		/// Queries for assigning authority
-		/// </summary>
-		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
+        }
+
+        /// <summary>
+        /// Queries for assigning authority
+        /// </summary>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public IEnumerable<Object> Query(NameValueCollection queryParameters)
 		{
-			return this.m_repository.FindAssigningAuthority(QueryExpressionParser.BuildLinqExpression<AssigningAuthority>(queryParameters));
+			return this.m_repository.Find(QueryExpressionParser.BuildLinqExpression<AssigningAuthority>(queryParameters));
 		}
 
 		/// <summary>
@@ -124,7 +125,7 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public IEnumerable<Object> Query(NameValueCollection queryParameters, int offset, int count, out int totalCount)
 		{
-			return this.m_repository.FindAssigningAuthority(QueryExpressionParser.BuildLinqExpression<AssigningAuthority>(queryParameters), offset, count, out totalCount);
+			return this.m_repository.Find(QueryExpressionParser.BuildLinqExpression<AssigningAuthority>(queryParameters), offset, count, out totalCount);
 		}
 
 		/// <summary>
@@ -132,7 +133,8 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
 		/// </summary>
 		public Object Update(Object  data)
 		{
-			throw new NotSupportedException();
-		}
-	}
+            throw new NotSupportedException("Assigning Authorities cannot be updated on HDSI use AMI");
+
+        }
+    }
 }

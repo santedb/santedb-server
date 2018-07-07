@@ -125,9 +125,9 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
         /// <param name="versionId">The version id of the resource.</param>
         /// <returns>Returns the resource.</returns>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AdministerConceptDictionary)]
-        public Object Get(Guid id, Guid versionId)
+        public Object Get(object id, object versionId)
 		{
-			return this.repository.GetConceptReferenceTerm(id);
+			return this.repository.GetConceptReferenceTerm((Guid)id);
 		}
 
         /// <summary>
@@ -136,9 +136,9 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
         /// <param name="key">The key of the resource to obsolete.</param>
         /// <returns>Returns the obsoleted resource.</returns>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AdministerConceptDictionary)]
-        public Object Obsolete(Guid  key)
+        public Object Obsolete(object key)
 		{
-			return this.repository.GetConceptReferenceTerm(key);
+			return this.repository.GetConceptReferenceTerm((Guid)key);
 		}
 
         /// <summary>

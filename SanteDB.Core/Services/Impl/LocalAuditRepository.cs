@@ -10,6 +10,7 @@ using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Security;
 using MARC.HI.EHRS.SVC.Core.Data;
+using SanteDB.Core.Security.Attribute;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -49,6 +50,7 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Find with query controls
         /// </summary>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AccessAuditLog)]
         public IEnumerable<AuditData> Find(Expression<Func<AuditData, bool>> query, int offset, int? count, out int totalResults)
         {
             var service = ApplicationContext.Current.GetService<IDataPersistenceService<AuditData>>();
@@ -78,6 +80,7 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Get the specified audit by key
         /// </summary>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AccessAuditLog)]
         public AuditData Get(Guid key, Guid versionKey)
         {
             var service = ApplicationContext.Current.GetService<IDataPersistenceService<AuditData>>();
@@ -104,6 +107,7 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Obsolete the specified data
         /// </summary>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AccessAuditLog)]
         public AuditData Obsolete(Guid key)
         {
             var service = ApplicationContext.Current.GetService<IDataPersistenceService<AuditData>>();
@@ -117,6 +121,7 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Save (create or update) the specified object
         /// </summary>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AccessAuditLog)]
         public AuditData Save(AuditData data)
         {
             var service = ApplicationContext.Current.GetService<IDataPersistenceService<AuditData>>();

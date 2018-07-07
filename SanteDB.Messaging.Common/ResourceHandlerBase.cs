@@ -126,17 +126,17 @@ namespace SanteDB.Messaging.Common
         /// <summary>
         /// Read clinical data
         /// </summary>
-        public virtual Object Get(Guid id, Guid versionId)
+        public virtual Object Get(object id, object versionId)
         {
-            return this.m_repository.Get(id, versionId);
+            return this.m_repository.Get((Guid)id, (Guid)versionId);
         }
 
         /// <summary>
         /// Obsolete data
         /// </summary>
-        public virtual Object Obsolete(Guid key)
+        public virtual Object Obsolete(object key)
         {
-            return this.m_repository.Obsolete(key);
+            return this.m_repository.Obsolete((Guid)key);
         }
 
         /// <summary>

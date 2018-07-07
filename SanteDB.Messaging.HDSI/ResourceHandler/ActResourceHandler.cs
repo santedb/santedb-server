@@ -46,7 +46,7 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
         /// Gets the specified act
         /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadClinicalData)]
-        public override Object Get(Guid id, Guid versionId)
+        public override Object Get(object id, object versionId)
         {
             return base.Get(id, versionId);
         }
@@ -55,7 +55,7 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
         /// Obsoletes the specified act
         /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.DeleteClinicalData)]
-        public override Object Obsolete(Guid key)
+        public override Object Obsolete(object key)
         {
             return base.Obsolete(key);
         }

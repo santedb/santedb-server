@@ -64,14 +64,14 @@ namespace SanteDB.Messaging.Common
         /// <param name="id">The id of the resource.</param>
         /// <param name="versionId">The version id of the resource.</param>
         /// <returns>Returns the resource.</returns>
-        Object Get(Guid id, Guid versionId);
+        Object Get(Object id, Object versionId);
 
         /// <summary>
         /// Obsoletes a resource.
         /// </summary>
         /// <param name="key">The key of the resource to obsolete.</param>
         /// <returns>Returns the obsoleted resource.</returns>
-        Object Obsolete(Guid key);
+        Object Obsolete(Object key);
 
 		/// <summary>
 		/// Queries for a resource.

@@ -94,20 +94,20 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
         /// Get the specified instance
         /// </summary>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
-        public Object Get(Guid id, Guid versionId)
+        public Object Get(object id, object versionId)
 		{
 			var conceptService = ApplicationContext.Current.GetService<IConceptRepositoryService>();
-			return conceptService.GetConcept(id, versionId);
+			return conceptService.GetConcept((Guid)id, (Guid)versionId);
 		}
 
 		/// <summary>
 		/// Obsolete the specified concept
 		/// </summary>
 		[PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AdministerConceptDictionary)]
-		public Object Obsolete(Guid  key)
+		public Object Obsolete(object  key)
 		{
 			var conceptService = ApplicationContext.Current.GetService<IConceptRepositoryService>();
-			return conceptService.ObsoleteConcept(key);
+			return conceptService.ObsoleteConcept((Guid)key);
 		}
 
         /// <summary>

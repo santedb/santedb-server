@@ -51,7 +51,7 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
         /// </summary>
         /// <returns></returns>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedMetadata)]
-        public override Object Get(Guid id, Guid versionId)
+        public override Object Get(object id, object versionId)
         {
             return base.Get(id, versionId);
         }
@@ -60,7 +60,7 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
         /// Obsoletes the specified place
         /// </summary>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedMetadata)]
-        public override Object Obsolete(Guid key)
+        public override Object Obsolete(object key)
         {
             return base.Obsolete(key);
         }

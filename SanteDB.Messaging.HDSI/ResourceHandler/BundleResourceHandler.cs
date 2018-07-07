@@ -108,7 +108,7 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
 		/// <summary>
 		/// Gets the specified data
 		/// </summary>
-		public Object Get(Guid id, Guid versionId)
+		public Object Get(object id, object versionId)
 		{
 			throw new NotSupportedException();
 		}
@@ -116,7 +116,7 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
 		/// <summary>
 		/// Obsoletes the bundle
 		/// </summary>
-		public Object Obsolete(Guid  key)
+		public Object Obsolete(object key)
 		{
 			throw new NotSupportedException();
 		}

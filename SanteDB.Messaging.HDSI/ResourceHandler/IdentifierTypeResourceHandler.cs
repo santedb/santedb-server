@@ -129,9 +129,9 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
         /// <param name="versionId">The version id of the identifier type.</param>
         /// <returns></returns>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
-        public Object Get(Guid id, Guid versionId)
+        public Object Get(object id, object versionId)
 		{
-			return this.repository.Get(id, versionId);
+			return this.repository.Get((Guid)id, (Guid)versionId);
 		}
 
         /// <summary>
@@ -140,9 +140,9 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
         /// <param name="key">The key of the identifier type to obsolete.</param>
         /// <returns>Returns the obsoleted identifier type.</returns>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedMetadata)]
-        public Object Obsolete(Guid  key)
+        public Object Obsolete(object key)
 		{
-			return this.repository.Obsolete(key);
+			return this.repository.Obsolete((Guid)key);
 		}
 
         /// <summary>

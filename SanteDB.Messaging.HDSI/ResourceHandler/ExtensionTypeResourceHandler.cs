@@ -91,16 +91,16 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
         /// Get the extension
         /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
-        public Object Get(Guid id, Guid versionId)
+        public Object Get(object id, object versionId)
         {
             var repository = ApplicationContext.Current.GetService<IDataPersistenceService<ExtensionType>>();
-            return repository?.Get<Guid>(new MARC.HI.EHRS.SVC.Core.Data.Identifier<Guid>(id, versionId), AuthenticationContext.Current.Principal, false);
+            return repository?.Get<Guid>(new MARC.HI.EHRS.SVC.Core.Data.Identifier<Guid>((Guid)id, (Guid)versionId), AuthenticationContext.Current.Principal, false);
         }
 
         /// <summary>
         /// Read only
         /// </summary>
-        public Object Obsolete(Guid  key)
+        public Object Obsolete(object  key)
         {
             throw new NotSupportedException();
         }

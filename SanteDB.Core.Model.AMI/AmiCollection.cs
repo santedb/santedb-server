@@ -21,7 +21,7 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace SanteDB.Core.Model.AMI.Security
+namespace SanteDB.Core.Model.AMI.Collections
 {
 	/// <summary>
 	/// Represents an administrative collection item.

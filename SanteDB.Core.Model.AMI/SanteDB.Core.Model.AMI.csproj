@@ -38,12 +38,11 @@
   <ItemGroup>
     <Compile Include="AmiCollection.cs" />
     <Compile Include="Applet\AppletManifestInfo.cs" />
-    <Compile Include="Auth\SecurityApplicationInfo.cs" />
-    <Compile Include="Auth\SecurityDeviceInfo.cs" />
     <Compile Include="Auth\SecurityPolicyInfo.cs" />
+    <Compile Include="Auth\SecurityEntityInfo.cs" />
     <Compile Include="Auth\SecurityRoleInfo.cs" />
-    <Compile Include="Auth\TfaRequestInfo.cs" />
     <Compile Include="Auth\SecurityUserInfo.cs" />
+    <Compile Include="Auth\TfaRequestInfo.cs" />
     <Compile Include="Auth\TfaMechanismInfo.cs" />
     <Compile Include="Diagnostics\DiagnosticApplicationInfo.cs" />
     <Compile Include="Diagnostics\DiagnosticEnvironmentInfo.cs" />
@@ -86,9 +85,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-
-    <PackageReference Include="MARC.HI.EHRS.SVC.Auditing.Core" Version="2.0.0"/>
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2"/>
+    <PackageReference Include="MARC.HI.EHRS.SVC.Auditing.Core" Version="2.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

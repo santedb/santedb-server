@@ -65,7 +65,10 @@ namespace SanteDB.Core.Services.Impl
             else
                 results = persistenceService.Query(query, offset, count, AuthenticationContext.Current.Principal, out totalResults);
 
-            return businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
+            var retVal = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
+
+            this.DataDisclosed?.Invoke(this, new AuditDataDisclosureEventArgs(query.ToString(), retVal));
+            return retVal;
         }
 
         /// <summary>
@@ -138,8 +141,9 @@ namespace SanteDB.Core.Services.Impl
 
             var result = persistenceService.Get(new Identifier<Guid>(key, versionKey), AuthenticationContext.Current.Principal, true);
 
-            return businessRulesService?.AfterRetrieve(result) ?? result;
-
+            var retVal = businessRulesService?.AfterRetrieve(result) ?? result;
+            this.DataDisclosed?.Invoke(this, new AuditDataDisclosureEventArgs(key.ToString(), new Object[] { retVal }));
+            return retVal;
         }
 
         /// <summary>

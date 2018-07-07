@@ -41,7 +41,14 @@ namespace SanteDB.Core.Services.Impl
 	/// <summary>
 	/// Represents a security repository service that uses the direct local services
 	/// </summary>
-	public class LocalSecurityRepositoryService : LocalEntityRepositoryServiceBase, ISecurityRepositoryService, IRepositoryService<UserEntity>, ISecurityAuditEventSource
+	public class LocalSecurityRepositoryService : LocalEntityRepositoryServiceBase, 
+        ISecurityRepositoryService, 
+        IRepositoryService<UserEntity>, 
+        ISecurityAuditEventSource, 
+        IRepositoryService<SecurityApplication>,
+        IRepositoryService<SecurityDevice>,
+        IRepositoryService<SecurityRole>,
+        IRepositoryService<SecurityUser>
     {
 		private TraceSource m_traceSource = new TraceSource(SanteDBConstants.ServiceTraceSourceName);
 
@@ -82,26 +89,15 @@ namespace SanteDB.Core.Services.Impl
 		{
 			this.m_traceSource.TraceEvent(TraceEventType.Information, 0, "Creating application {0}", application);
 
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityApplication>>();
-
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException($"{nameof(IDataPersistenceService<SecurityApplication>)} not found");
-			}
-
 			application.ApplicationSecret = ApplicationContext.Current.GetService<IPasswordHashingService>().EncodePassword(application.ApplicationSecret);
-
-			var createdApplication = persistenceService.Insert(application, AuthenticationContext.Current.Principal, TransactionMode.Commit);
-
+			var createdApplication = base.Insert(application);
             this.SecurityResourceCreated?.Invoke(this, new SecurityAuditDataEventArgs(createdApplication));
-
             base.Insert(new ApplicationEntity
             {
                 SecurityApplication = createdApplication,
                 SoftwareName = application.Name,
                 StatusConceptKey = StatusKeys.Active
             });
-
 			return createdApplication;
 		}
 
@@ -115,18 +111,9 @@ namespace SanteDB.Core.Services.Impl
 		{
 			this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Creating device {0}", device);
 
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityDevice>>();
-
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException($"{nameof(IDataPersistenceService<SecurityDevice>)} not found");
-			}
-
 			device.DeviceSecret = ApplicationContext.Current.GetService<IPasswordHashingService>().EncodePassword(device.DeviceSecret);
-
-			var createdDevice = persistenceService.Insert(device, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+			var createdDevice = base.Insert(device);
             this.SecurityResourceCreated?.Invoke(this, new SecurityAuditDataEventArgs(createdDevice));
-
             base.Insert(new DeviceEntity
             {
                 ManufacturerModelName = device.Name,
@@ -147,16 +134,9 @@ namespace SanteDB.Core.Services.Impl
 		{
 			this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Creating policy {0}", policy);
 
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
-
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<SecurityPolicy>)));
-			}
-
+            var retVal = base.Insert(policy);
             this.SecurityResourceCreated?.Invoke(this, new SecurityAuditDataEventArgs(policy));
-
-            return persistenceService.Insert(policy, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+            return retVal;
 		}
 
 		/// <summary>
@@ -169,13 +149,10 @@ namespace SanteDB.Core.Services.Impl
 		{
 			this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Creating role {0}", roleInfo);
 
-			var pers = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityRole>>();
-			if (pers == null)
-				throw new InvalidOperationException("Misisng role provider service");
-
+            var retVal = base.Insert(roleInfo);
             this.SecurityResourceCreated?.Invoke(this, new SecurityAuditDataEventArgs(roleInfo, "Created"));
 
-            return pers.Insert(roleInfo, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+            return retVal;
 		}
 
 		/// <summary>
@@ -190,19 +167,13 @@ namespace SanteDB.Core.Services.Impl
 			this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Creating user {0}", userInfo);
 
 			var iids = ApplicationContext.Current.GetService<IIdentityProviderService>();
-			var pers = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityUser>>();
-
-			if (pers == null)
-				throw new InvalidOperationException("Missing persistence service");
-			else if (iids == null)
-				throw new InvalidOperationException("Missing identity provider service");
 
 			// Create the identity
 			var id = iids.CreateIdentity(userInfo.UserName, password, AuthenticationContext.Current.Principal);
 			// Now ensure local db record exists
 			var retVal = this.GetUser(id);
 			if (retVal == null)
-				retVal = pers.Insert(userInfo, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+				retVal = base.Insert(userInfo);
 			else
 			{
 				retVal.Email = userInfo.Email;
@@ -216,11 +187,11 @@ namespace SanteDB.Core.Services.Impl
 				retVal.TwoFactorEnabled = userInfo.TwoFactorEnabled;
 				retVal.UserPhoto = userInfo.UserPhoto;
                 retVal.UserClass = userInfo.UserClass;
-				pers.Update(retVal, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+				base.Save(retVal);
 			}
 
-            this.SecurityResourceCreated?.Invoke(this, new SecurityAuditDataEventArgs(retVal));
 
+            this.SecurityResourceCreated?.Invoke(this, new SecurityAuditDataEventArgs(retVal));
             this.CreateUserEntity(new UserEntity
 			{
 				SecurityUserKey = retVal.Key
@@ -260,14 +231,7 @@ namespace SanteDB.Core.Services.Impl
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public IEnumerable<SecurityApplication> FindApplications(Expression<Func<SecurityApplication, bool>> query, int offset, int? count, out int totalResults)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityApplication>>();
-
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException($"{nameof(IDataPersistenceService<SecurityApplication>)} not found");
-			}
-
-			return persistenceService.Query(query, offset, count, AuthenticationContext.Current.Principal, out totalResults);
+			return base.Find(query, offset, count, out totalResults, Guid.Empty);
 		}
 
 		/// <summary>
@@ -293,14 +257,7 @@ namespace SanteDB.Core.Services.Impl
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public IEnumerable<SecurityDevice> FindDevices(Expression<Func<SecurityDevice, bool>> query, int offset, int? count, out int totalResults)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityDevice>>();
-
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<SecurityDevice>)));
-			}
-
-			return persistenceService.Query(query, offset, count, AuthenticationContext.Current.Principal, out totalResults);
+			return base.Find(query, offset, count, out totalResults, Guid.Empty);
 		}
 
 		/// <summary>
@@ -326,14 +283,7 @@ namespace SanteDB.Core.Services.Impl
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public IEnumerable<SecurityPolicy> FindPolicies(Expression<Func<SecurityPolicy, bool>> query, int offset, int? count, out int totalResults)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
-
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<SecurityPolicy>)));
-			}
-
-			return persistenceService.Query(query, offset, count, AuthenticationContext.Current.Principal, out totalResults);
+			return base.Find(query, offset, count, out totalResults, Guid.Empty);
 		}
 
 		/// <summary>
@@ -359,14 +309,7 @@ namespace SanteDB.Core.Services.Impl
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public IEnumerable<SecurityRole> FindRoles(Expression<Func<SecurityRole, bool>> query, int offset, int? count, out int totalResults)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityRole>>();
-
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<SecurityRole>)));
-			}
-
-			return persistenceService.Query(query, offset, count, AuthenticationContext.Current.Principal, out totalResults);
+			return base.Find(query, offset, count, out totalResults, Guid.Empty);
 		}
 
 		/// <summary>
@@ -411,14 +354,7 @@ namespace SanteDB.Core.Services.Impl
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.Login)]
 		public IEnumerable<SecurityUser> FindUsers(Expression<Func<SecurityUser, bool>> query, int offset, int? count, out int totalResults)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityUser>>();
-
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<SecurityUser>)));
-			}
-
-			return persistenceService.Query(query, offset, count, AuthenticationContext.Current.Principal, out totalResults);
+			return base.Find(query, offset, count, out totalResults, Guid.Empty);
 		}
 
 		/// <summary>
@@ -429,14 +365,7 @@ namespace SanteDB.Core.Services.Impl
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public SecurityApplication GetApplication(Guid applicationId)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityApplication>>();
-
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException($"{nameof(IDataPersistenceService<SecurityApplication>)} not found");
-			}
-
-			return persistenceService.Get<Guid>(new Identifier<Guid>(applicationId), AuthenticationContext.Current.Principal, false);
+			return base.Get<SecurityApplication>(applicationId, Guid.Empty);
 		}
 
 		/// <summary>
@@ -447,32 +376,18 @@ namespace SanteDB.Core.Services.Impl
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public SecurityDevice GetDevice(Guid deviceId)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityDevice>>();
+            return base.Get<SecurityDevice>(deviceId, Guid.Empty);
+        }
 
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<SecurityDevice>)));
-			}
-
-			return persistenceService.Get<Guid>(new Identifier<Guid>(deviceId), AuthenticationContext.Current.Principal, false);
-		}
-
-		/// <summary>
-		/// Gets a specific policy.
-		/// </summary>
-		/// <param name="policyId">The id of the policy to be retrieved.</param>
-		/// <returns>Returns the policy.</returns>
-		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
+        /// <summary>
+        /// Gets a specific policy.
+        /// </summary>
+        /// <param name="policyId">The id of the policy to be retrieved.</param>
+        /// <returns>Returns the policy.</returns>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public SecurityPolicy GetPolicy(Guid policyId)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
-
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<SecurityPolicy>)));
-			}
-
-			return persistenceService.Get<Guid>(new Identifier<Guid>(policyId), AuthenticationContext.Current.Principal, false);
+			return base.Get<SecurityPolicy>(policyId, Guid.Empty);
 		}
 
 		/// <summary>
@@ -483,14 +398,7 @@ namespace SanteDB.Core.Services.Impl
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public SecurityRole GetRole(Guid roleId)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityRole>>();
-
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<SecurityRole>)));
-			}
-
-			return persistenceService.Get<Guid>(new Identifier<Guid>(roleId), AuthenticationContext.Current.Principal, false);
+			return base.Get<SecurityRole>(roleId, Guid.Empty);
 		}
 
 		/// <summary>
@@ -501,14 +409,7 @@ namespace SanteDB.Core.Services.Impl
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public SecurityUser GetUser(Guid userId)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityUser>>();
-
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<SecurityUser>)));
-			}
-
-			return persistenceService.Get<Guid>(new Identifier<Guid>(userId), AuthenticationContext.Current.Principal, false);
+			return base.Get<SecurityUser>(userId, Guid.Empty);
 		}
 
         /// <summary>
@@ -519,16 +420,9 @@ namespace SanteDB.Core.Services.Impl
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         public SecurityUser GetUser(String userName)
         {
-            var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityUser>>();
-
-            if (persistenceService == null)
-            {
-                throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<SecurityUser>)));
-            }
-
             var identity = ApplicationContext.Current.GetService<IIdentityProviderService>().GetIdentity(userName);
-
-            return persistenceService.Query(u => u.UserName == identity.Name, AuthenticationContext.Current.Principal).FirstOrDefault();
+            int tr = 0;
+            return base.Find<SecurityUser>(u => u.UserName == identity.Name, 0, 1, out tr, Guid.Empty).FirstOrDefault();
         }
 
         /// <summary>
@@ -537,10 +431,8 @@ namespace SanteDB.Core.Services.Impl
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public SecurityUser GetUser(IIdentity identity)
 		{
-			var pers = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityUser>>();
-			if (pers == null)
-				throw new InvalidOperationException("Missing persistence service");
-			return pers.Query(o => o.UserName == identity.Name && o.ObsoletionTime == null, AuthenticationContext.Current.Principal).FirstOrDefault();
+            int tr = 0;
+			return base.Find<SecurityUser>(o => o.UserName == identity.Name && o.ObsoletionTime == null, 0, 1, out tr, Guid.Empty).FirstOrDefault();
 		}
 
 		/// <summary>
@@ -586,20 +478,13 @@ namespace SanteDB.Core.Services.Impl
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateApplication)]
 		public SecurityApplication ObsoleteApplication(Guid applicationId)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityApplication>>();
-
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException($"{nameof(IDataPersistenceService<SecurityApplication>)} not found");
-			}
-
             int t = 0;
             var appEntity = base.Find<ApplicationEntity>(o => o.SecurityApplicationKey == applicationId, 0, 1, out t, Guid.Empty).FirstOrDefault();
             base.Obsolete<ApplicationEntity>(appEntity.Key.Value);
-            var app = this.GetApplication(applicationId);
-            this.SecurityResourceDeleted?.Invoke(this, new SecurityAuditDataEventArgs(app));
-            return persistenceService.Obsolete(app, AuthenticationContext.Current.Principal, TransactionMode.Commit);
-		}
+            var retVal = base.Obsolete<SecurityApplication>(applicationId);
+            this.SecurityResourceDeleted?.Invoke(this, new SecurityAuditDataEventArgs(retVal));
+            return retVal;
+        }
 
 		/// <summary>
 		/// Obsoletes a device.
@@ -609,80 +494,53 @@ namespace SanteDB.Core.Services.Impl
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateDevice)]
 		public SecurityDevice ObsoleteDevice(Guid deviceId)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityDevice>>();
-
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<SecurityDevice>)));
-			}
-
             int t = 0;
             var devEntity = base.Find<DeviceEntity>(o => o.SecurityDeviceKey == deviceId, 0, 1, out t, Guid.Empty).FirstOrDefault();
             base.Obsolete<DeviceEntity>(devEntity.Key.Value);
+            var retVal = base.Obsolete<SecurityDevice>(deviceId);
+            this.SecurityResourceDeleted?.Invoke(this, new SecurityAuditDataEventArgs(retVal));
+            return retVal;
+        }
 
-            var dev = this.GetDevice(deviceId);
-            this.SecurityResourceDeleted?.Invoke(this, new SecurityAuditDataEventArgs(dev));
-            return persistenceService.Obsolete(dev, AuthenticationContext.Current.Principal, TransactionMode.Commit);
-		}
-
-		/// <summary>
-		/// Obsoletes a policy.
-		/// </summary>
-		/// <param name="policyId">THe id of the policy to be obsoleted.</param>
-		/// <returns>Returns the obsoleted policy.</returns>
-		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterPolicy)]
+        /// <summary>
+        /// Obsoletes a policy.
+        /// </summary>
+        /// <param name="policyId">THe id of the policy to be obsoleted.</param>
+        /// <returns>Returns the obsoleted policy.</returns>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterPolicy)]
 		public SecurityPolicy ObsoletePolicy(Guid policyId)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
+            var retVal = base.Obsolete<SecurityPolicy>(policyId);
+            this.SecurityResourceDeleted?.Invoke(this, new SecurityAuditDataEventArgs(retVal));
+            return retVal;
 
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<SecurityPolicy>)));
-			}
+        }
 
-            var pol = this.GetPolicy(policyId);
-            this.SecurityResourceDeleted?.Invoke(this, new SecurityAuditDataEventArgs(pol));
-            return persistenceService.Obsolete(pol, AuthenticationContext.Current.Principal, TransactionMode.Commit);
-		}
-
-		/// <summary>
-		/// Obsoletes a role.
-		/// </summary>
-		/// <param name="roleId">The id of the role to be obsoleted.</param>
-		/// <returns>Returns the obsoleted role.</returns>
-		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterRoles)]
+        /// <summary>
+        /// Obsoletes a role.
+        /// </summary>
+        /// <param name="roleId">The id of the role to be obsoleted.</param>
+        /// <returns>Returns the obsoleted role.</returns>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterRoles)]
 		public SecurityRole ObsoleteRole(Guid roleId)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityRole>>();
+            var retVal = base.Obsolete<SecurityRole>(roleId);
+            this.SecurityResourceDeleted?.Invoke(this, new SecurityAuditDataEventArgs(retVal));
+            return retVal;
+        }
 
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<SecurityRole>)));
-			}
-
-            var rol = this.GetRole(roleId);
-            this.SecurityResourceDeleted?.Invoke(this, new SecurityAuditDataEventArgs(rol));
-            return persistenceService.Obsolete(rol, AuthenticationContext.Current.Principal, TransactionMode.Commit);
-		}
-
-		/// <summary>
-		/// Obsoletes a user.
-		/// </summary>
-		/// <param name="userId">The id of the user to be obsoleted.</param>
-		/// <returns>Returns the obsoleted user.</returns>
-		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
+        /// <summary>
+        /// Obsoletes a user.
+        /// </summary>
+        /// <param name="userId">The id of the user to be obsoleted.</param>
+        /// <returns>Returns the obsoleted user.</returns>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
 		public SecurityUser ObsoleteUser(Guid userId)
 		{
 			var iids = ApplicationContext.Current.GetService<IIdentityProviderService>();
-			var pers = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityUser>>();
-
-			if (pers == null)
-				throw new InvalidOperationException("Missing persistence service");
-			else if (iids == null)
-				throw new InvalidOperationException("Missing identity provider service");
-
-			var retVal = pers.Obsolete(this.GetUser(userId), AuthenticationContext.Current.Principal, TransactionMode.Commit);
-			iids.DeleteIdentity(retVal.UserName, AuthenticationContext.Current.Principal);
+            var retVal = base.Obsolete<SecurityUser>(userId);
+            iids.DeleteIdentity(retVal.UserName, AuthenticationContext.Current.Principal);
+            this.SecurityResourceDeleted?.Invoke(this, new SecurityAuditDataEventArgs(retVal));
 			return retVal;
 		}
 
@@ -691,7 +549,6 @@ namespace SanteDB.Core.Services.Impl
 		/// </summary>
 		public UserEntity ObsoleteUserEntity(Guid id)
 		{
-			
 			return base.Obsolete<UserEntity>(id);
 		}
 
@@ -703,103 +560,90 @@ namespace SanteDB.Core.Services.Impl
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateApplication)]
         public SecurityApplication SaveApplication(SecurityApplication application)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityApplication>>();
-
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException($"{nameof(IDataPersistenceService<SecurityApplication>)} not found");
-			}
+            if (!String.IsNullOrEmpty(application.ApplicationSecret))
+            {
+                this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Will update secret for application {0}", application.Name);
+                application.ApplicationSecret = ApplicationContext.Current.GetSerivce<IPasswordHashingService>().EncodePassword(application.ApplicationSecret);
+            }
 
             this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(application));
-			return persistenceService.Update(application, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+            return base.Save(application);
 		}
 
-		/// <summary>
-		/// Updates a security device.
-		/// </summary>
-		/// <param name="device">The security device containing the updated information.</param>
-		/// <returns>Returns the updated device.</returns>
-		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateDevice)]
-		public SecurityDevice SaveDevice(SecurityDevice device)
-		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityDevice>>();
+        /// <summary>
+        /// Updates a security device.
+        /// </summary>
+        /// <param name="device">The security device containing the updated information.</param>
+        /// <returns>Returns the updated device.</returns>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateDevice)]
+        public SecurityDevice SaveDevice(SecurityDevice device)
+        {
+            if (!String.IsNullOrEmpty(device.DeviceSecret))
+            {
+                this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Will update secret for device {0}", device.Name);
+                device.DeviceSecret = ApplicationContext.Current.GetSerivce<IPasswordHashingService>().EncodePassword(device.DeviceSecret);
+            }
 
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException($"{nameof(IDataPersistenceService<SecurityDevice>)} not found");
-			}
+            var retVal = base.Save(device);
             this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(device));
+            return retVal;
+        }
 
-            return persistenceService.Update(device, AuthenticationContext.Current.Principal, TransactionMode.Commit);
-		}
-
-		/// <summary>
-		/// Updates a security policy.
-		/// </summary>
-		/// <param name="policy">The security policy containing the updated information.</param>
-		/// <returns>Returns the updated policy.</returns>
-		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterPolicy)]
+        /// <summary>
+        /// Updates a security policy.
+        /// </summary>
+        /// <param name="policy">The security policy containing the updated information.</param>
+        /// <returns>Returns the updated policy.</returns>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterPolicy)]
 		public SecurityPolicy SavePolicy(SecurityPolicy policy)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
+            var retVal = base.Save(policy);
+            this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(retVal));
+            return retVal;
+        }
 
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<SecurityPolicy>)));
-			}
-            this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(policy));
-
-            return persistenceService.Update(policy, AuthenticationContext.Current.Principal, TransactionMode.Commit);
-		}
-
-		/// <summary>
-		/// Updates a security role.
-		/// </summary>
-		/// <param name="role">The security role containing the updated information.</param>
-		/// <returns>Returns the updated role.</returns>
-		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterRoles)]
+        /// <summary>
+        /// Updates a security role.
+        /// </summary>
+        /// <param name="role">The security role containing the updated information.</param>
+        /// <returns>Returns the updated role.</returns>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterRoles)]
 		public SecurityRole SaveRole(SecurityRole role)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityRole>>();
+            var retVal = base.Save(role);
+            this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(retVal));
+            return retVal;
+        }
 
-			if (persistenceService == null)
-			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<SecurityRole>)));
-			}
-            this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(role));
-
-            return persistenceService.Update(role, AuthenticationContext.Current.Principal, TransactionMode.Commit);
-		}
-
-		/// <summary>
-		/// Updates a security user.
-		/// </summary>
-		/// <param name="user">The security user containing the updated information.</param>
-		/// <returns>Returns the updated user.</returns>
+        /// <summary>
+        /// Updates a security user.
+        /// </summary>
+        /// <param name="user">The security user containing the updated information.</param>
+        /// <returns>Returns the updated user.</returns>
         public SecurityUser SaveUser(SecurityUser user)
 		{
             // Only the current user can update themselves or an administrator
             if (AuthenticationContext.Current.Principal.Identity.Name != user.UserName)
                 new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AlterIdentity).Demand();
+            
+            // User password change request?
+            if(!String.IsNullOrEmpty(user.Password))
+            {
+                // If the user is not themselves then they must have alter password permission
+                if (AuthenticationContext.Current.Principal.Identity.Name != user.UserName)
+                    new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.ChangePassword).Demand();
+                this.ChangePassword(user.Key.Value, user.Password);
+            }
 
-			var pers = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityUser>>();
-			user.PasswordHash = null; // Don't update the password hash here
-			if (pers == null)
-				throw new InvalidOperationException("Missing persistence service");
+            var retVal = base.Save(user);
+            this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(retVal));
+            return retVal;
+        }
 
-			// Demand permission do this operation
-			if (AuthenticationContext.Current.Principal.Identity.Name != user.UserName) // Users can update their own info
-				new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AlterIdentity).Demand(); // Otherwise demand to be an administrator
-
-            this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(user));
-
-            return pers.Update(user, AuthenticationContext.Current.Principal, TransactionMode.Commit);
-		}
-
-		/// <summary>
-		/// Saves the specified user entity
-		/// </summary>
-		public UserEntity SaveUserEntity(UserEntity userEntity)
+        /// <summary>
+        /// Saves the specified user entity
+        /// </summary>
+        public UserEntity SaveUserEntity(UserEntity userEntity)
 		{
             return base.Save(userEntity);
 		}
@@ -840,6 +684,75 @@ namespace SanteDB.Core.Services.Impl
         }
 
         /// <summary>
+        /// Find the specified security application
+        /// </summary>
+        IEnumerable<SecurityApplication> IRepositoryService<SecurityApplication>.Find(Expression<Func<SecurityApplication, bool>> query)
+        {
+            return this.FindApplications(query);
+        }
+
+        /// <summary>
+        /// Find the security application with the specified limiters
+        /// </summary>
+        /// <param name="query">The query to filter</param>
+        /// <param name="offset">The offset of the first record</param>
+        /// <param name="count">The number of records to return</param>
+        /// <param name="totalResults">The total results </param>
+        /// <returns>The matching security applications</returns>
+        IEnumerable<SecurityApplication> IRepositoryService<SecurityApplication>.Find(Expression<Func<SecurityApplication, bool>> query, int offset, int? count, out int totalResults)
+        {
+            return this.FindApplications(query, offset, count, out totalResults);
+        }
+
+        /// <summary>
+        /// Find security devices matching the query
+        /// </summary>
+        IEnumerable<SecurityDevice> IRepositoryService<SecurityDevice>.Find(Expression<Func<SecurityDevice, bool>> query)
+        {
+            return this.FindDevices(query);
+        }
+
+        /// <summary>
+        /// Find security devices matching the query
+        /// </summary>
+        IEnumerable<SecurityDevice> IRepositoryService<SecurityDevice>.Find(Expression<Func<SecurityDevice, bool>> query, int offset, int? count, out int totalResults)
+        {
+            return this.FindDevices(query, offset, count, out totalResults);
+        }
+
+        /// <summary>
+        /// Find the specified security roles
+        /// </summary>
+        IEnumerable<SecurityRole> IRepositoryService<SecurityRole>.Find(Expression<Func<SecurityRole, bool>> query)
+        {
+            return this.FindRoles(query);
+        }
+
+        /// <summary>
+        /// Find specified security roles
+        /// </summary>
+        IEnumerable<SecurityRole> IRepositoryService<SecurityRole>.Find(Expression<Func<SecurityRole, bool>> query, int offset, int? count, out int totalResults)
+        {
+            return this.FindRoles(query, offset, count, out totalResults);
+        }
+
+        /// <summary>
+        /// Find specified security users
+        /// </summary>
+        IEnumerable<SecurityUser> IRepositoryService<SecurityUser>.Find(Expression<Func<SecurityUser, bool>> query)
+        {
+            return this.FindUsers(query);
+        }
+
+        /// <summary>
+        /// Find specified security users with limits
+        /// </summary>
+        IEnumerable<SecurityUser> IRepositoryService<SecurityUser>.Find(Expression<Func<SecurityUser, bool>> query, int offset, int? count, out int totalResults)
+        {
+            return this.FindUsers(query, offset, count, out totalResults);
+        }
+
+        /// <summary>
         /// Get user entity
         /// </summary>
         UserEntity IRepositoryService<UserEntity>.Get(Guid key)
@@ -856,11 +769,109 @@ namespace SanteDB.Core.Services.Impl
         }
 
         /// <summary>
+        /// Get specified security application
+        /// </summary>
+        SecurityApplication IRepositoryService<SecurityApplication>.Get(Guid key)
+        {
+            return this.GetApplication(key);
+        }
+
+        /// <summary>
+        /// Get specified security application
+        /// </summary>
+        SecurityApplication IRepositoryService<SecurityApplication>.Get(Guid key, Guid versionKey)
+        {
+            return this.GetApplication(key);
+        }
+
+        /// <summary>
+        /// Get security device
+        /// </summary>
+        SecurityDevice IRepositoryService<SecurityDevice>.Get(Guid key)
+        {
+            return this.GetDevice(key);
+        }
+
+        /// <summary>
+        /// Get security device
+        /// </summary>
+        SecurityDevice IRepositoryService<SecurityDevice>.Get(Guid key, Guid versionKey)
+        {
+            return this.GetDevice(key);
+        }
+
+        /// <summary>
+        /// Get the specified security role
+        /// </summary> 
+        SecurityRole IRepositoryService<SecurityRole>.Get(Guid key)
+        {
+            return this.GetRole(key);
+        }
+
+        /// <summary>
+        /// Get specified security role
+        /// </summary>
+        SecurityRole IRepositoryService<SecurityRole>.Get(Guid key, Guid versionKey)
+        {
+            return this.GetRole(key);
+        }
+
+        /// <summary>
+        /// Get the specified security user
+        /// </summary>
+        SecurityUser IRepositoryService<SecurityUser>.Get(Guid key)
+        {
+            return this.GetUser(key);
+        }
+
+        /// <summary>
+        /// Get the specified security user
+        /// </summary>
+        SecurityUser IRepositoryService<SecurityUser>.Get(Guid key, Guid versionKey)
+        {
+            return this.GetUser(key);
+        }
+
+        /// <summary>
         /// Insert user entity
         /// </summary>
         UserEntity IRepositoryService<UserEntity>.Insert(UserEntity data)
         {
             return this.Insert<UserEntity>(data);
+        }
+
+        /// <summary>
+        /// Insert specified user entity
+        /// </summary>
+        SecurityApplication IRepositoryService<SecurityApplication>.Insert(SecurityApplication data)
+        {
+            return this.CreateApplication(data);
+        }
+
+        /// <summary>
+        /// Insert the specified security device
+        /// </summary>
+        SecurityDevice IRepositoryService<SecurityDevice>.Insert(SecurityDevice data)
+        {
+            return this.CreateDevice(data);
+        }
+
+        /// <summary>
+        /// Insert the specified security role
+        /// </summary>
+        SecurityRole IRepositoryService<SecurityRole>.Insert(SecurityRole data)
+        {
+            return this.CreateRole(data);
+        }
+
+        /// <summary>
+        /// Insert the specified security user
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        SecurityUser IRepositoryService<SecurityUser>.Insert(SecurityUser data)
+        {
+            return this.CreateUser(data, data.Password);
         }
 
         /// <summary>
@@ -872,11 +883,75 @@ namespace SanteDB.Core.Services.Impl
         }
 
         /// <summary>
+        /// Obsolete the security application
+        /// </summary>
+        SecurityApplication IRepositoryService<SecurityApplication>.Obsolete(Guid key)
+        {
+            return this.ObsoleteApplication(key);
+        }
+
+        /// <summary>
+        /// OBsolete the device
+        /// </summary>
+        SecurityDevice IRepositoryService<SecurityDevice>.Obsolete(Guid key)
+        {
+            return this.ObsoleteDevice(key);
+        }
+
+        /// <summary>
+        /// Obsolete role
+        /// </summary>
+        SecurityRole IRepositoryService<SecurityRole>.Obsolete(Guid key)
+        {
+            return this.ObsoleteRole(key);
+        }
+
+        /// <summary>
+        /// Obsolete security user
+        /// </summary>
+        SecurityUser IRepositoryService<SecurityUser>.Obsolete(Guid key)
+        {
+            return this.ObsoleteUser(key);
+        }
+
+        /// <summary>
         /// Save user entity
         /// </summary>
         UserEntity IRepositoryService<UserEntity>.Save(UserEntity data)
         {
             return this.Save(data);
+        }
+
+        /// <summary>
+        /// Save the security application
+        /// </summary>
+        SecurityApplication IRepositoryService<SecurityApplication>.Save(SecurityApplication data)
+        {
+            return this.SaveApplication(data);
+        }
+
+        /// <summary>
+        /// Save security device
+        /// </summary>
+        SecurityDevice IRepositoryService<SecurityDevice>.Save(SecurityDevice data)
+        {
+            return this.SaveDevice(data);
+        }
+
+        /// <summary>
+        /// Save the security role
+        /// </summary>
+        SecurityRole IRepositoryService<SecurityRole>.Save(SecurityRole data)
+        {
+            return this.SaveRole(data);
+        }
+
+        /// <summary>
+        /// Save the security user
+        /// </summary>
+        SecurityUser IRepositoryService<SecurityUser>.Save(SecurityUser data)
+        {
+            return this.SaveUser(data);
         }
     }
 }

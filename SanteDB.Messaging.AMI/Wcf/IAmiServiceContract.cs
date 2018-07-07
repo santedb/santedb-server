@@ -19,6 +19,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Schema;
 using SanteDB.Core.Alerting;
+using SwaggerWcf.Attributes;
+using SanteDB.Core.Model.AMI.Collections;
 
 namespace SanteDB.Messaging.AMI.Wcf
 {
@@ -30,10 +32,10 @@ namespace SanteDB.Messaging.AMI.Wcf
     [ServiceKnownType(typeof(ExtensionType))]
     [ServiceKnownType(typeof(AlertMessage))]
     [ServiceKnownType(typeof(SecurityApplication))]
-    [ServiceKnownType(typeof(SecurityApplicationInfo))]
     [ServiceKnownType(typeof(TfaRequestInfo))]
     [ServiceKnownType(typeof(SecurityDevice))]
-    [ServiceKnownType(typeof(SecurityDeviceInfo))]
+    [ServiceKnownType(typeof(SecurityEntityInfo<SecurityDevice>))]
+    [ServiceKnownType(typeof(SecurityEntityInfo<SecurityApplication>))]
     [ServiceKnownType(typeof(SecurityPolicy))]
     [ServiceKnownType(typeof(SecurityPolicyInfo))]
     [ServiceKnownType(typeof(SecurityRole))]
@@ -63,8 +65,8 @@ namespace SanteDB.Messaging.AMI.Wcf
     [ServiceKnownType(typeof(AmiCollection<SubmissionInfo>))]
     [ServiceKnownType(typeof(AmiCollection<ExtensionType>))]
     [ServiceKnownType(typeof(AmiCollection<AppletManifestInfo>))]
-    [ServiceKnownType(typeof(AmiCollection<SecurityApplicationInfo>))]
-    [ServiceKnownType(typeof(AmiCollection<SecurityDeviceInfo>))]
+    [ServiceKnownType(typeof(AmiCollection<SecurityEntityInfo<SecurityApplication>>))]
+    [ServiceKnownType(typeof(AmiCollection<SecurityEntityInfo<SecurityDevice>>))]
     [ServiceKnownType(typeof(AmiCollection<SecurityRoleInfo>))]
     [ServiceKnownType(typeof(AmiCollection<SecurityPolicyInfo>))]
     [ServiceKnownType(typeof(AmiCollection<TfaMechanismInfo>))]
@@ -157,15 +159,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         IdentifiedData Search(String resourceType);
 
         /// <summary>
-        /// Patches the specified resource with the provided patch
-        /// </summary>
-        /// <param name="resourceType">The type of resource to be patched</param>
-        /// <param name="key">The key of the resource to be patched</param>
-        /// <param name="patch">The patch data</param>
-        [WebInvoke(Method = "PATCH", UriTemplate = "/{resourceType}/{key}", BodyStyle = WebMessageBodyStyle.Bare)]
-        void Patch(String resourceType, String key, Patch patch);
-
-        /// <summary>
         /// Get the service options
         /// </summary>
         /// <returns>The options of the server</returns>
@@ -178,5 +171,67 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <param name="resourceType">The type of resource to get service options</param>
         [WebInvoke(Method = "OPTIONS", UriTemplate = "/{resourceType}", BodyStyle = WebMessageBodyStyle.Bare)]
         ServiceResourceOptions Options(String resourceType);
+
+        #region Diagnostic / Ad-Hoc interfaces
+
+        /// <summary>
+		/// Creates a diagnostic report.
+		/// </summary>
+		/// <param name="report">The diagnostic report to be created.</param>
+		/// <returns>Returns the created diagnostic report.</returns>
+		[WebInvoke(UriTemplate = "/sherlock", BodyStyle = WebMessageBodyStyle.Bare, Method = "POST")]
+        [SwaggerWcfPath("Create Diagnostic Report", "Creates a diagnostic report. A diagnostic report contains logs and configuration information used to debug and resolve issues")]
+        DiagnosticReport CreateDiagnosticReport(DiagnosticReport report);
+
+        /// <summary>
+		/// Gets a specific log file.
+		/// </summary>
+		/// <param name="logId">The log identifier.</param>
+		/// <returns>Returns the log file information.</returns>
+		[WebGet(UriTemplate = "/log/{logId}")]
+        LogFileInfo GetLog(string logId);
+
+        /// <summary>
+        /// Get log files on the server and their sizes.
+        /// </summary>
+        /// <returns>Returns a collection of log files.</returns>
+        [WebGet(UriTemplate = "/log")]
+        AmiCollection<LogFileInfo> GetLogs();
+
+        /// <summary>
+		/// Gets a server diagnostic report.
+		/// </summary>
+		/// <returns>Returns the created diagnostic report.</returns>
+		[WebGet(UriTemplate = "/sherlock", BodyStyle = WebMessageBodyStyle.Bare)]
+        [SwaggerWcfPath("Get Diagnostic Report", "A diagnostic report contains logs and configuration information used to debug and resolve issues")]
+        DiagnosticReport GetServerDiagnosticReport();
+
+        /// <summary>
+		/// Ping the service to determine up/down
+		/// </summary>
+		[WebInvoke(UriTemplate = "/", Method = "PING")]
+        [SwaggerWcfPath("Service Availability Status", "Forces the service to respond with a 204 if the AMI is running at this endpoint", ExternalDocsUrl = "http://santedb.org/artifacts/1.0/hdsi/", ExternalDocsDescription = "AMI Data Contract Documentation")]
+        void Ping();
+
+        #endregion
+
+        #region Two-Factor Authentication
+
+        /// <summary>
+		/// Creates a request that the server issue a reset code
+		/// </summary>
+		[WebInvoke(UriTemplate = "/tfa", BodyStyle = WebMessageBodyStyle.Bare, Method = "POST")]
+        void SendTfaSecret(TfaRequestInfo resetInfo);
+
+        /// <summary>
+        /// Gets the list of TFA mechanisms.
+        /// </summary>
+        /// <returns>Returns a list of TFA mechanisms.</returns>
+        [WebGet(UriTemplate = "/tfa")]
+        [SwaggerWcfPath("Get TFA Mechanism", "Retrieves a list of supported TFA mechanisms")]
+        AmiCollection<TfaMechanismInfo> GetTfaMechanisms();
+
+        #endregion
+
     }
 }

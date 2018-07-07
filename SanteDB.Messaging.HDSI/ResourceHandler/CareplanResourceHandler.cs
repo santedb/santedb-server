@@ -109,26 +109,16 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
         /// <summary>
         /// Gets a careplan by identifier
         /// </summary>
-        public Object Get(Guid id, Guid versionId)
+        public Object Get(object id, object versionId)
         {
-
-            Patient target = ApplicationContext.Current.GetService<IRepositoryService<Patient>>().Get(id);
-            var carePlanner = ApplicationContext.Current.GetService<ICarePlanService>();
-            var plan = carePlanner.CreateCarePlan(target,
-               WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters["_asEncounters"] == "true",
-               WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters.ToQuery().ToDictionary(o => o.Key, o => (Object)o.Value));
-            IConceptRepositoryService conceptService = ApplicationContext.Current.GetService<IConceptRepositoryService>();
-
-            foreach (var p in plan.Action)
-                p.Participations.ForEach(o => o.ParticipationRoleKey = o.ParticipationRoleKey ?? conceptService.GetConcept(o.ParticipationRole?.Mnemonic).Key);
-            return plan;
-
+            // TODO: This will become the retrieval of care plan object 
+            throw new NotSupportedException();
         }
 
         /// <summary>
         /// Obsolete the care plan
         /// </summary>
-        public Object Obsolete(Guid  key)
+        public Object Obsolete(object  key)
         {
             throw new NotSupportedException();
         }

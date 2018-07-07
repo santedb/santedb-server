@@ -66,7 +66,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
 		/// </summary>
 		/// <value>The password hash.</value>
 		[Column("passwd")]
-		public String PasswordHash {
+		public String Password {
 			get;
 			set;
 		}

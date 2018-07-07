@@ -124,9 +124,9 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
 		/// <param name="id">The id of the organization.</param>
 		/// <param name="versionId">The version id of the organization.</param>
 		/// <returns>Returns the organization.</returns>
-		public Object Get(Guid id, Guid versionId)
+		public Object Get(Object id, Object versionId)
 		{
-			return this.repository.GetConceptClass(id);
+			return this.repository.GetConceptClass((Guid)id);
 		}
 
 		/// <summary>
@@ -134,9 +134,9 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
 		/// </summary>
 		/// <param name="key">The key of the organization to obsolete.</param>
 		/// <returns>Returns the obsoleted organization.</returns>
-		public Object Obsolete(Guid  key)
+		public Object Obsolete(Object key)
 		{
-			return this.repository.ObsoleteConceptClass(key);
+			return this.repository.ObsoleteConceptClass((Guid)key);
 		}
 
 		/// <summary>

@@ -238,7 +238,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 pdpOutcome != PolicyDecisionOutcomeType.Grant)
                                 throw new PolicyViolationException(PermissionPolicyIdentifiers.ChangePassword, pdpOutcome.Value);
 
-                            user.PasswordHash = passwordHashingService.EncodePassword(newPassword);
+                            user.Password = passwordHashingService.EncodePassword(newPassword);
                             user.SecurityHash = Guid.NewGuid().ToString();
                             user.UpdatedByKey = principal.GetUserKey(dataContext);
 
@@ -310,7 +310,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             DbSecurityUser newIdentityUser = new DbSecurityUser()
                             {
                                 UserName = userName,
-                                PasswordHash = hashingService.EncodePassword(password),
+                                Password = hashingService.EncodePassword(password),
                                 SecurityHash = Guid.NewGuid().ToString(),
                                 UserClass = UserClassKeys.HumanUser
                             };

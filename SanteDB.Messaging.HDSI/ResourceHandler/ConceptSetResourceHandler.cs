@@ -110,23 +110,23 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
 		/// <summary>
 		/// Gets the specified conceptset
 		/// </summary>
-		public Object Get(Guid id, Guid versionId)
+		public Object Get(object id, object versionId)
 		{
-			if (versionId != Guid.Empty)
+			if ((Guid)versionId != Guid.Empty)
 			{
 				throw new NotSupportedException();
 			}
 
-			return this.repositoryService.GetConceptSet(id);
+			return this.repositoryService.GetConceptSet((Guid)id);
 		}
 
 		/// <summary>
 		/// Obsolete the specified concept set
 		/// </summary>
 		[PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AdministerConceptDictionary)]
-		public Object Obsolete(Guid  key)
+		public Object Obsolete(object key)
 		{
-			return this.repositoryService.ObsoleteConceptSet(key);
+			return this.repositoryService.ObsoleteConceptSet((Guid)key);
 		}
 
 		/// <summary>

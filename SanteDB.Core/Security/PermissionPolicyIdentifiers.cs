@@ -40,118 +40,129 @@ namespace SanteDB.Core.Security
         /// <summary>
         /// Access administrative function
         /// </summary>
-        public const string UnrestrictedAdministration = "1.3.6.1.4.1.33349.3.1.5.9.2.0";
+        public const string UnrestrictedAdministration = UnrestrictedAll + ".0";
 
         /// <summary>
         /// Policy identifier for allowance of changing passwords
         /// </summary>
         /// TODO: Affix the mohawk college OID for this
-        public const string ChangePassword = "1.3.6.1.4.1.33349.3.1.5.9.2.0.1";
+        public const string ChangePassword = UnrestrictedAdministration + ".1";
 
         /// <summary>
         /// Whether the user can create roles
         /// </summary>
-        public const string CreateRoles = "1.3.6.1.4.1.33349.3.1.5.9.2.0.2";
+        public const string CreateRoles = UnrestrictedAdministration + ".2";
 
         /// <summary>
         /// Policy identifier for allowance of altering passwords
         /// </summary>
-        public const string AlterRoles = "1.3.6.1.4.1.33349.3.1.5.9.2.0.3";
+        public const string AlterRoles = UnrestrictedAdministration + ".3";
 
         /// <summary>
         /// Policy identifier for allowing of creating new identities
         /// </summary>
-        public const string CreateIdentity = "1.3.6.1.4.1.33349.3.1.5.9.2.0.4";
+        public const string CreateIdentity = UnrestrictedAdministration + ".4";
 
         /// <summary>
         /// Policy identifier for allowing of creating new devices
         /// </summary>
-        public const string CreateDevice = "1.3.6.1.4.1.33349.3.1.5.9.2.0.5";
+        public const string CreateDevice = UnrestrictedAdministration + ".5";
 
         /// <summary>
         /// Policy identifier for allowing of creating new applications
         /// </summary>
-        public const string CreateApplication = "1.3.6.1.4.1.33349.3.1.5.9.2.0.6";
+        public const string CreateApplication = UnrestrictedAdministration + ".6";
 
         /// <summary>
         /// Administer the concept dictionary
         /// </summary>
-        public const string AdministerConceptDictionary = "1.3.6.1.4.1.33349.3.1.5.9.2.0.7";
+        public const string AdministerConceptDictionary = UnrestrictedAdministration + ".7";
 
         /// <summary>
         /// Policy identifier for allowing of creating new identities
         /// </summary>
-        public const string AlterIdentity = "1.3.6.1.4.1.33349.3.1.5.9.2.0.8";
+        public const string AlterIdentity = UnrestrictedAdministration + ".8";
 
         /// <summary>
         /// Allows an identity to alter a policy
         /// </summary>
-        public const string AlterPolicy = "1.3.6.1.4.1.33349.3.1.5.9.2.0.9";
+        public const string AlterPolicy = UnrestrictedAdministration + ".9";
 
         /// <summary>
         /// Administer data warehouse
         /// </summary>
-        public const string AdministerWarehouse  = "1.3.6.1.4.1.33349.3.1.5.9.2.0.10";
+        public const string AdministerWarehouse  = UnrestrictedAdministration + ".10";
+
+        /// <summary>
+        /// Unrestricted access to the audit repository
+        /// </summary>
+        public const string AccessAuditLog = UnrestrictedAdministration + ".11";
+
+        /// <summary>
+        /// Access to administrative applet information
+        /// </summary>
+        public const string AdministerApplet = UnrestrictedAdministration + ".12";
+
 
         /// <summary>
         /// Policy identifier for allowance of login
         /// </summary>
-        public const string Login = "1.3.6.1.4.1.33349.3.1.5.9.2.1";
+        public const string Login = UnrestrictedAll + ".1";
 
         /// <summary>
         /// Login to an interactive session (with user interaction)
         /// </summary>
-        public const string LoginAsService = "1.3.6.1.4.1.33349.3.1.5.9.2.1.0";
+        public const string LoginAsService = Login + ".0";
                                                 
         /// <summary>
         /// Access clinical data permission 
         /// </summary>
-        public const string UnrestrictedClinicalData = "1.3.6.1.4.1.33349.3.1.5.9.2.2";
+        public const string UnrestrictedClinicalData = UnrestrictedAll + ".2";
 
         /// <summary>
         /// Query clinical data
         /// </summary>
-        public const string QueryClinicalData = "1.3.6.1.4.1.33349.3.1.5.9.2.2.0";
+        public const string QueryClinicalData = UnrestrictedClinicalData + ".0";
 
         /// <summary>
         /// Write clinical data
         /// </summary>
-        public const string WriteClinicalData = "1.3.6.1.4.1.33349.3.1.5.9.2.2.1";
+        public const string WriteClinicalData = UnrestrictedClinicalData + ".1";
 
         /// <summary>
         /// Delete clinical data
         /// </summary>
-        public const string DeleteClinicalData = "1.3.6.1.4.1.33349.3.1.5.9.2.2.2";
+        public const string DeleteClinicalData = UnrestrictedClinicalData + ".2";
 
         /// <summary>
         /// Read clinical data
         /// </summary>
-        public const string ReadClinicalData = "1.3.6.1.4.1.33349.3.1.5.9.2.2.3";
+        public const string ReadClinicalData = UnrestrictedClinicalData + ".3";
 
         /// <summary>
         /// Allows the exporting of clinical data
         /// </summary>
-        public const string ExportClinicalData = "1.3.6.1.4.1.33349.3.1.5.9.2.2.4";
+        public const string ExportClinicalData = UnrestrictedClinicalData + ".4";
 
         /// <summary>
         /// Indicates the user can elevate themselves (Break the glass)
         /// </summary>
-        public const string ElevateClinicalData = "1.3.6.1.4.1.33349.3.1.5.9.2.3";
+        public const string ElevateClinicalData = UnrestrictedClinicalData + ".5";
 
 
         /// <summary>
         /// Indicates the user can update metadata
         /// </summary>
-        public const string UnrestrictedMetadata = "1.3.6.1.4.1.33349.3.1.5.9.2.4";
+        public const string UnrestrictedMetadata = UnrestrictedAll + ".4";
         /// <summary>
         /// Indicates the user can read metadata
         /// </summary>
-        public const string ReadMetadata = "1.3.6.1.4.1.33349.3.1.5.9.2.4.0";
+        public const string ReadMetadata = UnrestrictedMetadata + ".0";
 
         /// <summary>
         /// Allow a user all access to the warehouse 
         /// </summary>
-        public const string UnrestrictedWarehouse = "1.3.6.1.4.1.33349.3.1.5.9.2.5";
+        public const string UnrestrictedWarehouse = UnrestrictedAll + ".5";
 
         /// <summary>
         /// Allow a user to write data to the warehouse 
