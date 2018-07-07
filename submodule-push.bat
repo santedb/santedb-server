@@ -12,7 +12,7 @@ IF %1=="" (
 			git add *
 			git commit -am %1
 			git pull
-			git push origin HEAD:master
+			git push
 		)
 		POPD
 	)

@@ -9,6 +9,7 @@
 [submodule "santedb-applets"]
 	path = santedb-applets
 	url = https://github.com/santedb/santedb-applets
+	branch = master
 [submodule "santedb-bre-js"]
 	path = santedb-bre-js
 	url = https://github.com/santedb/santedb-bre-js.git
