@@ -31,12 +31,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Auditing.Core" Version="2.0.0"/>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Messaging.FHIR" Version="2.0.0"/>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0"/>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.0"/>
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2"/>
-    <PackageReference Include="SwaggerWcf.MEDIC" Version="0.2.9"/>
+    <PackageReference Include="MARC.HI.EHRS.SVC.Auditing.Core" Version="2.0.0" />
+    <PackageReference Include="MARC.HI.EHRS.SVC.Messaging.FHIR" Version="2.0.0" />
+    <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0" />
+    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="SwaggerWcf.MEDIC" Version="0.2.9" />
+    <Reference Include="MARC.Everest, Version=1.5.0.0, Culture=neutral, PublicKeyToken=ba5b2480018546af, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Solution Items\MARC.Everest.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
