@@ -6,7 +6,8 @@ git submodule update --remote
 		PUSHD %%G
 		IF EXIST ".git" (
 			ECHO Pulling %%G
-			git pull origin master
+			git checkout master
+			git pull
 		)
 		POPD
 	)
