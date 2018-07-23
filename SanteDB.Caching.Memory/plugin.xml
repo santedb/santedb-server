@@ -1,12 +1,16 @@
 <Plugin xmlns="http://santedb.org/package">
 	<meta>
+    <id>SanteDB.Caching.Memory</id>
 		<group>Performance</group>
 		<name>Local Memory Cache</name>
 		<description>Represents a simple memory cache which is capable of using the local computer's memory for caching of data</description>
 		<author>Mohawk College of Applied Arts and Technology</author>
 		<version>1.1.0</version>
-		<default>true</true>
+		<default>true</default>
 	</meta>
+  <dependencies>
+    <dependency id="SanteDB.Core" version="1.1.0"/>
+  </dependencies>
 	<files>
 		<add>SanteDB.Caching.Memory.dll</add>
 	</files>

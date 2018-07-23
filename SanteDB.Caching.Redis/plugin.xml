@@ -1,12 +1,16 @@
 <Plugin xmlns="http://santedb.org/package">
 	<meta>
+    <id>SanteDB.Caching.Redis</id>
 		<group>Performance</group>
 		<name>REDIS Memory Cache</name>
 		<description>Provides shared memory caching using a REDIS server</description>
 		<author>Mohawk College of Applied Arts and Technology</author>
 		<version>1.1.0</version>
-		<default>false</true>
+		<default>false</default>
 	</meta>
+  <dependencies>
+    <dependency id="SanteDB.Core" version="1.1.0"/>
+  </dependencies>
 	<files>
 		<add>SanteDB.Caching.Redis.dll</add>
 		<add>StackExchange.Redis.dll</add>

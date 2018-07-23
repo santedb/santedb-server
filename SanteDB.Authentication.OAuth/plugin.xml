@@ -5,7 +5,7 @@
 		<description>Represents a OAUTH 2.0 Token Service which uses the SanteDB authentication directory</description>
 		<author>Mohawk College of Applied Arts and Technology</author>
 		<version>1.1.0</version>
-		<default>true</true>
+		<default>true</default>
 	</meta>
 	<files>
 		<add>SanteDB.Authentication.OAuth2.dll</add>
@@ -27,25 +27,6 @@
 						<label>Issuer</label>
 						<description>The URL to the issuer which this token is issued for</description>
 					</setting>
-				</group>
-				<group name="signature" required="true" maxOccurs="1">
-					<label>Token Signing</label>
-					<choice name="certificate">
-						<label>RSA256 Digital Certificate</label>
-						<setting name="." type="certificate" required="true">
-							<label>Certificate</label>
-							<description>The X.509 Certificate used to sign JWT tokens issued from this service</description>
-							<icon>certificate</icon>
-						</setting>
-					</choice>
-					<choice name="symmetricKey">
-						<label>HMAC256 Symmetric Key</label>
-						<setting name="secret" type="password" required="true">
-							<label>Secret Key</label>
-							<description>The symmetric key that will be used to sign the JWT tokens issued by this service</description>
-							<icon>asterisk</icon>
-						</setting>
-					</choice>
 				</group>
 				<group name="claims" required="true" maxOccurs="*">
 					<label>Allowed Client Claims</label>
