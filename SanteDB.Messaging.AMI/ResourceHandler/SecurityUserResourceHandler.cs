@@ -52,21 +52,30 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
             var td = data as SecurityUserInfo;
 
             // Update the user
-            var retVal = base.Update(data) as SecurityUserInfo;
-
-            // Roles? We want to update
-            if(td.Roles.Count > 0)
+            if (td.PasswordOnly)
             {
-                var irps = ApplicationContext.Current.GetService<IRoleProviderService>();
-                // Remove the user from all roles
-                irps.RemoveUsersFromRoles(new string[] { retVal.Entity.UserName }, irps.GetAllRoles(), AuthenticationContext.Current.Principal);
-                irps.AddUsersToRoles(new string[] { retVal.Entity.UserName }, td.Roles.ToArray(), AuthenticationContext.Current.Principal);
+                ApplicationContext.Current.GetService<IIdentityProviderService>().ChangePassword(td.Entity.UserName, td.Entity.Password, AuthenticationContext.Current.Principal);
+                return null;
             }
-            
-            return new SecurityUserInfo(retVal.Entity)
+            else
             {
-                Roles = td.Roles
-            };
+                var retVal = base.Update(data) as SecurityUserInfo;
+
+                // Roles? We want to update
+                if (td.Roles.Count > 0)
+                {
+                    var irps = ApplicationContext.Current.GetService<IRoleProviderService>();
+                    // Remove the user from all roles
+                    irps.RemoveUsersFromRoles(new string[] { retVal.Entity.UserName }, irps.GetAllRoles(), AuthenticationContext.Current.Principal);
+                    irps.AddUsersToRoles(new string[] { retVal.Entity.UserName }, td.Roles.ToArray(), AuthenticationContext.Current.Principal);
+                }
+
+                return new SecurityUserInfo(retVal.Entity)
+                {
+                    Roles = td.Roles
+                };
+
+            }
 
         }
     }

@@ -67,7 +67,7 @@ namespace SanteDB.Core.Services.Impl
         /// <returns>Returns the updated user.</returns>
         public SecurityUser ChangePassword(Guid userId, string password)
 		{
-			this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Changing user password");
+            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Changing user password");
 			var securityUser = this.GetUser(userId);
 			if (securityUser == null)
 				throw new KeyNotFoundException("Cannot locate security user");
@@ -629,12 +629,10 @@ namespace SanteDB.Core.Services.Impl
             // User password change request?
             if(!String.IsNullOrEmpty(user.Password))
             {
-                // If the user is not themselves then they must have alter password permission
-                if (AuthenticationContext.Current.Principal.Identity.Name != user.UserName)
-                    new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.ChangePassword).Demand();
                 this.ChangePassword(user.Key.Value, user.Password);
             }
 
+            if()
             var retVal = base.Save(user);
             this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(retVal));
             return retVal;

@@ -35,6 +35,12 @@ namespace SanteDB.Core.Model.AMI.Auth
         }
 
         /// <summary>
+        /// When true, indicates that the update is for password setting only
+        /// </summary>
+        [XmlElement("passwordOnly"), JsonProperty("passwordOnly")]
+        public bool PasswordOnly { get; set; }
+
+        /// <summary>
         /// Gets or sets the role this user belongs to
         /// </summary>
         [XmlElement("role"), JsonProperty("role")]

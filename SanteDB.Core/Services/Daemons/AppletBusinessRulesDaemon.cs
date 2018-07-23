@@ -32,7 +32,7 @@ namespace SanteDB.Core.Services.Daemons
     /// <summary>
     /// A daemon which loads business rules from the applet manager
     /// </summary>
-    [Description("Applet BRE Source")]
+    [Description("Applet JavaScript BRE Source")]
     public class AppletBusinessRulesDaemon : IDaemonService
     {
 
