@@ -5,7 +5,7 @@
 		<description>Represents a OAUTH 2.0 Token Service which uses the SanteDB authentication directory</description>
 		<author>Mohawk College of Applied Arts and Technology</author>
 		<version>1.1.0</version>
-		<default>true</true>
+		<default>true</default>
 	</meta>
 	<files>
 		<add>SanteDB.Authentication.OAuth2.dll</add>
