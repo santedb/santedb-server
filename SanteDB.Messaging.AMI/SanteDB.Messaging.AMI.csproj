@@ -89,7 +89,6 @@
     <Compile Include="ResourceHandler\SecurityPolicyResourceHandler.cs" />
     <Compile Include="ResourceHandler\SecurityRoleResourceHandler.cs" />
     <Compile Include="ResourceHandler\SecurityUserResourceHandler.cs" />
-    <Compile Include="ResourceHandler\TSecurityEntity.cs" />
     <Compile Include="Wcf\AmiServiceBehavior.cs" />
     <Compile Include="Wcf\Behavior\AmiRestEndpointBehavior.cs" />
     <Compile Include="Wcf\Behavior\AmiSerializerOperationBehavior.cs" />
