@@ -135,6 +135,7 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
         /// <summary>
         /// Query for care plan objects... Constructs a care plan for all patients matching the specified query parameters
         /// </summary>
+        /// TODO: Change this to actually query care plans
         public IEnumerable<Object> Query(NameValueCollection queryParameters, int offset, int count, out int totalCount)
         {
             var repositoryService = ApplicationContext.Current.GetService<IRepositoryService<Patient>>();
