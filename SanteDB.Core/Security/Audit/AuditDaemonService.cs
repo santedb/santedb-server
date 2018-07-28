@@ -70,6 +70,12 @@ namespace SanteDB.Core.Security.Audit
             this.Starting?.Invoke(this, EventArgs.Empty);
 
             this.m_safeToStop = false;
+            ApplicationContext.Current.Stopping += (o, e) =>
+            {
+                this.m_safeToStop = true;
+                AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStop);
+                this.Stop();
+            };
             ApplicationContext.Current.Started += (o, e) =>
             {
                 try
@@ -114,7 +120,6 @@ namespace SanteDB.Core.Security.Audit
                     this.m_tracer.TraceError("Error starting up audit repository service: {0}", ex);
                 }
             };
-            ApplicationContext.Current.Stopping += (o, e) => this.m_safeToStop = true;
 
             this.Started?.Invoke(this, EventArgs.Empty);
             return true;
