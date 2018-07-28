@@ -13,9 +13,9 @@ namespace SanteDB.Core.Model.AMI.Auth
     /// Represents security user information
     /// </summary>
     [XmlType(nameof(SecurityUserInfo), Namespace = "http://santedb.org/ami")]
-    [XmlRoot("SecurityUser", Namespace = "http://santedb.org/ami")]
+    [XmlRoot(nameof(SecurityUserInfo), Namespace = "http://santedb.org/ami")]
     [JsonObject(nameof(SecurityUserInfo))]
-    public class SecurityUserInfo : SecurityEntityInfo<SecurityUser>
+    public class SecurityUserInfo //: SecurityEntityInfo<SecurityUser>
     {
 
         /// <summary>
@@ -29,10 +29,16 @@ namespace SanteDB.Core.Model.AMI.Auth
         /// <summary>
         /// Get the security user information
         /// </summary>
-        public SecurityUserInfo(SecurityUser user) : base(user)
+        public SecurityUserInfo(SecurityUser user) //: base(user)
         {
             this.Roles = user.Roles.Select(o => o.Name).ToList();
         }
+
+        /// <summary>
+        /// Represents the entity
+        /// </summary>
+        [XmlElement("entity"), JsonProperty("entity")]
+        public SecurityUser Entity { get; set; }
 
         /// <summary>
         /// When true, indicates that the update is for password setting only

@@ -85,6 +85,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.BusinessRules.JavaS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.OrmLite", "santedb-orm\SanteDB.OrmLite\SanteDB.OrmLite.csproj", "{407C87E6-A1F3-45E6-B883-A8176B350817}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Warehouse.ADO", "SanteDB.Warehouse.ADO\SanteDB.Warehouse.ADO.csproj", "{BFC58F38-9023-4700-B35C-AA933A608E43}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -219,6 +221,10 @@ Global
 		{407C87E6-A1F3-45E6-B883-A8176B350817}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{407C87E6-A1F3-45E6-B883-A8176B350817}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{407C87E6-A1F3-45E6-B883-A8176B350817}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFC58F38-9023-4700-B35C-AA933A608E43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFC58F38-9023-4700-B35C-AA933A608E43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFC58F38-9023-4700-B35C-AA933A608E43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFC58F38-9023-4700-B35C-AA933A608E43}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -258,6 +264,7 @@ Global
 		{39E61451-F4FE-493D-B754-5F06EB284AAC} = {58D303FA-0113-4888-AA67-A9436DDEBFAD}
 		{3BFD6EE6-0267-4D82-BE7D-9B48B2F6F3D4} = {58D303FA-0113-4888-AA67-A9436DDEBFAD}
 		{407C87E6-A1F3-45E6-B883-A8176B350817} = {66328BE7-81CC-4820-99E9-8C5C534B4A2B}
+		{BFC58F38-9023-4700-B35C-AA933A608E43} = {66328BE7-81CC-4820-99E9-8C5C534B4A2B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E73A1AED-8AB7-492C-A4F0-C71FCC5C393C}

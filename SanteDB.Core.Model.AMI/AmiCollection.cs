@@ -18,31 +18,78 @@
  * Date: 2017-9-1
  */
 
+using Newtonsoft.Json;
+using SanteDB.Core.Alerting;
+using SanteDB.Core.Applets.Model;
+using SanteDB.Core.Interop;
+using SanteDB.Core.Model.AMI.Applet;
+using SanteDB.Core.Model.AMI.Auth;
+using SanteDB.Core.Model.AMI.Diagnostics;
+using SanteDB.Core.Model.AMI.Logging;
+using SanteDB.Core.Model.AMI.Security;
+using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Security;
+using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace SanteDB.Core.Model.AMI.Collections
 {
+
+    
 	/// <summary>
 	/// Represents an administrative collection item.
 	/// </summary>
-	/// <typeparam name="T">The type of collection of the collection items.</typeparam>
-	[XmlType(Namespace = "http://santedb.org/ami")]
-	public class AmiCollection<T>
+	[XmlType(nameof(AmiCollection), Namespace = "http://santedb.org/ami")]
+    [JsonObject(nameof(AmiCollection))]
+    [XmlInclude(typeof(Entity))]
+    [XmlInclude(typeof(ExtensionType))]
+    [XmlInclude(typeof(AlertMessage))]
+    [XmlInclude(typeof(TfaRequestInfo))]
+    [XmlInclude(typeof(SecurityDeviceInfo))]
+    [XmlInclude(typeof(SecurityPolicyInfo))]
+    [XmlInclude(typeof(SecurityRoleInfo))]
+    [XmlInclude(typeof(SecurityUser))]
+    [XmlInclude(typeof(SecurityRole))]
+    [XmlInclude(typeof(SecurityDevice))]
+    [XmlInclude(typeof(SecurityApplication))]
+    [XmlInclude(typeof(SecurityUserInfo))]
+    [XmlInclude(typeof(AuditSubmission))]
+    [XmlInclude(typeof(AppletManifest))]
+    [XmlInclude(typeof(AppletManifestInfo))]
+    [XmlInclude(typeof(DeviceEntity))]
+    [XmlInclude(typeof(DiagnosticApplicationInfo))]
+    [XmlInclude(typeof(DiagnosticAttachmentInfo))]
+    [XmlInclude(typeof(DiagnosticBinaryAttachment))]
+    [XmlInclude(typeof(DiagnosticTextAttachment))]
+    [XmlInclude(typeof(DiagnosticEnvironmentInfo))]
+    [XmlInclude(typeof(DiagnosticReport))]
+    [XmlInclude(typeof(DiagnosticSyncInfo))]
+    [XmlInclude(typeof(DiagnosticVersionInfo))]
+    [XmlInclude(typeof(SubmissionInfo))]
+    [XmlInclude(typeof(SubmissionResult))]
+    [XmlInclude(typeof(ApplicationEntity))]
+    [XmlInclude(typeof(SubmissionRequest))]
+    [XmlInclude(typeof(ServiceOptions))]
+    [XmlInclude(typeof(X509Certificate2Info))]
+    [XmlInclude(typeof(CodeSystem))]
+    [XmlInclude(typeof(LogFileInfo))]
+    public class AmiCollection
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AmiCollection{T}"/> class.
 		/// </summary>
 		public AmiCollection()
 		{
-			this.CollectionItem = new List<T>();
+			this.CollectionItem = new List<Object>();
 		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AmiCollection{T}"/> class
 		/// with a specific list of collection items.
 		/// </summary>
-		public AmiCollection(List<T> collectionItems)
+		public AmiCollection(List<Object> collectionItems)
 		{
 			this.CollectionItem = collectionItems;
 		}
@@ -51,27 +98,29 @@ namespace SanteDB.Core.Model.AMI.Collections
 		/// Initializes a new instance of the <see cref="AmiCollection{T}"/> class
 		/// with a specific list of collection items.
 		/// </summary>
-		public AmiCollection(IEnumerable<T> collectionItems)
+		public AmiCollection(IEnumerable<Object> collectionItems, int offset, int totalCount)
 		{
-			this.CollectionItem = new List<T>(collectionItems);
+			this.CollectionItem = new List<Object>(collectionItems);
+            this.Offset = offset;
+            this.Size = totalCount;
 		}
 
 		/// <summary>
 		/// Gets or sets a list of collection items.
 		/// </summary>
-		[XmlElement("item")]
-		public List<T> CollectionItem { get; set; }
+		[XmlElement("item"), JsonProperty("item")]
+		public List<Object> CollectionItem { get; set; }
 
 		/// <summary>
 		/// Gets or sets the total offset.
 		/// </summary>
-		[XmlAttribute("offset")]
+		[XmlAttribute("offset"), JsonProperty("offset")]
 		public int Offset { get; set; }
 
 		/// <summary>
 		/// Gets or sets the total collection size.
 		/// </summary>
-		[XmlAttribute("size")]
+		[XmlAttribute("size"), JsonProperty("size")]
 		public int Size { get; set; }
-	}
+    }
 }

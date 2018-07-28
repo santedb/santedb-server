@@ -632,7 +632,6 @@ namespace SanteDB.Core.Services.Impl
                 this.ChangePassword(user.Key.Value, user.Password);
             }
 
-            if()
             var retVal = base.Save(user);
             this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(retVal));
             return retVal;

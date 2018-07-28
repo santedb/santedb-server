@@ -28,7 +28,6 @@ using System.Security.Permissions;
 using SanteDB.Core.Model.AMI.Logging;
 using System.Reflection;
 using SanteDB.Core.Model.AMI.Security;
-using SanteDB.Core.Model.AMI.Collections;
 using SwaggerWcf.Attributes;
 using System.Xml.Serialization;
 using SanteDB.Core.Model.AMI.Auth;
@@ -37,6 +36,10 @@ using SanteDB.Core.Wcf;
 using SanteDB.Messaging.AMI.Configuration;
 using MARC.HI.EHRS.SVC.Core.Services.Security;
 using SanteDB.Core.Security.Claims;
+using SanteDB.Core.Model.Collection;
+using SanteDB.Core.Model.AMI.Collections;
+using MARC.Everest.Threading;
+using SanteDB.Core.Model.AMI;
 
 namespace SanteDB.Messaging.AMI.Wcf
 {
@@ -73,7 +76,7 @@ namespace SanteDB.Messaging.AMI.Wcf
         public LogFileInfo GetLog(string logId)
         {
             var logFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), logId + ".log");
-            var retVal = new AmiCollection<LogFileInfo>();
+            var retVal = new AmiCollection();
             var fi = new FileInfo(logFile);
             return new LogFileInfo()
             {
@@ -89,10 +92,10 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// </summary>
         /// <returns>Returns a collection of log files.</returns>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
-        public AmiCollection<LogFileInfo> GetLogs()
+        public AmiCollection GetLogs()
         {
             var logDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            var retVal = new AmiCollection<LogFileInfo>();
+            var retVal = new AmiCollection();
             foreach (var itm in Directory.GetFiles(logDirectory, "*.log"))
             {
                 var fi = new FileInfo(itm);
@@ -180,19 +183,19 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// Get a list of TFA mechanisms
         /// </summary>
         /// <returns>Returns a list of TFA mechanisms.</returns>
-        public AmiCollection<TfaMechanismInfo> GetTfaMechanisms()
+        public AmiCollection GetTfaMechanisms()
         {
             var tfaRelay = ApplicationContext.Current.GetService<ITfaRelayService>();
             if (tfaRelay == null)
                 throw new InvalidOperationException("TFA Relay missing");
-            return new AmiCollection<TfaMechanismInfo>()
+            return new AmiCollection()
             {
                 CollectionItem = tfaRelay.Mechanisms.Select(o => new TfaMechanismInfo()
                 {
                     Id = o.Id,
                     Name = o.Name,
                     ChallengeText = o.Challenge
-                }).ToList()
+                }).OfType<Object>().ToList()
             };
         }
 
@@ -253,6 +256,7 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <summary>
         /// Creates security reset information
         /// </summary>
+        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
         public void SendTfaSecret(TfaRequestInfo resetInfo)
         {
             var securityRepository = ApplicationContext.Current.GetService<ISecurityRepositoryService>();
@@ -293,7 +297,8 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <param name="resourceType">The type of resource being created</param>
         /// <param name="data">The resource data being created</param>
         /// <returns>The created the data</returns>
-        public IdentifiedData Create(string resourceType, IdentifiedData data)
+        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
+        public Object Create(string resourceType, Object data)
         {
             this.ThrowIfNotReady();
 
@@ -333,54 +338,346 @@ namespace SanteDB.Messaging.AMI.Wcf
             }
         }
 
-        public IdentifiedData CreateUpdate(string resourceType, string key, IdentifiedData data)
+        /// <summary>
+        /// Create or update the specific resource
+        /// </summary>
+        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
+        public Object CreateUpdate(string resourceType, string key, Object data)
         {
-            throw new NotImplementedException();
+            this.ThrowIfNotReady();
+            try
+            {
+                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
+                if (handler != null)
+                {
+                    var retVal = handler.Create(data, true) as IdentifiedData;
+                    var versioned = retVal as IVersionedEntity;
+                    WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Created;
+                    WebOperationContext.Current.OutgoingResponse.ETag = retVal.Tag;
+
+                    if (versioned != null)
+                        WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}/history/{3}",
+                            WebOperationContext.Current.IncomingRequest.UriTemplateMatch.BaseUri,
+                            resourceType,
+                            retVal.Key,
+                            versioned.Key));
+                    else
+                        WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}",
+                            WebOperationContext.Current.IncomingRequest.UriTemplateMatch.BaseUri,
+                            resourceType,
+                            retVal.Key));
+
+                    return retVal;
+                }
+                else
+                    throw new FileNotFoundException(resourceType);
+
+            }
+            catch (Exception e)
+            {
+                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
+                throw;
+
+            }
         }
 
-        public IdentifiedData Delete(string resourceType, string key)
+        /// <summary>
+        /// Delete the specified resource
+        /// </summary>
+
+        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
+        public Object Delete(string resourceType, string key)
         {
-            throw new NotImplementedException();
+            this.ThrowIfNotReady();
+            try
+            {
+                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
+                if (handler != null)
+                {
+
+                    var retVal = handler.Obsolete(Guid.Parse(key)) as IdentifiedData;
+
+                    var versioned = retVal as IVersionedEntity;
+
+                    WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Created;
+                    if (versioned != null)
+                        WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}/history/{3}",
+                            WebOperationContext.Current.IncomingRequest.UriTemplateMatch.BaseUri,
+                            resourceType,
+                            retVal.Key,
+                            versioned.Key));
+                    else
+                        WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}",
+                            WebOperationContext.Current.IncomingRequest.UriTemplateMatch.BaseUri,
+                            resourceType,
+                            retVal.Key));
+
+                    return retVal;
+                }
+                else
+                    throw new FileNotFoundException(resourceType);
+
+            }
+            catch (Exception e)
+            {
+                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
+                throw;
+
+            }
         }
 
-        public IdentifiedData Get(string resourceType, string key)
+        /// <summary>
+        /// Get the specified resource
+        /// </summary>
+        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
+        public Object Get(string resourceType, string key)
         {
-            throw new NotImplementedException();
+            this.ThrowIfNotReady();
+            try
+            {
+
+
+                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
+                if (handler != null)
+                {
+                    var retVal = handler.Get(Guid.Parse(key), Guid.Empty) as IdentifiedData;
+                    if (retVal == null)
+                        throw new FileNotFoundException(key);
+
+                    WebOperationContext.Current.OutgoingResponse.ETag = retVal.Tag;
+                    WebOperationContext.Current.OutgoingResponse.LastModified = retVal.ModifiedOn.DateTime;
+
+                    // HTTP IF headers?
+                    if (WebOperationContext.Current.IncomingRequest.IfModifiedSince.HasValue &&
+                        retVal.ModifiedOn <= WebOperationContext.Current.IncomingRequest.IfModifiedSince ||
+                        WebOperationContext.Current.IncomingRequest.IfNoneMatch?.Any(o => retVal.Tag == o) == true)
+                    {
+                        WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NotModified;
+                        return null;
+                    }
+                    else
+                    {
+                        return retVal;
+                    }
+                }
+                else
+                    throw new FileNotFoundException(resourceType);
+
+            }
+            catch (Exception e)
+            {
+                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
+                throw;
+
+            }
         }
 
-        public XmlSchema GetSchema()
+        /// <summary>
+        /// Get a specific version of the resource 
+        /// </summary>
+        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
+        public Object GetVersion(string resourceType, string key, string versionKey)
         {
-            throw new NotImplementedException();
+            this.ThrowIfNotReady();
+            try
+            {
+                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
+                if (handler != null)
+                {
+                    var retVal = handler.Get(Guid.Parse(key), Guid.Parse(versionKey)) as IdentifiedData;
+                    if (retVal == null)
+                        throw new FileNotFoundException(key);
+
+
+                    WebOperationContext.Current.OutgoingResponse.ETag = retVal.Tag;
+                    return retVal;
+                }
+                else
+                    throw new FileNotFoundException(resourceType);
+
+            }
+            catch (Exception e)
+            {
+                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
+                throw;
+
+            }
         }
 
-        public IdentifiedData GetVersion(string resourceType, string key, string versionKey)
+        /// <summary>
+        /// Get the complete history of a resource 
+        /// </summary>
+        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
+        public AmiCollection History(string resourceType, string key)
         {
-            throw new NotImplementedException();
+            this.ThrowIfNotReady();
+            try
+            {
+                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
+
+                if (handler != null)
+                {
+                    String since = WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters["_since"];
+                    Guid sinceGuid = since != null ? Guid.Parse(since) : Guid.Empty;
+
+                    // Query 
+                    var retVal = handler.Get(Guid.Parse(key), Guid.Empty) as IVersionedEntity;
+                    List<IVersionedEntity> histItm = new List<IVersionedEntity>() { retVal };
+                    while (retVal.PreviousVersionKey.HasValue)
+                    {
+                        retVal = handler.Get(Guid.Parse(key), retVal.PreviousVersionKey.Value) as IVersionedEntity;
+                        if (retVal != null)
+                            histItm.Add(retVal);
+                        // Should we stop fetching?
+                        if (retVal?.VersionKey == sinceGuid)
+                            break;
+
+                    }
+
+                    // Lock the item
+                    return new AmiCollection(histItm, 0, histItm.Count);
+                }
+                else
+                    throw new FileNotFoundException(resourceType);
+            }
+            catch (Exception e)
+            {
+                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
+                throw;
+
+            }
         }
 
-        public IdentifiedData History(string resourceType, string key)
+        /// <summary>
+        /// Get options / capabilities of a specific object
+        /// </summary>
+        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
+        public ServiceResourceOptions ResourceOptions(string resourceType)
         {
-            throw new NotImplementedException();
-        }
-        
-        public ServiceResourceOptions Options(string resourceType)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IdentifiedData Search(string resourceType)
-        {
-            throw new NotImplementedException();
+            var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
+            if (handler == null)
+                throw new FileNotFoundException(resourceType);
+            else
+                return new ServiceResourceOptions(resourceType, handler.Capabilities);
         }
 
-        public IdentifiedData Update(string resourceType, string key, IdentifiedData data)
+        /// <summary>
+        /// Performs a search of the specified AMI resource
+        /// </summary>
+        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
+        public AmiCollection Search(string resourceType)
         {
-            throw new NotImplementedException();
+            this.ThrowIfNotReady();
+            try
+            {
+                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
+                if (handler != null)
+                {
+                    String offset = WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters["_offset"],
+                        count = WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters["_count"];
+
+                    var query = WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters.ToQuery();
+
+                    // Modified on?
+                    if (WebOperationContext.Current.IncomingRequest.IfModifiedSince.HasValue)
+                        query.Add("modifiedOn", ">" + WebOperationContext.Current.IncomingRequest.IfModifiedSince.Value.ToString("o"));
+
+                    // No obsoletion time?
+                    if (typeof(BaseEntityData).IsAssignableFrom(handler.Type) && !query.ContainsKey("obsoletionTime"))
+                        query.Add("obsoletionTime", "null");
+
+                    int totalResults = 0;
+
+                    // Lean mode
+                    var lean = WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters["_lean"];
+                    bool parsedLean = false;
+                    bool.TryParse(lean, out parsedLean);
+
+
+                    var retVal = handler.Query(query, Int32.Parse(offset ?? "0"), Int32.Parse(count ?? "100"), out totalResults).OfType<IdentifiedData>().Select(o => o.GetLocked()).ToList();
+                    WebOperationContext.Current.OutgoingResponse.LastModified = retVal.OrderByDescending(o => o.ModifiedOn).FirstOrDefault()?.ModifiedOn.DateTime ?? DateTime.Now;
+
+
+                    // Last modification time and not modified conditions
+                    if ((WebOperationContext.Current.IncomingRequest.IfModifiedSince.HasValue ||
+                        WebOperationContext.Current.IncomingRequest.IfNoneMatch != null) &&
+                        totalResults == 0)
+                    {
+                        WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NotModified;
+                        return null;
+                    }
+                    else
+                    {
+                        return new AmiCollection(retVal, Int32.Parse(offset ?? "0"), totalResults);
+                    }
+                }
+                else
+                    throw new FileNotFoundException(resourceType);
+            }
+            catch (Exception e)
+            {
+                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
+                throw;
+
+            }
+        }
+
+        /// <summary>
+        /// Updates the specified object on the server
+        /// </summary>
+        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
+        public Object Update(string resourceType, string key, Object data)
+        {
+            this.ThrowIfNotReady();
+            try
+            {
+                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
+                if (handler != null)
+                {
+
+                    var retVal = handler.Update(data);
+
+                    var versioned = retVal as IVersionedEntity;
+                    WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.OK;
+                    WebOperationContext.Current.OutgoingResponse.ETag = (retVal as IdentifiedData)?.Tag;
+
+                    if (versioned != null)
+                        WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}/history/{3}",
+                            WebOperationContext.Current.IncomingRequest.UriTemplateMatch.BaseUri,
+                            resourceType,
+                            (retVal as IIdentifiedEntity)?.Key?.ToString() ?? (retVal as IAmiIdentified)?.Key,
+                            versioned.Key));
+                    else
+                        WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}",
+                            WebOperationContext.Current.IncomingRequest.UriTemplateMatch.BaseUri,
+                            resourceType,
+                            (retVal as IIdentifiedEntity)?.Key?.ToString() ?? (retVal as IAmiIdentified)?.Key));
+
+                    return retVal;
+                }
+                else
+                    throw new FileNotFoundException(resourceType);
+
+            }
+            catch (Exception e)
+            {
+                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
+                throw;
+
+            }
         }
 
         /// <summary>
         /// Service is not ready
         /// </summary>
+        [SwaggerWcfHidden]
         private void ThrowIfNotReady()
         {
             if (ApplicationContext.Current.IsRunning)

@@ -18,11 +18,12 @@
  * Date: 2017-9-1
  */
 using MARC.HI.EHRS.SVC.Core;
-using SanteDB.Core.Data.Warehouse;
 using SanteDB.Core.Model.RISI;
+using SanteDB.Core.Model.Warehouse;
 using SanteDB.Core.Services;
 using SwaggerWcf.Attributes;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.ServiceModel.Web;
@@ -175,7 +176,12 @@ namespace SanteDB.Messaging.RISI.Wcf
 				throw new InvalidOperationException("Cannot find the adhoc data warehouse service");
 
             int tr = 0;
-            var res = adhocService.StoredQuery(Guid.Parse(datamartId), queryId, WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters.ToQuery(), out tr).Select(o => new DataWarehouseObject(o));
+            var qry = WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters.ToQuery();
+            List<string> offset = null, count = null ;
+            qry.TryGetValue("_offset", out offset);
+            qry.TryGetValue("_count", out count);
+
+            var res = adhocService.StoredQuery(Guid.Parse(datamartId), queryId, qry, Int32.Parse(offset?.FirstOrDefault() ?? "0"), Int32.Parse(count?.FirstOrDefault() ?? "100"),  out tr).Select(o => new DataWarehouseObject(o));
 
             return new RisiCollection<DataWarehouseObject>(res) { Size = tr };
 		}

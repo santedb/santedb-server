@@ -180,8 +180,9 @@ namespace SanteDB.Core.Security.Audit
         /// <summary>
         /// Autility utility which can be used to send a data audit 
         /// </summary>
-        public static void AuditDataAction<TData>(EventTypeCodes typeCode, ActionType action, AuditableObjectLifecycle lifecycle, EventIdentifierType eventType, OutcomeIndicator outcome, String queryPerformed, params TData[] data) where TData : IdentifiedData
+        public static void AuditDataAction<TData>(EventTypeCodes typeCode, ActionType action, AuditableObjectLifecycle lifecycle, EventIdentifierType eventType, OutcomeIndicator outcome, String queryPerformed, params TData[] data) 
         {
+
             traceSource.TraceVerbose("Create AuditDataAction audit");
 
             AuditCode eventTypeId = CreateAuditActionCode(typeCode);
@@ -226,13 +227,19 @@ namespace SanteDB.Core.Security.Audit
                     roleCode = AuditableObjectRole.SecurityUser;
                     objType = AuditableObjectType.SystemObject;
                 }
+                else if(o is AuditData)
+                {
+                    idTypeCode = AuditableObjectIdType.ReportNumber;
+                    roleCode = AuditableObjectRole.SecurityResource;
+                    objType = AuditableObjectType.SystemObject;
+                }
 
                 return new AuditableObject()
                 {
                     IDTypeCode = idTypeCode,
                     CustomIdTypeCode = idTypeCode == AuditableObjectIdType.Custom ? new AuditCode(o.GetType().Name, "SanteDBTable") : null,
                     LifecycleType = lifecycle,
-                    ObjectId = o.Key?.ToString(),
+                    ObjectId = (o as IIdentifiedEntity)?.Key?.ToString() ?? (o as AuditData)?.CorrelationToken.ToString(),
                     Role = roleCode,
                     Type = objType
                 };
@@ -337,6 +344,7 @@ namespace SanteDB.Core.Security.Audit
                 }
 
                 ApplicationContext.Current.GetService<IAuditorService>()?.SendAudit(audit);
+                ApplicationContext.Current.GetSerivce<IAuditRepositoryService>()?.Insert(audit); // insert into local AR 
             });
 
         }
@@ -354,7 +362,6 @@ namespace SanteDB.Core.Security.Audit
                 NetworkAccessPointId = Dns.GetHostName(),
                 NetworkAccessPointType = NetworkAccessPointType.MachineName,
                 UserName = AuthenticationContext.Current.Principal.Identity.Name,
-                UserIdentifier = configService.GetUser(AuthenticationContext.Current.Principal.Identity).Key.ToString(),
                 UserIsRequestor = true
             });
         }

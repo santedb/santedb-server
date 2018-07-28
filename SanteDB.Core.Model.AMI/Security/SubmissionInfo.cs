@@ -18,6 +18,7 @@
  * Date: 2017-9-1
  */
 
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -30,59 +31,61 @@ namespace SanteDB.Core.Model.AMI.Security
 	/// </summary>
 	[XmlType(nameof(SubmissionInfo), Namespace = "http://santedb.org/ami")]
 	[XmlRoot(nameof(SubmissionInfo), Namespace = "http://santedb.org/ami")]
+    [JsonObject(nameof(SubmissionInfo))]
 	public class SubmissionInfo
 	{
 		/// <summary>
 		/// Administration contact
 		/// </summary>
-		[XmlElement("adminContact")]
+		[XmlElement("adminContact"), JsonProperty("adminContact")]
 		public string AdminContact { get; set; }
 
 		/// <summary>
 		/// Administration
 		/// </summary>
+        [XmlElement("adminAddress"), JsonProperty("adminAddress")]
 		public String AdminSiteAddress { get; set; }
 
 		/// <summary>
 		/// Disposition message
 		/// </summary>
-		[XmlElement("message")]
+		[XmlElement("message"), JsonProperty("message")]
 		public string DispositionMessage { get; set; }
 
 		/// <summary>
 		/// DN
 		/// </summary>
-		[XmlElement("dn")]
+		[XmlElement("dn"), JsonProperty("dn")]
 		public string DistinguishedName { get; set; }
 
 		/// <summary>
 		/// Email address of user
 		/// </summary>
-		[XmlElement("email")]
+		[XmlElement("email"), JsonProperty("email")]
 		public string EMail { get; set; }
 
 		/// <summary>
 		/// Expiry
 		/// </summary>
-		[XmlElement("notAfter")]
+		[XmlElement("notAfter"), JsonProperty("notAfter")]
 		public string NotAfter { get; set; }
 
 		/// <summary>
 		/// Before date
 		/// </summary>
-		[XmlElement("notBefore")]
+		[XmlElement("notBefore"), JsonProperty("notBefore")]
 		public string NotBefore { get; set; }
 
 		/// <summary>
 		/// RequestId
 		/// </summary>
-		[XmlAttribute("id")]
+		[XmlAttribute("id"), JsonProperty("id")]
 		public string RequestID { get; set; }
 
 		/// <summary>
 		/// Resolved on
 		/// </summary>
-		[XmlElement("resolved")]
+		[XmlElement("resolved"), JsonProperty("resolved")]
 		public string ResolvedWhen { get; set; }
 
 		/// <summary>
@@ -102,25 +105,25 @@ namespace SanteDB.Core.Model.AMI.Security
 		/// <summary>
 		/// Revoked on
 		/// </summary>
-		[XmlElement("revoked")]
+		[XmlElement("revoked"), JsonProperty("revoked")]
 		public string RevokedWhen { get; set; }
 
 		/// <summary>
 		/// Submitted on
 		/// </summary>
-		[XmlElement("submitted")]
+		[XmlElement("submitted"), JsonProperty("submitted")]
 		public string SubmittedWhen { get; set; }
 
 		/// <summary>
 		/// Revokation reason
 		/// </summary>
-		[XmlElement("revokationReason")]
+		[XmlElement("revokationReason"), JsonProperty("revokationReason")]
 		public RevokeReason XmlRevokeReason { get; set; }
 
 		/// <summary>
 		/// Status code
 		/// </summary>
-		[XmlAttribute("status")]
+		[XmlAttribute("status"), JsonProperty("status")]
 		public SubmissionStatus XmlStatusCode { get; set; }
 
         /// <summary>

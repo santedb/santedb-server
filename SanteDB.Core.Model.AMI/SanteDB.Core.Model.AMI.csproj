@@ -38,8 +38,10 @@
   <ItemGroup>
     <Compile Include="AmiCollection.cs" />
     <Compile Include="Applet\AppletManifestInfo.cs" />
+    <Compile Include="Auth\ISecurityEntityInfo.cs" />
+    <Compile Include="Auth\SecurityApplicationInfo.cs" />
+    <Compile Include="Auth\SecurityDeviceInfo.cs" />
     <Compile Include="Auth\SecurityPolicyInfo.cs" />
-    <Compile Include="Auth\SecurityEntityInfo.cs" />
     <Compile Include="Auth\SecurityRoleInfo.cs" />
     <Compile Include="Auth\SecurityUserInfo.cs" />
     <Compile Include="Auth\TfaRequestInfo.cs" />
@@ -53,8 +55,10 @@
     <Compile Include="Diagnostics\DiagnosticSyncInfo.cs" />
     <Compile Include="Diagnostics\DiagnosticThreadInfo.cs" />
     <Compile Include="Diagnostics\DiagnosticVersionInfo.cs" />
+    <Compile Include="IAmiIdentified.cs" />
     <Compile Include="Logging\LogFileInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Security\AuditSubmission.cs" />
     <Compile Include="Security\AuditInfo.cs" />
     <Compile Include="Security\RevokeReason.cs" />
     <Compile Include="Security\SubmissionInfo.cs" />

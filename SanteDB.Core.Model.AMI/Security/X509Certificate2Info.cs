@@ -18,6 +18,7 @@
  * Date: 2017-9-1
  */
 
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,7 @@ namespace SanteDB.Core.Model.AMI.Security
 	/// </summary>
 	[XmlRoot(nameof(X509Certificate2Info), Namespace = "http://santedb.org/ami")]
 	[XmlType(nameof(X509Certificate2Info), Namespace = "http://santedb.org/ami")]
+    [JsonObject(nameof(X509Certificate2Info))]
 	public class X509Certificate2Info
 	{
 		public X509Certificate2Info()
@@ -66,37 +68,37 @@ namespace SanteDB.Core.Model.AMI.Security
 		/// <summary>
 		/// The identifier of the certificate
 		/// </summary>
-		[XmlAttribute("id")]
+		[XmlAttribute("id"), JsonProperty("id")]
 		public int Id { get; set; }
 
 		/// <summary>
 		/// Gets or sets the issuers
 		/// </summary>
-		[XmlElement("iss")]
+		[XmlElement("iss"), JsonProperty("iss")]
 		public String Issuer { get; set; }
 
 		/// <summary>
 		/// Gets or sets the expiry date
 		/// </summary>
-		[XmlElement("exp")]
+		[XmlElement("exp"), JsonProperty("exp")]
 		public DateTime? NotAfter { get; set; }
 
 		/// <summary>
 		/// Gets or sets the issue date
 		/// </summary>
-		[XmlElement("nbf")]
+		[XmlElement("nbf"), JsonProperty("nbf")]
 		public DateTime? NotBefore { get; set; }
 
 		/// <summary>
 		/// Distinguished name
 		/// </summary>
-		[XmlElement("sub")]
+		[XmlElement("sub"), JsonProperty("sub")]
 		public String Subject { get; set; }
 
 		/// <summary>
 		/// Gets or sets the thumbprint
 		/// </summary>
-		[XmlElement("thumbprint")]
+		[XmlElement("thumbprint"), JsonProperty("thumbprint")]
 		public String Thumbprint { get; set; }
 
 		public bool ShouldSerializeNotAfter() => this.NotAfter.HasValue;

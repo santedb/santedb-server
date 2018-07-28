@@ -18,6 +18,7 @@
  * Date: 2017-9-1
  */
 
+using Newtonsoft.Json;
 using System.Xml.Serialization;
 
 namespace SanteDB.Core.Model.AMI.Security
@@ -27,6 +28,7 @@ namespace SanteDB.Core.Model.AMI.Security
 	/// </summary>
 	[XmlType(nameof(SubmissionResult), Namespace = "http://santedb.org/ami")]
 	[XmlRoot(nameof(SubmissionResult), Namespace = "http://santedb.org/ami")]
+    [JsonObject(nameof(SubmissionResult))]
 	public class SubmissionResult
 	{
 		public SubmissionResult()
@@ -48,25 +50,25 @@ namespace SanteDB.Core.Model.AMI.Security
 		/// <summary>
 		/// Gets or sets the certificate content
 		/// </summary>
-		[XmlElement("pkcs")]
+		[XmlElement("pkcs"), JsonProperty("pkcs")]
 		public string Certificate { get; set; }
 
 		/// <summary>
 		/// Gets or sets the message from the server
 		/// </summary>
-		[XmlElement("message")]
+		[XmlElement("message"), JsonProperty("message")]
 		public string Message { get; set; }
 
 		/// <summary>
 		/// Gets or sets the request id
 		/// </summary>
-		[XmlAttribute("id")]
+		[XmlAttribute("id"), JsonProperty("id")]
 		public int RequestId { get; set; }
 
 		/// <summary>
 		/// Gets or sets the status
 		/// </summary>
-		[XmlAttribute("status")]
+		[XmlAttribute("status"), JsonProperty("status")]
 		public SubmissionStatus Status { get; set; }
 	}
 }

@@ -37,19 +37,12 @@
       <HintPath>..\Solution Items\CERTADMINLib.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="MARC.HI.EHRS.SVC.Auditing.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MARC.Everest, Version=1.5.0.0, Culture=neutral, PublicKeyToken=ba5b2480018546af, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Solution Items\MARC.HI.EHRS.SVC.Auditing.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="MARC.HI.EHRS.SVC.Core">
-      <HintPath>..\Solution Items\MARC.HI.EHRS.SVC.Core.dll</HintPath>
+      <HintPath>..\Solution Items\MARC.Everest.dll</HintPath>
     </Reference>
     <Reference Include="MARC.Util.CertificateTools">
       <HintPath>..\Solution Items\MARC.Util.CertificateTools.dll</HintPath>
-    </Reference>
-    <Reference Include="SwaggerWcf, Version=0.2.9.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Solution Items\SwaggerWcf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />

@@ -48,6 +48,7 @@ using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Applets.ViewModel.Json;
 using SanteDB.Core.Model.Json.Formatter;
 using SanteDB.Core.Applets.ViewModel.Description;
+using SanteDB.Core.Diagnostics;
 
 namespace SanteDB.Core.Wcf.Serialization
 {
@@ -74,10 +75,24 @@ namespace SanteDB.Core.Wcf.Serialization
         static WcfMessageDispatchFormatter()
         {
             m_defaultViewModel = ViewModelDescription.Load(typeof(RawBodyWriter).Assembly.GetManifestResourceStream("SanteDB.Core.Resources.ViewModel.xml"));
+            var tracer = new TraceSource(SanteDBConstants.WcfTraceSourceName);
+
+            tracer.TraceInfo("Will generate serializer for {0}", typeof(TContract).FullName);
 
             foreach (var s in s_knownTypes)
-                if(!s_serializers.ContainsKey(s))
-                    s_serializers.Add(s, new XmlSerializer(s,  s.GetCustomAttributes<XmlIncludeAttribute>().Select(o => o.Type).ToArray()));
+                if (!s_serializers.ContainsKey(s))
+                {
+                    tracer.TraceVerbose("Generating serializer for {0}", s.Name);
+                    try
+                    {
+                        s_serializers.Add(s, new XmlSerializer(s, s.GetCustomAttributes<XmlIncludeAttribute>().Select(o => o.Type).ToArray()));
+                    }
+                    catch(Exception e)
+                    {
+                        tracer.TraceError("Error generating for {0} : {1}", s.Name, e.ToString());
+                        //throw;
+                    }
+                }
         }
 
         /// <summary>
@@ -191,7 +206,7 @@ namespace SanteDB.Core.Wcf.Serialization
                         StreamReader sr = new StreamReader(ms);
 
                         // Is this in view model format or regular format?
-                        if (contentType?.StartsWith("application/json+oiz-viewmodel") == true)
+                        if (contentType?.StartsWith("application/json+sdb-viewmodel") == true && typeof(IdentifiedData).IsAssignableFrom(parm.Type))
                         {
                             var nvc = NameValueCollection.ParseQueryString(httpRequest.QueryString);
                             var viewModel = httpRequest.Headers["X-SanteDB-ViewModel"] ?? nvc["_viewModel"]?.FirstOrDefault();
@@ -269,7 +284,8 @@ namespace SanteDB.Core.Wcf.Serialization
                     if (accepts?.StartsWith("application/json") == true ||
                         contentType?.StartsWith("application/json") == true)
                     {
-                        if (accepts?.StartsWith("application/json+sdb-viewmodel") == true)
+                        if (accepts?.StartsWith("application/json+sdb-viewmodel") == true &&
+                            typeof(IdentifiedData).IsAssignableFrom(result?.GetType()))
                         {
                             var nvc = NameValueCollection.ParseQueryString(httpRequest.QueryString);
                             var viewModel = httpRequest.Headers["X-SanteDB-ViewModel"] ?? nvc["_viewModel"]?.FirstOrDefault();

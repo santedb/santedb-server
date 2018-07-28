@@ -13,6 +13,8 @@ using SanteDB.Core.Services;
 using MARC.HI.EHRS.SVC.Core;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security;
+using SanteDB.Core.Model;
+using MARC.HI.EHRS.SVC.Auditing.Services;
 
 namespace SanteDB.Messaging.AMI.ResourceHandler
 {
@@ -64,10 +66,25 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
             if (this.m_repository == null)
                 throw new InvalidOperationException("No audit repository is configured");
 
-            var auditData = data as AuditInfo;
-            if (auditData == null) throw new ArgumentException(nameof(data));
-
-            auditData.Audit.ForEach(o=>this.m_repository.Insert(o));
+            var auditData = data as AuditSubmission;
+            if (auditData == null) // may be a single audit
+            {
+                var singleAudit = data as AuditInfo;
+                if (singleAudit != null)
+                {
+                    this.m_repository.Insert(singleAudit);
+                    ApplicationContext.Current.GetService<IAuditorService>()?.SendAudit(singleAudit);
+                }
+            }
+            else
+            {
+                auditData.Audit.ForEach(o =>
+                {
+                    this.m_repository.Insert(o);
+                    ApplicationContext.Current.GetService<IAuditorService>()?.SendAudit(o);
+                });
+                // Send the audit to the audit repo
+            }
             return null;
         }
 
@@ -83,8 +100,10 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
             if (this.m_repository == null)
                 throw new InvalidOperationException("No audit repository is configured");
 
-            return new AuditInfo(this.m_repository.Get(id));
+            var retVal = new AuditInfo();
+            retVal.CopyObjectData(this.m_repository.Get(id));
 
+            return retVal;
         }
 
         /// <summary>

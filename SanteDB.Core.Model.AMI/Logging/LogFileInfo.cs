@@ -19,6 +19,7 @@
  */
 
 using Newtonsoft.Json;
+using SanteDB.Core.Model.Interfaces;
 using System;
 using System.Xml.Serialization;
 
@@ -29,7 +30,7 @@ namespace SanteDB.Core.Model.AMI.Logging
 	/// </summary>
 	[XmlRoot(nameof(LogFileInfo), Namespace = "http://santedb.org/ami")]
 	[JsonObject(nameof(LogFileInfo))]
-	public class LogFileInfo
+	public class LogFileInfo : IAmiIdentified
 	{
 		/// <summary>
 		/// Gets or sets the content
@@ -54,5 +55,10 @@ namespace SanteDB.Core.Model.AMI.Logging
 		/// </summary>
 		[XmlElement("size"), JsonProperty("size")]
 		public long Size { get; set; }
-	}
+
+        /// <summary>
+        /// Get the requested key
+        /// </summary>
+        public string Key => this.Name;
+    }
 }
