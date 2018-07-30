@@ -65,20 +65,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\ServiceTool.cs" />
-    <Compile Include="Configuration\UI\CoreConfigurationPanel.cs" />
-    <Compile Include="Configuration\UI\ServiceConfigurationPanel.cs" />
-    <Compile Include="Configuration\UI\ucCoreSettings.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Configuration\UI\ucCoreSettings.Designer.cs">
-      <DependentUpon>ucCoreSettings.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Configuration\UI\ucServiceSettings.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Configuration\UI\ucServiceSettings.designer.cs">
-      <DependentUpon>ucServiceSettings.cs</DependentUpon>
-    </Compile>
     <Compile Include="Diagnostics\DiagnosticExtensions.cs" />
     <Compile Include="Diagnostics\LogTraceWriter.cs" />
     <Compile Include="ExtensionMethods.cs" />
@@ -207,14 +193,6 @@
       <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
       <Name>SanteDB.Core.Api</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Configuration\UI\ucCoreSettings.resx">
-      <DependentUpon>ucCoreSettings.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Configuration\UI\ucServiceSettings.resx">
-      <DependentUpon>ucServiceSettings.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\ViewModel.xml" />
