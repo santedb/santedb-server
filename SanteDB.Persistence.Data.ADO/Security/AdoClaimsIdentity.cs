@@ -321,7 +321,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
                     claims.Add(new Claim(ClaimTypes.MobilePhone, this.m_securityUser.PhoneNumber));
                 // TODO: Demographic data for the user
                 var retVal = new ClaimsPrincipal(
-                        new ClaimsIdentity[] { new ClaimsIdentity(this, claims.AsReadOnly()) }
+                        new ClaimsIdentity[] { new ClaimsIdentity(this, claims.AsReadOnly(), AuthenticationTypes.Password, ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType) }
                     );
                 s_traceSource.TraceInformation("Created security principal from identity {0} > {1}", this, AdoClaimsIdentity.PrincipalToString(retVal));
                 return retVal;

@@ -86,7 +86,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
         /// </summary>
         [WebInvoke(UriTemplate = "/{resourceType}", Method = "OPTIONS", BodyStyle = WebMessageBodyStyle.Bare)]
         [SwaggerWcfPath("Get Service Options", "Retrieves a list of resources and operations supported by this HDSI service", ExternalDocsUrl = "http://santedb.org/artifacts/1.0/hdsi/", ExternalDocsDescription = "HDSI Data Contract Documentation")]
-        ServiceResourceOptions Options(string resourceType);
+        ServiceResourceOptions ResourceOptions(string resourceType);
 
         /// <summary>
         /// Performs a minimal PING request to test service uptime
