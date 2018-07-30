@@ -43,7 +43,7 @@
       <Version>4.0.4.403061554</Version>
     </PackageReference>
     <Reference Include="System" />
-    <Reference Include="System.configuration" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IdentityModel" />
@@ -208,13 +208,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Data\SQL\PSQL\SanteDB-drop.sql">
+    <EmbeddedResource Include="Data\SQL\PSQL\santedb-drop.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Data\SQL\PSQL\SanteDB-fn.sql">
+    <EmbeddedResource Include="Data\SQL\PSQL\santedb-fn.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Data\SQL\PSQL\SanteDB-init.sql">
+    <EmbeddedResource Include="Data\SQL\PSQL\santedb-init.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Data\SQL\Updates\20170721-PSQL.sql">
@@ -227,10 +227,10 @@
       <DependentUpon>ucAdoPersistence.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Data\Map\ModelMap.xml" />
-    <EmbeddedResource Include="Data\SQL\PSQL\SanteDB-codes.sql">
+    <EmbeddedResource Include="Data\SQL\PSQL\santedb-codes.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Data\SQL\PSQL\SanteDB-ddl.sql">
+    <EmbeddedResource Include="Data\SQL\PSQL\santedb-ddl.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Locale.resx">
