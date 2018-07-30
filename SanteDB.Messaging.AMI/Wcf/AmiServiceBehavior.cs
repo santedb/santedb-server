@@ -312,7 +312,7 @@ namespace SanteDB.Messaging.AMI.Wcf
 
                     var versioned = retVal as IVersionedEntity;
                     WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.Created;
-                    WebOperationContext.Current.OutgoingResponse.ETag = (retVal as IdentifiedData).Tag;
+                    WebOperationContext.Current.OutgoingResponse.ETag = (retVal as IAmiIdentified)?.Tag ?? (retVal as IdentifiedData)?.Tag;
                     if (versioned != null)
                         WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}/history/{3}",
                            WebOperationContext.Current.IncomingRequest.UriTemplateMatch.BaseUri,
@@ -323,11 +323,12 @@ namespace SanteDB.Messaging.AMI.Wcf
                         WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}",
                             WebOperationContext.Current.IncomingRequest.UriTemplateMatch.BaseUri,
                             resourceType,
-                            (retVal as IdentifiedData).Key));
+                            (retVal as IAmiIdentified)?.Key ?? (retVal as IdentifiedData)?.Key.ToString()));
+                    return retVal;
+
                 }
                 else
                     throw new FileNotFoundException(resourceType);
-                return null;
             }
             catch (Exception e)
             {
@@ -350,6 +351,11 @@ namespace SanteDB.Messaging.AMI.Wcf
                 var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
                 if (handler != null)
                 {
+                    if (data is IdentifiedData)
+                        (data as IdentifiedData).Key = Guid.Parse(key);
+                    else if (data is IAmiIdentified)
+                        (data as IAmiIdentified).Key = key;
+
                     var retVal = handler.Create(data, true) as IdentifiedData;
                     var versioned = retVal as IVersionedEntity;
                     WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Created;
@@ -640,11 +646,18 @@ namespace SanteDB.Messaging.AMI.Wcf
                 var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
                 if (handler != null)
                 {
+                    if (data is IdentifiedData)
+                        (data as IdentifiedData).Key = Guid.Parse(key);
+                    else if (data is IAmiIdentified)
+                        (data as IAmiIdentified).Key = key;
 
                     var retVal = handler.Update(data);
+                    if (retVal == null)
+                        WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NoContent;
+                    else
+                        WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.OK;
 
                     var versioned = retVal as IVersionedEntity;
-                    WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.OK;
                     WebOperationContext.Current.OutgoingResponse.ETag = (retVal as IdentifiedData)?.Tag;
 
                     if (versioned != null)

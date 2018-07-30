@@ -47,6 +47,7 @@ namespace SanteDB.Core.Model.AMI.Collections
     [XmlInclude(typeof(ExtensionType))]
     [XmlInclude(typeof(MailMessage))]
     [XmlInclude(typeof(TfaRequestInfo))]
+    [XmlInclude(typeof(SecurityApplicationInfo))]
     [XmlInclude(typeof(SecurityDeviceInfo))]
     [XmlInclude(typeof(SecurityPolicyInfo))]
     [XmlInclude(typeof(SecurityRoleInfo))]

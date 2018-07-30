@@ -45,5 +45,19 @@ namespace SanteDB.Core.Model.AMI.Auth
         /// </summary>
         [XmlElement("policy"), JsonProperty("policy")]
         public List<SecurityPolicyInfo> Policies { get; set; }
+
+        /// <summary>
+        /// Get the key for the object
+        /// </summary>
+        public string Key
+        {
+            get => this.Entity?.Key?.ToString();
+            set => this.Entity.Key = Guid.Parse(value);
+        }
+
+        /// <summary>
+        /// Get the tag
+        /// </summary>
+        public string Tag => this.Entity?.Tag;
     }
 }

@@ -14,5 +14,9 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
     /// </summary>
     public class SecurityDeviceResourceHandler : SecurityEntityResourceHandler<SecurityDevice>
     {
+        /// <summary>
+        /// Type of security device
+        /// </summary>
+        public override Type Type => typeof(SecurityDeviceInfo);
     }
 }

@@ -59,6 +59,14 @@ namespace SanteDB.Core.Model.AMI.Logging
         /// <summary>
         /// Get the requested key
         /// </summary>
-        public string Key => this.Name;
+        public string Key {
+            get => this.Name;
+            set {; }
+        }
+
+        /// <summary>
+        /// Gets the ETag
+        /// </summary>
+        public string Tag => null;
     }
 }

@@ -20,6 +20,17 @@ namespace SanteDB.Core.Model.AMI.Security
         /// <summary>
         /// Get the key for this object
         /// </summary>
-        public string Key => this.CorrelationToken.ToString();
+        public string Key {
+            get => this.CorrelationToken.ToString();
+            set
+            {
+                ;
+            }
+        }
+
+        /// <summary>
+        /// Gets the ETag
+        /// </summary>
+        public string Tag => this.Timestamp.ToString("yyyyMMddHHmmSS");
     }
 }

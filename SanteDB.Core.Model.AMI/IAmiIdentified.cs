@@ -15,6 +15,11 @@ namespace SanteDB.Core.Model.AMI
         /// <summary>
         /// Get the desired url resource key 
         /// </summary>
-        String Key { get; }
+        String Key { get; set;  }
+
+        /// <summary>
+        /// Gets the tag for the resource
+        /// </summary>
+        string Tag { get; }
     }
 }

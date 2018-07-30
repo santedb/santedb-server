@@ -48,7 +48,9 @@ namespace SanteDB.Core.Services.Impl
         IRepositoryService<SecurityApplication>,
         IRepositoryService<SecurityDevice>,
         IRepositoryService<SecurityRole>,
-        IRepositoryService<SecurityUser>
+        IRepositoryService<SecurityUser>,
+        IRepositoryService<ApplicationEntity>,
+        IRepositoryService<DeviceEntity>
     {
 		private TraceSource m_traceSource = new TraceSource(SanteDBConstants.ServiceTraceSourceName);
 
@@ -750,6 +752,40 @@ namespace SanteDB.Core.Services.Impl
         }
 
         /// <summary>
+        /// Find app entity
+        /// </summary>
+        IEnumerable<ApplicationEntity> IRepositoryService<ApplicationEntity>.Find(Expression<Func<ApplicationEntity, bool>> query)
+        {
+            int tr = 0;
+            return base.Find(query, 0, 100, out tr, Guid.Empty);
+        }
+
+        /// <summary>
+        /// Find app entity
+        /// </summary>
+        IEnumerable<ApplicationEntity> IRepositoryService<ApplicationEntity>.Find(Expression<Func<ApplicationEntity, bool>> query, int offset, int? count, out int totalResults)
+        {
+            return base.Find(query, offset, count, out totalResults, Guid.Empty);
+        }
+
+        /// <summary>
+        /// Find device entity
+        /// </summary>
+        IEnumerable<DeviceEntity> IRepositoryService<DeviceEntity>.Find(Expression<Func<DeviceEntity, bool>> query)
+        {
+            int tr = 0;
+            return base.Find(query, 0, 100, out tr, Guid.Empty);
+        }
+
+        /// <summary>
+        /// Find device entity
+        /// </summary>
+        IEnumerable<DeviceEntity> IRepositoryService<DeviceEntity>.Find(Expression<Func<DeviceEntity, bool>> query, int offset, int? count, out int totalResults)
+        {
+            return base.Find(query, offset, count, out totalResults, Guid.Empty);
+        }
+
+        /// <summary>
         /// Get user entity
         /// </summary>
         UserEntity IRepositoryService<UserEntity>.Get(Guid key)
@@ -830,6 +866,38 @@ namespace SanteDB.Core.Services.Impl
         }
 
         /// <summary>
+        /// Get device entity
+        /// </summary>
+        ApplicationEntity IRepositoryService<ApplicationEntity>.Get(Guid key)
+        {
+            return base.Get<ApplicationEntity>(key, Guid.Empty);
+        }
+
+        /// <summary>
+        /// Get application entity specified version
+        /// </summary>
+        ApplicationEntity IRepositoryService<ApplicationEntity>.Get(Guid key, Guid versionKey)
+        {
+            return base.Get<ApplicationEntity>(key, versionKey);
+        }
+
+        /// <summary>
+        /// Get device entity current version
+        /// </summary>
+        DeviceEntity IRepositoryService<DeviceEntity>.Get(Guid key)
+        {
+            return base.Get<DeviceEntity>(key, Guid.Empty);
+        }
+
+        /// <summary>
+        /// Get device entity specified version
+        /// </summary>
+        DeviceEntity IRepositoryService<DeviceEntity>.Get(Guid key, Guid versionKey)
+        {
+            return base.Get<DeviceEntity>(key, versionKey);
+        }
+
+        /// <summary>
         /// Insert user entity
         /// </summary>
         UserEntity IRepositoryService<UserEntity>.Insert(UserEntity data)
@@ -869,6 +937,22 @@ namespace SanteDB.Core.Services.Impl
         SecurityUser IRepositoryService<SecurityUser>.Insert(SecurityUser data)
         {
             return this.CreateUser(data, data.Password);
+        }
+
+        /// <summary>
+        /// Insert application entity
+        /// </summary>
+        ApplicationEntity IRepositoryService<ApplicationEntity>.Insert(ApplicationEntity data)
+        {
+            return base.Insert(data);
+        }
+
+        /// <summary>
+        /// Insert device entity
+        /// </summary>
+        DeviceEntity IRepositoryService<DeviceEntity>.Insert(DeviceEntity data)
+        {
+            return base.Insert(data);
         }
 
         /// <summary>
@@ -912,6 +996,22 @@ namespace SanteDB.Core.Services.Impl
         }
 
         /// <summary>
+        /// Obsolete application entity
+        /// </summary>
+        ApplicationEntity IRepositoryService<ApplicationEntity>.Obsolete(Guid key)
+        {
+            return base.Obsolete<ApplicationEntity>(key);
+        }
+
+        /// <summary>
+        /// Obsolete device entity
+        /// </summary>
+        DeviceEntity IRepositoryService<DeviceEntity>.Obsolete(Guid key)
+        {
+            return base.Obsolete<DeviceEntity>(key);
+        }
+
+        /// <summary>
         /// Save user entity
         /// </summary>
         UserEntity IRepositoryService<UserEntity>.Save(UserEntity data)
@@ -949,6 +1049,22 @@ namespace SanteDB.Core.Services.Impl
         SecurityUser IRepositoryService<SecurityUser>.Save(SecurityUser data)
         {
             return this.SaveUser(data);
+        }
+
+        /// <summary>
+        /// Save application entity
+        /// </summary>
+        ApplicationEntity IRepositoryService<ApplicationEntity>.Save(ApplicationEntity data)
+        {
+            return base.Save(data);
+        }
+
+        /// <summary>
+        /// Save device entity
+        /// </summary>
+        DeviceEntity IRepositoryService<DeviceEntity>.Save(DeviceEntity data)
+        {
+            return base.Save(data);
         }
     }
 }

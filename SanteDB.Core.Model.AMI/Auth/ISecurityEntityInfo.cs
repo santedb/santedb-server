@@ -10,7 +10,7 @@ namespace SanteDB.Core.Model.AMI.Auth
     /// <summary>
     /// Represents an object that provide a wrapper for a security info
     /// </summary>
-    public interface ISecurityEntityInfo<TSecurityObject>
+    public interface ISecurityEntityInfo<TSecurityObject> : IAmiIdentified
         where TSecurityObject : SecurityEntity
     {
 
