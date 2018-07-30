@@ -72,8 +72,9 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
                 var singleAudit = data as AuditInfo;
                 if (singleAudit != null)
                 {
-                    this.m_repository.Insert(singleAudit);
+                    var retVal = this.m_repository.Insert(singleAudit);
                     ApplicationContext.Current.GetService<IAuditorService>()?.SendAudit(singleAudit);
+                    return new AuditInfo().CopyObjectData(retVal);
                 }
             }
             else
