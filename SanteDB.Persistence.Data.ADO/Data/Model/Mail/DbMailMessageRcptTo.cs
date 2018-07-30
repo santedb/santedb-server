@@ -25,23 +25,23 @@ using System.Threading.Tasks;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 
-namespace SanteDB.Persistence.Data.ADO.Data.Model.Alerts
+namespace SanteDB.Persistence.Data.ADO.Data.Model.Mail
 {
 	/// <summary>
 	/// Represents an alert recipient.
 	/// </summary>
-	[Table("alrt_rcpt_to_tbl")]
-	public class DbAlertRcptTo : DbAssociation
+	[Table("mail_msg_rcpt_to_tbl")]
+	public class DbMailMessageRcptTo : DbAssociation
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="DbAlertRcptTo"/> class.
+		/// Initializes a new instance of the <see cref="DbMailMessageRcptTo"/> class.
 		/// </summary>
-		public DbAlertRcptTo()
+		public DbMailMessageRcptTo()
 		{
 			
 		}
 
-		public DbAlertRcptTo(Guid alertId, Guid userId)
+		public DbMailMessageRcptTo(Guid alertId, Guid userId)
 		{
 			this.Key = alertId;
 			this.SourceKey = userId;
@@ -50,7 +50,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Alerts
 		/// <summary>
 		/// Gets or sets the key of the object.
 		/// </summary>
-		[Column("alrt_id"), ForeignKey(typeof(DbAlertMessage), nameof(DbAlertMessage.Key))]
+		[Column("alrt_id"), ForeignKey(typeof(DbMailMessage), nameof(DbMailMessage.Key))]
 		public override Guid Key { get; set; }
 
 		/// <summary>

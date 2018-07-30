@@ -19,7 +19,7 @@
  */
 
 using Newtonsoft.Json;
-using SanteDB.Core.Alerting;
+using SanteDB.Core.Mail;
 using SanteDB.Core.Applets.Model;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Model.AMI.Applet;
@@ -45,7 +45,7 @@ namespace SanteDB.Core.Model.AMI.Collections
     [JsonObject(nameof(AmiCollection))]
     [XmlInclude(typeof(Entity))]
     [XmlInclude(typeof(ExtensionType))]
-    [XmlInclude(typeof(AlertMessage))]
+    [XmlInclude(typeof(MailMessage))]
     [XmlInclude(typeof(TfaRequestInfo))]
     [XmlInclude(typeof(SecurityDeviceInfo))]
     [XmlInclude(typeof(SecurityPolicyInfo))]

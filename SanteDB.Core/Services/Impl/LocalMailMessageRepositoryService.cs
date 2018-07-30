@@ -26,14 +26,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
-using SanteDB.Core.Alerting;
+using SanteDB.Core.Mail;
 
 namespace SanteDB.Core.Services.Impl
 {
 	/// <summary>
 	/// Represents a local alert service.
 	/// </summary>
-	public class LocalAlertRepositoryService : IAlertRepositoryService
+	public class LocalMailMessageRepositoryService : IMailMessageRepositoryService
 	{
 		/// <summary>
 		/// The internal reference to the <see cref="TraceSource"/> instance.
@@ -43,20 +43,20 @@ namespace SanteDB.Core.Services.Impl
 		/// <summary>
 		/// Fired when an alert was raised and is being processed.
 		/// </summary>
-		public event EventHandler<AlertEventArgs> Committed;
+		public event EventHandler<MailMessageEventArgs> Committed;
 
 		/// <summary>
 		/// Fired when an alert is received.
 		/// </summary>
-		public event EventHandler<AlertEventArgs> Received;
+		public event EventHandler<MailMessageEventArgs> Received;
 
 		/// <summary>
 		/// Broadcasts an alert.
 		/// </summary>
 		/// <param name="message">The alert message to be broadcast.</param>
-		public void BroadcastAlert(AlertMessage message)
+		public void Broadcast(MailMessage message)
 		{
-			this.Committed?.Invoke(this, new AlertEventArgs(message));
+			this.Committed?.Invoke(this, new MailMessageEventArgs(message));
 		}
 
 		/// <summary>
@@ -67,13 +67,13 @@ namespace SanteDB.Core.Services.Impl
 		/// <param name="count">The count of the search results.</param>
 		/// <param name="totalCount">The total count of the alerts.</param>
 		/// <returns>Returns a list of alerts.</returns>
-		public IEnumerable<AlertMessage> Find(Expression<Func<AlertMessage, bool>> predicate, int offset, int? count, out int totalCount)
+		public IEnumerable<MailMessage> Find(Expression<Func<MailMessage, bool>> predicate, int offset, int? count, out int totalCount)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<AlertMessage>>();
+			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<MailMessage>>();
 
 			if (persistenceService == null)
 			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<AlertMessage>)));
+				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<MailMessage>)));
 			}
 
 			return persistenceService.Query(predicate, offset, count, AuthenticationContext.Current.Principal, out totalCount);
@@ -84,13 +84,13 @@ namespace SanteDB.Core.Services.Impl
 		/// </summary>
 		/// <param name="id">The id of the alert to be retrieved.</param>
 		/// <returns>Returns an alert.</returns>
-		public AlertMessage Get(Guid id)
+		public MailMessage Get(Guid id)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<AlertMessage>>();
+			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<MailMessage>>();
 
 			if (persistenceService == null)
 			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<AlertMessage>)));
+				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<MailMessage>)));
 			}
 
 			return persistenceService.Get<Guid>(new Identifier<Guid>(id), AuthenticationContext.Current.Principal, false);
@@ -101,21 +101,21 @@ namespace SanteDB.Core.Services.Impl
 		/// </summary>
 		/// <param name="message">The alert message to be inserted.</param>
 		/// <returns>Returns the inserted alert.</returns>
-		public AlertMessage Insert(AlertMessage message)
+		public MailMessage Insert(MailMessage message)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<AlertMessage>>();
+			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<MailMessage>>();
 
 			if (persistenceService == null)
 			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<AlertMessage>)));
+				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<MailMessage>)));
 			}
 
-			AlertMessage alert;
+			MailMessage alert;
 
 			try
 			{
 				alert = persistenceService.Insert(message, AuthenticationContext.Current.Principal, TransactionMode.Commit);
-				this.Received?.Invoke(this, new AlertEventArgs(alert));
+				this.Received?.Invoke(this, new MailMessageEventArgs(alert));
 			}
 			catch (Exception e)
 			{
@@ -134,16 +134,16 @@ namespace SanteDB.Core.Services.Impl
 		/// Saves an alert.
 		/// </summary>
 		/// <param name="message">The alert message to be saved.</param>
-		public AlertMessage Save(AlertMessage message)
+		public MailMessage Save(MailMessage message)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<AlertMessage>>();
+			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<MailMessage>>();
 
 			if (persistenceService == null)
 			{
-				throw new InvalidOperationException($"{nameof(IDataPersistenceService<AlertMessage>)} not found");
+				throw new InvalidOperationException($"{nameof(IDataPersistenceService<MailMessage>)} not found");
 			}
 
-			AlertMessage alert;
+			MailMessage alert;
 
 			try
 			{
@@ -152,12 +152,12 @@ namespace SanteDB.Core.Services.Impl
 					persistenceService.Obsolete(message, AuthenticationContext.Current.Principal, TransactionMode.Commit) : 
 					persistenceService.Update(message, AuthenticationContext.Current.Principal, TransactionMode.Commit);
 
-				this.Received?.Invoke(this, new AlertEventArgs(alert));
+				this.Received?.Invoke(this, new MailMessageEventArgs(alert));
 			}
 			catch (DataPersistenceException)
 			{
 				alert = persistenceService.Insert(message, AuthenticationContext.Current.Principal, TransactionMode.Commit);
-				this.Received?.Invoke(this, new AlertEventArgs(alert));
+				this.Received?.Invoke(this, new MailMessageEventArgs(alert));
 			}
 
 			return alert;

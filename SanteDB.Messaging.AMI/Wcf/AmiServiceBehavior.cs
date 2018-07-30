@@ -675,12 +675,24 @@ namespace SanteDB.Messaging.AMI.Wcf
         }
 
         /// <summary>
+        /// Perform a head operation
+        /// </summary>
+        /// <param name="resourceType">The resource type</param>
+        /// <param name="id">The id of the resource</param>
+        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
+        public void Head(string resourceType, string id)
+        {
+            this.ThrowIfNotReady();
+            this.Get(resourceType, id);
+        }
+
+        /// <summary>
         /// Service is not ready
         /// </summary>
         [SwaggerWcfHidden]
         private void ThrowIfNotReady()
         {
-            if (ApplicationContext.Current.IsRunning)
+            if (!ApplicationContext.Current.IsRunning)
                 throw new DomainStateException();
         }
     }

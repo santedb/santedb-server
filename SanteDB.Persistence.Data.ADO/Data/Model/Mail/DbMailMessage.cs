@@ -27,19 +27,19 @@ using SanteDB.Core.Model.Security;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 
-namespace SanteDB.Persistence.Data.ADO.Data.Model.Alerts
+namespace SanteDB.Persistence.Data.ADO.Data.Model.Mail
 {
 	/// <summary>
 	/// Represents an alert message.
 	/// </summary>
-	[Table("alrt_tbl")]
-    [AssociativeTable(typeof(DbSecurityUser), typeof(DbAlertRcptTo))]
-	public class DbAlertMessage : DbNonVersionedBaseData
+	[Table("mail_msg_tbl")]
+    [AssociativeTable(typeof(DbSecurityUser), typeof(DbMailMessageRcptTo))]
+	public class DbMailMessage : DbNonVersionedBaseData
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="DbAlertMessage"/> class.
+		/// Initializes a new instance of the <see cref="DbMailMessage"/> class.
 		/// </summary>
-		public DbAlertMessage()
+		public DbMailMessage()
 		{
 			
 		}

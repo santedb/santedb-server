@@ -50,7 +50,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
         /// <summary>
         /// Gets the name of the resource
         /// </summary>
-        public string ResourceName => "csr";
+        public string ResourceName => "Csr";
 
         /// <summary>
         /// Gets the scope

@@ -50,7 +50,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
         /// <summary>
         /// Get the resource name
         /// </summary>
-        public string ResourceName => "certificate";
+        public string ResourceName => "Certificate";
 
         /// <summary>
         /// Get the scope of this handler
@@ -100,7 +100,8 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
         public object Obsolete(object key)
         {
             // Revoke reason
-            var strReason = WebOperationContext.Current.IncomingRequest.Headers["X-SanteDB-RevokeReason"];
+            var strReason = WebOperationContext.Current.IncomingRequest.Headers["X-SanteDB-RevokeReason"] ??
+                   WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters["reason"];
             var reason = (SanteDB.Core.Model.AMI.Security.RevokeReason)Enum.Parse(typeof(SanteDB.Core.Model.AMI.Security.RevokeReason), strReason);
             int id = Int32.Parse(key.ToString());
             var result = this.m_certTool.GetRequestStatus(id);

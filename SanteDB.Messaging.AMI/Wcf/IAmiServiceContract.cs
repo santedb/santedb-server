@@ -18,7 +18,7 @@ using System.ServiceModel.Web;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Schema;
-using SanteDB.Core.Alerting;
+using SanteDB.Core.Mail;
 using SwaggerWcf.Attributes;
 using SanteDB.Core.Model.AMI.Collections;
 using SanteDB.Core.Model.Collection;
@@ -32,7 +32,7 @@ namespace SanteDB.Messaging.AMI.Wcf
     [ServiceKnownType(typeof(SecurityUserInfo))]
     [ServiceKnownType(typeof(Entity))]
     [ServiceKnownType(typeof(ExtensionType))]
-    [ServiceKnownType(typeof(AlertMessage))]
+    [ServiceKnownType(typeof(MailMessage))]
     [ServiceKnownType(typeof(SecurityApplication))]
     [ServiceKnownType(typeof(TfaRequestInfo))]
     [ServiceKnownType(typeof(SecurityDeviceInfo))]
@@ -117,6 +117,15 @@ namespace SanteDB.Messaging.AMI.Wcf
         Object Get(String resourceType, String key);
 
         /// <summary>
+        /// Heads the specified resource from the service
+        /// </summary>
+        /// <param name="resourceType">The type of resource to be fetched</param>
+        /// <param name="key">The key of the resource</param>
+        /// <returns>Headers for the specified resource</returns>
+        [WebInvoke(Method = "HEAD", UriTemplate = "/{resourceType}/{key}", BodyStyle = WebMessageBodyStyle.Bare)]
+        void Head(String resourceType, String key);
+
+        /// <summary>
         /// Gets the specified versioned copy of the data
         /// </summary>
         /// <param name="resourceType">The type of resource</param>
@@ -164,7 +173,7 @@ namespace SanteDB.Messaging.AMI.Wcf
 		/// </summary>
 		/// <param name="report">The diagnostic report to be created.</param>
 		/// <returns>Returns the created diagnostic report.</returns>
-		[WebInvoke(UriTemplate = "/sherlock", BodyStyle = WebMessageBodyStyle.Bare, Method = "POST")]
+		[WebInvoke(UriTemplate = "/Sherlock", BodyStyle = WebMessageBodyStyle.Bare, Method = "POST")]
         [SwaggerWcfPath("Create Diagnostic Report", "Creates a diagnostic report. A diagnostic report contains logs and configuration information used to debug and resolve issues")]
         DiagnosticReport CreateDiagnosticReport(DiagnosticReport report);
 
@@ -173,21 +182,21 @@ namespace SanteDB.Messaging.AMI.Wcf
 		/// </summary>
 		/// <param name="logId">The log identifier.</param>
 		/// <returns>Returns the log file information.</returns>
-		[WebGet(UriTemplate = "/log/{logId}")]
+		[WebGet(UriTemplate = "/Log/{logId}")]
         LogFileInfo GetLog(string logId);
 
         /// <summary>
         /// Get log files on the server and their sizes.
         /// </summary>
         /// <returns>Returns a collection of log files.</returns>
-        [WebGet(UriTemplate = "/log")]
+        [WebGet(UriTemplate = "/Log")]
         AmiCollection GetLogs();
 
         /// <summary>
 		/// Gets a server diagnostic report.
 		/// </summary>
 		/// <returns>Returns the created diagnostic report.</returns>
-		[WebGet(UriTemplate = "/sherlock", BodyStyle = WebMessageBodyStyle.Bare)]
+		[WebGet(UriTemplate = "/Sherlock", BodyStyle = WebMessageBodyStyle.Bare)]
         [SwaggerWcfPath("Get Diagnostic Report", "A diagnostic report contains logs and configuration information used to debug and resolve issues")]
         DiagnosticReport GetServerDiagnosticReport();
 
@@ -205,14 +214,14 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <summary>
 		/// Creates a request that the server issue a reset code
 		/// </summary>
-		[WebInvoke(UriTemplate = "/tfa", BodyStyle = WebMessageBodyStyle.Bare, Method = "POST")]
+		[WebInvoke(UriTemplate = "/Tfa", BodyStyle = WebMessageBodyStyle.Bare, Method = "POST")]
         void SendTfaSecret(TfaRequestInfo resetInfo);
 
         /// <summary>
         /// Gets the list of TFA mechanisms.
         /// </summary>
         /// <returns>Returns a list of TFA mechanisms.</returns>
-        [WebGet(UriTemplate = "/tfa")]
+        [WebGet(UriTemplate = "/Tfa")]
         [SwaggerWcfPath("Get TFA Mechanism", "Retrieves a list of supported TFA mechanisms")]
         AmiCollection GetTfaMechanisms();
 

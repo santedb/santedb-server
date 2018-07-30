@@ -43,7 +43,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
         /// <summary>
         /// The name of the resource
         /// </summary>
-        public string ResourceName => "audit";
+        public string ResourceName => "Audit";
 
         /// <summary>
         /// Get the scope
