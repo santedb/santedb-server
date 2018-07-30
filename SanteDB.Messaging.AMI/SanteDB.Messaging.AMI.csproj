@@ -66,6 +66,7 @@
     <Compile Include="Configuration\AmiConfigurationSectionHandler.cs" />
     <Compile Include="Configuration\CertificationAuthorityConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResourceHandler\ApplicationEntityResourceHandler.cs" />
     <Compile Include="ResourceHandler\MailMessageResourceHandler.cs" />
     <Compile Include="ResourceHandler\AppletResourceHandler.cs" />
     <Compile Include="ResourceHandler\AssigningAuthorityResourceHandler.cs" />

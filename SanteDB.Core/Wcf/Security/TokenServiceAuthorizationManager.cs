@@ -36,6 +36,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
+using System.ServiceModel.Web;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -60,7 +61,6 @@ namespace SanteDB.Core.Wcf.Security
         {
             this.m_traceSource.TraceInformation("CheckAccessCore");
             this.m_traceSource.TraceInformation("User {0} already authenticated", Core.Security.AuthenticationContext.Current.Principal.Identity.Name);
-
             return base.CheckAccessCore(operationContext);
         }
 

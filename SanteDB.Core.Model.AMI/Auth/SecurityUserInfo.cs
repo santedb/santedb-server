@@ -32,6 +32,7 @@ namespace SanteDB.Core.Model.AMI.Auth
         public SecurityUserInfo(SecurityUser user) //: base(user)
         {
             this.Roles = user.Roles.Select(o => o.Name).ToList();
+            this.Entity = user;
         }
 
         /// <summary>
