@@ -18,6 +18,7 @@
  * Date: 2017-9-1
  */
 
+using Newtonsoft.Json;
 using SanteDB.Core.Model.Security;
 using System.Xml.Serialization;
 
@@ -28,6 +29,7 @@ namespace SanteDB.Core.Model.AMI.Auth
 	/// </summary>
 	[XmlType(nameof(SecurityPolicyInfo), Namespace = "http://santedb.org/ami")]
 	[XmlRoot(nameof(SecurityPolicyInfo), Namespace = "http://santedb.org/ami")]
+    [JsonObject(nameof(SecurityPolicyInfo))]
 	public class SecurityPolicyInfo
 	{
 		/// <summary>
@@ -59,31 +61,31 @@ namespace SanteDB.Core.Model.AMI.Auth
 		/// <summary>
 		/// True if the policy can be overridden
 		/// </summary>
-		[XmlAttribute("canOverride")]
+		[XmlAttribute("canOverride"), JsonProperty("canOverride")]
 		public bool CanOverride { get; set; }
 
 		/// <summary>
 		/// The outcome grant if an instance
 		/// </summary>
-		[XmlAttribute("grant")]
+		[XmlAttribute("grant"), JsonProperty("grant")]
 		public PolicyGrantType Grant { get; set; }
 
 		/// <summary>
 		/// The name of the policy
 		/// </summary>
-		[XmlAttribute("name")]
+		[XmlAttribute("name"), JsonProperty("name")]
 		public string Name { get; set; }
 
 		/// <summary>
 		/// The OID of the policy
 		/// </summary>
-		[XmlAttribute("oid")]
+		[XmlAttribute("oid"), JsonProperty("oid")]
 		public string Oid { get; set; }
 
 		/// <summary>
 		/// Gets or sets the policy information
 		/// </summary>
-		[XmlElement("policyInfo")]
+		[XmlElement("policyInfo"), JsonProperty("policyInfo")]
 		public SecurityPolicy Policy { get; set; }
 	}
 }

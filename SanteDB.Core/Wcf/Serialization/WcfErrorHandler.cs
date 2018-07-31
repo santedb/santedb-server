@@ -72,6 +72,7 @@ namespace SanteDB.Core.Wcf.Serialization
             FaultCode code = FaultCode.CreateSenderFaultCode("GENERR", "http://santedb.org/model");
             FaultReason reason = new FaultReason(error.Message);
             this.m_traceSource.TraceEvent(TraceEventType.Error, error.HResult, "Error on WCF pipeline: {0}", error);
+            var uriMatched = OperationContext.Current.IncomingMessageProperties["Via"] as Uri;
 
             bool isSecurityViolation = false;
 
@@ -79,7 +80,7 @@ namespace SanteDB.Core.Wcf.Serialization
             if (error is DomainStateException)
                 WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.ServiceUnavailable;
             else if (error is PolicyViolationException || error is SecurityException || (error as FaultException)?.Code.SubCode?.Name == "FailedAuthentication") {
-                AuditUtil.AuditRestrictedFunction(error, WebOperationContext.Current.IncomingRequest.UriTemplateMatch.RequestUri);
+                AuditUtil.AuditRestrictedFunction(error, uriMatched ?? WebOperationContext.Current.IncomingRequest.UriTemplateMatch.RequestUri);
                 WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.Forbidden;
             }
             else if (error is SecurityTokenException)
@@ -97,13 +98,13 @@ namespace SanteDB.Core.Wcf.Serialization
             else if (error is UnauthorizedRequestException)
             {
                 isSecurityViolation = true;
-                AuditUtil.AuditRestrictedFunction(error as UnauthorizedRequestException, WebOperationContext.Current.IncomingRequest.UriTemplateMatch.RequestUri);
+                AuditUtil.AuditRestrictedFunction(error as UnauthorizedRequestException, uriMatched ?? WebOperationContext.Current.IncomingRequest.UriTemplateMatch.RequestUri);
                 WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.Unauthorized;
                 WebOperationContext.Current.OutgoingResponse.Headers.Add("WWW-Authenticate", (error as UnauthorizedRequestException).AuthenticateChallenge);
             }
             else if (error is UnauthorizedAccessException)
             {
-                AuditUtil.AuditRestrictedFunction(error, WebOperationContext.Current.IncomingRequest.UriTemplateMatch.RequestUri);
+                AuditUtil.AuditRestrictedFunction(error, uriMatched ?? WebOperationContext.Current.IncomingRequest.UriTemplateMatch.RequestUri);
                 WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.Forbidden;
             }
             else if (error is WebFaultException)

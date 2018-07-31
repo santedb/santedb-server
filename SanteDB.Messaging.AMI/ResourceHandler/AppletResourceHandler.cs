@@ -43,7 +43,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
         {
             get
             {
-                return "applet";
+                return "Applet";
             }
         }
 

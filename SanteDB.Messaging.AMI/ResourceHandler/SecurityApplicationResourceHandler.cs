@@ -13,5 +13,10 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
     /// </summary>
     public class SecurityApplicationResourceHandler : SecurityEntityResourceHandler<SecurityApplication>
     {
+
+        /// <summary>
+        /// Get the type of results
+        /// </summary>
+        public override Type Type => typeof(SecurityApplicationInfo);
     }
 }

@@ -38,12 +38,12 @@
       <Version>3.2.7</Version>
     </PackageReference>
     <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0" />
-    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.0" />
+    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt">
       <Version>4.0.4.403061554</Version>
     </PackageReference>
     <Reference Include="System" />
-    <Reference Include="System.configuration" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IdentityModel" />
@@ -82,8 +82,8 @@
     <Compile Include="Data\Model\Acts\DbProcedure.cs" />
     <Compile Include="Data\Model\Acts\DbProtocol.cs" />
     <Compile Include="Data\Model\Acts\DbSubstanceAdministration.cs" />
-    <Compile Include="Data\Model\Alerts\DbAlertMessage.cs" />
-    <Compile Include="Data\Model\Alerts\DbAlertRcptTo.cs" />
+    <Compile Include="Data\Model\Mail\DbMailMessage.cs" />
+    <Compile Include="Data\Model\Mail\DbMailMessageRcptTo.cs" />
     <Compile Include="Data\Model\Security\DbSession.cs" />
     <Compile Include="Data\Model\Security\DbSessionClaim.cs" />
     <Compile Include="Data\SQL\AdoCodeDataFeature.cs" />
@@ -165,7 +165,7 @@
     <Compile Include="Services\Persistence\ActPersistenceService.cs" />
     <Compile Include="Services\Persistence\ActRelationshipPersistenceService.cs" />
     <Compile Include="Services\Persistence\AdoPersistenceCache.cs" />
-    <Compile Include="Services\Persistence\AlertPersistenceService.cs" />
+    <Compile Include="Services\Persistence\MailMessagePersistenceService.cs" />
     <Compile Include="Services\Persistence\ApplicationEntityPersistenceService.cs" />
     <Compile Include="Services\Persistence\AssigningAuthorityPersistenceService.cs" />
     <Compile Include="Services\Persistence\BaseDataPersistenceService.cs" />
@@ -208,13 +208,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Data\SQL\PSQL\SanteDB-drop.sql">
+    <EmbeddedResource Include="Data\SQL\PSQL\santedb-drop.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Data\SQL\PSQL\SanteDB-fn.sql">
+    <EmbeddedResource Include="Data\SQL\PSQL\santedb-fn.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Data\SQL\PSQL\SanteDB-init.sql">
+    <EmbeddedResource Include="Data\SQL\PSQL\santedb-init.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Data\SQL\Updates\20170721-PSQL.sql">
@@ -227,10 +227,10 @@
       <DependentUpon>ucAdoPersistence.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Data\Map\ModelMap.xml" />
-    <EmbeddedResource Include="Data\SQL\PSQL\SanteDB-codes.sql">
+    <EmbeddedResource Include="Data\SQL\PSQL\santedb-codes.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Data\SQL\PSQL\SanteDB-ddl.sql">
+    <EmbeddedResource Include="Data\SQL\PSQL\santedb-ddl.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Locale.resx">

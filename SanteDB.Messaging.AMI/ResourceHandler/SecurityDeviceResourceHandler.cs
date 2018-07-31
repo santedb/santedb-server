@@ -1,4 +1,6 @@
-﻿using SanteDB.Core.Model.Security;
+﻿using SanteDB.Core.Model.AMI.Auth;
+using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +14,9 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
     /// </summary>
     public class SecurityDeviceResourceHandler : SecurityEntityResourceHandler<SecurityDevice>
     {
+        /// <summary>
+        /// Type of security device
+        /// </summary>
+        public override Type Type => typeof(SecurityDeviceInfo);
     }
 }

@@ -43,7 +43,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
         /// <summary>
         /// Gets the type that this handles
         /// </summary>
-        public virtual Type Type => typeof(SecurityEntityInfo<TSecurityEntity>);
+        public virtual Type Type => typeof(ISecurityEntityInfo<TSecurityEntity>);
 
         /// <summary>
         /// Gets the scope of the object
@@ -65,7 +65,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
         {
 
             // First, we want to copy over the roles
-            var td = data as SecurityEntityInfo<TSecurityEntity>;
+            var td = data as ISecurityEntityInfo<TSecurityEntity>;
             if (td is null) throw new ArgumentException("Invalid type", nameof(data));
 
             // Now for the fun part we want to map any policies over to the wrapped type
@@ -123,7 +123,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
         public virtual object Update(object data)
         {
             // First, we want to copy over the roles
-            var td = data as SecurityEntityInfo<TSecurityEntity>;
+            var td = data as ISecurityEntityInfo<TSecurityEntity>;
             if (td is null) throw new ArgumentException("Invalid type", nameof(data));
 
             // Now for the fun part we want to map any policies over to the wrapped type

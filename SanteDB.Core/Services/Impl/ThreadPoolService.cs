@@ -68,6 +68,7 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public void Dispose()
         {
+            
             this.m_threadPool?.Dispose();
         }
 
@@ -160,6 +161,17 @@ namespace SanteDB.Core.Services.Impl
         public bool Stop()
         {
             this.Stopping?.Invoke(this, EventArgs.Empty);
+
+            this.m_traceSource.TraceInfo("Waiting for thread pool work to finish...");
+            try
+            {
+                this.m_threadPool.WaitOne(new TimeSpan(0, 0, 60), true);
+            }
+            catch (Exception e)
+            {
+                this.m_traceSource.TraceError("Thread pool work could not complete in specified time. {0}", e.ToString());
+            }
+
             this.m_threadPool.Dispose();
             this.m_threadPool = null;
             this.Stopped?.Invoke(this, EventArgs.Empty);

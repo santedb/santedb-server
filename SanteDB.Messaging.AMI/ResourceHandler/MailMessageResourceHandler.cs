@@ -1,4 +1,4 @@
-﻿using SanteDB.Core.Alerting;
+﻿using SanteDB.Core.Mail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
     /// <summary>
     /// Represents an alert resource handler which can store / retrieve alerts
     /// </summary>
-    public class AlertResourceHandler : ResourceHandlerBase<AlertMessage>
+    public class MailMessageResourceHandler : ResourceHandlerBase<MailMessage>
     {
 
     }

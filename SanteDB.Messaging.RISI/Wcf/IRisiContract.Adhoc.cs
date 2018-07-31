@@ -17,8 +17,8 @@
  * User: fyfej
  * Date: 2017-9-1
  */
-using SanteDB.Core.Data.Warehouse;
 using SanteDB.Core.Model.RISI;
+using SanteDB.Core.Model.Warehouse;
 using SwaggerWcf.Attributes;
 using System;
 using System.ServiceModel;

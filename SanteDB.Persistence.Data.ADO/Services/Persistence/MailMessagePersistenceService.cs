@@ -24,28 +24,28 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using MARC.HI.EHRS.SVC.Core;
-using SanteDB.Core.Alerting;
+using SanteDB.Core.Mail;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data.Model;
-using SanteDB.Persistence.Data.ADO.Data.Model.Alerts;
+using SanteDB.Persistence.Data.ADO.Data.Model.Mail;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
 	/// <summary>
 	/// Represents an alert persistence service.
 	/// </summary>
-	public class AlertPersistenceService : BaseDataPersistenceService<AlertMessage, DbAlertMessage>
+	public class MailMessagePersistenceService : BaseDataPersistenceService<MailMessage, DbMailMessage>
 	{
 		/// <summary>
-		/// Converts a <see cref="AlertMessage"/> instance to an <see cref="DbAlertMessage"/> instance.
+		/// Converts a <see cref="MailMessage"/> instance to an <see cref="DbMailMessage"/> instance.
 		/// </summary>
 		/// <param name="modelInstance">The alert message instance.</param>
 		/// <param name="context">The data context.</param>
 		/// <param name="princpal">The authentication context.</param>
 		/// <returns>Returns the converted instance.</returns>
-		public override object FromModelInstance(AlertMessage modelInstance, DataContext context, IPrincipal princpal)
+		public override object FromModelInstance(MailMessage modelInstance, DataContext context, IPrincipal princpal)
 		{
-			var alert = base.FromModelInstance(modelInstance, context, princpal) as DbAlertMessage;
+			var alert = base.FromModelInstance(modelInstance, context, princpal) as DbMailMessage;
 
 			alert.Flags = (int)modelInstance.Flags;
 
@@ -59,30 +59,30 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <param name="data">The alert to insert.</param>
 		/// <param name="principal">The authentication context.</param>
 		/// <returns>Returns the inserted alert.</returns>
-		public override AlertMessage InsertInternal(DataContext context, AlertMessage data, IPrincipal principal)
+		public override MailMessage InsertInternal(DataContext context, MailMessage data, IPrincipal principal)
 		{
 			var alert = base.InsertInternal(context, data, principal);
 
 			foreach (var securityUser in alert.RcptTo)
 			{
-				context.Insert(new DbAlertRcptTo(data.Key.Value, securityUser.Key.Value));
+				context.Insert(new DbMailMessageRcptTo(data.Key.Value, securityUser.Key.Value));
 			}
 
 			return alert;
 		}
 
 		/// <summary>
-		/// Converts a <see cref="DbAlertMessage"/> instance to a <see cref="AlertMessage"/> instance.
+		/// Converts a <see cref="DbMailMessage"/> instance to a <see cref="MailMessage"/> instance.
 		/// </summary>
 		/// <param name="dataInstance">The db alert message instance.</param>
 		/// <param name="context">The data context.</param>
 		/// <param name="principal">The authentication context.</param>
 		/// <returns>Returns the converted instance.</returns>
-		public override AlertMessage ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+		public override MailMessage ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
 		{
 			var modelInstance = base.ToModelInstance(dataInstance, context, principal);
 
-			modelInstance.Flags = (AlertMessageFlags)(dataInstance as DbAlertMessage).Flags;
+			modelInstance.Flags = (MailMessageFlags)(dataInstance as DbMailMessage).Flags;
 
 			return base.ToModelInstance(dataInstance, context, principal);
 		}

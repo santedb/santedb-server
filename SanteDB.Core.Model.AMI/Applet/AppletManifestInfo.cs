@@ -18,6 +18,7 @@
  * Date: 2017-9-1
  */
 
+using Newtonsoft.Json;
 using SanteDB.Core.Applets.Model;
 using SanteDB.Core.Model.AMI.Security;
 using System.Xml.Serialization;
@@ -29,6 +30,7 @@ namespace SanteDB.Core.Model.AMI.Applet
 	/// </summary>
 	[XmlType(nameof(AppletManifestInfo), Namespace = "http://santedb.org/ami")]
 	[XmlRoot(nameof(AppletManifestInfo), Namespace = "http://santedb.org/ami")]
+    [JsonObject(nameof(AppletManifestInfo))]
 	public class AppletManifestInfo
 	{
 		/// <summary>
@@ -52,13 +54,13 @@ namespace SanteDB.Core.Model.AMI.Applet
 		/// <summary>
 		/// Gets the applet information name
 		/// </summary>
-		[XmlElement("applet")]
+		[XmlElement("applet"), JsonProperty("applet")]
 		public AppletInfo AppletInfo { get; set; }
 
 		/// <summary>
 		/// Publisher information if available
 		/// </summary>
-		[XmlElement("publisher")]
+		[XmlElement("publisher"), JsonProperty("publisher")]
 		public X509Certificate2Info PublisherData { get; set; }
 	}
 }

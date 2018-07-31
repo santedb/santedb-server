@@ -27,6 +27,7 @@ using SanteDB.Messaging.AMI.Configuration;
 using SanteDB.Messaging.AMI.Wcf;
 using SanteDB.Messaging.AMI.Wcf.Behavior;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -37,9 +38,29 @@ using System.ServiceModel.Web;
 
 namespace SanteDB.Messaging.AMI
 {
-	/// <summary>
-	/// AMI Message handler
-	/// </summary>
+
+
+    /// <summary>
+    /// Http helper extensions
+    /// </summary>
+    public static class HttpHelperExtensions
+    {
+
+        /// <summary>
+        /// Convert query types
+        /// </summary>
+        public static SanteDB.Core.Model.Query.NameValueCollection ToQuery(this System.Collections.Specialized.NameValueCollection nvc)
+        {
+            var retVal = new SanteDB.Core.Model.Query.NameValueCollection();
+            foreach (var k in nvc.AllKeys)
+                retVal.Add(k, new List<String>(nvc.GetValues(k)));
+            return retVal;
+        }
+    }
+
+    /// <summary>
+    /// AMI Message handler
+    /// </summary>
     [Description("AMI Message Service")]
 	public class AmiMessageHandler : IDaemonService, IApiEndpointProvider
 	{

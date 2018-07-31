@@ -864,7 +864,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
         /// <summary>
         /// Options resource
         /// </summary>
-        public ServiceResourceOptions Options(string resourceType)
+        public ServiceResourceOptions ResourceOptions(string resourceType)
         {
 
             var handler = ResourceHandlerUtil.Current.GetResourceHandler<IHdsiServiceContract>(resourceType);
