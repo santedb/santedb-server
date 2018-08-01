@@ -299,6 +299,16 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                 if (!String.IsNullOrEmpty(tel))
                     claims.Add(new Claim("tel", tel));
             }
+            else if (!(oizPrincipal is ApplicationPrincipal))
+            {
+                claims.AddRange(new Claim[]
+                   {
+                    //new Claim(ClaimTypes.AuthenticationInstant, issued.ToString("o")), 
+                    new Claim(ClaimTypes.AuthenticationMethod, "OAuth2"),
+                    new Claim(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim,
+                    (clientPrincipal as ClaimsPrincipal).FindFirst(ClaimTypes.Sid).Value)
+                   });
+            }
 
             // Name identifier
             claims.AddRange((oizPrincipal as ClaimsPrincipal).Claims.Where(o => o.Type == ClaimTypes.NameIdentifier));

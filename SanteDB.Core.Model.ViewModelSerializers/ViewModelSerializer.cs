@@ -2161,7 +2161,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                                                             else {
                                                                                                 if ("password".Equals(r.Value)) {
                                                                                                     r.Read();
-                                                                                                    object _instance = context.JsonContext.ReadElementUtil(r, typeof(string), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("passwordHash", context.JsonContext, _retVal, context));
+                                                                                                    object _instance = context.JsonContext.ReadElementUtil(r, typeof(string), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("password", context.JsonContext, _retVal, context));
                                                                                                     if ((_instance != null)) {
                                                                                                         _retVal.Password = ((string)(_instance));
                                                                                                     }
