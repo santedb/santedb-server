@@ -110,7 +110,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
 
             try
             {
-                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IHdsiServiceContract>(resourceType);
+                var handler = HdsiMessageHandler.ResourceHandler.GetResourceHandler<IHdsiServiceContract>(resourceType);
                 if (handler != null)
                 {
 
@@ -168,7 +168,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
             this.ThrowIfNotReady();
             try
             {
-                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IHdsiServiceContract>(resourceType);
+                var handler = HdsiMessageHandler.ResourceHandler.GetResourceHandler<IHdsiServiceContract>(resourceType);
                 if (handler != null)
                 {
                     var retVal = handler.Create(body, true) as IdentifiedData;
@@ -228,7 +228,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
             {
 
 
-                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IHdsiServiceContract>(resourceType);
+                var handler = HdsiMessageHandler.ResourceHandler.GetResourceHandler<IHdsiServiceContract>(resourceType);
                 if (handler != null)
                 {
                     var retVal = handler.Get(Guid.Parse(id), Guid.Empty) as IdentifiedData;
@@ -293,7 +293,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
             this.ThrowIfNotReady();
             try
             {
-                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IHdsiServiceContract>(resourceType);
+                var handler = HdsiMessageHandler.ResourceHandler.GetResourceHandler<IHdsiServiceContract>(resourceType);
                 if (handler != null)
                 {
                     var retVal = handler.Get(Guid.Parse(id), Guid.Parse(versionId)) as IdentifiedData;
@@ -383,7 +383,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
             this.ThrowIfNotReady();
             try
             {
-                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IHdsiServiceContract>(resourceType);
+                var handler = HdsiMessageHandler.ResourceHandler.GetResourceHandler<IHdsiServiceContract>(resourceType);
 
                 if (handler != null)
                 {
@@ -441,7 +441,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
             this.ThrowIfNotReady();
             try
             {
-                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IHdsiServiceContract>(resourceType);
+                var handler = HdsiMessageHandler.ResourceHandler.GetResourceHandler<IHdsiServiceContract>(resourceType);
                 if (handler != null)
                 {
                     String offset = WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters["_offset"],
@@ -554,7 +554,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
             this.ThrowIfNotReady();
             try
             {
-                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IHdsiServiceContract>(resourceType);
+                var handler = HdsiMessageHandler.ResourceHandler.GetResourceHandler<IHdsiServiceContract>(resourceType);
                 if (handler != null)
                 {
 
@@ -614,7 +614,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
             this.ThrowIfNotReady();
             try
             {
-                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IHdsiServiceContract>(resourceType);
+                var handler = HdsiMessageHandler.ResourceHandler.GetResourceHandler<IHdsiServiceContract>(resourceType);
                 if (handler != null)
                 {
 
@@ -730,7 +730,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
                 var versionId = Guid.ParseExact(match, "N");
 
                 // First we load
-                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IHdsiServiceContract>(resourceType);
+                var handler = HdsiMessageHandler.ResourceHandler.GetResourceHandler<IHdsiServiceContract>(resourceType);
 
                 if (handler == null)
                     throw new FileNotFoundException(resourceType);
@@ -829,7 +829,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
                 };
 
                 // Get the resources which are supported
-                foreach (var itm in ResourceHandlerUtil.Current.Handlers)
+                foreach (var itm in HdsiMessageHandler.ResourceHandler.Handlers)
                 {
                     var svc = new ServiceResourceOptions()
                     {
@@ -867,7 +867,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
         public ServiceResourceOptions ResourceOptions(string resourceType)
         {
 
-            var handler = ResourceHandlerUtil.Current.GetResourceHandler<IHdsiServiceContract>(resourceType);
+            var handler = HdsiMessageHandler.ResourceHandler.GetResourceHandler<IHdsiServiceContract>(resourceType);
             if (handler == null)
                 throw new FileNotFoundException(resourceType);
             else

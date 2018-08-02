@@ -26,6 +26,7 @@ using SanteDB.Core.Wcf.Security;
 using SanteDB.Messaging.AMI.Configuration;
 using SanteDB.Messaging.AMI.Wcf;
 using SanteDB.Messaging.AMI.Wcf.Behavior;
+using SanteDB.Messaging.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -64,10 +65,15 @@ namespace SanteDB.Messaging.AMI
     [Description("AMI Message Service")]
 	public class AmiMessageHandler : IDaemonService, IApiEndpointProvider
 	{
-		/// <summary>
-		/// The internal reference to the trace source.
-		/// </summary>
-		private readonly TraceSource tracer = new TraceSource("SanteDB.Messaging.AMI");
+        /// <summary>
+        /// Resource handler tool
+        /// </summary>
+        internal static ResourceHandlerTool ResourceHandler { get; private set; }
+
+        /// <summary>
+        /// The internal reference to the trace source.
+        /// </summary>
+        private readonly TraceSource tracer = new TraceSource("SanteDB.Messaging.AMI");
 
 		/// <summary>
 		/// The internal reference to the AMI configuration.
@@ -173,7 +179,7 @@ namespace SanteDB.Messaging.AMI
 
 				// Start the webhost
 				this.m_webHost.Open();
-
+                AmiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.configuration.ResourceHandlers);
 				this.Started?.Invoke(this, EventArgs.Empty);
 				return true;
 			}

@@ -167,6 +167,7 @@
       <Link>SanteDB.licenseheader</Link>
     </None>
     <None Include="packages.config" />
+    <None Include="SanteDB.Core.nuspec" />
     <None Include="Schema\SanteDBDataSet.xsd">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -31,12 +31,12 @@ namespace SanteDB.Messaging.Common
 	/// Resource handler utility
 	/// </summary>
     [TraceSource("SanteDB.Messaging.Common")]
-	public class ResourceHandlerUtil
+	public class ResourceHandlerTool
 	{
 		// Resource handler utility classes
 		private static object m_lockObject = new object();
 
-		private static ResourceHandlerUtil m_instance = null;
+		private static ResourceHandlerTool m_instance = null;
 
         // Common trace
         private TraceSource m_traceSource = new TraceSource("SanteDB.Messaging.Common");
@@ -45,54 +45,31 @@ namespace SanteDB.Messaging.Common
 		private Dictionary<String, IResourceHandler> m_handlers = new Dictionary<string, IResourceHandler>();
 
 		/// <summary>
-		/// Gets the current resource handler utility
-		/// </summary>
-		public static ResourceHandlerUtil Current
-		{
-			get
-			{
-				if (m_instance == null)
-					lock (m_lockObject)
-						if (m_instance == null)
-							m_instance = new ResourceHandlerUtil();
-				return m_instance;
-			}
-		}
-
-		/// <summary>
 		/// Get the current handlers
 		/// </summary>
 		public IEnumerable<IResourceHandler> Handlers => this.m_handlers.Values;
 
-		/// <summary>
-		/// Resource handler utility ctor
-		/// </summary>
-		private ResourceHandlerUtil()
-		{
-			foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
-			{
-				try
-				{
-					foreach (var t in asm.GetTypes().Where(o => typeof(IResourceHandler).IsAssignableFrom(o) && o.IsClass && !o.IsAbstract))
-					{
-                        try
-                        {
-                            ConstructorInfo ci = t.GetConstructor(Type.EmptyTypes);
-                            IResourceHandler rh = ci.Invoke(null) as IResourceHandler;
-                            m_handlers.Add($"{rh.Scope.Name}/{rh.ResourceName}", rh);
-                        }
-                        catch(Exception e)
-                        {
-                            this.m_traceSource.TraceError("Error binding: {0} due to {1}", t.FullName, e);
-                        }
-					}
-				}
-				catch (ReflectionTypeLoadException)
-				{
-					// ignored
-				}
-			}
-		}
+        /// <summary>
+        /// Creates an single resource handler for a particular service
+        /// </summary>
+        /// <param name="resourceTypes">The type of resource handlers</param>
+        public ResourceHandlerTool(IEnumerable<Type> resourceHandlerTypes)
+        {
+            foreach (var t in resourceHandlerTypes)
+            {
+                try
+                {
+                    ConstructorInfo ci = t.GetConstructor(Type.EmptyTypes);
+                    IResourceHandler rh = ci.Invoke(null) as IResourceHandler;
+                    this.m_handlers.Add($"{rh.Scope.Name}/{rh.ResourceName}", rh);
+                    this.m_traceSource.TraceInfo("Adding {0} to {1}", rh.ResourceName, rh.Scope);
+                }
+                catch (Exception e)
+                {
+                    this.m_traceSource.TraceError("Error binding: {0} due to {1}", t.FullName, e);
+                }
+            }
+        }
 
 		/// <summary>
 		/// Get resource handler

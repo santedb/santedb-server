@@ -71,6 +71,11 @@ namespace SanteDB.Messaging.HDSI
     public class HdsiMessageHandler : IMessageHandlerService, IApiEndpointProvider
     {
 
+        /// <summary>
+        /// Resource handler tool
+        /// </summary>
+        internal static ResourceHandlerTool ResourceHandler { get; private set; }
+
         // HDSI Trace host
         private TraceSource m_traceSource = new TraceSource("SanteDB.Messaging.HDSI");
 
@@ -162,7 +167,7 @@ namespace SanteDB.Messaging.HDSI
                 this.Starting?.Invoke(this, EventArgs.Empty);
 
                 // Force startup
-                ResourceHandlerUtil.Current.GetType();
+                HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.m_configuration.ResourceHandlers);
 
                 this.m_webHost = new WebServiceHost(typeof(HdsiServiceBehavior));
                 foreach(ServiceEndpoint endpoint in this.m_webHost.Description.Endpoints)

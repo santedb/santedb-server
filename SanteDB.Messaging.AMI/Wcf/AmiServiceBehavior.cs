@@ -305,7 +305,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             try
             {
 
-                IResourceHandler handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
+                IResourceHandler handler = AmiMessageHandler.ResourceHandler.GetResourceHandler<IAmiServiceContract>(resourceType);
                 if (handler != null)
                 {
                     var retVal = handler.Create(data, false);
@@ -348,7 +348,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             this.ThrowIfNotReady();
             try
             {
-                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
+                var handler = AmiMessageHandler.ResourceHandler.GetResourceHandler<IAmiServiceContract>(resourceType);
                 if (handler != null)
                 {
                     if (data is IdentifiedData)
@@ -398,7 +398,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             this.ThrowIfNotReady();
             try
             {
-                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
+                var handler = AmiMessageHandler.ResourceHandler.GetResourceHandler<IAmiServiceContract>(resourceType);
                 if (handler != null)
                 {
 
@@ -445,7 +445,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             {
 
 
-                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
+                var handler = AmiMessageHandler.ResourceHandler.GetResourceHandler<IAmiServiceContract>(resourceType);
                 if (handler != null)
                 {
                     var retVal = handler.Get(Guid.Parse(key), Guid.Empty) as IdentifiedData;
@@ -490,7 +490,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             this.ThrowIfNotReady();
             try
             {
-                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
+                var handler = AmiMessageHandler.ResourceHandler.GetResourceHandler<IAmiServiceContract>(resourceType);
                 if (handler != null)
                 {
                     var retVal = handler.Get(Guid.Parse(key), Guid.Parse(versionKey)) as IdentifiedData;
@@ -523,7 +523,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             this.ThrowIfNotReady();
             try
             {
-                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
+                var handler = AmiMessageHandler.ResourceHandler.GetResourceHandler<IAmiServiceContract>(resourceType);
 
                 if (handler != null)
                 {
@@ -565,7 +565,7 @@ namespace SanteDB.Messaging.AMI.Wcf
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
         public ServiceResourceOptions ResourceOptions(string resourceType)
         {
-            var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
+            var handler = AmiMessageHandler.ResourceHandler.GetResourceHandler<IAmiServiceContract>(resourceType);
             if (handler == null)
                 throw new FileNotFoundException(resourceType);
             else
@@ -581,7 +581,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             this.ThrowIfNotReady();
             try
             {
-                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
+                var handler = AmiMessageHandler.ResourceHandler.GetResourceHandler<IAmiServiceContract>(resourceType);
                 if (handler != null)
                 {
                     String offset = WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters["_offset"],
@@ -643,7 +643,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             this.ThrowIfNotReady();
             try
             {
-                var handler = ResourceHandlerUtil.Current.GetResourceHandler<IAmiServiceContract>(resourceType);
+                var handler = AmiMessageHandler.ResourceHandler.GetResourceHandler<IAmiServiceContract>(resourceType);
                 if (handler != null)
                 {
                     if (data is IdentifiedData)

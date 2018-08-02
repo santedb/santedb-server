@@ -1,0 +1,25 @@
+<Plugin xmlns="http://santedb.org/package">
+	<meta>
+		<id></id>
+		<group></group>
+		<name></name>
+		<description></description>
+		<author></author>
+		<version></version>
+		<default></default>
+	</meta>
+  <dependencies>
+    <dependency id="" version=""/>
+  </dependencies>
+	<files>
+		<add></add>
+	</files>
+	<services>
+		<add>
+			<class></class>
+			<provides></provides>
+			<configuration sectionName="" handler="">
+			</configuration>
+		</add>
+	</services>
+</Plugin>

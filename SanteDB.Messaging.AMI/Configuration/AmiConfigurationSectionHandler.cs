@@ -18,9 +18,12 @@
  * Date: 2017-9-1
  */
 using SanteDB.Core.Interop;
+using SanteDB.Messaging.AMI.Wcf;
+using SanteDB.Messaging.Common;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.Xml;
 
 namespace SanteDB.Messaging.AMI.Configuration
@@ -61,12 +64,23 @@ namespace SanteDB.Messaging.AMI.Configuration
 				});
 			}
 
-			// Configuration
-			return new AmiConfiguration()
-			{
-				CaConfiguration = caConfiguration,
-				Endpoints = epOptions
-			};
+
+            var resourceHandlers = section.SelectNodes("./*[local-name() = 'resourceHandler']/*[local-name() = 'add']");
+            List<Type> epHandlers = new List<Type>();
+            foreach(XmlElement xel in resourceHandlers)
+            {
+                var type = xel.Attributes["type"]?.Value;
+                if (type == null)
+                    throw new ConfigurationErrorsException("Resource handler must carry @type attribute");
+                var t = Type.GetType(type);
+                if (t == null)
+                    throw new ConfigurationErrorsException($"Cannot find type described by {type}");
+                epHandlers.Add(t);
+            }
+            if(epHandlers.Count == 0) // Use all resource handlers in "this"
+                epHandlers = typeof(AmiConfiguration).Assembly.ExportedTypes.Where(t=>!t.IsAbstract && !t.IsInterface && typeof(IResourceHandler).IsAssignableFrom(t)).ToList();
+            // Configuration
+            return new AmiConfiguration(caConfiguration, epOptions, epHandlers);
 		}
 	}
 }
