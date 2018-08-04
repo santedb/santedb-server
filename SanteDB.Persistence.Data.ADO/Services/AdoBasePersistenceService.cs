@@ -50,12 +50,14 @@ using System.Xml.Serialization;
 using System.IO;
 using System.Text;
 using System.Threading;
+using MARC.HI.EHRS.SVC.Core.Attributes;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
     /// <summary>
     /// Represents a data persistence service which stores data in the local SQLite data store
     /// </summary>
+    [TraceSource(AdoDataConstants.TraceSourceName)]
     public abstract class AdoBasePersistenceService<TData> : IDataPersistenceService<TData>, IStoredQueryDataPersistenceService<TData>, IFastQueryDataPersistenceService<TData>, IAdoPersistenceService where TData : IdentifiedData
     {
 
@@ -763,7 +765,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
             var retVal = this.QueryInternal(context, query, queryId, offset, count, out totalResults, principal, countResults);
             return retVal;
         }
-
 
         /// <summary>
         /// Insert the object for generic methods

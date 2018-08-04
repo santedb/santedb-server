@@ -50,7 +50,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     {
 
         // Query persistence
-        protected MARC.HI.EHRS.SVC.Core.Services.IQueryPersistenceService m_queryPersistence = ApplicationContext.Current.GetService<MARC.HI.EHRS.SVC.Core.Services.IQueryPersistenceService>();
+        protected Core.Services.IQueryPersistenceService m_queryPersistence = ApplicationContext.Current.GetService<Core.Services.IQueryPersistenceService>();
 
         /// <summary>
         /// Get the order by function
@@ -185,11 +185,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
 
                 // Query has been registered?
-                if (queryId != Guid.Empty && this.m_queryPersistence?.IsRegistered(queryId.ToString()) == true)
+                if (queryId != Guid.Empty && this.m_queryPersistence?.IsRegistered(queryId) == true)
                 {
-                    totalResults = (int)this.m_queryPersistence.QueryResultTotalQuantity(queryId.ToString());
-                    var resultKeys = this.m_queryPersistence.GetQueryResults<Guid>(queryId.ToString(), offset, count.Value);
-                    return resultKeys.Select(p => p.Id).OfType<Object>();
+                    totalResults = (int)this.m_queryPersistence.QueryResultTotalQuantity(queryId);
+                    var resultKeys = this.m_queryPersistence.GetQueryResults(queryId, offset, count.Value);
+                    return resultKeys.OfType<Object>();
                 }
 
                 // Is obsoletion time already specified?
@@ -249,7 +249,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                         //ApplicationContext.Current.GetService<IThreadPoolService>().QueueNonPooledWorkItem(a => this.m_queryPersistence?.RegisterQuerySet(queryId.ToString(), resultKeys.Select(o => new Identifier<Guid>(o)).ToArray(), query), null);
                         // Another check
-                        this.m_queryPersistence?.RegisterQuerySet(queryId.ToString(), resultKeys.Count(), resultKeys.Select(o => new Identifier<Guid>(o)).Take(1000).ToArray(), query);
+                        this.m_queryPersistence?.RegisterQuerySet(queryId, resultKeys.Take(1000).ToArray(), query, resultKeys.Count());
 
                         ApplicationContext.Current.GetService<IThreadPoolService>().QueueNonPooledWorkItem(o =>
                         {
@@ -257,7 +257,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                             var rkeys = o as Guid[];
                             while (ofs < rkeys.Length)
                             {
-                                this.m_queryPersistence?.AddResults(queryId.ToString(), rkeys.Skip(ofs).Take(1000).Select(k => new Identifier<Guid>(k)).ToArray());
+                                this.m_queryPersistence.AddResults(queryId, rkeys.Skip(ofs).Take(1000).ToArray());
                                 ofs += 1000;
                             }
                         }, resultKeys.ToArray());

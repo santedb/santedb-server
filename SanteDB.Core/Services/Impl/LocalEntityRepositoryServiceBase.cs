@@ -30,6 +30,7 @@ using System.Linq;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Interfaces;
+using MARC.HI.EHRS.SVC.Auditing.Data;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -44,6 +45,11 @@ namespace SanteDB.Core.Services.Impl
         public event EventHandler<AuditDataEventArgs> DataUpdated;
         public event EventHandler<AuditDataEventArgs> DataObsoleted;
         public event EventHandler<AuditDataDisclosureEventArgs> DataDisclosed;
+
+        /// <summary>
+        /// When true, suppresses audit events
+        /// </summary>
+        protected bool suppressAuditEvents = false;
 
         /// <summary>
         /// Find with stored query parameters
@@ -67,7 +73,8 @@ namespace SanteDB.Core.Services.Impl
 
             var retVal = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
 
-            this.DataDisclosed?.Invoke(this, new AuditDataDisclosureEventArgs(query.ToString(), retVal));
+            if(!this.suppressAuditEvents)
+                this.DataDisclosed?.Invoke(this, new AuditDataDisclosureEventArgs(query.ToString(), retVal));
             return retVal;
         }
 
@@ -91,7 +98,8 @@ namespace SanteDB.Core.Services.Impl
 
             entity = persistenceService.Insert(entity, AuthenticationContext.Current.Principal, TransactionMode.Commit);
 
-            this.DataCreated?.Invoke(this, new AuditDataEventArgs(entity));
+            if (!this.suppressAuditEvents)
+                this.DataCreated?.Invoke(this, new AuditDataEventArgs(entity));
             businessRulesService?.AfterInsert(entity);
 
             return entity;
@@ -121,7 +129,8 @@ namespace SanteDB.Core.Services.Impl
             entity = businessRulesService?.BeforeObsolete(entity) ?? entity;
 
             entity = persistenceService.Obsolete(entity, AuthenticationContext.Current.Principal, TransactionMode.Commit);
-
+            if (!this.suppressAuditEvents)
+                this.DataObsoleted?.Invoke(this, new AuditDataEventArgs(entity));
             return businessRulesService?.AfterObsolete(entity) ?? entity;
         }
 
@@ -142,7 +151,8 @@ namespace SanteDB.Core.Services.Impl
             var result = persistenceService.Get(new Identifier<Guid>(key, versionKey), AuthenticationContext.Current.Principal, true);
 
             var retVal = businessRulesService?.AfterRetrieve(result) ?? result;
-            this.DataDisclosed?.Invoke(this, new AuditDataDisclosureEventArgs(key.ToString(), new Object[] { retVal }));
+            if (!this.suppressAuditEvents)
+                this.DataDisclosed?.Invoke(this, new AuditDataDisclosureEventArgs(key.ToString(), new Object[] { retVal }));
             return retVal;
         }
 
@@ -151,8 +161,6 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         protected TEntity Save<TEntity>(TEntity data) where TEntity : IdentifiedData
         {
-
-
             var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TEntity>>();
 
             if (persistenceService == null)
@@ -183,7 +191,8 @@ namespace SanteDB.Core.Services.Impl
 
                 data = businessRulesService?.BeforeUpdate(data) ?? data;
                 data = persistenceService.Update(data, AuthenticationContext.Current.Principal, TransactionMode.Commit);
-                this.DataUpdated?.Invoke(this, new AuditDataEventArgs(data));
+                if (!this.suppressAuditEvents)
+                    this.DataUpdated?.Invoke(this, new AuditDataEventArgs(data));
                 businessRulesService?.AfterUpdate(data);
                 return data;
             }
@@ -191,12 +200,11 @@ namespace SanteDB.Core.Services.Impl
             {
                 data = businessRulesService?.BeforeInsert(data) ?? data;
                 data = persistenceService.Insert(data, AuthenticationContext.Current.Principal, TransactionMode.Commit);
-                this.DataCreated?.Invoke(this, new AuditDataEventArgs(data));
+                if (!this.suppressAuditEvents)
+                    this.DataCreated?.Invoke(this, new AuditDataEventArgs(data));
                 businessRulesService?.AfterInsert(data);
                 return data;
             }
-
-            return data;
         }
 
         /// <summary>
@@ -234,7 +242,10 @@ namespace SanteDB.Core.Services.Impl
             IEnumerable<TEntity> results = null;
             results = persistenceService.QueryFast(query, queryId, offset, count, AuthenticationContext.Current.Principal, out totalResults);
 
-            return businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
+            results = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
+            if (!this.suppressAuditEvents)
+                this.DataDisclosed?.Invoke(this, new AuditDataDisclosureEventArgs(query.ToString(), results));
+            return results;
         }
     }
 }

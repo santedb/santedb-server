@@ -194,11 +194,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
 
             // Query has been registered?
-            if (this.m_queryPersistence?.IsRegistered(queryId.ToString()) == true)
+            if (this.m_queryPersistence?.IsRegistered(queryId) == true)
             {
-                totalResults = (int)this.m_queryPersistence.QueryResultTotalQuantity(queryId.ToString());
-                var keyResults = this.m_queryPersistence.GetQueryResults<Guid>(queryId.ToString(), offset, count.Value);
-                return keyResults.Select(p => p.Id).OfType<Object>();
+                totalResults = (int)this.m_queryPersistence.QueryResultTotalQuantity(queryId);
+                var keyResults = this.m_queryPersistence.GetQueryResults(queryId, offset, count.Value);
+                return keyResults.OfType<Object>();
             }
 
             SqlStatement domainQuery = null;
@@ -221,7 +221,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                 var keyQuery = AdoPersistenceService.GetQueryBuilder().CreateQuery(query, pkColumn).Build();
                 var resultKeys = context.Query<Guid>(keyQuery.Build());
-                this.m_queryPersistence?.RegisterQuerySet(queryId.ToString(), resultKeys.Count(), resultKeys.Take(1000).Select(o => new Identifier<Guid>(o)).ToArray(), query);
+                this.m_queryPersistence?.RegisterQuerySet(queryId, resultKeys.Take(1000).ToArray(), query, resultKeys.Count());
 
                 ApplicationContext.Current.GetService<IThreadPoolService>().QueueNonPooledWorkItem(o =>
                 {
@@ -233,7 +233,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     }
                     while (ofs < rkeys.Length)
                     {
-                        this.m_queryPersistence?.AddResults(queryId.ToString(), rkeys.Skip(ofs).Take(1000).Select(k => new Identifier<Guid>(k)).ToArray());
+                        this.m_queryPersistence?.AddResults(queryId, rkeys.Skip(ofs).Take(1000).ToArray());
                         ofs += 1000;
                     }
                 }, resultKeys.ToArray());

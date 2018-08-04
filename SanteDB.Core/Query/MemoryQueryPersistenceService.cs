@@ -17,7 +17,6 @@
  * User: fyfej
  * Date: 2017-11-21
  */
-using MARC.HI.EHRS.SVC.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +28,7 @@ using SanteDB.Core.Diagnostics;
 using MARC.HI.EHRS.SVC.Core.Timer;
 using System.Timers;
 using MARC.HI.EHRS.SVC.Core;
+using MARC.HI.EHRS.SVC.Core.Services;
 
 namespace SanteDB.Core.Query
 {
@@ -37,7 +37,7 @@ namespace SanteDB.Core.Query
     /// <summary>
     /// Represents a simple query persistence service that uses local memory for query continuation
     /// </summary>
-    public class MemoryQueryPersistenceService : IQueryPersistenceService, ITimerJob, IDaemonService
+    public class MemoryQueryPersistenceService : SanteDB.Core.Services.IQueryPersistenceService, ITimerJob, IDaemonService
     {
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace SanteDB.Core.Query
             /// <summary>
             /// Results in the result set
             /// </summary>
-            public List<Object> Results { get; set; }
+            public List<Guid> Results { get; set; }
 
             /// <summary>
             /// The query tag
@@ -78,7 +78,7 @@ namespace SanteDB.Core.Query
         private TraceSource m_tracer = new TraceSource("SanteDB.Core.Query.MemoryQueryPersistence");
 
         // Memory cache of queries
-        private Dictionary<String, MemoryQueryInfo> m_queryCache = new Dictionary<String, MemoryQueryInfo>(10);
+        private Dictionary<Guid, MemoryQueryInfo> m_queryCache = new Dictionary<Guid, MemoryQueryInfo>(10);
 
         // Sync object
         private Object m_syncObject = new object();
@@ -108,38 +108,35 @@ namespace SanteDB.Core.Query
         /// <summary>
         /// Add results to id set
         /// </summary>
-        public bool AddResults<TIdentifier>(string queryId, Identifier<TIdentifier>[] results)
+        public void AddResults(Guid queryId, IEnumerable<Guid> results)
         {
             MemoryQueryInfo retVal = null;
             if (this.m_queryCache.TryGetValue(queryId, out retVal))
             {
                 this.m_tracer.TraceVerbose("Updating query {0} ({1} results)", queryId, results.Count());
                 lock (retVal.Results)
-                    retVal.Results.AddRange(results.Where(o => !retVal.Results.Contains(o.Id)).Select(o => o.Id).OfType<Object>());
+                    retVal.Results.AddRange(results.Where(o => !retVal.Results.Contains(o)).Select(o => o));
 
                 //retVal.TotalResults = retVal.Results.Count();
-                return true;
             }
-            else
-                return false;
         }
 
         /// <summary>
         /// Get query results
         /// </summary>
-        public Identifier<TIdentifier>[] GetQueryResults<TIdentifier>(string queryId, int startRecord, int nRecords)
+        public IEnumerable<Guid> GetQueryResults(Guid queryId, int startRecord, int nRecords)
         {
             MemoryQueryInfo retVal = null;
             if (this.m_queryCache.TryGetValue(queryId, out retVal))
                 lock(retVal.Results)
-                    return retVal.Results.ToArray().Distinct().Skip(startRecord).Take(nRecords).Select(o => new Identifier<Guid>((Guid)o)).OfType<Identifier<TIdentifier>>().ToArray();
+                    return retVal.Results.ToArray().Distinct().Skip(startRecord).Take(nRecords).OfType<Guid>().ToArray();
             return null;
         }
 
         /// <summary>
         /// Get query tag
         /// </summary>
-        public object GetQueryTag(string queryId)
+        public object GetQueryTag(Guid queryId)
         {
             MemoryQueryInfo retVal = null;
             if (this.m_queryCache.TryGetValue(queryId, out retVal))
@@ -150,7 +147,7 @@ namespace SanteDB.Core.Query
         /// <summary>
         /// True if registered
         /// </summary>
-        public bool IsRegistered(string queryId)
+        public bool IsRegistered(Guid queryId)
         {
             return this.m_queryCache.ContainsKey(queryId);
         }
@@ -158,7 +155,7 @@ namespace SanteDB.Core.Query
         /// <summary>
         /// Get total results
         /// </summary>
-        public long QueryResultTotalQuantity(string queryId)
+        public long QueryResultTotalQuantity(Guid queryId)
         {
             MemoryQueryInfo retVal = null;
             if (this.m_queryCache.TryGetValue(queryId, out retVal))
@@ -169,7 +166,7 @@ namespace SanteDB.Core.Query
         /// <summary>
         /// Register a query
         /// </summary>
-        public bool RegisterQuerySet<TIdentifier>(string queryId, int count, Identifier<TIdentifier>[] results, object tag)
+        public bool RegisterQuerySet(Guid queryId, IEnumerable<Guid> results, object tag, int totalResults)
         {
             lock (this.m_syncObject)
             {
@@ -177,9 +174,9 @@ namespace SanteDB.Core.Query
                 if (this.m_queryCache.TryGetValue(queryId, out retVal))
                 {
                     this.m_tracer.TraceVerbose("Updating query {0} ({1} results)", queryId, results.Count());
-                    retVal.Results = results.Select(o => o.Id).OfType<Object>().ToList();
+                    retVal.Results = results.Select(o => o).ToList();
                     retVal.QueryTag = tag;
-                    retVal.TotalResults = count;
+                    retVal.TotalResults = totalResults;
                 }
                 else
                 {
@@ -188,8 +185,8 @@ namespace SanteDB.Core.Query
                     this.m_queryCache.Add(queryId, new MemoryQueryInfo()
                     {
                         QueryTag = tag,
-                        Results = results.Select(o => o.Id).OfType<Object>().ToList(),
-                        TotalResults = count
+                        Results = results.Select(o => o).ToList(),
+                        TotalResults = totalResults
                     });
                 }
             }
