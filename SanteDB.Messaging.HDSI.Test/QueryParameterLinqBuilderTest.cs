@@ -286,6 +286,5 @@ namespace SanteDB.Messaging.HDSI.Test
             Assert.AreEqual(expr.ToString(), expected);
         }
 
-
     }
 }

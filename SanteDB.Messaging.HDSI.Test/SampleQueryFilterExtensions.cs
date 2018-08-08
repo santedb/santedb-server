@@ -44,7 +44,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Gets the return type
         /// </summary>
-        public Type ReturnType => typeof(Int32);
+        public MethodInfo ExtensionMethod => typeof(SimpleQueryExtensionMethods).GetRuntimeMethod("TestExpression", new Type[] { typeof(String) });
 
         /// <summary>
         /// Compose the expression
@@ -53,7 +53,7 @@ namespace SanteDB.Messaging.HDSI.Test
         {
             return Expression.MakeBinary(comparison,
                 Expression.Call(
-                        typeof(SimpleQueryExtensionMethods).GetRuntimeMethod("TestExpression", new Type[] { typeof(String) }), scope)
+                        this.ExtensionMethod, scope)
                         , operand);
         }
 
@@ -65,15 +65,6 @@ namespace SanteDB.Messaging.HDSI.Test
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Detect whether the extension is present
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        public bool Detect(BinaryExpression expression)
-        {
-            throw new NotImplementedException();
-        }
     }
 
     /// <summary>
@@ -90,7 +81,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Gets the return type
         /// </summary>
-        public Type ReturnType => typeof(TimeSpan);
+        public MethodInfo ExtensionMethod => typeof(SimpleQueryExtensionMethods).GetRuntimeMethod("TestExpressionEx", new Type[] { typeof(DateTime), typeof(DateTime) });
 
         /// <summary>
         /// Compose the expression
@@ -98,7 +89,7 @@ namespace SanteDB.Messaging.HDSI.Test
         public BinaryExpression Compose(Expression scope, ExpressionType comparison, Expression valueExpression, string[] parms)
         {
             return Expression.MakeBinary(comparison,
-                Expression.Call(typeof(SimpleQueryExtensionMethods).GetRuntimeMethod("TestExpressionEx", new Type[] { typeof(DateTime), typeof(DateTime) }), new Expression[] {
+                Expression.Call(this.ExtensionMethod, new Expression[] {
                     scope,
                     Expression.Constant(DateTime.Parse(parms[0]))
                 }), valueExpression);
