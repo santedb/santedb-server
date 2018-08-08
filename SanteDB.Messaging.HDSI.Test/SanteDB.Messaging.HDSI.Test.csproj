@@ -35,8 +35,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0"/>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.1"/>
+    <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0" />
+    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.1" />
     <Reference Include="System" />
   </ItemGroup>
   <Choose>
@@ -55,6 +55,7 @@
     <Compile Include="HttpQueryExpressionTest.cs" />
     <Compile Include="QueryParameterLinqBuilderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SampleQueryFilterExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

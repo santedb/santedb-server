@@ -30,6 +30,7 @@ using System.Linq.Expressions;
 
 namespace SanteDB.Messaging.HDSI.Test
 {
+
 	[TestClass]
 	public class QueryParameterLinqBuilderTest
 	{
@@ -256,5 +257,35 @@ namespace SanteDB.Messaging.HDSI.Test
             Assert.AreEqual(httpQueryParameters.ToString(), pexpr.ToString());
 
         }
+
+        /// <summary>
+        /// Test the extended query filter has been parsed
+        /// </summary>
+        [TestMethod]
+        public void TestExtendedQueryFilterParse()
+        {
+            var expected = "o => o.Names.Any(name => name.Component.Where(guard => (guard.ComponentType.Mnemonic == \"OfficialRecord\")).Any(component => (component.Value.TestExpression() < 6)))";
+            QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtension());
+            NameValueCollection httpQueryParameters = new NameValueCollection();
+            httpQueryParameters.Add("name.component[OfficialRecord].value",":(test)<6");
+            var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
+            Assert.AreEqual(expr.ToString(), expected);
+        }
+
+        /// <summary>
+        /// Test the extended query filter has been parsed
+        /// </summary>
+        [TestMethod]
+        public void TestExtendedQueryFilterWithParameterParse()
+        {
+            var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx(1/1/2018 12:00:00 AM) > 7305.00:00:00))";
+            QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());
+            NameValueCollection httpQueryParameters = new NameValueCollection();
+            httpQueryParameters.Add("dateOfBirth", ":(testEx|2018-01-01)>20y");
+            var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
+            Assert.AreEqual(expr.ToString(), expected);
+        }
+
+
     }
 }

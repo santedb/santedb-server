@@ -12,6 +12,7 @@ using SanteDB.OrmLite;
 using SanteDB.Core.Model.Map;
 using SanteDB.Persistence.Data.ADO.Services;
 using SanteDB.OrmLite.Providers;
+using SanteDB.OrmLite.Providers.Postgres;
 
 namespace SanteDB.Persistence.Data.ADO.Test
 {
