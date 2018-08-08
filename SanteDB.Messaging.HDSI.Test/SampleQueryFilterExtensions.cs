@@ -49,7 +49,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Compose the expression
         /// </summary>
-        public BinaryExpression Compose(Expression scope, ExpressionType comparison, Expression operand, string[] parms)
+        public BinaryExpression Compose(Expression scope, ExpressionType comparison, Expression operand, Expression[] parms)
         {
             return Expression.MakeBinary(comparison,
                 Expression.Call(
@@ -86,12 +86,12 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Compose the expression
         /// </summary>
-        public BinaryExpression Compose(Expression scope, ExpressionType comparison, Expression valueExpression, string[] parms)
+        public BinaryExpression Compose(Expression scope, ExpressionType comparison, Expression valueExpression, Expression[] parms)
         {
             return Expression.MakeBinary(comparison,
                 Expression.Call(this.ExtensionMethod, new Expression[] {
                     scope,
-                    Expression.Constant(DateTime.Parse(parms[0]))
+                    parms[0]
                 }), valueExpression);
 
         }
