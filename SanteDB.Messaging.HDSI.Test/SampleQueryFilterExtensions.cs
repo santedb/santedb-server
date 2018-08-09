@@ -29,6 +29,14 @@ namespace SanteDB.Messaging.HDSI.Test
         {
             return parm.Subtract(me);
         }
+
+        /// <summary>
+        /// Boolean test
+        /// </summary>
+        public static bool BoolTest(this String me)
+        {
+            return true;
+        }
     }
 
     /// <summary>
@@ -57,14 +65,39 @@ namespace SanteDB.Messaging.HDSI.Test
                         , operand);
         }
 
-        /// <summary>
-        /// DeCompose the expression
-        /// </summary>
-        public KeyValuePair<string, object> DeCompose(BinaryExpression expression)
-        {
-            throw new NotImplementedException();
-        }
 
+    }
+
+    /// <summary>
+    /// A boolean query extension
+    /// </summary>
+    public class BoolQueryExtension : IQueryFilterExtension
+    {
+        /// <summary>
+        /// Get the name
+        /// </summary>
+        public string Name => "testBool";
+
+        /// <summary>
+        /// Get the extension method
+        /// </summary>
+        public MethodInfo ExtensionMethod => typeof(SimpleQueryExtensionMethods).GetRuntimeMethod("BoolTest", new Type[] { typeof(String) });
+
+        /// <summary>
+        /// Compose the expression
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="comparison"></param>
+        /// <param name="valueExpression"></param>
+        /// <param name="parms"></param>
+        /// <returns></returns>
+        public BinaryExpression Compose(Expression scope, ExpressionType comparison, Expression valueExpression, Expression[] parms)
+        {
+            return Expression.MakeBinary(ExpressionType.Equal,
+                Expression.Call(
+                        this.ExtensionMethod, scope)
+                        , Expression.Constant(true));
+        }
     }
 
     /// <summary>

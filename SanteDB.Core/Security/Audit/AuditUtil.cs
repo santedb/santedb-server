@@ -323,6 +323,7 @@ namespace SanteDB.Core.Security.Audit
         {
             traceSource.TraceVerbose("Sending Audit - {0}", audit.CorrelationToken);
 
+            // If the current principal is SYSTEM then we don't need to send an audit
             ApplicationContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(o =>
             {
                 AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
