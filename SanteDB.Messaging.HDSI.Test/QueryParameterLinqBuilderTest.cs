@@ -348,7 +348,6 @@ namespace SanteDB.Messaging.HDSI.Test
             {
                 { "input" , ((Func<Patient>)(() => new Patient() { DateOfBirth = DateTime.Parse("2018-01-01") })) }
             });
-            
             Assert.AreEqual(expr.ToString(), expected);
         }
     }
