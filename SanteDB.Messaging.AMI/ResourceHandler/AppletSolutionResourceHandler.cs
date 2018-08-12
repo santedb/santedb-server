@@ -1,29 +1,28 @@
-﻿using SanteDB.Messaging.Common;
+﻿using MARC.HI.EHRS.SVC.Core;
+using SanteDB.Core.Applets.Model;
+using SanteDB.Core.Applets.Services;
+using SanteDB.Core.Interop;
+using SanteDB.Core.Model.AMI.Applet;
+using SanteDB.Core.Model.AMI.Security;
+using SanteDB.Core.Model.Query;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Attribute;
+using SanteDB.Messaging.AMI.Wcf;
+using SanteDB.Messaging.Common;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
-using SanteDB.Core.Interop;
-using SanteDB.Core.Model.Query;
-using SanteDB.Messaging.AMI.Wcf;
-using SanteDB.Core.Model.AMI.Applet;
-using SanteDB.Core.Applets.Model;
-using System.IO;
-using MARC.HI.EHRS.SVC.Core;
-using SanteDB.Core.Applets.Services;
-using System.Security.Cryptography.X509Certificates;
-using SanteDB.Core.Model.AMI.Security;
-using System.ServiceModel.Web;
-using SanteDB.Core.Security.Attribute;
-using SanteDB.Core.Security;
 
 namespace SanteDB.Messaging.AMI.ResourceHandler
 {
     /// <summary>
-    /// Represents a resource handler that handles applets
+    /// Represents a resource handler for applet solution files
     /// </summary>
-    public class AppletResourceHandler : IResourceHandler
+    public class AppletSolutionResourceHandler : IResourceHandler
     {
         /// <summary>
         /// Gets the capabilities of the resource handler
@@ -43,7 +42,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
         {
             get
             {
-                return "Applet";
+                return "AppletSolution";
             }
         }
 
@@ -63,8 +62,11 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AdministerApplet)]
         public object Create(object data, bool updateIfExists)
         {
-            var pkg = AppletPackage.Load((Stream)data);
-            ApplicationContext.Current.GetService<IAppletManagerService>().Install(pkg);
+            var pkg = AppletPackage.Load((Stream)data) as AppletSolution;
+            if (pkg == null)
+                throw new InvalidOperationException($"Package does not appear to be a solution");
+
+            ApplicationContext.Current.GetService<IAppletSolutionManagerService>().Install(pkg);
             X509Certificate2 cert = null;
             if (pkg.PublicKey != null)
                 cert = new X509Certificate2(pkg.PublicKey);
@@ -83,39 +85,37 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
                     store.Close();
                 }
             }
-            return new AppletManifestInfo(pkg.Meta, new X509Certificate2Info(cert?.Issuer, cert?.NotBefore, cert?.NotAfter, cert?.Subject, cert?.Thumbprint));
+            return new AppletSolutionInfo(pkg, new X509Certificate2Info(cert?.Issuer, cert?.NotBefore, cert?.NotAfter, cert?.Subject, cert?.Thumbprint));
         }
 
         /// <summary>
         /// Gets the contents of the applet with the specified ID
         /// </summary>
-        /// <param name="appletId">The identifier of the applet to be loaded</param>
+        /// <param name="solutionId">The identifier of the applet to be loaded</param>
         /// <param name="versionId">The version of the applet</param>
         /// <returns></returns>
-        public object Get(Object appletId, Object versionId)
+        public object Get(Object solutionId, Object versionId)
         {
-            var appletService = ApplicationContext.Current.GetService<IAppletManagerService>();
-            var appletData = appletService.GetPackage(appletId.ToString());
+            var appletService = ApplicationContext.Current.GetService<IAppletSolutionManagerService>();
+            var appletData = appletService.Solutions.FirstOrDefault(o=>o.Meta.Icon == solutionId.ToString());
 
             if (appletData == null)
-                throw new FileNotFoundException(appletId.ToString());
+                throw new FileNotFoundException(solutionId.ToString());
             else
             {
-                var appletManifest = AppletPackage.Load(appletData);
-                this.SetAppletHeaders(appletManifest.Meta);
-                return new MemoryStream(appletData);
+                return new AppletSolutionInfo(appletData, null);
             }
         }
 
         /// <summary>
         /// Obsoletes the specified applet
         /// </summary>
-        /// <param name="appletId">The identifier of the applet to uninstall</param>
+        /// <param name="solutionId">The identifier of the applet to uninstall</param>
         /// <returns>Null</returns>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AdministerApplet)]
-        public object Obsolete(object appletId)
+        public object Obsolete(object solutionId)
         {
-            ApplicationContext.Current.GetService<IAppletManagerService>().UnInstall(appletId.ToString());
+            ApplicationContext.Current.GetService<IAppletSolutionManagerService>().UnInstall(solutionId.ToString());
             return null;
         }
 
@@ -138,10 +138,10 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
         /// <param name="count">The count of objects</param>
         /// <param name="totalCount">The total matching results</param>
         /// <returns>The applet manifests</returns>
-        public IEnumerable<object> Query(NameValueCollection queryParameters, int offset, int count, out int totalCount)
+        public IEnumerable<object> Query(Core.Model.Query.NameValueCollection queryParameters, int offset, int count, out int totalCount)
         {
-            var query = QueryExpressionParser.BuildLinqExpression<AppletManifest>(queryParameters);
-            var applets = ApplicationContext.Current.GetService<IAppletManagerService>().Applets.Where(query.Compile()).Select(o => new AppletManifestInfo(o.Info, null));
+            var query = QueryExpressionParser.BuildLinqExpression<AppletSolution>(queryParameters);
+            var applets = ApplicationContext.Current.GetService<IAppletSolutionManagerService>().Solutions.Where(query.Compile()).Select(o => new AppletSolutionInfo(o, null));
             totalCount = applets.Count();
             return applets.Skip(offset).Take(count).OfType<Object>();
 
@@ -155,13 +155,13 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AdministerApplet)]
         public object Update(object data)
         {
-            var appletMgr = ApplicationContext.Current.GetService<IAppletManagerService>();
+            var appletMgr = ApplicationContext.Current.GetService<IAppletSolutionManagerService>();
 
-            var pkg = AppletPackage.Load((Stream)data);
-            if (!appletMgr.Applets.Any(o => pkg.Meta.Id == o.Info.Id))
+            var pkg = AppletPackage.Load((Stream)data) as AppletSolution;
+            if (!appletMgr.Solutions.Any(o => pkg.Meta.Id == o.Meta.Id))
                 throw new FileNotFoundException(pkg.Meta.Id);
 
-            ApplicationContext.Current.GetService<IAppletManagerService>().Install(pkg, true);
+            appletMgr.Install(pkg, true);
             X509Certificate2 cert = null;
             if (pkg.PublicKey != null)
                 cert = new X509Certificate2(pkg.PublicKey);
@@ -180,22 +180,8 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
                     store.Close();
                 }
             }
-            return new AppletManifestInfo(pkg.Meta, new X509Certificate2Info(cert?.Issuer, cert?.NotBefore, cert?.NotAfter, cert?.Subject, cert?.Thumbprint));
+            return new AppletSolutionInfo(pkg, new X509Certificate2Info(cert?.Issuer, cert?.NotBefore, cert?.NotAfter, cert?.Subject, cert?.Thumbprint));
         }
 
-        /// <summary>
-        /// Set applet headers
-        /// </summary>
-        private void SetAppletHeaders(AppletInfo package)
-        {
-            WebOperationContext.Current.OutgoingResponse.ETag = package.Version;
-            WebOperationContext.Current.OutgoingResponse.Headers.Add("X-SanteDB-PakID", package.Id);
-            if (package.Hash != null)
-                WebOperationContext.Current.OutgoingResponse.Headers.Add("X-SanteDB-Hash", Convert.ToBase64String(package.Hash));
-            WebOperationContext.Current.OutgoingResponse.Headers.Add("Content-Type", "application/octet-stream");
-            WebOperationContext.Current.OutgoingResponse.ContentType = "application/octet-stream";
-            WebOperationContext.Current.OutgoingResponse.Headers.Add("Content-Disposition", $"attachment; filename=\"{package.Id}.pak.gz\"");
-            WebOperationContext.Current.OutgoingResponse.Location = $"/ami/Applet/{package.Id}";
-        }
     }
 }

@@ -38,6 +38,7 @@
   <ItemGroup>
     <Compile Include="AmiCollection.cs" />
     <Compile Include="Applet\AppletManifestInfo.cs" />
+    <Compile Include="Applet\AppletSolutionInfo.cs" />
     <Compile Include="Auth\ISecurityEntityInfo.cs" />
     <Compile Include="Auth\SecurityApplicationInfo.cs" />
     <Compile Include="Auth\SecurityDeviceInfo.cs" />
