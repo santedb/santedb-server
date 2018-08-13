@@ -35,36 +35,54 @@ namespace SanteDB.Messaging.HDSI.ResourceHandler
     /// </summary>
     public class PatientEncounterResourceHandler : ResourceHandlerBase<PatientEncounter>
     {
+        /// <summary>
+        /// Create the specified patient encounter
+        /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.WriteClinicalData)]
         public override Object Create(Object data, bool updateIfExists)
         {
             return base.Create(data, updateIfExists);
         }
 
+        /// <summary>
+        /// Get the specified patient encounter
+        /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadClinicalData)]
         public override Object Get(object id, object versionId)
         {
             return base.Get(id, versionId);
         }
 
+        /// <summary>
+        /// Obsolete the specified patient encounter
+        /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.DeleteClinicalData)]
         public override Object Obsolete(object key)
         {
             return base.Obsolete(key);
         }
 
+        /// <summary>
+        /// Query for the specified patient encounters
+        /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadClinicalData)]
         public override IEnumerable<Object> Query(NameValueCollection queryParameters)
         {
             return base.Query(queryParameters);
         }
 
+        /// <summary>
+        /// Query for the specified patient encounters
+        /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadClinicalData)]
         public override IEnumerable<Object> Query(NameValueCollection queryParameters, int offset, int count, out int totalCount)
         {
             return base.Query(queryParameters, offset, count, out totalCount);
         }
 
+        /// <summary>
+        /// Update the specified patient encounters
+        /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.WriteClinicalData)]
         public override Object Update(Object data)
         {

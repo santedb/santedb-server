@@ -31,6 +31,9 @@ namespace SanteDB.Core.Model.AMI.Diagnostics
 	[JsonObject(nameof(DiagnosticServiceInfo)), XmlType(nameof(DiagnosticServiceInfo), Namespace = "http://santedb.org/ami/diagnostics")]
 	public class DiagnosticServiceInfo
 	{
+        /// <summary>
+        /// Creates new diagnostic service info
+        /// </summary>
 		public DiagnosticServiceInfo()
 		{
 		}

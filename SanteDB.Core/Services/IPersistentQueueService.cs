@@ -26,6 +26,9 @@ using System.Threading.Tasks;
 namespace SanteDB.Core.Services
 {
 
+    /// <summary>
+    /// Represents event args related to a queue event
+    /// </summary>
     public class PersistentQueueEventArgs : EventArgs
     {
         /// <summary>
@@ -38,6 +41,11 @@ namespace SanteDB.Core.Services
         /// </summary>
         public Object Data { get; private set; }
 
+        /// <summary>
+        /// Create a new persistence queue event arg instance
+        /// </summary>
+        /// <param name="queueName">The name of the queue</param>
+        /// <param name="data">The data in the queue</param>
         public PersistentQueueEventArgs(String queueName, object data)
         {
             this.Data = data;

@@ -52,6 +52,9 @@ namespace SanteDB.Core.Model.AMI.Diagnostics
 			this.Info = asm.GetCustomAttribute<AssemblyDescriptionAttribute>()?.Description;
 		}
 
+        /// <summary>
+        /// Gets or sets the copyright statement for the version
+        /// </summary>
 		[JsonProperty("copyright"), XmlAttribute("copyright")]
 		public String Copyright { get; set; }
 
@@ -61,6 +64,9 @@ namespace SanteDB.Core.Model.AMI.Diagnostics
 		[JsonProperty("info"), XmlElement("description")]
 		public String Info { get; set; }
 
+        /// <summary>
+        /// Gets or sets the human readable name for the version
+        /// </summary>
 		[JsonProperty("infoVersion"), XmlAttribute("infoVersion")]
 		public String InformationalVersion { get; set; }
 
@@ -70,9 +76,15 @@ namespace SanteDB.Core.Model.AMI.Diagnostics
 		[JsonProperty("name"), XmlAttribute("name")]
 		public String Name { get; set; }
 
+        /// <summary>
+        /// Gets or sets the product to which the item belongs
+        /// </summary>
 		[JsonProperty("product"), XmlAttribute("product")]
 		public String Product { get; set; }
 
+        /// <summary>
+        /// Gets or sets the version ID of the product
+        /// </summary>
 		[JsonProperty("version"), XmlAttribute("version")]
 		public String Version { get; set; }
 	}

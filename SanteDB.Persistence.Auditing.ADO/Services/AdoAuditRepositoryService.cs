@@ -30,6 +30,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
     /// </summary>
     [Description("ADO Audit Repository")]
     [TraceSource(AuditConstants.TraceSourceName)]
+    #pragma warning disable CS0067
     public class AdoAuditRepositoryService : IDataPersistenceService<AuditData>
     {
 
@@ -441,4 +442,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             }
         }
     }
+    #pragma warning restore CS0067
+
 }

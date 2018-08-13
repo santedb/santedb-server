@@ -229,7 +229,6 @@ namespace SanteDB.Messaging.FHIR.Util
 			{
 				return null;
 			}
-            IOidRegistrarService d;
 
             traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping assigning authority");
 

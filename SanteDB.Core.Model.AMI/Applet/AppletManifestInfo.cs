@@ -45,6 +45,7 @@ namespace SanteDB.Core.Model.AMI.Applet
 		/// with a specific applet manifest instance.
 		/// </summary>
 		/// <param name="info">The applet manifest metadata instance.</param>
+        /// <param name="publisher">The publisher of the applet</param>
 		public AppletManifestInfo(AppletInfo info, X509Certificate2Info publisher)
 		{
 			this.AppletInfo = info;

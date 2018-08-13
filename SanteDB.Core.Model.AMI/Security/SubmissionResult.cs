@@ -31,6 +31,9 @@ namespace SanteDB.Core.Model.AMI.Security
     [JsonObject(nameof(SubmissionResult))]
 	public class SubmissionResult
 	{
+        /// <summary>
+        /// Creates a new submossion result
+        /// </summary>
 		public SubmissionResult()
 		{
 		}
@@ -38,7 +41,10 @@ namespace SanteDB.Core.Model.AMI.Security
 		/// <summary>
 		/// Creates a new client certificate request result based on the internal request response
 		/// </summary>
-		/// <param name="certificateRequestResponse"></param>
+        /// <param name="cert">The certificate</param>
+        /// <param name="id">The id of the certificate</param>
+        /// <param name="msg">The message for the submission result</param>
+        /// <param name="outcome">The outcome of the submission</param>
 		public SubmissionResult(string msg, int id, SubmissionStatus outcome, string cert)
 		{
 			this.Message = msg;

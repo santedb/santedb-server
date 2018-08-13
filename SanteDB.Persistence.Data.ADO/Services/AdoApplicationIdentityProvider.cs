@@ -44,6 +44,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// <summary>
     /// Sql Application IdP
     /// </summary>
+#pragma warning disable CS0067
     public class AdoApplicationIdentityProvider : IApplicationIdentityProviderService
     {
         // Trace source
@@ -61,6 +62,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// Fired after an authentication request has been made
         /// </summary>
         public event EventHandler<AuthenticatedEventArgs> Authenticated;
+
         /// <summary>
         /// Authenticate the application identity to an application principal
         /// </summary>
@@ -115,3 +117,4 @@ namespace SanteDB.Persistence.Data.ADO.Services
         }
     }
 }
+#pragma warning restore CS0067

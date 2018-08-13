@@ -28,6 +28,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+#pragma warning disable CS0472, CS0219
 namespace SanteDB.Core.Model.Json.Formatter {
     using SanteDB.Core.Model;
     
@@ -49,7 +50,6 @@ namespace SanteDB.Core.Model.Json.Formatter {
                 throw new System.ArgumentNullException("o");
             }
             SanteDB.Core.Model.NonVersionedEntityData _strong = null;
-            SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext _jsonContext = null;
             bool _loaded = false;
             try {
                 _strong = ((SanteDB.Core.Model.NonVersionedEntityData)(o));
@@ -31189,3 +31189,4 @@ namespace SanteDB.Core.Model.Json.Formatter {
         }
     }
 }
+#pragma warning restore CS0472, CS0219

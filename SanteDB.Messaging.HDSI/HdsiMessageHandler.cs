@@ -121,7 +121,7 @@ namespace SanteDB.Messaging.HDSI
         {
             get
             {
-                return ServiceEndpointType.ImmunizationIntegrationService;
+                return ServiceEndpointType.HealthDataService;
             }
         }
 

@@ -37,26 +37,50 @@ namespace SanteDB.Core.Services.Impl
 	/// </summary>
 	public class LocalBatchRepositoryService : IBatchRepositoryService, IRepositoryService<Bundle>
 	{
+        /// <summary>
+        /// New data has been created
+        /// </summary>
         public event EventHandler<AuditDataEventArgs> DataCreated;
+        /// <summary>
+        /// Data has been disclosed
+        /// </summary>
         public event EventHandler<AuditDataDisclosureEventArgs> DataDisclosed;
+        /// <summary>
+        /// Data has been obsoleted
+        /// </summary>
         public event EventHandler<AuditDataEventArgs> DataObsoleted;
+        /// <summary>
+        /// Data has been updated
+        /// </summary>
         public event EventHandler<AuditDataEventArgs> DataUpdated;
 
+        /// <summary>
+        /// Find the specified bundle (Not supported)
+        /// </summary>
         public IEnumerable<Bundle> Find(Expression<Func<Bundle, bool>> query)
         {
             throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Find the specfied bundle (not supported)
+        /// </summary>
         public IEnumerable<Bundle> Find(Expression<Func<Bundle, bool>> query, int offset, int? count, out int totalResults)
         {
             throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Get the specified bundle (not supported)
+        /// </summary>
         public Bundle Get(Guid key)
         {
             throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Get the specified bundle (not supported)
+        /// </summary>
         public Bundle Get(Guid key, Guid versionKey)
         {
             throw new NotSupportedException();
@@ -84,6 +108,9 @@ namespace SanteDB.Core.Services.Impl
 			return bundle;
 		}
 
+        /// <summary>
+        /// Obsolete the specified bundle
+        /// </summary>
         public Bundle Obsolete(Guid key)
         {
             throw new NotSupportedException();
@@ -164,8 +191,6 @@ namespace SanteDB.Core.Services.Impl
 
                 return bundle;
 			}
-
-			return bundle;
 		}
 
 		/// <summary>

@@ -22,6 +22,7 @@ namespace SanteDB.Core.Services
         /// </summary>
         /// <param name="principal">The principal for which the session is to be established</param>
         /// <param name="expiry">The time when the session is to expire</param>
+        /// <param name="aud">The audience of the session</param>
         /// <returns>The session information that was established</returns>
         ISession Establish(ClaimsPrincipal principal, DateTimeOffset expiry, String aud);
 

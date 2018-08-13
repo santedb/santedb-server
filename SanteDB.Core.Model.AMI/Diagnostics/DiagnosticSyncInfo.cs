@@ -30,6 +30,9 @@ namespace SanteDB.Core.Model.AMI.Diagnostics
 	[JsonObject("RemoteSyncInfo"), XmlType(nameof(DiagnosticSyncInfo), Namespace = "http://santedb.org/ami/diagnostics")]
 	public class DiagnosticSyncInfo
 	{
+        /// <summary>
+        /// Gets or sets the last etag of the sync
+        /// </summary>
 		[JsonProperty("etag"), XmlAttribute("etag")]
 		public String Etag { get; set; }
 
@@ -39,6 +42,9 @@ namespace SanteDB.Core.Model.AMI.Diagnostics
 		[JsonProperty("filter"), XmlText]
 		public String Filter { get; set; }
 
+        /// <summary>
+        /// Gets or sets the last sync time
+        /// </summary>
 		[JsonProperty("lastSync"), XmlAttribute("lastSync")]
 		public DateTime LastSync { get; set; }
 
@@ -48,6 +54,9 @@ namespace SanteDB.Core.Model.AMI.Diagnostics
 		[JsonProperty("name"), XmlAttribute("name")]
 		public string Name { get; set; }
 
+        /// <summary>
+        /// Gets or sets the resource name
+        /// </summary>
 		[JsonProperty("resource"), XmlAttribute("resource")]
 		public String ResourceName { get; set; }
 	}

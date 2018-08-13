@@ -232,7 +232,7 @@ namespace SanteDB.Core.Wcf.Serialization
                             JsonSerializer jsz = new JsonSerializer()
                             {
                                 SerializationBinder = new ModelSerializationBinder(),
-                                TypeNameAssemblyFormat = 0,
+                                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
                                 TypeNameHandling = TypeNameHandling.All
                             };
                             jsz.Converters.Add(new StringEnumConverter());

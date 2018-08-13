@@ -417,7 +417,7 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Gets a specific user.
         /// </summary>
-        /// <param name="userId">The id of the user to retrieve.</param>
+        /// <param name="userName">The id of the user to retrieve.</param>
         /// <returns>Returns the user.</returns>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         public SecurityUser GetUser(String userName)

@@ -57,10 +57,21 @@ namespace SanteDB.Core.Services.Impl
             }
         }
 
-        // Event handlers
+        /// <summary>
+        /// Service has started
+        /// </summary>
         public event EventHandler Started;
+        /// <summary>
+        /// Service is starting
+        /// </summary>
         public event EventHandler Starting;
+        /// <summary>
+        /// Service has stopped
+        /// </summary>
         public event EventHandler Stopped;
+        /// <summary>
+        /// Service is stopping
+        /// </summary>
         public event EventHandler Stopping;
 
         /// <summary>

@@ -38,7 +38,7 @@ namespace SanteDB.Core.Wcf.Compression
     {
 
         // Buffer size
-        public const int BUFFER_SIZE = 1024;
+        private const int BUFFER_SIZE = 1024;
 
         /// <summary>
         /// Get compression scheme

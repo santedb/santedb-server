@@ -195,7 +195,6 @@ namespace ServiceTools
         /// </summary>
         Pause = 0x00000002,
         /// <summary>
-
         /// 
         /// </summary>
         Continue = 0x00000003,
@@ -427,11 +426,8 @@ namespace ServiceTools
         /// <summary>
         /// Takes a service name, a service display name and the path to the service executable and installs / starts the windows service.
         /// </summary>
-        /// <param name="ServiceName">The service name that this service will have</param>
-        /// <param name="DisplayName">The display name that this service will have</param>
-        /// <param name="FileName">The path to the executable of the service</param>
-        public static void Install(string ServiceName, string DisplayName,
-        string FileName, string accountName, string accountPassword, ServiceBootFlag bootFlag)
+        public static void Install(string serviceName, string displayName,
+        string fileName, string accountName, string accountPassword, ServiceBootFlag bootFlag)
         {
             if (Environment.OSVersion.Platform != PlatformID.Win32NT) return;
 
@@ -439,13 +435,13 @@ namespace ServiceTools
             ServiceManagerRights.CreateService);
             try
             {
-                IntPtr service = OpenService(scman, ServiceName,
+                IntPtr service = OpenService(scman, serviceName,
                 ServiceRights.QueryStatus | ServiceRights.Start);
                 if (service == IntPtr.Zero)
                 {
-                    service = CreateService(scman, ServiceName, DisplayName,
+                    service = CreateService(scman, serviceName, displayName,
                     ServiceRights.QueryStatus | ServiceRights.Start, SERVICE_WIN32_OWN_PROCESS,
-                    bootFlag, ServiceError.Normal, FileName, null, IntPtr.Zero,
+                    bootFlag, ServiceError.Normal, fileName, null, IntPtr.Zero,
                     null, accountName, accountPassword);
                 }
                 if (service == IntPtr.Zero)

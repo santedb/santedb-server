@@ -43,6 +43,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira
     /// <summary>
     /// Diagnostic report persistence service.
     /// </summary>
+#pragma warning disable CS0067
     public class DiagnosticReportPersistenceService : IDataPersistenceService<DiagnosticReport>
     {
 
@@ -226,4 +227,6 @@ namespace SanteDB.Persistence.Diagnostics.Jira
             throw new NotImplementedException();
         }
     }
+#pragma warning restore CS0067
+
 }

@@ -30,10 +30,19 @@ namespace SanteDB.Messaging.HDSI.Model
     [XmlType(nameof(DetailType), Namespace = "http://santedb.org/hdsi")]
     public enum DetailType
     {
+        /// <summary>
+        /// The detail is for information only
+        /// </summary>
         [XmlEnum("I")]
         Information,
+        /// <summary>
+        /// The detail is a warning
+        /// </summary>
         [XmlEnum("W")]
         Warning,
+        /// <summary>
+        /// The detail is an error
+        /// </summary>
         [XmlEnum("E")]
         Error
     }

@@ -27,6 +27,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
     /// <summary>
     /// Persistence service for diagnostics
     /// </summary>
+    #pragma warning disable CS0067
     public class DiagnosticReportPersistenceService : IDataPersistenceService<DiagnosticReport>
     {
 
@@ -203,4 +204,6 @@ namespace SanteDB.Persistence.Diagnostics.Email
             throw new NotImplementedException();
         }
     }
+    #pragma warning restore CS0067
+
 }

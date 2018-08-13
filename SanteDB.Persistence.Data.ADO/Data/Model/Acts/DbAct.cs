@@ -25,7 +25,6 @@ using System.Threading.Tasks;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.ADO.Data.Model.Extensibility;
 using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
-using SanteDB.OrmLite.Attributes;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Acts
 {

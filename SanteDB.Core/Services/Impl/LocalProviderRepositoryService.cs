@@ -33,6 +33,9 @@ using System.Security.Principal;
 
 namespace SanteDB.Core.Services.Impl
 {
+    /// <summary>
+    /// Represents a provider repository that uses local persistence services
+    /// </summary>
 	public class LocalProviderRepositoryService : LocalEntityRepositoryServiceBase, IProviderRepositoryService, IRepositoryService<Provider>
     {
 		/// <summary>

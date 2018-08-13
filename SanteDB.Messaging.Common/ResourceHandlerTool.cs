@@ -36,8 +36,6 @@ namespace SanteDB.Messaging.Common
 		// Resource handler utility classes
 		private static object m_lockObject = new object();
 
-		private static ResourceHandlerTool m_instance = null;
-
         // Common trace
         private TraceSource m_traceSource = new TraceSource("SanteDB.Messaging.Common");
 

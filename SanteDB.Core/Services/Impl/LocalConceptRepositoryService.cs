@@ -186,7 +186,6 @@ namespace SanteDB.Core.Services.Impl
 		public IEnumerable<Concept> FindConceptsByReferenceTerm(string code, string codeSystemDomain)
 		{
             Regex oidRegex = new Regex("^(\\d+?\\.){1,}\\d+$");
-            Uri tryUri = null;
             if(codeSystemDomain.StartsWith("http:") || codeSystemDomain.StartsWith("urn:"))
                 return this.FindConcepts(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Url == codeSystemDomain && r.ReferenceTerm.Mnemonic == code));
             else if(oidRegex.IsMatch(codeSystemDomain))

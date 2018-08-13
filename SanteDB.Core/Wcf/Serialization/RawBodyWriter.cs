@@ -36,6 +36,9 @@ namespace SanteDB.Core.Wcf.Serialization
         private byte[] m_bytes;
         private Stream m_stream;
 
+        /// <summary>
+        /// Write RAW bytes
+        /// </summary>
         public RawBodyWriter(byte[] message)
             : base(true)
         {

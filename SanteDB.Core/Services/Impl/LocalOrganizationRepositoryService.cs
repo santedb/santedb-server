@@ -74,7 +74,6 @@ namespace SanteDB.Core.Services.Impl
         /// Gets the specified organization.
         /// </summary>
         /// <param name="id">The id of the organization.</param>
-        /// <param name="versionId">The version id of the organization.</param>
         /// <returns>Returns the specified organization.</returns>
         public Organization Get(Guid id)
         {

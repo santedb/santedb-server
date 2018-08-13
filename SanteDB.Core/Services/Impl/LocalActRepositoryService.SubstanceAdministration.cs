@@ -74,7 +74,6 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Gets the specified model.
         /// </summary>
-        /// <param name="key">The key.</param>
         /// <returns>Returns the model.</returns>
         SubstanceAdministration IRepositoryService<SubstanceAdministration>.Get(Guid key, Guid versionKey)
         {

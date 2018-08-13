@@ -47,6 +47,7 @@ namespace SanteDB.Core.Persistence
     /// Data initialization service
     /// </summary>
     [Description("Dataset Installation Service")]
+    #pragma warning disable CS0067
     public class DataInitializationService : IDaemonService, IReportProgressChanged
     {
 
@@ -291,4 +292,6 @@ namespace SanteDB.Core.Persistence
             return true;
         }
     }
+    #pragma warning enable CS0067
+
 }

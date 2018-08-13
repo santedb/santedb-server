@@ -18,7 +18,6 @@
  * Date: 2017-9-1
  */
 using SanteDB.OrmLite.Attributes;
-using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
 using System;
 

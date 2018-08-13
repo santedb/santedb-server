@@ -336,7 +336,7 @@ namespace SanteDB.Core.Services.Impl
 			{
 				extensionType = persistenceService.Update(extensionType, AuthenticationContext.Current.Principal, TransactionMode.Commit);
 			}
-			catch (DataPersistenceException e)
+			catch
 			{
 				extensionType = persistenceService.Insert(extensionType, AuthenticationContext.Current.Principal, TransactionMode.Commit);
 			}

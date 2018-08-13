@@ -50,10 +50,21 @@ namespace SanteDB.Core.Services.Impl
         IFastQueryRepositoryService
 	{
 
-        // Events for audit
+        /// <summary>
+        /// New data has been created
+        /// </summary>
         public event EventHandler<AuditDataEventArgs> DataCreated;
+        /// <summary>
+        /// Existing data has been updated
+        /// </summary>
         public event EventHandler<AuditDataEventArgs> DataUpdated;
+        /// <summary>
+        /// Data has been obsoleted
+        /// </summary>
         public event EventHandler<AuditDataEventArgs> DataObsoleted;
+        /// <summary>
+        /// Data has been disclosed
+        /// </summary>
         public event EventHandler<AuditDataDisclosureEventArgs> DataDisclosed;
 
         /// <summary>

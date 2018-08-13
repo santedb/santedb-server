@@ -59,13 +59,6 @@
     <Compile Include="AdoDataConstants.cs" />
     <Compile Include="Configuration\AdoConfiguration.cs" />
     <Compile Include="Configuration\AdoConfigurationSectionHandler.cs" />
-    <Compile Include="Configuration\UserInterface\AdoPersistenceConfigurableFeature.cs" />
-    <Compile Include="Configuration\UserInterface\ucAdoPersistence.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Configuration\UserInterface\ucAdoPersistence.Designer.cs">
-      <DependentUpon>ucAdoPersistence.cs</DependentUpon>
-    </Compile>
     <Compile Include="Data\Extensions\DataModelExtensions.cs" />
     <Compile Include="Data\Hax\ConceptQueryHack.cs" />
     <Compile Include="Data\Hax\CreationTimeQueryHack.cs" />
@@ -205,6 +198,7 @@
     <None Include="..\SanteDB.licenseheader">
       <Link>SanteDB.licenseheader</Link>
     </None>
+    <None Include="app.config" />
     <None Include="SanteDB.Persistence.ADO.nuspec" />
   </ItemGroup>
   <ItemGroup>
@@ -222,9 +216,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Data\SQL\Updates\20170725-PSQL.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Configuration\UserInterface\ucAdoPersistence.resx">
-      <DependentUpon>ucAdoPersistence.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Data\Map\ModelMap.xml" />
     <EmbeddedResource Include="Data\SQL\PSQL\santedb-codes.sql">

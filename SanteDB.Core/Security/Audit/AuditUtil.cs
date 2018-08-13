@@ -52,6 +52,7 @@ namespace SanteDB.Core.Security.Audit
     /// <summary>
     /// Event type codes
     /// </summary>
+    #pragma warning disable CS1591
     public enum EventTypeCodes
     {
         [XmlEnum("SecurityAuditCode-ApplicationActivity")]
@@ -102,6 +103,7 @@ namespace SanteDB.Core.Security.Audit
         SecurityObjectChanged,
 
     }
+    #pragma warning restore CS1591
 
     /// <summary>
     /// Security utility

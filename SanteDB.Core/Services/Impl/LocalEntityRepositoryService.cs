@@ -121,7 +121,6 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Gets the specified data.
         /// </summary>
-        /// <param name="key">The key.</param>
         /// <returns>TModel.</returns>
         /// <exception cref="System.InvalidOperationException">Thrown if the persistence service is not found.</exception>
         EntityRelationship IRepositoryService<EntityRelationship>.Get(Guid key, Guid versionKey)

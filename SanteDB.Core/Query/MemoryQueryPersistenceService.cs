@@ -83,11 +83,26 @@ namespace SanteDB.Core.Query
         // Sync object
         private Object m_syncObject = new object();
 
+        /// <summary>
+        /// The daemon is starting
+        /// </summary>
         public event EventHandler Starting;
+        /// <summary>
+        /// The daemon is stopping
+        /// </summary>
         public event EventHandler Stopping;
+        /// <summary>
+        /// The damon has started
+        /// </summary>
         public event EventHandler Started;
+        /// <summary>
+        /// The daemon has stopped
+        /// </summary>
         public event EventHandler Stopped;
 
+        /// <summary>
+        /// Gets whether the daemon is running
+        /// </summary>
         public bool IsRunning
         {
             get

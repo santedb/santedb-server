@@ -55,7 +55,6 @@ namespace SanteDB.Core.Services.Impl
 		/// Searches the place service for the specified place matching the
 		/// given predicate
 		/// </summary>
-		/// <param name="predicate">The predicate function to search by.</param>
 		/// <returns>Returns a list of places.</returns>
 		public IEnumerable<Place> Find(Expression<Func<Place, bool>> predicate, int offset, int? count, out int totalCount)
 		{

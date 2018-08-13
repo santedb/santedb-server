@@ -30,16 +30,7 @@ namespace SanteDB.Core.Model.RISI
 	[JsonObject(nameof(ReportParameter))]
 	public class ReportParameter : BaseEntityData
 	{
-		/// <summary>
-		/// The parameter type.
-		/// </summary>
-		private ParameterType parameterType;
-
-		/// <summary>
-		/// The parameter type key.
-		/// </summary>
-		private Guid parameterTypeKey;
-
+		
 		/// <summary>
 		/// The report definition.
 		/// </summary>

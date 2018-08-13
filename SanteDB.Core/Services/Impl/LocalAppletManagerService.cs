@@ -95,10 +95,21 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public IEnumerable<AppletSolution> Solutions => this.m_solutions;
 
-        // Events
+        /// <summary>
+        /// The daemon has started
+        /// </summary>
         public event EventHandler Started;
+        /// <summary>
+        /// The daemon is starting
+        /// </summary>
         public event EventHandler Starting;
+        /// <summary>
+        /// The daemon has stopped
+        /// </summary>
         public event EventHandler Stopped;
+        /// <summary>
+        /// The daemon is stopping
+        /// </summary>
         public event EventHandler Stopping;
 
         /// <summary>

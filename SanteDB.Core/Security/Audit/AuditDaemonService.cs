@@ -57,9 +57,21 @@ namespace SanteDB.Core.Security.Audit
             }
         }
 
+        /// <summary>
+        /// The service has started
+        /// </summary>
         public event EventHandler Started;
+        /// <summary>
+        /// The service is starting
+        /// </summary>
         public event EventHandler Starting;
+        /// <summary>
+        /// The service has stopped
+        /// </summary>
         public event EventHandler Stopped;
+        /// <summary>
+        /// The service is stopping
+        /// </summary>
         public event EventHandler Stopping;
         
         /// <summary>

@@ -787,6 +787,9 @@ namespace SanteDB.Messaging.HDSI.Wcf
             }
         }
 
+        /// <summary>
+        /// Gets the specifieed patch id
+        /// </summary>
         [SwaggerWcfHidden]
         public Patch GetPatch(string resourceType, string id)
         {

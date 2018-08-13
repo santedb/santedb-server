@@ -79,7 +79,7 @@ namespace SanteDB.Core.Model.AMI.Collections
     public class AmiCollection
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="AmiCollection{T}"/> class.
+		/// Initializes a new instance of the <see cref="AmiCollection"/> class.
 		/// </summary>
 		public AmiCollection()
 		{
@@ -87,7 +87,7 @@ namespace SanteDB.Core.Model.AMI.Collections
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="AmiCollection{T}"/> class
+		/// Initializes a new instance of the <see cref="AmiCollection"/> class
 		/// with a specific list of collection items.
 		/// </summary>
 		public AmiCollection(List<Object> collectionItems)
@@ -96,7 +96,7 @@ namespace SanteDB.Core.Model.AMI.Collections
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="AmiCollection{T}"/> class
+		/// Initializes a new instance of the <see cref="AmiCollection"/> class
 		/// with a specific list of collection items.
 		/// </summary>
 		public AmiCollection(IEnumerable<Object> collectionItems, int offset, int totalCount)

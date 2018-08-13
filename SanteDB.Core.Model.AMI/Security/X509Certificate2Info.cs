@@ -34,6 +34,9 @@ namespace SanteDB.Core.Model.AMI.Security
     [JsonObject(nameof(X509Certificate2Info))]
 	public class X509Certificate2Info
 	{
+        /// <summary>
+        /// Creates a new X509 certificate information class
+        /// </summary>
 		public X509Certificate2Info()
 		{
 		}
@@ -41,7 +44,11 @@ namespace SanteDB.Core.Model.AMI.Security
 		/// <summary>
 		/// Constructs a certificate info
 		/// </summary>
-		/// <param name="cert"></param>
+        /// <param name="issuer">The issuer of th ecert</param>
+        /// <param name="naf">The date when the certificate expires</param>
+        /// <param name="nbf">The date when the certificate was issued</param>
+        /// <param name="ser">The serial number of the certificate</param>
+        /// <param name="sub">The subject of the certificate</param>
 		public X509Certificate2Info(String issuer, DateTime? nbf, DateTime? naf, String sub, String ser)
 		{
 			this.Issuer = issuer;
@@ -101,8 +108,10 @@ namespace SanteDB.Core.Model.AMI.Security
 		[XmlElement("thumbprint"), JsonProperty("thumbprint")]
 		public String Thumbprint { get; set; }
 
-		public bool ShouldSerializeNotAfter() => this.NotAfter.HasValue;
 
+#pragma warning disable CS1591
+        public bool ShouldSerializeNotAfter() => this.NotAfter.HasValue;
 		public bool ShouldSerializeNotBefore() => this.NotBefore.HasValue;
-	}
+#pragma warning restore CS1591
+    }
 }

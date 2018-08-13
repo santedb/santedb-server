@@ -98,7 +98,6 @@ namespace SanteDB.Core.Security
                 return PolicyDecisionOutcomeType.Grant;
             else if ((policyInstance.Policy as ILocalPolicy)?.Handler != null)
             {
-                IPolicyHandler handlerInstance = null;
                 var policy = policyInstance.Policy as ILocalPolicy;
                 if (policy != null)
                     return policy.Handler.GetPolicyDecision(principal, policy, null).Outcome;

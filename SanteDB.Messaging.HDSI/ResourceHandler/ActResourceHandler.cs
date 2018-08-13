@@ -31,6 +31,9 @@ using System.Linq.Expressions;
 
 namespace SanteDB.Messaging.HDSI.ResourceHandler
 {
+    /// <summary>
+    /// Represents a resource handler for ACTs
+    /// </summary>
 	public class ActResourceHandler : ResourceHandlerBase<Act>
 	{
         /// <summary>

@@ -73,7 +73,6 @@ namespace SanteDB.Core.Services.Impl
         /// Gets the specified patient.
         /// </summary>
         /// <param name="id">The identifier.</param>
-        /// <param name="versionId">The version identifier.</param>
         /// <returns>Returns the patient or null if no patient is found.</returns>
         /// <exception cref="System.InvalidOperationException">If the persistence service is not found.</exception>
         public Patient Get(Guid id)

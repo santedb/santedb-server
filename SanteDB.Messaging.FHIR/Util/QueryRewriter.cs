@@ -163,7 +163,7 @@ namespace SanteDB.Messaging.FHIR.Util
                                 return MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.SearchParamType.Composite;
                         }
                     }
-                    catch (Exception e)
+                    catch
                     {
                         return MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.SearchParamType.String;
                     }

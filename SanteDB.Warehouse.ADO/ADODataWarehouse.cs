@@ -49,6 +49,7 @@ namespace SanteDB.Warehouse.ADO
     /// <summary>
     /// Represents a simple ADO ad-hoc data warehouse
     /// </summary>
+#pragma warning disable CS0067
     public class ADODataWarehouse : IAdHocDatawarehouseService
     {
 
@@ -60,9 +61,21 @@ namespace SanteDB.Warehouse.ADO
         // Tracer
         private TraceSource m_tracer = new TraceSource(DataWarehouseConstants.TraceSourceName);
 
+        /// <summary>
+        /// Daemon is starting
+        /// </summary>
         public event EventHandler Starting;
+        /// <summary>
+        /// Daemon has started
+        /// </summary>
         public event EventHandler Started;
+        /// <summary>
+        /// Daemon is stopping
+        /// </summary>
         public event EventHandler Stopping;
+        /// <summary>
+        /// Daemon has stopped
+        /// </summary>
         public event EventHandler Stopped;
 
         /// <summary>
@@ -1010,4 +1023,5 @@ namespace SanteDB.Warehouse.ADO
         }
 
     }
+#pragma warning restore CS0067
 }

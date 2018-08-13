@@ -25,7 +25,6 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model;
 using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
-using SanteDB.OrmLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
