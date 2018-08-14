@@ -109,7 +109,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         List<IPolicyInstance> retVal = new List<IPolicyInstance>();
 
                         // Role policies
-                        SqlStatement query = context.CreateSqlStatement<DbSecurityRolePolicy>().SelectFrom()
+                        SqlStatement query = context.CreateSqlStatement<DbSecurityRolePolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityRolePolicy))
                             .InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
                             .InnerJoin<DbSecurityUserRole>(o => o.SourceKey, o => o.RoleKey)
                             .Where<DbSecurityUserRole>(o => o.UserKey == user.Key);

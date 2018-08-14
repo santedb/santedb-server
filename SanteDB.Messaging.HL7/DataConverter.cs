@@ -23,9 +23,9 @@ namespace SanteDB.Messaging.HL7
     public static class DataConverter
     {
 
-        private const string AddressUseCodeSystem = "urn:oid:2.16.840.1.113883.5.1";
-        private const string NameUseCodeSystem = "urn:oid:2.16.840.1.113883.5.1120";
-        private const string TelecomUseCodeSystem = "urn:oid:2.16.840.1.113883.5.1011";
+        private const string AddressUseCodeSystem = "2.16.840.1.113883.5.1";
+        private const string NameUseCodeSystem = "2.16.840.1.113883.5.1120";
+        private const string TelecomUseCodeSystem = "2.16.840.1.113883.5.1011";
 
         /// <summary>
         /// Convert the message to v2.5
@@ -161,6 +161,7 @@ namespace SanteDB.Messaging.HL7
                 {
                     {  nameof(XPN.FamilyName), NameComponentKeys.Family },
                     {  nameof(XPN.GivenName), NameComponentKeys.Given },
+                    {  nameof(XPN.SecondAndFurtherGivenNamesOrInitialsThereof), NameComponentKeys.Given },
                     {  nameof(XPN.PrefixEgDR), NameComponentKeys.Prefix },
                     {  nameof(XPN.SuffixEgJRorIII), NameComponentKeys.Suffix }
                 };

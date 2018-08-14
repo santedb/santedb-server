@@ -25,13 +25,12 @@ namespace SanteDB.Messaging.HL7.Segments
     public class PIDSegmentHandler : ISegmentHandler
     {
 
-        private const string AdministrativeGenderCodeSystem = "urn:oid:2.16.840.1.113883.5.1";
-        private const string RaceCodeSystem = "urn:oid:2.16.840.1.113883.5.5";
-        private const string MaritalStatusCodeSystem = "urn:oid:2.16.840.1.113883.5.2";
-        private const string ReligionCodeSystem = "urn:oid:2.16.840.1.113883.5.6";
-        private const string EthnicGroupCodeSystem = "urn:oid:2.16.840.1.113883.5.189";
-        private const string LivingArrangementCodeSystem = "urn:oid:2.16.840.1.113883.5.220";
-        private const string DisabilityCodeSystem = "urn:oid:2.16.840.1.113883.5.295";
+        private const string AdministrativeGenderCodeSystem = "2.16.840.1.113883.5.1";
+        private const string RaceCodeSystem = "2.16.840.1.113883.5.5";
+        private const string MaritalStatusCodeSystem = "2.16.840.1.113883.5.2";
+        private const string ReligionCodeSystem = "2.16.840.1.113883.5.6";
+        private const string EthnicGroupCodeSystem = "2.16.840.1.113883.5.189";
+
 
         /// <summary>
         /// Gets the name of the segment
@@ -54,22 +53,19 @@ namespace SanteDB.Messaging.HL7.Segments
         /// </summary>
         /// <param name="segment">The segment to be parsed</param>
         /// <returns>The parsed patient information</returns>
-        public IEnumerable<IdentifiedData> Parse(ISegment segment)
+        public IEnumerable<IdentifiedData> Parse(ISegment segment, IEnumerable<IdentifiedData> context)
         {
-            var patientService = ApplicationContext.Current.GetService<IRepositoryService<Patient>>();
+            var patientService = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>();
 
             var pidSegment = segment as PID;
-            // Get the PD1 and NK1 segments
-            var pd1Segment = pidSegment.ParentStructure.GetStructure("PD1") as PD1;
-            var nk1Segments = pidSegment.ParentStructure.GetAll("NK1").OfType<NK1>();
-
-            Patient retVal = new Patient();
+           
+            Patient retVal = new Patient() { Key = Guid.NewGuid() };
             // Existing patient?
             foreach (var id in pidSegment.GetAlternatePatientIDPID())
             {
                 var queryId = id.ToModel();
-                retVal = patientService.Find(o => o.Identifiers.Any(i => i.Value == queryId.Value &&
-                    i.AuthorityKey == queryId.AuthorityKey)).FirstOrDefault();
+                retVal = patientService.Query(o => o.Identifiers.Any(i => i.Value == queryId.Value &&
+                    i.AuthorityKey == queryId.AuthorityKey), AuthenticationContext.SystemPrincipal).FirstOrDefault();
                 if (retVal != null) break;
             }
             Dictionary<Guid, Person> nok = new Dictionary<Guid, Person>();
@@ -136,7 +132,7 @@ namespace SanteDB.Messaging.HL7.Segments
             if(!pidSegment.PatientAccountNumber.IsEmpty())
             {
 
-                var account = ApplicationContext.Current.GetService<IRepositoryService<Account>>()?.Find(o => o.Identifiers.Any(i => i.Value == pidSegment.PatientAccountNumber.IDNumber.Value)).FirstOrDefault();
+                var account = ApplicationContext.Current.GetService<IDataPersistenceService<Account>>()?.Query(o => o.Identifiers.Any(i => i.Value == pidSegment.PatientAccountNumber.IDNumber.Value), AuthenticationContext.SystemPrincipal).FirstOrDefault();
                 if(account != null)
                     retVal.Participations.Add(new ActParticipation(ActParticipationKey.Holder, retVal) { SourceEntityKey = account.Key });
             }
@@ -144,7 +140,7 @@ namespace SanteDB.Messaging.HL7.Segments
             // Birth place is present
             if(!pidSegment.BirthPlace.IsEmpty()) // We need to find the birthplace relationship
             {
-                var places = ApplicationContext.Current.GetService<IRepositoryService<Place>>()?.Find(o => o.Names.Any(n => n.Component.Any(c => c.Value == pidSegment.BirthPlace.Value)));
+                var places = ApplicationContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Names.Any(n => n.Component.Any(c => c.Value == pidSegment.BirthPlace.Value)), AuthenticationContext.SystemPrincipal);
                 if (places.Count() == 1)
                     retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Birthplace, places.First().Key));
             }
@@ -160,7 +156,7 @@ namespace SanteDB.Messaging.HL7.Segments
             {
                 foreach (var cit in pidSegment.GetCitizenship())
                 {
-                    var places = ApplicationContext.Current.GetService<IRepositoryService<Place>>()?.Find(o => o.Identifiers.Any(i => i.Value == cit.Identifier.Value));
+                    var places = ApplicationContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Identifiers.Any(i => i.Value == cit.Identifier.Value), AuthenticationContext.SystemPrincipal);
                     if (places.Count() == 1)
                         retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Citizen, places.First().Key));
                 }
@@ -180,54 +176,13 @@ namespace SanteDB.Messaging.HL7.Segments
             if(!pidSegment.LastUpdateFacility.IsEmpty())
             {
                 // Find by user ID
-                var user = ApplicationContext.Current.GetService<ISecurityRepositoryService>().GetUser(pidSegment.LastUpdateFacility.NamespaceID.Value);
+                var user = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityUser>>().Query(u=>u.UserName == pidSegment.LastUpdateFacility.NamespaceID.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault();
                 if (user != null)
                     retVal.CreatedBy = user;
             }
 
-            // Living arrangement
-            if (!pd1Segment.LivingArrangement.IsEmpty())
-                retVal.LivingArrangement = pd1Segment.LivingArrangement.ToConcept(LivingArrangementCodeSystem);
+            return new IdentifiedData[] { retVal };
 
-            // Primary facility
-            if (pd1Segment.PatientPrimaryFacilityRepetitionsUsed > 0)
-            {
-                var sdlRepo = ApplicationContext.Current.GetService<IPlaceRepositoryService>();
-                foreach (var xon in pd1Segment.GetPatientPrimaryFacility())
-                {
-                    var authority = xon.AssigningAuthority.ToModel();
-                    // Find the org or SDL
-                    Entity place = sdlRepo.Find(o => o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation && o.Identifiers.Any(i => i.Value == xon.IDNumber.Value && i.AuthorityKey == authority.Key)).SingleOrDefault();
-                    if (place != null)
-                        retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation, place));
-
-                }
-            }
-
-            // Disabilities
-            if (!pd1Segment.Handicap.IsEmpty())
-            {
-                var handicap = pd1Segment.Handicap.ToConcept(DisabilityCodeSystem)?.Key.Value;
-                if (handicap.HasValue)
-                    retVal.DisabilityCodeKeys.Add(handicap.Value);
-            }
-
-            // Privacy code
-            if(!pd1Segment.ProtectionIndicator.IsEmpty())
-            {
-                var pip = ApplicationContext.Current.GetService<ISecurityRepositoryService>();
-                if (pd1Segment.ProtectionIndicator.Value == "Y")
-                {
-                    var policy = pip.FindPolicies(o => o.Oid == DataPolicyIdentifiers.RestrictedInformation).FirstOrDefault();
-                    retVal.Policies.Add(new SecurityPolicyInstance(policy, PolicyGrantType.Grant));
-                }
-                else
-                    retVal.Policies.Clear();
-            }
-
-            // Next of KIN
-
-            return null;
         }
     }
 }

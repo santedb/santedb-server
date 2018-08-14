@@ -43,7 +43,7 @@ namespace SanteDB.Messaging.HL7
         /// </summary>
         public static bool IsEmpty(this AbstractPrimitive me)
         {
-            return !String.IsNullOrEmpty(me.Value);
+            return String.IsNullOrEmpty(me.Value);
         }
 
         /// <summary>

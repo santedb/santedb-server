@@ -37,7 +37,7 @@ namespace SanteDB.Messaging.HL7.Messages
         /// </summary>
         static MessageHandlerBase()
         {
-            foreach(var t in AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.ExportedTypes.Where(t => typeof(ISegmentHandler).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface)))
+            foreach(var t in AppDomain.CurrentDomain.GetAssemblies().Where(a=>!a.IsDynamic).SelectMany(a => a.ExportedTypes.Where(t => typeof(ISegmentHandler).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface)))
             {
                 var instance = Activator.CreateInstance(t) as ISegmentHandler;
                 s_segmentHandlers.Add(instance.Name, instance);
@@ -65,7 +65,7 @@ namespace SanteDB.Messaging.HL7.Messages
         /// <returns>The parsed message</returns>
         protected virtual Bundle Parse(IGroup message)
         {
-
+            
             Bundle retVal = new Bundle();
             var finder = new SegmentFinder(message);
             while(finder.hasNextChild())
@@ -85,7 +85,7 @@ namespace SanteDB.Messaging.HL7.Messages
                         ISegmentHandler handler = null;
                         if (s_segmentHandlers.TryGetValue(current.GetStructureName(), out handler))
                         {
-                            var parsed = handler.Parse(current as AbstractSegment);
+                            var parsed = handler.Parse(current as AbstractSegment, retVal.Item);
                             retVal.ExpansionKeys.Add(parsed.First().Key.GetValueOrDefault());
                             retVal.Item.AddRange(parsed);
                         }

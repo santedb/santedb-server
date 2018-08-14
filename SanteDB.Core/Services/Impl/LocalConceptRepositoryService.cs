@@ -152,7 +152,6 @@ namespace SanteDB.Core.Services.Impl
 		/// <param name="name">The name of the concept.</param>
 		/// <param name="language">The language of the concept.</param>
 		/// <returns>Returns a list of concepts.</returns>
-		[PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public IEnumerable<Concept> FindConceptsByName(string name, string language)
 		{
 			return this.FindConcepts(o => o.ConceptNames.Any(n => n.Name == name && n.Language == language));
@@ -164,7 +163,6 @@ namespace SanteDB.Core.Services.Impl
 		/// <param name="code">The code of the reference term.</param>
 		/// <param name="codeSystem">The code system OID of the reference term.</param>
 		/// <returns>Returns a list of concepts.</returns>
-		[PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public IEnumerable<Concept> FindConceptsByReferenceTerm(string code, Uri codeSystem)
 		{
 			if ((codeSystem.Scheme == "urn" || codeSystem.Scheme == "oid"))
@@ -185,6 +183,8 @@ namespace SanteDB.Core.Services.Impl
 		/// </summary>
 		public IEnumerable<Concept> FindConceptsByReferenceTerm(string code, string codeSystemDomain)
 		{
+            if (codeSystemDomain.StartsWith("urn:oid:"))
+                codeSystemDomain = codeSystemDomain.Substring(8);
             Regex oidRegex = new Regex("^(\\d+?\\.){1,}\\d+$");
             if(codeSystemDomain.StartsWith("http:") || codeSystemDomain.StartsWith("urn:"))
                 return this.FindConcepts(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Url == codeSystemDomain && r.ReferenceTerm.Mnemonic == code));
@@ -322,7 +322,8 @@ namespace SanteDB.Core.Services.Impl
 		/// <param name="codeSystem">The code system.</param>
 		/// <returns>ReferenceTerm.</returns>
 		/// <exception cref="System.InvalidOperationException">Cannot find concept service</exception>
-		public ReferenceTerm GetConceptReferenceTerm(Guid conceptId, string codeSystem)
+		[PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
+        public ReferenceTerm GetConceptReferenceTerm(Guid conceptId, string codeSystem)
 		{
 			// Concept is loaded
 			var refTermService = ApplicationContext.Current.GetService<IDataPersistenceService<ConceptReferenceTerm>>();
@@ -400,7 +401,8 @@ namespace SanteDB.Core.Services.Impl
 		/// <summary>
 		/// Returns a value which indicates whether <paramref name="a"/> implies <paramref name="b"/>
 		/// </summary>
-		public bool Implies(Concept a, Concept b)
+		[PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
+        public bool Implies(Concept a, Concept b)
 		{
 			throw new NotImplementedException();
 		}
@@ -622,7 +624,8 @@ namespace SanteDB.Core.Services.Impl
 		/// <param name="key">The key.</param>
 		/// <returns>Returns the obsoleted reference term.</returns>
 		/// <exception cref="System.InvalidOperationException">Unable to locate persistence service</exception>
-		public ReferenceTerm ObsoleteReferenceTerm(Guid key)
+		[PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AdministerConceptDictionary)]
+        public ReferenceTerm ObsoleteReferenceTerm(Guid key)
 		{
 			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<ReferenceTerm>>();
 
@@ -776,6 +779,7 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Find all code systems
         /// </summary>
+		[PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         public IEnumerable<CodeSystem> FindCodeSystems(Expression<Func<CodeSystem, bool>> query)
         {
             int t = 0;

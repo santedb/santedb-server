@@ -277,7 +277,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 return retVal;
             else
             {
-                var domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom()
+                var domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(typeof(TDomain), typeof(TDomainKey))
                     .InnerJoin<TDomain, TDomainKey>(o => o.Key, o => o.Key)
                     .Where<TDomain>(o => o.Key == key && o.ObsoletionTime == null)
                     .OrderBy<TDomain>(o => o.VersionSequenceId, Core.Model.Map.SortOrderType.OrderByDescending);

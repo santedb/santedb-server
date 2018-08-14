@@ -24,7 +24,7 @@ namespace SanteDB.Messaging.HL7.Segments
         /// </summary>
         /// <param name="segment">The segment to be parsed</param>
         /// <returns>The parsed data</returns>
-        IEnumerable<IdentifiedData> Parse(ISegment segment);
+        IEnumerable<IdentifiedData> Parse(ISegment segment, IEnumerable<IdentifiedData> context);
 
         /// <summary>
         /// Create necesary segment(s) from the specified data

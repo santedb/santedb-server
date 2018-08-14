@@ -18,6 +18,7 @@
     <TestProjectType>UnitTest</TestProjectType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,6 +38,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
@@ -46,9 +48,17 @@
     <Compile Include="TestUtil.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
+      <Project>{DB9BC05E-45F1-4F96-A161-F36BDECAF566}</Project>
+      <Name>SanteDB.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Messaging.HL7\SanteDB.Messaging.HL7.csproj">
       <Project>{c1f86ea3-fc84-456f-a9d9-0bf8db0d48d3}</Project>
       <Name>SanteDB.Messaging.HL7</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Persistence.Data.ADO.Test\SanteDB.Persistence.Data.ADO.Test.csproj">
+      <Project>{11407adb-e336-4c0c-af8e-ea6b601ba69e}</Project>
+      <Name>SanteDB.Persistence.Data.ADO.Test</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -62,21 +72,24 @@
       <Version>2.0.0</Version>
     </PackageReference>
     <PackageReference Include="MARC.HI.EHRS.SVC.Core">
-      <Version>2.0.0</Version>
+      <Version>2.0.1.1</Version>
     </PackageReference>
     <PackageReference Include="MARC.HI.EHRS.SVC.Messaging.HAPI">
       <Version>2.0.1.2</Version>
     </PackageReference>
-    <PackageReference Include="MSTest.TestAdapter">
-      <Version>1.2.1</Version>
-    </PackageReference>
-    <PackageReference Include="MSTest.TestFramework">
-      <Version>1.2.1</Version>
-    </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>9.0.1</Version>
+      <Version>11.0.2</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="Data\santedb_test.fdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>"$(SolutionDir)\Solution Items\FirebirdSQL-3.0.3-Embedded.bat" "$(SolutionDir)\Solution Items" "$(TargetDir)"</PreBuildEvent>
+  </PropertyGroup>
 </Project>
