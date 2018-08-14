@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MARC.Everest">
+      <HintPath>..\Solution Items\MARC.Everest.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -40,16 +43,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataConverter.cs" />
+    <Compile Include="MessageExtensions.cs" />
+    <Compile Include="Messages\AdtMessageHandler.cs" />
+    <Compile Include="Messages\MessageHandlerBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Segments\ISegmentHandler.cs" />
+    <Compile Include="Segments\PIDSegmentHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MARC.HI.EHRS.SVC.Messaging.HAPI">
       <Version>2.0.1</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="MessageHandlers\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="Data\003-HL7v2AddressUseCodes.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -60,6 +67,20 @@
     <None Include="Data\003-HL7v2TelecommunicationUseCodes.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
+      <Project>{3A45F695-47A2-464C-ACE6-BDABBFA39FBC}</Project>
+      <Name>SanteDB.Core.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
+      <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
+      <Name>SanteDB.Core.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
+      <Project>{DB9BC05E-45F1-4F96-A161-F36BDECAF566}</Project>
+      <Name>SanteDB.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

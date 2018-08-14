@@ -89,6 +89,7 @@
     <Compile Include="Security\Audit\AuditUtil.cs" />
     <Compile Include="Security\Claims\PurposeOfUseClaimHandler.cs" />
     <Compile Include="Security\Claims\IClaimTypeHandler.cs" />
+    <Compile Include="Security\DataPolicyIdentifiers.cs" />
     <Compile Include="Security\DefaultTfaRelayService.cs" />
     <Compile Include="Security\DeviceIdentity.cs" />
     <Compile Include="Security\DevicePrincipal.cs" />

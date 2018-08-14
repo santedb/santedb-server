@@ -91,6 +91,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Cdss.Xml", "santedb
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Messaging.HL7", "SanteDB.Messaging.HL7\SanteDB.Messaging.HL7.csproj", "{C1F86EA3-FC84-456F-A9D9-0BF8DB0D48D3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Messaging.HL7.Test", "SanteDB.Messaging.HL7.Test\SanteDB.Messaging.HL7.Test.csproj", "{F187FEFC-0112-43DF-A854-271496E0AC42}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -237,6 +239,10 @@ Global
 		{C1F86EA3-FC84-456F-A9D9-0BF8DB0D48D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1F86EA3-FC84-456F-A9D9-0BF8DB0D48D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1F86EA3-FC84-456F-A9D9-0BF8DB0D48D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F187FEFC-0112-43DF-A854-271496E0AC42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F187FEFC-0112-43DF-A854-271496E0AC42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F187FEFC-0112-43DF-A854-271496E0AC42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F187FEFC-0112-43DF-A854-271496E0AC42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -279,6 +285,7 @@ Global
 		{BFC58F38-9023-4700-B35C-AA933A608E43} = {66328BE7-81CC-4820-99E9-8C5C534B4A2B}
 		{CAD6BCB7-758B-4AA4-A5FE-A9FAB8A4CF2F} = {58D303FA-0113-4888-AA67-A9436DDEBFAD}
 		{C1F86EA3-FC84-456F-A9D9-0BF8DB0D48D3} = {FE92CEE3-7E0D-4041-8F95-DA2855A50B7A}
+		{F187FEFC-0112-43DF-A854-271496E0AC42} = {FE92CEE3-7E0D-4041-8F95-DA2855A50B7A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E73A1AED-8AB7-492C-A4F0-C71FCC5C393C}

@@ -54,7 +54,7 @@
     <Concept xmlns="http://openiz.org/model">
       <id>aef9a9d0-e62b-4907-a394-4b5c4786fa62</id>
       <isReadonly>false</isReadonly>
-      <mnemonic>HL7v2AddressUse-BDL</mnemonic>
+      <mnemonic>BirthDeliveryLocation</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
@@ -84,7 +84,7 @@
     <Concept xmlns="http://openiz.org/model">
       <id>5519e04f-b808-468f-9301-134390296466</id>
       <isReadonly>false</isReadonly>
-      <mnemonic>HL7v2AddressUse-BR</mnemonic>
+      <mnemonic>ResidenceAtBirth</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
@@ -133,7 +133,7 @@
     <Concept xmlns="http://openiz.org/model">
       <id>092ec914-b8a1-4497-9a98-2f6b7ed97fdc</id>
       <isReadonly>false</isReadonly>
-      <mnemonic>HL7v2AddressUse-F</mnemonic>
+      <mnemonic>CountryOfOrigin</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
@@ -201,7 +201,7 @@
     <Concept xmlns="http://openiz.org/model">
       <id>99f2195c-8095-4cf8-afa8-f7c6dab9baab</id>
       <isReadonly>false</isReadonly>
-      <mnemonic>HL7v2AddressUse-N</mnemonic>
+      <mnemonic>AddressAtBirth</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
