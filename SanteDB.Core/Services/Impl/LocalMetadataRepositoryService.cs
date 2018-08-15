@@ -27,21 +27,40 @@ using System.Linq;
 using System.Linq.Expressions;
 using MARC.HI.EHRS.SVC.Core.Data;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Interfaces;
 
 namespace SanteDB.Core.Services.Impl
 {
 	/// <summary>
 	/// Represents a local metadata repository service
 	/// </summary>
-	public class LocalMetadataRepositoryService : IMetadataRepositoryService
+	public class LocalMetadataRepositoryService : IMetadataRepositoryService, IRepositoryService<CodeSystem>
 	{
-		/// <summary>
-		/// Creates the code system.
-		/// </summary>
-		/// <param name="codeSystem">The code system.</param>
-		/// <returns>Returns the created code system.</returns>
-		/// <exception cref="System.InvalidOperationException">Unable to locate persistence service</exception>
-		public CodeSystem CreateCodeSystem(CodeSystem codeSystem)
+
+        /// <summary>
+        /// Data was created
+        /// </summary>
+        public event EventHandler<AuditDataEventArgs> DataCreated;
+        /// <summary>
+        /// Data was updated
+        /// </summary>
+        public event EventHandler<AuditDataEventArgs> DataUpdated;
+        /// <summary>
+        /// Data was obsoleted
+        /// </summary>
+        public event EventHandler<AuditDataEventArgs> DataObsoleted;
+        /// <summary>
+        /// Data was disclosed
+        /// </summary>
+        public event EventHandler<AuditDataDisclosureEventArgs> DataDisclosed;
+
+        /// <summary>
+        /// Creates the code system.
+        /// </summary>
+        /// <param name="codeSystem">The code system.</param>
+        /// <returns>Returns the created code system.</returns>
+        /// <exception cref="System.InvalidOperationException">Unable to locate persistence service</exception>
+        public CodeSystem CreateCodeSystem(CodeSystem codeSystem)
 		{
 			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<CodeSystem>>();
 
@@ -393,5 +412,63 @@ namespace SanteDB.Core.Services.Impl
                 throw new InvalidOperationException("Cannot find template definition persister");
             return idpService.Insert(templateDefinition, AuthenticationContext.Current.Principal, TransactionMode.Commit);
         }
+
+
+        /// <summary>
+        /// Get the code system
+        /// </summary>
+        CodeSystem IRepositoryService<CodeSystem>.Get(Guid key)
+        {
+            return this.GetCodeSystem(key);
+        }
+
+        /// <summary>
+        /// Get code system by key version
+        /// </summary>
+        CodeSystem IRepositoryService<CodeSystem>.Get(Guid key, Guid versionKey)
+        {
+            return this.GetCodeSystem(key);
+        }
+
+        /// <summary>
+        /// Find a code system
+        /// </summary>
+        IEnumerable<CodeSystem> IRepositoryService<CodeSystem>.Find(Expression<Func<CodeSystem, bool>> query)
+        {
+            return this.FindCodeSystem(query);
+        }
+
+        /// <summary>
+        /// Find code system with limits
+        /// </summary>
+        IEnumerable<CodeSystem> IRepositoryService<CodeSystem>.Find(Expression<Func<CodeSystem, bool>> query, int offset, int? count, out int totalResults)
+        {
+            return this.FindCodeSystem(query, offset, count, out totalResults);
+        }
+
+        /// <summary>
+        /// Insert code system
+        /// </summary>
+        CodeSystem IRepositoryService<CodeSystem>.Insert(CodeSystem data)
+        {
+            return this.CreateCodeSystem(data);
+        }
+
+        /// <summary>
+        /// Save code system
+        /// </summary>
+        CodeSystem IRepositoryService<CodeSystem>.Save(CodeSystem data)
+        {
+            return this.UpdateCodeSystem(data);
+        }
+
+        /// <summary>
+        /// Obsolete code system
+        /// </summary>
+        CodeSystem IRepositoryService<CodeSystem>.Obsolete(Guid key)
+        {
+            return this.DeleteCodeSystem(key);
+        }
+
     }
 }

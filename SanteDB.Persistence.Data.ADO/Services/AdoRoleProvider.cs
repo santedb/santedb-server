@@ -229,7 +229,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     if (securityUser == null)
                         throw new KeyNotFoundException(String.Format("User {0} not found", userName));
 
-                    var query = dataContext.CreateSqlStatement<DbSecurityUserRole>().SelectFrom()
+                    var query = dataContext.CreateSqlStatement<DbSecurityUserRole>().SelectFrom(typeof(DbSecurityRole), typeof(DbSecurityUserRole))
                         .InnerJoin<DbSecurityRole, DbSecurityUserRole>()
                         .Where(o => o.UserKey == securityUser.Key);
 

@@ -76,7 +76,6 @@
     <Compile Include="ResourceHandler\CertificateSigningRequestHandler.cs" />
     <Compile Include="ResourceHandler\DeviceEntityResourceHandler.cs" />
     <Compile Include="ResourceHandler\SecurityDeviceResourceHandler.cs" />
-    <Compile Include="ResourceHandler\CodeSystemResourceHandler.cs" />
     <Compile Include="ResourceHandler\ExtensionTypeResourceHandler.cs" />
     <Compile Include="ResourceHandler\MetadataResourceHandler.cs" />
     <Compile Include="ResourceHandler\ResourceHandlerBase.cs" />

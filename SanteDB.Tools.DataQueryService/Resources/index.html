@@ -1,0 +1,123 @@
+﻿<html ng-app="layout" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Simple SanteDB Query Tool</title>
+    <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="css/select2.min.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous"/>
+    <script src="js/jquery.min.js" type="text/javascript"></script>
+    <script src="js/jquery.datefix.min.js" type="text/javascript"></script>
+    <script src="js/angular.min.js" type="text/javascript"></script>
+    <script src="js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="js/select2.min.js" type="text/javascript"></script>
+    <script src="js/query-tool.js" type="text/javascript"></script>
+    <script src="js/select2-extended-ajax.min.js" type="text/javascript"></script>
+    <script src="js/santedb.js" type="text/javascript"></script>
+    <script src="js/santedb-model.js" type="text/javascript"></script>
+    <script src="js/santedb-ng.js" type="text/javascript"></script>
+    <script src="controllers/index.js" type="text/javascript"></script>
+    <script src="controllers/codeSystem.js" type="text/javascript"></script>
+    <script src="controllers/authenticate.js" type="text/javascript"></script>
+</head>
+
+<body ng-controller="IndexController" style="padding-top:65px">
+    <nav>
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                        aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">SanteDB Developer Console</a>
+                </div>
+                <form class="navbar-form navbar-right">
+                    <select name="realm" class="form-control" ng-model="$root.realm">
+                        <option ng-repeat="r in $root.configuration.realm" value="{{r.url}}">{{r.name}} ({{r.url}})</option>
+                    </select>
+                    <button type="button" class="btn btn-info" ng-if="$root.realm &amp;&amp; $root.session" ng-click="$root.session.abandon()">Logout</button>
+                    <button type="button" class="btn btn-info" ng-if="$root.realm &amp;&amp; !$root.session" ng-click="login()">Login</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <div class="clearfix"></div>
+    <div class="container panel panel-default">
+        <div class="row">
+            <div class="col-sm-12">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="active">
+                <a role="tab" data-toggle="tab" data-target="#requestTab">Request Editor</a>
+            </li>
+            <li>
+                <a role="tab" data-toggle="tab" data-target="#datasetTab">CodeSystem Tool</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade in active" id="requestTab"><div ng-include="'requestBuilder.html'"></div></div>
+            <div class="tab-pane fade" id="datasetTab"><div  ng-include="'codeSystem.html'"></div></div>
+        </div>
+    </div>
+</div>
+</div>
+    <div class="modal fade" id="dlgAuthenticate" ng-controller="AuthenticationController" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form ng-submit="authenticate(loginForm)" class="form" name="loginForm" novalidate="novalidate">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                        </button>
+                        <h4 class="modal-title">Login to Server</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <fieldset class="form-horizontal form-group" xmlns="http://www.w3.org/1999/xhtml">
+                                <div class="form-group" ng-class="{ 'has-error' : loginForm.username.$invalid &amp;&amp; loginForm.username.$touched }">
+                                    <label for="usernameInput" class="control-label">User:</label>
+                                    <input ng-model="username" type="text" ng-required="!token || token.length == 0" placeholder="Username" class="form-control"
+                                        name="username" id="usernameInput" autocomplete="off" autofocus="autofocus" autocorrect="off"
+                                        autocapitalize="none" />
+                                    <p ng-show="loginForm.username.$invalid &amp;&amp; loginForm.username.$touched" class="help-block text-danger">Username required</p>
+                                </div>
+                                <div class="form-group" ng-class="{ 'has-error' : loginForm.password.$invalid &amp;&amp; loginForm.password.$touched }">
+                                    <label for="passwordInput" class="control-label">Password:</label>
+                                    <input ng-model="password" type="password" ng-required="!token || token.length == 0" placeholder="Password" class="form-control"
+                                        name="password" />
+                                    <p ng-show="loginForm.password.$invalid &amp;&amp; loginForm.password.$touched" class="help-block text-danger">Password is required</p>
+                                </div>
+                                <div class="form-group">
+                                    <label for="oauthMode" class="control-label">OAUTH Client Secret Mode:</label>
+                                    <select ng-model="mode" class="form-control">
+                                        <option value="basic" selected="selected">BASIC (default)</option>
+                                        <option value="qstring">Query String</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" ng-class="{ 'has-error' : loginForm.password.$invalid &amp;&amp; loginForm.password.$touched }">
+                                    <label for="tokenInput" class="control-label">OAUTH2 JWT Token (If you already have one):</label>
+                                    <textarea ng-model="token" placeholder="JWT Token" class="form-control" name="token"></textarea>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger btn-lg" data-dismiss="modal" ng-click="QueryTool.$authentication = {}">
+                            <span>
+                                <span class="glyphicon glyphicon-remove"></span> Cancel
+                            </span>
+                        </button>
+                        <button type="submit" id="loginButton" class="btn btn-primary btn-lg">
+                            Ok
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

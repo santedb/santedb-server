@@ -60,7 +60,7 @@ namespace SanteDB.Core.Services.Impl
         private Dictionary<String, String> m_fileDictionary = new Dictionary<string, string>();
 
         // Config file
-        private SanteDBConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("SanteDB.core") as SanteDBConfiguration;
+        private SanteDBConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.core") as SanteDBConfiguration;
 
         // Tracer
         private TraceSource m_tracer = new TraceSource(SanteDBConstants.ServiceTraceSourceName);

@@ -65,7 +65,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     // Security device
                     if (securable is Core.Model.Security.SecurityDevice || securable is DevicePrincipal)
                     {
-						var query = context.CreateSqlStatement<DbSecurityDevicePolicy>().SelectFrom().InnerJoin<DbSecurityPolicy, DbSecurityDevicePolicy>();
+						var query = context.CreateSqlStatement<DbSecurityDevicePolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityDevicePolicy))
+                            .InnerJoin<DbSecurityPolicy, DbSecurityDevicePolicy>();
 
 						if (securable is DevicePrincipal)
 							query.InnerJoin<DbSecurityDevice, DbSecurityDevice>()
@@ -78,7 +79,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 					}
                     else if (securable is Core.Model.Security.SecurityRole)
                     {
-                        var query = context.CreateSqlStatement<DbSecurityRolePolicy>().SelectFrom()
+                        var query = context.CreateSqlStatement<DbSecurityRolePolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityRolePolicy))
                             .InnerJoin<DbSecurityPolicy, DbSecurityRolePolicy>()
                             .Where(o => o.SourceKey == (securable as IdentifiedData).Key);
 
@@ -87,7 +88,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     }
                     else if (securable is Core.Model.Security.SecurityApplication || securable is ApplicationPrincipal)
                     {
-                        var query = context.CreateSqlStatement<DbSecurityApplicationPolicy>().SelectFrom()
+                        var query = context.CreateSqlStatement<DbSecurityApplicationPolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityApplicationPolicy))
                             .InnerJoin<DbSecurityPolicy, DbSecurityApplicationPolicy>();
 
                         if (securable is ApplicationPrincipal)

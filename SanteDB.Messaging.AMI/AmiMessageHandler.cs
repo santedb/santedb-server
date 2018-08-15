@@ -78,7 +78,7 @@ namespace SanteDB.Messaging.AMI
 		/// <summary>
 		/// The internal reference to the AMI configuration.
 		/// </summary>
-		private AmiConfiguration configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("SanteDB.messaging.ami") as AmiConfiguration;
+		private AmiConfiguration configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.messaging.ami") as AmiConfiguration;
 
 		// web host
 		private WebServiceHost m_webHost;

@@ -20,6 +20,7 @@
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Data;
 using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Security;
@@ -37,20 +38,41 @@ namespace SanteDB.Core.Services.Impl
 	/// Represents a service which is responsible for the
 	/// maintenance of concepts.
 	/// </summary>
-	public class LocalConceptRepositoryService : IConceptRepositoryService, IPersistableQueryRepositoryService
+	public class LocalConceptRepositoryService : IConceptRepositoryService, IPersistableQueryRepositoryService,
+        IRepositoryService<Concept>,
+        IRepositoryService<ReferenceTerm>,
+        IRepositoryService<ConceptSet>
 	{
-		/// <summary>
-		/// Find using query continuation
-		/// </summary>
-		/// <typeparam name="TEntity">The underlying entity type which is being queried</typeparam>
-		/// <param name="query">The query to be executed</param>
-		/// <param name="offset">The offset</param>
-		/// <param name="count">The number of results</param>
-		/// <param name="totalResults">The total results in the query</param>
-		/// <param name="queryId">The unique identifier for the query</param>
-		/// <returns>Returns a list of entities.</returns>
-		/// <exception cref="System.InvalidOperationException"></exception>
-		[PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
+
+        /// <summary>
+        /// Data was created
+        /// </summary>
+        public event EventHandler<AuditDataEventArgs> DataCreated;
+        /// <summary>
+        /// Data was updated
+        /// </summary>
+        public event EventHandler<AuditDataEventArgs> DataUpdated;
+        /// <summary>
+        /// Data was obsoleted
+        /// </summary>
+        public event EventHandler<AuditDataEventArgs> DataObsoleted;
+        /// <summary>
+        /// Data was disclosed
+        /// </summary>
+        public event EventHandler<AuditDataDisclosureEventArgs> DataDisclosed;
+
+        /// <summary>
+        /// Find using query continuation
+        /// </summary>
+        /// <typeparam name="TEntity">The underlying entity type which is being queried</typeparam>
+        /// <param name="query">The query to be executed</param>
+        /// <param name="offset">The offset</param>
+        /// <param name="count">The number of results</param>
+        /// <param name="totalResults">The total results in the query</param>
+        /// <param name="queryId">The unique identifier for the query</param>
+        /// <returns>Returns a list of entities.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
+        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public IEnumerable<TEntity> Find<TEntity>(Expression<Func<TEntity, bool>> query, int offset, int? count, out int totalResults, Guid queryId) where TEntity : IdentifiedData
 		{
 			var persistence = ApplicationContext.Current.GetService<IDataPersistenceService<TEntity>>();
@@ -254,7 +276,7 @@ namespace SanteDB.Core.Services.Impl
 		/// <returns>Returns the specified concept.</returns>
 		/// <exception cref="System.InvalidOperationException">Concept persistence service not found.</exception>
 		[PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
-		public IdentifiedData GetConcept(Guid id, Guid versionId)
+		public Concept GetConcept(Guid id, Guid versionId)
 		{
 			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<Concept>>();
 
@@ -784,6 +806,177 @@ namespace SanteDB.Core.Services.Impl
         {
             int t = 0;
             return this.Find<CodeSystem>(query, 0, null, out t, Guid.Empty);
+        }
+
+        /// <summary>
+        /// Get the concept by key
+        /// </summary>
+        Concept IRepositoryService<Concept>.Get(Guid key)
+        {
+            return this.GetConcept(key, Guid.Empty);
+        }
+
+        /// <summary>
+        /// Get concept by key and version
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="versionKey"></param>
+        /// <returns></returns>
+        Concept IRepositoryService<Concept>.Get(Guid key, Guid versionKey)
+        {
+            return this.GetConcept(key, versionKey);
+        }
+
+        /// <summary>
+        /// Find the specified concept
+        /// </summary>
+        IEnumerable<Concept> IRepositoryService<Concept>.Find(Expression<Func<Concept, bool>> query)
+        {
+            return this.FindConcepts(query);
+        }
+
+        /// <summary>
+        /// Find the specified concepts
+        /// </summary>
+        IEnumerable<Concept> IRepositoryService<Concept>.Find(Expression<Func<Concept, bool>> query, int offset, int? count, out int totalResults)
+        {
+            return this.FindConcepts(query, offset, count, out totalResults);
+        }
+
+        /// <summary>
+        /// Insert concept
+        /// </summary>
+        Concept IRepositoryService<Concept>.Insert(Concept data)
+        {
+            return this.InsertConcept(data);
+        }
+
+        /// <summary>
+        /// Save concept
+        /// </summary>
+        Concept IRepositoryService<Concept>.Save(Concept data)
+        {
+            return this.SaveConcept(data);
+        }
+
+        /// <summary>
+        /// Obsolete concept
+        /// </summary>
+        Concept IRepositoryService<Concept>.Obsolete(Guid key)
+        {
+            return this.ObsoleteConcept(key);
+        }
+
+        /// <summary>
+        /// Get reference term
+        /// </summary>
+        ReferenceTerm IRepositoryService<ReferenceTerm>.Get(Guid key)
+        {
+            return this.GetReferenceTerm(key);
+        }
+
+        /// <summary>
+        /// Get reference term
+        /// </summary>
+        ReferenceTerm IRepositoryService<ReferenceTerm>.Get(Guid key, Guid versionKey)
+        {
+            return this.GetReferenceTerm(key);
+        }
+
+        /// <summary>
+        /// Find reference term
+        /// </summary>
+        IEnumerable<ReferenceTerm> IRepositoryService<ReferenceTerm>.Find(Expression<Func<ReferenceTerm, bool>> query)
+        {
+            return this.FindReferenceTerms(query);
+        }
+
+        /// <summary>
+        /// Find reference term with offsets
+        /// </summary>
+        IEnumerable<ReferenceTerm> IRepositoryService<ReferenceTerm>.Find(Expression<Func<ReferenceTerm, bool>> query, int offset, int? count, out int totalResults)
+        {
+            return this.FindReferenceTerms(query, offset, count, out totalResults);
+        }
+
+        /// <summary>
+        /// Insert reference term
+        /// </summary>
+        ReferenceTerm IRepositoryService<ReferenceTerm>.Insert(ReferenceTerm data)
+        {
+            return this.InsertReferenceTerm(data);
+        }
+
+        /// <summary>
+        /// Save reference term
+        /// </summary>
+        ReferenceTerm IRepositoryService<ReferenceTerm>.Save(ReferenceTerm data)
+        {
+            return this.SaveReferenceTerm(data);
+        }
+
+        /// <summary>
+        /// Obsolete reference term
+        /// </summary>
+        ReferenceTerm IRepositoryService<ReferenceTerm>.Obsolete(Guid key)
+        {
+            return this.ObsoleteReferenceTerm(key);
+        }
+
+        /// <summary>
+        /// Get concept set
+        /// </summary>
+        ConceptSet IRepositoryService<ConceptSet>.Get(Guid key)
+        {
+            return this.GetConceptSet(key);
+        }
+
+        /// <summary>
+        /// Get concept set
+        /// </summary>
+        ConceptSet IRepositoryService<ConceptSet>.Get(Guid key, Guid versionKey)
+        {
+            return this.GetConceptSet(key);
+        }
+
+        /// <summary>
+        /// Find concept set
+        /// </summary>
+        IEnumerable<ConceptSet> IRepositoryService<ConceptSet>.Find(Expression<Func<ConceptSet, bool>> query)
+        {
+            return this.FindConceptSets(query);
+        }
+        
+        /// <summary>
+        /// Find concept sets
+        /// </summary>
+        IEnumerable<ConceptSet> IRepositoryService<ConceptSet>.Find(Expression<Func<ConceptSet, bool>> query, int offset, int? count, out int totalResults)
+        {
+            return this.FindConceptSets(query, offset, count, out totalResults);
+        }
+
+        /// <summary>
+        /// Insert concept set
+        /// </summary>
+        ConceptSet IRepositoryService<ConceptSet>.Insert(ConceptSet data)
+        {
+            return this.InsertConceptSet(data);
+        }
+
+        /// <summary>
+        /// Save concept set
+        /// </summary>
+        ConceptSet IRepositoryService<ConceptSet>.Save(ConceptSet data)
+        {
+            return this.SaveConceptSet(data);
+        }
+
+        /// <summary>
+        /// Obsolete concept set
+        /// </summary>
+        ConceptSet IRepositoryService<ConceptSet>.Obsolete(Guid key)
+        {
+            return this.ObsoleteConceptSet(key);
         }
     }
 }

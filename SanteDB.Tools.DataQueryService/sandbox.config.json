@@ -1,0 +1,469 @@
+﻿{
+  "realm": [
+    {
+      "name": "Localhost",
+      "url": "http://localhost:8080"
+    },
+    {
+      "name": "SanteDB Development",
+      "url": "http://demo.santedb.org:8080"
+    }
+  ],
+  "types": {
+    "date": {
+      "ops": {
+        "lt": true,
+        "le": true,
+        "gt": true,
+        "ge": true,
+        "ne": true,
+        "ap": true
+      }
+    },
+    "text": {
+      "ops": {
+        "ap": true
+      }
+    },
+    "checkbox": {
+      "ops": {
+        "ne": true
+      }
+    },
+    "concept": {
+      "ops": {
+        "ne": true
+      },
+      "search": "Concept",
+      "searchField": "mnemonic"
+    },
+    "place": {
+      "ops": {
+        "ne": true
+      },
+      "search": "Place",
+      "searchField": "name.component.value"
+    },
+    "material": {
+      "ops": { "ne": true },
+      "search": "Material",
+      "searchField": "name.component.value"
+    },
+    "manufacturedMaterial": {
+      "ops": { "ne": true },
+      "search": "ManufacturedMaterial",
+      "searchField": "name.component.value"
+    },
+    "patient": {
+      "ops": {
+        "ne": true
+      },
+      "search": "Patient",
+      "searchField": "name.component.value"
+    },
+    "person": {
+      "ops": {
+        "ne": true
+      },
+      "search": "Person",
+      "searchField": "name.component.value"
+    },
+    "userEntity": {
+      "ops": {
+        "ne": true
+      },
+      "search": "UserEntity",
+      "searchField": "securityUser.userName"
+    }
+  },
+  "parameters": {
+    "id": {
+      "name": "Key / Identifier",
+      "type": "text",
+      "scope": [
+        "Act",
+        "QuantityObservation",
+        "CodedObservation",
+        "TextObservation",
+        "SubstanceAdministration",
+        "PatientEncounter",
+        "Procedure",
+        "Entity",
+        "Patient",
+        "Person",
+        "UserEntity",
+        "Place",
+        "Organization",
+        "Material",
+        "ManufacturedMaterial",
+        "Concept"
+      ]
+    },
+    "creationTime": {
+      "name": "Creation Time",
+      "type": "date",
+      "scope": [
+        "Act",
+        "QuantityObservation",
+        "CodedObservation",
+        "TextObservation",
+        "SubstanceAdministration",
+        "PatientEncounter",
+        "Procedure",
+        "Entity",
+        "Patient",
+        "Person",
+        "UserEntity",
+        "Place",
+        "Material",
+        "ManufacturedMaterial",
+        "Concept",
+        "Organization",
+        "ConceptSet"
+      ]
+    },
+    "statusConcept": {
+      "name": "Status",
+      "searchFilter": "{\"conceptSet.mnemonic\":\"~Status\"}",
+      "type": "concept",
+      "scope": [
+        "Act",
+        "QuantityObservation",
+        "CodedObservation",
+        "TextObservation",
+        "SubstanceAdministration",
+        "PatientEncounter",
+        "Procedure",
+        "Organization",
+        "Entity",
+        "Patient",
+        "Person",
+        "UserEntity",
+        "Place",
+        "Material",
+        "ManufacturedMaterial",
+        "Concept"
+      ]
+    },
+    "participation[Location].player": {
+      "name": "Facility",
+      "searchFilter": "{\"classConcept\":\"ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c\"}",
+      "type": "place",
+      "scope": [
+        "Act",
+        "QuantityObservation",
+        "CodedObservation",
+        "TextObservation",
+        "SubstanceAdministration",
+        "PatientEncounter",
+        "Procedure"
+      ]
+    },
+    "participation[RecordTarget].player": {
+      "name": "Patient",
+      "type": "patient",
+      "scope": [
+        "Act",
+        "QuantityObservation",
+        "CodedObservation",
+        "TextObservation",
+        "SubstanceAdministration",
+        "PatientEncounter",
+        "Procedure"
+      ]
+    },
+    "participation[RecordTarget].player@Patient.dateOfBirth": {
+      "name": "Patient Date Of Birth",
+      "type": "date",
+      "scope": [
+        "Act",
+        "QuantityObservation",
+        "CodedObservation",
+        "TextObservation",
+        "SubstanceAdministration",
+        "PatientEncounter",
+        "Procedure"
+      ]
+    },
+    "participation[RecordTarget].player@Patient.genderConcept": {
+      "name": "Patient Gender",
+      "type": "concept",
+      "searchFilter": "{\"conceptSet.mnemonic\":\"AdministrativeGenderCode\"}",
+      "scope": [
+        "Act",
+        "QuantityObservation",
+        "CodedObservation",
+        "TextObservation",
+        "SubstanceAdministration",
+        "PatientEncounter",
+        "Procedure"
+      ]
+    },
+    "participation[Authororiginator].player": {
+      "name": "Author / Originator",
+      "type": "userEntity",
+      "searchFilter": "{\"statusConcept\":\"!BDEF5F90-5497-4F26-956C-8F818CCE2BD2\"}",
+      "scope": [
+        "Act",
+        "QuantityObservation",
+        "CodedObservation",
+        "TextObservation",
+        "SubstanceAdministration",
+        "PatientEncounter",
+        "Procedure"
+      ]
+    },
+    "participation[Performer].player": {
+      "name": "Performer",
+      "type": "userEntity",
+      "searchFilter": "{\"statusConcept\":\"!BDEF5F90-5497-4F26-956C-8F818CCE2BD2\"}",
+      "scope": [
+        "Act",
+        "QuantityObservation",
+        "CodedObservation",
+        "TextObservation",
+        "SubstanceAdministration",
+        "PatientEncounter",
+        "Procedure"
+      ]
+    },
+    "participation[DataEnterer].player": {
+      "name": "Data Enterer",
+      "type": "userEntity",
+      "searchFilter": "{\"statusConcept\":\"!BDEF5F90-5497-4F26-956C-8F818CCE2BD2\"}",
+      "scope": [
+        "Act",
+        "QuantityObservation",
+        "CodedObservation",
+        "TextObservation",
+        "SubstanceAdministration",
+        "PatientEncounter",
+        "Procedure"
+      ]
+    },
+    "interpretationConcept": {
+      "name": "Interpretation Code",
+      "type": "concept",
+      "searchFilter": "{\"conceptSet.mnemonic\":\"ActInterpretation\"}",
+      "scope": [
+        "QuantityObservation",
+        "CodedObservation",
+        "TextObservation"
+      ]
+    },
+    "typeConcept": {
+      "name": "Type Concept",
+      "type": "concept",
+      "scope": [
+        "QuantityObservation",
+        "CodedObservation",
+        "TextObservation",
+        "Act",
+        "SubstanceAdministration",
+        "PatientEncounter",
+        "Organization",
+        "Procedure"
+      ]
+    },
+    "relationship[DedicatedServiceDeliveryLocation].target": {
+      "name": "Assigned Facility",
+      "type": "place",
+      "searchFilter": "{\"classConcept\":\"ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c\"}",
+      "scope": [
+        "Patient",
+        "UserEntity",
+        "Person"
+      ]
+    },
+    "relationship[ServiceDeliveryLocation].target": {
+      "name": "Registration Facility",
+      "type": "place",
+      "searchFilter": "{\"classConcept\":\"ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c\"}",
+      "scope": [
+        "Patient"
+      ]
+    },
+    "relationship[Mother|Father].target": {
+      "name": "Mother or Father",
+      "type": "person",
+      "scope": [
+        "Patient"
+      ]
+    },
+    "relationship[Parent].target@Place.id": {
+      "name": "Parent Place",
+      "type": "place",
+      "scope": [
+        "Place"
+      ]
+    },
+    "expiryDate": {
+      "name": "Expiration Date",
+      "type": "date",
+      "scope": [
+        "Material",
+        "ManufacturedMaterial"
+      ]
+    },
+    "lotNumber": {
+      "name": "Lot Number",
+      "type": "text",
+      "scope": [
+        "ManufacturedMaterial"
+      ]
+    },
+    "name.component.value": {
+      "name": "Name",
+      "type": "text",
+      "scope": [
+        "Entity",
+        "Place",
+        "Person",
+        "Patient",
+        "Provider",
+        "UserEntity",
+        "Material",
+        "Organization",
+        "ManufacturedMaterial"
+      ]
+    },
+    "actTime": {
+      "name": "Act Time",
+      "type": "date",
+      "scope": [
+        "Act",
+        "QuantityObservation",
+        "CodedObservation",
+        "TextObservation",
+        "SubstanceAdministration",
+        "PatientEncounter",
+        "Procedure"
+      ]
+    },
+    "isNegated": {
+      "name": "Negation indicator",
+      "type": "bool",
+      "scope": [
+        "Act",
+        "QuantityObservation",
+        "CodedObservation",
+        "TextObservation",
+        "SubstanceAdministration",
+        "PatientEncounter",
+        "Procedure"
+      ]
+    },
+    "reasonConcept": {
+      "name": "Reason",
+      "type": "concept",
+      "searchFilter": "conceptSet.mnemonic=ActReason",
+      "scope": [
+        "Act",
+        "QuantityObservation",
+        "CodedObservation",
+        "TextObservation",
+        "SubstanceAdministration",
+        "PatientEncounter",
+        "Procedure"
+      ]
+    },
+    "name.value": {
+      "name": "Name",
+      "type": "text",
+      "scope": [
+        "Concept"
+      ]
+    },
+    "mnemonic": {
+      "name": "Code mnemonic",
+      "type": "text",
+      "scope": [
+        "Concept",
+        "ConceptSet"
+      ]
+    },
+    "participation[Product].player": {
+      "name": "Product type",
+      "type": "material",
+      "searchFilter": "{\"classConcept\":\"D39073BE-0F8F-440E-B8C8-7034CC138A95\"}",
+      "scope": [
+        "Act",
+        "SubstanceAdministration"
+      ]
+    },
+    "participation[Consumable].player": {
+      "name": "Consumable type",
+      "type": "manufacturedMaterial",
+      "scope": [
+        "Act",
+        "SubstanceAdministration"
+      ]
+    },
+    "dateOfBirth": {
+      "name": "Date of Birth",
+      "type": "date",
+      "scope": [
+        "Patient",
+        "Person"
+      ]
+    },
+    "address.component.value": {
+      "name": "Address Part",
+      "type": "text",
+      "scope": [
+        "Patient",
+        "Person",
+        "Place",
+        "Entity",
+        "UserEntity",
+        "Organization"
+      ]
+    },
+    "tag.key": {
+      "name": "Has a Tag named",
+      "type": "text",
+      "scope": [
+        "Act",
+        "QuantityObservation",
+        "CodedObservation",
+        "TextObservation",
+        "SubstanceAdministration",
+        "PatientEncounter",
+        "Procedure",
+        "Entity",
+        "Patient",
+        "Person",
+        "UserEntity",
+        "Place",
+        "Material",
+        "ManufacturedMaterial",
+        "Concept",
+        "Organization",
+        "ConceptSet"
+
+      ]
+    },
+    "classConcept": {
+      "name": "Classification Context",
+      "type": "concept",
+      "searchFilter" : "{\"conceptSet.mnemonic\":\"ActClass\",\"conceptSet.mnemonic\":\"EntityClass\"}",
+      "scope": [
+        "Act",
+        "QuantityObservation",
+        "CodedObservation",
+        "TextObservation",
+        "SubstanceAdministration",
+        "PatientEncounter",
+        "Procedure",
+        "Organization",
+        "Entity",
+        "Patient",
+        "Person",
+        "UserEntity",
+        "Place",
+        "Material",
+        "ManufacturedMaterial"
+      ]
+    }
+  }
+}

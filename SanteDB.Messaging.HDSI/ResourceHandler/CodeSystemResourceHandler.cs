@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.Messaging.AMI.ResourceHandler
+namespace SanteDB.Messaging.HDSI.ResourceHandler
 {
     /// <summary>
     /// Represents a resource handler for code systems

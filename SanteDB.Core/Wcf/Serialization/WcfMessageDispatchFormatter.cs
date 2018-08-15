@@ -288,7 +288,7 @@ namespace SanteDB.Core.Wcf.Serialization
                             typeof(IdentifiedData).IsAssignableFrom(result?.GetType()))
                         {
                             var nvc = NameValueCollection.ParseQueryString(httpRequest.QueryString);
-                            var viewModel = httpRequest.Headers["X-SanteDB-ViewModel"] ?? nvc["_viewModel"]?.FirstOrDefault();
+                            var viewModel = httpRequest.Headers["X-SanteDB-ViewModel"] ?? nvc?.FirstOrDefault(o=>o.Key == "_viewModel").Value?.FirstOrDefault();
 
                             // Create the view model serializer
                             var viewModelSerializer = new JsonViewModelSerializer();

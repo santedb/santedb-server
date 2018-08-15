@@ -521,7 +521,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     context.Open();
                     var sessionId = new Guid(session.Id.Take(16).ToArray());
 
-                    var sql = context.CreateSqlStatement<DbSession>().SelectFrom()
+                    var sql = context.CreateSqlStatement<DbSession>().SelectFrom(typeof(DbSession), typeof(DbSecurityApplication), typeof(DbSecurityUser))
                         .InnerJoin<DbSecurityApplication>(o => o.ApplicationKey, o => o.Key)
                         .Join<DbSession, DbSecurityUser>("LEFT", o => o.UserKey, o => o.Key)
                         .Where<DbSession>(s => s.Key == sessionId && s.NotAfter > DateTimeOffset.Now);
