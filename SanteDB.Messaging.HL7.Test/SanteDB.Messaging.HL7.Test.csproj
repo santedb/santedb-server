@@ -62,7 +62,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\HL7ADT1.txt" />
+    <EmbeddedResource Include="Resources\ADT_SIMPLE.txt" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MARC.HI.EHRS.SVC.Auditing.Core">
@@ -86,6 +86,9 @@
     <None Include="Data\santedb_test.fdb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ADT_PD1.txt" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

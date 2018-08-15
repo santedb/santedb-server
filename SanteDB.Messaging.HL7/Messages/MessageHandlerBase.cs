@@ -3,6 +3,7 @@ using MARC.HI.EHRS.SVC.Core.Exceptions;
 using MARC.HI.EHRS.SVC.Messaging.HAPI;
 using MARC.HI.EHRS.SVC.Messaging.HAPI.TransportProtocol;
 using NHapi.Base.Model;
+using NHapi.Base.Parser;
 using NHapi.Base.Util;
 using NHapi.Model.V25.Message;
 using NHapi.Model.V25.Segment;
@@ -82,6 +83,9 @@ namespace SanteDB.Messaging.HL7.Messages
                         }
                     else if (current is AbstractSegment)
                     {
+                        // Empty, don't parse
+                        if (PipeParser.Encode(current as AbstractSegment, new EncodingCharacters('|', "^~\\&")).Length == 3)
+                            continue ;
                         ISegmentHandler handler = null;
                         if (s_segmentHandlers.TryGetValue(current.GetStructureName(), out handler))
                         {
@@ -233,7 +237,7 @@ namespace SanteDB.Messaging.HL7.Messages
             var config = ApplicationContext.Current.Configuration;
             msh.MessageControlID.Value = Guid.NewGuid().ToString();
             msh.SendingApplication.NamespaceID.Value = config.DeviceName ?? Environment.MachineName;
-            msh.SendingFacility.NamespaceID.Value = config.JurisdictionData.Name;
+            msh.SendingFacility.NamespaceID.Value = config.JurisdictionData?.Name ?? System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().DomainName;
             msh.ReceivingApplication.NamespaceID.Value = inbound.SendingApplication.NamespaceID.Value;
             msh.ReceivingFacility.NamespaceID.Value = inbound.ReceivingFacility.NamespaceID.Value;
             msh.DateTimeOfMessage.Time.Value = DateTime.Now.ToString("yyyyMMddHHmmss");

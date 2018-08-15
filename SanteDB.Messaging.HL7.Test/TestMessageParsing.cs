@@ -27,7 +27,7 @@ namespace SanteDB.Messaging.HL7.Test
         public void TestParseADTMessage()
         {
             AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
-            var msg = TestUtil.GetMessage("HL7ADT1");
+            var msg = TestUtil.GetMessage("ADT_SIMPLE");
             var message = new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
 
         }

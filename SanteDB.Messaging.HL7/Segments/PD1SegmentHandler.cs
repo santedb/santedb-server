@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MARC.HI.EHRS.SVC.Core;
+using MARC.HI.EHRS.SVC.Core.Data;
 using MARC.HI.EHRS.SVC.Core.Services;
 using NHapi.Base.Model;
 using NHapi.Model.V25.Segment;
@@ -23,8 +24,8 @@ namespace SanteDB.Messaging.HL7.Segments
     public class PD1SegmentHandler : ISegmentHandler
     {
 
-        private const string LivingArrangementCodeSystem = "2.16.840.1.113883.5.220";
-        private const string DisabilityCodeSystem = "2.16.840.1.113883.5.295";
+        private const string LivingArrangementCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.220";
+        private const string DisabilityCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.295";
 
         /// <summary>
         /// Patient demographics 1
@@ -57,9 +58,14 @@ namespace SanteDB.Messaging.HL7.Segments
                 var sdlRepo = ApplicationContext.Current.GetService<IDataPersistenceService<Place>>();
                 foreach (var xon in pd1Segment.GetPatientPrimaryFacility())
                 {
-                    var authority = xon.AssigningAuthority.ToModel();
+                    var authority = xon.AssigningAuthority.ToModel(false);
+                    var idnumber = xon.OrganizationIdentifier.Value ?? xon.IDNumber.Value;
                     // Find the org or SDL
-                    var place = sdlRepo.Query(o => o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation && o.Identifiers.Any(i => i.Value == xon.IDNumber.Value && i.AuthorityKey == authority.Key), AuthenticationContext.SystemPrincipal).SingleOrDefault();
+                    Place place = null;
+                    if (authority == null && xon.AssigningAuthority.NamespaceID.Value == ApplicationContext.Current.Configuration.Custodianship.Id.Id)
+                        place = sdlRepo.Get(new Identifier<Guid>(Guid.Parse(idnumber)), AuthenticationContext.SystemPrincipal, true);
+                    else
+                        place = sdlRepo.Query(o => o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation && o.Identifiers.Any(i => i.Value == idnumber && i.AuthorityKey == authority.Key), AuthenticationContext.SystemPrincipal).SingleOrDefault();
                     if (place != null)
                         retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation, place));
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MARC.HI.EHRS.SVC.Core;
+using MARC.HI.EHRS.SVC.Core.Data;
 using MARC.HI.EHRS.SVC.Core.Services;
 using MARC.HI.EHRS.SVC.Core.Services.Policy;
 using NHapi.Base.Model;
@@ -25,11 +26,11 @@ namespace SanteDB.Messaging.HL7.Segments
     public class PIDSegmentHandler : ISegmentHandler
     {
 
-        private const string AdministrativeGenderCodeSystem = "2.16.840.1.113883.5.1";
+        private const string AdministrativeGenderCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.1";
         private const string RaceCodeSystem = "2.16.840.1.113883.5.5";
-        private const string MaritalStatusCodeSystem = "2.16.840.1.113883.5.2";
-        private const string ReligionCodeSystem = "2.16.840.1.113883.5.6";
-        private const string EthnicGroupCodeSystem = "2.16.840.1.113883.5.189";
+        private const string MaritalStatusCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.2";
+        private const string ReligionCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.6";
+        private const string EthnicGroupCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.189";
 
 
         /// <summary>
@@ -60,16 +61,22 @@ namespace SanteDB.Messaging.HL7.Segments
             var pidSegment = segment as PID;
            
             Patient retVal = new Patient() { Key = Guid.NewGuid() };
+            Person motherEntity = null;
+
             // Existing patient?
             foreach (var id in pidSegment.GetAlternatePatientIDPID())
             {
-                var queryId = id.ToModel();
-                retVal = patientService.Query(o => o.Identifiers.Any(i => i.Value == queryId.Value &&
-                    i.AuthorityKey == queryId.AuthorityKey), AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                var idnumber = id.IDNumber.Value;
+                var authority = id.AssigningAuthority.ToModel();
+                Guid idguid = Guid.Empty;
+                if (authority == null &&
+                    id.AssigningAuthority.NamespaceID.Value == ApplicationContext.Current.Configuration.Custodianship.Id.Id)
+                    retVal = patientService.Get(new Identifier<Guid>(Guid.Parse(id.IDNumber.Value)), AuthenticationContext.SystemPrincipal, true);
+                else if(authority?.IsUnique == true)
+                    retVal = patientService.Query(o => o.Identifiers.Any(i => i.Value == idnumber &&
+                        i.AuthorityKey == authority.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
                 if (retVal != null) break;
             }
-            Dictionary<Guid, Person> nok = new Dictionary<Guid, Person>();
-
 
             if (!pidSegment.PatientID.IsEmpty())
                 retVal.Identifiers.Add(pidSegment.PatientID.ToModel());
@@ -80,11 +87,25 @@ namespace SanteDB.Messaging.HL7.Segments
 
             // Mother's maiden name, create a relationship for mother
             if (pidSegment.MotherSMaidenNameRepetitionsUsed > 0 || pidSegment.MotherSIdentifierRepetitionsUsed > 0)
-                nok.Add(EntityRelationshipTypeKeys.Mother, new Person()
+            {
+                // Attempt to find the mother
+                var personPersistence = ApplicationContext.Current.GetService<IDataPersistenceService<Person>>();
+                foreach(var id in pidSegment.GetMotherSIdentifier())
                 {
-                    Identifiers = pidSegment.GetMotherSIdentifier().ToModel().ToList(),
-                    Names = pidSegment.GetMotherSMaidenName().ToModel().ToList()
-                });
+                    var authortiy = id.AssigningAuthority.ToModel(false);
+                    if (authortiy?.IsUnique == true)
+                        motherEntity = personPersistence.Query(o => o.Identifiers.Any(i => i.Value == id.IDNumber.Value && i.AuthorityKey == authortiy.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                }
+
+                if (motherEntity == null)
+                    motherEntity = new Person()
+                    {
+                        Key = Guid.NewGuid(),
+                        Identifiers = pidSegment.GetMotherSIdentifier().ToModel().ToList(),
+                        Names = pidSegment.GetMotherSMaidenName().ToModel().ToList()
+                    };
+                retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Mother, motherEntity.Key));
+            }
 
             // Date/time of birth
             if (!pidSegment.DateTimeOfBirth.IsEmpty())
@@ -181,8 +202,10 @@ namespace SanteDB.Messaging.HL7.Segments
                     retVal.CreatedBy = user;
             }
 
-            return new IdentifiedData[] { retVal };
-
+            if (motherEntity == null)
+                return new IdentifiedData[] { retVal };
+            else
+                return new IdentifiedData[] { motherEntity, retVal };
         }
     }
 }

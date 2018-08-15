@@ -54,7 +54,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId, IPrincipal principal)
         {
             int tr = 0;
-            var addrLookupQuery = context.CreateSqlStatement<DbEntityAddressComponent>().SelectFrom()
+            var addrLookupQuery = context.CreateSqlStatement<DbEntityAddressComponent>().SelectFrom(typeof(DbEntityAddressComponent), typeof(DbEntityAddress), typeof(DbEntityAddressComponentValue))
                 .InnerJoin<DbEntityAddress>(o=>o.SourceKey, o=>o.Key)
                 .InnerJoin<DbEntityAddressComponentValue>(o=>o.ValueSequenceId, o=>o.SequenceId)
                 .Where<DbEntityAddress>(o=>o.SourceKey == id && o.ObsoleteVersionSequenceId == null);

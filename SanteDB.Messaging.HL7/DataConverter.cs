@@ -198,7 +198,7 @@ namespace SanteDB.Messaging.HL7
 		/// </summary>
 		/// <param name="id">The id value to be converted.</param>
 		/// <returns>Returns the converted assigning authority.</returns>
-		public static AssigningAuthority ToModel(this HD id)
+		public static AssigningAuthority ToModel(this HD id, bool throwIfNotFound = true)
         {
             var assigningAuthorityRepositoryService = ApplicationContext.Current.GetService<IMetadataRepositoryService>();
             AssigningAuthority assigningAuthority = null;
@@ -209,7 +209,7 @@ namespace SanteDB.Messaging.HL7
             if (!string.IsNullOrEmpty(id.NamespaceID.Value))
             {
                 assigningAuthority = assigningAuthorityRepositoryService.FindAssigningAuthority(a => a.DomainName == id.NamespaceID.Value).FirstOrDefault();
-                if (assigningAuthority == null)
+                if (assigningAuthority == null && throwIfNotFound)
                     throw new KeyNotFoundException($"Cannot find assigning authority {id.NamespaceID.Value}");
             }
 
@@ -217,7 +217,7 @@ namespace SanteDB.Messaging.HL7
             {
                 var tAssigningAuthority = assigningAuthorityRepositoryService.FindAssigningAuthority(a => a.Oid == id.UniversalID.Value).FirstOrDefault();
 
-                if (tAssigningAuthority == null)
+                if (tAssigningAuthority == null && throwIfNotFound)
                     throw new KeyNotFoundException($"Cannot find assigning authority {id.UniversalID.Value}");
                 else if (assigningAuthority != null && tAssigningAuthority?.Key != assigningAuthority.Key) // Must agree
                     throw new InvalidOperationException("When both NamespaceID and UniversalID are specified, both must agree with configured values");

@@ -19,7 +19,7 @@ namespace SanteDB.Messaging.HL7
         /// </summary>
         public static bool IsEmpty(this CX me)
         {
-            return me.IDNumber.IsEmpty() && !me.AssigningAuthority.IsEmpty();
+            return me.IDNumber.IsEmpty() && me.AssigningAuthority.IsEmpty();
         }
 
         /// <summary>

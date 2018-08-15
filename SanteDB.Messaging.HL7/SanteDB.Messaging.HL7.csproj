@@ -48,6 +48,7 @@
     <Compile Include="Messages\AdtMessageHandler.cs" />
     <Compile Include="Messages\MessageHandlerBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Segments\EVNSegmentHandler.cs" />
     <Compile Include="Segments\ISegmentHandler.cs" />
     <Compile Include="Segments\NK1SegmentHandler.cs" />
     <Compile Include="Segments\PD1SegmentHandler.cs" />
@@ -60,15 +61,19 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="Data\003-HL7v2AddressUseCodes.dataset">
+    <None Include="Data\009-HL7v2AdministrativeGenderCodes.dataset">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\009-HL7v2AddressUseCodes.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
-    <None Include="Data\003-HL7v2NameUseCodes.dataset">
+    <None Include="Data\009-HL7v2NameUseCodes.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
-    <None Include="Data\003-HL7v2TelecommunicationUseCodes.dataset">
+    <None Include="Data\009-HL7v2TelecommunicationUseCodes.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
