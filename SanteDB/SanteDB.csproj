@@ -74,6 +74,9 @@
     <None Include="Applets\org.santedb.core.pak">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Data\000-Countries.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\000-IndustryTypes.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -91,6 +94,9 @@
     <EmbeddedResource Include="License.rtf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <None Include="Data\000-ISO639-1-Codes.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\demo\990-demo.concepts.dataset" />
     <None Include="Data\demo\991-demo.facilities.dataset" />
     <None Include="Data\demo\992-demo.places.dataset" />

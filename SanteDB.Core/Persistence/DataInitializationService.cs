@@ -40,6 +40,7 @@ using System.Xml.Serialization;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Interfaces;
 using System.ComponentModel;
+using SanteDB.Core.Model.Export;
 
 namespace SanteDB.Core.Persistence
 {
@@ -94,7 +95,7 @@ namespace SanteDB.Core.Persistence
         /// <summary>
         /// Install dataset
         /// </summary>
-        public void InstallDataset(DatasetInstall ds)
+        public void InstallDataset(Dataset ds)
         {
             try
             {
@@ -233,7 +234,7 @@ namespace SanteDB.Core.Persistence
                 String dataDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Data");
                 this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Scanning Directory {0} for datasets", dataDirectory);
 
-                XmlSerializer xsz = new XmlSerializer(typeof(DatasetInstall));
+                XmlSerializer xsz = new XmlSerializer(typeof(Dataset));
                 var datasetFiles = Directory.GetFiles(dataDirectory, "*.dataset");
                 Array.Sort(datasetFiles);
                 int i = 0;
@@ -250,7 +251,7 @@ namespace SanteDB.Core.Persistence
 
                         using (var fs = File.OpenRead(f))
                         {
-                            var ds = xsz.Deserialize(fs) as DatasetInstall;
+                            var ds = xsz.Deserialize(fs) as Dataset;
                             fileProgress?.Invoke(this, new Services.ProgressChangedEventArgs(++i / (float)datasetFiles.Length, ds.Id));
                             this.m_traceSource.TraceEvent(TraceEventType.Information, 0, "Installing {0}...", Path.GetFileName(f));
                             this.InstallDataset(ds);
