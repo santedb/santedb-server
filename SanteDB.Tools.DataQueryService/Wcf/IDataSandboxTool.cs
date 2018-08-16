@@ -23,5 +23,12 @@ namespace SanteDB.Tools.DataSandbox.Wcf
         [OperationContract]
         [WebInvoke(Method = "GET", BodyStyle = WebMessageBodyStyle.Bare, UriTemplate = "/{*content}")]
         Stream StaticContent(string content);
+
+        /// <summary>
+        /// Create dataset 
+        /// </summary>
+        [OperationContract]
+        [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Bare, UriTemplate = "/dataset")]
+        Stream CreateDataset(Stream datasetSource);
     }
 }

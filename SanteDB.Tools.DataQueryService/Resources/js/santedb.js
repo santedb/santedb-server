@@ -108,8 +108,8 @@
             if (entity === undefined) return;
 
             var address = entity.component !== undefined ? entity :
-                entity.address !== undefined ? (entity.address.Direct || entity.address.HomeAddress || result.name.$other) :
-                (entity.Direct || entity.HomeAddress || entity.$other);
+                entity.address !== undefined ? (entity.address.Direct || entity.address.HomeAddress || entity.address.PhysicalVisit || result.name.$other) :
+                (entity.Direct || entity.HomeAddress || entity.PhysicalVisit || entity.$other);
             var retVal = "";
             if (address.component) {
                 if (address.component.AdditionalLocator)

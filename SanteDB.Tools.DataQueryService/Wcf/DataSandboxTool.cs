@@ -1,4 +1,8 @@
-﻿using System;
+﻿using SanteDB.Core.Applets.ViewModel;
+using SanteDB.Core.Applets.ViewModel.Json;
+using SanteDB.Core.Model.Collection;
+using SanteDB.Core.Model.Export;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -8,6 +12,7 @@ using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace SanteDB.Tools.DataSandbox.Wcf
 {
@@ -19,6 +24,29 @@ namespace SanteDB.Tools.DataSandbox.Wcf
     {
 
         private TraceSource m_traceSource = new TraceSource("SanteDB.Tools.DataSandbox");
+
+        /// <summary>
+        /// Create dataset
+        /// </summary>
+        public Stream CreateDataset(Stream datasetSource)
+        {
+            Bundle input = new JsonViewModelSerializer().DeSerialize(datasetSource, typeof(Bundle)) as Bundle;
+            Dataset output = new Dataset("Generated Dataset");
+            output.Action = input.Item.Select(i => new DataUpdate()
+            {
+                InsertIfNotExists = true,
+                Element = i
+            }).OfType<DataInstallAction>().ToList();
+
+            WebOperationContext.Current.OutgoingResponse.ContentType = "text/xml";
+            WebOperationContext.Current.OutgoingResponse.Headers["Content-Disposition"] = "attachment; filename=codesystem.dataset";
+
+            MemoryStream ms = new MemoryStream();
+            new XmlSerializer(typeof(Dataset)).Serialize(ms, output);
+            ms.Seek(0, SeekOrigin.Begin);
+            return ms;
+
+        }
 
         /// <summary>
         /// Get static content

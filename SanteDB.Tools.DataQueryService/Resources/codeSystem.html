@@ -75,10 +75,10 @@
                     <div class="form-group" ng-class="{ 'has-error' : datasetForm.urlInput.$invalid &amp;&amp; datasetForm.urlInput.$touched }">
                         <label for="importInput" class="col-sm-2 control-label">Import Terms:</label>
                         <div class="col-sm-8">
-                            <select name="importInput" ng-model="importTerms" class="form-control" style="width:100%" sdb-search="ConceptSet" data-url="{{$root.realm}}"
+                            <select name="importInput" id="importInput" ng-model="conceptSet" class="form-control" style="width:100%" sdb-search="ConceptSet" data-url="{{$root.realm}}"
                                 data-searchfield="mnemonic"></select>
                         </div>
-                        <button class="col-sm-2 btn btn-info" type="button" ng-click="importTerms()">
+                        <button class="col-sm-2 btn btn-info" type="button" ng-click="importTerms(conceptSet)">
                             <span class="glyphicon glyphicon-download"></span> Import</button>
                     </div>
                     <table class="table table-striped">
@@ -107,17 +107,22 @@
                                             <option selected="selected" value="en">en</option>
                                             <option selected="selected" value="fr">fr</option>
                                             <option selected="selected" value="es">es</option>
+                                            <option selected="selected" value="de">de</option>
                                             <option selected="selected" value="sw">sw</option>
                                         </select>
                                     </div>
                                 </td>
                                 <td ng-class="{ 'has-error' : datasetForm['concept' + $index].$invalid &amp;&amp; datasetForm['concept' + $index].$touched }">
-                                    <select name="concept{{$index}}" ng-model="ref.concept.id" class="form-control" style="width:100%" sdb-search="Concept" data-url="{{$root.realm}}"
+                                    <div class="input-group" style="width:100%">
+                                    <select name="concept{{$index}}" ng-model="ref.concept.id" class="form-control" style="width:75%" sdb-search="Concept" data-url="{{$root.realm}}"
                                         data-searchfield="mnemonic">
                                         <option value="{{ref.concept.id}}" selected="selected">{{ref.concept.mnemonic}}</option>
                                     </select>
+                                    <button type="button" ng-click="createConcept(ref)" class="btn btn-secondary">
+                                        <span class="glyphicon glyphicon-asterisk"></span> New</button>
+                                    </div>
                                 </td>
-                                
+
                                 <td>
                                     <button type="button" ng-if="$index > 0" class="btn btn-danger" ng-click="removeTerm($index)">
                                         <span class="glyphicon glyphicon-remove"></span>
@@ -136,12 +141,75 @@
             <div class="pull-right">
                 <div class="btn-group">
                     <button class="btn btn-primary" type="button" ng-click="download()">
-                        <span class="glyphicon glyphicon-download"></span> Download</button>
+                        <span class="glyphicon glyphicon-download"></span> Create</button>
                     <button class="btn btn-danger" type="button" ng-click="cancel()">
                         <span class="glyphicon glyphicon-remove"></span> Cancel</button>
                 </div>
             </div>
         </div>
+        <div ng-if="bundle" class="col-sm-12">
+            <pre>
+                {{bundle}}
+            </pre>
+        </div>
     </div>
 
+
+    <div class="modal fade" id="dlgCreateConcept" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </button>
+                    <h4 class="modal-title">Create Concept</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <fieldset class="form-horizontal form-group" xmlns="http://www.w3.org/1999/xhtml">
+                            <div class="form-group">
+                                <label class="control-label">Mnemonic:</label>
+                                <input ng-model="newConcept.mnemonic" type="text" class="form-control" autocomplete="off" autofocus="autofocus" autocorrect="off"
+                                    autocapitalize="none" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Display Name:</label>
+                                <div class="input-group">
+                                    <input type="text" ng-model="newConcept.name.value" style="width:70%" required="required" class="form-control" />
+                                    <select ng-model="newConcept.name.language" required="required" class="form-control" style="width:25%">
+                                        <option selected="selected" value="en">en</option>
+                                        <option selected="selected" value="fr">fr</option>
+                                        <option selected="selected" value="es">es</option>
+                                        <option selected="selected" value="de">de</option>
+                                        <option selected="selected" value="sw">sw</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Class:</label>
+                                <select ng-model="newConcept.conceptClass" required="required" class="form-control">
+                                    <option ng-repeat="cls in conceptClasses" value="{{cls.id}}">{{cls.name}}</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Concept Set</label>
+                                <select name="importInput" ng-model="newConcept.conceptSet" class="form-control" style="width:100%" sdb-search="ConceptSet" data-url="{{$root.realm}}"
+                                    data-searchfield="mnemonic"></select>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger btn-lg" data-dismiss="modal">
+                        <span>
+                            <span class="glyphicon glyphicon-remove"></span> Cancel
+                        </span>
+                    </button>
+                    <button type="button" data-dismiss="modal" id="loginButton" class="btn btn-primary btn-lg">
+                        Ok
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
