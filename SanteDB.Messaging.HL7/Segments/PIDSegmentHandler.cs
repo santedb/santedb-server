@@ -59,24 +59,32 @@ namespace SanteDB.Messaging.HL7.Segments
             var patientService = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>();
 
             var pidSegment = segment as PID;
-           
+
             Patient retVal = new Patient() { Key = Guid.NewGuid() };
             Person motherEntity = null;
 
+            retVal.CreationActKey = context.OfType<ControlAct>().FirstOrDefault()?.Key;
+
             // Existing patient?
-            foreach (var id in pidSegment.GetAlternatePatientIDPID())
+            foreach (var id in pidSegment.GetPatientIdentifierList())
             {
                 var idnumber = id.IDNumber.Value;
                 var authority = id.AssigningAuthority.ToModel();
                 Guid idguid = Guid.Empty;
+                Patient found = null;
                 if (authority == null &&
                     id.AssigningAuthority.NamespaceID.Value == ApplicationContext.Current.Configuration.Custodianship.Id.Id)
-                    retVal = patientService.Get(new Identifier<Guid>(Guid.Parse(id.IDNumber.Value)), AuthenticationContext.SystemPrincipal, true);
+                    found = patientService.Get(new Identifier<Guid>(Guid.Parse(id.IDNumber.Value)), AuthenticationContext.SystemPrincipal, true);
                 else if(authority?.IsUnique == true)
-                    retVal = patientService.Query(o => o.Identifiers.Any(i => i.Value == idnumber &&
+                    found = patientService.Query(o => o.Identifiers.Any(i => i.Value == idnumber &&
                         i.AuthorityKey == authority.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                if (retVal != null) break;
+                if (found != null)
+                {
+                    retVal = found;
+                    break;
+                }
             }
+            
 
             if (!pidSegment.PatientID.IsEmpty())
                 retVal.Identifiers.Add(pidSegment.PatientID.ToModel());
@@ -97,6 +105,7 @@ namespace SanteDB.Messaging.HL7.Segments
                         motherEntity = personPersistence.Query(o => o.Identifiers.Any(i => i.Value == id.IDNumber.Value && i.AuthorityKey == authortiy.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
                 }
 
+                // Mother doesn't exist, so add it
                 if (motherEntity == null)
                     motherEntity = new Person()
                     {
@@ -104,7 +113,13 @@ namespace SanteDB.Messaging.HL7.Segments
                         Identifiers = pidSegment.GetMotherSIdentifier().ToModel().ToList(),
                         Names = pidSegment.GetMotherSMaidenName().ToModel().ToList()
                     };
-                retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Mother, motherEntity.Key));
+
+                var existingRelationship = retVal.Relationships.FirstOrDefault(r => r.SourceEntityKey == retVal.Key && r.TargetEntityKey == motherEntity.Key);
+                if (existingRelationship == null)
+                    retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Mother, motherEntity.Key));
+                else
+                    existingRelationship.RelationshipTypeKey = EntityRelationshipTypeKeys.Mother;
+
             }
 
             // Date/time of birth
@@ -124,7 +139,7 @@ namespace SanteDB.Messaging.HL7.Segments
 
             // Race codes
             if (pidSegment.RaceRepetitionsUsed > 0)
-                retVal.RaceCodeKeys.AddRange(pidSegment.GetRace().ToModel(RaceCodeSystem).Select(o => o.Key.Value));
+                ; // TODO: Implement as an extension if needed 
 
             if (pidSegment.PatientAddressRepetitionsUsed > 0)
                 retVal.Addresses.AddRange(pidSegment.GetPatientAddress().ToModel());
@@ -137,7 +152,7 @@ namespace SanteDB.Messaging.HL7.Segments
             if (!pidSegment.PrimaryLanguage.IsEmpty())
                 retVal.LanguageCommunication = new List<PersonLanguageCommunication>()
                 {
-                    new PersonLanguageCommunication(pidSegment.PrimaryLanguage.Identifier.Value, true)
+                    new PersonLanguageCommunication(pidSegment.PrimaryLanguage.Identifier.Value.ToLower(), true)
                 };
 
             if (!pidSegment.MaritalStatus.IsEmpty())
@@ -147,7 +162,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 retVal.ReligiousAffiliation = pidSegment.Religion.ToModel(ReligionCodeSystem);
 
             if (pidSegment.EthnicGroupRepetitionsUsed > 0)
-                retVal.EthnicGroupCodeKeys = pidSegment.GetEthnicGroup().ToModel(EthnicGroupCodeSystem).Select(o=>o.Key.Value).ToList();
+                retVal.EthnicGroupCodeKey = pidSegment.GetEthnicGroup().First().ToModel(EthnicGroupCodeSystem).Key;
 
             // Patient account, locate the specified account
             if(!pidSegment.PatientAccountNumber.IsEmpty())
@@ -177,7 +192,7 @@ namespace SanteDB.Messaging.HL7.Segments
             {
                 foreach (var cit in pidSegment.GetCitizenship())
                 {
-                    var places = ApplicationContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Identifiers.Any(i => i.Value == cit.Identifier.Value), AuthenticationContext.SystemPrincipal);
+                    var places = ApplicationContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Identifiers.Any(i => i.Value == cit.Identifier.Value && i.AuthorityKey == AssigningAuthorityKeys.Iso3166CountryCode), AuthenticationContext.SystemPrincipal);
                     if (places.Count() == 1)
                         retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Citizen, places.First().Key));
                 }

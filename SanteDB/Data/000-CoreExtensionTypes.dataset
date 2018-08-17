@@ -14,4 +14,11 @@
       <name>http://santedb.org/extensions/core/originalDate</name>
     </ExtensionType>
   </update>
+  <update insertIfNotExists="true">
+    <ExtensionType xmlns="http://santedb.org/model">
+      <id>5d91d3d5-783d-4024-bb20-d50bc101f7fc</id>
+      <handlerClass>SanteDB.Core.Extensions.DictionaryExtensionHandler, SanteDB.Core.Model, Version=1.1.0.0</handlerClass>
+      <name>http://santedb.org/extensions/core/contactRole</name>
+    </ExtensionType>
+  </update>
 </dataset>

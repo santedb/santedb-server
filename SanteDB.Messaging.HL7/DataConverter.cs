@@ -23,9 +23,9 @@ namespace SanteDB.Messaging.HL7
     public static class DataConverter
     {
 
-        private const string AddressUseCodeSystem = "2.16.840.1.113883.5.1";
-        private const string NameUseCodeSystem = "2.16.840.1.113883.5.1120";
-        private const string TelecomUseCodeSystem = "2.16.840.1.113883.5.1011";
+        private const string AddressUseCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.190";
+        private const string NameUseCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.200";
+        private const string TelecomUseCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.201";
 
         /// <summary>
         /// Convert the message to v2.5
@@ -404,7 +404,7 @@ namespace SanteDB.Messaging.HL7
         public static IEnumerable<Concept> ToModel(this CE[] me, String preferredDomain = null, bool throwIfNotFound = true)
         { 
             var termService = ApplicationContext.Current.GetService<IConceptRepositoryService>();
-            List<Concept> retval = null;
+            List<Concept> retval = new List<Concept>();
 
             foreach (var code in me)
             {
@@ -414,7 +414,7 @@ namespace SanteDB.Messaging.HL7
                 if (concept == null)
                     concept = termService.FindConceptsByReferenceTerm(code.Identifier.Value, code.NameOfCodingSystem.Value).FirstOrDefault();
 
-                if (throwIfNotFound)
+                if (concept == null && throwIfNotFound)
                     throw new KeyNotFoundException($"Reference term {code.Identifier.Value} not found in {preferredDomain} or {code.NameOfCodingSystem.Value}");
                 retval.Add(concept);
             }

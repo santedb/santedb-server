@@ -37,7 +37,7 @@ namespace SanteDB.Messaging.HL7.Segments
             var evnSegment = segment as EVN;
 
             // Now load event segments
-            var retVal = new ControlAct() { Key = Guid.Empty };
+            var retVal = new ControlAct() { Key = Guid.NewGuid() };
 
             // Recorded event time
             if (!evnSegment.RecordedDateTime.IsEmpty())

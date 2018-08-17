@@ -77,7 +77,7 @@ namespace SanteDB.Messaging.HL7.Segments
             {
                 var handicap = pd1Segment.Handicap.ToConcept(DisabilityCodeSystem)?.Key.Value;
                 // TODO: Create functional limitation
-                throw new NotImplementedException();
+                throw new NotImplementedException("Handicap / Functional Limitation handler for PD1 is not completed yet");
             }
 
             // Privacy code

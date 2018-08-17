@@ -60,6 +60,16 @@ namespace SanteDB.Messaging.HL7.Messages
         protected abstract bool Validate(IMessage message);
 
         /// <summary>
+        /// Gets the segment handler for the specified segment
+        /// </summary>
+        protected ISegmentHandler GetSegmentHandler(string name)
+        {
+            ISegmentHandler handler = null;
+            s_segmentHandlers.TryGetValue(name, out handler);
+            return handler;
+        }
+
+        /// <summary>
         /// Parses the specified message components
         /// </summary>
         /// <param name="message">The message to be parsed</param>
@@ -86,12 +96,15 @@ namespace SanteDB.Messaging.HL7.Messages
                         // Empty, don't parse
                         if (PipeParser.Encode(current as AbstractSegment, new EncodingCharacters('|', "^~\\&")).Length == 3)
                             continue ;
-                        ISegmentHandler handler = null;
-                        if (s_segmentHandlers.TryGetValue(current.GetStructureName(), out handler))
+                        var handler = this.GetSegmentHandler(current.GetStructureName());
+                        if(handler != null)
                         {
                             var parsed = handler.Parse(current as AbstractSegment, retVal.Item);
-                            retVal.ExpansionKeys.Add(parsed.First().Key.GetValueOrDefault());
-                            retVal.Item.AddRange(parsed);
+                            if (parsed.Any())
+                            {
+                                retVal.ExpansionKeys.Add(parsed.First().Key.GetValueOrDefault());
+                                retVal.Item.AddRange(parsed);
+                            }
                         }
                     }
                     else if (current is AbstractGroup)

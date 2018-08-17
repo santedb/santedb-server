@@ -31,5 +31,17 @@ namespace SanteDB.Messaging.HL7.Test
             var message = new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
 
         }
+
+        /// <summary>
+        /// Test that ADT message is parsed properly
+        /// </summary>
+        [TestMethod]
+        public void TestParseComplexADTMessage()
+        {
+            AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
+            var msg = TestUtil.GetMessage("ADT_PD1");
+            var message = new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
+
+        }
     }
 }

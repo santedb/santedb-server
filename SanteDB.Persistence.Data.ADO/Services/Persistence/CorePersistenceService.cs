@@ -200,7 +200,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
 
                 // Domain query
-                domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom();
+                Type[] selectTypes = { typeof(TQueryReturn) };
+                if (selectTypes[0].IsConstructedGenericType)
+                    selectTypes = selectTypes[0].GenericTypeArguments;
+
+                domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(selectTypes);
                 var expression = m_mapper.MapModelExpression<TModel, TDomain>(query, false);
                 if (expression != null)
                 {
