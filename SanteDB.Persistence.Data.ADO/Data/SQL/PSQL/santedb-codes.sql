@@ -550,6 +550,11 @@ INSERT INTO CD_SET_TBL (SET_ID, SET_NAME, MNEMONIC, OID, URL, CRT_USR_ID) VALUES
 INSERT INTO CD_SET_TBL (SET_ID, SET_NAME, MNEMONIC, OID, URL, CRT_USR_ID) VALUES ('BDFA274A-4192-4612-B6B5-0C67DCF75855','Spousal Family Members','SpousalFamilyMember','1.3.6.1.4.1.33349.3.1.5.9.3.24','http://santedb.org/conceptset/SpousalFamilyMember', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
 INSERT INTO CD_SET_TBL (SET_ID, SET_NAME, MNEMONIC, OID, URL, CRT_USR_ID) VALUES ('5737CA40-57DC-4590-AB3B-54C9AFCCD55A', 'Container Cap', 'ContainerCap', '2.16.840.1.113883.5.26', 'http://santedb.org/conceptset/v3-ContainerCap','fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
 INSERT INTO CD_SET_TBL (SET_ID, SET_NAME, MNEMONIC, OID, URL, CRT_USR_ID) VALUES ('B9AC7826-5D19-421E-A848-61C3C8F563A2', 'Container Separator', 'ContainerSeparator', '2.16.840.1.113883.5.27', 'http://santedb.org/conceptset/v3-ContainerSeparator','fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO CD_SET_TBL (SET_ID, SET_NAME, MNEMONIC, OID, URL, CRT_USR_ID) VALUES ('08cfff5d-638a-42ae-9099-280732f6a62e', 'Living Arrangement', 'Living Arrangement', '1.3.6.1.4.1.33349.3.1.5.9.3.60', 'http://santedb.org/conceptset/living-arrangement','fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO CD_SET_TBL (SET_ID, SET_NAME, MNEMONIC, OID, URL, CRT_USR_ID) VALUES ('a2e5d1ca-f7d7-44eb-bcdf-f83829e24929', 'Marital Status', 'MaritalStatus', '1.3.6.1.4.1.33349.3.1.5.9.3.61', 'http://santedb.org/conceptset/marital-status','fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO CD_SET_TBL (SET_ID, SET_NAME, MNEMONIC, OID, URL, CRT_USR_ID) VALUES ('8953be89-a401-47bf-aa3a-2d6845da9e4a', 'Ethnicities', 'Ethnicity', '1.3.6.1.4.1.33349.3.1.5.9.3.62', 'http://santedb.org/conceptset/ethnicity','fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO CD_SET_TBL (SET_ID, SET_NAME, MNEMONIC, OID, URL, CRT_USR_ID) VALUES ('2ec8f67f-0245-42ac-b310-566178b603c0', 'Religions', 'Religion', '1.3.6.1.4.1.33349.3.1.5.9.3.63', 'http://santedb.org/conceptset/religion','fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+
 
 -- Concept Set Members
 INSERT INTO CD_SET_MEM_ASSOC_TBL (CD_ID, SET_ID) VALUES ('0FF2AB03-6E0A-40D1-8947-04C4937B4CC4','1285EC57-5969-46C7-897D-37C169D34029');

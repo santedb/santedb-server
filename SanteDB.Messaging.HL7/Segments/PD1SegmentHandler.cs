@@ -72,12 +72,12 @@ namespace SanteDB.Messaging.HL7.Segments
                 }
             }
 
-            // Disabilities
+            // Disabilities - Create functional limitation template
             if (!pd1Segment.Handicap.IsEmpty())
             {
                 var handicap = pd1Segment.Handicap.ToConcept(DisabilityCodeSystem)?.Key.Value;
-                if (handicap.HasValue)
-                    retVal.DisabilityCodeKeys.Add(handicap.Value);
+                // TODO: Create functional limitation
+                throw new NotImplementedException();
             }
 
             // Privacy code

@@ -1,0 +1,1646 @@
+<?xml version="1.0"?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="HL7v2 Religions">
+  <insert skipIfError="false" skipIfExists="true">
+    <CodeSystem xmlns="http://santedb.org/model">
+      <id>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</id>
+      <name>HL7v2 Relgion Codes</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.200.6</oid>
+      <authority>0006</authority>
+      <url>http://hl7.org/fhir/v2/0006/2.4</url>
+    </CodeSystem>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>f713b455-97a5-4bfc-8118-30d917fe3b7b</id>
+      <mnemonic>ABC</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: American Baptist Church</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>494572ce-58a2-4376-8a7c-51da073cb8c6</source>
+      <term>f713b455-97a5-4bfc-8118-30d917fe3b7b</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>b5d48dbb-541e-4e18-9332-e3102ef0eb50</id>
+      <mnemonic>AGN</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Agnostic</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>18d758d9-956e-4a3f-a8fa-3b7b6b736515</source>
+      <term>b5d48dbb-541e-4e18-9332-e3102ef0eb50</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>91f1abf2-fb13-4e33-99df-cdec5bcca764</id>
+      <mnemonic>AME</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: African Methodist Episcopal Zion</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>b95acb46-a7a6-4fb4-92a1-5e4ffae6be9c</source>
+      <term>91f1abf2-fb13-4e33-99df-cdec5bcca764</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>c3b77eea-4c39-4826-820a-90e3d21166a9</id>
+      <mnemonic>AMT</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: African Methodist Episcopal</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>387ffe57-3f8c-41bb-9daf-d90331640974</source>
+      <term>c3b77eea-4c39-4826-820a-90e3d21166a9</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>de6af195-85f5-4b9d-a294-04b370ef93a1</id>
+      <mnemonic>ANG</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Anglican</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>f45c5e4a-db56-4567-b1f5-ab9f9915be32</source>
+      <term>de6af195-85f5-4b9d-a294-04b370ef93a1</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>9a1c2c29-cff4-4d2b-b6b9-e23e0334da45</id>
+      <mnemonic>AOG</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Assembly of God</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>b9d67119-772a-4562-89e0-04112d057a9c</source>
+      <term>9a1c2c29-cff4-4d2b-b6b9-e23e0334da45</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>641fcd17-2708-4f7f-af02-4ae6e27111b2</id>
+      <mnemonic>ATH</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Atheist</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>27e4752c-7afd-4963-843b-db0a3e3cde82</source>
+      <term>641fcd17-2708-4f7f-af02-4ae6e27111b2</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>ecfe5962-1e8a-4ab2-a21a-3e0ced524b38</id>
+      <mnemonic>BAH</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Baha'i</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>56096e63-921f-41ee-b114-c04127b31287</source>
+      <term>ecfe5962-1e8a-4ab2-a21a-3e0ced524b38</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>dfd80b69-1251-4582-9f31-ab9e9f75c8f3</id>
+      <mnemonic>BAP</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Baptist</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>c60dc139-f653-4c53-acc9-28ca397d8c80</source>
+      <term>dfd80b69-1251-4582-9f31-ab9e9f75c8f3</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>693c6f04-3d64-47f7-a439-59762a09fd51</id>
+      <mnemonic>BMA</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Buddhist: Mahayana</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>4ffb45c7-1b9a-47e1-a6e6-7c905e2ba9bc</source>
+      <term>693c6f04-3d64-47f7-a439-59762a09fd51</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>bcc7b731-9d2b-4a3f-9106-ca0dcb53faf8</id>
+      <mnemonic>BOT</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Buddhist: Other</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>75dfbfb9-88c7-47bb-bda7-cda7cf05eea1</source>
+      <term>bcc7b731-9d2b-4a3f-9106-ca0dcb53faf8</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>5d3fa812-9f0b-4b8c-bbe2-f2211601c2c4</id>
+      <mnemonic>BRE</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Brethren</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>8c202afc-aba9-4b40-865d-879a68cf8d55</source>
+      <term>5d3fa812-9f0b-4b8c-bbe2-f2211601c2c4</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>81597186-bd99-40d3-bab7-217095ed34e4</id>
+      <mnemonic>BTA</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Buddhist: Tantrayana</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>0de1a474-e9bf-418e-8d27-053b0cb63e04</source>
+      <term>81597186-bd99-40d3-bab7-217095ed34e4</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>e0be66bd-d52c-4af0-abed-f4147d352b96</id>
+      <mnemonic>BTH</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Buddhist: Theravada</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>b3a4313d-5008-49b8-8eb9-0b0a84880eac</source>
+      <term>e0be66bd-d52c-4af0-abed-f4147d352b96</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>9b59ace0-9f70-43f1-84d0-b25c4c05cd65</id>
+      <mnemonic>BUD</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Buddhist</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>79e348cd-4c64-42b7-80d0-bab7c831a257</source>
+      <term>9b59ace0-9f70-43f1-84d0-b25c4c05cd65</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>ceac5ea1-45cf-485c-a2f4-7b19465c2f32</id>
+      <mnemonic>CAT</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Roman Catholic</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>235701e7-f625-4172-9e50-1b31ea23773b</source>
+      <term>ceac5ea1-45cf-485c-a2f4-7b19465c2f32</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>fc09716b-c53a-4a34-b0c7-f6835619fefb</id>
+      <mnemonic>CFR</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Chinese Folk Religionist</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>2d1c24dd-7615-4da3-91a3-8f0d4ba8d900</source>
+      <term>fc09716b-c53a-4a34-b0c7-f6835619fefb</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>ae40d35f-8302-49fd-861a-05463968069e</id>
+      <mnemonic>CHR</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>e0c64b0b-b52d-42f7-9860-45785cfdd988</source>
+      <term>ae40d35f-8302-49fd-861a-05463968069e</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>9892b3f7-1e73-4306-bbc4-ebbd1676c256</id>
+      <mnemonic>CHS</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Christian Science</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>dd3465b5-cb0b-401a-939c-f47f442c8a04</source>
+      <term>9892b3f7-1e73-4306-bbc4-ebbd1676c256</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>741d0933-d247-4572-b142-167a9e38cf6a</id>
+      <mnemonic>CMA</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Christian Missionary Alliance</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>f3cc2ba3-086d-4ccd-bbee-5947b8ae3530</source>
+      <term>741d0933-d247-4572-b142-167a9e38cf6a</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>2704bac9-f014-40df-8e5c-5dc3f45ab848</id>
+      <mnemonic>CNF</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Confucian</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>47f30732-5fdd-4a57-b534-b43d202a6c4c</source>
+      <term>2704bac9-f014-40df-8e5c-5dc3f45ab848</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>fb3ca101-9b37-4f81-8dda-1cff6eab90d0</id>
+      <mnemonic>COC</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Church of Christ</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>8830538b-a793-4f51-a159-47f7ae61020c</source>
+      <term>fb3ca101-9b37-4f81-8dda-1cff6eab90d0</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>b03d25ec-6934-48aa-b881-ac8dfdacf4be</id>
+      <mnemonic>COG</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Church of God</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>72006b54-52d0-41bd-875d-3d671f0ca5cf</source>
+      <term>b03d25ec-6934-48aa-b881-ac8dfdacf4be</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>6e86c021-8c7e-4a4e-834a-c9ddb258e15f</id>
+      <mnemonic>COI</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Church of God in Christ</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>42a27ea5-db67-4ea7-bb93-8c689248bb94</source>
+      <term>6e86c021-8c7e-4a4e-834a-c9ddb258e15f</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>fd563678-5ab5-46d0-8105-e1d44f895916</id>
+      <mnemonic>COL</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Congregational</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>d5393e44-02be-4346-b0dd-4898ad224f7a</source>
+      <term>fd563678-5ab5-46d0-8105-e1d44f895916</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>3a6a585d-6e03-4986-9c35-237de411e635</id>
+      <mnemonic>COM</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Community</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>b9729ed8-c5d0-436a-8f9b-46c5b8acca73</source>
+      <term>3a6a585d-6e03-4986-9c35-237de411e635</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>24aa6bbe-71ba-4feb-9658-d7d4090614f7</id>
+      <mnemonic>COP</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Other Pentecostal</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>69fbd44c-bf4f-454d-b01b-5e3c7fd44460</source>
+      <term>24aa6bbe-71ba-4feb-9658-d7d4090614f7</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>e0322b54-0591-4b89-b29b-31bf1dbcab93</id>
+      <mnemonic>COT</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Other</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>84bc96cf-d91c-4d01-952b-e0d64afee615</source>
+      <term>e0322b54-0591-4b89-b29b-31bf1dbcab93</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>3b42dd0b-08e3-4961-a7df-117fc1e9a1fe</id>
+      <mnemonic>CRR</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Christian Reformed</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>2b8359e8-9847-4f7f-8c00-f02903397021</source>
+      <term>3b42dd0b-08e3-4961-a7df-117fc1e9a1fe</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>9a5d86bd-fedd-41cf-adb3-550f07511871</id>
+      <mnemonic>DOC</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Disciples of Christ</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>40d1474f-8e07-463e-969d-ebb798763345</source>
+      <term>9a5d86bd-fedd-41cf-adb3-550f07511871</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>3ac3e5d1-f2de-4bfb-a529-93a209a4acfb</id>
+      <mnemonic>EOT</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Eastern Orthodox</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>77b9e822-f5b1-4966-a4af-0ec3991c112b</source>
+      <term>3ac3e5d1-f2de-4bfb-a529-93a209a4acfb</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>0325a3ae-a943-404a-a8db-a90302053e6c</id>
+      <mnemonic>EPI</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Episcopalian</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>494ae814-7665-4f65-8ef2-e601e9d9a486</source>
+      <term>0325a3ae-a943-404a-a8db-a90302053e6c</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>3933010d-6ed7-41ec-bfe7-e8b0188f25d5</id>
+      <mnemonic>ERL</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Ethnic Religionist</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>6b3ccb79-313a-4f5c-805a-9f26947d6344</source>
+      <term>3933010d-6ed7-41ec-bfe7-e8b0188f25d5</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>4efc5759-2027-40cf-8ff7-2ebe34c8b836</id>
+      <mnemonic>EVC</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Evangelical Church</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>864f61f2-fef6-4eb7-a938-85520377999f</source>
+      <term>4efc5759-2027-40cf-8ff7-2ebe34c8b836</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>4d7212ee-6ae8-4358-afe9-f2e7a648c01b</id>
+      <mnemonic>FRQ</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Friends</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>cae0bf0d-018f-482d-b7b2-fcce0b43093c</source>
+      <term>4d7212ee-6ae8-4358-afe9-f2e7a648c01b</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>f1ca4925-aa1a-46bf-83c1-d33aa833fdff</id>
+      <mnemonic>FUL</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Full Gospel</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>35584c29-552c-4a03-b392-a00717c52d13</source>
+      <term>f1ca4925-aa1a-46bf-83c1-d33aa833fdff</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>defce89e-60d0-4c39-9134-94f59b6a0e68</id>
+      <mnemonic>FWB</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Free Will Baptist</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>044f9c20-c1ca-4bc9-8343-2a57ef9fcf00</source>
+      <term>defce89e-60d0-4c39-9134-94f59b6a0e68</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>48e8b478-c4b4-42fd-ac0c-b7dfb7fa3839</id>
+      <mnemonic>GRE</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Greek Orthodox</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>b9933282-88f5-4747-8a73-ad51faa3a3f1</source>
+      <term>48e8b478-c4b4-42fd-ac0c-b7dfb7fa3839</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>27da32eb-111f-43fb-bfa3-585b0e0c397d</id>
+      <mnemonic>HIN</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Hindu</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>10c939f4-692b-4e55-a1d0-c170cbc082df</source>
+      <term>27da32eb-111f-43fb-bfa3-585b0e0c397d</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>40670d66-f027-4895-b07f-6b044cd02e7d</id>
+      <mnemonic>HOT</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Hindu: Other</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>75571a53-8724-4ace-a3b0-479ebd8a9a1d</source>
+      <term>40670d66-f027-4895-b07f-6b044cd02e7d</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>2d38314d-7e97-4b2c-8597-b13c21a10de9</id>
+      <mnemonic>HSH</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Hindu: Shaivites</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>05a95293-cadd-4aaa-a5cf-ad895fdabbd1</source>
+      <term>2d38314d-7e97-4b2c-8597-b13c21a10de9</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>8c8faf99-1584-4d4f-890e-ffa69f1ff7cd</id>
+      <mnemonic>HVA</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Hindu: Vaishnavites</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>13e38a53-0b7c-4979-bbaf-655c62507f76</source>
+      <term>8c8faf99-1584-4d4f-890e-ffa69f1ff7cd</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>ea64672d-a561-4edd-9883-f95e87ab9fa3</id>
+      <mnemonic>JAI</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Jain</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>044b5ab9-2e55-472d-bc35-5fd89b70dcc4</source>
+      <term>ea64672d-a561-4edd-9883-f95e87ab9fa3</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>5eae9626-25e8-4a96-b3cd-885820b389c5</id>
+      <mnemonic>JCO</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Jewish: Conservative</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>fdef34b6-96d4-426f-b453-77b196feb894</source>
+      <term>5eae9626-25e8-4a96-b3cd-885820b389c5</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>08c4bf2c-5dd9-4960-8c7b-09be2499a04e</id>
+      <mnemonic>JEW</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Jewish</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>a640cc95-c426-41db-addd-445b723ef100</source>
+      <term>08c4bf2c-5dd9-4960-8c7b-09be2499a04e</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>8d731c3c-2365-4c02-ab7c-c200a9484ff6</id>
+      <mnemonic>JOR</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Jewish: Orthodox</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>67f20e39-894b-4d5a-b86b-7396b5d2c2c4</source>
+      <term>8d731c3c-2365-4c02-ab7c-c200a9484ff6</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>0ecf83ef-61c8-4104-8ff3-e78cb7b0aa01</id>
+      <mnemonic>JOT</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Jewish: Other</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>69d1a1b6-8b01-4597-a63e-8e113b24b1e3</source>
+      <term>0ecf83ef-61c8-4104-8ff3-e78cb7b0aa01</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>40ee4608-3368-4eb0-8933-aacebd3dfe16</id>
+      <mnemonic>JRC</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Jewish: Reconstructionist</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>8ca5ef79-fb9b-4b22-9837-4dfa8d462765</source>
+      <term>40ee4608-3368-4eb0-8933-aacebd3dfe16</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>5dbe17cd-6543-434a-9a50-e043f6a19652</id>
+      <mnemonic>JRF</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Jewish: Reform</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>f5cc41c3-7b61-41af-8e35-323e0572f925</source>
+      <term>5dbe17cd-6543-434a-9a50-e043f6a19652</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>f6795f04-2776-49dd-848c-60b804baba73</id>
+      <mnemonic>JRN</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Jewish: Renewal</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>d9df2119-0662-410c-973a-dddf3a16cca6</source>
+      <term>f6795f04-2776-49dd-848c-60b804baba73</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>23a86de0-5249-4bb4-bffe-771a5648f24b</id>
+      <mnemonic>JWN</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Jehovah's Witness</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>77a73de2-556e-4c09-92e8-9b6bb1520772</source>
+      <term>23a86de0-5249-4bb4-bffe-771a5648f24b</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>9f558f38-9eda-4dca-b282-4791a0534d91</id>
+      <mnemonic>LMS</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Lutheran Missouri Synod</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>11cfb9d8-6ffb-4ac9-82c5-0154f98b4cec</source>
+      <term>9f558f38-9eda-4dca-b282-4791a0534d91</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>d0d9307d-3d47-427e-aa1c-7064d10d5118</id>
+      <mnemonic>LUT</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Lutheran</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>a4d2ff00-0458-45fc-8df4-3a8325ef53e4</source>
+      <term>d0d9307d-3d47-427e-aa1c-7064d10d5118</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>ed6b3f7e-98ea-4be1-983f-7db797db405d</id>
+      <mnemonic>MEN</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Mennonite</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>08fc7b53-11e6-4290-8b96-e1aad44adfeb</source>
+      <term>ed6b3f7e-98ea-4be1-983f-7db797db405d</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>e3680983-cd51-4fcc-88be-b5f3c1a54b93</id>
+      <mnemonic>MET</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Methodist</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>663b1e37-9794-4e6d-b88b-85833de49a7c</source>
+      <term>e3680983-cd51-4fcc-88be-b5f3c1a54b93</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>f57f0442-aaae-4c39-a741-8486bac2c4c5</id>
+      <mnemonic>MOM</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Latter-day Saints</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>9b02c365-0a2d-4252-8a8c-67f6be3dbc93</source>
+      <term>f57f0442-aaae-4c39-a741-8486bac2c4c5</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>7055512c-97bb-4579-8f5a-bc01bf1e30f5</id>
+      <mnemonic>MOS</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Muslim</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>572bde23-b7ac-42ac-91f9-414b739c2e22</source>
+      <term>7055512c-97bb-4579-8f5a-bc01bf1e30f5</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>0bac768c-48c4-471b-9e22-f84304e5b699</id>
+      <mnemonic>MOT</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Muslim: Other</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>8cf43589-6dbb-4212-a540-58d8a5111ce4</source>
+      <term>0bac768c-48c4-471b-9e22-f84304e5b699</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>2da39951-8b30-4dc9-92ce-68a4f4ae9e07</id>
+      <mnemonic>MSH</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Muslim: Shiite</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>38ec0b5e-f054-4914-93d0-a7229bd29053</source>
+      <term>2da39951-8b30-4dc9-92ce-68a4f4ae9e07</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>a84fb2e8-a464-44ca-9289-8bdaa2e40432</id>
+      <mnemonic>MSU</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Muslim: Sunni</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>8aee85ad-53f2-41b2-b07d-b7b862c185d6</source>
+      <term>a84fb2e8-a464-44ca-9289-8bdaa2e40432</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>6e8473e9-a65f-4601-b6f0-a8665b891709</id>
+      <mnemonic>NAM</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Native American</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>0961a1ad-0780-4b36-80ce-c303479bd0a3</source>
+      <term>6e8473e9-a65f-4601-b6f0-a8665b891709</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>2e10864b-1959-4092-b521-66aad49ab252</id>
+      <mnemonic>NAZ</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Church of the Nazarene</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>a1b9289b-5e48-4ee3-8419-197c7f26db13</source>
+      <term>2e10864b-1959-4092-b521-66aad49ab252</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>b5f55064-6af9-419b-8152-9f9a4337e2c8</id>
+      <mnemonic>NOE</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Nonreligious</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>e4987458-227f-4bb0-866b-f32ce382f558</source>
+      <term>b5f55064-6af9-419b-8152-9f9a4337e2c8</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>f77f4fc8-0f0b-4638-951a-9fe131791a94</id>
+      <mnemonic>NRL</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>New Religionist</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>193a334f-b76e-46f6-816b-31ecc47f03a2</source>
+      <term>f77f4fc8-0f0b-4638-951a-9fe131791a94</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>4a631ba0-b159-47d5-9a89-407b9abad6df</id>
+      <mnemonic>ORT</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Orthodox</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>e75c6fd5-4e40-492d-bee4-d7625648aa8a</source>
+      <term>4a631ba0-b159-47d5-9a89-407b9abad6df</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>0df25d97-c8ff-4484-a842-60fbbfc1e87a</id>
+      <mnemonic>OTH</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Other</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>640274e3-75d8-4606-b98e-000a94288034</source>
+      <term>0df25d97-c8ff-4484-a842-60fbbfc1e87a</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>e0c74390-5a5c-4964-90b4-ea6d871fe197</id>
+      <mnemonic>PEN</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Pentecostal</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>ddc0e974-78f7-4d67-9092-ef5daba064aa</source>
+      <term>e0c74390-5a5c-4964-90b4-ea6d871fe197</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>b01d0e1d-cc90-4ce4-a1c2-38c0d6709b16</id>
+      <mnemonic>PRC</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Other Protestant</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>4c970628-98bb-4a59-aab3-2543b07151ee</source>
+      <term>b01d0e1d-cc90-4ce4-a1c2-38c0d6709b16</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>2fad7488-6252-42c6-9e2c-359f2f7d3c8e</id>
+      <mnemonic>PRE</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Presbyterian</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>a6b2c296-022b-4001-aff6-a0f1e2dcb74e</source>
+      <term>2fad7488-6252-42c6-9e2c-359f2f7d3c8e</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>2cdb8022-b03c-4c16-8c56-a2f8408e391a</id>
+      <mnemonic>PRO</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Protestant</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>f3768ce2-bea3-4c02-899f-d29d672cf6d0</source>
+      <term>2cdb8022-b03c-4c16-8c56-a2f8408e391a</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>03ffb180-34a9-4768-9497-4759fe34be10</id>
+      <mnemonic>QUA</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Friends</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>cae0bf0d-018f-482d-b7b2-fcce0b43093c</source>
+      <term>03ffb180-34a9-4768-9497-4759fe34be10</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>a0bee9a5-c36f-4a30-8f0b-21a87ae2c88f</id>
+      <mnemonic>REC</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Reformed Church</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>0710c2b7-fc54-41a5-9f3f-37866f3196fd</source>
+      <term>a0bee9a5-c36f-4a30-8f0b-21a87ae2c88f</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>204a11be-8068-482f-90d7-e558e1885900</id>
+      <mnemonic>REO</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Reorganized Church of Jesus Christ-LDS</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>9922a48d-a92f-48a5-ae13-eeb330ecd34c</source>
+      <term>204a11be-8068-482f-90d7-e558e1885900</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>dbab8b46-c796-4fb9-9e9f-604a5ce2918b</id>
+      <mnemonic>SAA</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Salvation Army</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>b649f446-d430-4883-aa67-14f20a3ea170</source>
+      <term>dbab8b46-c796-4fb9-9e9f-604a5ce2918b</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>1dd19442-1e87-4499-965b-a72f105f7c28</id>
+      <mnemonic>SEV</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Seventh Day Adventist</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>8720fb7b-0325-48e6-824a-f628e184012f</source>
+      <term>1dd19442-1e87-4499-965b-a72f105f7c28</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>39fc14f5-6928-4e8f-b650-ea9fe256aa3c</id>
+      <mnemonic>SHN</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Shintoist</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>59589336-c06f-40b8-bf0f-711d62a8d154</source>
+      <term>39fc14f5-6928-4e8f-b650-ea9fe256aa3c</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>1b5ce3ff-3328-44af-9f3b-b3a0bc880bf5</id>
+      <mnemonic>SIK</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Sikh</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>392c0de7-9dce-4e50-bb0c-9fe60360994e</source>
+      <term>1b5ce3ff-3328-44af-9f3b-b3a0bc880bf5</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>f91a04b2-f3e9-4e64-babe-6f60884f18de</id>
+      <mnemonic>SOU</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Southern Baptist</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>dbee8058-0b6f-4641-b3cf-37cb41970dd8</source>
+      <term>f91a04b2-f3e9-4e64-babe-6f60884f18de</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>e3d420f2-778f-43e5-9c09-53905341b8ec</id>
+      <mnemonic>SPI</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Spiritist</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>5d0c7708-714b-4368-9e60-3779ff125eea</source>
+      <term>e3d420f2-778f-43e5-9c09-53905341b8ec</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>6c7ca5fd-d875-4276-b4dd-44564ebee9bd</id>
+      <mnemonic>UCC</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: United Church of Christ</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>dd3ca520-c99c-43e0-846c-73325c25ee13</source>
+      <term>6c7ca5fd-d875-4276-b4dd-44564ebee9bd</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>f8f05f91-23ac-49aa-88c6-c4c6d6c3ef7f</id>
+      <mnemonic>UMD</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: United Methodist</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>8d06804d-0638-435c-8efe-e721be919078</source>
+      <term>f8f05f91-23ac-49aa-88c6-c4c6d6c3ef7f</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>5d4bde46-2e86-4019-a53f-d176a2d7bce9</id>
+      <mnemonic>UNI</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Unitarian</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>7db19768-4917-4987-986f-bf8e14b9aa56</source>
+      <term>5d4bde46-2e86-4019-a53f-d176a2d7bce9</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>94c06022-4cce-41cc-92d0-307e4d1b4bb6</id>
+      <mnemonic>UNU</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Unitarian Universalist</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>ee16ac82-1b1b-478a-8617-19bbfd9fbab1</source>
+      <term>94c06022-4cce-41cc-92d0-307e4d1b4bb6</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>56e837b4-43bc-4159-9783-b48f604ce90c</id>
+      <mnemonic>VAR</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Unknown</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>b2f9b62c-a4a1-4841-89b7-88a284f55bf8</source>
+      <term>56e837b4-43bc-4159-9783-b48f604ce90c</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>3f3cf4f4-1bc3-4af3-ba67-d302b7c4fed1</id>
+      <mnemonic>WES</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Wesleyan</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>f30f1461-7631-4297-8977-e7c48c72f665</source>
+      <term>3f3cf4f4-1bc3-4af3-ba67-d302b7c4fed1</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>3a7b9796-963a-4d47-9ab1-157743d8cbe1</id>
+      <mnemonic>WMC</mnemonic>
+      <codeSystem>7ccd4a76-e54f-403e-b8fd-be5d6fec480d</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Christian: Wesleyan Methodist</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>601e4bed-1dcc-4b5b-aaed-cd2be33c024d</source>
+      <term>3a7b9796-963a-4d47-9ab1-157743d8cbe1</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+</dataset>
