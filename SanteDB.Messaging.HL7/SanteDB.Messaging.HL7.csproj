@@ -61,6 +61,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <None Include="Data\009-HL7Ethnicity.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\009-HL7v2Religions.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
