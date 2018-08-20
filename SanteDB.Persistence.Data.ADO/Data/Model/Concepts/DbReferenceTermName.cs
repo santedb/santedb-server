@@ -49,7 +49,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Concepts
 	    /// <summary>
 	    /// Created by 
 	    /// </summary>
-	    [Column("crt_usr_id"), ForeignKey(typeof(DbSecurityUser), nameof(DbSecurityUser.Key))]
+	    [Column("crt_prov_id"), ForeignKey(typeof(DbSecurityProvenance), nameof(DbSecurityProvenance.Key))]
 	    public Guid CreatedByKey { get; set; }
 
 	    /// <summary>
@@ -61,7 +61,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Concepts
 	    /// <summary>
 	    /// Obsoleted by 
 	    /// </summary>
-	    [Column("obslt_usr_id"), ForeignKey(typeof(DbSecurityUser), nameof(DbSecurityUser.Key))]
+	    [Column("obslt_prov_id"), ForeignKey(typeof(DbSecurityProvenance), nameof(DbSecurityProvenance.Key))]
 	    public Guid? ObsoletedByKey { get; set; }
 
 	    /// <summary>

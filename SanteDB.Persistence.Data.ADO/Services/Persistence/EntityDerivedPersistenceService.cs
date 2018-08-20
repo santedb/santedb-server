@@ -54,9 +54,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// From model instance
         /// </summary>
-        public override object FromModelInstance(TModel modelInstance, DataContext context, IPrincipal princpal)
+        public override object FromModelInstance(TModel modelInstance, DataContext context)
         {
-            var retVal = base.FromModelInstance(modelInstance, context, princpal);
+            var retVal = base.FromModelInstance(modelInstance, context);
             (retVal as DbEntitySubTable).ParentKey = modelInstance.VersionKey.Value;
             return retVal;
         }
@@ -64,43 +64,43 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Entity model instance
         /// </summary>
-        public override sealed TModel ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+        public override sealed TModel ToModelInstance(object dataInstance, DataContext context)
         {
-            return (TModel)this.m_entityPersister.ToModelInstance(dataInstance, context, principal);
+            return (TModel)this.m_entityPersister.ToModelInstance(dataInstance, context);
         }
 
         /// <summary>
         /// Conversion based on type
         /// </summary>
-        protected override TModel CacheConvert(object o, DataContext context, IPrincipal principal)
+        protected override TModel CacheConvert(object o, DataContext context)
         {
-            return (TModel)this.m_entityPersister.DoCacheConvert(o, context, principal);
+            return (TModel)this.m_entityPersister.DoCacheConvert(o, context);
         }
 
         /// <summary>
         /// Insert the specified TModel into the database
         /// </summary>
-        public override TModel InsertInternal(DataContext context, TModel data, IPrincipal principal)
+        public override TModel InsertInternal(DataContext context, TModel data)
         {
             if (typeof(TModel).BaseType == typeof(Core.Model.Entities.Entity))
             {
-                var inserted = this.m_entityPersister.InsertCoreProperties(context, data, principal);
+                var inserted = this.m_entityPersister.InsertCoreProperties(context, data);
                 data.Key = inserted.Key;
                 data.VersionKey = inserted.VersionKey;
             }
-            return base.InsertInternal(context, data, principal);
+            return base.InsertInternal(context, data);
 
         }
 
         /// <summary>
         /// Update the specified TModel
         /// </summary>
-        public override TModel UpdateInternal(DataContext context, TModel data, IPrincipal principal)
+        public override TModel UpdateInternal(DataContext context, TModel data)
         {
             if (typeof(TModel).BaseType == typeof(Core.Model.Entities.Entity))
-                this.m_entityPersister.UpdateCoreProperties(context, data, principal);
-            return base.InsertInternal(context, data, principal);
-            //return base.Update(context, data, principal);
+                this.m_entityPersister.UpdateCoreProperties(context, data);
+            return base.InsertInternal(context, data);
+            //return base.Update(context, data);
         }
 
 
@@ -131,11 +131,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Obsolete the object
         /// </summary>
-        public override TModel ObsoleteInternal(DataContext context, TModel data, IPrincipal principal)
+        public override TModel ObsoleteInternal(DataContext context, TModel data)
         {
             if (typeof(TModel).BaseType == typeof(Core.Model.Entities.Entity))
-                this.m_entityPersister.ObsoleteInternal(context, data, principal);
-            return base.InsertInternal(context, data, principal);
+                this.m_entityPersister.ObsoleteInternal(context, data);
+            return base.InsertInternal(context, data);
         }
 
     }

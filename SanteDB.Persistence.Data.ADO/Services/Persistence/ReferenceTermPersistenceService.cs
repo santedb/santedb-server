@@ -40,13 +40,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <param name="data">Data.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the inserted reference term.</returns>
-		public override ReferenceTerm InsertInternal(DataContext context, ReferenceTerm data, IPrincipal principal)
+		public override ReferenceTerm InsertInternal(DataContext context, ReferenceTerm data)
 		{
-			var referenceTerm = base.InsertInternal(context, data, principal);
+			var referenceTerm = base.InsertInternal(context, data);
 
 			if (referenceTerm.DisplayNames != null)
 			{
-				base.UpdateAssociatedItems<ReferenceTermName, DbReferenceTermName>(referenceTerm.DisplayNames, data, context, principal);
+				base.UpdateAssociatedItems<ReferenceTermName, DbReferenceTermName>(referenceTerm.DisplayNames, data, context);
 			}
 
 			return referenceTerm;
@@ -59,13 +59,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <param name="data">Data.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the updated reference term.</returns>
-		public override ReferenceTerm UpdateInternal(DataContext context, ReferenceTerm data, IPrincipal principal)
+		public override ReferenceTerm UpdateInternal(DataContext context, ReferenceTerm data)
 		{
-			var referenceTerm = base.UpdateInternal(context, data, principal);
+			var referenceTerm = base.UpdateInternal(context, data);
 
 			if (referenceTerm.DisplayNames != null)
 			{
-				base.UpdateAssociatedItems<ReferenceTermName, DbReferenceTermName>(referenceTerm.DisplayNames, data, context, principal);
+				base.UpdateAssociatedItems<ReferenceTermName, DbReferenceTermName>(referenceTerm.DisplayNames, data, context);
 			}
 
 			return referenceTerm;

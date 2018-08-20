@@ -51,7 +51,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Model
 		/// <param name="report">The report instance.</param>
 		public ReportDefinition(Core.Model.RISI.ReportDefinition report) : this(report.Key.Value)
 		{
-			this.Author = report.CreatedBy.UserName;
+			this.Author = report.CreatedBy.User?.UserName;
 			this.CorrelationId = report.CorrelationId;
 			this.Description = report.Description;
 			this.Name = report.Name;

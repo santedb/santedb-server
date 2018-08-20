@@ -41,10 +41,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Convert assigning authority to model
         /// </summary>
-        public override Core.Model.DataTypes.AssigningAuthority ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+        public override Core.Model.DataTypes.AssigningAuthority ToModelInstance(object dataInstance, DataContext context)
         {
             var dataAA = dataInstance as DbAssigningAuthority;
-            var retVal = base.ToModelInstance(dataInstance, context, principal);
+            var retVal = base.ToModelInstance(dataInstance, context);
             if(retVal != null)
                 retVal.AuthorityScopeXml = context.Query<DbAuthorityScope>(o => o.AssigningAuthorityKey == retVal.Key.Value).Select(o=>o.ScopeConceptKey).ToList();
             
@@ -54,9 +54,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the specified data
         /// </summary>
-        public override Core.Model.DataTypes.AssigningAuthority InsertInternal(DataContext context, Core.Model.DataTypes.AssigningAuthority data, IPrincipal principal)
+        public override Core.Model.DataTypes.AssigningAuthority InsertInternal(DataContext context, Core.Model.DataTypes.AssigningAuthority data)
         {
-            var retVal = base.InsertInternal(context, data, principal);
+            var retVal = base.InsertInternal(context, data);
 
             // Scopes?
             if (data.AuthorityScopeXml != null)
@@ -74,9 +74,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Update the specified data
         /// </summary>
-        public override Core.Model.DataTypes.AssigningAuthority UpdateInternal(DataContext context, Core.Model.DataTypes.AssigningAuthority data, IPrincipal principal)
+        public override Core.Model.DataTypes.AssigningAuthority UpdateInternal(DataContext context, Core.Model.DataTypes.AssigningAuthority data)
         {
-            var retVal = base.UpdateInternal(context, data, principal);
+            var retVal = base.UpdateInternal(context, data);
 
             // Scopes?
             if (data.AuthorityScopeXml != null)

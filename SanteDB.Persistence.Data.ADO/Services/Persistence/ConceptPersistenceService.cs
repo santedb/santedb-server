@@ -45,7 +45,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// To morel instance
         /// </summary>
-        public override Core.Model.DataTypes.Concept ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+        public override Core.Model.DataTypes.Concept ToModelInstance(object dataInstance, DataContext context)
         {
             var dbConceptVersion = (dataInstance as CompositeResult)?.Values.OfType<DbConceptVersion>().FirstOrDefault() ?? dataInstance as DbConceptVersion;
             var retVal = m_mapper.MapDomainInstance<DbConceptVersion, Concept>(dbConceptVersion);
@@ -61,7 +61,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             if (context.LoadState == Core.Model.LoadState.FullLoad)
             {
-                retVal.LoadAssociations(context, principal);
+                retVal.LoadAssociations(context);
                 retVal.LoadState = Core.Model.LoadState.FullLoad;
             }
             else
@@ -75,19 +75,19 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert concept 
         /// </summary>
-        public override Core.Model.DataTypes.Concept InsertInternal(DataContext context, Core.Model.DataTypes.Concept data, IPrincipal principal)
+        public override Core.Model.DataTypes.Concept InsertInternal(DataContext context, Core.Model.DataTypes.Concept data)
         {
             data.StatusConceptKey = data.StatusConceptKey ?? StatusKeys.Active;
             data.ClassKey = data.ClassKey ?? ConceptClassKeys.Other;
 
             // Ensure exists
-            if(data.Class != null) data.Class = data.Class?.EnsureExists(context, principal) as ConceptClass;
-            if(data.StatusConcept != null) data.StatusConcept = data.StatusConcept?.EnsureExists(context, principal) as Concept;
+            if(data.Class != null) data.Class = data.Class?.EnsureExists(context) as ConceptClass;
+            if(data.StatusConcept != null) data.StatusConcept = data.StatusConcept?.EnsureExists(context) as Concept;
             data.ClassKey = data.Class?.Key ?? data.ClassKey;
             data.StatusConceptKey = data.StatusConcept?.Key ?? data.StatusConceptKey;
 
             // Persist
-            var retVal = base.InsertInternal(context, data, principal);
+            var retVal = base.InsertInternal(context, data);
 
             // Concept sets xml
             if (data.ConceptSetsXml != null)
@@ -106,16 +106,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.ConceptName, DbConceptName>(
                    data.ConceptNames,
                     data,
-                    context,
-                    principal
+                    context
                 );
 
             if (data.ReferenceTerms != null)
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.ConceptReferenceTerm, DbConceptReferenceTerm>(
                     data.ReferenceTerms,
                      data,
-                     context,
-                     principal
+                     context
                  );
 
             return retVal;
@@ -124,30 +122,28 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Override update to handle associated items
         /// </summary>
-        public override Core.Model.DataTypes.Concept UpdateInternal(DataContext context, Core.Model.DataTypes.Concept data, IPrincipal principal)
+        public override Core.Model.DataTypes.Concept UpdateInternal(DataContext context, Core.Model.DataTypes.Concept data)
         {
-            if (data.Class != null) data.Class = data.Class?.EnsureExists(context, principal) as ConceptClass;
-            if (data.StatusConcept != null) data.StatusConcept = data.StatusConcept?.EnsureExists(context, principal) as Concept;
+            if (data.Class != null) data.Class = data.Class?.EnsureExists(context) as ConceptClass;
+            if (data.StatusConcept != null) data.StatusConcept = data.StatusConcept?.EnsureExists(context) as Concept;
             data.ClassKey = data.Class?.Key ?? data.ClassKey;
             data.StatusConceptKey = data.StatusConcept?.Key ?? data.StatusConceptKey;
 
-            var retVal = base.UpdateInternal(context, data, principal);
+            var retVal = base.UpdateInternal(context, data);
 
             var sourceKey = data.Key.Value.ToByteArray();
             if (data.ConceptNames != null)
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.ConceptName, DbConceptName>(
                     data.ConceptNames,
                      data,
-                     context,
-                     principal
+                     context
                  );
 
             if (retVal.ReferenceTerms != null)
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.ConceptReferenceTerm, DbConceptReferenceTerm>(
                     data.ReferenceTerms,
                      data,
-                     context,
-                     principal
+                     context
                  );
 
             // Concept sets 
@@ -160,7 +156,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 var newConcepts = data.ConceptSetsXml.Where(o => !existingConceptSets.Contains(o));
                 foreach (var i in newConcepts)
                 {
-                    //i.EnsureExists(context, principal);
+                    //i.EnsureExists(context);
                     context.Insert(new DbConceptSetConceptAssociation() { ConceptKey = retVal.Key.Value, ConceptSetKey = i });
                 }
 
@@ -175,10 +171,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Obsolete the object
         /// </summary>
-        public override Core.Model.DataTypes.Concept ObsoleteInternal(DataContext context, Core.Model.DataTypes.Concept data, IPrincipal principal)
+        public override Core.Model.DataTypes.Concept ObsoleteInternal(DataContext context, Core.Model.DataTypes.Concept data)
         {
             data.StatusConceptKey = StatusKeys.Obsolete;
-            return base.UpdateInternal(context, data, principal);
+            return base.UpdateInternal(context, data);
         }
 
     }
@@ -191,9 +187,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Concept name service
         /// </summary>
-        public override object FromModelInstance(Core.Model.DataTypes.ConceptName modelInstance, DataContext context, IPrincipal princpal)
+        public override object FromModelInstance(Core.Model.DataTypes.ConceptName modelInstance, DataContext context)
         {
-            var retVal = base.FromModelInstance(modelInstance, context, princpal) as DbConceptName;
+            var retVal = base.FromModelInstance(modelInstance, context) as DbConceptName;
             var phoneticCoder = ApplicationContext.Current.GetService<IPhoneticAlgorithmHandler>();
             retVal.PhoneticAlgorithmKey = phoneticCoder?.AlgorithmId ?? PhoneticAlgorithmKeys.None;
             retVal.PhoneticCode = phoneticCoder?.GenerateCode(modelInstance.Name);
@@ -208,10 +204,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <param name="versionSequenceId"></param>
         /// <param name="principal"></param>
         /// <returns></returns>
-        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId, IPrincipal principal)
+        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId)
         {
             int tr = 0;
-            return this.QueryInternal(context, this.BuildSourceQuery<ConceptName>(id, versionSequenceId), Guid.Empty, 0, null, out tr, principal, false).ToList();
+            return this.QueryInternal(context, this.BuildSourceQuery<ConceptName>(id, versionSequenceId), Guid.Empty, 0, null, out tr, false).ToList();
         }
     }
 }

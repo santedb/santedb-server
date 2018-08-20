@@ -40,7 +40,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Convert to model
         /// </summary>
-        public override EntityIdentifier ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+        public override EntityIdentifier ToModelInstance(object dataInstance, DataContext context)
         {
             var identifier = (dataInstance as CompositeResult)?.Values.OfType<DbEntityIdentifier>().FirstOrDefault() ?? dataInstance as DbEntityIdentifier;
             var authority = (dataInstance as CompositeResult)?.Values.OfType<DbAssigningAuthority>().FirstOrDefault();
@@ -61,30 +61,30 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Get from source
         /// </summary>
-        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId, IPrincipal principal)
+        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId)
         {
             int tr = 0;
-            return this.QueryInternal(context, base.BuildSourceQuery<EntityIdentifier>(id, versionSequenceId), Guid.Empty, 0, null, out tr, principal, false).ToList();
+            return this.QueryInternal(context, base.BuildSourceQuery<EntityIdentifier>(id, versionSequenceId), Guid.Empty, 0, null, out tr, false).ToList();
         }
 
         /// <summary>
         /// Insert the entity identifier
         /// </summary>
-        public override EntityIdentifier InsertInternal(DataContext context, EntityIdentifier data, IPrincipal principal)
+        public override EntityIdentifier InsertInternal(DataContext context, EntityIdentifier data)
         {
-            if (data.Authority != null) data.Authority = data.Authority.EnsureExists(context, principal) as AssigningAuthority;
+            if (data.Authority != null) data.Authority = data.Authority.EnsureExists(context) as AssigningAuthority;
             data.AuthorityKey = data.Authority?.Key ?? data.AuthorityKey;
-            return base.InsertInternal(context, data, principal);
+            return base.InsertInternal(context, data);
         }
 
         /// <summary>
         /// Update the data
         /// </summary>
-        public override EntityIdentifier UpdateInternal(DataContext context, EntityIdentifier data, IPrincipal principal)
+        public override EntityIdentifier UpdateInternal(DataContext context, EntityIdentifier data)
         {
-            if (data.Authority != null) data.Authority = data.Authority.EnsureExists(context, principal) as AssigningAuthority;
+            if (data.Authority != null) data.Authority = data.Authority.EnsureExists(context) as AssigningAuthority;
             data.AuthorityKey = data.Authority?.Key ?? data.AuthorityKey;
-            return base.UpdateInternal(context, data, principal);
+            return base.UpdateInternal(context, data);
         }
 
     }

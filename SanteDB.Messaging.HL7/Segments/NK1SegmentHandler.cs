@@ -181,7 +181,10 @@ namespace SanteDB.Messaging.HL7.Segments
             patient.Relationships.RemoveAll(o => o.SourceEntityKey == retValRelation.SourceEntityKey && o.TargetEntityKey == retValRelation.TargetEntityKey);
             patient.Relationships.Add(retValRelation);
 
-            return new IdentifiedData[] { retVal };
+            if (!context.Contains(retVal))
+                return new IdentifiedData[] { retVal };
+            else
+                return new IdentifiedData[0];
         }
     }
 }

@@ -43,9 +43,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Model instance
         /// </summary>
-        public Core.Model.Roles.Provider ToModelInstance(DbProvider providerInstance, DbPerson personInstance, DbEntityVersion entityVersionInstance, DbEntity entityInstance, DataContext context, IPrincipal principal)
+        public Core.Model.Roles.Provider ToModelInstance(DbProvider providerInstance, DbPerson personInstance, DbEntityVersion entityVersionInstance, DbEntity entityInstance, DataContext context)
         {
-            var retVal = m_entityPersister.ToModelInstance<Core.Model.Roles.Provider>(entityVersionInstance, entityInstance, context, principal);
+            var retVal = m_entityPersister.ToModelInstance<Core.Model.Roles.Provider>(entityVersionInstance, entityInstance, context);
             if (retVal == null) return null;
 
             retVal.DateOfBirth = personInstance?.DateOfBirth;
@@ -68,34 +68,34 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the specified person into the database
         /// </summary>
-        public override Core.Model.Roles.Provider InsertInternal(DataContext context, Core.Model.Roles.Provider data, IPrincipal principal)
+        public override Core.Model.Roles.Provider InsertInternal(DataContext context, Core.Model.Roles.Provider data)
         {
-            if(data.ProviderSpecialty != null) data.ProviderSpecialty = data.ProviderSpecialty?.EnsureExists(context, principal) as Concept;
+            if(data.ProviderSpecialty != null) data.ProviderSpecialty = data.ProviderSpecialty?.EnsureExists(context) as Concept;
             data.ProviderSpecialtyKey = data.ProviderSpecialty?.Key ?? data.ProviderSpecialtyKey;
 
-            var inserted = this.m_personPersister.InsertInternal(context, data, principal);
-            return base.InsertInternal(context, data, principal);
+            var inserted = this.m_personPersister.InsertInternal(context, data);
+            return base.InsertInternal(context, data);
         }
 
         /// <summary>
         /// Update the specified person
         /// </summary>
-        public override Core.Model.Roles.Provider UpdateInternal(DataContext context, Core.Model.Roles.Provider data, IPrincipal principal)
+        public override Core.Model.Roles.Provider UpdateInternal(DataContext context, Core.Model.Roles.Provider data)
         {
             // Ensure exists
-            if (data.ProviderSpecialty != null) data.ProviderSpecialty = data.ProviderSpecialty?.EnsureExists(context, principal) as Concept;
+            if (data.ProviderSpecialty != null) data.ProviderSpecialty = data.ProviderSpecialty?.EnsureExists(context) as Concept;
             data.ProviderSpecialtyKey = data.ProviderSpecialty?.Key ?? data.ProviderSpecialtyKey;
 
-            this.m_personPersister.UpdateInternal(context, data, principal);
-            return base.UpdateInternal(context, data, principal);
+            this.m_personPersister.UpdateInternal(context, data);
+            return base.UpdateInternal(context, data);
         }
 
         /// <summary>
         /// Obsolete the object
         /// </summary>
-        public override Core.Model.Roles.Provider ObsoleteInternal(DataContext context, Core.Model.Roles.Provider data, IPrincipal principal)
+        public override Core.Model.Roles.Provider ObsoleteInternal(DataContext context, Core.Model.Roles.Provider data)
         {
-            var retVal = this.m_personPersister.ObsoleteInternal(context, data, principal);
+            var retVal = this.m_personPersister.ObsoleteInternal(context, data);
             return data;
         }
 

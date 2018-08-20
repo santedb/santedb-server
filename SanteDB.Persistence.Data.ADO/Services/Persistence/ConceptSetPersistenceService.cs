@@ -41,11 +41,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <param name="context">The model data context.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the converted <see cref="Core.Model.DataTypes.ConceptSet"/> instance.</returns>
-        public override Core.Model.DataTypes.ConceptSet ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+        public override Core.Model.DataTypes.ConceptSet ToModelInstance(object dataInstance, DataContext context)
         {
 	        var conceptSet = dataInstance as DbConceptSet;
 
-	        var retVal = base.ToModelInstance(dataInstance, context, principal);
+	        var retVal = base.ToModelInstance(dataInstance, context);
 
             if (retVal != null)
             {
@@ -62,15 +62,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Inser the specified concept set
         /// </summary>
-        public override Core.Model.DataTypes.ConceptSet InsertInternal(DataContext context, Core.Model.DataTypes.ConceptSet data, IPrincipal principal)
+        public override Core.Model.DataTypes.ConceptSet InsertInternal(DataContext context, Core.Model.DataTypes.ConceptSet data)
         {
-            var retVal = base.InsertInternal(context, data, principal);
+            var retVal = base.InsertInternal(context, data);
 
             // Concept sets 
             if (data.ConceptsXml != null)
                 foreach (var i in data.ConceptsXml)
                 {
-                    //i.EnsureExists(context, principal);
+                    //i.EnsureExists(context);
                     context.Insert(new DbConceptSetConceptAssociation() { ConceptKey = i, ConceptSetKey = retVal.Key.Value });
                 }
             return retVal;
@@ -79,9 +79,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Update the specified conceptset
         /// </summary>
-        public override Core.Model.DataTypes.ConceptSet UpdateInternal(DataContext context, Core.Model.DataTypes.ConceptSet data, IPrincipal principal)
+        public override Core.Model.DataTypes.ConceptSet UpdateInternal(DataContext context, Core.Model.DataTypes.ConceptSet data)
         {
-            var retVal = base.UpdateInternal(context, data, principal);
+            var retVal = base.UpdateInternal(context, data);
 
             // Concept sets 
             if (data.ConceptsXml != null)

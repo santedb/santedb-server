@@ -36,10 +36,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Convert to model instance
         /// </summary>
-        public Core.Model.Acts.ControlAct ToModelInstance(DbControlAct controlAct, DbActVersion actVersionInstance, DbAct actInstance, DataContext context, IPrincipal principal)
+        public Core.Model.Acts.ControlAct ToModelInstance(DbControlAct controlAct, DbActVersion actVersionInstance, DbAct actInstance, DataContext context)
         {
             // TODO: Any other cact fields
-            return m_actPersister.ToModelInstance<Core.Model.Acts.ControlAct>(actVersionInstance, actInstance, context, principal);
+            return m_actPersister.ToModelInstance<Core.Model.Acts.ControlAct>(actVersionInstance, actInstance, context);
         }
     }
 }

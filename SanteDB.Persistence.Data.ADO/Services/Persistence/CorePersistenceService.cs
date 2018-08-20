@@ -65,11 +65,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         /// <returns>The model instance.</returns>
         /// <param name="dataInstance">Data instance.</param>
-        public override TModel ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+        public override TModel ToModelInstance(object dataInstance, DataContext context)
         {
             var dInstance = (dataInstance as CompositeResult)?.Values.OfType<TDomain>().FirstOrDefault() ?? dataInstance as TDomain;
             var retVal = m_mapper.MapDomainInstance<TDomain, TModel>(dInstance);
-            retVal.LoadAssociations(context, principal);
+            retVal.LoadAssociations(context);
             this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "Model instance {0} created", dataInstance);
 
             return retVal;
@@ -80,15 +80,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// </summary>
 		/// <param name="context">Context.</param>
 		/// <param name="data">Data.</param>
-		public override TModel InsertInternal(DataContext context, TModel data, IPrincipal principal)
+		public override TModel InsertInternal(DataContext context, TModel data)
         {
-            var domainObject = this.FromModelInstance(data, context, principal) as TDomain;
+            var domainObject = this.FromModelInstance(data, context) as TDomain;
 
             domainObject = context.Insert<TDomain>(domainObject);
 
             if (domainObject is IDbIdentified)
                 data.Key = (domainObject as IDbIdentified)?.Key;
-            //data.CopyObjectData(this.ToModelInstance(domainObject, context, principal));
+            //data.CopyObjectData(this.ToModelInstance(domainObject, context));
             //data.Key = domainObject.Key
             return data;
         }
@@ -98,14 +98,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="data">Data.</param>
-        public override TModel UpdateInternal(DataContext context, TModel data, IPrincipal principal)
+        public override TModel UpdateInternal(DataContext context, TModel data)
         {
             // Sanity 
             if (data.Key == Guid.Empty)
                 throw new AdoFormalConstraintException(AdoFormalConstraintType.NonIdentityUpdate);
 
             // Map and copy
-            var newDomainObject = this.FromModelInstance(data, context, principal) as TDomain;
+            var newDomainObject = this.FromModelInstance(data, context) as TDomain;
             context.Update<TDomain>(newDomainObject);
             return data;
         }
@@ -115,12 +115,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="data">Data.</param>
-        public override TModel ObsoleteInternal(DataContext context, TModel data, IPrincipal principal)
+        public override TModel ObsoleteInternal(DataContext context, TModel data)
         {
             if (data.Key == Guid.Empty)
                 throw new AdoFormalConstraintException(AdoFormalConstraintType.NonIdentityUpdate);
 
-            context.Delete<TDomain>((TDomain)this.FromModelInstance(data, context, principal));
+            context.Delete<TDomain>((TDomain)this.FromModelInstance(data, context));
 
             return data;
         }
@@ -128,10 +128,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Performs the actual query
         /// </summary>
-        public override IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, IPrincipal principal, bool countResults = true)
+        public override IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = true)
         {
             int resultCount = 0;
-            var results = this.QueryInternal(context, query, queryId, offset, count, out resultCount, countResults).ToList();
+            var results = this.DoQueryInternal(context, query, queryId, offset, count, out resultCount, countResults).ToList();
             totalResults = resultCount;
 
             if (!AdoPersistenceService.GetConfiguration().SingleThreadFetch)
@@ -145,9 +145,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         if (newSubContext) subContext = subContext.OpenClonedContext();
 
                         if (o is Guid)
-                            return this.Get(subContext, (Guid)o, principal);
+                            return this.Get(subContext, (Guid)o);
                         else
-                            return this.CacheConvert(o, subContext, principal);
+                            return this.CacheConvert(o, subContext);
                     }
                     catch (Exception e)
                     {
@@ -164,16 +164,16 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 return results.Select(o =>
                 {
                     if (o is Guid)
-                        return this.Get(context, (Guid)o, principal);
+                        return this.Get(context, (Guid)o);
                     else
-                        return this.CacheConvert(o, context, principal);
+                        return this.CacheConvert(o, context);
                 });
         }
 
         /// <summary>
         /// Perform the query 
         /// </summary>
-        protected virtual IEnumerable<Object> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool incudeCount = true)
+        protected virtual IEnumerable<Object> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool incudeCount = true)
         {
 #if DEBUG
             Stopwatch sw = new Stopwatch();
@@ -360,7 +360,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Tru to load from cache
         /// </summary>
-        protected virtual TModel CacheConvert(Object o, DataContext context, IPrincipal principal)
+        protected virtual TModel CacheConvert(Object o, DataContext context)
         {
             if (o == null) return null;
 
@@ -369,7 +369,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var idData = (o as CompositeResult)?.Values.OfType<IDbIdentified>().FirstOrDefault() ?? o as IDbIdentified;
             var objData = (o as CompositeResult)?.Values.OfType<IDbBaseData>().FirstOrDefault() ?? o as IDbBaseData;
             if (objData?.ObsoletionTime != null || idData == null || idData.Key == Guid.Empty)
-                return this.ToModelInstance(o, context, principal);
+                return this.ToModelInstance(o, context);
             else
             {
                 var cacheItem = cacheService?.GetCacheItem<TModel>(idData?.Key ?? Guid.Empty);
@@ -377,14 +377,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 {
                     if (cacheItem.LoadState < context.LoadState)
                     {
-                        cacheItem.LoadAssociations(context, principal);
+                        cacheItem.LoadAssociations(context);
                         cacheService?.Add(cacheItem);
                     }
                     return cacheItem;
                 }
                 else
                 {
-                    cacheItem = this.ToModelInstance(o, context, principal);
+                    cacheItem = this.ToModelInstance(o, context);
                     if (context.Transaction == null)
                         cacheService?.Add(cacheItem);
                 }
@@ -398,7 +398,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <returns>The model instance.</returns>
         /// <param name="modelInstance">Model instance.</param>
         /// <param name="context">Context.</param>
-        public override object FromModelInstance(TModel modelInstance, DataContext context, IPrincipal princpal)
+        public override object FromModelInstance(TModel modelInstance, DataContext context)
         {
             return m_mapper.MapModelInstance<TModel, TDomain>(modelInstance);
         }
@@ -406,7 +406,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Update associated items
         /// </summary>
-        protected virtual void UpdateAssociatedItems<TAssociation, TDomainAssociation>(IEnumerable<TAssociation> storage, TModel source, DataContext context, IPrincipal principal)
+        protected virtual void UpdateAssociatedItems<TAssociation, TDomainAssociation>(IEnumerable<TAssociation> storage, TModel source, DataContext context)
             where TAssociation : IdentifiedData, ISimpleAssociation, new()
             where TDomainAssociation : DbAssociation, new()
         {
@@ -432,12 +432,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Update those that need it
             var updateRecords = storage.Where(o => existing.Any(ecn => ecn.Key == o.Key && o.Key != Guid.Empty));
             foreach (var upd in updateRecords)
-                persistenceService.UpdateInternal(context, upd, principal);
+                persistenceService.UpdateInternal(context, upd);
 
             // Insert those that do not exist
             var insertRecords = storage.Where(o => !existing.Any(ecn => ecn.Key == o.Key));
             foreach (var ins in insertRecords)
-                persistenceService.InsertInternal(context, ins, principal);
+                persistenceService.InsertInternal(context, ins);
 
         }
 

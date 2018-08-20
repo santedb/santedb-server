@@ -366,7 +366,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
 		/// <param name="context">The context.</param>
 		private static void UpdateCache(DbSecurityUser user, DataContext context)
 	    {
-		    var securityUser = new SanteDB.Persistence.Data.ADO.Services.Persistence.SecurityUserPersistenceService().ToModelInstance(user, context, AuthenticationContext.SystemPrincipal);
+		    var securityUser = new SanteDB.Persistence.Data.ADO.Services.Persistence.SecurityUserPersistenceService().ToModelInstance(user, context);
 		    ApplicationContext.Current.GetService<IDataCachingService>()?.Add(securityUser);
 		}
     }

@@ -63,7 +63,7 @@ namespace SanteDB.Messaging.HL7.Segments
             Patient retVal = new Patient() { Key = Guid.NewGuid() };
             Person motherEntity = null;
 
-            retVal.CreationActKey = context.OfType<ControlAct>().FirstOrDefault()?.Key;
+            retVal.CreationAct = context.OfType<ControlAct>().FirstOrDefault();
 
             // Existing patient?
             foreach (var id in pidSegment.GetPatientIdentifierList())
@@ -209,13 +209,13 @@ namespace SanteDB.Messaging.HL7.Segments
             // Last update time
             if (!pidSegment.LastUpdateDateTime.IsEmpty())
                 retVal.CreationTime = (DateTimeOffset)pidSegment.LastUpdateDateTime.ToModel();
-            if(!pidSegment.LastUpdateFacility.IsEmpty())
-            {
-                // Find by user ID
-                var user = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityUser>>().Query(u=>u.UserName == pidSegment.LastUpdateFacility.NamespaceID.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                if (user != null)
-                    retVal.CreatedBy = user;
-            }
+            //if(!pidSegment.LastUpdateFacility.IsEmpty())
+            //{
+            //    // Find by user ID
+            //    var user = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityUser>>().Query(u=>u.UserName == pidSegment.LastUpdateFacility.NamespaceID.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault();
+            //    if (user != null)
+            //        retVal.CreatedBy = user;
+            //}
 
             if (motherEntity == null)
                 return new IdentifiedData[] { retVal };

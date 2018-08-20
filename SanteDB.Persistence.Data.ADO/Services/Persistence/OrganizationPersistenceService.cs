@@ -41,9 +41,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Model instance
         /// </summary>
-        public Core.Model.Entities.Organization ToModelInstance(DbOrganization orgInstance, DbEntityVersion dbEntityVersion, DbEntity dbEntity, DataContext context, IPrincipal principal)
+        public Core.Model.Entities.Organization ToModelInstance(DbOrganization orgInstance, DbEntityVersion dbEntityVersion, DbEntity dbEntity, DataContext context)
         {
-            var retVal = m_entityPersister.ToModelInstance<Core.Model.Entities.Organization>(dbEntityVersion, dbEntity, context, principal);
+            var retVal = m_entityPersister.ToModelInstance<Core.Model.Entities.Organization>(dbEntityVersion, dbEntity, context);
             if (retVal == null) return null;
             retVal.IndustryConceptKey = orgInstance?.IndustryConceptKey;
             return retVal;
@@ -52,23 +52,23 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the organization
         /// </summary>
-        public override Core.Model.Entities.Organization InsertInternal(DataContext context, Core.Model.Entities.Organization data, IPrincipal principal)
+        public override Core.Model.Entities.Organization InsertInternal(DataContext context, Core.Model.Entities.Organization data)
         {
             // ensure industry concept exists
-            if(data.IndustryConcept != null) data.IndustryConcept = data.IndustryConcept?.EnsureExists(context, principal) as Concept;
+            if(data.IndustryConcept != null) data.IndustryConcept = data.IndustryConcept?.EnsureExists(context) as Concept;
             data.IndustryConceptKey = data.IndustryConcept?.Key ?? data.IndustryConceptKey;
 
-            return base.InsertInternal(context, data, principal);
+            return base.InsertInternal(context, data);
         }
 
         /// <summary>
         /// Update the organization
         /// </summary>
-        public override Core.Model.Entities.Organization UpdateInternal(DataContext context, Core.Model.Entities.Organization data, IPrincipal principal)
+        public override Core.Model.Entities.Organization UpdateInternal(DataContext context, Core.Model.Entities.Organization data)
         {
-            if (data.IndustryConcept != null) data.IndustryConcept = data.IndustryConcept?.EnsureExists(context, principal) as Concept;
+            if (data.IndustryConcept != null) data.IndustryConcept = data.IndustryConcept?.EnsureExists(context) as Concept;
             data.IndustryConceptKey = data.IndustryConcept?.Key ?? data.IndustryConceptKey;
-            return base.UpdateInternal(context, data, principal);
+            return base.UpdateInternal(context, data);
         }
 
     }

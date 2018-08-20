@@ -44,9 +44,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// From model instance
         /// </summary>
-        public override object FromModelInstance(Patient modelInstance, DataContext context, IPrincipal principal)
+        public override object FromModelInstance(Patient modelInstance, DataContext context)
         {
-            var dbPatient = base.FromModelInstance(modelInstance, context, principal) as DbPatient;
+            var dbPatient = base.FromModelInstance(modelInstance, context) as DbPatient;
 
             if (modelInstance.DeceasedDatePrecision.HasValue)
                 dbPatient.DeceasedDatePrecision = PersonPersistenceService.PrecisionMap[modelInstance.DeceasedDatePrecision.Value];
@@ -56,9 +56,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Model instance
         /// </summary>
-        public Core.Model.Roles.Patient ToModelInstance(DbPatient patientInstance, DbPerson personInstance, DbEntityVersion entityVersionInstance, DbEntity entityInstance, DataContext context, IPrincipal principal)
+        public Core.Model.Roles.Patient ToModelInstance(DbPatient patientInstance, DbPerson personInstance, DbEntityVersion entityVersionInstance, DbEntity entityInstance, DataContext context)
         {
-            var retVal = this.m_entityPersister.ToModelInstance<Core.Model.Roles.Patient>(entityVersionInstance, entityInstance, context, principal);
+            var retVal = this.m_entityPersister.ToModelInstance<Core.Model.Roles.Patient>(entityVersionInstance, entityInstance, context);
             if (retVal == null) return null;
 
             retVal.DeceasedDate = patientInstance.DeceasedDate;
@@ -82,33 +82,33 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the specified person into the database
         /// </summary>
-        public override Core.Model.Roles.Patient InsertInternal(DataContext context, Core.Model.Roles.Patient data, IPrincipal principal)
+        public override Core.Model.Roles.Patient InsertInternal(DataContext context, Core.Model.Roles.Patient data)
         {
-            if (data.GenderConcept != null) data.GenderConcept = data.GenderConcept?.EnsureExists(context, principal) as Concept;
+            if (data.GenderConcept != null) data.GenderConcept = data.GenderConcept?.EnsureExists(context) as Concept;
             data.GenderConceptKey = data.GenderConcept?.Key ?? data.GenderConceptKey;
-            this.m_personPersister.InsertInternal(context, data, principal);
-            return base.InsertInternal(context, data, principal);
+            this.m_personPersister.InsertInternal(context, data);
+            return base.InsertInternal(context, data);
         }
 
         /// <summary>
         /// Update the specified person
         /// </summary>
-        public override Core.Model.Roles.Patient UpdateInternal(DataContext context, Core.Model.Roles.Patient data, IPrincipal principal)
+        public override Core.Model.Roles.Patient UpdateInternal(DataContext context, Core.Model.Roles.Patient data)
         {
             // Ensure exists
-            if (data.GenderConcept != null) data.GenderConcept = data.GenderConcept?.EnsureExists(context, principal) as Concept;
+            if (data.GenderConcept != null) data.GenderConcept = data.GenderConcept?.EnsureExists(context) as Concept;
             data.GenderConceptKey = data.GenderConcept?.Key ?? data.GenderConceptKey;
 
-            this.m_personPersister.UpdateInternal(context, data, principal);
-            return base.UpdateInternal(context, data, principal);
+            this.m_personPersister.UpdateInternal(context, data);
+            return base.UpdateInternal(context, data);
         }
 
         /// <summary>
         /// Obsolete the object
         /// </summary>
-        public override Core.Model.Roles.Patient ObsoleteInternal(DataContext context, Core.Model.Roles.Patient data, IPrincipal principal)
+        public override Core.Model.Roles.Patient ObsoleteInternal(DataContext context, Core.Model.Roles.Patient data)
         {
-            this.m_personPersister.ObsoleteInternal(context, data, principal);
+            this.m_personPersister.ObsoleteInternal(context, data);
             return data;
         }
 

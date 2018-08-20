@@ -224,6 +224,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     using (var tx = dataContext.BeginTransaction())
                         try
                         {
+                            
                             var user = dataContext.SingleOrDefault<DbSecurityUser>(u => u.UserName.ToLower() == userName.ToLower() && !u.ObsoletionTime.HasValue);
                             if (user == null)
                                 throw new InvalidOperationException(String.Format("Cannot locate user {0}", userName));
@@ -240,7 +241,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                             user.Password = passwordHashingService.EncodePassword(newPassword);
                             user.SecurityHash = Guid.NewGuid().ToString();
-                            user.UpdatedByKey = principal.GetUserKey(dataContext);
+                            user.UpdatedByKey = dataContext.EstablishProvenance(principal); 
 
                             dataContext.Update(user);
                             tx.Commit();
@@ -300,6 +301,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     using (var tx = dataContext.BeginTransaction())
                         try
                         {
+                            
                             var hashingService = ApplicationContext.Current.GetService<IPasswordHashingService>();
                             var pdpService = ApplicationContext.Current.GetService<IPolicyDecisionService>();
 
@@ -315,7 +317,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 UserClass = UserClassKeys.HumanUser
                             };
                             if (authContext != null)
-                                newIdentityUser.CreatedByKey = authContext.GetUserKey(dataContext).Value;
+                                newIdentityUser.CreatedByKey = dataContext.EstablishProvenance(authContext);
 
                             dataContext.Insert(newIdentityUser);
                             var retVal = AdoClaimsIdentity.Create(newIdentityUser);
@@ -353,7 +355,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 using (var dataContext = this.m_configuration.Provider.GetWriteConnection())
                 {
                     dataContext.Open();
-
                     new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.UnrestrictedAdministration, authContext).Demand();
 
                     var user = dataContext.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLower() == userName.ToLower());
@@ -362,7 +363,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     // Obsolete
                     user.ObsoletionTime = DateTimeOffset.Now;
-                    user.ObsoletedByKey = authContext.GetUserKey(dataContext);
+                    user.ObsoletedByKey = dataContext.EstablishProvenance(authContext);
                     user.SecurityHash = Guid.NewGuid().ToString();
 
                     dataContext.Update(user);
@@ -406,13 +407,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     user.ObsoletionTime = null;
                     user.ObsoletedByKey = null;
-                    user.UpdatedByKey = authContext.GetUserKey(dataContext);
+                    user.UpdatedByKey = dataContext.EstablishProvenance(authContext);
                     user.UpdatedTime = DateTimeOffset.Now;
                     user.SecurityHash = Guid.NewGuid().ToString();
 
                     var updatedUser = dataContext.Update(user);
 
-	                var securityUser = new SecurityUserPersistenceService().ToModelInstance(updatedUser, dataContext, authContext);
+	                var securityUser = new SecurityUserPersistenceService().ToModelInstance(updatedUser, dataContext);
 					ApplicationContext.Current.GetService<IDataCachingService>()?.Add(securityUser);
                 }
 
@@ -521,12 +522,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     context.Open();
                     var sessionId = new Guid(session.Id.Take(16).ToArray());
 
-                    var sql = context.CreateSqlStatement<DbSession>().SelectFrom(typeof(DbSession), typeof(DbSecurityApplication), typeof(DbSecurityUser))
+                    var sql = context.CreateSqlStatement<DbSession>().SelectFrom(typeof(DbSession), typeof(DbSecurityApplication), typeof(DbSecurityUser), typeof(DbSecurityDevice))
                         .InnerJoin<DbSecurityApplication>(o => o.ApplicationKey, o => o.Key)
                         .Join<DbSession, DbSecurityUser>("LEFT", o => o.UserKey, o => o.Key)
+                        .Join<DbSession, DbSecurityDevice>("LEFT", o=>o.DeviceKey, o=>o.Key)
                         .Where<DbSession>(s => s.Key == sessionId && s.NotAfter > DateTimeOffset.Now);
 
-                    var auth = context.FirstOrDefault<CompositeResult<DbSession, DbSecurityApplication, DbSecurityUser>>(sql);
+                    var auth = context.FirstOrDefault<CompositeResult<DbSession, DbSecurityApplication, DbSecurityUser, DbSecurityDevice>>(sql);
 
                     var principal = auth.Object1.UserKey == Guid.Empty ?
                         new ApplicationPrincipal(new SanteDB.Core.Security.ApplicationIdentity(auth.Object2.Key, auth.Object2.PublicId, true))

@@ -80,7 +80,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             // Update
             Assert.IsNotNull(userAfterUpdate.UpdatedTime);
             Assert.IsNotNull(userAfterUpdate.PhoneNumber);
-            Assert.AreEqual(authContext.Identity.Name, userAfterUpdate.UpdatedBy.UserName);
+            Assert.AreEqual(authContext.Identity.Name, userAfterUpdate.UpdatedBy.User.UserName);
         }
 
         /// <summary>

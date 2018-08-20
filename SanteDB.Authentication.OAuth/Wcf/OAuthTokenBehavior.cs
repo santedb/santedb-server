@@ -115,7 +115,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
             // Password grant needs well formed scope which defaults to * or all permissions
             if (tokenRequest["scope"] == null)
                 tokenRequest.Add("scope", "*");
-            
+
             // Client principal
             IPrincipal clientPrincipal = ClaimsPrincipal.Current;
             // Client is not present so look in body
@@ -130,7 +130,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                 {
                     clientPrincipal = ApplicationContext.Current.GetService<IApplicationIdentityProviderService>().Authenticate(client_identity, client_secret);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_traceSource.TraceError("Error authenticating client: {0}", e.Message);
                     return this.CreateErrorCondition(OAuthErrorType.unauthorized_client, e.Message);
@@ -138,19 +138,37 @@ namespace SanteDB.Authentication.OAuth2.Wcf
             }
             else if (!clientPrincipal.Identity.IsAuthenticated)
                 return this.CreateErrorCondition(OAuthErrorType.unauthorized_client, "Unauthorized Client");
-            
+
+            // Device principal?
+            IPrincipal devicePrincipal = null;
+            var authHead = ((HttpRequestMessageProperty)incomingMessage.Properties[HttpRequestMessageProperty.Name]).Headers["X-Device-Authorization"];
+
+            if (OperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets != null)
+            {
+                var claimSet = OperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets.OfType<System.IdentityModel.Claims.X509CertificateClaimSet>().FirstOrDefault();
+                if (claimSet != null) // device authenticated with X509 PKI Cert
+                    devicePrincipal = ApplicationContext.Current.GetSerivce<IDeviceIdentityProviderService>().Authenticate(claimSet.X509Certificate);
+            }
+            if (devicePrincipal == null && !String.IsNullOrEmpty(authHead)) // Device is authenticated using basic auth
+            {
+                var authParts = Encoding.UTF8.GetString(Convert.FromBase64String(authHead)).Split(':');
+                devicePrincipal = ApplicationContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(authParts[0], authParts[1]);
+            }
+
             // Validate username and password
             try
             {
                 IPrincipal principal = null;
 
                 // perform auth
-                switch(tokenRequest["grant_type"])
+                switch (tokenRequest["grant_type"])
                 {
                     case OAuthConstants.GrantNameClientCredentials:
-                        principal = clientPrincipal;
+                        if (devicePrincipal == null)
+                            throw new SecurityException("client_credentials grant requires device authentication either using X509 or X-Device-Authorization");
+                        principal = devicePrincipal;
                         // Demand "Login As Service" permission
-                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService, clientPrincipal).Demand();
+                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService, devicePrincipal).Demand();
                         break;
                     case OAuthConstants.GrantNamePassword:
 
@@ -175,13 +193,13 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                     default:
                         throw new InvalidOperationException("Invalid grant type");
                 }
-                
+
                 if (principal == null)
                     return this.CreateErrorCondition(OAuthErrorType.invalid_grant, "Invalid username or password");
                 else
                 {
                     var clams = this.ValidateClaims(principal);
-                    return this.EstablishSession(principal, clientPrincipal, tokenRequest["scope"], this.ValidateClaims(principal));
+                    return this.EstablishSession(principal, clientPrincipal, devicePrincipal, tokenRequest["scope"], this.ValidateClaims(principal));
                 }
             }
             catch (AuthenticationException e)
@@ -236,17 +254,23 @@ namespace SanteDB.Authentication.OAuth2.Wcf
         /// <summary>
         /// Create a token response
         /// </summary>
-        private Stream EstablishSession(IPrincipal oizPrincipal, IPrincipal clientPrincipal, String scope, IEnumerable<Claim> additionalClaims)
+        private Stream EstablishSession(IPrincipal oizPrincipal, IPrincipal clientPrincipal, IPrincipal devicePrincipal, String scope, IEnumerable<Claim> additionalClaims)
         {
 
             this.m_traceSource.TraceInformation("Will create new ClaimsPrincipal based on existing principal");
+
+            var claimsPrincipal = oizPrincipal as ClaimsPrincipal;
+            if (clientPrincipal is ClaimsPrincipal && clientPrincipal.Identity != claimsPrincipal.Identity)
+                claimsPrincipal.AddIdentity(clientPrincipal.Identity as ClaimsIdentity);
+            if (devicePrincipal is ClaimsPrincipal && devicePrincipal.Identity != claimsPrincipal.Identity)
+                claimsPrincipal.AddIdentity(devicePrincipal.Identity as ClaimsIdentity);
 
             IRoleProviderService roleProvider = ApplicationContext.Current.GetService<IRoleProviderService>();
             IPolicyInformationService pip = ApplicationContext.Current.GetService<IPolicyInformationService>();
             ISessionProviderService isp = ApplicationContext.Current.GetService<ISessionProviderService>();
 
             // TODO: Add configuration for expiry
-            DateTime issued = DateTime.Parse((oizPrincipal as ClaimsPrincipal)?.FindFirst(ClaimTypes.AuthenticationInstant)?.Value ?? DateTime.Now.ToString("o")),
+            DateTime issued = DateTime.Parse((claimsPrincipal)?.FindFirst(ClaimTypes.AuthenticationInstant)?.Value ?? DateTime.Now.ToString("o")),
                 expires = DateTime.Now.Add(this.m_configuration.ValidityTime);
 
             // System claims
@@ -266,20 +290,17 @@ namespace SanteDB.Authentication.OAuth2.Wcf
             var oizPrincipalPolicies = pip.GetActivePolicies(oizPrincipal);
 
             // Add grant if not exists
-            if ((oizPrincipal as ClaimsPrincipal)?.FindFirst(ClaimTypes.Actor)?.Value == UserClassKeys.HumanUser.ToString())
+            if ((claimsPrincipal)?.FindFirst(ClaimTypes.Actor)?.Value == UserClassKeys.HumanUser.ToString())
             {
                 claims.AddRange(new Claim[]
                     {
                     //new Claim(ClaimTypes.AuthenticationInstant, issued.ToString("o")), 
                     new Claim(ClaimTypes.AuthenticationMethod, "OAuth2"),
-                    new Claim(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim,
-                    (clientPrincipal as ClaimsPrincipal).FindFirst(ClaimTypes.Sid).Value)
+                    new Claim(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim, (clientPrincipal as ClaimsPrincipal)?.FindFirst(ClaimTypes.Sid)?.Value),
+                    new Claim(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim, (devicePrincipal as ClaimsPrincipal)?.FindFirst(ClaimTypes.Sid)?.Value)
                     });
-
-                if ((oizPrincipal as ClaimsPrincipal)?.HasClaim(o => o.Type == SanteDBClaimTypes.SanteDBGrantedPolicyClaim) == true)
-                    claims.AddRange((oizPrincipal as ClaimsPrincipal).FindAll(SanteDBClaimTypes.SanteDBGrantedPolicyClaim));
-                else
-                    claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyDecisionOutcomeType.Grant).Select(o => new Claim(SanteDBClaimTypes.SanteDBGrantedPolicyClaim, o.Policy.Oid)));
+                
+                claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyDecisionOutcomeType.Grant).Select(o => new Claim(SanteDBClaimTypes.SanteDBGrantedPolicyClaim, o.Policy.Oid)));
 
                 // Is the user elevated? If so, add claims for those policies in scope
                 if (claims.Exists(o => o.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim))
@@ -294,25 +315,25 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                 claims.Add(new Claim(SanteDBClaimTypes.SanteDBScopeClaim, String.Join(";", claims.Where(o => o.Type == SanteDBClaimTypes.SanteDBGrantedPolicyClaim).Select(o => o.Value).ToArray())));
 
                 // Add Email address from idp
-                claims.AddRange((oizPrincipal as ClaimsPrincipal).Claims.Where(o => o.Type == ClaimTypes.Email));
-                var tel = (oizPrincipal as ClaimsPrincipal).Claims.FirstOrDefault(o => o.Type == ClaimTypes.MobilePhone)?.Value;
+                claims.AddRange(claimsPrincipal.Claims.Where(o => o.Type == ClaimTypes.Email));
+                var tel = claimsPrincipal.Claims.FirstOrDefault(o => o.Type == ClaimTypes.MobilePhone)?.Value;
                 if (!String.IsNullOrEmpty(tel))
                     claims.Add(new Claim("tel", tel));
             }
-            else if (!(oizPrincipal is ApplicationPrincipal))
+            else if (oizPrincipal is DevicePrincipal)
             {
                 claims.AddRange(new Claim[]
                    {
                     //new Claim(ClaimTypes.AuthenticationInstant, issued.ToString("o")), 
                     new Claim(ClaimTypes.AuthenticationMethod, "OAuth2"),
-                    new Claim(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim,
-                    (clientPrincipal as ClaimsPrincipal).FindFirst(ClaimTypes.Sid).Value)
+                    new Claim(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim, (clientPrincipal as ClaimsPrincipal).FindFirst(ClaimTypes.Sid).Value),
+                    new Claim(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim, (devicePrincipal as ClaimsPrincipal)?.FindFirst(ClaimTypes.Sid)?.Value)
                    });
             }
 
             // Name identifier
-            claims.AddRange((oizPrincipal as ClaimsPrincipal).Claims.Where(o => o.Type == ClaimTypes.NameIdentifier));
-            
+            claims.AddRange((claimsPrincipal).Claims.Where(o => o.Type == ClaimTypes.NameIdentifier));
+
             // Find the nameid
             var nameId = claims.Find(o => o.Type == ClaimTypes.NameIdentifier);
             if (nameId != null)
@@ -322,13 +343,17 @@ namespace SanteDB.Authentication.OAuth2.Wcf
             }
 
             // Find the session identifier
-            String aud = 
+            String aud =
                 WebOperationContext.Current.IncomingRequest.Headers["X-Forwarded-For"] ??
                 ((RemoteEndpointMessageProperty)OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name]).Address;
-            var session = isp.Establish(new ClaimsPrincipal(new ClaimsIdentity(oizPrincipal.Identity, claims)), expires, aud);
 
-            string refreshToken = null, sessionId = null; 
-            if(session != null)
+            claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
+
+            // Establish the session
+            var session = isp.Establish(new ClaimsPrincipal(claimsPrincipal.Identities), expires, aud);
+
+            string refreshToken = null, sessionId = null;
+            if (session != null)
             {
                 sessionId = BitConverter.ToString(session.Id).Replace("-", "");
                 claims.Add(new Claim("jti", sessionId));

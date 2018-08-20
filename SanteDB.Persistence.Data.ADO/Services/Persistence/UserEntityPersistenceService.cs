@@ -44,10 +44,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// To model instance
         /// </summary>
-        public Core.Model.Entities.UserEntity ToModelInstance(DbUserEntity userEntityInstance, DbPerson personInstance, DbEntityVersion entityVersionInstance, DbEntity entityInstance, DataContext context, IPrincipal principal)
+        public Core.Model.Entities.UserEntity ToModelInstance(DbUserEntity userEntityInstance, DbPerson personInstance, DbEntityVersion entityVersionInstance, DbEntity entityInstance, DataContext context)
         {
 
-            var retVal = this.m_entityPersister.ToModelInstance<UserEntity>(entityVersionInstance, entityInstance, context, principal);
+            var retVal = this.m_entityPersister.ToModelInstance<UserEntity>(entityVersionInstance, entityInstance, context);
             if (retVal == null) return null;
 
             // Copy from person 
@@ -71,32 +71,32 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Inserts the user entity
         /// </summary>
-        public override Core.Model.Entities.UserEntity InsertInternal(DataContext context, Core.Model.Entities.UserEntity data, IPrincipal principal)
+        public override Core.Model.Entities.UserEntity InsertInternal(DataContext context, Core.Model.Entities.UserEntity data)
         {
-            if(data.SecurityUser != null) data.SecurityUser = data.SecurityUser?.EnsureExists(context, principal) as SecurityUser;
+            if(data.SecurityUser != null) data.SecurityUser = data.SecurityUser?.EnsureExists(context) as SecurityUser;
             data.SecurityUserKey = data.SecurityUser?.Key ?? data.SecurityUserKey;
-            var inserted = this.m_personPersister.InsertInternal(context, data, principal);
+            var inserted = this.m_personPersister.InsertInternal(context, data);
 
-            return base.InsertInternal(context, data, principal);
+            return base.InsertInternal(context, data);
         }
 
         /// <summary>
         /// Update the specified user entity
         /// </summary>
-        public override Core.Model.Entities.UserEntity UpdateInternal(DataContext context, Core.Model.Entities.UserEntity data, IPrincipal principal)
+        public override Core.Model.Entities.UserEntity UpdateInternal(DataContext context, Core.Model.Entities.UserEntity data)
         {
-            if (data.SecurityUser != null) data.SecurityUser = data.SecurityUser?.EnsureExists(context, principal) as SecurityUser;
+            if (data.SecurityUser != null) data.SecurityUser = data.SecurityUser?.EnsureExists(context) as SecurityUser;
             data.SecurityUserKey = data.SecurityUser?.Key ?? data.SecurityUserKey;
-            this.m_personPersister.UpdateInternal(context, data, principal);
-            return base.UpdateInternal(context, data, principal);
+            this.m_personPersister.UpdateInternal(context, data);
+            return base.UpdateInternal(context, data);
         }
 
         /// <summary>
         /// Obsolete the specified user instance
         /// </summary>
-        public override Core.Model.Entities.UserEntity ObsoleteInternal(DataContext context, Core.Model.Entities.UserEntity data, IPrincipal principal)
+        public override Core.Model.Entities.UserEntity ObsoleteInternal(DataContext context, Core.Model.Entities.UserEntity data)
         {
-            var retVal = this.m_personPersister.ObsoleteInternal(context, data, principal);
+            var retVal = this.m_personPersister.ObsoleteInternal(context, data);
             return data;
         }
     }

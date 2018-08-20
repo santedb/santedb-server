@@ -46,9 +46,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <param name="context">Context.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>The model instance.</returns>
-		public override object FromModelInstance(ReferenceTermName modelInstance, DataContext context, IPrincipal principal)
+		public override object FromModelInstance(ReferenceTermName modelInstance, DataContext context)
 		{
-			var domainInstance = base.FromModelInstance(modelInstance, context, principal) as DbReferenceTermName;
+			var domainInstance = base.FromModelInstance(modelInstance, context) as DbReferenceTermName;
 
 			var phoneticCoder = ApplicationContext.Current.GetService<IPhoneticAlgorithmHandler>();
 
@@ -65,7 +65,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <param name="data">Data.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the inserted reference term name.</returns>
-		public override ReferenceTermName InsertInternal(DataContext context, ReferenceTermName data, IPrincipal principal)
+		public override ReferenceTermName InsertInternal(DataContext context, ReferenceTermName data)
 		{
 			// set the key if we don't have one
 			if (!data.Key.HasValue || data.Key == Guid.Empty)
@@ -75,7 +75,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 			if (data.CreationTime == default(DateTimeOffset))
 				data.CreationTime = DateTimeOffset.Now;
 
-			return base.InsertInternal(context, data, principal);
+			return base.InsertInternal(context, data);
 		}
 	}
 }

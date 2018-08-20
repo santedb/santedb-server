@@ -42,17 +42,17 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Get relationships from source
         /// </summary>
-        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId, IPrincipal principal)
+        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId)
         {
             int tr = 0;
-            return this.QueryInternal(context, base.BuildSourceQuery<EntityRelationship>(id, versionSequenceId), Guid.Empty, 0, null, out tr, principal, false).ToList();
+            return this.QueryInternal(context, base.BuildSourceQuery<EntityRelationship>(id, versionSequenceId), Guid.Empty, 0, null, out tr, false).ToList();
 
         }
 
         /// <summary>
         /// Represents as a model instance
         /// </summary>
-        public override EntityRelationship ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+        public override EntityRelationship ToModelInstance(object dataInstance, DataContext context)
         {
             if (dataInstance == null) return null;
 
@@ -75,26 +75,26 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the relationship
         /// </summary>
-        public override EntityRelationship InsertInternal(DataContext context, EntityRelationship data, IPrincipal principal)
+        public override EntityRelationship InsertInternal(DataContext context, EntityRelationship data)
         {
             
             // Ensure we haven't already persisted this
-            if(data.TargetEntity != null && !data.InversionIndicator) data.TargetEntity = data.TargetEntity.EnsureExists(context, principal) as Entity;
+            if(data.TargetEntity != null && !data.InversionIndicator) data.TargetEntity = data.TargetEntity.EnsureExists(context) as Entity;
             data.TargetEntityKey = data.TargetEntity?.Key ?? data.TargetEntityKey;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
             
-            return base.InsertInternal(context, data, principal);
+            return base.InsertInternal(context, data);
         }
 
         /// <summary>
         /// Update the specified object
         /// </summary>
-        public override EntityRelationship UpdateInternal(DataContext context, EntityRelationship data, IPrincipal principal)
+        public override EntityRelationship UpdateInternal(DataContext context, EntityRelationship data)
         {
             // Ensure we haven't already persisted this
             data.TargetEntityKey = data.TargetEntity?.Key ?? data.TargetEntityKey;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
-            return base.UpdateInternal(context, data, principal);
+            return base.UpdateInternal(context, data);
         }
 
         /// <summary>

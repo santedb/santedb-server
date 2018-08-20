@@ -39,9 +39,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Convert database instance to patient encounter
         /// </summary>
-        public Core.Model.Acts.PatientEncounter ToModelInstance(DbPatientEncounter dbEnc, DbActVersion actVersionInstance, DbAct actInstance, DataContext context, IPrincipal principal)
+        public Core.Model.Acts.PatientEncounter ToModelInstance(DbPatientEncounter dbEnc, DbActVersion actVersionInstance, DbAct actInstance, DataContext context)
         {
-            var retVal = m_actPersister.ToModelInstance<Core.Model.Acts.PatientEncounter>(actVersionInstance, actInstance, context, principal);
+            var retVal = m_actPersister.ToModelInstance<Core.Model.Acts.PatientEncounter>(actVersionInstance, actInstance, context);
             if (retVal == null) return null;
             else if (dbEnc == null)
             {
@@ -57,21 +57,21 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the patient encounter
         /// </summary>
-        public override Core.Model.Acts.PatientEncounter InsertInternal(DataContext context, Core.Model.Acts.PatientEncounter data, IPrincipal principal)
+        public override Core.Model.Acts.PatientEncounter InsertInternal(DataContext context, Core.Model.Acts.PatientEncounter data)
         {
-            if(data.DischargeDisposition != null) data.DischargeDisposition = data.DischargeDisposition?.EnsureExists(context, principal) as Concept;
+            if(data.DischargeDisposition != null) data.DischargeDisposition = data.DischargeDisposition?.EnsureExists(context) as Concept;
             data.DischargeDispositionKey = data.DischargeDisposition?.Key ?? data.DischargeDispositionKey;
-            return base.InsertInternal(context, data, principal);
+            return base.InsertInternal(context, data);
         }
 
         /// <summary>
         /// Updates the specified data
         /// </summary>
-        public override Core.Model.Acts.PatientEncounter UpdateInternal(DataContext context, Core.Model.Acts.PatientEncounter data, IPrincipal principal)
+        public override Core.Model.Acts.PatientEncounter UpdateInternal(DataContext context, Core.Model.Acts.PatientEncounter data)
         {
-            if (data.DischargeDisposition != null) data.DischargeDisposition = data.DischargeDisposition?.EnsureExists(context, principal) as Concept;
+            if (data.DischargeDisposition != null) data.DischargeDisposition = data.DischargeDisposition?.EnsureExists(context) as Concept;
             data.DischargeDispositionKey = data.DischargeDisposition?.Key ?? data.DischargeDispositionKey;
-            return base.UpdateInternal(context, data, principal);
+            return base.UpdateInternal(context, data);
         }
     }
 }

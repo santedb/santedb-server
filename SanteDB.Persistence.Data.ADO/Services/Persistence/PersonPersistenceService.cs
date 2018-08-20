@@ -54,9 +54,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// From model instance
         /// </summary>
-        public override object FromModelInstance(Core.Model.Entities.Person modelInstance, DataContext context, IPrincipal principal)
+        public override object FromModelInstance(Core.Model.Entities.Person modelInstance, DataContext context)
         {
-            var dbPerson = base.FromModelInstance(modelInstance, context, principal) as DbPerson;
+            var dbPerson = base.FromModelInstance(modelInstance, context) as DbPerson;
 
             if (modelInstance.DateOfBirthPrecision.HasValue)
                 dbPerson.DateOfBirthPrecision = PrecisionMap[modelInstance.DateOfBirthPrecision.Value];
@@ -66,10 +66,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Model instance
         /// </summary>
-        public Core.Model.Entities.Person ToModelInstance(DbPerson personInstance, DbEntityVersion entityVersionInstance, DbEntity entityInstance, DataContext context, IPrincipal principal)
+        public Core.Model.Entities.Person ToModelInstance(DbPerson personInstance, DbEntityVersion entityVersionInstance, DbEntity entityInstance, DataContext context)
         {
 
-            var retVal = m_entityPersister.ToModelInstance<Person>(entityVersionInstance, entityInstance, context, principal);
+            var retVal = m_entityPersister.ToModelInstance<Person>(entityVersionInstance, entityInstance, context);
             if (retVal == null || personInstance == null) return retVal;
             retVal.DateOfBirth = personInstance.DateOfBirth;
 
@@ -93,9 +93,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <param name="context"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        public override Core.Model.Entities.Person InsertInternal(DataContext context, Core.Model.Entities.Person data, IPrincipal principal)
+        public override Core.Model.Entities.Person InsertInternal(DataContext context, Core.Model.Entities.Person data)
         {
-            var retVal = base.InsertInternal(context, data, principal);
+            var retVal = base.InsertInternal(context, data);
             //byte[] sourceKey = retVal.Key.Value.ToByteArray();
 
             // Language communication
@@ -103,17 +103,16 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 this.m_entityPersister.UpdateVersionedAssociatedItems<Core.Model.Entities.PersonLanguageCommunication,DbPersonLanguageCommunication>(
                    data.LanguageCommunication,
                     retVal,
-                    context,
-                    principal);
+                    context);
             return retVal;
         }
 
         /// <summary>
         /// Update the person entity
         /// </summary>
-        public override Core.Model.Entities.Person UpdateInternal(DataContext context, Core.Model.Entities.Person data, IPrincipal principal)
+        public override Core.Model.Entities.Person UpdateInternal(DataContext context, Core.Model.Entities.Person data)
         {
-            var retVal = base.UpdateInternal(context, data, principal);
+            var retVal = base.UpdateInternal(context, data);
             var sourceKey = retVal.Key.Value.ToByteArray();
 
             // Language communication
@@ -121,8 +120,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 this.m_entityPersister.UpdateVersionedAssociatedItems<Core.Model.Entities.PersonLanguageCommunication,DbPersonLanguageCommunication>(
                    data.LanguageCommunication,
                     retVal,
-                    context,
-                    principal);
+                    context);
             return retVal;
         }
     }

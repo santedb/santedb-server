@@ -41,19 +41,19 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Get from source
         /// </summary>
-        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId, IPrincipal principal)
+        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId)
         {
             int tr = 0;
-            return this.QueryInternal(context, base.BuildSourceQuery<ActRelationship>(id, versionSequenceId), Guid.Empty, 0, null, out tr, principal, false).ToList();
+            return this.QueryInternal(context, base.BuildSourceQuery<ActRelationship>(id, versionSequenceId), Guid.Empty, 0, null, out tr, false).ToList();
         }
 
         /// <summary>
         /// Insert the relationship
         /// </summary>
-        public override ActRelationship InsertInternal(DataContext context, ActRelationship data, IPrincipal principal)
+        public override ActRelationship InsertInternal(DataContext context, ActRelationship data)
         {
             // Ensure we haven't already persisted this
-            if (data.TargetAct != null) data.TargetAct = data.TargetAct.EnsureExists(context, principal) as Act;
+            if (data.TargetAct != null) data.TargetAct = data.TargetAct.EnsureExists(context) as Act;
             data.TargetActKey = data.TargetAct?.Key ?? data.TargetActKey;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
 
@@ -77,7 +77,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             //if (existing == null)
             //{
-            return base.InsertInternal(context, data, principal);
+            return base.InsertInternal(context, data);
             //    (dbrelationships as List<DbActRelationship>).Add(new DbActRelationship()
             //    {
             //        Uuid = retVal.Key.Value.ToByteArray(),
@@ -97,12 +97,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Update the specified object
         /// </summary>
-        public override ActRelationship UpdateInternal(DataContext context, ActRelationship data, IPrincipal principal)
+        public override ActRelationship UpdateInternal(DataContext context, ActRelationship data)
         {
             data.TargetActKey = data.TargetAct?.Key ?? data.TargetActKey;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
 
-            return base.UpdateInternal(context, data, principal);
+            return base.UpdateInternal(context, data);
         }
 
         /// <summary>

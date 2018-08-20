@@ -52,7 +52,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// From model instance
         /// </summary>
-        public override object FromModelInstance(Bundle modelInstance, DataContext context, IPrincipal principal)
+        public override object FromModelInstance(Bundle modelInstance, DataContext context)
         {
             return m_mapper.MapModelInstance<Bundle, Object>(modelInstance);
         }
@@ -145,7 +145,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// Insert or update contents of the bundle
         /// </summary>
         /// <returns></returns>
-        public override Bundle InsertInternal(DataContext context, Bundle data, IPrincipal principal)
+        public override Bundle InsertInternal(DataContext context, Bundle data)
         {
 
             if (data.Item == null) return data;
@@ -162,7 +162,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 var svc = ApplicationContext.Current.GetService(idp);
 				var method = "Insert";
 
-	            if (itm.TryGetExisting(context, principal, true) != null)
+	            if (itm.TryGetExisting(context, true) != null)
 	            {
 					method = "Update";
 				}
@@ -173,7 +173,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 var mi = svc.GetType().GetRuntimeMethod(method, new Type[] { typeof(DataContext), itm.GetType(), typeof(IPrincipal) });
                 try
                 {
-                    data.Item[i] = mi.Invoke(svc, new object[] { context, itm, principal }) as IdentifiedData;
+                    data.Item[i] = mi.Invoke(svc, new object[] { context, itm }) as IdentifiedData;
                 }
                 catch(TargetInvocationException e)
                 {
@@ -193,7 +193,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Obsolete each object in the bundle
         /// </summary>
-        public override Bundle ObsoleteInternal(DataContext context, Bundle data, IPrincipal principal)
+        public override Bundle ObsoleteInternal(DataContext context, Bundle data)
         {
             foreach (var itm in data.Item)
             {
@@ -201,7 +201,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 				var svc = ApplicationContext.Current.GetService(idp);
 				var mi = svc.GetType().GetRuntimeMethod("Obsolete", new Type[] { typeof(DataContext), itm.GetType(), typeof(IPrincipal) });
 
-				itm.CopyObjectData(mi.Invoke(ApplicationContext.Current.GetService(idp), new object[] { context, itm, principal }));
+				itm.CopyObjectData(mi.Invoke(ApplicationContext.Current.GetService(idp), new object[] { context, itm }));
             }
             return data;
         }
@@ -209,7 +209,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Query the specified object
         /// </summary>
-        public override IEnumerable<Bundle> QueryInternal(DataContext context, Expression<Func<Bundle, bool>> query, Guid queryId, int offset, int? count, out int totalResults, IPrincipal principal, bool countResults = true)
+        public override IEnumerable<Bundle> QueryInternal(DataContext context, Expression<Func<Bundle, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = true)
         {
             totalResults = 0;
             return new List<Bundle>().AsQueryable();
@@ -218,7 +218,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Model instance 
         /// </summary>
-        public override Bundle ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+        public override Bundle ToModelInstance(object dataInstance, DataContext context)
         {
             return m_mapper.MapModelInstance<Object, Bundle>(dataInstance);
 
@@ -231,9 +231,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <param name="data"></param>
         /// <param name="principal"></param>
         /// <returns></returns>
-        public override Bundle UpdateInternal(DataContext context, Bundle data, IPrincipal principal)
+        public override Bundle UpdateInternal(DataContext context, Bundle data)
         {
-            return this.InsertInternal(context, data, principal);
+            return this.InsertInternal(context, data);
         }
 
     

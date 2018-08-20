@@ -51,6 +51,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using MARC.HI.EHRS.SVC.Core.Attributes;
+using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -92,48 +93,48 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         /// <returns>The model instance.</returns>
         /// <param name="dataInstance">Data instance.</param>
-        public abstract TData ToModelInstance(Object dataInstance, DataContext context, IPrincipal principal);
+        public abstract TData ToModelInstance(Object dataInstance, DataContext context);
 
         /// <summary>
         /// Froms the model instance.
         /// </summary>
         /// <returns>The model instance.</returns>
         /// <param name="modelInstance">Model instance.</param>
-        public abstract Object FromModelInstance(TData modelInstance, DataContext context, IPrincipal principal);
+        public abstract Object FromModelInstance(TData modelInstance, DataContext context);
 
         /// <summary>
         /// Performthe actual insert.
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="data">Data.</param>
-        public abstract TData InsertInternal(DataContext context, TData data, IPrincipal principal);
+        public abstract TData InsertInternal(DataContext context, TData data);
 
         /// <summary>
         /// Perform the actual update.
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="data">Data.</param>
-        public abstract TData UpdateInternal(DataContext context, TData data, IPrincipal principal);
+        public abstract TData UpdateInternal(DataContext context, TData data);
 
         /// <summary>
         /// Performs the actual obsoletion
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="data">Data.</param>
-        public abstract TData ObsoleteInternal(DataContext context, TData data, IPrincipal principal);
+        public abstract TData ObsoleteInternal(DataContext context, TData data);
 
         /// <summary>
         /// Performs the actual query
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="query">Query.</param>
-        public abstract IEnumerable<TData> QueryInternal(DataContext context, Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalResults, IPrincipal principal, bool countResults = true);
+        public abstract IEnumerable<TData> QueryInternal(DataContext context, Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = true);
 
         /// <summary>
         /// Get the specified key.
         /// </summary>
         /// <param name="key">Key.</param>
-        internal virtual TData Get(DataContext context, Guid key, IPrincipal principal)
+        internal virtual TData Get(DataContext context, Guid key)
         {
             int tr = 0;
             var cacheService = new AdoPersistenceCache(context);
@@ -143,14 +144,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
             {
                 if (cacheItem.LoadState < context.LoadState)
                 {
-                    cacheItem.LoadAssociations(context, principal);
+                    cacheItem.LoadAssociations(context);
                     cacheService?.Add(cacheItem);
                 }
                 return cacheItem;
             }
             else
             {
-                cacheItem = this.QueryInternal(context, o => o.Key == key, Guid.Empty, 0, 1, out tr, principal, false)?.FirstOrDefault();
+                cacheItem = this.QueryInternal(context, o => o.Key == key, Guid.Empty, 0, 1, out tr, false)?.FirstOrDefault();
                 if (cacheService != null)
                     cacheService.Add(cacheItem);
                 return cacheItem;
@@ -184,14 +185,16 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     using (IDbTransaction tx = connection.BeginTransaction())
                         try
                         {
+
                             // Disable inserting duplicate classified objects
-                            var existing = data.TryGetExisting(connection, principal, true);
+                            connection.EstablishProvenance(principal);
+                            var existing = data.TryGetExisting(connection, true);
                             if (existing != null)
                             {
                                 if (m_configuration.AutoUpdateExisting)
                                 {
                                     this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "INSERT WOULD RESULT IN DUPLICATE CLASSIFIER: UPDATING INSTEAD {0}", data);
-                                    data = this.Update(connection, data, principal);
+                                    data = this.Update(connection, data);
                                 }
                                 else
                                     throw new DuplicateNameException(data.Key?.ToString());
@@ -199,7 +202,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             else
                             {
                                 this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "INSERT {0}", data);
-                                data = this.Insert(connection, data, principal);
+                                data = this.Insert(connection, data);
                             }
                             data.LoadState = LoadState.FullLoad; // We just persisted so it is fully loaded
 
@@ -302,7 +305,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                             this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "UPDATE {0}", data);
 
-                            data = this.Update(connection, data, principal);
+                            connection.EstablishProvenance(principal);
+                            data = Update(connection, data);
                             data.LoadState = LoadState.FullLoad; // We just persisted this so it is fully loaded
 
                             if (mode == TransactionMode.Commit)
@@ -369,6 +373,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
         }
 
+        
         /// <summary>
         /// Translates a DB exception to an appropriate SanteDB exception
         /// </summary>
@@ -483,8 +488,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             //connection.Connection.Open();
 
                             this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "OBSOLETE {0}", data);
-
-                            data = this.Obsolete(connection, data, principal);
+                            connection.EstablishProvenance(principal);
+                            data = this.Obsolete(connection, data);
 
                             if (mode == TransactionMode.Commit)
                             {
@@ -566,7 +571,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         else
                             connection.LoadState = LoadState.FullLoad;
 
-                        var result = this.Get(connection, guidIdentifier.Id, principal);
+                        var result = this.Get(connection, guidIdentifier.Id);
                         var postData = new PostRetrievalEventArgs<TData>(result, principal);
                         this.Retrieved?.Invoke(this, postData);
 
@@ -666,7 +671,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     else
                         connection.LoadState = LoadState.FullLoad;
 
-                    var results = this.Query(connection, query, queryId, offset, count ?? 1000, out totalCount, true, authContext);
+                    var results = this.Query(connection, preArgs.Query, queryId, offset, count ?? 1000, out totalCount, true);
                     var postData = new PostQueryEventArgs<TData>(query, results.AsQueryable(), authContext);
                     this.Queried?.Invoke(this, postData);
 
@@ -712,9 +717,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="data">Data.</param>
-        public TData Insert(DataContext context, TData data, IPrincipal principal)
+        public TData Insert(DataContext context, TData data)
         {
-            var retVal = this.InsertInternal(context, data, principal);
+            var retVal = this.InsertInternal(context, data);
             //if (retVal != data) System.Diagnostics.Debugger.Break();
             context.AddCacheCommit(retVal);
             return retVal;
@@ -724,7 +729,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="data">Data.</param>
-        public TData Update(DataContext context, TData data, IPrincipal principal)
+        public TData Update(DataContext context, TData data)
         {
             //// Make sure we're updating the right thing
             //if (data.Key.HasValue)
@@ -737,7 +742,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             //    }
             //}
 
-            var retVal = this.UpdateInternal(context, data, principal);
+            var retVal = this.UpdateInternal(context, data);
             //if (retVal != data) System.Diagnostics.Debugger.Break();
             context.AddCacheCommit(retVal);
             return retVal;
@@ -748,9 +753,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="data">Data.</param>
-        public TData Obsolete(DataContext context, TData data, IPrincipal principal)
+        public TData Obsolete(DataContext context, TData data)
         {
-            var retVal = this.ObsoleteInternal(context, data, principal);
+            var retVal = this.ObsoleteInternal(context, data);
             //if (retVal != data) System.Diagnostics.Debugger.Break();
             context.AddCacheCommit(retVal);
             return retVal;
@@ -760,42 +765,42 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="query">Query.</param>
-        public IEnumerable<TData> Query(DataContext context, Expression<Func<TData, bool>> query, Guid queryId, int offset, int count, out int totalResults, bool countResults, IPrincipal principal)
+        public IEnumerable<TData> Query(DataContext context, Expression<Func<TData, bool>> query, Guid queryId, int offset, int count, out int totalResults, bool countResults)
         {
-            var retVal = this.QueryInternal(context, query, queryId, offset, count, out totalResults, principal, countResults);
+            var retVal = this.QueryInternal(context, query, queryId, offset, count, out totalResults, countResults);
             return retVal;
         }
 
         /// <summary>
         /// Insert the object for generic methods
         /// </summary>
-        object IAdoPersistenceService.Insert(DataContext context, object data, IPrincipal principal)
+        object IAdoPersistenceService.Insert(DataContext context, object data)
         {
-            return this.InsertInternal(context, (TData)data, principal);
+            return this.InsertInternal(context, (TData)data);
         }
 
         /// <summary>
         /// Update the object for generic methods
         /// </summary>
-        object IAdoPersistenceService.Update(DataContext context, object data, IPrincipal principal)
+        object IAdoPersistenceService.Update(DataContext context, object data)
         {
-            return this.UpdateInternal(context, (TData)data, principal);
+            return this.UpdateInternal(context, (TData)data);
         }
 
         /// <summary>
         /// Obsolete the object for generic methods
         /// </summary>
-        object IAdoPersistenceService.Obsolete(DataContext context, object data, IPrincipal principal)
+        object IAdoPersistenceService.Obsolete(DataContext context, object data)
         {
-            return this.ObsoleteInternal(context, (TData)data, principal);
+            return this.ObsoleteInternal(context, (TData)data);
         }
 
         /// <summary>
         /// Get the specified data
         /// </summary>
-        object IAdoPersistenceService.Get(DataContext context, Guid id, IPrincipal principal)
+        object IAdoPersistenceService.Get(DataContext context, Guid id)
         {
-            return this.Get(context, id, principal);
+            return this.Get(context, id);
         }
 
         /// <summary>
@@ -834,9 +839,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// Generic to model instance for other callers
         /// </summary>
         /// <returns></returns>
-        object IAdoPersistenceService.ToModelInstance(object domainInstance, DataContext context, IPrincipal principal)
+        object IAdoPersistenceService.ToModelInstance(object domainInstance, DataContext context)
         {
-            return this.ToModelInstance(domainInstance, context, principal);
+            return this.ToModelInstance(domainInstance, context);
         }
 
         /// <summary>

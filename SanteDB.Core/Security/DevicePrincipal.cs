@@ -32,7 +32,7 @@ namespace SanteDB.Core.Security
 	/// </summary>
 	/// <seealso cref="System.Security.Claims.ClaimsPrincipal" />
 	public class DevicePrincipal : ClaimsPrincipal
-	{
+    {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DevicePrincipal"/> class.
 		/// </summary>

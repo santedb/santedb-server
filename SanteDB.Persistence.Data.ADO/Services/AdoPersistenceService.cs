@@ -142,7 +142,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             /// <summary>
             /// Ensure exists
             /// </summary>
-            public override TModel InsertInternal(DataContext context, TModel data, IPrincipal principal)
+            public override TModel InsertInternal(DataContext context, TModel data)
             {
                 foreach (var rp in typeof(TModel).GetRuntimeProperties().Where(o => typeof(IdentifiedData).GetTypeInfo().IsAssignableFrom(o.PropertyType.GetTypeInfo())))
                 {
@@ -151,15 +151,15 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     var instance = rp.GetValue(data);
                     if (instance != null)
-                        rp.SetValue(data, DataModelExtensions.EnsureExists(instance as IdentifiedData, context, principal));
+                        rp.SetValue(data, DataModelExtensions.EnsureExists(instance as IdentifiedData, context));
                 }
-                return base.InsertInternal(context, data, principal);
+                return base.InsertInternal(context, data);
             }
 
             /// <summary>
             /// Update the specified object
             /// </summary>
-            public override TModel UpdateInternal(DataContext context, TModel data, IPrincipal principal)
+            public override TModel UpdateInternal(DataContext context, TModel data)
             {
                 foreach (var rp in typeof(TModel).GetRuntimeProperties().Where(o => typeof(IdentifiedData).GetTypeInfo().IsAssignableFrom(o.PropertyType.GetTypeInfo())))
                 {
@@ -168,10 +168,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     var instance = rp.GetValue(data);
                     if (instance != null)
-                        rp.SetValue(data, DataModelExtensions.EnsureExists(instance as IdentifiedData, context, principal));
+                        rp.SetValue(data, DataModelExtensions.EnsureExists(instance as IdentifiedData, context));
 
                 }
-                return base.UpdateInternal(context, data, principal);
+                return base.UpdateInternal(context, data);
             }
         }
 
@@ -185,7 +185,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             /// <summary>
             /// Ensure exists
             /// </summary>
-            public override TModel InsertInternal(DataContext context, TModel data, IPrincipal principal)
+            public override TModel InsertInternal(DataContext context, TModel data)
             {
                 foreach (var rp in typeof(TModel).GetRuntimeProperties().Where(o => typeof(IdentifiedData).GetTypeInfo().IsAssignableFrom(o.PropertyType.GetTypeInfo())))
                 {
@@ -194,16 +194,16 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     var instance = rp.GetValue(data);
                     if (instance != null)
-                        rp.SetValue(data, DataModelExtensions.EnsureExists(instance as IdentifiedData, context, principal));
+                        rp.SetValue(data, DataModelExtensions.EnsureExists(instance as IdentifiedData, context));
 
                 }
-                return base.InsertInternal(context, data, principal);
+                return base.InsertInternal(context, data);
             }
 
             /// <summary>
             /// Update the specified object
             /// </summary>
-            public override TModel UpdateInternal(DataContext context, TModel data, IPrincipal principal)
+            public override TModel UpdateInternal(DataContext context, TModel data)
             {
                 foreach (var rp in typeof(TModel).GetRuntimeProperties().Where(o => typeof(IdentifiedData).GetTypeInfo().IsAssignableFrom(o.PropertyType.GetTypeInfo())))
                 {
@@ -212,10 +212,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     var instance = rp.GetValue(data);
                     if (instance != null)
-                        rp.SetValue(data, DataModelExtensions.EnsureExists(instance as IdentifiedData, context, principal));
+                        rp.SetValue(data, DataModelExtensions.EnsureExists(instance as IdentifiedData, context));
 
                 }
-                return base.UpdateInternal(context, data, principal);
+                return base.UpdateInternal(context, data);
             }
         }
 
@@ -230,10 +230,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
             /// <summary>
             /// Get all the matching TModel object from source
             /// </summary>
-            public IEnumerable GetFromSource(DataContext context, Guid sourceId, decimal? versionSequenceId, IPrincipal principal)
+            public IEnumerable GetFromSource(DataContext context, Guid sourceId, decimal? versionSequenceId)
             {
                 int tr = 0;
-                return this.QueryInternal(context, base.BuildSourceQuery<TModel>(sourceId), Guid.Empty, 0, null, out tr, principal).ToList();
+                return this.QueryInternal(context, base.BuildSourceQuery<TModel>(sourceId), Guid.Empty, 0, null, out tr).ToList();
             }
         }
 
@@ -248,11 +248,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
             /// <summary>
             /// Get all the matching TModel object from source
             /// </summary>
-            public IEnumerable GetFromSource(DataContext context, Guid sourceId, decimal? versionSequenceId, IPrincipal principal)
+            public IEnumerable GetFromSource(DataContext context, Guid sourceId, decimal? versionSequenceId)
             {
                 int tr = 0;
                 // TODO: Check that this query is actually building what it is supposed to.
-                return this.QueryInternal(context, base.BuildSourceQuery<TModel>(sourceId, versionSequenceId), Guid.Empty, 0, null, out tr, principal).ToList();
+                return this.QueryInternal(context, base.BuildSourceQuery<TModel>(sourceId, versionSequenceId), Guid.Empty, 0, null, out tr).ToList();
             }
         }
 
@@ -267,10 +267,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
             /// <summary>
             /// Get all the matching TModel object from source
             /// </summary>
-            public IEnumerable GetFromSource(DataContext context, Guid sourceId, decimal? versionSequenceId, IPrincipal principal)
+            public IEnumerable GetFromSource(DataContext context, Guid sourceId, decimal? versionSequenceId)
             {
                 int tr = 0;
-                return this.QueryInternal(context, base.BuildSourceQuery<TModel>(sourceId), Guid.Empty, 0, null, out tr, principal).ToList();
+                return this.QueryInternal(context, base.BuildSourceQuery<TModel>(sourceId), Guid.Empty, 0, null, out tr).ToList();
             }
         }
 
@@ -285,11 +285,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
             /// <summary>
             /// Get all the matching TModel object from source
             /// </summary>
-            public IEnumerable GetFromSource(DataContext context, Guid sourceId, decimal? versionSequenceId, IPrincipal principal)
+            public IEnumerable GetFromSource(DataContext context, Guid sourceId, decimal? versionSequenceId)
             {
                 int tr = 0;
                 // TODO: Check that this query is actually building what it is supposed to.
-                return this.QueryInternal(context, base.BuildSourceQuery<TModel>(sourceId, versionSequenceId), Guid.Empty, 0, null, out tr, principal).ToList();
+                return this.QueryInternal(context, base.BuildSourceQuery<TModel>(sourceId, versionSequenceId), Guid.Empty, 0, null, out tr).ToList();
             }
         }
 

@@ -38,9 +38,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Convert databased model to model
         /// </summary>
-        public Core.Model.Acts.SubstanceAdministration ToModelInstance(DbSubstanceAdministration sbadmInstance, DbActVersion actVersionInstance, DbAct actInstance, DataContext context, IPrincipal principal)
+        public Core.Model.Acts.SubstanceAdministration ToModelInstance(DbSubstanceAdministration sbadmInstance, DbActVersion actVersionInstance, DbAct actInstance, DataContext context)
         {
-            var retVal = m_actPersister.ToModelInstance<Core.Model.Acts.SubstanceAdministration>(actVersionInstance, actInstance, context, principal);
+            var retVal = m_actPersister.ToModelInstance<Core.Model.Acts.SubstanceAdministration>(actVersionInstance, actInstance, context);
             if (retVal == null) return null;
             else if(sbadmInstance == null)
             {
@@ -64,10 +64,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the specified sbadm
         /// </summary>
-        public override Core.Model.Acts.SubstanceAdministration InsertInternal(DataContext context, Core.Model.Acts.SubstanceAdministration data, IPrincipal principal)
+        public override Core.Model.Acts.SubstanceAdministration InsertInternal(DataContext context, Core.Model.Acts.SubstanceAdministration data)
         {
-            if(data.DoseUnit != null) data.DoseUnit = data.DoseUnit?.EnsureExists(context, principal) as Concept;
-            if (data.Route != null) data.Route = data.Route?.EnsureExists(context, principal) as Concept;
+            if(data.DoseUnit != null) data.DoseUnit = data.DoseUnit?.EnsureExists(context) as Concept;
+            if (data.Route != null) data.Route = data.Route?.EnsureExists(context) as Concept;
             else if(!data.RouteKey.HasValue)
                 data.RouteKey = NullReasonKeys.NoInformation;
 
@@ -77,23 +77,23 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 data.DoseUnitKey = Guid.Parse("a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76");
             data.DoseUnitKey = data.DoseUnit?.Key ?? data.DoseUnitKey;
             data.RouteKey = data.Route?.Key ?? data.RouteKey;
-            return base.InsertInternal(context, data, principal);
+            return base.InsertInternal(context, data);
         }
 
 
         /// <summary>
         /// Insert the specified sbadm
         /// </summary>
-        public override Core.Model.Acts.SubstanceAdministration UpdateInternal(DataContext context, Core.Model.Acts.SubstanceAdministration data, IPrincipal principal)
+        public override Core.Model.Acts.SubstanceAdministration UpdateInternal(DataContext context, Core.Model.Acts.SubstanceAdministration data)
         {
-            if (data.DoseUnit != null) data.DoseUnit = data.DoseUnit?.EnsureExists(context, principal) as Concept;
-            if (data.Route != null) data.Route = data.Route?.EnsureExists(context, principal) as Concept;
+            if (data.DoseUnit != null) data.DoseUnit = data.DoseUnit?.EnsureExists(context) as Concept;
+            if (data.Route != null) data.Route = data.Route?.EnsureExists(context) as Concept;
             else
                 data.RouteKey = NullReasonKeys.NoInformation;
 
             data.DoseUnitKey = data.DoseUnit?.Key ?? data.DoseUnitKey;
             data.RouteKey = data.Route?.Key ?? data.RouteKey;
-            return base.UpdateInternal(context, data, principal);
+            return base.UpdateInternal(context, data);
         }
     }
 }

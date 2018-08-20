@@ -41,7 +41,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// Identifies the user key to which the session belongs
         /// </summary>
         [Column("usr_id")]
-        public Guid UserKey { get; set; }
+        public Guid? UserKey { get; set; }
 
         /// <summary>
         /// Identifies the refresh token which can be used to refresh the session
@@ -61,5 +61,10 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         [Column("aud"), NotNull]
         public String Audience { get; set; }
 
+        /// <summary>
+        /// The device key
+        /// </summary>
+        [Column("dev_id")]
+        public Guid? DeviceKey { get; internal set; }
     }
 }

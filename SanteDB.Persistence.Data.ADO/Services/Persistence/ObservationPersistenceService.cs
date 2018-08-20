@@ -41,7 +41,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Convert from model instance
         /// </summary>
-        public override object FromModelInstance(Observation modelInstance, DataContext context, IPrincipal princpal)
+        public override object FromModelInstance(Observation modelInstance, DataContext context)
         {
             var retVal = m_mapper.MapModelInstance<Observation, DbObservation>(modelInstance);
             if (modelInstance is TextObservation)
@@ -56,19 +56,19 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Convert a data act and observation instance to an observation
         /// </summary>
-        public virtual Observation ToModelInstance(DbObservation dataInstance, DbActVersion actVersionInstance, DbAct actInstance, DataContext context, IPrincipal principal)
+        public virtual Observation ToModelInstance(DbObservation dataInstance, DbActVersion actVersionInstance, DbAct actInstance, DataContext context)
         {
-            return this.ToModelInstance<Observation>(dataInstance, actVersionInstance, actInstance, context, principal);
+            return this.ToModelInstance<Observation>(dataInstance, actVersionInstance, actInstance, context);
         }
 
 
         /// <summary>
         /// Convert a data act and observation instance to an observation
         /// </summary>
-        public virtual TObservation ToModelInstance<TObservation>(DbObservation dataInstance, DbActVersion actVersionInstance, DbAct actInstance, DataContext context, IPrincipal principal)
+        public virtual TObservation ToModelInstance<TObservation>(DbObservation dataInstance, DbActVersion actVersionInstance, DbAct actInstance, DataContext context)
             where TObservation : Observation, new()
         {
-            var retVal = m_actPersister.ToModelInstance<TObservation>(actVersionInstance, actInstance, context, principal);
+            var retVal = m_actPersister.ToModelInstance<TObservation>(actVersionInstance, actInstance, context);
             if (retVal == null) return null;
 
             if (dataInstance.InterpretationConceptKey != null)
@@ -80,33 +80,33 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the specified observation into the database
         /// </summary>
-        public override Observation InsertInternal(DataContext context, Observation data, IPrincipal principal)
+        public override Observation InsertInternal(DataContext context, Observation data)
         {
-            if(data.InterpretationConcept != null) data.InterpretationConcept = data.InterpretationConcept?.EnsureExists(context, principal) as Concept;
+            if(data.InterpretationConcept != null) data.InterpretationConcept = data.InterpretationConcept?.EnsureExists(context) as Concept;
             data.InterpretationConceptKey = data.InterpretationConcept?.Key ?? data.InterpretationConceptKey;
-            return base.InsertInternal(context, data, principal);
+            return base.InsertInternal(context, data);
         }
 
         /// <summary>
         /// Updates the specified observation
         /// </summary>
-        public override Observation UpdateInternal(DataContext context, Observation data, IPrincipal principal)
+        public override Observation UpdateInternal(DataContext context, Observation data)
         {
-            if (data.InterpretationConcept != null) data.InterpretationConcept = data.InterpretationConcept?.EnsureExists(context, principal) as Concept;
+            if (data.InterpretationConcept != null) data.InterpretationConcept = data.InterpretationConcept?.EnsureExists(context) as Concept;
             data.InterpretationConceptKey = data.InterpretationConcept?.Key ?? data.InterpretationConceptKey;
 
-            return base.UpdateInternal(context, data, principal);
+            return base.UpdateInternal(context, data);
         }
 
         /// <summary>
         /// Updates the specified observation
         /// </summary>
-        public override Observation ObsoleteInternal(DataContext context, Observation data, IPrincipal principal)
+        public override Observation ObsoleteInternal(DataContext context, Observation data)
         {
-            if (data.InterpretationConcept != null) data.InterpretationConcept = data.InterpretationConcept?.EnsureExists(context, principal) as Concept;
+            if (data.InterpretationConcept != null) data.InterpretationConcept = data.InterpretationConcept?.EnsureExists(context) as Concept;
             data.InterpretationConceptKey = data.InterpretationConcept?.Key ?? data.InterpretationConceptKey;
 
-            return base.ObsoleteInternal(context, data, principal);
+            return base.ObsoleteInternal(context, data);
         }
     }
 
@@ -121,19 +121,19 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Query internal
         /// </summary>
-        public override IEnumerable<TextObservation> QueryInternal(DataContext context, Expression<Func<TextObservation, bool>> query, Guid queryId, int offset, int? count, out int totalResults, IPrincipal principal, bool countResults = true)
+        public override IEnumerable<TextObservation> QueryInternal(DataContext context, Expression<Func<TextObservation, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = true)
         {
             var parm = query.Parameters[0];
             query = Expression.Lambda<Func<TextObservation, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, query.Body, Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(parm, typeof(Observation).GetProperty(nameof(Observation.ValueType))), Expression.Constant("ED"))), parm);
-            return base.QueryInternal(context, query, queryId, offset, count, out totalResults, principal, countResults);
+            return base.QueryInternal(context, query, queryId, offset, count, out totalResults, countResults);
         }
 
         /// <summary>
         /// Convert the specified object to a model instance
         /// </summary>
-        public Core.Model.Acts.TextObservation ToModelInstance(DbTextObservation dataInstance, DbObservation obsInstance, DbActVersion actVersionInstance, DbAct actInstance, DataContext context, IPrincipal principal)
+        public Core.Model.Acts.TextObservation ToModelInstance(DbTextObservation dataInstance, DbObservation obsInstance, DbActVersion actVersionInstance, DbAct actInstance, DataContext context)
         {
-            var retVal = this.m_observationPersistence.ToModelInstance<TextObservation>(obsInstance, actVersionInstance, actInstance, context, principal);
+            var retVal = this.m_observationPersistence.ToModelInstance<TextObservation>(obsInstance, actVersionInstance, actInstance, context);
             if (retVal == null) return null;
             retVal.Value = dataInstance.Value;
             return retVal;
@@ -142,9 +142,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the specified object
         /// </summary>
-        public override TextObservation InsertInternal(DataContext context, TextObservation data, IPrincipal principal)
+        public override TextObservation InsertInternal(DataContext context, TextObservation data)
         {
-            var obsData = this.m_observationPersistence.InsertInternal(context, data, principal);
+            var obsData = this.m_observationPersistence.InsertInternal(context, data);
             context.Insert(new DbTextObservation()
             {
                 ParentKey = obsData.VersionKey.Value,
@@ -156,9 +156,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Update the specified object
         /// </summary>
-        public override TextObservation UpdateInternal(DataContext context, TextObservation data, IPrincipal principal)
+        public override TextObservation UpdateInternal(DataContext context, TextObservation data)
         {
-            var obsData = this.m_observationPersistence.UpdateInternal(context, data, principal);
+            var obsData = this.m_observationPersistence.UpdateInternal(context, data);
             context.Insert(new DbTextObservation()
             {
                 ParentKey = obsData.VersionKey.Value,
@@ -170,9 +170,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Obsolete the observation
         /// </summary>
-        public override TextObservation ObsoleteInternal(DataContext context, TextObservation data, IPrincipal principal)
+        public override TextObservation ObsoleteInternal(DataContext context, TextObservation data)
         {
-            var obsData = this.m_observationPersistence.ObsoleteInternal(context, data, principal);
+            var obsData = this.m_observationPersistence.ObsoleteInternal(context, data);
             context.Insert(new DbTextObservation()
             {
                 ParentKey = obsData.VersionKey.Value,
@@ -192,19 +192,19 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Query internal
         /// </summary>
-        public override IEnumerable<CodedObservation> QueryInternal(DataContext context, Expression<Func<CodedObservation, bool>> query, Guid queryId, int offset, int? count, out int totalResults, IPrincipal principal, bool countResults = true)
+        public override IEnumerable<CodedObservation> QueryInternal(DataContext context, Expression<Func<CodedObservation, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = true)
         {
             var parm = query.Parameters[0];
             query = Expression.Lambda<Func<CodedObservation, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, query.Body, Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(parm, typeof(Observation).GetProperty(nameof(Observation.ValueType))), Expression.Constant("CD"))), parm);
-            return base.QueryInternal(context, query, queryId, offset, count, out totalResults, principal, countResults);
+            return base.QueryInternal(context, query, queryId, offset, count, out totalResults, countResults);
         }
 
         /// <summary>
         /// Convert the specified object to a model instance
         /// </summary>
-        public Core.Model.Acts.CodedObservation ToModelInstance(DbCodedObservation dataInstance, DbObservation obsInstance, DbActVersion actVersionInstance, DbAct actInstance, DataContext context, IPrincipal principal)
+        public Core.Model.Acts.CodedObservation ToModelInstance(DbCodedObservation dataInstance, DbObservation obsInstance, DbActVersion actVersionInstance, DbAct actInstance, DataContext context)
         {
-            var retVal = this.m_observationPersistence.ToModelInstance<CodedObservation>(obsInstance, actVersionInstance, actInstance, context, principal);
+            var retVal = this.m_observationPersistence.ToModelInstance<CodedObservation>(obsInstance, actVersionInstance, actInstance, context);
             if (retVal == null) return null;
             if (dataInstance.Value != null)
                 retVal.ValueKey = dataInstance.Value;
@@ -214,11 +214,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the observation
         /// </summary>
-        public override Core.Model.Acts.CodedObservation InsertInternal(DataContext context, Core.Model.Acts.CodedObservation data, IPrincipal principal)
+        public override Core.Model.Acts.CodedObservation InsertInternal(DataContext context, Core.Model.Acts.CodedObservation data)
         {
-            if(data.Value != null) data.Value =data.Value?.EnsureExists(context, principal) as Concept;
+            if(data.Value != null) data.Value =data.Value?.EnsureExists(context) as Concept;
             data.ValueKey = data.Value?.Key ?? data.ValueKey;
-            var obsData = this.m_observationPersistence.InsertInternal(context, data, principal);
+            var obsData = this.m_observationPersistence.InsertInternal(context, data);
             context.Insert(new DbCodedObservation()
             {
                 ParentKey = obsData.VersionKey.Value,
@@ -230,11 +230,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Update the specified observation
         /// </summary>
-        public override Core.Model.Acts.CodedObservation UpdateInternal(DataContext context, Core.Model.Acts.CodedObservation data, IPrincipal principal)
+        public override Core.Model.Acts.CodedObservation UpdateInternal(DataContext context, Core.Model.Acts.CodedObservation data)
         {
-            if (data.Value != null) data.Value = data.Value?.EnsureExists(context, principal) as Concept;
+            if (data.Value != null) data.Value = data.Value?.EnsureExists(context) as Concept;
             data.ValueKey = data.Value?.Key ?? data.ValueKey;
-            var obsData = this.m_observationPersistence.UpdateInternal(context, data, principal);
+            var obsData = this.m_observationPersistence.UpdateInternal(context, data);
             context.Insert(new DbCodedObservation()
             {
                 ParentKey = obsData.VersionKey.Value,
@@ -247,11 +247,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Update the specified observation
         /// </summary>
-        public override Core.Model.Acts.CodedObservation ObsoleteInternal(DataContext context, Core.Model.Acts.CodedObservation data, IPrincipal principal)
+        public override Core.Model.Acts.CodedObservation ObsoleteInternal(DataContext context, Core.Model.Acts.CodedObservation data)
         {
-            if (data.Value != null) data.Value = data.Value?.EnsureExists(context, principal) as Concept;
+            if (data.Value != null) data.Value = data.Value?.EnsureExists(context) as Concept;
             data.ValueKey = data.Value?.Key ?? data.ValueKey;
-            var obsData = this.m_observationPersistence.ObsoleteInternal(context, data, principal);
+            var obsData = this.m_observationPersistence.ObsoleteInternal(context, data);
             context.Insert(new DbCodedObservation()
             {
                 ParentKey = obsData.VersionKey.Value,
@@ -273,20 +273,20 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Query internal
         /// </summary>
-        public override IEnumerable<QuantityObservation> QueryInternal(DataContext context, Expression<Func<QuantityObservation, bool>> query, Guid queryId, int offset, int? count, out int totalResults, IPrincipal principal, bool countResults = true)
+        public override IEnumerable<QuantityObservation> QueryInternal(DataContext context, Expression<Func<QuantityObservation, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = true)
         {
             var parm = query.Parameters[0];
             query = Expression.Lambda<Func<QuantityObservation, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, query.Body, Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(parm, typeof(Observation).GetProperty(nameof(Observation.ValueType))), Expression.Constant("PQ"))), parm);
-            return base.QueryInternal(context, query, queryId, offset, count, out totalResults, principal, countResults);
+            return base.QueryInternal(context, query, queryId, offset, count, out totalResults, countResults);
         }
 
 
         /// <summary>
         /// Convert the specified object to a model instance
         /// </summary>
-        public Core.Model.Acts.QuantityObservation ToModelInstance(DbQuantityObservation dataInstance, DbObservation obsInstance, DbActVersion actVersionInstance, DbAct actInstance, DataContext context, IPrincipal principal)
+        public Core.Model.Acts.QuantityObservation ToModelInstance(DbQuantityObservation dataInstance, DbObservation obsInstance, DbActVersion actVersionInstance, DbAct actInstance, DataContext context)
         {
-            var retVal = this.m_observationPersistence.ToModelInstance<QuantityObservation>(obsInstance, actVersionInstance, actInstance, context, principal);
+            var retVal = this.m_observationPersistence.ToModelInstance<QuantityObservation>(obsInstance, actVersionInstance, actInstance, context);
             if (retVal == null) return null;
             if (dataInstance.UnitOfMeasureKey != null)
                 retVal.UnitOfMeasureKey = dataInstance.UnitOfMeasureKey;
@@ -297,11 +297,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the observation
         /// </summary>
-        public override Core.Model.Acts.QuantityObservation InsertInternal(DataContext context, Core.Model.Acts.QuantityObservation data, IPrincipal principal)
+        public override Core.Model.Acts.QuantityObservation InsertInternal(DataContext context, Core.Model.Acts.QuantityObservation data)
         {
-            if(data.UnitOfMeasure != null) data.UnitOfMeasure = data.UnitOfMeasure?.EnsureExists(context, principal) as Concept;
+            if(data.UnitOfMeasure != null) data.UnitOfMeasure = data.UnitOfMeasure?.EnsureExists(context) as Concept;
             data.UnitOfMeasureKey = data.UnitOfMeasure?.Key ?? data.UnitOfMeasureKey;
-            var retVal = this.m_observationPersistence.InsertInternal(context, data, principal);
+            var retVal = this.m_observationPersistence.InsertInternal(context, data);
             context.Insert(new DbQuantityObservation()
             {
                 ParentKey = data.VersionKey.Value,
@@ -315,11 +315,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Update the specified observation
         /// </summary>
-        public override Core.Model.Acts.QuantityObservation UpdateInternal(DataContext context, Core.Model.Acts.QuantityObservation data, IPrincipal principal)
+        public override Core.Model.Acts.QuantityObservation UpdateInternal(DataContext context, Core.Model.Acts.QuantityObservation data)
         {
-            if(data.UnitOfMeasure != null) data.UnitOfMeasure = data.UnitOfMeasure?.EnsureExists(context, principal) as Concept;
+            if(data.UnitOfMeasure != null) data.UnitOfMeasure = data.UnitOfMeasure?.EnsureExists(context) as Concept;
             data.UnitOfMeasureKey = data.UnitOfMeasure?.Key ?? data.UnitOfMeasureKey;
-            this.m_observationPersistence.UpdateInternal(context, data, principal);
+            this.m_observationPersistence.UpdateInternal(context, data);
             context.Insert(new DbQuantityObservation()
             {
                 ParentKey = data.VersionKey.Value,
@@ -333,11 +333,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Update the specified observation
         /// </summary>
-        public override Core.Model.Acts.QuantityObservation ObsoleteInternal(DataContext context, Core.Model.Acts.QuantityObservation data, IPrincipal principal)
+        public override Core.Model.Acts.QuantityObservation ObsoleteInternal(DataContext context, Core.Model.Acts.QuantityObservation data)
         {
-            if (data.UnitOfMeasure != null) data.UnitOfMeasure = data.UnitOfMeasure?.EnsureExists(context, principal) as Concept;
+            if (data.UnitOfMeasure != null) data.UnitOfMeasure = data.UnitOfMeasure?.EnsureExists(context) as Concept;
             data.UnitOfMeasureKey = data.UnitOfMeasure?.Key ?? data.UnitOfMeasureKey;
-            this.m_observationPersistence.ObsoleteInternal(context, data, principal);
+            this.m_observationPersistence.ObsoleteInternal(context, data);
             context.Insert(new DbQuantityObservation()
             {
                 ParentKey = data.VersionKey.Value,

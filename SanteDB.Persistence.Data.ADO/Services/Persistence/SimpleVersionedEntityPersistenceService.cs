@@ -49,7 +49,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Get the specified object
         /// </summary>
-        internal override TModel Get(DataContext context, Guid key, IPrincipal principal)
+        internal override TModel Get(DataContext context, Guid key)
         {
             // We need to join, but to what?
             // True to get the cache item
@@ -59,7 +59,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
                 if (cacheItem.LoadState < context.LoadState)
                 {
-                    cacheItem.LoadAssociations(context, principal);
+                    cacheItem.LoadAssociations(context);
                     cacheService?.Add(cacheItem);
                 }
                     return cacheItem;
@@ -68,7 +68,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
                 var domainQuery = AdoPersistenceService.GetQueryBuilder().CreateQuery<TModel>(o => o.Key == key && o.ObsoletionTime == null).Build();
                 domainQuery.OrderBy<TRootEntity>(o => o.VersionSequenceId, Core.Model.Map.SortOrderType.OrderByDescending);
-                cacheItem = this.ToModelInstance(context.FirstOrDefault<TQueryReturn>(domainQuery), context, principal);
+                cacheItem = this.ToModelInstance(context.FirstOrDefault<TQueryReturn>(domainQuery), context);
                 if (cacheService != null)
                     cacheService.Add(cacheItem);
                 return cacheItem;
@@ -96,7 +96,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             sw.Start();
 #endif
 
-            PreRetrievalEventArgs preArgs = new PreRetrievalEventArgs(containerId, principal);
+            PreRetrievalEventArgs preArgs = new PreRetrievalEventArgs(containerId);
             this.FireRetrieving(preArgs);
             if (preArgs.Cancel)
             {
@@ -115,11 +115,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     connection.LoadState = LoadState.FullLoad;
                     // Get most recent version
                     if (uuid.VersionId == Guid.Empty)
-                        retVal = this.Get(connection, uuid.Id, principal);
+                        retVal = this.Get(connection, uuid.Id);
                     else
-                        retVal = this.CacheConvert(this.QueryInternal(connection, o => o.Key == uuid.Id && o.VersionKey == uuid.VersionId, Guid.Empty, 0, 1, out tr).FirstOrDefault(), connection, principal);
+                        retVal = this.CacheConvert(this.QueryInternal(connection, o => o.Key == uuid.Id && o.VersionKey == uuid.VersionId, Guid.Empty, 0, 1, out tr).FirstOrDefault(), connection);
 
-                    var postData = new PostRetrievalEventArgs<TModel>(retVal, principal);
+                    var postData = new PostRetrievalEventArgs<TModel>(retVal);
                     this.FireRetrieved(postData);
 
                     return retVal;

@@ -40,10 +40,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// To model instance
         /// </summary>
-        public Core.Model.Entities.ApplicationEntity ToModelInstance(DbApplicationEntity applicationEntity, DbEntityVersion entityVersion, DbEntity entity, DataContext context, IPrincipal principal)
+        public Core.Model.Entities.ApplicationEntity ToModelInstance(DbApplicationEntity applicationEntity, DbEntityVersion entityVersion, DbEntity entity, DataContext context)
         {
 
-            var retVal = m_entityPersister.ToModelInstance<Core.Model.Entities.ApplicationEntity>(entityVersion, entity, context, principal);
+            var retVal = m_entityPersister.ToModelInstance<Core.Model.Entities.ApplicationEntity>(entityVersion, entity, context);
 
             if (retVal == null) return null;
 
@@ -57,21 +57,21 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the application entity
         /// </summary>
-        public override Core.Model.Entities.ApplicationEntity InsertInternal(DataContext context, Core.Model.Entities.ApplicationEntity data, IPrincipal principal)
+        public override Core.Model.Entities.ApplicationEntity InsertInternal(DataContext context, Core.Model.Entities.ApplicationEntity data)
         {
-            if(data.SecurityApplication != null) data.SecurityApplication = data.SecurityApplication?.EnsureExists(context, principal) as SecurityApplication;
+            if(data.SecurityApplication != null) data.SecurityApplication = data.SecurityApplication?.EnsureExists(context) as SecurityApplication;
             data.SecurityApplicationKey = data.SecurityApplication?.Key ?? data.SecurityApplicationKey;
-            return base.InsertInternal(context, data, principal);
+            return base.InsertInternal(context, data);
         }
         
         /// <summary>
         /// Update the application entity
         /// </summary>
-        public override Core.Model.Entities.ApplicationEntity UpdateInternal(DataContext context, Core.Model.Entities.ApplicationEntity data, IPrincipal principal)
+        public override Core.Model.Entities.ApplicationEntity UpdateInternal(DataContext context, Core.Model.Entities.ApplicationEntity data)
         {
-            if(data.SecurityApplication != null) data.SecurityApplication = data.SecurityApplication?.EnsureExists(context, principal) as SecurityApplication;
+            if(data.SecurityApplication != null) data.SecurityApplication = data.SecurityApplication?.EnsureExists(context) as SecurityApplication;
             data.SecurityApplicationKey = data.SecurityApplication?.Key ?? data.SecurityApplicationKey;
-            return base.UpdateInternal(context, data, principal);
+            return base.UpdateInternal(context, data);
         }
     }
 }

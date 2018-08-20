@@ -39,7 +39,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Convert to model instance
         /// </summary>
-        public override Protocol ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+        public override Protocol ToModelInstance(object dataInstance, DataContext context)
         {
             if(dataInstance == null) return null;
 
@@ -64,7 +64,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Convert from model instance
         /// </summary>
-        public override object FromModelInstance(Protocol modelInstance, DataContext context, IPrincipal princpal)
+        public override object FromModelInstance(Protocol modelInstance, DataContext context)
         {
             var existingHandler = context.FirstOrDefault<DbProtocolHandler>(o => o.TypeName == modelInstance.HandlerClassName);
             if(existingHandler == null)
@@ -72,7 +72,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 existingHandler = new DbProtocolHandler()
                 {
                     Key = Guid.NewGuid(),
-                    CreatedByKey = modelInstance.CreatedByKey ?? princpal.GetUserKey(context).Value,
+                    CreatedByKey = modelInstance.CreatedByKey ?? context.ContextId,
                     CreationTime = DateTime.Now,
                     IsActive = true,
                     Name = modelInstance.HandlerClass.Name,
@@ -85,7 +85,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             return new DbProtocol()
             {
                 Key = modelInstance.Key ?? Guid.NewGuid(),
-                CreatedByKey = modelInstance.CreatedByKey ?? princpal.GetUserKey(context).Value,
+                CreatedByKey = modelInstance.CreatedByKey ?? context.ContextId,
                 CreationTime = modelInstance.CreationTime,
                 Name = modelInstance.Name,
                 ObsoletedByKey = modelInstance.ObsoletedByKey,

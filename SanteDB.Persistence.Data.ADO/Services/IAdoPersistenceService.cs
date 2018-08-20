@@ -35,27 +35,27 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Inserts the specified object
         /// </summary>
-        Object Insert(DataContext context, Object data, IPrincipal principal);
+        Object Insert(DataContext context, Object data);
 
         /// <summary>
         /// Updates the specified data
         /// </summary>
-        Object Update(DataContext context, Object data, IPrincipal principal);
+        Object Update(DataContext context, Object data);
 
         /// <summary>
         /// Obsoletes the specified data
         /// </summary>
-        Object Obsolete(DataContext context, Object data, IPrincipal principal);
+        Object Obsolete(DataContext context, Object data);
 
         /// <summary>
         /// Gets the specified data
         /// </summary>
-        Object Get(DataContext context, Guid id, IPrincipal principal);
+        Object Get(DataContext context, Guid id);
 
         /// <summary>
         /// Map to model instance
         /// </summary>
-        Object ToModelInstance(object domainInstance, DataContext context, IPrincipal principal);
+        Object ToModelInstance(object domainInstance, DataContext context);
     }
 
     /// <summary>
@@ -66,6 +66,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Get the set objects from the source
         /// </summary>
-        IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId, IPrincipal principal);
+        IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId);
     }
 }

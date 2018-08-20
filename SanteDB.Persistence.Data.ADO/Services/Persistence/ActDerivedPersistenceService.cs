@@ -57,9 +57,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// From model instance
         /// </summary>
-        public override object FromModelInstance(TModel modelInstance, DataContext context, IPrincipal princpal)
+        public override object FromModelInstance(TModel modelInstance, DataContext context)
         {
-            var retVal = base.FromModelInstance(modelInstance, context, princpal);
+            var retVal = base.FromModelInstance(modelInstance, context);
             (retVal as DbActSubTable).ParentKey = modelInstance.VersionKey.Value;
             return retVal;
         }
@@ -67,41 +67,41 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Entity model instance
         /// </summary>
-        public override sealed TModel ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+        public override sealed TModel ToModelInstance(object dataInstance, DataContext context)
         {
-            return (TModel)this.m_actPersister.ToModelInstance(dataInstance, context, principal);
+            return (TModel)this.m_actPersister.ToModelInstance(dataInstance, context);
         }
 
         /// <summary>
         /// Insert the specified TModel into the database
         /// </summary>
-        public override TModel InsertInternal(DataContext context, TModel data, IPrincipal principal)
+        public override TModel InsertInternal(DataContext context, TModel data)
         {
             if (typeof(TModel).BaseType == typeof(Act))
             {
-                var inserted = this.m_actPersister.InsertCoreProperties(context, data, principal);
+                var inserted = this.m_actPersister.InsertCoreProperties(context, data);
                 data.Key = inserted.Key;
             }
-            return base.InsertInternal(context, data, principal);
+            return base.InsertInternal(context, data);
         }
 
         /// <summary>
         /// Update the specified TModel
         /// </summary>
-        public override TModel UpdateInternal(DataContext context, TModel data, IPrincipal principal)
+        public override TModel UpdateInternal(DataContext context, TModel data)
         {
             if (typeof(TModel).BaseType == typeof(Act))
-                this.m_actPersister.UpdateCoreProperties(context, data, principal);
-            return base.InsertInternal(context, data, principal);
+                this.m_actPersister.UpdateCoreProperties(context, data);
+            return base.InsertInternal(context, data);
         }
 
         /// <summary>
         /// Obsolete the object
         /// </summary>
-        public override TModel ObsoleteInternal(DataContext context, TModel data, IPrincipal principal)
+        public override TModel ObsoleteInternal(DataContext context, TModel data)
         {
-            var retVal = this.m_actPersister.ObsoleteInternal(context, data, principal);
-            return base.InsertInternal(context, data, principal);
+            var retVal = this.m_actPersister.ObsoleteInternal(context, data);
+            return base.InsertInternal(context, data);
         }
 
     }

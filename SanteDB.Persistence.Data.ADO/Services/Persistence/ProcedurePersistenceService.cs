@@ -38,9 +38,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Convert databased model to model
         /// </summary>
-        public Core.Model.Acts.Procedure ToModelInstance(DbProcedure procedureInstance, DbActVersion actVersionInstance, DbAct actInstance, DataContext context, IPrincipal principal)
+        public Core.Model.Acts.Procedure ToModelInstance(DbProcedure procedureInstance, DbActVersion actVersionInstance, DbAct actInstance, DataContext context)
         {
-            var retVal = m_actPersister.ToModelInstance<Core.Model.Acts.Procedure>(actVersionInstance, actInstance, context, principal);
+            var retVal = m_actPersister.ToModelInstance<Core.Model.Acts.Procedure>(actVersionInstance, actInstance, context);
             if (retVal == null) return null;
             else if(procedureInstance == null)
             {
@@ -61,42 +61,42 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the specified sbadm
         /// </summary>
-        public override Core.Model.Acts.Procedure InsertInternal(DataContext context, Core.Model.Acts.Procedure data, IPrincipal principal)
+        public override Core.Model.Acts.Procedure InsertInternal(DataContext context, Core.Model.Acts.Procedure data)
         {
-            if (data.Method != null) data.Method = data.Method?.EnsureExists(context, principal) as Concept;
+            if (data.Method != null) data.Method = data.Method?.EnsureExists(context) as Concept;
             else if(!data.MethodKey.HasValue)
                 data.MethodKey = NullReasonKeys.NoInformation;
 
-            if (data.ApproachSite != null) data.ApproachSite = data.ApproachSite?.EnsureExists(context, principal) as Concept;
-            if (data.TargetSite != null) data.TargetSite = data.TargetSite?.EnsureExists(context, principal) as Concept;
+            if (data.ApproachSite != null) data.ApproachSite = data.ApproachSite?.EnsureExists(context) as Concept;
+            if (data.TargetSite != null) data.TargetSite = data.TargetSite?.EnsureExists(context) as Concept;
 
             // JF: Correct dose unit key
              data.MethodKey = data.Method?.Key ?? data.MethodKey;
             data.ApproachSiteKey = data.ApproachSite?.Key ?? data.ApproachSiteKey;
             data.TargetSiteKey = data.TargetSite?.Key ?? data.TargetSiteKey;
 
-            return base.InsertInternal(context, data, principal);
+            return base.InsertInternal(context, data);
         }
 
 
         /// <summary>
         /// Insert the specified sbadm
         /// </summary>
-        public override Core.Model.Acts.Procedure UpdateInternal(DataContext context, Core.Model.Acts.Procedure data, IPrincipal principal)
+        public override Core.Model.Acts.Procedure UpdateInternal(DataContext context, Core.Model.Acts.Procedure data)
         {
-            if (data.Method != null) data.Method = data.Method?.EnsureExists(context, principal) as Concept;
+            if (data.Method != null) data.Method = data.Method?.EnsureExists(context) as Concept;
             else if (!data.MethodKey.HasValue)
                 data.MethodKey = NullReasonKeys.NoInformation;
 
-            if (data.ApproachSite != null) data.ApproachSite = data.ApproachSite?.EnsureExists(context, principal) as Concept;
-            if (data.TargetSite != null) data.TargetSite = data.TargetSite?.EnsureExists(context, principal) as Concept;
+            if (data.ApproachSite != null) data.ApproachSite = data.ApproachSite?.EnsureExists(context) as Concept;
+            if (data.TargetSite != null) data.TargetSite = data.TargetSite?.EnsureExists(context) as Concept;
 
             // JF: Correct dose unit key
             data.MethodKey = data.Method?.Key ?? data.MethodKey;
             data.ApproachSiteKey = data.ApproachSite?.Key ?? data.ApproachSiteKey;
             data.TargetSiteKey = data.TargetSite?.Key ?? data.TargetSiteKey;
 
-            return base.UpdateInternal(context, data, principal);
+            return base.UpdateInternal(context, data);
         }
     }
 }

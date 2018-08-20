@@ -43,15 +43,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Convert data instance to model instance
         /// </summary>
-        public override EntityAddress ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+        public override EntityAddress ToModelInstance(object dataInstance, DataContext context)
         {
-            return base.ToModelInstance(dataInstance, context, principal);
+            return base.ToModelInstance(dataInstance, context);
         }
 
         /// <summary>
         /// Get addresses from source
         /// </summary>
-        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId, IPrincipal principal)
+        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId)
         {
             int tr = 0;
             var addrLookupQuery = context.CreateSqlStatement<DbEntityAddressComponent>().SelectFrom(typeof(DbEntityAddressComponent), typeof(DbEntityAddress), typeof(DbEntityAddressComponentValue))
@@ -86,22 +86,21 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the specified object
         /// </summary>
-        public override Core.Model.Entities.EntityAddress InsertInternal(DataContext context, EntityAddress data, IPrincipal principal)
+        public override Core.Model.Entities.EntityAddress InsertInternal(DataContext context, EntityAddress data)
         {
 
             // Ensure exists
-            if (data.AddressUse != null) data.AddressUse = data.AddressUse?.EnsureExists(context, principal) as Concept;
+            if (data.AddressUse != null) data.AddressUse = data.AddressUse?.EnsureExists(context) as Concept;
             data.AddressUseKey = data.AddressUse?.Key ?? data.AddressUseKey;
 
-            var retVal = base.InsertInternal(context, data, principal);
+            var retVal = base.InsertInternal(context, data);
 
             // Data component
             if (data.Component != null)
                 base.UpdateAssociatedItems<Core.Model.Entities.EntityAddressComponent, DbEntityAddressComponent>(
                    data.Component,
                     data,
-                    context,
-                    principal);
+                    context);
 
             return retVal;
         }
@@ -109,14 +108,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Update the entity name
         /// </summary>
-        public override Core.Model.Entities.EntityAddress UpdateInternal(DataContext context, Core.Model.Entities.EntityAddress data, IPrincipal principal)
+        public override Core.Model.Entities.EntityAddress UpdateInternal(DataContext context, Core.Model.Entities.EntityAddress data)
         {
 
             // Ensure exists
-            if (data.AddressUse != null) data.AddressUse = data.AddressUse?.EnsureExists(context, principal) as Concept;
+            if (data.AddressUse != null) data.AddressUse = data.AddressUse?.EnsureExists(context) as Concept;
             data.AddressUseKey = data.AddressUse?.Key ?? data.AddressUseKey;
 
-            var retVal = base.UpdateInternal(context, data, principal);
+            var retVal = base.UpdateInternal(context, data);
 
             var sourceKey = data.Key.Value.ToByteArray();
 
@@ -125,8 +124,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 base.UpdateAssociatedItems<Core.Model.Entities.EntityAddressComponent, DbEntityAddressComponent>(
                    data.Component,
                     data,
-                    context,
-                    principal);
+                    context);
 
             return retVal;
         }
@@ -143,7 +141,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// To model instance
         /// </summary>
-        public override EntityAddressComponent ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+        public override EntityAddressComponent ToModelInstance(object dataInstance, DataContext context)
         {
             if (dataInstance == null) return null;
 
@@ -164,9 +162,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// From the model instance
         /// </summary>
-        public override object FromModelInstance(Core.Model.Entities.EntityAddressComponent modelInstance, DataContext context, IPrincipal princpal)
+        public override object FromModelInstance(Core.Model.Entities.EntityAddressComponent modelInstance, DataContext context)
         {
-            var retVal = base.FromModelInstance(modelInstance, context, princpal) as DbEntityAddressComponent;
+            var retVal = base.FromModelInstance(modelInstance, context) as DbEntityAddressComponent;
 
             // Address component already exists?
             var existing = context.FirstOrDefault<DbEntityAddressComponentValue>(o => o.Value == modelInstance.Value);
@@ -183,31 +181,31 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Entity address component
         /// </summary>
-        public override Core.Model.Entities.EntityAddressComponent InsertInternal(DataContext context, Core.Model.Entities.EntityAddressComponent data, IPrincipal principal)
+        public override Core.Model.Entities.EntityAddressComponent InsertInternal(DataContext context, Core.Model.Entities.EntityAddressComponent data)
         {
-            if (data.ComponentType != null) data.ComponentType = data.ComponentType?.EnsureExists(context, principal) as Concept;
+            if (data.ComponentType != null) data.ComponentType = data.ComponentType?.EnsureExists(context) as Concept;
             data.ComponentTypeKey = data.ComponentType?.Key ?? data.ComponentTypeKey;
-            return base.InsertInternal(context, data, principal);
+            return base.InsertInternal(context, data);
         }
 
         /// <summary>
         /// Update 
         /// </summary>
-        public override Core.Model.Entities.EntityAddressComponent UpdateInternal(DataContext context, Core.Model.Entities.EntityAddressComponent data, IPrincipal principal)
+        public override Core.Model.Entities.EntityAddressComponent UpdateInternal(DataContext context, Core.Model.Entities.EntityAddressComponent data)
         {
-            if (data.ComponentType != null) data.ComponentType = data.ComponentType?.EnsureExists(context, principal) as Concept;
+            if (data.ComponentType != null) data.ComponentType = data.ComponentType?.EnsureExists(context) as Concept;
 
             data.ComponentTypeKey = data.ComponentType?.Key ?? data.ComponentTypeKey;
-            return base.UpdateInternal(context, data, principal);
+            return base.UpdateInternal(context, data);
         }
 
         /// <summary>
         /// Get components from source
         /// </summary>
-        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId, IPrincipal principal)
+        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId)
         {
             int tr = 0;
-            return this.QueryInternal(context, base.BuildSourceQuery<EntityAddressComponent>(id), Guid.Empty, 0, null, out tr, principal, false).ToList();
+            return this.QueryInternal(context, base.BuildSourceQuery<EntityAddressComponent>(id), Guid.Empty, 0, null, out tr, false).ToList();
         }
 
     }

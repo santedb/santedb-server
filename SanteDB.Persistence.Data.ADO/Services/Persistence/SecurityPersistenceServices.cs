@@ -37,9 +37,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 	/// </summary>
 	public class SecurityApplicationPersistenceService : BaseDataPersistenceService<Core.Model.Security.SecurityApplication, DbSecurityApplication>
 	{
-		internal override SecurityApplication Get(DataContext context, Guid key, IPrincipal principal)
+		internal override SecurityApplication Get(DataContext context, Guid key)
 		{
-			var application = base.Get(context, key, principal);
+			var application = base.Get(context, key);
 
 			if (application != null && context.LoadState == LoadState.FullLoad)
 			{
@@ -56,14 +56,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <summary>
 		/// Insert the specified object
 		/// </summary>
-		public override Core.Model.Security.SecurityApplication InsertInternal(DataContext context, Core.Model.Security.SecurityApplication data, IPrincipal principal)
+		public override Core.Model.Security.SecurityApplication InsertInternal(DataContext context, Core.Model.Security.SecurityApplication data)
 		{
-			var retVal = base.InsertInternal(context, data, principal);
+			var retVal = base.InsertInternal(context, data);
 
 			if (data.Policies == null)
 				return retVal;
 
-			data.Policies.ForEach(o => o.Policy?.EnsureExists(context, principal));
+			data.Policies.ForEach(o => o.Policy?.EnsureExists(context));
 			foreach (var itm in data.Policies.Select(o => new DbSecurityApplicationPolicy()
 			{
 				PolicyKey = o.PolicyKey.Value,
@@ -79,9 +79,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <summary>
 		/// Represent as model instance
 		/// </summary>
-		public override Core.Model.Security.SecurityApplication ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+		public override Core.Model.Security.SecurityApplication ToModelInstance(object dataInstance, DataContext context)
 		{
-			var retVal = base.ToModelInstance(dataInstance, context, principal);
+			var retVal = base.ToModelInstance(dataInstance, context);
 			if (retVal == null) return null;
 			var policyQuery = context.CreateSqlStatement<DbSecurityApplicationPolicy>().SelectFrom()
 				.InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
@@ -98,9 +98,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <param name="data">The security application to update.</param>
 		/// <param name="principal">The authentication principal.</param>
 		/// <returns>Returns the updated security application.</returns>
-		public override Core.Model.Security.SecurityApplication UpdateInternal(DataContext context, Core.Model.Security.SecurityApplication data, IPrincipal principal)
+		public override Core.Model.Security.SecurityApplication UpdateInternal(DataContext context, Core.Model.Security.SecurityApplication data)
 		{
-			var domainInstance = this.FromModelInstance(data, context, principal);
+			var domainInstance = this.FromModelInstance(data, context);
 
 			var currentObject = context.FirstOrDefault<DbSecurityApplication>(d => d.Key == data.Key);
 
@@ -138,9 +138,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 	/// </summary>
 	public class SecurityDevicePersistenceService : BaseDataPersistenceService<Core.Model.Security.SecurityDevice, DbSecurityDevice>
 	{
-		internal override SecurityDevice Get(DataContext context, Guid key, IPrincipal principal)
+		internal override SecurityDevice Get(DataContext context, Guid key)
 		{
-			var device = base.Get(context, key, principal);
+			var device = base.Get(context, key);
 
 			if (device != null && context.LoadState == LoadState.FullLoad)
 			{
@@ -157,14 +157,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <summary>
 		/// Insert the specified object
 		/// </summary>
-		public override Core.Model.Security.SecurityDevice InsertInternal(DataContext context, Core.Model.Security.SecurityDevice data, IPrincipal principal)
+		public override Core.Model.Security.SecurityDevice InsertInternal(DataContext context, Core.Model.Security.SecurityDevice data)
 		{
-			var retVal = base.InsertInternal(context, data, principal);
+			var retVal = base.InsertInternal(context, data);
 
 			if (data.Policies == null)
 				return retVal;
 
-			data.Policies.ForEach(o => o.Policy?.EnsureExists(context, principal));
+			data.Policies.ForEach(o => o.Policy?.EnsureExists(context));
 			foreach (var itm in data.Policies.Select(o => new DbSecurityDevicePolicy()
 			{
 				PolicyKey = o.PolicyKey.Value,
@@ -180,9 +180,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <summary>
 		/// Represent as model instance
 		/// </summary>
-		public override Core.Model.Security.SecurityDevice ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+		public override Core.Model.Security.SecurityDevice ToModelInstance(object dataInstance, DataContext context)
 		{
-			var retVal = base.ToModelInstance(dataInstance, context, principal);
+			var retVal = base.ToModelInstance(dataInstance, context);
 			if (retVal == null) return null;
 			var policyQuery = context.CreateSqlStatement<DbSecurityDevicePolicy>().SelectFrom()
 				.InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
@@ -195,9 +195,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <summary>
 		/// Update the roles to security user
 		/// </summary>
-		public override Core.Model.Security.SecurityDevice UpdateInternal(DataContext context, Core.Model.Security.SecurityDevice data, IPrincipal principal)
+		public override Core.Model.Security.SecurityDevice UpdateInternal(DataContext context, Core.Model.Security.SecurityDevice data)
 		{
-			var domainInstance = this.FromModelInstance(data, context, principal);
+			var domainInstance = this.FromModelInstance(data, context);
 
 			var currentObject = context.FirstOrDefault<DbSecurityDevice>(d => d.Key == data.Key);
 
@@ -238,7 +238,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <summary>
 		/// Updating policies is a security risk and not permitted... ever
 		/// </summary>
-		public override Core.Model.Security.SecurityPolicy UpdateInternal(DataContext context, Core.Model.Security.SecurityPolicy data, IPrincipal principal)
+		public override Core.Model.Security.SecurityPolicy UpdateInternal(DataContext context, Core.Model.Security.SecurityPolicy data)
 		{
 			throw new AdoFormalConstraintException(AdoFormalConstraintType.UpdatedReadonlyObject);
 		}
@@ -256,9 +256,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <param name="key">The key.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns a security role instance.</returns>
-		internal override SecurityRole Get(DataContext context, Guid key, IPrincipal principal)
+		internal override SecurityRole Get(DataContext context, Guid key)
 		{
-			var role = base.Get(context, key, principal);
+			var role = base.Get(context, key);
 
 			if (role != null && context.LoadState == LoadState.FullLoad)
 			{
@@ -275,14 +275,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <summary>
 		/// Insert the specified object
 		/// </summary>
-		public override Core.Model.Security.SecurityRole InsertInternal(DataContext context, Core.Model.Security.SecurityRole data, IPrincipal principal)
+		public override Core.Model.Security.SecurityRole InsertInternal(DataContext context, Core.Model.Security.SecurityRole data)
 		{
-			var retVal = base.InsertInternal(context, data, principal);
+			var retVal = base.InsertInternal(context, data);
 
 			if (data.Policies != null)
 			{
 				// TODO: Clean this up
-				data.Policies.ForEach(o => o.Policy?.EnsureExists(context, principal));
+				data.Policies.ForEach(o => o.Policy?.EnsureExists(context));
 				foreach (var pol in data.Policies.Select(o => new DbSecurityRolePolicy()
 
 				{
@@ -300,9 +300,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <summary>
 		/// Represent as model instance
 		/// </summary>
-		public override Core.Model.Security.SecurityRole ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+		public override Core.Model.Security.SecurityRole ToModelInstance(object dataInstance, DataContext context)
 		{
-			var retVal = base.ToModelInstance(dataInstance, context, principal);
+			var retVal = base.ToModelInstance(dataInstance, context);
 			if (retVal == null) return null;
 
 			var policyQuery = context.CreateSqlStatement<DbSecurityRolePolicy>().SelectFrom()
@@ -323,9 +323,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <summary>
 		/// Update the roles to security user
 		/// </summary>
-		public override Core.Model.Security.SecurityRole UpdateInternal(DataContext context, Core.Model.Security.SecurityRole data, IPrincipal principal)
+		public override Core.Model.Security.SecurityRole UpdateInternal(DataContext context, Core.Model.Security.SecurityRole data)
 		{
-			var domainInstance = this.FromModelInstance(data, context, principal);
+			var domainInstance = this.FromModelInstance(data, context);
 
 			var currentObject = context.FirstOrDefault<DbSecurityRole>(d => d.Key == data.Key);
 
@@ -371,15 +371,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <param name="data">Data.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Core.Model.Security.SecurityUser.</returns>
-		public override Core.Model.Security.SecurityUser InsertInternal(DataContext context, Core.Model.Security.SecurityUser data, IPrincipal principal)
+		public override Core.Model.Security.SecurityUser InsertInternal(DataContext context, Core.Model.Security.SecurityUser data)
 		{
-			var retVal = base.InsertInternal(context, data, principal);
+			var retVal = base.InsertInternal(context, data);
 
 			// Roles
 			if (data.Roles != null)
 				foreach (var r in data.Roles)
 				{
-					r.EnsureExists(context, principal);
+					r.EnsureExists(context);
 					context.Insert(new DbSecurityUserRole()
 					{
 						UserKey = retVal.Key.Value,
@@ -402,9 +402,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <param name="principal">The principal.</param>
 		/// <param name="countResults">if set to <c>true</c> [count results].</param>
 		/// <returns>IEnumerable&lt;SecurityUser&gt;.</returns>
-		public override IEnumerable<SecurityUser> QueryInternal(DataContext context, Expression<Func<SecurityUser, bool>> query, Guid queryId, int offset, int? count, out int totalResults, IPrincipal principal, bool countResults = true)
+		public override IEnumerable<SecurityUser> QueryInternal(DataContext context, Expression<Func<SecurityUser, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = true)
 		{
-			var results = base.QueryInternal(context, query, queryId, offset, count, out totalResults, principal, countResults);
+			var results = base.QueryInternal(context, query, queryId, offset, count, out totalResults, countResults);
 
 			var users = new List<SecurityUser>();
 
@@ -429,10 +429,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <param name="context">The context.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>The model instance.</returns>
-		public override Core.Model.Security.SecurityUser ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+		public override Core.Model.Security.SecurityUser ToModelInstance(object dataInstance, DataContext context)
 		{
 			var dbUser = dataInstance as DbSecurityUser;
-			var retVal = base.ToModelInstance(dataInstance, context, principal);
+			var retVal = base.ToModelInstance(dataInstance, context);
 			if (retVal == null) return null;
 
 			retVal.Lockout = dbUser?.Lockout;
@@ -452,9 +452,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <param name="data">Data.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Core.Model.Security.SecurityUser.</returns>
-		public override Core.Model.Security.SecurityUser UpdateInternal(DataContext context, Core.Model.Security.SecurityUser data, IPrincipal principal)
+		public override Core.Model.Security.SecurityUser UpdateInternal(DataContext context, Core.Model.Security.SecurityUser data)
 		{
-			var retVal = base.UpdateInternal(context, data, principal);
+			var retVal = base.UpdateInternal(context, data);
 
 			if (data.Roles == null)
 			{
@@ -464,7 +464,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 			context.Delete<DbSecurityUserRole>(o => o.UserKey == retVal.Key);
 			foreach (var r in data.Roles)
 			{
-				r.EnsureExists(context, principal);
+				r.EnsureExists(context);
 				context.Insert(new DbSecurityUserRole()
 				{
 					UserKey = retVal.Key.Value,
@@ -482,9 +482,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <param name="key">The key of the user to retrieve.</param>
 		/// <param name="principal">The authentication context.</param>
 		/// <returns>Returns a security user or null if no user is found.</returns>
-		internal override SecurityUser Get(DataContext context, Guid key, IPrincipal principal)
+		internal override SecurityUser Get(DataContext context, Guid key)
 		{
-			var user = base.Get(context, key, principal);
+			var user = base.Get(context, key);
 			if (user == null) return null;
 			var rolesQuery = context.CreateSqlStatement<DbSecurityUserRole>().SelectFrom(typeof(DbSecurityRole))
 				.InnerJoin<DbSecurityRole>(o => o.RoleKey, o => o.Key)

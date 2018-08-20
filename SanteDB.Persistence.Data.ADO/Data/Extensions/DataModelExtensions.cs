@@ -42,6 +42,8 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using SanteDB.Persistence.Data.ADO.Services.Persistence;
+using SanteDB.Core.Security;
+using SanteDB.Core.Diagnostics;
 
 namespace SanteDB.Persistence.Data.ADO.Data
 {
@@ -75,6 +77,8 @@ namespace SanteDB.Persistence.Data.ADO.Data
         private static Dictionary<String, Guid> m_classIdCache = new Dictionary<string, Guid>();
 
         private static Dictionary<String, Guid> m_userIdCache = new Dictionary<string, Guid>();
+        private static Dictionary<String, Guid> m_deviceIdCache = new Dictionary<string, Guid>();
+        private static Dictionary<String, Guid> m_applicationIdCache = new Dictionary<string, Guid>();
 
         /// <summary>
         /// Get fields
@@ -96,7 +100,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
         /// <summary>
         /// Try get by classifier
         /// </summary>
-        public static IIdentifiedEntity TryGetExisting(this IIdentifiedEntity me, DataContext context, IPrincipal principal, bool forceDatabase = false)
+        public static IIdentifiedEntity TryGetExisting(this IIdentifiedEntity me, DataContext context, bool forceDatabase = false)
         {
 
             // Is there a classifier?
@@ -118,7 +122,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
                 //        existing = idpInstance.ToModelInstance(dbExisting, context, principal) as IIdentifiedEntity;
                 //}
             if (me.Key != Guid.Empty && me.Key != null)
-                existing = idpInstance.Get(context, me.Key.Value, principal) as IIdentifiedEntity;
+                existing = idpInstance.Get(context, me.Key.Value) as IIdentifiedEntity;
 
             var classAtt = me.GetType().GetCustomAttribute<KeyLookupAttribute>();
             if (classAtt != null && existing == null)
@@ -165,7 +169,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
                         if (existCache != null)
                             existing = existCache as IdentifiedData;
                         else
-                            existing = idpInstance.ToModelInstance(dataObject, context, principal) as IIdentifiedEntity;
+                            existing = idpInstance.ToModelInstance(dataObject, context) as IIdentifiedEntity;
                     }
                 }
             }
@@ -194,7 +198,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
         /// <summary>
         /// Ensures a model has been persisted
         /// </summary>
-        public static IIdentifiedEntity EnsureExists(this IIdentifiedEntity me, DataContext context, IPrincipal principal)
+        public static IIdentifiedEntity EnsureExists(this IIdentifiedEntity me, DataContext context)
         {
 
             if (me == null) return null;
@@ -203,7 +207,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
             var vMe = me as IVersionedEntity;
             String dkey = String.Format("{0}.{1}", me.GetType().FullName, me.Key);
 
-            IIdentifiedEntity existing = me.TryGetExisting(context, principal);
+            IIdentifiedEntity existing = me.TryGetExisting(context);
             var idpInstance = AdoPersistenceService.GetPersister(me.GetType());
 
             // Don't touch the child just return reference
@@ -227,7 +231,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
                     vMe?.VersionKey != null && vMe?.VersionKey != Guid.Empty)
                 {
                     // Update method
-                    IVersionedEntity updated = idpInstance.Update(context, me, principal) as IVersionedEntity;
+                    IVersionedEntity updated = idpInstance.Update(context, me) as IVersionedEntity;
                     me.Key = updated.Key;
                     if (vMe != null)
                         vMe.VersionKey = (updated as IVersionedEntity).VersionKey;
@@ -237,7 +241,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
             }
             else if (existing == null) // Insert
             {
-                IIdentifiedEntity inserted = idpInstance.Insert(context, me, principal) as IIdentifiedEntity;
+                IIdentifiedEntity inserted = idpInstance.Insert(context, me) as IIdentifiedEntity;
                 me.Key = inserted.Key;
 
                 if (vMe != null)
@@ -272,31 +276,32 @@ namespace SanteDB.Persistence.Data.ADO.Data
         /// <param name="principal">The current authorization context</param>
         /// <param name="dataContext">The context under which the get operation should be completed</param>
         /// <returns>The UUID of the user which the authorization context subject represents</returns>
-        public static Guid? GetUserKey(this IPrincipal principal, DataContext dataContext)
+        public static Guid? GetKey(this IIdentity me, DataContext dataContext)
         {
 
-            if (principal == null)
-                return null;
+            Guid retVal = Guid.Empty;
+            IDbIdentified loaded = null;
+            if (me is DeviceIdentity && !m_deviceIdCache.TryGetValue(me.Name.ToLower(), out retVal))
+                loaded = dataContext.SingleOrDefault<DbSecurityDevice>(o=>o.PublicId.ToLower() == me.Name.ToLower() && !o.ObsoletionTime.HasValue);
+            else if (me is Core.Security.ApplicationIdentity && !m_applicationIdCache.TryGetValue(me.Name.ToLower(), out retVal))
+                loaded = dataContext.SingleOrDefault<DbSecurityApplication>(o => o.PublicId.ToLower() == me.Name.ToLower() && !o.ObsoletionTime.HasValue);
+            else if (!m_userIdCache.TryGetValue(me.Name.ToLower(), out retVal))
+                loaded = dataContext.SingleOrDefault<DbSecurityUser>(o => o.UserName.ToLower() == me.Name.ToLower() && !o.ObsoletionTime.HasValue);
 
-            Guid userId = Guid.Empty;
-            DbSecurityUser user = null;
-            if (!m_userIdCache.TryGetValue(principal.Identity.Name.ToLower(), out userId))
-            {
-                user = dataContext.SingleOrDefault<DbSecurityUser>(o => o.UserName.ToLower() == principal.Identity.Name.ToLower() && !o.ObsoletionTime.HasValue);
-                userId = user.Key;
+            if(retVal == Guid.Empty) { 
+                retVal = loaded.Key;
                 // TODO: Enable auto-creation of users via configuration
-                if (user == null)
-                    throw new SecurityException("User in authorization context does not exist or is obsolete");
+                if (loaded == null)
+                    throw new SecurityException("Object in authorization context does not exist or is obsolete");
                 else
                 {
                     lock (m_userIdCache)
-                        if (!m_userIdCache.ContainsKey(principal.Identity.Name.ToLower()))
-                            m_userIdCache.Add(principal.Identity.Name.ToLower(), user.Key);
+                        if (!m_userIdCache.ContainsKey(me.Name.ToLower()))
+                            m_userIdCache.Add(me.Name.ToLower(), loaded.Key);
                 }
             }
 
-
-            return userId;
+            return retVal;
 
         }
 
@@ -315,7 +320,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
         /// <summary>
         /// This method will load all basic properties for the specified model object
         /// </summary>
-        public static void LoadAssociations<TModel>(this TModel me, DataContext context, IPrincipal principal, params String[] loadProperties) where TModel : IIdentifiedEntity
+        public static void LoadAssociations<TModel>(this TModel me, DataContext context, params String[] loadProperties) where TModel : IIdentifiedEntity
         {
             // I duz not haz a chzbrgr?
             if (me == null || me.LoadState >= context.LoadState)
@@ -398,7 +403,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
 
                     // We want to query based on our PK and version if applicable
                     decimal? versionSequence = (me as IBaseEntityData)?.ObsoletionTime.HasValue == true ? (me as IVersionedEntity)?.VersionSequence : null;
-                    var assoc = assocPersister.GetFromSource(context, me.Key.Value, versionSequence, principal);
+                    var assoc = assocPersister.GetFromSource(context, me.Key.Value, versionSequence);
                     ConstructorInfo ci = null;
                     if(!m_constructors.TryGetValue(pi.PropertyType, out ci))
                     {
@@ -441,7 +446,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
                     object value = null;
                     if (!context.Data.TryGetValue(keyValue.ToString(), out value))
                     {
-                        value = adoPersister.Get(context, (Guid)keyValue, principal);
+                        value = adoPersister.Get(context, (Guid)keyValue);
                         context.AddData(keyValue.ToString(), value);
                     }
                     pid.SetValue(me, value);
@@ -456,5 +461,42 @@ namespace SanteDB.Persistence.Data.ADO.Data
             if (me.LoadState == LoadState.New)
                 me.LoadState = LoadState.FullLoad;
         }
+
+        /// <summary>
+        /// Establish provenance for the specified connection
+        /// </summary>
+        public static Guid EstablishProvenance(this DataContext me, IPrincipal principal)
+        {
+            // First, we want to get the identities
+            var cprincipal = principal as ClaimsPrincipal;
+            DbSecurityProvenance retVal = new DbSecurityProvenance()
+            {
+                Key = me.ContextId
+            };
+            foreach(var ident in cprincipal.Identities)
+            {
+                if (ident is DeviceIdentity)
+                    retVal.DeviceKey = ident.GetKey(me);
+                else if (ident is Core.Security.ApplicationIdentity)
+                    retVal.ApplicationKey = ident.GetKey(me).Value;
+                else
+                    retVal.UserKey = ident.GetKey(me);
+            }
+            
+            // Context 
+            try
+            {
+                if (retVal.UserKey.ToString() == AuthenticationContext.SystemUserSid ||
+                    retVal.UserKey.ToString() == AuthenticationContext.AnonymousUserSid)
+                    me.ContextId = retVal.UserKey.Value;
+                else
+                    retVal = me.Insert(retVal);
+            }
+            catch (Exception e) {
+                s_traceSource.TraceWarning("Error creating context: {0}", e);
+            }
+            return retVal.Key;
+        }
+
     }
 }

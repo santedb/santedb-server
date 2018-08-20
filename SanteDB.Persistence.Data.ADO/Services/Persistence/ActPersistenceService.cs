@@ -47,7 +47,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// To model instance
         /// </summary>
-        public virtual TActType ToModelInstance<TActType>(DbActVersion dbInstance, DbAct actInstance, DataContext context, IPrincipal principal) where TActType : Core.Model.Acts.Act, new()
+        public virtual TActType ToModelInstance<TActType>(DbActVersion dbInstance, DbAct actInstance, DataContext context) where TActType : Core.Model.Acts.Act, new()
         {
 
             var retVal = m_mapper.MapDomainInstance<DbActVersion, TActType>(dbInstance);
@@ -62,7 +62,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Create an appropriate entity based on the class code
         /// </summary>
-        public override Core.Model.Acts.Act ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+        public override Core.Model.Acts.Act ToModelInstance(object dataInstance, DataContext context)
         {
             // Alright first, which type am I mapping to?
 
@@ -80,23 +80,21 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 (dataInstance as CompositeResult)?.Values.OfType<DbControlAct>().FirstOrDefault() ?? context.FirstOrDefault<DbControlAct>(o => o.ParentKey == dbActVersion.VersionKey),
                                 dbActVersion,
                                 dbAct,
-                                context,
-                                principal);
+                                context);
                     break;
                 case ActClassKeyStrings.SubstanceAdministration:
                     retVal = new SubstanceAdministrationPersistenceService().ToModelInstance(
                                 (dataInstance as CompositeResult)?.Values.OfType<DbSubstanceAdministration>().FirstOrDefault() ?? context.FirstOrDefault<DbSubstanceAdministration>(o => o.ParentKey == dbActVersion.VersionKey),
                                 dbActVersion,
                                 dbAct,
-                                context,
-                                principal);
+                                context);
                     break;
                 case ActClassKeyStrings.Observation:
                     var dbObs = (dataInstance as CompositeResult)?.Values.OfType<DbObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbObservation>(o => o.ParentKey == dbActVersion.VersionKey);
                     if (dbObs == null)
                     {
                         this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Warning, -10293, "Observation {0} is missing observation data! Even though class code is {1}", dbAct.Key, dbAct.ClassConceptKey);
-                        retVal = this.ToModelInstance<Core.Model.Acts.Act>(dbActVersion, dbAct, context, principal);
+                        retVal = this.ToModelInstance<Core.Model.Acts.Act>(dbActVersion, dbAct, context);
                     }
                     else
                         switch (dbObs.ValueType)
@@ -107,8 +105,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                     dbObs,
                                     dbActVersion,
                                     dbAct,
-                                    context,
-                                    principal);
+                                    context);
                                 break;
                             case "CD":
                                 retVal = new CodedObservationPersistenceService().ToModelInstance(
@@ -116,8 +113,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                     dbObs,
                                     dbActVersion,
                                     dbAct,
-                                    context,
-                                    principal);
+                                    context);
                                 break;
                             case "PQ":
                                 retVal = new QuantityObservationPersistenceService().ToModelInstance(
@@ -125,16 +121,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                     dbObs,
                                     dbActVersion,
                                     dbAct,
-                                    context,
-                                    principal);
+                                    context);
                                 break;
                             default:
                                 retVal = new ObservationPersistenceService().ToModelInstance(
                                     dbObs,
                                     dbActVersion,
                                     dbAct,
-                                    context,
-                                    principal);
+                                    context);
                                 break;
                         }
                     break;
@@ -143,23 +137,22 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 (dataInstance as CompositeResult)?.Values.OfType<DbPatientEncounter>().FirstOrDefault() ?? context.FirstOrDefault<DbPatientEncounter>(o => o.ParentKey == dbActVersion.VersionKey),
                                 dbActVersion,
                                 dbAct,
-                                context,
-                                principal);
+                                context);
                     break;
                 case ActClassKeyStrings.Condition:
                 default:
-                    retVal = this.ToModelInstance<Core.Model.Acts.Act>(dbActVersion, dbAct, context, principal);
+                    retVal = this.ToModelInstance<Core.Model.Acts.Act>(dbActVersion, dbAct, context);
                     break;
             }
 
-            retVal.LoadAssociations(context, principal);
+            retVal.LoadAssociations(context);
             return retVal;
         }
 
         /// <summary>
         /// Override cache conversion
         /// </summary>
-        protected override Act CacheConvert(object dataInstance, DataContext context, IPrincipal principal)
+        protected override Act CacheConvert(object dataInstance, DataContext context)
         {
             if (dataInstance == null) return null;
             DbActVersion dbActVersion = (dataInstance as CompositeResult)?.Values.OfType<DbActVersion>().FirstOrDefault() ?? dataInstance as DbActVersion ?? context.FirstOrDefault<DbActVersion>(o => o.VersionKey == (dataInstance as DbActSubTable).ParentKey);
@@ -205,20 +198,20 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (retVal != null)
                 return retVal;
             else
-                return base.CacheConvert(dataInstance, context, principal);
+                return base.CacheConvert(dataInstance, context);
         }
 
         /// <summary>
         /// Insert the act into the database
         /// </summary>
-        public Core.Model.Acts.Act InsertCoreProperties(DataContext context, Core.Model.Acts.Act data, IPrincipal principal)
+        public Core.Model.Acts.Act InsertCoreProperties(DataContext context, Core.Model.Acts.Act data)
         {
-            if (data.ClassConcept != null) data.ClassConcept = data.ClassConcept?.EnsureExists(context, principal) as Concept;
-            if (data.MoodConcept != null) data.MoodConcept = data.MoodConcept?.EnsureExists(context, principal) as Concept;
-            if (data.ReasonConcept != null) data.ReasonConcept = data.ReasonConcept?.EnsureExists(context, principal) as Concept;
-            if (data.StatusConcept != null) data.StatusConcept = data.StatusConcept?.EnsureExists(context, principal) as Concept;
-            if (data.TypeConcept != null) data.TypeConcept = data.TypeConcept?.EnsureExists(context, principal) as Concept;
-            if (data.Template != null) data.Template = data.Template?.EnsureExists(context, principal) as TemplateDefinition;
+            if (data.ClassConcept != null) data.ClassConcept = data.ClassConcept?.EnsureExists(context) as Concept;
+            if (data.MoodConcept != null) data.MoodConcept = data.MoodConcept?.EnsureExists(context) as Concept;
+            if (data.ReasonConcept != null) data.ReasonConcept = data.ReasonConcept?.EnsureExists(context) as Concept;
+            if (data.StatusConcept != null) data.StatusConcept = data.StatusConcept?.EnsureExists(context) as Concept;
+            if (data.TypeConcept != null) data.TypeConcept = data.TypeConcept?.EnsureExists(context) as Concept;
+            if (data.Template != null) data.Template = data.Template?.EnsureExists(context) as TemplateDefinition;
 
             data.ClassConceptKey = data.ClassConcept?.Key ?? data.ClassConceptKey;
             data.MoodConceptKey = data.MoodConcept?.Key ?? data.MoodConceptKey;
@@ -227,62 +220,56 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             data.TypeConceptKey = data.TypeConcept?.Key ?? data.TypeConceptKey;
 
             // Do the insert
-            var retVal = base.InsertInternal(context, data, principal);
+            var retVal = base.InsertInternal(context, data);
 
             if (data.Extensions != null && data.Extensions.Any())
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.ActExtension, DbActExtension>(
                    data.Extensions.Where(o => o != null && !o.IsEmpty()),
                     retVal,
-                    context,
-                    principal);
+                    context);
 
             if (data.Identifiers != null && data.Identifiers.Any())
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.ActIdentifier, DbActIdentifier>(
                    data.Identifiers.Where(o => o != null && !o.IsEmpty()),
                     retVal,
-                    context,
-                    principal);
+                    context);
 
             if (data.Notes != null && data.Notes.Any())
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.ActNote, DbActNote>(
                    data.Notes.Where(o => o != null && !o.IsEmpty()),
                     retVal,
-                    context,
-                    principal);
+                    context);
 
             if (data.Participations != null && data.Participations.Any())
             {
-                data.Participations = data.Participations.Where(o => o != null && !o.IsEmpty()).Select(o => new ActParticipation(o.ParticipationRole?.EnsureExists(context, principal)?.Key ?? o.ParticipationRoleKey , o.PlayerEntityKey) { Quantity = o.Quantity }).ToList();
+                data.Participations = data.Participations.Where(o => o != null && !o.IsEmpty()).Select(o => new ActParticipation(o.ParticipationRole?.EnsureExists(context)?.Key ?? o.ParticipationRoleKey , o.PlayerEntityKey) { Quantity = o.Quantity }).ToList();
                 base.UpdateVersionedAssociatedItems<Core.Model.Acts.ActParticipation, DbActParticipation>(
                    data.Participations,
                     retVal,
-                    context,
-                    principal);
+                    context);
             }
 
             if (data.Relationships != null && data.Relationships.Any())
                 base.UpdateVersionedAssociatedItems<Core.Model.Acts.ActRelationship, DbActRelationship>(
                    data.Relationships.Where(o => o != null && !o.IsEmpty()),
                     retVal,
-                    context,
-                    principal);
+                    context);
 
             if (data.Tags != null && data.Tags.Any())
                 base.UpdateAssociatedItems<Core.Model.DataTypes.ActTag, DbActTag>(
                    data.Tags.Where(o => o != null && !o.IsEmpty()),
                     retVal,
-                    context,
-                    principal);
+                    context);
 
             if (data.Protocols != null && data.Protocols.Any())
                 foreach (var p in data.Protocols)
                 {
-                    var proto = p.Protocol?.EnsureExists(context, principal);
+                    var proto = p.Protocol?.EnsureExists(context);
                     if (proto == null) // maybe we can retrieve the protocol from the protocol repository?
                     {
                         int t = 0;
                         proto = ApplicationContext.Current.GetService<IClinicalProtocolRepositoryService>().FindProtocol(o => o.Key == p.ProtocolKey, 0, 1, out t).FirstOrDefault();
-                        proto = proto.EnsureExists(context, principal);
+                        proto = proto.EnsureExists(context);
                     }
                     if (proto != null)
                         context.Insert(new DbActProtocol()
@@ -299,14 +286,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Update the specified data
         /// </summary>
-        public Core.Model.Acts.Act UpdateCoreProperties(DataContext context, Core.Model.Acts.Act data, IPrincipal principal)
+        public Core.Model.Acts.Act UpdateCoreProperties(DataContext context, Core.Model.Acts.Act data)
         {
-            if (data.ClassConcept != null) data.ClassConcept = data.ClassConcept?.EnsureExists(context, principal) as Concept;
-            if (data.MoodConcept != null) data.MoodConcept = data.MoodConcept?.EnsureExists(context, principal) as Concept;
-            if (data.ReasonConcept != null) data.ReasonConcept = data.ReasonConcept?.EnsureExists(context, principal) as Concept;
-            if (data.StatusConcept != null) data.StatusConcept = data.StatusConcept?.EnsureExists(context, principal) as Concept;
-            if (data.TypeConcept != null) data.TypeConcept = data.TypeConcept?.EnsureExists(context, principal) as Concept;
-            if (data.Template != null) data.Template = data.Template?.EnsureExists(context, principal) as TemplateDefinition;
+            if (data.ClassConcept != null) data.ClassConcept = data.ClassConcept?.EnsureExists(context) as Concept;
+            if (data.MoodConcept != null) data.MoodConcept = data.MoodConcept?.EnsureExists(context) as Concept;
+            if (data.ReasonConcept != null) data.ReasonConcept = data.ReasonConcept?.EnsureExists(context) as Concept;
+            if (data.StatusConcept != null) data.StatusConcept = data.StatusConcept?.EnsureExists(context) as Concept;
+            if (data.TypeConcept != null) data.TypeConcept = data.TypeConcept?.EnsureExists(context) as Concept;
+            if (data.Template != null) data.Template = data.Template?.EnsureExists(context) as TemplateDefinition;
 
             data.ClassConceptKey = data.ClassConcept?.Key ?? data.ClassConceptKey;
             data.MoodConceptKey = data.MoodConcept?.Key ?? data.MoodConceptKey;
@@ -314,28 +301,25 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             data.StatusConceptKey = data.StatusConcept?.Key ?? data.StatusConceptKey ?? StatusKeys.New;
 
             // Do the update
-            var retVal = base.UpdateInternal(context, data, principal);
+            var retVal = base.UpdateInternal(context, data);
 
             if (data.Extensions != null)
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.ActExtension, DbActExtension>(
                    data.Extensions.Where(o => o != null && !o.IsEmpty()),
                     retVal,
-                    context,
-                    principal);
+                    context);
 
             if (data.Identifiers != null)
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.ActIdentifier, DbActIdentifier>(
                    data.Identifiers.Where(o => o != null && !o.IsEmpty()),
                     retVal,
-                    context,
-                    principal);
+                    context);
 
             if (data.Notes != null)
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.ActNote, DbActNote>(
                    data.Notes.Where(o => o != null && !o.IsEmpty()),
                     retVal,
-                    context,
-                    principal);
+                    context);
 
             if (data.Participations != null)
             {
@@ -363,8 +347,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 base.UpdateVersionedAssociatedItems<Core.Model.Acts.ActParticipation, DbActParticipation>(
                       data.Participations.Where(o => o != null && !o.IsEmpty()),
                         retVal,
-                        context,
-                        principal);
+                        context);
 
 
             }
@@ -373,15 +356,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 base.UpdateVersionedAssociatedItems<Core.Model.Acts.ActRelationship, DbActRelationship>(
                    data.Relationships.Where(o => o != null && !o.IsEmpty() && (o.SourceEntityKey == data.Key || !o.SourceEntityKey.HasValue)),
                     retVal,
-                    context,
-                    principal);
+                    context);
 
             if (data.Tags != null)
                 base.UpdateAssociatedItems<Core.Model.DataTypes.ActTag, DbActTag>(
                    data.Tags.Where(o => o != null && !o.IsEmpty()),
                     retVal,
-                    context,
-                    principal);
+                    context);
 
             return retVal;
         }
@@ -390,40 +371,40 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// Obsolete the act
         /// </summary>
         /// <param name="context"></param>
-        public override Core.Model.Acts.Act ObsoleteInternal(DataContext context, Core.Model.Acts.Act data, IPrincipal principal)
+        public override Core.Model.Acts.Act ObsoleteInternal(DataContext context, Core.Model.Acts.Act data)
         {
             data.StatusConceptKey = StatusKeys.Obsolete;
-            return base.UpdateInternal(context, data, principal);
+            return base.UpdateInternal(context, data);
         }
 
         /// <summary>
         /// Perform insert
         /// </summary>
-        public override Act InsertInternal(DataContext context, Act data, IPrincipal principal)
+        public override Act InsertInternal(DataContext context, Act data)
         {
             switch (data.ClassConceptKey.ToString().ToUpper())
             {
                 case ActClassKeyStrings.ControlAct:
-                    return new ControlActPersistenceService().InsertInternal(context, data.Convert<ControlAct>(), principal);
+                    return new ControlActPersistenceService().InsertInternal(context, data.Convert<ControlAct>());
                 case ActClassKeyStrings.SubstanceAdministration:
-                    return new SubstanceAdministrationPersistenceService().InsertInternal(context, data.Convert<SubstanceAdministration>(), principal);
+                    return new SubstanceAdministrationPersistenceService().InsertInternal(context, data.Convert<SubstanceAdministration>());
                 case ActClassKeyStrings.Observation:
                     switch (data.GetType().Name)
                     {
                         case "TextObservation":
-                            return new TextObservationPersistenceService().InsertInternal(context, data.Convert<TextObservation>(), principal);
+                            return new TextObservationPersistenceService().InsertInternal(context, data.Convert<TextObservation>());
                         case "CodedObservation":
-                            return new CodedObservationPersistenceService().InsertInternal(context, data.Convert<CodedObservation>(), principal);
+                            return new CodedObservationPersistenceService().InsertInternal(context, data.Convert<CodedObservation>());
                         case "QuantityObservation":
-                            return new QuantityObservationPersistenceService().InsertInternal(context, data.Convert<QuantityObservation>(), principal);
+                            return new QuantityObservationPersistenceService().InsertInternal(context, data.Convert<QuantityObservation>());
                         default:
-                            return this.InsertCoreProperties(context, data, principal);
+                            return this.InsertCoreProperties(context, data);
                     }
                 case ActClassKeyStrings.Encounter:
-                    return new EncounterPersistenceService().InsertInternal(context, data.Convert<PatientEncounter>(), principal);
+                    return new EncounterPersistenceService().InsertInternal(context, data.Convert<PatientEncounter>());
                 case ActClassKeyStrings.Condition:
                 default:
-                    return this.InsertCoreProperties(context, data, principal);
+                    return this.InsertCoreProperties(context, data);
 
             }
         }
@@ -431,31 +412,31 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Perform update
         /// </summary>
-        public override Act UpdateInternal(DataContext context, Act data, IPrincipal principal)
+        public override Act UpdateInternal(DataContext context, Act data)
         {
             switch (data.ClassConceptKey.ToString().ToUpper())
             {
                 case ActClassKeyStrings.ControlAct:
-                    return new ControlActPersistenceService().UpdateInternal(context, data.Convert<ControlAct>(), principal);
+                    return new ControlActPersistenceService().UpdateInternal(context, data.Convert<ControlAct>());
                 case ActClassKeyStrings.SubstanceAdministration:
-                    return new SubstanceAdministrationPersistenceService().UpdateInternal(context, data.Convert<SubstanceAdministration>(), principal);
+                    return new SubstanceAdministrationPersistenceService().UpdateInternal(context, data.Convert<SubstanceAdministration>());
                 case ActClassKeyStrings.Observation:
                     switch (data.GetType().Name)
                     {
                         case "TextObservation":
-                            return new TextObservationPersistenceService().UpdateInternal(context, data.Convert<TextObservation>(), principal);
+                            return new TextObservationPersistenceService().UpdateInternal(context, data.Convert<TextObservation>());
                         case "CodedObservation":
-                            return new CodedObservationPersistenceService().UpdateInternal(context, data.Convert<CodedObservation>(), principal);
+                            return new CodedObservationPersistenceService().UpdateInternal(context, data.Convert<CodedObservation>());
                         case "QuantityObservation":
-                            return new QuantityObservationPersistenceService().UpdateInternal(context, data.Convert<QuantityObservation>(), principal);
+                            return new QuantityObservationPersistenceService().UpdateInternal(context, data.Convert<QuantityObservation>());
                         default:
-                            return this.UpdateCoreProperties(context, data, principal);
+                            return this.UpdateCoreProperties(context, data);
                     }
                 case ActClassKeyStrings.Encounter:
-                    return new EncounterPersistenceService().UpdateInternal(context, data.Convert<PatientEncounter>(), principal);
+                    return new EncounterPersistenceService().UpdateInternal(context, data.Convert<PatientEncounter>());
                 case ActClassKeyStrings.Condition:
                 default:
-                    return this.UpdateCoreProperties(context, data, principal);
+                    return this.UpdateCoreProperties(context, data);
 
             }
         }

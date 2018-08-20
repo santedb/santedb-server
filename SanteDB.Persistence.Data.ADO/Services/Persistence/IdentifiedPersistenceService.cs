@@ -63,11 +63,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="data">Data.</param>
-        public override TModel InsertInternal(DataContext context, TModel data, IPrincipal principal)
+        public override TModel InsertInternal(DataContext context, TModel data)
         {
             try
             {
-                var domainObject = this.FromModelInstance(data, context, principal) as TDomain;
+                var domainObject = this.FromModelInstance(data, context) as TDomain;
 
                 domainObject = context.Insert<TDomain>(domainObject);
                 data.Key = domainObject.Key;
@@ -86,7 +86,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="data">Data.</param>
-        public override TModel UpdateInternal(DataContext context, TModel data, IPrincipal principal)
+        public override TModel UpdateInternal(DataContext context, TModel data)
         {
             try
             {
@@ -95,7 +95,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     throw new AdoFormalConstraintException(AdoFormalConstraintType.NonIdentityUpdate);
 
                 // Map and copy
-                var newDomainObject = this.FromModelInstance(data, context, principal) as TDomain;
+                var newDomainObject = this.FromModelInstance(data, context) as TDomain;
                 var oldDomainObject = context.SingleOrDefault<TDomain>(o => o.Key == newDomainObject.Key);
                 if (oldDomainObject == null)
                     throw new KeyNotFoundException(data.Key.ToString());
@@ -117,7 +117,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="data">Data.</param>
-        public override TModel ObsoleteInternal(DataContext context, TModel data, IPrincipal principal)
+        public override TModel ObsoleteInternal(DataContext context, TModel data)
         {
             try
             {
@@ -144,22 +144,22 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Performs the actual query
         /// </summary>
-        public override IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, IPrincipal principal, bool countResults = false)
+        public override IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = false)
         {
-            return this.QueryInternal(context, query, queryId, offset, count, out totalResults, countResults).Select(o => o is Guid ? this.Get(context, (Guid)o, principal) : this.CacheConvert(o, context, principal));
+            return this.DoQueryInternal(context, query, queryId, offset, count, out totalResults, countResults).Select(o => o is Guid ? this.Get(context, (Guid)o) : this.CacheConvert(o, context));
         }
 
         /// <summary>
         /// Get the specified object
         /// </summary>
-        internal override TModel Get(DataContext context, Guid key, IPrincipal principal)
+        internal override TModel Get(DataContext context, Guid key)
         {
             var cacheService = new AdoPersistenceCache(context);
             var retVal = cacheService?.GetCacheItem<TModel>(key);
             if (retVal != null)
                 return retVal;
             else
-                return this.CacheConvert(context.FirstOrDefault<TDomain>(o => o.Key == key), context, principal);
+                return this.CacheConvert(context.FirstOrDefault<TDomain>(o => o.Key == key), context);
         }
 
         #endregion

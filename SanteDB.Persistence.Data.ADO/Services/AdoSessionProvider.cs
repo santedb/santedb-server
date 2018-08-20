@@ -97,10 +97,17 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     context.Open();
                     var refreshToken = this.CreateRefreshToken();
 
+                    var applicationKey = principal.Identities.OfType<Core.Security.ApplicationIdentity>()?.FirstOrDefault()?.FindFirst(ClaimTypes.Sid)?.Value ??
+                        principal.FindFirst(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim)?.Value;
+                    var deviceKey = principal.Identities.OfType<Core.Security.DeviceIdentity>()?.FirstOrDefault()?.FindFirst(ClaimTypes.Sid)?.Value ??
+                        principal.FindFirst(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim)?.Value;
+                    var userKey = principal.FindFirst(ClaimTypes.Sid).Value;
+
                     var dbSession = new DbSession()
                     {
-                        ApplicationKey = Guid.Parse(principal.FindFirst(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim).Value),
-                        UserKey = Guid.Parse(principal.FindFirst(ClaimTypes.Sid).Value),
+                        DeviceKey = deviceKey != null ? (Guid?)Guid.Parse(deviceKey) : null,
+                        ApplicationKey = Guid.Parse(applicationKey),
+                        UserKey = userKey != null && userKey != deviceKey ? (Guid?)Guid.Parse(userKey) : null,
                         NotBefore = DateTimeOffset.Now,
                         NotAfter = expiry,
                         RefreshExpiration = expiry.AddMinutes(10),

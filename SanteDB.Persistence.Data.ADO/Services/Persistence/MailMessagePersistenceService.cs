@@ -43,9 +43,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <param name="context">The data context.</param>
 		/// <param name="princpal">The authentication context.</param>
 		/// <returns>Returns the converted instance.</returns>
-		public override object FromModelInstance(MailMessage modelInstance, DataContext context, IPrincipal princpal)
+		public override object FromModelInstance(MailMessage modelInstance, DataContext context)
 		{
-			var alert = base.FromModelInstance(modelInstance, context, princpal) as DbMailMessage;
+			var alert = base.FromModelInstance(modelInstance, context) as DbMailMessage;
 
 			alert.Flags = (int)modelInstance.Flags;
 
@@ -59,9 +59,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <param name="data">The alert to insert.</param>
 		/// <param name="principal">The authentication context.</param>
 		/// <returns>Returns the inserted alert.</returns>
-		public override MailMessage InsertInternal(DataContext context, MailMessage data, IPrincipal principal)
+		public override MailMessage InsertInternal(DataContext context, MailMessage data)
 		{
-			var alert = base.InsertInternal(context, data, principal);
+			var alert = base.InsertInternal(context, data);
 
 			foreach (var securityUser in alert.RcptTo)
 			{
@@ -78,13 +78,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <param name="context">The data context.</param>
 		/// <param name="principal">The authentication context.</param>
 		/// <returns>Returns the converted instance.</returns>
-		public override MailMessage ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+		public override MailMessage ToModelInstance(object dataInstance, DataContext context)
 		{
-			var modelInstance = base.ToModelInstance(dataInstance, context, principal);
+			var modelInstance = base.ToModelInstance(dataInstance, context);
 
 			modelInstance.Flags = (MailMessageFlags)(dataInstance as DbMailMessage).Flags;
 
-			return base.ToModelInstance(dataInstance, context, principal);
+			return base.ToModelInstance(dataInstance, context);
 		}
 	}
 }

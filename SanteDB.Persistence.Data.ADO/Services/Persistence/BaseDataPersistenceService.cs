@@ -54,26 +54,26 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="data">Data.</param>
-        public override TModel InsertInternal(DataContext context, TModel data, IPrincipal principal)
+        public override TModel InsertInternal(DataContext context, TModel data)
         {
-            if (data.CreatedBy != null) data.CreatedBy = data.CreatedBy?.EnsureExists(context, principal) as SecurityUser;
+            if (data.CreatedBy != null) data.CreatedBy = data.CreatedBy?.EnsureExists(context) as SecurityProvenance;
             data.CreatedByKey = data.CreatedBy?.Key ?? data.CreatedByKey;
 
             // HACK: For now, modified on can only come from one property, some non-versioned data elements are bound on UpdatedTime
             var nvd = data as NonVersionedEntityData;
             if (nvd != null)
             {
-                nvd.UpdatedByKey = nvd.UpdatedByKey ?? principal.GetUserKey(context);
+                nvd.UpdatedByKey = nvd.UpdatedByKey ?? context.ContextId;
                 nvd.UpdatedTime = DateTimeOffset.Now;
             }
 
             if (data.CreationTime == DateTimeOffset.MinValue || data.CreationTime.Year < 100)
                 data.CreationTime = DateTimeOffset.Now;
 
-            var domainObject = this.FromModelInstance(data, context, principal) as TDomain;
+            var domainObject = this.FromModelInstance(data, context) as TDomain;
 
             // Ensure created by exists
-            data.CreatedByKey = domainObject.CreatedByKey = domainObject.CreatedByKey == Guid.Empty ? principal.GetUserKey(context).Value : domainObject.CreatedByKey;
+            data.CreatedByKey = domainObject.CreatedByKey = domainObject.CreatedByKey == Guid.Empty ? context.ContextId : domainObject.CreatedByKey;
             domainObject = context.Insert<TDomain>(domainObject);
             data.CreationTime = (DateTimeOffset)domainObject.CreationTime;
             data.Key = domainObject.Key;
@@ -86,12 +86,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="data">Data.</param>
-        public override TModel UpdateInternal(DataContext context, TModel data, IPrincipal principal)
+        public override TModel UpdateInternal(DataContext context, TModel data)
         {
             var nvd = data as NonVersionedEntityData;
             if (nvd != null)
             {
-                if (nvd.UpdatedBy != null) nvd.UpdatedBy = nvd.UpdatedBy?.EnsureExists(context, principal) as SecurityUser;
+                if (nvd.UpdatedBy != null) nvd.UpdatedBy = nvd.UpdatedBy?.EnsureExists(context) as SecurityProvenance;
                 nvd.UpdatedByKey = nvd.UpdatedBy?.Key ?? nvd.UpdatedByKey;
             }
 
@@ -100,7 +100,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 throw new AdoFormalConstraintException(AdoFormalConstraintType.NonIdentityUpdate);
 
             // Get current object
-            var domainObject = this.FromModelInstance(data, context, principal) as TDomain;
+            var domainObject = this.FromModelInstance(data, context) as TDomain;
             var currentObject = context.FirstOrDefault<TDomain>(o => o.Key == data.Key);
             // Not found
             if (currentObject == null)
@@ -110,7 +110,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var vobject = domainObject as IDbNonVersionedBaseData;
             if (vobject != null)
             {
-                nvd.UpdatedByKey = vobject.UpdatedByKey = nvd.UpdatedByKey ?? principal.GetUserKey(context);
+                nvd.UpdatedByKey = vobject.UpdatedByKey = nvd.UpdatedByKey ?? context.ContextId;
                 nvd.UpdatedTime = vobject.UpdatedTime = DateTimeOffset.Now;
             }
 
@@ -127,10 +127,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// Query the specified object ordering by creation time
         /// </summary>
         /// <returns></returns>
-        public override IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, IPrincipal principal, bool countResults = true)
+        public override IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = true)
         {
-            var qresult = this.QueryInternal(context, query, queryId, offset, count, out totalResults, countResults);
-            return qresult.Select(o => o is Guid ? this.Get(context, (Guid)o, principal) : this.CacheConvert(o, context, principal)).ToList();
+            var qresult = this.DoQueryInternal(context, query, queryId, offset, count, out totalResults, countResults);
+            return qresult.Select(o => o is Guid ? this.Get(context, (Guid)o) : this.CacheConvert(o, context)).ToList();
         }
 
         /// <summary>
@@ -138,12 +138,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="data">Data.</param>
-        public override TModel ObsoleteInternal(DataContext context, TModel data, IPrincipal principal)
+        public override TModel ObsoleteInternal(DataContext context, TModel data)
         {
             if (data.Key == Guid.Empty)
                 throw new AdoFormalConstraintException(AdoFormalConstraintType.NonIdentityUpdate);
 
-            if (data.ObsoletedBy != null) data.ObsoletedBy = data.ObsoletedBy?.EnsureExists(context, principal) as SecurityUser;
+            if (data.ObsoletedBy != null) data.ObsoletedBy = data.ObsoletedBy?.EnsureExists(context) as SecurityProvenance;
             data.ObsoletedByKey = data.ObsoletedBy?.Key ?? data.ObsoletedByKey;
 
             // Current object
@@ -151,8 +151,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (currentObject == null)
                 throw new KeyNotFoundException(data.Key.ToString());
 
-            //data.ObsoletedBy?.EnsureExists(context, principal);
-            data.ObsoletedByKey = currentObject.ObsoletedByKey = data.ObsoletedBy?.Key ?? principal.GetUserKey(context);
+            //data.ObsoletedBy?.EnsureExists(context);
+            data.ObsoletedByKey = currentObject.ObsoletedByKey = data.ObsoletedBy?.Key ?? context.ContextId;
             data.ObsoletionTime = currentObject.ObsoletionTime = currentObject.ObsoletionTime ?? DateTimeOffset.Now;
 
             context.Update(currentObject);

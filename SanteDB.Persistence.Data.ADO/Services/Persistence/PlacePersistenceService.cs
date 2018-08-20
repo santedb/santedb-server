@@ -39,10 +39,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Load to a model instance
         /// </summary>
-        public Core.Model.Entities.Place ToModelInstance(DbPlace placeInstance, DbEntityVersion entityVersionInstance, DbEntity entityInstance, DataContext context, IPrincipal principal)
+        public Core.Model.Entities.Place ToModelInstance(DbPlace placeInstance, DbEntityVersion entityVersionInstance, DbEntity entityInstance, DataContext context)
         {
 
-            var retVal = m_entityPersister.ToModelInstance<Core.Model.Entities.Place>(entityVersionInstance, entityInstance, context, principal);
+            var retVal = m_entityPersister.ToModelInstance<Core.Model.Entities.Place>(entityVersionInstance, entityInstance, context);
             if (retVal == null) return null;
             retVal.IsMobile = placeInstance?.IsMobile == true;
             retVal.Lat = placeInstance?.Lat;
@@ -53,16 +53,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert 
         /// </summary>
-        public override Core.Model.Entities.Place InsertInternal(DataContext context, Core.Model.Entities.Place data, IPrincipal principal)
+        public override Core.Model.Entities.Place InsertInternal(DataContext context, Core.Model.Entities.Place data)
         {
-            var retVal = base.InsertInternal(context, data, principal);
+            var retVal = base.InsertInternal(context, data);
 
             if (data.Services != null)
                 this.m_entityPersister.UpdateVersionedAssociatedItems<Core.Model.Entities.PlaceService,DbPlaceService>(
                    data.Services,
                     data,
-                    context, 
-                    principal);
+                    context);
 
             return retVal;
         }
@@ -70,16 +69,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Update the place
         /// </summary>
-        public override Core.Model.Entities.Place UpdateInternal(DataContext context, Core.Model.Entities.Place data, IPrincipal principal)
+        public override Core.Model.Entities.Place UpdateInternal(DataContext context, Core.Model.Entities.Place data)
         {
-            var retVal = base.UpdateInternal(context, data, principal);
+            var retVal = base.UpdateInternal(context, data);
 
             if (data.Services != null)
                 this.m_entityPersister.UpdateVersionedAssociatedItems<Core.Model.Entities.PlaceService,DbPlaceService>(
                    data.Services,
                     data,
-                    context,
-                    principal);
+                    context);
 
             return retVal;
         }

@@ -60,17 +60,17 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the data
         /// </summary>
-        public override TModel InsertInternal(DataContext context, TModel data, IPrincipal principal)
+        public override TModel InsertInternal(DataContext context, TModel data)
         {
             // Ensure exists
-            data.CreatedBy?.EnsureExists(context, principal);
+            data.CreatedBy?.EnsureExists(context);
             data.CreatedByKey = data.CreatedBy?.Key ?? data.CreatedByKey;
 
             // first we map the TDataKey entity
             var nonVersionedPortion = m_mapper.MapModelInstance<TModel, TDomainKey>(data);
 
             // Domain object
-            var domainObject = this.FromModelInstance(data, context, principal) as TDomain;
+            var domainObject = this.FromModelInstance(data, context) as TDomain;
 
             // First we must assign non versioned portion data
             if (nonVersionedPortion.Key == Guid.Empty &&
@@ -94,7 +94,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             nonVersionedPortion = context.Insert(nonVersionedPortion);
 
             // Ensure created by exists
-            data.CreatedByKey = domainObject.CreatedByKey = domainObject.CreatedByKey == Guid.Empty ? principal.GetUserKey(context).Value : domainObject.CreatedByKey;
+            data.CreatedByKey = domainObject.CreatedByKey = domainObject.CreatedByKey == Guid.Empty ? context.ContextId : domainObject.CreatedByKey;
 
             if (data.CreationTime == DateTimeOffset.MinValue || data.CreationTime.Year < 100)
                 data.CreationTime = DateTimeOffset.Now;
@@ -112,12 +112,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Update the data with new version information
         /// </summary>
-        public override TModel UpdateInternal(DataContext context, TModel data, IPrincipal principal)
+        public override TModel UpdateInternal(DataContext context, TModel data)
         {
             if (data.Key == Guid.Empty)
                 throw new AdoFormalConstraintException(AdoFormalConstraintType.NonIdentityUpdate);
 
-            data.CreatedBy.EnsureExists(context, principal);
+            data.CreatedBy.EnsureExists(context);
             data.CreatedByKey = data.CreatedBy?.Key ?? data.CreatedByKey;
 
 
@@ -136,10 +136,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 throw new AdoFormalConstraintException(AdoFormalConstraintType.UpdatedReadonlyObject);
 
             // Map existing
-            var storageInstance = this.FromModelInstance(data, context, principal);
+            var storageInstance = this.FromModelInstance(data, context);
 
             // Create a new version
-            var user = principal.GetUserKey(context);
             var newEntityVersion = new TDomain();
             newEntityVersion.CopyObjectData(storageInstance);
 
@@ -152,9 +151,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             data.VersionSequence = newEntityVersion.VersionSequenceId = null;
             newEntityVersion.Key = data.Key.Value;
             data.PreviousVersionKey = newEntityVersion.ReplacesVersionKey = existingObject.VersionKey;
-            data.CreatedByKey = newEntityVersion.CreatedByKey = data.CreatedByKey ?? user.Value;
+            data.CreatedByKey = newEntityVersion.CreatedByKey = data.CreatedByKey ?? context.ContextId;
             // Obsolete the old version 
-            existingObject.ObsoletedByKey = data.CreatedByKey ?? user;
+            existingObject.ObsoletedByKey = data.CreatedByKey ?? context.ContextId;
             existingObject.ObsoletionTime = DateTimeOffset.Now;
             newEntityVersion.CreationTime = DateTimeOffset.Now;
 
@@ -168,7 +167,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             data.CreationTime = newEntityVersion.CreationTime;
 
             return data;
-            //return base.Update(context, data, principal);
+            //return base.Update(context, data);
         }
 
 
@@ -184,7 +183,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Query internal
         /// </summary>
-        protected override IEnumerable<Object> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = true)
+        protected override IEnumerable<Object> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = true)
         {
             // Is obsoletion time already specified?
             if (!query.ToString().Contains("ObsoletionTime"))
@@ -268,7 +267,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Perform a version aware get
         /// </summary>
-        internal override TModel Get(DataContext context, Guid key, IPrincipal principal)
+        internal override TModel Get(DataContext context, Guid key)
         {
             // Attempt to get a cahce item
             var cacheService = new AdoPersistenceCache(context);
@@ -281,7 +280,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     .InnerJoin<TDomain, TDomainKey>(o => o.Key, o => o.Key)
                     .Where<TDomain>(o => o.Key == key && o.ObsoletionTime == null)
                     .OrderBy<TDomain>(o => o.VersionSequenceId, Core.Model.Map.SortOrderType.OrderByDescending);
-                return this.CacheConvert(context.FirstOrDefault<CompositeResult<TDomain, TDomainKey>>(domainQuery), context, principal);
+                return this.CacheConvert(context.FirstOrDefault<CompositeResult<TDomain, TDomainKey>>(domainQuery), context);
             }
         }
 
@@ -307,7 +306,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             sw.Start();
 #endif
 
-            PreRetrievalEventArgs preArgs = new PreRetrievalEventArgs(containerId, principal);
+            PreRetrievalEventArgs preArgs = new PreRetrievalEventArgs(containerId);
             this.FireRetrieving(preArgs);
             if (preArgs.Cancel)
             {
@@ -330,11 +329,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                     // Get most recent version
                     if (uuid.VersionId == Guid.Empty)
-                        retVal = this.Get(connection, uuid.Id, principal);
+                        retVal = this.Get(connection, uuid.Id);
                     else
-                        retVal = this.CacheConvert(this.QueryInternal(connection, o => o.Key == uuid.Id && o.VersionKey == uuid.VersionId && o.ObsoletionTime == null || o.ObsoletionTime != null, Guid.Empty, 0, 1, out tr).FirstOrDefault(), connection, principal);
+                        retVal = this.CacheConvert(this.QueryInternal(connection, o => o.Key == uuid.Id && o.VersionKey == uuid.VersionId && o.ObsoletionTime == null || o.ObsoletionTime != null, Guid.Empty, 0, 1, out tr).FirstOrDefault(), connection);
 
-                    var postData = new PostRetrievalEventArgs<TModel>(retVal, principal);
+                    var postData = new PostRetrievalEventArgs<TModel>(retVal);
                     this.FireRetrieved(postData);
 
                     return retVal;
@@ -362,7 +361,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Update versioned association items
         /// </summary>
-        internal virtual void UpdateVersionedAssociatedItems<TAssociation, TDomainAssociation>(IEnumerable<TAssociation> storage, TModel source, DataContext context, IPrincipal principal)
+        internal virtual void UpdateVersionedAssociatedItems<TAssociation, TDomainAssociation>(IEnumerable<TAssociation> storage, TModel source, DataContext context)
             where TAssociation : VersionedAssociation<TModel>, new()
             where TDomainAssociation : class, IDbVersionedAssociation, IDbIdentified, new()
         {
@@ -435,7 +434,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 // Update by key, these lines make no sense we just update the existing versioned association
                 //upd.store.EffectiveVersionSequenceId = upd.existing.EffectiveVersionSequenceId;
                 //upd.store.ObsoleteVersionSequenceId = upd.existing.EffectiveVersionSequenceId;
-                persistenceService.UpdateInternal(context, upd.store as TAssociation, principal);
+                persistenceService.UpdateInternal(context, upd.store as TAssociation);
             }
 
             // Insert those that do not exist
@@ -447,7 +446,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     eftVersion = source.VersionSequence.GetValueOrDefault();
                 ins.EffectiveVersionSequenceId = eftVersion;
 
-                persistenceService.InsertInternal(context, ins, principal);
+                persistenceService.InsertInternal(context, ins);
             }
         }
     }

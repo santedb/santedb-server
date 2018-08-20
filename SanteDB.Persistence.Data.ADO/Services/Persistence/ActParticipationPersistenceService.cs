@@ -42,10 +42,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Get from source id
         /// </summary>
-        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId, IPrincipal principal)
+        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId)
         {
             int tr = 0;
-            return this.QueryInternal(context, base.BuildSourceQuery<ActParticipation>(id, versionSequenceId), Guid.Empty, 0, null, out tr, principal, false).ToList();
+            return this.QueryInternal(context, base.BuildSourceQuery<ActParticipation>(id, versionSequenceId), Guid.Empty, 0, null, out tr, false).ToList();
 
         }
 
@@ -60,7 +60,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Represents as a model instance
         /// </summary>
-        public override ActParticipation ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+        public override ActParticipation ToModelInstance(object dataInstance, DataContext context)
         {
             if (dataInstance == null) return null;
 
@@ -91,13 +91,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the relationship
         /// </summary>
-        public override ActParticipation InsertInternal(DataContext context, ActParticipation data, IPrincipal principal)
+        public override ActParticipation InsertInternal(DataContext context, ActParticipation data)
         {
             // Ensure we haven't already persisted this
-            if (data.PlayerEntity != null) data.PlayerEntity = data.PlayerEntity.EnsureExists(context, principal) as Entity;
+            if (data.PlayerEntity != null) data.PlayerEntity = data.PlayerEntity.EnsureExists(context) as Entity;
             data.PlayerEntityKey = data.PlayerEntity?.Key ?? data.PlayerEntityKey;
             data.ParticipationRoleKey = data.ParticipationRole?.Key ?? data.ParticipationRoleKey;
-            if (data.Act != null) data.Act = data.Act.EnsureExists(context, principal) as Act;
+            if (data.Act != null) data.Act = data.Act.EnsureExists(context) as Act;
             data.ActKey = data.Act?.Key ?? data.ActKey;
 
             byte[] target = data.PlayerEntityKey.Value.ToByteArray(),
@@ -120,7 +120,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             //if (existing == null)
             //{
-            return base.InsertInternal(context, data, principal);
+            return base.InsertInternal(context, data);
             //    (dbrelationships as List<DbActParticipation>).Add(new DbActParticipation()
             //    {
             //        Uuid = retVal.Key.Value.ToByteArray(),
@@ -140,13 +140,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Update the specified object
         /// </summary>
-        public override ActParticipation UpdateInternal(DataContext context, ActParticipation data, IPrincipal principal)
+        public override ActParticipation UpdateInternal(DataContext context, ActParticipation data)
         {
             data.PlayerEntityKey = data.PlayerEntity?.Key ?? data.PlayerEntityKey;
             data.ParticipationRoleKey = data.ParticipationRole?.Key ?? data.ParticipationRoleKey;
             data.ActKey = data.Act?.Key ?? data.ActKey;
 
-            return base.UpdateInternal(context, data, principal);
+            return base.UpdateInternal(context, data);
         }
 
         /// <summary>

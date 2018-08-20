@@ -42,10 +42,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Creates the specified model instance
         /// </summary>
-        public TModel ToModelInstance<TModel>(DbMaterial dbMat, DbEntityVersion dbEntVersion, DbEntity dbEnt, DataContext context, IPrincipal principal)
+        public TModel ToModelInstance<TModel>(DbMaterial dbMat, DbEntityVersion dbEntVersion, DbEntity dbEnt, DataContext context)
             where TModel : Core.Model.Entities.Material, new()
         {
-            var retVal = this.m_entityPersister.ToModelInstance<TModel>(dbEntVersion, dbEnt, context, principal);
+            var retVal = this.m_entityPersister.ToModelInstance<TModel>(dbEntVersion, dbEnt, context);
             if (retVal == null) return null;
 
             retVal.ExpiryDate = dbMat.ExpiryDate;
@@ -60,25 +60,25 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the material
         /// </summary>
-        public override Core.Model.Entities.Material InsertInternal(DataContext context, Core.Model.Entities.Material data, IPrincipal principal)
+        public override Core.Model.Entities.Material InsertInternal(DataContext context, Core.Model.Entities.Material data)
         {
-            if(data.FormConcept != null) data.FormConcept = data.FormConcept?.EnsureExists(context, principal) as Concept;
-            if(data.QuantityConcept != null) data.QuantityConcept = data.QuantityConcept?.EnsureExists(context, principal) as Concept;
+            if(data.FormConcept != null) data.FormConcept = data.FormConcept?.EnsureExists(context) as Concept;
+            if(data.QuantityConcept != null) data.QuantityConcept = data.QuantityConcept?.EnsureExists(context) as Concept;
             data.FormConceptKey = data.FormConcept?.Key ?? data.FormConceptKey;
             data.QuantityConceptKey = data.QuantityConcept?.Key ?? data.QuantityConceptKey;
-            return base.InsertInternal(context, data, principal);
+            return base.InsertInternal(context, data);
         }
 
         /// <summary>
         /// Update the specified material
         /// </summary>
-        public override Core.Model.Entities.Material UpdateInternal(DataContext context, Core.Model.Entities.Material data, IPrincipal principal)
+        public override Core.Model.Entities.Material UpdateInternal(DataContext context, Core.Model.Entities.Material data)
         {
-            if (data.FormConcept != null) data.FormConcept = data.FormConcept?.EnsureExists(context, principal) as Concept;
-            if (data.QuantityConcept != null) data.QuantityConcept = data.QuantityConcept?.EnsureExists(context, principal) as Concept;
+            if (data.FormConcept != null) data.FormConcept = data.FormConcept?.EnsureExists(context) as Concept;
+            if (data.QuantityConcept != null) data.QuantityConcept = data.QuantityConcept?.EnsureExists(context) as Concept;
             data.FormConceptKey = data.FormConcept?.Key ?? data.FormConceptKey;
             data.QuantityConceptKey = data.QuantityConcept?.Key ?? data.QuantityConceptKey;
-            return base.UpdateInternal(context, data, principal);
+            return base.UpdateInternal(context, data);
         }
 
     }

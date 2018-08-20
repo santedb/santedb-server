@@ -47,10 +47,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <param name="context"></param>
         /// <param name="principal"></param>
         /// <returns></returns>
-        public Core.Model.Entities.ManufacturedMaterial ToModelInstance(DbManufacturedMaterial dbMmat, DbMaterial dbMat, DbEntityVersion dbEntityVersion, DbEntity dbEntity, DataContext context, IPrincipal principal)
+        public Core.Model.Entities.ManufacturedMaterial ToModelInstance(DbManufacturedMaterial dbMmat, DbMaterial dbMat, DbEntityVersion dbEntityVersion, DbEntity dbEntity, DataContext context)
         {
 
-            var retVal = this.m_materialPersister.ToModelInstance<Core.Model.Entities.ManufacturedMaterial>(dbMat, dbEntityVersion, dbEntity, context, principal);
+            var retVal = this.m_materialPersister.ToModelInstance<Core.Model.Entities.ManufacturedMaterial>(dbMat, dbEntityVersion, dbEntity, context);
             if (retVal == null) return null;
 
             retVal.LotNumber = dbMmat.LotNumber;
@@ -61,28 +61,28 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the specified manufactured material
         /// </summary>
-        public override Core.Model.Entities.ManufacturedMaterial InsertInternal(DataContext context, Core.Model.Entities.ManufacturedMaterial data, IPrincipal principal)
+        public override Core.Model.Entities.ManufacturedMaterial InsertInternal(DataContext context, Core.Model.Entities.ManufacturedMaterial data)
         {
-            var retVal = this.m_materialPersister.InsertInternal(context, data, principal);
-            return base.InsertInternal(context, data, principal);
+            var retVal = this.m_materialPersister.InsertInternal(context, data);
+            return base.InsertInternal(context, data);
         }
 
         /// <summary>
         /// Updates the manufactured material
         /// </summary>
-        public override Core.Model.Entities.ManufacturedMaterial UpdateInternal(DataContext context, Core.Model.Entities.ManufacturedMaterial data, IPrincipal principal)
+        public override Core.Model.Entities.ManufacturedMaterial UpdateInternal(DataContext context, Core.Model.Entities.ManufacturedMaterial data)
         {
-            var updated = this.m_materialPersister.UpdateInternal(context, data, principal);
-            return base.InsertInternal(context, data, principal);
+            var updated = this.m_materialPersister.UpdateInternal(context, data);
+            return base.InsertInternal(context, data);
         }
 
         /// <summary>
         /// Obsolete the specified manufactured material
         /// </summary>
-        public override Core.Model.Entities.ManufacturedMaterial ObsoleteInternal(DataContext context, Core.Model.Entities.ManufacturedMaterial data, IPrincipal principal)
+        public override Core.Model.Entities.ManufacturedMaterial ObsoleteInternal(DataContext context, Core.Model.Entities.ManufacturedMaterial data)
         {
-            var obsoleted = this.m_materialPersister.ObsoleteInternal(context, data, principal);
-            return base.InsertInternal(context, data, principal) ;
+            var obsoleted = this.m_materialPersister.ObsoleteInternal(context, data);
+            return base.InsertInternal(context, data) ;
         }
     }
 }

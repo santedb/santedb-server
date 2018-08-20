@@ -77,6 +77,7 @@
     <Compile Include="Data\Model\Acts\DbSubstanceAdministration.cs" />
     <Compile Include="Data\Model\Mail\DbMailMessage.cs" />
     <Compile Include="Data\Model\Mail\DbMailMessageRcptTo.cs" />
+    <Compile Include="Data\Model\Security\DbSecurityProvenance.cs" />
     <Compile Include="Data\Model\Security\DbSession.cs" />
     <Compile Include="Data\Model\Security\DbSessionClaim.cs" />
     <Compile Include="Data\SQL\AdoCodeDataFeature.cs" />

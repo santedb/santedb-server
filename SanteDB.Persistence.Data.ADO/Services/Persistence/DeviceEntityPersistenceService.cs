@@ -42,9 +42,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Convert the database representation to a model instance
         /// </summary>
-        public Core.Model.Entities.DeviceEntity ToModelInstance(DbDeviceEntity deviceEntity, DbEntityVersion entityVersion, DbEntity entity, DataContext context, IPrincipal principal)
+        public Core.Model.Entities.DeviceEntity ToModelInstance(DbDeviceEntity deviceEntity, DbEntityVersion entityVersion, DbEntity entity, DataContext context)
         {
-            var retVal = m_entityPersister.ToModelInstance<Core.Model.Entities.DeviceEntity>(entityVersion, entity, context, principal);
+            var retVal = m_entityPersister.ToModelInstance<Core.Model.Entities.DeviceEntity>(entityVersion, entity, context);
             if (retVal == null) return null;
 
             retVal.SecurityDeviceKey = deviceEntity.SecurityDeviceKey;
@@ -56,22 +56,22 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the specified device entity
         /// </summary>
-        public override Core.Model.Entities.DeviceEntity InsertInternal(DataContext context, Core.Model.Entities.DeviceEntity data, IPrincipal principal)
+        public override Core.Model.Entities.DeviceEntity InsertInternal(DataContext context, Core.Model.Entities.DeviceEntity data)
         {
-            if(data.SecurityDevice != null) data.SecurityDevice = data.SecurityDevice?.EnsureExists(context, principal) as SecurityDevice;
+            if(data.SecurityDevice != null) data.SecurityDevice = data.SecurityDevice?.EnsureExists(context) as SecurityDevice;
             data.SecurityDeviceKey = data.SecurityDevice?.Key ?? data.SecurityDeviceKey;
 
-            return base.InsertInternal(context, data, principal);
+            return base.InsertInternal(context, data);
         }
 
         /// <summary>
         /// Updates the specified user
         /// </summary>
-        public override Core.Model.Entities.DeviceEntity UpdateInternal(DataContext context, Core.Model.Entities.DeviceEntity data, IPrincipal principal)
+        public override Core.Model.Entities.DeviceEntity UpdateInternal(DataContext context, Core.Model.Entities.DeviceEntity data)
         {
-            if (data.SecurityDevice != null) data.SecurityDevice = data.SecurityDevice?.EnsureExists(context, principal) as SecurityDevice;
+            if (data.SecurityDevice != null) data.SecurityDevice = data.SecurityDevice?.EnsureExists(context) as SecurityDevice;
             data.SecurityDeviceKey = data.SecurityDevice?.Key ?? data.SecurityDeviceKey;
-            return base.UpdateInternal(context, data, principal);
+            return base.UpdateInternal(context, data);
         }
     }
 }

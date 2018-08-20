@@ -88,7 +88,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             var oid = dataContext.FirstOrDefault<DbAssigningAuthority>(o => o.DomainName == oidName);
                             if (oid == null) throw new KeyNotFoundException(oidName);
 
-                            oid.ObsoletedByKey = AuthenticationContext.Current.Principal.GetUserKey(dataContext);
+                            oid.ObsoletedByKey = dataContext.ContextId;
                             oid.ObsoletionTime = DateTimeOffset.Now;
                             dataContext.Update(oid);
 

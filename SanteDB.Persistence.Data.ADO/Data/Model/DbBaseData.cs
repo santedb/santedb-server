@@ -74,12 +74,12 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         /// <summary>
         /// Gets or sets the entity id which created this
         /// </summary>
-        [Column("crt_usr_id"), ForeignKey(typeof(DbSecurityUser), nameof(DbSecurityUser.Key))]
+        [Column("crt_prov_id"), ForeignKey(typeof(DbSecurityProvenance), nameof(DbSecurityProvenance.Key))]
         public Guid CreatedByKey { get; set; }
         /// <summary>
         /// Gets or sets the id which obsoleted this
         /// </summary>
-        [Column("obslt_usr_id"), ForeignKey(typeof(DbSecurityUser), nameof(DbSecurityUser.Key))]
+        [Column("obslt_prov_id"), ForeignKey(typeof(DbSecurityProvenance), nameof(DbSecurityProvenance.Key))]
         public Guid? ObsoletedByKey { get; set; }
         /// <summary>
         /// Gets or sets the creation time
@@ -102,7 +102,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         /// <summary>
         /// Gets or sets the updated user
         /// </summary>
-        [Column("upd_usr_id"), ForeignKey(typeof(DbSecurityUser), nameof(DbSecurityUser.Key))]
+        [Column("upd_prov_id"), ForeignKey(typeof(DbSecurityProvenance), nameof(DbSecurityProvenance.Key))]
         public Guid? UpdatedByKey { get; set; }
 
         /// <summary>

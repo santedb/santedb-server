@@ -166,7 +166,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -174,7 +174,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -419,7 +419,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -427,7 +427,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -690,7 +690,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -698,7 +698,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -947,7 +947,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -955,7 +955,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -1207,7 +1207,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -1215,7 +1215,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -1687,7 +1687,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -1695,7 +1695,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -2035,7 +2035,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -2043,7 +2043,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -2816,7 +2816,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -2824,7 +2824,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -3729,7 +3729,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -3737,7 +3737,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -4219,7 +4219,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -4227,7 +4227,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -4978,7 +4978,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -4986,7 +4986,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -5953,7 +5953,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -5961,7 +5961,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -6826,7 +6826,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -6834,7 +6834,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -7692,7 +7692,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -7700,7 +7700,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -8509,7 +8509,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -8517,7 +8517,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -10827,7 +10827,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -10835,7 +10835,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -11753,7 +11753,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -11761,7 +11761,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -12623,7 +12623,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -12631,7 +12631,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -13456,7 +13456,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -13464,7 +13464,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -14494,7 +14494,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -14502,7 +14502,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -15234,7 +15234,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -15242,7 +15242,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -15594,7 +15594,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -15602,7 +15602,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -16038,7 +16038,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -16046,7 +16046,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -16399,7 +16399,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -16407,7 +16407,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -17433,7 +17433,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -17441,7 +17441,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -17733,7 +17733,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -17741,7 +17741,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -18554,7 +18554,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -18562,7 +18562,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -19289,7 +19289,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -19297,7 +19297,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -20042,7 +20042,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -20050,7 +20050,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -20352,7 +20352,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -20360,7 +20360,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -20667,7 +20667,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -20675,7 +20675,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -20973,7 +20973,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -20981,7 +20981,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -21261,7 +21261,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -21269,7 +21269,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -21570,7 +21570,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -21578,7 +21578,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -22398,7 +22398,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -22406,7 +22406,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -23601,7 +23601,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -23609,7 +23609,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -24192,7 +24192,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -24200,7 +24200,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -25041,7 +25041,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -25049,7 +25049,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -25950,7 +25950,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -25958,7 +25958,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -26860,7 +26860,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -26868,7 +26868,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -27771,7 +27771,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -27779,7 +27779,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -28658,7 +28658,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -28666,7 +28666,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -29570,7 +29570,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -29578,7 +29578,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -30095,7 +30095,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -30103,7 +30103,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {
@@ -30787,7 +30787,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                     r.Read();
                                     object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("obsoletedByModel", context.JsonContext, _retVal, context));
                                     if ((_instance != null)) {
-                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                        _retVal.ObsoletedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                     }
                                 }
                                 else {
@@ -30795,7 +30795,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                         r.Read();
                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(SanteDB.Core.Model.Security.SecurityUser), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("createdByModel", context.JsonContext, _retVal, context));
                                         if ((_instance != null)) {
-                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityUser)(_instance));
+                                            _retVal.CreatedBy = ((SanteDB.Core.Model.Security.SecurityProvenance)(_instance));
                                         }
                                     }
                                     else {

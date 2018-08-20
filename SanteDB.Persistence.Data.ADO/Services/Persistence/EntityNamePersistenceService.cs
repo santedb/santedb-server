@@ -47,15 +47,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Convert data instance to model instance
         /// </summary>
-        public override EntityName ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+        public override EntityName ToModelInstance(object dataInstance, DataContext context)
         {
-            return base.ToModelInstance(dataInstance, context, principal);
+            return base.ToModelInstance(dataInstance, context);
         }
 
         /// <summary>
         /// Get from source
         /// </summary>
-        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId, IPrincipal principal)
+        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId)
         {
             int tr = 0;
             var addrLookupQuery = context.CreateSqlStatement<DbEntityNameComponent>().SelectFrom(typeof(DbEntityNameComponent), typeof(DbEntityName), typeof(DbPhoneticValue))
@@ -92,20 +92,19 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert the specified object
         /// </summary>
-        public override Core.Model.Entities.EntityName InsertInternal(DataContext context, Core.Model.Entities.EntityName data, IPrincipal principal)
+        public override Core.Model.Entities.EntityName InsertInternal(DataContext context, Core.Model.Entities.EntityName data)
         {
             // Ensure exists
-            if (data.NameUse != null) data.NameUse = data.NameUse?.EnsureExists(context, principal) as Concept;
+            if (data.NameUse != null) data.NameUse = data.NameUse?.EnsureExists(context) as Concept;
             data.NameUseKey = data.NameUse?.Key ?? data.NameUseKey;
-            var retVal = base.InsertInternal(context, data, principal);
+            var retVal = base.InsertInternal(context, data);
 
             // Data component
             if (data.Component != null)
                 base.UpdateAssociatedItems<Core.Model.Entities.EntityNameComponent, DbEntityNameComponent>(
                    data.Component,
                     data,
-                    context,
-                    principal);
+                    context);
 
             return retVal;
         }
@@ -113,14 +112,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Update the entity name
         /// </summary>
-        public override Core.Model.Entities.EntityName UpdateInternal(DataContext context, Core.Model.Entities.EntityName data, IPrincipal principal)
+        public override Core.Model.Entities.EntityName UpdateInternal(DataContext context, Core.Model.Entities.EntityName data)
         {
             // Ensure exists
-            if (data.NameUse != null) data.NameUse = data.NameUse?.EnsureExists(context, principal) as Concept;
+            if (data.NameUse != null) data.NameUse = data.NameUse?.EnsureExists(context) as Concept;
 
             data.NameUseKey = data.NameUse?.Key ?? data.NameUseKey;
 
-            var retVal = base.UpdateInternal(context, data, principal);
+            var retVal = base.UpdateInternal(context, data);
 
             var sourceKey = data.Key.Value.ToByteArray();
 
@@ -129,8 +128,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 base.UpdateAssociatedItems<Core.Model.Entities.EntityNameComponent, DbEntityNameComponent>(
                    data.Component,
                     data,
-                    context,
-                    principal);
+                    context);
 
             return retVal;
         }
@@ -151,9 +149,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// From model instance
         /// </summary>
-        public override object FromModelInstance(Core.Model.Entities.EntityNameComponent modelInstance, DataContext context, IPrincipal princpal)
+        public override object FromModelInstance(Core.Model.Entities.EntityNameComponent modelInstance, DataContext context)
         {
-            var retVal = base.FromModelInstance(modelInstance, context, princpal) as DbEntityNameComponent;
+            var retVal = base.FromModelInstance(modelInstance, context) as DbEntityNameComponent;
 
             // Duplicate name?
             var existing = context.FirstOrDefault<DbPhoneticValue>(o => o.Value == modelInstance.Value);
@@ -177,7 +175,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Convert to model instance
         /// </summary>
-        public override EntityNameComponent ToModelInstance(object dataInstance, DataContext context, IPrincipal principal)
+        public override EntityNameComponent ToModelInstance(object dataInstance, DataContext context)
         {
             if (dataInstance == null) return null;
 
@@ -199,31 +197,31 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Insert context
         /// </summary>
-        public override Core.Model.Entities.EntityNameComponent InsertInternal(DataContext context, Core.Model.Entities.EntityNameComponent data, IPrincipal principal)
+        public override Core.Model.Entities.EntityNameComponent InsertInternal(DataContext context, Core.Model.Entities.EntityNameComponent data)
         {
-            if (data.ComponentType != null) data.ComponentType = data.ComponentType?.EnsureExists(context, principal) as Concept;
+            if (data.ComponentType != null) data.ComponentType = data.ComponentType?.EnsureExists(context) as Concept;
             data.ComponentTypeKey = data.ComponentType?.Key ?? data.ComponentTypeKey;
-            return base.InsertInternal(context, data, principal);
+            return base.InsertInternal(context, data);
         }
 
         /// <summary>
         /// Update
         /// </summary>
-        public override Core.Model.Entities.EntityNameComponent UpdateInternal(DataContext context, Core.Model.Entities.EntityNameComponent data, IPrincipal principal)
+        public override Core.Model.Entities.EntityNameComponent UpdateInternal(DataContext context, Core.Model.Entities.EntityNameComponent data)
         {
-            if (data.ComponentType != null) data.ComponentType = data.ComponentType?.EnsureExists(context, principal) as Concept;
+            if (data.ComponentType != null) data.ComponentType = data.ComponentType?.EnsureExists(context) as Concept;
 
             data.ComponentTypeKey = data.ComponentType?.Key ?? data.ComponentTypeKey;
-            return base.UpdateInternal(context, data, principal);
+            return base.UpdateInternal(context, data);
         }
 
         /// <summary>
         /// Get components from source
         /// </summary>
-        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId, IPrincipal principal)
+        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId)
         {
             int tr = 0;
-            return this.QueryInternal(context, base.BuildSourceQuery<EntityNameComponent>(id), Guid.Empty, 0, null, out tr, false).Select(o => this.CacheConvert(o, context, principal)).ToList();
+            return this.QueryInternal(context, base.BuildSourceQuery<EntityNameComponent>(id), Guid.Empty, 0, null, out tr, false).Select(o => this.CacheConvert(o, context)).ToList();
         }
     }
 }
