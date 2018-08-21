@@ -31,6 +31,7 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -39,6 +40,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Security;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
@@ -406,6 +408,39 @@ namespace SanteDB.Core.Security.Audit
                 }
             });
 
+        }
+
+        /// <summary>
+        /// Audit an override operation
+        /// </summary>
+        public static void AuditOverride(IPrincipal principal, string purposeOfUse, string[] policies, bool success)
+        {
+
+            traceSource.TraceVerbose("Create Override audit");
+
+            AuditData audit = new AuditData(DateTime.Now, ActionType.Execute, success ? OutcomeIndicator.Success : OutcomeIndicator.EpicFail, EventIdentifierType.EmergencyOverrideStarted, new AuditCode(purposeOfUse, SanteDBClaimTypes.XspaPurposeOfUseClaim));
+            audit.Actors.Add(new AuditActorData()
+            {
+                NetworkAccessPointType = NetworkAccessPointType.MachineName,
+                NetworkAccessPointId = Dns.GetHostName(),
+                UserName = principal?.Identity?.Name,
+                UserIsRequestor = true,
+                ActorRoleCode = principal == null || principal is ApplicationPrincipal ? new List<AuditCode>() : ApplicationContext.Current.GetService<IRoleProviderService>()?.GetAllRoles(principal.Identity.Name).Select(o =>
+                   new AuditCode(o, null)
+                ).ToList()
+            });
+            AddDeviceActor(audit);
+            AddSenderDeviceActor(audit);
+
+            audit.AuditableObjects.AddRange(policies.Select(o => new AuditableObject()
+            {
+                IDTypeCode = AuditableObjectIdType.Uri,
+                ObjectId = $"urn:oid:{o}",
+                Type = AuditableObjectType.SystemObject,
+                Role = AuditableObjectRole.SecurityGranularityDefinition
+            }));
+
+            SendAudit(audit);
         }
 
         /// <summary>

@@ -530,9 +530,15 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     var auth = context.FirstOrDefault<CompositeResult<DbSession, DbSecurityApplication, DbSecurityUser, DbSecurityDevice>>(sql);
 
+                    // Identities
+                    List<ClaimsIdentity> identities = new List<ClaimsIdentity>(3);
+                    if (auth.Object1.DeviceKey.HasValue)
+                        identities.Add(new DeviceIdentity(auth.Object4.Key, auth.Object4.PublicId, true));
+                    if (auth.Object2?.Key != null)
+                        identities.Add(new Core.Security.ApplicationIdentity(auth.Object2.Key, auth.Object2.PublicId, true));
+
                     var principal = auth.Object1.UserKey == Guid.Empty ?
-                        new ApplicationPrincipal(new SanteDB.Core.Security.ApplicationIdentity(auth.Object2.Key, auth.Object2.PublicId, true))
-                        : AdoClaimsIdentity.Create(auth.Object3, true).CreateClaimsPrincipal();
+                        new ClaimsPrincipal(identities) : AdoClaimsIdentity.Create(auth.Object3, true, "SESSION", session).CreateClaimsPrincipal(identities);
 
                     // TODO: Load additional claims made about the user on the session
                     return principal;

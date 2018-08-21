@@ -184,7 +184,10 @@ namespace SanteDB.Core.Security
         /// </summary>
         public const string QueryWarehouseData = UnrestrictedWarehouse + ".3";
 
-
+        /// <summary>
+        /// Override policy permission
+        /// </summary>
+        public const string OverridePolicyPermission = "1.3.6.1.4.1.33349.3.1.5.9.2.3";
         #endregion
 
         #region SanteDB Client Functions

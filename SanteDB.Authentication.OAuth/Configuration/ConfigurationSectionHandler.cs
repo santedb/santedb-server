@@ -56,8 +56,7 @@ namespace SanteDB.Authentication.OAuth2.Configuration
 
             // Nodes
             XmlElement tokenElement = section.SelectSingleNode("./token") as XmlElement;
-            XmlNodeList claims = section.SelectNodes("./claims/add/@claimType"),
-                scopes = section.SelectNodes("./scopes/add/@name") ;
+            XmlNodeList claims = section.SelectNodes("./claims/add/@claimType");
 
             retVal.ValidityTime = TimeSpan.Parse(tokenElement?.Attributes["expiry"]?.Value ?? "00:00:10:00");
             retVal.IssuerName = tokenElement?.Attributes["issuerName"]?.Value ?? "http://localhost/oauth2_token";
@@ -66,10 +65,7 @@ namespace SanteDB.Authentication.OAuth2.Configuration
             if (claims != null)
                 foreach (XmlNode itm in claims)
                     retVal.AllowedClientClaims.Add(itm.Value);
-            if (scopes != null)
-                foreach (XmlNode itm in scopes)
-                    retVal.AllowedScopes.Add(itm.Value);
-
+           
             return retVal;
 
         }

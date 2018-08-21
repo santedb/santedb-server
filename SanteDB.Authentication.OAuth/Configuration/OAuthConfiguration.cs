@@ -38,7 +38,6 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         /// </summary>
         public OAuthConfiguration()
         {
-            this.AllowedScopes = new List<string>();
             this.AllowedClientClaims = new List<string>();
         }
 
@@ -56,12 +55,6 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         /// Issuer name
         /// </summary>
         public String IssuerName { get; set; }
-
-
-        /// <summary>
-        /// The scopes that are permitted for granting on this endpoint
-        /// </summary>
-        public List<String> AllowedScopes { get; set; }
 
         /// <summary>
         /// Gets or sets the token type to use

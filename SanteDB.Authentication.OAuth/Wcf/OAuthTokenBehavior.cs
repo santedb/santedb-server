@@ -53,6 +53,7 @@ using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Security.Audit;
 
 namespace SanteDB.Authentication.OAuth2.Wcf
 {
@@ -198,12 +199,12 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                     return this.CreateErrorCondition(OAuthErrorType.invalid_grant, "Invalid username or password");
                 else
                 {
-                    var clams = this.ValidateClaims(principal);
                     return this.EstablishSession(principal, clientPrincipal, devicePrincipal, tokenRequest["scope"], this.ValidateClaims(principal));
                 }
             }
             catch (AuthenticationException e)
             {
+
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error generating token: {0}", e);
                 return this.CreateErrorCondition(OAuthErrorType.invalid_grant, e.Message);
             }
@@ -287,7 +288,9 @@ namespace SanteDB.Authentication.OAuth2.Wcf
             claims.AddRange(additionalClaims);
 
             // Get policies
-            var oizPrincipalPolicies = pip.GetActivePolicies(oizPrincipal);
+            List<IPolicyInstance> oizPrincipalPolicies = new List<IPolicyInstance>();
+            foreach(var pol in pip.GetActivePolicies(oizPrincipal).GroupBy(o=>o.Policy.Oid))
+                oizPrincipalPolicies.Add(pol.FirstOrDefault(o => (int)o.Rule == pol.Min(r => (int)r.Rule)));
 
             // Add grant if not exists
             if ((claimsPrincipal)?.FindFirst(ClaimTypes.Actor)?.Value == UserClassKeys.HumanUser.ToString())
@@ -296,23 +299,48 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                     {
                     //new Claim(ClaimTypes.AuthenticationInstant, issued.ToString("o")), 
                     new Claim(ClaimTypes.AuthenticationMethod, "OAuth2"),
-                    new Claim(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim, (clientPrincipal as ClaimsPrincipal)?.FindFirst(ClaimTypes.Sid)?.Value),
-                    new Claim(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim, (devicePrincipal as ClaimsPrincipal)?.FindFirst(ClaimTypes.Sid)?.Value)
+                    new Claim(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim, (clientPrincipal as ClaimsPrincipal)?.FindFirst(ClaimTypes.Sid)?.Value)
                     });
-                
-                claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyDecisionOutcomeType.Grant).Select(o => new Claim(SanteDBClaimTypes.SanteDBGrantedPolicyClaim, o.Policy.Oid)));
+
+                if (devicePrincipal != null)
+                    claims.Add(new Claim(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim, (devicePrincipal as ClaimsPrincipal)?.FindFirst(ClaimTypes.Sid)?.Value));
+
+                // Scopes user is allowed to access
+                claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyDecisionOutcomeType.Grant).Select(o => new Claim(SanteDBClaimTypes.SanteDBScopeClaim, o.Policy.Oid)));
 
                 // Is the user elevated? If so, add claims for those policies in scope
-                if (claims.Exists(o => o.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim))
-                    claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyDecisionOutcomeType.Elevate).Select(o => new Claim(SanteDBClaimTypes.SanteDBGrantedPolicyClaim, o.Policy.Oid)));
+                if (claims.Exists(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim))
+                {
+                    try
+                    {
+                        // 1. SCOPE must exist 
+                        if (String.IsNullOrEmpty(scope))
+                            throw new InvalidOperationException("Override requires scope");
+                        // 2. POU must exist
+                        if (!claims.Exists(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim))
+                            throw new InvalidOperationException("Override required purpose of use");
+                        // 3. Person must have override permission
+                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.OverridePolicyPermission, claimsPrincipal).Demand();
+                        // Add elevation objects as GRANT to this session
+                        claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyDecisionOutcomeType.Elevate).Select(o => new Claim(SanteDBClaimTypes.SanteDBScopeClaim, o.Policy.Oid)));
+
+                        // Audit override
+                        AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(';'), true);
+                    }
+                    catch (Exception e)
+                    {
+                        AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(';'), false);
+                    }
+                }
 
                 // Now restrict down to claimed scope
                 if (scope != "*")
                 {
                     var scopes = scope.Split(';');
-                    claims.RemoveAll(o => o.Type == SanteDBClaimTypes.SanteDBGrantedPolicyClaim && !scopes.Contains(o.Value));
+                    foreach (var s in scopes)
+                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, s, claimsPrincipal).Demand(); // Ensure that scope is granted
+                    claims.RemoveAll(o => o.Type == SanteDBClaimTypes.SanteDBScopeClaim && !scopes.Contains(o.Value));
                 }
-                claims.Add(new Claim(SanteDBClaimTypes.SanteDBScopeClaim, String.Join(";", claims.Where(o => o.Type == SanteDBClaimTypes.SanteDBGrantedPolicyClaim).Select(o => o.Value).ToArray())));
 
                 // Add Email address from idp
                 claims.AddRange(claimsPrincipal.Claims.Where(o => o.Type == ClaimTypes.Email));

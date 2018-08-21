@@ -49,6 +49,7 @@ namespace SanteDB.Core
         internal const string BasicHttpClientClaimHeaderName = "X-SanteDBClient-Claim";
         // Client auth header
         internal const string BasicHttpClientCredentialHeaderName = "X-SanteDBClient-Authorization";
+
         // WCF trace source
         internal const string WcfTraceSourceName = "SanteDB.Core.Wcf";
 

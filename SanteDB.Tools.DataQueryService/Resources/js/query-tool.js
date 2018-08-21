@@ -10,7 +10,7 @@ var QueryTool = {
                 grant_type : "password",
                 username : controlData.username,
                 password : controlData.password,
-                scope : url + "/hdsi" 
+                scope : "*" 
             };
             var headers = {};
 

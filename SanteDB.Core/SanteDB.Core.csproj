@@ -86,6 +86,7 @@
     <Compile Include="Security\ApplicationPrincipal.cs" />
     <Compile Include="Security\Audit\AuditDaemonService.cs" />
     <Compile Include="Security\Audit\AuditUtil.cs" />
+    <Compile Include="Security\Claims\OverrideClaimHandler.cs" />
     <Compile Include="Security\Claims\PurposeOfUseClaimHandler.cs" />
     <Compile Include="Security\Claims\IClaimTypeHandler.cs" />
     <Compile Include="Security\DataPolicyIdentifiers.cs" />

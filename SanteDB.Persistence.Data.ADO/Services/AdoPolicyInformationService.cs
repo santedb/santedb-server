@@ -65,17 +65,40 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     // Security device
                     if (securable is Core.Model.Security.SecurityDevice || securable is DevicePrincipal)
                     {
-						var query = context.CreateSqlStatement<DbSecurityDevicePolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityDevicePolicy))
+                        var query = context.CreateSqlStatement<DbSecurityDevicePolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityDevicePolicy))
                             .InnerJoin<DbSecurityPolicy, DbSecurityDevicePolicy>();
 
-						if (securable is DevicePrincipal)
-							query.InnerJoin<DbSecurityDevice, DbSecurityDevice>()
-									.Where(o => o.PublicId == (securable as DevicePrincipal).Identity.Name);
-						else
-							query.Where(o => o.Key == (securable as IdentifiedData).Key);
+                        if (securable is DevicePrincipal)
+                            query.InnerJoin<DbSecurityDevice, DbSecurityDevice>()
+                                    .Where(o => o.PublicId == (securable as DevicePrincipal).Identity.Name);
+                        else
+                            query.Where(o => o.Key == (securable as IdentifiedData).Key);
 
-                        return context.Query<CompositeResult<DbSecurityPolicy, DbSecurityDevicePolicy>>(query)
-                                                    .Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable));
+                        var retVal = context.Query<CompositeResult<DbSecurityPolicy, DbSecurityDevicePolicy>>(query)
+                                                    .Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable)).ToList();
+
+                        // App claim
+                        if (securable is DevicePrincipal)
+                        {
+                            var cp = securable as DevicePrincipal;
+
+                            var appClaim = cp.Identities.OfType<Core.Security.ApplicationIdentity>().SingleOrDefault()?.FindAll(ClaimTypes.Sid).SingleOrDefault() ??
+                                   cp.FindAll(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim).SingleOrDefault();
+                            
+                            // There is an application claim so we want to add the application policies - most restrictive
+                            if (appClaim != null)
+                            {
+                                var claim = Guid.Parse(appClaim.Value);
+
+                                var aquery = context.CreateSqlStatement<DbSecurityApplicationPolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityApplicationPolicy))
+                                   .InnerJoin<DbSecurityPolicy, DbSecurityApplicationPolicy>()
+                                   .Where(o => o.SourceKey == claim);
+
+                                retVal.AddRange(context.Query<CompositeResult<DbSecurityPolicy, DbSecurityApplicationPolicy>>(aquery).Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable)).Where(p => retVal.Any(r => r.Policy.Oid == p.Policy.Oid)));
+                            }
+                        }
+
+                        return retVal;
 					}
                     else if (securable is Core.Model.Security.SecurityRole)
                     {
@@ -121,31 +144,36 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         if (securable is ClaimsPrincipal)
                         {
                             var cp = securable as ClaimsPrincipal;
-                            var appClaim = cp.FindAll(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim).SingleOrDefault();
-                            var devClaim = cp.FindAll(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim).SingleOrDefault();
+                            var appClaim = cp.Identities.OfType<Core.Security.ApplicationIdentity>().SingleOrDefault()?.FindAll(ClaimTypes.Sid).SingleOrDefault() ??
+                                cp.FindAll(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim).SingleOrDefault();
+                            var devClaim = cp.Identities.OfType<Core.Security.DeviceIdentity>().SingleOrDefault()?.FindAll(ClaimTypes.Sid).SingleOrDefault() ?? 
+                                cp.FindAll(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim).SingleOrDefault();
+
 
                             // There is an application claim so we want to add the application policies - most restrictive
                             if (appClaim != null)
                             {
                                 var claim = Guid.Parse(appClaim.Value);
 
-                                query = context.CreateSqlStatement<DbSecurityApplicationPolicy>().SelectFrom()
+                                query = context.CreateSqlStatement<DbSecurityApplicationPolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityApplicationPolicy))
                                    .InnerJoin<DbSecurityPolicy, DbSecurityApplicationPolicy>()
                                    .Where(o => o.SourceKey == claim);
 
-                                retVal.AddRange(context.Query<CompositeResult<DbSecurityPolicy, DbSecurityApplicationPolicy>>(query).Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, user)));
+                                retVal.AddRange(context.Query<CompositeResult<DbSecurityPolicy, DbSecurityApplicationPolicy>>(query).Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, user)).Where(p=>retVal.Any(r=>r.Policy.Oid == p.Policy.Oid)));
                             }
+
                             // There is an device claim so we want to add the device policies - most restrictive
                             if (devClaim != null)
                             {
                                 var claim = Guid.Parse(devClaim.Value);
 
-                                query = context.CreateSqlStatement<DbSecurityDevicePolicy>().SelectFrom()
+                                query = context.CreateSqlStatement<DbSecurityDevicePolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityDevicePolicy))
                                    .InnerJoin<DbSecurityPolicy, DbSecurityDevicePolicy>()
                                    .Where(o => o.SourceKey == claim);
 
-                                retVal.AddRange(context.Query<CompositeResult<DbSecurityPolicy, DbSecurityDevicePolicy>>(query).Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, user)));
+                                retVal.AddRange(context.Query<CompositeResult<DbSecurityPolicy, DbSecurityDevicePolicy>>(query).Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, user)).Where(p => retVal.Any(r => r.Policy.Oid == p.Policy.Oid)));
                             }
+
                         }
 
                         this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Principal {0} effective policy set {1}", user.UserName, String.Join(",", retVal.Select(o => $"{o.Policy.Oid} [{o.Rule}]")));

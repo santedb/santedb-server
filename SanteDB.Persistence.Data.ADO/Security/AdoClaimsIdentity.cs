@@ -290,7 +290,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
         /// <summary>
         /// Create an authorization context
         /// </summary>
-        public ClaimsPrincipal CreateClaimsPrincipal()
+        public ClaimsPrincipal CreateClaimsPrincipal(IEnumerable<ClaimsIdentity> otherIdentities = null)
         {
 
             if (!this.m_isAuthenticated)
@@ -319,9 +319,14 @@ namespace SanteDB.Persistence.Data.ADO.Security
                     claims.Add(new Claim(ClaimTypes.Email, this.m_securityUser.Email));
                 if (this.m_securityUser.PhoneNumber != null)
                     claims.Add(new Claim(ClaimTypes.MobilePhone, this.m_securityUser.PhoneNumber));
+
+                var identities = new ClaimsIdentity[] { new ClaimsIdentity(this, claims.AsReadOnly(), AuthenticationTypes.Password, ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType) };
+                if (otherIdentities != null)
+                    identities = identities.Union(otherIdentities).ToArray();
+
                 // TODO: Demographic data for the user
                 var retVal = new ClaimsPrincipal(
-                        new ClaimsIdentity[] { new ClaimsIdentity(this, claims.AsReadOnly(), AuthenticationTypes.Password, ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType) }
+                        identities
                     );
                 s_traceSource.TraceInformation("Created security principal from identity {0} > {1}", this, AdoClaimsIdentity.PrincipalToString(retVal));
                 return retVal;

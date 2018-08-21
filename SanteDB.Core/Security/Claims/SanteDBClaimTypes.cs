@@ -58,7 +58,7 @@ namespace SanteDB.Core.Security.Claims
         /// <summary>
         /// Granted policy claim
         /// </summary>
-        public const string SanteDBGrantedPolicyClaim = "grant";
+        public const string SanteDBGrantedPolicyClaim = "scope";
 
         /// <summary>
         /// Device identifier claim
@@ -85,6 +85,10 @@ namespace SanteDB.Core.Security.Claims
         /// </summary>
         public const string SanteDBScopeClaim = "scope";
 
+        /// <summary>
+        /// Override claim
+        /// </summary>
+        public const string SanteDBOverrideClaim = "urn:santedb:org:override";
 
         /// <summary>
         /// Patient identifier claim
