@@ -58,6 +58,7 @@ namespace SanteDB.Core.Model.AMI.Collections
     [XmlInclude(typeof(SecurityUserInfo))]
     [XmlInclude(typeof(AuditSubmission))]
     [XmlInclude(typeof(AppletManifest))]
+    [XmlInclude(typeof(AppletSolutionInfo))]
     [XmlInclude(typeof(AppletManifestInfo))]
     [XmlInclude(typeof(DeviceEntity))]
     [XmlInclude(typeof(DiagnosticApplicationInfo))]
