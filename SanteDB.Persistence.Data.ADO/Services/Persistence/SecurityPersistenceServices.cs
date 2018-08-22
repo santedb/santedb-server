@@ -305,13 +305,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 			var retVal = base.ToModelInstance(dataInstance, context);
 			if (retVal == null) return null;
 
-			var policyQuery = context.CreateSqlStatement<DbSecurityRolePolicy>().SelectFrom()
+			var policyQuery = context.CreateSqlStatement<DbSecurityRolePolicy>().SelectFrom(typeof(DbSecurityRolePolicy), typeof(DbSecurityPolicy))
 				.InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
 				.Where<DbSecurityRolePolicy>(o => o.SourceKey == retVal.Key);
 
 			retVal.Policies = context.Query<CompositeResult<DbSecurityRolePolicy, DbSecurityPolicy>>(policyQuery).Select(o => new SecurityPolicyInstance(m_mapper.MapDomainInstance<DbSecurityPolicy, SecurityPolicy>(o.Object2), (PolicyGrantType)o.Object1.GrantType)).ToList();
 
-			var rolesQuery = context.CreateSqlStatement<DbSecurityUserRole>().SelectFrom()
+			var rolesQuery = context.CreateSqlStatement<DbSecurityUserRole>().SelectFrom(typeof(DbSecurityUser))
 				.InnerJoin<DbSecurityUser>(o => o.UserKey, o => o.Key)
 				.Where<DbSecurityUserRole>(o => o.RoleKey == retVal.Key);
 

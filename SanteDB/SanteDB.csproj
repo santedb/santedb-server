@@ -241,10 +241,6 @@
       <Project>{135cbea7-7b25-4db0-b9ee-62d61b87b8b0}</Project>
       <Name>SanteDB.Messaging.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Messaging.HL7\SanteDB.Messaging.HL7.csproj">
-      <Project>{c1f86ea3-fc84-456f-a9d9-0bf8db0d48d3}</Project>
-      <Name>SanteDB.Messaging.HL7</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
