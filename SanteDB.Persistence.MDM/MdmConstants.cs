@@ -23,5 +23,15 @@ namespace SanteDB.Persistence.MDM
         /// Relationship used to represent that a local record has a high probability of being a duplicate with a master record
         /// </summary>
         public static readonly Guid DuplicateRecordRelationship = Guid.Parse("56cfb115-8207-4f89-b52e-d20dbad8f8cc");
+
+        /// <summary>
+        /// The name of the trace source to use for the MDM logs
+        /// </summary>
+        public const String TraceSourceName = "SanteDB.Persistence.MDM";
+
+        /// <summary>
+        /// MDM configuration name
+        /// </summary>
+        public const String ConfigurationSectionName = "santedb.mdm";
     }
 }

@@ -309,7 +309,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                 claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyDecisionOutcomeType.Grant).Select(o => new Claim(SanteDBClaimTypes.SanteDBScopeClaim, o.Policy.Oid)));
 
                 // Is the user elevated? If so, add claims for those policies in scope
-                if (claims.Exists(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim))
+                if (claims.FirstOrDefault(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim)?.Value?.ToLower() == "true")
                 {
                     try
                     {
@@ -330,6 +330,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                     catch (Exception e)
                     {
                         AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(';'), false);
+                        throw;
                     }
                 }
 

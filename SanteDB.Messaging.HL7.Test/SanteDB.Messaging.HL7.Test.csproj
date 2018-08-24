@@ -83,9 +83,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Data\santedb_test.fdb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\ADT_PD1.txt" />
@@ -93,6 +90,10 @@
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"$(SolutionDir)\Solution Items\FirebirdSQL-3.0.3-Embedded.bat" "$(SolutionDir)\Solution Items" "$(TargetDir)"</PreBuildEvent>
+    <PreBuildEvent>"$(SolutionDir)Solution Items\FirebirdSQL-3.0.3-Embedded.bat" "$(SolutionDir)Solution Items" "$(TargetDir)"</PreBuildEvent>
   </PropertyGroup>
+  <Target Name="BeforeBuild">
+    <Copy SourceFiles="..\Solution Items\santedb_test.fdb" DestinationFolder="$(OutputPath)" ContinueOnError="false" />
+  </Target>
+
 </Project>

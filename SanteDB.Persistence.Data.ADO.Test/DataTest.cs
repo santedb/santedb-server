@@ -11,7 +11,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
     /// <summary>
     /// Represents an abstract data test tool
     /// </summary>
-    [DeploymentItem(@"Data\santedb_test.fdb")]
+    [DeploymentItem(@"santedb_test.fdb")]
     [DeploymentItem(@"fbclient.dll")]
     [DeploymentItem(@"firebird.conf")]
     [DeploymentItem(@"firebird.msg")]

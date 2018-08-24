@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="MDM Codes">
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <name>Unrestricted MDM</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.6</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <name>Write MDM Master</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.6.1</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <name>Read MDM Locals</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.6.2</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <name>Merge MDM Master</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.6.3</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
+</dataset>
