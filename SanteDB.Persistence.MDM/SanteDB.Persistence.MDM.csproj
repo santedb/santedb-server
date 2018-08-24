@@ -67,6 +67,10 @@
       <Project>{f1a82a4f-4a57-47d7-ae76-444c8a4ff54a}</Project>
       <Name>SanteDB.Core.Model</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
+      <Project>{DB9BC05E-45F1-4F96-A161-F36BDECAF566}</Project>
+      <Name>SanteDB.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MARC.HI.EHRS.SVC.Configuration">
