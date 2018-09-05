@@ -1,7 +1,9 @@
 ﻿using MARC.HI.EHRS.SVC.Core;
+using MARC.HI.EHRS.SVC.Core.Data;
 using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
@@ -222,7 +224,7 @@ namespace SanteDB.Persistence.MDM.Services
             var matchGroups = matchingRecords
                 .GroupBy(o => o.Classification)
                 .ToDictionary(o => o.Key, o => o);
-
+            
             // Inbound record *IS A MASTER*
             // MASTER records can be duplicates or detected duplicates of other MASTER records. For example, 
             // if an inbound LOCAL record JOHN SMITH, 1980-01-01 results in the creation of a new MASTER record JOHN SMITH, 1980-01-01
@@ -234,7 +236,7 @@ namespace SanteDB.Persistence.MDM.Services
             {
                 // We want to remove all previous probable matches
                 var query = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
-                    .Invoke(null, new object[] { NameValueCollection.ParseQueryString($"sourceKey={identified.Key}&relationshipType={MdmConstants.DuplicateRecordRelationship}") }) as Expression;
+                    .Invoke(null, new object[] { NameValueCollection.ParseQueryString($"source={identified.Key}&relationshipType={MdmConstants.DuplicateRecordRelationship}") }) as Expression;
                 int tr = 0;
                 var rels = relationshipService.Query(query, 0, 100, out tr);
                 foreach (var r in rels)
@@ -244,13 +246,7 @@ namespace SanteDB.Persistence.MDM.Services
                 var matchRelationships = matchingRecords.Where(o => o.Classification == RecordMatchClassification.Match || o.Classification == RecordMatchClassification.Probable)
                     .Select(m => m.Record)
                     .OfType<IdentifiedData>()
-                    .Select(m =>
-                    {
-                        var relationship = Activator.CreateInstance(relationshipType, (Guid?)MdmConstants.DuplicateRecordRelationship, (Guid?)m.Key);
-                        (relationship as IIdentifiedEntity).Key = Guid.NewGuid();
-                        (relationship as ISimpleAssociation).SourceEntityKey = identified.Key;
-                        return relationship;
-                    });
+                    .Select(m => this.CreateRelationship(relationshipType, MdmConstants.DuplicateRecordRelationship, identified.Key, m.Key));
                 foreach (var r in matchRelationships)
                     relationshipService.Insert(r);
 
@@ -258,28 +254,119 @@ namespace SanteDB.Persistence.MDM.Services
                 typeof(T).GetRuntimeProperty("Relationships").SetValue(e.Data, matchRelationships.ToList());
             }
             // Record is a LOCAL record
-            // LOCAL records can be duplicates of MASTER records. 
-            // IF MATCHES.COUNT = 1 AND AUTOMERGE = TRUE THEN
-            //      LOCAL.MASTER = MATCHES[0];
-            // IF MATCHES.COUNT = 0 OR MATCHES.COUNT = 1 AND AUTOMERGE = FALSE THEN
-            //      LOCAL.MASTER = NEW MASTER()
-            //      IF AUTOMERGE = FALSE THEN
-            //          LOCAL.PROBABLE.ADD(MATCHES[0])
-            //      END
-            // IF MATCHES.COUNT > 1 THEN
-            //      LOCAL.MASTER = NEW MASTER()
-            //      FOR EACH MATCH IN MATCHES
-            //          LOCAL.PROBABLE.ADD(MATCH);
-            // END
-            // FOR EACH PROB IN PROBABLES
-            //      LOCAL.PROBABLE.ADD(PROB);
-            // END
-            // record and automerge is true, then the 
+            //// INPUT = INBOUND LOCAL RECORD (FROM PATIENT SOURCE) THAT HAS BEEN INSERTED 
+            //// MATCHES = THE RECORDS THAT HAVE BEEN DETERMINED TO BE DEFINITE MATCHES WHEN COMPARED TO INPUT 
+            //// PROBABLES = THE RECORDS THAT HAVE BEEN DETERMINED TO BE POTENTIAL MATCHES WHEN COMPARE TO INPUT
+            //// AUTOMERGE = A CONFIGURATION VALUE WHICH INSTRUCTS THE MPI TO AUTOMATICALLY MERGE DATA WHEN SAFE
+
+            //// THE MATCH SERVICE HAS FOUND 1 DEFINITE MASTER RECORD THAT MATCHES THE INPUT RECORD AND AUTOMERGE IS ON
+            //IF MATCHES.COUNT = 1 AND AUTOMERGE = TRUE THEN
+            //        INPUT.MASTER = MATCHES[0]; // ASSIGN THE FOUND MATCH AS THE MASTER RECORD OF THE INPUT
+            //// THE MATCH SERVICE HAS FOUND NO DEFINITE MASTER RECORDS THAT MATCH THE INPUT RECORD OR 1 WAS FOUND AND AUTOMERGE IS OFF
+            //ELSE
+            //        INPUT.MASTER = NEW MASTER(INPUT) // CREATE A NEW MASTER RECORD FOR THE INPUT
+            //        FOR EACH MATCH IN MATCHES // FOR EACH OF THE DEFINITE MATCHES THAT WERE FOUND ADD THEM AS PROBABLE MATCHES TO THE INPUT
+            //            INPUT.PROBABLE.ADD(MATCH);
+            //        END FOR
+            //END IF
+
+            //// ANY PROBABLE MATCHES FROM THE MATCH SERVICE ARE JUST ADDED AS PROBABLES
+            //FOR EACH PROB IN PROBABLES
+            //        INPUT.PROBABLE.ADD(PROB);
+            //END FOR
             else if(mdmTag.Value == "L")
             {
 
+                List<IdentifiedData> insertData = new List<IdentifiedData>();
+
+                // There is exactly one match and it is set to automerge
+                if(matchGroups[RecordMatchClassification.Match].Count() == 1 
+                    && this.m_resourceConfiguration.AutoMerge)
+                {
+                    var master = matchGroups[RecordMatchClassification.Match].First().Record;
+                    var dataService = ApplicationContext.Current.GetService<IDataPersistenceService<T>>() as IDataPersistenceService;
+                    insertData.Add(this.CreateRelationship(relationshipType, MdmConstants.MasterRecordRelationship, identified.Key, master.Key));
+
+                    // Grab the current list of local records and fold this new data into the master
+                    var query = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
+                       .Invoke(null, new object[] { NameValueCollection.ParseQueryString($"target={master.Key}&relationshipType={MdmConstants.MasterRecordRelationship}") }) as Expression;
+                    int tr = 0;
+                    var currentLocals = relationshipService.Query(query, 0, 100, out tr).OfType<ISimpleAssociation>().Select(o=>dataService.Get(o.SourceEntityKey.Value));
+                    var updatedMaster = this.UpdateMasterRecord(master, currentLocals.OfType<T>().Union(new T[] { e.Data }).ToArray());
+                    dataService.Update(master);
+                }
+                else
+                {
+                    // We want to create a new master for this record
+                    var master = this.CreateMasterRecord((T)identified);
+                    insertData.Add(master);
+                    insertData.Add(this.CreateRelationship(relationshipType, MdmConstants.MasterRecordRelationship, identified.Key, master.Key));
+
+                    // Now add each of the found masters to the probable list
+                    insertData.AddRange(matchGroups[RecordMatchClassification.Match].Select(m => this.CreateRelationship(relationshipType, MdmConstants.DuplicateRecordRelationship, identified.Key, m.Record.Key)));
+                }
+
+                // Add probable records
+                insertData.AddRange(matchGroups[RecordMatchClassification.Probable].Select(m => this.CreateRelationship(relationshipType, MdmConstants.DuplicateRecordRelationship, identified.Key, m.Record.Key)));
+
+                // Insert relationships
+                ApplicationContext.Current.GetService<IDataPersistenceService<Bundle>>().Insert(new Bundle()
+                {
+                    Item = insertData
+                }, AuthenticationContext.SystemPrincipal, TransactionMode.Commit);
             }
 
+        }
+
+        /// <summary>
+        /// Create a relationship of the specied type
+        /// </summary>
+        /// <param name="relationshipType"></param>
+        /// <param name="relationshipClassification"></param>
+        /// <param name="sourceEntity"></param>
+        /// <param name="targetEntity"></param>
+        /// <returns></returns>
+        private IdentifiedData CreateRelationship(Type relationshipType, Guid relationshipClassification, Guid? sourceEntity, Guid? targetEntity)
+        {
+            var relationship = Activator.CreateInstance(relationshipType, relationshipClassification, targetEntity) as IdentifiedData;
+            relationship.Key = Guid.NewGuid();
+            (relationship as ISimpleAssociation).SourceEntityKey = sourceEntity;
+            return relationship;
+        }
+
+        /// <summary>
+        /// Create a master record from the specified local records
+        /// </summary>
+        /// <param name="localRecords">The local records that are to be used to generate a master record</param>
+        /// <returns>The created master record</returns>
+        private T CreateMasterRecord(params T[] localRecords)
+        {
+            return this.UpdateMasterRecord(null, localRecords);
+        }
+
+        /// <summary>
+        /// Updates the master record
+        /// </summary>
+        /// <param name="currentMaster">The current master record that should be updated</param>
+        /// <param name="localRecords">The local records that should be used to formulate the update to the master</param>
+        private T UpdateMasterRecord(T currentMaster, params T[] localRecords)
+        {
+            if (localRecords.Length == 0)
+                throw new ArgumentOutOfRangeException(nameof(localRecords), "Must contain at least one local record");
+
+            // Current master doesn't exist
+            if (currentMaster == null)
+            {
+                currentMaster = Activator.CreateInstance<T>();
+                currentMaster.Key = Guid.NewGuid();
+                (currentMaster as Entity)?.Tags.Add(new EntityTag("mdm.type", "M"));
+                (currentMaster as Act)?.Tags.Add(new ActTag("mdm.type", "M"));
+            }
+
+            // Process local records and copy the field values if no semantically equivalent object exists in the master and if the current master is protected
+            currentMaster.SemanticUpdate(localRecords.Where(o => !(o is ISecurable) || (o as ISecurable).Policies.Count == 0).ToArray());
+
+            return currentMaster;
         }
 
         /// <summary>

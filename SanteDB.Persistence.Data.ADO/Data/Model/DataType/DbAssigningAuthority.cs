@@ -68,8 +68,8 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.DataType
         /// <summary>
         /// Assigning device identifier
         /// </summary>
-        [Column("dev_id"), ForeignKey(typeof(DbSecurityDevice), nameof(DbSecurityDevice.Key))]
-        public Guid? AssigningDeviceKey { get; set; }
+        [Column("app_id"), ForeignKey(typeof(DbSecurityApplication), nameof(DbSecurityApplication.Key))]
+        public Guid? AssigningApplicationKey { get; set; }
 
         /// <summary>
         /// Validation regular expression

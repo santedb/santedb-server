@@ -15120,10 +15120,10 @@ namespace SanteDB.Core.Model.Json.Formatter {
                 }
             }
             if (context.ShouldSerialize("assigningDevice")) {
-                if ((_strong.AssigningDeviceKey == null)) {
+                if ((_strong.AssigningApplicationKey == null)) {
                 }
                 else {
-                    context.JsonContext.WritePropertyUtil(w, "assigningDevice", _strong.AssigningDeviceKey, context);
+                    context.JsonContext.WritePropertyUtil(w, "assigningDevice", _strong.AssigningApplicationKey, context);
                 }
             }
             if (context.ShouldSerialize("validation")) {
@@ -15306,7 +15306,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                                         r.Read();
                                                                         object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<System.Guid>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("assigningDevice", context.JsonContext, _retVal, context));
                                                                         if ((_instance != null)) {
-                                                                            _retVal.AssigningDeviceKey = ((System.Nullable<System.Guid>)(_instance));
+                                                                            _retVal.AssigningApplicationKey = ((System.Nullable<System.Guid>)(_instance));
                                                                         }
                                                                     }
                                                                     else {
