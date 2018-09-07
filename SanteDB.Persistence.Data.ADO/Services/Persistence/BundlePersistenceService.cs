@@ -158,27 +158,31 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             for(int i  = 0; i < data.Item.Count; i++)
             {
                 var itm = data.Item[i];
-                var idp = typeof(IDataPersistenceService<>).MakeGenericType(new Type[] { itm.GetType() });
-                var svc = ApplicationContext.Current.GetService(idp);
-				var method = "Insert";
-
-	            if (itm.TryGetExisting(context, true) != null)
-	            {
-					method = "Update";
-				}
-
-                this.m_tracer.TraceInformation("Will {0} object from bundle {1}...", method, itm);
+                var svc = AdoPersistenceService.GetPersister(itm.GetType());
+                
                 this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)(i + 1) / data.Item.Count, itm));
-
-                var mi = svc.GetType().GetRuntimeMethod(method, new Type[] { typeof(DataContext), itm.GetType(), typeof(IPrincipal) });
                 try
                 {
-                    data.Item[i] = mi.Invoke(svc, new object[] { context, itm }) as IdentifiedData;
+                    if (itm.TryGetExisting(context, true) != null)
+                    {
+                        this.m_tracer.TraceInformation("Will update {0} object from bundle...", itm);
+                        data.Item[i] = svc.Update(context, itm) as IdentifiedData;
+                    }
+                    else
+                    {
+                        this.m_tracer.TraceInformation("Will insert {0} object from bundle...", itm);
+                        data.Item[i] = svc.Insert(context, itm) as IdentifiedData;
+                    }
                 }
-                catch(TargetInvocationException e)
+                catch (TargetInvocationException e)
                 {
                     throw e.InnerException;
                 }
+                catch(Exception)
+                {
+                    throw;
+                }
+
             }
 
             // Cache items

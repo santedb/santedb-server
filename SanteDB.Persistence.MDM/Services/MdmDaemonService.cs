@@ -76,7 +76,7 @@ namespace SanteDB.Persistence.MDM.Services
                 {
                     this.m_traceSource.TraceInformation("Adding MDM listener for {0}...", itm.ResourceType.Name);
                     var idt = typeof(MdmResourceListener<>).MakeGenericType(itm.ResourceType);
-                    this.m_listeners.Add(Activator.CreateInstance(idt) as MdmResourceListener);
+                    this.m_listeners.Add(Activator.CreateInstance(idt, itm) as MdmResourceListener);
                 }
             };
 

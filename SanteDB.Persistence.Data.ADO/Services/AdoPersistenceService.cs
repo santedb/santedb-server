@@ -42,6 +42,9 @@ using SanteDB.Persistence.Data.ADO.Services.Persistence;
 using System.Collections;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data.Hax;
+using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Security;
+using System.Data;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -50,7 +53,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// <summary>
     /// Represents a dummy service which just adds the persistence services to the context
     /// </summary>
-    public class AdoPersistenceService : IDaemonService
+    public class AdoPersistenceService : IDaemonService, ISqlDataPersistenceService
     {
 
         private static ModelMapper s_mapper;
@@ -88,8 +91,17 @@ namespace SanteDB.Persistence.Data.ADO.Services
             IAdoPersistenceService retVal = null;
             if (!s_persistenceCache.TryGetValue(tDomain, out retVal))
             {
-                var idpType = typeof(IDataPersistenceService<>).MakeGenericType(tDomain);
+                // Scan type heirarchy as well
+                var sDomain = tDomain;
+                var idpType = typeof(IDataPersistenceService<>).MakeGenericType(sDomain);
                 retVal = ApplicationContext.Current.GetService(idpType) as IAdoPersistenceService;
+                while(retVal == null && sDomain != typeof(object))
+                {
+                    sDomain = sDomain.BaseType;
+                    idpType = typeof(IDataPersistenceService<>).MakeGenericType(sDomain);
+                    retVal = ApplicationContext.Current.GetService(idpType) as IAdoPersistenceService;
+                }
+
                 if (retVal != null)
                     lock (s_persistenceCache)
                         if (!s_persistenceCache.ContainsKey(tDomain))
@@ -328,6 +340,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
         }
 
         /// <summary>
+        /// Gets the invariant name
+        /// </summary>
+        public string InvariantName => s_configuration.Provider.Name;
+
+        /// <summary>
         /// Start the service and bind all of the sub-services
         /// </summary>
         public bool Start()
@@ -469,6 +486,39 @@ namespace SanteDB.Persistence.Data.ADO.Services
             this.m_running = false;
             this.Stopped?.Invoke(this, EventArgs.Empty);
             return true;
+        }
+
+        /// <summary>
+        /// Execute the SQL provided
+        /// </summary>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
+        public void Execute(string sql)
+        {
+            using (var conn = s_configuration.Provider.GetWriteConnection())
+            {
+                IDbTransaction tx = null;
+                try
+                {
+                    conn.Open();
+                    tx = conn.BeginTransaction();
+                    var rsql = sql;
+                    while (rsql.Contains(";")) {
+                        conn.ExecuteNonQuery(conn.CreateSqlStatement(rsql.Substring(0, rsql.IndexOf(";"))));
+                        rsql = rsql.Substring(rsql.IndexOf(";") + 1);
+                    }
+
+                    if(!String.IsNullOrEmpty(rsql) && !String.IsNullOrWhiteSpace(rsql))
+                        conn.ExecuteNonQuery(conn.CreateSqlStatement(rsql));
+
+                    tx.Commit();
+                }
+                catch(Exception e)
+                {
+                    tx.Rollback();
+                    this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Could not execute SQL: {0}", e);
+                    throw;
+                }
+            }
         }
     }
 }

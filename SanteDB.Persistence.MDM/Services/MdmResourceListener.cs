@@ -12,13 +12,16 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.MDM.Configuration;
+using SanteDB.Persistence.MDM.Model;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Permissions;
+using System.Security.Principal;
 
 namespace SanteDB.Persistence.MDM.Services
 {
@@ -38,7 +41,7 @@ namespace SanteDB.Persistence.MDM.Services
     /// Represents a base class for an MDM resource listener
     /// </summary>
     public class MdmResourceListener<T> : MdmResourceListener, IRecordMergingService<T>
-        where T : IdentifiedData
+        where T : IdentifiedData, new()
     {
 
         // Configuration
@@ -53,8 +56,9 @@ namespace SanteDB.Persistence.MDM.Services
         /// <summary>
         /// Resource listener
         /// </summary>
-        public MdmResourceListener()
+        public MdmResourceListener(MdmResourceConfiguration configuration)
         {
+            this.m_resourceConfiguration = configuration;
             this.m_repository = ApplicationContext.Current.GetService<IDataPersistenceService<T>>();
             if (this.m_repository == null)
                 throw new InvalidOperationException($"Could not find persistence service for {typeof(T)}");
@@ -83,7 +87,44 @@ namespace SanteDB.Persistence.MDM.Services
         /// </remarks>
         private void Querying(object sender, MARC.HI.EHRS.SVC.Core.Event.PreQueryEventArgs<T> e)
         {
-            throw new NotImplementedException();
+            var query = new NameValueCollection(QueryExpressionBuilder.BuildQuery<T>(e.Query).ToArray());
+
+            // The query is already querying for master records
+            if (query.ContainsKey("classConcept") && query["classConcept"].Contains(MdmConstants.MasterRecordClassification.ToString()))
+                return;
+            // The query doesn't contain a query for master records, so...
+            // If the user is not in the role "SYSTEM" OR they didn't ask specifically for LOCAL records we have to rewrite the query to use MASTER
+            if (!e.Principal.IsInRole("SYSTEM") || !query.ContainsKey("tag[mdm.type].value"))
+            {
+                // Did the person ask specifically for a local record? if so we need to demand permission
+                if (query.ContainsKey("tag[mdm.type].value") && query["tag[mdm.type].value"].Contains("L"))
+                    new PolicyPermission(PermissionState.Unrestricted, MdmPermissionPolicyIdentifiers.ReadMdmLocals).Demand();
+                else // We want to modify the query to only include masters and rewrite the query
+                {
+                    query = new NameValueCollection(query.ToDictionary(o => $"relationship[MDM-Master].source@{typeof(T).Name}.{o.Key}", o => o.Value));
+                    query.Add("classConcept", MdmConstants.MasterRecordClassification.ToString());
+                    e.Cancel = true; // We want to cancel the other's query
+
+                    // We are wrapping an entity, so we query entity masters
+                    int tr = 0;
+                    if (typeof(Entity).IsAssignableFrom(typeof(T)))
+                        e.OverrideResults = this.MasterQuery<Entity>(query, e.QueryId.GetValueOrDefault(), e.Offset, e.Count, e.Principal, out tr);
+                    else
+                        e.OverrideResults = this.MasterQuery<Act>(query, e.QueryId.GetValueOrDefault(), e.Offset, e.Count, e.Principal, out tr);
+                    e.OverrideTotalResults = tr;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Perform a master query 
+        /// </summary>
+        private IEnumerable<T> MasterQuery<TMasterType>(NameValueCollection query, Guid queryId, int offset, int? count, IPrincipal principal, out int totalResults)
+        {
+            var masterQuery = QueryExpressionParser.BuildLinqExpression<TMasterType>(query);
+            int tr = 0;
+            return ApplicationContext.Current.GetService<IStoredQueryDataPersistenceService<TMasterType>>().Query(masterQuery, queryId, offset, count, principal, out totalResults)
+                .Select(o => o is Entity ? new EntityMaster<T>((Entity)(object)o).GetMaster(principal) : new ActMaster<T>((Act)(Object)o).GetMaster(principal));
         }
 
         /// <summary>
@@ -95,7 +136,8 @@ namespace SanteDB.Persistence.MDM.Services
         /// in the MASTER record</remarks>
         private void Queried(object sender, MARC.HI.EHRS.SVC.Core.Event.PostQueryEventArgs<T> e)
         {
-            throw new NotImplementedException();
+            // TODO: Filter master record data based on taboo child records.
+
         }
 
         /// <summary>
@@ -119,8 +161,9 @@ namespace SanteDB.Persistence.MDM.Services
         /// being sent with tag of MASTER are indeed sent by the MDM or SYSTEM user.</remarks>
         private void PrePersistenceValidate(object sender, MARC.HI.EHRS.SVC.Core.Event.PrePersistenceEventArgs<T> e)
         {
-            var taggable = e.Data as ITaggable;
-            if (taggable?.Tags.Any(t => t.TagKey == "mdm.type" && t.TagKey == "M") == true &&
+            Guid? classConcept = (e.Data as Entity)?.ClassConceptKey ?? (e.Data as Act)?.ClassConceptKey;
+            // We are touching a master record and we are not system?
+            if (classConcept.GetValueOrDefault() == MdmConstants.MasterRecordClassification &&
                 !e.Principal.IsInRole("SYSTEM"))
                 new PolicyPermission(PermissionState.Unrestricted, MdmPermissionPolicyIdentifiers.WriteMdmMaster).Demand();
             // We want to ensure that a master link is not being explicitly persisted
@@ -213,6 +256,8 @@ namespace SanteDB.Persistence.MDM.Services
                     mdmTag = at;
                 }
             }
+            else
+                throw new InvalidOperationException("Cannot insert synthetic master record");
 
             // Find records for which this record could be match // async
             var relationshipType = identified is Entity ? typeof(EntityRelationship) : typeof(ActRelationship);
@@ -225,34 +270,7 @@ namespace SanteDB.Persistence.MDM.Services
                 .GroupBy(o => o.Classification)
                 .ToDictionary(o => o.Key, o => o);
             
-            // Inbound record *IS A MASTER*
-            // MASTER records can be duplicates or detected duplicates of other MASTER records. For example, 
-            // if an inbound LOCAL record JOHN SMITH, 1980-01-01 results in the creation of a new MASTER record JOHN SMITH, 1980-01-01
-            // and that MASTER record matches an existing one on file
-            if (mdmTag.Value == "M" &&
-                (matchGroups.ContainsKey(RecordMatchClassification.Match) &&
-                matchGroups[RecordMatchClassification.Match].Count() > 1 ||
-                matchGroups.ContainsKey(RecordMatchClassification.Probable)))
-            {
-                // We want to remove all previous probable matches
-                var query = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
-                    .Invoke(null, new object[] { NameValueCollection.ParseQueryString($"source={identified.Key}&relationshipType={MdmConstants.DuplicateRecordRelationship}") }) as Expression;
-                int tr = 0;
-                var rels = relationshipService.Query(query, 0, 100, out tr);
-                foreach (var r in rels)
-                    relationshipService.Obsolete(r);
-
-                // Now we want to create a new relationship for the type
-                var matchRelationships = matchingRecords.Where(o => o.Classification == RecordMatchClassification.Match || o.Classification == RecordMatchClassification.Probable)
-                    .Select(m => m.Record)
-                    .OfType<IdentifiedData>()
-                    .Select(m => this.CreateRelationship(relationshipType, MdmConstants.DuplicateRecordRelationship, identified.Key, m.Key));
-                foreach (var r in matchRelationships)
-                    relationshipService.Insert(r);
-
-                // Add to return value
-                typeof(T).GetRuntimeProperty("Relationships").SetValue(e.Data, matchRelationships.ToList());
-            }
+            
             // Record is a LOCAL record
             //// INPUT = INBOUND LOCAL RECORD (FROM PATIENT SOURCE) THAT HAS BEEN INSERTED 
             //// MATCHES = THE RECORDS THAT HAVE BEEN DETERMINED TO BE DEFINITE MATCHES WHEN COMPARED TO INPUT 
@@ -274,40 +292,33 @@ namespace SanteDB.Persistence.MDM.Services
             //FOR EACH PROB IN PROBABLES
             //        INPUT.PROBABLE.ADD(PROB);
             //END FOR
-            else if(mdmTag.Value == "L")
+            if(mdmTag.Value == "L")
             {
 
                 List<IdentifiedData> insertData = new List<IdentifiedData>();
 
                 // There is exactly one match and it is set to automerge
-                if(matchGroups[RecordMatchClassification.Match].Count() == 1 
+                if(matchGroups.ContainsKey(RecordMatchClassification.Match) && matchGroups[RecordMatchClassification.Match].Count() == 1 
                     && this.m_resourceConfiguration.AutoMerge)
                 {
                     var master = matchGroups[RecordMatchClassification.Match].First().Record;
                     var dataService = ApplicationContext.Current.GetService<IDataPersistenceService<T>>() as IDataPersistenceService;
-                    insertData.Add(this.CreateRelationship(relationshipType, MdmConstants.MasterRecordRelationship, identified.Key, master.Key));
-
-                    // Grab the current list of local records and fold this new data into the master
-                    var query = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
-                       .Invoke(null, new object[] { NameValueCollection.ParseQueryString($"target={master.Key}&relationshipType={MdmConstants.MasterRecordRelationship}") }) as Expression;
-                    int tr = 0;
-                    var currentLocals = relationshipService.Query(query, 0, 100, out tr).OfType<ISimpleAssociation>().Select(o=>dataService.Get(o.SourceEntityKey.Value));
-                    var updatedMaster = this.UpdateMasterRecord(master, currentLocals.OfType<T>().Union(new T[] { e.Data }).ToArray());
+                    insertData.Add(this.CreateRelationship(relationshipType, MdmConstants.MasterRecordRelationship, identified.Key, master.Key, (identified as IVersionedEntity).VersionSequence));
                     dataService.Update(master);
                 }
                 else
                 {
                     // We want to create a new master for this record
-                    var master = this.CreateMasterRecord((T)identified);
-                    insertData.Add(master);
-                    insertData.Add(this.CreateRelationship(relationshipType, MdmConstants.MasterRecordRelationship, identified.Key, master.Key));
+                    var master = this.CreateMasterRecord();
+                    insertData.Add(master as IdentifiedData);
+                    insertData.Add(this.CreateRelationship(relationshipType, MdmConstants.MasterRecordRelationship, identified.Key, master.Key, (identified as IVersionedEntity).VersionSequence));
 
                     // Now add each of the found masters to the probable list
-                    insertData.AddRange(matchGroups[RecordMatchClassification.Match].Select(m => this.CreateRelationship(relationshipType, MdmConstants.DuplicateRecordRelationship, identified.Key, m.Record.Key)));
+                    if(matchGroups.ContainsKey(RecordMatchClassification.Match)) insertData.AddRange(matchGroups[RecordMatchClassification.Match].Select(m => this.CreateRelationship(relationshipType, MdmConstants.DuplicateRecordRelationship, identified.Key, m.Record.Key, (identified as IVersionedEntity).VersionSequence)));
                 }
 
                 // Add probable records
-                insertData.AddRange(matchGroups[RecordMatchClassification.Probable].Select(m => this.CreateRelationship(relationshipType, MdmConstants.DuplicateRecordRelationship, identified.Key, m.Record.Key)));
+                if (matchGroups.ContainsKey(RecordMatchClassification.Probable)) insertData.AddRange(matchGroups[RecordMatchClassification.Probable].Select(m => this.CreateRelationship(relationshipType, MdmConstants.DuplicateRecordRelationship, identified.Key, m.Record.Key, (identified as IVersionedEntity).VersionSequence)));
 
                 // Insert relationships
                 ApplicationContext.Current.GetService<IDataPersistenceService<Bundle>>().Insert(new Bundle()
@@ -326,11 +337,12 @@ namespace SanteDB.Persistence.MDM.Services
         /// <param name="sourceEntity"></param>
         /// <param name="targetEntity"></param>
         /// <returns></returns>
-        private IdentifiedData CreateRelationship(Type relationshipType, Guid relationshipClassification, Guid? sourceEntity, Guid? targetEntity)
+        private IdentifiedData CreateRelationship(Type relationshipType, Guid relationshipClassification, Guid? sourceEntity, Guid? targetEntity, Decimal? versionSequence)
         {
             var relationship = Activator.CreateInstance(relationshipType, relationshipClassification, targetEntity) as IdentifiedData;
             relationship.Key = Guid.NewGuid();
             (relationship as ISimpleAssociation).SourceEntityKey = sourceEntity;
+            (relationship as IVersionedAssociation).EffectiveVersionSequenceId = versionSequence;
             return relationship;
         }
 
@@ -339,34 +351,13 @@ namespace SanteDB.Persistence.MDM.Services
         /// </summary>
         /// <param name="localRecords">The local records that are to be used to generate a master record</param>
         /// <returns>The created master record</returns>
-        private T CreateMasterRecord(params T[] localRecords)
+        private IMdmMaster<T> CreateMasterRecord()
         {
-            return this.UpdateMasterRecord(null, localRecords);
-        }
-
-        /// <summary>
-        /// Updates the master record
-        /// </summary>
-        /// <param name="currentMaster">The current master record that should be updated</param>
-        /// <param name="localRecords">The local records that should be used to formulate the update to the master</param>
-        private T UpdateMasterRecord(T currentMaster, params T[] localRecords)
-        {
-            if (localRecords.Length == 0)
-                throw new ArgumentOutOfRangeException(nameof(localRecords), "Must contain at least one local record");
-
-            // Current master doesn't exist
-            if (currentMaster == null)
-            {
-                currentMaster = Activator.CreateInstance<T>();
-                currentMaster.Key = Guid.NewGuid();
-                (currentMaster as Entity)?.Tags.Add(new EntityTag("mdm.type", "M"));
-                (currentMaster as Act)?.Tags.Add(new ActTag("mdm.type", "M"));
-            }
-
-            // Process local records and copy the field values if no semantically equivalent object exists in the master and if the current master is protected
-            currentMaster.SemanticUpdate(localRecords.Where(o => !(o is ISecurable) || (o as ISecurable).Policies.Count == 0).ToArray());
-
-            return currentMaster;
+            var mtype = typeof(Entity).IsAssignableFrom(typeof(T)) ? typeof(EntityMaster<>) : typeof(ActMaster<>);
+            var retVal = Activator.CreateInstance(mtype.MakeGenericType(typeof(T))) as IMdmMaster<T>;
+            retVal.Key = Guid.NewGuid();
+            retVal.VersionKey = null;
+            return retVal;
         }
 
         /// <summary>

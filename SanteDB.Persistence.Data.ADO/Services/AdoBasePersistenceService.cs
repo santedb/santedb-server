@@ -642,15 +642,15 @@ namespace SanteDB.Persistence.Data.ADO.Services
             sw.Start();
 #endif
 
-            PreQueryEventArgs<TData> preArgs = new PreQueryEventArgs<TData>(query, authContext);
+            PreQueryEventArgs<TData> preArgs = new PreQueryEventArgs<TData>(query, queryId, offset, count, authContext);
             this.Querying?.Invoke(this, preArgs);
             if (preArgs.Cancel)
             {
                 this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Pre-Event handler indicates abort query {0}", query);
-                totalCount = 0;
-                return null;
+                totalCount = preArgs.OverrideTotalResults.GetValueOrDefault() ;
+                return preArgs.OverrideResults;
             }
-
+            
             // Query object
             using (var connection = m_configuration.Provider.GetReadonlyConnection())
                 try
@@ -671,7 +671,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     else
                         connection.LoadState = LoadState.FullLoad;
 
-                    var results = this.Query(connection, preArgs.Query, queryId, offset, count ?? 1000, out totalCount, true);
+                    var results = this.Query(connection, preArgs.Query, queryId, preArgs.Offset, preArgs.Count ?? 1000, out totalCount, true);
                     var postData = new PostQueryEventArgs<TData>(query, results.AsQueryable(), authContext);
                     this.Queried?.Invoke(this, postData);
 

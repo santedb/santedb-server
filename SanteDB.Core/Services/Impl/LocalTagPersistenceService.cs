@@ -55,7 +55,11 @@ namespace SanteDB.Core.Services.Impl
                         idp.Update(existing as EntityTag, AuthenticationContext.Current.Principal, TransactionMode.Commit);
                 }
                 else
+                {
+                    if (!tag.SourceEntityKey.HasValue)
+                        tag.SourceEntityKey = sourceKey;
                     idp.Insert(tag as EntityTag, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+                }
             }
             else if (tag is ActTag)
             {
@@ -71,7 +75,11 @@ namespace SanteDB.Core.Services.Impl
                         idp.Update(existing as ActTag, AuthenticationContext.Current.Principal, TransactionMode.Commit);
                 }
                 else
+                {
+                    if (!tag.SourceEntityKey.HasValue)
+                        tag.SourceEntityKey = sourceKey;
                     idp.Insert(tag as ActTag, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+                }
             }
 
             cache.Remove(sourceKey);

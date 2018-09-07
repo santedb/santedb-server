@@ -200,6 +200,14 @@ namespace SanteDB.Core.Persistence
                             throw;
                     }
                 }
+
+                // Execute the changes
+                var isqlp = ApplicationContext.Current.GetSerivce<ISqlDataPersistenceService>();
+                foreach (var de in ds.Exec.Where(o => o.InvariantName == isqlp?.InvariantName))
+                {
+                    this.m_traceSource.TraceInformation("Executing post-dataset SQL instructions for {0}...", ds.Id);
+                    isqlp.Execute(de.QueryText);
+                }
                 this.m_traceSource.TraceInformation("Applied {0} changes", ds.Action.Count);
 
             }

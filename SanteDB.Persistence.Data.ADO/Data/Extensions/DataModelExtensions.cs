@@ -471,8 +471,11 @@ namespace SanteDB.Persistence.Data.ADO.Data
             var cprincipal = principal as ClaimsPrincipal;
             DbSecurityProvenance retVal = new DbSecurityProvenance()
             {
-                Key = me.ContextId
+                Key = me.ContextId,
+                ApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid)
             };
+
+            // Identities
             foreach(var ident in cprincipal.Identities)
             {
                 if (ident is DeviceIdentity)
@@ -494,6 +497,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
             }
             catch (Exception e) {
                 s_traceSource.TraceWarning("Error creating context: {0}", e);
+                throw;
             }
             return retVal.Key;
         }

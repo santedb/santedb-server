@@ -44,14 +44,19 @@ namespace SanteDB.Core.Security
         public const String AnonymousUserSid = "C96859F0-043C-4480-8DAB-F69D6E86696C";
 
         /// <summary>
+        /// SYSTEM application's SID
+        /// </summary>
+        public const String SystemApplicationSid = "4c5b9f8d-49f4-4101-9662-4270895224b2";
+
+        /// <summary>
         /// System identity
         /// </summary>
-        private static readonly IPrincipal s_system = new GenericPrincipal(new GenericIdentity("SYSTEM"), new string[] { });
+        private static readonly IPrincipal s_system = new GenericPrincipal(new GenericIdentity("SYSTEM"), new string[] { "SYSTEM" });
         
         /// <summary>
         /// Anonymous identity
         /// </summary>
-        private static readonly IPrincipal s_anonymous = new GenericPrincipal(new GenericIdentity("ANONYMOUS"), new string[] { });
+        private static readonly IPrincipal s_anonymous = new GenericPrincipal(new GenericIdentity("ANONYMOUS"), new string[] {  "ANONYMOUS" });
 
         /// <summary>
         /// Gets the anonymous principal

@@ -24,6 +24,7 @@ using System.Collections;
 using System.Security.Principal;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.OrmLite;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -56,6 +57,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// Map to model instance
         /// </summary>
         Object ToModelInstance(object domainInstance, DataContext context);
+        
+
     }
 
     /// <summary>

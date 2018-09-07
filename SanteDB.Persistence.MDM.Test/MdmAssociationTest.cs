@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Services;
@@ -49,10 +50,18 @@ namespace SanteDB.Persistence.MDM.Test
                 Identifiers = new List<EntityIdentifier>()
                 {
                     new EntityIdentifier(new AssigningAuthority("TEST", "TEST", "1.2.3.4.5"), "10239")
-                }
+                },
+                GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
 
-            var createdPatient = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>().Insert(patientUnderTest, AuthenticationContext.SystemPrincipal, TransactionMode.Commit);
+            try
+            {
+                var createdPatient = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>().Insert(patientUnderTest, AuthenticationContext.SystemPrincipal, TransactionMode.Commit);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.ToString());
+            }
             // The creation / matching of a master record may take some time, so we need to wait for the matcher to finish
             Thread.Sleep(1000);
         }

@@ -242,12 +242,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                             // Add attributes 
                             var regex = oidData.Attributes.FirstOrDefault(o => o.Key == "ValidationRegex");
-                            var asgnDev = oidData.Attributes.FirstOrDefault(o => o.Key == "AssigningDevice");
+                            var asgnDev = oidData.Attributes.FirstOrDefault(o => o.Key == "AssigningApplication");
                             dba.ValidationRegex = regex.Value;
                             if(!String.IsNullOrEmpty(asgnDev.Value))
                             {
                                 var device = ApplicationContext.Current.GetService<ISecurityRepositoryService>().FindDevices(o => o.Name == asgnDev.Value).FirstOrDefault();
-                                dba.AssigningDeviceKey = device?.Key;
+                                dba.AssigningApplicationKey = device?.Key;
                             }
 
                             dataContext.Insert(dba);

@@ -25,6 +25,16 @@ namespace SanteDB.Persistence.MDM
         public static readonly Guid DuplicateRecordRelationship = Guid.Parse("56cfb115-8207-4f89-b52e-d20dbad8f8cc");
 
         /// <summary>
+        /// Master record classification
+        /// </summary>
+        public static readonly Guid MasterRecordClassification = Guid.Parse("49328452-7e30-4dcd-94cd-fd532d111578");
+
+        /// <summary>
+        /// Determiner codes
+        /// </summary>
+        public static readonly Guid MasterRecordDeterminer = Guid.Parse("92837281-7e30-4dcd-94cd-fd532d111578");
+
+        /// <summary>
         /// The name of the trace source to use for the MDM logs
         /// </summary>
         public const String TraceSourceName = "SanteDB.Persistence.MDM";
