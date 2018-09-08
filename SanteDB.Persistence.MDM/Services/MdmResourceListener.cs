@@ -124,7 +124,7 @@ namespace SanteDB.Persistence.MDM.Services
             var masterQuery = QueryExpressionParser.BuildLinqExpression<TMasterType>(query);
             int tr = 0;
             return ApplicationContext.Current.GetService<IStoredQueryDataPersistenceService<TMasterType>>().Query(masterQuery, queryId, offset, count, principal, out totalResults)
-                .Select(o => o is Entity ? new EntityMaster<T>((Entity)(object)o).GetMaster(principal) : new ActMaster<T>((Act)(Object)o).GetMaster(principal));
+                .Select(o => o is Entity ? new EntityMaster<T>((Entity)(object)o).GetMaster(principal) : new ActMaster<T>((Act)(Object)o).GetMaster(principal)).AsParallel().ToList();
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace SanteDB.Persistence.MDM.Services
         private void Queried(object sender, MARC.HI.EHRS.SVC.Core.Event.PostQueryEventArgs<T> e)
         {
             // TODO: Filter master record data based on taboo child records.
-
+            
         }
 
         /// <summary>

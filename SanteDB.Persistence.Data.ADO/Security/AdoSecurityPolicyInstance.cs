@@ -80,6 +80,17 @@ namespace SanteDB.Persistence.Data.PSQL.Security
         }
 
         /// <summary>
+        /// Local security policy instance
+        /// </summary>
+        public AdoSecurityPolicyInstance(DbEntitySecurityPolicy entityPolicy, DbSecurityPolicy policy, object securable)
+        {
+            this.Policy = new AdoSecurityPolicy(policy);
+            // TODO: Configuration of the policy as opt-in / opt-out
+            this.Rule = PolicyDecisionOutcomeType.Grant;
+            this.Securable = securable;
+        }
+
+        /// <summary>
         /// The policy 
         /// </summary>
         public IPolicy Policy { get; private set; }

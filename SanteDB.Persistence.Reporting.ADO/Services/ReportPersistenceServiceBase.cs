@@ -453,7 +453,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 				throw new ArgumentNullException(nameof(query));
 			}
 
-			var preArgs = new PreQueryEventArgs<TModel>(query, authContext);
+			var preArgs = new PreQueryEventArgs<TModel>(query, authContext: authContext);
 
 			this.Querying?.Invoke(this, preArgs);
 

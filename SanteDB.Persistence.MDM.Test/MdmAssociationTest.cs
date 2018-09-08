@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Services;
@@ -54,9 +55,10 @@ namespace SanteDB.Persistence.MDM.Test
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
 
+            Patient createdPatient = null;
             try
             {
-                var createdPatient = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>().Insert(patientUnderTest, AuthenticationContext.SystemPrincipal, TransactionMode.Commit);
+                createdPatient = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>().Insert(patientUnderTest, AuthenticationContext.SystemPrincipal, TransactionMode.Commit);
             }
             catch (Exception e)
             {
@@ -64,6 +66,14 @@ namespace SanteDB.Persistence.MDM.Test
             }
             // The creation / matching of a master record may take some time, so we need to wait for the matcher to finish
             Thread.Sleep(1000);
+
+            // Now attempt to query for the record just created, it should be a synthetic MASTER record
+            var masterPatient = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "10239"), AuthenticationContext.SystemPrincipal);
+            Assert.AreEqual(1, masterPatient.Count());
+            Assert.AreEqual("10239", masterPatient.First().Identifiers.First().Value);
+            Assert.AreEqual("M", masterPatient.First().Tags.First().Value);
+            Assert.AreEqual("mdm.type", masterPatient.First().Tags.First().TagKey);
+            Assert.AreEqual(createdPatient.Key, masterPatient.First().Relationships.First().SourceEntityKey); // Ensure master is pointed properly
         }
     }
 }

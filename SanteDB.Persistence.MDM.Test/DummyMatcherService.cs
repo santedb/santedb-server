@@ -35,7 +35,7 @@ namespace SanteDB.Persistence.MDM.Test
         /// </summary>
         public IEnumerable<IRecordMatchResult<T>> Classify<T>(T input, IEnumerable<T> blocks, string configurationName) where T : IdentifiedData
         {
-            return blocks.Select(o => new DummyMatchResult<T>(o));
+            return blocks.Select(o => new DummyMatchResult<T>(input, o));
         }
 
         /// <summary>
@@ -69,14 +69,28 @@ namespace SanteDB.Persistence.MDM.Test
         /// <summary>
         /// Match classification
         /// </summary>
-        public RecordMatchClassification Classification => RecordMatchClassification.Match;
+        public RecordMatchClassification Classification { get; private set; }
 
         /// <summary>
         /// Create a dummy match
         /// </summary>
-        public DummyMatchResult(T record)
+        public DummyMatchResult(T input, T record)
         {
             this.m_record = record;
+
+            // Patient?
+            if (input is Patient)
+            {
+                var pInput = (Patient)(object)input;
+                var pRecord = (Patient)(object)record;
+                // Classify
+                if (pInput.MultipleBirthOrder.HasValue && pInput.MultipleBirthOrder != pRecord.MultipleBirthOrder)
+                    this.Classification = RecordMatchClassification.Probable;
+                else
+                    this.Classification = RecordMatchClassification.Match;
+            }
+            else
+                this.Classification = RecordMatchClassification.Match;
         }
     }
 }

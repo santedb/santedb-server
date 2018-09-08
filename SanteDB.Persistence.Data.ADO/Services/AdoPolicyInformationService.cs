@@ -183,7 +183,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     else if (securable is Core.Model.Acts.Act)
                     {
                         var pAct = securable as Core.Model.Acts.Act;
-                        var query = context.CreateSqlStatement<DbActSecurityPolicy>().SelectFrom()
+                        var query = context.CreateSqlStatement<DbActSecurityPolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbActSecurityPolicy))
                                   .InnerJoin<DbSecurityPolicy, DbActSecurityPolicy>()
                                   .Where(o => o.SourceKey == pAct.Key);
 
@@ -192,7 +192,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     }
                     else if (securable is Core.Model.Entities.Entity)
                     {
-                        throw new NotImplementedException();
+                        var pEntity = securable as Core.Model.Entities.Entity;
+                        var query = context.CreateSqlStatement<DbEntitySecurityPolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbEntitySecurityPolicy))
+                                  .InnerJoin<DbSecurityPolicy, DbEntitySecurityPolicy>()
+                                  .Where(o => o.SourceKey == pEntity.Key);
+
+                        return context.Query<CompositeResult<DbSecurityPolicy, DbEntitySecurityPolicy>>(query)
+                            .Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable));
                     }
                     else
                         return new List<IPolicyInstance>();

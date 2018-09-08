@@ -54,9 +54,14 @@ namespace SanteDB.Core.Security
                 principalPolicies = pip.GetActivePolicies(principal);
 
             var retVal = new PolicyDecision(securable);
-            retVal.Details.AddRange(securablePolicies.Select(o => new PolicyDecisionDetail(o.Policy.Oid,
-                    principalPolicies.Any(p => p.Policy.Oid.StartsWith(o.Policy.Oid)) ? PolicyDecisionOutcomeType.Grant : PolicyDecisionOutcomeType.Deny
-                )));
+
+            foreach (var pol in securablePolicies)
+            {
+                // Get most restrictive from principal
+                var rule = principalPolicies.Where(p => p.Policy.Oid.StartsWith(pol.Policy.Oid)).Select(o => o.Rule).Min();
+                retVal.Details.Add(new PolicyDecisionDetail(pol.Policy.Oid, rule));
+            }
+
             return retVal;
         }
 

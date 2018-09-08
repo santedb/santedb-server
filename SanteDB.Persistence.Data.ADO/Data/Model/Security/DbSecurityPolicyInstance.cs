@@ -39,16 +39,6 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         public override Guid Key { get; set; }
 
         /// <summary>
-        /// Gets or sets the type of the grant.
-        /// </summary>
-        /// <value>The type of the grant.</value>
-        [Column("pol_act")]
-		public int GrantType {
-			get;
-			set;
-		}
-
-        /// <summary>
         /// Gets or sets the policy identifier.
         /// </summary>
         /// <value>The policy identifier.</value>
@@ -63,7 +53,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
 	/// <summary>
 	/// Represents a relationship between an entity and security policy
 	/// </summary>
-	[Table("ent_sec_pol_assoc_tbl")]
+	[Table("ent_pol_assoc_tbl")]
 	public class DbEntitySecurityPolicy : DbSecurityPolicyInstance
 	{
         /// <summary>
@@ -106,6 +96,17 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
 	public class DbSecurityRolePolicy : DbSecurityPolicyInstance
 	{
         /// <summary>
+        /// Gets or sets the type of the grant.
+        /// </summary>
+        /// <value>The type of the grant.</value>
+        [Column("pol_act")]
+        public int GrantType
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets the source
         /// </summary>
         /// <value>The source identifier.</value>
@@ -135,13 +136,24 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
             get;
             set;
         }
-        
+
+        /// <summary>
+        /// Gets or sets the type of the grant.
+        /// </summary>
+        /// <value>The type of the grant.</value>
+        [Column("pol_act")]
+        public int GrantType
+        {
+            get;
+            set;
+        }
+
     }
 
-	/// <summary>
-	/// Represents a security policy applied to a device
-	/// </summary>
-	[Table("sec_dev_pol_assoc_tbl")]
+    /// <summary>
+    /// Represents a security policy applied to a device
+    /// </summary>
+    [Table("sec_dev_pol_assoc_tbl")]
 	public class DbSecurityDevicePolicy : DbSecurityPolicyInstance
 	{
         /// <summary>
@@ -155,6 +167,16 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
             set;
         }
 
+        /// <summary>
+        /// Gets or sets the type of the grant.
+        /// </summary>
+        /// <value>The type of the grant.</value>
+        [Column("pol_act")]
+        public int GrantType
+        {
+            get;
+            set;
+        }
 
     }
 }

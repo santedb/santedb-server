@@ -25,6 +25,11 @@ namespace SanteDB.Persistence.MDM
         public static readonly Guid DuplicateRecordRelationship = Guid.Parse("56cfb115-8207-4f89-b52e-d20dbad8f8cc");
 
         /// <summary>
+        /// Represents a record of truth, this is a record which is promoted on the master record such that it is the "true" version of the record
+        /// </summary>
+        public static readonly Guid MasterRecordOfTruthRelationship = Guid.Parse("1C778948-2CB6-4696-BC04-4A6ECA140C20");
+
+        /// <summary>
         /// Master record classification
         /// </summary>
         public static readonly Guid MasterRecordClassification = Guid.Parse("49328452-7e30-4dcd-94cd-fd532d111578");
