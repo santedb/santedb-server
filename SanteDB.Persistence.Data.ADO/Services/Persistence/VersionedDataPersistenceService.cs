@@ -306,12 +306,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             sw.Start();
 #endif
 
-            PreRetrievalEventArgs preArgs = new PreRetrievalEventArgs(containerId);
+            PreRetrievalEventArgs<TModel> preArgs = new PreRetrievalEventArgs<TModel>(containerId);
             this.FireRetrieving(preArgs);
             if (preArgs.Cancel)
             {
                 this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Pre-Event handler indicates abort retrieve {0}", containerId.Id);
-                return null;
+                return preArgs.OverrideResult;
             }
 
             // Query object

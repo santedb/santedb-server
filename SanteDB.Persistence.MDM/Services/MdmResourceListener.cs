@@ -4,10 +4,12 @@ using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Collection;
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Query;
+using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Services;
@@ -20,6 +22,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Security.Claims;
 using System.Security.Permissions;
 using System.Security.Principal;
 
@@ -70,6 +73,7 @@ namespace SanteDB.Persistence.MDM.Services
             this.m_repository.Updated += this.Updated;
             this.m_repository.Obsoleting += this.Obsoleting;
             this.m_repository.Retrieved += this.Retrieved;
+            this.m_repository.Retrieving += this.Retrieving;
             this.m_repository.Queried += this.Queried;
             this.m_repository.Querying += this.Querying;
         }
@@ -137,7 +141,37 @@ namespace SanteDB.Persistence.MDM.Services
         private void Queried(object sender, MARC.HI.EHRS.SVC.Core.Event.PostQueryEventArgs<T> e)
         {
             // TODO: Filter master record data based on taboo child records.
-            
+
+        }
+
+        /// <summary>
+        /// Handles when subscribed object is being retrieved
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <remarks>The MDM records are actually redirected types. For example, a request to retrieve a Patient 
+        /// which is a master is actually retrieving an entity which has a synthetic record of type Patient. If we 
+        /// don't redirect these requests then technically a request to retrieve a master will result in an emtpy / exception
+        /// case.</remarks>
+        private void Retrieving(object sender, MARC.HI.EHRS.SVC.Core.Event.PreRetrievalEventArgs<T> e)
+        {
+            var retrieveId = (Identifier<Guid>)e.Identifier;
+
+            // There aren't actually any data in the database which is of this type
+            if ((sender as IDataPersistenceService<T>).Count(o => o.Key == retrieveId.Id, AuthenticationContext.Current.Principal) == 0) //
+            {
+                e.Cancel = true;
+                if (typeof(Entity).IsAssignableFrom(typeof(T)))
+                {
+                    var master = ApplicationContext.Current.GetService<IDataPersistenceService<Entity>>().Get(retrieveId, AuthenticationContext.Current.Principal, false);
+                    e.OverrideResult = new EntityMaster<T>(master).GetMaster(AuthenticationContext.Current.Principal);
+                }
+                else if (typeof(Act).IsAssignableFrom(typeof(T)))
+                {
+                    var master = ApplicationContext.Current.GetService<IDataPersistenceService<Act>>().Get(retrieveId, AuthenticationContext.Current.Principal, false);
+                    e.OverrideResult = new ActMaster<T>(master).GetMaster(AuthenticationContext.Current.Principal);
+                }
+            }
         }
 
         /// <summary>
@@ -149,7 +183,16 @@ namespace SanteDB.Persistence.MDM.Services
         /// data from masked LOCAL records is included.</remarks>
         private void Retrieved(object sender, MARC.HI.EHRS.SVC.Core.Event.PostRetrievalEventArgs<T> e)
         {
-            throw new NotImplementedException();
+            // We have retrieved an object from the database. If it is local we have to ensure that 
+            // 1. The user actually requested the local
+            // 2. The user is the original owner of the local, or
+            // 2a. The user has READ LOCAL permission
+            if ((e.Data as ITaggable)?.Tags.Any(t => t.TagKey == "mdm.type" && t.Value == "L") == true) // is a local record
+            {
+                // Is the requesting user the provenance of that record?
+                this.EnsureProvenance(e.Data, AuthenticationContext.Current.Principal);
+            }
+
         }
 
         /// <summary>
@@ -166,12 +209,13 @@ namespace SanteDB.Persistence.MDM.Services
             if (classConcept.GetValueOrDefault() == MdmConstants.MasterRecordClassification &&
                 !e.Principal.IsInRole("SYSTEM"))
                 new PolicyPermission(PermissionState.Unrestricted, MdmPermissionPolicyIdentifiers.WriteMdmMaster).Demand();
+
             // We want to ensure that a master link is not being explicitly persisted
             var identified = e.Data as IIdentifiedEntity;
             int tr = 0;
             if (e.Data is Entity)
             {
-                var eRelationship = (e.Data as Entity).Relationships.FirstOrDefault(o => o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship || o.RelationshipTypeKey == MdmConstants.DuplicateRecordRelationship);
+                var eRelationship = (e.Data as Entity).LoadCollection<EntityRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship || o.RelationshipTypeKey == MdmConstants.DuplicateRecordRelationship);
                 if (eRelationship != null)
                 {
                     // Get existing er if available
@@ -181,10 +225,15 @@ namespace SanteDB.Persistence.MDM.Services
                     else if (!e.Principal.IsInRole("SYSTEM")) // The target entity is being re-associated make sure the principal is allowed to do this
                         new PolicyPermission(PermissionState.Unrestricted, MdmPermissionPolicyIdentifiers.WriteMdmMaster).Demand();
                 }
+
+                if ((e.Data as ITaggable)?.Tags.Any(o => o.TagKey == "mdm.type" && o.Value == "T") == true &&
+                        (e.Data as Entity).Relationships.Single(o => o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship) == null)
+                    throw new InvalidOperationException("Records of truth must have exactly one MASTER");
+
             }
             else if (e.Data is Act)
             {
-                var eRelationship = (e.Data as Act).Relationships.FirstOrDefault(o => o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship || o.RelationshipTypeKey == MdmConstants.DuplicateRecordRelationship);
+                var eRelationship = (e.Data as Act).LoadCollection<ActRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship || o.RelationshipTypeKey == MdmConstants.DuplicateRecordRelationship);
                 if (eRelationship != null)
                 {
                     // Get existing er if available
@@ -194,7 +243,13 @@ namespace SanteDB.Persistence.MDM.Services
                     else if (!e.Principal.IsInRole("SYSTEM")) // The target entity is being re-associated make sure the principal is allowed to do this
                         new PolicyPermission(PermissionState.Unrestricted, MdmPermissionPolicyIdentifiers.WriteMdmMaster).Demand();
                 }
+
+                if ((e.Data as ITaggable)?.Tags.Any(o => o.TagKey == "mdm.type" && o.Value == "T") == true &&
+                    (e.Data as Act).Relationships.Single(o => o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship) == null)
+                    throw new InvalidOperationException("Records of truth must have exactly one MASTER");
+
             }
+
         }
 
         /// <summary>
@@ -206,7 +261,14 @@ namespace SanteDB.Persistence.MDM.Services
         /// obsolete and also require that all LOCAL records be either re-assigned or obsoleted as well.</remarks>
         private void Obsoleting(object sender, MARC.HI.EHRS.SVC.Core.Event.PrePersistenceEventArgs<T> e)
         {
-            throw new NotImplementedException();
+            // Obsoleting a master record requires that the user be a SYSTEM user or has WriteMDM permission
+            Guid? classConcept = (e.Data as Entity)?.ClassConceptKey ?? (e.Data as Act)?.ClassConceptKey;
+            // We are touching a master record and we are not system?
+            if (classConcept.GetValueOrDefault() == MdmConstants.MasterRecordClassification &&
+                !e.Principal.IsInRole("SYSTEM"))
+                new PolicyPermission(PermissionState.Unrestricted, MdmPermissionPolicyIdentifiers.WriteMdmMaster).Demand();
+
+            // We will receive an obsolete on a MASTER for its type however the repository needs to be redirected as we aren't getting that particular object
         }
 
         /// <summary>
@@ -218,7 +280,34 @@ namespace SanteDB.Persistence.MDM.Services
         /// that any new links be created/updated.</remarks>
         private void Updated(object sender, MARC.HI.EHRS.SVC.Core.Event.PostPersistenceEventArgs<T> e)
         {
-            throw new NotImplementedException();
+
+            // Is this object a ROT, if it is then we do not perform any changes to re-binding
+            var taggable = e.Data as ITaggable;
+            var identified = e.Data as IIdentifiedEntity;
+            var mdmTag = taggable?.Tags.FirstOrDefault(o => o.TagKey == "mdm.type");
+            if (mdmTag?.Value == "T")
+                return; // Record of truth is never re-matched and remains bound to the original object
+            else if (mdmTag?.Value != "M") // record is a local and may need to be re-matched
+            {
+                if (identified is Entity && mdmTag == null)
+                {
+                    var et = new EntityTag("mdm.type", "L");
+                    ApplicationContext.Current.GetService<ITagPersistenceService>().Save(identified.Key.Value, et);
+                    (e.Data as Entity).Tags.Add(et);
+                    mdmTag = et;
+                }
+                else if (identified is Act && mdmTag == null)
+                {
+                    var at = new ActTag("mdm.type", "L");
+                    ApplicationContext.Current.GetService<ITagPersistenceService>().Save(identified.Key.Value, at);
+                    (e.Data as Act).Tags.Add(at);
+                    mdmTag = at;
+                }
+
+                // Perform matching
+                ApplicationContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(this.PerformMdmMatch, identified);
+            }
+
         }
 
         /// <summary>
@@ -231,15 +320,11 @@ namespace SanteDB.Persistence.MDM.Services
         private void Inserted(object sender, MARC.HI.EHRS.SVC.Core.Event.PostPersistenceEventArgs<T> e)
         {
 
-            var matchService = ApplicationContext.Current.GetService<IRecordMatchingService>();
-            if (matchService == null)
-                return; // Cannot make determination of matching
-
-            // Is this not a master?
+            // Gather tags to determine whether the object has been linked to a master
             var taggable = e.Data as ITaggable;
             var identified = e.Data as IIdentifiedEntity;
             var mdmTag = taggable?.Tags.FirstOrDefault(o => o.TagKey == "mdm.type");
-            if (mdmTag?.Value != "M") // Record is a master - MASTER duplication on input is rare
+            if (mdmTag?.Value != "M" && mdmTag?.Value != "T") // Record is a master - MASTER duplication on input is rare
             {
                 if (identified is Entity)
                 {
@@ -256,21 +341,38 @@ namespace SanteDB.Persistence.MDM.Services
                     mdmTag = at;
                 }
             }
-            else
-                throw new InvalidOperationException("Cannot insert synthetic master record");
 
             // Find records for which this record could be match // async
+            if (mdmTag?.Value == "L")
+                ApplicationContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(this.PerformMdmMatch, identified);
+
+        }
+
+        /// <summary>
+        /// Perform an MDM match process to link the probable and definitive match
+        /// </summary>
+        private void PerformMdmMatch(object state)
+        {
+            var matchService = ApplicationContext.Current.GetService<IRecordMatchingService>();
+            if (matchService == null)
+                return; // Cannot make determination of matching
+
+            var identified = (IdentifiedData)state;
+            var taggable = (ITaggable)state;
             var relationshipType = identified is Entity ? typeof(EntityRelationship) : typeof(ActRelationship);
             var relationshipService = ApplicationContext.Current.GetService(typeof(IDataPersistenceService<>).MakeGenericType(relationshipType)) as IDataPersistenceService;
-            var matchingRecords = matchService.Match(e.Data, this.m_resourceConfiguration.MatchConfiguration);
+            var matchingRecords = matchService.Match(identified, this.m_resourceConfiguration.MatchConfiguration);
 
             // Matching records can only match with MASTER records
             matchingRecords = matchingRecords.Where(o => (o.Record as ITaggable)?.Tags.Any(t => t.TagKey == "mdm.type" && t.Value == "M") == true);
             var matchGroups = matchingRecords
                 .GroupBy(o => o.Classification)
                 .ToDictionary(o => o.Key, o => o);
-            
-            
+            if (!matchGroups.ContainsKey(RecordMatchClassification.Match))
+                matchGroups.Add(RecordMatchClassification.Match, null);
+            if (!matchGroups.ContainsKey(RecordMatchClassification.Probable))
+                matchGroups.Add(RecordMatchClassification.Probable, null);
+
             // Record is a LOCAL record
             //// INPUT = INBOUND LOCAL RECORD (FROM PATIENT SOURCE) THAT HAS BEEN INSERTED 
             //// MATCHES = THE RECORDS THAT HAVE BEEN DETERMINED TO BE DEFINITE MATCHES WHEN COMPARED TO INPUT 
@@ -292,41 +394,88 @@ namespace SanteDB.Persistence.MDM.Services
             //FOR EACH PROB IN PROBABLES
             //        INPUT.PROBABLE.ADD(PROB);
             //END FOR
-            if(mdmTag.Value == "L")
+            List<IdentifiedData> insertData = new List<IdentifiedData>();
+            var ignoreList = taggable.Tags.FirstOrDefault(o => o.TagKey == "mdm.ignore")?.Value.Split(';') ?? new string[0];
+
+            // Existing probable links
+            var existingProbableQuery = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
+                .Invoke(null, new object[] { NameValueCollection.ParseQueryString($"source={identified.Key}&relationshipType={MdmConstants.DuplicateRecordRelationship}") }) as Expression;
+            int tr = 0;
+            var existingProbableLinks = relationshipService.Query(existingProbableQuery, 0, 100, out tr);
+
+            // We want to obsolete any existing links that are no longer valid
+            foreach (var er in existingProbableLinks.OfType<EntityRelationship>().Where(er => matchGroups[RecordMatchClassification.Match]?.Any(m => m.Record.Key == er.TargetEntityKey) == false && matchGroups[RecordMatchClassification.Probable]?.Any(m => m.Record.Key == er.TargetEntityKey) == false))
+                relationshipService.Obsolete(er);
+            foreach (var ar in existingProbableLinks.OfType<ActRelationship>().Where(ar => matchGroups[RecordMatchClassification.Match]?.Any(m => m.Record.Key == ar.TargetActKey) == false && matchGroups[RecordMatchClassification.Probable]?.Any(m => m.Record.Key == ar.TargetActKey) == false))
+                relationshipService.Obsolete(ar);
+
+            // There is exactly one match and it is set to automerge
+            if (matchGroups.ContainsKey(RecordMatchClassification.Match) && matchGroups[RecordMatchClassification.Match]?.Count() == 1
+                && this.m_resourceConfiguration.AutoMerge)
             {
+                // Next, ensure that the new master is set
+                var master = matchGroups[RecordMatchClassification.Match].Single().Record;
 
-                List<IdentifiedData> insertData = new List<IdentifiedData>();
-
-                // There is exactly one match and it is set to automerge
-                if(matchGroups.ContainsKey(RecordMatchClassification.Match) && matchGroups[RecordMatchClassification.Match].Count() == 1 
-                    && this.m_resourceConfiguration.AutoMerge)
+                // We want to remove all previous master matches
+                var query = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
+                    .Invoke(null, new object[] { NameValueCollection.ParseQueryString($"source={identified.Key}&relationshipType={MdmConstants.MasterRecordRelationship}") }) as Expression;
+                var rels = relationshipService.Query(query, 0, 100, out tr);
+                // Are there any matches, then obsolete them and redirect to this master
+                bool needsRelation = true;
+                foreach (var r in rels)
                 {
-                    var master = matchGroups[RecordMatchClassification.Match].First().Record;
-                    var dataService = ApplicationContext.Current.GetService<IDataPersistenceService<T>>() as IDataPersistenceService;
-                    insertData.Add(this.CreateRelationship(relationshipType, MdmConstants.MasterRecordRelationship, identified.Key, master.Key, (identified as IVersionedEntity).VersionSequence));
-                    dataService.Update(master);
+                    if ((r as EntityRelationship)?.TargetEntityKey == master.Key || (r as ActRelationship)?.TargetActKey == master.Key)
+                    {
+                        needsRelation = false;
+                        if (r is EntityRelationship)
+                            (r as EntityRelationship).SourceEntity = state as Entity;
+                        else
+                            (r as ActRelationship).SourceEntity = state as Act;
+
+                        relationshipService.Update(r);
+                    }
+                    else
+                        relationshipService.Obsolete(r);
                 }
-                else
+
+                if (needsRelation)
+                    insertData.Add(this.CreateRelationship(relationshipType, MdmConstants.MasterRecordRelationship, identified.Key, master.Key, (identified as IVersionedEntity).VersionSequence));
+                // dataService.Update(master);
+                // No change in master
+            }
+            else
+            {
+                // We want to create a new master for this record?
+                var query = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
+                    .Invoke(null, new object[] { NameValueCollection.ParseQueryString($"source={identified.Key}&relationshipType={MdmConstants.MasterRecordRelationship}") }) as Expression;
+                var rels = relationshipService.Query(query, 0, 100, out tr);
+                if (!rels.OfType<Object>().Any()) // THere is already a master so no need to create one (as this becomes the master)
                 {
-                    // We want to create a new master for this record
                     var master = this.CreateMasterRecord();
                     insertData.Add(master as IdentifiedData);
                     insertData.Add(this.CreateRelationship(relationshipType, MdmConstants.MasterRecordRelationship, identified.Key, master.Key, (identified as IVersionedEntity).VersionSequence));
-
-                    // Now add each of the found masters to the probable list
-                    if(matchGroups.ContainsKey(RecordMatchClassification.Match)) insertData.AddRange(matchGroups[RecordMatchClassification.Match].Select(m => this.CreateRelationship(relationshipType, MdmConstants.DuplicateRecordRelationship, identified.Key, m.Record.Key, (identified as IVersionedEntity).VersionSequence)));
                 }
 
-                // Add probable records
-                if (matchGroups.ContainsKey(RecordMatchClassification.Probable)) insertData.AddRange(matchGroups[RecordMatchClassification.Probable].Select(m => this.CreateRelationship(relationshipType, MdmConstants.DuplicateRecordRelationship, identified.Key, m.Record.Key, (identified as IVersionedEntity).VersionSequence)));
-
-                // Insert relationships
-                ApplicationContext.Current.GetService<IDataPersistenceService<Bundle>>().Insert(new Bundle()
-                {
-                    Item = insertData
-                }, AuthenticationContext.SystemPrincipal, TransactionMode.Commit);
+                // Now we persist
+                if (matchGroups[RecordMatchClassification.Match] != null)
+                    insertData.AddRange(matchGroups[RecordMatchClassification.Match]
+                        .Where(m => !ignoreList.Contains(m.Record.Key.Value.ToString())) // ignore list
+                        .Where(m => !rels.OfType<EntityRelationship>().Any(er => er.TargetEntityKey == m.Record.Key)) // existing relationships
+                        .Where(m => !rels.OfType<ActRelationship>().Any(er => er.TargetActKey == m.Record.Key)) // existing relationships
+                        .Select(m => this.CreateRelationship(relationshipType, MdmConstants.DuplicateRecordRelationship, identified.Key, m.Record.Key, (identified as IVersionedEntity).VersionSequence)));
             }
 
+            // Add probable records
+            if (matchGroups[RecordMatchClassification.Probable] != null)
+                insertData.AddRange(matchGroups[RecordMatchClassification.Probable]
+                    .Where(m => !ignoreList.Contains(m.Record.Key.Value.ToString())) // ignore list
+                    .Select(m => this.CreateRelationship(relationshipType, MdmConstants.DuplicateRecordRelationship, identified.Key, m.Record.Key, (identified as IVersionedEntity).VersionSequence)));
+
+            // Insert relationships
+            ApplicationContext.Current.GetService<IDataPersistenceService<Bundle>>().Insert(new Bundle()
+            {
+                Item = insertData
+            }, AuthenticationContext.SystemPrincipal, TransactionMode.Commit);
         }
 
         /// <summary>
@@ -372,6 +521,7 @@ namespace SanteDB.Persistence.MDM.Services
                 this.m_repository.Inserted -= this.Inserted;
                 this.m_repository.Updated -= this.Updated;
                 this.m_repository.Retrieved -= this.Retrieved;
+                this.m_repository.Retrieving -= this.Retrieving;
                 this.m_repository.Obsoleting -= this.Obsoleting;
                 this.m_repository.Querying -= this.Querying;
                 this.m_repository.Queried -= this.Queried;
@@ -386,7 +536,139 @@ namespace SanteDB.Persistence.MDM.Services
         /// <returns></returns>
         public T Merge(T master, IEnumerable<T> linkedDuplicates)
         {
-            throw new NotImplementedException();
+            // Relationship type
+            var relationshipType = master is Entity ? typeof(EntityRelationship) : typeof(ActRelationship);
+            var relationshipService = ApplicationContext.Current.GetService(typeof(IDataPersistenceService<>).MakeGenericType(relationshipType)) as IDataPersistenceService;
+
+            // Ensure that MASTER is in fact a master
+            IDataPersistenceService masterService = master is Entity ? ApplicationContext.Current.GetService<IDataPersistenceService<Entity>>() as IDataPersistenceService : ApplicationContext.Current.GetService<IDataPersistenceService<Act>>() as IDataPersistenceService;
+            var masterData = masterService.Get(master.Key.Value) as IClassifiable;
+            if (masterData.ClassConceptKey == MdmConstants.MasterRecordClassification && !AuthenticationContext.Current.Principal.IsInRole("SYSTEM"))
+                new PolicyPermission(PermissionState.Unrestricted, MdmPermissionPolicyIdentifiers.WriteMdmMaster).Demand();
+            else
+            {
+                this.EnsureProvenance(master, AuthenticationContext.Current.Principal);
+                var existingMasterQry = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
+                           .Invoke(null, new object[] { NameValueCollection.ParseQueryString($"source={master.Key}&relationshipType={MdmConstants.MasterRecordRelationship}") }) as Expression;
+                int tr = 0;
+                var masterRel = relationshipService.Query(existingMasterQry, 0, 2, out tr).OfType<ISimpleAssociation>().SingleOrDefault();
+                masterData = masterService.Get((Guid)masterRel.GetType().GetQueryProperty("target").GetValue(masterRel)) as IClassifiable;
+            }
+
+            // For each of the linked duplicates we want to get the master relationships 
+            foreach (var ldpl in linkedDuplicates)
+            {
+                // Is the linked duplicate a master record?
+                var linkedClass = masterService.Get(ldpl.Key.Value) as IClassifiable;
+                if (linkedClass.ClassConceptKey == MdmConstants.MasterRecordClassification && !AuthenticationContext.Current.Principal.IsInRole("SYSTEM"))
+                    new PolicyPermission(PermissionState.Unrestricted, MdmPermissionPolicyIdentifiers.MergeMdmMaster).Demand();
+                else
+                    this.EnsureProvenance(ldpl, AuthenticationContext.Current.Principal);
+
+                // Allowed merges
+                // LOCAL > MASTER - A local record is being merged into a MASTER
+                // MASTER > MASTER - Two MASTER records are being merged (administrative merge)
+                // LOCAL > LOCAL - Two LOCAL records are being merged
+                if (linkedClass.ClassConceptKey == masterData.ClassConceptKey)
+                {
+                    if (linkedClass.ClassConceptKey == MdmConstants.MasterRecordClassification) // MASTER <> MASTER
+                    {
+                        // First, we move all references from the subsumed MASTER to the new MASTER
+                        var existingMasterQry = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
+                            .Invoke(null, new object[] { NameValueCollection.ParseQueryString($"target={ldpl.Key}&relationshipType={MdmConstants.MasterRecordRelationship}") }) as Expression;
+                        int tr = 0;
+                        var existingMasters = relationshipService.Query(existingMasterQry, 0, 100, out tr);
+                        foreach (var erel in existingMasters)
+                        {
+                            erel.GetType().GetQueryProperty("target").SetValue(erel, master.Key);
+                            relationshipService.Update(erel);
+                        }
+
+                        // Now we want to mark LMASTER replaced by MASTER
+                        var mrel = this.CreateRelationship(relationshipType, EntityRelationshipTypeKeys.Replaces, master.Key, ldpl.Key, (master as IVersionedEntity).VersionSequence);
+                        relationshipService.Insert(mrel);
+                        ApplicationContext.Current.GetService<IDataPersistenceService<T>>().Obsolete(ldpl, AuthenticationContext.SystemPrincipal, TransactionMode.Commit);
+                    }
+                    else // LOCAL <> LOCAL
+                    {
+                        // With local to local we want to remove the existing MASTER from the replaced local and redirect it to the MASTER of the new local
+                        var existingMasterQry = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
+                            .Invoke(null, new object[] { NameValueCollection.ParseQueryString($"source={ldpl.Key}&relationshipType={MdmConstants.MasterRecordRelationship}") }) as Expression;
+                        int tr = 0;
+                        var localMaster = relationshipService.Query(existingMasterQry, 0, 2, out tr).OfType<ISimpleAssociation>().SingleOrDefault();
+
+                        Guid oldMaster = (Guid)localMaster.GetType().GetQueryProperty("target").GetValue(localMaster);
+                        // Now we want to move the local master to the master of the MASTER LOCAL
+                        localMaster.GetType().GetQueryProperty("target").SetValue(localMaster, (masterData as IdentifiedData).Key);
+                        relationshipService.Update(localMaster);
+
+                        // Now we want to set replaces relationship
+                        var mrel = this.CreateRelationship(relationshipType, EntityRelationshipTypeKeys.Replaces, master.Key, ldpl.Key, (master as IVersionedEntity).VersionSequence);
+                        relationshipService.Insert(mrel);
+                        ApplicationContext.Current.GetService<IDataPersistenceService<T>>().Obsolete(ldpl, AuthenticationContext.SystemPrincipal, TransactionMode.Commit);
+
+                        // Check if the master is orphaned, if so obsolete it
+                        existingMasterQry = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
+                            .Invoke(null, new object[] { NameValueCollection.ParseQueryString($"target={oldMaster}&relationshipType={MdmConstants.MasterRecordRelationship}") }) as Expression;
+                        var otherMaster = relationshipService.Query(existingMasterQry, 0, 0, out tr);
+                        if (tr == 0)
+                            masterService.Obsolete(masterService.Get(oldMaster));
+                    }
+                }
+                // LOCAL > MASTER
+                else if (masterData.ClassConceptKey == MdmConstants.MasterRecordClassification &&
+                    linkedClass.ClassConceptKey != MdmConstants.MasterRecordClassification)
+                {
+                    // LOCAL to MASTER is merged as removing all probables and assigning the MASTER relationship from the 
+                    // existing master to the identified master
+                    var existingQuery = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
+                           .Invoke(null, new object[] { NameValueCollection.ParseQueryString($"source={ldpl.Key}&relationshipType={MdmConstants.MasterRecordRelationship}&relationshipType={MdmConstants.DuplicateRecordRelationship}") }) as Expression;
+                    int tr = 0;
+                    var existingRelationships = relationshipService.Query(existingQuery, 0, null, out tr);
+                    var oldMaster = Guid.Empty;
+                    // Remove existing relationships
+                    foreach (var rel in existingRelationships)
+                    {
+                        if (rel.GetType().GetQueryProperty("relationshipType").GetValue(rel).Equals(MdmConstants.MasterRecordClassification))
+                            oldMaster = (Guid)rel.GetType().GetQueryProperty("target").GetValue(rel);
+                        relationshipService.Obsolete(rel);
+                    }
+
+                    // Add relationship 
+                    relationshipService.Insert(this.CreateRelationship(relationshipType, MdmConstants.MasterRecordRelationship, ldpl.Key, master.Key, (master as IVersionedEntity).VersionSequence));
+
+                    // Obsolete the old master
+                    existingQuery = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
+                            .Invoke(null, new object[] { NameValueCollection.ParseQueryString($"target={oldMaster}&relationshipType={MdmConstants.MasterRecordRelationship}") }) as Expression;
+                    var otherMaster = relationshipService.Query(existingQuery, 0, 0, out tr);
+                    if (tr == 0)
+                        masterService.Obsolete(masterService.Get(oldMaster));
+                }
+                else
+                    throw new InvalidOperationException("Invalid merge. Only LOCAL>MASTER, MASTER>MASTER or LOCAL>LOCAL are supported");
+            }
+
+            if (masterData.ClassConceptKey == MdmConstants.MasterRecordClassification)
+                return masterData is Entity ? new EntityMaster<T>((Entity)masterService.Get(master.Key.Value)).GetMaster(AuthenticationContext.Current.Principal) :
+                    new ActMaster<T>((Act)masterService.Get(master.Key.Value)).GetMaster(AuthenticationContext.Current.Principal);
+            else
+                return (T)masterService.Get(master.Key.Value);
+        }
+
+        /// <summary>
+        /// Ensures that <paramref name="master"/> is owned by application granted by <paramref name="principal"/>
+        /// </summary>
+        /// <param name="master"></param>
+        /// <param name="principal"></param>
+        private void EnsureProvenance(T master, IPrincipal principal)
+        {
+            var provenance = (master as BaseEntityData)?.LoadProperty<SecurityProvenance>("CreatedBy");
+            var claimsPrincipal = principal as ClaimsPrincipal;
+            var applicationPrincipal = claimsPrincipal.Identities.OfType<Core.Security.ApplicationIdentity>().SingleOrDefault();
+            if (applicationPrincipal != null &&
+                applicationPrincipal.Name != provenance?.LoadProperty<SecurityApplication>("Application")?.Name // was not the original author
+                || !AuthenticationContext.Current.Principal.IsInRole("SYSTEM"))
+                new PolicyPermission(PermissionState.Unrestricted, MdmPermissionPolicyIdentifiers.ReadMdmLocals).Demand();
         }
 
         /// <summary>

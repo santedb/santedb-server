@@ -84,7 +84,7 @@
       <Version>2.0.0.1</Version>
     </PackageReference>
     <PackageReference Include="MARC.HI.EHRS.SVC.Core">
-      <Version>2.0.1.7</Version>
+      <Version>2.0.1.8</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

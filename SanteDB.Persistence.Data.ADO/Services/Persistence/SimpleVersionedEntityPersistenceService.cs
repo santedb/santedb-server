@@ -51,6 +51,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         internal override TModel Get(DataContext context, Guid key)
         {
+
             // We need to join, but to what?
             // True to get the cache item
             var cacheService = new AdoPersistenceCache(context);
@@ -83,6 +84,17 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var tr = 0;
             var uuid = containerId as Identifier<Guid>;
 
+            if (uuid.Id == Guid.Empty)
+                return default(TModel);
+
+            PreRetrievalEventArgs<TModel> preArgs = new PreRetrievalEventArgs<TModel>(containerId);
+            this.FireRetrieving(preArgs);
+            if (preArgs.Cancel)
+            {
+                this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Pre-Event handler indicates abort retrieve {0}", containerId.Id);
+                return preArgs.OverrideResult;
+            }
+
             if (uuid.Id != Guid.Empty)
             {
                 var cacheItem = ApplicationContext.Current.GetService<IDataCachingService>()?.GetCacheItem<TModel>(uuid.Id) as TModel;
@@ -96,14 +108,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             sw.Start();
 #endif
 
-            PreRetrievalEventArgs preArgs = new PreRetrievalEventArgs(containerId);
-            this.FireRetrieving(preArgs);
-            if (preArgs.Cancel)
-            {
-                this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Pre-Event handler indicates abort retrieve {0}", containerId.Id);
-                return null;
-            }
-
+            
             // Query object
             using (var connection = m_configuration.Provider.GetReadonlyConnection())
                 try

@@ -58,19 +58,25 @@ namespace SanteDB.Persistence.MDM.Model
         {
             if (this.m_master == null)
             {
+                this.m_master = new T();
+                this.m_master.CopyObjectData<IdentifiedData>(this.m_masterRecord);
+
                 // Is there a relationship which is the record of truth
                 var rot = this.LoadCollection<EntityRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == MdmConstants.MasterRecordOfTruthRelationship);
+                var pdp = ApplicationContext.Current.GetService<IPolicyDecisionService>();
+
                 if (rot == null) // We have to create a synthetic record 
                 {
-                    var pdp = ApplicationContext.Current.GetService<IPolicyDecisionService>();
-                    this.m_master = new T();
-                    this.m_master.CopyObjectData<IdentifiedData>(this.m_masterRecord);
                     this.m_master.SemanticCopy(this.LocalRecords.Where(o => pdp.GetPolicyDecision(principal, o).Outcome == PolicyDecisionOutcomeType.Grant).ToArray());
-                    (this.m_master as Entity).Tags.RemoveAll(o => o.TagKey == "mdm.type");
-                    (this.m_master as Entity).Tags.Add(new EntityTag("mdm.type", "M"));
                 }
-                else
-                    this.m_master = rot.LoadProperty<T>("TargetEntity");
+                else // there is a ROT so use it to override the values
+                {
+                    this.m_master.SemanticCopy(rot.LoadProperty<T>("TargetEntity"));
+                    this.m_master.SemanticCopyNullFields(this.LocalRecords.Where(o => pdp.GetPolicyDecision(principal, o).Outcome == PolicyDecisionOutcomeType.Grant).ToArray());
+                }
+
+                (this.m_master as Entity).Tags.RemoveAll(o => o.TagKey == "mdm.type");
+                (this.m_master as Entity).Tags.Add(new EntityTag("mdm.type", "M"));
             }
             return this.m_master;
         }

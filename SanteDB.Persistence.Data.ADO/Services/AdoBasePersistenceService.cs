@@ -83,7 +83,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         public event EventHandler<PostPersistenceEventArgs<TData>> Updated;
         public event EventHandler<PrePersistenceEventArgs<TData>> Obsoleting;
         public event EventHandler<PostPersistenceEventArgs<TData>> Obsoleted;
-        public event EventHandler<PreRetrievalEventArgs> Retrieving;
+        public event EventHandler<PreRetrievalEventArgs<TData>> Retrieving;
         public event EventHandler<PostRetrievalEventArgs<TData>> Retrieved;
         public event EventHandler<PreQueryEventArgs<TData>> Querying;
         public event EventHandler<PostQueryEventArgs<TData>> Queried;
@@ -547,12 +547,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 sw.Start();
 #endif
 
-                PreRetrievalEventArgs preArgs = new PreRetrievalEventArgs(containerId, principal);
+                PreRetrievalEventArgs<TData> preArgs = new PreRetrievalEventArgs<TData>(containerId, principal);
                 this.Retrieving?.Invoke(this, preArgs);
                 if (preArgs.Cancel)
                 {
                     this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Pre-Event handler indicates abort retrieve {0}", containerId.Id);
-                    return null;
+                    return preArgs.OverrideResult;
                 }
 
                 // Query object
@@ -858,7 +858,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Fire retrieving
         /// </summary>
-        protected void FireRetrieving(PreRetrievalEventArgs e)
+        protected void FireRetrieving(PreRetrievalEventArgs<TData> e)
         {
             this.Retrieving?.Invoke(this, e);
         }
