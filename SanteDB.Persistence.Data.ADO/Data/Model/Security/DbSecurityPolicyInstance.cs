@@ -54,7 +54,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
 	/// Represents a relationship between an entity and security policy
 	/// </summary>
 	[Table("ent_pol_assoc_tbl")]
-	public class DbEntitySecurityPolicy : DbSecurityPolicyInstance
+	public class DbEntitySecurityPolicy : DbSecurityPolicyInstance, IDbVersionedAssociation
 	{
         /// <summary>
         /// Gets or sets the source
@@ -66,15 +66,25 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
             get;
             set;
         }
-        
 
+        /// <summary>
+        /// Effective version sequence
+        /// </summary>
+        [Column("efft_vrsn_seq_id"), NotNull]
+        public decimal EffectiveVersionSequenceId { get; set; }
+
+        /// <summary>
+        /// Obsolete version sequence ID
+        /// </summary>
+        [Column("obslt_vrsn_seq_id")]
+        public decimal? ObsoleteVersionSequenceId { get; set; }
     }
 
     /// <summary>
     /// Represents a security policy applied to an act
     /// </summary>
     [Table("act_pol_assoc_tbl")]
-	public class DbActSecurityPolicy : DbSecurityPolicyInstance
+	public class DbActSecurityPolicy : DbSecurityPolicyInstance, IDbVersionedAssociation
 	{
         /// <summary>
         /// Gets or sets the source
@@ -87,6 +97,17 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
             set;
         }
 
+        /// <summary>
+        /// Effective version sequence
+        /// </summary>
+        [Column("efft_vrsn_seq_id"), NotNull]
+        public decimal EffectiveVersionSequenceId { get; set; }
+
+        /// <summary>
+        /// Obsolete version sequence ID
+        /// </summary>
+        [Column("obslt_vrsn_seq_id")]
+        public decimal? ObsoleteVersionSequenceId { get; set; }
     }
 
     /// <summary>

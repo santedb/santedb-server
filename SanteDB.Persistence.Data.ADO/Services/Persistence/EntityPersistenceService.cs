@@ -42,6 +42,9 @@ using SanteDB.Core.Services;
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Data;
 using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Persistence.Data.ADO.Data.Model.Security;
+using MARC.HI.EHRS.SVC.Core.Services.Policy;
+using SanteDB.Core.Model.Security;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -63,6 +66,25 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             retVal.ClassConceptKey = entInstance.ClassConceptKey;
             retVal.DeterminerConceptKey = entInstance.DeterminerConceptKey;
             retVal.TemplateKey = entInstance.TemplateKey;
+
+            // Attempt to load policies
+            var policySql = context.CreateSqlStatement<DbEntitySecurityPolicy>()
+                .SelectFrom(typeof(DbEntitySecurityPolicy), typeof(DbSecurityPolicy))
+                .InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
+                .Where(o => o.SourceKey == retVal.Key && o.EffectiveVersionSequenceId <= retVal.VersionSequence && (!o.ObsoleteVersionSequenceId.HasValue || o.ObsoleteVersionSequenceId > retVal.VersionSequence));
+            retVal.Policies = context.Query<CompositeResult<DbEntitySecurityPolicy, DbSecurityPolicy>>(policySql).Select(o => new SecurityPolicyInstance(new SecurityPolicy()
+            {
+                CanOverride = o.Object2.CanOverride,
+                CreatedByKey = o.Object2.CreatedByKey,
+                CreationTime = o.Object2.CreationTime,
+                Handler = o.Object2.Handler,
+                IsPublic = o.Object2.IsPublic,
+                Name = o.Object2.Name,
+                LoadState = LoadState.FullLoad,
+                Key = o.Object2.Key,
+                Oid = o.Object2.Oid
+            }, PolicyGrantType.Grant)).ToList();
+
             // Inversion relationships
             //if (retVal.Relationships != null)
             //{
@@ -357,6 +379,38 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     retVal,
                     context);
 
+            // Persist policies
+            if (data.Policies != null && data.Policies.Any())
+            {
+                foreach (var p in data.Policies)
+                {
+                    var pol = p.Policy?.EnsureExists(context);
+                    if (pol == null) // maybe we can retrieve it from the PIP?
+                    {
+                        var pipInfo = ApplicationContext.Current.GetService<IPolicyInformationService>().GetPolicy(p.PolicyKey.ToString());
+                        if (pipInfo != null)
+                        {
+                            p.Policy = new Core.Model.Security.SecurityPolicy()
+                            {
+                                Oid = pipInfo.Oid,
+                                Name = pipInfo.Name,
+                                CanOverride = pipInfo.CanOverride
+                            };
+                            pol = p.Policy.EnsureExists(context);
+                        }
+                        else throw new InvalidOperationException("Cannot find policy information");
+                    }
+
+                    // Insert
+                    context.Insert(new DbEntitySecurityPolicy()
+                    {
+                        Key = Guid.NewGuid(),
+                        PolicyKey = pol.Key.Value,
+                        SourceKey = retVal.Key.Value,
+                        EffectiveVersionSequenceId = retVal.VersionSequence.Value
+                    });
+                }
+            }
 
             return retVal;
         }
@@ -450,7 +504,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     retVal,
                     context);
 
-
+           
             return retVal;
         }
 

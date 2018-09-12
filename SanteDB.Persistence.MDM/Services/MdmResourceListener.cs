@@ -305,7 +305,8 @@ namespace SanteDB.Persistence.MDM.Services
                 }
 
                 // Perform matching
-                ApplicationContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(this.PerformMdmMatch, identified);
+                this.PerformMdmMatch(identified);
+                //ApplicationContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(this.PerformMdmMatch, identified);
             }
 
         }
@@ -344,7 +345,8 @@ namespace SanteDB.Persistence.MDM.Services
 
             // Find records for which this record could be match // async
             if (mdmTag?.Value == "L")
-                ApplicationContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(this.PerformMdmMatch, identified);
+                this.PerformMdmMatch(identified);
+                //ApplicationContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(this.PerformMdmMatch, identified);
 
         }
 
@@ -395,7 +397,7 @@ namespace SanteDB.Persistence.MDM.Services
             //        INPUT.PROBABLE.ADD(PROB);
             //END FOR
             List<IdentifiedData> insertData = new List<IdentifiedData>();
-            var ignoreList = taggable.Tags.FirstOrDefault(o => o.TagKey == "mdm.ignore")?.Value.Split(';') ?? new string[0];
+            var ignoreList = taggable.Tags.FirstOrDefault(o => o.TagKey == "mdm.ignore")?.Value.Split(';').AsEnumerable() ?? new string[0];
 
             // Existing probable links
             var existingProbableQuery = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
@@ -435,7 +437,20 @@ namespace SanteDB.Persistence.MDM.Services
                         relationshipService.Update(r);
                     }
                     else
+                    {
                         relationshipService.Obsolete(r);
+                        // Cleanup old master
+                        var oldMasterId = (Guid)r.GetType().GetQueryProperty("target").GetValue(r);
+                        query = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
+                            .Invoke(null, new object[] { NameValueCollection.ParseQueryString($"target={oldMasterId}&source=!{identified.Key}&relationshipType={MdmConstants.MasterRecordRelationship}") }) as Expression;
+                        relationshipService.Query(query, 0, 0, out tr);
+                        if (tr == 0) // no other records point at the old master, obsolete it
+                        {
+                            var idt = typeof(IDataPersistenceService<>).MakeGenericType(typeof(Entity).IsAssignableFrom(typeof(T)) ? typeof(Entity) : typeof(Act));
+                            var ids = ApplicationContext.Current.GetService(idt) as IDataPersistenceService;
+                            ids.Obsolete(ids.Get(oldMasterId));
+                        }
+                    }
                 }
 
                 if (needsRelation)
@@ -449,13 +464,31 @@ namespace SanteDB.Persistence.MDM.Services
                 var query = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
                     .Invoke(null, new object[] { NameValueCollection.ParseQueryString($"source={identified.Key}&relationshipType={MdmConstants.MasterRecordRelationship}") }) as Expression;
                 var rels = relationshipService.Query(query, 0, 100, out tr);
-                if (!rels.OfType<Object>().Any()) // THere is already a master so no need to create one (as this becomes the master)
+                if (!rels.OfType<Object>().Any()) // There is no master
                 {
                     var master = this.CreateMasterRecord();
                     insertData.Add(master as IdentifiedData);
                     insertData.Add(this.CreateRelationship(relationshipType, MdmConstants.MasterRecordRelationship, identified.Key, master.Key, (identified as IVersionedEntity).VersionSequence));
                 }
+                else
+                {
+                    // Is this the only record in the current master relationship?
+                    var oldMasterRel = rels.OfType<IdentifiedData>().SingleOrDefault().Clone();
+                    var oldMasterId = (Guid)oldMasterRel.GetType().GetQueryProperty("target").GetValue(oldMasterRel);
+                    ApplicationContext.Current.GetService<IDataCachingService>()?.Remove(oldMasterRel.Key.Value);
 
+                    // Query for other masters
+                    query = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
+                    .Invoke(null, new object[] { NameValueCollection.ParseQueryString($"target={oldMasterId}&source=!{identified.Key}&relationshipType={MdmConstants.MasterRecordRelationship}") }) as Expression;
+                    relationshipService.Query(query, 0, 0, out tr);
+                    if(tr > 0) // Old master has other records, we want to detach
+                    {
+                        var master = this.CreateMasterRecord();
+                        insertData.Add(master as IdentifiedData);
+                        insertData.Add(this.CreateRelationship(relationshipType, MdmConstants.MasterRecordRelationship, identified.Key, master.Key, (identified as IVersionedEntity).VersionSequence));
+                        relationshipService.Obsolete(oldMasterRel);
+                    } // otherwise we just leave the master 
+                }
                 // Now we persist
                 if (matchGroups[RecordMatchClassification.Match] != null)
                     insertData.AddRange(matchGroups[RecordMatchClassification.Match]

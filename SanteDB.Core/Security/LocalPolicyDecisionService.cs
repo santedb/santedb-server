@@ -58,7 +58,10 @@ namespace SanteDB.Core.Security
             foreach (var pol in securablePolicies)
             {
                 // Get most restrictive from principal
-                var rule = principalPolicies.Where(p => p.Policy.Oid.StartsWith(pol.Policy.Oid)).Select(o => o.Rule).Min();
+                var rules = principalPolicies.Where(p => p.Policy.Oid.StartsWith(pol.Policy.Oid)).Select(o => o.Rule);
+                PolicyDecisionOutcomeType rule = PolicyDecisionOutcomeType.Deny;
+                if(rules.Any())
+                    rule = rules.Min();
                 retVal.Details.Add(new PolicyDecisionDetail(pol.Policy.Oid, rule));
             }
 

@@ -35,6 +35,8 @@ using SanteDB.Core.Model;
 using SanteDB.OrmLite;
 using SanteDB.Core.Services;
 using MARC.HI.EHRS.SVC.Core;
+using MARC.HI.EHRS.SVC.Core.Services.Policy;
+using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -280,6 +282,38 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         });
                 }
 
+            // Persist policies
+            if(data.Policies != null && data.Policies.Any())
+            {
+                foreach(var p in data.Policies)
+                {
+                    var pol = p.Policy?.EnsureExists(context);
+                    if(pol == null) // maybe we can retrieve it from the PIP?
+                    {
+                        var pipInfo = ApplicationContext.Current.GetService<IPolicyInformationService>().GetPolicy(p.PolicyKey.ToString());
+                        if (pipInfo != null)
+                        {
+                            p.Policy = new Core.Model.Security.SecurityPolicy()
+                            {
+                                Oid = pipInfo.Oid,
+                                Name = pipInfo.Name,
+                                CanOverride = pipInfo.CanOverride
+                            };
+                            pol = p.Policy.EnsureExists(context);
+                        }
+                        else throw new InvalidOperationException("Cannot find policy information");
+                    }
+
+                    // Insert
+                    context.Insert(new DbActSecurityPolicy()
+                    {
+                        Key = Guid.NewGuid(),
+                        PolicyKey = pol.Key.Value,
+                        SourceKey = retVal.Key.Value,
+                        EffectiveVersionSequenceId = retVal.VersionSequence.Value
+                    });
+                }
+            }
             return retVal;
         }
 
