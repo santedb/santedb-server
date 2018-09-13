@@ -413,12 +413,21 @@ namespace SanteDB.Core.Services.Impl
 			return base.Get<SecurityRole>(roleId, Guid.Empty);
 		}
 
-		/// <summary>
-		/// Gets a specific user.
-		/// </summary>
-		/// <param name="userId">The id of the user to retrieve.</param>
-		/// <returns>Returns the user.</returns>
-		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
+        /// <summary>
+        /// Get the specified role 
+        /// </summary>
+        public SecurityRole GetRole(string roleName)
+        {
+            int tr = 0;
+            return base.Find<SecurityRole>(o => o.Name == roleName, 0, 1, out tr, Guid.Empty).SingleOrDefault();
+        }
+
+        /// <summary>
+        /// Gets a specific user.
+        /// </summary>
+        /// <param name="userId">The id of the user to retrieve.</param>
+        /// <returns>Returns the user.</returns>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public SecurityUser GetUser(Guid userId)
 		{
 			return base.Get<SecurityUser>(userId, Guid.Empty);

@@ -13,6 +13,7 @@ using MARC.HI.EHRS.SVC.Core.Services.Policy;
 using MARC.HI.EHRS.SVC.Core;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Security;
 
 namespace SanteDB.Persistence.MDM.Model
 {
@@ -74,7 +75,7 @@ namespace SanteDB.Persistence.MDM.Model
                     this.m_master.SemanticCopy(rot.LoadProperty<T>("TargetEntity"));
                     this.m_master.SemanticCopyNullFields(this.LocalRecords.Where(o => pdp.GetPolicyDecision(principal, o).Outcome == PolicyDecisionOutcomeType.Grant).ToArray());
                 }
-
+                (this.m_master as Entity).Policies = this.LocalRecords.SelectMany(o => (o as Entity).Policies).Where(o=>o.Policy.CanOverride).Select(o=>new SecurityPolicyInstance(o.Policy, (PolicyGrantType)(int)pdp.GetPolicyOutcome(principal, o.Policy.Oid))).ToList();
                 (this.m_master as Entity).Tags.RemoveAll(o => o.TagKey == "mdm.type");
                 (this.m_master as Entity).Tags.Add(new EntityTag("mdm.type", "M"));
             }

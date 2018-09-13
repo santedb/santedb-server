@@ -279,9 +279,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Create a basic user
         /// </summary>
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateIdentity)]
         public IIdentity CreateIdentity(string userName, string password, IPrincipal authContext)
         {
+
+            this.VerifyPrincipal(authContext, PermissionPolicyIdentifiers.CreateIdentity);
 
             if (String.IsNullOrEmpty(userName))
                 throw new ArgumentNullException(nameof(userName));
@@ -342,11 +343,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Delete the specified identity
         /// </summary>
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
         public void DeleteIdentity(string userName, IPrincipal authContext)
         {
             if (String.IsNullOrEmpty(userName))
                 throw new ArgumentNullException(nameof(userName));
+
+            this.VerifyPrincipal(authContext, PermissionPolicyIdentifiers.AlterIdentity);
 
             this.m_traceSource.TraceInformation("Delete identity {0}", userName);
             try
@@ -380,11 +382,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Set the lockout status
         /// </summary>
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
         public void SetLockout(string userName, bool lockout, IPrincipal authContext)
         {
             if (String.IsNullOrEmpty(userName))
                 throw new ArgumentNullException(nameof(userName));
+
+            this.VerifyPrincipal(authContext, PermissionPolicyIdentifiers.AlterIdentity);
 
             this.m_traceSource.TraceInformation("Lockout identity {0} = {1}", userName, lockout);
             try
@@ -552,5 +555,18 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 throw;
             }
         }
+
+        /// <summary>
+        /// Verify principal
+        /// </summary>
+        private void VerifyPrincipal(IPrincipal authPrincipal, String policyId)
+        {
+            if (authPrincipal == null)
+                throw new ArgumentNullException(nameof(authPrincipal));
+
+            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, policyId, authPrincipal).Demand();
+
+        }
+
     }
 }

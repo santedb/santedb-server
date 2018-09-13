@@ -40,6 +40,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -52,6 +53,111 @@ namespace SanteDB.Persistence.Data.ADO.Services
         private AdoConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(AdoDataConstants.ConfigurationSectionName) as AdoConfiguration;
 
         private TraceSource m_traceSource = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
+
+        /// <summary>
+        /// Adds the specified policies to the specified object
+        /// </summary>
+        /// <param name="securable">The securible to which the policy is to be added</param>
+        /// <param name="rule">The rule to apply to the securable</param>
+        /// <param name="policyOids">The policy OIDs to apply</param>
+        public void AddPolicies(object securable, PolicyDecisionOutcomeType rule, params string[] policyOids)
+        {
+            using (DataContext context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                IDbTransaction tx = null;
+                try
+                {
+                    context.Open();
+                    tx = context.BeginTransaction();
+                    foreach (var oid in policyOids) {
+                        var policy = context.FirstOrDefault<DbSecurityPolicy>(p => p.Oid == oid);
+                        if (policy == null) throw new KeyNotFoundException($"Policy {oid} not found");
+
+                        // Add
+                        if (securable is SecurityRole)
+                        {
+                            // Delete the existing role
+                            context.Delete<DbSecurityRolePolicy>(o => o.PolicyKey == policy.Key);
+                            context.Insert(new DbSecurityRolePolicy()
+                            {
+                                SourceKey = (securable as SecurityRole).Key.Value,
+                                GrantType = (int)rule,
+                                PolicyKey = policy.Key
+                            });
+                        }
+                        else if (securable is SecurityApplication)
+                        {
+                            // Delete the existing role
+                            context.Delete<DbSecurityApplicationPolicy>(o => o.PolicyKey == policy.Key);
+                            context.Insert(new DbSecurityApplicationPolicy()
+                            {
+                                SourceKey = (securable as SecurityApplication).Key.Value,
+                                GrantType = (int)rule,
+                                PolicyKey = policy.Key
+                            });
+
+                        }
+                        else if (securable is SecurityDevice)
+                        {
+                            // Delete the existing role
+                            context.Delete<DbSecurityDevicePolicy>(o => o.PolicyKey == policy.Key);
+                            context.Insert(new DbSecurityDevicePolicy()
+                            {
+                                SourceKey = (securable as SecurityDevice).Key.Value,
+                                GrantType = (int)rule,
+                                PolicyKey = policy.Key
+                            });
+                        }
+                        else if (securable is Entity)
+                        {
+                            var ent = securable as Entity;
+                            var existing = context.FirstOrDefault<DbEntitySecurityPolicy>(e => e.SourceKey == ent.Key && e.PolicyKey == policy.Key);
+                            if (existing != null)
+                                context.Insert(new DbEntitySecurityPolicy()
+                                {
+                                    EffectiveVersionSequenceId = ent.VersionSequence.Value,
+                                    PolicyKey = policy.Key,
+                                    SourceKey = ent.Key.Value
+                                });
+                            else
+                            {
+                                // Set obsolete to null if rule is DENY
+                                existing.ObsoleteVersionSequenceId = null;
+                                context.Update(existing);
+                            }
+                        }
+                        else if (securable is Act)
+                        {
+                            var act = securable as Act;
+                            var existing = context.FirstOrDefault<DbActSecurityPolicy>(e => e.SourceKey == act.Key && e.PolicyKey == policy.Key);
+                            if (existing != null)
+                                context.Insert(new DbActSecurityPolicy()
+                                {
+                                    EffectiveVersionSequenceId = act.VersionSequence.Value,
+                                    PolicyKey = policy.Key,
+                                    SourceKey = act.Key.Value
+                                });
+                            else
+                            {
+                                // Set obsolete to null if rule is DENY
+                                existing.ObsoleteVersionSequenceId = null;
+                                context.Update(existing);
+                            }
+
+                        }
+                        else
+                            throw new NotSupportedException($"Policies are not supported for {securable}");
+                    }
+                    tx.Commit();
+                }
+                catch (Exception e)
+                {
+                    tx.Rollback();
+                    this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error adding policies to {0}: {1}", securable, e);
+                    throw;
+                }
+            }
+        }
 
         /// <summary>
         /// Get active policies for the specified securable type

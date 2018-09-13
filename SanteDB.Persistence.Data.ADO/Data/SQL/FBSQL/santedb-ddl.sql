@@ -1753,7 +1753,7 @@ INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uui
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('3a8642cb-28e4-4e9e-bd7b-d6df72b729b2'), '1.3.6.1.4.1.33349.3.1.5.9.2.5.2', 'Read Warehouse Data', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('4a8642cb-28e4-4e9e-bd7b-d6df72b729b2'), '1.3.6.1.4.1.33349.3.1.5.9.2.5.3', 'Query Warehouse Data', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 
-INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('36f1ed35-552e-421a-8f59-629561ab9eb6'), '1.3.6.1.4.1.33349.3.1.5.9.3', 'Restricted Information', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID, IS_ELEV) VALUES (char_to_uuid('36f1ed35-552e-421a-8f59-629561ab9eb6'), '1.3.6.1.4.1.33349.3.1.5.9.3', 'Restricted Information', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'), true);
 
 -- INSERT THE DEFAULT ASSOCIATIONS
 -- CREATE USERS ROLE

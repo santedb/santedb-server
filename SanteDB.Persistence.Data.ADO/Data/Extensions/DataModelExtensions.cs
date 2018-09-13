@@ -491,7 +491,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
             {
                 if (retVal.UserKey.ToString() == AuthenticationContext.SystemUserSid ||
                     retVal.UserKey.ToString() == AuthenticationContext.AnonymousUserSid)
-                    me.ContextId = retVal.UserKey.Value;
+                    retVal.Key = me.ContextId = retVal.UserKey.Value;
                 else
                     retVal = me.Insert(retVal);
             }

@@ -55,6 +55,10 @@
       <Project>{3A45F695-47A2-464C-ACE6-BDABBFA39FBC}</Project>
       <Name>SanteDB.Core.Api</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-applets\SanteDB.Core.Applets\SanteDB.Core.Applets.csproj">
+      <Project>{39E61451-F4FE-493D-B754-5F06EB284AAC}</Project>
+      <Name>SanteDB.Core.Applets</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
       <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
       <Name>SanteDB.Core.Model</Name>
@@ -78,7 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MARC.HI.EHRS.SVC.Core">
-      <Version>2.0.1.8</Version>
+      <Version>2.0.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

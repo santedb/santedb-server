@@ -18,6 +18,8 @@ using SanteDB.Persistence.MDM.Services;
 using SanteDB.Core.Model;
 using MARC.HI.EHRS.SVC.Core.Services.Policy;
 using SanteDB.Core.Model.Security;
+using MARC.HI.EHRS.SVC.Core.Services.Security;
+using SanteDB.Core.Applets.ViewModel.Json;
 
 namespace SanteDB.Persistence.MDM.Test
 {
@@ -460,7 +462,6 @@ namespace SanteDB.Persistence.MDM.Test
             var localPatient1 = pservice.Insert(patient1, AuthenticationContext.SystemPrincipal, TransactionMode.Commit);
 
             // Here patient 2 has some unique identifier information for an HIV clinic including his HIV alias name
-            
             var patient2 = new Patient()
             {
                 DateOfBirth = DateTime.Parse("1985-07-06"),
@@ -484,6 +485,78 @@ namespace SanteDB.Persistence.MDM.Test
             Assert.AreEqual(1, masters.First().Names.Count);
             Assert.AreEqual(1, masters.First().Identifiers.Count);
             Assert.IsFalse(masters.First().Identifiers.Any(o => o.Value == "TC-8B")); // Shoudl not contain the HIV identifier
+        }
+
+        /// <summary>
+        /// Tests that a master record with Taboo information properly almagamates information from the locals when the current user principal is elevated properly
+        /// </summary>
+        [TestMethod]
+        public void TestShouldShowTabooInformationForAppropriateUser()
+        {
+            // Create a user and authenticate as that user which has access to taboo information
+            var roleService = ApplicationContext.Current.GetService<IRoleProviderService>();
+            roleService.CreateRole("RESTRICTED_USERS", AuthenticationContext.SystemPrincipal);
+            var userService = ApplicationContext.Current.GetService<IIdentityProviderService>();
+            userService.CreateIdentity("RESTRICTED", "TEST123", AuthenticationContext.SystemPrincipal);
+            roleService.AddUsersToRoles(new string[] { "RESTRICTED" }, new string[] { "RESTRICTED_USERS", "CLINICAL_STAFF" }, AuthenticationContext.SystemPrincipal);
+            // Add security policy to the newly created role
+            var role = ApplicationContext.Current.GetService<ISecurityRepositoryService>().GetRole("RESTRICTED_USERS");
+            ApplicationContext.Current.GetService<IPolicyInformationService>().AddPolicies(role, PolicyDecisionOutcomeType.Grant, DataPolicyIdentifiers.RestrictedInformation);
+
+             // Now we're going insert two patients, one with HIV data
+            var pservice = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>();
+            var patient1 = new Patient()
+            {
+                DateOfBirth = DateTime.Parse("1990-07-06"),
+                Names = new List<EntityName>()
+                {
+                    new EntityName(NameUseKeys.Legal, "Smith", "Testy")
+                },
+                Identifiers = new List<EntityIdentifier>()
+                {
+                    new EntityIdentifier(new AssigningAuthority("TEST", "TEST", "1.2.3.4.5.5"), "TC-9A")
+                },
+                GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
+            };
+            var localPatient1 = pservice.Insert(patient1, AuthenticationContext.SystemPrincipal, TransactionMode.Commit);
+
+            // Here patient 2 has some unique identifier information for an HIV clinic including his HIV alias name
+            var patient2 = new Patient()
+            {
+                DateOfBirth = DateTime.Parse("1990-07-06"),
+                Names = new List<EntityName>()
+                {
+                    new EntityName(NameUseKeys.Anonymous, "John Brenner")
+                },
+                Identifiers = new List<EntityIdentifier>()
+                {
+                    new EntityIdentifier(new AssigningAuthority("HIVCLINIC", "HIVCLINIC", "9.9.9.9.9"), "TC-9B")
+                },
+                GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
+            };
+            patient2.AddPolicy(DataPolicyIdentifiers.RestrictedInformation);
+            var localPatient2 = pservice.Insert(patient2, AuthenticationContext.SystemPrincipal, TransactionMode.Commit);
+
+            // Thread.Sleep(1000);
+            // When running as SYSTEM - A user which does not have access
+            var masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-9")), AuthenticationContext.SystemPrincipal);
+            Assert.AreEqual(1, masters.Count());
+            // Note that only one identifier from the locals can be in the master synthetic
+            Assert.AreEqual(1, masters.First().Names.Count);
+            Assert.AreEqual(1, masters.First().Identifiers.Count);
+            Assert.IsFalse(masters.First().Identifiers.Any(o => o.Value == "TC-9B")); // Shoudl not contain the HIV identifier
+            Assert.AreEqual(1, masters.First().Policies.Count);
+
+            // When running as our user
+            var restrictedUser = userService.Authenticate("RESTRICTED", "TEST123");
+            masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-9")), restrictedUser);
+            Assert.AreEqual(1, masters.Count());
+            // Note that two identifiers from the locals should be in the synthetic
+            Assert.AreEqual(2, masters.First().Names.Count);
+            Assert.AreEqual(2, masters.First().Identifiers.Count);
+            Assert.IsTrue(masters.First().Identifiers.Any(o => o.Value == "TC-9B")); // Shoudl not contain the HIV identifier
+            Assert.AreEqual(1, masters.First().Policies.Count);
+
         }
     }
 }
