@@ -19,6 +19,7 @@
  */
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
@@ -41,6 +42,9 @@ namespace SanteDB.Core.Services.Impl
         public void Save(Guid sourceKey, ITag tag)
         {
             var cache = ApplicationContext.Current.GetService<IDataCachingService>();
+
+            // Don't persist empty tags
+            if ((tag as IdentifiedData)?.IsEmpty() == true) return;
 
             if (tag is EntityTag)
             {

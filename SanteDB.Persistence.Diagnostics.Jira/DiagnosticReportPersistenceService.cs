@@ -91,7 +91,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         /// <summary>
         /// Not supported
         /// </summary>
-        public event EventHandler<PreRetrievalEventArgs> Retrieving;
+        public event EventHandler<PreRetrievalEventArgs<DiagnosticReport>> Retrieving;
         /// <summary>
         /// Not supported
         /// </summary>

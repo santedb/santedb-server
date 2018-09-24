@@ -233,18 +233,19 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     {
                         var identity = (securable as IPrincipal)?.Identity ?? securable as IIdentity;
                         var user = context.SingleOrDefault<DbSecurityUser>(u => u.UserName.ToLower() == identity.Name.ToLower());
-                        if (user == null)
-                            throw new KeyNotFoundException("Identity not found");
-
                         List<IPolicyInstance> retVal = new List<IPolicyInstance>();
 
-                        // Role policies
-                        SqlStatement query = context.CreateSqlStatement<DbSecurityRolePolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityRolePolicy))
-                            .InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
-                            .InnerJoin<DbSecurityUserRole>(o => o.SourceKey, o => o.RoleKey)
-                            .Where<DbSecurityUserRole>(o => o.UserKey == user.Key);
+                        SqlStatement query = null;
+                        if (user != null) // Is this a user based claim?
+                        {
+                            // Role policies
+                            query = context.CreateSqlStatement<DbSecurityRolePolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityRolePolicy))
+                                .InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
+                                .InnerJoin<DbSecurityUserRole>(o => o.SourceKey, o => o.RoleKey)
+                                .Where<DbSecurityUserRole>(o => o.UserKey == user.Key);
 
-                        retVal.AddRange(context.Query<CompositeResult<DbSecurityPolicy, DbSecurityRolePolicy>>(query).Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, user)));
+                            retVal.AddRange(context.Query<CompositeResult<DbSecurityPolicy, DbSecurityRolePolicy>>(query).Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, user)));
+                        }
 
                         // Claims principal, then we want device and app SID
                         if (securable is ClaimsPrincipal)
@@ -265,7 +266,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                    .InnerJoin<DbSecurityPolicy, DbSecurityApplicationPolicy>()
                                    .Where(o => o.SourceKey == claim);
 
-                                retVal.AddRange(context.Query<CompositeResult<DbSecurityPolicy, DbSecurityApplicationPolicy>>(query).Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, user)).Where(p=>retVal.Any(r=>r.Policy.Oid == p.Policy.Oid)));
+                                retVal.AddRange(context.Query<CompositeResult<DbSecurityPolicy, DbSecurityApplicationPolicy>>(query).Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, user)).Where(p=>user == null || retVal.Any(r=>r.Policy.Oid == p.Policy.Oid)));
                             }
 
                             // There is an device claim so we want to add the device policies - most restrictive
@@ -277,12 +278,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                    .InnerJoin<DbSecurityPolicy, DbSecurityDevicePolicy>()
                                    .Where(o => o.SourceKey == claim);
 
-                                retVal.AddRange(context.Query<CompositeResult<DbSecurityPolicy, DbSecurityDevicePolicy>>(query).Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, user)).Where(p => retVal.Any(r => r.Policy.Oid == p.Policy.Oid)));
+                                retVal.AddRange(context.Query<CompositeResult<DbSecurityPolicy, DbSecurityDevicePolicy>>(query).Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, user)).Where(p => retVal.Any(r => user == null || r.Policy.Oid == p.Policy.Oid)));
                             }
 
                         }
 
-                        this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Principal {0} effective policy set {1}", user.UserName, String.Join(",", retVal.Select(o => $"{o.Policy.Oid} [{o.Rule}]")));
+                        this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Principal {0} effective policy set {1}", identity?.Name, String.Join(",", retVal.Select(o => $"{o.Policy.Oid} [{o.Rule}]")));
                         // TODO: Most restrictive
                         return retVal;
                     }

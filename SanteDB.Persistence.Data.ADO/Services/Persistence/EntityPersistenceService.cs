@@ -45,6 +45,8 @@ using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using MARC.HI.EHRS.SVC.Core.Services.Policy;
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Model.Acts;
+using System.Security;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -302,11 +304,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (data.StatusConcept != null) data.StatusConcept = data.StatusConcept?.EnsureExists(context) as Concept;
             if (data.TypeConcept != null) data.TypeConcept = data.TypeConcept?.EnsureExists(context) as Concept;
             if (data.Template != null) data.Template = data.Template?.EnsureExists(context) as TemplateDefinition;
+            if (data.CreationAct != null) data.CreationAct = data.CreationAct?.EnsureExists(context) as Act;
             data.TypeConceptKey = data.TypeConcept?.Key ?? data.TypeConceptKey;
             data.DeterminerConceptKey = data.DeterminerConcept?.Key ?? data.DeterminerConceptKey;
             data.ClassConceptKey = data.ClassConcept?.Key ?? data.ClassConceptKey;
             data.StatusConceptKey = data.StatusConcept?.Key ?? data.StatusConceptKey;
             data.StatusConceptKey = data.StatusConceptKey == Guid.Empty || data.StatusConceptKey == null ? StatusKeys.New : data.StatusConceptKey;
+            data.CreationActKey = data.CreationAct?.Key ?? data.CreationActKey;
 
             var retVal = base.InsertInternal(context, data);
 
@@ -314,16 +318,31 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 	        if (data.Identifiers != null)
 	        {
 		        // Validate unique values for IDs
-		        var uniqueIds = data.Identifiers.Where(o => o.AuthorityKey.HasValue).Where(o => (ApplicationContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>() as AdoBasePersistenceService<AssigningAuthority>).Get(context, o.AuthorityKey.Value)?.IsUnique == true);
+		        var authorities = data.Identifiers.Where(o => o.AuthorityKey.HasValue).Select(o => (ApplicationContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>() as AdoBasePersistenceService<AssigningAuthority>).Get(context, o.AuthorityKey.Value));
+                DbSecurityProvenance provenance = null;
 
-		        foreach (var entityIdentifier in uniqueIds)
+		        foreach (var auth in authorities)
 		        {
-			        if (context.Query<DbEntityIdentifier>(c => c.SourceKey != data.Key && c.AuthorityKey == entityIdentifier.AuthorityKey && c.Value == entityIdentifier.Value && c.ObsoleteVersionSequenceId == null).Any())
-			        {
-						throw new DuplicateNameException(entityIdentifier.Value);
-					}
+                    if (auth.IsUnique) {
+                        var dups = data.Identifiers.Where(id => id.AuthorityKey == auth.Key).SelectMany(id => context.Query<DbEntityIdentifier>(c => c.SourceKey != data.Key && c.AuthorityKey == auth.Key && c.Value == id.Value && c.ObsoleteVersionSequenceId == null));
+                        if (dups.Any(did => !data.Relationships.Any(o=> o.RelationshipTypeKey == EntityRelationshipTypeKeys.Replaces && o.TargetEntityKey == did.SourceKey))) 
+                            // TODO: Ensure that the duplicate is also not a RELATED to the via a MASTER
+                            throw new DuplicateNameException(String.Join(",", dups.Select(o => o.ToString())));
+                    }
+                    else if(auth.AssigningApplicationKey.HasValue) // Must have permission
+                    {
+                        if (provenance == null) provenance = context.FirstOrDefault<DbSecurityProvenance>(o => o.Key == context.ContextId);
+
+                        // If the provenance application does not have authority to assign then all the identifiers must already exist!
+                        if (provenance.ApplicationKey != auth.AssigningApplicationKey)
+                        {
+                            if(!data.Identifiers.Where(id => id.AuthorityKey == auth.Key).All(id => context.Any<EntityIdentifier>(o => o.AuthorityKey == auth.Key && o.Value == id.Value && o.SourceEntityKey != data.Key)))
+                                throw new SecurityException($"Application {provenance.ApplicationKey} does not have permission to assign {auth.DomainName}");
+                        }
+                    }
 				}
 
+                // Assert 
 				base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.EntityIdentifier, DbEntityIdentifier>(
 					data.Identifiers.Where(o => o != null && !o.IsEmpty()),
 					retVal,

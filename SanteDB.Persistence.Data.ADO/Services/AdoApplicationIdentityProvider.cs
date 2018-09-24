@@ -81,7 +81,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         throw new SecurityException("Invalid application credentials");
 
                     IPrincipal applicationPrincipal = new ApplicationPrincipal(new SanteDB.Core.Security.ApplicationIdentity(client.Key, client.PublicId, true));
-                    new PolicyPermission(System.Security.Permissions.PermissionState.None, PermissionPolicyIdentifiers.Login, applicationPrincipal).Demand();
+                    new PolicyPermission(System.Security.Permissions.PermissionState.None, PermissionPolicyIdentifiers.LoginAsService, applicationPrincipal).Demand();
                     return applicationPrincipal;
                 }
                 catch (Exception e)

@@ -37,7 +37,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>0744B6AD-BE39-4A08-B64D-F61CB8282267</id>
       <isReadonly>false</isReadonly>
-      <mnemonic>ActType-AdverseEventFollowingImmunization</mnemonic>
+      <mnemonic>ActType-AdverseEvent</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
@@ -50,19 +50,19 @@
       </referenceTerm>
       <name>
         <language>en</language>
-        <value>Adverse event following immunization AEFI</value>
+        <value>Adverse event following procedure</value>
       </name>
     </Concept>
   </update>
+  
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>14d69b32-f6c4-4a49-a527-a74893dbcf4a</id>
-      
       <previousVersion xsi:nil="true" />
       <version xsi:nil="true" />
       <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
-      <mnemonic>Order</mnemonic>
+      <mnemonic>ActType-Order</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <name>
@@ -76,6 +76,106 @@
     </Concept>
   </update>
   <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>fed69b32-f6c4-4a49-a527-a74893dbcfff</id>
+      <previousVersion xsi:nil="true" />
+      <version xsi:nil="true" />
+      <sequence xsi:nil="true" />
+      <isReadonly>false</isReadonly>
+      <mnemonic>ActType-PatientRegistration</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <source xsi:nil="true" />
+        <effectiveVersionSequence xsi:nil="true" />
+        <obsoleteVersionSequence xsi:nil="true" />
+        <language>en</language>
+        <value>Patient Registration</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>e723c259-96a1-4857-8767-097147f929fc</id>
+      <previousVersion xsi:nil="true" />
+      <version xsi:nil="true" />
+      <sequence xsi:nil="true" />
+      <isReadonly>false</isReadonly>
+      <mnemonic>ActType-MergeRecord</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <source xsi:nil="true" />
+        <effectiveVersionSequence xsi:nil="true" />
+        <obsoleteVersionSequence xsi:nil="true" />
+        <language>en</language>
+        <value>Merge</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>73237608-cbc2-4340-90ee-d93fba1ca005</id>
+      <previousVersion xsi:nil="true" />
+      <version xsi:nil="true" />
+      <sequence xsi:nil="true" />
+      <isReadonly>false</isReadonly>
+      <mnemonic>ActType-PatientTransfer</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <source xsi:nil="true" />
+        <effectiveVersionSequence xsi:nil="true" />
+        <obsoleteVersionSequence xsi:nil="true" />
+        <language>en</language>
+        <value>Patient Transfer</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>a3d69b32-f6c4-4a49-a527-a74893dbcfc3</id>
+      <previousVersion xsi:nil="true" />
+      <version xsi:nil="true" />
+      <sequence xsi:nil="true" />
+      <isReadonly>false</isReadonly>
+      <mnemonic>ActType-Discharge</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <source xsi:nil="true" />
+        <effectiveVersionSequence xsi:nil="true" />
+        <obsoleteVersionSequence xsi:nil="true" />
+        <language>en</language>
+        <value>Discharge</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>89ed9a8c-97fc-4050-b59e-67b78c2a8fbd</id>
+      <previousVersion xsi:nil="true" />
+      <version xsi:nil="true" />
+      <sequence xsi:nil="true" />
+      <isReadonly>false</isReadonly>
+      <mnemonic>ActType-Cancellation</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <source xsi:nil="true" />
+        <effectiveVersionSequence xsi:nil="true" />
+        <obsoleteVersionSequence xsi:nil="true" />
+        <language>en</language>
+        <value>Cancel Previous Action</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
       <id>4BE73176-2531-41B8-8A68-2F9D41226A96</id>
       <name>Act Types</name>
@@ -84,6 +184,11 @@
       <url>http://santedb.org/conceptsets/contrib/ActTypeCode</url>
       <concept>14d69b32-f6c4-4a49-a527-a74893dbcf4a</concept>
       <concept>0744B6AD-BE39-4A08-B64D-F61CB8282267</concept>
+      <concept>fed69b32-f6c4-4a49-a527-a74893dbcfff</concept>
+      <concept>a3d69b32-f6c4-4a49-a527-a74893dbcfc3</concept>
+      <concept>73237608-cbc2-4340-90ee-d93fba1ca005</concept>
+      <concept>89ed9a8c-97fc-4050-b59e-67b78c2a8fbd</concept>
+      <concept>e723c259-96a1-4857-8767-097147f929fc</concept>
     </ConceptSet>
   </update>
   <update insertIfNotExists="true">

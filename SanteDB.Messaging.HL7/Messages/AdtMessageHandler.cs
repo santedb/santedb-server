@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Messaging.HAPI.TransportProtocol;
 using NHapi.Base.Model;
 using NHapi.Model.V25.Segment;
 using SanteDB.Core.Model.Collection;
+using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Roles;
+using SanteDB.Core.Services;
 
 namespace SanteDB.Messaging.HL7.Messages
 {
@@ -30,9 +33,9 @@ namespace SanteDB.Messaging.HL7.Messages
             {
                 case "A01": // Admit
                 case "A04": // Register
-                    return this.PerformAdmit(e, parsed.Item.OfType<Patient>().SingleOrDefault());
+                    return this.PerformAdmit(e, parsed); // parsed.Item.OfType<Patient>().SingleOrDefault(o=>o.Tags.Any(t=>t.TagKey == ".v2.segment" && t.Value == "PID")));
                 case "A08": // Update
-                    return this.PerformUpdate(e, parsed.Item.OfType<Patient>().SingleOrDefault());
+                    return this.PerformUpdate(e, parsed.Item.OfType<Patient>().SingleOrDefault(o => o.Tags.Any(t => t.TagKey == ".v2.segment" && t.Value == "PID")));
                 case "A40": // Merge
                     return this.PerformMerge(e, parsed);
                 default:
@@ -43,10 +46,20 @@ namespace SanteDB.Messaging.HL7.Messages
         /// <summary>
         /// Perform an admission operation
         /// </summary>
-        protected virtual IMessage PerformAdmit(Hl7MessageReceivedEventArgs e, Patient p)
+        protected virtual IMessage PerformAdmit(Hl7MessageReceivedEventArgs e, Bundle insertBundle)
         {
-            return null;
+            var patient = insertBundle.Item.OfType<Patient>().FirstOrDefault(it => it.Tags.Any(t => t.TagKey == ".v2.segment" && t.Value == "PID"));
+            if (patient == null)
+                throw new ArgumentNullException(nameof(insertBundle), "Message did not contain a patient");
 
+            var repoService = ApplicationContext.Current.GetService<IBatchRepositoryService>();
+            if (repoService == null)
+                throw new InvalidOperationException("Cannot find repository for Patient");
+
+            insertBundle = repoService.Insert(insertBundle);
+
+            // Create response message
+            return this.CreateACK(e.Message, "AA", $"{patient.Key} created");
         }
 
         /// <summary>
@@ -54,6 +67,9 @@ namespace SanteDB.Messaging.HL7.Messages
         /// </summary>
         protected virtual IMessage PerformUpdate(Hl7MessageReceivedEventArgs e, Patient p)
         {
+            if (p == null)
+                throw new ArgumentNullException(nameof(p), "Message did not contain a patient");
+
             return null;
 
         }

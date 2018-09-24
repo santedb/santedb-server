@@ -83,7 +83,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		{
 			var retVal = base.ToModelInstance(dataInstance, context);
 			if (retVal == null) return null;
-			var policyQuery = context.CreateSqlStatement<DbSecurityApplicationPolicy>().SelectFrom()
+			var policyQuery = context.CreateSqlStatement<DbSecurityApplicationPolicy>().SelectFrom(typeof(DbSecurityApplicationPolicy), typeof(DbSecurityPolicy))
 				.InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
 				.Where<DbSecurityApplicationPolicy>(o => o.SourceKey == retVal.Key);
 
@@ -184,7 +184,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		{
 			var retVal = base.ToModelInstance(dataInstance, context);
 			if (retVal == null) return null;
-			var policyQuery = context.CreateSqlStatement<DbSecurityDevicePolicy>().SelectFrom()
+			var policyQuery = context.CreateSqlStatement<DbSecurityDevicePolicy>().SelectFrom(typeof(DbSecurityDevicePolicy), typeof(DbSecurityPolicy))
 				.InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
 				.Where<DbSecurityDevicePolicy>(o => o.SourceKey == retVal.Key);
 
@@ -262,7 +262,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
 			if (role != null && context.LoadState == LoadState.FullLoad)
 			{
-				var policyQuery = context.CreateSqlStatement<DbSecurityRolePolicy>().SelectFrom()
+				var policyQuery = context.CreateSqlStatement<DbSecurityRolePolicy>().SelectFrom(typeof(DbSecurityRolePolicy), typeof(DbSecurityPolicy))
 										.InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
 										.Where<DbSecurityRolePolicy>(o => o.SourceKey == role.Key);
 

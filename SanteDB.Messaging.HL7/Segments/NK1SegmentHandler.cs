@@ -139,7 +139,7 @@ namespace SanteDB.Messaging.HL7.Segments
             if (!nk1Segment.DateTimeOfBirth.IsEmpty())
             {
                 retVal.DateOfBirth = nk1Segment.DateTimeOfBirth.ToModel();
-                retVal.DateOfBirthPrecision = nk1Segment.DateTimeOfBirth.DegreeOfPrecision.ToDatePrecision();
+                retVal.DateOfBirthPrecision = nk1Segment.DateTimeOfBirth.ToDatePrecision();
             }
 
             // Citizenship

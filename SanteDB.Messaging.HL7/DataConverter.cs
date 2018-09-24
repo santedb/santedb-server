@@ -371,21 +371,48 @@ namespace SanteDB.Messaging.HL7
         /// <summary>
         /// Convert to date precision
         /// </summary>
-        public static DatePrecision ToDatePrecision(this ID me)
+        public static DatePrecision ToDatePrecision(this TS me)
         {
-            return me.Value == "Y" ? Core.Model.DataTypes.DatePrecision.Year :
-                                me.Value == "L" ? Core.Model.DataTypes.DatePrecision.Month :
-                                me.Value == "D" ? Core.Model.DataTypes.DatePrecision.Day :
-                                me.Value == "H" ? Core.Model.DataTypes.DatePrecision.Hour :
-                                me.Value == "M" ? Core.Model.DataTypes.DatePrecision.Minute :
-                                me.Value == "S" ? Core.Model.DataTypes.DatePrecision.Year :
+            if(!me.DegreeOfPrecision.IsEmpty())
+                return me.DegreeOfPrecision.Value == "Y" ? Core.Model.DataTypes.DatePrecision.Year :
+                                me.DegreeOfPrecision.Value == "L" ? Core.Model.DataTypes.DatePrecision.Month :
+                                me.DegreeOfPrecision.Value == "D" ? Core.Model.DataTypes.DatePrecision.Day :
+                                me.DegreeOfPrecision.Value == "H" ? Core.Model.DataTypes.DatePrecision.Hour :
+                                me.DegreeOfPrecision.Value == "M" ? Core.Model.DataTypes.DatePrecision.Minute :
+                                me.DegreeOfPrecision.Value == "S" ? Core.Model.DataTypes.DatePrecision.Year :
                                 Core.Model.DataTypes.DatePrecision.Full;
+            else
+                switch(me.Time.Value.Length)
+                {
+                    case 4:
+                        return DatePrecision.Year;
+                    case 6:
+                        return DatePrecision.Month;
+                    case 8:
+                        return DatePrecision.Day;
+                    case 10:
+                        return DatePrecision.Hour;
+                    case 12:
+                        return DatePrecision.Minute;
+                    case 14:
+                        return DatePrecision.Second;
+                    default:
+                        throw new InvalidOperationException($"Cannot determine degree of precision of date {me.Time.Value}");
+                }
         }
 
         /// <summary>
         /// Convert a simple string to a concept in the specified domain
         /// </summary>
         public static Concept ToConcept(this IS me, String domain)
+        {
+            return ApplicationContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(me.Value, domain).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Convert a simple string to a concept in the specified domain
+        /// </summary>
+        public static Concept ToConcept(this ID me, String domain)
         {
             return ApplicationContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(me.Value, domain).FirstOrDefault();
         }

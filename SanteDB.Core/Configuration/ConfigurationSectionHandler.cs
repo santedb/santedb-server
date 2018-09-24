@@ -90,7 +90,8 @@ namespace SanteDB.Core.Configuration
 
 
                 retVal.Security.AllowUnsignedApplets = Boolean.Parse(appletSecurityNode?.Attributes["allowUnsignedApplets"]?.Value ?? "false");
-                retVal.Security.TrustedPublishers = new System.Collections.ObjectModel.ObservableCollection<string>(appletSecurityNode?.SelectNodes("./trustedPublishers/add")?.OfType<XmlElement>().Select(o => o.InnerText).ToArray());
+                if(appletSecurityNode != null)
+                    retVal.Security.TrustedPublishers = new System.Collections.ObjectModel.ObservableCollection<string>(appletSecurityNode?.SelectNodes("./trustedPublishers/add")?.OfType<XmlElement>().Select(o => o.InnerText).ToArray());
 
                 if (x509Signature != null)
                 {

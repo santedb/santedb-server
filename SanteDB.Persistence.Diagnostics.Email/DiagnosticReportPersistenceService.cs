@@ -67,7 +67,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// <summary>
         /// Not supported
         /// </summary>
-        public event EventHandler<PreRetrievalEventArgs> Retrieving;
+        public event EventHandler<PreRetrievalEventArgs<DiagnosticReport>> Retrieving;
         /// <summary>
         /// Not supported
         /// </summary>

@@ -24,5 +24,13 @@ namespace SanteDB.Messaging.HL7.Test
             using (var sw = new StreamReader(s))
                 return new PipeParser().Parse(sw.ReadToEnd().Replace("2.3.1", "2.5"));
         }
+
+        /// <summary>
+        /// Represent message as string
+        /// </summary>
+        public static String ToString(IMessage msg)
+        {
+            return new PipeParser().Encode(msg);
+        }
     }
 }

@@ -57,7 +57,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
         
         // Trace source
         private static TraceSource s_traceSource = new TraceSource(AdoDataConstants.TraceSourceName);
-
+        
         // Field cache
         private static Dictionary<Type, FieldInfo[]> s_fieldCache = new Dictionary<Type, FieldInfo[]>();
 

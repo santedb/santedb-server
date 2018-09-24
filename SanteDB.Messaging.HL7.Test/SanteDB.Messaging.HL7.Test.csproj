@@ -48,6 +48,14 @@
     <Compile Include="TestUtil.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
+      <Project>{3A45F695-47A2-464C-ACE6-BDABBFA39FBC}</Project>
+      <Name>SanteDB.Core.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
+      <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
+      <Name>SanteDB.Core.Model</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{DB9BC05E-45F1-4F96-A161-F36BDECAF566}</Project>
       <Name>SanteDB.Core</Name>
@@ -69,13 +77,13 @@
       <Version>2.0.1.6</Version>
     </PackageReference>
     <PackageReference Include="MARC.HI.EHRS.SVC.Configuration">
-      <Version>2.0.0</Version>
+      <Version>2.0.0.1</Version>
     </PackageReference>
     <PackageReference Include="MARC.HI.EHRS.SVC.Core">
-      <Version>2.0.1.1</Version>
+      <Version>2.0.2</Version>
     </PackageReference>
     <PackageReference Include="MARC.HI.EHRS.SVC.Messaging.HAPI">
-      <Version>2.0.1.2</Version>
+      <Version>2.0.2.5</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>11.0.2</Version>
@@ -87,6 +95,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\ADT_PD1.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ADT_INV_ID.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ADT_INV_AUTH.txt" />
+  </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
@@ -95,5 +109,4 @@
   <Target Name="BeforeBuild">
     <Copy SourceFiles="..\Solution Items\santedb_test.fdb" DestinationFolder="$(OutputPath)" ContinueOnError="false" />
   </Target>
-
 </Project>

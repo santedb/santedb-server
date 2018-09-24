@@ -1785,7 +1785,7 @@ INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VA
 INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('d15b96ab-646c-4c00-9a58-ea09eee67d7c'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 0); -- DENY Login
 INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('f6840336-4e20-4bc0-b965-baa6d7c80be3'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 2); -- GRANT Unrestricted Clinical Data
 INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('dea891aa-224d-4859-81b3-c1eb2750067e'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 0); -- DENY Override disclosure
-INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('fea891aa-224d-4859-81b3-c1eb2750067e'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 2); -- GRANT Read Metadata Administrator
+INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('eea891aa-224d-4859-81b3-c1eb2750067e'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 2); -- GRANT Read Metadata Administrator
 INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('0a8642cb-28e4-4e9e-bd7b-d6df72b729b2'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 2); -- GRANT Unrestricted Warehouse
 
 -- CREATE ROLE ANONYMOUS WHICH IS DENIED ALL CLINICAL 
@@ -1866,3 +1866,6 @@ CREATE TABLE SEC_SES_CLM_TBL (
 );
 
 COMMIT;
+
+ALTER TABLE ENT_VRSN_TBL ADD CRT_ACT_ID UUID;
+ALTER TABLE ENT_VRSN_TBL ADD CONSTRAINT FK_ENT_VRSN_CRT_ACT FOREIGN KEY (CRT_ACT_ID) REFERENCES ACT_TBL(ACT_ID);

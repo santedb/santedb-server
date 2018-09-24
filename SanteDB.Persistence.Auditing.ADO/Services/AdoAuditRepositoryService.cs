@@ -73,7 +73,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Fired when data is being retrieved
         /// </summary>
-        public event EventHandler<PreRetrievalEventArgs> Retrieving;
+        public event EventHandler<PreRetrievalEventArgs<AuditData>> Retrieving;
         /// <summary>
         /// Fired when data is has been retrieved
         /// </summary>
@@ -330,7 +330,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         public AuditData Get<TIdentifier>(MARC.HI.EHRS.SVC.Core.Data.Identifier<TIdentifier> containerId, IPrincipal principal, bool loadFast)
         {
 
-            var preEvtData = new PreRetrievalEventArgs(containerId, principal);
+            var preEvtData = new PreRetrievalEventArgs<AuditData>(containerId, principal);
             this.Retrieving?.Invoke(this, preEvtData);
             if(preEvtData.Cancel)
             {
@@ -391,7 +391,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         public IEnumerable<AuditData> Query(Expression<Func<AuditData, bool>> query, int offset, int? count, IPrincipal authContext, out int totalCount)
         {
 
-            var preEvtData = new PreQueryEventArgs<AuditData>(query, authContext);
+            var preEvtData = new PreQueryEventArgs<AuditData>(query, offset: offset, count: count, authContext: authContext);
             this.Querying?.Invoke(this, preEvtData);
             if(preEvtData.Cancel)
             {

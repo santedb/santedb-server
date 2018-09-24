@@ -48,7 +48,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             { DatePrecision.Minute, "m" },
             { DatePrecision.Month, "M" },
             { DatePrecision.Second, "s" },
-            { DatePrecision.Year, "Y" }
+            { DatePrecision.Year, "Y" },
+            { DatePrecision.Full, "F" }
         };
 
         /// <summary>

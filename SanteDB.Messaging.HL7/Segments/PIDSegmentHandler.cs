@@ -126,7 +126,7 @@ namespace SanteDB.Messaging.HL7.Segments
             if (!pidSegment.DateTimeOfBirth.IsEmpty())
             {
                 retVal.DateOfBirth = pidSegment.DateTimeOfBirth.ToModel();
-                retVal.DateOfBirthPrecision = pidSegment.DateTimeOfBirth.DegreeOfPrecision.ToDatePrecision() ;
+                retVal.DateOfBirthPrecision = pidSegment.DateTimeOfBirth.ToDatePrecision() ;
             }
 
             // Administrative gender
@@ -203,7 +203,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 retVal.DeceasedDate = pidSegment.PatientDeathIndicator.Value == "Y" ? (DateTime?)DateTime.MinValue : null;
             if (!pidSegment.PatientDeathDateAndTime.IsEmpty()) {
                 retVal.DeceasedDate = pidSegment.PatientDeathDateAndTime.ToModel();
-                retVal.DeceasedDatePrecision = pidSegment.PatientDeathDateAndTime.DegreeOfPrecision.ToDatePrecision();
+                retVal.DeceasedDatePrecision = pidSegment.PatientDeathDateAndTime.ToDatePrecision();
             }
 
             // Last update time

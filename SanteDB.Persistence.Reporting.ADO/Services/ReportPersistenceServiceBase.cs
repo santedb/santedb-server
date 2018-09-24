@@ -86,7 +86,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <summary>
 		/// Fired while a data type is being retrieved.
 		/// </summary>
-		public event EventHandler<PreRetrievalEventArgs> Retrieving;
+		public event EventHandler<PreRetrievalEventArgs<TModel>> Retrieving;
 
 		/// <summary>
 		/// Fired after a data type is updated.
@@ -144,7 +144,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		{
 			var identifier = containerId as Identifier<Guid>;
 
-			var preRetrievalArgs = new PreRetrievalEventArgs(containerId, principal);
+			var preRetrievalArgs = new PreRetrievalEventArgs<TModel>(containerId, principal);
 
 			this.Retrieving?.Invoke(this, preRetrievalArgs);
 
