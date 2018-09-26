@@ -1,0 +1,10 @@
+﻿<Hl7QueryParameterMap xmlns="http://santedb.org/model/hl7v2">
+  <messageType trigger="Q22" name="Find Candidates Query" response="K22" queryTarget="Patient">
+    <parameter hl7="@PID.5.1.1" model="name.component[Family].value"/>
+    <parameter hl7="@PID.5.2.1" model="name.component[Given].value"/>
+    <parameter hl7="@PID.8.1.1" model="genderConcept" type="concept"/>
+    <parameter hl7="@PID.3.1.1" model="identifier.value"/>
+    <parameter hl7="@PID.3.4.1" model="identifier.authority.domain"/>
+    <parameter hl7="@PID.3.4.2" model="identifier.authority.oid"/>
+  </messageType>
+</Hl7QueryParameterMap>
