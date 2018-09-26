@@ -1,6 +1,7 @@
 ﻿using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Attributes;
 using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.MDM.Configuration;
 using System;
@@ -78,6 +79,8 @@ namespace SanteDB.Persistence.MDM.Services
                     var idt = typeof(MdmResourceListener<>).MakeGenericType(itm.ResourceType);
                     this.m_listeners.Add(Activator.CreateInstance(idt, itm) as MdmResourceListener);
                 }
+
+                this.m_listeners.Add(new BundleResourceListener(this.m_listeners));
             };
 
             this.Started?.Invoke(this, EventArgs.Empty);

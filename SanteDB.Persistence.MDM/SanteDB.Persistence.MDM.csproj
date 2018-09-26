@@ -50,6 +50,7 @@
     <Compile Include="Model\EntityMaster.cs" />
     <Compile Include="Model\IMdmMaster.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\BundleResourceListener.cs" />
     <Compile Include="Services\MdmDaemonService.cs" />
     <Compile Include="Services\MdmResourceListener.cs" />
   </ItemGroup>

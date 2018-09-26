@@ -67,15 +67,15 @@ namespace SanteDB.Persistence.MDM.Services
                 throw new InvalidOperationException($"Could not find persistence service for {typeof(T)}");
 
             // Subscribe
-            this.m_repository.Inserting += this.PrePersistenceValidate;
-            this.m_repository.Updating += this.PrePersistenceValidate;
-            this.m_repository.Inserted += this.Inserted;
-            this.m_repository.Updated += this.Updated;
-            this.m_repository.Obsoleting += this.Obsoleting;
-            this.m_repository.Retrieved += this.Retrieved;
-            this.m_repository.Retrieving += this.Retrieving;
-            this.m_repository.Queried += this.Queried;
-            this.m_repository.Querying += this.Querying;
+            this.m_repository.Inserting += this.OnPrePersistenceValidate;
+            this.m_repository.Updating += this.OnPrePersistenceValidate;
+            this.m_repository.Inserted += this.OnInserted;
+            this.m_repository.Updated += this.OnUpdated;
+            this.m_repository.Obsoleting += this.OnObsoleting;
+            this.m_repository.Retrieved += this.OnRetrieved;
+            this.m_repository.Retrieving += this.OnRetrieving;
+            this.m_repository.Queried += this.OnQueried;
+            this.m_repository.Querying += this.OnQuerying;
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// otherwise they will receive the master records.
         /// </para>
         /// </remarks>
-        private void Querying(object sender, MARC.HI.EHRS.SVC.Core.Event.PreQueryEventArgs<T> e)
+        protected virtual void OnQuerying(object sender, MARC.HI.EHRS.SVC.Core.Event.PreQueryEventArgs<T> e)
         {
             var query = new NameValueCollection(QueryExpressionBuilder.BuildQuery<T>(e.Query).ToArray());
 
@@ -138,7 +138,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <param name="e"></param>
         /// <remarks>The MDM provider will ensure that no data from the LOCAL instance which is masked is returned
         /// in the MASTER record</remarks>
-        private void Queried(object sender, MARC.HI.EHRS.SVC.Core.Event.PostQueryEventArgs<T> e)
+        protected virtual void OnQueried(object sender, MARC.HI.EHRS.SVC.Core.Event.PostQueryEventArgs<T> e)
         {
             // TODO: Filter master record data based on taboo child records.
 
@@ -153,7 +153,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// which is a master is actually retrieving an entity which has a synthetic record of type Patient. If we 
         /// don't redirect these requests then technically a request to retrieve a master will result in an emtpy / exception
         /// case.</remarks>
-        private void Retrieving(object sender, MARC.HI.EHRS.SVC.Core.Event.PreRetrievalEventArgs<T> e)
+        protected virtual void OnRetrieving(object sender, MARC.HI.EHRS.SVC.Core.Event.PreRetrievalEventArgs<T> e)
         {
             var retrieveId = (Identifier<Guid>)e.Identifier;
 
@@ -181,7 +181,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <param name="e"></param>
         /// <remarks>MDM provider will ensure that if the retrieved record is a MASTER record, that no 
         /// data from masked LOCAL records is included.</remarks>
-        private void Retrieved(object sender, MARC.HI.EHRS.SVC.Core.Event.PostRetrievalEventArgs<T> e)
+        protected virtual void OnRetrieved(object sender, MARC.HI.EHRS.SVC.Core.Event.PostRetrievalEventArgs<T> e)
         {
             // We have retrieved an object from the database. If it is local we have to ensure that 
             // 1. The user actually requested the local
@@ -202,7 +202,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <param name="e"></param>
         /// <remarks>We don't want clients submitting MASTER records, so this method will ensure that all records
         /// being sent with tag of MASTER are indeed sent by the MDM or SYSTEM user.</remarks>
-        private void PrePersistenceValidate(object sender, MARC.HI.EHRS.SVC.Core.Event.PrePersistenceEventArgs<T> e)
+        protected virtual void OnPrePersistenceValidate(object sender, MARC.HI.EHRS.SVC.Core.Event.PrePersistenceEventArgs<T> e)
         {
             Guid? classConcept = (e.Data as Entity)?.ClassConceptKey ?? (e.Data as Act)?.ClassConceptKey;
             // We are touching a master record and we are not system?
@@ -259,7 +259,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <param name="e"></param>
         /// <remarks>We don't want a MASTER record to be obsoleted under any condition. MASTER records require special permission to 
         /// obsolete and also require that all LOCAL records be either re-assigned or obsoleted as well.</remarks>
-        private void Obsoleting(object sender, MARC.HI.EHRS.SVC.Core.Event.PrePersistenceEventArgs<T> e)
+        protected virtual void OnObsoleting(object sender, MARC.HI.EHRS.SVC.Core.Event.PrePersistenceEventArgs<T> e)
         {
             // Obsoleting a master record requires that the user be a SYSTEM user or has WriteMDM permission
             Guid? classConcept = (e.Data as Entity)?.ClassConceptKey ?? (e.Data as Act)?.ClassConceptKey;
@@ -278,7 +278,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <param name="e"></param>
         /// <remarks>This method will ensure that the record matching service is re-run after an update, and 
         /// that any new links be created/updated.</remarks>
-        private void Updated(object sender, MARC.HI.EHRS.SVC.Core.Event.PostPersistenceEventArgs<T> e)
+        protected virtual void OnUpdated(object sender, MARC.HI.EHRS.SVC.Core.Event.PostPersistenceEventArgs<T> e)
         {
 
             // Is this object a ROT, if it is then we do not perform any changes to re-binding
@@ -318,7 +318,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <param name="e"></param>
         /// <remarks>This method will fire the record matching service and will ensure that duplicates are marked
         /// and merged into any existing MASTER record.</remarks>
-        private void Inserted(object sender, MARC.HI.EHRS.SVC.Core.Event.PostPersistenceEventArgs<T> e)
+        protected virtual void OnInserted(object sender, MARC.HI.EHRS.SVC.Core.Event.PostPersistenceEventArgs<T> e)
         {
 
             // Gather tags to determine whether the object has been linked to a master
@@ -549,15 +549,15 @@ namespace SanteDB.Persistence.MDM.Services
         {
             if (this.m_repository != null)
             {
-                this.m_repository.Inserting -= this.PrePersistenceValidate;
-                this.m_repository.Updating -= this.PrePersistenceValidate;
-                this.m_repository.Inserted -= this.Inserted;
-                this.m_repository.Updated -= this.Updated;
-                this.m_repository.Retrieved -= this.Retrieved;
-                this.m_repository.Retrieving -= this.Retrieving;
-                this.m_repository.Obsoleting -= this.Obsoleting;
-                this.m_repository.Querying -= this.Querying;
-                this.m_repository.Queried -= this.Queried;
+                this.m_repository.Inserting -= this.OnPrePersistenceValidate;
+                this.m_repository.Updating -= this.OnPrePersistenceValidate;
+                this.m_repository.Inserted -= this.OnInserted;
+                this.m_repository.Updated -= this.OnUpdated;
+                this.m_repository.Retrieved -= this.OnRetrieved;
+                this.m_repository.Retrieving -= this.OnRetrieving;
+                this.m_repository.Obsoleting -= this.OnObsoleting;
+                this.m_repository.Querying -= this.OnQuerying;
+                this.m_repository.Queried -= this.OnQueried;
             }
         }
 
@@ -567,7 +567,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <param name="master"></param>
         /// <param name="linkedDuplicates"></param>
         /// <returns></returns>
-        public T Merge(T master, IEnumerable<T> linkedDuplicates)
+        public virtual T Merge(T master, IEnumerable<T> linkedDuplicates)
         {
             // Relationship type
             var relationshipType = master is Entity ? typeof(EntityRelationship) : typeof(ActRelationship);
@@ -710,7 +710,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <param name="master"></param>
         /// <param name="unmergeDuplicate"></param>
         /// <returns></returns>
-        public T Unmerge(T master, T unmergeDuplicate)
+        public virtual T Unmerge(T master, T unmergeDuplicate)
         {
             throw new NotImplementedException();
         }

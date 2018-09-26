@@ -160,33 +160,24 @@ namespace SanteDB.Messaging.HL7.Messages
         /// <returns>The result of the message handling</returns>
         public virtual IMessage HandleMessage(Hl7MessageReceivedEventArgs e)
         {
-            ISession session = null;
             try
             {
-                // Authenticated event, so we shall authenticate!
-                session = this.Authenticate(e);
-
+                this.Authenticate(e);
                 if (!this.Validate(e.Message))
                     throw new ArgumentException("Invalid message");
 
-                var retVal =  this.HandleMessageInternal(e, this.Parse(e.Message));
-                if (session != null)
-                    (retVal.GetStructure("MSH") as MSH).Security.Value = $"sid://{BitConverter.ToString(session.Id).Replace("-", "")}";
-                return retVal;
+                return this.HandleMessageInternal(e, this.Parse(e.Message));
             }
             catch (Exception ex)
             {
-                var retVal = this.CreateNACK(e.Message, ex, e);
-                if (session != null)
-                    (retVal.GetStructure("MSH") as MSH).Security.Value = $"sid://{BitConverter.ToString(session.Id).Replace("-", "")}";
-                return retVal;
+                return this.CreateNACK(e.Message, ex, e);
             }
         }
 
         /// <summary>
         /// Authetnicate
         /// </summary>
-        private ISession Authenticate(Hl7MessageReceivedEventArgs e)
+        private void Authenticate(Hl7MessageReceivedEventArgs e)
         {
             ClaimsPrincipal principal = null;
             var msh = e.Message.GetStructure("MSH") as MSH;
@@ -195,10 +186,13 @@ namespace SanteDB.Messaging.HL7.Messages
 
             // Authenticated args?
             if (msh.Security.Value.StartsWith("sid://")) // Session identifier
-                return sessionService.Get(Enumerable.Range(5, msh.Security.Value.Length - 5)
+            {
+                var session = sessionService.Get(Enumerable.Range(5, msh.Security.Value.Length - 5)
                                     .Where(x => x % 2 == 0)
                                     .Select(x => Convert.ToByte(msh.Security.Value.Substring(x, 2), 16))
                                     .ToArray());
+                principal = ApplicationContext.Current.GetService<ISessionIdentityProviderService>().Authenticate(session) as ClaimsPrincipal;
+            }
             else if (e is AuthenticatedHl7MessageReceivedEventArgs)
             {
                 var auth = e as AuthenticatedHl7MessageReceivedEventArgs;
@@ -249,13 +243,8 @@ namespace SanteDB.Messaging.HL7.Messages
 
             // Pricipal
             if(principal != null)
-            {
-                var session = sessionService.Establish(principal, DateTimeOffset.Now.AddMinutes(5), "v2");
                 AuthenticationContext.Current = new AuthenticationContext(principal);
-                return session;
-            }
 
-            return null;
         }
 
         /// <summary>
@@ -318,6 +307,8 @@ namespace SanteDB.Messaging.HL7.Messages
                 retVal = this.CreateACK(request, "CE", "Data not found");
             else if (error is DetectedIssueException)
                 retVal = this.CreateACK(request, "CR", "Business Rule Violation");
+            else if (error is DataPersistenceException)
+                retVal = this.CreateACK(request, "CE", "Error committing data");
             else if (error is NotImplementedException)
                 retVal = this.CreateACK(request, "AE", "Not Implemented");
             else if (error is NotSupportedException)
@@ -337,6 +328,18 @@ namespace SanteDB.Messaging.HL7.Messages
                     err.HL7ErrorCode.Identifier.Value = "207";
                     err.Severity.Value = itm.Priority == Core.Services.DetectedIssuePriorityType.Error ? "E" : itm.Priority == Core.Services.DetectedIssuePriorityType.Warning ? "W" : "I";
                     err.GetErrorCodeAndLocation(err.ErrorCodeAndLocationRepetitionsUsed).CodeIdentifyingError.Text.Value = itm.Text;
+                }
+            }
+            else
+            {
+                var ex = error.InnerException;
+                while(ex != null)
+                {
+                    var err = retVal.GetERR(retVal.ERRRepetitionsUsed);
+                    err.HL7ErrorCode.Identifier.Value = this.MapErrCode(ex);
+                    err.Severity.Value = "E";
+                    err.GetErrorCodeAndLocation(err.ErrorCodeAndLocationRepetitionsUsed).CodeIdentifyingError.Text.Value = ex.Message;
+                    ex = ex.InnerException;
                 }
             }
 

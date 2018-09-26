@@ -336,7 +336,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         // If the provenance application does not have authority to assign then all the identifiers must already exist!
                         if (provenance.ApplicationKey != auth.AssigningApplicationKey)
                         {
-                            if(!data.Identifiers.Where(id => id.AuthorityKey == auth.Key).All(id => context.Any<EntityIdentifier>(o => o.AuthorityKey == auth.Key && o.Value == id.Value && o.SourceEntityKey != data.Key)))
+                            if(!data.Identifiers.Where(id => id.AuthorityKey == auth.Key).All(id => context.Any<DbEntityIdentifier>(o => o.AuthorityKey == auth.Key && o.Value == id.Value && o.SourceKey != data.Key)))
                                 throw new SecurityException($"Application {provenance.ApplicationKey} does not have permission to assign {auth.DomainName}");
                         }
                     }

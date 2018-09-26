@@ -20,6 +20,7 @@ using MARC.HI.EHRS.SVC.Core.Services.Policy;
 using SanteDB.Core.Model.Security;
 using MARC.HI.EHRS.SVC.Core.Services.Security;
 using SanteDB.Core.Applets.ViewModel.Json;
+using SanteDB.Core.Model.Collection;
 
 namespace SanteDB.Persistence.MDM.Test
 {
@@ -556,6 +557,58 @@ namespace SanteDB.Persistence.MDM.Test
             Assert.AreEqual(2, masters.First().Identifiers.Count);
             Assert.IsTrue(masters.First().Identifiers.Any(o => o.Value == "TC-9B")); // Shoudl not contain the HIV identifier
             Assert.AreEqual(1, masters.First().Policies.Count);
+
+        }
+
+        /// <summary>
+        /// Test - When submitting patients in a bundle each of the individual MDM rules should run
+        /// </summary>
+        [TestMethod]
+        public void TestShouldProcessBundle()
+        {
+            var patientUnderTest = new Patient()
+            {
+                DateOfBirth = DateTime.Parse("1983-02-20"),
+                Names = new List<EntityName>()
+                {
+                    new EntityName(NameUseKeys.Legal, "Smith", "Testy")
+                },
+                Identifiers = new List<EntityIdentifier>()
+                {
+                    new EntityIdentifier(new AssigningAuthority("TEST", "TEST", "1.2.3.4.5"), "TC-10")
+                },
+                GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
+            };
+
+            try
+            {
+                ApplicationContext.Current.GetService<IDataPersistenceService<Bundle>>().Insert(new Bundle()
+                {
+                    Item = { patientUnderTest }
+                }, AuthenticationContext.SystemPrincipal, TransactionMode.Commit);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.ToString());
+                Assert.Fail(e.Message);
+            }
+            // The creation / matching of a master record may take some time, so we need to wait for the matcher to finish
+            //Thread.Sleep(1000);
+
+            // Now attempt to query for the record just created, it should be a synthetic MASTER record
+            var masterPatient = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "TC-10"), AuthenticationContext.SystemPrincipal);
+            Assert.AreEqual(1, masterPatient.Count());
+            Assert.AreEqual("TC-10", masterPatient.First().Identifiers.First().Value);
+            Assert.AreEqual("M", masterPatient.First().Tags.First().Value);
+            Assert.AreEqual("mdm.type", masterPatient.First().Tags.First().TagKey);
+            Assert.AreEqual(patientUnderTest.Key, masterPatient.First().Relationships.First().SourceEntityKey); // Ensure master is pointed properly
+
+            // Should redirect a retrieve request
+            var masterGet = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>().Get<Guid>(new MARC.HI.EHRS.SVC.Core.Data.Identifier<Guid>(masterPatient.First().Key.Value), AuthenticationContext.SystemPrincipal, true);
+            Assert.AreEqual(masterPatient.First().Key, masterGet.Key);
+            Assert.AreEqual("TC-10", masterGet.Identifiers.First().Value);
+            Assert.AreEqual("M", masterGet.Tags.First().Value);
+            Assert.AreEqual("mdm.type", masterGet.Tags.First().TagKey);
 
         }
     }

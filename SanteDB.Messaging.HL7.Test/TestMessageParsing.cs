@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Linq;
 using MARC.HI.EHRS.SVC.Core;
+using MARC.HI.EHRS.SVC.Core.Services;
 using MARC.HI.EHRS.SVC.Messaging.HAPI.TransportProtocol;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NHapi.Model.V25.Segment;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
@@ -50,6 +55,24 @@ namespace SanteDB.Messaging.HL7.Test
                 AssigningApplicationKey = app.Key
             });
 
+            // Add another application for security checks
+            dev = new SecurityDevice()
+            {
+                DeviceSecret = "DEVICESECRET2",
+                Name = "TEST_HARNESS2|TEST"
+            };
+            dev.AddPolicy(PermissionPolicyIdentifiers.LoginAsService);
+            dev = securityService.CreateDevice(dev);
+
+            app = new SecurityApplication()
+            {
+                Name = "TEST_HARNESS2",
+                ApplicationSecret = "APPLICATIONSECRET2"
+            };
+            app.AddPolicy(PermissionPolicyIdentifiers.LoginAsService);
+            app.AddPolicy(PermissionPolicyIdentifiers.UnrestrictedClinicalData);
+            app.AddPolicy(PermissionPolicyIdentifiers.ReadMetadata);
+            app = securityService.CreateApplication(app);
         }
 
         /// <summary>
@@ -62,6 +85,15 @@ namespace SanteDB.Messaging.HL7.Test
             var msg = TestUtil.GetMessage("ADT_SIMPLE");
             var message = new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
             var messageStr = TestUtil.ToString(message);
+            Assert.AreEqual("CA", (message.GetStructure("MSA") as MSA).AcknowledgmentCode.Value);
+
+            // Ensure that the patient actually was persisted
+            var patient = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "TC-1"), AuthenticationContext.SystemPrincipal).SingleOrDefault();
+            Assert.IsNotNull(patient);
+            Assert.IsTrue(messageStr.Contains(patient.Key.ToString()));
+            Assert.AreEqual(1, patient.Names.Count);
+            Assert.AreEqual("JOHNSTON", patient.Names.First().Component.First(o => o.ComponentTypeKey == NameComponentKeys.Family).Value);
+            Assert.AreEqual("ROBERT", patient.Names.First().Component.First(o => o.ComponentTypeKey == NameComponentKeys.Given).Value);
         }
 
         /// <summary>
@@ -74,7 +106,22 @@ namespace SanteDB.Messaging.HL7.Test
             var msg = TestUtil.GetMessage("ADT_PD1");
             var message = new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
             var messageStr = TestUtil.ToString(message);
+            Assert.AreEqual("CA", (message.GetStructure("MSA") as MSA).AcknowledgmentCode.Value);
 
+            // Ensure that the patient actually was persisted
+            var patient = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "TC-2"), AuthenticationContext.SystemPrincipal).SingleOrDefault();
+            Assert.IsNotNull(patient);
+            Assert.IsTrue(messageStr.Contains(patient.Key.ToString()));
+            Assert.AreEqual(1, patient.Names.Count);
+            Assert.AreEqual("JOHNSTON", patient.Names.First().Component.First(o => o.ComponentTypeKey == NameComponentKeys.Family).Value);
+            Assert.AreEqual("ROBERT", patient.Names.First().Component.First(o => o.ComponentTypeKey == NameComponentKeys.Given).Value);
+            Assert.AreEqual(1, patient.Relationships.Count(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Birthplace));
+            Assert.AreEqual(1, patient.Relationships.Count(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Father));
+            Assert.AreEqual(1, patient.Relationships.Count(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother));
+            Assert.AreEqual(2, patient.Relationships.Count(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Citizen));
+            Assert.AreEqual(1, patient.Policies.Count);
         }
+
+
     }
 }

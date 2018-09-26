@@ -35,7 +35,7 @@ namespace SanteDB.Messaging.HL7.Messages
                 case "A04": // Register
                     return this.PerformAdmit(e, parsed); // parsed.Item.OfType<Patient>().SingleOrDefault(o=>o.Tags.Any(t=>t.TagKey == ".v2.segment" && t.Value == "PID")));
                 case "A08": // Update
-                    return this.PerformUpdate(e, parsed.Item.OfType<Patient>().SingleOrDefault(o => o.Tags.Any(t => t.TagKey == ".v2.segment" && t.Value == "PID")));
+                    return this.PerformUpdate(e, parsed);
                 case "A40": // Merge
                     return this.PerformMerge(e, parsed);
                 default:
@@ -59,18 +59,26 @@ namespace SanteDB.Messaging.HL7.Messages
             insertBundle = repoService.Insert(insertBundle);
 
             // Create response message
-            return this.CreateACK(e.Message, "AA", $"{patient.Key} created");
+            return this.CreateACK(e.Message, "CA", $"{patient.Key} created");
         }
 
         /// <summary>
         /// Perform an update of the specified patient
         /// </summary>
-        protected virtual IMessage PerformUpdate(Hl7MessageReceivedEventArgs e, Patient p)
+        protected virtual IMessage PerformUpdate(Hl7MessageReceivedEventArgs e, Bundle updateBundle)
         {
-            if (p == null)
-                throw new ArgumentNullException(nameof(p), "Message did not contain a patient");
+            var patient = updateBundle.Item.OfType<Patient>().FirstOrDefault(it => it.Tags.Any(t => t.TagKey == ".v2.segment" && t.Value == "PID"));
+            if (patient == null)
+                throw new ArgumentNullException(nameof(updateBundle), "Message did not contain a patient");
 
-            return null;
+            var repoService = ApplicationContext.Current.GetService<IBatchRepositoryService>();
+            if (repoService == null)
+                throw new InvalidOperationException("Cannot find repository for Patient");
+
+            updateBundle = repoService.Update(updateBundle);
+
+            // Create response message
+            return this.CreateACK(e.Message, "CA", $"{patient.Key} updated");
 
         }
 

@@ -4279,6 +4279,19 @@ SELECT char_to_uuid('d1578637-e1cb-415e-b319-4011da033813'), cd_id, cd_id, 'err_
 -- RULE 17: ORGS ARE TERRITORIAL AUTHORITIES OF PLACES
 INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('C6B92576-1D62-4896-8799-6F931F8AB607'), char_to_uuid('7C08BD55-4D42-49CD-92F8-6388D6C4183F'), char_to_uuid('21AB7873-8EF3-4D78-9C19-4582B3C40631'), 'err_stateDedicatedSDL');
 
+-- RULE BIRTHPLACE CAN BE BETWEEN A PLACE OR ORGANIZATION AND PATIENT OR PERSON
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('F3EF7E48-D8B7-4030-B431-AFF7E0E1CB76'), char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'), char_to_uuid('21ab7873-8ef3-4d78-9c19-4582b3c40631'), 'Birthplace Person>Place');
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('F3EF7E48-D8B7-4030-B431-AFF7E0E1CB76'), char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'), char_to_uuid('7c08bd55-4d42-49cd-92f8-6388d6c4183f'), 'Birthplace Person>Organization');
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('F3EF7E48-D8B7-4030-B431-AFF7E0E1CB76'), char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'), char_to_uuid('21ab7873-8ef3-4d78-9c19-4582b3c40631'), 'Birthplace Patient>Place');
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('F3EF7E48-D8B7-4030-B431-AFF7E0E1CB76'), char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'), char_to_uuid('7c08bd55-4d42-49cd-92f8-6388d6c4183f'), 'Birthplace Patient>Organization');
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('F3EF7E48-D8B7-4030-B431-AFF7E0E1CB76'), char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'), char_to_uuid('ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c'), 'Birthplace Person>SDL');
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('F3EF7E48-D8B7-4030-B431-AFF7E0E1CB76'), char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'), char_to_uuid('ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c'), 'Birthplace Person>SDL');
+
+-- RULE CITIZENSHIP
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('35B13152-E43C-4BCB-8649-A9E83BEE33A2'), char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'), char_to_uuid('48b2ffb3-07db-47ba-ad73-fc8fb8502471'), 'Citizenship Person>COUNTRY');
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('35B13152-E43C-4BCB-8649-A9E83BEE33A2'), char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'), char_to_uuid('48b2ffb3-07db-47ba-ad73-fc8fb8502471'), 'Citizenship Patient>COUNTRY');
+
+
 UPDATE ENT_REL_VRFY_CDTBL 
 	SET err_desc = (
 		SELECT SRC.MNEMONIC || ' ==[' || TYP.MNEMONIC || ']==> ' || TRG.MNEMONIC 
