@@ -1,4 +1,6 @@
-﻿using SanteDB.Core.Model.Query;
+﻿using SanteDB.Core.Model;
+
+using SanteDB.Core.Model.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -121,10 +123,15 @@ namespace SanteDB.Messaging.HDSI.Test
         /// </summary>
         public BinaryExpression Compose(Expression scope, ExpressionType comparison, Expression valueExpression, Expression[] parms)
         {
+            Expression parmExpr = parms[0];
+            if (parmExpr.Type.StripNullable() != typeof(DateTime) &&
+                parmExpr is ConstantExpression)
+                parmExpr = Expression.Constant(DateTime.Parse((parmExpr as ConstantExpression).Value.ToString()));
+
             return Expression.MakeBinary(comparison,
                 Expression.Call(this.ExtensionMethod, new Expression[] {
                     scope,
-                    parms[0]
+                    parmExpr
                 }), valueExpression);
 
         }

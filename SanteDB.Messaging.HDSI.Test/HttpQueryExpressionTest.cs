@@ -49,7 +49,13 @@ namespace SanteDB.Messaging.HDSI.Test
             String queryString = String.Empty;
             foreach (var kv in query)
             {
-                queryString += String.Format("{0}={1}", kv.Key, Uri.EscapeDataString(kv.Value.ToString()));
+                List<String> val = kv.Value is List<Object> ? (kv.Value as List<Object>).OfType<String>().ToList() : new List<String>() { kv.Value.ToString() };
+                foreach (var itm in val)
+                {
+                    queryString += String.Format("{0}={1}", kv.Key, Uri.EscapeDataString(itm));
+                    if (!itm.Equals(val.Last()))
+                        queryString += "&";
+                }
                 if (!kv.Equals(query.Last()))
                     queryString += "&";
             }
