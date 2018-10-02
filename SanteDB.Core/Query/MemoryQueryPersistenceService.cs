@@ -261,5 +261,23 @@ namespace SanteDB.Core.Query
                 this.m_tracer.TraceError(ex.ToString());
             }
         }
+
+        /// <summary>
+        /// Find the query ID by the tagged value of that query
+        /// </summary>
+        public Guid FindQueryId(object queryTag)
+        {
+            return this.m_queryCache.FirstOrDefault(o => o.Value.QueryTag.Equals(queryTag)).Key;
+        }
+
+        /// <summary>
+        /// Set the query tag
+        /// </summary>
+        public void SetQueryTag(Guid queryId, object tagValue)
+        {
+            MemoryQueryInfo queryInfo = null;
+            if (this.m_queryCache.TryGetValue(queryId, out queryInfo))
+                queryInfo.QueryTag = tagValue;
+        }
     }
 }

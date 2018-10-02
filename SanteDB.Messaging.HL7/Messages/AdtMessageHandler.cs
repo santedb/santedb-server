@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Messaging.HAPI.TransportProtocol;
 using NHapi.Base.Model;
+using NHapi.Model.V25.Message;
 using NHapi.Model.V25.Segment;
 using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.Interfaces;
@@ -59,7 +60,7 @@ namespace SanteDB.Messaging.HL7.Messages
             insertBundle = repoService.Insert(insertBundle);
 
             // Create response message
-            return this.CreateACK(e.Message, "CA", $"{patient.Key} created");
+            return this.CreateACK(typeof(ACK), e.Message, "CA", $"{patient.Key} created");
         }
 
         /// <summary>
@@ -78,7 +79,7 @@ namespace SanteDB.Messaging.HL7.Messages
             updateBundle = repoService.Update(updateBundle);
 
             // Create response message
-            return this.CreateACK(e.Message, "CA", $"{patient.Key} updated");
+            return this.CreateACK(typeof(ACK), e.Message, "CA", $"{patient.Key} updated");
 
         }
 

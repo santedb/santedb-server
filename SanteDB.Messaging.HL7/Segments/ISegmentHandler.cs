@@ -32,7 +32,7 @@ namespace SanteDB.Messaging.HL7.Segments
         /// <param name="data">The data to be translated into segment(s)</param>
         /// <param name="context">The message in which the segment is created</param>
         /// <returns>The necessary segments to be added to the message</returns>
-        IEnumerable<ISegment> Create(IdentifiedData data, IMessage context);
+        IEnumerable<ISegment> Create(IdentifiedData data, IGroup context);
 
     }
 }

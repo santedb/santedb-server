@@ -25,7 +25,7 @@ namespace SanteDB.Messaging.HL7.Segments
         /// </summary>
         public string Name => "EVN";
 
-        public IEnumerable<ISegment> Create(IdentifiedData data, IMessage context)
+        public IEnumerable<ISegment> Create(IdentifiedData data, IGroup context)
         {
             throw new NotImplementedException();
         }

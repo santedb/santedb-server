@@ -2,12 +2,14 @@
 using MARC.HI.EHRS.SVC.Core.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,6 +47,19 @@ namespace SanteDB.Persistence.MDM.Test
         {
             Assert.AreEqual("default", configurationName);
             return this.Classify(input, this.Block(input, configurationName), configurationName);
+        }
+
+        /// <summary>
+        /// Perform a score
+        /// </summary>
+        public IRecordMatchResult<T> Score<T>(T input, Expression<Func<T, bool>> query, string configurationName) where T : IdentifiedData
+        {
+            if (input.GetType() == typeof(Patient))
+            {
+                Patient p = (Patient)((Object)input);
+                return new DummyMatchResult<T>(input, input);
+            }
+            else return null;
         }
     }
 

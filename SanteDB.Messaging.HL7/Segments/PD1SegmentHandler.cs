@@ -32,9 +32,14 @@ namespace SanteDB.Messaging.HL7.Segments
         /// </summary>
         public string Name => "PD1";
 
-        public IEnumerable<ISegment> Create(IdentifiedData data, IMessage context)
+        /// <summary>
+        /// Create PD1
+        /// </summary>
+        public IEnumerable<ISegment> Create(IdentifiedData data, IGroup context)
         {
-            throw new NotImplementedException();
+            var retVal = context.GetStructure("PD1") as PD1;
+
+            return new ISegment[] { retVal };
         }
 
         /// <summary>

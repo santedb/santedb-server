@@ -47,12 +47,17 @@
     <Compile Include="MessageExtensions.cs" />
     <Compile Include="Messages\AdtMessageHandler.cs" />
     <Compile Include="Messages\MessageHandlerBase.cs" />
+    <Compile Include="Messages\QbpMessageHandler.cs" />
+    <Compile Include="ParameterMap\Hl7QueryParameterMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Query\FindCandidatesQueryResultHandler.cs" />
+    <Compile Include="Query\IQueryResultHandler.cs" />
     <Compile Include="Segments\EVNSegmentHandler.cs" />
     <Compile Include="Segments\ISegmentHandler.cs" />
     <Compile Include="Segments\NK1SegmentHandler.cs" />
     <Compile Include="Segments\PD1SegmentHandler.cs" />
     <Compile Include="Segments\PIDSegmentHandler.cs" />
+    <Compile Include="Segments\SegmentHandlers.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MARC.HI.EHRS.SVC.Messaging.HAPI">

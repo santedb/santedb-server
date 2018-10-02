@@ -8,6 +8,7 @@ using MARC.HI.EHRS.SVC.Core.Data;
 using MARC.HI.EHRS.SVC.Core.Services;
 using MARC.HI.EHRS.SVC.Core.Services.Policy;
 using NHapi.Base.Model;
+using NHapi.Base.Parser;
 using NHapi.Model.V25.Segment;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
@@ -44,9 +45,11 @@ namespace SanteDB.Messaging.HL7.Segments
         /// <param name="data">The data to be created</param>
         /// <param name="context">The message in which the segment is created</param>
         /// <returns>The segments to add to the messge</returns>
-        public IEnumerable<ISegment> Create(IdentifiedData data, IMessage context)
+        public IEnumerable<ISegment> Create(IdentifiedData data, IGroup context)
         {
-            throw new NotImplementedException();
+            var retVal = context.GetStructure("PID") as PID;
+
+            return new ISegment[] { retVal };
         }
 
         /// <summary>

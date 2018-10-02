@@ -20,6 +20,7 @@ using SanteDB.Messaging.HL7.Segments;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -41,8 +42,6 @@ namespace SanteDB.Messaging.HL7.Messages
         // Configuration
         private HL7ConfigurationSection m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("marc.hi.ehrs.svc.messaging.hapi") as HL7ConfigurationSection;
 
-        // Segment handlers
-        private static Dictionary<String, ISegmentHandler> s_segmentHandlers = new Dictionary<string, ISegmentHandler>();
 
         // Entry ASM hash
         private static String s_entryAsmHash = null;
@@ -50,17 +49,7 @@ namespace SanteDB.Messaging.HL7.Messages
         // Installation date
         private static DateTime? s_installDate = null;
 
-        /// <summary>
-        /// Scan types for message handler
-        /// </summary>
-        static MessageHandlerBase()
-        {
-            foreach (var t in AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic).SelectMany(a => a.ExportedTypes.Where(t => typeof(ISegmentHandler).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface)))
-            {
-                var instance = Activator.CreateInstance(t) as ISegmentHandler;
-                s_segmentHandlers.Add(instance.Name, instance);
-            }
-        }
+        protected TraceSource m_traceSource = new TraceSource("SanteDB.Messaging.HL7");
 
         /// <summary>
         /// Allows overridden classes to implement the message handling logic
@@ -75,16 +64,6 @@ namespace SanteDB.Messaging.HL7.Messages
         /// <param name="message">The message to be validated</param>
         /// <returns>True if the message is valid</returns>
         protected abstract bool Validate(IMessage message);
-
-        /// <summary>
-        /// Gets the segment handler for the specified segment
-        /// </summary>
-        protected ISegmentHandler GetSegmentHandler(string name)
-        {
-            ISegmentHandler handler = null;
-            s_segmentHandlers.TryGetValue(name, out handler);
-            return handler;
-        }
 
         /// <summary>
         /// Parses the specified message components
@@ -118,7 +97,7 @@ namespace SanteDB.Messaging.HL7.Messages
                         // Empty, don't parse
                         if (PipeParser.Encode(current as AbstractSegment, new EncodingCharacters('|', "^~\\&")).Length == 3)
                             continue;
-                        var handler = this.GetSegmentHandler(current.GetStructureName());
+                        var handler = SegmentHandlers.GetSegmentHandler(current.GetStructureName());
                         if (handler != null)
                         {
                             var parsed = handler.Parse(current as AbstractSegment, retVal.Item);
@@ -170,7 +149,7 @@ namespace SanteDB.Messaging.HL7.Messages
             }
             catch (Exception ex)
             {
-                return this.CreateNACK(e.Message, ex, e);
+                return this.CreateNACK(typeof(ACK), e.Message, ex, e);
             }
         }
 
@@ -279,52 +258,54 @@ namespace SanteDB.Messaging.HL7.Messages
         /// <param name="request">The request message</param>
         /// <param name="error">The exception that occurred</param>
         /// <returns>NACK message</returns>
-        protected IMessage CreateNACK(IMessage request, Exception error, Hl7MessageReceivedEventArgs receiveData)
+        protected IMessage CreateNACK(Type nackType, IMessage request, Exception error, Hl7MessageReceivedEventArgs receiveData)
         {
             // Extract TIE into real cause
             while (error is TargetInvocationException)
                 error = error.InnerException;
 
-            ACK retVal = null;
+            IMessage retVal = null;
             if (error is DomainStateException)
-                retVal = this.CreateACK(request, "AR", "Domain Error");
+                retVal = this.CreateACK(nackType, request, "AR", "Domain Error");
             else if (error is PolicyViolationException || error is SecurityException)
             {
-                retVal = this.CreateACK(request, "AR", "Security Error");
+                retVal = this.CreateACK(nackType, request, "AR", "Security Error");
                 AuditUtil.AuditRestrictedFunction(error, receiveData.ReceiveEndpoint);
             }
             else if (error is UnauthorizedRequestException || error is UnauthorizedAccessException)
             {
-                retVal = this.CreateACK(request, "AR", "Unauthorized");
+                retVal = this.CreateACK(nackType, request, "AR", "Unauthorized");
                 AuditUtil.AuditRestrictedFunction(error as UnauthorizedRequestException, receiveData.ReceiveEndpoint);
             }
             else if (error is Newtonsoft.Json.JsonException ||
                 error is System.Xml.XmlException)
-                retVal = this.CreateACK(request, "AR", "Messaging Error");
+                retVal = this.CreateACK(nackType, request, "AR", "Messaging Error");
             else if (error is DuplicateNameException)
-                retVal = this.CreateACK(request, "CR", "Duplicate Data");
+                retVal = this.CreateACK(nackType, request, "CR", "Duplicate Data");
             else if (error is FileNotFoundException || error is KeyNotFoundException)
-                retVal = this.CreateACK(request, "CE", "Data not found");
+                retVal = this.CreateACK(nackType, request, "CE", "Data not found");
             else if (error is DetectedIssueException)
-                retVal = this.CreateACK(request, "CR", "Business Rule Violation");
+                retVal = this.CreateACK(nackType, request, "CR", "Business Rule Violation");
             else if (error is DataPersistenceException)
-                retVal = this.CreateACK(request, "CE", "Error committing data");
+                retVal = this.CreateACK(nackType, request, "CE", "Error committing data");
             else if (error is NotImplementedException)
-                retVal = this.CreateACK(request, "AE", "Not Implemented");
+                retVal = this.CreateACK(nackType, request, "AE", "Not Implemented");
             else if (error is NotSupportedException)
-                retVal = this.CreateACK(request, "AR", "Not Supported");
+                retVal = this.CreateACK(nackType, request, "AR", "Not Supported");
             else
-                retVal = this.CreateACK(request, "AE", "General Error");
+                retVal = this.CreateACK(nackType, request, "AE", "General Error");
 
-            retVal.MSA.ErrorCondition.Identifier.Value = this.MapErrCode(error);
-            retVal.MSA.ErrorCondition.Text.Value = error.Message;
+            var msa = retVal.GetStructure("MSA") as MSA;
+            msa.ErrorCondition.Identifier.Value = this.MapErrCode(error);
+            msa.ErrorCondition.Text.Value = error.Message;
 
+            int erc = 0;
             // Detected issue exception
             if (error is DetectedIssueException)
             {
                 foreach (var itm in (error as DetectedIssueException).Issues)
                 {
-                    var err = retVal.GetERR(retVal.ERRRepetitionsUsed);
+                    var err = retVal.GetStructure("ERR", erc++) as ERR;
                     err.HL7ErrorCode.Identifier.Value = "207";
                     err.Severity.Value = itm.Priority == Core.Services.DetectedIssuePriorityType.Error ? "E" : itm.Priority == Core.Services.DetectedIssuePriorityType.Warning ? "W" : "I";
                     err.GetErrorCodeAndLocation(err.ErrorCodeAndLocationRepetitionsUsed).CodeIdentifyingError.Text.Value = itm.Text;
@@ -335,7 +316,7 @@ namespace SanteDB.Messaging.HL7.Messages
                 var ex = error.InnerException;
                 while(ex != null)
                 {
-                    var err = retVal.GetERR(retVal.ERRRepetitionsUsed);
+                    var err = retVal.GetStructure("ERR", erc++) as ERR;
                     err.HL7ErrorCode.Identifier.Value = this.MapErrCode(ex);
                     err.Severity.Value = "E";
                     err.GetErrorCodeAndLocation(err.ErrorCodeAndLocationRepetitionsUsed).CodeIdentifyingError.Text.Value = ex.Message;
@@ -353,14 +334,15 @@ namespace SanteDB.Messaging.HL7.Messages
         /// <param name="ackCode">The acknowledgemode code</param>
         /// <param name="ackMessage">The message to append to the ACK</param>
         /// <returns></returns>
-        protected ACK CreateACK(IMessage request, String ackCode, String ackMessage)
+        protected IMessage CreateACK(Type ackType, IMessage request, String ackCode, String ackMessage)
         {
-            var retVal = new ACK();
-            this.UpdateMSH(retVal.MSH, request.GetStructure("MSH") as MSH);
-            this.UpdateSFT(retVal.GetSFT());
-            retVal.MSA.MessageControlID.Value = (request.GetStructure("MSH") as MSH).MessageControlID.Value;
-            retVal.MSA.AcknowledgmentCode.Value = ackCode;
-            retVal.MSA.TextMessage.Value = ackMessage;
+            var retVal = Activator.CreateInstance(ackType) as IMessage;
+            this.UpdateMSH(retVal.GetStructure("MSH") as MSH, request.GetStructure("MSH") as MSH);
+            this.UpdateSFT(retVal.GetStructure("SFT") as SFT);
+            var msa = retVal.GetStructure("MSA") as MSA;
+            msa.MessageControlID.Value = (request.GetStructure("MSH") as MSH).MessageControlID.Value;
+            msa.AcknowledgmentCode.Value = ackCode;
+            msa.TextMessage.Value = ackMessage;
             return retVal;
         }
 

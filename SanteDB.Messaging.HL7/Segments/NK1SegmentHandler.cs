@@ -28,14 +28,44 @@ namespace SanteDB.Messaging.HL7.Segments
         // Next of kin relationship code system
         private const string RelationshipCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.63";
 
+        // Next of kin relationship types
+        private Guid[] NextOfKinRelationshipTypes;
+
+        /// <summary>
+        /// NK1 segment handler ctor
+        /// </summary>
+        public NK1SegmentHandler()
+        {
+            ApplicationContext.Current.Started += (o, e) =>
+            {
+                this.NextOfKinRelationshipTypes = ApplicationContext.Current.GetService<IDataPersistenceService<Concept>>().Query(
+                    c => c.ConceptSets.Any(s => s.Mnemonic == "FamilyMember"),
+                    AuthenticationContext.SystemPrincipal
+                ).Select(c => c.Key.Value).ToArray();
+            };
+        }
+
         /// <summary>
         /// Gets or sets the name of the segment
         /// </summary>
         public string Name => "NK1";
 
-        public IEnumerable<ISegment> Create(IdentifiedData data, IMessage context)
+        /// <summary>
+        /// Create next of kin relationship
+        /// </summary>
+        public IEnumerable<ISegment> Create(IdentifiedData data, IGroup context)
         {
-            throw new NotImplementedException();
+            List<ISegment> retVal = new List<ISegment>();
+            var patient = data as Patient;
+
+            foreach(var itm in patient.Relationships.Where(o=>NextOfKinRelationshipTypes.Contains(o.RelationshipTypeKey.Value)))
+            {
+                var nk1 = context.GetStructure("NK1", context.GetAll("NK1").Length) as NK1;
+
+                retVal.Add(nk1);
+            }
+
+            return retVal.ToArray();
         }
 
         /// <summary>
