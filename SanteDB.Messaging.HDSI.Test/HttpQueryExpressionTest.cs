@@ -282,6 +282,19 @@ namespace SanteDB.Messaging.HDSI.Test
             Assert.AreEqual("dateOfBirth=%3A%28testEx%7C1980-01-01T00%3A00%3A00.0000000%29%3C1.00%3A00%3A00", expression);
         }
 
+        /// <summary>
+        /// Test that an HTTP query has extended filter
+        /// </summary>
+        [TestMethod]
+        public void TestWriteSelfParameterRef()
+        {
+            QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());
+            DateTime other = DateTime.Parse("1980-01-01");
+            TimeSpan myTime = new TimeSpan(1, 0, 0, 0);
+            var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.DateOfBirth.Value.TestExpressionEx(o.CreationTime.DateTime) < myTime);
+            var expression = CreateQueryString(query.ToArray());
+            Assert.AreEqual("dateOfBirth=%3A%28testEx%7C%24_.creationTime%29%3C1.00%3A00%3A00", expression);
+        }
 
     }
 }
