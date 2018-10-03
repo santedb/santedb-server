@@ -29,20 +29,25 @@ namespace SanteDB.Messaging.HL7.Segments
         private const string RelationshipCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.63";
 
         // Next of kin relationship types
-        private Guid[] NextOfKinRelationshipTypes;
+        private Guid[] m_nextOfKinRelationshipTypes;
 
+        private Guid[] NextOfKinRelationshipTypes
+        {
+            get
+            {
+                if (this.m_nextOfKinRelationshipTypes == null)
+                    this.m_nextOfKinRelationshipTypes = ApplicationContext.Current.GetService<IDataPersistenceService<Concept>>().Query(
+                        c => c.ConceptSets.Any(s => s.Mnemonic == "FamilyMember"),
+                        AuthenticationContext.SystemPrincipal
+                    ).Select(c => c.Key.Value).ToArray();
+                return this.m_nextOfKinRelationshipTypes;
+            }
+        }
         /// <summary>
         /// NK1 segment handler ctor
         /// </summary>
         public NK1SegmentHandler()
         {
-            ApplicationContext.Current.Started += (o, e) =>
-            {
-                this.NextOfKinRelationshipTypes = ApplicationContext.Current.GetService<IDataPersistenceService<Concept>>().Query(
-                    c => c.ConceptSets.Any(s => s.Mnemonic == "FamilyMember"),
-                    AuthenticationContext.SystemPrincipal
-                ).Select(c => c.Key.Value).ToArray();
-            };
         }
 
         /// <summary>
@@ -58,7 +63,7 @@ namespace SanteDB.Messaging.HL7.Segments
             List<ISegment> retVal = new List<ISegment>();
             var patient = data as Patient;
 
-            foreach(var itm in patient.Relationships.Where(o=>NextOfKinRelationshipTypes.Contains(o.RelationshipTypeKey.Value)))
+            foreach (var itm in patient.Relationships.Where(o => NextOfKinRelationshipTypes.Contains(o.RelationshipTypeKey.Value)))
             {
                 var nk1 = context.GetStructure("NK1", context.GetAll("NK1").Length) as NK1;
 
@@ -120,7 +125,7 @@ namespace SanteDB.Messaging.HL7.Segments
             {
                 // Get the existing mother relationship
                 var existingMotherRel = patient.Relationships.FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother);
-                if(existingMotherRel != null)
+                if (existingMotherRel != null)
                 {
                     retValRelation = existingMotherRel;
                     retVal = context.FirstOrDefault(o => o.Key == existingMotherRel.TargetEntityKey) as Person;
@@ -207,7 +212,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 retVal.Identifiers = nk1Segment.GetNextOfKinAssociatedPartySIdentifiers().ToModel().ToList();
 
             // Find the existing relationship on the patient
-            
+
             patient.Relationships.RemoveAll(o => o.SourceEntityKey == retValRelation.SourceEntityKey && o.TargetEntityKey == retValRelation.TargetEntityKey);
             patient.Relationships.Add(retValRelation);
 

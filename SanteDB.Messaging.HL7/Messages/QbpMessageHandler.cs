@@ -30,7 +30,7 @@ namespace SanteDB.Messaging.HL7.Messages
     /// <summary>
     /// Query by parameter messge handler
     /// </summary>
-    public abstract class QbpMessageHandler : MessageHandlerBase
+    public class QbpMessageHandler : MessageHandlerBase
     {
 
         // Loaded query parameter map
@@ -42,11 +42,15 @@ namespace SanteDB.Messaging.HL7.Messages
         static QbpMessageHandler()
         {
             OpenMapping(typeof(QbpMessageHandler).Assembly.GetManifestResourceStream("SanteDB.Messaging.HL7.ParameterMap.xml"));
-            var externMap = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "ParameterMap.Hl7.xml");
 
-            if (File.Exists(externMap))
-                using (var s = File.OpenRead(externMap))
-                    OpenMapping(s);
+            if (!String.IsNullOrEmpty(Assembly.GetEntryAssembly()?.Location))
+            {
+                var externMap = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "ParameterMap.Hl7.xml");
+
+                if (File.Exists(externMap))
+                    using (var s = File.OpenRead(externMap))
+                        OpenMapping(s);
+            }
         }
 
         /// <summary>
@@ -76,13 +80,11 @@ namespace SanteDB.Messaging.HL7.Messages
             var msh = e.Message.GetStructure("MSH") as MSH;
             var trigger = msh.MessageType.TriggerEvent.Value;
             var map = s_map.Map.First(o => o.Trigger == trigger);
-            var responseName = e.Message.GetType().Name.Replace("QBP", "RSP");
-            var responseType = Type.GetType($"NHapi.Model.V25.Message.{responseName}, NHapi.Model.V25, Version=2.3.0.0");
-
+            
             try
             {
-                if (responseType == null)
-                    throw new NotSupportedException($"Response type {responseName} not found");
+                if (map.ResponseType == null)
+                    throw new NotSupportedException($"Response type not found");
 
                 // First, process the query parameters
                 var qpd = e.Message.GetStructure("QPD") as QPD;
@@ -104,7 +106,7 @@ namespace SanteDB.Messaging.HL7.Messages
                 }
 
                 // Get the query tag which is the current offset
-                if (ApplicationContext.Current.GetService<Core.Services.IQueryPersistenceService>().IsRegistered(queryId))
+                if (ApplicationContext.Current.GetService<Core.Services.IQueryPersistenceService>()?.IsRegistered(queryId) == true)
                 {
                     var tag = ApplicationContext.Current.GetService<Core.Services.IQueryPersistenceService>().GetQueryTag(queryId);
                     if (tag is int)
@@ -123,33 +125,39 @@ namespace SanteDB.Messaging.HL7.Messages
                 var filterQuery = queryMethod.Invoke(null, new object[] { query }) as Expression;
 
                 // Now we want to query
-                object[] parameters = { filterQuery, offset.Value, count, null, queryId };
+                object[] parameters = { filterQuery, offset.Value, (int?)count, null, queryId };
                 var findMethod = repoService.GetType().GetGenericMethod(nameof(IPersistableQueryRepositoryService.Find),
                     new Type[] { map.QueryTarget },
-                    parameters.Select(o => o?.GetType() ?? typeof(int)).ToArray()
+                    new Type[] { filterQuery.GetType(), typeof(int), typeof(int?), typeof(int), typeof(Guid) }
                 );
                 IEnumerable results = findMethod.Invoke(repoService, parameters) as IEnumerable;
                 int totalResults = (int)parameters[3];
 
                 // Save the tag
                 if (dsc.ContinuationPointer.Value != queryId.ToString())
-                    ApplicationContext.Current.GetService<Core.Services.IQueryPersistenceService>().SetQueryTag(queryId, count);
+                    ApplicationContext.Current.GetService<Core.Services.IQueryPersistenceService>()?.SetQueryTag(queryId, count);
 
                 // Query basics
-                var retVal = this.CreateACK(responseType, e.Message, "AA", "Query Success");
+                var retVal = this.CreateACK(map.ResponseType, e.Message, "AA", "Query Success");
+                var omsh = retVal.GetStructure("MSH") as MSH;
                 var qak = retVal.GetStructure("QAK") as QAK;
                 var odsc = retVal.GetStructure("DSC") as DSC;
                 var oqpd = retVal.GetStructure("QPD") as QPD;
                 DeepCopy.copy(qpd, oqpd);
+                omsh.MessageType.TriggerEvent.Value = map.ResponseTrigger;
                 qak.HitCount.Value = totalResults.ToString();
-                qak.HitsRemaining.Value = (totalResults - offset - count).ToString();
+                qak.HitsRemaining.Value = (totalResults - offset - count > 0 ? totalResults - offset - count : 0).ToString();
                 qak.QueryResponseStatus.Value = "AA";
                 qak.ThisPayload.Value = results.OfType<Object>().Count().ToString();
-                odsc.ContinuationPointer.Value = queryId.ToString();
-                odsc.ContinuationStyle.Value = "RD";
+
+                if (ApplicationContext.Current.GetService<Core.Services.IQueryPersistenceService>() != null)
+                {
+                    odsc.ContinuationPointer.Value = queryId.ToString();
+                    odsc.ContinuationStyle.Value = "RD";
+                }
 
                 // Process results
-                retVal = map.ResultHandler.AppendQueryResult(results, filterQuery, retVal, e, map.ScoreConfiguration);
+                retVal = map.ResultHandler.AppendQueryResult(results, filterQuery, retVal, e, map.ScoreConfiguration, offset.GetValueOrDefault());
                 return retVal;
             }
             catch(Exception ex)
@@ -157,7 +165,7 @@ namespace SanteDB.Messaging.HL7.Messages
                 this.m_traceSource.TraceEvent(TraceEventType.Error, ex.HResult, "Error executing query: {0}", ex);
 
                 // Now we construct the response
-                return this.CreateNACK(responseType, e.Message, ex, e);
+                return this.CreateNACK(map.ResponseType, e.Message, ex, e);
             }
         }
 

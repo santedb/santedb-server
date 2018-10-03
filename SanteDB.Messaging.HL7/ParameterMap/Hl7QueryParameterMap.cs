@@ -17,6 +17,7 @@
  * User: fyfej
  * Date: 2017-9-1
  */
+using NHapi.Model.V25.Message;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Messaging.HL7.Query;
 using System;
@@ -85,8 +86,24 @@ namespace SanteDB.Messaging.HL7.ParameterMap
         /// <summary>
         /// Response type
         /// </summary>
-        [XmlAttribute("response")]
+        [XmlAttribute("responseTrigger")]
         public String ResponseTrigger { get; set; }
+
+        /// <summary>
+        /// Gets or sets the response type
+        /// </summary>
+        [XmlIgnore]
+        public Type ResponseType { get; set; }
+
+        /// <summary>
+        /// The model type
+        /// </summary>
+        [XmlAttribute("response")]
+        public String ResponseTypeXml
+        {
+            get { return this.ResponseType.Name; }
+            set { this.ResponseType = typeof(RSP_K21).Assembly.GetType($"NHapi.Model.V25.Message.{value}"); }
+        }
 
         /// <summary>
         /// Gets or sets the source type

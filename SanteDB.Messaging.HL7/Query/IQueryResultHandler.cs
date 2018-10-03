@@ -24,7 +24,7 @@ namespace SanteDB.Messaging.HL7.Query
         /// <param name="currentResponse"></param>
         /// <param name="evt"></param>
         /// <returns></returns>
-        IMessage AppendQueryResult(IEnumerable results, Expression queryDefinition, IMessage currentResponse, Hl7MessageReceivedEventArgs evt, String scoreConfiguration = null);
+        IMessage AppendQueryResult(IEnumerable results, Expression queryDefinition, IMessage currentResponse, Hl7MessageReceivedEventArgs evt, String scoreConfiguration = null, int offset = 0);
 
     }
 }

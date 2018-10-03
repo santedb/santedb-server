@@ -13,6 +13,7 @@ using NHapi.Model.V25.Segment;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Model.Security;
@@ -48,6 +49,59 @@ namespace SanteDB.Messaging.HL7.Segments
         public IEnumerable<ISegment> Create(IdentifiedData data, IGroup context)
         {
             var retVal = context.GetStructure("PID") as PID;
+            var patient = data as Patient;
+            if (patient == null)
+                throw new InvalidOperationException($"Cannot convert {data.GetType().Name} to PID");
+
+            // Map patient to PID
+            retVal.GetPatientIdentifierList(retVal.PatientIdentifierListRepetitionsUsed).FromModel(new EntityIdentifier(ApplicationContext.Current.Configuration.Custodianship.Id.Id, patient.Key.ToString()));
+
+            // Map alternate identifiers
+            foreach (var id in patient.LoadCollection<EntityIdentifier>("Identifiers"))
+                retVal.GetPatientIdentifierList(retVal.PatientIdentifierListRepetitionsUsed).FromModel(id);
+
+            // Addresses
+            foreach (var addr in patient.LoadCollection<EntityAddress>("Addresses"))
+                retVal.GetPatientAddress(retVal.PatientAddressRepetitionsUsed).FromModel(addr);
+
+            // Names
+            foreach (var en in patient.LoadCollection<EntityName>("Names"))
+                retVal.GetPatientName(retVal.PatientNameRepetitionsUsed).FromModel(en);
+
+            // Date of birth
+            if (patient.DateOfBirth.HasValue) {
+                switch (patient.DateOfBirthPrecision ?? DatePrecision.Day) {
+                    case DatePrecision.Year:
+                        retVal.DateTimeOfBirth.Time.Set(patient.DateOfBirth.Value, "yyyy");
+                        break;
+                    case DatePrecision.Month:
+                        retVal.DateTimeOfBirth.Time.Set(patient.DateOfBirth.Value, "yyyyMM");
+                        break;
+                    case DatePrecision.Day:
+                        retVal.DateTimeOfBirth.Time.Set(patient.DateOfBirth.Value, "yyyyMMdd");
+                        break;
+                }
+            }
+
+            // Deceased date
+            if(patient.DeceasedDate.HasValue)
+            {
+                if (patient.DeceasedDate == DateTime.MinValue)
+                    retVal.PatientDeathIndicator.Value = "Y";
+                else
+                    switch (patient.DeceasedDatePrecision ?? DatePrecision.Day)
+                    {
+                        case DatePrecision.Year:
+                            retVal.PatientDeathDateAndTime.Time.Set(patient.DeceasedDate.Value, "yyyy");
+                            break;
+                        case DatePrecision.Month:
+                            retVal.PatientDeathDateAndTime.Time.Set(patient.DeceasedDate.Value, "yyyyMM");
+                            break;
+                        case DatePrecision.Day:
+                            retVal.PatientDeathDateAndTime.Time.Set(patient.DeceasedDate.Value, "yyyyMMdd");
+                            break;
+                    }
+            }
 
             return new ISegment[] { retVal };
         }

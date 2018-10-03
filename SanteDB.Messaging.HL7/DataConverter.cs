@@ -1,4 +1,5 @@
-﻿using MARC.Everest.Connectors;
+﻿using SanteDB.Core.Model;
+using MARC.Everest.Connectors;
 using MARC.HI.EHRS.SVC.Core;
 using NHapi.Base.Model;
 using NHapi.Base.Parser;
@@ -26,6 +27,7 @@ namespace SanteDB.Messaging.HL7
         private const string AddressUseCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.190";
         private const string NameUseCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.200";
         private const string TelecomUseCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.201";
+        private const string IdentifierTypeCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.203";
 
         /// <summary>
         /// Convert the message to v2.5
@@ -64,7 +66,7 @@ namespace SanteDB.Messaging.HL7
             if (addresses.Length == 0)
                 return entityAddresses.AsEnumerable();
 
-            foreach(var xad in addresses)
+            foreach (var xad in addresses)
             {
                 var entityAddress = new EntityAddress();
                 var addressUse = AddressUseKeys.TemporaryAddress;
@@ -92,13 +94,13 @@ namespace SanteDB.Messaging.HL7
                     {  nameof(XAD.OtherGeographicDesignation), AddressComponentKeys.Precinct }
                 };
 
-                foreach(var kv in mappedFields)
+                foreach (var kv in mappedFields)
                 {
                     var rawValue = typeof(XAD).GetRuntimeProperty(kv.Key).GetValue(xad);
                     if (rawValue is SAD)
                     {
                         var value = rawValue as SAD;
-                        if(!String.IsNullOrEmpty(value.StreetOrMailingAddress.Value))
+                        if (!String.IsNullOrEmpty(value.StreetOrMailingAddress.Value))
                             entityAddress.Component.Add(new EntityAddressComponent(kv.Value, value.StreetOrMailingAddress.Value));
                         if (!String.IsNullOrEmpty(value.StreetName.Value))
                             entityAddress.Component.Add(new EntityAddressComponent(AddressComponentKeys.StreetName, value.StreetName.Value));
@@ -117,6 +119,54 @@ namespace SanteDB.Messaging.HL7
 
             return entityAddresses.AsEnumerable();
         }
+
+        /// <summary>
+        /// Convert address to XAD
+        /// </summary>
+        public static XAD FromModel(this XAD me, EntityAddress addr)
+        {
+            var refTerm = ApplicationContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(addr.AddressUseKey.GetValueOrDefault(), AddressUseCodeSystem);
+            if (refTerm != null)
+                me.AddressType.Value = refTerm.Mnemonic;
+
+            var mappedFields = new Dictionary<Guid, String>()
+                {
+                    {  AddressComponentKeys.CensusTract, nameof(XAD.CensusTract) },
+                    {  AddressComponentKeys.City , nameof(XAD.City) },
+                    {  AddressComponentKeys.Country, nameof(XAD.Country)  },
+                    {  AddressComponentKeys.County, nameof(XAD.CountyParishCode) },
+                    {  AddressComponentKeys.AdditionalLocator, nameof(XAD.OtherDesignation)  },
+                    {  AddressComponentKeys.State , nameof(XAD.StateOrProvince) },
+                    {  AddressComponentKeys.StreetAddressLine , nameof(XAD.StreetAddress) },
+                    {  AddressComponentKeys.Precinct, nameof(XAD.OtherGeographicDesignation) },
+                    {  AddressComponentKeys.StreetName, nameof(XAD.StreetAddress) },
+                    {  AddressComponentKeys.UnitIdentifier, nameof(XAD.StreetAddress) }
+                };
+
+            foreach (var itm in addr.LoadCollection<EntityAddressComponent>("Component"))
+            {
+                String propertyName = null;
+                if (itm.ComponentTypeKey.HasValue && mappedFields.TryGetValue(itm.ComponentTypeKey.Value, out propertyName))
+                {
+                    var valueItem = typeof(XAD).GetRuntimeProperty(propertyName).GetValue(me);
+                    if (valueItem is SAD) // Street address {
+                    {
+                        var sadItem = valueItem as SAD;
+                        if (itm.ComponentTypeKey == AddressComponentKeys.UnitIdentifier)
+                            sadItem.DwellingNumber.Value = itm.Value;
+                        else if (itm.ComponentTypeKey == AddressComponentKeys.StreetName)
+                            sadItem.StreetName.Value = itm.Value;
+                        else if (itm.ComponentTypeKey == AddressComponentKeys.StreetAddressLine)
+                            sadItem.StreetOrMailingAddress.Value = itm.Value;
+                    }
+                    else if (valueItem is AbstractPrimitive)
+                        (valueItem as AbstractPrimitive).Value = itm.Value;
+                }
+            }
+
+            return me;
+        }
+
 
         /// <summary>
         /// Converts the specified XPN instance to an entity name
@@ -194,6 +244,39 @@ namespace SanteDB.Messaging.HL7
         }
 
         /// <summary>
+        /// Convert name to XPN
+        /// </summary>
+        public static XPN FromModel(this XPN me, EntityName name)
+        {
+            var refTerm = ApplicationContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(name.NameUseKey.GetValueOrDefault(), NameUseCodeSystem);
+            if (refTerm != null)
+                me.NameTypeCode.Value = refTerm.Mnemonic;
+
+            // Convert components
+            foreach (var itm in name.LoadCollection<EntityNameComponent>("Component"))
+                if (itm.ComponentTypeKey == NameComponentKeys.Family)
+                {
+                    if (string.IsNullOrEmpty(me.FamilyName.Surname.Value))
+                        me.FamilyName.Surname.Value = itm.Value;
+                    else if (string.IsNullOrEmpty(me.FamilyName.OwnSurname.Value))
+                        me.FamilyName.OwnSurname.Value = itm.Value;
+                }
+                else if (itm.ComponentTypeKey == NameComponentKeys.Given)
+                {
+                    if (String.IsNullOrEmpty(me.GivenName.Value))
+                        me.GivenName.Value = itm.Value;
+                    else
+                        me.SecondAndFurtherGivenNamesOrInitialsThereof.Value += itm.Value + " ";
+                }
+                else if (itm.ComponentTypeKey == NameComponentKeys.Suffix)
+                    me.SuffixEgJRorIII.Value = itm.Value;
+                else if (itm.ComponentTypeKey == NameComponentKeys.Prefix)
+                    me.PrefixEgDR.Value = itm.Value;
+
+            return me;
+        }
+
+        /// <summary>
 		/// Converts an <see cref="HD"/> instance to an <see cref="AssigningAuthority"/> instance.
 		/// </summary>
 		/// <param name="id">The id value to be converted.</param>
@@ -250,10 +333,18 @@ namespace SanteDB.Messaging.HL7
             if (identifiers.Length == 0)
                 return entityIdentifiers.AsEnumerable();
 
-            foreach(var cx in identifiers)
+            foreach (var cx in identifiers)
             {
                 var assigningAuthority = cx.AssigningAuthority.ToModel();
-                entityIdentifiers.Add(new EntityIdentifier(assigningAuthority, cx.IDNumber.Value));
+                var id = new EntityIdentifier(assigningAuthority, cx.IDNumber.Value);
+
+                if (!String.IsNullOrEmpty(cx.IdentifierTypeCode.Value))
+                {
+                    var idType = ApplicationContext.Current.GetService<IIdentifierTypeRepositoryService>().Find(o => o.TypeConcept.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == cx.IdentifierTypeCode.Value && r.ReferenceTerm.CodeSystem.Oid == IdentifierTypeCodeSystem)).FirstOrDefault();
+                    id.IdentifierTypeKey = idType?.Key;
+                }
+
+                entityIdentifiers.Add(id);
             }
 
             return entityIdentifiers.AsEnumerable();
@@ -373,7 +464,7 @@ namespace SanteDB.Messaging.HL7
         /// </summary>
         public static DatePrecision ToDatePrecision(this TS me)
         {
-            if(!me.DegreeOfPrecision.IsEmpty())
+            if (!me.DegreeOfPrecision.IsEmpty())
                 return me.DegreeOfPrecision.Value == "Y" ? Core.Model.DataTypes.DatePrecision.Year :
                                 me.DegreeOfPrecision.Value == "L" ? Core.Model.DataTypes.DatePrecision.Month :
                                 me.DegreeOfPrecision.Value == "D" ? Core.Model.DataTypes.DatePrecision.Day :
@@ -382,7 +473,7 @@ namespace SanteDB.Messaging.HL7
                                 me.DegreeOfPrecision.Value == "S" ? Core.Model.DataTypes.DatePrecision.Year :
                                 Core.Model.DataTypes.DatePrecision.Full;
             else
-                switch(me.Time.Value.Length)
+                switch (me.Time.Value.Length)
                 {
                     case 4:
                         return DatePrecision.Year;
@@ -429,7 +520,7 @@ namespace SanteDB.Messaging.HL7
         /// Convert <see cref="CE"/> to <see cref="Concept"/>
         /// </summary>
         public static IEnumerable<Concept> ToModel(this CE[] me, String preferredDomain = null, bool throwIfNotFound = true)
-        { 
+        {
             var termService = ApplicationContext.Current.GetService<IConceptRepositoryService>();
             List<Concept> retval = new List<Concept>();
 
@@ -447,5 +538,25 @@ namespace SanteDB.Messaging.HL7
             }
             return retval;
         }
+
+        /// <summary>
+        /// Convert entity identifier to a CX
+        /// </summary>
+        public static CX FromModel(this CX me, EntityIdentifier id)
+        {
+            me.IDNumber.Value = id.Value;
+            me.AssigningAuthority.NamespaceID.Value = id.LoadProperty<AssigningAuthority>("Authority").DomainName;
+            me.AssigningAuthority.UniversalID.Value = id.Authority.Oid;
+            me.AssigningAuthority.UniversalIDType.Value = !String.IsNullOrEmpty(id.Authority.Oid) ? "ISO" : null;
+
+            // Identifier type
+            if (id.IdentifierType?.TypeConceptKey.HasValue == true)
+            {
+                var refTerm = ApplicationContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(id.IdentifierType.TypeConceptKey.Value, IdentifierTypeCodeSystem);
+                me.IdentifierTypeCode.Value = refTerm?.Mnemonic;
+            }
+            return me;
+        }
+
     }
 }

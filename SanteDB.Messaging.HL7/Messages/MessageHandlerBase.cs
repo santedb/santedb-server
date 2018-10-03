@@ -40,8 +40,17 @@ namespace SanteDB.Messaging.HL7.Messages
     {
 
         // Configuration
-        private HL7ConfigurationSection m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("marc.hi.ehrs.svc.messaging.hapi") as HL7ConfigurationSection;
+        private HL7ConfigurationSection m_configuration;
 
+        private HL7ConfigurationSection Configuration
+        {
+            get
+            {
+                if (this.m_configuration == null)
+                    this.m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("marc.hi.ehrs.svc.messaging.hapi") as HL7ConfigurationSection;
+                return this.m_configuration;
+            }
+        }
 
         // Entry ASM hash
         private static String s_entryAsmHash = null;
@@ -181,38 +190,38 @@ namespace SanteDB.Messaging.HL7.Messages
                     throw new SecurityException("MSH-4 must be provided for authenticating device");
                 else if (String.IsNullOrEmpty(msh.SendingApplication.NamespaceID.Value))
                     throw new SecurityException("MSH-3 must be provided for authenticating device/application");
-                else if (this.m_configuration.Security == SecurityMethod.Sft4 && String.IsNullOrEmpty(sft.SoftwareBinaryID.Value))
+                else if (this.Configuration.Security == SecurityMethod.Sft4 && String.IsNullOrEmpty(sft.SoftwareBinaryID.Value))
                     throw new SecurityException("SFT-4 must be provided for authenticating application");
-                else if (this.m_configuration.Security == SecurityMethod.Msh8 && String.IsNullOrEmpty(msh.Security.Value))
+                else if (this.Configuration.Security == SecurityMethod.Msh8 && String.IsNullOrEmpty(msh.Security.Value))
                     throw new SecurityException("MSH-8 must be provided for authenticating application");
 
                 String deviceId = $"{msh.SendingApplication.NamespaceID.Value}|{msh.SendingFacility.NamespaceID.Value}",
                     deviceSecret = BitConverter.ToString(auth.AuthorizationToken).Replace("-", ""),
                     applicationId = msh.SendingApplication.NamespaceID.Value,
-                    applicationSecret = this.m_configuration.Security == SecurityMethod.Sft4 ? sft.SoftwareBinaryID.Value :
-                        this.m_configuration.Security == SecurityMethod.Msh8 ? msh.Security.Value : null;
+                    applicationSecret = this.Configuration.Security == SecurityMethod.Sft4 ? sft.SoftwareBinaryID.Value :
+                        this.Configuration.Security == SecurityMethod.Msh8 ? msh.Security.Value : null;
 
                 IPrincipal devicePrincipal = ApplicationContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(deviceId, deviceSecret),
                     applicationPrincipal = applicationSecret != null ? ApplicationContext.Current.GetService<IApplicationIdentityProviderService>().Authenticate(applicationId, applicationSecret) : null;
                 principal = new ClaimsPrincipal(new IIdentity[] { devicePrincipal.Identity, applicationPrincipal?.Identity }.OfType<ClaimsIdentity>());
             }
-            else if (this.m_configuration.Security != SecurityMethod.None)
+            else if (this.Configuration.Security != SecurityMethod.None)
             {
                 // Ensure proper authentication exists
                 if (String.IsNullOrEmpty(msh.SendingFacility.NamespaceID.Value) || String.IsNullOrEmpty(msh.Security.Value))
                     throw new SecurityException("MSH-4 and MSH-8 must always be provided for authenticating device when SLLP is not used");
                 else if (String.IsNullOrEmpty(msh.SendingFacility.NamespaceID.Value))
                     throw new SecurityException("MSH-3 must be provided for authenticating application");
-                else if (this.m_configuration.Security == SecurityMethod.Sft4 && String.IsNullOrEmpty(sft.SoftwareBinaryID.Value))
+                else if (this.Configuration.Security == SecurityMethod.Sft4 && String.IsNullOrEmpty(sft.SoftwareBinaryID.Value))
                     throw new SecurityException("SFT-4 must be provided for authenticating application");
-                else if (this.m_configuration.Security == SecurityMethod.Msh8 && String.IsNullOrEmpty(sft.SoftwareBinaryID.Value))
+                else if (this.Configuration.Security == SecurityMethod.Msh8 && String.IsNullOrEmpty(sft.SoftwareBinaryID.Value))
                     throw new SecurityException("MSH-8 must be provided for authenticating application");
 
                 String deviceId = $"{msh.SendingApplication.NamespaceID.Value}|{msh.SendingFacility.NamespaceID.Value}",
                    deviceSecret = msh.Security.Value,
                    applicationId = msh.SendingApplication.NamespaceID.Value,
-                   applicationSecret = this.m_configuration.Security == SecurityMethod.Sft4 ? sft.SoftwareBinaryID.Value :
-                                            this.m_configuration.Security == SecurityMethod.Msh8 ? msh.Security.Value : null;
+                   applicationSecret = this.Configuration.Security == SecurityMethod.Sft4 ? sft.SoftwareBinaryID.Value :
+                                            this.Configuration.Security == SecurityMethod.Msh8 ? msh.Security.Value : null;
 
                 IPrincipal devicePrincipal = ApplicationContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(deviceId, deviceSecret),
                     applicationPrincipal = applicationSecret != null ? ApplicationContext.Current.GetService<IApplicationIdentityProviderService>().Authenticate(applicationId, applicationSecret) : null;

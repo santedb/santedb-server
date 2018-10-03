@@ -23,7 +23,7 @@ namespace SanteDB.Messaging.HL7.Query
         /// <summary>
         /// Append query results to the message
         /// </summary>
-        public IMessage AppendQueryResult(IEnumerable results, Expression queryDefinition, IMessage currentResponse, Hl7MessageReceivedEventArgs evt, String matchConfiguration = null)
+        public IMessage AppendQueryResult(IEnumerable results, Expression queryDefinition, IMessage currentResponse, Hl7MessageReceivedEventArgs evt, String matchConfiguration = null, int offset = 0)
         {
             var patients = results.OfType<Patient>();
             if (patients.Count() == 0) return currentResponse;
@@ -36,13 +36,14 @@ namespace SanteDB.Messaging.HL7.Query
             var matchConfigService = ApplicationContext.Current.GetService<IRecordMatchingConfigurationService>();
 
             // Process results
+            int i = offset + 1;
             foreach (var itm in patients)
             {
                 var queryInstance = retVal.GetQUERY_RESPONSE(retVal.QUERY_RESPONSERepetitionsUsed);
                 pidHandler.Create(itm, queryInstance);
                 pd1Handler.Create(itm, queryInstance);
                 nokHandler.Create(itm, queryInstance);
-
+                queryInstance.PID.SetIDPID.Value = (i++).ToString();
                 // QRI?
                 if(matchService != null && !String.IsNullOrEmpty(matchConfiguration))
                 {
