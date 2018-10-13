@@ -39,7 +39,7 @@ namespace SanteDB.Core.Model.AMI.Applet
         /// <summary>
         /// Gets the data this includes
         /// </summary>
-        [XmlElement("include")]
+        [XmlElement("include"), JsonProperty("include")]
         public List<AppletManifestInfo> Include { get; set; }
     }
 }

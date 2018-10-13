@@ -410,7 +410,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
 			foreach (var user in results)
 			{
-				var rolesQuery = context.CreateSqlStatement<DbSecurityUserRole>().SelectFrom()
+				var rolesQuery = context.CreateSqlStatement<DbSecurityUserRole>().SelectFrom(typeof(DbSecurityUserRole), typeof(DbSecurityRole))
 					.InnerJoin<DbSecurityRole>(o => o.RoleKey, o => o.Key)
 					.Where<DbSecurityUserRole>(o => o.UserKey == user.Key);
 

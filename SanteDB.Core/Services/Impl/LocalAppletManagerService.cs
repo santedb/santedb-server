@@ -355,8 +355,9 @@ namespace SanteDB.Core.Services.Impl
                                     this.m_tracer.TraceEvent(TraceEventType.Critical, 1096, "Duplicate solution {0} is not permitted", pkg.Meta.Id);
                                     throw new DuplicateKeyException(pkg.Meta.Id);
                                 }
-                                else if(this.Install(pkg as AppletSolution, true))
+                                else if(!this.Install(pkg as AppletSolution, true))
                                 {
+                                    throw new InvalidOperationException($"Could not install applet solution {pkg.Meta.Id}");
                                 }
                             }
                             else if (this.m_fileDictionary.ContainsKey(pkg.Meta.Id))
