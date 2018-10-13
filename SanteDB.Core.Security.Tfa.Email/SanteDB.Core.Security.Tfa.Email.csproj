@@ -31,7 +31,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0" />
+    <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0.1" />
     <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.2" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
