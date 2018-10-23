@@ -44,5 +44,12 @@ namespace SanteDB.Authentication.OAuth2.Wcf
         [WebInvoke(UriTemplate = "oauth2_token", Method = "POST")]
         [OperationContract]
         Stream Token(Message inboundData);
+
+        /// <summary>
+        /// Get the session from the authenticated bearer or JWT token
+        /// </summary>
+        [WebGet(UriTemplate = "session")]
+        [OperationContract]
+        Stream Session();
     }
 }

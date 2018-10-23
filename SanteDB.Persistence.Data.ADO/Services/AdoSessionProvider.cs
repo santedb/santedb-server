@@ -20,6 +20,8 @@ using System.Security.Cryptography;
 using System.IdentityModel.Tokens;
 using System.IO;
 using System.Data;
+using MARC.HI.EHRS.SVC.Core.Services.Security;
+using System.Threading;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -40,6 +42,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
         // Master configuration
         private SanteDBConfiguration m_masterConfig = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.core") as SanteDBConfiguration;
+
+        // Session cache
+        private Dictionary<Guid, DbSession> m_sessionCache = new Dictionary<Guid, DbSession>();
+        // Session lookups
+        private Int32 m_sessionLookups = 0;
 
         /// <summary>
         /// Create signing credentials
@@ -74,7 +81,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             // First we shall set the refresh claim
             return Guid.NewGuid().ToByteArray();
         }
-        
+
         /// <summary>
         /// Establish the session
         /// </summary>
@@ -112,7 +119,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         NotAfter = expiry,
                         RefreshExpiration = expiry.AddMinutes(10),
                         Audience = aud,
-                        RefreshToken = BitConverter.ToString(refreshToken).Replace("-", "")
+                        RefreshToken = ApplicationContext.Current.GetService<IPasswordHashingService>().EncodePassword(BitConverter.ToString(refreshToken).Replace("-", ""))
                     };
 
                     if (dbSession.ApplicationKey == dbSession.UserKey) // SID == Application = Application Grant
@@ -144,7 +151,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         public ISession Extend(byte[] refreshToken)
         {
             // Validate the parameters
-            if (refreshToken== null)
+            if (refreshToken == null)
                 throw new ArgumentNullException(nameof(refreshToken));
 
             IDbTransaction tx = null;
@@ -167,17 +174,18 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     // Get the session to be extended
                     var qToken = BitConverter.ToString(refreshToken.Take(16).ToArray()).Replace("-", "");
+                    qToken = ApplicationContext.Current.GetService<IPasswordHashingService>().EncodePassword(qToken);
                     var dbSession = context.SingleOrDefault<DbSession>(o => o.RefreshToken == qToken && o.RefreshExpiration > DateTimeOffset.Now);
                     if (dbSession == null)
                         throw new FileNotFoundException(BitConverter.ToString(refreshToken));
 
                     // Get rid of the old session
-                    context.Delete(qToken);
+                    context.Delete(dbSession);
 
                     // Generate a new session for this user
                     dbSession.Key = Guid.Empty;
                     refreshToken = this.CreateRefreshToken();
-                    dbSession.RefreshToken = BitConverter.ToString(refreshToken).Replace("-", "");
+                    dbSession.RefreshToken = ApplicationContext.Current.GetService<IPasswordHashingService>().EncodePassword(BitConverter.ToString(refreshToken).Replace("-", ""));
                     dbSession.NotAfter = DateTimeOffset.Now + (dbSession.NotAfter - dbSession.NotBefore); // Extend for original time
                     dbSession.NotBefore = DateTimeOffset.Now;
                     dbSession.RefreshExpiration = dbSession.NotAfter.AddMinutes(10);
@@ -227,9 +235,38 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         throw new SecurityException("Session token appears to have been tampered with");
 
                     var sessionId = new Guid(sessionToken.Take(16).ToArray());
-                    var dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionId && o.NotAfter > DateTimeOffset.Now);
-                    if(dbSession == null)
-                        throw new FileNotFoundException(BitConverter.ToString(sessionToken));
+
+                    // Check the cache
+                    DbSession dbSession = null;
+                    if (!this.m_sessionCache.TryGetValue(sessionId, out dbSession) ||
+                        dbSession.NotAfter < DateTimeOffset.Now)
+                    {
+                        dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionId && o.NotAfter > DateTimeOffset.Now);
+                        if (dbSession == null)
+                            throw new FileNotFoundException(BitConverter.ToString(sessionToken));
+                        else lock (this.m_syncLock)
+                            {
+                                if (!this.m_sessionCache.ContainsKey(sessionId))
+                                    this.m_sessionCache.Add(sessionId, dbSession);
+                                else
+                                    this.m_sessionCache[sessionId] = dbSession;
+                            }
+                    }
+
+                    // TODO: Write a timer job for this
+                    lock (this.m_syncLock)
+                    {
+                        this.m_sessionLookups++;
+                        if (this.m_sessionLookups > 10000) // Clean up  {
+                        {
+                            this.m_sessionLookups = 0;
+                            this.m_traceSource.TraceInfo("Cleaning expired sessions from cache");
+                            var keyIds = this.m_sessionCache.Where(s => s.Value.NotAfter <= DateTimeOffset.Now).Select(s => s.Key).ToList();
+                            foreach (var kid in keyIds)
+                                this.m_sessionCache.Remove(kid);
+                        }
+                    }
+
                     return new GenericSession(sessionToken, null, dbSession.NotBefore, dbSession.NotAfter);
                 }
             }

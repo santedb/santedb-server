@@ -214,7 +214,7 @@ namespace SanteDB.Messaging.HL7.Messages
                     throw new SecurityException("MSH-3 must be provided for authenticating application");
                 else if (this.Configuration.Security == SecurityMethod.Sft4 && String.IsNullOrEmpty(sft.SoftwareBinaryID.Value))
                     throw new SecurityException("SFT-4 must be provided for authenticating application");
-                else if (this.Configuration.Security == SecurityMethod.Msh8 && String.IsNullOrEmpty(sft.SoftwareBinaryID.Value))
+                else if (this.Configuration.Security == SecurityMethod.Msh8 && String.IsNullOrEmpty(msh.Security.Value))
                     throw new SecurityException("MSH-8 must be provided for authenticating application");
 
                 String deviceId = $"{msh.SendingApplication.NamespaceID.Value}|{msh.SendingFacility.NamespaceID.Value}",

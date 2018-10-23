@@ -101,13 +101,19 @@ namespace SanteDB.Core.Wcf.Security
                 switch(auth[0].ToLowerInvariant())
                 {
                     case "bearer":
-                        return this.CheckBearerAccess(operationContext, auth[1]);
+                        this.CheckBearerAccess(operationContext, auth[1]);
+                        break;
                     case "urn:ietf:params:oauth:token-type:jwt": // Will use JWT authorization
-                        return this.CheckJwtAccess(operationContext, auth[1]);
+                        this.CheckJwtAccess(operationContext, auth[1]);
+                        break;
                     default:
                         throw new UnauthorizedRequestException("Invalid authentication scheme", "Bearer", this.m_configuration.Security.ClaimsAuth.Realm, this.m_configuration.Security.ClaimsAuth.Audiences.FirstOrDefault());
                 }
 
+                if (OperationContext.Current != operationContext)
+                    return base.CheckAccess(operationContext);
+                else
+                    return true;
             }
             catch(UnauthorizedAccessException e) {
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "JWT Token Error (From: {0}) : {1}", remoteEndpoint?.Address, e);
@@ -132,7 +138,7 @@ namespace SanteDB.Core.Wcf.Security
         /// <param name="operationContext">The operation context within which the access token should be validated</param>
         /// <param name="authorization">The authorization data </param>
         /// <returns>True if authorization is successful</returns>
-        private bool CheckBearerAccess(OperationContext operationContext, string authorization)
+        private void CheckBearerAccess(OperationContext operationContext, string authorization)
         {
             var session = ApplicationContext.Current.GetService<ISessionProviderService>().Get(
                 Enumerable.Range(0, authorization.Length)
@@ -145,11 +151,11 @@ namespace SanteDB.Core.Wcf.Security
 
             operationContext.ServiceSecurityContext.AuthorizationContext.Properties["Identities"] = (principal as ClaimsPrincipal).Identities;
             operationContext.ServiceSecurityContext.AuthorizationContext.Properties["Principal"] = principal;
+            operationContext.ServiceSecurityContext.AuthorizationContext.Properties["Session"] = session;
             Core.Security.AuthenticationContext.Current = new Core.Security.AuthenticationContext(principal);
 
             this.m_traceSource.TraceInformation("User {0} authenticated via SESSION BEARER", principal.Identity.Name);
 
-            return base.CheckAccess(operationContext);
         }
 
         /// <summary>
@@ -158,7 +164,7 @@ namespace SanteDB.Core.Wcf.Security
         /// <param name="operationContext">The operation context within which this should be checked</param>
         /// <param name="authorization">The authorization data</param>
         /// <returns>True when authorization is successful</returns>
-        private bool CheckJwtAccess(OperationContext operationContext, string authorization)
+        private void CheckJwtAccess(OperationContext operationContext, string authorization)
         {
             authorization = authorization.Trim();
             String authorizationToken = authorization.Substring(authorization.IndexOf(" ")).Trim();
@@ -180,11 +186,12 @@ namespace SanteDB.Core.Wcf.Security
 
             operationContext.ServiceSecurityContext.AuthorizationContext.Properties["Identities"] = identities.Identities;
             operationContext.ServiceSecurityContext.AuthorizationContext.Properties["Principal"] = identities;
+            operationContext.ServiceSecurityContext.AuthorizationContext.Properties["Session"] = token;
+
             Core.Security.AuthenticationContext.Current = new Core.Security.AuthenticationContext(identities);
 
             this.m_traceSource.TraceInformation("User {0} authenticated via JWT", identities.Identity.Name);
 
-            return base.CheckAccess(operationContext);
         }
     }
 }

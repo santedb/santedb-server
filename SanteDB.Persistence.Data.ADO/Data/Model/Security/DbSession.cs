@@ -46,7 +46,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// <summary>
         /// Identifies the refresh token which can be used to refresh the session
         /// </summary>
-        [Column("rfrsh_tkn"), NotNull, Hashed]
+        [Column("rfrsh_tkn"), NotNull]
         public String RefreshToken { get; set; }
 
         /// <summary>
