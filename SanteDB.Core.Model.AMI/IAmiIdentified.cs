@@ -21,5 +21,10 @@ namespace SanteDB.Core.Model.AMI
         /// Gets the tag for the resource
         /// </summary>
         string Tag { get; }
+
+        /// <summary>
+        /// Get the modified on
+        /// </summary>
+        DateTimeOffset ModifiedOn { get; }
     }
 }

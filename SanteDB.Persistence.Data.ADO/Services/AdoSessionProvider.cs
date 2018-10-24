@@ -238,8 +238,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     // Check the cache
                     DbSession dbSession = null;
-                    if (!this.m_sessionCache.TryGetValue(sessionId, out dbSession) ||
-                        dbSession.NotAfter < DateTimeOffset.Now)
+                    if (!this.m_sessionCache.TryGetValue(sessionId, out dbSession))
                     {
                         dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionId && o.NotAfter > DateTimeOffset.Now);
                         if (dbSession == null)

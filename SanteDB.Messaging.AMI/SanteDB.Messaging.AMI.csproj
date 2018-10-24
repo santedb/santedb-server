@@ -82,12 +82,12 @@
     <Compile Include="ResourceHandler\SecurityApplicationResourceHandler.cs" />
     <Compile Include="ResourceHandler\SecurityEntityResourceHandler.cs" />
     <Compile Include="ResourceHandler\SecurityPolicyResourceHandler.cs" />
+    <Compile Include="ResourceHandler\SecurityProvenanceHandler.cs" />
     <Compile Include="ResourceHandler\SecurityRoleResourceHandler.cs" />
     <Compile Include="ResourceHandler\SecurityUserResourceHandler.cs" />
     <Compile Include="Wcf\AmiServiceBehavior.cs" />
     <Compile Include="Wcf\Behavior\AmiRestEndpointBehavior.cs" />
     <Compile Include="Wcf\Behavior\AmiSerializerOperationBehavior.cs" />
-    <Compile Include="Wcf\AmiMessageInspector.cs" />
     <Compile Include="Wcf\AmiContentTypeHandler.cs" />
     <Compile Include="Wcf\IAmiServiceContract.cs" />
   </ItemGroup>

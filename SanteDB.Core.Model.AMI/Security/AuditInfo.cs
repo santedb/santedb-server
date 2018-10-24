@@ -32,5 +32,11 @@ namespace SanteDB.Core.Model.AMI.Security
         /// Gets the ETag
         /// </summary>
         public string Tag => this.Timestamp.ToString("yyyyMMddHHmmSS");
+
+        /// <summary>
+        /// Get the modified on
+        /// </summary>
+        [JsonIgnore, XmlIgnore]
+        public DateTimeOffset ModifiedOn => this.Timestamp;
     }
 }

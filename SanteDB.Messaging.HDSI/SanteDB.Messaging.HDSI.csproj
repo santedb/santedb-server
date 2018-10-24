@@ -99,7 +99,6 @@
     <Compile Include="Wcf\Behavior\HdsiErrorEndpointBehavior.cs" />
     <Compile Include="Wcf\IHdsiServiceContract.cs" />
     <Compile Include="Wcf\HdsiContentTypeHandler.cs" />
-    <Compile Include="Wcf\HdsiMessageInspector.cs" />
     <Compile Include="Wcf\Behavior\HdsiRestEndpointBehavior.cs" />
     <Compile Include="Wcf\Behavior\HdsiSerializerOperationBehavior.cs" />
     <Compile Include="Wcf\HdsiServiceBehavior.cs" />

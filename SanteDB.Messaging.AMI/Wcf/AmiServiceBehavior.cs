@@ -448,17 +448,20 @@ namespace SanteDB.Messaging.AMI.Wcf
                 var handler = AmiMessageHandler.ResourceHandler.GetResourceHandler<IAmiServiceContract>(resourceType);
                 if (handler != null)
                 {
-                    var retVal = handler.Get(Guid.Parse(key), Guid.Empty) as IdentifiedData;
+                    var retVal = handler.Get(Guid.Parse(key), Guid.Empty);
                     if (retVal == null)
                         throw new FileNotFoundException(key);
 
-                    WebOperationContext.Current.OutgoingResponse.ETag = retVal.Tag;
-                    WebOperationContext.Current.OutgoingResponse.LastModified = retVal.ModifiedOn.DateTime;
+                    var idata = retVal as IdentifiedData;
+                    var adata = retVal as IAmiIdentified;
+
+                    WebOperationContext.Current.OutgoingResponse.ETag = idata?.Tag ?? adata?.Tag;
+                    WebOperationContext.Current.OutgoingResponse.LastModified = idata?.ModifiedOn.DateTime ?? adata?.ModifiedOn.DateTime ?? DateTime.Now;
 
                     // HTTP IF headers?
                     if (WebOperationContext.Current.IncomingRequest.IfModifiedSince.HasValue &&
-                        retVal.ModifiedOn <= WebOperationContext.Current.IncomingRequest.IfModifiedSince ||
-                        WebOperationContext.Current.IncomingRequest.IfNoneMatch?.Any(o => retVal.Tag == o) == true)
+                        (adata?.ModifiedOn ?? idata?.ModifiedOn) <= WebOperationContext.Current.IncomingRequest.IfModifiedSince ||
+                        WebOperationContext.Current.IncomingRequest.IfNoneMatch?.Any(o => idata?.Tag == o || adata?.Tag == o) == true)
                     {
                         WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NotModified;
                         return null;
@@ -607,7 +610,6 @@ namespace SanteDB.Messaging.AMI.Wcf
 
                     var retVal = handler.Query(query, Int32.Parse(offset ?? "0"), Int32.Parse(count ?? "100"), out totalResults).ToList();
                     WebOperationContext.Current.OutgoingResponse.LastModified = retVal.OfType<IdentifiedData>().OrderByDescending(o => o.ModifiedOn).FirstOrDefault()?.ModifiedOn.DateTime ?? DateTime.Now;
-
 
                     // Last modification time and not modified conditions
                     if ((WebOperationContext.Current.IncomingRequest.IfModifiedSince.HasValue ||

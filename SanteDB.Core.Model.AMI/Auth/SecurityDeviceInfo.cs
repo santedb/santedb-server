@@ -49,6 +49,7 @@ namespace SanteDB.Core.Model.AMI.Auth
         /// <summary>
         /// Get the key for the object
         /// </summary>
+        [JsonIgnore, XmlIgnore]
         public string Key
         {
             get => this.Entity?.Key?.ToString();
@@ -58,6 +59,13 @@ namespace SanteDB.Core.Model.AMI.Auth
         /// <summary>
         /// Get the tag
         /// </summary>
+        [JsonIgnore, XmlIgnore]
         public string Tag => this.Entity?.Tag;
+
+        /// <summary>
+        /// Get the modified on
+        /// </summary>
+        [JsonIgnore, XmlIgnore]
+        public DateTimeOffset ModifiedOn => this.Entity?.ModifiedOn ?? DateTimeOffset.Now;
     }
 }

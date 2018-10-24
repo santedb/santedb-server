@@ -59,6 +59,7 @@ namespace SanteDB.Core.Model.AMI.Logging
         /// <summary>
         /// Get the requested key
         /// </summary>
+        [JsonIgnore, XmlIgnore]
         public string Key {
             get => this.Name;
             set {; }
@@ -67,6 +68,13 @@ namespace SanteDB.Core.Model.AMI.Logging
         /// <summary>
         /// Gets the ETag
         /// </summary>
+        [JsonIgnore, XmlIgnore]
         public string Tag => null;
+
+        /// <summary>
+        /// Get the modified on
+        /// </summary>
+        [JsonIgnore, XmlIgnore]
+        public DateTimeOffset ModifiedOn => this.LastWrite;
     }
 }

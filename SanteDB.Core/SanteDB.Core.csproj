@@ -156,6 +156,7 @@
     <Compile Include="Wcf\Security\TokenServiceAuthorizationManager.cs" />
     <Compile Include="Services\Impl\LocalConceptRepositoryService.cs" />
     <Compile Include="Services\Impl\LocalSecurityRepositoryService.cs" />
+    <Compile Include="Wcf\Serialization\WcfCompressionMessageInspector.cs" />
     <Compile Include="Wcf\Serialization\WcfErrorHandler.cs" />
     <Compile Include="Wcf\Serialization\RawBodyWriter.cs" />
     <Compile Include="Wcf\Serialization\WcfMessageDispatchFormatter.cs" />

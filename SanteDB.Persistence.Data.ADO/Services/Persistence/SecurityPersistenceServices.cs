@@ -32,6 +32,44 @@ using MARC.HI.EHRS.SVC.Core.Data;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
+
+    /// <summary>
+    /// Security provenance service
+    /// </summary>
+    public class SecurityProvenancePersistenceService : IdentifiedPersistenceService<SecurityProvenance, DbSecurityProvenance>
+    {
+        /// <summary>
+        /// Inserting with IDataContext is not permitted
+        /// </summary>
+        public override SecurityProvenance InsertInternal(DataContext context, SecurityProvenance data)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Updating Provenance with DataPersistenceService is not permitted
+        /// </summary>
+        public override SecurityProvenance UpdateInternal(DataContext context, SecurityProvenance data)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Obsoleting provenance is not supported
+        /// </summary>
+        public override SecurityProvenance ObsoleteInternal(DataContext context, SecurityProvenance data)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Querying for provenance is not supported
+        /// </summary>
+        protected override IEnumerable<object> DoQueryInternal(DataContext context, Expression<Func<SecurityProvenance, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool incudeCount = true)
+        {
+            throw new NotSupportedException();
+        }
+    }
 	/// <summary>
 	/// Security user persistence
 	/// </summary>

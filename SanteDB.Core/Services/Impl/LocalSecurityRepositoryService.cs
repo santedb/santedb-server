@@ -50,7 +50,8 @@ namespace SanteDB.Core.Services.Impl
         IRepositoryService<SecurityRole>,
         IRepositoryService<SecurityUser>,
         IRepositoryService<ApplicationEntity>,
-        IRepositoryService<DeviceEntity>
+        IRepositoryService<DeviceEntity>,
+        IRepositoryService<SecurityPolicy>
     {
 		private TraceSource m_traceSource = new TraceSource(SanteDBConstants.ServiceTraceSourceName);
 
@@ -400,6 +401,14 @@ namespace SanteDB.Core.Services.Impl
         {
             int tr = 0;
             return base.Find<SecurityPolicy>(o => o.Oid == policyOid, 0, 1, out tr, Guid.Empty).SingleOrDefault();
+        }
+
+        /// <summary>
+        /// Get the security provenance 
+        /// </summary>
+        public SecurityProvenance GetProvenance(Guid provenanceId)
+        {
+            return ApplicationContext.Current.GetSerivce<IDataPersistenceService<SecurityProvenance>>().Get(new Identifier<Guid>(provenanceId), AuthenticationContext.Current.Principal, true);
         }
 
         /// <summary>
@@ -805,6 +814,23 @@ namespace SanteDB.Core.Services.Impl
         }
 
         /// <summary>
+        /// Find security policy
+        /// </summary>
+        IEnumerable<SecurityPolicy> IRepositoryService<SecurityPolicy>.Find(Expression<Func<SecurityPolicy, bool>> query)
+        {
+            int tr = 0;
+            return base.Find(query, 0, null, out tr, Guid.Empty);
+        }
+
+        /// <summary>
+        /// Find policy
+        /// </summary>
+        IEnumerable<SecurityPolicy> IRepositoryService<SecurityPolicy>.Find(Expression<Func<SecurityPolicy, bool>> query, int offset, int? count, out int totalResults)
+        {
+            return base.Find(query, offset, count, out totalResults, Guid.Empty);
+        }
+
+        /// <summary>
         /// Get user entity
         /// </summary>
         UserEntity IRepositoryService<UserEntity>.Get(Guid key)
@@ -917,6 +943,23 @@ namespace SanteDB.Core.Services.Impl
         }
 
         /// <summary>
+        /// Get security policy
+        /// </summary>
+        SecurityPolicy IRepositoryService<SecurityPolicy>.Get(Guid key)
+        {
+            return base.Get<SecurityPolicy>(key, Guid.Empty);
+
+        }
+
+        /// <summary>
+        /// Get security policy
+        /// </summary>
+        SecurityPolicy IRepositoryService<SecurityPolicy>.Get(Guid key, Guid versionKey)
+        {
+            return base.Get<SecurityPolicy>(key, Guid.Empty);
+        }
+
+        /// <summary>
         /// Insert user entity
         /// </summary>
         UserEntity IRepositoryService<UserEntity>.Insert(UserEntity data)
@@ -970,6 +1013,14 @@ namespace SanteDB.Core.Services.Impl
         /// Insert device entity
         /// </summary>
         DeviceEntity IRepositoryService<DeviceEntity>.Insert(DeviceEntity data)
+        {
+            return base.Insert(data);
+        }
+
+        /// <summary>
+        /// Insert
+        /// </summary>
+        SecurityPolicy IRepositoryService<SecurityPolicy>.Insert(SecurityPolicy data)
         {
             return base.Insert(data);
         }
@@ -1031,6 +1082,14 @@ namespace SanteDB.Core.Services.Impl
         }
 
         /// <summary>
+        /// Obsolete
+        /// </summary>
+        SecurityPolicy IRepositoryService<SecurityPolicy>.Obsolete(Guid key)
+        {
+            return base.Obsolete<SecurityPolicy>(key);
+        }
+
+        /// <summary>
         /// Save user entity
         /// </summary>
         UserEntity IRepositoryService<UserEntity>.Save(UserEntity data)
@@ -1082,6 +1141,14 @@ namespace SanteDB.Core.Services.Impl
         /// Save device entity
         /// </summary>
         DeviceEntity IRepositoryService<DeviceEntity>.Save(DeviceEntity data)
+        {
+            return base.Save(data);
+        }
+
+        /// <summary>
+        /// Save security policy
+        /// </summary>
+        SecurityPolicy IRepositoryService<SecurityPolicy>.Save(SecurityPolicy data)
         {
             return base.Save(data);
         }

@@ -18,6 +18,7 @@
  * Date: 2017-9-1
  */
 using MARC.HI.EHRS.SVC.Core.Wcf;
+using SanteDB.Core.Wcf.Serialization;
 using SanteDB.Messaging.HDSI.Wcf.Serialization;
 using System;
 using System.Collections.Generic;
@@ -51,7 +52,7 @@ namespace SanteDB.Messaging.HDSI.Wcf.Behavior
         {
 
             // Add the inspector for the messaging
-            endpointDispatcher.DispatchRuntime.MessageInspectors.Add(new HdsiMessageInspector());
+            endpointDispatcher.DispatchRuntime.MessageInspectors.Add(new WcfCompressionMessageInspector());
             endpointDispatcher.DispatchRuntime.MessageInspectors.Add(new LogMessageInspector());
 
             // Apply to each operation the HDSI formatter

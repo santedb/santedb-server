@@ -13,7 +13,7 @@ DELETE FROM SEC_APP_POL_ASSOC_TBL WHERE APP_ID IN (SELECT APP_ID FROM SEC_APP_TB
 DELETE FROM SEC_APP_TBL WHERE APP_PUB_ID = 'fiddler';
 
 INSERT INTO SEC_USR_TBL (USR_ID, USR_NAME, SEC_STMP, PASSWD, EMAIL, PHN_NUM, EMAIL_CNF, PHN_CNF, CRT_PROV_ID)
-	VALUES (char_to_uuid('db67a3c1-c7bc-4e21-8f6c-b1c19a7f2c50'), 'Administrator', char_to_uuid('6c351600-9fc3-408b-9d55-428a4d29361b'), '59ff5973691ff75f8baa45f1e38fae24875f77ef00987ed22b02df075fb144f9', 'administrator@marc-hi.ca', 'tel:+19055751212;ext=4085', TRUE, TRUE, char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+	VALUES (char_to_uuid('db67a3c1-c7bc-4e21-8f6c-b1c19a7f2c50'), 'Administrator', '6c351600-9fc3-408b-9d55-428a4d29361b', '59ff5973691ff75f8baa45f1e38fae24875f77ef00987ed22b02df075fb144f9', 'administrator@marc-hi.ca', 'tel:+19055751212;ext=4085', TRUE, TRUE, char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 
 INSERT INTO ent_tbl (ent_id, cls_cd_id, dtr_cd_id) 
 	VALUES (char_to_uuid('b55f0836-40e6-4ee2-9522-27e3f8bfe532'), char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'), char_to_uuid('f29f08de-78a7-4a5e-aeaf-7b545ba19a09'));
@@ -29,14 +29,14 @@ INSERT INTO SEC_USR_ROL_ASSOC_TBL (USR_ID, ROL_ID)
 	WHERE SEC_USR_TBL.USR_NAME = 'Administrator' AND SEC_ROL_TBL.ROL_Name IN ('ADMINISTRATORS');
 
 INSERT INTO SEC_USR_TBL (USR_ID, USR_NAME, SEC_STMP, PASSWD, EMAIL, PHN_NUM, EMAIL_CNF, PHN_CNF, CRT_PROV_ID)
-	VALUES (char_to_uuid('28e0b42d-2be3-4139-803b-67ac68756275'), 'Bob', char_to_uuid('dc50d0b3-bc02-45b6-8b87-0b6f3c18acd6'), '59ff5973691ff75f8baa45f1e38fae24875f77ef00987ed22b02df075fb144f9', 'bob@marc-hi.ca', 'tel:+19055751212;ext=4085', TRUE, TRUE, char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+	VALUES (char_to_uuid('28e0b42d-2be3-4139-803b-67ac68756275'), 'Bob', 'dc50d0b3-bc02-45b6-8b87-0b6f3c18acd6', '59ff5973691ff75f8baa45f1e38fae24875f77ef00987ed22b02df075fb144f9', 'bob@marc-hi.ca', 'tel:+19055751212;ext=4085', TRUE, TRUE, char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 
 INSERT INTO SEC_USR_ROL_ASSOC_TBL (USR_ID, ROL_ID)
 	SELECT USR_ID, ROL_ID FROM SEC_USR_TBL, SEC_ROL_TBL 
 	WHERE SEC_USR_TBL.USR_NAME = 'Bob' AND SEC_ROL_TBL.ROL_Name IN ('USERS');
 
 INSERT INTO SEC_USR_TBL (USR_ID, USR_NAME, SEC_STMP, PASSWD, EMAIL, PHN_NUM, EMAIL_CNF, PHN_CNF, CRT_PROV_ID)
-	VALUES (char_to_uuid('0bfbc6bc-ab38-45a6-8d8b-201776fe4e53'), 'Allison', char_to_uuid('a7ec2ec7-ecde-4ea6-ac24-bf6d032cd90c'), '59ff5973691ff75f8baa45f1e38fae24875f77ef00987ed22b02df075fb144f9', 'allison@marc-hi.ca', 'tel:+19055751212;ext=4085', TRUE, TRUE, char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+	VALUES (char_to_uuid('0bfbc6bc-ab38-45a6-8d8b-201776fe4e53'), 'Allison', 'a7ec2ec7-ecde-4ea6-ac24-bf6d032cd90c', '59ff5973691ff75f8baa45f1e38fae24875f77ef00987ed22b02df075fb144f9', 'allison@marc-hi.ca', 'tel:+19055751212;ext=4085', TRUE, TRUE, char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 
 INSERT INTO SEC_USR_ROL_ASSOC_TBL (USR_ID, ROL_ID)
 	SELECT USR_ID, ROL_ID FROM SEC_USR_TBL, SEC_ROL_TBL 

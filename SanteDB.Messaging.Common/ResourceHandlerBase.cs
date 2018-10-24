@@ -104,6 +104,9 @@ namespace SanteDB.Messaging.Common
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
+            else if ((this.Capabilities & ResourceCapability.Create) == 0 &&
+                (this.Capabilities & ResourceCapability.CreateOrUpdate) == 0)
+                throw new NotSupportedException();
 
             var bundle = data as Bundle;
 
@@ -128,6 +131,9 @@ namespace SanteDB.Messaging.Common
         /// </summary>
         public virtual Object Get(object id, object versionId)
         {
+            if ((this.Capabilities & ResourceCapability.Get) == 0 &&
+                (this.Capabilities & ResourceCapability.GetVersion) == 0)
+                throw new NotSupportedException();
             return this.m_repository.Get((Guid)id, (Guid)versionId);
         }
 
@@ -136,6 +142,8 @@ namespace SanteDB.Messaging.Common
         /// </summary>
         public virtual Object Obsolete(object key)
         {
+            if ((this.Capabilities & ResourceCapability.Delete) == 0)
+                throw new NotSupportedException();
             return this.m_repository.Obsolete((Guid)key);
         }
 
@@ -144,6 +152,9 @@ namespace SanteDB.Messaging.Common
         /// </summary>
         public virtual IEnumerable<Object> Query(NameValueCollection queryParameters)
         {
+            if ((this.Capabilities & ResourceCapability.Search) == 0)
+                throw new NotSupportedException();
+
             int tr = 0;
             return this.Query(queryParameters, 0, 100, out tr);
         }
@@ -153,6 +164,9 @@ namespace SanteDB.Messaging.Common
         /// </summary>
         public virtual IEnumerable<Object> Query(NameValueCollection queryParameters, int offset, int count, out int totalCount)
         {
+            if ((this.Capabilities & ResourceCapability.Search) == 0)
+                throw new NotSupportedException();
+
             var queryExpression = QueryExpressionParser.BuildLinqExpression<TResource>(queryParameters, null, false);
             List<String> query = null;
 
@@ -180,6 +194,10 @@ namespace SanteDB.Messaging.Common
         /// </summary>
         public virtual Object Update(Object data)
         {
+
+            if ((this.Capabilities & ResourceCapability.Update) == 0)
+                throw new NotSupportedException();
+
             Bundle bundleData = data as Bundle;
             bundleData?.Reconstitute();
             var processData = bundleData?.Entry ?? data;

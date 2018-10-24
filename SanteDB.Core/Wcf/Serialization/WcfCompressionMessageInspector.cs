@@ -1,51 +1,27 @@
-﻿/*
- * Copyright 2015-2018 Mohawk College of Applied Arts and Technology
- *
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you 
- * may not use this file except in compliance with the License. You may 
- * obtain a copy of the License at 
- * 
- * http://www.apache.org/licenses/LICENSE-2.0 
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations under 
- * the License.
- * 
- * User: fyfej
- * Date: 2017-9-1
- */
+﻿using SanteDB.Core.Wcf.Compression;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Dispatcher;
 using System.ServiceModel.Web;
-using System.IO;
-using System.Xml;
 using System.Text;
-using System.Diagnostics;
-using SanteDB.Messaging.HDSI.Wcf.Serialization;
-using Newtonsoft.Json;
-using System.Xml.Serialization;
-using System.Reflection;
-using SanteDB.Core.Model;
-using SanteDB.Core.Wcf.Compression;
-using MARC.HI.EHRS.SVC.Core;
+using System.Threading.Tasks;
+using System.Xml;
 
-namespace SanteDB.Messaging.HDSI.Wcf
+namespace SanteDB.Core.Wcf.Serialization
 {
     /// <summary>
     /// Represents an HDSI message inspector which can inspect messages and perform tertiary functions
     /// not included in WCF (such as compression)
     /// </summary>
-    public class HdsiMessageInspector : IDispatchMessageInspector
+    public class WcfCompressionMessageInspector : IDispatchMessageInspector
     {
         // Trace source
-        private TraceSource m_traceSource = new TraceSource("SanteDB.Messaging.HDSI");
+        private TraceSource m_traceSource = new TraceSource(SanteDBConstants.WcfTraceSourceName);
 
         /// <summary>
         /// Get the message's classified format

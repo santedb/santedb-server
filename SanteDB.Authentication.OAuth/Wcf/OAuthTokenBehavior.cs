@@ -508,22 +508,25 @@ namespace SanteDB.Authentication.OAuth2.Wcf
             var hasSession = new TokenServiceAuthorizationManager().CheckAccess(OperationContext.Current);
             if (hasSession)
             {
-                var session = OperationContext.Current.ServiceSecurityContext.AuthorizationContext.Properties["Session"];
-                JwtSecurityToken jwt = session as JwtSecurityToken;
-                if(jwt == null)
-                {
-                    var tSession = session as Core.Security.ISession;
-                    var principal = ApplicationContext.Current.GetSerivce<ISessionIdentityProviderService>().Authenticate(tSession);
-                    jwt = this.HydrateToken(principal as ClaimsPrincipal, null, null, tSession.NotBefore.DateTime, tSession.NotAfter.DateTime);
-                }
+                var principal = Core.Security.AuthenticationContext.Current.Principal as ClaimsPrincipal;
 
-                return this.CreateResponse(new OAuthTokenResponse()
+                if (principal.Identity.Name == Core.Security.AuthenticationContext.AnonymousPrincipal.Identity.Name)
+                    return this.CreateResponse(new OAuthError()
+                    {
+                        Error = OAuthErrorType.invalid_request,
+                        ErrorDescription = "No Such Session"
+                    });
+                else
                 {
-                    AccessToken = (OperationContext.Current.IncomingMessageProperties[HttpRequestMessageProperty.Name] as HttpRequestMessageProperty).Headers["Authorization"].Split(' ')[1],
-                    IdentityToken = new JwtSecurityTokenHandler().WriteToken(jwt),
-                    ExpiresIn = (int)((session as Core.Security.ISession)?.NotAfter ?? (session as SecurityToken)?.ValidTo ?? DateTime.Now).Subtract(DateTime.Now).TotalMilliseconds,
-                    TokenType = session is Core.Security.ISession ? OAuthConstants.BearerTokenType : OAuthConstants.JwtTokenType
-                });
+                    DateTime notBefore = DateTime.Parse(principal.FindFirst(ClaimTypes.AuthenticationInstant).Value), notAfter = DateTime.Parse(principal.FindFirst(ClaimTypes.Expiration).Value);
+                    var jwt = this.HydrateToken(principal, principal.FindFirst(SanteDBClaimTypes.SanteDBScopeClaim)?.Value ?? "*", null, notBefore, notAfter);
+                    return this.CreateResponse(new OAuthTokenResponse()
+                    {
+                        AccessToken = (OperationContext.Current.IncomingMessageProperties[HttpRequestMessageProperty.Name] as HttpRequestMessageProperty).Headers["Authorization"].Split(' ')[1],
+                        IdentityToken = new JwtSecurityTokenHandler().WriteToken(jwt),
+                        ExpiresIn = (int)(notAfter).Subtract(DateTime.Now).TotalMilliseconds,
+                    });
+                }
             }
             else
             {

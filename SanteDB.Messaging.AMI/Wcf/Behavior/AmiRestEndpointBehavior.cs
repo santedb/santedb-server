@@ -19,6 +19,7 @@
  */
 
 using MARC.HI.EHRS.SVC.Core.Wcf;
+using SanteDB.Core.Wcf.Serialization;
 using System;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Description;
@@ -56,7 +57,7 @@ namespace SanteDB.Messaging.AMI.Wcf.Behavior
 		/// <param name="endpointDispatcher">The endpoint dispatcher of the endpoint.</param>
 		public void ApplyDispatchBehavior(ServiceEndpoint endpoint, EndpointDispatcher endpointDispatcher)
 		{
-			endpointDispatcher.DispatchRuntime.MessageInspectors.Add(new AmiMessageInspector());
+			endpointDispatcher.DispatchRuntime.MessageInspectors.Add(new WcfCompressionMessageInspector());
 			endpointDispatcher.DispatchRuntime.MessageInspectors.Add(new LogMessageInspector());
 
 			// Apply to each operation the AMI formatter

@@ -38,6 +38,7 @@ namespace SanteDB.Messaging.AMI.Wcf
     [ServiceKnownType(typeof(SecurityDeviceInfo))]
     [ServiceKnownType(typeof(SecurityApplicationInfo))]
     [ServiceKnownType(typeof(SecurityPolicyInfo))]
+    [ServiceKnownType(typeof(SecurityProvenance))]
     [ServiceKnownType(typeof(SecurityRoleInfo))]
     [ServiceKnownType(typeof(AuditSubmission))]
     [ServiceKnownType(typeof(AuditInfo))]

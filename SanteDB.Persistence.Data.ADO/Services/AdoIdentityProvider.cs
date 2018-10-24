@@ -539,10 +539,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         identities.Add(new Core.Security.ApplicationIdentity(auth.Object2.Key, auth.Object2.PublicId, true));
                     if (auth.Object1.DeviceKey.HasValue)
                         identities.Add(new DeviceIdentity(auth.Object4.Key, auth.Object4.PublicId, true));
-
+                    identities.First().AddClaim(new Claim(ClaimTypes.AuthenticationInstant, session.NotBefore.ToString("o")));
+                    identities.First().AddClaim(new Claim(ClaimTypes.Expiration, session.NotAfter.ToString("o")));
                     var principal = auth.Object1.UserKey.GetValueOrDefault() == Guid.Empty ?
                         new ClaimsPrincipal(identities) : AdoClaimsIdentity.Create(auth.Object3, true, "SESSION", session).CreateClaimsPrincipal(identities);
-
+                    
                     // TODO: Load additional claims made about the user on the session
                     return principal;
                 }
