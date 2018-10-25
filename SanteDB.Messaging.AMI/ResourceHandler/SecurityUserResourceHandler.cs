@@ -59,6 +59,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
             }
             else
             {
+                td.Entity.Password = null;
                 var retVal = base.Update(data) as SecurityUserInfo;
 
                 // Roles? We want to update

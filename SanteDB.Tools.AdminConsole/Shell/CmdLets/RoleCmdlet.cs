@@ -30,6 +30,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SanteDB.Core.Model.Security;
 
 namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
 {
@@ -70,16 +71,22 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
             /// <summary>
             /// Gets or sets the policies
             /// </summary>
-            [Description("The policies to set on the role")]
-            [Parameter("p")]
-            public StringCollection Policies { get; set; }
+            [Description("The policies to grant the role")]
+            [Parameter("g")]
+            public StringCollection GrantPolicies { get; set; }
 
-            
+            /// <summary>
+            /// Gets or sets the policies
+            /// </summary>
+            [Description("The policies to deny the role")]
+            [Parameter("d")]
+            public StringCollection DenyPolicies { get; set; }
+
             /// <summary>
             /// Gets or sets the description
             /// </summary>
-            [Description("Set the description of the role")]
-            [Parameter("d")]
+            [Description("Set a note/description of the role")]
+            [Parameter("n")]
             public String Description { get; set; }
 
         }
@@ -88,16 +95,17 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// Add a role
         /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateRoles)]
-        [AdminCommand("roleadd", "Adds a role to the current OpenIZ instance")]
+        [AdminCommand("roleadd", "Adds a role to the current SanteDB instance")]
         internal static void AddRole(AddRoleParms parms)
         {
             var policies = new List<SecurityPolicyInfo>();
 
-            if (parms.Policies?.Count > 0)
-            {
-                policies = parms.Policies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Name == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicyInfo>().ToList();
-                policies.ForEach(o => o.Grant = Core.Model.Security.PolicyGrantType.Grant);
-            }
+            if (parms.GrantPolicies?.Count > 0)
+                policies = parms.GrantPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Name == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o)).ToList();
+            if (parms.DenyPolicies?.Count > 0)
+                policies = policies.Union(parms.DenyPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Name == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o))).ToList();
+
+            policies.ForEach(o => o.Grant = parms.GrantPolicies?.Contains(o.Name) == true ? Core.Model.Security.PolicyGrantType.Grant : PolicyGrantType.Deny);
 
             m_client.CreateRole(new Core.Model.AMI.Auth.SecurityRoleInfo()
             {

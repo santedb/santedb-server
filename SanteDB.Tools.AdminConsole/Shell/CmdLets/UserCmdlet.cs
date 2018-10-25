@@ -93,8 +93,8 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// Useradd parameters
         /// </summary>
-        [AdminCommand("useradd", "Adds a user to the OpenIZ instance")]
-        [Description("This command add the specified user to the OpenIZ IMS instance")]
+        [AdminCommand("useradd", "Adds a user to the SanteDB instance")]
+        [Description("This command add the specified user to the SanteDB IMS instance")]
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateIdentity)]
         internal static void Useradd(UseraddParms parms)
         {
@@ -145,7 +145,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// Useradd parameters
         /// </summary>
-        [AdminCommand("userdel", "De-activates a user to the OpenIZ instance")]
+        [AdminCommand("userdel", "De-activates a user to the SanteDB instance")]
         [Description("This command change the obsoletion time of the user effectively de-activating it")]
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
         internal static void Userdel(GenericUserParms parms)
@@ -167,7 +167,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// Useradd parameters
         /// </summary>
-        [AdminCommand("userundel", "Re-activates a user to the OpenIZ instance")]
+        [AdminCommand("userundel", "Re-activates a user to the SanteDB instance")]
         [Description("This command will undo a de-activation and will reset the user's obsoletion time")]
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
         internal static void Userudel(GenericUserParms parms)
@@ -254,7 +254,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// List users
         /// </summary>
-        [AdminCommand("userlist", "Lists users in the OpenIZ instance")]
+        [AdminCommand("userlist", "Lists users in the SanteDB instance")]
         [Description("This command lists all users in the user database regardless of their status, or class. To filter use the filter parameters listed.")]
         internal static void Userlist(UserListParms parms)
         {
@@ -365,7 +365,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
                     throw new KeyNotFoundException($"User {un} not found");
 
                 user.Entity.Password = parms.Password;
-
+                user.PasswordOnly = true;
                 m_client.UpdateUser(user.Entity.Key.Value, user);
                 break;
             }

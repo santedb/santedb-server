@@ -50,7 +50,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// <summary>
         /// Application authentication secret
         /// </summary>
-        [Column("app_scrt")]
+        [Column("app_scrt"), Secret]
         public String Secret { get; set; }
 
         /// <summary>

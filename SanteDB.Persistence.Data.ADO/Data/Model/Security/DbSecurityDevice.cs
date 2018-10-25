@@ -44,7 +44,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// <summary>
         /// Device secret
         /// </summary>
-        [Column("dev_scrt")]
+        [Column("dev_scrt"), Secret]
         public String DeviceSecret { get; set; }
 
         /// <summary>

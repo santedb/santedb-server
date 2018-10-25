@@ -79,7 +79,7 @@ namespace SanteDB.Tools.AdminConsole.Security
 				{ "Authorization", String.Format("BASIC {0}", Convert.ToBase64String(Encoding.UTF8.GetBytes(appAuthString))) }
 			};
 			//if (claimString.Length > 0)
-			//	retVal.Add ("X-OpenIZClient-Claim", claimString.ToString ());
+			//	retVal.Add ("X-SanteDBClient-Claim", claimString.ToString ());
 				
 			return retVal;
 		}

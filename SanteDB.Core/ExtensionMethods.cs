@@ -24,7 +24,9 @@ using System.Security.Claims;
 using System.Security.Principal;
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Services;
+using MARC.HI.EHRS.SVC.Core.Services.Policy;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 
@@ -132,5 +134,21 @@ namespace SanteDB.Core
 				return locale.GetString(stringId);
 			}
 		}
+
+        /// <summary>
+        /// Convert to policy instance
+        /// </summary>
+        public static SecurityPolicyInstance ToPolicyInstance(this IPolicyInstance me)
+        {
+            return new SecurityPolicyInstance(
+                new SecurityPolicy()
+                {
+                    CanOverride = me.Policy.CanOverride,
+                    Oid = me.Policy.Oid,
+                    Name = me.Policy.Name
+                },
+                (PolicyGrantType)(int)me.Rule
+            );
+        }
 	}
 }

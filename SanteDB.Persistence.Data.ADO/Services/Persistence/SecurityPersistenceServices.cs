@@ -111,7 +111,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 			}))
 				context.Insert(itm);
 
-			return retVal;
+            retVal.ApplicationSecret = null;
+
+            return retVal;
 		}
 
 		/// <summary>
@@ -167,6 +169,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 					context.Insert(pol);
 			}
 
+            data.ApplicationSecret = null;
 			return data;
 		}
 	}
@@ -212,7 +215,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 			}))
 				context.Insert(itm);
 
-			return retVal;
+            data.DeviceSecret = null;
+
+            return retVal;
 		}
 
 		/// <summary>
@@ -264,7 +269,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 					context.Insert(pol);
 			}
 
-			return data;
+            data.DeviceSecret = null;
+
+            return data;
 		}
 	}
 
@@ -425,6 +432,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 					});
 				}
 
+            retVal.Password = null;
 			return retVal;
 		}
 
@@ -510,7 +518,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 				});
 			}
 
-			return retVal;
+            retVal.Password = null;
+
+            return retVal;
 		}
 
 		/// <summary>

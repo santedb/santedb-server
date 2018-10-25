@@ -1,4 +1,6 @@
 ﻿using MARC.HI.EHRS.SVC.Core;
+using MARC.HI.EHRS.SVC.Core.Services.Policy;
+using SanteDB.Core;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Model.Query;
@@ -20,13 +22,13 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
     /// Represents a resource handler that wraps a security based entity
     /// </summary>
     /// <typeparam name="TSecurityEntity">The type of security entity being wrapped</typeparam>
-    public class SecurityEntityResourceHandler<TSecurityEntity> : IResourceHandler
+    public abstract class SecurityEntityResourceHandler<TSecurityEntity> : IResourceHandler
         where TSecurityEntity : SecurityEntity
     {
 
         // The repository for the entity
         private IRepositoryService<TSecurityEntity> m_repository;
-
+        
         /// <summary>
         /// Create a new instance of the security entity resource handler
         /// </summary>
@@ -67,7 +69,6 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
             // First, we want to copy over the roles
             var td = data as ISecurityEntityInfo<TSecurityEntity>;
             if (td is null) throw new ArgumentException("Invalid type", nameof(data));
-
             // Now for the fun part we want to map any policies over to the wrapped type
             td.Entity.Policies = td.Policies.Select(p => new SecurityPolicyInstance(p.Policy, p.Grant)).ToList();
 
@@ -85,9 +86,12 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
         public virtual object Get(object id, object versionId)
         {
             // Get the object
-            var retVal = this.m_repository.Get((Guid)id, (Guid)versionId);
+            var data = this.m_repository.Get((Guid)id, (Guid)versionId);
 
-            return Activator.CreateInstance(this.Type, retVal);
+            var retVal = Activator.CreateInstance(this.Type, data) as ISecurityEntityInfo<TSecurityEntity>;
+            retVal.Policies = ApplicationContext.Current.GetService<IPolicyInformationService>().GetActivePolicies(data).Select(o=>new SecurityPolicyInfo(o.ToPolicyInstance())).ToList();
+            return retVal;
+
         }
 
         /// <summary>
@@ -114,7 +118,12 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
         {
             var query = QueryExpressionParser.BuildLinqExpression<TSecurityEntity>(queryParameters);
             var results = this.m_repository.Find(query, offset, count, out totalCount);
-            return results.Select(o => Activator.CreateInstance(this.Type, o)).OfType<Object>();
+            return results.AsParallel().Select(o =>
+            {
+                var r = Activator.CreateInstance(this.Type, o) as ISecurityEntityInfo<TSecurityEntity>;
+                r.Policies = ApplicationContext.Current.GetSerivce<IPolicyInformationService>().GetActivePolicies(o).Select(p=>new SecurityPolicyInfo(p.ToPolicyInstance())).ToList();
+                return r;
+            }).OfType<Object>();
         }
 
         /// <summary>

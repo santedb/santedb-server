@@ -18,3 +18,6 @@
 	path = santedb-orm
 	url = https://github.com/santedb/santedb-orm.git
 	branch = master
+[submodule "santedb-cdss"]
+	path = santedb-cdss
+	url = https://github.com/santedb/santedb-cdss

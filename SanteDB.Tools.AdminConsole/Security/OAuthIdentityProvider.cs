@@ -135,7 +135,7 @@ namespace SanteDB.Tools.AdminConsole.Security
                         restClient.Requesting += (o, p) =>
                         {
                             if (!String.IsNullOrEmpty(tfaSecret))
-                                p.AdditionalHeaders.Add("X-OpenIZ-TfaSecret", tfaSecret);
+                                p.AdditionalHeaders.Add("X-SanteDB-TfaSecret", tfaSecret);
                         };
 
                         OAuthTokenResponse response = restClient.Post<OAuthTokenRequest, OAuthTokenResponse>("oauth2_token", "application/x-www-urlform-encoded", request);

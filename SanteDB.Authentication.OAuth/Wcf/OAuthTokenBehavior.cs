@@ -353,8 +353,8 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                    {
                     //new Claim(ClaimTypes.AuthenticationInstant, issued.ToString("o")), 
                     new Claim(ClaimTypes.AuthenticationMethod, "OAuth2"),
-                    new Claim(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim, claimsPrincipal.FindFirst(ClaimTypes.Sid).Value),
-                    new Claim(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim, claimsPrincipal.FindFirst(ClaimTypes.Sid)?.Value)
+                    new Claim(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim, claimsPrincipal.Identities.OfType<Core.Security.ApplicationIdentity>().FirstOrDefault()?.FindFirst(ClaimTypes.Sid).Value),
+                    new Claim(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim, claimsPrincipal.Identities.OfType<Core.Security.DeviceIdentity>().FirstOrDefault()?.FindFirst(ClaimTypes.Sid)?.Value)
                    });
             }
 

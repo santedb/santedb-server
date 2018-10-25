@@ -65,7 +65,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
 		/// Gets or sets the password hash.
 		/// </summary>
 		/// <value>The password hash.</value>
-		[Column("passwd")]
+		[Column("passwd"), Secret]
 		public String Password {
 			get;
 			set;
