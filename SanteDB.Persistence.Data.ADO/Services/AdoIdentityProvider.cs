@@ -173,7 +173,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             else if (!String.IsNullOrEmpty(password))
                                 retVal = this.Authenticate(userName, password) as ClaimsPrincipal;
                             else
-                                throw new PolicyViolationException(PermissionPolicyIdentifiers.Login, PolicyDecisionOutcomeType.Deny);
+                                throw new PolicyViolationException(new GenericPrincipal(new GenericIdentity(userName), new string[0]), PermissionPolicyIdentifiers.Login, PolicyDecisionOutcomeType.Deny);
 
                             // Now we want to fire authenticated
                             this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, retVal, true));
@@ -237,7 +237,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             if (userName != principal.Identity.Name &&
                                 pdpOutcome.HasValue &&
                                 pdpOutcome != PolicyDecisionOutcomeType.Grant)
-                                throw new PolicyViolationException(PermissionPolicyIdentifiers.ChangePassword, pdpOutcome.Value);
+                                throw new PolicyViolationException(principal, PermissionPolicyIdentifiers.ChangePassword, pdpOutcome.Value);
 
                             user.Password = passwordHashingService.EncodePassword(newPassword);
                             user.SecurityHash = Guid.NewGuid().ToString();

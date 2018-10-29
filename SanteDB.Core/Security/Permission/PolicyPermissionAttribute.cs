@@ -123,7 +123,7 @@ namespace SanteDB.Core.Security.Attribute
             // Non system principals must be authenticated
             if(!principal.Identity.IsAuthenticated &&
                 principal != AuthenticationContext.SystemPrincipal)
-                throw new PolicyViolationException(this.m_policyId, PolicyDecisionOutcomeType.Deny);
+                throw new PolicyViolationException(principal, this.m_policyId, PolicyDecisionOutcomeType.Deny);
 
             PolicyDecisionOutcomeType action = PolicyDecisionOutcomeType.Deny;
             if (pdp == null) // No way to verify 
@@ -134,7 +134,7 @@ namespace SanteDB.Core.Security.Attribute
             this.m_traceSource.TraceInformation("Policy Enforce: {0}({1}) = {2}", principal?.Identity?.Name, this.m_policyId, action);
 
             if (action != PolicyDecisionOutcomeType.Grant)
-                throw new PolicyViolationException(this.m_policyId, action);
+                throw new PolicyViolationException(principal, this.m_policyId, action);
         }
 
         /// <summary>

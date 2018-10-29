@@ -54,7 +54,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0.1" />
-    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.2" />
+    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.3" />
     <Reference Include="MohawkCollege.Util.Console.Parameters">
       <HintPath>..\Solution Items\MohawkCollege.Util.Console.Parameters.dll</HintPath>
     </Reference>

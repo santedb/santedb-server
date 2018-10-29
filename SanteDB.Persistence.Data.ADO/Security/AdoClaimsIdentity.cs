@@ -115,7 +115,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
                 if (userName == AuthenticationContext.AnonymousPrincipal.Identity.Name ||
                     userName == AuthenticationContext.SystemPrincipal.Identity.Name)
                 {
-                    throw new PolicyViolationException(PermissionPolicyIdentifiers.Login, PolicyDecisionOutcomeType.Deny);
+                    throw new PolicyViolationException(new GenericPrincipal(new GenericIdentity(userName), new String[0]), PermissionPolicyIdentifiers.Login, PolicyDecisionOutcomeType.Deny);
                 }
 
                 Guid? userId = Guid.Empty;
