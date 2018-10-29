@@ -657,7 +657,7 @@ namespace SanteDB.Messaging.AMI.Wcf
                     if (retVal == null)
                         WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NoContent;
                     else
-                        WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.OK;
+                        WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Created;
 
                     var versioned = retVal as IVersionedEntity;
                     WebOperationContext.Current.OutgoingResponse.ETag = (retVal as IdentifiedData)?.Tag;
@@ -709,6 +709,88 @@ namespace SanteDB.Messaging.AMI.Wcf
         {
             if (!ApplicationContext.Current.IsRunning)
                 throw new DomainStateException();
+        }
+
+        /// <summary>
+        /// Lock resource
+        /// </summary>
+        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
+        public object Lock(string resourceType, string key)
+        {
+            this.ThrowIfNotReady();
+            try
+            {
+
+                var handler = AmiMessageHandler.ResourceHandler.GetResourceHandler<IAmiServiceContract>(resourceType);
+                if (handler != null && handler is ILockableResourceHandler)
+                {
+                    var retVal = (handler as ILockableResourceHandler).Lock(Guid.Parse(key));
+                    if (retVal == null)
+                        throw new FileNotFoundException(key);
+
+                    var idata = retVal as IdentifiedData;
+                    var adata = retVal as IAmiIdentified;
+
+                    WebOperationContext.Current.OutgoingResponse.ETag = idata?.Tag ?? adata?.Tag;
+                    WebOperationContext.Current.OutgoingResponse.LastModified = idata?.ModifiedOn.DateTime ?? adata?.ModifiedOn.DateTime ?? DateTime.Now;
+
+                    // HTTP IF headers?
+                    WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Created;
+                    return retVal;
+                }
+                else if (handler == null)
+                    throw new FileNotFoundException(resourceType);
+                else
+                    throw new NotSupportedException();
+            }
+            catch (Exception e)
+            {
+                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
+                throw;
+
+            }
+        }
+
+        /// <summary>
+        /// Unlock resource
+        /// </summary>
+        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
+        public object UnLock(string resourceType, string key)
+        {
+            this.ThrowIfNotReady();
+            try
+            {
+
+                var handler = AmiMessageHandler.ResourceHandler.GetResourceHandler<IAmiServiceContract>(resourceType);
+                if (handler != null && handler is ILockableResourceHandler)
+                {
+                    var retVal = (handler as ILockableResourceHandler).Unlock(Guid.Parse(key));
+                    if (retVal == null)
+                        throw new FileNotFoundException(key);
+
+                    var idata = retVal as IdentifiedData;
+                    var adata = retVal as IAmiIdentified;
+
+                    WebOperationContext.Current.OutgoingResponse.ETag = idata?.Tag ?? adata?.Tag;
+                    WebOperationContext.Current.OutgoingResponse.LastModified = idata?.ModifiedOn.DateTime ?? adata?.ModifiedOn.DateTime ?? DateTime.Now;
+
+                    // HTTP IF headers?
+                    WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Created;
+                    return retVal;
+                }
+                else if (handler == null)
+                    throw new FileNotFoundException(resourceType);
+                else
+                    throw new NotSupportedException();
+            }
+            catch (Exception e)
+            {
+                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
+                throw;
+
+            }
         }
     }
 }

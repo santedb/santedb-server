@@ -325,8 +325,8 @@ namespace SanteDB.Core.Security.Audit
         /// </summary>
         public static void SendAudit(AuditData audit)
         {
-            traceSource.TraceVerbose("Sending Audit - {0}", audit.CorrelationToken);
-
+            traceSource.TraceInfo("Dispatching Audit - {0}", audit.CorrelationToken);
+            
             // If the current principal is SYSTEM then we don't need to send an audit
             ApplicationContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(o =>
             {

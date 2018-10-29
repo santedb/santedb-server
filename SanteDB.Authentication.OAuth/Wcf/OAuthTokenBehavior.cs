@@ -525,6 +525,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                         AccessToken = (OperationContext.Current.IncomingMessageProperties[HttpRequestMessageProperty.Name] as HttpRequestMessageProperty).Headers["Authorization"].Split(' ')[1],
                         IdentityToken = new JwtSecurityTokenHandler().WriteToken(jwt),
                         ExpiresIn = (int)(notAfter).Subtract(DateTime.Now).TotalMilliseconds,
+                        TokenType = this.m_configuration.TokenType
                     });
                 }
             }

@@ -176,7 +176,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
             catch (DbException e)
             {
                 s_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Database Error Creating Identity: {0}", e);
-                throw new AuthenticationException(e.Message);
+                throw new AuthenticationException(e.Message, e);
             }
             catch (Exception e)
             {

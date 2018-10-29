@@ -163,6 +163,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)(i + 1) / data.Item.Count, itm));
                 try
                 {
+                    if (svc == null)
+                        throw new InvalidOperationException($"Cannot find persister for {itm.GetType()}");
                     if (itm.TryGetExisting(context, true) != null)
                     {
                         this.m_tracer.TraceInformation("Will update {0} object from bundle...", itm);
@@ -181,7 +183,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
                 catch(Exception e)
                 {
-                    throw new Exception("Could not insert bundle due to sub-object persistence", e);
+                    throw new Exception($"Could not insert bundle due to sub-object persistence (bundle item {i})", e);
                 }
 
             }

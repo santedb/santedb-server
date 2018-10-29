@@ -45,6 +45,7 @@ using SanteDB.Persistence.Data.ADO.Data.Hax;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security;
 using System.Data;
+using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -380,7 +381,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 {
                     this.m_tracer.TraceEvent(TraceEventType.Information, 0, "Loading {0}...", t.AssemblyQualifiedName);
 
-	                ApplicationContext.Current.AddServiceProvider(t);
+                    // If the persistence service is generic then we should check if we're allowed
+                    if(!t.IsGenericType || 
+                        t.IsGenericType && (s_configuration.AllowedResources.Count == 0 ||
+                        s_configuration.AllowedResources.Contains(t.GetGenericArguments()[0].GetCustomAttribute<XmlTypeAttribute>()?.TypeName)))
+	                    ApplicationContext.Current.AddServiceProvider(t);
 
 					// Add to cache since we're here anyways
 
@@ -404,6 +409,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     var idpType = typeof(IDataPersistenceService<>);
                     Type modelClassType = Type.GetType(itm.ModelClass),
                         domainClassType = Type.GetType(itm.DomainClass);
+
+                    // Make sure we're allowed to run this
+                    if (s_configuration.AllowedResources.Count > 0 &&
+                        !s_configuration.AllowedResources.Contains(modelClassType.GetCustomAttribute<XmlTypeAttribute>()?.TypeName))
+                        continue;
+
                     idpType = idpType.MakeGenericType(modelClassType);
 
                     if (modelClassType.IsAbstract || domainClassType.IsAbstract) continue;

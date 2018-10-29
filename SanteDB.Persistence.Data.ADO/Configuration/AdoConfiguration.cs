@@ -86,6 +86,10 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         public List<String> DataCorrectionKeys { get; set; }
 
         /// <summary>
+        /// Allowed resources
+        /// </summary>
+        public List<String> AllowedResources { get; set; }
+        /// <summary>
         /// True if statements should be prepared
         /// </summary>
         public bool PrepareStatements { get; set; }

@@ -4,6 +4,7 @@ using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.Messaging.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
     /// <summary>
     /// Represents a resource handler that can handle security users
     /// </summary>
-    public class SecurityUserResourceHandler : SecurityEntityResourceHandler<SecurityUser>
+    public class SecurityUserResourceHandler : SecurityEntityResourceHandler<SecurityUser>, ILockableResourceHandler
     {
 
         /// <summary>
@@ -42,6 +43,24 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
             {
                 Roles = td.Roles
             };
+        }
+
+        /// <summary>
+        /// Lock the specified user
+        /// </summary>
+        public object Lock(object key)
+        {
+            ApplicationContext.Current.GetService<ISecurityRepositoryService>().LockUser((Guid)key);
+            return this.Get(key, Guid.Empty);
+        }
+
+        /// <summary>
+        /// Unlock user
+        /// </summary>
+        public object Unlock(object key)
+        {
+            ApplicationContext.Current.GetService<ISecurityRepositoryService>().UnlockUser((Guid)key);
+            return this.Get(key, Guid.Empty);
         }
 
         /// <summary>

@@ -51,6 +51,11 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
                 throw new ConfigurationErrorsException("No connection manager specified", section);
             else
             {
+                var allowedResources = section.SelectNodes("./resources/add");
+                retVal.AllowedResources = new List<string>();
+                foreach (XmlElement resourceXml in allowedResources)
+                    retVal.AllowedResources.Add(resourceXml.Attributes["name"].Value);
+
                 if (connectionNode.Attributes["readWriteConnection"] == null)
                     throw new ConfigurationErrorsException("Connection manager must have a read/write connection", connectionNode);
                 else

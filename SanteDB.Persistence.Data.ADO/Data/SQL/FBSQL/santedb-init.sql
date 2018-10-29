@@ -60,12 +60,6 @@ INSERT INTO SEC_APP_POL_ASSOC_TBL(SEC_POL_INST_ID, APP_ID, POL_ID, POL_ACT)
 	WHERE
 		SEC_APP_TBL.APP_PUB_ID = 'org.santedb.disconnected_client';
 
-INSERT INTO SEC_DEV_TBL (DEV_ID, DEV_SCRT, DEV_PUB_ID, CRT_PROV_ID)		
-	VALUES (char_to_uuid('F90F1488-F3CC-4357-9462-7CE3AB12B148'), 'device_secret', 'device_public_id', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
-
-INSERT INTO ASGN_AUT_TBL (AUT_ID, AUT_NAME, Oid, NSID, Url, DEV_ID, DESCR, CRT_PROV_ID)
-		VALUES (char_to_uuid('86e92633-43d5-41ce-937e-0a080b49dc99'), 'Test', '1.3.6.1.4.1.33349.3.1.5.9.2.10000', 'Test', 'http://marc-hi.ca', char_to_uuid('F90F1488-F3CC-4357-9462-7CE3AB12B148'), 'Testing Device', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
-
 INSERT INTO SEC_APP_TBL (APP_ID, APP_PUB_ID, APP_SCRT, CRT_UTC, CRT_PROV_ID) 
 		VALUES (char_to_uuid('4C5A581C-A6EE-4267-9231-B0D3D50CC08F'), 'org.santedb.debug', 'cba830db9a6f5a4b638ff95ef70e98aa82d414ac35b351389024ecb6be40ebf0', CURRENT_TIMESTAMP, char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 

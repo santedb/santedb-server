@@ -91,6 +91,15 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         /// </summary>
         [Column("obslt_utc")]
         public DateTimeOffset? ObsoletionTime { get; set; }
+
+        /// <summary>
+        /// Identifies whether obsoletion time is specified
+        /// </summary>
+        public bool ObsoletionTimeSpecified { get; set; }
+        /// <summary>
+        /// Identifies whether obsoletion time is specified
+        /// </summary>
+        public bool ObsoletedByKeySpecified { get; set; }
     }
 
     /// <summary>

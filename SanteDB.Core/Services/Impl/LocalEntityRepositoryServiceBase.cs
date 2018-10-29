@@ -38,30 +38,8 @@ namespace SanteDB.Core.Services.Impl
     /// Represents a base class for entity repository services
     /// </summary>
     public abstract class LocalEntityRepositoryServiceBase : IPersistableQueryRepositoryService,
-        IAuditEventSource,
         IFastQueryRepositoryService
     {
-        /// <summary>
-        /// Fired when new data is created
-        /// </summary>
-        public event EventHandler<AuditDataEventArgs> DataCreated;
-        /// <summary>
-        /// Fired when data is updated
-        /// </summary>
-        public event EventHandler<AuditDataEventArgs> DataUpdated;
-        /// <summary>
-        /// Fired when data is obsoleted
-        /// </summary>
-        public event EventHandler<AuditDataEventArgs> DataObsoleted;
-        /// <summary>
-        /// Fired when data is disclosed
-        /// </summary>
-        public event EventHandler<AuditDataDisclosureEventArgs> DataDisclosed;
-
-        /// <summary>
-        /// When true, suppresses audit events
-        /// </summary>
-        protected bool suppressAuditEvents = false;
 
         /// <summary>
         /// Find with stored query parameters
@@ -85,8 +63,6 @@ namespace SanteDB.Core.Services.Impl
 
             var retVal = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
 
-            if(!this.suppressAuditEvents)
-                this.DataDisclosed?.Invoke(this, new AuditDataDisclosureEventArgs(query.ToString(), retVal));
             return retVal;
         }
 
@@ -110,8 +86,6 @@ namespace SanteDB.Core.Services.Impl
 
             entity = persistenceService.Insert(entity, AuthenticationContext.Current.Principal, TransactionMode.Commit);
 
-            if (!this.suppressAuditEvents)
-                this.DataCreated?.Invoke(this, new AuditDataEventArgs(entity));
             businessRulesService?.AfterInsert(entity);
 
             return entity;
@@ -141,8 +115,6 @@ namespace SanteDB.Core.Services.Impl
             entity = businessRulesService?.BeforeObsolete(entity) ?? entity;
 
             entity = persistenceService.Obsolete(entity, AuthenticationContext.Current.Principal, TransactionMode.Commit);
-            if (!this.suppressAuditEvents)
-                this.DataObsoleted?.Invoke(this, new AuditDataEventArgs(entity));
             return businessRulesService?.AfterObsolete(entity) ?? entity;
         }
 
@@ -163,8 +135,6 @@ namespace SanteDB.Core.Services.Impl
             var result = persistenceService.Get(new Identifier<Guid>(key, versionKey), AuthenticationContext.Current.Principal, true);
 
             var retVal = businessRulesService?.AfterRetrieve(result) ?? result;
-            if (!this.suppressAuditEvents)
-                this.DataDisclosed?.Invoke(this, new AuditDataDisclosureEventArgs(key.ToString(), new Object[] { retVal }));
             return retVal;
         }
 
@@ -203,8 +173,6 @@ namespace SanteDB.Core.Services.Impl
 
                 data = businessRulesService?.BeforeUpdate(data) ?? data;
                 data = persistenceService.Update(data, AuthenticationContext.Current.Principal, TransactionMode.Commit);
-                if (!this.suppressAuditEvents)
-                    this.DataUpdated?.Invoke(this, new AuditDataEventArgs(data));
                 businessRulesService?.AfterUpdate(data);
                 return data;
             }
@@ -212,8 +180,6 @@ namespace SanteDB.Core.Services.Impl
             {
                 data = businessRulesService?.BeforeInsert(data) ?? data;
                 data = persistenceService.Insert(data, AuthenticationContext.Current.Principal, TransactionMode.Commit);
-                if (!this.suppressAuditEvents)
-                    this.DataCreated?.Invoke(this, new AuditDataEventArgs(data));
                 businessRulesService?.AfterInsert(data);
                 return data;
             }
@@ -255,8 +221,6 @@ namespace SanteDB.Core.Services.Impl
             results = persistenceService.QueryFast(query, queryId, offset, count, AuthenticationContext.Current.Principal, out totalResults);
 
             results = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
-            if (!this.suppressAuditEvents)
-                this.DataDisclosed?.Invoke(this, new AuditDataDisclosureEventArgs(query.ToString(), results));
             return results;
         }
     }

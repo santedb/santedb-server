@@ -206,9 +206,12 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
                 if (user == null)
                     throw new KeyNotFoundException($"User {un} not found");
 
-                user.Entity.Lockout = DateTime.MaxValue;
+                user.Entity.Lockout = !parms.Locked ? null : (DateTime?)DateTime.MaxValue;
 
-                m_client.UpdateUser(user.Entity.Key.Value, user);
+                if(parms.Locked)
+                    m_client.Client.Lock<SecurityUserInfo>($"SecurityUser/{user.Key}");
+                else
+                    m_client.Client.Unlock<SecurityUserInfo>($"SecurityUser/{user.Key}");
             }
         }
 

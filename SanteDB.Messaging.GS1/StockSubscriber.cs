@@ -93,8 +93,8 @@ namespace SanteDB.Messaging.GS1
             {
                 this.m_gs1Util = new Gs1Util();
                 // Application has started let's bind to the events we need
-                ApplicationContext.Current.GetService<IRepositoryService<Act>>().DataCreated += (xo, xe) => this.NotifyAct(xe.Objects.OfType<Act>());
-                ApplicationContext.Current.GetService<IRepositoryService<Bundle>>().DataCreated += (xo, xe) => this.NotifyAct(xe.Objects.OfType<Bundle>().SelectMany(i=>i.Item.OfType<Act>()));
+                ApplicationContext.Current.GetService<IDataPersistenceService<Act>>().Inserted += (xo, xe) => this.NotifyAct(new Act[] { xe.Data });
+                ApplicationContext.Current.GetService<IDataPersistenceService<Bundle>>().Inserted += (xo, xe) => this.NotifyAct(xe.Data.Item.OfType<Act>());
 
             };
 

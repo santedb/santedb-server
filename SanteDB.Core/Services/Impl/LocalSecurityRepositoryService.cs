@@ -450,7 +450,9 @@ namespace SanteDB.Core.Services.Impl
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         public SecurityUser GetUser(String userName)
         {
+            if (String.IsNullOrEmpty(userName)) return null;
             var identity = ApplicationContext.Current.GetService<IIdentityProviderService>().GetIdentity(userName);
+            if (identity == null) return null;
             int tr = 0;
             return base.Find<SecurityUser>(u => u.UserName == identity.Name, 0, 1, out tr, Guid.Empty).FirstOrDefault();
         }

@@ -10,20 +10,16 @@ if exist "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild
 	) else ( echo Unable to locate VS 2017 build tools, will use default build tools )
 )
 
-set cwd = %cd%
-echo Will use NUGET in %cd%
+set cwd=%cd%
+set nuget="%cwd%\.nuget\nuget.exe"
+echo Will use NUGET in %nuget%
 echo Will use MSBUILD in %msbuild%
 
-FOR /R %cwd% %%G IN (*.sln) DO (
-	echo Building %%~pG 
-	pushd %%~pG
-	%msbuild% %%G /t:rebuild /p:configuration=release /m
-	popd
-)
+%msbuild% santedb-server-ext.sln /t:restore /t:rebuild /p:configuration=debug /m
 
 FOR /R %cwd% %%G IN (*.nuspec) DO (
 	echo Packing %%~pG
 	pushd %%~pG
-	%cd%\nuget.exe pack -OutputDirectory %localappdata%\NugetStaging -prop Configuration=Release
+	%nuget% pack -OutputDirectory %localappdata%\NugetStaging -prop Configuration=Release -symbols
 	popd
 )

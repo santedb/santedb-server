@@ -52,6 +52,7 @@ using System.Text;
 using System.Threading;
 using MARC.HI.EHRS.SVC.Core.Attributes;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
+using SanteDB.Core.Model.Collection;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -448,7 +449,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
         private String ObjectToString(TData data)
         {
             if (data == null) return "null";
-            XmlSerializer xsz = new XmlSerializer(data.GetType());
+            IEnumerable<Type> extraTypes = new Type[] { typeof(TData) };
+            if (data is Bundle)
+                extraTypes = extraTypes.Union((data as Bundle).Item.Select(o => o.GetType()));
+
+            XmlSerializer xsz = new XmlSerializer(data.GetType(), extraTypes.ToArray());
             using (MemoryStream ms = new MemoryStream())
             {
                 xsz.Serialize(ms, data);

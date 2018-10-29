@@ -408,8 +408,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
 	                else
 		                user.Lockout = null;
 
+                    user.LockoutSpecified = true;
                     user.ObsoletionTime = null;
+                    user.ObsoletionTimeSpecified = true;
                     user.ObsoletedByKey = null;
+                    user.ObsoletedByKeySpecified = true;
+
                     user.UpdatedByKey = dataContext.EstablishProvenance(authContext);
                     user.UpdatedTime = DateTimeOffset.Now;
                     user.SecurityHash = Guid.NewGuid().ToString();

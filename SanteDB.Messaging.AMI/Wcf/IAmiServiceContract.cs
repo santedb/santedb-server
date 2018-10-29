@@ -118,6 +118,24 @@ namespace SanteDB.Messaging.AMI.Wcf
         Object Get(String resourceType, String key);
 
         /// <summary>
+        /// Locks the specified resource from the service
+        /// </summary>
+        /// <param name="resourceType">The type of resource to be locked</param>
+        /// <param name="key">The key of the resource</param>
+        /// <returns>The locked resource</returns>
+        [WebInvoke(Method = "LOCK", UriTemplate = "/{resourceType}/{key}", BodyStyle = WebMessageBodyStyle.Bare)]
+        Object Lock(String resourceType, String key);
+
+        /// <summary>
+        /// Unlocks the specified resource from the service
+        /// </summary>
+        /// <param name="resourceType">The type of resource to be unlocked</param>
+        /// <param name="key">The key of the resource</param>
+        /// <returns>The unlocked resource</returns>
+        [WebInvoke(Method = "UNLOCK", UriTemplate = "/{resourceType}/{key}", BodyStyle = WebMessageBodyStyle.Bare)]
+        Object UnLock(String resourceType, String key);
+
+        /// <summary>
         /// Heads the specified resource from the service
         /// </summary>
         /// <param name="resourceType">The type of resource to be fetched</param>

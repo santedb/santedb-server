@@ -48,6 +48,14 @@ namespace SanteDB
         /// </summary>
         static void Main(String[] args)
         {
+            // Trace copyright information
+            Assembly entryAsm = Assembly.GetEntryAssembly();
+
+            // Dump some info
+            Trace.TraceInformation("SanteDB Startup : v{0}", entryAsm.GetName().Version);
+            Trace.TraceInformation("SanteDB Working Directory : {0}", entryAsm.Location);
+            Trace.TraceInformation("Operating System: {0} {1}", Environment.OSVersion.Platform, Environment.OSVersion.VersionString);
+            Trace.TraceInformation("CLI Version: {0}", Environment.Version);
 
             AppDomain.CurrentDomain.SetData(
                "DataDirectory",
@@ -63,17 +71,10 @@ namespace SanteDB
             // Parser
             ParameterParser<ConsoleParameters> parser = new ParameterParser<ConsoleParameters>();
 
-            // Trace copyright information
-            Assembly entryAsm = Assembly.GetEntryAssembly();
-
+           
             bool hasConsole = true;
 
-            // Dump some info
-            Trace.TraceInformation("SanteDB Startup : v{0}", entryAsm.GetName().Version);
-            Trace.TraceInformation("SanteDB Working Directory : {0}", entryAsm.Location);
-            Trace.TraceInformation("Operating System: {0} {1}", Environment.OSVersion.Platform, Environment.OSVersion.VersionString);
-            Trace.TraceInformation("CLI Version: {0}", Environment.Version);
-
+            
             try
             {
                 var parameters = parser.Parse(args);
