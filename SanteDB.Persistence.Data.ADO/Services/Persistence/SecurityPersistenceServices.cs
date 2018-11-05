@@ -205,7 +205,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 			if (data.Policies == null)
 				return retVal;
 
-			data.Policies.ForEach(o => o.Policy?.EnsureExists(context));
+            data.Policies.ForEach(o => o.PolicyKey = o.Policy?.EnsureExists(context)?.Key ?? o.PolicyKey);
 			foreach (var itm in data.Policies.Select(o => new DbSecurityDevicePolicy()
 			{
 				PolicyKey = o.PolicyKey.Value,

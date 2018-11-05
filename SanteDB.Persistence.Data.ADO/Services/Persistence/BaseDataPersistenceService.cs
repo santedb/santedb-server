@@ -57,7 +57,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override TModel InsertInternal(DataContext context, TModel data)
         {
             if (data.CreatedBy != null) data.CreatedBy = data.CreatedBy?.EnsureExists(context) as SecurityProvenance;
-            data.CreatedByKey = data.CreatedBy?.Key ?? data.CreatedByKey;
+            data.CreatedByKey = data.CreatedBy?.Key ?? data.CreatedByKey ?? context.ContextId;
 
             // HACK: For now, modified on can only come from one property, some non-versioned data elements are bound on UpdatedTime
             var nvd = data as NonVersionedEntityData;

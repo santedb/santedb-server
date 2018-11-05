@@ -85,7 +85,10 @@ namespace SanteDB.Core.Wcf.Serialization
                     tracer.TraceVerbose("Generating serializer for {0}", s.Name);
                     try
                     {
-                        s_serializers.Add(s, new XmlSerializer(s, s.GetCustomAttributes<XmlIncludeAttribute>().Select(o => o.Type).ToArray()));
+                        if (typeof(Bundle).IsAssignableFrom(s))
+                            s_serializers.Add(s, new XmlSerializer(s, AppDomain.CurrentDomain.GetAssemblies().SelectMany(o => o.GetTypes()).Where(t => typeof(IdentifiedData).IsAssignableFrom(t) && !t.IsGenericTypeDefinition && !t.IsAbstract).ToArray()));
+                        else
+                            s_serializers.Add(s, new XmlSerializer(s, s.GetCustomAttributes<XmlIncludeAttribute>().Select(o => o.Type).ToArray()));
                     }
                     catch(Exception e)
                     {
