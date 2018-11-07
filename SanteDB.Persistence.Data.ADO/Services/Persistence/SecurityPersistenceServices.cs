@@ -101,8 +101,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 			if (data.Policies == null)
 				return retVal;
 
-			data.Policies.ForEach(o => o.Policy?.EnsureExists(context));
-			foreach (var itm in data.Policies.Select(o => new DbSecurityApplicationPolicy()
+            data.Policies.ForEach(o => o.PolicyKey = o.Policy?.EnsureExists(context)?.Key ?? o.PolicyKey);
+            foreach (var itm in data.Policies.Select(o => new DbSecurityApplicationPolicy()
 			{
 				PolicyKey = o.PolicyKey.Value,
 				GrantType = (int)o.GrantType,
@@ -159,7 +159,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 			if (data.Policies != null)
 			{
 				context.Delete<DbSecurityApplicationPolicy>(o => o.SourceKey == data.Key);
-				foreach (var pol in data.Policies.Select(o => new DbSecurityApplicationPolicy
+                data.Policies.ForEach(o => o.PolicyKey = o.Policy?.EnsureExists(context)?.Key ?? o.PolicyKey);
+                foreach (var pol in data.Policies.Select(o => new DbSecurityApplicationPolicy
 				{
 					PolicyKey = o.PolicyKey.Value,
 					GrantType = (int)o.GrantType,
@@ -259,7 +260,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 			if (data.Policies != null)
 			{
 				context.Delete<DbSecurityDevicePolicy>(o => o.SourceKey == data.Key);
-				foreach (var pol in data.Policies.Select(o => new DbSecurityDevicePolicy
+                data.Policies.ForEach(o => o.PolicyKey = o.Policy?.EnsureExists(context)?.Key ?? o.PolicyKey);
+                foreach (var pol in data.Policies.Select(o => new DbSecurityDevicePolicy
 				{
 					PolicyKey = o.PolicyKey.Value,
 					GrantType = (int)o.GrantType,
@@ -326,9 +328,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
 			if (data.Policies != null)
 			{
-				// TODO: Clean this up
-				data.Policies.ForEach(o => o.Policy?.EnsureExists(context));
-				foreach (var pol in data.Policies.Select(o => new DbSecurityRolePolicy()
+                // TODO: Clean this up
+                data.Policies.ForEach(o => o.PolicyKey = o.Policy?.EnsureExists(context)?.Key ?? o.PolicyKey);
+                foreach (var pol in data.Policies.Select(o => new DbSecurityRolePolicy()
 
 				{
 					PolicyKey = o.PolicyKey.Value,
@@ -389,7 +391,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 			if (data.Policies != null)
 			{
 				context.Delete<DbSecurityRolePolicy>(o => o.SourceKey == data.Key);
-				foreach (var pol in data.Policies.Select(o => new DbSecurityRolePolicy
+                data.Policies.ForEach(o => o.PolicyKey = o.Policy?.EnsureExists(context)?.Key ?? o.PolicyKey);
+                foreach (var pol in data.Policies.Select(o => new DbSecurityRolePolicy
 
 				{
 					PolicyKey = o.PolicyKey.Value,
