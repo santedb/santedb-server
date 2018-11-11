@@ -39,35 +39,53 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Acts
         /// Parent key
         /// </summary>
         [JoinFilter(PropertyName = nameof(DbAct.ClassConceptKey), Value = ActClassKeyStrings.Procedure)]
-        public override Guid ParentKey
+        public override Int32 ParentPrivateKey
         {
             get
             {
-                return base.ParentKey;
+                return base.ParentPrivateKey;
             }
 
             set
             {
-                base.ParentKey = value;
+                base.ParentPrivateKey = value;
             }
         }
 
         /// <summary>
         /// Gets or sets the technique used 
         /// </summary>
-        [Column("mth_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("mth_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
+        public Int32 MethodConceptPrivateKey { get; set; }
+        
+        /// <summary>
+        /// Method concept key
+        /// </summary>
+        [PublicKeyRef(nameof(MethodConceptKey))]
         public Guid? MethodConceptKey { get; set; }
 
         /// <summary>
         /// Gets or sets the approach body site or system
         /// </summary>
-        [Column("apr_ste_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("apr_ste_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
+        public Int32 ApproachSiteConceptPrivateKey { get; set; }
+
+        /// <summary>
+        /// Lookup public key
+        /// </summary>
+        [PublicKeyRef(nameof(ApproachSiteConceptKey))]
         public Guid? ApproachSiteConceptKey { get; set; }
 
         /// <summary>
         /// Gets or sets the target site code
         /// </summary>
-        [Column("trg_ste_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("trg_ste_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
+        public Int32 TargetSiteConceptPrivateKey { get; set; }
+
+        /// <summary>
+        /// Gets the target site concept key
+        /// </summary>
+        [PublicKeyRef(nameof(TargetSiteConceptPrivateKey))]
         public Guid? TargetSiteConceptKey { get; set; }
     }
 }

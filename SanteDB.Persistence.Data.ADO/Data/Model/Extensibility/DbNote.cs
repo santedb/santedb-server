@@ -26,11 +26,11 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Extensibility
 {
-	/// <summary>
-	/// Represents note storage
-	/// </summary>
-	public abstract class DbNote : DbVersionedAssociation
-	{
+    /// <summary>
+    /// Represents note storage
+    /// </summary>
+    public abstract class DbNote : DbVersionedAssociation
+    {
         /// <summary>
         /// Gets or sets the key
         /// </summary>
@@ -41,35 +41,49 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Extensibility
 		/// Gets or sets the author identifier.
 		/// </summary>
 		/// <value>The author identifier.</value>
-		[Column("auth_ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.Key))]
-		public Guid AuthorKey {
-			get;
-			set;
-		}
+		[Column("auth_ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.PrivateKey))]
+        public Int32 AuthorPrivateKey
+        {
+            get;
+            set;
+        }
 
-		/// <summary>
-		/// Gets or sets the text.
-		/// </summary>
-		/// <value>The text.</value>
-		[Column("note_txt")]
-		public String Text {
-			get;
-			set;
-		}
-	}
+        /// <summary>
+        /// Authoriship key
+        /// </summary>
+        [PublicKeyRef(nameof(AuthorPrivateKey))]
+        public Guid AuthorKey { get; set; }
 
-	/// <summary>
-	/// Entity note.
-	/// </summary>
-	[Table("ent_note_tbl")]
-	public class DbEntityNote : DbNote
-	{
+        /// <summary>
+        /// Gets or sets the text.
+        /// </summary>
+        /// <value>The text.</value>
+        [Column("note_txt")]
+        public String Text
+        {
+            get;
+            set;
+        }
+    }
+
+    /// <summary>
+    /// Entity note.
+    /// </summary>
+    [Table("ent_note_tbl")]
+    public class DbEntityNote : DbNote
+    {
 
         /// <summary>
         /// Gets or sets the source identifier.
         /// </summary>
         /// <value>The source identifier.</value>
-        [Column("ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.Key))]
+        [Column("ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.PrivateKey))]
+        public override int SourcePrivateKey { get; set; }
+
+        /// <summary>
+        /// Source key public key
+        /// </summary>
+        [PublicKeyRef(nameof(SourcePrivateKey))]
         public override Guid SourceKey
         {
             get;
@@ -82,13 +96,19 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Extensibility
     /// Act note.
     /// </summary>
     [Table("act_note_tbl")]
-	public class DbActNote : DbNote
-	{
+    public class DbActNote : DbNote
+    {
         /// <summary>
         /// Gets or sets the source identifier.
         /// </summary>
         /// <value>The source identifier.</value>
-        [Column("act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.Key))]
+        [Column("act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.PrivateKey))]
+        public override Int32 SourcePrivateKey { get; set; }
+
+        /// <summary>
+        /// Source private key
+        /// </summary>
+        [PublicKeyRef(nameof(SourcePrivateKey))]
         public override Guid SourceKey
         {
             get;

@@ -2864,7 +2864,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -3777,7 +3777,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -5026,7 +5026,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -6001,7 +6001,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -6874,7 +6874,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -7740,7 +7740,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -8557,7 +8557,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -10875,7 +10875,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -11801,7 +11801,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -12671,7 +12671,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -13504,7 +13504,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -14542,7 +14542,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -16086,7 +16086,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -22446,7 +22446,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -24240,7 +24240,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -25089,7 +25089,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -25998,7 +25998,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -26908,7 +26908,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -27819,7 +27819,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -28706,7 +28706,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -29618,7 +29618,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {
@@ -30835,7 +30835,7 @@ namespace SanteDB.Core.Model.Json.Formatter {
                                                             r.Read();
                                                             object _instance = context.JsonContext.ReadElementUtil(r, typeof(System.Nullable<decimal>), new SanteDB.Core.Applets.ViewModel.Json.JsonSerializationContext("sequence", context.JsonContext, _retVal, context));
                                                             if ((_instance != null)) {
-                                                                _retVal.VersionSequence = ((System.Nullable<decimal>)(_instance));
+                                                                _retVal.VersionSequence = ((System.Nullable<int>)(_instance));
                                                             }
                                                         }
                                                         else {

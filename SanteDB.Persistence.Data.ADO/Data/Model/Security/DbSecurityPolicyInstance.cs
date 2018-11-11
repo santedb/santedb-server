@@ -60,7 +60,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// Gets or sets the source
         /// </summary>
         /// <value>The source identifier.</value>
-        [Column("ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.Key))]
+        [Column("ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.PrivateKey))]
+        public int SourcePrivateKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the private key
+        /// </summary>
+        [PublicKeyRef(nameof(SourcePrivateKey))]
         public override Guid SourceKey
         {
             get;
@@ -90,7 +96,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// Gets or sets the source
         /// </summary>
         /// <value>The source identifier.</value>
-        [Column("act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.Key))]
+        [Column("act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.PrivateKey))]
+        public int SourcePrivateKey { get; set; }
+
+        /// <summary>
+        /// Source private key
+        /// </summary>
+        [PublicKeyRef(nameof(SourcePrivateKey))]
         public override Guid SourceKey
         {
             get;

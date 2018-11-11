@@ -37,19 +37,37 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Acts
         /// <summary>
         /// Gets or sets the source act key
         /// </summary>
-        [Column("src_act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.Key))]
+        [Column("src_act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.PrivateKey))]
+        public override int SourcePrivateKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the public key
+        /// </summary>
+        [PublicKeyRef(nameof(SourcePrivateKey))]
         public override Guid SourceKey { get; set; }
 
         /// <summary>
         /// Gets or sets the target entity key
         /// </summary>
-        [Column("trg_act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.Key))]
+        [Column("trg_act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.PrivateKey))]
+        public int TargetPrivateKey { get; set; }
+
+        /// <summary>
+        /// Target key
+        /// </summary>
+        [PublicKeyRef(nameof(TargetPrivateKey))]
         public Guid TargetKey { get; set; }
 
         /// <summary>
         /// Gets or sets the link type concept
         /// </summary>
-        [Column("rel_typ_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("rel_typ_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
+        public int RelationshipTypePrivateKey { get; set; }
+
+        /// <summary>
+        /// Public key for type
+        /// </summary>
+        [PublicKeyRef(nameof(RelationshipTypePrivateKey))]
         public Guid RelationshipTypeKey { get; set; }
 
         /// <summary>

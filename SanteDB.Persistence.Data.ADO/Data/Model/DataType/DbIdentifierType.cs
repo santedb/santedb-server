@@ -39,7 +39,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.DataType
         /// Gets or sets the type concept identifier.
         /// </summary>
         /// <value>The type concept identifier.</value>
-        [Column("typ_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("typ_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
+        public Int32 TypeConceptPrivateKey { get; set; }
+
+        /// <summary>
+        /// Gets the public key
+        /// </summary>
+        [PublicKeyRef(nameof(TypeConceptPrivateKey))]
 		public Guid TypeConceptKey {
 			get;
 			set;
@@ -49,7 +55,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.DataType
         /// Gets or sets the type concept identifier.
         /// </summary>
         /// <value>The type concept identifier.</value>
-        [Column("ent_scp_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("ent_scp_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
+        public Int32 EntityScopePrivateKey { get; set; }
+
+        /// <summary>
+        /// Entityscope private key
+        /// </summary>
+        [PublicKeyRef(nameof(EntityScopePrivateKey))]
         public Guid? EntityScopeKey
         {
             get;

@@ -39,23 +39,29 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Acts
         /// Parent key
         /// </summary>
         [JoinFilter(PropertyName = nameof(DbAct.ClassConceptKey), Value = ActClassKeyStrings.Encounter)]
-        public override Guid ParentKey
+        public override Int32 ParentPrivateKey
         {
             get
             {
-                return base.ParentKey;
+                return base.ParentPrivateKey;
             }
 
             set
             {
-                base.ParentKey = value;
+                base.ParentPrivateKey = value;
             }
         }
 
         /// <summary>
         /// Identifies the manner in which the patient was discharged
         /// </summary>
-        [Column("dsch_dsp_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("dsch_dsp_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
+        public Int32 DischargeDispositionPrivateKey { get; set; }
+
+        /// <summary>
+        /// Gets the discharge disposition key
+        /// </summary>
+        [PublicKeyRef(nameof(DischargeDispositionPrivateKey))]
         public Guid DischargeDispositionKey { get; set; }
     }
 }

@@ -55,7 +55,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Acts
         /// <summary>
         /// Target entity key
         /// </summary>
-        [Column("ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.Key))]
+        [Column("ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.PrivateKey))]
+        public Int32 TargetPrivateKey { get; set; }
+
+        /// <summary>
+        /// Gets the target key
+        /// </summary>
+        [PublicKeyRef(nameof(TargetPrivateKey))]
         public Guid TargetKey { get; set; }
 
         /// <summary>

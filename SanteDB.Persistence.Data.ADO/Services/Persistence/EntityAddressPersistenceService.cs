@@ -56,7 +56,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             int tr = 0;
             var addrLookupQuery = context.CreateSqlStatement<DbEntityAddressComponent>().SelectFrom(typeof(DbEntityAddressComponent), typeof(DbEntityAddress), typeof(DbEntityAddressComponentValue))
                 .InnerJoin<DbEntityAddress>(o=>o.SourceKey, o=>o.Key)
-                .InnerJoin<DbEntityAddressComponentValue>(o=>o.ValueSequenceId, o=>o.SequenceId)
+                .InnerJoin<DbEntityAddressComponentValue>(o=>o.ValueId, o=>o.PrivateKey)
                 .Where<DbEntityAddress>(o=>o.SourceKey == id && o.ObsoleteVersionSequenceId == null);
 
             /// Yowza! But it appears to be faster than the other way 
@@ -148,7 +148,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var addrComp = (dataInstance as CompositeResult)?.Values.OfType<DbEntityAddressComponent>().FirstOrDefault() ?? dataInstance as DbEntityAddressComponent;
             var addrValue = (dataInstance as CompositeResult)?.Values.OfType<DbEntityAddressComponentValue>().FirstOrDefault();
             if (addrValue == null)
-                addrValue = context.FirstOrDefault<DbEntityAddressComponentValue>(o => o.SequenceId == addrComp.ValueSequenceId);
+                addrValue = context.FirstOrDefault<DbEntityAddressComponentValue>(o => o.PrivateKey == addrComp.ValueId);
 
             return new EntityAddressComponent()
             {
@@ -168,13 +168,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             // Address component already exists?
             var existing = context.FirstOrDefault<DbEntityAddressComponentValue>(o => o.Value == modelInstance.Value);
-            if (existing != null && existing.SequenceId != retVal.ValueSequenceId)
-                retVal.ValueSequenceId = existing.SequenceId.Value;
+            if (existing != null && existing.PrivateKey != retVal.ValueId)
+                retVal.ValueId = existing.PrivateKey.Value;
             else
-                retVal.ValueSequenceId = context.Insert(new DbEntityAddressComponentValue()
+                retVal.ValueId = context.Insert(new DbEntityAddressComponentValue()
                 {
                     Value = modelInstance.Value
-                }).SequenceId.Value;
+                }).PrivateKey.Value;
             return retVal;
         }
 

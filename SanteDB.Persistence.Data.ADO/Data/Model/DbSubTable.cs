@@ -37,8 +37,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         /// <summary>
         /// Parent key
         /// </summary>
-        public abstract Guid ParentKey { get; set; }
+        public abstract Int32 ParentPrivateKey { get; set; }
 
+        /// <summary>
+        /// Parent key
+        /// </summary>
+        [PublicKeyRef(nameof(ParentPrivateKey))]
+        public Guid ParentKey { get; set; }
 
     }
 
@@ -50,8 +55,8 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         /// <summary>
         /// Gets or sets the parent key
         /// </summary>
-        [Column("act_vrsn_id"), ForeignKey(typeof(DbActVersion), nameof(DbActVersion.VersionKey)), PrimaryKey, AlwaysJoin]
-        public override Guid ParentKey { get; set; }
+        [Column("vrsn_seq_id"), ForeignKey(typeof(DbActVersion), nameof(DbActVersion.VersionSequenceId)), PrimaryKey, AlwaysJoin]
+        public override Int32 ParentPrivateKey { get; set; }
     }
 
     /// <summary>
@@ -62,8 +67,8 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         /// <summary>
         /// Gets or sets the parent key
         /// </summary>
-        [Column("act_vrsn_id"), ForeignKey(typeof(DbObservation), nameof(DbObservation.ParentKey)), PrimaryKey]
-        public override Guid ParentKey { get; set; }
+        [Column("vrsn_seq_id"), ForeignKey(typeof(DbObservation), nameof(DbObservation.ParentPrivateKey)), PrimaryKey]
+        public override Int32 ParentPrivateKey { get; set; }
     }
 
     /// <summary>
@@ -71,11 +76,12 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
     /// </summary>
     public abstract class DbEntitySubTable : DbSubTable
     {
+
         /// <summary>
         /// Gets or sets the parent key
         /// </summary>
-        [Column("ent_vrsn_id"), ForeignKey(typeof(DbEntityVersion), nameof(DbEntityVersion.VersionKey)), PrimaryKey, AlwaysJoin]
-        public override Guid ParentKey { get; set; }
+        [Column("vrsn_seq_id"), ForeignKey(typeof(DbEntityVersion), nameof(DbEntityVersion.VersionSequenceId)), PrimaryKey, AlwaysJoin]
+        public override Int32 ParentPrivateKey { get; set; }
     }
 
     /// <summary>
@@ -86,7 +92,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         /// <summary>
         /// Gets or sets the parent key
         /// </summary>
-        [Column("ent_vrsn_id"), ForeignKey(typeof(DbPerson), nameof(DbPerson.ParentKey)), PrimaryKey, AlwaysJoin]
-        public override Guid ParentKey { get; set; }
+        [Column("vrsn_seq_id"), ForeignKey(typeof(DbPerson), nameof(DbPerson.ParentPrivateKey)), PrimaryKey, AlwaysJoin]
+        public override Int32 ParentPrivateKey { get; set; }
     }
 }

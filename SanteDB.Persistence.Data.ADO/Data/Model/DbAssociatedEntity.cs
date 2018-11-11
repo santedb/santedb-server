@@ -41,10 +41,23 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         Guid SourceKey { get; set; }
     }
 
+
+    /// <summary>
+    /// Database association which uses an internal key
+    /// </summary>
+    public interface IDbPrivateAssociation : IDbAssociation
+    {
+        /// <summary>
+        /// Gets or sets the source of the association
+        /// </summary>
+        Int32 SourcePrivateKey { get; set; }
+    }
+
     /// <summary>
     /// Versioned association
     /// </summary>
-    public interface IDbVersionedAssociation : IDbAssociation {
+    public interface IDbVersionedAssociation : IDbPrivateAssociation {
+
         /// <summary>
         /// Gets or sets the version when the relationship is effective
         /// </summary>
@@ -88,18 +101,28 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         [Column("obslt_vrsn_seq_id")]
         public Decimal? ObsoleteVersionSequenceId { get; set; }
 
+        /// <summary>
+        /// Source private key
+        /// </summary>
+        public abstract Int32 SourcePrivateKey { get; set; }
     }
 
     /// <summary>
     /// Represents an act association
     /// </summary>
-    public abstract class DbActAssociation : DbAssociation
+    public abstract class DbActAssociation : DbAssociation, IDbPrivateAssociation
     {
 
         /// <summary>
         /// Gets or sets the source entity id
         /// </summary>
-        [Column("act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.Key))]
+        [Column("act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.PrivateKey))]
+        public Int32 SourcePrivateKey { get; set; }
+
+        /// <summary>
+        /// Public key
+        /// </summary>
+        [PublicKeyRef(nameof(SourcePrivateKey))]
         public override Guid SourceKey { get; set; }
     }
 
@@ -112,7 +135,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         /// <summary>
         /// Gets or sets the source entity id
         /// </summary>
-        [Column("act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.Key))]
+        [Column("act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.PrivateKey))]
+        public override Int32 SourcePrivateKey { get; set; }
+        
+        /// <summary>
+        /// Source key
+        /// </summary>
+        [PublicKeyRef(nameof(SourcePrivateKey))]
         public override Guid SourceKey { get; set; }
     }
 
@@ -120,13 +149,19 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
     /// <summary>
     /// Represents an act association
     /// </summary>
-    public abstract class DbEntityAssociation : DbAssociation
+    public abstract class DbEntityAssociation : DbAssociation, IDbPrivateAssociation
     {
 
         /// <summary>
         /// Gets or sets the source entity id
         /// </summary>
-        [Column("ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.Key))]
+        [Column("ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.PrivateKey))]
+        public Int32 SourcePrivateKey { get; set; }
+
+        /// <summary>
+        /// Gets the source key
+        /// </summary>
+        [PublicKeyRef(nameof(SourcePrivateKey))]
         public override Guid SourceKey { get; set; }
     }
 
@@ -139,7 +174,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         /// <summary>
         /// Gets or sets the source entity id
         /// </summary>
-        [Column("ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.Key))]
+        [Column("ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.PrivateKey))]
+        public override Int32 SourcePrivateKey { get; set; }
+
+        /// <summary>
+        /// Source key
+        /// </summary>
+        [PublicKeyRef(nameof(SourcePrivateKey))]
         public override Guid SourceKey { get; set; }
 
     }
@@ -153,7 +194,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         /// <summary>
         /// Gets or sets the source entity id
         /// </summary>
-        [Column("cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
+        public override Int32 SourcePrivateKey { get; set; }
+
+        /// <summary>
+        /// Gets the source key
+        /// </summary>
+        [PublicKeyRef(nameof(SourcePrivateKey))]
         public override Guid SourceKey { get; set; }
     }
 

@@ -106,7 +106,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.DataType
         /// <summary>
         /// Gets or sets the scope of the auhority
         /// </summary>
-        [Column("cd_id"), PrimaryKey, ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("cd_id"), PrimaryKey, ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
+        public Int32 ScopeConceptPrivateKey { get; set; }
+
+        /// <summary>
+        /// Gets the public concept key
+        /// </summary>
+        [PublicKeyRef(nameof(ScopeConceptPrivateKey))]
         public Guid ScopeConceptKey { get; set; }
 
     }

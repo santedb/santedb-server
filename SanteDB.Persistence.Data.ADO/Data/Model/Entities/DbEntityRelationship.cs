@@ -37,7 +37,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
         /// <summary>
         /// Gets or sets the link type concept
         /// </summary>
-        [Column("rel_typ_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key)), AlwaysJoin]
+        [Column("rel_typ_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey)), AlwaysJoin]
+        public Int32 RelationshipTypePrivateKey { get; set; }
+
+        /// <summary>
+        /// Gets the private key
+        /// </summary>
+        [PublicKeyRef(nameof(RelationshipTypePrivateKey))]
         public Guid RelationshipTypeKey { get; set; }
 
         /// <summary>
@@ -49,13 +55,22 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
         /// <summary>
         /// Gets or sets the source entity id
         /// </summary>
-        [Column("src_ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.Key))]
+        [Column("src_ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.PrivateKey))]
+        public override int SourcePrivateKey { get; set; }
+
+        /// <summary>
+        /// Gets the public key of the source
+        /// </summary>
+        [PublicKeyRef(nameof(SourcePrivateKey))]
         public override Guid SourceKey { get; set; }
 
         /// <summary>
         /// Target entity key
         /// </summary>
-        [Column("trg_ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.Key))]
+        [Column("trg_ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.PrivateKey))]
+        public int TargetPrivateKey { get; set; }
+
+        [PublicKeyRef(nameof(TargetPrivateKey))]
         public Guid TargetKey { get; set; }
 
         /// <summary>

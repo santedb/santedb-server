@@ -28,7 +28,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
 	/// Represents a security device. This table should only have one row (the current device)
 	/// </summary>
 	[Table("sec_dev_tbl")]
-	public class DbSecurityDevice : DbBaseData
+	public class DbSecurityDevice : DbNonVersionedBaseData
 	{
 		
 		/// <summary>

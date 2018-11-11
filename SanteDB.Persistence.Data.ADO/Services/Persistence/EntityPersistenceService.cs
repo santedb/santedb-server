@@ -114,7 +114,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (dataInstance == null)
                 return null;
             // Alright first, which type am I mapping to?
-            var dbEntityVersion = (dataInstance as CompositeResult)?.Values.OfType<DbEntityVersion>().FirstOrDefault() ?? dataInstance as DbEntityVersion ?? context.FirstOrDefault<DbEntityVersion>(o => o.VersionKey == (dataInstance as DbEntitySubTable).ParentKey);
+            var dbEntityVersion = (dataInstance as CompositeResult)?.Values.OfType<DbEntityVersion>().FirstOrDefault() ?? dataInstance as DbEntityVersion ?? context.FirstOrDefault<DbEntityVersion>(o => o.VersionSequenceId == (dataInstance as DbEntitySubTable).ParentPrivateKey);
             var dbEntity = (dataInstance as CompositeResult)?.Values.OfType<DbEntity>().FirstOrDefault() ?? context.FirstOrDefault<DbEntity>(o => o.Key == dbEntityVersion.Key);
             Entity retVal = null;
 
@@ -122,47 +122,47 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
                 case EntityClassKeyStrings.Device:
                     retVal = new DeviceEntityPersistenceService().ToModelInstance(
-                        (dataInstance as CompositeResult)?.Values.OfType<DbDeviceEntity>().FirstOrDefault() ?? context.FirstOrDefault<DbDeviceEntity>(o => o.ParentKey == dbEntityVersion.VersionKey),
+                        (dataInstance as CompositeResult)?.Values.OfType<DbDeviceEntity>().FirstOrDefault() ?? context.FirstOrDefault<DbDeviceEntity>(o => o.ParentPrivateKey == dbEntityVersion.VersionSequenceId),
                         dbEntityVersion,
                         dbEntity,
                         context);
                     break;
                 case EntityClassKeyStrings.NonLivingSubject:
                     retVal = new ApplicationEntityPersistenceService().ToModelInstance(
-                        (dataInstance as CompositeResult)?.Values.OfType<DbApplicationEntity>().FirstOrDefault() ?? context.FirstOrDefault<DbApplicationEntity>(o => o.ParentKey == dbEntityVersion.VersionKey),
+                        (dataInstance as CompositeResult)?.Values.OfType<DbApplicationEntity>().FirstOrDefault() ?? context.FirstOrDefault<DbApplicationEntity>(o => o.ParentPrivateKey == dbEntityVersion.VersionSequenceId),
                         dbEntityVersion,
                         dbEntity,
                         context);
                     break;
                 case EntityClassKeyStrings.Person:
-                    var ue = (dataInstance as CompositeResult)?.Values.OfType<DbUserEntity>().FirstOrDefault() ?? context.FirstOrDefault<DbUserEntity>(o => o.ParentKey == dbEntityVersion.VersionKey);
+                    var ue = (dataInstance as CompositeResult)?.Values.OfType<DbUserEntity>().FirstOrDefault() ?? context.FirstOrDefault<DbUserEntity>(o => o.ParentPrivateKey == dbEntityVersion.VersionSequenceId);
 
                     if (ue != null)
                         retVal = new UserEntityPersistenceService().ToModelInstance(
                             ue,
-                            (dataInstance as CompositeResult)?.Values.OfType<DbPerson>().FirstOrDefault() ?? context.FirstOrDefault<DbPerson>(o => o.ParentKey == dbEntityVersion.VersionKey),
+                            (dataInstance as CompositeResult)?.Values.OfType<DbPerson>().FirstOrDefault() ?? context.FirstOrDefault<DbPerson>(o => o.ParentPrivateKey == dbEntityVersion.VersionSequenceId),
                             dbEntityVersion,
                             dbEntity,
                             context);
                     else
                         retVal = new PersonPersistenceService().ToModelInstance(
-                            (dataInstance as CompositeResult)?.Values.OfType<DbPerson>().FirstOrDefault() ?? context.FirstOrDefault<DbPerson>(o => o.ParentKey == dbEntityVersion.VersionKey),
+                            (dataInstance as CompositeResult)?.Values.OfType<DbPerson>().FirstOrDefault() ?? context.FirstOrDefault<DbPerson>(o => o.ParentPrivateKey == dbEntityVersion.VersionSequenceId),
                             dbEntityVersion,
                             dbEntity,
                             context);
                     break;
                 case EntityClassKeyStrings.Patient:
                     retVal = new PatientPersistenceService().ToModelInstance(
-                        (dataInstance as CompositeResult)?.Values.OfType<DbPatient>().FirstOrDefault() ?? context.FirstOrDefault<DbPatient>(o => o.ParentKey == dbEntityVersion.VersionKey),
-                        (dataInstance as CompositeResult)?.Values.OfType<DbPerson>().FirstOrDefault() ?? context.FirstOrDefault<DbPerson>(o => o.ParentKey == dbEntityVersion.VersionKey),
+                        (dataInstance as CompositeResult)?.Values.OfType<DbPatient>().FirstOrDefault() ?? context.FirstOrDefault<DbPatient>(o => o.ParentPrivateKey == dbEntityVersion.VersionSequenceId),
+                        (dataInstance as CompositeResult)?.Values.OfType<DbPerson>().FirstOrDefault() ?? context.FirstOrDefault<DbPerson>(o => o.ParentPrivateKey == dbEntityVersion.VersionSequenceId),
                         dbEntityVersion,
                         dbEntity,
                         context);
                     break;
                 case EntityClassKeyStrings.Provider:
                     retVal = new ProviderPersistenceService().ToModelInstance(
-                        (dataInstance as CompositeResult)?.Values.OfType<DbProvider>().FirstOrDefault() ?? context.FirstOrDefault<DbProvider>(o => o.ParentKey == dbEntityVersion.VersionKey),
-                        (dataInstance as CompositeResult)?.Values.OfType<DbPerson>().FirstOrDefault() ?? context.FirstOrDefault<DbPerson>(o => o.ParentKey == dbEntityVersion.VersionKey),
+                        (dataInstance as CompositeResult)?.Values.OfType<DbProvider>().FirstOrDefault() ?? context.FirstOrDefault<DbProvider>(o => o.ParentPrivateKey == dbEntityVersion.VersionSequenceId),
+                        (dataInstance as CompositeResult)?.Values.OfType<DbPerson>().FirstOrDefault() ?? context.FirstOrDefault<DbPerson>(o => o.ParentPrivateKey == dbEntityVersion.VersionSequenceId),
                         dbEntityVersion,
                         dbEntity,
                         context);
@@ -174,29 +174,29 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 case EntityClassKeyStrings.State:
                 case EntityClassKeyStrings.ServiceDeliveryLocation:
                     retVal = new PlacePersistenceService().ToModelInstance(
-                        (dataInstance as CompositeResult)?.Values.OfType<DbPlace>().FirstOrDefault() ?? context.FirstOrDefault<DbPlace>(o => o.ParentKey == dbEntityVersion.VersionKey),
+                        (dataInstance as CompositeResult)?.Values.OfType<DbPlace>().FirstOrDefault() ?? context.FirstOrDefault<DbPlace>(o => o.ParentPrivateKey == dbEntityVersion.VersionSequenceId),
                         dbEntityVersion,
                         dbEntity,
                         context);
                     break;
                 case EntityClassKeyStrings.Organization:
                     retVal = new OrganizationPersistenceService().ToModelInstance(
-                        (dataInstance as CompositeResult)?.Values.OfType<DbOrganization>().FirstOrDefault() ?? context.FirstOrDefault<DbOrganization>(o => o.ParentKey == dbEntityVersion.VersionKey),
+                        (dataInstance as CompositeResult)?.Values.OfType<DbOrganization>().FirstOrDefault() ?? context.FirstOrDefault<DbOrganization>(o => o.ParentPrivateKey == dbEntityVersion.VersionSequenceId),
                         dbEntityVersion,
                         dbEntity,
                         context);
                     break;
                 case EntityClassKeyStrings.Material:
                     retVal = new MaterialPersistenceService().ToModelInstance<Material>(
-                        (dataInstance as CompositeResult)?.Values.OfType<DbMaterial>().FirstOrDefault() ?? context.FirstOrDefault<DbMaterial>(o => o.ParentKey == dbEntityVersion.VersionKey),
+                        (dataInstance as CompositeResult)?.Values.OfType<DbMaterial>().FirstOrDefault() ?? context.FirstOrDefault<DbMaterial>(o => o.ParentPrivateKey == dbEntityVersion.VersionSequenceId),
                         dbEntityVersion,
                         dbEntity,
                         context);
                     break;
                 case EntityClassKeyStrings.ManufacturedMaterial:
                     retVal = new ManufacturedMaterialPersistenceService().ToModelInstance(
-                        (dataInstance as CompositeResult)?.Values.OfType<DbManufacturedMaterial>().FirstOrDefault() ?? context.FirstOrDefault<DbManufacturedMaterial>(o => o.ParentKey == dbEntityVersion.VersionKey),
-                        (dataInstance as CompositeResult)?.Values.OfType<DbMaterial>().FirstOrDefault() ?? context.FirstOrDefault<DbMaterial>(o => o.ParentKey == dbEntityVersion.VersionKey),
+                        (dataInstance as CompositeResult)?.Values.OfType<DbManufacturedMaterial>().FirstOrDefault() ?? context.FirstOrDefault<DbManufacturedMaterial>(o => o.ParentPrivateKey == dbEntityVersion.VersionSequenceId),
+                        (dataInstance as CompositeResult)?.Values.OfType<DbMaterial>().FirstOrDefault() ?? context.FirstOrDefault<DbMaterial>(o => o.ParentPrivateKey == dbEntityVersion.VersionSequenceId),
                         dbEntityVersion,
                         dbEntity,
                         context);
@@ -230,7 +230,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (dataInstance == null)
                 return null;
             // Alright first, which type am I mapping to?
-            var dbEntityVersion = (dataInstance as CompositeResult)?.Values.OfType<DbEntityVersion>().FirstOrDefault() ?? dataInstance as DbEntityVersion ?? context.FirstOrDefault<DbEntityVersion>(o => o.VersionKey == (dataInstance as DbEntitySubTable).ParentKey);
+            var dbEntityVersion = (dataInstance as CompositeResult)?.Values.OfType<DbEntityVersion>().FirstOrDefault() ?? dataInstance as DbEntityVersion ?? context.FirstOrDefault<DbEntityVersion>(o => o.VersionSequenceId == (dataInstance as DbEntitySubTable).ParentPrivateKey);
             var dbEntity = (dataInstance as CompositeResult)?.Values.OfType<DbEntity>().FirstOrDefault() ?? context.FirstOrDefault<DbEntity>(o => o.Key == dbEntityVersion.Key);
             Entity retVal = null;
             var cache = new AdoPersistenceCache(context);
@@ -245,7 +245,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         retVal = cache?.GetCacheItem<ApplicationEntity>(dbEntity.Key);
                         break;
                     case EntityClassKeyStrings.Person:
-                        var ue = (dataInstance as CompositeResult)?.Values.OfType<DbUserEntity>().FirstOrDefault() ?? context.FirstOrDefault<DbUserEntity>(o => o.ParentKey == dbEntityVersion.VersionKey);
+                        var ue = (dataInstance as CompositeResult)?.Values.OfType<DbUserEntity>().FirstOrDefault() ?? context.FirstOrDefault<DbUserEntity>(o => o.ParentPrivateKey == dbEntityVersion.VersionSequenceId);
                         if (ue != null)
                             retVal = cache?.GetCacheItem<UserEntity>(dbEntity.Key);
 

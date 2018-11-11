@@ -15,14 +15,14 @@ DELETE FROM SEC_APP_TBL WHERE APP_PUB_ID = 'fiddler';
 INSERT INTO SEC_USR_TBL (USR_ID, USR_NAME, SEC_STMP, PASSWD, EMAIL, PHN_NUM, EMAIL_CNF, PHN_CNF, CRT_PROV_ID)
 	VALUES (char_to_uuid('db67a3c1-c7bc-4e21-8f6c-b1c19a7f2c50'), 'Administrator', '6c351600-9fc3-408b-9d55-428a4d29361b', '59ff5973691ff75f8baa45f1e38fae24875f77ef00987ed22b02df075fb144f9', 'administrator@marc-hi.ca', 'tel:+19055751212;ext=4085', TRUE, TRUE, char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 
-INSERT INTO ent_tbl (ent_id, cls_cd_id, dtr_cd_id) 
-	VALUES (char_to_uuid('b55f0836-40e6-4ee2-9522-27e3f8bfe532'), char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'), char_to_uuid('f29f08de-78a7-4a5e-aeaf-7b545ba19a09'));
+INSERT INTO ent_tbl (uuid, cls_cd_id, dtr_cd_id) 
+	VALUES (char_to_uuid('b55f0836-40e6-4ee2-9522-27e3f8bfe532'), cd_xref(char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea')), cd_xref(char_to_uuid('f29f08de-78a7-4a5e-aeaf-7b545ba19a09')));
 	
-INSERT INTO ent_vrsn_tbl(ent_vrsn_id, ent_id, sts_cd_id, CRT_PROV_ID) 
-	VALUES (char_to_uuid('abfaffc1-5021-40fd-a8e6-9b290f34ead7'), char_to_uuid('b55f0836-40e6-4ee2-9522-27e3f8bfe532'), char_to_uuid('c8064cbd-fa06-4530-b430-1a52f1530c27'), char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+INSERT INTO ent_vrsn_tbl(vrsn_uuid, ent_id, sts_cd_id, CRT_PROV_ID) 
+	VALUES (char_to_uuid('abfaffc1-5021-40fd-a8e6-9b290f34ead7'), 1, cd_xref(char_to_uuid('c8064cbd-fa06-4530-b430-1a52f1530c27')), char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 
-INSERT INTO psn_tbl (ent_vrsn_id) VALUES (char_to_uuid('abfaffc1-5021-40fd-a8e6-9b290f34ead7'));
-INSERT INTO usr_ent_tbl (ent_vrsn_id, sec_usr_id) SELECT char_to_uuid('abfaffc1-5021-40fd-a8e6-9b290f34ead7'), usr_id FROM sec_usr_tbl WHERE usr_name = 'Administrator';
+INSERT INTO psn_tbl (vrsn_seq_id) VALUES (1);
+INSERT INTO usr_ent_tbl (vrsn_seq_id, sec_usr_id) SELECT 1, usr_id FROM sec_usr_tbl WHERE usr_name = 'Administrator';
 
 INSERT INTO SEC_USR_ROL_ASSOC_TBL (USR_ID, ROL_ID)
 	SELECT USR_ID, ROL_ID FROM SEC_USR_TBL, SEC_ROL_TBL 

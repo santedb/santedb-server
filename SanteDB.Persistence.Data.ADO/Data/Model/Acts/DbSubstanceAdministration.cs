@@ -39,35 +39,53 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Acts
         /// Parent key
         /// </summary>
         [JoinFilter(PropertyName = nameof(DbAct.ClassConceptKey), Value = ActClassKeyStrings.SubstanceAdministration)]
-        public override Guid ParentKey
+        public override Int32 ParentPrivateKey
         {
             get
             {
-                return base.ParentKey;
+                return base.ParentPrivateKey;
             }
 
             set
             {
-                base.ParentKey = value;
+                base.ParentPrivateKey = value;
             }
         }
 
         /// <summary>
         /// Gets or sets the route of administration
         /// </summary>
-        [Column("rte_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("rte_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
+        public Guid RouteConceptPrivateKey { get; set; }
+
+        /// <summary>
+        /// Route concept key
+        /// </summary>
+        [PublicKeyRef(nameof(RouteConceptKey))]
         public Guid RouteConceptKey { get; set; }
 
         /// <summary>
         /// Gets or sets the dose unit
         /// </summary>
-        [Column("dos_unt_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("dos_unt_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
+        public Int32 DoseUnitConceptPrivateKey { get; set; }
+
+        /// <summary>
+        /// Gets the dose unit public key
+        /// </summary>
+        [PublicKeyRef(nameof(DoseUnitConceptPrivateKey))]
         public Guid DoseUnitConceptKey { get; set; }
 
         /// <summary>
         /// Gets or sets the site
         /// </summary>
-        [Column("ste_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("ste_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
+        public Int32 SiteConceptPrivateKey { get; set; }
+
+        /// <summary>
+        /// Gets the public key for site concept
+        /// </summary>
+        [PublicKeyRef(nameof(SiteConceptPrivateKey))]
         public Guid SiteConceptKey { get; set; }
 
         /// <summary>

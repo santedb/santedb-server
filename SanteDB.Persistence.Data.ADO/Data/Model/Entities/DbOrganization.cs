@@ -33,8 +33,14 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
 		/// Gets or sets the industry concept.
 		/// </summary>
 		/// <value>The industry concept.</value>
-		[Column("ind_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-		public Guid IndustryConceptKey {
+		[Column("ind_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
+        public Int32 IndustryConceptPrivateKey { get; set; }
+
+        /// <summary>
+        /// Gets the public concepts
+        /// </summary>
+        [PublicKeyRef(nameof(IndustryConceptPrivateKey))]
+        public Guid IndustryConceptKey {
 			get;
 			set;
 		}
