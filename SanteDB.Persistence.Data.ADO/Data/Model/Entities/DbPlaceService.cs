@@ -43,13 +43,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
         /// <summary>
         /// Gets or sets the service concept
         /// </summary>
-        [Column("svc_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
-        public Int32 ServiceConceptPrivateKey { get; set; }
-
-        /// <summary>
-        /// Service concept public key
-        /// </summary>
-        [PublicKeyRef(nameof(ServiceConceptPrivateKey))]
+        [Column("svc_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid ServiceConceptKey { get; set; }
 
         /// <summary>

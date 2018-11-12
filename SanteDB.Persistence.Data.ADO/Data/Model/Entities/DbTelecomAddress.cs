@@ -41,14 +41,8 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
         /// Gets or sets the telecom use.
         /// </summary>
         /// <value>The telecom use.</value>
-        [Column("use_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
-        public Int32 TelecomUsePrivateKey  { get; set; }
-
-        /// <summary>
-        /// Gets the use key
-        /// </summary>
-        [PublicKeyRef(nameof(TelecomUsePrivateKey))]
-        public Guid TelecomUseKey {
+        [Column("use_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+		public Guid TelecomUseKey {
 			get;
 			set;
 		}

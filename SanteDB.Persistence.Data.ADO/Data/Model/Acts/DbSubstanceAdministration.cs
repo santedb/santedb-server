@@ -39,53 +39,35 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Acts
         /// Parent key
         /// </summary>
         [JoinFilter(PropertyName = nameof(DbAct.ClassConceptKey), Value = ActClassKeyStrings.SubstanceAdministration)]
-        public override Int32 ParentPrivateKey
+        public override Guid ParentKey
         {
             get
             {
-                return base.ParentPrivateKey;
+                return base.ParentKey;
             }
 
             set
             {
-                base.ParentPrivateKey = value;
+                base.ParentKey = value;
             }
         }
 
         /// <summary>
         /// Gets or sets the route of administration
         /// </summary>
-        [Column("rte_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
-        public Guid RouteConceptPrivateKey { get; set; }
-
-        /// <summary>
-        /// Route concept key
-        /// </summary>
-        [PublicKeyRef(nameof(RouteConceptKey))]
+        [Column("rte_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid RouteConceptKey { get; set; }
 
         /// <summary>
         /// Gets or sets the dose unit
         /// </summary>
-        [Column("dos_unt_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
-        public Int32 DoseUnitConceptPrivateKey { get; set; }
-
-        /// <summary>
-        /// Gets the dose unit public key
-        /// </summary>
-        [PublicKeyRef(nameof(DoseUnitConceptPrivateKey))]
+        [Column("dos_unt_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid DoseUnitConceptKey { get; set; }
 
         /// <summary>
         /// Gets or sets the site
         /// </summary>
-        [Column("ste_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
-        public Int32 SiteConceptPrivateKey { get; set; }
-
-        /// <summary>
-        /// Gets the public key for site concept
-        /// </summary>
-        [PublicKeyRef(nameof(SiteConceptPrivateKey))]
+        [Column("ste_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid SiteConceptKey { get; set; }
 
         /// <summary>

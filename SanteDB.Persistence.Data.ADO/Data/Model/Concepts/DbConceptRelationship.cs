@@ -47,25 +47,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Concepts
         /// <summary>
         /// Gets or sets the source act key
         /// </summary>
-        [Column("src_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
-        public override Int32 SourcePrivateKey { get; set; }
-
-        /// <summary>
-        /// Source key 
-        /// </summary>
-        [PublicKeyRef(nameof(SourcePrivateKey))]
+        [Column("src_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public override Guid SourceKey { get; set; }
 
         /// <summary>
         /// Gets or sets the target entity key
         /// </summary>
-        [Column("trg_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
-        public Int32 TargetPrivateKey { get; set; }
-
-        /// <summary>
-        /// Target key
-        /// </summary>
-        [PublicKeyRef(nameof(TargetPrivateKey))]
+        [Column("trg_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid TargetKey { get; set; }
     }
 }

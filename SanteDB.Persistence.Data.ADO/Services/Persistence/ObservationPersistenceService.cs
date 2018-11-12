@@ -147,7 +147,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var obsData = this.m_observationPersistence.InsertInternal(context, data);
             context.Insert(new DbTextObservation()
             {
-                ParentPrivateKey = obsData.VersionSequence.Value,
+                ParentKey = obsData.VersionKey.Value,
                 Value = data.Value
             });
             return data;
@@ -161,7 +161,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var obsData = this.m_observationPersistence.UpdateInternal(context, data);
             context.Insert(new DbTextObservation()
             {
-                ParentPrivateKey = obsData.VersionSequence.Value,
+                ParentKey = obsData.VersionKey.Value,
                 Value = data.Value
             });
             return data;
@@ -175,7 +175,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var obsData = this.m_observationPersistence.ObsoleteInternal(context, data);
             context.Insert(new DbTextObservation()
             {
-                ParentPrivateKey = obsData.VersionSequence.Value,
+                ParentKey = obsData.VersionKey.Value,
                 Value = data.Value
             });
             return data;
@@ -221,7 +221,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var obsData = this.m_observationPersistence.InsertInternal(context, data);
             context.Insert(new DbCodedObservation()
             {
-                ParentPrivateKey = obsData.VersionSequence.Value,
+                ParentKey = obsData.VersionKey.Value,
                 Value = data.ValueKey
             });
             return data;
@@ -237,7 +237,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var obsData = this.m_observationPersistence.UpdateInternal(context, data);
             context.Insert(new DbCodedObservation()
             {
-                ParentPrivateKey = obsData.VersionSequence.Value,
+                ParentKey = obsData.VersionKey.Value,
                 Value = data.ValueKey
             });
             return data;
@@ -254,7 +254,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var obsData = this.m_observationPersistence.ObsoleteInternal(context, data);
             context.Insert(new DbCodedObservation()
             {
-                ParentPrivateKey = obsData.VersionSequence.Value,
+                ParentKey = obsData.VersionKey.Value,
                 Value = data.ValueKey
             });
             return data;
@@ -304,7 +304,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var retVal = this.m_observationPersistence.InsertInternal(context, data);
             context.Insert(new DbQuantityObservation()
             {
-                ParentPrivateKey = data.VersionSequence.Value,
+                ParentKey = data.VersionKey.Value,
                 UnitOfMeasureKey = data.UnitOfMeasureKey.Value,
                 Value = data.Value
 
@@ -322,7 +322,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             this.m_observationPersistence.UpdateInternal(context, data);
             context.Insert(new DbQuantityObservation()
             {
-                ParentPrivateKey = data.VersionSequence.Value,
+                ParentKey = data.VersionKey.Value,
                 UnitOfMeasureKey = data.UnitOfMeasureKey.Value,
                 Value = data.Value
 
@@ -340,7 +340,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             this.m_observationPersistence.ObsoleteInternal(context, data);
             context.Insert(new DbQuantityObservation()
             {
-                ParentPrivateKey = data.VersionSequence.Value,
+                ParentKey = data.VersionKey.Value,
                 UnitOfMeasureKey = data.UnitOfMeasureKey.Value,
                 Value = data.Value
 

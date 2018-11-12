@@ -38,16 +38,16 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
         /// </summary>
         [JoinFilter(PropertyName = nameof(DbEntity.ClassConceptKey), Value = EntityClassKeyStrings.Material)]
         [JoinFilter(PropertyName = nameof(DbEntity.ClassConceptKey), Value = EntityClassKeyStrings.ManufacturedMaterial)]
-        public override Int32 ParentPrivateKey
+        public override Guid ParentKey
         {
             get
             {
-                return base.ParentPrivateKey;
+                return base.ParentKey;
             }
 
             set
             {
-                base.ParentPrivateKey = value;
+                base.ParentKey = value;
             }
         }
 
@@ -65,14 +65,8 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
 		/// Gets or sets the form concept.
 		/// </summary>
 		/// <value>The form concept.</value>
-		[Column("frm_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
-        public Int32 FormConceptPrivateKey { get; set; }
-
-        /// <summary>
-        /// Gets or sets the form concept private kye
-        /// </summary>
-        [PublicKeyRef(nameof(FormConceptPrivateKey))]
-        public Guid FormConceptKey {
+		[Column("frm_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+		public Guid FormConceptKey {
 			get;
 			set;
 		}
@@ -81,14 +75,8 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
 		/// Gets or sets the quantity concept.
 		/// </summary>
 		/// <value>The quantity concept.</value>
-		[Column("qty_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
-        public Int32 QuantityConceptPrivateKey { get; set; }
-
-        /// <summary>
-        /// Gets or sets the quantity concept key
-        /// </summary>
-        [PublicKeyRef(nameof(QuantityConceptPrivateKey))]
-        public Guid QuantityConceptKey {
+		[Column("qty_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+		public Guid QuantityConceptKey {
 			get;
 			set;
 		}
@@ -124,17 +112,17 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
         /// <summary>
         /// Parent key filter
         /// </summary>
-        [Column("ent_vrsn_id"), ForeignKey(typeof(DbMaterial), nameof(DbMaterial.ParentPrivateKey)), PrimaryKey, AlwaysJoin, JoinFilter(PropertyName = nameof(DbEntity.ClassConceptKey), Value = EntityClassKeyStrings.ManufacturedMaterial)]
-        public override Int32 ParentPrivateKey
+        [Column("ent_vrsn_id"), ForeignKey(typeof(DbMaterial), nameof(DbMaterial.ParentKey)), PrimaryKey, AlwaysJoin, JoinFilter(PropertyName = nameof(DbEntity.ClassConceptKey), Value = EntityClassKeyStrings.ManufacturedMaterial)]
+        public override Guid ParentKey
         {
             get
             {
-                return base.ParentPrivateKey;
+                return base.ParentKey;
             }
 
             set
             {
-                base.ParentPrivateKey = value;
+                base.ParentKey = value;
             }
         }
               

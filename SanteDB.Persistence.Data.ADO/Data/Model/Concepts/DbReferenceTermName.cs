@@ -43,13 +43,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Concepts
         /// <summary>
         /// Gets or sets the ref term to which the nae applies
         /// </summary>
-        [Column("ref_term_id"), ForeignKey(typeof(DbReferenceTerm), nameof(DbReferenceTerm.PrivateKey))]
-        public Int32 SourcePrivateKey { get; set; }
-
-        /// <summary>
-        /// Gets the public key
-        /// </summary>
-        [PublicKeyRef(nameof(SourcePrivateKey))]
+        [Column("ref_term_id"), ForeignKey(typeof(DbReferenceTerm), nameof(DbReferenceTerm.Key))]
         public override Guid SourceKey { get; set; }
 
 	    /// <summary>

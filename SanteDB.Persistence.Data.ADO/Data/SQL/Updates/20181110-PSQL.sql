@@ -179,7 +179,7 @@ alter table act_vrsn_tbl drop act_uuid;
 alter table act_vrsn_tbl drop sts_cd_uuid;
 alter table act_vrsn_tbl drop rsn_cd_uuid;
 alter table act_vrsn_tbl drop typ_cd_uuid;
-alter table act_vrsn_tbl add constraint ck_act_vrsn_rsn_cd check (rsn_cd_id is null or ck_is_cd_set_mem(rsn_cd_id, 'ActReasion', true));
+alter table act_vrsn_tbl add constraint ck_act_vrsn_rsn_cd check (ck_is_cd_set_mem(rsn_cd_id, 'ActReasion', true));
 alter table act_vrsn_tbl add constraint ck_act_vrsn_sts_cd check (ck_is_cd_set_mem(sts_cd_id, 'ActStatus', true));
 
 -- alter act extension table 
@@ -742,7 +742,7 @@ alter table cd_ref_term_assoc_tbl rename cd_id to cd_uuid;
 alter table cd_ref_term_assoc_tbl add cd_id integer;
 alter table cd_ref_term_assoc_tbl rename ref_term_id to ref_term_uuid;
 alter table cd_ref_term_assoc_Tbl add ref_term_id integer;
-update cd_ref_term_assoc_tbl set cd_id = cd_xref(cd_uuid), ref_term_id = (select ref_term_id from ref_term_tbl where uuid = ref_term_uuid);
+update cd_ref_term_assoc_tbl set cd_id = cd_xref(cd_uuid), ref_term_id = (select ref_term_id from ref_term_tbl where ref_term_tbl.ref_term_uuid = cd_ref_term_assoc_tbl.ref_term_uuid);
 alter table cd_ref_term_assoc_tbl alter cd_id set not null;
 alter table cd_ref_term_assoc_tbl alter ref_term_id set not null;
 alter table cd_ref_term_assoc_tbl drop cd_uuid;
@@ -973,7 +973,7 @@ alter table dev_ent_tbl add constraint pk_dev_ent_tbl primary key (vrsn_seq_id);
 alter table app_ent_tbl drop ent_vrsn_id cascade;
 alter table app_ent_tbl add constraint pk_app_ent_tbl primary key (vrsn_seq_id);
 create unique index ent_vrsn_ent_id_idx on ent_vrsn_tbl (ent_id) where (obslt_utc is null);
-alter table ent_vrsn_tbl rename ent_vrsn_id to vrsn_uuid;
+alter table ent_vrsn_tbl rename ent_vrsn_id to vsn_uuid;
 
 alter table ent_pol_assoc_tbl alter efft_vrsn_seq_id type integer;
 alter table ent_pol_assoc_tbl alter obslt_vrsn_seq_id type integer;
@@ -1063,127 +1063,6 @@ alter table ent_name_cmp_tbl alter val_id type integer;
 alter table phon_val_tbl alter val_id type integer;
 alter table cd_vrsn_tbl rename cd_vrsn_id to vrsn_uuid;
 alter table act_ptcpt_tbl alter ptcpt_seq_id type integer;
-alter table act_proto_assoc_tbl add constraint pk_act_proto_assoc_tbl primary key (proto_id, act_id);
-
-ALTER TABLE SEC_APP_TBL ADD LOCKED TIMESTAMPTZ; -- LOCKOUT PERIOD
-ALTER TABLE SEC_APP_TBL ADD FAIL_AUTH INTEGER; -- FAILED AUTHENTICATION ATTEMPTS
-ALTER TABLE SEC_APP_TBL ADD LAST_AUTH_UTC TIMESTAMPTZ; -- THE LAST AUTHETNICATION TIME
-ALTER TABLE SEC_APP_TBL ADD UPD_UTC TIMESTAMP; -- THE CREATION TIME OF THE APP
-ALTER TABLE SEC_APP_TBL ADD UPD_PROV_ID UUID; -- THE USER WHICH IS RESPONSIBLE FOR THE CREATION OF THE APP
-ALTER TABLE SEC_APP_TBL ADD CONSTRAINT FK_SEC_APP_UPD_PROV_ID FOREIGN KEY (UPD_PROV_ID) REFERENCES SEC_PROV_TBL(PROV_ID);
-
-ALTER TABLE SEC_DEV_TBL ADD LOCKED TIMESTAMPTZ; -- LOCKOUT PERIOD
-ALTER TABLE SEC_DEV_TBL ADD FAIL_AUTH INTEGER; -- FAILED AUTHENTICATION ATTEMPTS
-ALTER TABLE SEC_DEV_TBL ADD LAST_AUTH_UTC TIMESTAMPTZ; -- THE LAST AUTHETNICATION TIME
-ALTER TABLE SEC_DEV_TBL ADD UPD_UTC TIMESTAMP; -- THE CREATION TIME OF THE APP
-ALTER TABLE SEC_DEV_TBL ADD UPD_PROV_ID UUID; -- THE USER WHICH IS RESPONSIBLE FOR THE CREATION OF THE APP
-ALTER TABLE SEC_DEV_TBL ADD CONSTRAINT FK_SEC_DEV_UPD_PROV_ID FOREIGN KEY (UPD_PROV_ID) REFERENCES SEC_PROV_TBL(PROV_ID);
-
-
-DROP FUNCTION AUTH_APP (TEXT, TEXT);
-
--- AUTHENTICATE AN APPICATION
--- AUTHENTICATE AN APPICATION
-CREATE OR REPLACE FUNCTION AUTH_APP (
-	APP_PUB_ID_IN IN TEXT,
-	APP_SCRT_IN IN TEXT,
-	MAX_FAIL_AUTH_IN IN INTEGER
-) RETURNS SETOF SEC_APP_TBL AS 
-$$ 
-DECLARE 
-	APP_TPL SEC_APP_TBL;
-BEGIN
-	SELECT INTO APP_TPL * FROM SEC_APP_TBL WHERE APP_PUB_ID = APP_PUB_ID_IN LIMIT 1;
-	IF (APP_TPL.LOCKED > CURRENT_TIMESTAMP) THEN
-		APP_TPL.LOCKED = COALESCE(APP_TPL.LOCKED, CURRENT_TIMESTAMP) + ((APP_TPL.FAIL_AUTH - MAX_FAIL_AUTH_IN) ^ 1.5 * '30 SECONDS'::INTERVAL);
-		UPDATE SEC_APP_TBL SET FAIL_AUTH = SEC_APP_TBL.FAIL_AUTH + 1, LOCKED = APP_TPL.LOCKED
-			WHERE SEC_APP_TBL.APP_PUB_ID = APP_PUB_ID_IN;
-		APP_TPL.APP_PUB_ID := ('ERR:AUTH_LCK:' || ((APP_TPL.LOCKED - CURRENT_TIMESTAMP)::TEXT));
-		APP_TPL.APP_ID = UUID_NIL();
-		APP_TPL.APP_SCRT = NULL;
-		RETURN QUERY SELECT APP_TPL.*;
-	ELSE
-		-- LOCKOUT ACCOUNTS
-		IF (APP_TPL.APP_SCRT = APP_SCRT_IN) THEN
-			UPDATE SEC_APP_TBL SET 
-				FAIL_AUTH = 0,
-				LAST_AUTH_UTC = CURRENT_TIMESTAMP,
-				UPD_PROV_ID = 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8',
-				UPD_UTC = CURRENT_TIMESTAMP
-			WHERE SEC_APP_TBL.APP_PUB_ID = APP_PUB_ID_IN;
-			RETURN QUERY SELECT APP_TPL.*;
-		ELSIF(APP_TPL.FAIL_AUTH > MAX_FAIL_AUTH_IN) THEN 
-			APP_TPL.LOCKED = COALESCE(APP_TPL.LOCKED, CURRENT_TIMESTAMP) + ((APP_TPL.FAIL_AUTH - MAX_FAIL_AUTH_IN) ^ 1.5 * '30 SECONDS'::INTERVAL);
-			UPDATE SEC_APP_TBL SET FAIL_AUTH = COALESCE(SEC_APP_TBL.FAIL_AUTH, 0) + 1, LOCKED = APP_TPL.LOCKED
-				WHERE SEC_APP_TBL.APP_PUB_ID = APP_PUB_ID_IN;
-			APP_TPL.APP_PUB_ID := ('AUTH_LCK:' || ((APP_TPL.LOCKED - CURRENT_TIMESTAMP)::TEXT))::VARCHAR;
-			APP_TPL.APP_ID := UUID_NIL();
-			APP_TPL.APP_SCRT := NULL;
-			RETURN QUERY SELECT APP_TPL.*;
-		ELSE
-			UPDATE SEC_APP_TBL SET FAIL_AUTH = COALESCE(SEC_APP_TBL.FAIL_AUTH, 0) + 1 WHERE SEC_APP_TBL.APP_PUB_ID = APP_PUB_ID_IN;
-			APP_TPL.APP_PUB_ID := ('AUTH_INV:' || APP_PUB_ID_IN)::VARCHAR;
-			APP_TPL.APP_ID := UUID_NIL();
-			APP_TPL.APP_SCRT := NULL;			
-			RETURN QUERY SELECT APP_TPL.*;
-		END IF;
-	END IF;
-
-END
-$$ LANGUAGE PLPGSQL;
-
--- AUTHENTICATE A DEVICE
-DROP FUNCTION AUTH_DEV (TEXT, TEXT);
-CREATE OR REPLACE FUNCTION AUTH_DEV (
-	DEV_PUB_ID_IN IN TEXT,
-	DEV_SCRT_IN IN TEXT,
-	MAX_FAIL_AUTH_IN IN INTEGER
-) RETURNS SETOF SEC_DEV_TBL AS 
-$$ 
-DECLARE 
-	DEV_TPL SEC_DEV_TBL;
-BEGIN
-	SELECT INTO DEV_TPL * FROM SEC_DEV_TBL WHERE DEV_PUB_ID = DEV_PUB_ID_IN LIMIT 1;
-	IF (DEV_TPL.LOCKED > CURRENT_TIMESTAMP) THEN
-		DEV_TPL.LOCKED = COALESCE(DEV_TPL.LOCKED, CURRENT_TIMESTAMP) + ((DEV_TPL.FAIL_AUTH - MAX_FAIL_AUTH_IN) ^ 1.5 * '30 SECONDS'::INTERVAL);
-		UPDATE SEC_DEV_TBL SET FAIL_AUTH = SEC_DEV_TBL.FAIL_AUTH + 1, LOCKED = DEV_TPL.LOCKED
-			WHERE SEC_DEV_TBL.DEV_PUB_ID = DEV_PUB_ID_IN;
-		DEV_TPL.DEV_PUB_ID := ('ERR:AUTH_LCK:' || ((DEV_TPL.LOCKED - CURRENT_TIMESTAMP)::TEXT));
-		DEV_TPL.DEV_ID = UUID_NIL();
-		DEV_TPL.DEV_SCRT = NULL;
-		RETURN QUERY SELECT DEV_TPL.*;
-	ELSE
-		-- LOCKOUT ACCOUNTS
-		IF (DEV_TPL.DEV_SCRT = DEV_SCRT_IN) THEN
-			UPDATE SEC_DEV_TBL SET 
-				FAIL_AUTH = 0,
-				LAST_AUTH_UTC = CURRENT_TIMESTAMP,
-				UPD_PROV_ID = 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8',
-				UPD_UTC = CURRENT_TIMESTAMP
-			WHERE SEC_DEV_TBL.DEV_PUB_ID = DEV_PUB_ID_IN;
-			RETURN QUERY SELECT DEV_TPL.*;
-		ELSIF(DEV_TPL.FAIL_AUTH > MAX_FAIL_AUTH_IN) THEN 
-			DEV_TPL.LOCKED = COALESCE(DEV_TPL.LOCKED, CURRENT_TIMESTAMP) + ((DEV_TPL.FAIL_AUTH - MAX_FAIL_AUTH_IN) ^ 1.5 * '30 SECONDS'::INTERVAL);
-			UPDATE SEC_DEV_TBL SET FAIL_AUTH = COALESCE(SEC_DEV_TBL.FAIL_AUTH, 0) + 1, LOCKED = DEV_TPL.LOCKED
-				WHERE SEC_DEV_TBL.DEV_PUB_ID = DEV_PUB_ID_IN;
-			DEV_TPL.DEV_PUB_ID := ('AUTH_LCK:' || ((DEV_TPL.LOCKED - CURRENT_TIMESTAMP)::TEXT))::VARCHAR;
-			DEV_TPL.DEV_ID := UUID_NIL();
-			DEV_TPL.DEV_SCRT := NULL;
-			RETURN QUERY SELECT DEV_TPL.*;
-		ELSE
-			UPDATE SEC_DEV_TBL SET FAIL_AUTH = COALESCE(SEC_DEV_TBL.FAIL_AUTH, 0) + 1 WHERE SEC_DEV_TBL.DEV_PUB_ID = DEV_PUB_ID_IN;
-			DEV_TPL.DEV_PUB_ID := ('AUTH_INV:' || DEV_PUB_ID_IN)::VARCHAR;
-			DEV_TPL.DEV_ID := UUID_NIL();
-			DEV_TPL.DEV_SCRT := NULL;			
-			RETURN QUERY SELECT DEV_TPL.*;
-		END IF;
-	END IF;
-
-END
-$$ LANGUAGE PLPGSQL;
-
-
-
  -- GET THE SCHEMA VERSION
 CREATE OR REPLACE FUNCTION GET_SCH_VRSN() RETURNS VARCHAR(10) AS
 $$

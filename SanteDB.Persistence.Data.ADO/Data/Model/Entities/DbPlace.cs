@@ -41,16 +41,16 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
         [JoinFilter(PropertyName = nameof(DbEntity.ClassConceptKey), Value = EntityClassKeyStrings.Place)]
         [JoinFilter(PropertyName = nameof(DbEntity.ClassConceptKey), Value = EntityClassKeyStrings.ServiceDeliveryLocation)]
         [JoinFilter(PropertyName = nameof(DbEntity.ClassConceptKey), Value = EntityClassKeyStrings.State)]
-        public override Int32 ParentPrivateKey
+        public override Guid ParentKey
         {
             get
             {
-                return base.ParentPrivateKey;
+                return base.ParentKey;
             }
 
             set
             {
-                base.ParentPrivateKey = value;
+                base.ParentKey = value;
             }
         }
         /// <summary>

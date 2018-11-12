@@ -58,7 +58,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override object FromModelInstance(TModel modelInstance, DataContext context)
         {
             var retVal = base.FromModelInstance(modelInstance, context);
-            (retVal as DbEntitySubTable).ParentPrivateKey = modelInstance.VersionSequence.Value;
+            (retVal as DbEntitySubTable).ParentKey = modelInstance.VersionKey.Value;
             return retVal;
         }
 

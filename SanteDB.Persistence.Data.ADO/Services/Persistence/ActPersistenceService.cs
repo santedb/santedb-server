@@ -70,7 +70,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             if (dataInstance == null) return null;
 
-            DbActVersion dbActVersion = (dataInstance as CompositeResult)?.Values.OfType<DbActVersion>().FirstOrDefault() ?? dataInstance as DbActVersion ?? context.FirstOrDefault<DbActVersion>(o => o.VersionSequenceId == (dataInstance as DbActSubTable).ParentPrivateKey);
+            DbActVersion dbActVersion = (dataInstance as CompositeResult)?.Values.OfType<DbActVersion>().FirstOrDefault() ?? dataInstance as DbActVersion ?? context.FirstOrDefault<DbActVersion>(o => o.VersionKey == (dataInstance as DbActSubTable).ParentKey);
             DbAct dbAct = (dataInstance as CompositeResult)?.Values.OfType<DbAct>().FirstOrDefault() ?? context.FirstOrDefault<DbAct>(o => o.Key == dbActVersion.Key);
             Act retVal = null;
 
@@ -79,20 +79,20 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
                 case ActClassKeyStrings.ControlAct:
                     retVal = new ControlActPersistenceService().ToModelInstance(
-                                (dataInstance as CompositeResult)?.Values.OfType<DbControlAct>().FirstOrDefault() ?? context.FirstOrDefault<DbControlAct>(o => o.ParentPrivateKey == dbActVersion.VersionSequenceId),
+                                (dataInstance as CompositeResult)?.Values.OfType<DbControlAct>().FirstOrDefault() ?? context.FirstOrDefault<DbControlAct>(o => o.ParentKey == dbActVersion.VersionKey),
                                 dbActVersion,
                                 dbAct,
                                 context);
                     break;
                 case ActClassKeyStrings.SubstanceAdministration:
                     retVal = new SubstanceAdministrationPersistenceService().ToModelInstance(
-                                (dataInstance as CompositeResult)?.Values.OfType<DbSubstanceAdministration>().FirstOrDefault() ?? context.FirstOrDefault<DbSubstanceAdministration>(o => o.ParentPrivateKey == dbActVersion.VersionSequenceId),
+                                (dataInstance as CompositeResult)?.Values.OfType<DbSubstanceAdministration>().FirstOrDefault() ?? context.FirstOrDefault<DbSubstanceAdministration>(o => o.ParentKey == dbActVersion.VersionKey),
                                 dbActVersion,
                                 dbAct,
                                 context);
                     break;
                 case ActClassKeyStrings.Observation:
-                    var dbObs = (dataInstance as CompositeResult)?.Values.OfType<DbObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbObservation>(o => o.ParentPrivateKey == dbActVersion.VersionSequenceId);
+                    var dbObs = (dataInstance as CompositeResult)?.Values.OfType<DbObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbObservation>(o => o.ParentKey == dbActVersion.VersionKey);
                     if (dbObs == null)
                     {
                         this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Warning, -10293, "Observation {0} is missing observation data! Even though class code is {1}", dbAct.Key, dbAct.ClassConceptKey);
@@ -103,7 +103,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         {
                             case "ST":
                                 retVal = new TextObservationPersistenceService().ToModelInstance(
-                                    (dataInstance as CompositeResult)?.Values.OfType<DbTextObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbTextObservation>(o => o.ParentPrivateKey == dbObs.ParentPrivateKey),
+                                    (dataInstance as CompositeResult)?.Values.OfType<DbTextObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbTextObservation>(o => o.ParentKey == dbObs.ParentKey),
                                     dbObs,
                                     dbActVersion,
                                     dbAct,
@@ -111,7 +111,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 break;
                             case "CD":
                                 retVal = new CodedObservationPersistenceService().ToModelInstance(
-                                    (dataInstance as CompositeResult)?.Values.OfType<DbCodedObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbCodedObservation>(o => o.ParentPrivateKey == dbObs.ParentPrivateKey),
+                                    (dataInstance as CompositeResult)?.Values.OfType<DbCodedObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbCodedObservation>(o => o.ParentKey == dbObs.ParentKey),
                                     dbObs,
                                     dbActVersion,
                                     dbAct,
@@ -119,7 +119,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 break;
                             case "PQ":
                                 retVal = new QuantityObservationPersistenceService().ToModelInstance(
-                                    (dataInstance as CompositeResult)?.Values.OfType<DbQuantityObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbQuantityObservation>(o => o.ParentPrivateKey == dbObs.ParentPrivateKey),
+                                    (dataInstance as CompositeResult)?.Values.OfType<DbQuantityObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbQuantityObservation>(o => o.ParentKey == dbObs.ParentKey),
                                     dbObs,
                                     dbActVersion,
                                     dbAct,
@@ -136,7 +136,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     break;
                 case ActClassKeyStrings.Encounter:
                     retVal = new EncounterPersistenceService().ToModelInstance(
-                                (dataInstance as CompositeResult)?.Values.OfType<DbPatientEncounter>().FirstOrDefault() ?? context.FirstOrDefault<DbPatientEncounter>(o => o.ParentPrivateKey == dbActVersion.VersionSequenceId),
+                                (dataInstance as CompositeResult)?.Values.OfType<DbPatientEncounter>().FirstOrDefault() ?? context.FirstOrDefault<DbPatientEncounter>(o => o.ParentKey == dbActVersion.VersionKey),
                                 dbActVersion,
                                 dbAct,
                                 context);
@@ -157,7 +157,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         protected override Act CacheConvert(object dataInstance, DataContext context)
         {
             if (dataInstance == null) return null;
-            DbActVersion dbActVersion = (dataInstance as CompositeResult)?.Values.OfType<DbActVersion>().FirstOrDefault() ?? dataInstance as DbActVersion ?? context.FirstOrDefault<DbActVersion>(o => o.VersionSequenceId == (dataInstance as DbActSubTable).ParentPrivateKey);
+            DbActVersion dbActVersion = (dataInstance as CompositeResult)?.Values.OfType<DbActVersion>().FirstOrDefault() ?? dataInstance as DbActVersion ?? context.FirstOrDefault<DbActVersion>(o => o.VersionKey == (dataInstance as DbActSubTable).ParentKey);
             DbAct dbAct = (dataInstance as CompositeResult)?.Values.OfType<DbAct>().FirstOrDefault() ?? context.FirstOrDefault<DbAct>(o => o.Key == dbActVersion.Key);
             Act retVal = null;
             var cache= new AdoPersistenceCache(context);
@@ -172,7 +172,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         retVal = cache?.GetCacheItem<SubstanceAdministration>(dbAct.Key);
                         break;
                     case ActClassKeyStrings.Observation:
-                        var dbObs = (dataInstance as CompositeResult)?.Values.OfType<DbObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbObservation>(o => o.ParentPrivateKey == dbActVersion.VersionSequenceId);
+                        var dbObs = (dataInstance as CompositeResult)?.Values.OfType<DbObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbObservation>(o => o.ParentKey == dbActVersion.VersionKey);
                         if (dbObs != null)
                             switch (dbObs.ValueType)
                             {

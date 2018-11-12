@@ -41,13 +41,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Concepts
         /// <summary>
         /// Gets or sets the target key
         /// </summary>
-        [Column("ref_term_id"), ForeignKey(typeof(DbReferenceTerm), nameof(DbReferenceTerm.PrivateKey))]
-        public Int32 TargetPrivateKey { get; set; }
-
-        /// <summary>
-        /// Gets the public key 
-        /// </summary>
-        [PublicKeyRef(nameof(TargetPrivateKey))]
+        [Column("ref_term_id"), ForeignKey(typeof(DbReferenceTerm), nameof(DbReferenceTerm.Key))]
         public Guid TargetKey { get; set; }
 
         /// <summary>

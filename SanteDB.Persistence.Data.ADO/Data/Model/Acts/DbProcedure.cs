@@ -39,53 +39,35 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Acts
         /// Parent key
         /// </summary>
         [JoinFilter(PropertyName = nameof(DbAct.ClassConceptKey), Value = ActClassKeyStrings.Procedure)]
-        public override Int32 ParentPrivateKey
+        public override Guid ParentKey
         {
             get
             {
-                return base.ParentPrivateKey;
+                return base.ParentKey;
             }
 
             set
             {
-                base.ParentPrivateKey = value;
+                base.ParentKey = value;
             }
         }
 
         /// <summary>
         /// Gets or sets the technique used 
         /// </summary>
-        [Column("mth_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
-        public Int32 MethodConceptPrivateKey { get; set; }
-        
-        /// <summary>
-        /// Method concept key
-        /// </summary>
-        [PublicKeyRef(nameof(MethodConceptKey))]
+        [Column("mth_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid? MethodConceptKey { get; set; }
 
         /// <summary>
         /// Gets or sets the approach body site or system
         /// </summary>
-        [Column("apr_ste_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
-        public Int32 ApproachSiteConceptPrivateKey { get; set; }
-
-        /// <summary>
-        /// Lookup public key
-        /// </summary>
-        [PublicKeyRef(nameof(ApproachSiteConceptKey))]
+        [Column("apr_ste_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid? ApproachSiteConceptKey { get; set; }
 
         /// <summary>
         /// Gets or sets the target site code
         /// </summary>
-        [Column("trg_ste_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
-        public Int32 TargetSiteConceptPrivateKey { get; set; }
-
-        /// <summary>
-        /// Gets the target site concept key
-        /// </summary>
-        [PublicKeyRef(nameof(TargetSiteConceptPrivateKey))]
+        [Column("trg_ste_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid? TargetSiteConceptKey { get; set; }
     }
 }

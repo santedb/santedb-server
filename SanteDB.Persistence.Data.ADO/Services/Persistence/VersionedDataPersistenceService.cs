@@ -52,9 +52,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// Versioned domain data
     /// </summary>
     public abstract class VersionedDataPersistenceService<TModel, TDomain, TDomainKey> : BaseDataPersistenceService<TModel, TDomain, CompositeResult<TDomain, TDomainKey>>
-        where TDomain : class, IDbVersionedData, IDbPrivateKey, new()
+        where TDomain : class, IDbVersionedData, new()
         where TModel : VersionedEntityData<TModel>, new()
-        where TDomainKey : IDbIdentified, IDbPrivateKey, new()
+        where TDomainKey : IDbIdentified, new()
     {
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var expr = m_mapper.MapModelExpression<TModel, TDomain>(query, false);
             if (expr != null)
                 domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(typeof(TDomain), typeof(TDomainKey))
-                    .InnerJoin<TDomain, TDomainKey>(o => o.PrivateKey, o => o.PrivateKey)
+                    .InnerJoin<TDomain, TDomainKey>(o => o.Key, o => o.Key)
                     .Where<TDomain>(expr).Build();
             else
                 domainQuery = AdoPersistenceService.GetQueryBuilder().CreateQuery(query).Build();
@@ -277,7 +277,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             else
             {
                 var domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(typeof(TDomain), typeof(TDomainKey))
-                    .InnerJoin<TDomain, TDomainKey>(o => o.PrivateKey, o => o.PrivateKey)
+                    .InnerJoin<TDomain, TDomainKey>(o => o.Key, o => o.Key)
                     .Where<TDomain>(o => o.Key == key && o.ObsoletionTime == null)
                     .OrderBy<TDomain>(o => o.VersionSequenceId, Core.Model.Map.SortOrderType.OrderByDescending);
                 return this.CacheConvert(context.FirstOrDefault<CompositeResult<TDomain, TDomainKey>>(domainQuery), context);
@@ -363,7 +363,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         internal virtual void UpdateVersionedAssociatedItems<TAssociation, TDomainAssociation>(IEnumerable<TAssociation> storage, TModel source, DataContext context)
             where TAssociation : VersionedAssociation<TModel>, new()
-            where TDomainAssociation : class, IDbVersionedAssociation, IDbPrivateAssociation, IDbIdentified, new()
+            where TDomainAssociation : class, IDbVersionedAssociation, IDbIdentified, new()
         {
             var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TAssociation>>() as AdoBasePersistenceService<TAssociation>;
             if (persistenceService == null)
@@ -373,7 +373,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
 
             Dictionary<Guid, Decimal> sourceVersionMaps = new Dictionary<Guid, decimal>();
-            Dictionary<Guid, Int32> sourceSequenceMaps = new Dictionary<Guid, Int32>();
 
             // Ensure the source key is set
             foreach (var itm in storage)
@@ -406,10 +405,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     }
 
                     if (currentVersion != null)
-                    {
                         sourceVersionMaps.Add(itm.SourceEntityKey.Value, currentVersion.VersionSequenceId.Value);
-                        sourceSequenceMaps.Add(itm.SourceEntityKey.Value, (currentVersion as IDbPrivateKey).PrivateKey);
-                    }
                 }
 
             // Get existing
@@ -449,6 +445,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 if (!sourceVersionMaps.TryGetValue(ins.SourceEntityKey.Value, out eftVersion))
                     eftVersion = source.VersionSequence.GetValueOrDefault();
                 ins.EffectiveVersionSequenceId = eftVersion;
+
                 persistenceService.InsertInternal(context, ins);
             }
         }

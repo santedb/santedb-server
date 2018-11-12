@@ -60,7 +60,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             int tr = 0;
             var addrLookupQuery = context.CreateSqlStatement<DbEntityNameComponent>().SelectFrom(typeof(DbEntityNameComponent), typeof(DbEntityName), typeof(DbPhoneticValue))
                 .InnerJoin<DbEntityName>(o => o.SourceKey, o => o.Key)
-                .InnerJoin<DbPhoneticValue>(o => o.ValueId, o => o.PrivateKey)
+                .InnerJoin<DbPhoneticValue>(o => o.ValueSequenceId, o => o.SequenceId)
                 .Where<DbEntityName>(o => o.SourceKey == id && o.ObsoleteVersionSequenceId == null);
 
             /// Yowza! But it appears to be faster than the other way 
@@ -143,7 +143,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
         protected override SqlStatement AppendOrderBy(SqlStatement rawQuery)
         {
-            return rawQuery.OrderBy<DbEntityNameComponent>(o => o.PrivateKey);
+            return rawQuery.OrderBy<DbEntityNameComponent>(o => o.Sequence);
         }
 
         /// <summary>
@@ -155,8 +155,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             // Duplicate name?
             var existing = context.FirstOrDefault<DbPhoneticValue>(o => o.Value == modelInstance.Value);
-            if (existing != null && existing.PrivateKey != retVal.ValueId)
-                retVal.ValueId = existing.PrivateKey.Value;
+            if (existing != null && existing.SequenceId != retVal.ValueSequenceId)
+                retVal.ValueSequenceId = existing.SequenceId.Value;
             else if (existing == null)
             {
                 var phoneticCoder = ApplicationContext.Current.GetService<IPhoneticAlgorithmHandler>();
@@ -166,7 +166,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     PhoneticAlgorithmKey = phoneticCoder?.AlgorithmId ?? PhoneticAlgorithmKeys.None,
                     PhoneticCode = phoneticCoder?.GenerateCode(modelInstance.Value)
                 });
-                retVal.ValueId = value.PrivateKey.Value;
+                retVal.ValueSequenceId = value.SequenceId.Value;
             }
 
             return retVal;
@@ -182,7 +182,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var nameComp = (dataInstance as CompositeResult)?.Values.OfType<DbEntityNameComponent>().FirstOrDefault() ?? dataInstance as DbEntityNameComponent;
             var nameValue = (dataInstance as CompositeResult)?.Values.OfType<DbPhoneticValue>().FirstOrDefault();
             if(nameValue == null)
-                nameValue = context.FirstOrDefault<DbPhoneticValue>(o => o.PrivateKey == nameComp.ValueId);
+                nameValue = context.FirstOrDefault<DbPhoneticValue>(o => o.SequenceId == nameComp.ValueSequenceId);
             return new EntityNameComponent()
             {
                 ComponentTypeKey = nameComp.ComponentTypeKey,

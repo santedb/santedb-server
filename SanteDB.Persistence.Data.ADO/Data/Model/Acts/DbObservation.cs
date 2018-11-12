@@ -40,29 +40,23 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Acts
         /// Parent key
         /// </summary>
         [JoinFilter(PropertyName = nameof(DbAct.ClassConceptKey), Value = ActClassKeyStrings.Observation)]
-        public override Int32 ParentPrivateKey
+        public override Guid ParentKey
         {
             get
             {
-                return base.ParentPrivateKey;
+                return base.ParentKey;
             }
 
             set
             {
-                base.ParentPrivateKey = value;
+                base.ParentKey = value;
             }
         }
 
         /// <summary>
         /// Gets or sets the interpretation concept
         /// </summary>
-        [Column("int_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
-        public Guid InterpretationConceptPrivateKey { get; set; }
-
-        /// <summary>
-        /// Interpretation concept public key
-        /// </summary>
-        [PublicKeyRef(nameof(InterpretationConceptPrivateKey))]
+        [Column("int_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid InterpretationConceptKey { get; set; }
 
         /// <summary>
@@ -83,13 +77,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Acts
         /// <summary>
         /// Represents the unit of measure
         /// </summary>
-        [Column("uom_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))]
-        public Int32 UnitOfMeasurePrivateKey { get; set; }
-
-        /// <summary>
-        /// Gets the uom public key
-        /// </summary>
-        [PublicKeyRef(nameof(UnitOfMeasurePrivateKey))]
+        [Column("uom_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid UnitOfMeasureKey { get; set; }
 
         /// <summary>
@@ -130,13 +118,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Acts
         /// <summary>
         /// Gets or sets the concept representing the value of this
         /// </summary>
-        [Column("val_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.PrivateKey))] 
-        public Int32 ValuePrivateKey { get; set; }
-
-        /// <summary>
-        /// Private key
-        /// </summary>
-        [PublicKeyRef(nameof(ValuePrivateKey))]
+        [Column("val_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))] 
         public Guid? Value { get; set; }
         
     }
