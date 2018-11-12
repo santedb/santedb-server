@@ -244,6 +244,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Data\SQL\Updates\20181112-PSQL.sql" />
     <EmbeddedResource Include="Data\SQL\FBSQL\santedb-ddl.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -254,9 +255,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <Content Include="Data\SQL\FBSQL\santedb-init.sql" />
-    <Content Include="Data\SQL\Updates\20180126-PSQL.sql" />
-    <Content Include="Data\SQL\Updates\20180211-PSQL.sql" />
-    <Content Include="Data\SQL\Updates\20180131-PSQL.sql" />
+    <EmbeddedResource Include="Data\SQL\Updates\20180126-PSQL.sql" />
+    <EmbeddedResource Include="Data\SQL\Updates\20180211-PSQL.sql" />
+    <EmbeddedResource Include="Data\SQL\Updates\20180131-PSQL.sql" />
     <EmbeddedResource Include="Data\SQL\Updates\20171030-PSQL.sql" />
     <EmbeddedResource Include="Data\SQL\Updates\20171023-PSQL.sql" />
     <EmbeddedResource Include="Data\SQL\Updates\20171011-PSQL.sql" />

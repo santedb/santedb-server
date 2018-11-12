@@ -72,14 +72,10 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
             if (values is String)
                 values = new List<Object>() { values };
             var qValues = values as List<Object>;
-            bool isNegation = qValues.All(o => o.ToString().StartsWith("!"));
 
-            // Strip of ! because we will be doing this with the NOT EXISTS 
-            if (isNegation) qValues = qValues.Select(o => o.ToString().StartsWith("!") ? o.ToString().Substring(1) : o.ToString()).OfType<Object>().ToList();
-
-            whereClause.And($"{(isNegation ? "NOT " : null)} EXISTS (SELECT 1 FROM {valTblType} AS {queryPrefix}{valTblType} WHERE {queryPrefix}{valTblType}.val_seq_id = {queryPrefix}{cmpTblType}.val_seq_id");
-            whereClause.And(builder.CreateSqlPredicate($"{queryPrefix}{valTblType}", "val", componentType.GetProperty("Value"), qValues));
-            whereClause.Append(")");
+            sqlStatement.Append($"INNER JOIN (SELECT val_seq_id FROM {valTblType} AS {queryPrefix}{valTblType} WHERE ");
+            sqlStatement.Append(builder.CreateSqlPredicate($"{queryPrefix}{valTblType}", "val", componentType.GetProperty("Value"), qValues));
+            sqlStatement.Append($") AS {queryPrefix}{valTblType} ON ({queryPrefix}{valTblType}.val_seq_id = {queryPrefix}{cmpTblType}.val_seq_id)");
             return true;
         }
     }
