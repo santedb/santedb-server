@@ -122,6 +122,8 @@ alter table sub_adm_tbl drop rte_cd_uuid cascade;
 alter table sub_adm_tbl drop ste_cd_uuid cascade;
 alter table sub_adm_tbl drop dos_unt_cd_uuid cascade;
 alter table sub_adm_tbl alter rte_cd_id set default cd_xref('8ba48d37-6c86-4a54-9a2f-e3a1dad2e6a2');
+alter table sub_adm_tbl add constraint ck_sub_adm_rte_cd CHECK (assrt_cd_cls(rte_cd_id, 'Route'));
+alter table sub_adm_tbl add constraint ck_sub_adm_dos_unt_cd CHECK (assrt_cd_cls(dos_unt_cd_id, 'UnitOfMeasure'));
 
 -- act class
 create sequence act_id_seq start with 1 increment by 1;
@@ -138,6 +140,8 @@ alter table act_tbl alter mod_cd_id set not null;
 alter table act_tbl alter cls_cd_id set not null;
 alter table act_tbl drop mod_cd_uuid cascade;
 alter table act_tbl drop cls_cd_uuid cascade;
+alter table act_tbl add constraint ck_act_cls_cd check (ck_is_cd_set_mem(cls_cd_id, 'ActClass', false));
+alter table act_tbl add constraint ck_act_mod_cd check (ck_is_cd_set_mem(mod_cd_id, 'ActMood', false));
 
 -- act relationship table
 alter table act_rel_tbl rename rel_typ_cd_id to rel_typ_cd_uuid;
@@ -155,6 +159,7 @@ alter table act_rel_tbl alter trg_act_id set not null;
 alter table act_rel_tbl drop src_act_uuid;
 alter table act_rel_tbl drop trg_act_uuid;
 alter table act_rel_tbl drop rel_typ_cd_uuid;
+alter table act_rel_tbl add constraint ck_act_rel_rel_typ_cd check (ck_is_cd_set_mem(rel_typ_cd_id, 'ActRelationshipType', true));
 
 -- act version table
 alter table act_vrsn_tbl rename act_id to act_uuid;
@@ -174,6 +179,8 @@ alter table act_vrsn_tbl drop act_uuid;
 alter table act_vrsn_tbl drop sts_cd_uuid;
 alter table act_vrsn_tbl drop rsn_cd_uuid;
 alter table act_vrsn_tbl drop typ_cd_uuid;
+alter table act_vrsn_tbl add constraint ck_act_vrsn_rsn_cd check (rsn_cd_id is null or ck_is_cd_set_mem(rsn_cd_id, 'ActReasion', true));
+alter table act_vrsn_tbl add constraint ck_act_vrsn_sts_cd check (ck_is_cd_set_mem(sts_cd_id, 'ActStatus', true));
 
 -- alter act extension table 
 alter table act_ext_tbl rename act_id to act_uuid;
@@ -232,6 +239,8 @@ alter table ent_tbl alter cls_cd_id set not null;
 alter table ent_tbl alter dtr_cd_id set not null;
 alter table ent_tbl drop cls_cd_uuid cascade;
 alter table ent_tbl drop dtr_cd_uuid;
+alter table ent_tbl add constraint ck_ent_cls_cd check (ck_is_cd_set_mem(cls_cd_id, 'EntityClass', false));
+alter table ent_tbl add constraint ck_ent_dtr_cd check (ck_is_cd_set_mem(dtr_cd_id, 'EntityDeterminer', false));
 
 -- reset the version seq
 alter table ent_vrsn_tbl rename ent_id to ent_uuid;
@@ -243,13 +252,14 @@ alter table ent_vrsn_tbl add ent_id integer;
 alter table ent_vrsn_tbl drop constraint ck_ent_vrsn_sts_cd;
 alter table ent_vrsn_tbl rename crt_act_id to crt_act_uuid;
 alter table ent_vrsn_tbl add crt_act_id integer;
-update ent_vrsn_tbl set ent_id = (select ent_id from ent_tbl where ent_tbl.uuid = ent_vrsn_tbl.ent_uuid), sts_cd_id = cd_xref(sts_cd_uuid), typ_cd_id = cd_xref(typ_cd_uuid), crt_act_id = (select act_id from act_tbl where uuid = crt_act_uuid);
+update ent_vrsn_tbl set ent_id = (select ent_id from ent_tbl where uuid = ent_uuid), sts_cd_id = cd_xref(sts_cd_uuid), typ_cd_id = cd_xref(typ_cd_uuid), crt_act_id = (select act_id from act_tbl where uuid = crt_act_uuid);
 alter table ent_vrsn_tbl alter ent_id set not null;
 alter table ent_vrsn_tbl alter sts_cd_id set not null;
 alter table ent_vrsn_tbl drop crt_act_uuid;
 alter table ent_vrsn_tbl drop ent_uuid;
 alter table ent_vrsn_tbl drop sts_cd_uuid;
 alter table ent_vrsn_tbl drop typ_cd_uuid;
+alter table ent_vrsn_tbl add constraint ck_ent_vrsn_sts_cd check (ck_is_cd_set_mem(sts_cd_id, 'EntityStatus', false));
 
 -- correct ent address 
 create sequence ent_addr_id_seq start with 1 increment by 1;
@@ -265,6 +275,7 @@ alter table ent_addr_tbl alter ent_id set not null;
 alter table ent_addr_tbl alter use_cd_id set not null;
 alter table ent_addr_tbl drop ent_uuid cascade;
 alter table ent_addr_tbl drop use_cd_uuid;
+alter table ent_addr_tbl add constraint ck_ent_addr_use_cd check (ck_is_cd_set_mem(use_cd_id, 'AddressUse', false));
 
 -- correct ent address component
 create sequence ent_addr_cmp_id_seq start with 1 increment by 1;
@@ -279,6 +290,7 @@ alter table ent_addr_cmp_tbl drop cmp_id;
 alter table ent_addr_cmp_tbl add cmp_id integer not null default nextval('ent_addr_cmp_id_seq');
 alter table ent_addr_cmp_tbl drop addr_uuid;
 alter table ent_addr_cmp_tbl drop typ_cd_uuid;
+alter table ent_addr_cmp_tbl add constraint ck_ent_addr_cmp_typ_cd check (typ_cd_id is null or ck_is_cd_set_mem(typ_cd_id, 'AddressComponentType', false));
 alter table ent_addr_cmp_tbl rename val_seq_id to val_id;
 
 -- rekey address component
@@ -339,6 +351,7 @@ alter table ent_name_tbl alter ent_id set not null;
 alter table ent_name_tbl alter use_cd_id set not null;
 alter table ent_name_tbl drop ent_uuid cascade;
 alter table ent_name_tbl drop use_cd_uuid;
+alter table ent_name_tbl add constraint ck_ent_name_use_cd check (ck_is_cd_set_mem(use_cd_id, 'NameUse', false));
 
 -- correct ent address component
 create sequence ent_name_cmp_id_seq start with 1 increment by 1;
@@ -353,6 +366,7 @@ alter table ent_name_cmp_tbl drop cmp_id;
 alter table ent_name_cmp_tbl add cmp_id integer not null default nextval('ent_name_cmp_id_seq');
 alter table ent_name_cmp_tbl drop name_uuid;
 alter table ent_name_cmp_tbl drop typ_cd_uuid;
+alter table ent_name_cmp_tbl add constraint ck_ent_name_cmp_typ_cd check (typ_cd_id is null or ck_is_cd_set_mem(typ_cd_id, 'NameComponentType', false));
 alter table ent_name_cmp_tbl rename val_seq_id to val_id;
 
 -- rekey address component
@@ -383,6 +397,7 @@ alter table ent_rel_tbl alter rel_typ_cd_id set not null;
 alter table ent_rel_tbl drop rel_typ_cd_uuid;
 alter table ent_rel_tbl drop src_ent_uuid;
 alter table ent_rel_tbl drop trg_ent_uuid;
+alter table ent_rel_tbl add constraint ck_ent_rel_rel_typ_cd check (ck_is_cd_set_mem(rel_typ_cd_id, 'EntityRelationshipType', false));
 
 
 -- correct verification table
@@ -399,6 +414,9 @@ alter table ent_rel_vrfy_cdtbl alter trg_cls_cd_id set not null;
 alter table ent_rel_vrfy_cdtbl drop rel_typ_cd_uuid;
 alter table ent_rel_vrfy_cdtbl drop src_cls_cd_uuid;
 alter table ent_rel_vrfy_cdtbl drop trg_cls_cd_uuid;
+alter table ent_rel_vrfy_cdtbl add constraint ck_ent_vrfy_rel_typ_cd check (ck_is_cd_set_mem(rel_typ_cd_id, 'EntityRelationshipType', false));
+alter table ent_rel_vrfy_cdtbl add constraint ck_ent_vrfy_src_cls_cd check (ck_is_cd_set_mem(src_cls_cd_id, 'EntityClass', false));
+alter table ent_rel_vrfy_cdtbl add constraint ck_ent_vrfy_trg_cls_cd check (ck_is_cd_set_mem(trg_cls_cd_id, 'EntityClass', false));
 
 -- TRIGGER - ENSURE THAT ANY VALUE INSERTED INTO THE ENT_REL_TBL HAS THE PROPER PARENT
 CREATE OR REPLACE FUNCTION trg_vrfy_ent_rel_tbl () RETURNS TRIGGER AS $$
@@ -472,6 +490,8 @@ alter table ent_tel_tbl alter use_cd_id set not null;
 alter table ent_tel_tbl drop use_cd_uuid cascade;
 alter table ent_tel_tbl drop typ_cd_uuid;
 alter table ent_tel_tbl drop ent_uuid;
+alter table ent_tel_tbl add constraint ck_ent_tel_typ_cd check (typ_cd_id is null or ck_is_cd_set_mem(typ_cd_id, 'TelecomAddressType',true));
+alter table ent_tel_tbl add constraint ck_ent_tel_use_cd check (ck_is_cd_set_mem(use_cd_id, 'TelecomAddressUse', false));
 
 -- ASSRERT ENTITY IS A PARTICULAR CLASS
 CREATE OR REPLACE FUNCTION IS_ENT_CLS(
@@ -496,6 +516,8 @@ alter table plc_svc_tbl alter ent_id set not null;
 alter table plc_svc_tbl alter svc_cd_id set not null;
 alter table plc_svc_tbl drop ent_uuid;
 alter table plc_svc_tbl drop svc_cd_uuid;
+alter table plc_svc_tbl add constraint ck_plc_svc_cd check (ck_is_cd_set_mem(svc_cd_id, 'ServiceCode', false));
+alter table plc_svc_tbl add constraint ck_plc_svc_ent_cls check (is_ent_cls(ent_id, 'ServiceDeliveryLocation'));
 
 -- correct participation
 alter table act_ptcpt_tbl rename act_id to act_uuid;
@@ -512,6 +534,7 @@ alter table act_ptcpt_tbl alter rol_cd_id set not null;
 alter table act_ptcpt_tbl drop act_uuid;
 alter table act_ptcpt_tbl drop ent_uuid;
 alter table act_ptcpt_tbl drop rol_cd_uuid;
+alter table act_ptcpt_tbl add constraint ck_act_ptcpt_rol_cd check (ck_is_cd_set_mem(rol_cd_id, 'ActParticipationType', true));
 
 -- person language tables
 alter table psn_lng_tbl rename ent_id to ent_uuid;
@@ -566,6 +589,9 @@ update proc_tbl set mth_cd_id = cd_xref(mth_cd_uuid), apr_ste_cd_id = cd_xref(ap
 alter table proc_tbl drop trg_ste_cd_uuid;
 alter table proc_tbl drop mth_cd_uuid;
 alter table proc_tbl drop apr_ste_cd_uuid;
+alter table proc_tbl add constraint ck_proc_apr_ste_cd_id check (apr_ste_cd_id is null or ck_is_cd_set_mem(apr_ste_cd_id, 'BodySiteOrSystemCode', true));
+alter table proc_tbl add constraint ck_proc_mth_cd_id check (mth_cd_id is null or ck_is_cd_set_mem(mth_cd_id, 'ProcedureTechniqueCode', true));
+alter table proc_tbl add constraint ck_proc_trg_ste_cd_id check (trg_ste_cd_id is null or ck_is_cd_set_mem(trg_ste_cd_id, 'BodySiteOrSystemCode', true));
 
 
 -- fix discharge 
@@ -584,6 +610,8 @@ alter table mat_tbl drop constraint ck_mat_qty_cd;
 update mat_tbl set frm_cd_id = cd_xref(frm_cd_uuid), qty_cd_id = cd_xref(qty_cd_uuid);
 alter table mat_tbl drop frm_cd_uuid;
 alter table mat_tbl drop qty_cd_uuid;
+alter table mat_tbl add constraint ck_mat_frm_cd_id check (frm_cd_id is null or assrt_cd_cls(frm_cd_id, 'Form'));
+alter table mat_tbl add constraint ck_mat_qty_cd_id check (qty_cd_id is null or assrt_cd_cls(qty_cd_id, 'UnitOfMeasure'));
 
 -- fix gender code
 alter table pat_tbl rename gndr_cd_id to gndr_cd_uuid;
@@ -618,6 +646,13 @@ alter table pat_tbl drop edu_lvl_cd_uuid;
 alter table pat_tbl drop lvn_arg_cd_uuid;
 alter table pat_tbl drop rlgn_cd_uuid;
 alter table pat_tbl drop eth_grp_cd_uuid;
+alter table pat_tbl add constraint ck_pat_edu_lvl_cd check (edu_lvl_cd_id is null or is_cd_set_mem(edu_lvl_cd_id, 'EducationLevel'));
+alter table pat_tbl add constraint ck_pat_eth_grp_cd check (eth_grp_cd_id is null or is_cd_set_mem(eth_grp_cd_id, 'Ethnicity'));
+alter table pat_tbl add constraint ck_pat_gndr_cd check (ck_is_cd_set_mem(gndr_cd_id, 'AdministrativeGenderCode', true));
+alter table pat_tbl add constraint ck_pat_lvn_arg_cd check (lvn_arg_cd_id is null or is_cd_set_mem(lvn_arg_cd_id, 'LivingArrangement'));
+alter table pat_tbl add constraint ck_pat_mrtl_sts_cd check (mrtl_sts_cd_id is null or is_cd_set_mem(mrtl_sts_cd_id, 'MaritalStatus'));
+alter table pat_tbl add constraint ck_pat_rlgn_cd check (rlgn_cd_id is null or is_cd_set_mem(rlgn_cd_id, 'Reltion'));
+alter table pat_tbl add constraint pat_tbl_dcsd_prec_check check (dcsd_prec IN ('Y', 'M', 'D'));
 
 -- provider 
 alter table pvdr_tbl rename spec_cd_id to spec_cd_uuid;
@@ -631,6 +666,7 @@ alter table org_tbl add ind_cd_id integer;
 alter table org_tbl drop constraint ck_org_ind_cd;
 update org_tbl set ind_cd_id = cd_xref(ind_cd_uuid);
 alter table org_tbl drop ind_cd_uuid;
+alter table org_tbl add constraint ck_org_ind_cd check (ind_cd_id is null or ck_is_cd_set_mem(ind_cd_id, 'IndustryCode', true));
 
 -- coded obs value
 alter table cd_obs_tbl rename val_cd_id to val_cd_uuid;
@@ -645,6 +681,7 @@ alter table qty_obs_tbl drop constraint ck_qty_obs_uom_cd;
 update qty_obs_tbl set uom_cd_id = cd_xref(uom_cd_uuid);
 alter table qty_obs_tbl alter uom_cd_id set not null;
 alter table qty_obs_tbl drop uom_cd_uuid;
+alter table qty_obs_tbl add constraint ck_qty_obs_uom_cd check (assrt_cd_cls(uom_cd_id, 'UnitOfMeasure'));
 
 -- interpretation
 alter table obs_tbl rename int_cd_id to int_cd_uuid;
@@ -652,6 +689,7 @@ alter table obs_tbl add int_cd_id integer;
 alter table obs_tbl drop constraint ck_obs_int_cd;
 update obs_tbl set int_cd_id = cd_xref(int_cd_uuid);
 alter table obs_tbl drop int_cd_uuid;
+alter table obs_tbl add constraint ck_obs_int_cd check (int_cd_id is null or ck_is_cd_set_mem(int_cd_id, 'ActInterpretation', true));
 
 -- Identity type codes
 alter table id_typ_tbl rename typ_cd_id to typ_cd_uuid;
@@ -1026,45 +1064,6 @@ alter table phon_val_tbl alter val_id type integer;
 alter table cd_vrsn_tbl rename cd_vrsn_id to vrsn_uuid;
 alter table act_ptcpt_tbl alter ptcpt_seq_id type integer;
 alter table act_proto_assoc_tbl add constraint pk_act_proto_assoc_tbl primary key (proto_id, act_id);
-
-alter table obs_tbl add constraint ck_obs_int_cd check (int_cd_id is null or ck_is_cd_set_mem(int_cd_id, 'ActInterpretation', true));
-alter table qty_obs_tbl add constraint ck_qty_obs_uom_cd check (assrt_cd_cls(uom_cd_id, 'UnitOfMeasure'));
-alter table org_tbl add constraint ck_org_ind_cd check (ind_cd_id is null or ck_is_cd_set_mem(ind_cd_id, 'IndustryCode', true));
-alter table pat_tbl add constraint ck_pat_edu_lvl_cd check (edu_lvl_cd_id is null or is_cd_set_mem(edu_lvl_cd_id, 'EducationLevel'));
-alter table pat_tbl add constraint ck_pat_eth_grp_cd check (eth_grp_cd_id is null or is_cd_set_mem(eth_grp_cd_id, 'Ethnicity'));
-alter table pat_tbl add constraint ck_pat_gndr_cd check (ck_is_cd_set_mem(gndr_cd_id, 'AdministrativeGenderCode', true));
-alter table pat_tbl add constraint ck_pat_lvn_arg_cd check (lvn_arg_cd_id is null or is_cd_set_mem(lvn_arg_cd_id, 'LivingArrangement'));
-alter table pat_tbl add constraint ck_pat_mrtl_sts_cd check (mrtl_sts_cd_id is null or is_cd_set_mem(mrtl_sts_cd_id, 'MaritalStatus'));
-alter table pat_tbl add constraint ck_pat_rlgn_cd check (rlgn_cd_id is null or is_cd_set_mem(rlgn_cd_id, 'Reltion'));
-alter table pat_tbl add constraint pat_tbl_dcsd_prec_check check (dcsd_prec IN ('Y', 'M', 'D'));
-alter table mat_tbl add constraint ck_mat_frm_cd_id check (frm_cd_id is null or assrt_cd_cls(frm_cd_id, 'Form'));
-alter table mat_tbl add constraint ck_mat_qty_cd_id check (qty_cd_id is null or assrt_cd_cls(qty_cd_id, 'UnitOfMeasure'));
-alter table proc_tbl add constraint ck_proc_apr_ste_cd_id check (apr_ste_cd_id is null or ck_is_cd_set_mem(apr_ste_cd_id, 'BodySiteOrSystemCode', true));
-alter table proc_tbl add constraint ck_proc_mth_cd_id check (mth_cd_id is null or ck_is_cd_set_mem(mth_cd_id, 'ProcedureTechniqueCode', true));
-alter table proc_tbl add constraint ck_proc_trg_ste_cd_id check (trg_ste_cd_id is null or ck_is_cd_set_mem(trg_ste_cd_id, 'BodySiteOrSystemCode', true));
-alter table act_ptcpt_tbl add constraint ck_act_ptcpt_rol_cd check (ck_is_cd_set_mem(rol_cd_id, 'ActParticipationType', true));
-alter table plc_svc_tbl add constraint ck_plc_svc_cd check (ck_is_cd_set_mem(svc_cd_id, 'ServiceCode', false));
-alter table plc_svc_tbl add constraint ck_plc_svc_ent_cls check (is_ent_cls(ent_id, 'ServiceDeliveryLocation'));
-alter table ent_tel_tbl add constraint ck_ent_tel_typ_cd check (typ_cd_id is null or ck_is_cd_set_mem(typ_cd_id, 'TelecomAddressType',true));
-alter table ent_tel_tbl add constraint ck_ent_tel_use_cd check (ck_is_cd_set_mem(use_cd_id, 'TelecomAddressUse', false));
-alter table ent_rel_vrfy_cdtbl add constraint ck_ent_vrfy_rel_typ_cd check (ck_is_cd_set_mem(rel_typ_cd_id, 'EntityRelationshipType', false));
-alter table ent_rel_vrfy_cdtbl add constraint ck_ent_vrfy_src_cls_cd check (ck_is_cd_set_mem(src_cls_cd_id, 'EntityClass', false));
-alter table ent_rel_vrfy_cdtbl add constraint ck_ent_vrfy_trg_cls_cd check (ck_is_cd_set_mem(trg_cls_cd_id, 'EntityClass', false));
-alter table ent_rel_tbl add constraint ck_ent_rel_rel_typ_cd check (ck_is_cd_set_mem(rel_typ_cd_id, 'EntityRelationshipType', false));
-alter table ent_name_cmp_tbl add constraint ck_ent_name_cmp_typ_cd check (typ_cd_id is null or ck_is_cd_set_mem(typ_cd_id, 'NameComponentType', false));
-alter table ent_name_tbl add constraint ck_ent_name_use_cd check (ck_is_cd_set_mem(use_cd_id, 'NameUse', false));
-alter table ent_addr_cmp_tbl add constraint ck_ent_addr_cmp_typ_cd check (typ_cd_id is null or ck_is_cd_set_mem(typ_cd_id, 'AddressComponentType', false));
-alter table ent_addr_tbl add constraint ck_ent_addr_use_cd check (ck_is_cd_set_mem(use_cd_id, 'AddressUse', false));
-alter table ent_vrsn_tbl add constraint ck_ent_vrsn_sts_cd check (ck_is_cd_set_mem(sts_cd_id, 'EntityStatus', false));
-alter table ent_tbl add constraint ck_ent_cls_cd check (ck_is_cd_set_mem(cls_cd_id, 'EntityClass', false));
-alter table ent_tbl add constraint ck_ent_dtr_cd check (ck_is_cd_set_mem(dtr_cd_id, 'EntityDeterminer', false));
-alter table act_vrsn_tbl add constraint ck_act_vrsn_rsn_cd check (rsn_cd_id is null or ck_is_cd_set_mem(rsn_cd_id, 'ActReasion', true));
-alter table act_vrsn_tbl add constraint ck_act_vrsn_sts_cd check (ck_is_cd_set_mem(sts_cd_id, 'ActStatus', true));
-alter table act_rel_tbl add constraint ck_act_rel_rel_typ_cd check (ck_is_cd_set_mem(rel_typ_cd_id, 'ActRelationshipType', true));
-alter table act_tbl add constraint ck_act_cls_cd check (ck_is_cd_set_mem(cls_cd_id, 'ActClass', false));
-alter table act_tbl add constraint ck_act_mod_cd check (ck_is_cd_set_mem(mod_cd_id, 'ActMood', false));
-alter table sub_adm_tbl add constraint ck_sub_adm_rte_cd CHECK (assrt_cd_cls(rte_cd_id, 'Route'));
-alter table sub_adm_tbl add constraint ck_sub_adm_dos_unt_cd CHECK (assrt_cd_cls(dos_unt_cd_id, 'UnitOfMeasure'));
 
 ALTER TABLE SEC_APP_TBL ADD LOCKED TIMESTAMPTZ; -- LOCKOUT PERIOD
 ALTER TABLE SEC_APP_TBL ADD FAIL_AUTH INTEGER; -- FAILED AUTHENTICATION ATTEMPTS
