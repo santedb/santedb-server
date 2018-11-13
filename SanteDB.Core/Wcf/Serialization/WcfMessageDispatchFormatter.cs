@@ -353,13 +353,19 @@ namespace SanteDB.Core.Wcf.Serialization
                     // The request was in XML and/or the accept is JSON
                     else
                     {
-
-	                    if (!s_serializers.ContainsKey(result.GetType()))
+                        XmlSerializer xsz = null;
+                        if(!s_serializers.TryGetValue(result.GetType(), out xsz)) 
 	                    {
-		                    throw new KeyNotFoundException($"{result.GetType().Name} serializer not found");
+                            // Build a serializer
+                            this.m_traceSource.TraceWarning("Could not find pre-created serializer for {0}, will generate one...", result.GetType().FullName);
+                            xsz = new XmlSerializer(result.GetType());
+                            lock (s_serializers)
+                            {
+                                if (!s_serializers.ContainsKey(result.GetType()))
+                                    s_serializers.Add(result.GetType(), xsz);
+                            }
 	                    }
 
-                        XmlSerializer xsz = s_serializers[result.GetType()];
                         MemoryStream ms = new MemoryStream();
                         xsz.Serialize(ms, result);
                         format = WebContentFormat.Xml;

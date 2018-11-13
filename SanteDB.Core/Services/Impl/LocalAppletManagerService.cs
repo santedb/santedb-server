@@ -454,7 +454,10 @@ namespace SanteDB.Core.Services.Impl
                 var installedApplet = this.GetApplet(itm.Meta.Id);
                 if (installedApplet == null ||
                     new Version(installedApplet.Info.Version) < new Version(itm.Meta.Version)) // Installed version is there but is older or is not installed, so we install it
+                {
+                    this.m_tracer.TraceInfo("Installing Solution applet {0} v{1}...", itm.Meta.Id, itm.Meta.Version);
                     this.Install(itm, true);
+                }
                 itm.Manifest = null;
             }
 

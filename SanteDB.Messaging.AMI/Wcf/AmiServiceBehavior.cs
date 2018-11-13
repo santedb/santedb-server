@@ -448,7 +448,12 @@ namespace SanteDB.Messaging.AMI.Wcf
                 var handler = AmiMessageHandler.ResourceHandler.GetResourceHandler<IAmiServiceContract>(resourceType);
                 if (handler != null)
                 {
-                    var retVal = handler.Get(Guid.Parse(key), Guid.Empty);
+                    object strongKey = key;
+                    Guid guidKey = Guid.Empty;
+                    if (Guid.TryParse(key, out guidKey))
+                        strongKey = guidKey;
+
+                    var retVal = handler.Get(strongKey, Guid.Empty);
                     if (retVal == null)
                         throw new FileNotFoundException(key);
 
@@ -496,7 +501,14 @@ namespace SanteDB.Messaging.AMI.Wcf
                 var handler = AmiMessageHandler.ResourceHandler.GetResourceHandler<IAmiServiceContract>(resourceType);
                 if (handler != null)
                 {
-                    var retVal = handler.Get(Guid.Parse(key), Guid.Parse(versionKey)) as IdentifiedData;
+                    object strongKey = key, strongVersionKey = versionKey;
+                    Guid guidKey = Guid.Empty;
+                    if (Guid.TryParse(key, out guidKey))
+                        strongKey = guidKey;
+                    if (Guid.TryParse(versionKey, out guidKey))
+                        strongVersionKey = guidKey;
+
+                    var retVal = handler.Get(strongKey, strongVersionKey) as IdentifiedData;
                     if (retVal == null)
                         throw new FileNotFoundException(key);
 

@@ -14,7 +14,10 @@ create unique index act_rel_unq_enf_sha1 on act_rel_tbl(digest(src_Act_id::text 
 drop index act_rel_unq_enf;
 create unique index ent_rel_unq_enf_sha1 on ent_rel_tbl(digest(src_ent_id::text || trg_ent_id::text || rel_typ_cd_id::text, 'sha1'));
 drop index ent_rel_unq_enf;
-
+alter table alrt_tbl rename to mail_msg_tbl;
+alter table mail_msg_tbl rename alrt_id to mail_msg_id;
+alter table alrt_rcpt_to_tbl rename to mail_msg_rcpt_to_tbl;
+alter table mail_msg_rcpt_to_tbl rename alrt_id to mail_msg_id;
 SELECT REG_PATCH('20181113-01');
 
 COMMIT;

@@ -50,7 +50,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Mail
 		/// <summary>
 		/// Gets or sets the key of the object.
 		/// </summary>
-		[Column("alrt_id"), ForeignKey(typeof(DbMailMessage), nameof(DbMailMessage.Key))]
+		[Column("mail_msg_id"), ForeignKey(typeof(DbMailMessage), nameof(DbMailMessage.Key))]
 		public override Guid Key { get; set; }
 
 		/// <summary>

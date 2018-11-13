@@ -27,13 +27,16 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using SanteDB.Core.Mail;
+using SanteDB.Core.Model.Query;
+using System.Linq;
 
 namespace SanteDB.Core.Services.Impl
 {
 	/// <summary>
 	/// Represents a local alert service.
 	/// </summary>
-	public class LocalMailMessageRepositoryService : IMailMessageRepositoryService
+	public class LocalMailMessageRepositoryService : IMailMessageRepositoryService,
+        IRepositoryService<MailMessage>
 	{
 		/// <summary>
 		/// The internal reference to the <see cref="TraceSource"/> instance.
@@ -76,7 +79,11 @@ namespace SanteDB.Core.Services.Impl
 				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<MailMessage>)));
 			}
 
-			return persistenceService.Query(predicate, offset, count, AuthenticationContext.Current.Principal, out totalCount);
+            // Non archived messages
+            var qry = new NameValueCollection(QueryExpressionBuilder.BuildQuery(predicate).ToArray());
+            if (!qry.ContainsKey("flags"))
+                qry.Add("flags", $"!{(int)MailMessageFlags.Archived}");
+			return persistenceService.Query(QueryExpressionParser.BuildLinqExpression<MailMessage>(qry), offset, count, AuthenticationContext.Current.Principal, out totalCount);
 		}
 
 		/// <summary>
@@ -162,5 +169,64 @@ namespace SanteDB.Core.Services.Impl
 
 			return alert;
 		}
-	}
+
+        /// <summary>
+        /// Find the specified mail message
+        /// </summary>
+        IEnumerable<MailMessage> IRepositoryService<MailMessage>.Find(Expression<Func<MailMessage, bool>> query)
+        {
+            int tr = 0;
+            return this.Find(query, 0, 100, out tr);
+        }
+
+        /// <summary>
+        /// Find with restrictions
+        /// </summary>
+        IEnumerable<MailMessage> IRepositoryService<MailMessage>.Find(Expression<Func<MailMessage, bool>> query, int offset, int? count, out int totalResults)
+        {
+            return this.Find(query, offset, count, out totalResults);
+        }
+
+        /// <summary>
+        /// Get mail message
+        /// </summary>
+        MailMessage IRepositoryService<MailMessage>.Get(Guid key)
+        {
+            return this.Get(key);
+        }
+
+        /// <summary>
+        /// Get a version
+        /// </summary>
+        MailMessage IRepositoryService<MailMessage>.Get(Guid key, Guid versionKey)
+        {
+            return this.Get(key);
+        }
+
+        /// <summary>
+        /// Insert a mail message
+        /// </summary>
+        MailMessage IRepositoryService<MailMessage>.Insert(MailMessage data)
+        {
+            return this.Insert(data);
+        }
+
+        /// <summary>
+        /// OBsolete / delete an alert
+        /// </summary>
+        MailMessage IRepositoryService<MailMessage>.Obsolete(Guid key)
+        {
+            var msg = this.Get(key);
+            msg.Flags &= MailMessageFlags.Archived;
+            return this.Save(msg);
+        }
+
+        /// <summary>
+        /// Update mail message
+        /// </summary>
+        MailMessage IRepositoryService<MailMessage>.Save(MailMessage data)
+        {
+            return this.Save(data);
+        }
+    }
 }

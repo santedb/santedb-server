@@ -97,7 +97,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandler
         public object Get(Object solutionId, Object versionId)
         {
             var appletService = ApplicationContext.Current.GetService<IAppletSolutionManagerService>();
-            var appletData = appletService.Solutions.FirstOrDefault(o=>o.Meta.Icon == solutionId.ToString());
+            var appletData = appletService.Solutions.FirstOrDefault(o=>o.Meta.Id == solutionId.ToString());
 
             if (appletData == null)
                 throw new FileNotFoundException(solutionId.ToString());
