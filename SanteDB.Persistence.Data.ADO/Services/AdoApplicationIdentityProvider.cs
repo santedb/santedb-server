@@ -76,9 +76,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     dataContext.Open();
                     IPasswordHashingService hashService = ApplicationContext.Current.GetService<IPasswordHashingService>();
 
-                    var client = dataContext.FirstOrDefault<DbSecurityApplication>("auth_app", applicationId, hashService.EncodePassword(applicationSecret));
+                    var client = dataContext.FirstOrDefault<DbSecurityApplication>("auth_app", applicationId, hashService.EncodePassword(applicationSecret), 5);
                     if (client == null)
                         throw new SecurityException("Invalid application credentials");
+                    else if (client.Key == Guid.Empty)
+                        throw new AuthenticationException(client.PublicId);
 
                     IPrincipal applicationPrincipal = new ApplicationPrincipal(new SanteDB.Core.Security.ApplicationIdentity(client.Key, client.PublicId, true));
                     new PolicyPermission(System.Security.Permissions.PermissionState.None, PermissionPolicyIdentifiers.LoginAsService, applicationPrincipal).Demand();

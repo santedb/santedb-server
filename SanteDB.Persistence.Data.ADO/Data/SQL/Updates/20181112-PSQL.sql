@@ -1,5 +1,5 @@
 ﻿/** 
- * <update id="20181110-01" applyRange="1.0.0.0-1.9.0.0"  invariantName="npgsql">
+ * <update id="20181112-01" applyRange="1.0.0.0-1.9.0.0"  invariantName="npgsql">
  *	<summary>Adds lockout function to applications and devices</summary>
  *	<remarks>This patch adds lockout and update provenance to the application and device tables</remarks>
  *	<isInstalled>select ck_patch('20181112-01')</isInstalled>
