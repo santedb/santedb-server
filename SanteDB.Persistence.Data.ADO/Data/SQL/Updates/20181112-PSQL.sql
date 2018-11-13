@@ -186,6 +186,72 @@ alter table act_pol_assoc_tbl alter obslt_vrsn_seq_id type integer;
 alter table act_note_tbl alter efft_vrsn_seq_id type integer;
 alter table act_note_tbl alter obslt_vrsn_seq_id type integer;
 
+-- CURRENT CONCEPT VERSION VIEW
+CREATE VIEW CD_CUR_VRSN_VW AS
+	SELECT CD_VRSN_TBL.*, CD_TBL.IS_SYS, CD_CLS_TBL.MNEMONIC AS CLS_MNEMONIC 
+	FROM CD_VRSN_TBL INNER JOIN CD_TBL USING (CD_ID)
+		INNER JOIN CD_CLS_TBL USING (CLS_ID)
+		WHERE CD_VRSN_TBL.OBSLT_UTC IS NULL;
+
+-- CONCEPT SET MEMBERS VIEW
+CREATE OR REPLACE VIEW CD_SET_MEM_VW AS
+	SELECT CD_SET_TBL.SET_ID, CD_SET_TBL.MNEMONIC AS SET_MNEMONIC, CD_CUR_VRSN_VW.CD_ID, CD_CUR_VRSN_VW.CD_VRSN_ID, CD_CUR_VRSN_VW.MNEMONIC AS CD_MNEMONIC, CD_CUR_VRSN_VW.CLS_MNEMONIC
+	FROM CD_SET_MEM_ASSOC_TBL INNER JOIN CD_SET_TBL USING (SET_ID) 
+	INNER JOIN CD_CUR_VRSN_VW USING(CD_ID);
+
+
+CREATE OR REPLACE FUNCTION vrfy_ent_rel (
+	src_ent_id_in IN UUID,
+	trg_ent_id_in IN UUID,
+	rel_typ_cd_id_in IN UUID
+) RETURNS VARCHAR(128)[] AS $$
+DECLARE
+	err_ref_out varchar(128)[];
+BEGIN 
+	IF NOT EXISTS (
+		SELECT * 
+		FROM 
+			ent_rel_vrfy_cdtbl 
+			INNER JOIN ent_tbl src_ent ON (src_ent.ent_id = src_ent_id_in)
+			INNER JOIN ent_tbl trg_ent ON (trg_ent.ent_id = trg_ent_id_in)
+		WHERE 
+			rel_typ_cd_id = rel_typ_cd_id_in
+			AND src_cls_cd_id = src_ent.cls_cd_id 
+			AND trg_cls_cd_id = trg_ent.cls_cd_id
+	) THEN
+		SELECT DISTINCT 
+			('{' || rel_cd.mnemonic || ',' || src_cd.mnemonic || ',' || trg_cd.mnemonic || '}')::VARCHAR[] INTO err_ref_out
+		FROM 
+			ent_tbl src_ent 
+			CROSS JOIN ent_tbl trg_ent
+			CROSS JOIN CD_VRSN_TBL REL_CD
+			LEFT JOIN CD_VRSN_TBL SRC_CD ON (SRC_ENT.CLS_CD_ID = SRC_CD.CD_ID)
+			LEFT JOIN CD_VRSN_TBL TRG_CD ON (TRG_ENT.CLS_CD_ID = TRG_CD.CD_ID)
+		WHERE
+			src_ent.ent_id = src_ent_id_in
+			AND trg_ent.ent_id = trg_ent_id_in
+			AND REL_CD.CD_ID = REL_TYP_CD_ID_in;
+	END IF;
+	RETURN ERR_REF_OUT;
+END;
+$$ LANGUAGE PLPGSQL;
+
+-- TRIGGER - ENSURE THAT ANY VALUE INSERTED INTO THE ENT_REL_TBL HAS THE PROPER PARENT
+CREATE OR REPLACE FUNCTION trg_vrfy_ent_rel_tbl () RETURNS TRIGGER AS $$
+DECLARE 
+	err_ref varchar(128)[];
+	
+BEGIN
+	SELECT * INTO err_ref FROM vrfy_ent_rel(new.src_ent_id, new.trg_ent_id, new.rel_typ_cd_id);
+	IF err_ref[1] IS NULL OR err_ref[2] IS NULL OR err_ref[3] IS NULL THEN
+		RETURN NEW; -- LET THE FK WORK
+	ELSE 
+		RAISE EXCEPTION 'Validation error: Relationship % [%] between % [%] > % [%] is invalid', NEW.rel_typ_cd_id, err_ref[1], NEW.src_ent_id, err_ref[2], NEW.trg_ent_id, err_ref[3]
+			USING ERRCODE = 'O9001';
+	END IF;
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
  -- GET THE SCHEMA VERSION
 CREATE OR REPLACE FUNCTION GET_SCH_VRSN() RETURNS VARCHAR(10) AS
