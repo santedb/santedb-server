@@ -244,6 +244,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Data\SQL\Updates\20181113-PSQL.sql" />
     <EmbeddedResource Include="Data\SQL\Updates\20181112-PSQL.sql" />
     <EmbeddedResource Include="Data\SQL\FBSQL\santedb-ddl.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

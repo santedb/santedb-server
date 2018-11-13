@@ -5,7 +5,7 @@
 		<name>Local Memory Cache</name>
 		<description>Represents a simple memory cache which is capable of using the local computer's memory for caching of data</description>
 		<author>Mohawk College of Applied Arts and Technology</author>
-		<version>1.1.0</version>
+		<version>1.9.0</version>
 		<default>true</default>
 	</meta>
   <dependencies>
