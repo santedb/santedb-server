@@ -7,6 +7,26 @@
  */
 
  BEGIN TRANSACTION;
+
+
+-- ENTITY POLICY ASSOCIATION
+CREATE TABLE IF NOT EXISTS ENT_POL_ASSOC_TBL (
+	SEC_POL_INST_ID UUID NOT NULL DEFAULT uuid_generate_v1(),
+	ENT_ID UUID NOT NULL, -- THE ACT TO WHICH THE POLICY APPLIES
+	EFFT_VRSN_SEQ_ID NUMERIC(20) NOT NULL, -- THE VERSION OF THE ACT WHERE THE POLICY ASSOCIATION DID BECOME ACTIVE
+	OBSLT_VRSN_SEQ_ID NUMERIC(20), -- THE VERSION OF THE ACT WHERE THE POLICY ASSOCIATION IS OBSOLETE,
+	POL_ID UUID NOT NULL, -- THE IDENTIFIER OF THE POLICY WHICH IS ATTACHED TO THE ACT
+	CONSTRAINT PK_ENT_POL_ASSOC_TBL PRIMARY KEY(SEC_POL_INST_ID),
+	CONSTRAINT FK_ENT_POL_ENT_ID FOREIGN KEY (ENT_ID) REFERENCES ENT_TBL(ENT_ID),
+	CONSTRAINT FK_ENT_POL_EFFT_VRSN_SEQ_ID FOREIGN KEY (EFFT_VRSN_SEQ_ID) REFERENCES ENT_VRSN_TBL(VRSN_SEQ_ID),
+	CONSTRAINT FK_ENT_POL_OBSLT_VRSN_SEQ_ID FOREIGN KEY (OBSLT_VRSN_SEQ_ID) REFERENCES ENT_VRSN_TBL(VRSN_SEQ_ID),
+	CONSTRAINT FK_ENT_POL_POL_ID FOREIGN KEY (POL_ID) REFERENCES SEC_POL_TBL(POL_ID)
+);
+
+CREATE INDEX ENT_POL_ASSOC_POL_ID_IDX ON ENT_POL_ASSOC_TBL(POL_ID);
+CREATE INDEX ENT_POL_ASSOC_VRSN_IDX ON ENT_POL_ASSOC_TBL(EFFT_VRSN_SEQ_ID, OBSLT_VRSN_SEQ_ID);
+
+
 ALTER TABLE SEC_APP_TBL ADD LOCKED TIMESTAMPTZ; -- LOCKOUT PERIOD
 ALTER TABLE SEC_APP_TBL ADD FAIL_AUTH INTEGER; -- FAILED AUTHENTICATION ATTEMPTS
 ALTER TABLE SEC_APP_TBL ADD LAST_AUTH_UTC TIMESTAMPTZ; -- THE LAST AUTHETNICATION TIME
@@ -124,6 +144,47 @@ BEGIN
 END
 $$ LANGUAGE PLPGSQL;
 
+drop view if exists  act_cur_vrsn_vw cascade;
+drop view if exists  cd_cur_vrsn_vw cascade;
+drop view if exists ent_cur_vrsn_vw cascade;
+drop view if exists ent_cur_id_vw cascade;
+
+alter table ent_pol_assoc_tbl alter efft_vrsn_seq_id type integer;
+alter table ent_pol_assoc_tbl alter obslt_vrsn_seq_id type integer;
+alter table ent_rel_tbl alter efft_vrsn_seq_id type integer;
+alter table ent_rel_tbl alter obslt_vrsn_seq_id type integer;
+alter table ent_addr_tbl alter efft_vrsn_seq_id type integer;
+alter table ent_addr_tbl alter obslt_vrsn_seq_id type integer;
+alter table ent_ext_tbl alter efft_vrsn_seq_id type integer;
+alter table ent_ext_tbl alter obslt_vrsn_seq_id type integer;
+alter table ent_id_tbl alter efft_vrsn_seq_id type integer;
+alter table ent_id_tbl alter obslt_vrsn_seq_id type integer;
+alter table ent_name_tbl alter efft_vrsn_seq_id type integer;
+alter table ent_name_tbl alter obslt_vrsn_seq_id type integer;
+alter table ent_note_tbl alter efft_vrsn_seq_id type integer;
+alter table ent_note_tbl alter obslt_vrsn_seq_id type integer;
+alter table ent_rel_tbl alter efft_vrsn_seq_id type integer;
+alter table ent_rel_tbl alter obslt_vrsn_seq_id type integer;
+alter table ent_tel_tbl alter efft_vrsn_seq_id type integer;
+alter table ent_tel_tbl alter obslt_vrsn_seq_id type integer;
+alter table plc_svc_tbl alter efft_vrsn_seq_id type integer;
+alter table plc_svc_tbl alter obslt_vrsn_seq_id type integer;
+alter table psn_lng_tbl alter efft_vrsn_seq_id type integer;
+alter table psn_lng_tbl alter obslt_vrsn_seq_id type integer;
+alter table ent_vrsn_tbl alter vrsn_seq_id type integer;
+
+alter table act_id_tbl alter efft_vrsn_seq_id type integer;
+alter table act_id_tbl alter obslt_vrsn_seq_id type integer;
+alter table act_ext_tbl alter efft_vrsn_seq_id type integer;
+alter table act_ext_tbl alter obslt_vrsn_seq_id type integer;
+alter table act_rel_tbl alter efft_vrsn_seq_id type integer;
+alter table act_rel_tbl alter obslt_vrsn_seq_id type integer;
+alter table act_ptcpt_tbl alter efft_vrsn_seq_id type integer;
+alter table act_ptcpt_tbl alter obslt_vrsn_seq_id type integer;
+alter table act_pol_assoc_tbl alter efft_vrsn_seq_id type integer;
+alter table act_pol_assoc_tbl alter obslt_vrsn_seq_id type integer;
+alter table act_note_tbl alter efft_vrsn_seq_id type integer;
+alter table act_note_tbl alter obslt_vrsn_seq_id type integer;
 
 
  -- GET THE SCHEMA VERSION

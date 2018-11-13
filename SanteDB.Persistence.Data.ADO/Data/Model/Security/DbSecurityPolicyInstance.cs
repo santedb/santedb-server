@@ -71,13 +71,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// Effective version sequence
         /// </summary>
         [Column("efft_vrsn_seq_id"), NotNull]
-        public decimal EffectiveVersionSequenceId { get; set; }
+        public Int32 EffectiveVersionSequenceId { get; set; }
 
         /// <summary>
         /// Obsolete version sequence ID
         /// </summary>
         [Column("obslt_vrsn_seq_id")]
-        public decimal? ObsoleteVersionSequenceId { get; set; }
+        public Int32? ObsoleteVersionSequenceId { get; set; }
     }
 
     /// <summary>
@@ -101,13 +101,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// Effective version sequence
         /// </summary>
         [Column("efft_vrsn_seq_id"), NotNull]
-        public decimal EffectiveVersionSequenceId { get; set; }
+        public Int32 EffectiveVersionSequenceId { get; set; }
 
         /// <summary>
         /// Obsolete version sequence ID
         /// </summary>
         [Column("obslt_vrsn_seq_id")]
-        public decimal? ObsoleteVersionSequenceId { get; set; }
+        public Int32? ObsoleteVersionSequenceId { get; set; }
     }
 
     /// <summary>

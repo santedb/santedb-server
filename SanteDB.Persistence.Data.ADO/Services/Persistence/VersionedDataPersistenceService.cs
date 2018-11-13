@@ -372,7 +372,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 return;
             }
 
-            Dictionary<Guid, Decimal> sourceVersionMaps = new Dictionary<Guid, decimal>();
+            Dictionary<Guid, Int32> sourceVersionMaps = new Dictionary<Guid, Int32>();
 
             // Ensure the source key is set
             foreach (var itm in storage)
@@ -416,7 +416,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var obsoleteRecords = existing.Where(o => !storage.Any(ecn => ecn.Key == o.Key));
             foreach (var del in obsoleteRecords)
             {
-                decimal obsVersion = 0;
+                int obsVersion = 0;
                 if (!sourceVersionMaps.TryGetValue(del.SourceKey, out obsVersion))
                     obsVersion = source.VersionSequence.GetValueOrDefault();
 
@@ -441,7 +441,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var insertRecords = storage.Where(o => !existing.Any(ecn => ecn.Key == o.Key));
             foreach (var ins in insertRecords)
             {
-                decimal eftVersion = 0;
+                Int32 eftVersion = 0;
                 if (!sourceVersionMaps.TryGetValue(ins.SourceEntityKey.Value, out eftVersion))
                     eftVersion = source.VersionSequence.GetValueOrDefault();
                 ins.EffectiveVersionSequenceId = eftVersion;

@@ -49,13 +49,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         /// Gets or sets the version when the relationship is effective
         /// </summary>
         [Column("efft_vrsn_seq_id")]
-        decimal EffectiveVersionSequenceId { get; set; }
+        Int32 EffectiveVersionSequenceId { get; set; }
 
         /// <summary>
         /// Gets or sets the verson when the relationship is not effecitve
         /// </summary>
         [Column("obslt_vrsn_seq_id")]
-        Decimal? ObsoleteVersionSequenceId { get; set; }
+        Int32? ObsoleteVersionSequenceId { get; set; }
     }
 
 
@@ -80,13 +80,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         /// Gets or sets the version when the relationship is effective
         /// </summary>
         [Column("efft_vrsn_seq_id")]
-        public decimal EffectiveVersionSequenceId { get; set; }
+        public Int32 EffectiveVersionSequenceId { get; set; }
         
         /// <summary>
         /// Gets or sets the verson when the relationship is not effecitve
         /// </summary>
         [Column("obslt_vrsn_seq_id")]
-        public Decimal? ObsoleteVersionSequenceId { get; set; }
+        public Int32? ObsoleteVersionSequenceId { get; set; }
 
     }
 
