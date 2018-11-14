@@ -311,7 +311,7 @@ namespace SanteDB.Messaging.AMI.Wcf
                     var retVal = handler.Create(data, false);
 
                     var versioned = retVal as IVersionedEntity;
-                    WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.Created;
+                    WebOperationContext.Current.OutgoingResponse.StatusCode = retVal == null ? HttpStatusCode.NoContent : System.Net.HttpStatusCode.Created;
                     WebOperationContext.Current.OutgoingResponse.ETag = (retVal as IAmiIdentified)?.Tag ?? (retVal as IdentifiedData)?.Tag;
                     if (versioned != null)
                         WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}/history/{3}",
@@ -747,7 +747,7 @@ namespace SanteDB.Messaging.AMI.Wcf
                     WebOperationContext.Current.OutgoingResponse.LastModified = idata?.ModifiedOn.DateTime ?? adata?.ModifiedOn.DateTime ?? DateTime.Now;
 
                     // HTTP IF headers?
-                    WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Created;
+                    WebOperationContext.Current.OutgoingResponse.StatusCode = retVal == null ? HttpStatusCode.NoContent : HttpStatusCode.Created;
                     return retVal;
                 }
                 else if (handler == null)
@@ -788,7 +788,7 @@ namespace SanteDB.Messaging.AMI.Wcf
                     WebOperationContext.Current.OutgoingResponse.LastModified = idata?.ModifiedOn.DateTime ?? adata?.ModifiedOn.DateTime ?? DateTime.Now;
 
                     // HTTP IF headers?
-                    WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Created;
+                    WebOperationContext.Current.OutgoingResponse.StatusCode = retVal == null ? HttpStatusCode.NoContent : HttpStatusCode.Created;
                     return retVal;
                 }
                 else if (handler == null)

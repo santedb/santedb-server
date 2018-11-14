@@ -231,10 +231,18 @@ namespace SanteDB.Messaging.Common
             {
 
                 var queryExpression = QueryExpressionParser.BuildLinqExpression<TResource>(queryParameters, null, false);
-                List<String> query = null;
+                List<String> query = null, id = null;
 
                 IEnumerable<TResource> retVal = null;
-                if (queryParameters.TryGetValue("_queryId", out query) && this.m_repository is IPersistableQueryRepositoryService)
+                if (queryParameters.TryGetValue("_id", out id)) {
+                    var obj = this.m_repository.Get(Guid.Parse(id.First()));
+                    if (obj != null)
+                        retVal = new List<TResource>() { obj };
+                    else
+                        retVal = new List<TResource>();
+                    totalCount = retVal.Count();
+                }
+                else if (queryParameters.TryGetValue("_queryId", out query) && this.m_repository is IPersistableQueryRepositoryService)
                 {
                     Guid queryId = Guid.Parse(query[0]);
                     List<String> lean = null;
