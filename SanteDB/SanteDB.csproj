@@ -234,10 +234,6 @@
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
       <Name>SanteDB.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Messaging.Common\SanteDB.Messaging.Common.csproj">
-      <Project>{135cbea7-7b25-4db0-b9ee-62d61b87b8b0}</Project>
-      <Name>SanteDB.Messaging.Common</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

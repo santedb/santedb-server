@@ -51,7 +51,7 @@ namespace SanteDB.Core
         internal const string BasicHttpClientCredentialHeaderName = "X-SanteDBClient-Authorization";
 
         // WCF trace source
-        internal const string WcfTraceSourceName = "SanteDB.Core.Wcf";
+        internal const string WcfTraceSourceName = "SanteDB.Core.HttpRest";
 
         // Panic error code
         internal const string GeneralPanicErrorCode = "01189998819991197253";

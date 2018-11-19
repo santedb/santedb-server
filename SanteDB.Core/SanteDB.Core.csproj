@@ -52,8 +52,6 @@
     <Reference Include="System.IdentityModel" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="4.0.4.403061554" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -77,6 +75,22 @@
     <Compile Include="Model\EntityLoader\PersistenceServiceEntitySource.cs" />
     <Compile Include="Model\ModelExtensions.cs" />
     <Compile Include="Configuration\SanteDBConfiguration.cs" />
+    <Compile Include="Rest\Behavior\MessageCompressionEndpointBehavior.cs" />
+    <Compile Include="Rest\Behavior\ErrorServiceBehavior.cs" />
+    <Compile Include="Rest\Behavior\MessageDispatchFormatterBehavior.cs" />
+    <Compile Include="Rest\Behavior\MessageLoggingEndpointBehavior.cs" />
+    <Compile Include="Rest\Compression\BZip2CompressionScheme.cs" />
+    <Compile Include="Rest\Compression\CompressionUtil.cs" />
+    <Compile Include="Rest\Compression\DeflateCompressionScheme.cs" />
+    <Compile Include="Rest\Compression\GzipCompressionScheme.cs" />
+    <Compile Include="Rest\Compression\ICompressionScheme.cs" />
+    <Compile Include="Rest\Compression\LzmaCompressionScheme.cs" />
+    <Compile Include="Rest\Security\BasicAuthorizationAccessBehavior.cs" />
+    <Compile Include="Rest\Security\TokenAuthorizationAccessBehavior.cs" />
+    <Compile Include="Rest\Serialization\RestErrorHandler.cs" />
+    <Compile Include="Rest\Serialization\RestCompressionMessageInspector.cs" />
+    <Compile Include="Rest\Serialization\RestMessageDispatchFormatter.cs" />
+    <Compile Include="Rest\Services\IApiEndpointProvider.cs" />
     <Compile Include="SanteDBConstants.cs" />
     <Compile Include="Persistence\DataInitializationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -101,7 +115,6 @@
     <Compile Include="Security\IPolicyHandler.cs" />
     <Compile Include="Security\LocalPolicyDecisionService.cs" />
     <Compile Include="Security\Claims\SanteDBClaimTypes.cs" />
-    <Compile Include="Security\PermissionPolicyIdentifiers.cs" />
     <Compile Include="Security\Privacy\LocalPolicyEnforcementPointService.cs" />
     <Compile Include="Security\SecurityUtils.cs" />
     <Compile Include="Security\PasswordHashingServices.cs" />
@@ -141,25 +154,8 @@
     <Compile Include="Services\ISessionProviderService.cs" />
     <Compile Include="Services\IStoredQueryDataPersistenceService.cs" />
     <Compile Include="Services\ITfaRelayService.cs" />
-    <Compile Include="Wcf\Behavior\WcfErrorEndpointBehavior.cs" />
-    <Compile Include="Wcf\Compression\BZip2CompressionScheme.cs" />
-    <Compile Include="Wcf\Compression\CompressionBodyWriter.cs" />
-    <Compile Include="Wcf\Compression\CompressionUtil.cs" />
-    <Compile Include="Wcf\Compression\DeflateCompressionScheme.cs" />
-    <Compile Include="Wcf\Compression\GzipCompressionScheme.cs" />
-    <Compile Include="Wcf\Compression\ICompressionScheme.cs" />
-    <Compile Include="Wcf\Compression\LzmaCompressionScheme.cs" />
-    <Compile Include="Wcf\IApiEndpointProvider.cs" />
-    <Compile Include="Wcf\Security\BasicAuthorizationAccessPolicy.cs" />
-    <Compile Include="Wcf\Security\BasicAuthorizationCredentialValidator.cs" />
-    <Compile Include="Wcf\Security\TokenAuthorizationPolicy.cs" />
-    <Compile Include="Wcf\Security\TokenServiceAuthorizationManager.cs" />
     <Compile Include="Services\Impl\LocalConceptRepositoryService.cs" />
     <Compile Include="Services\Impl\LocalSecurityRepositoryService.cs" />
-    <Compile Include="Wcf\Serialization\WcfCompressionMessageInspector.cs" />
-    <Compile Include="Wcf\Serialization\WcfErrorHandler.cs" />
-    <Compile Include="Wcf\Serialization\RawBodyWriter.cs" />
-    <Compile Include="Wcf\Serialization\WcfMessageDispatchFormatter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Security\Wcf\" />
@@ -175,6 +171,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
+      <Project>{16EF1840-0361-439D-806C-92D0411122EB}</Project>
+      <Name>RestSrvr</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-applets\SanteDB.Core.Applets\SanteDB.Core.Applets.csproj">
       <Project>{39E61451-F4FE-493D-B754-5F06EB284AAC}</Project>
       <Name>SanteDB.Core.Applets</Name>
@@ -182,6 +182,10 @@
     <ProjectReference Include="..\santedb-bre-js\SanteDB.BusinessRules.JavaScript\SanteDB.BusinessRules.JavaScript.csproj">
       <Project>{3bfd6ee6-0267-4d82-be7d-9b48b2f6f3d4}</Project>
       <Name>SanteDB.BusinessRules.JavaScript</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
+      <Project>{786BD0EE-1806-4158-BA45-80249AC6DFE7}</Project>
+      <Name>SanteDB.Rest.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core.Model.ViewModelSerializers\SanteDB.Core.Model.ViewModelSerializers.csproj">
       <Project>{ECE9B280-9647-4092-BABF-EB2E25084670}</Project>

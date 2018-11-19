@@ -35,6 +35,7 @@ using System.Security.Principal;
 using System.Text;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Interfaces;
+using System.Security.Permissions;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -208,6 +209,11 @@ namespace SanteDB.Core.Services.Impl
 		/// </summary>
 		public UserEntity CreateUserEntity(UserEntity userEntity)
 		{
+            // Additional security: User should be admin be editing themselves
+            var securityUser = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>().GetUser(AuthenticationContext.Current.Principal.Identity);
+            if (securityUser.Key != userEntity?.SecurityUserKey)
+                new PolicyPermission(PermissionState.Unrestricted, PermissionPolicyIdentifiers.UnrestrictedMetadata).Demand();
+
             return base.Insert(userEntity);
 		}
 
@@ -408,7 +414,7 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public SecurityProvenance GetProvenance(Guid provenanceId)
         {
-            return ApplicationContext.Current.GetSerivce<IDataPersistenceService<SecurityProvenance>>().Get(new Identifier<Guid>(provenanceId), AuthenticationContext.Current.Principal, true);
+            return ApplicationContext.Current.GetService<IDataPersistenceService<SecurityProvenance>>().Get(new Identifier<Guid>(provenanceId), AuthenticationContext.Current.Principal, true);
         }
 
         /// <summary>
@@ -595,7 +601,7 @@ namespace SanteDB.Core.Services.Impl
             if (!String.IsNullOrEmpty(application.ApplicationSecret))
             {
                 this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Will update secret for application {0}", application.Name);
-                application.ApplicationSecret = ApplicationContext.Current.GetSerivce<IPasswordHashingService>().EncodePassword(application.ApplicationSecret);
+                application.ApplicationSecret = ApplicationContext.Current.GetService<IPasswordHashingService>().EncodePassword(application.ApplicationSecret);
             }
 
             this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(application));
@@ -613,7 +619,7 @@ namespace SanteDB.Core.Services.Impl
             if (!String.IsNullOrEmpty(device.DeviceSecret))
             {
                 this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Will update secret for device {0}", device.Name);
-                device.DeviceSecret = ApplicationContext.Current.GetSerivce<IPasswordHashingService>().EncodePassword(device.DeviceSecret);
+                device.DeviceSecret = ApplicationContext.Current.GetService<IPasswordHashingService>().EncodePassword(device.DeviceSecret);
             }
 
             var retVal = base.Save(device);
@@ -966,6 +972,10 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         UserEntity IRepositoryService<UserEntity>.Insert(UserEntity data)
         {
+            var securityUser = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>().GetUser(AuthenticationContext.Current.Principal.Identity);
+            if (securityUser.Key != data?.SecurityUserKey)
+                new PolicyPermission(PermissionState.Unrestricted, PermissionPolicyIdentifiers.UnrestrictedMetadata).Demand();
+
             return this.Insert<UserEntity>(data);
         }
 
@@ -1096,6 +1106,10 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         UserEntity IRepositoryService<UserEntity>.Save(UserEntity data)
         {
+            var securityUser = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>().GetUser(AuthenticationContext.Current.Principal.Identity);
+            if (securityUser.Key != data?.SecurityUserKey)
+                new PolicyPermission(PermissionState.Unrestricted, PermissionPolicyIdentifiers.UnrestrictedMetadata).Demand();
+
             return this.Save(data);
         }
 

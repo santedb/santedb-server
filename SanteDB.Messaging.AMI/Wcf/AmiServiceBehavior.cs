@@ -18,7 +18,7 @@ using SanteDB.Core.Model.Interfaces;
 using System.ServiceModel.Web;
 using System.Net;
 using System.ServiceModel.Channels;
-using SanteDB.Messaging.Common;
+using SanteDB.Rest.Common;
 using SanteDB.Core.Model;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Model.AMI.Diagnostics;

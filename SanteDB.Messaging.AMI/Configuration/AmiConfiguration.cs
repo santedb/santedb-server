@@ -18,7 +18,7 @@
  * Date: 2017-9-1
  */
 using SanteDB.Core.Interop;
-using SanteDB.Messaging.Common;
+using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
 

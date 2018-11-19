@@ -50,8 +50,6 @@
     <Reference Include="System.IdentityModel" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -66,25 +64,8 @@
     <Compile Include="Configuration\AmiConfigurationSectionHandler.cs" />
     <Compile Include="Configuration\CertificationAuthorityConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResourceHandler\AppletSolutionResourceHandler.cs" />
-    <Compile Include="ResourceHandler\ApplicationEntityResourceHandler.cs" />
-    <Compile Include="ResourceHandler\MailMessageResourceHandler.cs" />
-    <Compile Include="ResourceHandler\AppletResourceHandler.cs" />
-    <Compile Include="ResourceHandler\AssigningAuthorityResourceHandler.cs" />
-    <Compile Include="ResourceHandler\AuditResourceHandler.cs" />
-    <Compile Include="ResourceHandler\CertificateResourceHandler.cs" />
-    <Compile Include="ResourceHandler\CertificateSigningRequestHandler.cs" />
-    <Compile Include="ResourceHandler\DeviceEntityResourceHandler.cs" />
-    <Compile Include="ResourceHandler\SecurityDeviceResourceHandler.cs" />
-    <Compile Include="ResourceHandler\ExtensionTypeResourceHandler.cs" />
-    <Compile Include="ResourceHandler\MetadataResourceHandler.cs" />
-    <Compile Include="ResourceHandler\ResourceHandlerBase.cs" />
-    <Compile Include="ResourceHandler\SecurityApplicationResourceHandler.cs" />
-    <Compile Include="ResourceHandler\SecurityEntityResourceHandler.cs" />
-    <Compile Include="ResourceHandler\SecurityPolicyResourceHandler.cs" />
-    <Compile Include="ResourceHandler\SecurityProvenanceHandler.cs" />
-    <Compile Include="ResourceHandler\SecurityRoleResourceHandler.cs" />
-    <Compile Include="ResourceHandler\SecurityUserResourceHandler.cs" />
+    <Compile Include="ResourceHandlers\CertificateResourceHandler.cs" />
+    <Compile Include="ResourceHandlers\CertificateSigningRequestHandler.cs" />
     <Compile Include="Wcf\AmiServiceBehavior.cs" />
     <Compile Include="Wcf\Behavior\AmiRestEndpointBehavior.cs" />
     <Compile Include="Wcf\Behavior\AmiSerializerOperationBehavior.cs" />
@@ -92,13 +73,13 @@
     <Compile Include="Wcf\IAmiServiceContract.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
+      <Project>{16EF1840-0361-439D-806C-92D0411122EB}</Project>
+      <Name>RestSrvr</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-applets\SanteDB.Core.Applets\SanteDB.Core.Applets.csproj">
       <Project>{39e61451-f4fe-493d-b754-5f06eb284aac}</Project>
       <Name>SanteDB.Core.Applets</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Core.Model.AMI\SanteDB.Core.Model.AMI.csproj">
-      <Project>{65ef51c6-5cb8-43b8-ae65-4a68f0b44ad2}</Project>
-      <Name>SanteDB.Core.Model.AMI</Name>
     </ProjectReference>
     <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
       <Project>{f1a82a4f-4a57-47d7-ae76-444c8a4ff54a}</Project>
@@ -108,13 +89,21 @@
       <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
       <Name>SanteDB.Core.Api</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Core.Model.AMI\SanteDB.Core.Model.AMI.csproj">
+      <Project>{65ef51c6-5cb8-43b8-ae65-4a68f0b44ad2}</Project>
+      <Name>SanteDB.Core.Model.AMI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.AMI\SanteDB.Rest.AMI.csproj">
+      <Project>{f14023e2-f8df-4ebc-b2c4-34a825e3790e}</Project>
+      <Name>SanteDB.Rest.AMI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
+      <Project>{786bd0ee-1806-4158-ba45-80249ac6dfe7}</Project>
+      <Name>SanteDB.Rest.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
       <Name>SanteDB.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Messaging.Common\SanteDB.Messaging.Common.csproj">
-      <Project>{135CBEA7-7B25-4DB0-B9EE-62D61B87B8B0}</Project>
-      <Name>SanteDB.Messaging.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -125,9 +114,6 @@
   <ItemGroup>
     <PackageReference Include="MARC.HI.EHRS.SVC.Core">
       <Version>2.0.3</Version>
-    </PackageReference>
-    <PackageReference Include="SwaggerWcf.MEDIC">
-      <Version>0.2.9</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

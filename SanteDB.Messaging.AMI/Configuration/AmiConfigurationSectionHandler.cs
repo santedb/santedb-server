@@ -19,7 +19,7 @@
  */
 using SanteDB.Core.Interop;
 using SanteDB.Messaging.AMI.Wcf;
-using SanteDB.Messaging.Common;
+using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
 using System.Configuration;

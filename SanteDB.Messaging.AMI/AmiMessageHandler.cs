@@ -19,6 +19,7 @@
  */
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Services;
+using RestSrvr;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Wcf;
 using SanteDB.Core.Wcf.Behavior;
@@ -26,7 +27,7 @@ using SanteDB.Core.Wcf.Security;
 using SanteDB.Messaging.AMI.Configuration;
 using SanteDB.Messaging.AMI.Wcf;
 using SanteDB.Messaging.AMI.Wcf.Behavior;
-using SanteDB.Messaging.Common;
+using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -35,7 +36,6 @@ using System.Linq;
 using System.Reflection;
 using System.ServiceModel;
 using System.ServiceModel.Description;
-using System.ServiceModel.Web;
 
 namespace SanteDB.Messaging.AMI
 {
@@ -81,7 +81,7 @@ namespace SanteDB.Messaging.AMI
 		private AmiConfiguration configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.messaging.ami") as AmiConfiguration;
 
 		// web host
-		private WebServiceHost m_webHost;
+		private RestService m_webHost;
 
 		/// <summary>
 		/// Fired when the object is starting up.
@@ -122,9 +122,9 @@ namespace SanteDB.Messaging.AMI
 			get
 			{
 				var caps = ServiceEndpointCapabilities.Compression;
-				if (this.m_webHost.Description.Behaviors.OfType<ServiceCredentials>().Any(o => o.UserNameAuthentication?.CustomUserNamePasswordValidator != null))
+				if (this.m_webHost.Policies.OfType<BasicAuthorizationAccessPolicy>().Any())
 					caps |= ServiceEndpointCapabilities.BasicAuth;
-				if (this.m_webHost.Description.Behaviors.OfType<ServiceAuthorizationBehavior>().Any(o => o.ServiceAuthorizationManager is TokenServiceAuthorizationManager))
+				if (this.m_webHost.Policies.OfType<TokenAuthorizationPolicy>().Any())
 					caps |= ServiceEndpointCapabilities.BearerAuth;
 
 				return caps;
@@ -167,7 +167,6 @@ namespace SanteDB.Messaging.AMI
 				this.Starting?.Invoke(this, EventArgs.Empty);
 
 				this.m_webHost = new WebServiceHost(typeof(AmiServiceBehavior));
-
 				foreach (ServiceEndpoint endpoint in this.m_webHost.Description.Endpoints)
 				{
 					this.tracer.TraceInformation("Starting AMI on {0}...", endpoint.Address);

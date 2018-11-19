@@ -349,7 +349,7 @@ namespace SanteDB.Core.Security.Audit
                 }
 
                 ApplicationContext.Current.GetService<IAuditorService>()?.SendAudit(audit);
-                ApplicationContext.Current.GetSerivce<IAuditRepositoryService>()?.Insert(audit); // insert into local AR 
+                ApplicationContext.Current.GetService<IAuditRepositoryService>()?.Insert(audit); // insert into local AR 
             });
 
         }

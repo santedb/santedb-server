@@ -152,7 +152,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                 {
                     var claimSet = OperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets.OfType<System.IdentityModel.Claims.X509CertificateClaimSet>().FirstOrDefault();
                     if (claimSet != null) // device authenticated with X509 PKI Cert
-                        devicePrincipal = ApplicationContext.Current.GetSerivce<IDeviceIdentityProviderService>().Authenticate(claimSet.X509Certificate);
+                        devicePrincipal = ApplicationContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(claimSet.X509Certificate);
                 }
                 if (devicePrincipal == null && !String.IsNullOrEmpty(authHead)) // Device is authenticated using basic auth
                 {
