@@ -70,10 +70,8 @@ namespace SanteDB
 
             // Parser
             ParameterParser<ConsoleParameters> parser = new ParameterParser<ConsoleParameters>();
-
            
             bool hasConsole = true;
-
             
             try
             {

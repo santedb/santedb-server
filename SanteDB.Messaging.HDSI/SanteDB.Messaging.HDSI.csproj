@@ -61,8 +61,6 @@
     <Compile Include="Configuration\HdsiConfigurationSectionHandler.cs" />
     <Compile Include="HdsiMessageHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Util\BundleUtil.cs" />
-    <Compile Include="Util\ObjectExpander.cs" />
     <Compile Include="HdsiServiceBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
