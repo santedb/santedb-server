@@ -26,7 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.ServiceModel.Web;
+using RestSrvr;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -38,7 +38,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Map coded allergy intolerance resource to FHIR
         /// </summary>
-		protected override AllergyIntolerance MapToFhir(CodedObservation model, WebOperationContext webOperationContext)
+		protected override AllergyIntolerance MapToFhir(CodedObservation model, RestOperationContext RestOperationContext)
 		{
 			throw new NotImplementedException();
 		}
@@ -46,7 +46,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Map allergy intolerance from FHIR to a coded observation
         /// </summary>
-		protected override CodedObservation MapToModel(AllergyIntolerance resource, WebOperationContext webOperationContext)
+		protected override CodedObservation MapToModel(AllergyIntolerance resource, RestOperationContext RestOperationContext)
 		{
 			throw new NotImplementedException();
 		}

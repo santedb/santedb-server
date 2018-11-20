@@ -150,13 +150,7 @@ namespace SanteDB.Messaging.HDSI
                 // Force startup
                 HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.m_configuration.ResourceHandlers);
 
-                this.m_webHost = new RestService(typeof(HdsiServiceBehavior));
-                foreach(var itm in this.m_configuration.RestConfiguration.ServiceBehaviors)
-                    this.m_webHost.AddServiceBehavior(Activator.CreateInstance(itm) as IServiceBehavior);
-
-                // TODO: Supply certificate to an HTTPS binding
-                foreach(var itm in this.m_configuration.RestConfiguration.Endpoints) 
-                    this.m_webHost.AddServiceEndpoint(new Uri(itm), typeof(IHdsiServiceContract), new RestHttpBinding());
+                this.m_webHost = RestServiceTool.CreateService(typeof(HdsiServiceBehavior));
                 this.m_webHost.AddServiceBehavior(new ErrorServiceBehavior());
 
                 // Add service behaviors

@@ -17,29 +17,16 @@
  * User: fyfej
  * Date: 2017-9-1
  */
+using RestSrvr.Attributes;
 using SanteDB.Core.Model.RISI;
-using SwaggerWcf.Attributes;
 using System.IO;
-using System.ServiceModel;
-using System.ServiceModel.Web;
 
-namespace SanteDB.Messaging.RISI.Wcf
+namespace SanteDB.Messaging.RISI.Rest
 {
 	/// <summary>
 	/// Provides operations for running and managing reports.
 	/// </summary>
-	[ServiceKnownType(typeof(ReportBundle))]
-	[ServiceKnownType(typeof(ReportFormat))]
-	[ServiceKnownType(typeof(ParameterType))]
-	[ServiceKnownType(typeof(ReportDefinition))]
-	[ServiceKnownType(typeof(ReportParameter))]
-	[ServiceKnownType(typeof(AutoCompleteSourceDefinition))]
-	[ServiceKnownType(typeof(RisiCollection<ReportFormat>))]
-	[ServiceKnownType(typeof(RisiCollection<ReportParameter>))]
-	[ServiceKnownType(typeof(RisiCollection<ReportDefinition>))]
-	[ServiceKnownType(typeof(ListAutoCompleteSourceDefinition))]
-	[ServiceKnownType(typeof(QueryAutoCompleteSourceDefinition))]
-	[ServiceContract(Namespace = "http://santedb.org/risi/1.0", Name = "RISI", ConfigurationName = "RISI_1.0")]
+	[ServiceContractAttribute(Name = "RISI")]
 	public partial interface IRisiContract
 	{
 		/// <summary>
@@ -47,8 +34,7 @@ namespace SanteDB.Messaging.RISI.Wcf
 		/// </summary>
 		/// <param name="parameterType">The parameter type to create.</param>
 		/// <returns>Returns the created parameter type.</returns>
-		[WebInvoke(UriTemplate = "/type", BodyStyle = WebMessageBodyStyle.Bare, Method = "POST")]
-        [SwaggerWcfPath("Create Report Parameter Type", "Creates the specified report parameter type")]
+		[RestInvoke(UriTemplate = "/type",  Method = "POST")]
 		ParameterType CreateParameterType(ParameterType parameterType);
 
 		/// <summary>
@@ -56,8 +42,7 @@ namespace SanteDB.Messaging.RISI.Wcf
 		/// </summary>
 		/// <param name="reportDefinition">The report definition to create.</param>
 		/// <returns>Returns the created report definition.</returns>
-		[WebInvoke(UriTemplate = "/report", BodyStyle = WebMessageBodyStyle.Bare, Method = "POST")]
-        [SwaggerWcfPath("Create Report Definition", "Registers the provided report into the configured RISI report engine")]
+		[RestInvoke(UriTemplate = "/report",  Method = "POST")]
         ReportDefinition CreateReportDefinition(ReportDefinition reportDefinition);
 
 		/// <summary>
@@ -65,8 +50,7 @@ namespace SanteDB.Messaging.RISI.Wcf
 		/// </summary>
 		/// <param name="reportFormat">The report format to create.</param>
 		/// <returns>Returns the created report format.</returns>
-		[WebInvoke(UriTemplate = "/format", BodyStyle = WebMessageBodyStyle.Bare, Method = "POST")]
-        [SwaggerWcfPath("Create Report Export Format", "Registers an export format for reports in the configured RISI engine")]
+		[RestInvoke(UriTemplate = "/format",  Method = "POST")]
         ReportFormat CreateReportFormat(ReportFormat reportFormat);
 
 		/// <summary>
@@ -74,8 +58,7 @@ namespace SanteDB.Messaging.RISI.Wcf
 		/// </summary>
 		/// <param name="id">The id of the report parameter type to delete.</param>
 		/// <returns>Returns the deleted report parameter type.</returns>
-		[WebInvoke(UriTemplate = "/type/{id}", BodyStyle = WebMessageBodyStyle.Bare, Method = "DELETE")]
-        [SwaggerWcfPath("Delete Parameter Type", "Removes the identified parameter type from the RISI engine")]
+		[RestInvoke(UriTemplate = "/type/{id}",  Method = "DELETE")]
         ParameterType DeleteParameterType(string id);
 
 		/// <summary>
@@ -83,8 +66,7 @@ namespace SanteDB.Messaging.RISI.Wcf
 		/// </summary>
 		/// <param name="id">The id of the report definition to delete.</param>
 		/// <returns>Returns the deleted report definition.</returns>
-		[WebInvoke(UriTemplate = "/report/{id}", BodyStyle = WebMessageBodyStyle.Bare, Method = "DELETE")]
-        [SwaggerWcfPath("Delete Report Definition", "Deletes a report from the RISI engine")]
+		[RestInvoke(UriTemplate = "/report/{id}",  Method = "DELETE")]
         ReportDefinition DeleteReportDefinition(string id);
 
 		/// <summary>
@@ -92,16 +74,14 @@ namespace SanteDB.Messaging.RISI.Wcf
 		/// </summary>
 		/// <param name="id">The id of the report format.</param>
 		/// <returns>Returns the report deleted report format.</returns>
-		[WebInvoke(UriTemplate = "/format/{id}", BodyStyle = WebMessageBodyStyle.Bare, Method = "DELETE")]
-        [SwaggerWcfPath("Create Report Export Format", "Removes the specified report from from the RISI engine")]
+		[RestInvoke(UriTemplate = "/format/{id}",  Method = "DELETE")]
         ReportFormat DeleteReportFormat(string id);
 
 		/// <summary>
 		/// Gets a list of all report parameter types.
 		/// </summary>
 		/// <returns>Returns a list of report parameter types.</returns>
-		[WebGet(UriTemplate = "/type", BodyStyle = WebMessageBodyStyle.Bare)]
-        [SwaggerWcfPath("Get Report Parameter Types", "Retrieves a list of report parameter types from the server")]
+		[Get("/type")]
         RisiCollection<ParameterType> GetAllReportParameterTypes();
 
 		/// <summary>
@@ -109,16 +89,14 @@ namespace SanteDB.Messaging.RISI.Wcf
 		/// </summary>
 		/// <param name="id">The id of the report definition to retrieve.</param>
 		/// <returns>Returns a report definition.</returns>
-		[WebGet(UriTemplate = "/report/{id}", BodyStyle = WebMessageBodyStyle.Bare)]
-        [SwaggerWcfPath("Get Report Definition", "Retrieves the specified report definition from the RISI")]
+		[Get("/report/{id}")]
         ReportDefinition GetReportDefinition(string id);
 
 		/// <summary>
 		/// Gets a list of report definitions based on a specific query.
 		/// </summary>
 		/// <returns>Returns a list of report definitions.</returns>
-		[WebGet(UriTemplate = "/report", BodyStyle = WebMessageBodyStyle.Bare)]
-        [SwaggerWcfPath("Get Report Definitions", "Searches the report definitions registered in the RISI")]
+		[Get("/report")]
         RisiCollection<ReportDefinition> GetReportDefinitions();
 
 		/// <summary>
@@ -126,16 +104,14 @@ namespace SanteDB.Messaging.RISI.Wcf
 		/// </summary>
 		/// <param name="id">The id of the report format to retrieve.</param>
 		/// <returns>Returns a report format.</returns>
-		[WebGet(UriTemplate = "/format/{id}", BodyStyle = WebMessageBodyStyle.Bare)]
-        [SwaggerWcfPath("Get Report Format Definition", "Retrieves the specified report export format definition")]
+		[Get("/format/{id}")]
         ReportFormat GetReportFormat(string id);
 
 		/// <summary>
 		/// Gets the report formats.
 		/// </summary>
 		/// <returns>Returns a list of report formats.</returns>
-		[WebGet(UriTemplate = "/format", BodyStyle = WebMessageBodyStyle.Bare)]
-        [SwaggerWcfPath("Search Report Format Definition", "Searches registered report format definitions")]
+		[Get("/format")]
         RisiCollection<ReportFormat> GetReportFormats();
 
 		/// <summary>
@@ -143,8 +119,7 @@ namespace SanteDB.Messaging.RISI.Wcf
 		/// </summary>
 		/// <param name="id">The id of the report parameter to retrieve.</param>
 		/// <returns>Returns a report parameter.</returns>
-		[WebGet(UriTemplate = "/type/{id}", BodyStyle = WebMessageBodyStyle.Bare)]
-        [SwaggerWcfPath("Get Report Parameter Definition", "Retrieves the specified report parameter definition from the RISI")]
+		[Get("/type/{id}")]
 		ReportParameter GetReportParameter(string id);
 
 		/// <summary>
@@ -152,8 +127,7 @@ namespace SanteDB.Messaging.RISI.Wcf
 		/// </summary>
 		/// <param name="id">The id of the report for which to retrieve parameters.</param>
 		/// <returns>Returns a list of parameters.</returns>
-		[WebGet(UriTemplate = "/report/{id}/parm", BodyStyle = WebMessageBodyStyle.Bare)]
-        [SwaggerWcfPath("Search Report Parameters", "Searches report parameters matching the given query")]
+		[Get("/report/{id}/parm")]
 		RisiCollection<ReportParameter> GetReportParameters(string id);
 
 		/// <summary>
@@ -162,8 +136,7 @@ namespace SanteDB.Messaging.RISI.Wcf
 		/// <param name="id">The id of the report.</param>
 		/// <param name="parameterId">The id of the parameter for which to retrieve detailed information.</param>
 		/// <returns>Returns an auto complete source definition of valid parameters values for a given parameter.</returns>
-		[WebGet(UriTemplate = "/report/{id}/parm/{parameterId}/values")]
-        [SwaggerWcfPath("Get AutoComplete Values", "Retrieves a list of auto-completed parameters which are applicable for the provided parameter")]
+		[Get("/report/{id}/parm/{parameterId}/values")]
         AutoCompleteSourceDefinition GetReportParameterValues(string id, string parameterId);
 
 		/// <summary>
@@ -173,8 +146,7 @@ namespace SanteDB.Messaging.RISI.Wcf
 		/// <param name="parameterId">The id of the parameter for which to retrieve detailed information.</param>
 		/// <param name="parameterValue">The parameter value.</param>
 		/// <returns>Returns an auto complete source definition of valid parameter values for a given parameter within the context of another parameter value.</returns>
-		[WebGet(UriTemplate = "/report/{id}/parm/{parameterId}/values/{parameterValue}")]
-		[SwaggerWcfPath("Get AutoComplete Values", "Retrieves a list of auto-completed parameters which are applicable for the provided parameter")]
+		[Get("/report/{id}/parm/{parameterId}/values/{parameterValue}")]
 		AutoCompleteSourceDefinition GetReportParameterValuesCascading(string id, string parameterId, string parameterValue);
 
 		/// <summary>
@@ -182,8 +154,7 @@ namespace SanteDB.Messaging.RISI.Wcf
 		/// </summary>
 		/// <param name="id">The id of the report for which to retrieve the source.</param>
 		/// <returns>Returns the report source.</returns>
-		[WebGet(UriTemplate = "/report/{id}/source", BodyStyle = WebMessageBodyStyle.Bare)]
-        [SwaggerWcfPath("Retrieve Report Source", "Retrieves the report source (for example: JRXML) from the connected report engine")]
+		[Get("/report/{id}/source")]
 		Stream GetReportSource(string id);
 
 		/// <summary>
@@ -193,8 +164,7 @@ namespace SanteDB.Messaging.RISI.Wcf
 		/// <param name="format">The output format of the report.</param>
 		/// <param name="bundle">The report parameters.</param>
 		/// <returns>Returns the report in raw format.</returns>
-		[WebInvoke(UriTemplate = "/report/{id}/format/{format}", BodyStyle = WebMessageBodyStyle.Bare, Method = "POST")]
-        [SwaggerWcfPath("Execute Report", "Executes a report on the connected RISI reporting engine (Example: Jasper, SSRS, etc.) and returns the result in the specified format")]
+		[RestInvoke(UriTemplate = "/report/{id}/format/{format}",  Method = "POST")]
 		Stream RunReport(string id, string format, ReportBundle bundle);
 
 		/// <summary>
@@ -203,8 +173,7 @@ namespace SanteDB.Messaging.RISI.Wcf
 		/// <param name="id">The id of the parameter type.</param>
 		/// <param name="parameterType">The parameter type to update.</param>
 		/// <returns>Returns the updated parameter type definition.</returns>
-		[WebInvoke(UriTemplate = "/type/{id}", BodyStyle = WebMessageBodyStyle.Bare, Method = "PUT")]
-        [SwaggerWcfPath("Update Parameter Definition", "Updates the specified parameter definition in the RISI")]
+		[RestInvoke(UriTemplate = "/type/{id}",  Method = "PUT")]
 		ParameterType UpdateParameterType(string id, ParameterType parameterType);
 
 		/// <summary>
@@ -213,8 +182,7 @@ namespace SanteDB.Messaging.RISI.Wcf
 		/// <param name="id">The id of the report definition to update.</param>
 		/// <param name="reportDefinition">The updated report definition.</param>
 		/// <returns>Returns the updated report definition.</returns>
-		[WebInvoke(UriTemplate = "/report/{id}", BodyStyle = WebMessageBodyStyle.Bare, Method = "PUT")]
-        [SwaggerWcfPath("Update Report Definition", "Updates the specified report definition in the RISI")]
+		[RestInvoke(UriTemplate = "/report/{id}",  Method = "PUT")]
 		ReportDefinition UpdateReportDefinition(string id, ReportDefinition reportDefinition);
 
 		/// <summary>
@@ -223,8 +191,7 @@ namespace SanteDB.Messaging.RISI.Wcf
 		/// <param name="id">The id of the report format to update.</param>
 		/// <param name="reportFormat">The updated report format.</param>
 		/// <returns>Returns the update report format.</returns>
-		[WebInvoke(UriTemplate = "/format/{id}", BodyStyle = WebMessageBodyStyle.Bare, Method = "PUT")]
-        [SwaggerWcfPath("Update Report Export Format", "Updates the specified report export format information")]
+		[RestInvoke(UriTemplate = "/format/{id}",  Method = "PUT")]
         ReportFormat UpdateReportFormat(string id, ReportFormat reportFormat);
 	}
 }

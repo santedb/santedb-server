@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.ServiceModel;
-using System.ServiceModel.Web;
+using RestSrvr;
 using System.Text;
 using System.Threading.Tasks;
+using RestSrvr.Attributes;
 
 namespace SanteDB.Tools.DataSandbox.Wcf
 {
@@ -20,15 +21,13 @@ namespace SanteDB.Tools.DataSandbox.Wcf
         /// </summary>
         /// <param name="content">The content to retrieve</param>
         /// <returns>The static content</returns>
-        [OperationContract]
-        [WebInvoke(Method = "GET", BodyStyle = WebMessageBodyStyle.Bare, UriTemplate = "/{*content}")]
+        [RestInvoke(Method = "GET", UriTemplate = "/{*content}")]
         Stream StaticContent(string content);
 
         /// <summary>
         /// Create dataset 
         /// </summary>
-        [OperationContract]
-        [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Bare, UriTemplate = "/dataset")]
+        [RestInvoke(Method = "POST", UriTemplate = "/dataset")]
         Stream CreateDataset(Stream datasetSource);
     }
 }

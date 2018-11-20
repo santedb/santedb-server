@@ -26,7 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.ServiceModel.Web;
+using RestSrvr;
 using MARC.HI.EHRS.SVC.Messaging.FHIR;
 using System.Collections.Specialized;
 using SanteDB.Core.Model.Query;
@@ -45,7 +45,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Map to FHIR
         /// </summary>
-        protected override MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Observation MapToFhir(Core.Model.Acts.Observation model, WebOperationContext webOperationContext)
+        protected override MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Observation MapToFhir(Core.Model.Acts.Observation model, RestOperationContext RestOperationContext)
         {
             var retVal = DataTypeConverter.CreateResource<MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Observation>(model);
 
@@ -66,13 +66,13 @@ namespace SanteDB.Messaging.FHIR.Handlers
             var rct = model.Participations.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget);
             if (rct != null)
             {
-                retVal.Subject = Reference.CreateResourceReference(new Patient() { Id = rct.PlayerEntityKey.ToString() }, webOperationContext.IncomingRequest.UriTemplateMatch.BaseUri);
+                retVal.Subject = Reference.CreateResourceReference(new Patient() { Id = rct.PlayerEntityKey.ToString() }, RestOperationContext.IncomingRequest.Url);
             }
 
             // Performer
             var prf = model.Participations.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Performer);
             if (prf != null)
-                retVal.Performer = Reference.CreateResourceReference(new Practitioner() { Id = rct.PlayerEntityKey.ToString() }, webOperationContext.IncomingRequest.UriTemplateMatch.BaseUri);
+                retVal.Performer = Reference.CreateResourceReference(new Practitioner() { Id = rct.PlayerEntityKey.ToString() }, RestOperationContext.IncomingRequest.Url);
 
             retVal.Issued = new FhirInstant() { DateValue = model.CreationTime.DateTime };
 
@@ -113,7 +113,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Map to model
         /// </summary>
-        protected override Core.Model.Acts.Observation MapToModel(MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Observation resource, WebOperationContext webOperationContext)
+        protected override Core.Model.Acts.Observation MapToModel(MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Observation resource, RestOperationContext RestOperationContext)
         {
             throw new NotImplementedException();
         }
@@ -167,14 +167,14 @@ namespace SanteDB.Messaging.FHIR.Handlers
             }
 
 
-            var webOperationContext = WebOperationContext.Current;
+            var restOperationContext = RestOperationContext.Current;
 
             // Return FHIR query result
             return new FhirQueryResult()
             {
                 Details = issues,
                 Outcome = ResultCode.Accepted,
-                Results = hdsiResults.AsParallel().Select(o => this.MapToFhir(o, webOperationContext)).OfType<DomainResourceBase>().ToList(),
+                Results = hdsiResults.AsParallel().Select(o => this.MapToFhir(o, restOperationContext)).OfType<DomainResourceBase>().ToList(),
                 Query = query,
                 TotalResults = totalResults
             };

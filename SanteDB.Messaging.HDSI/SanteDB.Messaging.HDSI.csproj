@@ -59,7 +59,6 @@
   <ItemGroup>
     <Compile Include="Configuration\HdsiConfiguration.cs" />
     <Compile Include="Configuration\HdsiConfigurationSectionHandler.cs" />
-    <Compile Include="Configuration\RestServiceConfiguration.cs" />
     <Compile Include="HdsiMessageHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\BundleUtil.cs" />
@@ -71,7 +70,6 @@
       <Link>SanteDB.licenseheader</Link>
     </None>
     <None Include="app.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
@@ -103,9 +101,7 @@
       <Name>SanteDB.Core</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Wcf\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

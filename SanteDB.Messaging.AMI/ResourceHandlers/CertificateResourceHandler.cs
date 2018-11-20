@@ -11,11 +11,12 @@ using MARC.Util.CertificateTools;
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Messaging.AMI.Configuration;
-using System.ServiceModel.Web;
 using System.Security.Cryptography.Pkcs;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security;
 using SanteDB.Rest.Common;
+using SanteDB.Rest.AMI;
+using RestSrvr;
 
 namespace SanteDB.Messaging.AMI.ResourceHandlers
 {
@@ -83,8 +84,8 @@ namespace SanteDB.Messaging.AMI.ResourceHandlers
         {
             var id = int.Parse(rawId.ToString());
 
-            WebOperationContext.Current.OutgoingResponse.ContentType = "application/x-pkcs12";
-            WebOperationContext.Current.OutgoingResponse.Headers.Add("Content-Disposition", $"attachment; filename=\"crt-{id}.p12\"");
+            RestOperationContext.Current.OutgoingResponse.ContentType = "application/x-pkcs12";
+            RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Disposition", $"attachment; filename=\"crt-{id}.p12\"");
 
             var result = this.m_certTool.GetRequestStatus(id);
 
@@ -100,8 +101,8 @@ namespace SanteDB.Messaging.AMI.ResourceHandlers
         public object Obsolete(object key)
         {
             // Revoke reason
-            var strReason = WebOperationContext.Current.IncomingRequest.Headers["X-SanteDB-RevokeReason"] ??
-                   WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters["reason"];
+            var strReason = RestOperationContext.Current.IncomingRequest.Headers["X-SanteDB-RevokeReason"] ??
+                   RestOperationContext.Current.IncomingRequest.QueryString["reason"];
             var reason = (SanteDB.Core.Model.AMI.Security.RevokeReason)Enum.Parse(typeof(SanteDB.Core.Model.AMI.Security.RevokeReason), strReason);
             int id = Int32.Parse(key.ToString());
             var result = this.m_certTool.GetRequestStatus(id);

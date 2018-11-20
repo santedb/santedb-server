@@ -28,7 +28,6 @@ using SanteDB.Authentication.OAuth2.Model;
 using System.Diagnostics;
 using SanteDB.Core.Services;
 using MARC.HI.EHRS.SVC.Core;
-using System.ServiceModel.Web;
 using System.ServiceModel;
 using Newtonsoft.Json;
 using System.Security.Principal;
@@ -54,14 +53,17 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Security.Audit;
-using SanteDB.Core.Wcf.Security;
+using RestSrvr;
+using RestSrvr.Attributes;
+using RestSrvr.Message;
+using SanteDB.Core.Rest.Security;
 
-namespace SanteDB.Authentication.OAuth2.Wcf
+namespace SanteDB.Authentication.OAuth2.Rest
 {
     /// <summary>
     /// OAuth Token Service
     /// </summary>
-    [ServiceBehavior(ConfigurationName = "SanteDB.Authentication.OAuth2")]
+    [ServiceBehavior(Name = "OAuth2")]
     public class OAuthTokenBehavior : IOAuthTokenContract
     {
 
@@ -77,32 +79,8 @@ namespace SanteDB.Authentication.OAuth2.Wcf
         /// <summary>
         /// OAuth token request
         /// </summary>
-        public Stream Token(Message incomingMessage)
+        public Stream Token(NameValueCollection tokenRequest)
         {
-            // Convert inbound data to token request
-            // HACK: This is to overcome WCF's lack of easy URL encoded form processing
-            // Why use WCF you ask? Well, everything else is hosted in WCF and we 
-            // want to be able to use the same ports as our other services. Could find
-            // no documentation about running WCF and WepAPI stuff in the same app domain
-            // on the same ports
-            NameValueCollection tokenRequest = new NameValueCollection();
-            XmlDictionaryReader bodyReader = incomingMessage.GetReaderAtBodyContents();
-            //bodyReader.ReadStartElement("Binary");
-            String rawBody = Encoding.UTF8.GetString(bodyReader.ReadContentAsBase64());
-            var parms = rawBody.Split('&');
-            foreach (var p in parms)
-            {
-                var kvp = p.Split('=');
-                tokenRequest.Add(kvp[0], kvp[1].Replace('+', ' ').
-                    Replace("%3A", ":").
-                    Replace("%2F", "/").
-                    Replace("%3C", "<").
-                    Replace("%3E", ">").
-                    Replace("%21", "!").
-                    Replace("%3D", "=").
-                    Replace("%5B", "[").
-                    Replace("%5D", "]").Trim());
-            }
 
             // Get the client application 
             IApplicationIdentityProviderService clientIdentityService = ApplicationContext.Current.GetService<IApplicationIdentityProviderService>();
@@ -146,14 +124,15 @@ namespace SanteDB.Authentication.OAuth2.Wcf
 
                 // Device principal?
                 IPrincipal devicePrincipal = null;
-                var authHead = ((HttpRequestMessageProperty)incomingMessage.Properties[HttpRequestMessageProperty.Name]).Headers["X-Device-Authorization"];
+                var authHead = RestOperationContext.Current.IncomingRequest.Headers["X-Device-Authorization"];
 
-                if (OperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets != null)
-                {
-                    var claimSet = OperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets.OfType<System.IdentityModel.Claims.X509CertificateClaimSet>().FirstOrDefault();
-                    if (claimSet != null) // device authenticated with X509 PKI Cert
-                        devicePrincipal = ApplicationContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(claimSet.X509Certificate);
-                }
+                // TODO: X509 Authentication 
+                //if (RestOperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets != null)
+                //{
+                //    var claimSet = OperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets.OfType<System.IdentityModel.Claims.X509CertificateClaimSet>().FirstOrDefault();
+                //    if (claimSet != null) // device authenticated with X509 PKI Cert
+                //        devicePrincipal = ApplicationContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(claimSet.X509Certificate);
+                //}
                 if (devicePrincipal == null && !String.IsNullOrEmpty(authHead)) // Device is authenticated using basic auth
                 {
                     if (!authHead.ToLower().StartsWith("basic "))
@@ -182,8 +161,8 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                         if (String.IsNullOrWhiteSpace(tokenRequest["username"]) && String.IsNullOrWhiteSpace(tokenRequest["refresh_token"]))
                             return this.CreateErrorCondition(OAuthErrorType.invalid_request, "Invalid client grant message");
 
-                        if (WebOperationContext.Current.IncomingRequest.Headers[OAuthConstants.TfaHeaderName] != null)
-                            principal = identityProvider.Authenticate(tokenRequest["username"], tokenRequest["password"], WebOperationContext.Current.IncomingRequest.Headers[OAuthConstants.TfaHeaderName]);
+                        if (RestOperationContext.Current.IncomingRequest.Headers[OAuthConstants.TfaHeaderName] != null)
+                            principal = identityProvider.Authenticate(tokenRequest["username"], tokenRequest["password"], RestOperationContext.Current.IncomingRequest.Headers[OAuthConstants.TfaHeaderName]);
                         else
                             principal = identityProvider.Authenticate(tokenRequest["username"], tokenRequest["password"]);
 
@@ -236,7 +215,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
 
             // HACK: Find a better way to make claims
             // Claims are stored as X-SanteDBACS-Claim headers
-            foreach (var itm in SanteDBClaimTypes.ExtractClaims(WebOperationContext.Current.IncomingRequest.Headers))
+            foreach (var itm in SanteDBClaimTypes.ExtractClaims(RestOperationContext.Current.IncomingRequest.Headers))
             {
 
                 // Claim allowed
@@ -401,8 +380,8 @@ namespace SanteDB.Authentication.OAuth2.Wcf
             DateTime issued = DateTime.Parse((claimsPrincipal)?.FindFirst(ClaimTypes.AuthenticationInstant)?.Value ?? DateTime.Now.ToString("o")),
                 expires = DateTime.Now.Add(this.m_configuration.ValidityTime);
             String aud =
-                WebOperationContext.Current.IncomingRequest.Headers["X-Forwarded-For"] ??
-                ((RemoteEndpointMessageProperty)OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name]).Address;
+                RestOperationContext.Current.IncomingRequest.Headers["X-Forwarded-For"] ??
+                RestOperationContext.Current.IncomingRequest.RemoteEndPoint.Address.ToString();
 
             var jwt = this.HydrateToken(claimsPrincipal, scope, additionalClaims, issued, expires);
 
@@ -419,7 +398,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
             }
 
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-            WebOperationContext.Current.OutgoingResponse.ContentType = "application/json";
+            RestOperationContext.Current.OutgoingResponse.ContentType = "application/json";
 
             OAuthTokenResponse response = null;
             if (this.m_configuration.TokenType == OAuthConstants.BearerTokenType &&
@@ -475,7 +454,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
         private Stream CreateErrorCondition(OAuthErrorType errorType, String message)
         {
             this.m_traceSource.TraceEvent(TraceEventType.Error, (int)errorType, message);
-            WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
+            RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
             OAuthError err = new OAuthError()
             {
                 Error = errorType,
@@ -496,7 +475,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
             settings.Converters.Add(new StringEnumConverter());
             String result = JsonConvert.SerializeObject(response, Newtonsoft.Json.Formatting.Indented, settings);
             MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(result));
-            WebOperationContext.Current.OutgoingResponse.ContentType = "application/json";
+            RestOperationContext.Current.OutgoingResponse.ContentType = "application/json";
             return ms;
         }
 
@@ -505,10 +484,11 @@ namespace SanteDB.Authentication.OAuth2.Wcf
         /// </summary>
         public Stream Session()
         {
-            var hasSession = new TokenServiceAuthorizationManager().CheckAccess(OperationContext.Current);
-            if (hasSession)
+            new TokenAuthorizationAccessBehavior().Apply(new RestRequestMessage(RestOperationContext.Current.IncomingRequest)); ;
+            var principal = Core.Security.AuthenticationContext.Current.Principal as ClaimsPrincipal;
+
+            if (principal != null)
             {
-                var principal = Core.Security.AuthenticationContext.Current.Principal as ClaimsPrincipal;
 
                 if (principal.Identity.Name == Core.Security.AuthenticationContext.AnonymousPrincipal.Identity.Name)
                     return this.CreateResponse(new OAuthError()
@@ -522,7 +502,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                     var jwt = this.HydrateToken(principal, principal.FindFirst(SanteDBClaimTypes.SanteDBScopeClaim)?.Value ?? "*", null, notBefore, notAfter);
                     return this.CreateResponse(new OAuthTokenResponse()
                     {
-                        AccessToken = (OperationContext.Current.IncomingMessageProperties[HttpRequestMessageProperty.Name] as HttpRequestMessageProperty).Headers["Authorization"].Split(' ')[1],
+                        AccessToken = RestOperationContext.Current.IncomingRequest.Headers["Authorization"].Split(' ')[1],
                         IdentityToken = new JwtSecurityTokenHandler().WriteToken(jwt),
                         ExpiresIn = (int)(notAfter).Subtract(DateTime.Now).TotalMilliseconds,
                         TokenType = this.m_configuration.TokenType

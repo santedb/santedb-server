@@ -24,7 +24,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.ServiceModel.Web;
+using RestSrvr;
 using System.Linq.Expressions;
 using MARC.Everest.Connectors;
 using SanteDB.Core.Model.Constants;
@@ -48,7 +48,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Maps the object to model to fhir
         /// </summary>
-        protected override MedicationAdministration MapToFhir(SubstanceAdministration model, WebOperationContext webOperationContext)
+        protected override MedicationAdministration MapToFhir(SubstanceAdministration model, RestOperationContext RestOperationContext)
         {
             var retVal = DataTypeConverter.CreateResource<MedicationAdministration>(model);
 
@@ -68,16 +68,16 @@ namespace SanteDB.Messaging.FHIR.Handlers
             var consumableRelationship = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Consumable);
             var productRelationship = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Product);
             if (consumableRelationship != null)
-                retVal.Medication = DataTypeConverter.CreateReference<Medication>(consumableRelationship.LoadProperty<ManufacturedMaterial>("PlayerEntity"), webOperationContext);
+                retVal.Medication = DataTypeConverter.CreateReference<Medication>(consumableRelationship.LoadProperty<ManufacturedMaterial>("PlayerEntity"), RestOperationContext);
             else if (productRelationship != null)
             {
-                retVal.Medication = DataTypeConverter.CreateReference<Substance>(productRelationship.LoadProperty<Material>("PlayerEntity"), webOperationContext);
+                retVal.Medication = DataTypeConverter.CreateReference<Substance>(productRelationship.LoadProperty<Material>("PlayerEntity"), RestOperationContext);
                 //retVal.Medication = DataTypeConverter.ToFhirCodeableConcept(productRelationship.LoadProperty<Material>("PlayerEntity").LoadProperty<Concept>("TypeConcept"));
             }
 
             var rct = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget);
             if (rct != null)
-                retVal.Subject = DataTypeConverter.CreateReference<Patient>(rct.LoadProperty<Entity>("PlayerEntity"), webOperationContext);
+                retVal.Subject = DataTypeConverter.CreateReference<Patient>(rct.LoadProperty<Entity>("PlayerEntity"), RestOperationContext);
 
             // Encounter
             var erService = ApplicationContext.Current.GetService<IDataPersistenceService<EntityRelationship>>();
@@ -98,7 +98,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
                 retVal.Performer = new List<MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.MedicationPerformer>() {
                     new MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.MedicationPerformer()
                 {
-                    Actor = DataTypeConverter.CreateReference<Practitioner>(performer.LoadProperty<Entity>("PlayerEntity"), webOperationContext)
+                    Actor = DataTypeConverter.CreateReference<Practitioner>(performer.LoadProperty<Entity>("PlayerEntity"), RestOperationContext)
                 }
                 };
 
@@ -123,7 +123,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
             return retVal;
         }
 
-        protected override SubstanceAdministration MapToModel(MedicationAdministration resource, WebOperationContext webOperationContext)
+        protected override SubstanceAdministration MapToModel(MedicationAdministration resource, RestOperationContext RestOperationContext)
         {
             throw new NotImplementedException();
         }

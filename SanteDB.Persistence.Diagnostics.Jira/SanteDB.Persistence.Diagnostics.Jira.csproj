@@ -67,7 +67,6 @@
       <Link>SanteDB.licenseheader</Link>
     </None>
     <None Include="app.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
@@ -77,6 +76,10 @@
     <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
       <Project>{f1a82a4f-4a57-47d7-ae76-444c8a4ff54a}</Project>
       <Name>SanteDB.Core.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Core.Model.AMI\SanteDB.Core.Model.AMI.csproj">
+      <Project>{65ef51c6-5cb8-43b8-ae65-4a68f0b44ad2}</Project>
+      <Name>SanteDB.Core.Model.AMI</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>

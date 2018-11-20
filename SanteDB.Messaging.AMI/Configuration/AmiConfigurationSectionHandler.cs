@@ -41,7 +41,7 @@ namespace SanteDB.Messaging.AMI.Configuration
 			XmlElement caConfigurationElement = section.SelectSingleNode("./*[local-name() = 'ca']") as XmlElement;
 			CertificationAuthorityConfiguration caConfiguration = new CertificationAuthorityConfiguration();
 
-			if (caConfigurationElement != null)
+            if (caConfigurationElement != null)
 			{
 				caConfiguration.AutoApprove = caConfigurationElement?.Attributes["autoApprove"]?.Value == "true";
 				caConfiguration.Name = caConfigurationElement?.Attributes["cn"]?.Value;

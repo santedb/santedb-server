@@ -17,6 +17,8 @@
  * User: fyfej
  * Date: 2017-9-1
  */
+using RestSrvr.Attributes;
+using RestSrvr.Message;
 using SanteDB.Authentication.OAuth2.Model;
 using System;
 using System.Collections.Generic;
@@ -25,31 +27,28 @@ using System.IO;
 using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
-using System.ServiceModel.Web;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.Authentication.OAuth2.Wcf
+namespace SanteDB.Authentication.OAuth2.Rest
 {
     /// <summary>
     /// OAuth2.0 Contract
     /// </summary>
-    [ServiceContract(ConfigurationName = "SanteDB.Authentication.OAuth2")]
+    [ServiceContract(Name = "OAuth2")]
     public interface IOAuthTokenContract 
     {
 
         /// <summary>
         /// Token request
         /// </summary>
-        [WebInvoke(UriTemplate = "oauth2_token", Method = "POST")]
-        [OperationContract]
-        Stream Token(Message inboundData);
+        [RestInvoke(UriTemplate = "oauth2_token", Method = "POST")]
+        Stream Token(NameValueCollection tokenRequest);
 
         /// <summary>
         /// Get the session from the authenticated bearer or JWT token
         /// </summary>
-        [WebGet(UriTemplate = "session")]
-        [OperationContract]
+        [Get("session")]
         Stream Session();
     }
 }

@@ -108,7 +108,6 @@
     <None Include="Data\demo\992-demo.places.dataset" />
     <None Include="Data\demo\994-demo.manufactured-materials.dataset" />
     <None Include="Data\demo\sdb_sample.fdb" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\SanteDB.licenseheader">

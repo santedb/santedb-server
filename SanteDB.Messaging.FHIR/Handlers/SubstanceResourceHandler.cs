@@ -29,7 +29,7 @@ using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel.Web;
+using RestSrvr;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -41,7 +41,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// Map the substance to FHIR
 		/// </summary>
-		protected override Substance MapToFhir(Material model, WebOperationContext webOperationContext)
+		protected override Substance MapToFhir(Material model, RestOperationContext RestOperationContext)
 		{
 			var retVal = DataTypeConverter.CreateResource<Substance>(model);
 
@@ -86,7 +86,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			return retVal;
 		}
 
-		protected override Material MapToModel(Substance resource, WebOperationContext webOperationContext)
+		protected override Material MapToModel(Substance resource, RestOperationContext RestOperationContext)
 		{
 			throw new NotImplementedException();
 		}

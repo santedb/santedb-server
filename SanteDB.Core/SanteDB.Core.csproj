@@ -62,6 +62,7 @@
     <Reference Include="System.Xml.Serialization" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\RestConfiguration.cs" />
     <Compile Include="Configuration\ServiceTool.cs" />
     <Compile Include="Diagnostics\DiagnosticExtensions.cs" />
     <Compile Include="Diagnostics\LogTraceWriter.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="Rest\Compression\GzipCompressionScheme.cs" />
     <Compile Include="Rest\Compression\ICompressionScheme.cs" />
     <Compile Include="Rest\Compression\LzmaCompressionScheme.cs" />
+    <Compile Include="Rest\RestServiceTool.cs" />
     <Compile Include="Rest\Security\BasicAuthorizationAccessBehavior.cs" />
     <Compile Include="Rest\Security\TokenAuthorizationAccessBehavior.cs" />
     <Compile Include="Rest\Serialization\RestErrorHandler.cs" />

@@ -32,7 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.ServiceModel.Web;
+using RestSrvr;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -45,7 +45,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Maps the specified act to an adverse event
         /// </summary>
-        protected override AdverseEvent MapToFhir(Act model, WebOperationContext webOperationContext)
+        protected override AdverseEvent MapToFhir(Act model, RestOperationContext RestOperationContext)
         {
             var retVal = DataTypeConverter.CreateResource<AdverseEvent>(model);
 
@@ -55,7 +55,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 
             var recordTarget = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget);
             if (recordTarget != null)
-                retVal.Subject = DataTypeConverter.CreateReference<Patient>(recordTarget.LoadProperty<Entity>("PlayerEntity"), webOperationContext);
+                retVal.Subject = DataTypeConverter.CreateReference<Patient>(recordTarget.LoadProperty<Entity>("PlayerEntity"), RestOperationContext);
 
             // Main topic of the concern
             var subject = model.LoadCollection<ActRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == ActRelationshipTypeKeys.HasSubject)?.LoadProperty<Act>("TargetAct");
@@ -64,11 +64,11 @@ namespace SanteDB.Messaging.FHIR.Handlers
 
             // Reactions = HasManifestation
             var reactions = subject.LoadCollection<ActRelationship>("Relationships").Where(o => o.RelationshipTypeKey == ActRelationshipTypeKeys.HasManifestation);
-            retVal.Reaction = reactions.Select(o => DataTypeConverter.CreateReference<Condition>(o.LoadProperty<Act>("TargetAct"), webOperationContext)).ToList();
+            retVal.Reaction = reactions.Select(o => DataTypeConverter.CreateReference<Condition>(o.LoadProperty<Act>("TargetAct"), RestOperationContext)).ToList();
 
             var location = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Location);
             if (location != null)
-                retVal.Location = DataTypeConverter.CreateReference<Location>(location.LoadProperty<Entity>("PlayerEntity"), webOperationContext);
+                retVal.Location = DataTypeConverter.CreateReference<Location>(location.LoadProperty<Entity>("PlayerEntity"), RestOperationContext);
 
             // Severity
             var severity = subject.LoadCollection<ActRelationship>("Relationships").First(o => o.RelationshipTypeKey == ActRelationshipTypeKeys.HasComponent && o.LoadProperty<Act>("TargetAct").TypeConceptKey == ObservationTypeKeys.Severity);
@@ -86,7 +86,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 
             var author = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Authororiginator);
             if (author != null)
-                retVal.Recorder = DataTypeConverter.CreatePlainReference<Practitioner>(author.LoadProperty<Entity>("PlayerEntity"), webOperationContext);
+                retVal.Recorder = DataTypeConverter.CreatePlainReference<Practitioner>(author.LoadProperty<Entity>("PlayerEntity"), RestOperationContext);
 
             // Suspect entities
             var refersTo = model.LoadCollection<ActRelationship>("Relationships").Where(o => o.RelationshipTypeKey == ActRelationshipTypeKeys.RefersTo);
@@ -97,10 +97,10 @@ namespace SanteDB.Messaging.FHIR.Handlers
                     if (consumable == null)
                     {
                         var product = o.LoadCollection<ActParticipation>("Participations").FirstOrDefault(x => x.ParticipationRoleKey == ActParticipationKey.Product)?.LoadProperty<Material>("PlayerEntity");
-                        return new AdverseEventSuspectEntity() { Instance = DataTypeConverter.CreatePlainReference<Substance>(product, webOperationContext) };
+                        return new AdverseEventSuspectEntity() { Instance = DataTypeConverter.CreatePlainReference<Substance>(product, RestOperationContext) };
                     }
                     else
-                        return new AdverseEventSuspectEntity() { Instance = DataTypeConverter.CreatePlainReference<Medication>(consumable, webOperationContext) };
+                        return new AdverseEventSuspectEntity() { Instance = DataTypeConverter.CreatePlainReference<Medication>(consumable, RestOperationContext) };
                 }).ToList();
 
             return retVal;
@@ -109,7 +109,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Map adverse events to the model 
         /// </summary>
-        protected override Act MapToModel(AdverseEvent resource, WebOperationContext webOperationContext)
+        protected override Act MapToModel(AdverseEvent resource, RestOperationContext RestOperationContext)
         {
             throw new NotImplementedException();
         }

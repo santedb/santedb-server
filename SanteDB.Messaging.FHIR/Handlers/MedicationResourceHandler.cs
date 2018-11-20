@@ -27,7 +27,7 @@ using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel.Web;
+using RestSrvr;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -39,7 +39,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// Map this manufactured material to FHIR
 		/// </summary>
-		protected override Medication MapToFhir(ManufacturedMaterial model, WebOperationContext webOperationContext)
+		protected override Medication MapToFhir(ManufacturedMaterial model, RestOperationContext RestOperationContext)
 		{
 			var retVal = DataTypeConverter.CreateResource<Medication>(model);
 
@@ -59,7 +59,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 
 			var manufacturer = model.LoadCollection<EntityRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.WarrantedProduct);
 			if (manufacturer != null)
-				retVal.Manufacturer = DataTypeConverter.CreateReference<MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Organization>(manufacturer.LoadProperty<Entity>("TargetEntity"), webOperationContext);
+				retVal.Manufacturer = DataTypeConverter.CreateReference<MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Organization>(manufacturer.LoadProperty<Entity>("TargetEntity"), RestOperationContext);
 
 			// Form
 			retVal.Form = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("FormConcept"), "http://hl7.org/fhir/ValueSet/medication-form-codes");
@@ -82,7 +82,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			return retVal;
 		}
 
-		protected override ManufacturedMaterial MapToModel(Medication resource, WebOperationContext webOperationContext)
+		protected override ManufacturedMaterial MapToModel(Medication resource, RestOperationContext RestOperationContext)
 		{
 			throw new NotImplementedException();
 		}

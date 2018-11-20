@@ -41,20 +41,7 @@ namespace SanteDB.Messaging.HDSI.Configuration
             
             // Section
             XmlElement serviceElement = section.SelectSingleNode("./*[local-name() = 'service']") as XmlElement;
-
-            RestServiceConfiguration restConfiguration = new RestServiceConfiguration();
-
-            restConfiguration.ServiceBehaviors = serviceElement.SelectNodes("./*[local-name() = 'behavior']").OfType<XmlElement>().Select(b=>
-            {
-                Type authType = Type.GetType(b.InnerText);
-                if (authType == null)
-                    throw new ConfigurationErrorsException($"Cannot find the authorization policy type {b.InnerText}");
-                return authType;
-            }).ToList();
-
-            // Add the endpoints
-            restConfiguration.Endpoints.AddRange(serviceElement.SelectNodes("./*[local-name() = 'endpoint']").OfType<XmlElement>().Select(o => o.InnerText));
-
+            
             var resourceHandlers = section.SelectNodes("./*[local-name() = 'resourceHandler']/*[local-name() = 'add']");
             List<Type> epHandlers = new List<Type>();
             foreach (XmlElement xel in resourceHandlers)
@@ -70,7 +57,7 @@ namespace SanteDB.Messaging.HDSI.Configuration
             if (epHandlers.Count == 0) // Use all resource handlers in "this"
                 epHandlers = typeof(HdsiConfiguration).Assembly.ExportedTypes.Where(t => !t.IsAbstract && !t.IsInterface && typeof(IResourceHandler).IsAssignableFrom(t)).ToList();
 
-            return new HdsiConfiguration(restConfiguration, epHandlers);
+            return new HdsiConfiguration(epHandlers);
         }
     }
 }

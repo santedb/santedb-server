@@ -25,7 +25,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone;
-using System.ServiceModel.Web;
+using RestSrvr;
 using SanteDB.Messaging.FHIR.Util;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model;
@@ -59,7 +59,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Map the specified patient encounter to a FHIR based encounter
         /// </summary>
-        protected override Encounter MapToFhir(PatientEncounter model, WebOperationContext webOperationContext)
+        protected override Encounter MapToFhir(PatientEncounter model, RestOperationContext RestOperationContext)
         {
             var retVal = DataTypeConverter.CreateResource<Encounter>(model);
 
@@ -101,13 +101,13 @@ namespace SanteDB.Messaging.FHIR.Handlers
             var associated = model.LoadCollection<ActParticipation>("Participations");
 
             // Subject of encounter
-            retVal.Subject = DataTypeConverter.CreateReference<MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Patient>(associated.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget)?.LoadProperty<Entity>("PlayerEntity"), webOperationContext);
+            retVal.Subject = DataTypeConverter.CreateReference<MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Patient>(associated.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget)?.LoadProperty<Entity>("PlayerEntity"), RestOperationContext);
 
             // Locations
             retVal.Location = associated.Where(o => o.LoadProperty<Entity>("PlayerEntity") is Place).Select(o => new EncounterLocation()
             {
                 Period = new FhirPeriod() { Start = model.CreationTime.DateTime },
-                Location = DataTypeConverter.CreateReference<Location>(o.PlayerEntity, webOperationContext)
+                Location = DataTypeConverter.CreateReference<Location>(o.PlayerEntity, RestOperationContext)
             }).ToList();
 
 
@@ -116,14 +116,14 @@ namespace SanteDB.Messaging.FHIR.Handlers
             {
                 Period = new FhirPeriod() { Start = model.CreationTime.DateTime },
                 Type = new List<FhirCodeableConcept>() { DataTypeConverter.ToFhirCodeableConcept(o.LoadProperty<Concept>("ParticipationRole")) },
-                Individual = DataTypeConverter.CreateReference<Practitioner>(o.PlayerEntity, webOperationContext)
+                Individual = DataTypeConverter.CreateReference<Practitioner>(o.PlayerEntity, RestOperationContext)
             }).ToList();
 
 
             return retVal; 
         }
 
-        protected override PatientEncounter MapToModel(Encounter resource, WebOperationContext webOperationContext)
+        protected override PatientEncounter MapToModel(Encounter resource, RestOperationContext RestOperationContext)
         {
             throw new NotImplementedException();
         }

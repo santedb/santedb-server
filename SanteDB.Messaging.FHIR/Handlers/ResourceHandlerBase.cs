@@ -24,6 +24,7 @@ using MARC.HI.EHRS.SVC.Core.Services;
 using MARC.HI.EHRS.SVC.Messaging.FHIR;
 using MARC.HI.EHRS.SVC.Messaging.FHIR.Handlers;
 using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Interfaces;
@@ -37,7 +38,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.ServiceModel.Web;
 using System.Xml.Serialization;
 
 namespace SanteDB.Messaging.FHIR.Handlers
@@ -83,7 +83,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 				throw new InvalidDataException();
 
 			// We want to map from TFhirResource to TModel
-			var modelInstance = this.MapToModel(target as TFhirResource, WebOperationContext.Current);
+			var modelInstance = this.MapToModel(target as TFhirResource, RestOperationContext.Current);
 			if (modelInstance == null)
 				throw new SyntaxErrorException(ApplicationContext.Current.GetLocaleString("MSGE001"));
 
@@ -93,7 +93,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			// Return fhir operation result
 			return new FhirOperationResult()
 			{
-				Results = new List<DomainResourceBase>() { this.MapToFhir(result, WebOperationContext.Current) },
+				Results = new List<DomainResourceBase>() { this.MapToFhir(result, RestOperationContext.Current) },
 				Details = issues,
 				Outcome = issues.Exists(o => o.Type == MARC.Everest.Connectors.ResultDetailType.Error) ? ResultCode.Error : ResultCode.Accepted
 			};
@@ -127,7 +127,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			// Return fhir operation result
 			return new FhirOperationResult()
 			{
-				Results = new List<DomainResourceBase>() { this.MapToFhir(result, WebOperationContext.Current) },
+				Results = new List<DomainResourceBase>() { this.MapToFhir(result, RestOperationContext.Current) },
 				Details = details,
 				Outcome = details.Exists(o => o.Type == MARC.Everest.Connectors.ResultDetailType.Error) ? ResultCode.Error : ResultCode.Accepted
 			};
@@ -191,14 +191,14 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			List<IResultDetail> issues = new List<IResultDetail>();
 			var predicate = QueryExpressionParser.BuildLinqExpression<TModel>(hdsiQuery);
 			var hdsiResults = this.Query(predicate, issues, query.QueryId, query.Start, query.Quantity, out totalResults);
-			var webOperationContext = WebOperationContext.Current;
+			var restOperationContext = RestOperationContext.Current;
 
 			// Return FHIR query result
 			return new FhirQueryResult()
 			{
 				Details = issues,
 				Outcome = ResultCode.Accepted,
-				Results = hdsiResults.AsParallel().Select(o => this.MapToFhir(o, webOperationContext)).OfType<DomainResourceBase>().ToList(),
+				Results = hdsiResults.AsParallel().Select(o => this.MapToFhir(o, restOperationContext)).OfType<DomainResourceBase>().ToList(),
 				Query = query,
 				TotalResults = totalResults
 			};
@@ -234,7 +234,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			return new FhirOperationResult()
 			{
 				Outcome = ResultCode.Accepted,
-				Results = new List<DomainResourceBase>() { this.MapToFhir(result, WebOperationContext.Current) },
+				Results = new List<DomainResourceBase>() { this.MapToFhir(result, RestOperationContext.Current) },
 				Details = details
 			};
 		}
@@ -262,7 +262,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 				throw new InvalidDataException();
 
 			// We want to map from TFhirResource to TModel
-			var modelInstance = this.MapToModel(target as TFhirResource, WebOperationContext.Current);
+			var modelInstance = this.MapToModel(target as TFhirResource, RestOperationContext.Current);
 			if (modelInstance == null)
 				throw new SyntaxErrorException(ApplicationContext.Current.GetLocaleString("MSGE001"));
 
@@ -285,7 +285,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			// Return fhir operation result
 			return new FhirOperationResult
 			{
-				Results = new List<DomainResourceBase> { this.MapToFhir(result, WebOperationContext.Current) },
+				Results = new List<DomainResourceBase> { this.MapToFhir(result, RestOperationContext.Current) },
 				Details = issues,
 				Outcome = issues.Exists(o => o.Type == MARC.Everest.Connectors.ResultDetailType.Error) ? ResultCode.Error : ResultCode.Accepted
 			};
@@ -313,14 +313,14 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// </summary>
 		/// <param name="model">The model.</param>
 		/// <returns>Returns the mapped FHIR resource.</returns>
-		protected abstract TFhirResource MapToFhir(TModel model, WebOperationContext webOperationContext);
+		protected abstract TFhirResource MapToFhir(TModel model, RestOperationContext RestOperationContext);
 
 		/// <summary>
 		/// Maps a FHIR resource to a model instance.
 		/// </summary>
 		/// <param name="resource">The resource.</param>
 		/// <returns>Returns the mapped model.</returns>
-		protected abstract TModel MapToModel(TFhirResource resource, WebOperationContext webOperationContext);
+		protected abstract TModel MapToModel(TFhirResource resource, RestOperationContext RestOperationContext);
 
 		/// <summary>
 		/// Queries the specified query.

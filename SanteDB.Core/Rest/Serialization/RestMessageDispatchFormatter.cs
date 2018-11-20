@@ -72,7 +72,7 @@ namespace SanteDB.Core.Rest.Serialization
         // Static ctor
         static RestMessageDispatchFormatter()
         {
-            m_defaultViewModel = ViewModelDescription.Load(typeof(RawBodyWriter).Assembly.GetManifestResourceStream("SanteDB.Core.Resources.ViewModel.xml"));
+            m_defaultViewModel = ViewModelDescription.Load(typeof(RestMessageDispatchFormatter).Assembly.GetManifestResourceStream("SanteDB.Core.Resources.ViewModel.xml"));
             var tracer = new TraceSource(SanteDBConstants.WcfTraceSourceName);
         }
 

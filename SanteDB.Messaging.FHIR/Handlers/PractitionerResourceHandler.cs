@@ -25,7 +25,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone;
-using System.ServiceModel.Web;
+using RestSrvr;
 using SanteDB.Core.Services;
 using MARC.HI.EHRS.SVC.Core;
 using SanteDB.Core.Model;
@@ -60,7 +60,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Map a user entity to a practitioner
         /// </summary>
-        protected override Practitioner MapToFhir(UserEntity model, WebOperationContext webOperationContext)
+        protected override Practitioner MapToFhir(UserEntity model, RestOperationContext RestOperationContext)
         {
             // Is there a provider that matches this user?
             var provider = model.LoadCollection<EntityRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.AssignedEntity)?.LoadProperty<Provider>("TargetEntity") ;
@@ -109,7 +109,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Map a practitioner to a user entity
         /// </summary>
-        protected override UserEntity MapToModel(Practitioner resource, WebOperationContext webOperationContext)
+        protected override UserEntity MapToModel(Practitioner resource, RestOperationContext RestOperationContext)
         {
             throw new NotImplementedException();
         }

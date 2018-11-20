@@ -22,6 +22,7 @@ using MARC.HI.EHRS.SVC.Auditing.Services;
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Exceptions;
 using MARC.HI.EHRS.SVC.Core.Services.Security;
+using RestSrvr;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
@@ -44,7 +45,6 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
-using System.ServiceModel.Web;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -395,13 +395,13 @@ namespace SanteDB.Core.Security.Audit
         /// </summary>
         internal static void AddSenderDeviceActor(AuditData audit)
         {
-            var remoteAddress = (OperationContext.Current?.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty)?.Address;
+            var remoteAddress = RestOperationContext.Current?.IncomingRequest.RemoteEndPoint;
             if (remoteAddress == null) return;
 
             // For the current device name
             audit.Actors.Add(new AuditActorData()
             {
-                NetworkAccessPointId = remoteAddress,
+                NetworkAccessPointId = remoteAddress.Address.ToString(),
                 NetworkAccessPointType = NetworkAccessPointType.IPAddress,
                 ActorRoleCode = new List<AuditCode>() {
                     new  AuditCode("110153", "DCM") { DisplayName = "Source" }

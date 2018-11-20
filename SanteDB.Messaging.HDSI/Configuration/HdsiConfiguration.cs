@@ -32,17 +32,12 @@ namespace SanteDB.Messaging.HDSI.Configuration
         /// <summary>
         /// Creates a new HDSI configuration
         /// </summary>
-        public HdsiConfiguration(RestServiceConfiguration restConfiguration, List<Type> resourceHandler)
+        public HdsiConfiguration(List<Type> resourceHandler)
         {
             this.ResourceHandlers = resourceHandler;
-            this.RestConfiguration = restConfiguration;
         }
 
-        /// <summary>
-        /// Gets the wcf service name
-        /// </summary>
-        public RestServiceConfiguration RestConfiguration { get; private set; }
-
+      
         /// <summary>
         /// Gets or sets the resource tool that can be used for the configuration
         /// </summary>

@@ -68,7 +68,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
     /// <summary>
     /// Data implementation
     /// </summary>
-    [RestBehavior(Name = "HDSI")]
+    [ServiceBehavior(Name = "HDSI", InstanceMode = ServiceInstanceMode.PerCall)]
     [Description("Health Data Service Interface")]
     public class HdsiServiceBehavior : IHdsiServiceContract
     {
@@ -102,7 +102,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
 
                     var versioned = retVal as IVersionedEntity;
                     RestOperationContext.Current.OutgoingResponse.StatusCode = 201;
-                    RestOperationContext.Current.OutgoingResponse.AppendHeader("ETag", retVal.Tag);
+                    RestOperationContext.Current.OutgoingResponse.SetETag(retVal.Tag);
                     if (versioned != null)
                         RestOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}/history/{3}",
                             RestOperationContext.Current.IncomingRequest.Url,
@@ -145,7 +145,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
                     var retVal = handler.Create(body, true) as IdentifiedData;
                     var versioned = retVal as IVersionedEntity;
                     RestOperationContext.Current.OutgoingResponse.StatusCode = 201;
-                    RestOperationContext.Current.OutgoingResponse.AppendHeader("ETag", retVal.Tag);
+                    RestOperationContext.Current.OutgoingResponse.SetETag(retVal.Tag);
 
                     if (versioned != null)
                         RestOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}/history/{3}",
@@ -193,13 +193,13 @@ namespace SanteDB.Messaging.HDSI.Wcf
                     if (retVal == null)
                         throw new FileNotFoundException(id);
 
-                    RestOperationContext.Current.OutgoingResponse.AppendHeader("ETag", retVal.Tag);
-                    RestOperationContext.Current.OutgoingResponse.AppendHeader("Last-Modified", retVal.ModifiedOn.DateTime.ToString("r"));
+                    RestOperationContext.Current.OutgoingResponse.SetETag(retVal.Tag);
+                    RestOperationContext.Current.OutgoingResponse.SetLastModified(retVal.ModifiedOn.DateTime);
 
                     // HTTP IF headers?
-                    if (RestOperationContext.Current.IncomingRequest.Headers["If-Modified-Since"] != null &&
-                        retVal.ModifiedOn <= DateTime.Parse(RestOperationContext.Current.IncomingRequest.Headers["If-Modified-Since"]) ||
-                        RestOperationContext.Current.IncomingRequest.Headers["If-None-Match"].Split(',')?.Any(o => retVal.Tag == o) == true)
+                    if (RestOperationContext.Current.IncomingRequest.GetIfModifiedSince() != null &&
+                        retVal.ModifiedOn <= RestOperationContext.Current.IncomingRequest.GetIfModifiedSince() ||
+                        RestOperationContext.Current.IncomingRequest.GetIfNoneMatch()?.Any(o => retVal.Tag == o) == true)
                     {
                         RestOperationContext.Current.OutgoingResponse.StatusCode = 304;
                         return null;
@@ -253,7 +253,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
                         return Bundle.CreateBundle(retVal);
                     else
                     {
-                        RestOperationContext.Current.OutgoingResponse.AppendHeader("ETag", retVal.Tag);
+                        RestOperationContext.Current.OutgoingResponse.SetETag(retVal.Tag);
 
                         return retVal;
                     }
@@ -373,8 +373,8 @@ namespace SanteDB.Messaging.HDSI.Wcf
                     var query = RestOperationContext.Current.IncomingRequest.QueryString.ToQuery();
 
                     // Modified on?
-                    if (RestOperationContext.Current.IncomingRequest.Headers["If-Modified-Since"] != null)
-                        query.Add("modifiedOn", ">" + DateTime.Parse(RestOperationContext.Current.IncomingRequest.Headers["If-Modified-Since"]).ToString("o"));
+                    if (RestOperationContext.Current.IncomingRequest.GetIfModifiedSince() != null)
+                        query.Add("modifiedOn", ">" + RestOperationContext.Current.IncomingRequest.GetIfModifiedSince()?.ToString("o"));
 
                     // No obsoletion time?
                     if (typeof(BaseEntityData).IsAssignableFrom(handler.Type) && !query.ContainsKey("obsoletionTime"))
@@ -389,12 +389,12 @@ namespace SanteDB.Messaging.HDSI.Wcf
 
 
                     var retVal = handler.Query(query, Int32.Parse(offset ?? "0"), Int32.Parse(count ?? "100"), out totalResults).OfType<IdentifiedData>().Select(o=>o.GetLocked()).ToList();
-                    RestOperationContext.Current.OutgoingResponse.AppendHeader("Last-Modified", (retVal.OrderByDescending(o => o.ModifiedOn).FirstOrDefault()?.ModifiedOn.DateTime ?? DateTime.Now).ToString("r"));
+                    RestOperationContext.Current.OutgoingResponse.SetLastModified((retVal.OrderByDescending(o => o.ModifiedOn).FirstOrDefault()?.ModifiedOn.DateTime ?? DateTime.Now));
 
 
                     // Last modification time and not modified conditions
-                    if ((RestOperationContext.Current.IncomingRequest.Headers["If-Modified-Since"] != null ||
-                        RestOperationContext.Current.IncomingRequest.Headers["If-None-Match"] != null) &&
+                    if ((RestOperationContext.Current.IncomingRequest.GetIfModifiedSince() != null ||
+                        RestOperationContext.Current.IncomingRequest.GetIfNoneMatch() != null) &&
                         totalResults == 0)
                     {
                         RestOperationContext.Current.OutgoingResponse.StatusCode = 304;
@@ -468,7 +468,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
 
                     var versioned = retVal as IVersionedEntity;
                     RestOperationContext.Current.OutgoingResponse.StatusCode = 200;
-                    RestOperationContext.Current.OutgoingResponse.AppendHeader("ETag", retVal.Tag);
+                    RestOperationContext.Current.OutgoingResponse.SetETag(retVal.Tag);
 
                     if (versioned != null)
                         RestOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}/history/{3}",
@@ -611,8 +611,8 @@ namespace SanteDB.Messaging.HDSI.Wcf
                     var applied = ApplicationContext.Current.GetService<IPatchService>().Patch(body, existing, force);
                     var data = handler.Update(applied) as IdentifiedData;
                     RestOperationContext.Current.OutgoingResponse.StatusCode = 204;
-                    RestOperationContext.Current.OutgoingResponse.AppendHeader("ETag", data.Tag);
-                    RestOperationContext.Current.OutgoingResponse.AppendHeader("Last-Modified", applied.ModifiedOn.DateTime.ToString("r"));
+                    RestOperationContext.Current.OutgoingResponse.SetETag(data.Tag);
+                    RestOperationContext.Current.OutgoingResponse.SetLastModified(applied.ModifiedOn.DateTime);
                     var versioned = (data as IVersionedEntity)?.VersionKey;
                     if (versioned != null)
                         RestOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}/history/{3}",

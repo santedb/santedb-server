@@ -34,13 +34,10 @@
     <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0.1" />
     <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="SwaggerWcf.MEDIC" Version="0.2.9" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.IdentityModel" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -69,7 +66,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Content Include="Sample\SampleInventoryReportRequest.xml" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\SanteDB.licenseheader">
@@ -80,6 +76,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
+      <Project>{16EF1840-0361-439D-806C-92D0411122EB}</Project>
+      <Name>RestSrvr</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
       <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
       <Name>SanteDB.Core.Api</Name>

@@ -37,15 +37,14 @@ using SanteDB.Core.Model.Collection;
 using SanteDB.Messaging.GS1.Configuration;
 using SanteDB.Core.Security;
 using SanteDB.Core.Extensions;
-using SwaggerWcf.Attributes;
+using RestSrvr.Attributes;
 
 namespace SanteDB.Messaging.GS1.Wcf
 {
     /// <summary>
     /// Stock service behavior
     /// </summary>
-    [ServiceBehavior(Name = "GS1BMS_Behavior", ConfigurationName = "GS1BMS", InstanceContextMode = InstanceContextMode.PerCall)]
-    [SwaggerWcf("/gs1")]
+    [ServiceBehavior(Name = "GS1BMS", InstanceMode = ServiceInstanceMode.PerCall)]
     public class StockServiceBehavior : IStockService
     {
 
@@ -84,19 +83,6 @@ namespace SanteDB.Messaging.GS1.Wcf
         /// <summary>
         /// The issue despactch advice message will insert a new shipped order into the TImR system.
         /// </summary>
-        [SwaggerWcfSecurity("OAUTH2")]
-        [SwaggerWcfTag("GS1 BMS XML 3.3")]
-        [SwaggerWcfResponse(400, "The client has made a request that this server cannot fulfill")]
-        [SwaggerWcfResponse(401, "Operation requires authentication")]
-        [SwaggerWcfResponse(403, "User attempted to perform an operation but they are unauthorized to do so")]
-        [SwaggerWcfResponse(404, "The provided resource could not be found")]
-        [SwaggerWcfResponse(405, "You are not allowed to perform this operation on this resource")]
-        [SwaggerWcfResponse(409, "You are attempting to create a resource that already exists")]
-        [SwaggerWcfResponse(422, "The operation resulted in one or more business rules being violated")]
-        [SwaggerWcfResponse(429, "The server throttling has been exceeded")]
-        [SwaggerWcfResponse(501, "The method / operation you are calling is not implemented")]
-        [SwaggerWcfResponse(503, "The server has not completed startup or is in a state which cannot accept messages")]
-        [SwaggerWcfResponse(200, "Despatch advice was accepted")]
         public void IssueDespatchAdvice(DespatchAdviceMessageType advice)
         {
             if (advice == null || advice.despatchAdvice == null)
@@ -227,17 +213,6 @@ namespace SanteDB.Messaging.GS1.Wcf
         /// <summary>
         /// Requests the issuance of a BMS1 inventory report request
         /// </summary>
-        [SwaggerWcfSecurity("OAUTH2")]
-        [SwaggerWcfTag("GS1 BMS XML 3.3")]
-        [SwaggerWcfResponse(400, "The client has made a request that this server cannot fulfill")]
-        [SwaggerWcfResponse(401, "Operation requires authentication")]
-        [SwaggerWcfResponse(403, "User attempted to perform an operation but they are unauthorized to do so")]
-        [SwaggerWcfResponse(404, "The provided resource could not be found")]
-        [SwaggerWcfResponse(405, "You are not allowed to perform this operation on this resource")]
-        [SwaggerWcfResponse(429, "The server throttling has been exceeded")]
-        [SwaggerWcfResponse(501, "The method / operation you are calling is not implemented")]
-        [SwaggerWcfResponse(503, "The server has not completed startup or is in a state which cannot accept messages")]
-        [SwaggerWcfResponse(200, "Inventory report was constructed and returned")]
         public LogisticsInventoryReportMessageType IssueInventoryReportRequest(LogisticsInventoryReportRequestMessageType parameters)
         {
             // Status
@@ -489,19 +464,6 @@ namespace SanteDB.Messaging.GS1.Wcf
         /// <summary>
         /// Issues the order response message which will mark the requested order as underway
         /// </summary>
-        [SwaggerWcfSecurity("OAUTH2")]
-        [SwaggerWcfTag("GS1 BMS XML 3.3")]
-        [SwaggerWcfResponse(400, "The client has made a request that this server cannot fulfill")]
-        [SwaggerWcfResponse(401, "Operation requires authentication")]
-        [SwaggerWcfResponse(403, "User attempted to perform an operation but they are unauthorized to do so")]
-        [SwaggerWcfResponse(404, "The provided resource could not be found")]
-        [SwaggerWcfResponse(405, "You are not allowed to perform this operation on this resource")]
-        [SwaggerWcfResponse(409, "You are attempting to create a resource that already exists")]
-        [SwaggerWcfResponse(422, "The operation resulted in one or more business rules being violated")]
-        [SwaggerWcfResponse(429, "The server throttling has been exceeded")]
-        [SwaggerWcfResponse(501, "The method / operation you are calling is not implemented")]
-        [SwaggerWcfResponse(503, "The server has not completed startup or is in a state which cannot accept messages")]
-        [SwaggerWcfResponse(200, "Order response was accepted")]
         public void IssueOrderResponse(OrderResponseMessageType orderResponse)
         {
             // TODO: Validate the standard header

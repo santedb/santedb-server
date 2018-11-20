@@ -45,8 +45,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions">
       <Private>True</Private>
@@ -79,6 +77,10 @@
     <Compile Include="Util\QueryParameterMap.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
+      <Project>{16EF1840-0361-439D-806C-92D0411122EB}</Project>
+      <Name>RestSrvr</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
       <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
       <Name>SanteDB.Core.Api</Name>
@@ -117,7 +119,6 @@
     <None Include="Data\004-FHIR-NameUseCodes.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Extensions\" />

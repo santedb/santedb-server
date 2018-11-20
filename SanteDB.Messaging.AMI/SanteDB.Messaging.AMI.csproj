@@ -66,11 +66,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceHandlers\CertificateResourceHandler.cs" />
     <Compile Include="ResourceHandlers\CertificateSigningRequestHandler.cs" />
-    <Compile Include="Wcf\AmiServiceBehavior.cs" />
-    <Compile Include="Wcf\Behavior\AmiRestEndpointBehavior.cs" />
-    <Compile Include="Wcf\Behavior\AmiSerializerOperationBehavior.cs" />
-    <Compile Include="Wcf\AmiContentTypeHandler.cs" />
-    <Compile Include="Wcf\IAmiServiceContract.cs" />
+    <Compile Include="AmiServiceBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">

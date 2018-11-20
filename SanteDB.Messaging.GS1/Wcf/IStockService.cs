@@ -18,52 +18,48 @@
  * Date: 2017-9-1
  */
 using SanteDB.Messaging.GS1.Model;
-using SwaggerWcf.Attributes;
 using System.ServiceModel;
-using System.ServiceModel.Web;
+using RestSrvr;
+using RestSrvr.Attributes;
 
 namespace SanteDB.Messaging.GS1.Wcf
 {
 	/// <summary>
 	/// Stock service request
 	/// </summary>
-	[ServiceContract(ConfigurationName = "GS1BMS", Name = "GS1BMS")]
-	[XmlSerializerFormat]
+	[ServiceContract(Name = "GS1BMS")]
 	public interface IStockService
 	{
 		/// <summary>
 		/// Represents a request for issuance of an inventory report
 		/// </summary>
-		[WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Xml, ResponseFormat = WebMessageFormat.Xml, UriTemplate = "/inventoryReport")]
-        [SwaggerWcfPath("Issue Inventory Report", "Builds and returns a detailed inventory report for the specified facilities", ExternalDocsUrl = "https://www.gs1.org/edi-xml/xml-inventory-report/3-3", ExternalDocsDescription = "GS1 BMS XML 3.3 Specification for Inventory Report")]
+		[RestInvoke(Method = "POST", UriTemplate = "/inventoryReport")]
 		LogisticsInventoryReportMessageType IssueInventoryReportRequest(LogisticsInventoryReportRequestMessageType parameters);
 
         /// <summary>
         /// Represents a request to issue despatch advice
         /// </summary>
-        [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Xml, ResponseFormat = WebMessageFormat.Xml, UriTemplate = "/despatchAdvice")]
-        [SwaggerWcfPath("Issue Despatch Advice", "Sends a despatch (shipment of goods) to the SanteDB server", ExternalDocsUrl = "https://www.gs1.org/edi-xml/xml-despatch-advice/3-3", ExternalDocsDescription = "GS1 BMS XML 3.3 Specification for Despatch Advice")]
+        [RestInvoke(Method = "POST", UriTemplate = "/despatchAdvice")]
         void IssueDespatchAdvice(DespatchAdviceMessageType advice);
 
         /// <summary>
         /// Issue receiving advice to the SanteDB IMS system
         /// </summary>
         /// TODO: Finish this
-        //[WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Xml, ResponseFormat = WebMessageFormat.Xml, UriTemplate = "/receivingAdvice")]
+        //[RestInvoke(Method = "POST", RequestFormat = WebMessageFormat.Xml, ResponseFormat = WebMessageFormat.Xml, UriTemplate = "/receivingAdvice")]
         //void IssueReceivingAdvice(ReceivingAdviceMessageType advice);
 
         /// <summary>
         /// Represents a request to issue an order
         /// </summary>
         /// TODO: Finish this
-        //[WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Xml, ResponseFormat = WebMessageFormat.Xml, UriTemplate = "/order")]
+        //[RestInvoke(Method = "POST", RequestFormat = WebMessageFormat.Xml, ResponseFormat = WebMessageFormat.Xml, UriTemplate = "/order")]
         //void IssueOrder(OrderMessageType order);
 
         /// <summary>
         /// Issues order response
         /// </summary>
-        [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Bare, RequestFormat = WebMessageFormat.Xml, ResponseFormat = WebMessageFormat.Xml, UriTemplate = "/orderResponse")]
-        [SwaggerWcfPath("Issue Order Response", "Allows an external GS1 trading parter to send a response to an order request which originated from SanteDB", ExternalDocsUrl = "https://www.gs1.org/edi-xml/xml-order-response/3-3", ExternalDocsDescription = "GS1 BMS XML 3.3 Specification for Order Response")]
+        [RestInvoke(Method = "POST", UriTemplate = "/orderResponse")]
         void IssueOrderResponse(OrderResponseMessageType orderResponse);
     }
 }

@@ -15,7 +15,6 @@ using MARC.HI.EHRS.SVC.Core.Exceptions;
 using SanteDB.Core.Diagnostics;
 using System.IO;
 using SanteDB.Core.Model.Interfaces;
-using System.ServiceModel.Web;
 using System.Net;
 using System.ServiceModel.Channels;
 using SanteDB.Rest.Common;
@@ -28,11 +27,9 @@ using System.Security.Permissions;
 using SanteDB.Core.Model.AMI.Logging;
 using System.Reflection;
 using SanteDB.Core.Model.AMI.Security;
-using SwaggerWcf.Attributes;
 using System.Xml.Serialization;
 using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Services;
-using SanteDB.Core.Wcf;
 using SanteDB.Messaging.AMI.Configuration;
 using MARC.HI.EHRS.SVC.Core.Services.Security;
 using SanteDB.Core.Security.Claims;
@@ -40,14 +37,17 @@ using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.AMI.Collections;
 using MARC.Everest.Threading;
 using SanteDB.Core.Model.AMI;
+using RestSrvr.Attributes;
+using RestSrvr;
+using SanteDB.Core.Rest;
+using SanteDB.Rest.AMI;
 
 namespace SanteDB.Messaging.AMI.Wcf
 {
     /// <summary>
     /// Implementation of the AMI service behavior
     /// </summary>
-    [ServiceBehavior(ConfigurationName = "AMI", InstanceContextMode = InstanceContextMode.PerCall)]
-    [Description("Administrative Management Interface")]
+    [ServiceBehavior(Name = "AMI", InstanceMode = ServiceInstanceMode.PerCall)]
     [TraceSource(AmiConstants.TraceSourceName)]
     public class AmiServiceBehavior : IAmiServiceContract
     {
@@ -114,7 +114,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// </summary>
         /// <param name="schemaId">The id of the schema to be retrieved.</param>
         /// <returns>Returns the administrative interface schema.</returns>
-        [SwaggerWcfHidden]
         public XmlSchema GetSchema(int schemaId)
         {
             try
@@ -124,24 +123,24 @@ namespace SanteDB.Messaging.AMI.Wcf
                 XmlReflectionImporter importer = new XmlReflectionImporter("http://santedb.org/ami");
                 XmlSchemaExporter exporter = new XmlSchemaExporter(schemaCollection);
 
-                foreach (var cls in typeof(IAmiServiceContract).GetCustomAttributes<ServiceKnownTypeAttribute>().Select(o => o.Type))
+                foreach (var cls in AmiMessageHandler.ResourceHandler.Handlers.Select(o => o.Type))
                     exporter.ExportTypeMapping(importer.ImportTypeMapping(cls, "http://santedb.org/ami"));
 
                 if (schemaId > schemaCollection.Count)
                 {
-                    WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
+                    RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.NotFound;
                     return null;
                 }
                 else
                 {
-                    WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
-                    WebOperationContext.Current.OutgoingResponse.ContentType = "text/xml";
+                    RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.OK;
+                    RestOperationContext.Current.OutgoingResponse.ContentType = "text/xml";
                     return schemaCollection[schemaId];
                 }
             }
             catch (Exception e)
             {
-                WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.InternalServerError;
+                RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
                 return null;
             }
@@ -205,12 +204,12 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <returns>Returns options for the AMI service.</returns>
         public ServiceOptions Options()
         {
-            WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.OK;
-            WebOperationContext.Current.OutgoingResponse.Headers.Add("Allow", $"GET, PUT, POST, OPTIONS, HEAD, DELETE{(ApplicationContext.Current.GetService<IPatchService>() != null ? ", PATCH" : null)}");
+            RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.OK;
+            RestOperationContext.Current.OutgoingResponse.Headers.Add("Allow", $"GET, PUT, POST, OPTIONS, HEAD, DELETE{(ApplicationContext.Current.GetService<IPatchService>() != null ? ", PATCH" : null)}");
 
             if (ApplicationContext.Current.GetService<IPatchService>() != null)
             {
-                WebOperationContext.Current.OutgoingResponse.Headers.Add("Accept-Patch", "application/xml+oiz-patch");
+                RestOperationContext.Current.OutgoingResponse.Headers.Add("Accept-Patch", "application/xml+oiz-patch");
             }
 
             var serviceOptions = new ServiceOptions
@@ -247,10 +246,9 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <summary>
         /// Perform a ping
         /// </summary>
-        [SwaggerWcfHidden]
         public void Ping()
         {
-            WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.NoContent;
+            RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.NoContent;
         }
 
         /// <summary>
@@ -268,7 +266,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             if (securityUser == null)
             {
                 this.m_traceSource.TraceEvent(TraceEventType.Warning, 0, "Attempt to get TFA reset code for {0} which is not a valid user", resetInfo.UserName);
-                WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NoContent;
+                RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.NoContent;
                 return;
             }
 
@@ -289,7 +287,7 @@ namespace SanteDB.Messaging.AMI.Wcf
 
             // Now issue the TFA secret
             tfaRelay.SendSecret(resetInfo.ResetMechanism, securityUser, resetInfo.Verification, tfaSecret);
-            WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NoContent;
+            RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.NoContent;
         }
         /// <summary>
         /// Creates the specified resource for the AMI service 
@@ -311,17 +309,17 @@ namespace SanteDB.Messaging.AMI.Wcf
                     var retVal = handler.Create(data, false);
 
                     var versioned = retVal as IVersionedEntity;
-                    WebOperationContext.Current.OutgoingResponse.StatusCode = retVal == null ? HttpStatusCode.NoContent : System.Net.HttpStatusCode.Created;
-                    WebOperationContext.Current.OutgoingResponse.ETag = (retVal as IAmiIdentified)?.Tag ?? (retVal as IdentifiedData)?.Tag;
+                    RestOperationContext.Current.OutgoingResponse.StatusCode = retVal == null ? (int)HttpStatusCode.NoContent : (int)System.Net.HttpStatusCode.Created;
+                    RestOperationContext.Current.OutgoingResponse.SetETag((retVal as IAmiIdentified)?.Tag ?? (retVal as IdentifiedData)?.Tag ?? Guid.NewGuid().ToString());
                     if (versioned != null)
-                        WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}/history/{3}",
-                           WebOperationContext.Current.IncomingRequest.UriTemplateMatch.BaseUri,
+                        RestOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}/history/{3}",
+                           RestOperationContext.Current.IncomingRequest.Url,
                            resourceType,
                            (retVal as IdentifiedData).Key,
                            versioned.Key));
                     else
-                        WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}",
-                            WebOperationContext.Current.IncomingRequest.UriTemplateMatch.BaseUri,
+                        RestOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}",
+                            RestOperationContext.Current.IncomingRequest.Url,
                             resourceType,
                             (retVal as IAmiIdentified)?.Key ?? (retVal as IdentifiedData)?.Key.ToString()));
                     return retVal;
@@ -332,7 +330,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             }
             catch (Exception e)
             {
-                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                var remoteEndpoint = RestOperationContext.Current.IncomingRequest.RemoteEndPoint;
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
                 throw;
 
@@ -358,18 +356,18 @@ namespace SanteDB.Messaging.AMI.Wcf
 
                     var retVal = handler.Create(data, true) as IdentifiedData;
                     var versioned = retVal as IVersionedEntity;
-                    WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Created;
-                    WebOperationContext.Current.OutgoingResponse.ETag = retVal.Tag;
+                    RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.Created;
+                    RestOperationContext.Current.OutgoingResponse.SetETag(retVal.Tag);
 
                     if (versioned != null)
-                        WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}/history/{3}",
-                            WebOperationContext.Current.IncomingRequest.UriTemplateMatch.BaseUri,
+                        RestOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}/history/{3}",
+                            RestOperationContext.Current.IncomingRequest.Url,
                             resourceType,
                             retVal.Key,
                             versioned.Key));
                     else
-                        WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}",
-                            WebOperationContext.Current.IncomingRequest.UriTemplateMatch.BaseUri,
+                        RestOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}",
+                            RestOperationContext.Current.IncomingRequest.Url,
                             resourceType,
                             retVal.Key));
 
@@ -381,7 +379,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             }
             catch (Exception e)
             {
-                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                var remoteEndpoint = RestOperationContext.Current.IncomingRequest.RemoteEndPoint;
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
                 throw;
 
@@ -406,16 +404,16 @@ namespace SanteDB.Messaging.AMI.Wcf
 
                     var versioned = retVal as IVersionedEntity;
 
-                    WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Created;
+                    RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.Created;
                     if (versioned != null)
-                        WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}/history/{3}",
-                            WebOperationContext.Current.IncomingRequest.UriTemplateMatch.BaseUri,
+                        RestOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}/history/{3}",
+                            RestOperationContext.Current.IncomingRequest.Url,
                             resourceType,
                             retVal.Key,
                             versioned.Key));
                     else
-                        WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}",
-                            WebOperationContext.Current.IncomingRequest.UriTemplateMatch.BaseUri,
+                        RestOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}",
+                            RestOperationContext.Current.IncomingRequest.Url,
                             resourceType,
                             retVal.Key));
 
@@ -427,7 +425,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             }
             catch (Exception e)
             {
-                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                var remoteEndpoint = RestOperationContext.Current.IncomingRequest.RemoteEndPoint;
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
                 throw;
 
@@ -460,15 +458,17 @@ namespace SanteDB.Messaging.AMI.Wcf
                     var idata = retVal as IdentifiedData;
                     var adata = retVal as IAmiIdentified;
 
-                    WebOperationContext.Current.OutgoingResponse.ETag = idata?.Tag ?? adata?.Tag;
-                    WebOperationContext.Current.OutgoingResponse.LastModified = idata?.ModifiedOn.DateTime ?? adata?.ModifiedOn.DateTime ?? DateTime.Now;
+                    var tag = idata?.Tag ?? adata?.Tag;
+                    if(!String.IsNullOrEmpty(tag))
+                        RestOperationContext.Current.OutgoingResponse.SetETag(tag);
+                    RestOperationContext.Current.OutgoingResponse.SetLastModified((idata?.ModifiedOn.DateTime ?? adata?.ModifiedOn.DateTime ?? DateTime.Now));
 
                     // HTTP IF headers?
-                    if (WebOperationContext.Current.IncomingRequest.IfModifiedSince.HasValue &&
-                        (adata?.ModifiedOn ?? idata?.ModifiedOn) <= WebOperationContext.Current.IncomingRequest.IfModifiedSince ||
-                        WebOperationContext.Current.IncomingRequest.IfNoneMatch?.Any(o => idata?.Tag == o || adata?.Tag == o) == true)
+                    if (RestOperationContext.Current.IncomingRequest.GetIfModifiedSince().HasValue &&
+                        (adata?.ModifiedOn ?? idata?.ModifiedOn) <= RestOperationContext.Current.IncomingRequest.GetIfModifiedSince() ||
+                        RestOperationContext.Current.IncomingRequest.GetIfNoneMatch()?.Any(o => idata?.Tag == o || adata?.Tag == o) == true)
                     {
-                        WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NotModified;
+                        RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.NotModified;
                         return null;
                     }
                     else
@@ -482,7 +482,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             }
             catch (Exception e)
             {
-                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                var remoteEndpoint = RestOperationContext.Current.IncomingRequest.RemoteEndPoint;
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
                 throw;
 
@@ -513,7 +513,7 @@ namespace SanteDB.Messaging.AMI.Wcf
                         throw new FileNotFoundException(key);
 
 
-                    WebOperationContext.Current.OutgoingResponse.ETag = retVal.Tag;
+                    RestOperationContext.Current.OutgoingResponse.SetETag(retVal.Tag);
                     return retVal;
                 }
                 else
@@ -522,7 +522,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             }
             catch (Exception e)
             {
-                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                var remoteEndpoint = RestOperationContext.Current.IncomingRequest.RemoteEndPoint;
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
                 throw;
 
@@ -542,7 +542,7 @@ namespace SanteDB.Messaging.AMI.Wcf
 
                 if (handler != null)
                 {
-                    String since = WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters["_since"];
+                    String since = RestOperationContext.Current.IncomingRequest.QueryString["_since"];
                     Guid sinceGuid = since != null ? Guid.Parse(since) : Guid.Empty;
 
                     // Query 
@@ -567,7 +567,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             }
             catch (Exception e)
             {
-                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                var remoteEndpoint = RestOperationContext.Current.IncomingRequest.RemoteEndPoint;
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
                 throw;
 
@@ -599,14 +599,14 @@ namespace SanteDB.Messaging.AMI.Wcf
                 var handler = AmiMessageHandler.ResourceHandler.GetResourceHandler<IAmiServiceContract>(resourceType);
                 if (handler != null)
                 {
-                    String offset = WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters["_offset"],
-                        count = WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters["_count"];
+                    String offset = RestOperationContext.Current.IncomingRequest.QueryString["_offset"],
+                        count = RestOperationContext.Current.IncomingRequest.QueryString["_count"];
 
-                    var query = WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters.ToQuery();
+                    var query = RestOperationContext.Current.IncomingRequest.QueryString.ToQuery();
 
                     // Modified on?
-                    if (WebOperationContext.Current.IncomingRequest.IfModifiedSince.HasValue)
-                        query.Add("modifiedOn", ">" + WebOperationContext.Current.IncomingRequest.IfModifiedSince.Value.ToString("o"));
+                    if (RestOperationContext.Current.IncomingRequest.GetIfModifiedSince().HasValue)
+                        query.Add("modifiedOn", ">" + RestOperationContext.Current.IncomingRequest.GetIfModifiedSince().Value.ToString("o"));
 
                     // No obsoletion time?
                     if (typeof(BaseEntityData).IsAssignableFrom(handler.Type) && !query.ContainsKey("obsoletionTime"))
@@ -615,20 +615,20 @@ namespace SanteDB.Messaging.AMI.Wcf
                     int totalResults = 0;
 
                     // Lean mode
-                    var lean = WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters["_lean"];
+                    var lean = RestOperationContext.Current.IncomingRequest.QueryString["_lean"];
                     bool parsedLean = false;
                     bool.TryParse(lean, out parsedLean);
 
 
                     var retVal = handler.Query(query, Int32.Parse(offset ?? "0"), Int32.Parse(count ?? "100"), out totalResults).ToList();
-                    WebOperationContext.Current.OutgoingResponse.LastModified = retVal.OfType<IdentifiedData>().OrderByDescending(o => o.ModifiedOn).FirstOrDefault()?.ModifiedOn.DateTime ?? DateTime.Now;
+                    RestOperationContext.Current.OutgoingResponse.SetLastModified(retVal.OfType<IdentifiedData>().OrderByDescending(o => o.ModifiedOn).FirstOrDefault()?.ModifiedOn.DateTime ?? DateTime.Now);
 
                     // Last modification time and not modified conditions
-                    if ((WebOperationContext.Current.IncomingRequest.IfModifiedSince.HasValue ||
-                        WebOperationContext.Current.IncomingRequest.IfNoneMatch != null) &&
+                    if ((RestOperationContext.Current.IncomingRequest.GetIfModifiedSince().HasValue ||
+                        RestOperationContext.Current.IncomingRequest.GetIfNoneMatch() != null) &&
                         totalResults == 0)
                     {
-                        WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NotModified;
+                        RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.NotModified;
                         return null;
                     }
                     else
@@ -641,7 +641,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             }
             catch (Exception e)
             {
-                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                var remoteEndpoint = RestOperationContext.Current.IncomingRequest.RemoteEndPoint;
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
                 throw;
 
@@ -667,22 +667,22 @@ namespace SanteDB.Messaging.AMI.Wcf
 
                     var retVal = handler.Update(data);
                     if (retVal == null)
-                        WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NoContent;
+                        RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.NoContent;
                     else
-                        WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Created;
+                        RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.Created;
 
                     var versioned = retVal as IVersionedEntity;
-                    WebOperationContext.Current.OutgoingResponse.ETag = (retVal as IdentifiedData)?.Tag;
+                    RestOperationContext.Current.OutgoingResponse.SetETag((retVal as IdentifiedData)?.Tag);
 
                     if (versioned != null)
-                        WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}/history/{3}",
-                            WebOperationContext.Current.IncomingRequest.UriTemplateMatch.BaseUri,
+                        RestOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}/history/{3}",
+                            RestOperationContext.Current.IncomingRequest.Url,
                             resourceType,
                             (retVal as IIdentifiedEntity)?.Key?.ToString() ?? (retVal as IAmiIdentified)?.Key,
                             versioned.Key));
                     else
-                        WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}",
-                            WebOperationContext.Current.IncomingRequest.UriTemplateMatch.BaseUri,
+                        RestOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.ContentLocation, String.Format("{0}/{1}/{2}",
+                            RestOperationContext.Current.IncomingRequest.Url,
                             resourceType,
                             (retVal as IIdentifiedEntity)?.Key?.ToString() ?? (retVal as IAmiIdentified)?.Key));
 
@@ -694,7 +694,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             }
             catch (Exception e)
             {
-                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                var remoteEndpoint = RestOperationContext.Current.IncomingRequest.RemoteEndPoint;
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
                 throw;
 
@@ -716,7 +716,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <summary>
         /// Service is not ready
         /// </summary>
-        [SwaggerWcfHidden]
         private void ThrowIfNotReady()
         {
             if (!ApplicationContext.Current.IsRunning)
@@ -743,11 +742,11 @@ namespace SanteDB.Messaging.AMI.Wcf
                     var idata = retVal as IdentifiedData;
                     var adata = retVal as IAmiIdentified;
 
-                    WebOperationContext.Current.OutgoingResponse.ETag = idata?.Tag ?? adata?.Tag;
-                    WebOperationContext.Current.OutgoingResponse.LastModified = idata?.ModifiedOn.DateTime ?? adata?.ModifiedOn.DateTime ?? DateTime.Now;
+                    RestOperationContext.Current.OutgoingResponse.SetETag(idata?.Tag ?? adata?.Tag);
+                    RestOperationContext.Current.OutgoingResponse.SetLastModified(idata?.ModifiedOn.DateTime ?? adata?.ModifiedOn.DateTime ?? DateTime.Now);
 
                     // HTTP IF headers?
-                    WebOperationContext.Current.OutgoingResponse.StatusCode = retVal == null ? HttpStatusCode.NoContent : HttpStatusCode.Created;
+                    RestOperationContext.Current.OutgoingResponse.StatusCode = retVal == null ? (int)HttpStatusCode.NoContent : (int)HttpStatusCode.Created;
                     return retVal;
                 }
                 else if (handler == null)
@@ -757,7 +756,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             }
             catch (Exception e)
             {
-                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                var remoteEndpoint = RestOperationContext.Current.IncomingRequest.RemoteEndPoint;
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
                 throw;
 
@@ -784,11 +783,11 @@ namespace SanteDB.Messaging.AMI.Wcf
                     var idata = retVal as IdentifiedData;
                     var adata = retVal as IAmiIdentified;
 
-                    WebOperationContext.Current.OutgoingResponse.ETag = idata?.Tag ?? adata?.Tag;
-                    WebOperationContext.Current.OutgoingResponse.LastModified = idata?.ModifiedOn.DateTime ?? adata?.ModifiedOn.DateTime ?? DateTime.Now;
+                    RestOperationContext.Current.OutgoingResponse.SetETag(idata?.Tag ?? adata?.Tag);
+                    RestOperationContext.Current.OutgoingResponse.SetLastModified(idata?.ModifiedOn.DateTime ?? adata?.ModifiedOn.DateTime ?? DateTime.Now);
 
                     // HTTP IF headers?
-                    WebOperationContext.Current.OutgoingResponse.StatusCode = retVal == null ? HttpStatusCode.NoContent : HttpStatusCode.Created;
+                    RestOperationContext.Current.OutgoingResponse.StatusCode = retVal == null ? (int)HttpStatusCode.NoContent : (int)HttpStatusCode.Created;
                     return retVal;
                 }
                 else if (handler == null)
@@ -798,7 +797,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             }
             catch (Exception e)
             {
-                var remoteEndpoint = OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+                var remoteEndpoint = RestOperationContext.Current.IncomingRequest.RemoteEndPoint;
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, String.Format("{0} - {1}", remoteEndpoint?.Address, e.ToString()));
                 throw;
 

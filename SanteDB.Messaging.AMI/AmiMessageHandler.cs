@@ -20,13 +20,14 @@
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Services;
 using RestSrvr;
+using RestSrvr.Bindings;
 using SanteDB.Core.Interop;
-using SanteDB.Core.Wcf;
-using SanteDB.Core.Wcf.Behavior;
-using SanteDB.Core.Wcf.Security;
+using SanteDB.Core.Rest;
+using SanteDB.Core.Rest.Behavior;
+using SanteDB.Core.Rest.Security;
 using SanteDB.Messaging.AMI.Configuration;
 using SanteDB.Messaging.AMI.Wcf;
-using SanteDB.Messaging.AMI.Wcf.Behavior;
+using SanteDB.Rest.AMI;
 using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
@@ -65,6 +66,10 @@ namespace SanteDB.Messaging.AMI
     [Description("AMI Message Service")]
 	public class AmiMessageHandler : IDaemonService, IApiEndpointProvider
 	{
+
+        // Configuration
+        private readonly AmiConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(AmiConstants.ConfigurationName) as AmiConfiguration;
+
         /// <summary>
         /// Resource handler tool
         /// </summary>
@@ -73,7 +78,7 @@ namespace SanteDB.Messaging.AMI
         /// <summary>
         /// The internal reference to the trace source.
         /// </summary>
-        private readonly TraceSource tracer = new TraceSource("SanteDB.Messaging.AMI");
+        private readonly TraceSource m_traceSource = new TraceSource(AmiConstants.TraceSourceName);
 
 		/// <summary>
 		/// The internal reference to the AMI configuration.
@@ -122,12 +127,12 @@ namespace SanteDB.Messaging.AMI
 			get
 			{
 				var caps = ServiceEndpointCapabilities.Compression;
-				if (this.m_webHost.Policies.OfType<BasicAuthorizationAccessPolicy>().Any())
-					caps |= ServiceEndpointCapabilities.BasicAuth;
-				if (this.m_webHost.Policies.OfType<TokenAuthorizationPolicy>().Any())
-					caps |= ServiceEndpointCapabilities.BearerAuth;
+                if (this.m_webHost.ServiceBehaviors.OfType<BasicAuthorizationAccessBehavior>().Any())
+                    caps |= ServiceEndpointCapabilities.BasicAuth;
+                if (this.m_webHost.ServiceBehaviors.OfType<TokenAuthorizationAccessBehavior>().Any())
+                    caps |= ServiceEndpointCapabilities.BearerAuth;
 
-				return caps;
+                return caps;
 			}
 		}
 
@@ -138,7 +143,7 @@ namespace SanteDB.Messaging.AMI
 		{
 			get
 			{
-				return this.m_webHost?.State == CommunicationState.Opened;
+				return this.m_webHost?.IsRunning == true;
 			}
 		}
 
@@ -149,7 +154,7 @@ namespace SanteDB.Messaging.AMI
 		{
 			get
 			{
-				return this.m_webHost.Description.Endpoints.OfType<ServiceEndpoint>().Select(o => o.Address.Uri.ToString()).ToArray();
+				return this.m_webHost.Endpoints.OfType<ServiceEndpoint>().Select(o => o.Description.ListenUri.ToString()).ToArray();
 			}
 		}
 
@@ -166,25 +171,29 @@ namespace SanteDB.Messaging.AMI
             {
 				this.Starting?.Invoke(this, EventArgs.Empty);
 
-				this.m_webHost = new WebServiceHost(typeof(AmiServiceBehavior));
-				foreach (ServiceEndpoint endpoint in this.m_webHost.Description.Endpoints)
-				{
-					this.tracer.TraceInformation("Starting AMI on {0}...", endpoint.Address);
-					(endpoint.Binding as WebHttpBinding).ContentTypeMapper = new AmiContentTypeHandler();
+                this.m_webHost = RestServiceTool.CreateService(typeof(AmiServiceBehavior));
+                this.m_webHost.AddServiceBehavior(new ErrorServiceBehavior());
 
-					endpoint.EndpointBehaviors.Add(new AmiRestEndpointBehavior());
-					endpoint.EndpointBehaviors.Add(new WcfErrorEndpointBehavior());
-				}
+                // Add service behaviors
+                foreach (ServiceEndpoint endpoint in this.m_webHost.Endpoints)
+                {
+                    this.m_traceSource.TraceInformation("Starting AMI on {0}...", endpoint.Description.ListenUri);
+                    endpoint.AddEndpointBehavior(new MessageCompressionEndpointBehavior());
+                    endpoint.AddEndpointBehavior(new MessageDispatchFormatterBehavior());
+                    endpoint.AddEndpointBehavior(new MessageLoggingEndpointBehavior());
 
-				// Start the webhost
-				this.m_webHost.Open();
+                }
+
+                // Start the webhost
+                this.m_webHost.Start();
+
                 AmiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.configuration.ResourceHandlers);
 				this.Started?.Invoke(this, EventArgs.Empty);
 				return true;
 			}
 			catch (Exception e)
 			{
-				this.tracer.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+				this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
 				return false;
 			}
 		}
@@ -198,7 +207,7 @@ namespace SanteDB.Messaging.AMI
 
 			if (this.m_webHost != null)
 			{
-				this.m_webHost.Close();
+				this.m_webHost.Stop();
 				this.m_webHost = null;
 			}
 

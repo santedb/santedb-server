@@ -32,7 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.ServiceModel.Web;
+using RestSrvr;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -84,7 +84,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// </summary>
 		/// <param name="model">The model.</param>
 		/// <returns>Returns the mapped FHIR resource.</returns>
-		protected override ImmunizationRecommendation MapToFhir(SubstanceAdministration model, WebOperationContext webOperationContext)
+		protected override ImmunizationRecommendation MapToFhir(SubstanceAdministration model, RestOperationContext RestOperationContext)
 		{
 			ImmunizationRecommendation retVal = new ImmunizationRecommendation();
 
@@ -94,7 +94,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 
 			var rct = model.Participations.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget).PlayerEntity;
 			if (rct != null)
-				retVal.Patient = Reference.CreateResourceReference(new Patient() { Id = model.Key.ToString(), VersionId = model.VersionKey.ToString() }, WebOperationContext.Current.IncomingRequest.UriTemplateMatch.BaseUri);
+				retVal.Patient = Reference.CreateResourceReference(new Patient() { Id = model.Key.ToString(), VersionId = model.VersionKey.ToString() }, RestOperationContext.Current.IncomingRequest.Url);
 
 			var mat = model.Participations.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Product).PlayerEntity;
 
@@ -138,7 +138,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <param name="resource">The resource.</param>
 		/// <returns>Returns the mapped model.</returns>
 		/// <exception cref="System.NotImplementedException"></exception>
-		protected override SubstanceAdministration MapToModel(ImmunizationRecommendation resource, WebOperationContext webOperationContext)
+		protected override SubstanceAdministration MapToModel(ImmunizationRecommendation resource, RestOperationContext RestOperationContext)
 		{
 			throw new NotImplementedException();
 		}

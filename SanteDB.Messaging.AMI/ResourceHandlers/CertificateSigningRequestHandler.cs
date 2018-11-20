@@ -15,6 +15,7 @@ using System.Reflection;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security;
 using SanteDB.Rest.Common;
+using SanteDB.Rest.AMI;
 
 namespace SanteDB.Messaging.AMI.ResourceHandlers
 {
