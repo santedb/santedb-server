@@ -22,7 +22,7 @@ using System.ServiceModel;
 using RestSrvr;
 using RestSrvr.Attributes;
 
-namespace SanteDB.Messaging.GS1.Wcf
+namespace SanteDB.Messaging.GS1.Rest
 {
 	/// <summary>
 	/// Stock service request

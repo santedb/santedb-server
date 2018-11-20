@@ -50,7 +50,7 @@ namespace SanteDB.Core.Rest.Compression
         /// </summary>
         public Stream CreateCompressionStream(Stream underlyingStream)
         {
-            return new LZipStream(underlyingStream, CompressionMode.Compress);
+            return new LZipStream(underlyingStream, CompressionMode.Compress, true);
 
         }
 
@@ -59,7 +59,7 @@ namespace SanteDB.Core.Rest.Compression
         /// </summary>
         public Stream CreateDecompressionStream(Stream underlyingStream)
         {
-            return new LZipStream(underlyingStream, CompressionMode.Decompress);
+            return new LZipStream(underlyingStream, CompressionMode.Decompress, true);
         }
     }
 }

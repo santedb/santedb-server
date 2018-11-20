@@ -76,6 +76,7 @@
     <Compile Include="Model\EntityLoader\PersistenceServiceEntitySource.cs" />
     <Compile Include="Model\ModelExtensions.cs" />
     <Compile Include="Configuration\SanteDBConfiguration.cs" />
+    <Compile Include="Rest\Behavior\CorsEndpointBehavior.cs" />
     <Compile Include="Rest\Behavior\MessageCompressionEndpointBehavior.cs" />
     <Compile Include="Rest\Behavior\ErrorServiceBehavior.cs" />
     <Compile Include="Rest\Behavior\MessageDispatchFormatterBehavior.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="Rest\RestServiceTool.cs" />
     <Compile Include="Rest\Security\BasicAuthorizationAccessBehavior.cs" />
     <Compile Include="Rest\Security\TokenAuthorizationAccessBehavior.cs" />
+    <Compile Include="Rest\Serialization\CorsMessageInspector.cs" />
     <Compile Include="Rest\Serialization\RestErrorHandler.cs" />
     <Compile Include="Rest\Serialization\RestCompressionMessageInspector.cs" />
     <Compile Include="Rest\Serialization\RestMessageDispatchFormatter.cs" />

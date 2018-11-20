@@ -94,8 +94,8 @@ namespace SanteDB
                     Console.WriteLine("SanteDB (SanteDB) {0} ({1})", entryAsm.GetName().Version, entryAsm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
                     Console.WriteLine("{0}", entryAsm.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright);
                     Console.WriteLine("Complete Copyright information available at http://SanteDB.codeplex.com/wikipage?title=Contributions");
-                    ServiceUtil.Start(typeof(Program).GUID);
                     ApplicationServiceContext.Current = MARC.HI.EHRS.SVC.Core.ApplicationContext.Current;
+                    ServiceUtil.Start(typeof(Program).GUID);
                     MARC.HI.EHRS.SVC.Core.ApplicationContext.Current.AddServiceProvider(typeof(FileConfigurationService));
                     ApplicationServiceContext.HostType = SanteDBHostType.Server;
                     if (!parameters.StartupTest)

@@ -18,8 +18,8 @@
  * Date: 2017-9-1
  */
 using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
@@ -31,7 +31,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using RestSrvr;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.Backbone;
 using SanteDB.Core.Model.Acts;
 using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Extensions;

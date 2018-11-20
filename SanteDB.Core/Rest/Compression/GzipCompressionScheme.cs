@@ -48,7 +48,7 @@ namespace SanteDB.Core.Rest.Compression
         /// </summary>
         public Stream CreateCompressionStream(Stream underlyingStream)
         {
-            return new GZipStream(underlyingStream, CompressionLevel.Optimal);
+            return new GZipStream(underlyingStream, CompressionMode.Compress, true);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace SanteDB.Core.Rest.Compression
         /// </summary>
         public Stream CreateDecompressionStream(Stream underlyingStream)
         {
-            return new GZipStream(underlyingStream, CompressionMode.Decompress);
+            return new GZipStream(underlyingStream, CompressionMode.Decompress, true);
         }
     }
 }

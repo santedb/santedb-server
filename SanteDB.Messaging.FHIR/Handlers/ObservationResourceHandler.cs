@@ -18,8 +18,8 @@
  * Date: 2017-9-1
  */
 using MARC.Everest.Connectors;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Messaging.FHIR.Util;
 using System;
@@ -27,12 +27,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using RestSrvr;
-using MARC.HI.EHRS.SVC.Messaging.FHIR;
+using SanteDB.Messaging.FHIR;
 using System.Collections.Specialized;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.DataTypes;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.Backbone;
 using SanteDB.Core.Model.Acts;
 
 namespace SanteDB.Messaging.FHIR.Handlers
@@ -40,14 +40,14 @@ namespace SanteDB.Messaging.FHIR.Handlers
     /// <summary>
     /// Observation handler
     /// </summary>
-    public class ObservationResourceHandler : RepositoryResourceHandlerBase<MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Observation, Core.Model.Acts.Observation>
+    public class ObservationResourceHandler : RepositoryResourceHandlerBase<SanteDB.Messaging.FHIR.Resources.Observation, Core.Model.Acts.Observation>
     {
         /// <summary>
         /// Map to FHIR
         /// </summary>
-        protected override MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Observation MapToFhir(Core.Model.Acts.Observation model, RestOperationContext RestOperationContext)
+        protected override SanteDB.Messaging.FHIR.Resources.Observation MapToFhir(Core.Model.Acts.Observation model, RestOperationContext RestOperationContext)
         {
-            var retVal = DataTypeConverter.CreateResource<MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Observation>(model);
+            var retVal = DataTypeConverter.CreateResource<SanteDB.Messaging.FHIR.Resources.Observation>(model);
 
             retVal.EffectiveDateTime = (FhirDate)model.ActTime.DateTime;
 
@@ -113,7 +113,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Map to model
         /// </summary>
-        protected override Core.Model.Acts.Observation MapToModel(MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Observation resource, RestOperationContext RestOperationContext)
+        protected override Core.Model.Acts.Observation MapToModel(SanteDB.Messaging.FHIR.Resources.Observation resource, RestOperationContext RestOperationContext)
         {
             throw new NotImplementedException();
         }
@@ -142,7 +142,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
                 throw new ArgumentNullException(nameof(parameters));
 
             Core.Model.Query.NameValueCollection hdsiQuery = null;
-            FhirQuery query = QueryRewriter.RewriteFhirQuery<MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Observation, Core.Model.Acts.Observation>(parameters, out hdsiQuery);
+            FhirQuery query = QueryRewriter.RewriteFhirQuery<SanteDB.Messaging.FHIR.Resources.Observation, Core.Model.Acts.Observation>(parameters, out hdsiQuery);
 
             // Do the query
             int totalResults = 0;

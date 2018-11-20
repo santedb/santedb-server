@@ -20,7 +20,7 @@
 using MARC.HI.EHRS.SVC.Core.Services;
 using MARC.HI.EHRS.SVC.Core.Wcf;
 using SanteDB.Core.Interop;
-using SanteDB.Messaging.GS1.Wcf;
+using SanteDB.Messaging.GS1.Rest;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;

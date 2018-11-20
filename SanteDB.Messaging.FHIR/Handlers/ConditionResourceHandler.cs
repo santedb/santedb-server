@@ -20,9 +20,9 @@
 using MARC.Everest.Connectors;
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
@@ -63,7 +63,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 				retVal.ClinicalStatus = ConditionClinicalStatus.Inactive;
 
 			// Category
-			retVal.Category.Add(new MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/condition-category"), "encounter-diagnosis"));
+			retVal.Category.Add(new SanteDB.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/condition-category"), "encounter-diagnosis"));
 
 			// Severity?
 			var actRelationshipService = ApplicationContext.Current.GetService<IDataPersistenceService<ActRelationship>>();

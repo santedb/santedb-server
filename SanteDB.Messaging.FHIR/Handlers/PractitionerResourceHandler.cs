@@ -17,14 +17,14 @@
  * User: fyfej
  * Date: 2018-1-12
  */
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Core.Model.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.Backbone;
 using RestSrvr;
 using SanteDB.Core.Services;
 using MARC.HI.EHRS.SVC.Core;
@@ -33,7 +33,7 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Messaging.FHIR.Util;
 using SanteDB.Core.Model.DataTypes;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.DataTypes;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {

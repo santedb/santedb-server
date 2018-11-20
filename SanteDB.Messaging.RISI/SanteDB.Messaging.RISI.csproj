@@ -49,7 +49,6 @@
   <ItemGroup>
     <Compile Include="RisiMessageHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rest\IRisiContract.cs" />
     <Compile Include="Rest\RisiBehavior.Adhoc.cs" />
     <Compile Include="Rest\RisiBehavior.cs" />
   </ItemGroup>
@@ -57,7 +56,6 @@
     <None Include="..\SanteDB.licenseheader">
       <Link>SanteDB.licenseheader</Link>
     </None>
-    <Compile Include="Rest\IRisiContract.Adhoc.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">

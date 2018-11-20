@@ -21,9 +21,9 @@ using MARC.Everest.Connectors;
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Data;
 using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Messaging.FHIR;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Handlers;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR;
+using SanteDB.Messaging.FHIR.Handlers;
+using SanteDB.Messaging.FHIR.Resources;
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Model;
@@ -47,7 +47,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 	/// </summary>
 	/// <typeparam name="TFhirResource">The type of the t FHIR resource.</typeparam>
 	/// <typeparam name="TModel">The type of the t model.</typeparam>
-	/// <seealso cref="MARC.HI.EHRS.SVC.Messaging.FHIR.Handlers.IFhirResourceHandler" />
+	/// <seealso cref="SanteDB.Messaging.FHIR.Handlers.IFhirResourceHandler" />
 	public abstract class ResourceHandlerBase<TFhirResource, TModel> : IFhirResourceHandler
 		where TFhirResource : DomainResourceBase, new()
 		where TModel : IdentifiedData, new()
@@ -136,18 +136,18 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Get definition for the specified resource
         /// </summary>
-        public virtual MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.ResourceDefinition GetResourceDefinition()
+        public virtual SanteDB.Messaging.FHIR.Backbone.ResourceDefinition GetResourceDefinition()
         {
-            return new MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.ResourceDefinition()
+            return new SanteDB.Messaging.FHIR.Backbone.ResourceDefinition()
             {
                 ConditionalCreate = false,
                 ConditionalUpdate = true,
-                ConditionalDelete = MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.ConditionalDeleteStatus.NotSupported,
+                ConditionalDelete = SanteDB.Messaging.FHIR.Backbone.ConditionalDeleteStatus.NotSupported,
                 ReadHistory = true,
                 UpdateCreate = true,
                 Versioning = typeof(IVersionedEntity).IsAssignableFrom(typeof(TModel)) ? 
-                    MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.ResourceVersionPolicy.Versioned :
-                    MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.ResourceVersionPolicy.NonVersioned,
+                    SanteDB.Messaging.FHIR.Backbone.ResourceVersionPolicy.Versioned :
+                    SanteDB.Messaging.FHIR.Backbone.ResourceVersionPolicy.NonVersioned,
                 Interaction = this.GetInteractions().ToList(),
                 SearchParams = QueryRewriter.GetSearchParams<TFhirResource, TModel>().ToList(),
                 Type = typeof(TFhirResource).GetCustomAttribute<XmlRootAttribute>().ElementName,
@@ -170,7 +170,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Get interactions supported by this handler
         /// </summary>
-        protected abstract IEnumerable<MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.InteractionDefinition> GetInteractions();
+        protected abstract IEnumerable<SanteDB.Messaging.FHIR.Backbone.InteractionDefinition> GetInteractions();
 
         /// <summary>
         /// Queries for a specified resource.

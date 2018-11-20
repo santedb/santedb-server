@@ -57,8 +57,8 @@
     <Compile Include="Transport\As2IntegrationService.cs" />
     <Compile Include="StockSubscriber.cs" />
     <Compile Include="StockServiceMessageHandler.cs" />
-    <Compile Include="Wcf\IStockService.cs" />
-    <Compile Include="Wcf\StockServiceBehavior.cs" />
+    <Compile Include="Rest\IStockService.cs" />
+    <Compile Include="Rest\StockServiceBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

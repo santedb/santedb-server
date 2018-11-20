@@ -18,9 +18,9 @@
  * Date: 2017-9-1
  */
 using MARC.Everest.Connectors;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;

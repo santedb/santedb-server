@@ -17,21 +17,21 @@
  * User: fyfej
  * Date: 2018-1-9
  */
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Core.Model.Acts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.Backbone;
 using RestSrvr;
 using SanteDB.Messaging.FHIR.Util;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.DataTypes;
 using SanteDB.Core.Model.Roles;
 
 namespace SanteDB.Messaging.FHIR.Handlers
@@ -101,7 +101,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
             var associated = model.LoadCollection<ActParticipation>("Participations");
 
             // Subject of encounter
-            retVal.Subject = DataTypeConverter.CreateReference<MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Patient>(associated.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget)?.LoadProperty<Entity>("PlayerEntity"), RestOperationContext);
+            retVal.Subject = DataTypeConverter.CreateReference<SanteDB.Messaging.FHIR.Resources.Patient>(associated.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget)?.LoadProperty<Entity>("PlayerEntity"), RestOperationContext);
 
             // Locations
             retVal.Location = associated.Where(o => o.LoadProperty<Entity>("PlayerEntity") is Place).Select(o => new EncounterLocation()

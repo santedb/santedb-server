@@ -48,7 +48,7 @@ namespace SanteDB.Core.Rest.Compression
         /// </summary>
         public Stream CreateCompressionStream(Stream underlyingStream)
         {
-            return new BZip2Stream(underlyingStream, SharpCompress.Compressors.CompressionMode.Compress);
+            return new BZip2Stream(underlyingStream, SharpCompress.Compressors.CompressionMode.Compress, true);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace SanteDB.Core.Rest.Compression
         /// </summary>
         public Stream CreateDecompressionStream(Stream underlyingStream)
         {
-            return new BZip2Stream(underlyingStream, SharpCompress.Compressors.CompressionMode.Decompress);
+            return new BZip2Stream(underlyingStream, SharpCompress.Compressors.CompressionMode.Decompress, true);
 
         }
     }

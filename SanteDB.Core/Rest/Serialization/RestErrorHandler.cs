@@ -125,7 +125,7 @@ namespace SanteDB.Core.Rest.Serialization
             else
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
 
-            new RestMessageDispatchFormatter().SerializeResponse(faultMessage, null, fault);
+            RestMessageDispatchFormatter.CreateFormatter(RestOperationContext.Current.ServiceEndpoint.Description.Contract.Type).SerializeResponse(faultMessage, null, fault);
             return true;
             
         }

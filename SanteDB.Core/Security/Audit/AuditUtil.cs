@@ -241,9 +241,9 @@ namespace SanteDB.Core.Security.Audit
                 return new AuditableObject()
                 {
                     IDTypeCode = idTypeCode,
-                    CustomIdTypeCode = idTypeCode == AuditableObjectIdType.Custom ? new AuditCode(o.GetType().Name, "SanteDBTable") : null,
+                    CustomIdTypeCode = idTypeCode == AuditableObjectIdType.Custom ? new AuditCode(o.GetType().Name, o.GetType().Namespace) : null,
                     LifecycleType = lifecycle,
-                    ObjectId = (o as IIdentifiedEntity)?.Key?.ToString() ?? (o as AuditData)?.CorrelationToken.ToString(),
+                    ObjectId = (o as IIdentifiedEntity)?.Key?.ToString() ?? (o as AuditData)?.CorrelationToken.ToString() ?? (o.GetType().GetRuntimeProperty("Id")?.GetValue(o)?.ToString()),
                     Role = roleCode,
                     Type = objType
                 };

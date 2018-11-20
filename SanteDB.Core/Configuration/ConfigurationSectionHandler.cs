@@ -176,7 +176,7 @@ namespace SanteDB.Core.Configuration
                 foreach(var svc in rest.SelectNodes("./service").OfType<XmlElement>())
                 {
                     var svcConfig = new RestServiceConfiguration(svc.Attributes["name"]?.Value);
-                    svcConfig.Behaviors.AddRange(rest.SelectNodes("./behaviors/add@type").OfType<XmlAttribute>().Select(o =>
+                    svcConfig.Behaviors.AddRange(svc.SelectNodes("./behaviors/add/@type").OfType<XmlAttribute>().Select(o =>
                     {
                         var bType = Type.GetType(o.Value);
                         if (bType == null)
@@ -184,7 +184,7 @@ namespace SanteDB.Core.Configuration
                         return bType;
                     }).ToList());
 
-                    svcConfig.Endpoints.AddRange(rest.SelectNodes("./endpoint").OfType<XmlElement>().Select(e =>
+                    svcConfig.Endpoints.AddRange(svc.SelectNodes("./endpoint").OfType<XmlElement>().Select(e =>
                     {
                         var cType = Type.GetType(e.Attributes["contract"]?.Value);
                         if(cType == null || !cType.IsInterface)

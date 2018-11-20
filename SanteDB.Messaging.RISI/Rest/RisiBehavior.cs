@@ -27,6 +27,7 @@ using System.ServiceModel;
 using RestSrvr;
 using RestSrvr.Attributes;
 using SanteDB.Rest.Common;
+using SanteDB.Rest.RISI;
 
 namespace SanteDB.Messaging.RISI.Rest
 {

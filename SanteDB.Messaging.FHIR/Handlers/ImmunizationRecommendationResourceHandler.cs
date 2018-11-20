@@ -21,8 +21,8 @@ using MARC.Everest.Connectors;
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Data;
 using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
@@ -100,15 +100,15 @@ namespace SanteDB.Messaging.FHIR.Handlers
 
 			// Recommend
 			string status = (model.StopTime ?? model.ActTime) < DateTimeOffset.Now ? "overdue" : "due";
-			var recommendation = new MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.ImmunizationRecommendation()
+			var recommendation = new SanteDB.Messaging.FHIR.Backbone.ImmunizationRecommendation()
 			{
 				Date = model.CreationTime.DateTime,
 				DoseNumber = model.SequenceId,
 				VaccineCode = DataTypeConverter.ToFhirCodeableConcept(mat?.TypeConcept),
 				ForecastStatus = new FhirCodeableConcept(new Uri("http://hl7.org/fhir/conceptset/immunization-recommendation-status"), status),
-				DateCriterion = new List<MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.ImmunizationRecommendationDateCriterion>()
+				DateCriterion = new List<SanteDB.Messaging.FHIR.Backbone.ImmunizationRecommendationDateCriterion>()
 				{
-					new MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.ImmunizationRecommendationDateCriterion()
+					new SanteDB.Messaging.FHIR.Backbone.ImmunizationRecommendationDateCriterion()
 					{
 						Code = new FhirCodeableConcept(new Uri("http://hl7.org/fhir/conceptset/immunization-recommendation-date-criterion"), "recommended"),
 						Value = model.ActTime.DateTime
@@ -116,19 +116,19 @@ namespace SanteDB.Messaging.FHIR.Handlers
 				}
 			};
 			if (model.StartTime.HasValue)
-				recommendation.DateCriterion.Add(new MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.ImmunizationRecommendationDateCriterion()
+				recommendation.DateCriterion.Add(new SanteDB.Messaging.FHIR.Backbone.ImmunizationRecommendationDateCriterion()
 				{
 					Code = new FhirCodeableConcept(new Uri("http://hl7.org/fhir/conceptset/immunization-recommendation-date-criterion"), "earliest"),
 					Value = model.StartTime.Value.DateTime
 				});
 			if (model.StopTime.HasValue)
-				recommendation.DateCriterion.Add(new MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.ImmunizationRecommendationDateCriterion()
+				recommendation.DateCriterion.Add(new SanteDB.Messaging.FHIR.Backbone.ImmunizationRecommendationDateCriterion()
 				{
 					Code = new FhirCodeableConcept(new Uri("http://hl7.org/fhir/conceptset/immunization-recommendation-date-criterion"), "overdue"),
 					Value = model.StopTime.Value.DateTime
 				});
 
-			retVal.Recommendation = new List<MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.ImmunizationRecommendation>() { recommendation };
+			retVal.Recommendation = new List<SanteDB.Messaging.FHIR.Backbone.ImmunizationRecommendation>() { recommendation };
 			return retVal;
 		}
 
@@ -189,11 +189,11 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Get interactions
         /// </summary>
-        protected override IEnumerable<MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.InteractionDefinition> GetInteractions()
+        protected override IEnumerable<SanteDB.Messaging.FHIR.Backbone.InteractionDefinition> GetInteractions()
         {
-            return new MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.TypeRestfulInteraction[]
+            return new SanteDB.Messaging.FHIR.Backbone.TypeRestfulInteraction[]
             {
-            }.Select(o => new MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.InteractionDefinition() { Type = o });
+            }.Select(o => new SanteDB.Messaging.FHIR.Backbone.InteractionDefinition() { Type = o });
         }
     }
 }

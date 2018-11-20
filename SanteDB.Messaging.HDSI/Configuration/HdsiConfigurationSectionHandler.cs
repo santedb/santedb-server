@@ -18,10 +18,12 @@
  * Date: 2017-9-1
  */
 using SanteDB.Rest.Common;
+using SanteDB.Rest.HDSI.Resources;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -55,7 +57,7 @@ namespace SanteDB.Messaging.HDSI.Configuration
                 epHandlers.Add(t);
             }
             if (epHandlers.Count == 0) // Use all resource handlers in "this"
-                epHandlers = typeof(HdsiConfiguration).Assembly.ExportedTypes.Where(t => !t.IsAbstract && !t.IsInterface && typeof(IResourceHandler).IsAssignableFrom(t)).ToList();
+                epHandlers = typeof(PatientResourceHandler).Assembly.ExportedTypes.Where(t => !t.IsAbstract && !t.IsInterface && typeof(IResourceHandler).IsAssignableFrom(t)).ToList();
 
             return new HdsiConfiguration(epHandlers);
         }

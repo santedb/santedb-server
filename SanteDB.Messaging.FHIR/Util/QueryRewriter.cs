@@ -31,13 +31,13 @@ using SanteDB.Core.Model.Attributes;
 using System.Collections;
 using System.IO;
 using SanteDB.Core.Model.DataTypes;
-using MARC.HI.EHRS.SVC.Messaging.FHIR;
+using SanteDB.Messaging.FHIR;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Query;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.Resources;
 using MARC.HI.EHRS.SVC.Core;
 using SanteDB.Core.Services;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.DataTypes;
 
 namespace SanteDB.Messaging.FHIR.Util
 {
@@ -111,12 +111,12 @@ namespace SanteDB.Messaging.FHIR.Util
         /// <summary>
         /// Get a list of search parameters
         /// </summary>
-        public static IEnumerable<MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.SearchParamDefinition> GetSearchParams<TFhirResource, TModelType>()
+        public static IEnumerable<SanteDB.Messaging.FHIR.Backbone.SearchParamDefinition> GetSearchParams<TFhirResource, TModelType>()
         {
             var map = s_map.Map.FirstOrDefault(o => o.SourceType == typeof(TFhirResource));
-            if (map == null) return new MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.SearchParamDefinition[0];
+            if (map == null) return new SanteDB.Messaging.FHIR.Backbone.SearchParamDefinition[0];
             else
-                return map.Map.Select(o => new MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.SearchParamDefinition()
+                return map.Map.Select(o => new SanteDB.Messaging.FHIR.Backbone.SearchParamDefinition()
                 {
                     Name = o.FhirName,
                     Type = MapFhirParameterType<TModelType>(o.FhirType, o.ModelName),
@@ -129,15 +129,15 @@ namespace SanteDB.Messaging.FHIR.Util
         /// <summary>
         /// Map FHIR parameter type
         /// </summary>
-        private static MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.SearchParamType MapFhirParameterType<TModelType>(string type, string definition)
+        private static SanteDB.Messaging.FHIR.Backbone.SearchParamType MapFhirParameterType<TModelType>(string type, string definition)
         {
             switch (type)
             {
                 case "concept":
                 case "identifier":
-                    return MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.SearchParamType.Token;
+                    return SanteDB.Messaging.FHIR.Backbone.SearchParamType.Token;
                 case "reference":
-                    return MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.SearchParamType.Reference;
+                    return SanteDB.Messaging.FHIR.Backbone.SearchParamType.Reference;
                 default:
                     try
                     {
@@ -146,26 +146,26 @@ namespace SanteDB.Messaging.FHIR.Util
                         switch (GetQueryType<TModelType>(definition).StripNullable().Name)
                         {
                             case "String":
-                                return MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.SearchParamType.String;
+                                return SanteDB.Messaging.FHIR.Backbone.SearchParamType.String;
                             case "Uri":
-                                return MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.SearchParamType.Uri;
+                                return SanteDB.Messaging.FHIR.Backbone.SearchParamType.Uri;
                             case "Int32":
                             case "Int64":
                             case "Int16":
                             case "Double":
                             case "Decimal":
                             case "Float":
-                                return MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.SearchParamType.Number;
+                                return SanteDB.Messaging.FHIR.Backbone.SearchParamType.Number;
                             case "DateTime":
                             case "DateTimeOffset":
-                                return MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.SearchParamType.Date;
+                                return SanteDB.Messaging.FHIR.Backbone.SearchParamType.Date;
                             default:
-                                return MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.SearchParamType.Composite;
+                                return SanteDB.Messaging.FHIR.Backbone.SearchParamType.Composite;
                         }
                     }
                     catch
                     {
-                        return MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.SearchParamType.String;
+                        return SanteDB.Messaging.FHIR.Backbone.SearchParamType.String;
                     }
             }
         }

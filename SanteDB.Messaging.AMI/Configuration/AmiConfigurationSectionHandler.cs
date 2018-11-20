@@ -19,6 +19,7 @@
  */
 using SanteDB.Core.Interop;
 using SanteDB.Messaging.AMI.Wcf;
+using SanteDB.Rest.AMI.Resources;
 using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
@@ -78,7 +79,7 @@ namespace SanteDB.Messaging.AMI.Configuration
                 epHandlers.Add(t);
             }
             if(epHandlers.Count == 0) // Use all resource handlers in "this"
-                epHandlers = typeof(AmiConfiguration).Assembly.ExportedTypes.Where(t=>!t.IsAbstract && !t.IsInterface && typeof(IResourceHandler).IsAssignableFrom(t)).ToList();
+                epHandlers = typeof(SecurityUserResourceHandler).Assembly.ExportedTypes.Where(t=>!t.IsAbstract && !t.IsInterface && typeof(IResourceHandler).IsAssignableFrom(t)).ToList();
             // Configuration
             return new AmiConfiguration(caConfiguration, epOptions, epHandlers);
 		}

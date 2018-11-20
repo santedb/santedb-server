@@ -20,11 +20,11 @@
  -->
 <QueryParameterMap xmlns="http://santedb.org/model/fhir">
 
-  <type model="MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.ResourceBase, MARC.HI.EHRS.SVC.Messaging.FHIR, Version=2.0.0.0">
+  <type model="SanteDB.Messaging.FHIR.Resources.ResourceBase, SanteDB.Messaging.FHIR, Version=2.0.0.0">
     <map fhir="_id" model="id"/>
     <map fhir="_lastUpdated" model="modifiedOn"/>
   </type>
-  <type model="MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.ImmunizationRecommendation, MARC.HI.EHRS.SVC.Messaging.FHIR, Version=2.0.0.0">
+  <type model="SanteDB.Messaging.FHIR.Resources.ImmunizationRecommendation, SanteDB.Messaging.FHIR, Version=2.0.0.0">
     <map fhir="vaccine-type" model="participation[Product].player.typeConcept" type="concept"/>
     <map fhir="dose-number" model="doseSequence"/>
     <map fhir="date" model="creationTime"/>
@@ -34,7 +34,7 @@
     <map fhir="patient.birthDate" model="participation[RecordTarget].player@Person.dateOfBirth"/>
   </type>
   
-  <type model="MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Immunization, MARC.HI.EHRS.SVC.Messaging.FHIR, Version=2.0.0.0">
+  <type model="SanteDB.Messaging.FHIR.Resources.Immunization, SanteDB.Messaging.FHIR, Version=2.0.0.0">
     <map fhir="vaccine-code" model="participation[Consumable].player@ManufacturedMaterial.typeConcept" type="concept"/>
     <map fhir="dose-sequence" model="doseSequence"/>
     <map fhir="date" model="actTime"/>
@@ -51,7 +51,7 @@
     <map fhir="location.identifier" model="participation[Location].player@Place.identifier" type="identifier"/>
   </type>
 
-  <type model="MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Patient, MARC.HI.EHRS.SVC.Messaging.FHIR, Version=2.0.0.0">
+  <type model="SanteDB.Messaging.FHIR.Resources.Patient, SanteDB.Messaging.FHIR, Version=2.0.0.0">
     <map fhir="name" model="name.component.value"/>
     <map fhir="family" model="name.component[Family].value"/>
     <map fhir="given" model="name.component[Given].value"/>
@@ -71,7 +71,7 @@
     <map fhir="is-anonymous" model="tag[isAnonymous].value"/>
   </type>
 
-  <type model="MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Observation, MARC.HI.EHRS.SVC.Messaging.FHIR, Version=2.0.0.0">
+  <type model="SanteDB.Messaging.FHIR.Resources.Observation, SanteDB.Messaging.FHIR, Version=2.0.0.0">
     <map fhir="category" model="typeConcept" type="concept"/>
     <map fhir="code" model="typeConcept" type="concept"/>
     <map fhir="value-concept" model="value" type="concept"/>
@@ -93,7 +93,7 @@
     <map fhir="location.name" model="participation[Location].player.name.component.value" />
   </type>
 
-  <type model="MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.AdverseEvent, MARC.HI.EHRS.SVC.Messaging.FHIR, Version=2.0.0.0">
+  <type model="SanteDB.Messaging.FHIR.Resources.AdverseEvent, SanteDB.Messaging.FHIR, Version=2.0.0.0">
     <map fhir="date" model="relationship[HasSubject].target.actTime"/>
     <map fhir="location" model="participation[Location].player" type="reference"/>
     <map fhir="location.identifier" model="participation[Location].player.identifier" type="identifier"/>
@@ -121,7 +121,7 @@
     <map fhir="substance.type" model="relationship[RefersTo].target.participation[Product|Consumable].player.typeConcept" type="concept"/>
   </type>
 
-  <type model="MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.AllergyIntolerance, MARC.HI.EHRS.SVC.Messaging.FHIR, Version=2.0.0.0">
+  <type model="SanteDB.Messaging.FHIR.Resources.AllergyIntolerance, SanteDB.Messaging.FHIR, Version=2.0.0.0">
     <map fhir="asserter" model="participation[Authorororiginator].player" type="reference"/>
     <map fhir="asserter.identifier" model="participation[Authorororiginator].player.identifier" type="identifier"/>
     <map fhir="asserter.name" model="participation[Authorororiginator].player.name.component.value"/>
@@ -146,7 +146,7 @@
 
   </type>
 
-  <type model="MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Condition, MARC.HI.EHRS.SVC.Messaging.FHIR, Version=2.0.0.0">
+  <type model="SanteDB.Messaging.FHIR.Resources.Condition, SanteDB.Messaging.FHIR, Version=2.0.0.0">
     <map fhir="asserted-date" model="creationTime"/>
     <map fhir="asserter" model="participation[Authorororiginator].player" type="reference"/>
     <map fhir="asserter.identifier" model="participation[Authorororiginator].player.identifier" type="identifier"/>
@@ -164,7 +164,7 @@
     <map fhir="severity" model="relationship[HasComponent].target[ObservationType-Severity].value"/>
   </type>
 
-  <type model="MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.MedicationAdministration, MARC.HI.EHRS.SVC.Messaging.FHIR, Version=2.0.0.0">
+  <type model="SanteDB.Messaging.FHIR.Resources.MedicationAdministration, SanteDB.Messaging.FHIR, Version=2.0.0.0">
     <map fhir="code" model="participation[Product].player.typeConcept" type="concept"/>
     <map fhir="effective-time" model="actTime"/>
     <map fhir="date" model="actTime"/>
@@ -186,7 +186,7 @@
     
   </type>
 
-  <type model="MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Encounter, MARC.HI.EHRS.SVC.Messaging.FHIR, Version=2.0.0.0">
+  <type model="SanteDB.Messaging.FHIR.Resources.Encounter, SanteDB.Messaging.FHIR, Version=2.0.0.0">
     <map fhir="date" model="actTime"/>
     <map fhir="identifier" model="identifier" type="token"/>
     <map fhir="patient" model="participation[RecordTarget].player" type="reference"/>
@@ -203,7 +203,7 @@
   </type>
 
 
-  <type model="MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Location, MARC.HI.EHRS.SVC.Messaging.FHIR, Version=2.0.0.0">
+  <type model="SanteDB.Messaging.FHIR.Resources.Location, SanteDB.Messaging.FHIR, Version=2.0.0.0">
     <map fhir="address" model="address.component.value"/>
     <map fhir="address-city" model="address.component[City].value"/>
     <map fhir="address-country" model="address.component[Country].value"/>
@@ -214,7 +214,7 @@
     <map fhir="type" model="typeConcept" type="concept"/>
   </type>
 
-  <type model="MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Medication, MARC.HI.EHRS.SVC.Messaging.FHIR, Version=2.0.0.0">
+  <type model="SanteDB.Messaging.FHIR.Resources.Medication, SanteDB.Messaging.FHIR, Version=2.0.0.0">
     <map fhir="code" model="typeConcept" type="concept"/>
     <map fhir="form" model="formConcept" type="concept"/>
     <map fhir="manufacturer" model="relationship[WarrantedProduct].source" type="reference"/>
@@ -224,7 +224,7 @@
     <map fhir="status" model="statusConcept" type="concept" defaultCodeSystem="http://hl7.org/fhir/medication-status"/>
   </type>
 
-  <type model="MARC.HI.EHRS.SVC.Messaging.FHIR.Resources.Substance, MARC.HI.EHRS.SVC.Messaging.FHIR, Version=2.0.0.0">
+  <type model="SanteDB.Messaging.FHIR.Resources.Substance, SanteDB.Messaging.FHIR, Version=2.0.0.0">
     <map fhir="code" model="typeConcept" type="concept"/>
     <map fhir="expiry" model="expireDate"/>
     <map fhir="identifier" model="identifier" type="identifier"/>

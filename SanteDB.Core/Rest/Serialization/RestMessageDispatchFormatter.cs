@@ -51,19 +51,64 @@ using SanteDB.Core.Diagnostics;
 using RestSrvr;
 using SanteDB.Core.Rest.Serialization;
 using RestSrvr.Message;
+using RestSrvr.Attributes;
 
 namespace SanteDB.Core.Rest.Serialization
 {
+
+    /// <summary>
+    /// Represents the non-generic rest message dispatch formatter
+    /// </summary>
+    public abstract class RestMessageDispatchFormatter : IDispatchMessageFormatter
+    {
+
+        // Formatters
+        private static Dictionary<Type, RestMessageDispatchFormatter> m_formatters = new Dictionary<Type, RestMessageDispatchFormatter>();
+
+        /// <summary>
+        /// Create a formatter for the specified contract type
+        /// </summary>
+        public static RestMessageDispatchFormatter CreateFormatter(Type contractType)
+        {
+            RestMessageDispatchFormatter retVal = null;
+            if(!m_formatters.TryGetValue(contractType, out retVal))
+            {
+                lock(m_formatters)
+                {
+                    if (!m_formatters.ContainsKey(contractType))
+                    {
+                        var typeFormatter = typeof(RestMessageDispatchFormatter<>).MakeGenericType(contractType);
+                        retVal = Activator.CreateInstance(typeFormatter) as RestMessageDispatchFormatter;
+                        m_formatters.Add(contractType, retVal);
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        /// <summary>
+        /// Implemented below
+        /// </summary>
+        public abstract void DeserializeRequest(EndpointOperation operation, RestRequestMessage request, object[] parameters);
+
+        /// <summary>
+        /// Implemented below
+        /// </summary>
+        public abstract void SerializeResponse(RestResponseMessage response, object[] parameters, object result);
+    }
+
     /// <summary>
     /// Represents a dispatch message formatter which uses the JSON.NET serialization
     /// </summary>
-    public class RestMessageDispatchFormatter : IDispatchMessageFormatter
+    public class RestMessageDispatchFormatter<TContract> : RestMessageDispatchFormatter
     {
 
         private String m_version = Assembly.GetEntryAssembly().GetName().Version.ToString();
         private String m_versionName = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "Unnamed";
         // Trace source
         private TraceSource m_traceSource = new TraceSource(SanteDBConstants.WcfTraceSourceName);
+        // Known types
+        private static Type[] s_knownTypes = typeof(TContract).GetCustomAttributes<ServiceKnownResourceAttribute>().Select(t => t.Type).ToArray();
         // Serializers
         private static Dictionary<Type, XmlSerializer> s_serializers = new Dictionary<Type, XmlSerializer>();
         // Default view model
@@ -72,14 +117,36 @@ namespace SanteDB.Core.Rest.Serialization
         // Static ctor
         static RestMessageDispatchFormatter()
         {
-            m_defaultViewModel = ViewModelDescription.Load(typeof(RestMessageDispatchFormatter).Assembly.GetManifestResourceStream("SanteDB.Core.Resources.ViewModel.xml"));
+            m_defaultViewModel = ViewModelDescription.Load(typeof(RestMessageDispatchFormatter<>).Assembly.GetManifestResourceStream("SanteDB.Core.Resources.ViewModel.xml"));
             var tracer = new TraceSource(SanteDBConstants.WcfTraceSourceName);
+
+
+            tracer.TraceInfo("Will generate serializer for {0}", typeof(TContract).FullName);
+
+            foreach (var s in s_knownTypes)
+                if (!s_serializers.ContainsKey(s))
+                {
+                    tracer.TraceVerbose("Generating serializer for {0}", s.Name);
+                    try
+                    {
+                        if (typeof(Bundle).IsAssignableFrom(s))
+                            s_serializers.Add(s, new XmlSerializer(s, AppDomain.CurrentDomain.GetAssemblies().SelectMany(o => o.GetTypes()).Where(t => typeof(IdentifiedData).IsAssignableFrom(t) && !t.IsGenericTypeDefinition && !t.IsAbstract).ToArray()));
+                        else
+                            s_serializers.Add(s, new XmlSerializer(s, s.GetCustomAttributes<XmlIncludeAttribute>().Select(o => o.Type).ToArray()));
+                    }
+                    catch (Exception e)
+                    {
+                        tracer.TraceError("Error generating for {0} : {1}", s.Name, e.ToString());
+                        //throw;
+                    }
+                }
+
         }
 
         /// <summary>
         /// Deserialize the request
         /// </summary>
-        public void DeserializeRequest(EndpointOperation operation, RestRequestMessage request, object[] parameters)
+        public override void DeserializeRequest(EndpointOperation operation, RestRequestMessage request, object[] parameters)
         {
 
             try
@@ -104,15 +171,23 @@ namespace SanteDB.Core.Rest.Serialization
                     else if (contentType?.StartsWith("application/xml") == true)
                     {
                         XmlSerializer serializer = null;
-                        if (!s_serializers.TryGetValue(parm.ParameterType, out serializer))
+                        using (XmlReader bodyReader = XmlReader.Create(request.Body))
                         {
-                            serializer = new XmlSerializer(parm.ParameterType);
-                            lock (s_serializers)
-                                if (!s_serializers.ContainsKey(parm.ParameterType))
-                                    s_serializers.Add(parm.ParameterType, serializer);
+                            while (bodyReader.NodeType != XmlNodeType.Element)
+                                bodyReader.Read();
+
+                            Type eType = s_knownTypes.FirstOrDefault(o => o.GetCustomAttribute<XmlRootAttribute>()?.ElementName == bodyReader.LocalName &&
+                                o.GetCustomAttribute<XmlRootAttribute>()?.Namespace == bodyReader.NamespaceURI);
+                            if (!s_serializers.TryGetValue(eType, out serializer))
+                            {
+                                serializer = new XmlSerializer(eType);
+                                lock (s_serializers)
+                                    if (!s_serializers.ContainsKey(eType))
+                                        s_serializers.Add(eType, serializer);
+                            }
+                            parameters[pNumber] = serializer.Deserialize(request.Body);
                         }
-                        var requestObject = serializer.Deserialize(request.Body);
-                        parameters[pNumber] = requestObject;
+
                     }
                     else if (contentType?.StartsWith("application/json+sdb-viewmodel") == true && typeof(IdentifiedData).IsAssignableFrom(parm.ParameterType))
                     {
@@ -169,7 +244,7 @@ namespace SanteDB.Core.Rest.Serialization
         /// <summary>
         /// Serialize the reply
         /// </summary>
-        public void SerializeResponse(RestResponseMessage response, object[] parameters, object result)
+        public override void SerializeResponse(RestResponseMessage response, object[] parameters, object result)
         {
             try
             {
@@ -212,7 +287,7 @@ namespace SanteDB.Core.Rest.Serialization
                             response.Body = new MemoryStream(tms.ToArray());
                         }
 
-                        contentType = "application/json+oiz-viewmodel";
+                        contentType = "application/json+sdb-viewmodel";
                     }
                     else if (accepts?.StartsWith("application/json") == true ||
                         contentType?.StartsWith("application/json") == true)

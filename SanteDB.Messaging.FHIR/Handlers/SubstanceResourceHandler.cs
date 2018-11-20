@@ -18,8 +18,8 @@
  * Date: 2017-9-1
  */
 using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
@@ -58,9 +58,9 @@ namespace SanteDB.Messaging.FHIR.Handlers
 
 			// Category and code
 			if (model.LoadProperty<Concept>("TypeConcept").ConceptSetsXml.Any(o => o == ConceptSetKeys.VaccineTypeCodes))
-				retVal.Category = new MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/substance-category"), "drug");
+				retVal.Category = new SanteDB.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/substance-category"), "drug");
 			else
-				retVal.Category = new MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/substance-category"), "material");
+				retVal.Category = new SanteDB.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/substance-category"), "material");
 
 			retVal.Code = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("TypeConcept"), "http://hl7.org/fhir/ValueSet/substance-code");
 
@@ -70,12 +70,12 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			if (model.DeterminerConceptKey == DeterminerKeys.Specific)
 			{
 				var conceptRepo = ApplicationContext.Current.GetService<IConceptRepositoryService>();
-				retVal.Instance = new List<MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.SubstanceInstance>()
+				retVal.Instance = new List<SanteDB.Messaging.FHIR.Backbone.SubstanceInstance>()
 				{
-					new MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.SubstanceInstance()
+					new SanteDB.Messaging.FHIR.Backbone.SubstanceInstance()
 					{
 						Expiry = model.ExpiryDate,
-						Quantity = new MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes.FhirQuantity() {
+						Quantity = new SanteDB.Messaging.FHIR.DataTypes.FhirQuantity() {
 							Units = model.QuantityConceptKey.HasValue ? conceptRepo.GetConceptReferenceTerm(model.QuantityConceptKey.Value, "UCUM").Mnemonic : null,
 							Value = model.Quantity
 						}

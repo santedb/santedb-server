@@ -39,7 +39,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Extensions;
 using RestSrvr.Attributes;
 
-namespace SanteDB.Messaging.GS1.Wcf
+namespace SanteDB.Messaging.GS1.Rest
 {
     /// <summary>
     /// Stock service behavior

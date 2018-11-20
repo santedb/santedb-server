@@ -69,20 +69,7 @@ namespace SanteDB.Core.Rest.Serialization
                     else
                         response.Headers.Add("X-CompressResponseStream", "no-known-accept");
                 }
-
-
-                //var httpResponse = (HttpResponseMessageProperty)reply.Properties[HttpResponseMessageProperty.Name];
-                // CORS
-                // TODO: Add a configuration option to disable this
-                Dictionary<String, String> requiredHeaders = new Dictionary<string, string>() {
-                    {"Access-Control-Allow-Origin", "*"},
-                    {"Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"},
-                    {"Access-Control-Allow-Headers", "X-Requested-With,Content-Type,Accept,Content-Encoding,Accept-Encoding, Authorization"}
-                };
-                foreach (var kv in requiredHeaders)
-                    if (!RestOperationContext.Current.OutgoingResponse.Headers.AllKeys.Contains(kv.Key))
-                        RestOperationContext.Current.OutgoingResponse.Headers.Add(kv.Key, kv.Value);
-
+                
                 // No reply = no compress :)
                 if (response.Body == null)
                     return;
@@ -97,7 +84,13 @@ namespace SanteDB.Core.Rest.Serialization
                         response.Headers.Add("X-CompressResponseStream", compressionScheme);
 
                         // Read binary contents of the message
-                        response.Body = CompressionUtil.GetCompressionScheme(compressionScheme).CreateCompressionStream(response.Body);
+                        var memoryStream = new MemoryStream();
+                        using (var compressor = CompressionUtil.GetCompressionScheme(compressionScheme).CreateCompressionStream(memoryStream))
+                            response.Body.CopyTo(compressor);
+                        response.Body.Dispose();
+                        memoryStream.Seek(0, SeekOrigin.Begin);
+                        response.Body = memoryStream;
+
                     }
                     catch (Exception e)
                     {

@@ -100,7 +100,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             try
             {
                 // Client principal
-                IPrincipal clientPrincipal = ClaimsPrincipal.Current;
+                IPrincipal clientPrincipal = Core.Security.AuthenticationContext.Current.Principal;
                 // Client is not present so look in body
                 if (clientPrincipal == null || clientPrincipal == Core.Security.AuthenticationContext.AnonymousPrincipal)
                 {

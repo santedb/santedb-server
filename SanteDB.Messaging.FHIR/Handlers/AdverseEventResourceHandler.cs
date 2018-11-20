@@ -19,8 +19,8 @@
  */
 using MARC.Everest.Connectors;
 using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
@@ -78,11 +78,11 @@ namespace SanteDB.Messaging.FHIR.Handlers
             // Did the patient die?
             var causeOfDeath = model.LoadCollection<ActRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == ActRelationshipTypeKeys.IsCauseOf && o.LoadProperty<Act>("TargetAct").TypeConceptKey == ObservationTypeKeys.ClinicalState && (o.TargetAct as CodedObservation)?.ValueKey == Guid.Parse("6df3720b-857f-4ba2-826f-b7f1d3c3adbb"));
             if (causeOfDeath != null)
-                retVal.Outcome = new MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/adverse-event-outcome"), "fatal");
+                retVal.Outcome = new SanteDB.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/adverse-event-outcome"), "fatal");
             else if (model.StatusConceptKey == StatusKeys.Active)
-                retVal.Outcome = new MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/adverse-event-outcome"), "ongoing");
+                retVal.Outcome = new SanteDB.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/adverse-event-outcome"), "ongoing");
             else if (model.StatusConceptKey == StatusKeys.Completed)
-                retVal.Outcome = new MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/adverse-event-outcome"), "resolved");
+                retVal.Outcome = new SanteDB.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/adverse-event-outcome"), "resolved");
 
             var author = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Authororiginator);
             if (author != null)

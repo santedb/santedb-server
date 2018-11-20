@@ -17,9 +17,9 @@
  * User: fyfej
  * Date: 2017-9-1
  */
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
@@ -67,7 +67,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			retVal.Address = DataTypeConverter.ToFhirAddress(model.LoadCollection<EntityAddress>("Addresses").FirstOrDefault());
 
 			if (model.Lat.HasValue && model.Lng.HasValue)
-				retVal.Position = new MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.Position()
+				retVal.Position = new SanteDB.Messaging.FHIR.Backbone.Position()
 				{
 					Latitude = (decimal)model.Lat.Value,
 					Longitude = (decimal)model.Lng.Value

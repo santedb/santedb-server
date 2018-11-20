@@ -36,6 +36,7 @@ using System.Text;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Interfaces;
 using System.Security.Permissions;
+using MARC.HI.EHRS.SVC.Core.Services.Policy;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -52,7 +53,8 @@ namespace SanteDB.Core.Services.Impl
         IRepositoryService<SecurityUser>,
         IRepositoryService<ApplicationEntity>,
         IRepositoryService<DeviceEntity>,
-        IRepositoryService<SecurityPolicy>
+        IRepositoryService<SecurityPolicy>,
+        ISecurityInformationService
     {
 		private TraceSource m_traceSource = new TraceSource(SanteDBConstants.ServiceTraceSourceName);
 
@@ -62,6 +64,14 @@ namespace SanteDB.Core.Services.Impl
         public event EventHandler<SecurityAuditDataEventArgs> SecurityAttributesChanged;
         public event EventHandler<SecurityAuditDataEventArgs> SecurityResourceCreated;
         public event EventHandler<SecurityAuditDataEventArgs> SecurityResourceDeleted;
+
+        /// <summary>
+        /// Add users to roles
+        /// </summary>
+        public void AddUsersToRoles(string[] users, string[] roles)
+        {
+            ApplicationContext.Current.GetService<IRoleProviderService>().AddUsersToRoles(users, roles, AuthenticationContext.Current.Principal);
+        }
 
         /// <summary>
         /// Changes a user's password.
@@ -83,12 +93,20 @@ namespace SanteDB.Core.Services.Impl
 			return securityUser;
 		}
 
-		/// <summary>
-		/// Creates a security application.
-		/// </summary>
-		/// <param name="application">The security application.</param>
-		/// <returns>Returns the newly created application.</returns>
-		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateApplication)]
+        /// <summary>
+        /// Change password
+        /// </summary>
+        public void ChangePassword(string userName, string password)
+        {
+            ApplicationContext.Current.GetService<IIdentityProviderService>().ChangePassword(userName, password, AuthenticationContext.Current.Principal);
+        }
+
+        /// <summary>
+        /// Creates a security application.
+        /// </summary>
+        /// <param name="application">The security application.</param>
+        /// <returns>Returns the newly created application.</returns>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateApplication)]
 		public SecurityApplication CreateApplication(SecurityApplication application)
 		{
 			this.m_traceSource.TraceEvent(TraceEventType.Information, 0, "Creating application {0}", application);
@@ -366,12 +384,28 @@ namespace SanteDB.Core.Services.Impl
 			return base.Find(query, offset, count, out totalResults, Guid.Empty);
 		}
 
-		/// <summary>
-		/// Gets a specific application.
-		/// </summary>
-		/// <param name="applicationId">The id of the application to be retrieved.</param>
-		/// <returns>Returns a application.</returns>
-		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
+        /// <summary>
+        /// Get all active policies
+        /// </summary>
+        public IEnumerable<SecurityPolicyInstance> GetActivePolicies(object securable)
+        {
+            return ApplicationContext.Current.GetService<IPolicyInformationService>().GetActivePolicies(securable).Select(o => o.ToPolicyInstance());
+        }
+
+        /// <summary>
+        /// Get all roles from db
+        /// </summary>
+        public string[] GetAllRoles()
+        {
+            return ApplicationContext.Current.GetService<IRoleProviderService>().GetAllRoles();
+        }
+
+        /// <summary>
+        /// Gets a specific application.
+        /// </summary>
+        /// <param name="applicationId">The id of the application to be retrieved.</param>
+        /// <returns>Returns a application.</returns>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public SecurityApplication GetApplication(Guid applicationId)
 		{
 			return base.Get<SecurityApplication>(applicationId, Guid.Empty);
@@ -490,11 +524,19 @@ namespace SanteDB.Core.Services.Impl
 			return base.Get<UserEntity>(id, versionId);
 		}
 
-		/// <summary>
-		/// Locks a specific user.
-		/// </summary>
-		/// <param name="userId">The id of the user to lock.</param>
-		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
+        /// <summary>
+        /// Determine if user is in role
+        /// </summary>
+        public bool IsUserInRole(string user, string role)
+        {
+            return ApplicationContext.Current.GetService<IRoleProviderService>().IsUserInRole(user, role);
+        }
+
+        /// <summary>
+        /// Locks a specific user.
+        /// </summary>
+        /// <param name="userId">The id of the user to lock.</param>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
 		public void LockUser(Guid userId)
 		{
 			this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Locking user {0}", userId);
@@ -590,12 +632,20 @@ namespace SanteDB.Core.Services.Impl
 			return base.Obsolete<UserEntity>(id);
 		}
 
-		/// <summary>
-		/// Updates a security application.
-		/// </summary>
-		/// <param name="application">The security application containing the updated information.</param>
-		/// <returns>Returns the updated application.</returns>
-		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateApplication)]
+        /// <summary>
+        /// Remove user from roles
+        /// </summary>
+        public void RemoveUsersFromRoles(string[] users, string[] roles)
+        {
+            ApplicationContext.Current.GetService<IRoleProviderService>().RemoveUsersFromRoles(users, roles, AuthenticationContext.Current.Principal);
+        }
+
+        /// <summary>
+        /// Updates a security application.
+        /// </summary>
+        /// <param name="application">The security application containing the updated information.</param>
+        /// <returns>Returns the updated application.</returns>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateApplication)]
         public SecurityApplication SaveApplication(SecurityApplication application)
 		{
             if (!String.IsNullOrEmpty(application.ApplicationSecret))

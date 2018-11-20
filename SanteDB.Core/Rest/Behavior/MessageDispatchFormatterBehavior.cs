@@ -27,7 +27,8 @@ namespace SanteDB.Core.Rest.Behavior
         /// </summary>
         public void ApplyOperationBehavior(EndpointOperation operation, OperationDispatcher dispatcher)
         {
-            dispatcher.DispatchFormatter = new RestMessageDispatchFormatter();
+
+            dispatcher.DispatchFormatter = RestMessageDispatchFormatter.CreateFormatter(operation.Description.Contract.Type);
         }
     }
 }

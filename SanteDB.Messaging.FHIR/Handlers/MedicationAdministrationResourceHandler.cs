@@ -17,7 +17,7 @@
  * User: fyfej
  * Date: 2017-9-1
  */
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Core.Model.Acts;
 using System;
 using System.Collections.Generic;
@@ -36,7 +36,7 @@ using SanteDB.Core.Model.Entities;
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Security;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.Backbone;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -95,8 +95,8 @@ namespace SanteDB.Messaging.FHIR.Handlers
             var performer = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Performer) ??
                 model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Authororiginator);
             if (performer != null)
-                retVal.Performer = new List<MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.MedicationPerformer>() {
-                    new MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.MedicationPerformer()
+                retVal.Performer = new List<SanteDB.Messaging.FHIR.Backbone.MedicationPerformer>() {
+                    new SanteDB.Messaging.FHIR.Backbone.MedicationPerformer()
                 {
                     Actor = DataTypeConverter.CreateReference<Practitioner>(performer.LoadProperty<Entity>("PlayerEntity"), RestOperationContext)
                 }
@@ -109,11 +109,11 @@ namespace SanteDB.Messaging.FHIR.Handlers
             else if (model.ReasonConceptKey.HasValue)
                 retVal.ReasonCode = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("ReasonConcept"));
 
-            retVal.Dosage = new MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.MedicationDosage()
+            retVal.Dosage = new SanteDB.Messaging.FHIR.Backbone.MedicationDosage()
             {
                 Site = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("Site")),
                 Route = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("Route")),
-                Dose = new MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes.FhirQuantity()
+                Dose = new SanteDB.Messaging.FHIR.DataTypes.FhirQuantity()
                 {
                     Value = model.DoseQuantity,
                     Units = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("DoseUnit"), "http://hl7.org/fhir/sid/ucum").GetPrimaryCode()?.Code?.Value
