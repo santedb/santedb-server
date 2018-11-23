@@ -554,8 +554,7 @@ namespace SanteDB.Core.Security.Audit
                     ObjectData = new List<ObjectDataExtension>()
                     {
                         new ObjectDataExtension("decision", new byte[] { (byte)(ex as PolicyViolationException).PolicyDecision }),
-                        new ObjectDataExtension("policyId", Encoding.UTF8.GetBytes((ex as PolicyViolationException).PolicyId)),
-                        new ObjectDataExtension("policyName", Encoding.UTF8.GetBytes((ex as PolicyViolationException).Policy?.Name)),
+                        new ObjectDataExtension("policyId", Encoding.UTF8.GetBytes((ex as PolicyViolationException).PolicyId))
                     }
                 });
             else

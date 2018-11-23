@@ -76,7 +76,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                 var authHeader = httpRequest.Headers["Authorization"];
                 if(String.IsNullOrEmpty(authHeader) ||
                     !authHeader.ToLowerInvariant().StartsWith("basic"))
-                    throw new UnauthorizedRequestException("Invalid authentication scheme", "BASIC", this.m_configuration.Security.ClaimsAuth.Realm, this.m_configuration.Security.BasicAuth.Realm);
+                    throw new UnauthorizedRequestException("Invalid authentication scheme", "BASIC", this.m_configuration.Security.BasicAuth.Realm, PermissionPolicyIdentifiers.Login);
                 authHeader = authHeader.Substring(6);
                 var b64Data = Encoding.UTF8.GetString(Convert.FromBase64String(authHeader)).Split(':');
                 if (b64Data.Length != 2)
@@ -84,7 +84,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
 
                 var principal = identityService.Authenticate(b64Data[0], b64Data[1]);
                 if (principal == null)
-                    throw new UnauthorizedRequestException("Invalid client credentials", "Basic", this.m_configuration.Security.BasicAuth.Realm, null);
+                    throw new UnauthorizedRequestException("Invalid client credentials", "Basic", this.m_configuration.Security.BasicAuth.Realm, PermissionPolicyIdentifiers.Login);
 
                 // If the current principal is set-up then add the identity if not then don't
                 if(AuthenticationContext.Current.Principal == AuthenticationContext.AnonymousPrincipal)

@@ -1755,7 +1755,16 @@ INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uui
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('2e027dee-ede4-4731-b7fa-cb67ae0586be'), '1.3.6.1.4.1.33349.3.1.5.9.2.2.2', 'Delete Clinical Data', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('5fb731bf-4e59-4863-80bd-51757d58ea3b'), '1.3.6.1.4.1.33349.3.1.5.9.2.2.3', 'Read Clinical Data', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('5fb731bf-4e59-4863-80bd-51757d58ea9a'), '1.3.6.1.4.1.33349.3.1.5.9.2.2.4', 'Export Clinical Data', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
-INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('dea891aa-224d-4859-81b3-c1eb2750067e'), '1.3.6.1.4.1.33349.3.1.5.9.2.3', 'Override Disclosure', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('baa124aa-224d-4859-81b3-c1eb2750067e'), '1.3.6.1.4.1.33349.3.1.5.9.2.4.1.0', 'Write Materials', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('baa125aa-224d-4859-81b3-c1eb2750067e'), '1.3.6.1.4.1.33349.3.1.5.9.2.4.1.1', 'Delete Materials', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('baa126aa-224d-4859-81b3-c1eb2750067e'), '1.3.6.1.4.1.33349.3.1.5.9.2.4.0.1.2', 'Read Materials', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('baa127aa-224d-4859-81b3-c1eb2750067e'), '1.3.6.1.4.1.33349.3.1.5.9.2.4.0.1.3', 'Query Materials', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('baa224aa-224d-4859-81b3-c1eb2750067e'), '1.3.6.1.4.1.33349.3.1.5.9.2.4.2.0', 'Write Places & Orgs', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('baa225aa-224d-4859-81b3-c1eb2750067e'), '1.3.6.1.4.1.33349.3.1.5.9.2.4.2.1', 'Delete Places & Orgs', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('baa226aa-224d-4859-81b3-c1eb2750067e'), '1.3.6.1.4.1.33349.3.1.5.9.2.4.0.2.2', 'Read Places & Orgs', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('baa227aa-224d-4859-81b3-c1eb2750067e'), '1.3.6.1.4.1.33349.3.1.5.9.2.4.0.2.3', 'Query Places & Orgs', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('dea891aa-224d-4859-81b3-c1eb2750067e'), '1.3.6.1.4.1.33349.3.1.5.9.2.999', 'Override Disclosure', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('eea891aa-224d-4859-81b3-c1eb2750067e'), '1.3.6.1.4.1.33349.3.1.5.9.2.4', 'Unrestricted Metadata', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('fea891aa-224d-4859-81b3-c1eb2750067e'), '1.3.6.1.4.1.33349.3.1.5.9.2.4.0', 'Read Metadata', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 
@@ -1790,6 +1799,7 @@ INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VA
 INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('d15b96ab-646c-4c00-9a58-ea09eee67d7c'), char_to_uuid('43167DCB-6F77-4F37-8222-133E675B4434'), 2); -- GRANT Login
 INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('f6840336-4e20-4bc0-b965-baa6d7c80be3'), char_to_uuid('43167DCB-6F77-4F37-8222-133E675B4434'), 2); -- GRANT Unrestricted Clinical Data
 INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('dea891aa-224d-4859-81b3-c1eb2750067e'), char_to_uuid('43167DCB-6F77-4F37-8222-133E675B4434'), 0); -- DENY Override disclosure
+INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('fea891aa-224d-4859-81b3-c1eb2750067e'), char_to_uuid('43167DCB-6F77-4F37-8222-133E675B4434'), 2); -- GRANT Read Metadata Administrator
 INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('fea891aa-224d-4859-81b3-c1eb2750067e'), char_to_uuid('43167DCB-6F77-4F37-8222-133E675B4434'), 2); -- GRANT Read Metadata Administrator
 
 -- CREATE ROLE SYSTEM WHICH IS DENIED LOGIN

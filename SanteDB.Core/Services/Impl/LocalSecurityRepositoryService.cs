@@ -54,6 +54,7 @@ namespace SanteDB.Core.Services.Impl
         IRepositoryService<ApplicationEntity>,
         IRepositoryService<DeviceEntity>,
         IRepositoryService<SecurityPolicy>,
+        IRepositoryService<SecurityProvenance>,
         ISecurityInformationService
     {
 		private TraceSource m_traceSource = new TraceSource(SanteDBConstants.ServiceTraceSourceName);
@@ -888,6 +889,16 @@ namespace SanteDB.Core.Services.Impl
             return base.Find(query, offset, count, out totalResults, Guid.Empty);
         }
 
+        IEnumerable<SecurityProvenance> IRepositoryService<SecurityProvenance>.Find(Expression<Func<SecurityProvenance, bool>> query)
+        {
+            throw new NotSupportedException();
+        }
+
+        IEnumerable<SecurityProvenance> IRepositoryService<SecurityProvenance>.Find(Expression<Func<SecurityProvenance, bool>> query, int offset, int? count, out int totalResults)
+        {
+            throw new NotSupportedException();
+        }
+
         /// <summary>
         /// Get user entity
         /// </summary>
@@ -1017,6 +1028,16 @@ namespace SanteDB.Core.Services.Impl
             return base.Get<SecurityPolicy>(key, Guid.Empty);
         }
 
+        SecurityProvenance IRepositoryService<SecurityProvenance>.Get(Guid key)
+        {
+            return this.GetProvenance(key);
+        }
+
+        SecurityProvenance IRepositoryService<SecurityProvenance>.Get(Guid key, Guid versionKey)
+        {
+            return this.GetProvenance(key);
+        }
+
         /// <summary>
         /// Insert user entity
         /// </summary>
@@ -1087,6 +1108,11 @@ namespace SanteDB.Core.Services.Impl
             return base.Insert(data);
         }
 
+        SecurityProvenance IRepositoryService<SecurityProvenance>.Insert(SecurityProvenance data)
+        {
+            throw new NotSupportedException();
+        }
+
         /// <summary>
         /// Obsolete
         /// </summary>
@@ -1149,6 +1175,11 @@ namespace SanteDB.Core.Services.Impl
         SecurityPolicy IRepositoryService<SecurityPolicy>.Obsolete(Guid key)
         {
             return base.Obsolete<SecurityPolicy>(key);
+        }
+
+        SecurityProvenance IRepositoryService<SecurityProvenance>.Obsolete(Guid key)
+        {
+            throw new NotSupportedException();
         }
 
         /// <summary>
@@ -1217,6 +1248,11 @@ namespace SanteDB.Core.Services.Impl
         SecurityPolicy IRepositoryService<SecurityPolicy>.Save(SecurityPolicy data)
         {
             return base.Save(data);
+        }
+
+        SecurityProvenance IRepositoryService<SecurityProvenance>.Save(SecurityProvenance data)
+        {
+            throw new NotSupportedException();
         }
     }
 }

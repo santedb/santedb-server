@@ -373,5 +373,14 @@ namespace SanteDB.Messaging.AMI.Wcf
         {
             return base.UnLock(resourceType, key);
         }
+
+        /// <summary>
+        /// Demand permission
+        /// </summary>
+        /// <param name="policyId"></param>
+        protected override void Demand(string policyId)
+        {
+            new PolicyPermission(PermissionState.Unrestricted, policyId).Demand();
+        }
     }
 }

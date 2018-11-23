@@ -35,7 +35,7 @@ namespace SanteDB.Messaging.RISI.Rest
 	/// Provides operations for running and managing reports.
 	/// </summary>
 	[ServiceBehavior(Name = "RISI")]
-	public partial class RisiBehavior : IRisiContract
+	public partial class RisiBehavior : IRisiServiceContract
 	{
 		/// <summary>
 		/// The internal reference to the <see cref="IReportExecutor"/> instance.

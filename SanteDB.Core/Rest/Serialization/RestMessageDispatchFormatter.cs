@@ -185,7 +185,7 @@ namespace SanteDB.Core.Rest.Serialization
                                     if (!s_serializers.ContainsKey(eType))
                                         s_serializers.Add(eType, serializer);
                             }
-                            parameters[pNumber] = serializer.Deserialize(request.Body);
+                            parameters[pNumber] = serializer.Deserialize(bodyReader);
                         }
 
                     }

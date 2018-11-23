@@ -1,7 +1,10 @@
-﻿using MARC.HI.EHRS.SVC.Core.Exceptions;
+﻿using MARC.HI.EHRS.SVC.Core;
+using MARC.HI.EHRS.SVC.Core.Exceptions;
+using MARC.HI.EHRS.SVC.Core.Services;
 using RestSrvr;
 using RestSrvr.Exceptions;
 using RestSrvr.Message;
+using SanteDB.Core.Configuration;
 using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Rest.Serialization;
 using System;
@@ -24,6 +27,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
     {
 
         private TraceSource m_tracer = new TraceSource("SanteDB.Messaging.FHIR");
+        private SanteDBConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.core") as SanteDBConfiguration;
 
         /// <summary>
         /// Apply the service behavior
@@ -56,12 +60,12 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
             else if (error is SecurityTokenException)
             {
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
-                RestOperationContext.Current.OutgoingResponse.Headers.Add("WWW-Authenticate", "Bearer");
+                RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", $"Bearer realm=\"{this.m_configuration.Security.ClaimsAuth.Realm}\"");
             }
             else if (error is UnauthorizedRequestException)
             {
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
-                RestOperationContext.Current.OutgoingResponse.Headers.Add("WWW-Authenticate", (error as UnauthorizedRequestException).AuthenticateChallenge);
+                RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", (error as UnauthorizedRequestException).AuthenticateChallenge);
             }
             else if (error is FaultException)
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)(error as FaultException).StatusCode;

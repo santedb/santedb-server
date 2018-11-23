@@ -71,6 +71,8 @@ namespace SanteDB.Core.Rest.Security
             );
 
             IPrincipal principal = ApplicationContext.Current.GetService<ISessionIdentityProviderService>().Authenticate(session);
+            if (principal == null)
+                throw new SecurityTokenException("Invalid bearer token") ;
 
             Core.Security.AuthenticationContext.Current = new Core.Security.AuthenticationContext(principal);
 
@@ -124,9 +126,12 @@ namespace SanteDB.Core.Rest.Security
                 if (authorization == null)
                 {
                     if (httpMessage.HttpMethod == "OPTIONS" || httpMessage.HttpMethod == "PING")
+                    {
                         Core.Security.AuthenticationContext.Current = new Core.Security.AuthenticationContext(Core.Security.AuthenticationContext.AnonymousPrincipal);
+                        return;
+                    }
                     else
-                        throw new UnauthorizedRequestException("Missing Authorization header", "Bearer", this.m_configuration.Security.ClaimsAuth.Realm, this.m_configuration.Security.ClaimsAuth.Audiences.FirstOrDefault());
+                        throw new UnauthorizedRequestException("Missing Authorization header", "Bearer", this.m_configuration.Security.ClaimsAuth.Realm, PermissionPolicyIdentifiers.Login);
                 }
 
                 // Authorization method

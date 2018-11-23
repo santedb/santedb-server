@@ -62,6 +62,13 @@ namespace SanteDB.Core.Security
                 PolicyDecisionOutcomeType rule = PolicyDecisionOutcomeType.Deny;
                 if(rules.Any())
                     rule = rules.Min();
+
+                // Rule for elevate can only be made when the policy allows for it & the principal is allowed
+                if (rule == PolicyDecisionOutcomeType.Elevate &&
+                    (!pol.Policy.CanOverride ||
+                    principalPolicies.Any(o => o.Policy.Oid == PermissionPolicyIdentifiers.ElevateClinicalData && o.Rule == PolicyDecisionOutcomeType.Grant)))
+                    rule = PolicyDecisionOutcomeType.Deny;
+
                 retVal.Details.Add(new PolicyDecisionDetail(pol.Policy.Oid, rule));
             }
 
