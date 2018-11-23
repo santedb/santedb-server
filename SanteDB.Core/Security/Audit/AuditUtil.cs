@@ -526,11 +526,11 @@ namespace SanteDB.Core.Security.Audit
         /// <summary>
         /// Audit the use of a restricted function
         /// </summary>
-        public static void AuditRestrictedFunction(Exception ex, Uri url)
+        public static void AuditRestrictedFunction(Exception ex, Uri url, params string[] mitigations)
         {
             traceSource.TraceVerbose("Create RestrictedFunction audit");
 
-            AuditData audit = new AuditData(DateTime.Now, ActionType.Execute, OutcomeIndicator.EpicFail, EventIdentifierType.SecurityAlert, CreateAuditActionCode(EventTypeCodes.UseOfARestrictedFunction));
+            AuditData audit = new AuditData(DateTime.Now, ActionType.Execute, mitigations.Length > 0 ? OutcomeIndicator.MinorFail : OutcomeIndicator.EpicFail, EventIdentifierType.SecurityAlert, CreateAuditActionCode(EventTypeCodes.SecurityAlert));
             AddUserActor(audit);
             AddDeviceActor(audit);
             AddSenderDeviceActor(audit);
@@ -551,7 +551,7 @@ namespace SanteDB.Core.Security.Audit
                     ObjectId = $"http://santedb.org/policy/{(ex as PolicyViolationException).PolicyId}",
                     Role = AuditableObjectRole.SecurityResource,
                     Type = AuditableObjectType.SystemObject,
-                    ObjectData = new List<ObjectDataExtension>()
+                    ObjectData = new List<ObjectDataExtension>(mitigations.Select(o=>new ObjectDataExtension("mitigation", Encoding.UTF8.GetBytes(o))))
                     {
                         new ObjectDataExtension("decision", new byte[] { (byte)(ex as PolicyViolationException).PolicyDecision }),
                         new ObjectDataExtension("policyId", Encoding.UTF8.GetBytes((ex as PolicyViolationException).PolicyId))
@@ -565,11 +565,12 @@ namespace SanteDB.Core.Security.Audit
                     ObjectId = $"http://santedb.org/error/{ex.GetType().Name}",
                     Role= AuditableObjectRole.SecurityResource,
                     Type = AuditableObjectType.SystemObject,
-                    ObjectData = new List<ObjectDataExtension>()
+                    ObjectData = new List<ObjectDataExtension>(mitigations.Select(o => new ObjectDataExtension("mitigation", Encoding.UTF8.GetBytes(o))))
                     {
                         new ObjectDataExtension("exception", Encoding.UTF8.GetBytes(ex.ToString()))
                     }
                 });
+            
             SendAudit(audit);
         }
     }
