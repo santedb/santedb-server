@@ -18,9 +18,9 @@
  * Date: 2017-9-1
  */
 using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
@@ -30,7 +30,7 @@ using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel.Web;
+using RestSrvr;
 using DatePrecision = SanteDB.Core.Model.DataTypes.DatePrecision;
 
 namespace SanteDB.Messaging.FHIR.Handlers
@@ -58,7 +58,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// </summary>
 		/// <param name="model">The model.</param>
 		/// <returns>Returns the mapped FHIR resource.</returns>
-		protected override Patient MapToFhir(Core.Model.Roles.Patient model, WebOperationContext webOperationContext)
+		protected override Patient MapToFhir(Core.Model.Roles.Patient model, RestOperationContext RestOperationContext)
 		{
 			var retVal = DataTypeConverter.CreateResource<Patient>(model);
 			retVal.Active = model.StatusConceptKey == StatusKeys.Active;
@@ -86,7 +86,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 					relative.Identifier = rel.TargetEntity.LoadCollection<EntityIdentifier>(nameof(Entity.Identifiers)).Select(o => DataTypeConverter.ToFhirIdentifier(o)).ToList();
 					relative.Name = DataTypeConverter.ToFhirHumanName(rel.TargetEntity.LoadCollection<EntityName>(nameof(Entity.Names)).FirstOrDefault());
 					if (rel.TargetEntity is Core.Model.Roles.Patient)
-						relative.Patient = DataTypeConverter.CreateReference<Patient>(rel.TargetEntity, webOperationContext);
+						relative.Patient = DataTypeConverter.CreateReference<Patient>(rel.TargetEntity, RestOperationContext);
 					relative.Telecom = rel.TargetEntity.LoadCollection<EntityTelecomAddress>(nameof(Entity.Telecoms)).Select(o => DataTypeConverter.ToFhirTelecom(o)).ToList();
 					retVal.Contained.Add(new ContainedResource()
 					{
@@ -94,7 +94,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 					});
 				}
 				else if (rel.RelationshipTypeKey == EntityRelationshipTypeKeys.HealthcareProvider)
-					retVal.Provider = DataTypeConverter.CreateReference<Practitioner>(rel.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity)), webOperationContext);
+					retVal.Provider = DataTypeConverter.CreateReference<Practitioner>(rel.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity)), RestOperationContext);
 			}
 
 			var photo = model.LoadCollection<EntityExtension>("Extensions").FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.JpegPhotoExtension);
@@ -116,7 +116,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// </summary>
 		/// <param name="resource">The resource.</param>
 		/// <returns>Returns the mapped model.</returns>
-		protected override Core.Model.Roles.Patient MapToModel(Patient resource, WebOperationContext webOperationContext)
+		protected override Core.Model.Roles.Patient MapToModel(Patient resource, RestOperationContext RestOperationContext)
 		{
 			var patient = new Core.Model.Roles.Patient
 			{

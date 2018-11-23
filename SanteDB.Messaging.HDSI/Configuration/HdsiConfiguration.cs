@@ -17,7 +17,7 @@
  * User: fyfej
  * Date: 2017-9-1
  */
-using SanteDB.Messaging.Common;
+using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
 
@@ -32,20 +32,17 @@ namespace SanteDB.Messaging.HDSI.Configuration
         /// <summary>
         /// Creates a new HDSI configuration
         /// </summary>
-        public HdsiConfiguration(string wcfServiceName, List<Type> resourceHandler)
+        public HdsiConfiguration(List<Type> resourceHandler)
         {
-            this.WcfServiceName = wcfServiceName;
             this.ResourceHandlers = resourceHandler;
         }
 
-        /// <summary>
-        /// Gets the wcf service name
-        /// </summary>
-        public string WcfServiceName { get; private set; }
-
+      
         /// <summary>
         /// Gets or sets the resource tool that can be used for the configuration
         /// </summary>
         public List<Type> ResourceHandlers { get; private set; }
+
+
     }
 }

@@ -59,6 +59,14 @@ namespace SanteDB.Core.Configuration
     ///         <!-- If using symmetric key -->
     ///         <symmetric secret=""/>
     ///     </signing>
+    ///     <rest>
+    ///         <service name="SERVICE_NAME">
+    ///             <behaviors>
+    ///                 <add type=""/>
+    ///             </behaviors>
+    ///             <endpoint address="" contract=""/>
+    ///         </service>
+    ///     </rest>
     /// </SanteDB.core>
     /// ]]>
     /// </remarks>
@@ -160,6 +168,34 @@ namespace SanteDB.Core.Configuration
                 }
             }
 
+
+            // Rest configuration
+            var rest = section.SelectSingleNode("./rest");
+            if(rest != null)
+            {
+                foreach(var svc in rest.SelectNodes("./service").OfType<XmlElement>())
+                {
+                    var svcConfig = new RestServiceConfiguration(svc.Attributes["name"]?.Value);
+                    svcConfig.Behaviors.AddRange(svc.SelectNodes("./behaviors/add/@type").OfType<XmlAttribute>().Select(o =>
+                    {
+                        var bType = Type.GetType(o.Value);
+                        if (bType == null)
+                            throw new ConfigurationErrorsException($"Can't find behavior type {o.Value}", o);
+                        return bType;
+                    }).ToList());
+
+                    svcConfig.Endpoints.AddRange(svc.SelectNodes("./endpoint").OfType<XmlElement>().Select(e =>
+                    {
+                        var cType = Type.GetType(e.Attributes["contract"]?.Value);
+                        if(cType == null || !cType.IsInterface)
+                            throw new ConfigurationErrorsException($"Can't find contract type {e.Attributes["contract"]?.Value}", e);
+                        return new RestEndpointConfiguration(new Uri(e.Attributes["address"]?.Value), cType);
+                    }).ToList());
+
+                    // Add to master config
+                    retVal.RestConfiguration.Services.Add(svcConfig);
+                }
+            }
             return retVal;
         }
     }

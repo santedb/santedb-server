@@ -17,14 +17,14 @@
  * User: fyfej
  * Date: 2017-9-1
  */
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Core.Model.Acts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.ServiceModel.Web;
+using RestSrvr;
 using System.Linq.Expressions;
 using MARC.Everest.Connectors;
 using SanteDB.Core.Model.Constants;
@@ -36,7 +36,7 @@ using SanteDB.Core.Model.Entities;
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Security;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.Backbone;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -48,7 +48,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Maps the object to model to fhir
         /// </summary>
-        protected override MedicationAdministration MapToFhir(SubstanceAdministration model, WebOperationContext webOperationContext)
+        protected override MedicationAdministration MapToFhir(SubstanceAdministration model, RestOperationContext RestOperationContext)
         {
             var retVal = DataTypeConverter.CreateResource<MedicationAdministration>(model);
 
@@ -68,16 +68,16 @@ namespace SanteDB.Messaging.FHIR.Handlers
             var consumableRelationship = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Consumable);
             var productRelationship = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Product);
             if (consumableRelationship != null)
-                retVal.Medication = DataTypeConverter.CreateReference<Medication>(consumableRelationship.LoadProperty<ManufacturedMaterial>("PlayerEntity"), webOperationContext);
+                retVal.Medication = DataTypeConverter.CreateReference<Medication>(consumableRelationship.LoadProperty<ManufacturedMaterial>("PlayerEntity"), RestOperationContext);
             else if (productRelationship != null)
             {
-                retVal.Medication = DataTypeConverter.CreateReference<Substance>(productRelationship.LoadProperty<Material>("PlayerEntity"), webOperationContext);
+                retVal.Medication = DataTypeConverter.CreateReference<Substance>(productRelationship.LoadProperty<Material>("PlayerEntity"), RestOperationContext);
                 //retVal.Medication = DataTypeConverter.ToFhirCodeableConcept(productRelationship.LoadProperty<Material>("PlayerEntity").LoadProperty<Concept>("TypeConcept"));
             }
 
             var rct = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget);
             if (rct != null)
-                retVal.Subject = DataTypeConverter.CreateReference<Patient>(rct.LoadProperty<Entity>("PlayerEntity"), webOperationContext);
+                retVal.Subject = DataTypeConverter.CreateReference<Patient>(rct.LoadProperty<Entity>("PlayerEntity"), RestOperationContext);
 
             // Encounter
             var erService = ApplicationContext.Current.GetService<IDataPersistenceService<EntityRelationship>>();
@@ -95,10 +95,10 @@ namespace SanteDB.Messaging.FHIR.Handlers
             var performer = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Performer) ??
                 model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Authororiginator);
             if (performer != null)
-                retVal.Performer = new List<MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.MedicationPerformer>() {
-                    new MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.MedicationPerformer()
+                retVal.Performer = new List<SanteDB.Messaging.FHIR.Backbone.MedicationPerformer>() {
+                    new SanteDB.Messaging.FHIR.Backbone.MedicationPerformer()
                 {
-                    Actor = DataTypeConverter.CreateReference<Practitioner>(performer.LoadProperty<Entity>("PlayerEntity"), webOperationContext)
+                    Actor = DataTypeConverter.CreateReference<Practitioner>(performer.LoadProperty<Entity>("PlayerEntity"), RestOperationContext)
                 }
                 };
 
@@ -109,11 +109,11 @@ namespace SanteDB.Messaging.FHIR.Handlers
             else if (model.ReasonConceptKey.HasValue)
                 retVal.ReasonCode = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("ReasonConcept"));
 
-            retVal.Dosage = new MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.MedicationDosage()
+            retVal.Dosage = new SanteDB.Messaging.FHIR.Backbone.MedicationDosage()
             {
                 Site = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("Site")),
                 Route = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("Route")),
-                Dose = new MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes.FhirQuantity()
+                Dose = new SanteDB.Messaging.FHIR.DataTypes.FhirQuantity()
                 {
                     Value = model.DoseQuantity,
                     Units = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("DoseUnit"), "http://hl7.org/fhir/sid/ucum").GetPrimaryCode()?.Code?.Value
@@ -123,7 +123,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
             return retVal;
         }
 
-        protected override SubstanceAdministration MapToModel(MedicationAdministration resource, WebOperationContext webOperationContext)
+        protected override SubstanceAdministration MapToModel(MedicationAdministration resource, RestOperationContext RestOperationContext)
         {
             throw new NotImplementedException();
         }

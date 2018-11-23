@@ -7,9 +7,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.ServiceModel.Web;
+using RestSrvr;
 using System.Text;
 using System.Threading.Tasks;
+using SanteDB.Core.Rest;
 
 namespace SanteDB.Tools.DataSandbox
 {
@@ -24,7 +25,7 @@ namespace SanteDB.Tools.DataSandbox
         private TraceSource m_traceSource = new TraceSource("SanteDB.Tools.DataSandbox");
 
         // web host
-        private WebServiceHost m_webHost;
+        private RestService m_webHost;
 
         /// <summary>
         /// Returns true if the service is running
@@ -60,8 +61,8 @@ namespace SanteDB.Tools.DataSandbox
 
                 this.m_traceSource.TraceInformation("Starting Query Builder Service...");
                 
-                this.m_webHost = new WebServiceHost(typeof(DataSandboxTool));
-                this.m_webHost.Open();
+                this.m_webHost = RestServiceTool.CreateService(typeof(DataSandboxTool));
+                this.m_webHost.Start();
                 this.Started?.Invoke(this, EventArgs.Empty);
             };
 
@@ -78,7 +79,7 @@ namespace SanteDB.Tools.DataSandbox
             if (this.IsRunning)
             {
                 this.m_traceSource.TraceInformation("Stopping Query Builder Tool...");
-                this.m_webHost.Close();
+                this.m_webHost.Stop();
                 this.m_webHost = null;
             }
             this.Stopped?.Invoke(this, EventArgs.Empty);

@@ -30,6 +30,17 @@ namespace SanteDB.Core.Configuration
     /// </summary>
     public class SanteDBConfiguration
     {
+        /// <summary>
+        /// Create new santedb configuration object
+        /// </summary>
+        public SanteDBConfiguration()
+        {
+            this.RestConfiguration = new RestConfiguration();
+        }
+        /// <summary>
+        /// Gets the rest configuration
+        /// </summary>
+        public RestConfiguration RestConfiguration { get; private set; }
 
         /// <summary>
         /// Security configuration

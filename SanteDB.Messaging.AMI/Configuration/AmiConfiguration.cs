@@ -18,7 +18,7 @@
  * Date: 2017-9-1
  */
 using SanteDB.Core.Interop;
-using SanteDB.Messaging.Common;
+using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
 
@@ -43,12 +43,12 @@ namespace SanteDB.Messaging.AMI.Configuration
         /// <summary>
         /// Resources on the AMI that are forbidden
         /// </summary>
-        public List<Type> ResourceHandlers { get; private set; } 
+        public List<Type> ResourceHandlers { get; private set; }
 
-		/// <summary>
-		/// Certification authority configuration
-		/// </summary>
-		public CertificationAuthorityConfiguration CaConfiguration { get; private set; }
+        /// <summary>
+        /// Certification authority configuration
+        /// </summary>
+        public CertificationAuthorityConfiguration CaConfiguration { get; private set; }
 
 		/// <summary>
 		/// Extra endpoints

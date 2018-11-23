@@ -20,10 +20,7 @@
 using MARC.HI.EHRS.SVC.Core.Services;
 using MARC.HI.EHRS.SVC.Core.Wcf;
 using SanteDB.Core.Interop;
-using SanteDB.Core.Wcf;
-using SanteDB.Core.Wcf.Behavior;
-using SanteDB.Core.Wcf.Security;
-using SanteDB.Messaging.GS1.Wcf;
+using SanteDB.Messaging.GS1.Rest;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -31,7 +28,10 @@ using System.Linq;
 using System.Reflection;
 using System.ServiceModel;
 using System.ServiceModel.Description;
-using System.ServiceModel.Web;
+using RestSrvr;
+using SanteDB.Core.Rest;
+using SanteDB.Core.Rest.Security;
+using SanteDB.Core.Rest.Behavior;
 
 namespace SanteDB.Messaging.GS1
 {
@@ -45,7 +45,7 @@ namespace SanteDB.Messaging.GS1
 		private readonly TraceSource traceSource = new TraceSource("SanteDB.Messaging.GS1");
 
 		// web host
-		private WebServiceHost webHost;
+		private RestService webHost;
 
 		/// <summary>
 		/// Fired when the object is starting up
@@ -70,7 +70,7 @@ namespace SanteDB.Messaging.GS1
 		/// <summary>
 		/// True if running
 		/// </summary>
-		public bool IsRunning => this.webHost?.State == CommunicationState.Opened;
+		public bool IsRunning => this.webHost?.IsRunning == true;
 
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace SanteDB.Messaging.GS1
         {
             get
             {
-                return this.webHost.Description.Endpoints.OfType<ServiceEndpoint>().Select(o => o.Address.Uri.ToString()).ToArray();
+                return this.webHost.Endpoints.OfType<ServiceEndpoint>().Select(o => o.Description.ListenUri.ToString()).ToArray();
             }
         }
 
@@ -103,11 +103,10 @@ namespace SanteDB.Messaging.GS1
             get
             {
                 var caps = ServiceEndpointCapabilities.None;
-                if (this.webHost.Description.Behaviors.OfType<ServiceCredentials>().Any(o => o.UserNameAuthentication?.CustomUserNamePasswordValidator != null))
+                if (this.webHost.ServiceBehaviors.OfType<BasicAuthorizationAccessBehavior>().Any())
                     caps |= ServiceEndpointCapabilities.BasicAuth;
-                if (this.webHost.Description.Behaviors.OfType<ServiceAuthorizationBehavior>().Any(o => o.ServiceAuthorizationManager is TokenServiceAuthorizationManager))
+                if (this.webHost.ServiceBehaviors.OfType<TokenAuthorizationAccessBehavior>().Any())
                     caps |= ServiceEndpointCapabilities.BearerAuth;
-
                 return caps;
             }
         }
@@ -125,15 +124,15 @@ namespace SanteDB.Messaging.GS1
 			{
 				this.Starting?.Invoke(this, EventArgs.Empty);
 
-				this.webHost = new WebServiceHost(typeof(StockServiceBehavior));
-				foreach (ServiceEndpoint endpoint in this.webHost.Description.Endpoints)
+				this.webHost = RestServiceTool.CreateService(typeof(StockServiceBehavior));
+                this.webHost.AddServiceBehavior(new ErrorServiceBehavior());
+				foreach (ServiceEndpoint endpoint in this.webHost.Endpoints)
 				{
-					this.traceSource.TraceInformation("Starting GS1 on {0}...", endpoint.Address);
-                    endpoint.EndpointBehaviors.Add(new WcfErrorEndpointBehavior());
-                    endpoint.EndpointBehaviors.Add(new WcfLoggingEndpointBehavior());
+					this.traceSource.TraceInformation("Starting GS1 on {0}...", endpoint.Description.ListenUri);
+                    endpoint.AddEndpointBehavior(new MessageLoggingEndpointBehavior());
                 }
 				// Start the webhost
-				this.webHost.Open();
+				this.webHost.Start();
 
 				this.Started?.Invoke(this, EventArgs.Empty);
 				return true;
@@ -154,7 +153,7 @@ namespace SanteDB.Messaging.GS1
 
 			if (this.webHost != null)
 			{
-				this.webHost.Close();
+				this.webHost.Stop();
 				this.webHost = null;
 			}
 

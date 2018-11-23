@@ -35,6 +35,8 @@ using System.Security.Principal;
 using System.Text;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Interfaces;
+using System.Security.Permissions;
+using MARC.HI.EHRS.SVC.Core.Services.Policy;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -51,7 +53,9 @@ namespace SanteDB.Core.Services.Impl
         IRepositoryService<SecurityUser>,
         IRepositoryService<ApplicationEntity>,
         IRepositoryService<DeviceEntity>,
-        IRepositoryService<SecurityPolicy>
+        IRepositoryService<SecurityPolicy>,
+        IRepositoryService<SecurityProvenance>,
+        ISecurityInformationService
     {
 		private TraceSource m_traceSource = new TraceSource(SanteDBConstants.ServiceTraceSourceName);
 
@@ -61,6 +65,14 @@ namespace SanteDB.Core.Services.Impl
         public event EventHandler<SecurityAuditDataEventArgs> SecurityAttributesChanged;
         public event EventHandler<SecurityAuditDataEventArgs> SecurityResourceCreated;
         public event EventHandler<SecurityAuditDataEventArgs> SecurityResourceDeleted;
+
+        /// <summary>
+        /// Add users to roles
+        /// </summary>
+        public void AddUsersToRoles(string[] users, string[] roles)
+        {
+            ApplicationContext.Current.GetService<IRoleProviderService>().AddUsersToRoles(users, roles, AuthenticationContext.Current.Principal);
+        }
 
         /// <summary>
         /// Changes a user's password.
@@ -82,12 +94,20 @@ namespace SanteDB.Core.Services.Impl
 			return securityUser;
 		}
 
-		/// <summary>
-		/// Creates a security application.
-		/// </summary>
-		/// <param name="application">The security application.</param>
-		/// <returns>Returns the newly created application.</returns>
-		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateApplication)]
+        /// <summary>
+        /// Change password
+        /// </summary>
+        public void ChangePassword(string userName, string password)
+        {
+            ApplicationContext.Current.GetService<IIdentityProviderService>().ChangePassword(userName, password, AuthenticationContext.Current.Principal);
+        }
+
+        /// <summary>
+        /// Creates a security application.
+        /// </summary>
+        /// <param name="application">The security application.</param>
+        /// <returns>Returns the newly created application.</returns>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateApplication)]
 		public SecurityApplication CreateApplication(SecurityApplication application)
 		{
 			this.m_traceSource.TraceEvent(TraceEventType.Information, 0, "Creating application {0}", application);
@@ -208,6 +228,11 @@ namespace SanteDB.Core.Services.Impl
 		/// </summary>
 		public UserEntity CreateUserEntity(UserEntity userEntity)
 		{
+            // Additional security: User should be admin be editing themselves
+            var securityUser = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>().GetUser(AuthenticationContext.Current.Principal.Identity);
+            if (securityUser.Key != userEntity?.SecurityUserKey)
+                new PolicyPermission(PermissionState.Unrestricted, PermissionPolicyIdentifiers.UnrestrictedMetadata).Demand();
+
             return base.Insert(userEntity);
 		}
 
@@ -360,12 +385,28 @@ namespace SanteDB.Core.Services.Impl
 			return base.Find(query, offset, count, out totalResults, Guid.Empty);
 		}
 
-		/// <summary>
-		/// Gets a specific application.
-		/// </summary>
-		/// <param name="applicationId">The id of the application to be retrieved.</param>
-		/// <returns>Returns a application.</returns>
-		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
+        /// <summary>
+        /// Get all active policies
+        /// </summary>
+        public IEnumerable<SecurityPolicyInstance> GetActivePolicies(object securable)
+        {
+            return ApplicationContext.Current.GetService<IPolicyInformationService>().GetActivePolicies(securable).Select(o => o.ToPolicyInstance());
+        }
+
+        /// <summary>
+        /// Get all roles from db
+        /// </summary>
+        public string[] GetAllRoles()
+        {
+            return ApplicationContext.Current.GetService<IRoleProviderService>().GetAllRoles();
+        }
+
+        /// <summary>
+        /// Gets a specific application.
+        /// </summary>
+        /// <param name="applicationId">The id of the application to be retrieved.</param>
+        /// <returns>Returns a application.</returns>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public SecurityApplication GetApplication(Guid applicationId)
 		{
 			return base.Get<SecurityApplication>(applicationId, Guid.Empty);
@@ -408,7 +449,7 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public SecurityProvenance GetProvenance(Guid provenanceId)
         {
-            return ApplicationContext.Current.GetSerivce<IDataPersistenceService<SecurityProvenance>>().Get(new Identifier<Guid>(provenanceId), AuthenticationContext.Current.Principal, true);
+            return ApplicationContext.Current.GetService<IDataPersistenceService<SecurityProvenance>>().Get(new Identifier<Guid>(provenanceId), AuthenticationContext.Current.Principal, true);
         }
 
         /// <summary>
@@ -484,11 +525,19 @@ namespace SanteDB.Core.Services.Impl
 			return base.Get<UserEntity>(id, versionId);
 		}
 
-		/// <summary>
-		/// Locks a specific user.
-		/// </summary>
-		/// <param name="userId">The id of the user to lock.</param>
-		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
+        /// <summary>
+        /// Determine if user is in role
+        /// </summary>
+        public bool IsUserInRole(string user, string role)
+        {
+            return ApplicationContext.Current.GetService<IRoleProviderService>().IsUserInRole(user, role);
+        }
+
+        /// <summary>
+        /// Locks a specific user.
+        /// </summary>
+        /// <param name="userId">The id of the user to lock.</param>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
 		public void LockUser(Guid userId)
 		{
 			this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Locking user {0}", userId);
@@ -584,18 +633,26 @@ namespace SanteDB.Core.Services.Impl
 			return base.Obsolete<UserEntity>(id);
 		}
 
-		/// <summary>
-		/// Updates a security application.
-		/// </summary>
-		/// <param name="application">The security application containing the updated information.</param>
-		/// <returns>Returns the updated application.</returns>
-		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateApplication)]
+        /// <summary>
+        /// Remove user from roles
+        /// </summary>
+        public void RemoveUsersFromRoles(string[] users, string[] roles)
+        {
+            ApplicationContext.Current.GetService<IRoleProviderService>().RemoveUsersFromRoles(users, roles, AuthenticationContext.Current.Principal);
+        }
+
+        /// <summary>
+        /// Updates a security application.
+        /// </summary>
+        /// <param name="application">The security application containing the updated information.</param>
+        /// <returns>Returns the updated application.</returns>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateApplication)]
         public SecurityApplication SaveApplication(SecurityApplication application)
 		{
             if (!String.IsNullOrEmpty(application.ApplicationSecret))
             {
                 this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Will update secret for application {0}", application.Name);
-                application.ApplicationSecret = ApplicationContext.Current.GetSerivce<IPasswordHashingService>().EncodePassword(application.ApplicationSecret);
+                application.ApplicationSecret = ApplicationContext.Current.GetService<IPasswordHashingService>().EncodePassword(application.ApplicationSecret);
             }
 
             this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(application));
@@ -613,7 +670,7 @@ namespace SanteDB.Core.Services.Impl
             if (!String.IsNullOrEmpty(device.DeviceSecret))
             {
                 this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Will update secret for device {0}", device.Name);
-                device.DeviceSecret = ApplicationContext.Current.GetSerivce<IPasswordHashingService>().EncodePassword(device.DeviceSecret);
+                device.DeviceSecret = ApplicationContext.Current.GetService<IPasswordHashingService>().EncodePassword(device.DeviceSecret);
             }
 
             var retVal = base.Save(device);
@@ -832,6 +889,16 @@ namespace SanteDB.Core.Services.Impl
             return base.Find(query, offset, count, out totalResults, Guid.Empty);
         }
 
+        IEnumerable<SecurityProvenance> IRepositoryService<SecurityProvenance>.Find(Expression<Func<SecurityProvenance, bool>> query)
+        {
+            throw new NotSupportedException();
+        }
+
+        IEnumerable<SecurityProvenance> IRepositoryService<SecurityProvenance>.Find(Expression<Func<SecurityProvenance, bool>> query, int offset, int? count, out int totalResults)
+        {
+            throw new NotSupportedException();
+        }
+
         /// <summary>
         /// Get user entity
         /// </summary>
@@ -961,11 +1028,25 @@ namespace SanteDB.Core.Services.Impl
             return base.Get<SecurityPolicy>(key, Guid.Empty);
         }
 
+        SecurityProvenance IRepositoryService<SecurityProvenance>.Get(Guid key)
+        {
+            return this.GetProvenance(key);
+        }
+
+        SecurityProvenance IRepositoryService<SecurityProvenance>.Get(Guid key, Guid versionKey)
+        {
+            return this.GetProvenance(key);
+        }
+
         /// <summary>
         /// Insert user entity
         /// </summary>
         UserEntity IRepositoryService<UserEntity>.Insert(UserEntity data)
         {
+            var securityUser = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>().GetUser(AuthenticationContext.Current.Principal.Identity);
+            if (securityUser.Key != data?.SecurityUserKey)
+                new PolicyPermission(PermissionState.Unrestricted, PermissionPolicyIdentifiers.UnrestrictedMetadata).Demand();
+
             return this.Insert<UserEntity>(data);
         }
 
@@ -1025,6 +1106,11 @@ namespace SanteDB.Core.Services.Impl
         SecurityPolicy IRepositoryService<SecurityPolicy>.Insert(SecurityPolicy data)
         {
             return base.Insert(data);
+        }
+
+        SecurityProvenance IRepositoryService<SecurityProvenance>.Insert(SecurityProvenance data)
+        {
+            throw new NotSupportedException();
         }
 
         /// <summary>
@@ -1091,11 +1177,20 @@ namespace SanteDB.Core.Services.Impl
             return base.Obsolete<SecurityPolicy>(key);
         }
 
+        SecurityProvenance IRepositoryService<SecurityProvenance>.Obsolete(Guid key)
+        {
+            throw new NotSupportedException();
+        }
+
         /// <summary>
         /// Save user entity
         /// </summary>
         UserEntity IRepositoryService<UserEntity>.Save(UserEntity data)
         {
+            var securityUser = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>().GetUser(AuthenticationContext.Current.Principal.Identity);
+            if (securityUser.Key != data?.SecurityUserKey)
+                new PolicyPermission(PermissionState.Unrestricted, PermissionPolicyIdentifiers.UnrestrictedMetadata).Demand();
+
             return this.Save(data);
         }
 
@@ -1153,6 +1248,11 @@ namespace SanteDB.Core.Services.Impl
         SecurityPolicy IRepositoryService<SecurityPolicy>.Save(SecurityPolicy data)
         {
             return base.Save(data);
+        }
+
+        SecurityProvenance IRepositoryService<SecurityProvenance>.Save(SecurityProvenance data)
+        {
+            throw new NotSupportedException();
         }
     }
 }

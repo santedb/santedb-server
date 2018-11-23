@@ -17,9 +17,9 @@
  * User: fyfej
  * Date: 2017-9-1
  */
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
@@ -28,7 +28,7 @@ using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel.Web;
+using RestSrvr;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -40,7 +40,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// Map the inbound place to a FHIR model
 		/// </summary>
-		protected override Location MapToFhir(Place model, WebOperationContext webOperationContext)
+		protected override Location MapToFhir(Place model, RestOperationContext RestOperationContext)
 		{
 			Location retVal = DataTypeConverter.CreateResource<Location>(model);
 			retVal.Identifier = model.LoadCollection<EntityIdentifier>("Identifiers").Select(o => DataTypeConverter.ToFhirIdentifier<Entity>(o)).ToList();
@@ -67,7 +67,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			retVal.Address = DataTypeConverter.ToFhirAddress(model.LoadCollection<EntityAddress>("Addresses").FirstOrDefault());
 
 			if (model.Lat.HasValue && model.Lng.HasValue)
-				retVal.Position = new MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone.Position()
+				retVal.Position = new SanteDB.Messaging.FHIR.Backbone.Position()
 				{
 					Latitude = (decimal)model.Lat.Value,
 					Longitude = (decimal)model.Lng.Value
@@ -76,12 +76,12 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			// Part of?
 			var parent = model.LoadCollection<EntityRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Parent);
 			if (parent != null)
-				retVal.PartOf = DataTypeConverter.CreateReference<Location>(parent.LoadProperty<Entity>("TargetEntity"), webOperationContext);
+				retVal.PartOf = DataTypeConverter.CreateReference<Location>(parent.LoadProperty<Entity>("TargetEntity"), RestOperationContext);
 
 			return retVal;
 		}
 
-		protected override Place MapToModel(Location resource, WebOperationContext webOperationContext)
+		protected override Place MapToModel(Location resource, RestOperationContext RestOperationContext)
 		{
 			throw new NotImplementedException();
 		}

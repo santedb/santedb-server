@@ -19,11 +19,6 @@
  */
 using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Interop;
-using SanteDB.Core.Wcf;
-using SanteDB.Core.Wcf.Behavior;
-using SanteDB.Core.Wcf.Security;
-using SanteDB.Messaging.RISI.Wcf;
-using SanteDB.Messaging.RISI.Wcf.Behavior;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -31,7 +26,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.ServiceModel.Description;
-using System.ServiceModel.Web;
+using RestSrvr;
+using SanteDB.Core.Rest.Security;
+using SanteDB.Core.Rest;
+using SanteDB.Core.Rest.Behavior;
+using SanteDB.Messaging.RISI.Rest;
 
 namespace SanteDB.Messaging.RISI
 {
@@ -49,7 +48,7 @@ namespace SanteDB.Messaging.RISI
 		/// <summary>
 		/// The internal reference to the web host.
 		/// </summary>
-		private WebServiceHost webHost;
+		private RestService webHost;
 
 		/// <summary>
 		/// Fired when the object is starting up.
@@ -90,19 +89,19 @@ namespace SanteDB.Messaging.RISI
 			get
 			{
 				var caps = ServiceEndpointCapabilities.None;
-				if (this.webHost.Description.Behaviors.OfType<ServiceCredentials>().Any(o => o.UserNameAuthentication?.CustomUserNamePasswordValidator != null))
-					caps |= ServiceEndpointCapabilities.BasicAuth;
-				if (this.webHost.Description.Behaviors.OfType<ServiceAuthorizationBehavior>().Any(o => o.ServiceAuthorizationManager is TokenServiceAuthorizationManager))
-					caps |= ServiceEndpointCapabilities.BearerAuth;
+                if (this.webHost.ServiceBehaviors.OfType<BasicAuthorizationAccessBehavior>().Any())
+                    caps |= ServiceEndpointCapabilities.BasicAuth;
+                if (this.webHost.ServiceBehaviors.OfType<TokenAuthorizationAccessBehavior>().Any())
+                    caps |= ServiceEndpointCapabilities.BearerAuth;
 
-				return caps;
+                return caps;
 			}
 		}
 
-		/// <summary>
-		/// Gets the running state of the message handler.
-		/// </summary>
-		public bool IsRunning => this.webHost?.State == System.ServiceModel.CommunicationState.Opened;
+        /// <summary>
+        /// Gets the running state of the message handler.
+        /// </summary>
+        public bool IsRunning => this.webHost?.IsRunning == true;
 
 		/// <summary>
 		/// URL of the service
@@ -111,7 +110,7 @@ namespace SanteDB.Messaging.RISI
 		{
 			get
 			{
-				return this.webHost.Description.Endpoints.OfType<ServiceEndpoint>().Select(o => o.Address.Uri.ToString()).ToArray();
+				return this.webHost.Endpoints.OfType<ServiceEndpoint>().Select(o => o.Description.ListenUri.ToString()).ToArray();
 			}
 		}
 
@@ -130,17 +129,18 @@ namespace SanteDB.Messaging.RISI
 			{
 				this.Starting?.Invoke(this, EventArgs.Empty);
 
-				this.webHost = new WebServiceHost(typeof(RisiBehavior));
-
-				foreach (var endpoint in this.webHost.Description.Endpoints)
+				this.webHost = RestServiceTool.CreateService(typeof(RisiBehavior));
+                this.webHost.AddServiceBehavior(new ErrorServiceBehavior());
+				foreach (var endpoint in this.webHost.Endpoints)
 				{
-					this.traceSource.TraceInformation("Starting RISI on {0}...", endpoint.Address);
-					endpoint.EndpointBehaviors.Add(new RisiRestEndpointBehavior());
-					endpoint.EndpointBehaviors.Add(new WcfErrorEndpointBehavior());
+					this.traceSource.TraceInformation("Starting RISI on {0}...", endpoint.Description.ListenUri);
+                    endpoint.AddEndpointBehavior(new MessageCompressionEndpointBehavior());
+                    endpoint.AddEndpointBehavior(new MessageDispatchFormatterBehavior());
+                    endpoint.AddEndpointBehavior(new MessageLoggingEndpointBehavior());
 				}
 
 				// Start the webhost
-				this.webHost.Open();
+				this.webHost.Start();
 
 				this.traceSource.TraceEvent(TraceEventType.Information, 0, "RISI message handler started successfully");
 
@@ -166,7 +166,7 @@ namespace SanteDB.Messaging.RISI
 
 			if (this.webHost != null)
 			{
-				this.webHost.Close();
+				this.webHost.Stop();
 				this.webHost = null;
 			}
 

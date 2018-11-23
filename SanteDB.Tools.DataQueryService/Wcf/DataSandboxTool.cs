@@ -9,17 +9,18 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.ServiceModel;
-using System.ServiceModel.Web;
+using RestSrvr;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using RestSrvr.Attributes;
 
 namespace SanteDB.Tools.DataSandbox.Wcf
 {
     /// <summary>
     /// Query tool behavior
     /// </summary>
-    [ServiceBehavior(ConfigurationName = "DataSandboxTool")]
+    [ServiceBehavior(Name = "DataSandboxTool")]
     public class DataSandboxTool : IDataSandboxTool
     {
 
@@ -38,8 +39,8 @@ namespace SanteDB.Tools.DataSandbox.Wcf
                 Element = i
             }).OfType<DataInstallAction>().ToList();
 
-            WebOperationContext.Current.OutgoingResponse.ContentType = "text/xml";
-            WebOperationContext.Current.OutgoingResponse.Headers["Content-Disposition"] = "attachment; filename=codesystem.dataset";
+            RestOperationContext.Current.OutgoingResponse.ContentType = "text/xml";
+            RestOperationContext.Current.OutgoingResponse.Headers["Content-Disposition"] = "attachment; filename=codesystem.dataset";
 
             MemoryStream ms = new MemoryStream();
             new XmlSerializer(typeof(Dataset)).Serialize(ms, output);
@@ -65,7 +66,7 @@ namespace SanteDB.Tools.DataSandbox.Wcf
                 if (filename == "config.json")
                 {
                     var cpath = Path.Combine(Path.GetDirectoryName(typeof(DataSandboxTool).Assembly.Location), "sandbox.config.json");
-                    WebOperationContext.Current.OutgoingResponse.ContentType = this.GetContentType(cpath);
+                    RestOperationContext.Current.OutgoingResponse.ContentType = this.GetContentType(cpath);
                     return File.OpenRead(cpath);
                 }
                 else
@@ -76,15 +77,15 @@ namespace SanteDB.Tools.DataSandbox.Wcf
 
                     if (!File.Exists(contentPath))
                     {
-                        WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
+                        RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.NotFound;
                         return null;
                     }
                     else
                     {
 
-                        WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.OK;
-                        WebOperationContext.Current.OutgoingResponse.ContentLength = new FileInfo(contentPath).Length;
-                        WebOperationContext.Current.OutgoingResponse.ContentType = this.GetContentType(contentPath);
+                        RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.OK;
+                        RestOperationContext.Current.OutgoingResponse.ContentLength64 = new FileInfo(contentPath).Length;
+                        RestOperationContext.Current.OutgoingResponse.ContentType = this.GetContentType(contentPath);
 
                         return File.OpenRead(contentPath);
                     }
@@ -93,15 +94,15 @@ namespace SanteDB.Tools.DataSandbox.Wcf
 
                     if (!typeof(DataSandboxTool).Assembly.GetManifestResourceNames().Contains(contentPath))
                     {
-                        WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
+                        RestOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
                         return null;
                     }
                     else
                     {
 
-                        WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.OK;
-                        //WebOperationContext.Current.OutgoingResponse.ContentLength = new FileInfo(contentPath).Length;
-                        WebOperationContext.Current.OutgoingResponse.ContentType = this.GetContentType(contentPath);
+                        RestOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.OK;
+                        //RestOperationContext.Current.OutgoingResponse.ContentLength = new FileInfo(contentPath).Length;
+                        RestOperationContext.Current.OutgoingResponse.ContentType = this.GetContentType(contentPath);
 
                         return typeof(DataSandboxTool).Assembly.GetManifestResourceStream(contentPath);
                     }
@@ -110,7 +111,7 @@ namespace SanteDB.Tools.DataSandbox.Wcf
             }
             catch(Exception e)
             {
-                WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.InternalServerError;
+                RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
 
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
                 return null;

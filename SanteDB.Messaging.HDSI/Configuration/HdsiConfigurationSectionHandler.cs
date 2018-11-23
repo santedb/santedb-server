@@ -17,11 +17,13 @@
  * User: fyfej
  * Date: 2017-9-1
  */
-using SanteDB.Messaging.Common;
+using SanteDB.Rest.Common;
+using SanteDB.Rest.HDSI.Resources;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -41,12 +43,7 @@ namespace SanteDB.Messaging.HDSI.Configuration
             
             // Section
             XmlElement serviceElement = section.SelectSingleNode("./*[local-name() = 'service']") as XmlElement;
-
-            string wcfServiceName = serviceElement?.Attributes["wcfServiceName"]?.Value;
-
-            if(wcfServiceName == null)
-                throw new ConfigurationErrorsException("Missing serviceElement", section);
-
+            
             var resourceHandlers = section.SelectNodes("./*[local-name() = 'resourceHandler']/*[local-name() = 'add']");
             List<Type> epHandlers = new List<Type>();
             foreach (XmlElement xel in resourceHandlers)
@@ -60,9 +57,9 @@ namespace SanteDB.Messaging.HDSI.Configuration
                 epHandlers.Add(t);
             }
             if (epHandlers.Count == 0) // Use all resource handlers in "this"
-                epHandlers = typeof(HdsiConfiguration).Assembly.ExportedTypes.Where(t => !t.IsAbstract && !t.IsInterface && typeof(IResourceHandler).IsAssignableFrom(t)).ToList();
+                epHandlers = typeof(PatientResourceHandler).Assembly.ExportedTypes.Where(t => !t.IsAbstract && !t.IsInterface && typeof(IResourceHandler).IsAssignableFrom(t)).ToList();
 
-            return new HdsiConfiguration(wcfServiceName, epHandlers);
+            return new HdsiConfiguration(epHandlers);
         }
     }
 }

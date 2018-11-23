@@ -18,17 +18,18 @@
  * Date: 2017-9-1
  */
 using MARC.HI.EHRS.SVC.Core.Services;
+using RestSrvr;
+using SanteDB.Authentication.OAuth2.Rest;
 using SanteDB.Authentication.OAuth2.Wcf;
 using SanteDB.Core.Interop;
-using SanteDB.Core.Wcf;
-using SanteDB.Core.Wcf.Security;
+using SanteDB.Core.Rest;
+using SanteDB.Core.Rest.Security;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.ServiceModel.Description;
-using System.ServiceModel.Web;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -44,7 +45,7 @@ namespace SanteDB.Authentication.OAuth2
         private TraceSource m_traceSource = new TraceSource(OAuthConstants.TraceSourceName);
 
         // Service host
-        private WebServiceHost m_serviceHost;
+        private RestService m_serviceHost;
 
         /// <summary>
         /// True if is running
@@ -53,8 +54,7 @@ namespace SanteDB.Authentication.OAuth2
         {
             get
             {
-                return this.m_serviceHost != null &&
-                    this.m_serviceHost.State == System.ServiceModel.CommunicationState.Opened;
+                return this.m_serviceHost?.IsRunning == true;
             }
         }
 
@@ -77,7 +77,7 @@ namespace SanteDB.Authentication.OAuth2
         {
             get
             {
-                return this.m_serviceHost.Description.Endpoints.Select(o => o.Address.Uri.ToString()).ToArray();
+                return this.m_serviceHost.Endpoints.Select(o => o.Description.ListenUri.ToString()).ToArray();
             }
         }
 
@@ -89,10 +89,8 @@ namespace SanteDB.Authentication.OAuth2
             get
             {
                 var caps = ServiceEndpointCapabilities.None;
-                if (this.m_serviceHost.Description.Behaviors.OfType<ServiceCredentials>().Any(o => o.UserNameAuthentication?.CustomUserNamePasswordValidator != null))
+                if (this.m_serviceHost.ServiceBehaviors.OfType<ClientAuthorizationAccessBehavior>().Any())
                     caps |= ServiceEndpointCapabilities.BasicAuth;
-                if (this.m_serviceHost.Description.Behaviors.OfType<ServiceAuthorizationBehavior>().Any(o => o.ServiceAuthorizationManager is TokenServiceAuthorizationManager))
-                    caps |= ServiceEndpointCapabilities.BearerAuth;
 
                 return caps;
             }
@@ -128,10 +126,10 @@ namespace SanteDB.Authentication.OAuth2
             {
                 this.Starting?.Invoke(this, EventArgs.Empty);
 
-                this.m_serviceHost = new WebServiceHost(typeof(OAuthTokenBehavior));
-
+                this.m_serviceHost = RestServiceTool.CreateService(typeof(OAuthTokenBehavior));
+                this.m_serviceHost.AddServiceBehavior(new OAuthErrorBehavior());
                 // Start the webhost
-                this.m_serviceHost.Open();
+                this.m_serviceHost.Start();
 
                 this.Started?.Invoke(this, EventArgs.Empty);
                 return true;
@@ -152,7 +150,7 @@ namespace SanteDB.Authentication.OAuth2
 
             if (this.m_serviceHost != null)
             {
-                this.m_serviceHost.Close();
+                this.m_serviceHost.Stop();
                 this.m_serviceHost = null;
             }
 

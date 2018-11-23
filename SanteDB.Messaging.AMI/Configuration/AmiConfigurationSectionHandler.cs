@@ -19,7 +19,8 @@
  */
 using SanteDB.Core.Interop;
 using SanteDB.Messaging.AMI.Wcf;
-using SanteDB.Messaging.Common;
+using SanteDB.Rest.AMI.Resources;
+using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -41,7 +42,7 @@ namespace SanteDB.Messaging.AMI.Configuration
 			XmlElement caConfigurationElement = section.SelectSingleNode("./*[local-name() = 'ca']") as XmlElement;
 			CertificationAuthorityConfiguration caConfiguration = new CertificationAuthorityConfiguration();
 
-			if (caConfigurationElement != null)
+            if (caConfigurationElement != null)
 			{
 				caConfiguration.AutoApprove = caConfigurationElement?.Attributes["autoApprove"]?.Value == "true";
 				caConfiguration.Name = caConfigurationElement?.Attributes["cn"]?.Value;
@@ -78,7 +79,7 @@ namespace SanteDB.Messaging.AMI.Configuration
                 epHandlers.Add(t);
             }
             if(epHandlers.Count == 0) // Use all resource handlers in "this"
-                epHandlers = typeof(AmiConfiguration).Assembly.ExportedTypes.Where(t=>!t.IsAbstract && !t.IsInterface && typeof(IResourceHandler).IsAssignableFrom(t)).ToList();
+                epHandlers = typeof(SecurityUserResourceHandler).Assembly.ExportedTypes.Where(t=>!t.IsAbstract && !t.IsInterface && typeof(IResourceHandler).IsAssignableFrom(t)).ToList();
             // Configuration
             return new AmiConfiguration(caConfiguration, epOptions, epHandlers);
 		}

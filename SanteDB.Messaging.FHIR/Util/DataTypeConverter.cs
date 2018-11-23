@@ -18,8 +18,8 @@
  * Date: 2017-9-1
  */
 using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
@@ -30,8 +30,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.ServiceModel.Web;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone;
+using RestSrvr;
+using SanteDB.Messaging.FHIR.Backbone;
 using SanteDB.Core.Model.Acts;
 using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Extensions;
@@ -55,13 +55,13 @@ namespace SanteDB.Messaging.FHIR.Util
 		/// <typeparam name="TResource">The type of the t resource.</typeparam>
 		/// <param name="targetEntity">The target entity.</param>
 		/// <returns>Returns a reference instance.</returns>
-		public static Reference<TResource> CreateReference<TResource>(IVersionedEntity targetEntity, WebOperationContext context) where TResource : DomainResourceBase, new()
+		public static Reference<TResource> CreateReference<TResource>(IVersionedEntity targetEntity, RestOperationContext context) where TResource : DomainResourceBase, new()
 		{
             if (targetEntity == null)
                 throw new ArgumentNullException(nameof(targetEntity));
             else if (context == null)
                 throw new ArgumentNullException(nameof(context));
-			var refer =  Reference.CreateResourceReference(DataTypeConverter.CreateResource<TResource>(targetEntity), context.IncomingRequest.UriTemplateMatch.BaseUri);
+			var refer =  Reference.CreateResourceReference(DataTypeConverter.CreateResource<TResource>(targetEntity), context.IncomingRequest.Url);
             refer.Display = (targetEntity as Entity)?.Names?.FirstOrDefault()?.ToString();
             return refer;
 		}
@@ -72,9 +72,9 @@ namespace SanteDB.Messaging.FHIR.Util
         /// <typeparam name="TResource">The type of the t resource.</typeparam>
         /// <param name="targetEntity">The target entity.</param>
         /// <returns>Returns a reference instance.</returns>
-        public static Reference CreatePlainReference<TResource>(IVersionedEntity targetEntity, WebOperationContext context) where TResource : DomainResourceBase, new()
+        public static Reference CreatePlainReference<TResource>(IVersionedEntity targetEntity, RestOperationContext context) where TResource : DomainResourceBase, new()
         {
-            var refer = Reference.CreateResourceReference((DomainResourceBase)DataTypeConverter.CreateResource<TResource>(targetEntity), context.IncomingRequest.UriTemplateMatch.BaseUri);
+            var refer = Reference.CreateResourceReference((DomainResourceBase)DataTypeConverter.CreateResource<TResource>(targetEntity), context.IncomingRequest.Url);
             refer.Display = (targetEntity as Entity)?.Names?.FirstOrDefault()?.ToString();
             return refer;
 

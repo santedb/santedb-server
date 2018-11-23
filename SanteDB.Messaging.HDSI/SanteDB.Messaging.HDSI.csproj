@@ -38,7 +38,6 @@
     <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0.1" />
     <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="SwaggerWcf.MEDIC" Version="0.2.9" />
     <Reference Include="MARC.Everest, Version=1.5.0.0, Culture=neutral, PublicKeyToken=ba5b2480018546af, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Solution Items\MARC.Everest.dll</HintPath>
@@ -51,8 +50,6 @@
     <Reference Include="System.identitymodel.services" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -63,55 +60,20 @@
     <Compile Include="Configuration\HdsiConfiguration.cs" />
     <Compile Include="Configuration\HdsiConfigurationSectionHandler.cs" />
     <Compile Include="HdsiMessageHandler.cs" />
-    <Compile Include="Model\ErrorResult.cs" />
-    <Compile Include="Model\ResultDetail.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResourceHandler\ActResourceHandler.cs" />
-    <Compile Include="ResourceHandler\BundleResourceHandler.cs" />
-    <Compile Include="ResourceHandler\CareplanResourceHandler.cs" />
-    <Compile Include="ResourceHandler\CodeSystemResourceHandler.cs" />
-    <Compile Include="ResourceHandler\ConceptClassResourceHandler.cs" />
-    <Compile Include="ResourceHandler\EntityRelationshipResourceHandler.cs" />
-    <Compile Include="ResourceHandler\ExtensionTypeResourceHandler.cs" />
-    <Compile Include="ResourceHandler\PatientEncounterResourceHandler.cs" />
-    <Compile Include="ResourceHandler\PersonResourceHandler.cs" />
-    <Compile Include="ResourceHandler\ObservationResourceHandlers.cs" />
-    <Compile Include="ResourceHandler\ProcedureResourceHandler.cs" />
-    <Compile Include="ResourceHandler\ReferenceTermResourceHandler.cs" />
-    <Compile Include="ResourceHandler\ConceptReferenceTermResourceHandler.cs" />
-    <Compile Include="ResourceHandler\ConceptResourceHandler.cs" />
-    <Compile Include="ResourceHandler\ConceptSetResourceHandler.cs" />
-    <Compile Include="ResourceHandler\EntityResourceHandler.cs" />
-    <Compile Include="ResourceHandler\IdentifierTypeResourceHandler.cs" />
-    <Compile Include="ResourceHandler\ManufacturedMaterialHandler.cs" />
-    <Compile Include="ResourceHandler\MaterialResourceHandler.cs" />
-    <Compile Include="ResourceHandler\AssigningAuthorityResourceHandler.cs" />
-    <Compile Include="ResourceHandler\OrganizationResourceHandler.cs" />
-    <Compile Include="ResourceHandler\PatientResourceHandler.cs" />
-    <Compile Include="ResourceHandler\PlaceResourceHandler.cs" />
-    <Compile Include="ResourceHandler\ProviderResourceHandler.cs" />
-    <Compile Include="ResourceHandler\ResourceHandlerBase.cs" />
-    <Compile Include="ResourceHandler\SubstanceAdministrationResourceHandler.cs" />
-    <Compile Include="ResourceHandler\TemplateDefinitionResourceHandler.cs" />
-    <Compile Include="ResourceHandler\UserEntityResourceHandler.cs" />
-    <Compile Include="Util\BundleUtil.cs" />
-    <Compile Include="Util\ObjectExpander.cs" />
-    <Compile Include="Wcf\Behavior\HdsiErrorEndpointBehavior.cs" />
-    <Compile Include="Wcf\IHdsiServiceContract.cs" />
-    <Compile Include="Wcf\HdsiContentTypeHandler.cs" />
-    <Compile Include="Wcf\Behavior\HdsiRestEndpointBehavior.cs" />
-    <Compile Include="Wcf\Behavior\HdsiSerializerOperationBehavior.cs" />
-    <Compile Include="Wcf\HdsiServiceBehavior.cs" />
-    <Compile Include="Wcf\Serialization\HdsiErrorHandler.cs" />
+    <Compile Include="HdsiServiceBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\SanteDB.licenseheader">
       <Link>SanteDB.licenseheader</Link>
     </None>
     <None Include="app.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
+      <Project>{16EF1840-0361-439D-806C-92D0411122EB}</Project>
+      <Name>RestSrvr</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
       <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
       <Name>SanteDB.Core.Api</Name>
@@ -124,15 +86,20 @@
       <Project>{f1a82a4f-4a57-47d7-ae76-444c8a4ff54a}</Project>
       <Name>SanteDB.Core.Model</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
+      <Project>{786bd0ee-1806-4158-ba45-80249ac6dfe7}</Project>
+      <Name>SanteDB.Rest.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.HDSI\SanteDB.Rest.HDSI.csproj">
+      <Project>{903e2e75-7b62-4c42-a001-404dc0235a6b}</Project>
+      <Name>SanteDB.Rest.HDSI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
       <Name>SanteDB.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Messaging.Common\SanteDB.Messaging.Common.csproj">
-      <Project>{135cbea7-7b25-4db0-b9ee-62d61b87b8b0}</Project>
-      <Name>SanteDB.Messaging.Common</Name>
-    </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

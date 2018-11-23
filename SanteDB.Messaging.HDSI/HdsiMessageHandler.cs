@@ -20,14 +20,9 @@
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Interop;
-using SanteDB.Core.Wcf;
-using SanteDB.Core.Wcf.Security;
-using SanteDB.Messaging.Common;
+using SanteDB.Rest.Common;
 using SanteDB.Messaging.HDSI.Configuration;
-using SanteDB.Messaging.HDSI.ResourceHandler;
 using SanteDB.Messaging.HDSI.Wcf;
-using SanteDB.Messaging.HDSI.Wcf.Behavior;
-using SanteDB.Messaging.HDSI.Wcf.Serialization;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -38,31 +33,17 @@ using System.Reflection;
 using System.ServiceModel;
 using System.ServiceModel.Description;
 using System.ServiceModel.Dispatcher;
-using System.ServiceModel.Web;
 using System.Text;
 using System.Threading.Tasks;
+using RestSrvr;
+using SanteDB.Rest.HDSI;
+using RestSrvr.Bindings;
+using SanteDB.Core.Rest;
+using SanteDB.Core.Rest.Security;
+using SanteDB.Core.Rest.Behavior;
 
 namespace SanteDB.Messaging.HDSI
 {
-
-    
-    /// <summary>
-    /// Http helper extensions
-    /// </summary>
-    public static class HttpHelperExtensions
-    {
-
-        /// <summary>
-        /// Convert query types
-        /// </summary>
-        public static SanteDB.Core.Model.Query.NameValueCollection ToQuery(this System.Collections.Specialized.NameValueCollection nvc)
-        {
-            var retVal = new SanteDB.Core.Model.Query.NameValueCollection();
-            foreach (var k in nvc.AllKeys)
-                retVal.Add(k, new List<String>(nvc.GetValues(k)));
-            return retVal;
-        }
-    }
 
     /// <summary>
     /// The HDSI Message Handler Daemon class
@@ -83,7 +64,7 @@ namespace SanteDB.Messaging.HDSI
         private HdsiConfiguration m_configuration= ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.messaging.hdsi") as HdsiConfiguration;
 
         // web host
-        private WebServiceHost m_webHost;
+        private RestService m_webHost;
 
         /// <summary>
         /// True if running
@@ -92,7 +73,7 @@ namespace SanteDB.Messaging.HDSI
         {
             get
             {
-                return this.m_webHost?.State == System.ServiceModel.CommunicationState.Opened;
+                return this.m_webHost?.IsRunning == true;
             }
         }
 
@@ -132,7 +113,7 @@ namespace SanteDB.Messaging.HDSI
         {
             get
             {
-                return this.m_webHost.Description.Endpoints.OfType<ServiceEndpoint>().Select(o => o.Address.Uri.ToString()).ToArray();
+                return this.m_webHost.Endpoints.OfType<ServiceEndpoint>().Select(o => o.Description.ListenUri.ToString()).ToArray();
             }
         }
 
@@ -144,9 +125,9 @@ namespace SanteDB.Messaging.HDSI
             get
             {
                 var caps = ServiceEndpointCapabilities.Compression;
-                if (this.m_webHost.Description.Behaviors.OfType<ServiceCredentials>().Any(o => o.UserNameAuthentication?.CustomUserNamePasswordValidator != null))
+                if (this.m_webHost.ServiceBehaviors.OfType<BasicAuthorizationAccessBehavior>().Any())
                     caps |= ServiceEndpointCapabilities.BasicAuth;
-                if (this.m_webHost.Description.Behaviors.OfType<ServiceAuthorizationBehavior>().Any(o => o.ServiceAuthorizationManager is TokenServiceAuthorizationManager))
+                if (this.m_webHost.ServiceBehaviors.OfType<TokenAuthorizationAccessBehavior>().Any())
                     caps |= ServiceEndpointCapabilities.BearerAuth;
 
                 return caps;
@@ -169,17 +150,21 @@ namespace SanteDB.Messaging.HDSI
                 // Force startup
                 HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.m_configuration.ResourceHandlers);
 
-                this.m_webHost = new WebServiceHost(typeof(HdsiServiceBehavior));
-                foreach(ServiceEndpoint endpoint in this.m_webHost.Description.Endpoints)
+                this.m_webHost = RestServiceTool.CreateService(typeof(HdsiServiceBehavior));
+                this.m_webHost.AddServiceBehavior(new ErrorServiceBehavior());
+
+                // Add service behaviors
+                foreach (ServiceEndpoint endpoint in this.m_webHost.Endpoints)
                 {
-                    this.m_traceSource.TraceInformation("Starting HDSI on {0}...", endpoint.Address);
-                    (endpoint.Binding as WebHttpBinding).ContentTypeMapper = new HdsiContentTypeHandler();
-                    endpoint.EndpointBehaviors.Add(new HdsiRestEndpointBehavior());
-                    endpoint.EndpointBehaviors.Add(new HdsiErrorEndpointBehavior());
+                    this.m_traceSource.TraceInformation("Starting HDSI on {0}...", endpoint.Description.ListenUri);
+                    endpoint.AddEndpointBehavior(new MessageCompressionEndpointBehavior());
+                    endpoint.AddEndpointBehavior(new MessageDispatchFormatterBehavior());
+                    endpoint.AddEndpointBehavior(new MessageLoggingEndpointBehavior());
+
                 }
-                
+
                 // Start the webhost
-                this.m_webHost.Open();
+                this.m_webHost.Start();
 
                 this.Started?.Invoke(this, EventArgs.Empty);
                 return true;
@@ -200,7 +185,7 @@ namespace SanteDB.Messaging.HDSI
 
             if(this.m_webHost != null)
             {
-                this.m_webHost.Close();
+                this.m_webHost.Stop();
                 this.m_webHost = null;
             }
 

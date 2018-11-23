@@ -202,7 +202,7 @@ namespace SanteDB.Core.Persistence
                 }
 
                 // Execute the changes
-                var isqlp = ApplicationContext.Current.GetSerivce<ISqlDataPersistenceService>();
+                var isqlp = ApplicationContext.Current.GetService<ISqlDataPersistenceService>();
                 foreach (var de in ds.Exec.Where(o => o.InvariantName == isqlp?.InvariantName))
                 {
                     this.m_traceSource.TraceInformation("Executing post-dataset SQL instructions for {0}...", ds.Id);

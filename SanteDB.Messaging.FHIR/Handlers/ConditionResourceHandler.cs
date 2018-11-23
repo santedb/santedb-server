@@ -20,9 +20,9 @@
 using MARC.Everest.Connectors;
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Backbone;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes;
-using MARC.HI.EHRS.SVC.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
@@ -34,7 +34,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.ServiceModel.Web;
+using RestSrvr;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -46,7 +46,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// Map to FHIR
 		/// </summary>
-		protected override Condition MapToFhir(CodedObservation model, WebOperationContext webOperationContext)
+		protected override Condition MapToFhir(CodedObservation model, RestOperationContext RestOperationContext)
 		{
 			var retVal = DataTypeConverter.CreateResource<Condition>(model);
 
@@ -63,7 +63,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 				retVal.ClinicalStatus = ConditionClinicalStatus.Inactive;
 
 			// Category
-			retVal.Category.Add(new MARC.HI.EHRS.SVC.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/condition-category"), "encounter-diagnosis"));
+			retVal.Category.Add(new SanteDB.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/condition-category"), "encounter-diagnosis"));
 
 			// Severity?
 			var actRelationshipService = ApplicationContext.Current.GetService<IDataPersistenceService<ActRelationship>>();
@@ -91,7 +91,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
             if (recordTarget != null)
             {
                 this.traceSource.TraceInformation("RCT: {0}", recordTarget.PlayerEntityKey);
-                retVal.Subject = DataTypeConverter.CreateReference<Patient>(recordTarget.LoadProperty<Entity>("PlayerEntity"), webOperationContext);
+                retVal.Subject = DataTypeConverter.CreateReference<Patient>(recordTarget.LoadProperty<Entity>("PlayerEntity"), RestOperationContext);
             }
 			// Onset
 			if (model.StartTime.HasValue || model.StopTime.HasValue)
@@ -106,12 +106,12 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			retVal.AssertionDate = model.CreationTime.LocalDateTime;
 			var author = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Authororiginator);
 			if (author != null)
-				retVal.Asserter = DataTypeConverter.CreatePlainReference<Practitioner>(author.LoadProperty<Entity>("PlayerEntity"), webOperationContext);
+				retVal.Asserter = DataTypeConverter.CreatePlainReference<Practitioner>(author.LoadProperty<Entity>("PlayerEntity"), RestOperationContext);
 
 			return retVal;
 		}
 
-		protected override CodedObservation MapToModel(Condition resource, WebOperationContext webOperationContext)
+		protected override CodedObservation MapToModel(Condition resource, RestOperationContext RestOperationContext)
 		{
 			throw new NotImplementedException();
 		}
