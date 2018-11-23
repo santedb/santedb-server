@@ -1,7 +1,7 @@
 ﻿/// <reference path="santedb.js"/>
 /*
  * Copyright 2015-2018 Mohawk College of Applied Arts and Technology
- * 
+ *
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you 
  * may not use this file except in compliance with the License. You may 
@@ -15,14 +15,8 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2017-10-30
- */
-
-/**
- * @version 0.9.6 (Edmonton)
- * @copyright (C) 2015-2017, Mohawk College of Applied Arts and Technology
- * @license Apache 2.0
+ * User: justin
+ * Date: 2018-9-25
  */
 
 /**

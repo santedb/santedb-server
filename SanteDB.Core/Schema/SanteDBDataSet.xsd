@@ -15,8 +15,8 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  - 
- - User: fyfej
- - Date: 2017-9-1
+ - User: justin
+ - Date: 2018-6-22
  -->
 <xs:schema xmlns:tns="http://santedb.org/data" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:q1="http://santedb.org/model" xmlns:q2="http://santedb.org/model" xmlns:q3="http://santedb.org/model" xmlns:q4="http://santedb.org/model" xmlns:q5="http://santedb.org/model" xmlns:q6="http://santedb.org/model" xmlns:q7="http://santedb.org/model" xmlns:q8="http://santedb.org/model" xmlns:q9="http://santedb.org/model" xmlns:q10="http://santedb.org/model" xmlns:q11="http://santedb.org/model" xmlns:q12="http://santedb.org/model" xmlns:q13="http://santedb.org/model" xmlns:q14="http://santedb.org/model" xmlns:q15="http://santedb.org/model" xmlns:q16="http://santedb.org/model" xmlns:q17="http://santedb.org/model" xmlns:q18="http://santedb.org/model" xmlns:q19="http://santedb.org/model" xmlns:q20="http://santedb.org/model" xmlns:q21="http://santedb.org/model" targetNamespace="http://santedb.org/data" elementFormDefault="qualified">
   <xs:import namespace="http://santedb.org/model" schemaLocation="OpenIZModel.xsd"/>

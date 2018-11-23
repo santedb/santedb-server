@@ -68,6 +68,9 @@
     <EmbeddedResource Include="ParameterMap.xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\SanteDB.licenseheader">
+      <Link>SanteDB.licenseheader</Link>
+    </None>
     <None Include="Data\009-HL7Ethnicity.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

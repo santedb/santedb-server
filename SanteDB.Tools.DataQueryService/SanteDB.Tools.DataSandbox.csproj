@@ -56,6 +56,9 @@
     <EmbeddedResource Include="Resources\css\fonts\glyphicons-halflings-regular.ttf" />
     <EmbeddedResource Include="Resources\css\fonts\glyphicons-halflings-regular.woff" />
     <EmbeddedResource Include="Resources\css\fonts\glyphicons-halflings-regular.woff2" />
+    <None Include="..\SanteDB.licenseheader">
+      <Link>SanteDB.licenseheader</Link>
+    </None>
     <None Include="sandbox.config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

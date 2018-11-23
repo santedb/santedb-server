@@ -55,6 +55,9 @@
     <Compile Include="Services\MdmResourceListener.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\SanteDB.licenseheader">
+      <Link>SanteDB.licenseheader</Link>
+    </None>
     <None Include="Data\000-MDMClasses.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
