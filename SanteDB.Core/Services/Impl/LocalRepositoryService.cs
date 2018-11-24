@@ -105,13 +105,13 @@ namespace SanteDB.Core.Services.Impl
 
             foreach (var t in repositoryServices)
             {
-                this.m_tracer.TraceInformation("Adding repository service for {0}...", t.Name);
+                this.m_tracer.TraceInformation("Adding repository service for {0}...", t);
                 ApplicationContext.Current.AddServiceProvider(t);
             }
 
             ApplicationContext.Current.Started += (o, e) =>
             {
-                foreach (var t in AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetExportedTypes()).Where(t => typeof(IdentifiedData).IsAssignableFrom(t) && !t.IsAbstract && t.GetCustomAttribute<XmlRootAttribute>() != null))
+                foreach (var t in AppDomain.CurrentDomain.GetAssemblies().Where(a=>!a.IsDynamic).SelectMany(a => a.GetExportedTypes()).Where(t => typeof(IdentifiedData).IsAssignableFrom(t) && !t.IsAbstract && t.GetCustomAttribute<XmlRootAttribute>() != null))
                 {
                     var irst = typeof(IRepositoryService<>).MakeGenericType(t);
                     var irsi = ApplicationContext.Current.GetService(irst);
@@ -126,7 +126,7 @@ namespace SanteDB.Core.Services.Impl
                         else if (typeof(Entity).IsAssignableFrom(t))
                         {
                             this.m_tracer.TraceInformation("Adding Entity repository service for {0}...", t.Name);
-                            var mrst = typeof(GenericLocalActRepository<>).MakeGenericType(t);
+                            var mrst = typeof(GenericLocalEntityRepository<>).MakeGenericType(t);
                             ApplicationContext.Current.AddServiceProvider(mrst);
                         }
                     }
