@@ -29,7 +29,8 @@ namespace SanteDB.Messaging.HL7.Test
             DataTest.DataTestUtil.Start(context);
 
             // Create the test harness device / application
-            var securityService = ApplicationContext.Current.GetService<ISecurityRepositoryService>();
+            var securityDevService = ApplicationContext.Current.GetService<IRepositoryService<SecurityDevice>>();
+            var securityAppService = ApplicationContext.Current.GetService<IRepositoryService<SecurityApplication>>();
             var metadataService = ApplicationContext.Current.GetService<IAssigningAuthorityRepositoryService>();
             AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
             // Create device
@@ -39,7 +40,7 @@ namespace SanteDB.Messaging.HL7.Test
                 Name = "TEST_HARNESS|TEST"
             };
             dev.AddPolicy(PermissionPolicyIdentifiers.LoginAsService);
-            dev = securityService.CreateDevice(dev);
+            dev = securityDevService.Insert(dev);
 
             var app = new SecurityApplication()
             {
@@ -49,7 +50,7 @@ namespace SanteDB.Messaging.HL7.Test
             app.AddPolicy(PermissionPolicyIdentifiers.LoginAsService);
             app.AddPolicy(PermissionPolicyIdentifiers.UnrestrictedClinicalData);
             app.AddPolicy(PermissionPolicyIdentifiers.ReadMetadata);
-            app = securityService.CreateApplication(app);
+            app = securityAppService.Insert(app);
             metadataService.Insert(new Core.Model.DataTypes.AssigningAuthority("TEST", "TEST", "1.2.3.4.5.6.7")
             {
                 AssigningApplicationKey = app.Key
@@ -62,7 +63,7 @@ namespace SanteDB.Messaging.HL7.Test
                 Name = "TEST_HARNESS2|TEST"
             };
             dev.AddPolicy(PermissionPolicyIdentifiers.LoginAsService);
-            dev = securityService.CreateDevice(dev);
+            dev = securityDevService.Insert(dev);
 
             app = new SecurityApplication()
             {
@@ -72,7 +73,7 @@ namespace SanteDB.Messaging.HL7.Test
             app.AddPolicy(PermissionPolicyIdentifiers.LoginAsService);
             app.AddPolicy(PermissionPolicyIdentifiers.UnrestrictedClinicalData);
             app.AddPolicy(PermissionPolicyIdentifiers.ReadMetadata);
-            app = securityService.CreateApplication(app);
+            app = securityAppService.Insert(app);
         }
 
         /// <summary>

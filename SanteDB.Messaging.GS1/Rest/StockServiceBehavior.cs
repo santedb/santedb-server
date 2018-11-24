@@ -52,11 +52,13 @@ namespace SanteDB.Messaging.GS1.Rest
         private Gs1ConfigurationSection m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("SanteDB.messaging.gs1") as Gs1ConfigurationSection;
 
         // Act repository
-        private IActRepositoryService m_actRepository;
+        private IRepositoryService<Act> m_actRepository;
         // Material repository
-        private IMaterialRepositoryService m_materialRepository;
+        private IRepositoryService<Material> m_materialRepository;
+        // Manufactured materials
+        private IRepositoryService<ManufacturedMaterial> m_manufMaterialRepository;
         // Place repository
-        private IPlaceRepositoryService m_placeRepository;
+        private IRepositoryService<Place> m_placeRepository;
         // Stock service
         private IStockManagementRepositoryService m_stockService;
         // GS1 Utility
@@ -70,10 +72,11 @@ namespace SanteDB.Messaging.GS1.Rest
         /// </summary>
         public StockServiceBehavior()
         {
-            this.m_actRepository = ApplicationContext.Current.GetService<IActRepositoryService>();
-            this.m_materialRepository = ApplicationContext.Current.GetService<IMaterialRepositoryService>();
-            this.m_placeRepository = ApplicationContext.Current.GetService<IPlaceRepositoryService>();
+            this.m_actRepository = ApplicationContext.Current.GetService<IRepositoryService<Act>>();
+            this.m_materialRepository = ApplicationContext.Current.GetService<IRepositoryService<Material>>();
+            this.m_placeRepository = ApplicationContext.Current.GetService<IRepositoryService<Place>>();
             this.m_stockService = ApplicationContext.Current.GetService<IStockManagementRepositoryService>();
+            this.m_manufMaterialRepository = ApplicationContext.Current.GetService<IRepositoryService<ManufacturedMaterial>>();
             this.m_gs1Util = new Gs1Util();
         }
 
@@ -127,7 +130,7 @@ namespace SanteDB.Messaging.GS1.Rest
                     throw new KeyNotFoundException("Cannot find default issuing authority for advice identification. Please configure a valid OID");
 
                 int tr = 0;
-                var existing = this.m_actRepository.Find<Act>(o => o.Identifiers.Any(i => i.Authority.DomainName == issuingAuthority.Mnemonic && i.Value == adv.despatchAdviceIdentification.entityIdentification), 0, 1, out tr);
+                var existing = this.m_actRepository.Find(o => o.Identifiers.Any(i => i.Authority.DomainName == issuingAuthority.Mnemonic && i.Value == adv.despatchAdviceIdentification.entityIdentification), 0, 1, out tr);
                 if (existing.Any())
                 {
                     this.m_tracer.TraceWarning("Duplicate despatch {0} will be ignored", adv.despatchAdviceIdentification.entityIdentification);
@@ -201,7 +204,7 @@ namespace SanteDB.Messaging.GS1.Rest
             if (orderTransaction.Item.Count > 0)
                 try
                 {
-                    ApplicationContext.Current.GetService<IBatchRepositoryService>().Insert(orderTransaction);
+                    ApplicationContext.Current.GetService<IRepositoryService<Bundle>>().Insert(orderTransaction);
                 }
                 catch (Exception e)
                 {
@@ -305,7 +308,7 @@ namespace SanteDB.Messaging.GS1.Rest
 
                         if (!(rel.TargetEntity is ManufacturedMaterial))
                         {
-                            var matl = this.m_materialRepository.GetManufacturedMaterial(rel.TargetEntityKey.Value, Guid.Empty);
+                            var matl = this.m_manufMaterialRepository.Get(rel.TargetEntityKey.Value, Guid.Empty);
                             if (matl == null)
                             {
                                 Trace.TraceWarning("It looks like {0} owns {1} but {1} is not a mmat!?!?!", place.Key, rel.TargetEntityKey);
@@ -318,7 +321,7 @@ namespace SanteDB.Messaging.GS1.Rest
                         if (!(mmat is ManufacturedMaterial))
                             return;
 
-                        var mat = this.m_materialRepository.FindMaterial(o => o.Relationships.Where(r => r.RelationshipType.Mnemonic == "Instance").Any(r => r.TargetEntity.Key == mmat.Key)).FirstOrDefault();
+                        var mat = this.m_materialRepository.Find(o => o.Relationships.Where(r => r.RelationshipType.Mnemonic == "Instance").Any(r => r.TargetEntity.Key == mmat.Key)).FirstOrDefault();
                         var instanceData = mat.LoadCollection<EntityRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Instance);
 
                         decimal balanceOH = rel.Quantity ?? 0;
@@ -393,7 +396,7 @@ namespace SanteDB.Messaging.GS1.Rest
                         {
                             var reasonConcept = ApplicationContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(adjgrp.Key.Value, "GS1_STOCK_STATUS")?.Mnemonic;
                             if (reasonConcept == null)
-                                reasonConcept = (ApplicationContext.Current.GetService<IConceptRepositoryService>().GetConcept(adjgrp.Key.Value, Guid.Empty) as Concept)?.Mnemonic;
+                                reasonConcept = (ApplicationContext.Current.GetService<IConceptRepositoryService>().Get(adjgrp.Key.Value, Guid.Empty) as Concept)?.Mnemonic;
 
                             // Broken vials?
                             lock(tradeItemStatuses)
@@ -527,7 +530,7 @@ namespace SanteDB.Messaging.GS1.Rest
             // insert transaction
             try
             {
-                ApplicationContext.Current.GetService<IBatchRepositoryService>().Insert(orderTransaction);
+                ApplicationContext.Current.GetService<IRepositoryService<Bundle>>().Insert(orderTransaction);
             }
             catch (Exception e)
             {

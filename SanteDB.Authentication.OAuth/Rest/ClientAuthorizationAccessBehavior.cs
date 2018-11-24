@@ -95,6 +95,9 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                 {
                     (AuthenticationContext.Current.Principal as ClaimsPrincipal).AddIdentity(principal.Identity as ClaimsIdentity);
                 }
+
+                // Disposed context so reset the auth
+                RestOperationContext.Current.Disposed += (o, e) => AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.AnonymousPrincipal);
             }
             catch (Exception e)
             {

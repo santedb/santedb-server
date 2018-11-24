@@ -68,6 +68,7 @@ namespace SanteDB
                 Environment.Exit(999);
             };
 
+            
             // Parser
             ParameterParser<ConsoleParameters> parser = new ParameterParser<ConsoleParameters>();
            

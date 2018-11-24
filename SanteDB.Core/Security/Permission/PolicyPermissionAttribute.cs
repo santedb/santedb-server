@@ -49,6 +49,14 @@ namespace SanteDB.Core.Security.Attribute
         }
 
         /// <summary>
+        /// Creates a policy permission attribute
+        /// </summary>
+        public PolicyPermissionAttribute(SecurityAction action, string policyId) : base(action)
+        {
+            this.PolicyId = policyId;
+        }
+        
+        /// <summary>
         /// The claim type which the user must 
         /// </summary>
         public String PolicyId { get; set; }

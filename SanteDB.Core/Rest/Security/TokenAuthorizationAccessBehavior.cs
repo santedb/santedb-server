@@ -30,14 +30,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IdentityModel.Configuration;
-using System.IdentityModel.Policy;
 using System.IdentityModel.Tokens;
 using System.Linq;
 using System.Security.Authentication;
 using System.Security.Claims;
 using System.Security.Principal;
-using System.ServiceModel;
-using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -165,6 +162,11 @@ namespace SanteDB.Core.Rest.Security
             {
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Token Error (From: {0}) : {1}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint, e);
                 throw new SecurityTokenException(e.Message, e);
+            }
+            finally
+            {
+                // Disposed context so reset the auth
+                RestOperationContext.Current.Disposed += (o, e) => SanteDB.Core.Security.AuthenticationContext.Current = new SanteDB.Core.Security.AuthenticationContext(SanteDB.Core.Security.AuthenticationContext.AnonymousPrincipal);
             }
         }
         /// <summary>

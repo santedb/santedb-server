@@ -302,7 +302,7 @@ namespace SanteDB.Messaging.HL7
 		/// <returns>Returns the converted assigning authority.</returns>
 		public static AssigningAuthority ToModel(this HD id, bool throwIfNotFound = true)
         {
-            var assigningAuthorityRepositoryService = ApplicationContext.Current.GetService<IMetadataRepositoryService>();
+            var assigningAuthorityRepositoryService = ApplicationContext.Current.GetService<IAssigningAuthorityRepositoryService>();
             AssigningAuthority assigningAuthority = null;
 
             if (id == null)
@@ -310,14 +310,14 @@ namespace SanteDB.Messaging.HL7
 
             if (!string.IsNullOrEmpty(id.NamespaceID.Value))
             {
-                assigningAuthority = assigningAuthorityRepositoryService.FindAssigningAuthority(a => a.DomainName == id.NamespaceID.Value).FirstOrDefault();
+                assigningAuthority = assigningAuthorityRepositoryService.Get(id.NamespaceID.Value);
                 if (assigningAuthority == null && throwIfNotFound)
                     throw new KeyNotFoundException($"Cannot find assigning authority {id.NamespaceID.Value}");
             }
 
             if (!string.IsNullOrEmpty(id.UniversalID.Value))
             {
-                var tAssigningAuthority = assigningAuthorityRepositoryService.FindAssigningAuthority(a => a.Oid == id.UniversalID.Value).FirstOrDefault();
+                var tAssigningAuthority = assigningAuthorityRepositoryService.Get(new Uri($"urn:oid:{id.UniversalID.Value}"));
 
                 if (tAssigningAuthority == null && throwIfNotFound)
                     throw new KeyNotFoundException($"Cannot find assigning authority {id.UniversalID.Value}");
@@ -359,7 +359,7 @@ namespace SanteDB.Messaging.HL7
 
                 if (!String.IsNullOrEmpty(cx.IdentifierTypeCode.Value))
                 {
-                    var idType = ApplicationContext.Current.GetService<IIdentifierTypeRepositoryService>().Find(o => o.TypeConcept.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == cx.IdentifierTypeCode.Value && r.ReferenceTerm.CodeSystem.Oid == IdentifierTypeCodeSystem)).FirstOrDefault();
+                    var idType = ApplicationContext.Current.GetService<IRepositoryService<IdentifierType>>().Find(o => o.TypeConcept.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == cx.IdentifierTypeCode.Value && r.ReferenceTerm.CodeSystem.Oid == IdentifierTypeCodeSystem)).FirstOrDefault();
                     id.IdentifierTypeKey = idType?.Key;
                 }
 

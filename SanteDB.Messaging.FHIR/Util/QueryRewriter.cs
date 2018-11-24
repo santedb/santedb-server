@@ -336,12 +336,12 @@ namespace SanteDB.Messaging.FHIR.Util
                                 if (codeSystemUri.StartsWith("urn:oid:"))
                                 {
                                     codeSystemUri = codeSystemUri.Substring(8);
-                                    codeSystem = ApplicationContext.Current.GetService<IConceptRepositoryService>().FindCodeSystems(o => o.Oid == codeSystemUri).FirstOrDefault();
+                                    codeSystem = ApplicationContext.Current.GetService<IRepositoryService<CodeSystem>>().Find(o => o.Oid == codeSystemUri).FirstOrDefault();
                                 }
                                 else if (codeSystemUri.StartsWith("urn:") || codeSystemUri.StartsWith("http:"))
-                                    codeSystem = ApplicationContext.Current.GetService<IConceptRepositoryService>().FindCodeSystems(o => o.Url == codeSystemUri).FirstOrDefault();
+                                    codeSystem = ApplicationContext.Current.GetService<IRepositoryService<CodeSystem>>().Find(o => o.Url == codeSystemUri).FirstOrDefault();
                                 else
-                                    codeSystem = ApplicationContext.Current.GetService<IConceptRepositoryService>().FindCodeSystems(o => o.Name == codeSystemUri).FirstOrDefault();
+                                    codeSystem = ApplicationContext.Current.GetService<IRepositoryService<CodeSystem>>().Find(o => o.Name == codeSystemUri).FirstOrDefault();
 
 
                                 s_tracer.TraceInformation("Have translated FHIR domain {0} to {1}", codeSystemUri, codeSystem?.Name);

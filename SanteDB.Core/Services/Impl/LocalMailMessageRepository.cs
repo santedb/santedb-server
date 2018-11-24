@@ -35,7 +35,7 @@ namespace SanteDB.Core.Services.Impl
 	/// <summary>
 	/// Represents a local alert service.
 	/// </summary>
-	public class LocalMailMessageRepositoryService : IMailMessageRepositoryService,
+	public class LocalMailMessageRepository : IMailMessageRepositoryService,
         IRepositoryService<MailMessage>
 	{
 		/// <summary>

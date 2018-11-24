@@ -219,14 +219,14 @@ namespace SanteDB.Core.Services.Impl
             this.m_tracer.TraceInformation("Installing templates...");
 
             // Install templates
-            var idp = ApplicationContext.Current.GetService<IMetadataRepositoryService>();
+            var idp = ApplicationContext.Current.GetService<ITemplateDefinitionRepositoryService>();
             if(idp != null)
                 foreach(var itm in pkg.Templates)
                 {
                     if (idp.GetTemplateDefinition(itm.Mnemonic) == null)
                     {
                         this.m_tracer.TraceInfo("Installing {0}...", itm.Mnemonic);
-                        idp.CreateTemplateDefinition(new TemplateDefinition()
+                        idp.Insert(new TemplateDefinition()
                         {
                             Oid = itm.Oid,
                             Mnemonic = itm.Mnemonic,

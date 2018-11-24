@@ -31,21 +31,58 @@ using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Interfaces;
 using MARC.HI.EHRS.SVC.Auditing.Data;
+using SanteDB.Core.Model.Collection;
+using SanteDB.Core.Security.Attribute;
+using System.Diagnostics;
 
 namespace SanteDB.Core.Services.Impl
 {
     /// <summary>
     /// Represents a base class for entity repository services
     /// </summary>
-    public abstract class LocalEntityRepositoryServiceBase : IPersistableQueryRepositoryService,
-        IFastQueryRepositoryService
+    public class GenericLocalRepository<TEntity> :
+        IValidatingRepositoryService<TEntity>,
+        IPersistableQueryRepositoryService<TEntity>,
+        IFastQueryRepositoryService<TEntity>,
+        ISecuredRepositoryService
+        where TEntity : IdentifiedData
     {
+
+        /// <summary>
+        /// Trace source
+        /// </summary>
+        protected TraceSource m_traceSource = new TraceSource(SanteDBConstants.DataTraceSourceName);
+
+        /// <summary>
+        /// Gets the policy required for querying
+        /// </summary>
+        protected virtual String QueryPolicy => PermissionPolicyIdentifiers.Login;
+        /// <summary>
+        /// Gets the policy required for reading
+        /// </summary>
+        protected virtual String ReadPolicy => PermissionPolicyIdentifiers.Login;
+        /// <summary>
+        /// Gets the policy required for writing
+        /// </summary>
+        protected virtual String WritePolicy => PermissionPolicyIdentifiers.Login;
+        /// <summary>
+        /// Gets the policy required for deleting
+        /// </summary>
+        protected virtual String DeletePolicy => PermissionPolicyIdentifiers.Login;
+        /// <summary>
+        /// Gets the policy for altering
+        /// </summary>
+        protected virtual String AlterPolicy => PermissionPolicyIdentifiers.Login;
 
         /// <summary>
         /// Find with stored query parameters
         /// </summary>
-        public IEnumerable<TEntity> Find<TEntity>(Expression<Func<TEntity, bool>> query, int offset, int? count, out int totalResults, Guid queryId) where TEntity : IdentifiedData
+        public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> query, int offset, int? count, out int totalResults, Guid queryId)
         {
+
+            // Demand permission
+            this.DemandQuery();
+
             var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TEntity>>();
 
             if (persistenceService == null)
@@ -69,8 +106,11 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Performs insert of object
         /// </summary>
-        protected TEntity Insert<TEntity>(TEntity entity) where TEntity : IdentifiedData
+        public virtual TEntity Insert(TEntity data)
         {
+            // Demand permission
+            this.DemandWrite(data);
+
             var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TEntity>>();
 
             if (persistenceService == null)
@@ -78,24 +118,27 @@ namespace SanteDB.Core.Services.Impl
                 throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<TEntity>)}");
             }
 
-            this.Validate(entity);
+            data = this.Validate(data);
 
             var businessRulesService = ApplicationContext.Current.GetBusinessRulesService<TEntity>();
 
-            entity = businessRulesService?.BeforeInsert(entity) ?? entity;
+            data = businessRulesService?.BeforeInsert(data) ?? data;
 
-            entity = persistenceService.Insert(entity, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+            data = persistenceService.Insert(data, AuthenticationContext.Current.Principal, TransactionMode.Commit);
 
-            businessRulesService?.AfterInsert(entity);
+            businessRulesService?.AfterInsert(data);
 
-            return entity;
+            return data;
         }
 
         /// <summary>
         /// Obsolete the specified data
         /// </summary>
-        protected TEntity Obsolete<TEntity>(Guid key) where TEntity : IdentifiedData
+        public virtual TEntity Obsolete(Guid key) 
         {
+            // Demand permission
+            this.DemandDelete(key);
+
             var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TEntity>>();
 
             if (persistenceService == null)
@@ -113,16 +156,25 @@ namespace SanteDB.Core.Services.Impl
             var businessRulesService = ApplicationContext.Current.GetBusinessRulesService<TEntity>();
 
             entity = businessRulesService?.BeforeObsolete(entity) ?? entity;
-
             entity = persistenceService.Obsolete(entity, AuthenticationContext.Current.Principal, TransactionMode.Commit);
             return businessRulesService?.AfterObsolete(entity) ?? entity;
         }
 
         /// <summary>
+        /// Get the specified key
+        /// </summary>
+        public virtual TEntity Get(Guid key)
+        {
+            return this.Get(key, Guid.Empty);
+        }
+
+        /// <summary>
         /// Get specified data from persistence
         /// </summary>
-        protected TEntity Get<TEntity>(Guid key, Guid versionKey) where TEntity : IdentifiedData
+        public virtual TEntity Get(Guid key, Guid versionKey) 
         {
+            // Demand permission
+            this.DemandRead(key);
             var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TEntity>>();
 
             if (persistenceService == null)
@@ -141,8 +193,11 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Save the specified entity (insert or update)
         /// </summary>
-        protected TEntity Save<TEntity>(TEntity data) where TEntity : IdentifiedData
+        public virtual TEntity Save(TEntity data)
         {
+            // Demand permission
+            this.DemandAlter(data);
+
             var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TEntity>>();
 
             if (persistenceService == null)
@@ -150,7 +205,7 @@ namespace SanteDB.Core.Services.Impl
                 throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<TEntity>)}");
             }
 
-            this.Validate(data);
+            data=this.Validate(data);
 
             var businessRulesService = ApplicationContext.Current.GetBusinessRulesService<TEntity>();
 
@@ -188,7 +243,7 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Validate a patient before saving
         /// </summary>
-        internal TEntity Validate<TEntity>(TEntity p) where TEntity : IdentifiedData
+        public virtual TEntity Validate(TEntity p) 
         {
             p = (TEntity)p.Clean(); // clean up messy data
 
@@ -200,19 +255,37 @@ namespace SanteDB.Core.Services.Impl
             {
                 throw new DetectedIssueException(details);
             }
+
+            // Bundles cascade
+            var bundle = p as Bundle;
+            if (bundle != null)
+            {
+                for (int i = 0; i < bundle.Item.Count; i++)
+                {
+                    var itm = bundle.Item[i];
+                    var vrst = typeof(IValidatingRepositoryService<>).MakeGenericType(itm.GetType());
+                    var vrsi = ApplicationContext.Current.GetService(vrst);
+                    
+                    if (vrsi != null)
+                        bundle.Item[i] = vrsi.GetType().GetMethod(nameof(Validate)).Invoke(vrsi, new object[] { itm }) as IdentifiedData;
+                }
+            }
             return p;
         }
 
         /// <summary>
         /// Perform a faster version of the query for an object
         /// </summary>
-        public IEnumerable<TEntity> FindFast<TEntity>(Expression<Func<TEntity, bool>> query, int offset, int? count, out int totalResults, Guid queryId) where TEntity : IdentifiedData
+        public virtual IEnumerable<TEntity> FindFast(Expression<Func<TEntity, bool>> query, int offset, int? count, out int totalResults, Guid queryId) 
         {
+            // Demand permission
+            this.DemandQuery();
+
             var persistenceService = ApplicationContext.Current.GetService<IFastQueryDataPersistenceService<TEntity>>();
 
             if (persistenceService == null)
             {
-                return this.Find<TEntity>(query, offset, count, out totalResults, queryId);
+                return this.Find(query, offset, count, out totalResults, queryId);
             }
 
             var businessRulesService = ApplicationContext.Current.GetBusinessRulesService<TEntity>();
@@ -222,6 +295,64 @@ namespace SanteDB.Core.Services.Impl
 
             results = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
             return results;
+        }
+
+        /// <summary>
+        /// Perform a simple find
+        /// </summary>
+        public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> query)
+        {
+            int t = 0;
+            return this.Find(query, 0, null, out t, Guid.Empty);
+        }
+
+        /// <summary>
+        /// Perform a normal find
+        /// </summary>
+        public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> query, int offset, int? count, out int totalResults)
+        {
+            return this.Find(query, offset, count, out totalResults, Guid.Empty);
+        }
+
+        /// <summary>
+        /// Demand write permission
+        /// </summary>
+        public virtual void DemandWrite(object data)
+        {
+            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, this.WritePolicy).Demand();
+        }
+
+        /// <summary>
+        /// Demand read
+        /// </summary>
+        /// <param name="key"></param>
+        public virtual void DemandRead(Guid key)
+        {
+            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, this.ReadPolicy).Demand();
+        }
+
+        /// <summary>
+        /// Demand delete permission
+        /// </summary>
+        public virtual void DemandDelete(Guid key)
+        {
+            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, this.DeletePolicy).Demand();
+        }
+
+        /// <summary>
+        /// Demand alter permission
+        /// </summary>
+        public virtual void DemandAlter(object data)
+        {
+            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, this.AlterPolicy).Demand();
+        }
+
+        /// <summary>
+        /// Demand query 
+        /// </summary>
+        public virtual void DemandQuery()
+        {
+            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, this.QueryPolicy).Demand();
         }
     }
 }

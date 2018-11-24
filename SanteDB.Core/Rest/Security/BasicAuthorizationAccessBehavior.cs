@@ -76,7 +76,7 @@ namespace SanteDB.Core.Rest.Security
                 var httpRequest = RestOperationContext.Current.IncomingRequest;
 
                 var authHeader = httpRequest.Headers["Authorization"];
-                if(String.IsNullOrEmpty(authHeader) ||
+                if (String.IsNullOrEmpty(authHeader) ||
                     !authHeader.ToLowerInvariant().StartsWith("basic"))
                     throw new UnauthorizedRequestException("Invalid authentication scheme", "BASIC", this.m_configuration.Security.ClaimsAuth.Realm, this.m_configuration.Security.BasicAuth.Realm);
                 authHeader = authHeader.Substring(6);
@@ -137,6 +137,12 @@ namespace SanteDB.Core.Rest.Security
             {
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
             }
+            finally
+            {
+                // Disposed context so reset the auth
+                RestOperationContext.Current.Disposed += (o, e) => SanteDB.Core.Security.AuthenticationContext.Current = new SanteDB.Core.Security.AuthenticationContext(SanteDB.Core.Security.AuthenticationContext.AnonymousPrincipal);
+            }
+
         }
 
         /// <summary>

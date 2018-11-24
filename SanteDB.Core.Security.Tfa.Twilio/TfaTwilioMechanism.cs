@@ -20,6 +20,7 @@
 using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security.Tfa.Twilio.Configuration;
 using SanteDB.Core.Security.Tfa.Twilio.Resources;
@@ -91,8 +92,8 @@ namespace SanteDB.Core.Security.Tfa.Twilio
 			if (toNumber == null)
 			{
 				// Get preferred language for the user
-				var securityService = ApplicationContext.Current.GetService<ISecurityRepositoryService>();
-				var userEntity = securityService?.FindUserEntity(o => o.SecurityUserKey == user.Key).FirstOrDefault();
+				var securityService = ApplicationContext.Current.GetService<IRepositoryService<UserEntity>>();
+				var userEntity = securityService?.Find(o => o.SecurityUserKey == user.Key).FirstOrDefault();
 				if (userEntity != null)
 					toNumber = userEntity.Telecoms.FirstOrDefault(o => o.AddressUseKey == TelecomAddressUseKeys.MobileContact)?.Value;
 			}

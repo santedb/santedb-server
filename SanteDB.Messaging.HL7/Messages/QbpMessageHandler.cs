@@ -133,7 +133,7 @@ namespace SanteDB.Messaging.HL7.Messages
                 }
 
                 // Next, we want to get the repository for the bound type
-                var repoService = ApplicationContext.Current.GetService(typeof(IRepositoryService<>).MakeGenericType(map.QueryTarget)) as IPersistableQueryRepositoryService;
+                var repoService = ApplicationContext.Current.GetService(typeof(IRepositoryService<>).MakeGenericType(map.QueryTarget));
                 if (repoService == null)
                     throw new InvalidOperationException($"Cannot find repository service for {map.QueryTargetXml}");
 
@@ -145,10 +145,7 @@ namespace SanteDB.Messaging.HL7.Messages
 
                 // Now we want to query
                 object[] parameters = { filterQuery, offset.Value, (int?)count, null, queryId };
-                var findMethod = repoService.GetType().GetGenericMethod(nameof(IPersistableQueryRepositoryService.Find),
-                    new Type[] { map.QueryTarget },
-                    new Type[] { filterQuery.GetType(), typeof(int), typeof(int?), typeof(int), typeof(Guid) }
-                );
+                var findMethod = repoService.GetType().GetMethod("Find", new Type[] { filterQuery.GetType(), typeof(int), typeof(int?), typeof(int), typeof(Guid) });
                 IEnumerable results = findMethod.Invoke(repoService, parameters) as IEnumerable;
                 int totalResults = (int)parameters[3];
 

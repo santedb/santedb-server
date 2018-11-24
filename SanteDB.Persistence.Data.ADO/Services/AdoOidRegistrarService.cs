@@ -33,6 +33,7 @@ using System.Diagnostics;
 using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Core.Services;
+using SanteDB.Core.Model.Security;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -246,7 +247,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             dba.ValidationRegex = regex.Value;
                             if(!String.IsNullOrEmpty(asgnDev.Value))
                             {
-                                var device = ApplicationContext.Current.GetService<ISecurityRepositoryService>().FindDevices(o => o.Name == asgnDev.Value).FirstOrDefault();
+                                var device = ApplicationContext.Current.GetService<IRepositoryService<SecurityApplication>>().Find(o => o.Name == asgnDev.Value).FirstOrDefault();
                                 dba.AssigningApplicationKey = device?.Key;
                             }
 

@@ -83,18 +83,23 @@ namespace SanteDB.Core.Rest.Serialization
             // Formulate appropriate response
             if (error is DomainStateException)
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.ServiceUnavailable;
-            else if (error is PolicyViolationException) {
+            else if (error is PolicyViolationException)
+            {
                 var pve = error as PolicyViolationException;
-                AuditUtil.AuditRestrictedFunction(error, uriMatched);
                 if (pve.PolicyDecision == PolicyDecisionOutcomeType.Elevate)
                 {
                     // Ask the user to elevate themselves
                     faultMessage.StatusCode = 401;
-                    RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", $"{(this.m_configuration.Security.BasicAuth != null ? "Basic" : "Bearer")} realm=\"{RestOperationContext.Current.IncomingRequest.Url.Host}\" error=\"insufficient_scope\" scope=\"{pve.PolicyId}\"  error_description=\"{error.Message}\"");
+                    var authHeader = $"{(this.m_configuration.Security.BasicAuth != null ? "Basic" : "Bearer")} realm=\"{RestOperationContext.Current.IncomingRequest.Url.Host}\" error=\"insufficient_scope\" scope=\"{pve.PolicyId}\"  error_description=\"{error.Message}\"";
+                    AuditUtil.AuditRestrictedFunction(error as UnauthorizedRequestException, uriMatched, authHeader);
+                    RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", authHeader);
 
                 }
                 else
+                {
                     faultMessage.StatusCode = 403;
+                    AuditUtil.AuditRestrictedFunction(error, uriMatched, "HTTP-403");
+                }
             }
             else if (error is SecurityException)
             {
@@ -104,24 +109,27 @@ namespace SanteDB.Core.Rest.Serialization
             {
                 // TODO: Audit this
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
-                RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", $"Bearer realm=\"{RestOperationContext.Current.IncomingRequest.Url.Host}\" error=\"invalid_token\" error_description=\"{error.Message}\"");
-                
+                var authHeader = $"Bearer realm=\"{RestOperationContext.Current.IncomingRequest.Url.Host}\" error=\"invalid_token\" error_description=\"{error.Message}\"";
+                AuditUtil.AuditRestrictedFunction(error as UnauthorizedRequestException, uriMatched, authHeader);
+                RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", authHeader );
             }
             else if (error is LimitExceededException)
             {
+
                 faultMessage.StatusCode = (int)(HttpStatusCode)429;
                 faultMessage.StatusDescription = "Too Many Requests";
                 faultMessage.Headers.Add("Retry-After", "1200");
             }
             else if (error is UnauthorizedRequestException)
             {
-                AuditUtil.AuditRestrictedFunction(error as UnauthorizedRequestException, uriMatched);
+                var authHeader = (error as UnauthorizedRequestException).AuthenticateChallenge;
+                AuditUtil.AuditRestrictedFunction(error as UnauthorizedRequestException, uriMatched, authHeader);
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
-                RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", (error as UnauthorizedRequestException).AuthenticateChallenge);
+                RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", authHeader);
             }
             else if (error is UnauthorizedAccessException)
             {
-                AuditUtil.AuditRestrictedFunction(error, uriMatched);
+                AuditUtil.AuditRestrictedFunction(error, uriMatched, "HTTP-403");
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
             }
             else if (error is FaultException)
@@ -139,7 +147,7 @@ namespace SanteDB.Core.Rest.Serialization
                 faultMessage.StatusCode = (int)(System.Net.HttpStatusCode)422;
             else if (error is NotImplementedException)
                 faultMessage.StatusCode = (int)HttpStatusCode.NotImplemented;
-            else if(error is NotSupportedException)
+            else if (error is NotSupportedException)
                 faultMessage.StatusCode = (int)HttpStatusCode.MethodNotAllowed;
             else
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;

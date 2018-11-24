@@ -72,7 +72,7 @@ namespace SanteDB.Messaging.HL7.Messages
             if (patient == null)
                 throw new ArgumentNullException(nameof(insertBundle), "Message did not contain a patient");
 
-            var repoService = ApplicationContext.Current.GetService<IBatchRepositoryService>();
+            var repoService = ApplicationContext.Current.GetService<IRepositoryService<Bundle>>();
             if (repoService == null)
                 throw new InvalidOperationException("Cannot find repository for Patient");
 
@@ -91,11 +91,11 @@ namespace SanteDB.Messaging.HL7.Messages
             if (patient == null)
                 throw new ArgumentNullException(nameof(updateBundle), "Message did not contain a patient");
 
-            var repoService = ApplicationContext.Current.GetService<IBatchRepositoryService>();
+            var repoService = ApplicationContext.Current.GetService<IRepositoryService<Bundle>>();
             if (repoService == null)
                 throw new InvalidOperationException("Cannot find repository for Patient");
 
-            updateBundle = repoService.Update(updateBundle);
+            updateBundle = repoService.Save(updateBundle);
 
             // Create response message
             return this.CreateACK(typeof(ACK), e.Message, "CA", $"{patient.Key} updated");

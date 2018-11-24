@@ -22,6 +22,7 @@ using MARC.HI.EHRS.SVC.Core;
 using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Security;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -104,11 +105,16 @@ namespace SanteDB.Core.Services.Impl
             {
                 try
                 {
+                    AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.AnonymousPrincipal);
                     action(o);
                 }
                 catch (Exception e)
                 {
                     this.m_traceSource.TraceError("THREAD DEATH: {0}", e);
+                }
+                finally
+                {
+                    AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.AnonymousPrincipal);
                 }
             });
         }
@@ -121,12 +127,17 @@ namespace SanteDB.Core.Services.Impl
             this.m_threadPool.QueueUserWorkItem((o) => {
                 try
                 {
+                    AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.AnonymousPrincipal);
                     action(o);
                 }
                 catch (Exception e)
                 {
                     this.m_traceSource.TraceError("THREAD DEATH: {0}", e);
 
+                }
+                finally
+                {
+                    AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.AnonymousPrincipal);
                 }
             }, parm);
         }
@@ -140,12 +151,17 @@ namespace SanteDB.Core.Services.Impl
             new Timer((o) => {
                 try
                 {
+                    AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.AnonymousPrincipal);
                     action(o);
                 }
                 catch (Exception e)
                 {
                     this.m_traceSource.TraceError("THREAD DEATH: {0}", e);
 
+                }
+                finally
+                {
+                    AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.AnonymousPrincipal);
                 }
             }, parm, (int)timeout.TotalMilliseconds, Timeout.Infinite);
         }

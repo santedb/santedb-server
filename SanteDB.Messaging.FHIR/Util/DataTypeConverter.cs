@@ -137,9 +137,9 @@ namespace SanteDB.Messaging.FHIR.Util
 				throw new ArgumentNullException(nameof(fhirExtension), "Value cannot be null");
 			}
 
-			var extensionTypeService = ApplicationContext.Current.GetService<IMetadataRepositoryService>();
+			var extensionTypeService = ApplicationContext.Current.GetService<IExtensionTypeRepository>();
 
-			extension.ExtensionType = extensionTypeService.FindExtensionType(e => e.Name == fhirExtension.Url).FirstOrDefault();
+			extension.ExtensionType = extensionTypeService.Get(new Uri(fhirExtension.Url));
             //extension.ExtensionValue = fhirExtension.Value;
             if (extension.ExtensionType.ExtensionHandler == typeof(DecimalExtensionHandler))
                 extension.ExtensionValue = (fhirExtension.Value as FhirDecimal).Value;
@@ -171,9 +171,9 @@ namespace SanteDB.Messaging.FHIR.Util
                 throw new ArgumentNullException(nameof(fhirExtension), "Value cannot be null");
             }
 
-            var extensionTypeService = ApplicationContext.Current.GetService<IMetadataRepositoryService>();
+            var extensionTypeService = ApplicationContext.Current.GetService<IExtensionTypeRepository>();
 
-            extension.ExtensionType = extensionTypeService.FindExtensionType(e => e.Name == fhirExtension.Url).FirstOrDefault();
+            extension.ExtensionType = extensionTypeService.Get(new Uri(fhirExtension.Url));
             //extension.ExtensionValue = fhirExtension.Value;
             if (extension.ExtensionType.ExtensionHandler == typeof(DecimalExtensionHandler))
                 extension.ExtensionValue = (fhirExtension.Value as FhirDecimal).Value;
@@ -262,8 +262,8 @@ namespace SanteDB.Messaging.FHIR.Util
         public static Extension ToExtension(IModelExtension ext)
         {
 
-            var extensionTypeService = ApplicationContext.Current.GetService<IMetadataRepositoryService>();
-            var eType = extensionTypeService.GetExtensionType(ext.ExtensionTypeKey);
+            var extensionTypeService = ApplicationContext.Current.GetService<IExtensionTypeRepository>();
+            var eType = extensionTypeService.Get(ext.ExtensionTypeKey);
 
             var retVal = new Extension()
             {
@@ -612,8 +612,8 @@ namespace SanteDB.Messaging.FHIR.Util
 				return null;
 			}
 
-            var imetaService = ApplicationContext.Current.GetService<IMetadataRepositoryService>();
-            var authority = imetaService.GetAssigningAuthority(identifier.AuthorityKey.Value);
+            var imetaService = ApplicationContext.Current.GetService<IAssigningAuthorityRepositoryService>();
+            var authority = imetaService.Get(identifier.AuthorityKey.Value);
 			return new FhirIdentifier
 			{
 				System = new FhirUri(new Uri(authority?.Url ?? $"urn:oid:{authority?.Oid}")),

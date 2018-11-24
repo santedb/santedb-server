@@ -65,5 +65,9 @@ namespace SanteDB.Core
         /// Service trace source name
         /// </summary>
         public const string ServiceTraceSourceName = "SanteDB.Core";
+        /// <summary>
+        /// Data source name
+        /// </summary>
+        public const string DataTraceSourceName = ServiceTraceSourceName + ".Data";
     }
 }

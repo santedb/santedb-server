@@ -176,7 +176,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			if (queryId == Guid.Empty)
 				return this.m_repository.Find(query, offset, count, out totalResults);
 			else
-				return (this.m_repository as IPersistableQueryRepositoryService).Find<SubstanceAdministration>(query, offset, count, out totalResults, queryId);
+				return (this.m_repository as IPersistableQueryRepositoryService<SubstanceAdministration>).Find(query, offset, count, out totalResults, queryId);
 		}
 
         /// <summary>

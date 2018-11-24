@@ -41,17 +41,12 @@ namespace SanteDB.Messaging.FHIR.Handlers
 	/// </summary>
 	public class ImmunizationRecommendationResourceHandler : ResourceHandlerBase<ImmunizationRecommendation, SubstanceAdministration>
 	{
-		/// <summary>
-		/// The repository.
-		/// </summary>
-		private IActRepositoryService repository;
-
+		
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ImmunizationRecommendationResourceHandler"/> class.
 		/// </summary>
 		public ImmunizationRecommendationResourceHandler()
 		{
-			ApplicationContext.Current.Started += (o, e) => this.repository = ApplicationContext.Current.GetService<IActRepositoryService>();
 		}
 
 		/// <summary>
@@ -157,8 +152,9 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			// TODO: Hook this up to the forecaster
 			var obsoletionReference = Expression.MakeBinary(ExpressionType.NotEqual, Expression.MakeMemberAccess(query.Parameters[0], typeof(SubstanceAdministration).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
 			query = Expression.Lambda<Func<SubstanceAdministration, bool>>(Expression.AndAlso(obsoletionReference, query), query.Parameters);
-
-			return this.repository.Find<SubstanceAdministration>(query, offset, count, out totalResults);
+            totalResults = 0;
+            //return this.repository.Find<SubstanceAdministration>(query, offset, count, out totalResults);
+            return null;
 		}
 
 		/// <summary>
