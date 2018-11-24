@@ -32,7 +32,7 @@ namespace SanteDB.Core.Services.Impl
 	/// <summary>
 	/// Provides operations for managing organizations.
 	/// </summary>
-	public class LocalOrganizationRepository : GenericLocalEntityRepository<Organization>
+	public class LocalOrganizationRepository : GenericLocalNullifiedRepository<Organization>
     {
         protected override string QueryPolicy => PermissionPolicyIdentifiers.ReadPlacesAndOrgs;
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadPlacesAndOrgs;

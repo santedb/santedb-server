@@ -131,7 +131,6 @@
     <Compile Include="Services\Impl\GenericLocalActRepository.cs" />
     <Compile Include="Services\Impl\GenericLocalClinicalDataRepository.cs" />
     <Compile Include="Services\Impl\GenericLocalConceptRepository.cs" />
-    <Compile Include="Services\Impl\GenericLocalEntityRepository.cs" />
     <Compile Include="Services\Impl\GenericLocalNullifiedRepository.cs" />
     <Compile Include="Services\Impl\GenericLocalSecurityRepository.cs" />
     <Compile Include="Services\Impl\LocalEntityRelationshipRepository.cs" />
@@ -160,7 +159,7 @@
     <Compile Include="Services\Impl\LocalStockManagementRepositoryService.cs" />
     <Compile Include="Services\Impl\LocalTagPersistenceService.cs" />
     <Compile Include="Services\Impl\FileConfigurationService.cs" />
-    <Compile Include="Services\Impl\LocalUserEntityRepositoryService.cs" />
+    <Compile Include="Services\Impl\LocalUserEntityRepository.cs" />
     <Compile Include="Services\Impl\ThreadPoolService.cs" />
     <Compile Include="Services\IPersistentQueueService.cs" />
     <Compile Include="Services\ISessionIdentityProviderService.cs" />

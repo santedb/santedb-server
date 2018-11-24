@@ -12,7 +12,7 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Localuser entity repository
     /// </summary>
-    public class LocalUserEntityRepositoryService : GenericLocalMetadataRepository<UserEntity>
+    public class LocalUserEntityRepository : GenericLocalMetadataRepository<UserEntity>
     {
 
         /// <summary>

@@ -97,6 +97,7 @@ namespace SanteDB.Core.Services.Impl
                 typeof(LocalSecurityPolicyRepository),
                 typeof(LocalSecurityRoleRepositoryService),
                 typeof(LocalSecurityUserRepositoryService),
+                typeof(LocalUserEntityRepository),
                 typeof(LocalAssigningAuthorityRepository),
                 typeof(GenericLocalMetadataRepository<DeviceEntity>),
                 typeof(GenericLocalMetadataRepository<ApplicationEntity>),
@@ -126,7 +127,7 @@ namespace SanteDB.Core.Services.Impl
                         else if (typeof(Entity).IsAssignableFrom(t))
                         {
                             this.m_tracer.TraceInformation("Adding Entity repository service for {0}...", t.Name);
-                            var mrst = typeof(GenericLocalEntityRepository<>).MakeGenericType(t);
+                            var mrst = typeof(GenericLocalClinicalDataRepository<>).MakeGenericType(t);
                             ApplicationContext.Current.AddServiceProvider(mrst);
                         }
                     }

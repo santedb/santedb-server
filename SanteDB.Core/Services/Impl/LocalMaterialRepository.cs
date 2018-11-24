@@ -32,7 +32,7 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Local material persistence service
     /// </summary>
-    public class LocalMaterialRepository : GenericLocalEntityRepository<Material>
+    public class LocalMaterialRepository : GenericLocalNullifiedRepository<Material>
     {
         protected override string QueryPolicy => PermissionPolicyIdentifiers.QueryMaterials;
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadMaterials;

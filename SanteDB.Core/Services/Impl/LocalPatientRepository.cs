@@ -36,7 +36,7 @@ namespace SanteDB.Core.Services.Impl
 	/// <summary>
 	/// Local patient repository service
 	/// </summary>
-	public class LocalPatientRepository : GenericLocalEntityRepository<Patient>, IPatientRepositoryService, IRepositoryService<Patient>
+	public class LocalPatientRepository : GenericLocalNullifiedRepository<Patient>, IPatientRepositoryService, IRepositoryService<Patient>
 	{
 		
 		/// <summary>

@@ -211,21 +211,6 @@ namespace SanteDB.Core.Services.Impl
 
             try
             {
-                TEntity old = null;
-
-                if (data.Key.HasValue)
-                {
-                    old = persistenceService.Get(new Identifier<Guid>(data.Key.Value), AuthenticationContext.Current.Principal, true);
-                }
-
-                // HACK: Lookup by ER src<>trg
-                if (old == null && typeof(TEntity) == typeof(EntityRelationship))
-                {
-                    var tr = 0;
-                    var erd = data as EntityRelationship;
-                    old = (TEntity)(persistenceService as IDataPersistenceService<EntityRelationship>).Query(o => o.SourceEntityKey == erd.SourceEntityKey && o.TargetEntityKey == erd.TargetEntityKey, 0, 1, AuthenticationContext.Current.Principal, out tr).OfType<Object>().FirstOrDefault();
-                }
-
                 data = businessRulesService?.BeforeUpdate(data) ?? data;
                 data = persistenceService.Update(data, AuthenticationContext.Current.Principal, TransactionMode.Commit);
                 businessRulesService?.AfterUpdate(data);

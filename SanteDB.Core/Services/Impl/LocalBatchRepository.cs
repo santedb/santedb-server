@@ -110,7 +110,22 @@ namespace SanteDB.Core.Services.Impl
                 if (irsi is ISecuredRepositoryService)
                     (irsi as ISecuredRepositoryService).DemandAlter(itm);
             }
-            return base.Save(data);
+
+            // Demand permission
+            this.DemandAlter(data);
+
+            var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<Bundle>>();
+            var businessRulesService = ApplicationContext.Current.GetBusinessRulesService<Bundle>();
+
+            if (persistenceService == null)
+                throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<Bundle>)}");
+
+            data = this.Validate(data);
+
+            data = businessRulesService?.BeforeUpdate(data) ?? data;
+            data = persistenceService.Update(data, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+            businessRulesService?.AfterUpdate(data);
+            return data;
         }
     }
 }
