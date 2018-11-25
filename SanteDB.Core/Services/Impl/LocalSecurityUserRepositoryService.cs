@@ -70,5 +70,15 @@ namespace SanteDB.Core.Services.Impl
             
             return retVal;
         }
+
+        /// <summary>
+        /// Save the user credential
+        /// </summary>
+        public override SecurityUser Save(SecurityUser data)
+        {
+            if(!String.IsNullOrEmpty(data.Password))
+                ApplicationContext.Current.GetService<IIdentityProviderService>().ChangePassword(data.UserName, data.Password, AuthenticationContext.Current.Principal);
+            return base.Save(data);
+        }
     }
 }
