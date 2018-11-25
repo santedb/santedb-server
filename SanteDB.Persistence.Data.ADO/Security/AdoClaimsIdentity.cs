@@ -70,6 +70,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
         private DbSecurityUser m_securityUser;
         // The authentication type
         private String m_authenticationType;
+        private ISession m_session;
         // Issued on
         private DateTimeOffset m_issuedOn = DateTimeOffset.Now;
         // Expiration time
@@ -83,7 +84,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
         /// <summary>
         /// Gets the internal session id
         /// </summary>
-        internal byte[] SessionToken { get; set; }
+        internal byte[] SessionToken { get { return this.m_session?.Id; } }
         
         /// <summary>
         /// Gets the identifier of the session
@@ -93,7 +94,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
         /// <summary>
         /// Gets the 
         /// </summary>
-        public byte[] RefreshToken { get; internal set; }
+        public byte[] RefreshToken { get { return this.m_session?.RefreshToken; } }
 
         /// <summary>
         /// Gets the time of issuance
@@ -194,12 +195,13 @@ namespace SanteDB.Persistence.Data.ADO.Security
             var roles = user.Context.Query<DbSecurityRole>(user.Context.CreateSqlStatement<DbSecurityRole>().SelectFrom()
                         .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
                         .Where<DbSecurityUserRole>(o => o.UserKey == user.Key));
-
+            
             return new AdoClaimsIdentity(user, roles, isAuthenticated)
             {
                 m_authenticationType = authenticationMethod,
                 m_issuedOn = session?.NotBefore ?? DateTimeOffset.Now,
-                m_expires = session?.NotAfter ?? DateTimeOffset.Now.AddMinutes(10)
+                m_expires = session?.NotAfter ?? DateTimeOffset.Now.AddMinutes(10),
+                m_session = session
             };
 
 
@@ -320,6 +322,10 @@ namespace SanteDB.Persistence.Data.ADO.Security
                 if (this.m_securityUser.PhoneNumber != null)
                     claims.Add(new Claim(ClaimTypes.MobilePhone, this.m_securityUser.PhoneNumber));
 
+                if (this.SessionToken != null) {
+                    claims.Add(new Claim(ClaimTypes.IsPersistent, "true"));
+                    claims.Add(new Claim(SanteDBClaimTypes.SanteDBSessionIdClaim, (this.m_session as AdoSecuritySession)?.Key.ToString() ?? BitConverter.ToString(this.SessionToken).Replace("-","")));
+                }
                 var identities = new ClaimsIdentity[] { new ClaimsIdentity(this, claims.AsReadOnly(), AuthenticationTypes.Password, ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType) };
                 if (otherIdentities != null)
                     identities = identities.Union(otherIdentities).ToArray();

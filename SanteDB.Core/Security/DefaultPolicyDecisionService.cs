@@ -35,7 +35,7 @@ namespace SanteDB.Core.Security
     /// <summary>
     /// Local policy decision service
     /// </summary>
-    public class LocalPolicyDecisionService : IPolicyDecisionService
+    public class DefaultPolicyDecisionService : IPolicyDecisionService
     {
 
         /// <summary>

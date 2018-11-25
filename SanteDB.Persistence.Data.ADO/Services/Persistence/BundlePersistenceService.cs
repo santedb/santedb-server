@@ -38,6 +38,9 @@ using SanteDB.Core.Services;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
+using System.Security;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.Diagnostics;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -64,14 +67,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         private Bundle ReorganizeForInsert(Bundle bundle)
         {
             Bundle retVal = new Bundle() { Item = new List<IdentifiedData>() };
-            foreach(var itm in bundle.Item.Where(o=>o != null))
+            foreach (var itm in bundle.Item.Where(o => o != null))
             {
                 this.m_tracer.TraceInformation("Reorganizing {0}..", itm.Key);
                 // Are there any relationships
                 if (itm is Entity)
                 {
                     var ent = itm as Entity;
-                    foreach(var rel in ent.Relationships)
+                    foreach (var rel in ent.Relationships)
                     {
                         this.m_tracer.TraceInformation("Processing {0} / relationship / {1} ..", itm.Key, rel.TargetEntityKey);
 
@@ -86,7 +89,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     }
 
                 }
-                else if(itm is Act)
+                else if (itm is Act)
                 {
                     var act = itm as Act;
                     foreach (var rel in act.Relationships)
@@ -116,7 +119,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
 
                     // Old versions of the mobile had an issue with missing record targets
-                    if(AdoPersistenceService.GetConfiguration().DataCorrectionKeys.Contains("correct-missing-rct"))
+                    if (AdoPersistenceService.GetConfiguration().DataCorrectionKeys.Contains("correct-missing-rct"))
                     {
                         var patientEncounter = bundle.Item.OfType<PatientEncounter>().FirstOrDefault();
 
@@ -148,18 +151,20 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override Bundle InsertInternal(DataContext context, Bundle data)
         {
 
-            if (data.Item == null) return data;
             this.m_tracer.TraceInformation("Bundle has {0} objects...", data.Item.Count);
             data = this.ReorganizeForInsert(data);
             this.m_tracer.TraceInformation("After reorganization has {0} objects...", data.Item.Count);
 
-            if(AdoPersistenceService.GetConfiguration().PrepareStatements)
+            if (AdoPersistenceService.GetConfiguration().PrepareStatements)
                 context.PrepareStatements = true;
-            for(int i  = 0; i < data.Item.Count; i++)
+
+            Guid? externProvRef = null;
+
+            for (int i = 0; i < data.Item.Count; i++)
             {
                 var itm = data.Item[i];
                 var svc = AdoPersistenceService.GetPersister(itm.GetType());
-                
+
                 this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)(i + 1) / data.Item.Count, itm));
                 try
                 {
@@ -167,11 +172,49 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         throw new InvalidOperationException($"Cannot find persister for {itm.GetType()}");
                     if (itm.TryGetExisting(context, true) != null)
                     {
+                        var externProv = (itm as NonVersionedEntityData)?.UpdatedByKey ?? (itm as BaseEntityData)?.CreatedByKey;
+                        if (!externProvRef.HasValue)
+                            externProvRef = externProv;
+                        if (externProv.HasValue && externProvRef.HasValue &&
+                            externProv != externProvRef)
+                        {
+                            this.m_tracer.TraceError("PROVENANCE OF OBJECT DOES NOT MATCH: EXPECTED {0} GOT {1} (OBJECT #{2})", externProvRef, externProv, i);
+
+                            // Throw a detected issue exception
+                            throw new DetectedIssueException(new List<DetectedIssue>()
+                            {
+                                new DetectedIssue()
+                                {
+                                    Priority = DetectedIssuePriorityType.Error,
+                                    Text = $"PROVENANCE OF OBJECT DOES NOT MATCH: EXPECTED {externProvRef} GOT {externProv} (OBJECT #{i})"
+                                }
+                           });
+                        }
                         this.m_tracer.TraceInformation("Will update {0} object from bundle...", itm);
                         data.Item[i] = svc.Update(context, itm) as IdentifiedData;
                     }
                     else
                     {
+                        // Validate bundle : All objects must carry the same CREATED BY key or not carry a CREATED BY key at all
+                        var externProv = (itm as BaseEntityData)?.CreatedByKey;
+                        if (!externProvRef.HasValue)
+                            externProvRef = externProv;
+                        if (externProv.HasValue && externProvRef.HasValue &&
+                            externProv != externProvRef)
+                        {
+                            this.m_tracer.TraceError("PROVENANCE OF OBJECT DOES NOT MATCH: EXPECTED {0} GOT {1} (OBJECT #{2})", externProvRef, externProv, i);
+
+                            // Throw a detected issue exception
+                            throw new DetectedIssueException(new List<DetectedIssue>()
+                            {
+                                new DetectedIssue()
+                                {
+                                    Priority = DetectedIssuePriorityType.Error,
+                                    Text = $"PROVENANCE OF OBJECT DOES NOT MATCH: EXPECTED {externProvRef} GOT {externProv} (OBJECT #{i})"
+                                }
+                           });
+                        }
+
                         this.m_tracer.TraceInformation("Will insert {0} object from bundle...", itm);
                         data.Item[i] = svc.Insert(context, itm) as IdentifiedData;
                     }
@@ -181,7 +224,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Error, e.HResult, "Error inserting bundle: {0}", e);
                     throw e.InnerException;
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     throw new Exception($"Could not insert bundle due to sub-object persistence (bundle item {i})", e);
                 }
@@ -202,13 +245,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Bundle ObsoleteInternal(DataContext context, Bundle data)
         {
+
             foreach (var itm in data.Item)
             {
                 var idp = typeof(IDataPersistenceService<>).MakeGenericType(new Type[] { itm.GetType() });
-				var svc = ApplicationContext.Current.GetService(idp);
-				var mi = svc.GetType().GetRuntimeMethod("Obsolete", new Type[] { typeof(DataContext), itm.GetType(), typeof(IPrincipal) });
+                var svc = ApplicationContext.Current.GetService(idp);
+                var mi = svc.GetType().GetRuntimeMethod("Obsolete", new Type[] { typeof(DataContext), itm.GetType(), typeof(IPrincipal) });
 
-				itm.CopyObjectData(mi.Invoke(ApplicationContext.Current.GetService(idp), new object[] { context, itm }));
+                itm.CopyObjectData(mi.Invoke(ApplicationContext.Current.GetService(idp), new object[] { context, itm }));
             }
             return data;
         }
@@ -243,6 +287,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             return this.InsertInternal(context, data);
         }
 
-    
+
     }
 }

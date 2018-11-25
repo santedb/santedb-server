@@ -241,7 +241,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                             user.Password = passwordHashingService.EncodePassword(newPassword);
                             user.SecurityHash = Guid.NewGuid().ToString();
-                            user.UpdatedByKey = dataContext.EstablishProvenance(principal); 
+                            user.UpdatedByKey = dataContext.EstablishProvenance(principal, null); 
 
                             dataContext.Update(user);
                             tx.Commit();
@@ -318,7 +318,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 UserClass = UserClassKeys.HumanUser
                             };
                             if (authContext != null)
-                                newIdentityUser.CreatedByKey = dataContext.EstablishProvenance(authContext);
+                                newIdentityUser.CreatedByKey = dataContext.EstablishProvenance(authContext, null);
 
                             dataContext.Insert(newIdentityUser);
                             var retVal = AdoClaimsIdentity.Create(newIdentityUser);
@@ -365,7 +365,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     // Obsolete
                     user.ObsoletionTime = DateTimeOffset.Now;
-                    user.ObsoletedByKey = dataContext.EstablishProvenance(authContext);
+                    user.ObsoletedByKey = dataContext.EstablishProvenance(authContext, null);
                     user.SecurityHash = Guid.NewGuid().ToString();
 
                     dataContext.Update(user);
@@ -414,7 +414,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     user.ObsoletedByKey = null;
                     user.ObsoletedByKeySpecified = true;
 
-                    user.UpdatedByKey = dataContext.EstablishProvenance(authContext);
+                    user.UpdatedByKey = dataContext.EstablishProvenance(authContext, null);
                     user.UpdatedTime = DateTimeOffset.Now;
                     user.SecurityHash = Guid.NewGuid().ToString();
 

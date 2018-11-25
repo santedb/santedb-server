@@ -41,6 +41,7 @@ using System.IO;
 using System.Data;
 using MARC.HI.EHRS.SVC.Core.Services.Security;
 using System.Threading;
+using SanteDB.Persistence.Data.ADO.Security;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -152,7 +153,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     var signedToken = dbSession.Key.ToByteArray().Concat(encoder.Sign(dbSession.Key.ToByteArray())).ToArray();
                     var signedRefresh = refreshToken.Concat(encoder.Sign(refreshToken)).ToArray();
-                    return new GenericSession(signedToken, signedRefresh, dbSession.NotBefore, dbSession.NotAfter);
+                    return new AdoSecuritySession(dbSession.Key, signedToken, signedRefresh, dbSession.NotBefore, dbSession.NotAfter);
                 }
             }
             catch (Exception e)
@@ -218,7 +219,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     tx.Commit();
 
-                    return new GenericSession(signedToken, signedRefresh, dbSession.NotBefore, dbSession.NotAfter);
+                    return new AdoSecuritySession(dbSession.Key, signedToken, signedRefresh, dbSession.NotBefore, dbSession.NotAfter);
                 }
                 catch (Exception e)
                 {
@@ -285,7 +286,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         }
                     }
 
-                    return new GenericSession(sessionToken, null, dbSession.NotBefore, dbSession.NotAfter);
+                    return new AdoSecuritySession(dbSession.Key, sessionToken, null, dbSession.NotBefore, dbSession.NotAfter);
                 }
             }
             catch (Exception e)

@@ -44,6 +44,7 @@ using System.Xml.Serialization;
 using SanteDB.Persistence.Data.ADO.Services.Persistence;
 using SanteDB.Core.Security;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Security.Claims;
 
 namespace SanteDB.Persistence.Data.ADO.Data
 {
@@ -465,14 +466,17 @@ namespace SanteDB.Persistence.Data.ADO.Data
         /// <summary>
         /// Establish provenance for the specified connection
         /// </summary>
-        public static Guid EstablishProvenance(this DataContext me, IPrincipal principal)
+        public static Guid EstablishProvenance(this DataContext me, IPrincipal principal, Guid? externalRef)
         {
             // First, we want to get the identities
             var cprincipal = principal as ClaimsPrincipal;
             DbSecurityProvenance retVal = new DbSecurityProvenance()
             {
                 Key = me.ContextId,
-                ApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid)
+                ApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid),
+                ExternalSecurityObjectRefKey = externalRef,
+                ExternalSecurityObjectRefType = externalRef != null ?  
+                    (me.Count<DbSecurityUser>(o=>o.Key == externalRef) > 0 ? "U" : "P") : null
             };
 
             // Identities
@@ -485,7 +489,12 @@ namespace SanteDB.Persistence.Data.ADO.Data
                 else
                     retVal.UserKey = ident.GetKey(me);
             }
-            
+
+            // Session identifier 
+            var sidClaim = cprincipal?.FindFirst(SanteDBClaimTypes.SanteDBSessionIdClaim)?.Value;
+            Guid sid = Guid.Empty;
+            if (Guid.TryParse(sidClaim, out sid))
+                retVal.SessionKey = sid;
             // Context 
             try
             {
@@ -494,6 +503,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
                     retVal.Key = me.ContextId = retVal.UserKey.Value;
                 else
                     retVal = me.Insert(retVal);
+
             }
             catch (Exception e) {
                 s_traceSource.TraceWarning("Error creating context: {0}", e);

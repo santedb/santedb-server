@@ -61,5 +61,17 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// </summary>
         [Column("ses_id")]
         public Guid? SessionKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the external id that the sender claims was the provenance user
+        /// </summary>
+        [Column("ext_id")]
+        public Guid? ExternalSecurityObjectRefKey { get; set; }
+
+        /// <summary>
+        /// External provenance reference type
+        /// </summary>
+        [Column("ext_typ")]
+        public string ExternalSecurityObjectRefType { get; set; }
     }
 }

@@ -31,12 +31,12 @@ namespace SanteDB.Core.Security
     /// <summary>
     /// Represents a local regex password validator
     /// </summary>
-    public class LocalPasswordValidationService : RegexPasswordValidator
+    public class DefaultPasswordValidationService : RegexPasswordValidator
     {
         /// <summary>
         /// Local password validation service
         /// </summary>
-        public LocalPasswordValidationService() : base((ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(SanteDBConstants.SanteDBConfigurationName) as Configuration.SanteDBConfiguration).Security.PasswordRegex ?? RegexPasswordValidator.DefaultPasswordPattern)
+        public DefaultPasswordValidationService() : base((ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(SanteDBConstants.SanteDBConfigurationName) as Configuration.SanteDBConfiguration).Security.PasswordRegex ?? RegexPasswordValidator.DefaultPasswordPattern)
         {
             
         }

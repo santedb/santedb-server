@@ -112,12 +112,12 @@
     <Compile Include="Security\DeviceIdentity.cs" />
     <Compile Include="Security\DevicePrincipal.cs" />
     <Compile Include="Security\ISession.cs" />
-    <Compile Include="Security\LocalPasswordValidationService.cs" />
+    <Compile Include="Security\DefaultPasswordValidationService.cs" />
     <Compile Include="Security\Permission\PolicyPermissionAttribute.cs" />
     <Compile Include="Security\AuthenticationContext.cs" />
     <Compile Include="Security\ILocalPolicy.cs" />
     <Compile Include="Security\IPolicyHandler.cs" />
-    <Compile Include="Security\LocalPolicyDecisionService.cs" />
+    <Compile Include="Security\DefaultPolicyDecisionService.cs" />
     <Compile Include="Security\Claims\SanteDBClaimTypes.cs" />
     <Compile Include="Security\Privacy\LocalPolicyEnforcementPointService.cs" />
     <Compile Include="Security\SecurityUtils.cs" />
