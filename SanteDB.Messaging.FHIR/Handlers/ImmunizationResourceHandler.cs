@@ -18,28 +18,28 @@
  * Date: 2018-6-22
  */
 using MARC.Everest.Connectors;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.DataTypes;
-using SanteDB.Messaging.FHIR.Resources;
+using RestSrvr;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using RestSrvr;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
-	/// <summary>
-	/// Resource handler for immunization classes.
-	/// </summary>
-	public class ImmunizationResourceHandler : RepositoryResourceHandlerBase<Immunization, SubstanceAdministration>
+    /// <summary>
+    /// Resource handler for immunization classes.
+    /// </summary>
+    public class ImmunizationResourceHandler : RepositoryResourceHandlerBase<Immunization, SubstanceAdministration>
 	{
 		/// <summary>
 		/// Maps the substance administration to FHIR.

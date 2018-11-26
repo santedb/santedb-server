@@ -17,25 +17,25 @@
  * User: justin
  * Date: 2018-6-22
  */
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.DataTypes;
-using SanteDB.Messaging.FHIR.Resources;
+using RestSrvr;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RestSrvr;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
-	/// <summary>
-	/// Facility resource handler
-	/// </summary>
-	public class LocationResourceHandler : RepositoryResourceHandlerBase<Location, Place>
+    /// <summary>
+    /// Facility resource handler
+    /// </summary>
+    public class LocationResourceHandler : RepositoryResourceHandlerBase<Location, Place>
 	{
 		/// <summary>
 		/// Map the inbound place to a FHIR model

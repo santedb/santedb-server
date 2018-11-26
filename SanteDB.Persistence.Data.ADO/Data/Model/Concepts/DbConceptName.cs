@@ -24,10 +24,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Concepts
 {
-	/// <summary>
-	/// Represents a concept name
-	/// </summary>
-	[Table("cd_name_tbl")]
+    /// <summary>
+    /// Represents a concept name
+    /// </summary>
+    [Table("cd_name_tbl")]
 	public class DbConceptName : DbConceptVersionedAssociation
 	{
 	

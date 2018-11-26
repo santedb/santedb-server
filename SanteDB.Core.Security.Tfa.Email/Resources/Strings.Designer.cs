@@ -8,10 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SanteDB.Core.Security.Tfa.Email.Resources {
-    using System;
-    
-    
+namespace SanteDB.Core.Security.Tfa.Email.Resources
+{
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>

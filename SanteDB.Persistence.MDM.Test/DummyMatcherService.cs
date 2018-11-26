@@ -1,8 +1,6 @@
-﻿using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SanteDB.Core;
 using SanteDB.Core.Model;
-using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
@@ -10,8 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.MDM.Test
 {
@@ -27,7 +23,7 @@ namespace SanteDB.Persistence.MDM.Test
         {
             if (input.GetType() == typeof(Patient)) {
                 Patient p = (Patient)((Object)input);
-                return ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.DateOfBirth == p.DateOfBirth && o.Key != p.Key, AuthenticationContext.SystemPrincipal).OfType<T>();
+                return ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.DateOfBirth == p.DateOfBirth && o.Key != p.Key).OfType<T>();
             }
             return new List<T>();
         }

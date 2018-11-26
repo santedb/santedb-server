@@ -22,11 +22,11 @@ using System.Security.Claims;
 
 namespace SanteDB.Core.Security
 {
-	/// <summary>
-	/// Represents a device identity.
-	/// </summary>
-	/// <seealso cref="System.Security.Claims.ClaimsIdentity" />
-	public class DeviceIdentity : ClaimsIdentity
+    /// <summary>
+    /// Represents a device identity.
+    /// </summary>
+    /// <seealso cref="System.Security.Claims.ClaimsIdentity" />
+    public class DeviceIdentity : ClaimsIdentity
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DeviceIdentity"/> class.

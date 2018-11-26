@@ -27,8 +27,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Principal;
-using MARC.HI.EHRS.SVC.Core.Data;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {

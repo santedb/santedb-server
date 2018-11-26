@@ -17,32 +17,27 @@
  * User: justin
  * Date: 2018-10-14
  */
-using SanteDB.Core.Model;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Messaging.HAPI.TransportProtocol;
 using NHapi.Base.Model;
 using NHapi.Base.Util;
 using NHapi.Model.V25.Datatype;
-using NHapi.Model.V25.Message;
 using NHapi.Model.V25.Segment;
+using SanteDB.Core;
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.HL7.ParameterMap;
-using System.Linq.Expressions;
+using SanteDB.Messaging.HL7.TransportProtocol;
+using System;
 using System.Collections;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Xml.Serialization;
 
 namespace SanteDB.Messaging.HL7.Messages
 {
@@ -125,15 +120,15 @@ namespace SanteDB.Messaging.HL7.Messages
                 }
 
                 // Get the query tag which is the current offset
-                if (ApplicationContext.Current.GetService<Core.Services.IQueryPersistenceService>()?.IsRegistered(queryId) == true)
+                if (ApplicationServiceContext.Current.GetService<Core.Services.IQueryPersistenceService>()?.IsRegistered(queryId) == true)
                 {
-                    var tag = ApplicationContext.Current.GetService<Core.Services.IQueryPersistenceService>().GetQueryTag(queryId);
+                    var tag = ApplicationServiceContext.Current.GetService<Core.Services.IQueryPersistenceService>().GetQueryTag(queryId);
                     if (tag is int)
                         offset = (int)tag;
                 }
 
                 // Next, we want to get the repository for the bound type
-                var repoService = ApplicationContext.Current.GetService(typeof(IRepositoryService<>).MakeGenericType(map.QueryTarget));
+                var repoService = ApplicationServiceContext.Current.GetService(typeof(IRepositoryService<>).MakeGenericType(map.QueryTarget));
                 if (repoService == null)
                     throw new InvalidOperationException($"Cannot find repository service for {map.QueryTargetXml}");
 
@@ -151,7 +146,7 @@ namespace SanteDB.Messaging.HL7.Messages
 
                 // Save the tag
                 if (dsc.ContinuationPointer.Value != queryId.ToString())
-                    ApplicationContext.Current.GetService<Core.Services.IQueryPersistenceService>()?.SetQueryTag(queryId, count);
+                    ApplicationServiceContext.Current.GetService<Core.Services.IQueryPersistenceService>()?.SetQueryTag(queryId, count);
 
                 // Query basics
                 var retVal = this.CreateACK(map.ResponseType, e.Message, "AA", "Query Success");
@@ -166,7 +161,7 @@ namespace SanteDB.Messaging.HL7.Messages
                 qak.QueryResponseStatus.Value = "AA";
                 qak.ThisPayload.Value = results.OfType<Object>().Count().ToString();
 
-                if (ApplicationContext.Current.GetService<Core.Services.IQueryPersistenceService>() != null)
+                if (ApplicationServiceContext.Current.GetService<Core.Services.IQueryPersistenceService>() != null)
                 {
                     odsc.ContinuationPointer.Value = queryId.ToString();
                     odsc.ContinuationStyle.Value = "RD";
@@ -266,7 +261,7 @@ namespace SanteDB.Messaging.HL7.Messages
 
                 if (String.IsNullOrEmpty(rid.AssigningAuthority.NamespaceID.Value)) // lookup by AA 
                 {
-                    var aa = ApplicationContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>().Query(o => o.Oid == rid.AssigningAuthority.UniversalID.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                    var aa = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>().Query(o => o.Oid == rid.AssigningAuthority.UniversalID.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault();
                     if (aa == null)
                         throw new InvalidOperationException($"Domain {rid.AssigningAuthority.UniversalID.Value} is unknown");
                     else

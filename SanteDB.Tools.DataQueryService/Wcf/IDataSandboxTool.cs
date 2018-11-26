@@ -17,15 +17,8 @@
  * User: justin
  * Date: 2018-9-25
  */
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.ServiceModel;
-using RestSrvr;
-using System.Text;
-using System.Threading.Tasks;
 using RestSrvr.Attributes;
+using System.IO;
 
 namespace SanteDB.Tools.DataSandbox.Wcf
 {

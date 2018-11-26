@@ -17,15 +17,11 @@
  * User: justin
  * Date: 2018-11-23
  */
+using RestSrvr;
+using SanteDB.Messaging.FHIR.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using MARC.Everest.Connectors;
-using System.Xml.Serialization;
-using SanteDB.Messaging.FHIR.Resources;
-using System.Xml;
-using RestSrvr;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {

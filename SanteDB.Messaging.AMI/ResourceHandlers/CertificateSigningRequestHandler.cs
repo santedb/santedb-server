@@ -17,24 +17,20 @@
  * User: justin
  * Date: 2018-11-23
  */
+using MARC.Util.CertificateTools;
+using SanteDB.Core;
+using SanteDB.Core.Interop;
+using SanteDB.Core.Model.AMI.Security;
+using SanteDB.Core.Model.Query;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Services;
+using SanteDB.Messaging.AMI.Configuration;
+using SanteDB.Rest.AMI;
+using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Interop;
-using SanteDB.Core.Model.Query;
-using SanteDB.Messaging.AMI.Wcf;
-using SanteDB.Core.Model.AMI.Security;
-using MARC.Util.CertificateTools;
-using SanteDB.Messaging.AMI.Configuration;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using System.Reflection;
-using SanteDB.Core.Security.Attribute;
-using SanteDB.Core.Security;
-using SanteDB.Rest.Common;
-using SanteDB.Rest.AMI;
 
 namespace SanteDB.Messaging.AMI.ResourceHandlers
 {
@@ -48,7 +44,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandlers
         private readonly CertTool m_certTool;
 
         // Configuration
-        private readonly AmiConfiguration configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.messaging.ami") as AmiConfiguration;
+        private readonly AmiConfigurationSection configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AmiConfigurationSection>();
 
         /// <summary>
         /// Creates a new CSR request handler

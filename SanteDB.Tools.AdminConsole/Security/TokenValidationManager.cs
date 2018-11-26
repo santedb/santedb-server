@@ -18,10 +18,6 @@
  * Date: 2018-10-24
  */
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Tools.AdminConsole.Security
 {

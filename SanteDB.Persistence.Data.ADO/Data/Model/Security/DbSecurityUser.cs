@@ -17,17 +17,15 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
-
-using SanteDB.Core.Model.Security;
 using SanteDB.OrmLite.Attributes;
+using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
 {
-	/// <summary>
-	/// Represents a user for the purpose of authentication
-	/// </summary>
-	[Table("sec_usr_tbl")]
+    /// <summary>
+    /// Represents a user for the purpose of authentication
+    /// </summary>
+    [Table("sec_usr_tbl")]
 	public class DbSecurityUser : DbNonVersionedBaseData
 	{
 

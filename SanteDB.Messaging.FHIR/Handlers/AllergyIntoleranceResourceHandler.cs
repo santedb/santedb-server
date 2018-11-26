@@ -18,22 +18,22 @@
  * Date: 2018-6-22
  */
 using MARC.Everest.Connectors;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.Resources;
+using RestSrvr;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using RestSrvr;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
-	/// <summary>
-	/// Allergy / intolerance resource handler
-	/// </summary>
-	public class AllergyIntoleranceResourceHandler : RepositoryResourceHandlerBase<AllergyIntolerance, CodedObservation>
+    /// <summary>
+    /// Allergy / intolerance resource handler
+    /// </summary>
+    public class AllergyIntoleranceResourceHandler : RepositoryResourceHandlerBase<AllergyIntolerance, CodedObservation>
 	{
         /// <summary>
         /// Map coded allergy intolerance resource to FHIR

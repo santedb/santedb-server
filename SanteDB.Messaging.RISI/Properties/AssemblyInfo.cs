@@ -17,7 +17,6 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core.Attributes;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -55,8 +54,3 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyInformationalVersion("Gananoque")]
 [assembly: AssemblyFileVersion("1.9.0.0")]
 
-// Assembly plugin info
-[assembly: AssemblyPlugin()]
-
-// Depends: SanteDB.Core v1.1.0.0
-[assembly: AssemblyPluginDependency("SanteDB.Core", "1.9.0.0")]

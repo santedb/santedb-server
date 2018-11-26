@@ -1,17 +1,16 @@
-﻿using System;
-using System.Linq;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Messaging.HAPI.TransportProtocol;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NHapi.Model.V25.Segment;
+using SanteDB.Core;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.HL7.Messages;
+using SanteDB.Messaging.HL7.TransportProtocol;
 using SanteDB.Persistence.Data.ADO.Test;
+using System;
+using System.Linq;
 
 namespace SanteDB.Messaging.HL7.Test
 {
@@ -29,9 +28,9 @@ namespace SanteDB.Messaging.HL7.Test
             DataTest.DataTestUtil.Start(context);
 
             // Create the test harness device / application
-            var securityDevService = ApplicationContext.Current.GetService<IRepositoryService<SecurityDevice>>();
-            var securityAppService = ApplicationContext.Current.GetService<IRepositoryService<SecurityApplication>>();
-            var metadataService = ApplicationContext.Current.GetService<IAssigningAuthorityRepositoryService>();
+            var securityDevService = ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityDevice>>();
+            var securityAppService = ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityApplication>>();
+            var metadataService = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>();
             AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
             // Create device
             var dev = new SecurityDevice()
@@ -89,7 +88,7 @@ namespace SanteDB.Messaging.HL7.Test
             Assert.AreEqual("CA", (message.GetStructure("MSA") as MSA).AcknowledgmentCode.Value);
 
             // Ensure that the patient actually was persisted
-            var patient = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "HL7-1"), AuthenticationContext.SystemPrincipal).SingleOrDefault();
+            var patient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "HL7-1")).SingleOrDefault();
             Assert.IsNotNull(patient);
             Assert.IsTrue(messageStr.Contains(patient.Key.ToString()));
             Assert.AreEqual(1, patient.Names.Count);
@@ -110,7 +109,7 @@ namespace SanteDB.Messaging.HL7.Test
             Assert.AreEqual("CA", (message.GetStructure("MSA") as MSA).AcknowledgmentCode.Value);
 
             // Ensure that the patient actually was persisted
-            var patient = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "HL7-2"), AuthenticationContext.SystemPrincipal).SingleOrDefault();
+            var patient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "HL7-2")).SingleOrDefault();
             Assert.IsNotNull(patient);
             Assert.IsTrue(messageStr.Contains(patient.Key.ToString()));
             Assert.AreEqual(1, patient.Names.Count);
@@ -132,7 +131,7 @@ namespace SanteDB.Messaging.HL7.Test
             AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
             var msg = TestUtil.GetMessage("QBP_SIMPLE_PRE");
             new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
-            var patient = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "HL7-3"), AuthenticationContext.SystemPrincipal).SingleOrDefault();
+            var patient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "HL7-3")).SingleOrDefault();
             Assert.IsNotNull(patient);
             msg = TestUtil.GetMessage("QBP_SIMPLE");
             var message = new QbpMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));

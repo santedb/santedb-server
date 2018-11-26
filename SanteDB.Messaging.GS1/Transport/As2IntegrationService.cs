@@ -17,20 +17,16 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core.Services;
+using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Http;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.GS1.Configuration;
 using SanteDB.Messaging.GS1.Model;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Messaging.GS1.Transport.AS2
 {
@@ -48,7 +44,7 @@ namespace SanteDB.Messaging.GS1.Transport.AS2
         private TraceSource m_tracer = new TraceSource("SanteDB.Messaging.GS1");
 
         // Configuration
-        private Gs1ConfigurationSection m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.messaging.gs1") as Gs1ConfigurationSection;
+        private Gs1ConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Gs1ConfigurationSection>();
 
 
         /// <summary>
@@ -84,7 +80,7 @@ namespace SanteDB.Messaging.GS1.Transport.AS2
                     Object dq = null;
                     try
                     {
-                        dq = ApplicationContext.Current.GetService<IPersistentQueueService>().Dequeue(this.m_configuration.Gs1QueueName);
+                        dq = ApplicationServiceContext.Current.GetService<IPersistentQueueService>().Dequeue(this.m_configuration.Gs1QueueName);
                         if (dq == null) break;
                         this.SendQueueMessage(dq);
                     }
@@ -92,16 +88,16 @@ namespace SanteDB.Messaging.GS1.Transport.AS2
                     {
                         this.m_tracer.TraceError(">>>> !!ALERT!! >>>> Error sending message to GS1 broker. Message will be placed in dead-letter queue");
                         this.m_tracer.TraceError(ex.ToString());
-                        ApplicationContext.Current.GetService<IPersistentQueueService>().Enqueue("dead", dq);
+                        ApplicationServiceContext.Current.GetService<IPersistentQueueService>().Enqueue("dead", dq);
                     }
                 } while (true);
             };
 
             // Queue Handler
-            ApplicationContext.Current.Started += (o, e) =>
+            ApplicationServiceContext.Current.Started += (o, e) =>
             {
-                ApplicationContext.Current.GetService<IPersistentQueueService>().Queued += this.m_handler;
-                ApplicationContext.Current.GetService<IPersistentQueueService>().Open(this.m_configuration.Gs1QueueName);
+                ApplicationServiceContext.Current.GetService<IPersistentQueueService>().Queued += this.m_handler;
+                ApplicationServiceContext.Current.GetService<IPersistentQueueService>().Open(this.m_configuration.Gs1QueueName);
 
             };
 
@@ -144,7 +140,7 @@ namespace SanteDB.Messaging.GS1.Transport.AS2
         {
             this.Stopping?.Invoke(this, EventArgs.Empty);
 
-            ApplicationContext.Current.GetService<IPersistentQueueService>().Queued -= this.m_handler;
+            ApplicationServiceContext.Current.GetService<IPersistentQueueService>().Queued -= this.m_handler;
             this.m_handler = null;
 
             this.Stopped?.Invoke(this, EventArgs.Empty);

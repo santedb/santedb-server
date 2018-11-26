@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SanteDB.Core.Model.DataTypes;
-using System.IO;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Test
 {
@@ -47,7 +45,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
                 Handler = typeof(PhoneticAlgorithm).AssemblyQualifiedName,
                 Name = "An algorithm to be updated"
             };
-            var afterTest = base.DoTestUpdate(underTest, null, "Name");
+            var afterTest = base.DoTestUpdate(underTest, "Name");
             Assert.AreEqual(typeof(PhoneticAlgorithm).AssemblyQualifiedName, afterTest.Handler);
         }
 

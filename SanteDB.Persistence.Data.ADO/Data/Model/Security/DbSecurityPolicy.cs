@@ -24,10 +24,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
 {
-	/// <summary>
-	/// Represents a single security policy
-	/// </summary>
-	[Table("sec_pol_tbl")]
+    /// <summary>
+    /// Represents a single security policy
+    /// </summary>
+    [Table("sec_pol_tbl")]
 	public class DbSecurityPolicy : DbBaseData
 	{
 

@@ -17,20 +17,16 @@
  * User: justin
  * Date: 2018-6-22
  */
-using SanteDB.Core.Model.Entities;
-using SanteDB.Persistence.Data.ADO.Data.Model;
-using System.Security.Principal;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using System;
-using SanteDB.Core.Services;
-using System.Linq;
-using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
-using SanteDB.Persistence.Data.ADO.Data;
-using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
-using SanteDB.OrmLite;
+using SanteDB.Core;
+using SanteDB.Core.Event;
 using SanteDB.Core.Model;
-using MARC.HI.EHRS.SVC.Core.Event;
+using SanteDB.Core.Services;
+using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Data.Model;
+using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
+using System;
+using System.Linq;
+using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -108,13 +104,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Gets the specified object
         /// </summary>
-        public override TModel Get<TIdentifier>(MARC.HI.EHRS.SVC.Core.Data.Identifier<TIdentifier> containerId, IPrincipal principal, bool loadFast)
+        public override TModel Get(Guid containerId, Guid? versionId, bool loadFast, IPrincipal principal = null)
         {
             var tr = 0;
-            var uuid = containerId as Identifier<Guid>;
-
+            
             // Fire retrieving 
-            var preArgs = new PreRetrievalEventArgs<TModel>(containerId, principal);
+            var preArgs = new DataRetrievingEventArgs<TModel>(containerId, versionId, principal);
             this.FireRetrieving(preArgs);
             if (preArgs.Cancel)
             {
@@ -122,22 +117,22 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 return preArgs.OverrideResult;
             }
 
-            if (uuid.Id != Guid.Empty)
+            if (containerId != Guid.Empty)
             {
-                var cacheItem = ApplicationContext.Current.GetService<IDataCachingService>()?.GetCacheItem<TModel>(uuid.Id) as TModel;
-                if (cacheItem != null && (cacheItem.VersionKey.HasValue && uuid.VersionId == cacheItem.VersionKey.Value || uuid.VersionId == Guid.Empty) &&
+                var cacheItem = ApplicationServiceContext.Current.GetService<IDataCachingService>()?.GetCacheItem<TModel>(containerId) as TModel;
+                if (cacheItem != null && (cacheItem.VersionKey.HasValue && versionId == cacheItem.VersionKey.Value || versionId == Guid.Empty) &&
                     (loadFast && cacheItem.LoadState >= LoadState.PartialLoad || !loadFast && cacheItem.LoadState == LoadState.FullLoad))
                     return cacheItem;
             }
 
             // Get most recent version
             TModel result = default(TModel);
-            if (uuid.VersionId == Guid.Empty)
-                result = base.Query(o => o.Key == uuid.Id && o.ObsoletionTime == null, 0, 1, principal, out tr).FirstOrDefault();
+            if (versionId == Guid.Empty)
+                result = base.Query(o => o.Key == containerId && o.ObsoletionTime == null, 0, 1, out tr, principal).FirstOrDefault();
             else
-                result = base.Query(o => o.Key == uuid.Id && o.VersionKey == uuid.VersionId, 0, 1, principal, out tr).FirstOrDefault();
+                result = base.Query(o => o.Key == containerId && o.VersionKey == versionId, 0, 1, out tr, principal).FirstOrDefault();
 
-            var postArgs = new PostRetrievalEventArgs<TModel>(result, principal);
+            var postArgs = new DataRetrievedEventArgs<TModel>(result, principal);
             this.FireRetrieved(postArgs);
 
             return result;

@@ -17,8 +17,8 @@
  * User: justin
  * Date: 2018-11-23
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Exceptions;
+using SanteDB.Core;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Patch;
@@ -170,7 +170,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
         /// </summary>
         public override void ThrowIfNotReady()
         {
-            if (!ApplicationContext.Current.IsRunning)
+            if (!ApplicationServiceContext.Current.IsRunning)
                 throw new DomainStateException();
         }
 

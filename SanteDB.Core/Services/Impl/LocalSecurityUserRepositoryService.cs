@@ -1,14 +1,10 @@
-﻿using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
-using SanteDB.Core.Model.Security;
+﻿using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Security.Services;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -39,10 +35,10 @@ namespace SanteDB.Core.Services.Impl
         {
             this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Creating user {0}", data);
 
-            var iids = ApplicationContext.Current.GetService<IIdentityProviderService>();
+            var iids = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
 
             // Create the identity
-            var id = iids.CreateIdentity(data.UserName, data.Password, AuthenticationContext.Current.Principal);
+            var id = iids.CreateIdentity(data.UserName, data.Password);
 
             // Now ensure local db record exists
             int tr = 0;
@@ -78,7 +74,7 @@ namespace SanteDB.Core.Services.Impl
         {
             if (!String.IsNullOrEmpty(data.Password))
             {
-                ApplicationContext.Current.GetService<IIdentityProviderService>().ChangePassword(data.UserName, data.Password, AuthenticationContext.Current.Principal);
+                ApplicationServiceContext.Current.GetService<IIdentityProviderService>().ChangePassword(data.UserName, data.Password);
             }
             return base.Save(data);
         }

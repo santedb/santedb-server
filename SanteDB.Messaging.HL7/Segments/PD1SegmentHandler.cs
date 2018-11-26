@@ -17,23 +17,21 @@
  * User: justin
  * Date: 2018-9-25
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Services;
-using NHapi.Base.Model;
-using NHapi.Model.V25.Segment;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NHapi.Model.V25.Datatype;
+using NHapi.Base.Model;
+using NHapi.Model.V25.Segment;
+using SanteDB.Core;
 using SanteDB.Core.Services;
+using SanteDB.Messaging.HL7.Configuration;
 
 namespace SanteDB.Messaging.HL7.Segments
 {
@@ -45,6 +43,7 @@ namespace SanteDB.Messaging.HL7.Segments
 
         private const string LivingArrangementCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.220";
         private const string DisabilityCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.295";
+        private Hl7ConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
 
         /// <summary>
         /// Patient demographics 1
@@ -79,17 +78,17 @@ namespace SanteDB.Messaging.HL7.Segments
             // Primary facility
             if (pd1Segment.PatientPrimaryFacilityRepetitionsUsed > 0)
             {
-                var sdlRepo = ApplicationContext.Current.GetService<IDataPersistenceService<Place>>();
+                var sdlRepo = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>();
                 foreach (var xon in pd1Segment.GetPatientPrimaryFacility())
                 {
                     var authority = xon.AssigningAuthority.ToModel(false);
                     var idnumber = xon.OrganizationIdentifier.Value ?? xon.IDNumber.Value;
                     // Find the org or SDL
                     Place place = null;
-                    if (authority == null && xon.AssigningAuthority.NamespaceID.Value == ApplicationContext.Current.Configuration.Custodianship.Id.Id)
-                        place = sdlRepo.Get(new Identifier<Guid>(Guid.Parse(idnumber)), AuthenticationContext.SystemPrincipal, true);
+                    if (authority == null && xon.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority.DomainName)
+                        place = sdlRepo.Get(Guid.Parse(idnumber), null, true, AuthenticationContext.SystemPrincipal);
                     else
-                        place = sdlRepo.Query(o => o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation && o.Identifiers.Any(i => i.Value == idnumber && i.AuthorityKey == authority.Key), AuthenticationContext.SystemPrincipal).SingleOrDefault();
+                        place = sdlRepo.Query(o => o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation && o.Identifiers.Any(i => i.Value == idnumber && i.AuthorityKey == authority.Key)).SingleOrDefault();
                     if (place != null)
                         retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation, place));
 
@@ -107,10 +106,10 @@ namespace SanteDB.Messaging.HL7.Segments
             // Privacy code
             if (!pd1Segment.ProtectionIndicator.IsEmpty())
             {
-                var pip = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
+                var pip = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
                 if (pd1Segment.ProtectionIndicator.Value == "Y")
                 {
-                    var policy = pip.Query(o => o.Oid == DataPolicyIdentifiers.RestrictedInformation, AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                    var policy = pip.Query(o => o.Oid == DataPolicyIdentifiers.RestrictedInformation).FirstOrDefault();
                     retVal.Policies.Add(new SecurityPolicyInstance(policy, PolicyGrantType.Grant));
                 }
                 else

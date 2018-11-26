@@ -17,39 +17,30 @@
  * User: justin
  * Date: 2018-6-22
  */
-using SanteDB.Core.Services;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Exceptions;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Core.Services.Policy;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
+using SanteDB.Core;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security.Claims;
+using SanteDB.Core.Security.Services;
+using SanteDB.Core.Services;
+using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Configuration;
+using SanteDB.Persistence.Data.ADO.Data.Model.Error;
+using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data.SqlClient;
+using System.Data;
+using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security;
 using System.Security.Authentication;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Persistence.Data.ADO.Data.Model.Security;
-using SanteDB.Persistence.Data.ADO.Configuration;
-using System.Data;
-using System.Data.Common;
-using SanteDB.Persistence.Data.ADO.Data.Model;
-using SanteDB.Persistence.Data.ADO.Data.Model.Error;
-using SanteDB.Persistence.Data.ADO.Data;
-using SanteDB.OrmLite;
 
 namespace SanteDB.Persistence.Data.ADO.Security
 {
@@ -79,7 +70,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
         private List<DbSecurityRole> m_roles = null;
 
         // Configuration
-        private static AdoConfiguration s_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(AdoDataConstants.ConfigurationSectionName) as AdoConfiguration;
+        private static AdoPersistenceConfigurationSection s_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
 
         /// <summary>
         /// Gets the internal session id
@@ -116,7 +107,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
                 if (userName == AuthenticationContext.AnonymousPrincipal.Identity.Name ||
                     userName == AuthenticationContext.SystemPrincipal.Identity.Name)
                 {
-                    throw new PolicyViolationException(new GenericPrincipal(new GenericIdentity(userName), new String[0]), PermissionPolicyIdentifiers.Login, PolicyDecisionOutcomeType.Deny);
+                    throw new PolicyViolationException(new GenericPrincipal(new GenericIdentity(userName), new String[0]), PermissionPolicyIdentifiers.Login, PolicyGrantType.Deny);
                 }
 
                 Guid? userId = Guid.Empty;
@@ -126,9 +117,9 @@ namespace SanteDB.Persistence.Data.ADO.Security
                     dataContext.Open();
 
                     // Attempt to get a user
-                    var hashingService = ApplicationContext.Current.GetService<IPasswordHashingService>();
+                    var hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
-                    var passwordHash = hashingService.EncodePassword(password);
+                    var passwordHash = hashingService.ComputeHash(password);
                     var fnResult = dataContext.FirstOrDefault<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr", userName, passwordHash, 5);
 
 	                var user = fnResult.Object1;
@@ -378,7 +369,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
 		private static void UpdateCache(DbSecurityUser user, DataContext context)
 	    {
 		    var securityUser = new SanteDB.Persistence.Data.ADO.Services.Persistence.SecurityUserPersistenceService().ToModelInstance(user, context);
-		    ApplicationContext.Current.GetService<IDataCachingService>()?.Add(securityUser);
+		    ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(securityUser);
 		}
     }
 }

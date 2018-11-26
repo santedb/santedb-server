@@ -17,9 +17,9 @@
  * User: justin
  * Date: 2018-11-23
  */
-using System;
 using SanteDB.Messaging.FHIR.Attributes;
 using SanteDB.Messaging.FHIR.DataTypes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;

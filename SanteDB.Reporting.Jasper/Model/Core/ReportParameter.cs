@@ -22,10 +22,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.Core
 {
-	/// <summary>
-	/// Represents a report parameter.
-	/// </summary>
-	[XmlType("reportParameter")]
+    /// <summary>
+    /// Represents a report parameter.
+    /// </summary>
+    [XmlType("reportParameter")]
 	public class ReportParameter
 	{
 		/// <summary>

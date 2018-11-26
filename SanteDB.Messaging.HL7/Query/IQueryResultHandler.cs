@@ -17,15 +17,11 @@
  * User: justin
  * Date: 2018-10-14
  */
-using MARC.HI.EHRS.SVC.Messaging.HAPI.TransportProtocol;
 using NHapi.Base.Model;
+using SanteDB.Messaging.HL7.TransportProtocol;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Messaging.HL7.Query
 {

@@ -17,17 +17,13 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Auditing.Data;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Attributes;
-using MARC.HI.EHRS.SVC.Core.Event;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Core.Services.Policy;
+using SanteDB.Core.Event;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Security.Audit;
+using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 using System.Collections;
@@ -36,15 +32,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Security.Privacy
 {
     /// <summary>
     /// Local policy enforcement point service
     /// </summary>
-    [TraceSource(SanteDBConstants.SecurityTraceSourceName)]
     public class LocalPolicyEnforcementPointService : IDaemonService
     {
 
@@ -93,7 +86,7 @@ namespace SanteDB.Core.Security.Privacy
         {
             this.Starting?.Invoke(this, EventArgs.Empty);
 
-            ApplicationContext.Current.Started += (o, e) => this.BindEvents();
+            ApplicationServiceContext.Current.Started += (o, e) => this.BindEvents();
 
             this.Started?.Invoke(this, EventArgs.Empty);
 
@@ -121,7 +114,7 @@ namespace SanteDB.Core.Security.Privacy
         /// </summary>
         private void BindEvents()
         {
-            var svcManager = ApplicationContext.Current.GetService<IServiceManager>();
+            var svcManager = (ApplicationServiceContext.Current as IServiceManager);
 
             this.m_tracer.TraceInformation("Starting bind to persistence services...");
 
@@ -129,7 +122,7 @@ namespace SanteDB.Core.Security.Privacy
             {
 
                 var svcType = typeof(IDataPersistenceService<>).MakeGenericType(t);
-                var svcInstance = ApplicationContext.Current.GetService(svcType);
+                var svcInstance = ApplicationServiceContext.Current.GetService(svcType);
 
                 // Now comes the tricky dicky part - We need to subscribe to a generic event
                 if (svcInstance != null)
@@ -137,7 +130,7 @@ namespace SanteDB.Core.Security.Privacy
                     this.m_tracer.TraceInformation("Binding to {0}...", svcType);
 
                     // Construct the delegate for query
-                    var pqeArgType = typeof(PostQueryEventArgs<>).MakeGenericType(t);
+                    var pqeArgType = typeof(QueryResultEventArgs<>).MakeGenericType(t);
                     var qevtHdlrType = typeof(EventHandler<>).MakeGenericType(pqeArgType);
                     var senderParm = Expression.Parameter(typeof(Object), "o");
                     var eventParm = Expression.Parameter(pqeArgType, "e");
@@ -148,7 +141,7 @@ namespace SanteDB.Core.Security.Privacy
                     svcType.GetRuntimeEvent("Queried").AddEventHandler(svcInstance, queriedInstanceDelegate);
 
                     // Construct delegate for retrieve
-                    pqeArgType = typeof(PostRetrievalEventArgs<>).MakeGenericType(t);
+                    pqeArgType = typeof(DataRetrievedEventArgs<>).MakeGenericType(t);
                     senderParm = Expression.Parameter(typeof(Object), "o");
                     eventParm = Expression.Parameter(pqeArgType, "e");
                     delegateData = Expression.Convert(Expression.MakeMemberAccess(eventParm, pqeArgType.GetRuntimeProperty("Data")), t);
@@ -171,12 +164,12 @@ namespace SanteDB.Core.Security.Privacy
         public IEnumerable HandlePostQueryEvent(IEnumerable results)
         {
             // this is a very simple PEP which will enforce active policies in the result set.
-            var pdp = ApplicationContext.Current.GetService<IPolicyDecisionService>();
+            var pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
             var decisions = results.OfType<Object>().Select(o=>new { Securable = o, Decision = pdp.GetPolicyDecision(AuthenticationContext.Current.Principal, o) });
             
             return decisions
                 // We want to mask ELEVATE
-                .Where(o => o.Decision.Outcome == PolicyDecisionOutcomeType.Elevate && o.Securable is Act).Select(
+                .Where(o => o.Decision.Outcome == PolicyGrantType.Elevate && o.Securable is Act).Select(
                     o => new Act() {
                         ReasonConceptKey = NullReasonKeys.Masked,
                         Key = (o.Securable as IdentifiedData).Key
@@ -184,7 +177,7 @@ namespace SanteDB.Core.Security.Privacy
                 )
                 // We want to include all grant
                 .Union(
-                    decisions.Where(o => o.Decision.Outcome == PolicyDecisionOutcomeType.Grant).Select(o => o.Securable)
+                    decisions.Where(o => o.Decision.Outcome == PolicyGrantType.Grant).Select(o => o.Securable)
                 )
                 .ToList();
         }

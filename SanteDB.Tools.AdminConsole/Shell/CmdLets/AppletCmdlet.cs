@@ -18,16 +18,13 @@
  * Date: 2018-10-24
  */
 using MohawkCollege.Util.Console.Parameters;
-using SanteDB.Tools.AdminConsole.Attributes;
+using SanteDB.Core.Model.AMI.Applet;
 using SanteDB.Messaging.AMI.Client;
+using SanteDB.Tools.AdminConsole.Attributes;
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model.AMI.Applet;
 
 namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
 {
@@ -54,7 +51,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         }
 
         // Ami client
-        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
+        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationServiceContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
 
         /// <summary>
         /// List applets

@@ -17,25 +17,16 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Core.Exceptions;
-using SanteDB.Core.Model.Acts;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Security;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using SanteDB.Core.Model;
-using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Interfaces;
+using SanteDB.Core.Model;
+using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Entities;
+using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
-using SanteDB.Core.Model.Entities;
-using SanteDB.Core.Model.DataTypes;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -107,28 +98,28 @@ namespace SanteDB.Core.Services.Impl
             foreach (var t in repositoryServices)
             {
                 this.m_tracer.TraceInformation("Adding repository service for {0}...", t);
-                ApplicationContext.Current.AddServiceProvider(t);
+                (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(t);
             }
 
-            ApplicationContext.Current.Started += (o, e) =>
+            ApplicationServiceContext.Current.Started += (o, e) =>
             {
                 foreach (var t in AppDomain.CurrentDomain.GetAssemblies().Where(a=>!a.IsDynamic).SelectMany(a => a.GetExportedTypes()).Where(t => typeof(IdentifiedData).IsAssignableFrom(t) && !t.IsAbstract && t.GetCustomAttribute<XmlRootAttribute>() != null))
                 {
                     var irst = typeof(IRepositoryService<>).MakeGenericType(t);
-                    var irsi = ApplicationContext.Current.GetService(irst);
+                    var irsi = ApplicationServiceContext.Current.GetService(irst);
                     if (irsi == null)
                     {
                         if (typeof(Act).IsAssignableFrom(t))
                         {
                             this.m_tracer.TraceInformation("Adding Act repository service for {0}...", t.Name);
                             var mrst = typeof(GenericLocalActRepository<>).MakeGenericType(t);
-                            ApplicationContext.Current.AddServiceProvider(mrst);
+                            (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(mrst);
                         }
                         else if (typeof(Entity).IsAssignableFrom(t))
                         {
                             this.m_tracer.TraceInformation("Adding Entity repository service for {0}...", t.Name);
                             var mrst = typeof(GenericLocalClinicalDataRepository<>).MakeGenericType(t);
-                            ApplicationContext.Current.AddServiceProvider(mrst);
+                            (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(mrst);
                         }
                     }
                 }

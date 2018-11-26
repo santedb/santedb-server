@@ -17,14 +17,11 @@
  * User: justin
  * Date: 2018-11-23
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SanteDB.Messaging.FHIR.DataTypes;
-using System.Xml.Serialization;
-using System.Net;
+using System;
 using System.Diagnostics;
+using System.Net;
+using System.Xml.Serialization;
 
 namespace SanteDB.Messaging.FHIR.Resources
 {

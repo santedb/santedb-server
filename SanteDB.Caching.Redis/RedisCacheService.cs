@@ -17,16 +17,14 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using Newtonsoft.Json;
 using SanteDB.Caching.Redis.Configuration;
+using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Services;
@@ -38,8 +36,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace SanteDB.Caching.Redis
@@ -64,7 +60,7 @@ namespace SanteDB.Caching.Redis
         private ISubscriber m_subscriber;
 
         // Configuration
-        private RedisConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("SanteDB.caching.redis") as RedisConfiguration;
+        private RedisConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RedisConfigurationSection>();
 
         // Binder
         private ModelSerializationBinder m_binder = new ModelSerializationBinder();
@@ -410,8 +406,8 @@ namespace SanteDB.Caching.Redis
             catch (Exception e)
             {
                 this.m_tracer.TraceError("Error starting REDIS caching, will switch to no-caching : {0}", e);
-                ApplicationContext.Current.RemoveServiceProvider(typeof(RedisCacheService));
-                ApplicationContext.Current.RemoveServiceProvider(typeof(IDataCachingService));
+                (ApplicationServiceContext.Current as IServiceManager).RemoveServiceProvider(typeof(RedisCacheService));
+                (ApplicationServiceContext.Current as IServiceManager).RemoveServiceProvider(typeof(IDataCachingService));
                 return false;
             }
         }

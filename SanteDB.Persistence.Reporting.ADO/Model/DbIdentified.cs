@@ -23,12 +23,12 @@ using System;
 
 namespace SanteDB.Persistence.Reporting.PSQL.Model
 {
-	/// <summary>
-	/// Represents identified data.
-	/// </summary>
-	/// <seealso cref="SanteDB.OrmLite.IAdoLoadedData" />
-	/// <seealso cref="IDbIdentified" />
-	public abstract class DbIdentified : IAdoLoadedData, IDbIdentified
+    /// <summary>
+    /// Represents identified data.
+    /// </summary>
+    /// <seealso cref="SanteDB.OrmLite.IAdoLoadedData" />
+    /// <seealso cref="IDbIdentified" />
+    public abstract class DbIdentified : IAdoLoadedData, IDbIdentified
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DbIdentified"/> class.

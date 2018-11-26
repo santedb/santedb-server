@@ -22,11 +22,11 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.DataSource
 {
-	/// <summary>
-	/// Represents a virtual data source.
-	/// </summary>
-	/// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
-	[XmlType("virtualDataSource")]
+    /// <summary>
+    /// Represents a virtual data source.
+    /// </summary>
+    /// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
+    [XmlType("virtualDataSource")]
 	[XmlRoot("virtualDataSource")]
 	public class VirtualDataSource : ResourceBase
 	{

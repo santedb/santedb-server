@@ -22,12 +22,8 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Tools.AdminConsole.Parameters;
 using SanteDB.Tools.AdminConsole.Shell;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.Tracing;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Tools.AdminConsole
 {
@@ -56,8 +52,8 @@ namespace SanteDB.Tools.AdminConsole
                     else
                         Tracer.AddWriter(new ConsoleTraceWriter("Error"), EventLevel.Error);
 
-                    ApplicationContext.Initialize(options);
-                    if (ApplicationContext.Current.Start())
+                    ApplicationServiceContext.Initialize(options);
+                    if (ApplicationServiceContext.Current.Start())
                         new InteractiveShell().Exec();
                 }
                 catch (Exception e)

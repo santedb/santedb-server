@@ -17,9 +17,9 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core;
 using SanteDB.Core.Model.RISI;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using System;
 using System.Data;
@@ -29,10 +29,10 @@ using System.Security.Principal;
 
 namespace SanteDB.Persistence.Reporting.PSQL.Services
 {
-	/// <summary>
-	/// Represents a report format persistence service.
-	/// </summary>
-	public class ReportFormatPersistenceService : CorePersistenceService<ReportFormat, PSQL.Model.ReportFormat, PSQL.Model.ReportFormat>
+    /// <summary>
+    /// Represents a report format persistence service.
+    /// </summary>
+    public class ReportFormatPersistenceService : CorePersistenceService<ReportFormat, PSQL.Model.ReportFormat, PSQL.Model.ReportFormat>
 	{
 		/// <summary>
 		/// Converts a model instance to a domain instance.
@@ -41,7 +41,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="context">The context.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the converted model instance.</returns>
-		public override object FromModelInstance(ReportFormat modelInstance, DataContext context, IPrincipal principal)
+		public override object FromModelInstance(ReportFormat modelInstance, DataContext context)
 		{
 			if (modelInstance == null)
 			{
@@ -51,7 +51,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 
 			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(PSQL.Model.ReportFormat) } to { nameof(ReportFormat) }");
 
-			return base.FromModelInstance(modelInstance, context, principal);
+			return base.FromModelInstance(modelInstance, context);
 		}
 
 		/// <summary>
@@ -62,15 +62,15 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the inserted model.</returns>
 		/// <exception cref="DuplicateNameException">If the report format already exists</exception>
-		public override ReportFormat InsertInternal(DataContext context, ReportFormat model, IPrincipal principal)
+		public override ReportFormat InsertInternal(DataContext context, ReportFormat model)
 		{
 			int totalResults;
 
-			var result = this.QueryInternal(context, o => o.Format == model.Format, 0, null, out totalResults, false, principal).FirstOrDefault();
+			var result = this.QueryInternal(context, o => o.Format == model.Format, 0, null, out totalResults, false).FirstOrDefault();
 
 			if (result == null)
 			{
-				return base.InsertInternal(context, model, principal);
+				return base.InsertInternal(context, model);
 			}
 
 			throw new DuplicateNameException($"Cannot insert report format: {model.Format} because it already exists");
@@ -84,15 +84,15 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the obsoleted data.</returns>
 		/// <exception cref="System.InvalidOperationException">Cannot obsolete report format which is currently in use</exception>
-		public override ReportFormat ObsoleteInternal(DataContext context, ReportFormat model, IPrincipal principal)
+		public override ReportFormat ObsoleteInternal(DataContext context, ReportFormat model)
 		{
-			var reportDefinitionService = ApplicationContext.Current.GetService<IDataPersistenceService<ReportDefinition>>();
+			var reportDefinitionService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ReportDefinition>>();
 
-			var results = reportDefinitionService.Query(r => r.Formats.Any(f => f.Format == model.Format), principal);
+			var results = reportDefinitionService.Query(r => r.Formats.Any(f => f.Format == model.Format));
 
 			if (!results.Any())
 			{
-				return base.ObsoleteInternal(context, model, principal);
+				return base.ObsoleteInternal(context, model);
 			}
 
 			throw new InvalidOperationException("Cannot obsolete report format which is currently in use");
@@ -105,7 +105,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="context">The context.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the converted model instance.</returns>
-		public override ReportFormat ToModelInstance(object domainInstance, DataContext context, IPrincipal principal)
+		public override ReportFormat ToModelInstance(object domainInstance, DataContext context)
 		{
 			if (domainInstance == null)
 			{
@@ -120,7 +120,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 
 			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(ReportFormat) } to { nameof(PSQL.Model.ReportFormat) }");
 
-			return base.ToModelInstance(domainInstance, context, principal);
+			return base.ToModelInstance(domainInstance, context);
 		}
 	}
 }

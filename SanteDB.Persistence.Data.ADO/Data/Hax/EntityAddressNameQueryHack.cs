@@ -17,18 +17,13 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Entities;
 using SanteDB.OrmLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Reflection;
-using SanteDB.Core.Model.Entities;
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
-using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Hax
 {

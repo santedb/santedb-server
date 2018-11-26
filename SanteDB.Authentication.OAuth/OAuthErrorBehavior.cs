@@ -17,14 +17,14 @@
  * User: justin
  * Date: 2018-11-23
  */
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
 using Newtonsoft.Json;
 using RestSrvr;
 using RestSrvr.Message;
 using SanteDB.Authentication.OAuth2.Model;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
 
 namespace SanteDB.Authentication.OAuth2
 {

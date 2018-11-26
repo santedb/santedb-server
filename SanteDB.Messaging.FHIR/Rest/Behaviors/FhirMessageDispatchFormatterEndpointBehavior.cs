@@ -18,13 +18,7 @@
  * Date: 2018-11-23
  */
 using RestSrvr;
-using SanteDB.Core.Rest.Serialization;
 using SanteDB.Messaging.FHIR.Rest.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Messaging.FHIR.Rest.Behavior
 {

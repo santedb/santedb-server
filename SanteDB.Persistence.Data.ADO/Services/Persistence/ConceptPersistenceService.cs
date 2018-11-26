@@ -17,23 +17,16 @@
  * User: justin
  * Date: 2018-6-22
  */
-using SanteDB.Core.Model.DataTypes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Persistence.Data.ADO.Data.Model;
-using System.Security.Principal;
-using MARC.HI.EHRS.SVC.Core;
-using SanteDB.Core.Services;
-using System.Linq.Expressions;
-using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
-using SanteDB.Persistence.Data.ADO.Data;
-using SanteDB.OrmLite;
-using System.Collections;
+using SanteDB.Core;
 using SanteDB.Core.Interfaces;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.DataTypes;
+using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Data;
+using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
+using System;
+using System.Collections;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -190,7 +183,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override object FromModelInstance(Core.Model.DataTypes.ConceptName modelInstance, DataContext context)
         {
             var retVal = base.FromModelInstance(modelInstance, context) as DbConceptName;
-            var phoneticCoder = ApplicationContext.Current.GetService<IPhoneticAlgorithmHandler>();
+            var phoneticCoder = ApplicationServiceContext.Current.GetService<IPhoneticAlgorithmHandler>();
             retVal.PhoneticAlgorithmKey = phoneticCoder?.AlgorithmId ?? PhoneticAlgorithmKeys.None;
             retVal.PhoneticCode = phoneticCoder?.GenerateCode(modelInstance.Name);
             return retVal;

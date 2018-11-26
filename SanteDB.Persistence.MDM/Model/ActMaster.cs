@@ -18,21 +18,18 @@
  * Date: 2018-9-25
  */
 using Newtonsoft.Json;
+using SanteDB.Core;
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.EntityLoader;
+using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.EntityLoader;
 using System.Security.Principal;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services.Policy;
-using SanteDB.Core.Model.Interfaces;
-using SanteDB.Core.Model.DataTypes;
-using SanteDB.Core.Model.Constants;
+using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.MDM.Model
 {
@@ -82,16 +79,16 @@ namespace SanteDB.Persistence.MDM.Model
 
                 // Is there a relationship which is the record of truth
                 var rot = this.LoadCollection<ActRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == MdmConstants.MasterRecordOfTruthRelationship);
-                var pdp = ApplicationContext.Current.GetService<IPolicyDecisionService>();
+                var pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
 
                 if (rot == null) // We have to create a synthetic record 
                 {
-                    this.m_master.SemanticCopy(this.LocalRecords.Where(o => pdp.GetPolicyDecision(principal, o).Outcome == PolicyDecisionOutcomeType.Grant).ToArray());
+                    this.m_master.SemanticCopy(this.LocalRecords.Where(o => pdp.GetPolicyDecision(principal, o).Outcome == PolicyGrantType.Grant).ToArray());
                 }
                 else // there is a ROT so use it to override the values
                 {
                     this.m_master.SemanticCopy(rot.LoadProperty<T>("TargetAct"));
-                    this.m_master.SemanticCopyNullFields(this.LocalRecords.Where(o => pdp.GetPolicyDecision(principal, o).Outcome == PolicyDecisionOutcomeType.Grant).ToArray());
+                    this.m_master.SemanticCopyNullFields(this.LocalRecords.Where(o => pdp.GetPolicyDecision(principal, o).Outcome == PolicyGrantType.Grant).ToArray());
                 }
                 (this.m_master as Act).Policies = this.LocalRecords.SelectMany(o => (o as Act).Policies).Where(o => o.Policy.CanOverride).ToList();
                 (this.m_master as Act).Tags.RemoveAll(o => o.TagKey == "mdm.type");

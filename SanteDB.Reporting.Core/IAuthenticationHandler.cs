@@ -17,16 +17,16 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
 using SanteDB.Reporting.Core.Auth;
 using SanteDB.Reporting.Core.Event;
+using System;
 
 namespace SanteDB.Reporting.Core
 {
-	/// <summary>
-	/// Represents an authentication handler.
-	/// </summary>
-	public interface IAuthenticationHandler : IDisposable
+    /// <summary>
+    /// Represents an authentication handler.
+    /// </summary>
+    public interface IAuthenticationHandler : IDisposable
 	{
 		/// <summary>
 		/// Occurs when a service is authenticated.

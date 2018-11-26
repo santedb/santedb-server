@@ -21,11 +21,11 @@ using System;
 
 namespace SanteDB.Reporting.Core.Event
 {
-	/// <summary>
-	/// Representing authenticating event arguments.
-	/// </summary>
-	/// <seealso cref="System.EventArgs" />
-	public class AuthenticatingEventArgs : EventArgs
+    /// <summary>
+    /// Representing authenticating event arguments.
+    /// </summary>
+    /// <seealso cref="System.EventArgs" />
+    public class AuthenticatingEventArgs : EventArgs
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AuthenticatingEventArgs"/> class.

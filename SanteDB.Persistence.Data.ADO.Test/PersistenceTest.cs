@@ -1,17 +1,14 @@
-﻿using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SanteDB.Core;
 using SanteDB.Core.Model;
-using SanteDB.Core.Model.Security;
+using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
+using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.ADO.Test
 {
@@ -32,15 +29,15 @@ namespace SanteDB.Persistence.Data.ADO.Test
                 authContext = AuthenticationContext.AnonymousPrincipal;
 
             // Store user
-            IDataPersistenceService<TModel> persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TModel>>();
+            IDataPersistenceService<TModel> persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TModel>>();
             Assert.IsNotNull(persistenceService);
 
-            var objectAfterTest = persistenceService.Insert(objectUnderTest, authContext, TransactionMode.Commit);
+            var objectAfterTest = persistenceService.Insert(objectUnderTest, TransactionMode.Commit, authContext);
             // Key should be set
             Assert.AreNotEqual(Guid.Empty, objectAfterTest.Key);
 
             // Verify
-            objectAfterTest = persistenceService.Get(objectAfterTest.Id(), authContext, false);
+            objectAfterTest = persistenceService.Get(objectAfterTest.Key.Value, (objectAfterTest as IVersionedEntity)?.VersionKey, false, authContext);
             if(objectAfterTest is BaseEntityData)
                 Assert.AreNotEqual(default(DateTimeOffset), (objectAfterTest as BaseEntityData).CreationTime);
 
@@ -50,7 +47,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Do a test step for an update
         /// </summary>
-        public TModel DoTestUpdate(TModel objectUnderTest, IPrincipal authContext, String propertyToChange)
+        public TModel DoTestUpdate(TModel objectUnderTest, String propertyToChange, IPrincipal authContext = null)
         {
 
             // Auth context
@@ -58,11 +55,11 @@ namespace SanteDB.Persistence.Data.ADO.Test
                 authContext = AuthenticationContext.AnonymousPrincipal;
 
             // Store user
-            IDataPersistenceService<TModel> persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TModel>>();
+            IDataPersistenceService<TModel> persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TModel>>();
             Assert.IsNotNull(persistenceService);
 
             // Update the user
-            var objectAfterInsert = persistenceService.Insert(objectUnderTest, authContext, TransactionMode.Commit);
+            var objectAfterInsert = persistenceService.Insert(objectUnderTest, TransactionMode.Commit, authContext);
 
             // Update
             var propertyInfo = typeof(TModel).GetProperty(propertyToChange);
@@ -77,9 +74,9 @@ namespace SanteDB.Persistence.Data.ADO.Test
                 propertyInfo.PropertyType == typeof(Nullable<Boolean>))
                 propertyInfo.SetValue(objectAfterInsert, true);
 
-            var objectAfterUpdate = persistenceService.Update(objectAfterInsert, authContext, TransactionMode.Commit);
+            var objectAfterUpdate = persistenceService.Update(objectAfterInsert, TransactionMode.Commit, authContext);
             Assert.AreEqual(objectAfterInsert.Key, objectAfterUpdate.Key);
-            objectAfterUpdate = persistenceService.Get(objectAfterUpdate.Id(), authContext, false);
+            objectAfterUpdate = persistenceService.Get(objectAfterUpdate.Key.Value, (objectAfterInsert as IVersionedEntity)?.VersionKey, false, authContext);
             // Update attributes should be set
             Assert.AreNotEqual(originalValue, propertyInfo.GetValue(objectAfterUpdate));
             Assert.AreEqual(objectAfterInsert.Key, objectAfterUpdate.Key);
@@ -90,14 +87,14 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Perform a query
         /// </summary>
-        public IEnumerable<TModel> DoTestQuery(Expression<Func<TModel, bool>> predicate, Guid? knownResultKey, IPrincipal authContext)
+        public IEnumerable<TModel> DoTestQuery(Expression<Func<TModel, bool>> predicate, Guid? knownResultKey, IPrincipal authContext = null)
         {
 
             // Auth context
             if (authContext == null)
                 authContext = AuthenticationContext.AnonymousPrincipal;
 
-            IDataPersistenceService<TModel> persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TModel>>();
+            IDataPersistenceService<TModel> persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TModel>>();
             Assert.IsNotNull(persistenceService);
 
             // Perform query

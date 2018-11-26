@@ -23,10 +23,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
 {
-	/// <summary>
-	/// Represents an entity which is used to represent an application
-	/// </summary>
-	[Table("app_ent_tbl")]
+    /// <summary>
+    /// Represents an entity which is used to represent an application
+    /// </summary>
+    [Table("app_ent_tbl")]
 	public class DbApplicationEntity : DbEntitySubTable
     {
 		/// <summary>

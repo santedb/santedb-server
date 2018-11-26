@@ -17,29 +17,26 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Core.Wcf;
+using SanteDB.Core.Services;
+using RestSrvr;
 using SanteDB.Core.Interop;
+using SanteDB.Core.Rest;
+using SanteDB.Core.Rest.Behavior;
+using SanteDB.Core.Rest.Security;
 using SanteDB.Messaging.GS1.Rest;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.ServiceModel;
-using System.ServiceModel.Description;
-using RestSrvr;
-using SanteDB.Core.Rest;
-using SanteDB.Core.Rest.Security;
-using SanteDB.Core.Rest.Behavior;
 
 namespace SanteDB.Messaging.GS1
 {
-	/// <summary>
-	/// Stock service message handler
-	/// </summary>
+    /// <summary>
+    /// Stock service message handler
+    /// </summary>
     [Description("GS1 Stock Service")]
-	public class StockServiceMessageHandler : IMessageHandlerService, IApiEndpointProvider
+	public class StockServiceMessageHandler : IDaemonService, IApiEndpointProvider
 	{
 		// HDSI Trace host
 		private readonly TraceSource traceSource = new TraceSource("SanteDB.Messaging.GS1");

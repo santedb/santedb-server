@@ -17,18 +17,15 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
-using System.Linq;
-
-using System.Collections.Generic;
 using SanteDB.OrmLite.Attributes;
+using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Concepts
 {
-	/// <summary>
-	/// Physical data layer implemntation of concept
-	/// </summary>
-	[Table("cd_vrsn_tbl")]
+    /// <summary>
+    /// Physical data layer implemntation of concept
+    /// </summary>
+    [Table("cd_vrsn_tbl")]
 	public class DbConceptVersion : DbVersionedData
 	{
 

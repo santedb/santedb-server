@@ -26,10 +26,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Extensibility
 {
-	/// <summary>
-	/// Extension.
-	/// </summary>
-	public abstract class DbExtension : DbVersionedAssociation
+    /// <summary>
+    /// Extension.
+    /// </summary>
+    public abstract class DbExtension : DbVersionedAssociation
 	{
 
 		/// <summary>

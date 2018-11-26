@@ -17,35 +17,28 @@
  * User: justin
  * Date: 2018-6-22
  */
-using SanteDB.Core.Model.Entities;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model.DataTypes;
-using SanteDB.Core.Model.Constants;
-using System.Security.Principal;
-using SanteDB.Persistence.Data.ADO.Data.Model;
-using SanteDB.Core.Model.EntityLoader;
+using SanteDB.Core;
 using SanteDB.Core.Model;
-using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
+using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Roles;
+using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security.Services;
+using SanteDB.Core.Services;
+using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
+using SanteDB.Persistence.Data.ADO.Data.Model;
+using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
+using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
 using SanteDB.Persistence.Data.ADO.Data.Model.Extensibility;
 using SanteDB.Persistence.Data.ADO.Data.Model.Roles;
-using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
-using SanteDB.OrmLite;
-using System.Diagnostics;
-using SanteDB.Core.Model.Roles;
-using SanteDB.Core.Services;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
-using MARC.HI.EHRS.SVC.Core.Services.Policy;
-using SanteDB.Core.Model.Security;
-using SanteDB.Core.Model.Acts;
+using System;
+using System.Data;
+using System.Diagnostics;
+using System.Linq;
 using System.Security;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
@@ -318,7 +311,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 	        if (data.Identifiers != null)
 	        {
 		        // Validate unique values for IDs
-		        var authorities = data.Identifiers.Where(o => o.AuthorityKey.HasValue).Select(o => (ApplicationContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>() as AdoBasePersistenceService<AssigningAuthority>).Get(context, o.AuthorityKey.Value));
+		        var authorities = data.Identifiers.Where(o => o.AuthorityKey.HasValue).Select(o => (ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>() as AdoBasePersistenceService<AssigningAuthority>).Get(context, o.AuthorityKey.Value));
                 DbSecurityProvenance provenance = null;
 
 		        foreach (var auth in authorities)
@@ -406,7 +399,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     var pol = p.Policy?.EnsureExists(context);
                     if (pol == null) // maybe we can retrieve it from the PIP?
                     {
-                        var pipInfo = ApplicationContext.Current.GetService<IPolicyInformationService>().GetPolicy(p.PolicyKey.ToString());
+                        var pipInfo = ApplicationServiceContext.Current.GetService<IPolicyInformationService>().GetPolicy(p.PolicyKey.ToString());
                         if (pipInfo != null)
                         {
                             p.Policy = new Core.Model.Security.SecurityPolicy()
@@ -458,7 +451,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 	        if (data.Identifiers != null)
 	        {
 				// Validate unique values for IDs
-                var uniqueIds = data.Identifiers.Where(o => o.AuthorityKey.HasValue).Where(o => (ApplicationContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>() as AdoBasePersistenceService<AssigningAuthority>).Get(context, o.AuthorityKey.Value)?.IsUnique == true);
+                var uniqueIds = data.Identifiers.Where(o => o.AuthorityKey.HasValue).Where(o => (ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>() as AdoBasePersistenceService<AssigningAuthority>).Get(context, o.AuthorityKey.Value)?.IsUnique == true);
 
                 foreach (var entityIdentifier in uniqueIds)
 		        {

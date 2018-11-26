@@ -32,7 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.3" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -55,8 +54,7 @@
     <Compile Include="Model\ReportParameter.cs" />
     <Compile Include="ReportingPersistenceConstants.cs" />
     <Compile Include="ReportingPersistenceService.cs" />
-    <Compile Include="Configuration\ConfigurationSectionHandler.cs" />
-    <Compile Include="Configuration\ReportingConfiguration.cs" />
+    <Compile Include="Configuration\ReportingConfigurationSection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CorePersistenceService.cs" />
     <Compile Include="Services\ParameterTypePersistenceService.cs" />

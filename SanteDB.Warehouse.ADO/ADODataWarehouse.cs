@@ -17,32 +17,25 @@
  * User: justin
  * Date: 2018-7-31
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SanteDB.Core.Diagnostics;
-using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
-using System.IO;
-using System.Dynamic;
-using System.Reflection;
-using System.Collections;
-using System.Linq.Expressions;
-using System.Data;
-using SanteDB.Core.Services;
-using MARC.HI.EHRS.SVC.Core.Services;
-using System.Diagnostics;
-using SanteDB.Warehouse.ADO.Configuration;
-using MARC.HI.EHRS.SVC.Core;
-using SanteDB.OrmLite;
-using SanteDB.Core.Model.Query;
 using Newtonsoft.Json;
+using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Warehouse;
-using SanteDB.Core.Security.Attribute;
-using System.Security.Permissions;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Services;
+using SanteDB.OrmLite;
+using SanteDB.Warehouse.ADO.Configuration;
 using SanteDB.Warehouse.ADO.Data.Model;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Dynamic;
+using System.Linq;
+using System.Security.Permissions;
 
 namespace SanteDB.Warehouse.ADO
 {
@@ -53,7 +46,7 @@ namespace SanteDB.Warehouse.ADO
     public class ADODataWarehouse : IAdHocDatawarehouseService
     {
 
-        private AdoConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(DataWarehouseConstants.ConfigurationSectionName) as AdoConfiguration;
+        private AdoWarehouseConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoWarehouseConfigurationSection>();
 
         // Disposed
         private bool m_disposed = false;
@@ -85,7 +78,6 @@ namespace SanteDB.Warehouse.ADO
         {
             get
             {
-
                 return "ado";
             }
         }

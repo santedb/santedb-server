@@ -21,10 +21,10 @@ using System;
 
 namespace SanteDB.Persistence.Reporting.PSQL.Model
 {
-	/// <summary>
-	/// Represents an association.
-	/// </summary>
-	public interface IDbAssociation
+    /// <summary>
+    /// Represents an association.
+    /// </summary>
+    public interface IDbAssociation
 	{
 		/// <summary>
 		/// Gets or sets the source key.

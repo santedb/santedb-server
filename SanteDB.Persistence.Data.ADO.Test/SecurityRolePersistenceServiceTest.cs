@@ -1,16 +1,12 @@
-﻿using System;
-using System.Linq;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SanteDB.Core;
 using SanteDB.Core.Model;
-using System.Text;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SanteDB.Core.Model.Security;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
-using System.IO;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using System.Security.Principal;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
+using SanteDB.Core.Services;
+using System.Linq;
+using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.ADO.Test
 {
@@ -31,24 +27,24 @@ namespace SanteDB.Persistence.Data.ADO.Test
             DataTestUtil.Start(context);
 
             AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
-            IIdentityProviderService identityProvider = ApplicationContext.Current.GetService<IIdentityProviderService>();
-            var identity = identityProvider.CreateIdentity(nameof(SecurityRolePersistenceServiceTest), "password", AuthenticationContext.SystemPrincipal);
+            IIdentityProviderService identityProvider = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
+            var identity = identityProvider.CreateIdentity(nameof(SecurityRolePersistenceServiceTest), "password");
 
             // Give this identity the administrative functions group
-            IRoleProviderService roleProvider = ApplicationContext.Current.GetService<IRoleProviderService>();
-            roleProvider.AddUsersToRoles(new string[] { identity.Name }, new string[] { "ADMINISTRATORS" }, AuthenticationContext.SystemPrincipal);
+            IRoleProviderService roleProvider = ApplicationServiceContext.Current.GetService<IRoleProviderService>();
+            roleProvider.AddUsersToRoles(new string[] { identity.Name }, new string[] { "ADMINISTRATORS" });
 
             // Authorize
             s_authorization = identityProvider.Authenticate(nameof(SecurityRolePersistenceServiceTest), "password");
 
 
-            IDataPersistenceService<SecurityPolicy> policyService = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
+            IDataPersistenceService<SecurityPolicy> policyService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
             s_chickenCostumePolicy = new SecurityPolicy()
             {
                 Name = "Allow wearing of chicken costume",
                 Oid = "2.3.23.543.25.2"
             };
-            s_chickenCostumePolicy = policyService.Insert(s_chickenCostumePolicy, s_authorization, TransactionMode.Commit);
+            s_chickenCostumePolicy = policyService.Insert(s_chickenCostumePolicy, TransactionMode.Commit, s_authorization);
 
         }
 
@@ -95,7 +91,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             {
                 Name = "Test Update"
             };
-            var roleAfterTest = base.DoTestUpdate(roleUnderTest, s_authorization, "Description");
+            var roleAfterTest = base.DoTestUpdate(roleUnderTest, "Description", s_authorization);
             Assert.IsNotNull(roleAfterTest.Description);
 
         }
@@ -116,9 +112,9 @@ namespace SanteDB.Persistence.Data.ADO.Test
 
             // Now we want to update the grant so that users can elevate
             roleAfterInsert.Policies[0].GrantType = PolicyGrantType.Elevate;
-            var dataPersistence = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityRole>>();
-            dataPersistence.Update(roleAfterInsert, s_authorization, TransactionMode.Commit);
-            var roleAfterTest = dataPersistence.Get(roleAfterInsert.Id(), s_authorization, false);
+            var dataPersistence = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityRole>>();
+            dataPersistence.Update(roleAfterInsert, TransactionMode.Commit, s_authorization);
+            var roleAfterTest = dataPersistence.Get(roleAfterInsert.Key.Value, null, false, s_authorization);
             Assert.AreEqual(PolicyGrantType.Elevate, roleAfterTest.Policies[0].GrantType);
 
         }
@@ -139,9 +135,9 @@ namespace SanteDB.Persistence.Data.ADO.Test
 
             // Now we want to update the grant so that users can elevate
             roleAfterInsert.Policies.Clear();
-            var dataPersistence = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityRole>>();
-            dataPersistence.Update(roleAfterInsert, s_authorization, TransactionMode.Commit);
-            var roleAfterTest = dataPersistence.Get(roleAfterInsert.Id(), s_authorization, false);
+            var dataPersistence = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityRole>>();
+            dataPersistence.Update(roleAfterInsert, TransactionMode.Commit, s_authorization);
+            var roleAfterTest = dataPersistence.Get(roleAfterInsert.Key.Value, null, false, s_authorization);
             Assert.AreEqual(0, roleAfterTest.Policies.Count);
 
         }

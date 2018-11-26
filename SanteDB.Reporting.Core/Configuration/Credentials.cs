@@ -21,10 +21,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Core.Configuration
 {
-	/// <summary>
-	/// Represents a set of credentials.
-	/// </summary>
-	[XmlType(nameof(Credentials), Namespace = "http://santedb.org/reporting")]
+    /// <summary>
+    /// Represents a set of credentials.
+    /// </summary>
+    [XmlType(nameof(Credentials), Namespace = "http://santedb.org/configuration/reporting")]
 	public class Credentials
 	{
 		/// <summary>
@@ -38,14 +38,9 @@ namespace SanteDB.Reporting.Core.Configuration
 		/// Gets or sets the credential.
 		/// </summary>
 		/// <value>The credential.</value>
-		[XmlElement("credential")]
+		[XmlElement("certificate", typeof(CertificateCredential))]
+        [XmlElement("usernamePassword", typeof(UsernamePasswordCredential))]
 		public CredentialBase Credential { get; set; }
 
-		/// <summary>
-		/// Gets or sets the type of the credential.
-		/// </summary>
-		/// <value>The type of the credential.</value>
-		[XmlAttribute("type")]
-		public CredentialType CredentialType { get; set; }
 	}
 }

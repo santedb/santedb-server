@@ -17,13 +17,10 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Configuration.Data;
+using SanteDB.OrmLite.Migration;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.ADO.Data.SQL
 {

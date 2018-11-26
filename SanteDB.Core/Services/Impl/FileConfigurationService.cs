@@ -18,122 +18,88 @@
  * Date: 2018-6-22
  */
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
-using MARC.HI.EHRS.SVC.Configuration;
+using SanteDB.Core.Configuration;
+
 namespace SanteDB.Core.Services.Impl
 {
     /// <summary>
     /// Provides a redirected configuration service which reads configuration from a different file
     /// </summary>
-    public class FileConfigurationService : MARC.HI.EHRS.SVC.Core.Services.IConfigurationManager
+    public class FileConfigurationService : IConfigurationManager
     {
+        /// <summary>
+        /// Get the configuration
+        /// </summary>
+        public SanteDBConfiguration Configuration { get; set; }
 
         // Configuration
         private System.Configuration.Configuration m_configuration = null;
 
-        // Raw configuration
-        private XmlDocument m_rawConfiguration = null;
-
         /// <summary>
-        /// 
+        /// Get configuration service
         /// </summary>
         public FileConfigurationService()
         {
             try
             {
-                var configFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "SanteDB.config");
-                if (!File.Exists(configFile))
-                    configFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "SanteDB.exe.config");
+                var configFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "config.xml");
+                using (var s = File.OpenRead(configFile))
+                    this.Configuration = SanteDBConfiguration.Load(s);
+                ExeConfigurationFileMap fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "SanteDB.exe.config") }; //Path to your config file
+                this.m_configuration = System.Configuration.ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
 
-                this.Open(configFile);
             }
             catch { }
         }
-
+        
         /// <summary>
-        /// Open the specified configuration for this service
+        /// Get the provided section
         /// </summary>
-        public void Open(String fileName)
+        public T GetSection<T>() where T : IConfigurationSection
         {
-            ExeConfigurationFileMap fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = fileName }; //Path to your config file
-            this.m_configuration = System.Configuration.ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
-            this.m_rawConfiguration = new XmlDocument();
-            this.m_rawConfiguration.Load(fileName);
+            return this.Configuration.GetSection<T>();
         }
 
         /// <summary>
-        /// Application settings
+        /// Get the specified application setting
         /// </summary>
-        public NameValueCollection AppSettings
+        public string GetAppSetting(string key)
         {
-            get
-            {
-                var retVal = new NameValueCollection();
-                foreach (var itm in this.m_configuration.AppSettings.Settings.AllKeys)
-                    retVal.Add(itm, this.m_configuration.AppSettings.Settings[itm].Value);
-                return retVal;
-            }
-        }
-
-
-        /// <summary>
-        /// Connection Strings
-        /// </summary>
-        public ConnectionStringSettingsCollection ConnectionStrings
-        {
-            get
-            {
-                return this.m_configuration.ConnectionStrings.ConnectionStrings;
-            }
+            return this.m_configuration.AppSettings.Settings[key]?.Value;
         }
 
         /// <summary>
-        /// Get the specified section
+        /// Get connection string
         /// </summary>
-        /// <param name="sectionName"></param>
-        /// <returns></returns>
-        public object GetSection(string sectionName)
+        public ConnectionStringInfo GetConnectionString(string key)
         {
-            var configSection = this.m_configuration.GetSection(sectionName);
-
-            if (configSection == null) throw new ConfigurationErrorsException($"Section {sectionName} not found");
-
-            if (configSection is DefaultSection)
+            var cs = this.m_configuration.ConnectionStrings.ConnectionStrings[key];
+            if(cs != null)
             {
-                // Get the constructor
-                Type handlerType = Type.GetType(configSection.SectionInformation.Type);
-                if (handlerType == null)
-                    throw new ConfigurationErrorsException($"Configuration handler {configSection.SectionInformation.Type} not found");
-
-                var handler = Activator.CreateInstance(handlerType) as IConfigurationSectionHandler;
-                if (handler == null)
-                {
-                    // Fallback on manual
-                    var sect = this.m_rawConfiguration.GetSection(sectionName);
-                    if(sect == null)
-                        throw new ConfigurationErrorsException($"Configuration handler {configSection.SectionInformation.Type} does not implement IConfigurationSectionHandler");
-                    return sect;
-                }
-                var xml = configSection.SectionInformation.GetRawXml();
-                if (String.IsNullOrEmpty(xml))
-                    return null;
-
-                XmlDocument xdoc = new XmlDocument();
-                xdoc.LoadXml(xml);
-                return handler.Create(configSection.ElementInformation, this.m_configuration, xdoc.DocumentElement);
-
-                //return this.m_configuration.GetSection(sectionName);
+                return new ConnectionStringInfo(cs.ProviderName, cs.ConnectionString);
             }
-            else
-                return configSection;
+            return null;
+        }
+
+        /// <summary>
+        /// Set an application setting
+        /// </summary>
+        public void SetAppSetting(string key, string value)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Reload configuration from disk
+        /// </summary>
+        public void Reload()
+        {
+            throw new NotSupportedException();
         }
     }
 }

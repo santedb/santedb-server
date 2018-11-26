@@ -17,24 +17,16 @@
  * User: justin
  * Date: 2018-7-31
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using MARC.HI.EHRS.SVC.Core;
 using SanteDB.Core.Mail;
 using SanteDB.OrmLite;
-using SanteDB.Persistence.Data.ADO.Data.Model;
 using SanteDB.Persistence.Data.ADO.Data.Model.Mail;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
-	/// <summary>
-	/// Represents an alert persistence service.
-	/// </summary>
-	public class MailMessagePersistenceService : BaseDataPersistenceService<MailMessage, DbMailMessage>
+    /// <summary>
+    /// Represents an alert persistence service.
+    /// </summary>
+    public class MailMessagePersistenceService : BaseDataPersistenceService<MailMessage, DbMailMessage>
 	{
 		/// <summary>
 		/// Converts a <see cref="MailMessage"/> instance to an <see cref="DbMailMessage"/> instance.

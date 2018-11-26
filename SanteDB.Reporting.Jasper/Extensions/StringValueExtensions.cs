@@ -22,10 +22,10 @@ using System;
 
 namespace SanteDB.Reporting.Jasper.Extensions
 {
-	/// <summary>
-	/// Represents extensions for the <see cref="StringValueAttribute"/> class.
-	/// </summary>
-	public static class StringValueExtensions
+    /// <summary>
+    /// Represents extensions for the <see cref="StringValueAttribute"/> class.
+    /// </summary>
+    public static class StringValueExtensions
 	{
 		/// <summary>
 		/// Gets a string value for an enum.

@@ -17,22 +17,17 @@
  * User: justin
  * Date: 2018-9-25
  */
-using SanteDB.Core.Applets.ViewModel;
+using RestSrvr;
+using RestSrvr.Attributes;
 using SanteDB.Core.Applets.ViewModel.Json;
 using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.Export;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.ServiceModel;
-using RestSrvr;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
-using RestSrvr.Attributes;
 
 namespace SanteDB.Tools.DataSandbox.Wcf
 {

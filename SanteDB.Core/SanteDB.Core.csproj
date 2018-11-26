@@ -32,11 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0.1" />
-    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.3" />
-    <PackageReference Include="MARC.HI.EHRS.SVC.Core.Timer">
-      <Version>2.0.0</Version>
-    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <Reference Include="MARC.Everest">
       <HintPath>..\Solution Items\MARC.Everest.dll</HintPath>
@@ -62,20 +57,27 @@
     <Reference Include="System.Xml.Serialization" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\RestConfiguration.cs" />
+    <Compile Include="ApplicationContext.cs" />
+    <Compile Include="Configuration\JobConfigurationSection.cs" />
+    <Compile Include="Configuration\RestBehaviorConfiguration.cs" />
+    <Compile Include="Configuration\RestConfigurationSection.cs" />
+    <Compile Include="Configuration\RestEndpointConfiguration.cs" />
+    <Compile Include="Configuration\RestServiceConfiguration.cs" />
+    <Compile Include="Configuration\SecuritySignatureConfigurationSection.cs" />
     <Compile Include="Configuration\ServiceTool.cs" />
     <Compile Include="Diagnostics\DiagnosticExtensions.cs" />
     <Compile Include="Diagnostics\LogTraceWriter.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Configuration\ConfigurationSectionHandler.cs" />
-    <Compile Include="Configuration\SanteDBBasicAuthorization.cs" />
-    <Compile Include="Configuration\SanteDBClaimsAuthorization.cs" />
-    <Compile Include="Configuration\SanteDBSecurityConfiguration.cs" />
+    <Compile Include="Configuration\BasicAuthorizationConfigurationSection.cs" />
+    <Compile Include="Configuration\ClaimsAuthorizationConfigurationSection.cs" />
+    <Compile Include="Configuration\SecurityConfigurationSection.cs" />
     <Compile Include="Http\DefaultRestClient.cs" />
     <Compile Include="Http\ServiceClientDescription.cs" />
+    <Compile Include="Jobs\JobStateType.cs" />
     <Compile Include="Model\EntityLoader\PersistenceServiceEntitySource.cs" />
     <Compile Include="Model\ModelExtensions.cs" />
-    <Compile Include="Configuration\SanteDBConfiguration.cs" />
+    <Compile Include="Configuration\SanteDBServerConfiguration.cs" />
     <Compile Include="Rest\Behavior\CorsEndpointBehavior.cs" />
     <Compile Include="Rest\Behavior\MessageCompressionEndpointBehavior.cs" />
     <Compile Include="Rest\Behavior\ErrorServiceBehavior.cs" />
@@ -114,7 +116,6 @@
     <Compile Include="Security\ISession.cs" />
     <Compile Include="Security\DefaultPasswordValidationService.cs" />
     <Compile Include="Security\Permission\PolicyPermissionAttribute.cs" />
-    <Compile Include="Security\AuthenticationContext.cs" />
     <Compile Include="Security\ILocalPolicy.cs" />
     <Compile Include="Security\IPolicyHandler.cs" />
     <Compile Include="Security\DefaultPolicyDecisionService.cs" />
@@ -123,10 +124,11 @@
     <Compile Include="Security\SecurityUtils.cs" />
     <Compile Include="Security\PasswordHashingServices.cs" />
     <Compile Include="Security\TwoFactorSecretGenerators.cs" />
+    <Compile Include="Security\X509CertificateUtils.cs" />
     <Compile Include="Services\Daemons\AppletBusinessRulesDaemon.cs" />
     <Compile Include="Services\IApplicationIdentityProviderService.cs" />
-    <Compile Include="Services\IFastQueryDataPersistenceService.cs" />
-    <Compile Include="Services\IDeviceIdentityProviderService.cs" />
+    <Compile Include="Services\IJobManagerService.cs" />
+    <Compile Include="Services\IMessagePersistenceService.cs" />
     <Compile Include="Services\Impl\FileSystemQueueService.cs" />
     <Compile Include="Services\Impl\GenericLocalActRepository.cs" />
     <Compile Include="Services\Impl\GenericLocalClinicalDataRepository.cs" />
@@ -161,13 +163,14 @@
     <Compile Include="Services\Impl\FileConfigurationService.cs" />
     <Compile Include="Services\Impl\LocalUserEntityRepository.cs" />
     <Compile Include="Services\Impl\ThreadPoolService.cs" />
+    <Compile Include="Services\Daemons\DefaultJobManagerService.cs" />
     <Compile Include="Services\IPersistentQueueService.cs" />
     <Compile Include="Services\ISessionIdentityProviderService.cs" />
     <Compile Include="Services\ISessionProviderService.cs" />
-    <Compile Include="Services\IStoredQueryDataPersistenceService.cs" />
     <Compile Include="Services\ITfaRelayService.cs" />
     <Compile Include="Services\Impl\LocalConceptRepository.cs" />
     <Compile Include="Services\Impl\LocalSecurityRepositoryService.cs" />
+    <Compile Include="Jobs\IJob.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Security\Wcf\" />

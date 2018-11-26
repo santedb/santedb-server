@@ -17,49 +17,32 @@
  * User: justin
  * Date: 2018-11-23
  */
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Schema;
+using RestSrvr;
+using SanteDB.Core;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.Interfaces;
 using SanteDB.Core.Interop;
-using SanteDB.Core.Model.Patch;
-using System.Diagnostics;
-using MARC.HI.EHRS.SVC.Core.Attributes;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Exceptions;
-using SanteDB.Core.Diagnostics;
-using System.IO;
-using SanteDB.Core.Model.Interfaces;
-using System.Net;
-using System.ServiceModel.Channels;
-using SanteDB.Rest.Common;
 using SanteDB.Core.Model;
-using SanteDB.Core.Security.Attribute;
-using SanteDB.Core.Model.AMI.Diagnostics;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Core.Security;
-using System.Security.Permissions;
-using SanteDB.Core.Model.AMI.Logging;
-using System.Reflection;
-using SanteDB.Core.Model.AMI.Security;
-using System.Xml.Serialization;
 using SanteDB.Core.Model.AMI.Auth;
+using SanteDB.Core.Model.AMI.Collections;
+using SanteDB.Core.Model.AMI.Diagnostics;
+using SanteDB.Core.Model.AMI.Logging;
+using SanteDB.Core.Rest;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Security.Claims;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.AMI.Configuration;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
-using SanteDB.Core.Security.Claims;
-using SanteDB.Core.Model.Collection;
-using SanteDB.Core.Model.AMI.Collections;
-using MARC.Everest.Threading;
-using SanteDB.Core.Model.AMI;
-using RestSrvr.Attributes;
-using RestSrvr;
-using SanteDB.Core.Rest;
-using SanteDB.Rest.AMI;
+using SanteDB.Rest.Common;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Reflection;
+using System.Security.Permissions;
 
 namespace SanteDB.Messaging.AMI.Wcf
 {
@@ -86,10 +69,10 @@ namespace SanteDB.Messaging.AMI.Wcf
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.Login)]
         public override DiagnosticReport CreateDiagnosticReport(DiagnosticReport report)
         {
-            var persister = ApplicationContext.Current.GetService<IDataPersistenceService<DiagnosticReport>>();
+            var persister = ApplicationServiceContext.Current.GetService<IDataPersistenceService<DiagnosticReport>>();
             if (persister == null)
                 throw new InvalidOperationException("Cannot find appriopriate persister");
-            return persister.Insert(report, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+            return persister.Insert(report, TransactionMode.Commit);
         }
 
         /// <summary>
@@ -142,9 +125,9 @@ namespace SanteDB.Messaging.AMI.Wcf
         public override ServiceOptions Options()
         {
             RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.OK;
-            RestOperationContext.Current.OutgoingResponse.Headers.Add("Allow", $"GET, PUT, POST, OPTIONS, HEAD, DELETE{(ApplicationContext.Current.GetService<IPatchService>() != null ? ", PATCH" : null)}");
+            RestOperationContext.Current.OutgoingResponse.Headers.Add("Allow", $"GET, PUT, POST, OPTIONS, HEAD, DELETE{(ApplicationServiceContext.Current.GetService<IPatchService>() != null ? ", PATCH" : null)}");
 
-            if (ApplicationContext.Current.GetService<IPatchService>() != null)
+            if (ApplicationServiceContext.Current.GetService<IPatchService>() != null)
             {
                 RestOperationContext.Current.OutgoingResponse.Headers.Add("Accept-Patch", "application/xml+oiz-patch");
             }
@@ -160,7 +143,7 @@ namespace SanteDB.Messaging.AMI.Wcf
                         Capabilities = ResourceCapability.Get
                     }
                 },
-                Endpoints = ApplicationContext.Current.GetServices().OfType<IApiEndpointProvider>().Select(o =>
+                Endpoints = (ApplicationServiceContext.Current as IServiceManager).GetServices().OfType<IApiEndpointProvider>().Select(o =>
                     new ServiceEndpointOptions
                     {
                         BaseUrl = o.Url,
@@ -172,7 +155,7 @@ namespace SanteDB.Messaging.AMI.Wcf
 
             // Get endpoints
 
-            var config = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.messaging.ami") as AmiConfiguration;
+            var config = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AmiConfigurationSection>();
 
             if (config?.Endpoints != null)
                 serviceOptions.Endpoints.AddRange(config.Endpoints);
@@ -208,7 +191,7 @@ namespace SanteDB.Messaging.AMI.Wcf
                 UsedMemory = GC.GetTotalMemory(false),
                 Version = Environment.Version.ToString(),
             };
-            retVal.ApplicationInfo.ServiceInfo = ApplicationContext.Current.GetServices().OfType<IDaemonService>().Select(o => new DiagnosticServiceInfo(o)).ToList();
+            retVal.ApplicationInfo.ServiceInfo = (ApplicationServiceContext.Current as IServiceManager).GetServices().OfType<IDaemonService>().Select(o => new DiagnosticServiceInfo(o)).ToList();
             return retVal;
         }
 
@@ -218,7 +201,7 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <returns>Returns a list of TFA mechanisms.</returns>
         public override AmiCollection GetTfaMechanisms()
         {
-            var tfaRelay = ApplicationContext.Current.GetService<ITfaRelayService>();
+            var tfaRelay = ApplicationServiceContext.Current.GetService<ITfaRelayService>();
             if (tfaRelay == null)
                 throw new InvalidOperationException("TFA Relay missing");
             return new AmiCollection()
@@ -238,7 +221,7 @@ namespace SanteDB.Messaging.AMI.Wcf
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
         public override void SendTfaSecret(TfaRequestInfo resetInfo)
         {
-            var securityRepository = ApplicationContext.Current.GetService<ISecurityRepositoryService>();
+            var securityRepository = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>();
 
             var securityUser = securityRepository.GetUser(resetInfo.UserName);
 
@@ -252,17 +235,17 @@ namespace SanteDB.Messaging.AMI.Wcf
             }
 
             // Identity provider
-            var identityProvider = ApplicationContext.Current.GetService<IIdentityProviderService>();
+            var identityProvider = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
             var tfaSecret = identityProvider.GenerateTfaSecret(securityUser.UserName);
 
             // Add a claim
             if (resetInfo.Purpose == "PasswordReset")
             {
                 new PolicyPermission(PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService);
-                identityProvider.AddClaim(securityUser.UserName, new System.Security.Claims.Claim(SanteDBClaimTypes.SanteDBPasswordlessAuth, "true"));
+                identityProvider.AddClaim(securityUser.UserName, new GenericClaim(SanteDBClaimTypes.SanteDBPasswordlessAuth, "true"));
             }
 
-            var tfaRelay = ApplicationContext.Current.GetService<ITfaRelayService>();
+            var tfaRelay = ApplicationServiceContext.Current.GetService<ITfaRelayService>();
             if (tfaRelay == null)
                 throw new InvalidOperationException("TFA relay not specified");
 
@@ -371,7 +354,7 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// </summary>
         protected override void ThrowIfNotReady()
         {
-            if (!ApplicationContext.Current.IsRunning)
+            if (!ApplicationServiceContext.Current.IsRunning)
                 throw new DomainStateException();
         }
 

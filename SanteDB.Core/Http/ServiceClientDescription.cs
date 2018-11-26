@@ -22,29 +22,29 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace SanteDB.Core.Http
 {
     /// <summary>
     /// Represents a rest client description
     /// </summary>
-    public class ServiceClientDescription : ConfigurationElement, IRestClientDescription
+    [XmlType(nameof(ServiceClientDescription), Namespace = "http://santedb.org/configuration")]
+    public class ServiceClientDescription : IRestClientDescription
     {
 
         /// <summary>
         /// Gets or sets the service binding
         /// </summary>
-        [ConfigurationProperty("binding")]
+        [XmlElement("binding")]
         public ServiceClientBindingDescription Binding {
-            get { return (ServiceClientBindingDescription)this["binding"]; }
-            set { this["binding"] = value; }
+            get; set;
         }
 
         /// <summary>
         /// Gets or sets the binding description
         /// </summary>
+        [XmlIgnore]
         IRestClientBindingDescription IRestClientDescription.Binding
         {
             get
@@ -56,15 +56,13 @@ namespace SanteDB.Core.Http
         /// <summary>
         /// Gets whether a tracing is enabled.
         /// </summary>
-        [ConfigurationProperty("enableTracing")]
-        public bool Trace {
-            get { return (bool)this["enableTracing"]; }
-            set { this["enableTracing"] = value; }
-        }
+        [XmlElement("enableTracing")]
+        public bool Trace { get; set; }
 
         /// <summary>
         /// Gets or sets the endpoints
         /// </summary>
+        [XmlIgnore]
         public List<IRestClientEndpointDescription> Endpoint
         {
             get
@@ -76,45 +74,17 @@ namespace SanteDB.Core.Http
         /// <summary>
         /// Endpoint collection for configuration
         /// </summary>
-        [ConfigurationProperty("endpoint")]
-        [ConfigurationCollection(typeof(ServiceClientEndpointDescription),
-            AddItemName = "add",
-            ClearItemsName = "clear",
-            RemoveItemName = "remove")]
-        public ServiceClientEndpointCollection EndpointCollection {
-            get { return (ServiceClientEndpointCollection)this["endpoint"]; }
-            set { this["endpoint"] = value; }
-
-        }
+        [XmlArray("endpoint"), XmlArrayItem("add")]
+        public List<ServiceClientEndpointDescription> EndpointCollection { get;set;}
     }
 
 
-    /// <summary>
-    /// Represents a collection service client endpoints
-    /// </summary>
-    public class ServiceClientEndpointCollection : ConfigurationElementCollection
-    {
-        /// <summary>
-        /// Create new element
-        /// </summary>
-        protected override ConfigurationElement CreateNewElement()
-        {
-            return new ServiceClientEndpointDescription();
-        }
-
-        /// <summary>
-        /// Get element key
-        /// </summary>
-        protected override object GetElementKey(ConfigurationElement element)
-        {
-            return ((ServiceClientEndpointDescription)element).Address;
-        }
-    }
 
     /// <summary>
     /// Represents a service client description
     /// </summary>
-    public class ServiceClientEndpointDescription : ConfigurationElement, IRestClientEndpointDescription
+    [XmlType(nameof(ServiceClientEndpointDescription), Namespace = "http://santedb.org/configuration")]
+    public class ServiceClientEndpointDescription : IRestClientEndpointDescription
     {
 
         /// <summary>
@@ -137,45 +107,45 @@ namespace SanteDB.Core.Http
         /// <summary>
         /// Gets or sets the address
         /// </summary>
-        [ConfigurationProperty("address")]
+        [XmlAttribute("address")]
         public string Address {
-            get { return (string)this["address"]; }
-            set { this["address"] = value; }
+            get;set;
         }
 
         /// <summary>
         /// Gets or sets the timeout
         /// </summary>
-        [ConfigurationProperty("timeout")]
+        [XmlAttribute("timeout")]
         public int Timeout
         {
-            get { return (int)this["timeout"]; }
-            set { this["timeout"] = value; }
+            get;set;
         }
     }
 
     /// <summary>
     /// REST client binding description
     /// </summary>
-    public class ServiceClientBindingDescription : ConfigurationElement, IRestClientBindingDescription
+    [XmlType(nameof(ServiceClientBindingDescription), Namespace = "http://santedb.org/configuration")]
+    public class ServiceClientBindingDescription :  IRestClientBindingDescription
     {
         /// <summary>
         /// Gets the content type mapper
         /// </summary>
+        [XmlIgnore]
         public IContentTypeMapper ContentTypeMapper { get { return new DefaultContentTypeMapper(); } }
 
         /// <summary>
         /// Gets or sets the optimization flag
         /// </summary>
-        [ConfigurationProperty("optimize")]
+        [XmlAttribute("optimize")]
         public bool Optimize {
-            get { return (bool)this["optimize"]; }
-            set { this["optimize"] = value; }
+            get;set;
         }
 
         /// <summary>
         /// Gets or sets the security description
         /// </summary>
+        [XmlIgnore]
         public IRestClientSecurityDescription Security { get; set; }
     }
 }

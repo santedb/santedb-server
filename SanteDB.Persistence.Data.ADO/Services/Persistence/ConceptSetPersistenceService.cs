@@ -17,21 +17,16 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
-using System.Linq;
-using SanteDB.Core.Model.DataTypes;
-using SanteDB.Persistence.Data.ADO.Data.Model;
-using System.Security.Principal;
-using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
-using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
-	/// <summary>
-	/// Persistence service for ConceptSets
-	/// </summary>
-	public class ConceptSetPersistenceService : BaseDataPersistenceService<Core.Model.DataTypes.ConceptSet, DbConceptSet>
+    /// <summary>
+    /// Persistence service for ConceptSets
+    /// </summary>
+    public class ConceptSetPersistenceService : BaseDataPersistenceService<Core.Model.DataTypes.ConceptSet, DbConceptSet>
 	{
 
         /// <summary>

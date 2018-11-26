@@ -17,19 +17,15 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
+using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Data;
+using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections;
-using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
-using SanteDB.OrmLite;
-using System.Security.Principal;
-using SanteDB.Persistence.Data.ADO.Data;
-using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
-using SanteDB.Core.Model.DataTypes;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {

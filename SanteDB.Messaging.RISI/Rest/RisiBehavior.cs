@@ -17,30 +17,28 @@
  * User: justin
  * Date: 2018-11-23
  */
-using MARC.HI.EHRS.SVC.Core;
+using RestSrvr;
+using RestSrvr.Attributes;
+using SanteDB.Core;
 using SanteDB.Core.Model.RISI;
 using SanteDB.Core.Model.RISI.Constants;
 using SanteDB.Reporting.Core;
+using SanteDB.Rest.RISI;
 using System;
 using System.IO;
-using System.ServiceModel;
-using RestSrvr;
-using RestSrvr.Attributes;
-using SanteDB.Rest.Common;
-using SanteDB.Rest.RISI;
 
 namespace SanteDB.Messaging.RISI.Rest
 {
-	/// <summary>
-	/// Provides operations for running and managing reports.
-	/// </summary>
-	[ServiceBehavior(Name = "RISI")]
+    /// <summary>
+    /// Provides operations for running and managing reports.
+    /// </summary>
+    [ServiceBehavior(Name = "RISI")]
 	public partial class RisiBehavior : IRisiServiceContract
 	{
 		/// <summary>
 		/// The internal reference to the <see cref="IReportExecutor"/> instance.
 		/// </summary>
-		private readonly IReportExecutor reportExecutor = ApplicationContext.Current.GetService<IReportExecutor>();
+		private readonly IReportExecutor reportExecutor = ApplicationServiceContext.Current.GetService<IReportExecutor>();
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RisiBehavior"/> class.

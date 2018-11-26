@@ -26,10 +26,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Extensibility
 {
-	/// <summary>
-	/// Represents note storage
-	/// </summary>
-	public abstract class DbNote : DbVersionedAssociation
+    /// <summary>
+    /// Represents note storage
+    /// </summary>
+    public abstract class DbNote : DbVersionedAssociation
 	{
         /// <summary>
         /// Gets or sets the key

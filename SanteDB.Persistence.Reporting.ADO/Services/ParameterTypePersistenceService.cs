@@ -17,9 +17,9 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core;
 using SanteDB.Core.Model.RISI;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using System;
 using System.Diagnostics;
@@ -28,10 +28,10 @@ using System.Security.Principal;
 
 namespace SanteDB.Persistence.Reporting.PSQL.Services
 {
-	/// <summary>
-	/// Represents a data type persistence service.
-	/// </summary>
-	public class ParameterTypePersistenceService : CorePersistenceService<ParameterType, PSQL.Model.ParameterType, PSQL.Model.ParameterType>
+    /// <summary>
+    /// Represents a data type persistence service.
+    /// </summary>
+    public class ParameterTypePersistenceService : CorePersistenceService<ParameterType, PSQL.Model.ParameterType, PSQL.Model.ParameterType>
 	{
 		/// <summary>
 		/// Maps a <see cref="ParameterType" /> instance to a <see cref="PSQL.Model.ParameterType" /> instance.
@@ -40,7 +40,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="context">The context.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the mapped parameter type instance.</returns>
-		public override object FromModelInstance(ParameterType modelInstance, DataContext context, IPrincipal principal)
+		public override object FromModelInstance(ParameterType modelInstance, DataContext context)
 		{
 			if (modelInstance == null)
 			{
@@ -50,7 +50,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 
 			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(PSQL.Model.ParameterType) } to { nameof(ParameterType) }");
 
-			return base.FromModelInstance(modelInstance, context, principal);
+			return base.FromModelInstance(modelInstance, context);
 		}
 
 		/// <summary>
@@ -61,15 +61,15 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the obsoleted data.</returns>
 		/// <exception cref="System.InvalidOperationException">Cannot obsolete report format which is currently in use</exception>
-		public override ParameterType ObsoleteInternal(DataContext context, ParameterType model, IPrincipal principal)
+		public override ParameterType ObsoleteInternal(DataContext context, ParameterType model)
 		{
-			var parameterTypeService = ApplicationContext.Current.GetService<IDataPersistenceService<ReportParameter>>();
+			var parameterTypeService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ReportParameter>>();
 
-			var results = parameterTypeService.Query(r => r.ParameterType.Key == model.Key, principal);
+			var results = parameterTypeService.Query(r => r.ParameterType.Key == model.Key);
 
 			if (!results.Any())
 			{
-				return base.ObsoleteInternal(context, model, principal);
+				return base.ObsoleteInternal(context, model);
 			}
 
 			throw new InvalidOperationException("Cannot obsolete parameter type which is currently in use");
@@ -83,7 +83,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the mapped parameter type instance.</returns>
 		/// <exception cref="System.ArgumentException">If the domain instance is not of the correct type</exception>
-		public override ParameterType ToModelInstance(object domainInstance, DataContext context, IPrincipal principal)
+		public override ParameterType ToModelInstance(object domainInstance, DataContext context)
 		{
 			if (domainInstance == null)
 			{
@@ -98,7 +98,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 
 			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(ParameterType) } to { nameof(PSQL.Model.ParameterType) }");
 
-			return base.ToModelInstance(domainInstance, context, principal);
+			return base.ToModelInstance(domainInstance, context);
 		}
 	}
 }

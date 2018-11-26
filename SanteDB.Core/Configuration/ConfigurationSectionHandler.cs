@@ -17,15 +17,17 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IdentityModel.Tokens;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace SanteDB.Core.Configuration
@@ -33,169 +35,49 @@ namespace SanteDB.Core.Configuration
     /// <summary>
     /// Configuration section handler
     /// </summary>
-    /// <remarks>
-    /// <![CDATA[
-    /// <SanteDB.core>
-    ///     <security>
-    ///         <basic requireClientAuth="true" realm="">
-    ///             <!-- Claims allowed to be made by clients on basic auth -->
-    ///             <allowedClaims>
-    ///                 <add claimType=""/>
-    ///             </allowedClaims>
-    ///         </basic>
-    ///         <token realm="">
-    ///             <audience>
-    ///                 <add name=""/>
-    ///             </audience>
-    ///             <issuers customCertificateValidator="">
-    ///                 <add name="issuerName" findValue="" storeLocation="" storeName="" x509FindType=""/>
-    ///                 <add name="issuerName" symmetricKey=""/>
-    ///             </issuers>
-    ///         </token>
-    ///     </security>
-    ///     <signing>
-    ///         <!-- If using X509 RSA certificates -->
-    ///         <certificate storeLocation="" storeName="" x509FindType="" findValue=""/>
-    ///         <!-- If using symmetric key -->
-    ///         <symmetric secret=""/>
-    ///     </signing>
-    ///     <rest>
-    ///         <service name="SERVICE_NAME">
-    ///             <behaviors>
-    ///                 <add type=""/>
-    ///             </behaviors>
-    ///             <endpoint address="" contract=""/>
-    ///         </service>
-    ///     </rest>
-    /// </SanteDB.core>
-    /// ]]>
-    /// </remarks>
     public class ConfigurationSectionHandler : IConfigurationSectionHandler
     {
+
+        /// <summary>
+        /// Trace source name
+        /// </summary>
+        private TraceSource m_traceSource = new TraceSource(SanteDBConstants.ServiceTraceSourceName);
+
         /// <summary>
         /// Create the configuration
         /// </summary>
         public object Create(object parent, object configContext, XmlNode section)
         {
-            SanteDBConfiguration retVal = new SanteDBConfiguration();
+            SanteDBServerConfiguration retVal = new SanteDBServerConfiguration();
 
-            // Nodes
-            XmlElement securityNode = section.SelectSingleNode("./security") as XmlElement,
-                threadingNode = section.SelectSingleNode("./threading") as XmlElement;
+            if (section == null)
+                throw new InvalidOperationException("Can't find configuration section");
 
+            retVal.ServiceProviders = new List<Type>();
 
-            retVal.ThreadPoolSize = Int32.Parse(threadingNode?.Attributes["poolSize"].Value ?? Environment.ProcessorCount.ToString());
-            // Security?
-            if (securityNode != null)
-            {
-                retVal.Security = new SanteDBSecurityConfiguration();
+            XmlNode serviceProviderSection = section.SelectSingleNode("./*[local-name() = 'serviceProviders']");
 
-                XmlElement basicSecurityNode = securityNode.SelectSingleNode("./basic") as XmlElement,
-                    tokenSecurityNode = securityNode.SelectSingleNode("./token") as XmlElement,
-                    appletSecurityNode = securityNode.SelectSingleNode("./applet") as XmlElement,
-                    x509Signature = securityNode.SelectSingleNode("./signing/certificate") as XmlElement,
-                    symmSignature = securityNode.SelectSingleNode("./signing/symmetric") as XmlElement;
-
-
-                retVal.Security.AllowUnsignedApplets = Boolean.Parse(appletSecurityNode?.Attributes["allowUnsignedApplets"]?.Value ?? "false");
-                if(appletSecurityNode != null)
-                    retVal.Security.TrustedPublishers = new System.Collections.ObjectModel.ObservableCollection<string>(appletSecurityNode?.SelectNodes("./trustedPublishers/add")?.OfType<XmlElement>().Select(o => o.InnerText).ToArray());
-
-                if (x509Signature != null)
+            if (serviceProviderSection != null) // Load providers data
+                foreach (XmlNode nd in serviceProviderSection.SelectNodes("./*[local-name() = 'add']/@type"))
                 {
-                    retVal.Security.SigningCertificate = SecurityUtils.FindCertificate(x509Signature.Attributes["storeLocation"]?.Value,
-                        x509Signature.Attributes["storeName"]?.Value,
-                        x509Signature.Attributes["x509FindType"]?.Value,
-                        x509Signature.Attributes["findValue"]?.Value);
-                }
-                else if (symmSignature != null)
-                {
-                    retVal.Security.ServerSigningSecret = symmSignature.Attributes["secret"]?.Value;
-                    if (symmSignature.Attributes["key"] != null)
-                        retVal.Security.ServerSigningKey = Convert.FromBase64String(symmSignature.Attributes["key"].Value);
-
-                }
-                else
-                    throw new ConfigurationErrorsException("One of certificate or symmetric key must be selected", null, section);
-
-
-                if (tokenSecurityNode != null)
-                {
-                    retVal.Security.ClaimsAuth = new SanteDBClaimsAuthorization();
-                    retVal.Security.ClaimsAuth.Realm = tokenSecurityNode.Attributes["realm"]?.Value;
-
-                    foreach (XmlNode aud in tokenSecurityNode.SelectNodes("./audience/add/@name"))
-                        retVal.Security.ClaimsAuth.Audiences.Add(aud.Value);
-                    foreach (XmlNode iss in tokenSecurityNode.SelectNodes("./issuer/add"))
+                    Type t = Type.GetType(nd.Value);
+                    if (t != null)
                     {
-                        String name = iss.Attributes["name"]?.Value,
-                            thumbprint = iss.Attributes["findValue"]?.Value,
-                            storeLocation = iss.Attributes["storeLocation"]?.Value,
-                            storeName = iss.Attributes["storeName"]?.Value,
-                            findType = iss.Attributes["x509FindType"]?.Value,
-                            symmetricKey = iss.Attributes["symmetricKey"]?.Value,
-                            secret = iss.Attributes["symmetricSecret"]?.Value;
-
-                        if (String.IsNullOrEmpty(name))
-                            throw new ConfigurationException("Issuer must have name");
-
-                        if(!String.IsNullOrEmpty(secret))
-                            retVal.Security.ClaimsAuth.IssuerKeys.Add(name, new InMemorySymmetricSecurityKey(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(secret))));
-                        else if (!String.IsNullOrEmpty(symmetricKey))
-                            retVal.Security.ClaimsAuth.IssuerKeys.Add(name, new InMemorySymmetricSecurityKey(Convert.FromBase64String(symmetricKey)));
-                        else 
-                            retVal.Security.ClaimsAuth.IssuerKeys.Add(name, new X509SecurityKey(
-                                SecurityUtils.FindCertificate(
-                                    storeLocation,
-                                    storeName,
-                                    findType,
-                                    thumbprint
-                                    ))
-                            );
-                        
+                        ConstructorInfo ci = t.GetConstructor(Type.EmptyTypes);
+                        if (ci != null)
+                        {
+                            retVal.ServiceProviders.Add(t);
+                            this.m_traceSource.TraceInfo("Added provider {0}", t.FullName);
+                        }
+                        else
+                            this.m_traceSource.TraceInfo("Can't find parameterless constructor on type {0}", t.FullName);
                     }
+                    else
+                        this.m_traceSource.TraceInfo("Can't find type described by '{0}'", nd.Value);
                 }
-                else if(basicSecurityNode != null)
-                {
-                    retVal.Security.BasicAuth = new SanteDBBasicAuthorization();
-                    retVal.Security.BasicAuth.RequireClientAuth = basicSecurityNode.Attributes["requireClientAuth"]?.Value == "true";
-                    retVal.Security.BasicAuth.Realm = basicSecurityNode.Attributes["realm"]?.Value;
-                    // Allowed claims
-                    XmlNodeList allowedClaims = basicSecurityNode.SelectNodes("./allowedClaims/add/@claimType");
-                    retVal.Security.BasicAuth.AllowedClientClaims = new System.Collections.ObjectModel.ObservableCollection<string>();
-                    foreach(XmlNode all in allowedClaims)
-                        retVal.Security.BasicAuth.AllowedClientClaims.Add(all.Value);
-                }
-            }
 
 
-            // Rest configuration
-            var rest = section.SelectSingleNode("./rest");
-            if(rest != null)
-            {
-                foreach(var svc in rest.SelectNodes("./service").OfType<XmlElement>())
-                {
-                    var svcConfig = new RestServiceConfiguration(svc.Attributes["name"]?.Value);
-                    svcConfig.Behaviors.AddRange(svc.SelectNodes("./behaviors/add/@type").OfType<XmlAttribute>().Select(o =>
-                    {
-                        var bType = Type.GetType(o.Value);
-                        if (bType == null)
-                            throw new ConfigurationErrorsException($"Can't find behavior type {o.Value}", o);
-                        return bType;
-                    }).ToList());
 
-                    svcConfig.Endpoints.AddRange(svc.SelectNodes("./endpoint").OfType<XmlElement>().Select(e =>
-                    {
-                        var cType = Type.GetType(e.Attributes["contract"]?.Value);
-                        if(cType == null || !cType.IsInterface)
-                            throw new ConfigurationErrorsException($"Can't find contract type {e.Attributes["contract"]?.Value}", e);
-                        return new RestEndpointConfiguration(new Uri(e.Attributes["address"]?.Value), cType);
-                    }).ToList());
-
-                    // Add to master config
-                    retVal.RestConfiguration.Services.Add(svcConfig);
-                }
-            }
             return retVal;
         }
     }

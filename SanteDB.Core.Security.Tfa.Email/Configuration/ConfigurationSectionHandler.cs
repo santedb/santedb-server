@@ -24,10 +24,10 @@ using System.Xml;
 
 namespace SanteDB.Core.Security.Tfa.Email.Configuration
 {
-	/// <summary>
-	/// Configuration section handler
-	/// </summary>
-	public class ConfigurationSectionHandler : IConfigurationSectionHandler
+    /// <summary>
+    /// Configuration section handler
+    /// </summary>
+    public class ConfigurationSectionHandler : IConfigurationSectionHandler
 	{
         /// <summary>
         /// Creates the specified configuration object
@@ -37,7 +37,7 @@ namespace SanteDB.Core.Security.Tfa.Email.Configuration
             XmlElement smtp = section.SelectSingleNode("./*[local-name() = 'smtp']") as XmlElement;
             XmlNodeList templates = section.SelectNodes("./*[local-name() = 'template']/*[local-name() = 'add']");
 
-            MechanismConfiguration configuration = new MechanismConfiguration();
+            TfaEmailMechanismConfigurationSection configuration = new TfaEmailMechanismConfigurationSection();
 
             if (smtp == null)
                 throw new ConfigurationErrorsException("Missing SMTP configuration", section);

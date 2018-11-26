@@ -1,11 +1,7 @@
-﻿using MARC.HI.EHRS.SVC.Core.Services.Security;
-using SanteDB.Core.Model.Security;
+﻿using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -24,7 +20,7 @@ namespace SanteDB.Core.Services.Impl
         public override SecurityDevice Insert(SecurityDevice data)
         {
             if (!String.IsNullOrEmpty(data.DeviceSecret))
-                data.DeviceSecret = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().EncodePassword(data.DeviceSecret);
+                data.DeviceSecret = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(data.DeviceSecret);
             return base.Insert(data);
         }
 
@@ -34,7 +30,7 @@ namespace SanteDB.Core.Services.Impl
         public override SecurityDevice Save(SecurityDevice data)
         {
             if (!String.IsNullOrEmpty(data.DeviceSecret))
-                data.DeviceSecret = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().EncodePassword(data.DeviceSecret);
+                data.DeviceSecret = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(data.DeviceSecret);
             return base.Save(data);
         }
     }

@@ -17,18 +17,12 @@
  * User: justin
  * Date: 2018-9-25
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Attributes;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Core.Model.Collection;
+using SanteDB.Core;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.MDM.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.MDM.Services
 {
@@ -36,7 +30,6 @@ namespace SanteDB.Persistence.MDM.Services
     /// The MdmRecordDaemon is responsible for subscribing to MDM targets in the configuration 
     /// and linking/creating master records whenever a record of that type is created.
     /// </summary>
-    [TraceSource(MdmConstants.TraceSourceName)]
     public class MdmDaemonService : IDaemonService, IDisposable
     {
 
@@ -44,7 +37,7 @@ namespace SanteDB.Persistence.MDM.Services
         private TraceSource m_traceSource = new TraceSource(MdmConstants.TraceSourceName);
 
         // Configuration
-        private MdmConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(MdmConstants.ConfigurationSectionName) as MdmConfiguration;
+        private MdmConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<MdmConfigurationSection>();
 
         // Listeners
         private List<MdmResourceListener> m_listeners = new List<MdmResourceListener>();
@@ -87,9 +80,9 @@ namespace SanteDB.Persistence.MDM.Services
             this.Starting?.Invoke(this, EventArgs.Empty);
 
             // Wait until application context is started
-            ApplicationContext.Current.Started += (o, e) =>
+            ApplicationServiceContext.Current.Started += (o, e) =>
             {
-                if (ApplicationContext.Current.GetService<IRecordMatchingService>() == null)
+                if (ApplicationServiceContext.Current.GetService<IRecordMatchingService>() == null)
                     throw new InvalidOperationException("MDM requires a matching service to be configured");
 
                 foreach(var itm in this.m_configuration.ResourceTypes)

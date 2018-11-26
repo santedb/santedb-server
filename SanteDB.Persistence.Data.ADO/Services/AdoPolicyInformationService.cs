@@ -17,30 +17,26 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Core.Services.Policy;
+using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
-using SanteDB.Persistence.Data.ADO.Configuration;
-using SanteDB.Persistence.Data.ADO.Data;
-using SanteDB.Persistence.Data.ADO.Data.Model.Security;
+using SanteDB.Core.Security.Services;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Configuration;
+using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using SanteDB.Persistence.Data.PSQL.Security;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -50,7 +46,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
     public class AdoPolicyInformationService : IPolicyInformationService
     {
         // Get the SQL configuration
-        private AdoConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(AdoDataConstants.ConfigurationSectionName) as AdoConfiguration;
+        private AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
 
         private TraceSource m_traceSource = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
 
@@ -60,7 +56,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <param name="securable">The securible to which the policy is to be added</param>
         /// <param name="rule">The rule to apply to the securable</param>
         /// <param name="policyOids">The policy OIDs to apply</param>
-        public void AddPolicies(object securable, PolicyDecisionOutcomeType rule, params string[] policyOids)
+        public void AddPolicies(object securable, PolicyGrantType rule, params string[] policyOids)
         {
             using (DataContext context = this.m_configuration.Provider.GetWriteConnection())
             {

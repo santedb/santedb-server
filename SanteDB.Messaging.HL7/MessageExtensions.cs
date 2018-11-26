@@ -20,10 +20,6 @@
 using NHapi.Base.Model;
 using NHapi.Model.V25.Datatype;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Messaging.HL7
 {

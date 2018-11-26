@@ -17,7 +17,7 @@
  * User: justin
  * Date: 2018-7-31
  */
-namespace 
+namespace
     SanteDB.Warehouse.ADO
 {
     /// <summary>

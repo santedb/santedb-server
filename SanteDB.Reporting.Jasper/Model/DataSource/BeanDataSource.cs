@@ -21,11 +21,11 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.DataSource
 {
-	/// <summary>
-	/// Represents a bean data source.
-	/// </summary>
-	/// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
-	[XmlType("beanDataSource")]
+    /// <summary>
+    /// Represents a bean data source.
+    /// </summary>
+    /// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
+    [XmlType("beanDataSource")]
 	[XmlRoot("beanDataSource")]
 	public class BeanDataSource : ResourceBase
 	{

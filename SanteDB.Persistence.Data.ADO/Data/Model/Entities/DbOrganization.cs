@@ -23,10 +23,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
 {
-	/// <summary>
-	/// Represents an organization in the data store
-	/// </summary>
-	[Table("org_tbl")]
+    /// <summary>
+    /// Represents an organization in the data store
+    /// </summary>
+    [Table("org_tbl")]
 	public class DbOrganization : DbEntitySubTable
 	{
 		/// <summary>

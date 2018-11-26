@@ -17,27 +17,25 @@
  * User: justin
  * Date: 2018-11-23
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
+using RestSrvr.Attributes;
+using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Extensions;
+using SanteDB.Core.Model;
+using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.Messaging.GS1.Configuration;
 using SanteDB.Messaging.GS1.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.ServiceModel;
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.DataTypes;
-using System.Diagnostics;
-using SanteDB.Core.Diagnostics;
-using SanteDB.Core.Model.Acts;
-using SanteDB.Core.Model.Collection;
-using SanteDB.Messaging.GS1.Configuration;
-using SanteDB.Core.Security;
-using SanteDB.Core.Extensions;
-using RestSrvr.Attributes;
 
 namespace SanteDB.Messaging.GS1.Rest
 {
@@ -49,7 +47,7 @@ namespace SanteDB.Messaging.GS1.Rest
     {
 
         // Configuration
-        private Gs1ConfigurationSection m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("SanteDB.messaging.gs1") as Gs1ConfigurationSection;
+        private Gs1ConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Gs1ConfigurationSection>();
 
         // Act repository
         private IRepositoryService<Act> m_actRepository;
@@ -72,11 +70,11 @@ namespace SanteDB.Messaging.GS1.Rest
         /// </summary>
         public StockServiceBehavior()
         {
-            this.m_actRepository = ApplicationContext.Current.GetService<IRepositoryService<Act>>();
-            this.m_materialRepository = ApplicationContext.Current.GetService<IRepositoryService<Material>>();
-            this.m_placeRepository = ApplicationContext.Current.GetService<IRepositoryService<Place>>();
-            this.m_stockService = ApplicationContext.Current.GetService<IStockManagementRepositoryService>();
-            this.m_manufMaterialRepository = ApplicationContext.Current.GetService<IRepositoryService<ManufacturedMaterial>>();
+            this.m_actRepository = ApplicationServiceContext.Current.GetService<IRepositoryService<Act>>();
+            this.m_materialRepository = ApplicationServiceContext.Current.GetService<IRepositoryService<Material>>();
+            this.m_placeRepository = ApplicationServiceContext.Current.GetService<IRepositoryService<Place>>();
+            this.m_stockService = ApplicationServiceContext.Current.GetService<IStockManagementRepositoryService>();
+            this.m_manufMaterialRepository = ApplicationServiceContext.Current.GetService<IRepositoryService<ManufacturedMaterial>>();
             this.m_gs1Util = new Gs1Util();
         }
 
@@ -120,17 +118,19 @@ namespace SanteDB.Messaging.GS1.Rest
 
                 // Find the author of the shipment
 
-                var oidService = ApplicationContext.Current.GetService<IOidRegistrarService>();
-                var gln = oidService.GetOid("GLN");
-                var issuingAuthority = oidService.FindData($"{gln.Oid}.{adv.despatchAdviceIdentification.contentOwner?.gln}");
+                var oidService = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>();
+                var gln = oidService.Get("GLN");
+                AssigningAuthority issuingAuthority = null;
+                if(adv.despatchAdviceIdentification.contentOwner != null)
+                    issuingAuthority = oidService.Find(o=>o.Oid == $"{gln.Oid}.{adv.despatchAdviceIdentification.contentOwner.gln}").FirstOrDefault();
                 if (issuingAuthority == null)
-                    issuingAuthority = oidService.GetOid(this.m_configuration.DefaultContentOwnerAssigningAuthority);
+                    issuingAuthority = oidService.Get(this.m_configuration.DefaultContentOwnerAssigningAuthority);
 
                 if (issuingAuthority == null)
                     throw new KeyNotFoundException("Cannot find default issuing authority for advice identification. Please configure a valid OID");
 
                 int tr = 0;
-                var existing = this.m_actRepository.Find(o => o.Identifiers.Any(i => i.Authority.DomainName == issuingAuthority.Mnemonic && i.Value == adv.despatchAdviceIdentification.entityIdentification), 0, 1, out tr);
+                var existing = this.m_actRepository.Find(o => o.Identifiers.Any(i => i.AuthorityKey == issuingAuthority.Key && i.Value == adv.despatchAdviceIdentification.entityIdentification), 0, 1, out tr);
                 if (existing.Any())
                 {
                     this.m_tracer.TraceWarning("Duplicate despatch {0} will be ignored", adv.despatchAdviceIdentification.entityIdentification);
@@ -159,7 +159,7 @@ namespace SanteDB.Messaging.GS1.Rest
                     },
                     Identifiers = new List<ActIdentifier>()
                     {
-                        new ActIdentifier(new AssigningAuthority(issuingAuthority.Mnemonic, issuingAuthority.Name, issuingAuthority.Oid), adv.despatchAdviceIdentification.entityIdentification)
+                        new ActIdentifier(issuingAuthority, adv.despatchAdviceIdentification.entityIdentification)
                     },
                     Participations = new List<ActParticipation>()
                     {
@@ -204,7 +204,7 @@ namespace SanteDB.Messaging.GS1.Rest
             if (orderTransaction.Item.Count > 0)
                 try
                 {
-                    ApplicationContext.Current.GetService<IRepositoryService<Bundle>>().Insert(orderTransaction);
+                    ApplicationServiceContext.Current.GetService<IRepositoryService<Bundle>>().Insert(orderTransaction);
                 }
                 catch (Exception e)
                 {
@@ -272,9 +272,9 @@ namespace SanteDB.Messaging.GS1.Rest
                 filterPlaces = this.m_placeRepository.Find(o => o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation).ToList();
 
             // Get the GLN AA data
-            var oidService = ApplicationContext.Current.GetService<IOidRegistrarService>();
-            var gln = oidService.GetOid("GLN");
-            var gtin = oidService.GetOid("GTIN");
+            var oidService = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>();
+            var gln = oidService.Get("GLN");
+            var gtin = oidService.Get("GTIN");
 
             if (gln == null || gln.Oid == null)
                 throw new InvalidOperationException("GLN configuration must carry OID and be named GLN in repository");
@@ -300,8 +300,8 @@ namespace SanteDB.Messaging.GS1.Rest
                     var tradeItemStatuses = new List<TradeItemInventoryStatusType>();
 
                     // What are the relationships of held entities
-                    var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<EntityRelationship>>();
-                    var relationships = persistenceService.Query(o=>o.RelationshipTypeKey == EntityRelationshipTypeKeys.OwnedEntity && o.SourceEntityKey == place.Key.Value, AuthenticationContext.Current.Principal);
+                    var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityRelationship>>();
+                    var relationships = persistenceService.Query(o=>o.RelationshipTypeKey == EntityRelationshipTypeKeys.OwnedEntity && o.SourceEntityKey == place.Key.Value);
                     relationships.AsParallel().ForAll(rel =>
                     {
                         AuthenticationContext.Current = masterAuthContext;
@@ -341,7 +341,7 @@ namespace SanteDB.Messaging.GS1.Rest
 
                         ReferenceTerm cvx = null;
                         if (mat.TypeConceptKey.HasValue)
-                            cvx = ApplicationContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(mat.TypeConceptKey.Value, "CVX");
+                            cvx = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(mat.TypeConceptKey.Value, "CVX");
 
                         var typeItemCode = new ItemTypeCodeType()
                         {
@@ -394,9 +394,9 @@ namespace SanteDB.Messaging.GS1.Rest
 
                         foreach (var adjgrp in adjustments.GroupBy(o => o.ReasonConceptKey))
                         {
-                            var reasonConcept = ApplicationContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(adjgrp.Key.Value, "GS1_STOCK_STATUS")?.Mnemonic;
+                            var reasonConcept = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(adjgrp.Key.Value, "GS1_STOCK_STATUS")?.Mnemonic;
                             if (reasonConcept == null)
-                                reasonConcept = (ApplicationContext.Current.GetService<IConceptRepositoryService>().Get(adjgrp.Key.Value, Guid.Empty) as Concept)?.Mnemonic;
+                                reasonConcept = (ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().Get(adjgrp.Key.Value, Guid.Empty) as Concept)?.Mnemonic;
 
                             // Broken vials?
                             lock(tradeItemStatuses)
@@ -499,16 +499,16 @@ namespace SanteDB.Messaging.GS1.Rest
                     throw new KeyNotFoundException($"Could not find seller id with {resp.seller?.additionalPartyIdentification?.FirstOrDefault()?.Value ?? resp.seller.gln}");
                 }
 
-                var oidService = ApplicationContext.Current.GetService<IOidRegistrarService>();
-                var gln = oidService.GetOid("GLN");
-                var issuingAuthority = oidService.FindData($"{gln.Oid}.{resp.orderResponseIdentification.contentOwner.gln}");
+                var oidService = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>();
+                var gln = oidService.Get("GLN");
+                var issuingAuthority = oidService.Find(o=>o.Oid == $"{gln.Oid}.{resp.orderResponseIdentification.contentOwner.gln}").FirstOrDefault();
                 if (issuingAuthority == null)
-                    issuingAuthority = oidService.GetOid(this.m_configuration.DefaultContentOwnerAssigningAuthority);
+                    issuingAuthority = oidService.Get(this.m_configuration.DefaultContentOwnerAssigningAuthority);
 
                 if (issuingAuthority == null)
                     throw new KeyNotFoundException("Cannot find default issuing authority for advice identification. Please configure a valid OID");
 
-                orderRequestAct.Identifiers.Add(new ActIdentifier(new AssigningAuthority(issuingAuthority.Mnemonic, issuingAuthority.Name, issuingAuthority.Oid), resp.orderResponseIdentification.entityIdentification));
+                orderRequestAct.Identifiers.Add(new ActIdentifier(issuingAuthority, resp.orderResponseIdentification.entityIdentification));
 
                 // If the original order request is not comlete, then complete it
                 var existingTag = orderRequestAct.Tags.FirstOrDefault(o => o.TagKey == "orderStatus");
@@ -530,7 +530,7 @@ namespace SanteDB.Messaging.GS1.Rest
             // insert transaction
             try
             {
-                ApplicationContext.Current.GetService<IRepositoryService<Bundle>>().Insert(orderTransaction);
+                ApplicationServiceContext.Current.GetService<IRepositoryService<Bundle>>().Insert(orderTransaction);
             }
             catch (Exception e)
             {

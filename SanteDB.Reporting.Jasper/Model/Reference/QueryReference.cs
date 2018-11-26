@@ -21,11 +21,11 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.Reference
 {
-	/// <summary>
-	/// Represents a query reference.
-	/// </summary>
-	/// <seealso cref="SanteDB.Reporting.Jasper.Model.Reference.ReferenceBase" />
-	[XmlType("queryReference")]
+    /// <summary>
+    /// Represents a query reference.
+    /// </summary>
+    /// <seealso cref="SanteDB.Reporting.Jasper.Model.Reference.ReferenceBase" />
+    [XmlType("queryReference")]
 	public class QueryReference : ReferenceBase
 	{
 		/// <summary>

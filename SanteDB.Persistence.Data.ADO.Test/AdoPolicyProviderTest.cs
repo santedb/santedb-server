@@ -1,13 +1,11 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services.Policy;
-using System.Linq;
-using SanteDB.Core.Security;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SanteDB.Core;
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
+using System;
+using System.Linq;
 using System.Security.Principal;
-using System.IO;
 
 namespace SanteDB.Persistence.Data.ADO.Test
 {
@@ -33,7 +31,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         public void TestGetAllPolicies()
         {
 
-            var ipoli = ApplicationContext.Current.GetService<IPolicyInformationService>();
+            var ipoli = ApplicationServiceContext.Current.GetService<IPolicyInformationService>();
             Assert.IsNotNull(ipoli);
             var policies = ipoli.GetPolicies();
             Assert.AreNotEqual(0, policies.Count());
@@ -53,7 +51,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         public void TestGetRolePolicies()
         {
 
-            var ipoli = ApplicationContext.Current.GetService<IPolicyInformationService>();
+            var ipoli = ApplicationServiceContext.Current.GetService<IPolicyInformationService>();
 
             Assert.IsNotNull(ipoli);
 
@@ -69,7 +67,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         public void TestGetUserPolicies()
         {
 
-            var ipoli = ApplicationContext.Current.GetService<IPolicyInformationService>();
+            var ipoli = ApplicationServiceContext.Current.GetService<IPolicyInformationService>();
 
             Assert.IsNotNull(ipoli);
 

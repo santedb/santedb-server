@@ -24,10 +24,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Concepts
 {
-	/// <summary>
-	/// Represents storage entity for concept class
-	/// </summary>
-	[Table("cd_cls_tbl")]
+    /// <summary>
+    /// Represents storage entity for concept class
+    /// </summary>
+    [Table("cd_cls_tbl")]
 	public class DbConceptClass : DbNonVersionedBaseData
 	{
 

@@ -17,13 +17,12 @@
  * User: justin
  * Date: 2018-9-25
  */
-using NHapi.Base.Model;
 using SanteDB.Core.Model;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using NHapi.Model.V25.Datatype;
+using NHapi.Base.Model;
+using NHapi.Model.V25.Segment;
 
 namespace SanteDB.Messaging.HL7.Segments
 {

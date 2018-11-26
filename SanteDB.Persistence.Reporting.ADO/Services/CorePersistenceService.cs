@@ -29,14 +29,14 @@ using System.Security.Principal;
 
 namespace SanteDB.Persistence.Reporting.PSQL.Services
 {
-	/// <summary>
-	/// Represents a core persistence service.
-	/// </summary>
-	/// <typeparam name="TModel">The type of the model.</typeparam>
-	/// <typeparam name="TDomain">The type of the domain.</typeparam>
-	/// <typeparam name="TQueryReturn">The type of the query return.</typeparam>
-	/// <seealso cref="ReportPersistenceServiceBase{TModel}" />
-	public abstract class CorePersistenceService<TModel, TDomain, TQueryReturn> : ReportPersistenceServiceBase<TModel> where TModel : IdentifiedData, new() where TDomain : DbIdentified, new()
+    /// <summary>
+    /// Represents a core persistence service.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model.</typeparam>
+    /// <typeparam name="TDomain">The type of the domain.</typeparam>
+    /// <typeparam name="TQueryReturn">The type of the query return.</typeparam>
+    /// <seealso cref="ReportPersistenceServiceBase{TModel}" />
+    public abstract class CorePersistenceService<TModel, TDomain, TQueryReturn> : ReportPersistenceServiceBase<TModel> where TModel : IdentifiedData, new() where TDomain : DbIdentified, new()
 	{
 		/// <summary>
 		/// Converts a model instance to a domain instance.
@@ -45,7 +45,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="context">The context.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the converted model instance.</returns>
-		public override object FromModelInstance(TModel modelInstance, DataContext context, IPrincipal principal)
+		public override object FromModelInstance(TModel modelInstance, DataContext context)
 		{
 			return ModelMapper.MapModelInstance<TModel, TDomain>(modelInstance);
 		}
@@ -57,13 +57,13 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="model">The model.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the inserted model.</returns>
-		public override TModel InsertInternal(DataContext context, TModel model, IPrincipal principal)
+		public override TModel InsertInternal(DataContext context, TModel model)
 		{
-			var domainInstance = this.FromModelInstance(model, context, principal);
+			var domainInstance = this.FromModelInstance(model, context);
 
 			domainInstance = context.Insert(domainInstance as TDomain);
 
-			return this.ToModelInstance(domainInstance, context, principal);
+			return this.ToModelInstance(domainInstance, context);
 		}
 
 		/// <summary>
@@ -74,7 +74,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the obsoleted data.</returns>
 		/// <exception cref="System.InvalidOperationException"></exception>
-		public override TModel ObsoleteInternal(DataContext context, TModel model, IPrincipal principal)
+		public override TModel ObsoleteInternal(DataContext context, TModel model)
 		{
 			if (model.Key == Guid.Empty)
 			{
@@ -97,7 +97,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="countResults">if set to <c>true</c> [count results].</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns a list of the specified model instance which match the given query expression.</returns>
-		public override IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, int offset, int? count, out int totalResults, bool countResults, IPrincipal principal)
+		public override IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, int offset, int? count, out int totalResults, bool countResults)
 		{
 			try
 			{
@@ -147,7 +147,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 				var results = context.Query<TQueryReturn>(domainQuery).OfType<object>();
 				totalResults = results.Count();
 
-				return results.Select(r => ToModelInstance(r, context, principal));
+				return results.Select(r => ToModelInstance(r, context));
 			}
 			catch (Exception e)
 			{
@@ -163,7 +163,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="context">The context.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the converted model instance.</returns>
-		public override TModel ToModelInstance(object domainInstance, DataContext context, IPrincipal principal)
+		public override TModel ToModelInstance(object domainInstance, DataContext context)
 		{
 			return ModelMapper.MapDomainInstance<TDomain, TModel>(domainInstance as TDomain);
 		}
@@ -175,13 +175,13 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="model">The model.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the updated model instance.</returns>
-		public override TModel UpdateInternal(DataContext context, TModel model, IPrincipal principal)
+		public override TModel UpdateInternal(DataContext context, TModel model)
 		{
-			var domainInstance = this.FromModelInstance(model, context, principal);
+			var domainInstance = this.FromModelInstance(model, context);
 
 			domainInstance = context.Update(domainInstance as TDomain);
 
-			return this.ToModelInstance(domainInstance, context, principal);
+			return this.ToModelInstance(domainInstance, context);
 		}
 	}
 }

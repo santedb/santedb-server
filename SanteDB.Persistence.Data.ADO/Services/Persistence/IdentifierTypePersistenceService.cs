@@ -17,23 +17,14 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model.DataTypes;
-using SanteDB.Persistence.Data.ADO.Data.Model;
 using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
-using SanteDB.OrmLite;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
-	/// <summary>
-	/// Represents a persistence service for an identifier type.
-	/// </summary>
-	public class IdentifierTypePersistenceService : IdentifiedPersistenceService<Core.Model.DataTypes.IdentifierType, DbIdentifierType>
+    /// <summary>
+    /// Represents a persistence service for an identifier type.
+    /// </summary>
+    public class IdentifierTypePersistenceService : IdentifiedPersistenceService<Core.Model.DataTypes.IdentifierType, DbIdentifierType>
 	{
 	}
 }

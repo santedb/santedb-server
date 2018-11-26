@@ -22,10 +22,10 @@ using System;
 
 namespace SanteDB.Persistence.Reporting.PSQL.Model
 {
-	/// <summary>
-	/// Represents a parameter type.
-	/// </summary>
-	[Table("parameter_type")]
+    /// <summary>
+    /// Represents a parameter type.
+    /// </summary>
+    [Table("parameter_type")]
 	public class ParameterType : DbIdentified
 	{
 		/// <summary>

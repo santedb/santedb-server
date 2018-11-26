@@ -17,30 +17,30 @@
  * User: justin
  * Date: 2018-11-23
  */
-using MARC.HI.EHRS.SVC.Core;
+using RestSrvr;
+using SanteDB.Core;
 using SanteDB.Core.Model.RISI;
 using SanteDB.Core.Model.Warehouse;
 using SanteDB.Core.Services;
+using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using RestSrvr;
-using SanteDB.Rest.Common;
 
 namespace SanteDB.Messaging.RISI.Rest
 {
-	/// <summary>
-	/// Represents the RISI behavior implementation
-	/// </summary>
-	public partial class RisiBehavior
+    /// <summary>
+    /// Represents the RISI behavior implementation
+    /// </summary>
+    public partial class RisiBehavior
 	{
 		/// <summary>
 		/// Create datamart
 		/// </summary>
         public DatamartDefinition CreateDatamart(DatamartDefinition definition)
 		{
-			var adhocService = ApplicationContext.Current.GetService<IAdHocDatawarehouseService>();
+			var adhocService = ApplicationServiceContext.Current.GetService<IAdHocDatawarehouseService>();
 			if (adhocService == null)
 				throw new InvalidOperationException("Cannot find the adhoc data warehouse service");
 
@@ -52,7 +52,7 @@ namespace SanteDB.Messaging.RISI.Rest
         /// </summary>
         public DatamartStoredQuery CreateStoredQuery(string datamartId, DatamartStoredQuery queryDefinition)
 		{
-			var adhocService = ApplicationContext.Current.GetService<IAdHocDatawarehouseService>();
+			var adhocService = ApplicationServiceContext.Current.GetService<IAdHocDatawarehouseService>();
 			if (adhocService == null)
 				throw new InvalidOperationException("Cannot find the adhoc data warehouse service");
 
@@ -64,7 +64,7 @@ namespace SanteDB.Messaging.RISI.Rest
         /// </summary>
         public DataWarehouseObject CreateWarehouseObject(string datamartId, DataWarehouseObject obj)
 		{
-			var adhocService = ApplicationContext.Current.GetService<IAdHocDatawarehouseService>();
+			var adhocService = ApplicationServiceContext.Current.GetService<IAdHocDatawarehouseService>();
 			if (adhocService == null)
 				throw new InvalidOperationException("Cannot find the adhoc data warehouse service");
 
@@ -78,7 +78,7 @@ namespace SanteDB.Messaging.RISI.Rest
         /// </summary>
         public void DeleteDatamart(string id)
 		{
-			var adhocService = ApplicationContext.Current.GetService<IAdHocDatawarehouseService>();
+			var adhocService = ApplicationServiceContext.Current.GetService<IAdHocDatawarehouseService>();
 			if (adhocService == null)
 				throw new InvalidOperationException("Cannot find the adhoc data warehouse service");
 
@@ -90,7 +90,7 @@ namespace SanteDB.Messaging.RISI.Rest
         /// </summary>
         public RisiCollection<DataWarehouseObject> ExecuteAdhocQuery(string datamartId)
 		{
-			var adhocService = ApplicationContext.Current.GetService<IAdHocDatawarehouseService>();
+			var adhocService = ApplicationServiceContext.Current.GetService<IAdHocDatawarehouseService>();
 			if (adhocService == null)
 				throw new InvalidOperationException("Cannot find the adhoc data warehouse service");
 
@@ -102,7 +102,7 @@ namespace SanteDB.Messaging.RISI.Rest
         /// </summary>
         public RisiCollection<DataWarehouseObject> ExecuteStoredQuery(string datamartId, string queryId)
 		{
-			var adhocService = ApplicationContext.Current.GetService<IAdHocDatawarehouseService>();
+			var adhocService = ApplicationServiceContext.Current.GetService<IAdHocDatawarehouseService>();
 			if (adhocService == null)
 				throw new InvalidOperationException("Cannot find the adhoc data warehouse service");
 
@@ -122,7 +122,7 @@ namespace SanteDB.Messaging.RISI.Rest
         /// </summary>
         public DatamartDefinition GetDatamart(string id)
 		{
-			var adhocService = ApplicationContext.Current.GetService<IAdHocDatawarehouseService>();
+			var adhocService = ApplicationServiceContext.Current.GetService<IAdHocDatawarehouseService>();
 			if (adhocService == null)
 				throw new InvalidOperationException("Cannot find the adhoc data warehouse service");
 
@@ -137,7 +137,7 @@ namespace SanteDB.Messaging.RISI.Rest
         /// </summary>
         public RisiCollection<DatamartDefinition> GetDatamarts()
 		{
-			var adhocService = ApplicationContext.Current.GetService<IAdHocDatawarehouseService>();
+			var adhocService = ApplicationServiceContext.Current.GetService<IAdHocDatawarehouseService>();
 			if (adhocService == null)
 				throw new InvalidOperationException("Cannot find the adhoc data warehouse service");
 
@@ -149,7 +149,7 @@ namespace SanteDB.Messaging.RISI.Rest
         /// </summary>
         public RisiCollection<DatamartStoredQuery> GetStoredQueries(string datamartId)
 		{
-			var adhocService = ApplicationContext.Current.GetService<IAdHocDatawarehouseService>();
+			var adhocService = ApplicationServiceContext.Current.GetService<IAdHocDatawarehouseService>();
 			if (adhocService == null)
 				throw new InvalidOperationException("Cannot find the adhoc data warehouse service");
 
@@ -165,7 +165,7 @@ namespace SanteDB.Messaging.RISI.Rest
         /// </summary>
         public DataWarehouseObject GetWarehouseObject(string datamartId, string objectId)
 		{
-			var adhocService = ApplicationContext.Current.GetService<IAdHocDatawarehouseService>();
+			var adhocService = ApplicationServiceContext.Current.GetService<IAdHocDatawarehouseService>();
 			if (adhocService == null)
 				throw new InvalidOperationException("Cannot find the adhoc data warehouse service");
 

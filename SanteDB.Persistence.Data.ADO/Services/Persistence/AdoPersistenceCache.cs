@@ -17,12 +17,11 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
+using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using System;
-using System.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -35,7 +34,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         private DataContext m_context;
 
         // Cache
-        private IDataCachingService m_cache = ApplicationContext.Current.GetService<IDataCachingService>();
+        private IDataCachingService m_cache = ApplicationServiceContext.Current.GetService<IDataCachingService>();
 
         /// <summary>
         /// Create a new persistence cache

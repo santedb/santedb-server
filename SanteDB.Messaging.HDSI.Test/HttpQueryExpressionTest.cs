@@ -18,7 +18,6 @@
  * Date: 2017-9-1
  */
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Query;
@@ -26,9 +25,6 @@ using SanteDB.Core.Model.Roles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Messaging.HDSI.Test
 {

@@ -17,28 +17,28 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.DataTypes;
-using SanteDB.Messaging.FHIR.Resources;
+using RestSrvr;
+using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RestSrvr;
 using DatePrecision = SanteDB.Core.Model.DataTypes.DatePrecision;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
-	/// <summary>
-	/// Represents a resource handler which can handle patients.
-	/// </summary>
-	public class PatientResourceHandler : RepositoryResourceHandlerBase<Patient, Core.Model.Roles.Patient>
+    /// <summary>
+    /// Represents a resource handler which can handle patients.
+    /// </summary>
+    public class PatientResourceHandler : RepositoryResourceHandlerBase<Patient, Core.Model.Roles.Patient>
 	{
 		/// <summary>
 		/// The repository.
@@ -50,7 +50,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// </summary>
 		public PatientResourceHandler()
 		{
-			ApplicationContext.Current.Started += (o, e) => this.repository = ApplicationContext.Current.GetService<IPatientRepositoryService>();
+			ApplicationServiceContext.Current.Started += (o, e) => this.repository = ApplicationServiceContext.Current.GetService<IPatientRepositoryService>();
 		}
 
 		/// <summary>

@@ -17,8 +17,8 @@
  * User: justin
  * Date: 2018-10-24
  */
-using System;
 using SanteDB.Core.Http.Description;
+using System;
 
 namespace SanteDB.Tools.AdminConsole.Shell
 {

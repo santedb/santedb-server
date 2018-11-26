@@ -18,28 +18,25 @@
  * Date: 2018-6-22
  */
 using MARC.Everest.Connectors;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Messaging.FHIR.DataTypes;
-using SanteDB.Messaging.FHIR.Resources;
+using RestSrvr;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Services;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using RestSrvr;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
-	/// <summary>
-	/// Represents an immunization recommendation handler.
-	/// </summary>
-	public class ImmunizationRecommendationResourceHandler : ResourceHandlerBase<ImmunizationRecommendation, SubstanceAdministration>
+    /// <summary>
+    /// Represents an immunization recommendation handler.
+    /// </summary>
+    public class ImmunizationRecommendationResourceHandler : ResourceHandlerBase<ImmunizationRecommendation, SubstanceAdministration>
 	{
 		
 		/// <summary>
@@ -101,7 +98,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 				DoseNumber = model.SequenceId,
 				VaccineCode = DataTypeConverter.ToFhirCodeableConcept(mat?.TypeConcept),
 				ForecastStatus = new FhirCodeableConcept(new Uri("http://hl7.org/fhir/conceptset/immunization-recommendation-status"), status),
-				DateCriterion = new List<SanteDB.Messaging.FHIR.Backbone.ImmunizationRecommendationDateCriterion>()
+                DateCriterion = new List<SanteDB.Messaging.FHIR.Backbone.ImmunizationRecommendationDateCriterion>()
 				{
 					new SanteDB.Messaging.FHIR.Backbone.ImmunizationRecommendationDateCriterion()
 					{
@@ -164,7 +161,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <param name="details">The details.</param>
 		/// <returns>Returns the model which matches the given id.</returns>
 		/// <exception cref="System.NotImplementedException"></exception>
-		protected override SubstanceAdministration Read(Identifier<Guid> id, List<IResultDetail> details)
+		protected override SubstanceAdministration Read(Guid id, Guid versionId, List<IResultDetail> details)
 		{
 			throw new NotImplementedException();
 		}

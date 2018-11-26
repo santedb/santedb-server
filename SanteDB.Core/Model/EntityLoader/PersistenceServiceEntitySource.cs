@@ -17,16 +17,12 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Model.EntityLoader
 {
@@ -41,9 +37,9 @@ namespace SanteDB.Core.Model.EntityLoader
         /// </summary>
         public TObject Get<TObject>(Guid? key) where TObject : IdentifiedData, new()
         {
-            var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TObject>>();
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TObject>>();
             if(persistenceService != null  && key.HasValue)
-                return persistenceService.Get(new Identifier<Guid>(key.Value), null, true);
+                return persistenceService.Get(key.Value, null, true);
             return default(TObject);
         }
 
@@ -52,11 +48,11 @@ namespace SanteDB.Core.Model.EntityLoader
         /// </summary>
         public TObject Get<TObject>(Guid? key, Guid? versionKey) where TObject : IdentifiedData, IVersionedEntity, new()
         {
-            var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TObject>>();
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TObject>>();
             if (persistenceService != null && key.HasValue && versionKey.HasValue)
-                return persistenceService.Get(new Identifier<Guid>(key.Value, versionKey.Value), null, true);
+                return persistenceService.Get(key.Value, versionKey.Value, true);
             else if(persistenceService != null && key.HasValue)
-                return persistenceService.Get(new Identifier<Guid>(key.Value), null, true);
+                return persistenceService.Get(key.Value, null, true);
 
             return default(TObject);
         }
@@ -82,9 +78,9 @@ namespace SanteDB.Core.Model.EntityLoader
         /// </summary>
         public IEnumerable<TObject> Query<TObject>(Expression<Func<TObject, bool>> query) where TObject : IdentifiedData, new()
         {
-            var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TObject>>();
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TObject>>();
             if(persistenceService != null)
-                return persistenceService.Query(query, null);
+                return persistenceService.Query(query);
             return new List<TObject>();
         }
         

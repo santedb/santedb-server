@@ -19,12 +19,14 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace SanteDB.Caching.Memory.Configuration
 {
     /// <summary>
     /// Represents type cache configuration
     /// </summary>
+    [XmlType(nameof(TypeCacheConfigurationInfo), Namespace = "http://santedb.org/configuration/cache")]
     public class TypeCacheConfigurationInfo
     {
 
@@ -39,17 +41,20 @@ namespace SanteDB.Caching.Memory.Configuration
         /// <summary>
         /// Gets or sets the type of cache entry
         /// </summary>
+        [XmlIgnore]
         public Type Type { get; set; }
 
       
         /// <summary>
         /// Gets or sets the seed query data
         /// </summary>
+        [XmlElement("seed")]
         internal List<String> SeedQueries { get; set; }
 
         /// <summary>
         /// Gets or sets the value of type
         /// </summary>
+        [XmlAttribute("type")]
         public string TypeXml {
             get { return this.Type?.AssemblyQualifiedName; }
             set

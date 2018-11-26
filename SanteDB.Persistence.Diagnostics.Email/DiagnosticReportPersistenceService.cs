@@ -17,36 +17,35 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core;
+using SanteDB.Core.Event;
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.AMI.Diagnostics;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Services;
+using SanteDB.Persistence.Diagnostics.Email.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MARC.HI.EHRS.SVC.Core.Event;
-using System.Linq.Expressions;
-using System.Security.Principal;
 using System.Diagnostics;
-using MARC.HI.EHRS.SVC.Core;
-using SanteDB.Core.Security.Attribute;
-using System.Security.Permissions;
-using SanteDB.Core.Security;
-using System.Net.Mail;
-using SanteDB.Persistence.Diagnostics.Email.Configuration;
-using SanteDB.Core.Model.Constants;
-using System.Net;
 using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Net;
+using System.Net.Mail;
+using System.Security.Permissions;
+using System.Security.Principal;
+using System.Text;
 using System.Xml.Serialization;
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.Security;
 
 namespace SanteDB.Persistence.Diagnostics.Email
 {
     /// <summary>
     /// Persistence service for diagnostics
     /// </summary>
-    #pragma warning disable CS0067
+#pragma warning disable CS0067
     public class DiagnosticReportPersistenceService : IDataPersistenceService<DiagnosticReport>
     {
 
@@ -54,52 +53,52 @@ namespace SanteDB.Persistence.Diagnostics.Email
         private TraceSource m_traceSource = new TraceSource("SanteDB.Persistence.Diagnostics.Email");
 
         // Configuration
-        private DiagnosticEmailServiceConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("SanteDB.persistence.diagnostics.email") as DiagnosticEmailServiceConfiguration;
+        private DiagnosticEmailServiceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<DiagnosticEmailServiceConfigurationSection>();
 
         /// Fired when an issue is being inserted
         /// </summary>
-        public event EventHandler<PostPersistenceEventArgs<DiagnosticReport>> Inserted;
+        public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Inserted;
         /// <summary>
         /// Fired when the issue is being inserted
         /// </summary>
-        public event EventHandler<PrePersistenceEventArgs<DiagnosticReport>> Inserting;
+        public event EventHandler<DataPersistingEventArgs<DiagnosticReport>> Inserting;
         /// <summary>
         /// Not supported
         /// </summary>
-        public event EventHandler<PostPersistenceEventArgs<DiagnosticReport>> Obsoleted;
+        public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Obsoleted;
         /// <summary>
         /// Not supported
         /// </summary>
-        public event EventHandler<PrePersistenceEventArgs<DiagnosticReport>> Obsoleting;
+        public event EventHandler<DataPersistingEventArgs<DiagnosticReport>> Obsoleting;
         /// <summary>
         /// Not supported
         /// </summary>
-        public event EventHandler<PostQueryEventArgs<DiagnosticReport>> Queried;
+        public event EventHandler<QueryResultEventArgs<DiagnosticReport>> Queried;
         /// <summary>
         /// Not supported
         /// </summary>
-        public event EventHandler<PreQueryEventArgs<DiagnosticReport>> Querying;
+        public event EventHandler<QueryRequestEventArgs<DiagnosticReport>> Querying;
         /// <summary>
         /// Not supported
         /// </summary>
-        public event EventHandler<PostRetrievalEventArgs<DiagnosticReport>> Retrieved;
+        public event EventHandler<DataRetrievedEventArgs<DiagnosticReport>> Retrieved;
         /// <summary>
         /// Not supported
         /// </summary>
-        public event EventHandler<PreRetrievalEventArgs<DiagnosticReport>> Retrieving;
+        public event EventHandler<DataRetrievingEventArgs<DiagnosticReport>> Retrieving;
         /// <summary>
         /// Not supported
         /// </summary>
-        public event EventHandler<PostPersistenceEventArgs<DiagnosticReport>> Updated;
+        public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Updated;
         /// <summary>
         /// Not supported
         /// </summary>
-        public event EventHandler<PrePersistenceEventArgs<DiagnosticReport>> Updating;
+        public event EventHandler<DataPersistingEventArgs<DiagnosticReport>> Updating;
 
         /// <summary>
         /// Not supported
         /// </summary>
-        public int Count(Expression<Func<DiagnosticReport, bool>> query, IPrincipal authContext)
+        public long Count(Expression<Func<DiagnosticReport, bool>> query, IPrincipal overrideAuthContext = null)
         {
             throw new NotImplementedException();
         }
@@ -107,7 +106,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// <summary>
         /// Not supported
         /// </summary>
-        public DiagnosticReport Get<TIdentifier>(MARC.HI.EHRS.SVC.Core.Data.Identifier<TIdentifier> containerId, IPrincipal principal, bool loadFast)
+        public DiagnosticReport Get(Guid containerId, Guid? versionId, bool loadFast = false, IPrincipal overrideAuthContext = null)
         {
             throw new NotImplementedException();
         }
@@ -116,9 +115,9 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// Inserts the specified diagnostic report
         /// </summary>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.Login)]
-        public DiagnosticReport Insert(DiagnosticReport storageData, IPrincipal principal, TransactionMode mode)
+        public DiagnosticReport Insert(DiagnosticReport storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
-            var persistenceArgs = new PrePersistenceEventArgs<DiagnosticReport>(storageData, principal);
+            var persistenceArgs = new DataPersistingEventArgs<DiagnosticReport>(storageData, overrideAuthContext);
             this.Inserting?.Invoke(this, persistenceArgs);
             if (persistenceArgs.Cancel)
             {
@@ -178,7 +177,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
                 smtpClient.Send(bugMessage);
 
                 // Invoke
-                this.Inserted?.Invoke(this, new PostPersistenceEventArgs<DiagnosticReport>(storageData, principal));
+                this.Inserted?.Invoke(this, new DataPersistedEventArgs<DiagnosticReport>(storageData, overrideAuthContext));
                 storageData.CorrelationId = issueId;
                 storageData.Key = Guid.NewGuid();
                 return storageData;
@@ -194,7 +193,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// <summary>
         /// Not supported
         /// </summary>
-        public DiagnosticReport Obsolete(DiagnosticReport storageData, IPrincipal principal, TransactionMode mode)
+        public DiagnosticReport Obsolete(DiagnosticReport storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
             throw new NotImplementedException();
         }
@@ -202,7 +201,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// <summary>
         /// Not supported
         /// </summary>
-        public IEnumerable<DiagnosticReport> Query(Expression<Func<DiagnosticReport, bool>> query, IPrincipal authContext)
+        public IEnumerable<DiagnosticReport> Query(Expression<Func<DiagnosticReport, bool>> query, IPrincipal overrideAuthContext = null)
         {
             throw new NotImplementedException();
         }
@@ -210,7 +209,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// <summary>
         /// Not supported
         /// </summary>
-        public IEnumerable<DiagnosticReport> Query(Expression<Func<DiagnosticReport, bool>> query, int offset, int? count, IPrincipal authContext, out int totalCount)
+        public IEnumerable<DiagnosticReport> Query(Expression<Func<DiagnosticReport, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext = null)
         {
             throw new NotImplementedException();
         }
@@ -218,7 +217,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// <summary>
         /// Not supported
         /// </summary>
-        public DiagnosticReport Update(DiagnosticReport storageData, IPrincipal principal, TransactionMode mode)
+        public DiagnosticReport Update(DiagnosticReport storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
             throw new NotImplementedException();
         }

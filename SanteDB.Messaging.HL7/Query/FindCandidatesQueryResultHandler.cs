@@ -17,20 +17,17 @@
  * User: justin
  * Date: 2018-10-14
  */
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Messaging.HAPI.TransportProtocol;
 using NHapi.Base.Model;
 using NHapi.Model.V25.Message;
+using SanteDB.Core;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.HL7.Segments;
+using SanteDB.Messaging.HL7.TransportProtocol;
+using System;
+using System.Collections;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace SanteDB.Messaging.HL7.Query
 {
@@ -51,8 +48,8 @@ namespace SanteDB.Messaging.HL7.Query
             var pidHandler = SegmentHandlers.GetSegmentHandler("PID");
             var pd1Handler = SegmentHandlers.GetSegmentHandler("PD1");
             var nokHandler = SegmentHandlers.GetSegmentHandler("NK1");
-            var matchService = ApplicationContext.Current.GetService<IRecordMatchingService>();
-            var matchConfigService = ApplicationContext.Current.GetService<IRecordMatchingConfigurationService>();
+            var matchService = ApplicationServiceContext.Current.GetService<IRecordMatchingService>();
+            var matchConfigService = ApplicationServiceContext.Current.GetService<IRecordMatchingConfigurationService>();
 
             // Process results
             int i = offset + 1;
@@ -74,5 +71,6 @@ namespace SanteDB.Messaging.HL7.Query
 
             return retVal;
         }
+
     }
 }

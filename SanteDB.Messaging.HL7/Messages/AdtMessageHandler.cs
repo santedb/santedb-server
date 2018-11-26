@@ -17,20 +17,16 @@
  * User: justin
  * Date: 2018-9-25
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Messaging.HAPI.TransportProtocol;
 using NHapi.Base.Model;
 using NHapi.Model.V25.Message;
 using NHapi.Model.V25.Segment;
+using SanteDB.Core;
 using SanteDB.Core.Model.Collection;
-using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Services;
+using SanteDB.Messaging.HL7.TransportProtocol;
+using System;
+using System.Linq;
 
 namespace SanteDB.Messaging.HL7.Messages
 {
@@ -72,7 +68,7 @@ namespace SanteDB.Messaging.HL7.Messages
             if (patient == null)
                 throw new ArgumentNullException(nameof(insertBundle), "Message did not contain a patient");
 
-            var repoService = ApplicationContext.Current.GetService<IRepositoryService<Bundle>>();
+            var repoService = ApplicationServiceContext.Current.GetService<IRepositoryService<Bundle>>();
             if (repoService == null)
                 throw new InvalidOperationException("Cannot find repository for Patient");
 
@@ -91,7 +87,7 @@ namespace SanteDB.Messaging.HL7.Messages
             if (patient == null)
                 throw new ArgumentNullException(nameof(updateBundle), "Message did not contain a patient");
 
-            var repoService = ApplicationContext.Current.GetService<IRepositoryService<Bundle>>();
+            var repoService = ApplicationServiceContext.Current.GetService<IRepositoryService<Bundle>>();
             if (repoService == null)
                 throw new InvalidOperationException("Cannot find repository for Patient");
 

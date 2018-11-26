@@ -17,23 +17,21 @@
  * User: justin
  * Date: 2018-10-24
  */
-using System;
-using SanteDB.Tools.AdminConsole.Security;
-using System.Security.Permissions;
 using SanteDB.Core.Http;
-using System.Security;
-using System.Security.Principal;
 using SanteDB.Core.Security;
-using System.Security.Claims;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
+using SanteDB.Core.Security.Services;
 using SanteDB.Tools.AdminConsole.Shell;
+using System;
+using System.Security;
+using System.Security.Claims;
+using System.Security.Principal;
 
 namespace SanteDB.Tools.AdminConsole.Security
 {
-	/// <summary>
-	/// Represents a credential provider which provides a token
-	/// </summary>
-	public class TokenCredentialProvider : ICredentialProvider
+    /// <summary>
+    /// Represents a credential provider which provides a token
+    /// </summary>
+    public class TokenCredentialProvider : ICredentialProvider
 	{
 		#region ICredentialProvider implementation
 		/// <summary>
@@ -61,10 +59,10 @@ namespace SanteDB.Tools.AdminConsole.Security
                 if (DateTime.TryParse(tokenCredentials.FindFirst(o => o.Type == ClaimTypes.Expiration).Value, out expiryTime) &&
                     expiryTime < DateTime.Now)
                 {
-                    var idp = ApplicationContext.Current.GetService(typeof(IIdentityProviderService)) as IIdentityProviderService;
+                    var idp = ApplicationServiceContext.Current.GetService(typeof(IIdentityProviderService)) as IIdentityProviderService;
                     var principal = idp.Authenticate(null, null);   // Force a re-issue
                     AuthenticationContext.Current = new AuthenticationContext(principal);
-                    //XamarinApplicationContext.Current.SetDefaultPrincipal(principal);
+                    //XamarinApplicationServiceContext.Current.SetDefaultPrincipal(principal);
                 }
                 else if (expiryTime > DateTime.Now) // Token is good?
                     return this.GetCredentials(context);
@@ -73,7 +71,7 @@ namespace SanteDB.Tools.AdminConsole.Security
             }
             else
             {
-                if (ApplicationContext.Current.Authenticate(new OAuthIdentityProvider(), context))
+                if (ApplicationServiceContext.Current.Authenticate(new OAuthIdentityProvider(), context))
                     return this.GetCredentials(AuthenticationContext.Current.Principal);
             }
             return null;

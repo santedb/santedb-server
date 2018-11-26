@@ -17,16 +17,7 @@
  * User: justin
  * Date: 2018-11-23
  */
-using RestSrvr.Message;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Json;
-using System.ServiceModel.Channels;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 
 namespace SanteDB.Core.Rest.Compression
 {

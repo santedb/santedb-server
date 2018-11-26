@@ -17,17 +17,18 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Auditing.Data;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Attributes;
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core;
+using SanteDB.Core.Auditing;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Event;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Map;
+using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Services;
-using SanteDB.Persistence.Auditing.ADO.Data.Model;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Auditing.ADO.Configuration;
+using SanteDB.Persistence.Auditing.ADO.Data.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -35,12 +36,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using MARC.HI.EHRS.SVC.Core.Event;
 using System.Security.Principal;
-using MARC.HI.EHRS.SVC.Core.Data;
-using SanteDB.Core.Exceptions;
 
 namespace SanteDB.Persistence.Auditing.ADO.Services
 {
@@ -48,13 +44,12 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
     /// Represents a service which is responsible for the storage of audits
     /// </summary>
     [Description("ADO Audit Repository")]
-    [TraceSource(AuditConstants.TraceSourceName)]
     #pragma warning disable CS0067
     public class AdoAuditRepositoryService : IDataPersistenceService<AuditData>
     {
 
         // Confiugration
-        private AdoConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(AuditConstants.ConfigurationSectionName) as AdoConfiguration;
+        private AdoAuditConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoAuditConfigurationSection>();
 
         // Model map
         private ModelMapper m_mapper = null;
@@ -68,43 +63,43 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Fired when data is being inserted
         /// </summary>
-        public event EventHandler<PrePersistenceEventArgs<AuditData>> Inserting;
+        public event EventHandler<DataPersistingEventArgs<AuditData>> Inserting;
         /// <summary>
         /// Fired when data is has been inserted
         /// </summary>
-        public event EventHandler<PostPersistenceEventArgs<AuditData>> Inserted;
+        public event EventHandler<DataPersistedEventArgs<AuditData>> Inserted;
         /// <summary>
         /// Fired when data is being updated
         /// </summary>
-        public event EventHandler<PrePersistenceEventArgs<AuditData>> Updating;
+        public event EventHandler<DataPersistingEventArgs<AuditData>> Updating;
         /// <summary>
         /// Fired when data is has been inserted
         /// </summary>
-        public event EventHandler<PostPersistenceEventArgs<AuditData>> Updated;
+        public event EventHandler<DataPersistedEventArgs<AuditData>> Updated;
         /// <summary>
         /// Fired when data is being obsoleted
         /// </summary>
-        public event EventHandler<PrePersistenceEventArgs<AuditData>> Obsoleting;
+        public event EventHandler<DataPersistingEventArgs<AuditData>> Obsoleting;
         /// <summary>
         /// Fired when data is has been inserted
         /// </summary>
-        public event EventHandler<PostPersistenceEventArgs<AuditData>> Obsoleted;
+        public event EventHandler<DataPersistedEventArgs<AuditData>> Obsoleted;
         /// <summary>
         /// Fired when data is being retrieved
         /// </summary>
-        public event EventHandler<PreRetrievalEventArgs<AuditData>> Retrieving;
+        public event EventHandler<DataRetrievingEventArgs<AuditData>> Retrieving;
         /// <summary>
         /// Fired when data is has been retrieved
         /// </summary>
-        public event EventHandler<PostRetrievalEventArgs<AuditData>> Retrieved;
+        public event EventHandler<DataRetrievedEventArgs<AuditData>> Retrieved;
         /// <summary>
         /// Fired when data is being queryed
         /// </summary>
-        public event EventHandler<PreQueryEventArgs<AuditData>> Querying;
+        public event EventHandler<QueryRequestEventArgs<AuditData>> Querying;
         /// <summary>
         /// Fired when data is has been queried
         /// </summary>
-        public event EventHandler<PostQueryEventArgs<AuditData>> Queried;
+        public event EventHandler<QueryResultEventArgs<AuditData>> Queried;
 
         /// <summary>
         /// Create new audit repository service
@@ -136,12 +131,12 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 EventIdentifier = (EventIdentifierType)res.Object1.EventIdentifier,
                 Outcome = (OutcomeIndicator)res.Object1.Outcome,
                 Timestamp = res.Object1.Timestamp,
-                CorrelationToken = res.Object1.Key
+                Key = res.Object1.Key
             };
 
             if (res.Object1.EventTypeCode != null)
             {
-                var concept = ApplicationContext.Current.GetService<IConceptRepositoryService>().GetConcept(res.Object2.Code);
+                var concept = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConcept(res.Object2.Code);
                 retVal.EventTypeCode = new AuditCode(res.Object2.Code, res.Object2.CodeSystem)
                 {
                     DisplayName = concept?.ConceptNames.First()?.Name ?? res.Object2.Code
@@ -215,11 +210,11 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Insert the specified audit into the database
         /// </summary>
-        public AuditData Insert(AuditData storageData, IPrincipal principal, TransactionMode mode)
+        public AuditData Insert(AuditData storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
 
             // Pre-event trigger
-            var preEvtData = new PrePersistenceEventArgs<AuditData>(storageData, principal);
+            var preEvtData = new DataPersistingEventArgs<AuditData>(storageData, overrideAuthContext);
             this.Inserting?.Invoke(this, preEvtData);
             if (preEvtData.Cancel)
             {
@@ -254,8 +249,8 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     }
 
                     dbAudit.CreationTime = DateTime.Now;
-                    storageData.CorrelationToken = Guid.NewGuid();
-                    dbAudit.Key = storageData.CorrelationToken;
+                    storageData.Key = Guid.NewGuid();
+                    dbAudit.Key = storageData.Key.Value;
                     context.Insert(dbAudit);
 
                     // Insert secondary properties
@@ -309,10 +304,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     else
                         tx.Rollback();
 
-                    var args = new PostPersistenceEventArgs<AuditData>(storageData, principal)
-                    {
-                        Mode = mode
-                    };
+                    var args = new DataPersistedEventArgs<AuditData>(storageData, overrideAuthContext);
 
                     this.Inserted?.Invoke(this, args);
 
@@ -330,7 +322,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Update the audit - Not supported
         /// </summary>
-        public AuditData Update(AuditData storageData, IPrincipal principal, TransactionMode mode)
+        public AuditData Update(AuditData storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
             throw new NotSupportedException("Updates not permitted");
         }
@@ -338,7 +330,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Obsolete the audit - Not supported
         /// </summary>
-        public AuditData Obsolete(AuditData storageData, IPrincipal principal, TransactionMode mode)
+        public AuditData Obsolete(AuditData storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
             throw new NotSupportedException("Obsoletion of audits not permitted");
         }
@@ -346,10 +338,10 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Gets the specified object by identifier
         /// </summary>
-        public AuditData Get<TIdentifier>(MARC.HI.EHRS.SVC.Core.Data.Identifier<TIdentifier> containerId, IPrincipal principal, bool loadFast)
+        public AuditData Get(Guid containerId, Guid? versionId, bool loadFast = false, IPrincipal overrideAuthContext = null)
         {
 
-            var preEvtData = new PreRetrievalEventArgs<AuditData>(containerId, principal);
+            var preEvtData = new DataRetrievingEventArgs<AuditData>(containerId, versionId, overrideAuthContext);
             this.Retrieving?.Invoke(this, preEvtData);
             if(preEvtData.Cancel)
             {
@@ -360,18 +352,18 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             try
             {
 
-                var pk = containerId as Identifier<Guid>;
+                var pk = containerId;
 
                 // Fetch 
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     context.Open();
 
-                    var sql = this.m_builder.CreateQuery<AuditData>(o => o.CorrelationToken == pk.Id).Limit(1).Build();
+                    var sql = this.m_builder.CreateQuery<AuditData>(o => o.Key == pk).Limit(1).Build();
                     var res = context.FirstOrDefault(typeof(CompositeResult<DbAuditData, DbAuditCode>), sql);
                     var result = this.ToModelInstance(context, res as CompositeResult<DbAuditData, DbAuditCode>, false);
 
-                    var postEvtData = new PostRetrievalEventArgs<AuditData>(result, principal);
+                    var postEvtData = new DataRetrievedEventArgs<AuditData>(result, overrideAuthContext);
                     this.Retrieved?.Invoke(this, postEvtData);
 
                     return postEvtData.Data;
@@ -380,7 +372,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceError("Error retrieving audit {0} : {1}", containerId.Id, e);
+                this.m_traceSource.TraceError("Error retrieving audit {0} : {1}", containerId, e);
                 throw;
             }
         }
@@ -388,29 +380,29 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Return a count of audits matching the query
         /// </summary>
-        public int Count(Expression<Func<AuditData, bool>> query, IPrincipal authContext)
+        public long Count(Expression<Func<AuditData, bool>> query, IPrincipal overrideAuthContext = null)
         {
             var tr = 0;
-            this.Query(query, 0, null, authContext, out tr);
+            this.Query(query, 0, null, out tr, overrideAuthContext);
             return tr;
         }
 
         /// <summary>
         /// Execute a query
         /// </summary>
-        public IEnumerable<AuditData> Query(Expression<Func<AuditData, bool>> query, IPrincipal authContext)
+        public IEnumerable<AuditData> Query(Expression<Func<AuditData, bool>> query, IPrincipal overrideAuthContext = null)
         {
             int tr = 0;
-            return this.Query(query, 0, null, authContext, out tr);
+            return this.Query(query, 0, null, out tr);
         }
 
         /// <summary>
         /// Executes a query for the specified objects
         /// </summary>
-        public IEnumerable<AuditData> Query(Expression<Func<AuditData, bool>> query, int offset, int? count, IPrincipal authContext, out int totalCount)
+        public IEnumerable<AuditData> Query(Expression<Func<AuditData, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext = null)
         {
 
-            var preEvtData = new PreQueryEventArgs<AuditData>(query, offset: offset, count: count, authContext: authContext);
+            var preEvtData = new QueryRequestEventArgs<AuditData>(query, offset: offset, count: count, queryId: null, principal: overrideAuthContext);
             this.Querying?.Invoke(this, preEvtData);
             if(preEvtData.Cancel)
             {
@@ -447,7 +439,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     var results = itm.Select(o => this.ToModelInstance(context, o)).ToList().AsQueryable();
 
                     // Event args
-                    var postEvtArgs = new PostQueryEventArgs<AuditData>(query, results, authContext);
+                    var postEvtArgs = new QueryResultEventArgs<AuditData>(query, results, offset, count, totalCount, null, overrideAuthContext);
                     this.Queried?.Invoke(this, postEvtArgs);
                     return postEvtArgs.Results;
 

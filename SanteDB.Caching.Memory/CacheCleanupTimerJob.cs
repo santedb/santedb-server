@@ -17,12 +17,9 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core.Timer;
+using SanteDB.Core.Jobs;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
 
 namespace SanteDB.Caching.Memory
@@ -30,14 +27,51 @@ namespace SanteDB.Caching.Memory
     /// <summary>
     /// Timer job that cleans up cache
     /// </summary>
-    internal class CacheCleanupTimerJob : ITimerJob
+    internal class CacheCleanupTimerJob : IJob
     {
+        /// <summary>
+        /// Get the name of the service
+        /// </summary>
+        public string Name => "Memory Cache Cleanup";
+
+        /// <summary>
+        /// Can Cancel?
+        /// </summary>
+        public bool CanCancel => false;
+
+        /// <summary>
+        /// Current status
+        /// </summary>
+        public JobStateType CurrentState { get; private set; }
+
+        /// <summary>
+        /// Get the parameters
+        /// </summary>
+        public IDictionary<string, Type> Parameters => null;
+
+        /// <summary>
+        /// Cancel
+        /// </summary>
+        public void Cancel()
+        {
+            throw new NotSupportedException();
+        }
+
         /// <summary>
         /// Elapsed
         /// </summary>
-        public void Elapsed(object sender, ElapsedEventArgs e)
+        public void Run(object sender, ElapsedEventArgs e, object[] parameters)
         {
-            MemoryCache.Current.Clean();
+            try
+            {
+                this.CurrentState = JobStateType.Running;
+                MemoryCache.Current.Clean();
+                this.CurrentState = JobStateType.Completed;
+            }
+            catch
+            {
+                this.CurrentState = JobStateType.Aborted;
+            }
         }
     }
 }

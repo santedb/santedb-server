@@ -17,43 +17,58 @@
  * User: justin
  * Date: 2018-9-25
  */
+using SanteDB.Core.Model.Serialization;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
+using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.MDM.Configuration
 {
     /// <summary>
     /// Represents configuration for one resource
     /// </summary>
+    [XmlType(nameof(MdmResourceConfiguration), Namespace = "http://santedb.org/configuration/mdm")]
     public class MdmResourceConfiguration
     {
-
         /// <summary>
-        /// Creates a new mdm resource configuration
+        /// Serialization ctor
         /// </summary>
-        public MdmResourceConfiguration(Type resourceType, String matchConfiguration, bool merge)
+        public MdmResourceConfiguration()
         {
-            this.ResourceType = resourceType;
-            this.MatchConfiguration = matchConfiguration;
-            this.AutoMerge = merge;
+
         }
 
         /// <summary>
+        /// MDM resource configuration
+        /// </summary>
+        public MdmResourceConfiguration(Type type, String matchConfiguration, bool autoMerge)
+        {
+            this.ResourceTypeXml = type.GetCustomAttribute<XmlRootAttribute>()?.ElementName;
+            this.MatchConfiguration = matchConfiguration;
+            this.AutoMerge = autoMerge;
+        }
+        /// <summary>
         /// Gets or sets the resource type
         /// </summary>
-        public Type ResourceType { get; private set; }
+        [XmlAttribute("type")]
+        public String ResourceTypeXml { get; set; }
+
+        /// <summary>
+        /// Gets the resource
+        /// </summary>
+        [XmlIgnore]
+        public Type ResourceType => new ModelSerializationBinder().BindToType(null, this.ResourceTypeXml);
 
         /// <summary>
         /// Gets or sets the match configuration
         /// </summary>
-        public String MatchConfiguration { get; private set; }
+        [XmlAttribute("matchConfiguration")]
+        public String MatchConfiguration { get; set; }
 
         /// <summary>
         /// Gets the auto merge attribute
         /// </summary>
-        public bool AutoMerge { get; private set; }
+        [XmlAttribute("autoMerge")]
+        public bool AutoMerge { get; set; }
     }
 }

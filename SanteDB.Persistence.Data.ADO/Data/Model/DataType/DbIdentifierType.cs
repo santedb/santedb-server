@@ -23,10 +23,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.DataType
 {
-	/// <summary>
-	/// Identifier type table.
-	/// </summary>
-	[Table("id_typ_tbl")]
+    /// <summary>
+    /// Identifier type table.
+    /// </summary>
+    [Table("id_typ_tbl")]
 	public class DbIdentifierType : DbBaseData
 	{
         /// <summary>

@@ -23,10 +23,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.Core
 {
-	/// <summary>
-	/// Represents a report unit.
-	/// </summary>
-	[XmlType("reportUnit")]
+    /// <summary>
+    /// Represents a report unit.
+    /// </summary>
+    [XmlType("reportUnit")]
 	[XmlRoot("reportUnit")]
 	public class ReportUnit : ResourceBase
 	{

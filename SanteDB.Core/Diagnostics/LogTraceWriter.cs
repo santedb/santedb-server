@@ -18,10 +18,8 @@
  * Date: 2018-6-22
  */
 using System;
-using System.Diagnostics.Tracing;
 using System.Diagnostics;
-using SanteDB.Core.Diagnostics;
-using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Core.Diagnostics
 {

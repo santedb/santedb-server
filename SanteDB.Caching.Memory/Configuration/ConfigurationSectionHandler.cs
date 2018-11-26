@@ -18,12 +18,9 @@
  * Date: 2018-6-22
  */
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace SanteDB.Caching.Memory.Configuration
@@ -43,7 +40,7 @@ namespace SanteDB.Caching.Memory.Configuration
 
 
             // Iterate over registration types
-            MemoryCacheConfiguration retVal = new MemoryCacheConfiguration();
+            MemoryCacheConfigurationSection retVal = new MemoryCacheConfigurationSection();
             retVal.AutoSubscribeTypes = XmlConvert.ToBoolean(autoCreateNode?.Value);
             retVal.MaxCacheAge = TimeSpan.Parse(section.Attributes["maxAge"]?.Value ?? "1:0:0:0", CultureInfo.InvariantCulture).Ticks;
             retVal.MaxCacheSize = Int32.Parse(section.Attributes["maxSize"]?.Value ?? "5000");

@@ -21,10 +21,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.Collection
 {
-	/// <summary>
-	/// Represents an item.
-	/// </summary>
-	[XmlType("item")]
+    /// <summary>
+    /// Represents an item.
+    /// </summary>
+    [XmlType("item")]
 	public class Item
 	{
 		/// <summary>

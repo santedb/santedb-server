@@ -19,10 +19,10 @@
  */
 namespace SanteDB.Reporting.Core.Auth
 {
-	/// <summary>
-	/// Represents an authentication result.
-	/// </summary>
-	public class AuthenticationResult
+    /// <summary>
+    /// Represents an authentication result.
+    /// </summary>
+    public class AuthenticationResult
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AuthenticationResult"/> class.

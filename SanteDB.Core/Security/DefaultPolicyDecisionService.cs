@@ -17,18 +17,14 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core.Services.Policy;
+using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security.Claims;
+using SanteDB.Core.Security.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Principal;
-using MARC.HI.EHRS.SVC.Core;
-using SanteDB.Core.Model.Security;
-using MARC.HI.EHRS.SVC.Core.Services;
 using System.Security.Claims;
-using SanteDB.Core.Security.Claims;
+using System.Security.Principal;
 
 namespace SanteDB.Core.Security
 {
@@ -49,27 +45,28 @@ namespace SanteDB.Core.Security
                 throw new ArgumentNullException(nameof(securable));
 
             // We need to get the active policies for this
-            var pip = ApplicationContext.Current.GetService<IPolicyInformationService>();
+            var pip = ApplicationServiceContext.Current.GetService<IPolicyInformationService>();
             IEnumerable<IPolicyInstance> securablePolicies = pip.GetActivePolicies(securable),
                 principalPolicies = pip.GetActivePolicies(principal);
 
-            var retVal = new PolicyDecision(securable);
+            List<PolicyDecisionDetail> details = new List<PolicyDecisionDetail>();
+            var retVal = new PolicyDecision(securable, details);
 
             foreach (var pol in securablePolicies)
             {
                 // Get most restrictive from principal
                 var rules = principalPolicies.Where(p => p.Policy.Oid.StartsWith(pol.Policy.Oid)).Select(o => o.Rule);
-                PolicyDecisionOutcomeType rule = PolicyDecisionOutcomeType.Deny;
+                PolicyGrantType rule = PolicyGrantType.Deny;
                 if(rules.Any())
                     rule = rules.Min();
 
                 // Rule for elevate can only be made when the policy allows for it & the principal is allowed
-                if (rule == PolicyDecisionOutcomeType.Elevate &&
+                if (rule == PolicyGrantType.Elevate &&
                     (!pol.Policy.CanOverride ||
-                    principalPolicies.Any(o => o.Policy.Oid == PermissionPolicyIdentifiers.ElevateClinicalData && o.Rule == PolicyDecisionOutcomeType.Grant)))
-                    rule = PolicyDecisionOutcomeType.Deny;
+                    principalPolicies.Any(o => o.Policy.Oid == PermissionPolicyIdentifiers.ElevateClinicalData && o.Rule == PolicyGrantType.Grant)))
+                    rule = PolicyGrantType.Deny;
 
-                retVal.Details.Add(new PolicyDecisionDetail(pol.Policy.Oid, rule));
+                details.Add(new PolicyDecisionDetail(pol.Policy.Oid, rule));
             }
 
             return retVal;
@@ -78,7 +75,7 @@ namespace SanteDB.Core.Security
         /// <summary>
         /// Get a policy outcome
         /// </summary>
-        public PolicyDecisionOutcomeType GetPolicyOutcome(IPrincipal principal, string policyId)
+        public PolicyGrantType GetPolicyOutcome(IPrincipal principal, string policyId)
         {
             if (principal == null)
                 throw new ArgumentNullException(nameof(principal));
@@ -87,10 +84,10 @@ namespace SanteDB.Core.Security
 
             // Can we make this decision based on the claims? 
             if (principal is ClaimsPrincipal && (principal as ClaimsPrincipal).HasClaim(c => c.Type == SanteDBClaimTypes.SanteDBGrantedPolicyClaim && policyId.StartsWith(c.Value)))
-                return PolicyDecisionOutcomeType.Grant;
+                return PolicyGrantType.Grant;
 
             // Get the user object from the principal
-            var pip = ApplicationContext.Current.GetService<IPolicyInformationService>();
+            var pip = ApplicationServiceContext.Current.GetService<IPolicyInformationService>();
 
             // Policies
             var activePolicies = pip.GetActivePolicies(principal).Where(o => policyId.StartsWith(o.Policy.Oid));
@@ -105,12 +102,12 @@ namespace SanteDB.Core.Security
             if (policyInstance == null)
             {
                 // TODO: Configure OptIn or OptOut
-                return PolicyDecisionOutcomeType.Deny;
+                return PolicyGrantType.Deny;
             }
-            else if (!policyInstance.Policy.CanOverride && policyInstance.Rule == PolicyDecisionOutcomeType.Elevate)
-                return PolicyDecisionOutcomeType.Deny;
+            else if (!policyInstance.Policy.CanOverride && policyInstance.Rule == PolicyGrantType.Elevate)
+                return PolicyGrantType.Deny;
             else if (!policyInstance.Policy.IsActive)
-                return PolicyDecisionOutcomeType.Grant;
+                return PolicyGrantType.Grant;
             else if ((policyInstance.Policy as ILocalPolicy)?.Handler != null)
             {
                 var policy = policyInstance.Policy as ILocalPolicy;

@@ -1,14 +1,10 @@
-﻿using MARC.HI.EHRS.SVC.Core;
-using SanteDB.Core.Model.Acts;
+﻿using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -130,7 +126,7 @@ namespace SanteDB.Core.Services.Impl
                 throw new ArgumentNullException($"{nameof(data)} cannot be null");
             base.Validate(data);
 
-            var userService = ApplicationContext.Current.GetService<ISecurityRepositoryService>();
+            var userService = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>();
             var currentUserEntity = userService.GetUserEntity(AuthenticationContext.Current.Principal.Identity);
             if (data.Participations.All(o => o.ParticipationRoleKey != ActParticipationKey.Authororiginator))
                 data.Participations.Add(new ActParticipation(ActParticipationKey.Authororiginator, currentUserEntity));

@@ -25,8 +25,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
 {
@@ -37,7 +35,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
     public static class PolicyCmdlet
     {
 
-        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
+        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationServiceContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
 
         /// <summary>
         /// List policy parameters

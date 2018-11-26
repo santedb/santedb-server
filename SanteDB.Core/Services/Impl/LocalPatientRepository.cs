@@ -17,26 +17,17 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Core.Model.Roles;
-using SanteDB.Core.Security;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
-using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
-using SanteDB.Core.Exceptions;
+using SanteDB.Core.Model.Roles;
+using System;
+using System.Diagnostics;
 
 namespace SanteDB.Core.Services.Impl
 {
-	/// <summary>
-	/// Local patient repository service
-	/// </summary>
-	public class LocalPatientRepository : GenericLocalNullifiedRepository<Patient>, IPatientRepositoryService, IRepositoryService<Patient>
+    /// <summary>
+    /// Local patient repository service
+    /// </summary>
+    public class LocalPatientRepository : GenericLocalNullifiedRepository<Patient>, IPatientRepositoryService, IRepositoryService<Patient>
 	{
 		
 		/// <summary>
@@ -54,14 +45,14 @@ namespace SanteDB.Core.Services.Impl
 		/// <exception cref="System.NotImplementedException"></exception>
 		public Patient Merge(Patient survivor, Patient victim)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>();
+			var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>();
 
 			if (persistenceService == null)
 			{
 				throw new InvalidOperationException($"{nameof(IDataPersistenceService<Patient>)} not found");
 			}
 
-			var clientRegistryNotificationService = ApplicationContext.Current.GetService<IClientRegistryNotificationService>();
+			var clientRegistryNotificationService = ApplicationServiceContext.Current.GetService<IClientRegistryNotificationService>();
 
 			// TODO: Do this
 			throw new NotImplementedException();
@@ -75,7 +66,7 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public Patient UnMerge(Patient patient, Guid versionKey)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>();
+			var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>();
 
 			if (persistenceService == null)
 			{

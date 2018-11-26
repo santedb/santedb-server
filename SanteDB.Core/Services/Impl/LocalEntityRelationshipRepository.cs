@@ -1,11 +1,6 @@
-﻿using MARC.HI.EHRS.SVC.Core;
-using SanteDB.Core.Model.Entities;
+﻿using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -27,7 +22,7 @@ namespace SanteDB.Core.Services.Impl
         {
             // force set the version sequence
             if (data.EffectiveVersionSequenceId == null)
-                data.EffectiveVersionSequenceId = ApplicationContext.Current.GetService<IRepositoryService<Entity>>().Get(data.SourceEntityKey.Value, Guid.Empty)?.VersionSequence;
+                data.EffectiveVersionSequenceId = ApplicationServiceContext.Current.GetService<IRepositoryService<Entity>>().Get(data.SourceEntityKey.Value, Guid.Empty)?.VersionSequence;
 
             return base.Insert(data);
         }
@@ -42,7 +37,7 @@ namespace SanteDB.Core.Services.Impl
         {
             // force set the version sequence
             if (data.EffectiveVersionSequenceId == null)
-                data.EffectiveVersionSequenceId = ApplicationContext.Current.GetService<IRepositoryService<Entity>>().Get(data.SourceEntityKey.Value, Guid.Empty)?.VersionSequence;
+                data.EffectiveVersionSequenceId = ApplicationServiceContext.Current.GetService<IRepositoryService<Entity>>().Get(data.SourceEntityKey.Value, Guid.Empty)?.VersionSequence;
 
             return base.Save(data);
         }

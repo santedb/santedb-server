@@ -17,55 +17,68 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Configuration;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace SanteDB.Messaging.GS1.Configuration
 {
     /// <summary>
     /// GS1 configuration 
     /// </summary>
-    public class Gs1ConfigurationSection : ConfigurationSection
+    [XmlType(nameof(Gs1ConfigurationSection), Namespace = "http://santedb.org/configuration/gs1")]
+    public class Gs1ConfigurationSection  : IConfigurationSection
     {
         /// <summary>
         /// Auto create materials
         /// </summary>
-        [ConfigurationProperty("autoCreateMaterials")]
+        [XmlAttribute("autoCreateMaterials")]
         public bool AutoCreateMaterials {
-            get { return (bool)this["autoCreateMaterials"]; }
-            set { this["autoCreateMaterials"] = value; }
+            get;set;
         }
 
         /// <summary>
         /// Default content owner assigning authority
         /// </summary>
-        [ConfigurationProperty("defaultAuthority")]
+        [XmlAttribute("defaultAuthority")]
         public String DefaultContentOwnerAssigningAuthority {
-            get { return (string)this["defaultAuthority"]; }
-            set { this["defaultAuthority"] = value; }
+            get;set;
         }
 
         /// <summary>
         /// Gets the queue on which to place messages
         /// </summary>
-        [ConfigurationProperty("queueName")]
+        [XmlAttribute("queueName"), ConfigurationRequired]
         public String Gs1QueueName {
-            get { return (string)this["queueName"]; }
-            set { this["queueName"] = value; }
+            get;set;
         }
 
         /// <summary>
         /// Gets or sets the gs1 broker address
         /// </summary>
-        [ConfigurationProperty("broker")]
+        [XmlElement("broker"), ConfigurationRequired]
         public As2ServiceElement Gs1BrokerAddress {
-            get { return (As2ServiceElement)this["broker"]; }
-            set { this["broker"] = value; }
+            get;set;
         }
 
+        /// <summary>
+        /// Gets or set sthe sender information
+        /// </summary>
+        [XmlAttribute("partnerAuthority"), ConfigurationRequired]
+        public string PartnerIdentificationAuthority { get; set; }
+
+
+        /// <summary>
+        /// Gets or sets the partner identification
+        /// </summary>
+        [XmlAttribute("partnerIdentification"), ConfigurationRequired]
+        public string PartnerIdentification { get; set; }
+
+        /// <summary>
+        /// Identifies the sender contact email
+        /// </summary>
+        [XmlElement("senderContactEmail")]
+        public string SenderContactEmail { get; set; }
     }
 }

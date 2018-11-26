@@ -1,6 +1,5 @@
-﻿using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Configuration;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SanteDB.Core;
 using SanteDB.Core.Model.EntityLoader;
 using SanteDB.Persistence.Data.ADO.Services;
 using System;
@@ -45,10 +44,9 @@ namespace SanteDB.Persistence.Data.ADO.Test
                 var f = typeof(FirebirdSql.Data.FirebirdClient.FirebirdClientFactory).AssemblyQualifiedName;
 
                 // Start the daemon services
-                var adoPersistenceService = ApplicationContext.Current.GetService<AdoPersistenceService>();
+                var adoPersistenceService = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
                 if (!adoPersistenceService.IsRunning)
                 {
-                    ApplicationContext.Current.Configuration.ServiceProviders.Add(typeof(LocalConfigurationManager));
                     //adoPersistenceService.Start();
                     ApplicationContext.Current.Start();
                 }

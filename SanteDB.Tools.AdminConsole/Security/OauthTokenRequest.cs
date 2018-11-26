@@ -17,13 +17,9 @@
  * User: justin
  * Date: 2018-10-24
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using Newtonsoft.Json;
 using SanteDB.Core.Http;
+using System;
 
 namespace SanteDB.Tools.AdminConsole.Security
 {

@@ -17,14 +17,9 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.ADO.Exceptions
 {
@@ -88,25 +83,8 @@ namespace SanteDB.Persistence.Data.ADO.Exceptions
         {
             get
             {
-                ILocalizationService locale = ApplicationContext.Current.GetService<ILocalizationService>();
-                if (locale == null)
-                    return this.m_violation.ToString();
-                else switch (this.m_violation)
-                    {
-                        case AdoFormalConstraintType.IdentityInsert:
-                            return locale.GetString("DBCE001");
-                        case AdoFormalConstraintType.NonIdentityUpdate:
-                            return locale.GetString("DBCE002");
-                        case AdoFormalConstraintType.UpdatedReadonlyObject:
-                            return locale.GetString("DBCE003");
-                        case AdoFormalConstraintType.AssociatedEntityWithoutEffectiveVersion:
-                            return locale.GetString("DBCE004");
-                        case AdoFormalConstraintType.AssociatedEntityWithoutSourceKey:
-                            return locale.GetString("DBCE005");
-                            
-                        default:
-                            return this.m_violation.ToString();
-                    }
+                return $"Formal Constraint Violation: {this.m_violation}";
+
             }
         }
     }

@@ -17,19 +17,15 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Exceptions;
-using MARC.HI.EHRS.SVC.Core.Services.Policy;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security.Services;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Security;
 using System.Security.Permissions;
 using System.Security.Principal;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Security.Attribute
 {
@@ -68,7 +64,7 @@ namespace SanteDB.Core.Security.Attribute
         {
 
             // TODO: Configure this 
-            if (ApplicationContext.Current.GetService(typeof(IPolicyDecisionService)) == null)
+            if (ApplicationServiceContext.Current.GetService(typeof(IPolicyDecisionService)) == null)
                 return new PolicyPermission(PermissionState.None, this.PolicyId);
             else
                 return new PolicyPermission(PermissionState.Unrestricted, this.PolicyId);
@@ -124,24 +120,24 @@ namespace SanteDB.Core.Security.Attribute
         /// </summary>
         public void Demand()
         {
-            var pdp = ApplicationContext.Current.GetService<IPolicyDecisionService>();
+            var pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
 
             var principal = this.m_principal ?? AuthenticationContext.Current.Principal;
 
             // Non system principals must be authenticated
             if(!principal.Identity.IsAuthenticated &&
                 principal != AuthenticationContext.SystemPrincipal)
-                throw new PolicyViolationException(principal, this.m_policyId, PolicyDecisionOutcomeType.Deny);
+                throw new PolicyViolationException(principal, this.m_policyId, PolicyGrantType.Deny);
 
-            PolicyDecisionOutcomeType action = PolicyDecisionOutcomeType.Deny;
+            PolicyGrantType action = PolicyGrantType.Deny;
             if (pdp == null) // No way to verify 
-                action = PolicyDecisionOutcomeType.Deny;
+                action = PolicyGrantType.Deny;
             else if (pdp != null)
                 action = pdp.GetPolicyOutcome(principal, this.m_policyId);
 
             this.m_traceSource.TraceInformation("Policy Enforce: {0}({1}) = {2}", principal?.Identity?.Name, this.m_policyId, action);
 
-            if (action != PolicyDecisionOutcomeType.Grant)
+            if (action != PolicyGrantType.Grant)
                 throw new PolicyViolationException(principal, this.m_policyId, action);
         }
 
@@ -158,7 +154,7 @@ namespace SanteDB.Core.Security.Attribute
                 this.m_policyId = element;
             element = elem.Attribute("principal");
             if(element != null)
-                this.m_principal = new GenericPrincipal(ApplicationContext.Current.GetService<IIdentityProviderService>().GetIdentity(element), null);
+                this.m_principal = new GenericPrincipal(ApplicationServiceContext.Current.GetService<IIdentityProviderService>().GetIdentity(element), null);
             else
                 throw new InvalidOperationException("Must have policyid");
         }

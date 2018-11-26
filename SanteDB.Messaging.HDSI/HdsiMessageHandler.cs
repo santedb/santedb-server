@@ -17,30 +17,21 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
+using RestSrvr;
+using SanteDB.Core;
 using SanteDB.Core.Interop;
-using SanteDB.Rest.Common;
+using SanteDB.Core.Rest;
+using SanteDB.Core.Rest.Behavior;
+using SanteDB.Core.Rest.Security;
+using SanteDB.Core.Services;
 using SanteDB.Messaging.HDSI.Configuration;
 using SanteDB.Messaging.HDSI.Wcf;
+using SanteDB.Rest.Common;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.ServiceModel;
-using System.ServiceModel.Description;
-using System.ServiceModel.Dispatcher;
-using System.Text;
-using System.Threading.Tasks;
-using RestSrvr;
-using SanteDB.Rest.HDSI;
-using RestSrvr.Bindings;
-using SanteDB.Core.Rest;
-using SanteDB.Core.Rest.Security;
-using SanteDB.Core.Rest.Behavior;
 
 namespace SanteDB.Messaging.HDSI
 {
@@ -49,7 +40,7 @@ namespace SanteDB.Messaging.HDSI
     /// The HDSI Message Handler Daemon class
     /// </summary>
     [Description("HDSI Message Service")]
-    public class HdsiMessageHandler : IMessageHandlerService, IApiEndpointProvider
+    public class HdsiMessageHandler : IDaemonService, IApiEndpointProvider
     {
 
         /// <summary>
@@ -61,7 +52,7 @@ namespace SanteDB.Messaging.HDSI
         private TraceSource m_traceSource = new TraceSource("SanteDB.Messaging.HDSI");
 
         // configuration
-        private HdsiConfiguration m_configuration= ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.messaging.hdsi") as HdsiConfiguration;
+        private HdsiConfigurationSection m_configuration= ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<HdsiConfigurationSection>();
 
         // web host
         private RestService m_webHost;

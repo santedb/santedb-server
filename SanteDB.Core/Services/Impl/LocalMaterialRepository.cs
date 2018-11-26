@@ -17,15 +17,8 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using MARC.HI.EHRS.SVC.Core.Data;
-using SanteDB.Core.Exceptions;
 
 namespace SanteDB.Core.Services.Impl
 {

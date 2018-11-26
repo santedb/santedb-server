@@ -17,21 +17,16 @@
  * User: justin
  * Date: 2018-11-23
  */
+using MARC.Everest.Connectors;
+using RestSrvr;
+using SanteDB.Core;
+using SanteDB.Core.Services;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.Configuration;
+using SanteDB.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.Resources.Attributes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SanteDB.Messaging.FHIR.Resources;
-using System.Xml.Serialization;
-using MARC.Everest.Connectors;
-using SanteDB.Messaging.FHIR.Resources.Attributes;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.DataTypes;
-using SanteDB.Messaging.FHIR.Configuration;
-using RestSrvr;
 using System.IO;
 
 namespace SanteDB.Messaging.FHIR.Util
@@ -74,84 +69,6 @@ namespace SanteDB.Messaging.FHIR.Util
         }
 
         /// <summary>
-        /// Populate a domain identifier from a FHIR token
-        /// </summary>
-        public static Identifier<String> IdentifierFromToken(string token)
-        {
-            string[] tokens = token.Split('|');
-            if (tokens.Length == 1)
-                return new Identifier<String>() { Id = MessageUtil.UnEscape(tokens[0]) };
-            else
-                return new Identifier<String>()
-                {
-                    AssigningAuthority = TranslateFhirDomain(MessageUtil.UnEscape(tokens[0])),
-                    Id = MessageUtil.UnEscape(tokens[1])
-                };
-        }
-
-        /// <summary>
-        /// Attempt to translate fhir domain
-        /// </summary>
-        public static OidData TranslateFhirDomain(string fhirDomain)
-        {
-            var oidService = ApplicationContext.Current.GetService<IOidRegistrarService>();
-            if (oidService == null)
-                throw new InvalidOperationException("No OID Registrar service has been registered");
-
-            if (String.IsNullOrEmpty(fhirDomain))
-                return null;
-            Uri fhirDomainUri = null;
-            if (fhirDomain.StartsWith("urn:oid:"))
-                return oidService.FindData("urn:oid:", "");
-            else if (fhirDomain.StartsWith("urn:ietf:rfc:3986"))
-                return oidService.GetOid("UUID");
-
-            else if (Uri.TryCreate(fhirDomain, UriKind.Absolute, out fhirDomainUri))
-            {
-                var oid = oidService.FindData(fhirDomainUri);
-                if (oid == null)
-                    throw new InvalidOperationException(String.Format("Could not locate identity system '{0}'", fhirDomain));
-                return oid;
-            }
-            else if (MARC.Everest.DataTypes.II.IsValidOidFlavor(new MARC.Everest.DataTypes.II(fhirDomain)))
-                return oidService.FindData(fhirDomain);
-            else
-                return null;
-        }
-
-        /// <summary>
-        /// Attempt to translate fhir domain
-        /// </summary>
-        public static string TranslateDomain(string crDomain)
-        {
-            // Attempt to lookup the OID
-            var oidService = ApplicationContext.Current.GetService<IOidRegistrarService>();
-            if (oidService == null)
-                throw new InvalidOperationException("No OID Registrar service has been registered");
-
-            var oid = oidService.FindData(crDomain);
-            if (oid == null)
-                return String.Format("urn:oid:{0}", crDomain);
-            else if (crDomain == "urn:ietf:rfc:3986")
-                return crDomain;
-            else
-                return oid.Ref != null ? oid.Ref.ToString() : string.Format("urn:oid:{0}", crDomain);
-        }
-
-        /// <summary>
-        /// Populate a domain identifier from a FHIR token
-        /// </summary>
-        public static CodeValue CodeFromToken(string token)
-        {
-            string[] tokens = token.Split('|');
-            if (tokens.Length == 1)
-                return new CodeValue(MessageUtil.UnEscape(tokens[0]), null);
-            else
-                return new CodeValue(MessageUtil.UnEscape(tokens[1]), MessageUtil.UnEscape(tokens[0]));
-        }
-
-
-        /// <summary>
         /// Create a feed
         /// </summary>
         internal static Bundle CreateBundle(FhirOperationResult result)
@@ -168,7 +85,7 @@ namespace SanteDB.Messaging.FHIR.Util
             retVal.Id = String.Format("urn:uuid:{0}", Guid.NewGuid());
 
             // Make the Self uri
-            String baseUri = (ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(FhirConstants.ConfigurationSectionName) as FhirServiceConfiguration)?.ResourceBaseUri?.AbsoluteUri ?? RestOperationContext.Current.IncomingRequest.Url.AbsoluteUri;
+            String baseUri = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<FhirServiceConfigurationSection>()?.ResourceBaseUri ?? RestOperationContext.Current.IncomingRequest.Url.AbsoluteUri;
             if (baseUri.Contains("?"))
                 baseUri = baseUri.Substring(0, baseUri.IndexOf("?") + 1);
             else
@@ -205,8 +122,6 @@ namespace SanteDB.Messaging.FHIR.Util
 
             if (!baseUri.Contains("_format"))
                 baseUri += String.Format("_format={0}&", format);
-
-            var localizationService = ApplicationContext.Current.GetService<ILocalizationService>();
 
             // Self URI
             if (queryResult != null && queryResult.TotalResults > queryResult.Results.Count)
@@ -309,16 +224,7 @@ namespace SanteDB.Messaging.FHIR.Util
                 retVal.Issue.Add(issue);
             }
 
-            // Add detected issues
-            if (result.Issues != null)
-                foreach (var iss in result.Issues)
-                    retVal.Issue.Add(new Issue()
-                    {
-                        Diagnostics = new DataTypes.FhirString(iss.Text),
-                        Severity = (IssueSeverity)Enum.Parse(typeof(IssueSeverity), iss.Severity.ToString()),
-                        Code = new DataTypes.FhirCoding(fhirIssue, "business-rule")
-                    });
-
+            
             return retVal;
         }
 

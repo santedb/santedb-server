@@ -26,11 +26,11 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
 {
-	/// <summary>
-	/// Represents a security policy instance which includes a link to a policy and
-	/// to a decision
-	/// </summary>
-	public abstract class DbSecurityPolicyInstance : DbAssociation
+    /// <summary>
+    /// Represents a security policy instance which includes a link to a policy and
+    /// to a decision
+    /// </summary>
+    public abstract class DbSecurityPolicyInstance : DbAssociation
 	{
         /// <summary>
         /// Gets or sets the key 

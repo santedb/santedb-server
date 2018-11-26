@@ -22,11 +22,11 @@ using System.Runtime.Serialization;
 
 namespace SanteDB.Reporting.Core.Exceptions
 {
-	/// <summary>
-	/// Thrown when a certificate is not found.
-	/// </summary>
-	/// <seealso cref="Exception" />
-	public class CertificateNotFoundException : Exception
+    /// <summary>
+    /// Thrown when a certificate is not found.
+    /// </summary>
+    /// <seealso cref="Exception" />
+    public class CertificateNotFoundException : Exception
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="CertificateNotFoundException"/> class.

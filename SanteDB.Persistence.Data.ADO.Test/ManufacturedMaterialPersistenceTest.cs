@@ -1,11 +1,10 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SanteDB.Core.Model.Entities;
-using SanteDB.Core.Model.DataTypes;
-using System.Collections.Generic;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
-using System.IO;
+using System;
+using System.Collections.Generic;
 
 namespace SanteDB.Persistence.Data.ADO.Test
 {
@@ -37,7 +36,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
                 ExpiryDate = DateTime.Now,
                 IsAdministrative = false
             };
-            var afterTest = base.DoTestUpdate(mmat, AuthenticationContext.SystemPrincipal, "LotNumber");
+            var afterTest = base.DoTestUpdate(mmat, "LotNumber");
 
             Assert.AreEqual(1, afterTest.Names.Count);
             Assert.AreEqual(DeterminerKeys.Specific, afterTest.DeterminerConceptKey);

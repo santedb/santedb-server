@@ -17,27 +17,20 @@
  * User: justin
  * Date: 2018-6-22
  */
-using SanteDB.Core.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Principal;
-using SanteDB.Persistence.Data.ADO.Data.Model;
-using System.Diagnostics;
-using SanteDB.Persistence.Data.ADO.Configuration;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Event;
-using System.Security;
-using SanteDB.Core.Security.Attribute;
+using SanteDB.Core;
 using SanteDB.Core.Security;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
-using SanteDB.Persistence.Data.ADO.Data.Model.Security;
+using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Security.Services;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Configuration;
+using SanteDB.Persistence.Data.ADO.Data.Model.Security;
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Security;
 using System.Security.Authentication;
-using SanteDB.Persistence.Data.ADO.Data;
+using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -51,7 +44,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         private TraceSource m_traceSource = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
 
         // Configuration
-        private AdoConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(AdoDataConstants.ConfigurationSectionName) as AdoConfiguration;
+        private AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
 
         /// <summary>
         /// Fired prior to an authentication request being made
@@ -74,9 +67,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 try
                 {
                     dataContext.Open();
-                    IPasswordHashingService hashService = ApplicationContext.Current.GetService<IPasswordHashingService>();
+                    IPasswordHashingService hashService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
-                    var client = dataContext.FirstOrDefault<DbSecurityApplication>("auth_app", applicationId, hashService.EncodePassword(applicationSecret), 5);
+                    var client = dataContext.FirstOrDefault<DbSecurityApplication>("auth_app", applicationId, hashService.ComputeHash(applicationSecret), 5);
                     if (client == null)
                         throw new SecurityException("Invalid application credentials");
                     else if (client.Key == Guid.Empty)

@@ -17,27 +17,22 @@
  * User: justin
  * Date: 2018-6-22
  */
-using SanteDB.Core.Applets.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SanteDB.Core.Applets;
 using SanteDB.Core.Applets.Model;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Core;
-using System.IO;
-using System.Reflection;
+using SanteDB.Core.Applets.Services;
+using SanteDB.Core.Configuration;
+using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Model.DataTypes;
+using System;
+using System.Collections.Generic;
+using System.Data.Linq;
 using System.Diagnostics;
-using System.IO.Compression;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Security;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using System.Security;
-using SanteDB.Core.Configuration;
-using System.Data.Linq;
-using SanteDB.Core.Model.DataTypes;
-using SanteDB.Core.Diagnostics;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -60,7 +55,7 @@ namespace SanteDB.Core.Services.Impl
         private Dictionary<String, String> m_fileDictionary = new Dictionary<string, string>();
 
         // Config file
-        private SanteDBConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.core") as SanteDBConfiguration;
+        private SecurityConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
 
         // Tracer
         private TraceSource m_tracer = new TraceSource(SanteDBConstants.ServiceTraceSourceName);
@@ -219,7 +214,7 @@ namespace SanteDB.Core.Services.Impl
             this.m_tracer.TraceInformation("Installing templates...");
 
             // Install templates
-            var idp = ApplicationContext.Current.GetService<ITemplateDefinitionRepositoryService>();
+            var idp = ApplicationServiceContext.Current.GetService<ITemplateDefinitionRepositoryService>();
             if(idp != null)
                 foreach(var itm in pkg.Templates)
                 {
@@ -267,7 +262,7 @@ namespace SanteDB.Core.Services.Impl
                         if (package.PublicKey != null)
                         {
                             var embCert = new X509Certificate2(package.PublicKey);
-                            if (!this.m_configuration.Security.TrustedPublishers.Contains(embCert.Thumbprint) && !embCert.Verify())
+                            if (!this.m_configuration.TrustedPublishers.Contains(embCert.Thumbprint) && !embCert.Verify())
                                 throw new SecurityException($"Cannot verify identity of publisher {embCert.Subject}");
                             else
                                 cert = new X509Certificate2Collection(embCert);
@@ -309,7 +304,7 @@ namespace SanteDB.Core.Services.Impl
                     x509Store.Close();
                 }
             }
-            else if (this.m_configuration.Security.AllowUnsignedApplets)
+            else if (this.m_configuration.AllowUnsignedApplets)
             {
                 this.m_tracer.TraceEvent(TraceEventType.Warning, 1099, "Package {0} v.{1} (publisher: {2}) is not signed. To prevent unsigned applets from being installed disable the configuration option", package.Meta.Id, package.Meta.Version, package.Meta.Author);
                 return true;

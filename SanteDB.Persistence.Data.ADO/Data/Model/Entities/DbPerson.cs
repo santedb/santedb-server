@@ -17,18 +17,16 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
-
-using SanteDB.Core.Model.DataTypes;
-using SanteDB.OrmLite.Attributes;
 using SanteDB.Core.Model.Constants;
+using SanteDB.OrmLite.Attributes;
+using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
 {
-	/// <summary>
-	/// Represents a person
-	/// </summary>
-	[Table("psn_tbl")]
+    /// <summary>
+    /// Represents a person
+    /// </summary>
+    [Table("psn_tbl")]
 	public class DbPerson : DbEntitySubTable
 	{
         /// <summary>

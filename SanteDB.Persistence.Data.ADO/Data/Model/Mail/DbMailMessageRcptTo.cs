@@ -17,20 +17,16 @@
  * User: justin
  * Date: 2018-7-31
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
+using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Mail
 {
-	/// <summary>
-	/// Represents an alert recipient.
-	/// </summary>
-	[Table("mail_msg_rcpt_to_tbl")]
+    /// <summary>
+    /// Represents an alert recipient.
+    /// </summary>
+    [Table("mail_msg_rcpt_to_tbl")]
 	public class DbMailMessageRcptTo : DbAssociation
 	{
 		/// <summary>

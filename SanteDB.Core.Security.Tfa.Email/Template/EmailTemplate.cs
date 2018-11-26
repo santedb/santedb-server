@@ -23,10 +23,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Core.Security.Tfa.Email.Template
 {
-	/// <summary>
-	/// E-mail template
-	/// </summary>
-	[XmlType(nameof(EmailTemplate), Namespace = "http://santedb.org/tfa/email/template")]
+    /// <summary>
+    /// E-mail template
+    /// </summary>
+    [XmlType(nameof(EmailTemplate), Namespace = "http://santedb.org/tfa/email/template")]
 	[XmlRoot(nameof(EmailTemplate), Namespace = "http://santedb.org/tfa/email/template")]
 	public class EmailTemplate
 	{

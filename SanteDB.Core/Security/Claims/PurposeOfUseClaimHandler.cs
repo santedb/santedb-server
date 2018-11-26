@@ -17,18 +17,10 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.Everest.DataTypes.Primitives;
-using MARC.HI.EHRS.SVC.Core;
 using SanteDB.Core.Services;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
-using System.Linq;
-using System.Security;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Security.Claims
 {
@@ -56,7 +48,7 @@ namespace SanteDB.Core.Security.Claims
         /// </summary>
         public bool Validate(IPrincipal principal, String value)
         {
-            IConceptRepositoryService conceptService = ApplicationContext.Current.GetService<IConceptRepositoryService>();
+            IConceptRepositoryService conceptService = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>();
 
             try
             {

@@ -21,10 +21,6 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Acts
 {

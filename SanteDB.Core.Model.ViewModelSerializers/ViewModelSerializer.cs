@@ -29,10 +29,11 @@
 //------------------------------------------------------------------------------
 
 #pragma warning disable CS0472, CS0219
-namespace SanteDB.Core.Model.Json.Formatter {
+namespace SanteDB.Core.Model.Json.Formatter
+{
     using SanteDB.Core.Model;
-    
-    
+
+
     public class NonVersionedEntityDataViewModelSerializer : SanteDB.Core.Applets.ViewModel.Json.IJsonViewModelTypeFormatter {
         
         private SanteDB.Core.Model.Serialization.ModelSerializationBinder m_binder = new SanteDB.Core.Model.Serialization.ModelSerializationBinder();

@@ -21,16 +21,8 @@ using RestSrvr;
 using RestSrvr.Message;
 using SanteDB.Core.Rest.Compression;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.ServiceModel;
-using System.ServiceModel.Channels;
-using System.ServiceModel.Dispatcher;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 
 namespace SanteDB.Core.Rest.Serialization
 {

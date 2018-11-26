@@ -1,18 +1,15 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
-using System.Linq;
-using System.Diagnostics;
-using SanteDB.Core.Model.Acts;
-using SanteDB.Core.Model.Roles;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Model.Security;
 using SanteDB.Core.Model.Entities;
-using SanteDB.OrmLite;
 using SanteDB.Core.Model.Map;
-using SanteDB.Persistence.Data.ADO.Services;
-using SanteDB.OrmLite.Providers;
+using SanteDB.Core.Model.Roles;
+using SanteDB.OrmLite;
 using SanteDB.OrmLite.Providers.Postgres;
+using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
+using SanteDB.Persistence.Data.ADO.Services;
+using System;
+using System.Diagnostics;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Test
 {

@@ -17,10 +17,12 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core.Services;
+using SanteDB.Core;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.Map;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Reporting.PSQL.Configuration;
 using System;
@@ -30,10 +32,10 @@ using System.Reflection;
 
 namespace SanteDB.Persistence.Reporting.PSQL
 {
-	/// <summary>
-	/// Represents a persistence service for reporting services.
-	/// </summary>
-	public class ReportingPersistenceService : IDaemonService
+    /// <summary>
+    /// Represents a persistence service for reporting services.
+    /// </summary>
+    public class ReportingPersistenceService : IDaemonService
 	{
 		/// <summary>
 		/// The internal reference to the trace source.
@@ -44,7 +46,7 @@ namespace SanteDB.Persistence.Reporting.PSQL
 		{
 			var tracer = new TraceSource(ReportingPersistenceConstants.TraceName);
 
-			Configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(ReportingPersistenceConstants.ConfigurationSectionName) as ReportingConfiguration;
+			Configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<ReportingConfiguration>();
 
 			try
 			{
@@ -139,7 +141,7 @@ namespace SanteDB.Persistence.Reporting.PSQL
 					try
 					{
 						this.traceSource.TraceEvent(TraceEventType.Verbose, 0, "Loading {0}...", t.AssemblyQualifiedName);
-						ApplicationContext.Current.AddServiceProvider(t);
+						(ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(t);
 					}
 					catch (Exception e)
 					{

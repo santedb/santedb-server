@@ -17,8 +17,7 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Collection;
@@ -30,8 +29,6 @@ using SanteDB.Messaging.GS1.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Messaging.GS1.Model
 {
@@ -41,7 +38,7 @@ namespace SanteDB.Messaging.GS1.Model
     public class Gs1Util
     {
         // Configuration
-        private Gs1ConfigurationSection m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("SanteDB.messaging.gs1") as Gs1ConfigurationSection;
+        private Gs1ConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection< Gs1ConfigurationSection>();
 
         // Act repository
         private IRepositoryService<Act> m_actRepository;
@@ -58,11 +55,11 @@ namespace SanteDB.Messaging.GS1.Model
         /// </summary>
         public Gs1Util()
         {
-            this.m_actRepository = ApplicationContext.Current.GetService<IRepositoryService<Act>>();
-            this.m_materialRepository = ApplicationContext.Current.GetService<IRepositoryService<Material>>();
-            this.m_manufMaterialRepository = ApplicationContext.Current.GetService<IRepositoryService<ManufacturedMaterial>>();
-            this.m_placeRepository = ApplicationContext.Current.GetService<IRepositoryService<Place>>();
-            this.m_stockService = ApplicationContext.Current.GetService<IStockManagementRepositoryService>();
+            this.m_actRepository = ApplicationServiceContext.Current.GetService<IRepositoryService<Act>>();
+            this.m_materialRepository = ApplicationServiceContext.Current.GetService<IRepositoryService<Material>>();
+            this.m_manufMaterialRepository = ApplicationServiceContext.Current.GetService<IRepositoryService<ManufacturedMaterial>>();
+            this.m_placeRepository = ApplicationServiceContext.Current.GetService<IRepositoryService<Place>>();
+            this.m_stockService = ApplicationServiceContext.Current.GetService<IStockManagementRepositoryService>();
         }
 
         /// <summary>
@@ -72,8 +69,8 @@ namespace SanteDB.Messaging.GS1.Model
         {
             if (place == null) return null;
 
-            var oidService = ApplicationContext.Current.GetService<IOidRegistrarService>();
-            var gln = oidService.GetOid("GLN");
+            var oidService = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>();
+            var gln = oidService.Get("GLN");
             return new TransactionalPartyType()
             {
                 gln = place.Identifiers.FirstOrDefault(o => o.Authority.Oid == gln.Oid)?.Value,
@@ -143,16 +140,18 @@ namespace SanteDB.Messaging.GS1.Model
                 retVal = this.m_actRepository.Get(orderId, Guid.Empty);
             if (retVal == null)
             {
-                var oidService = ApplicationContext.Current.GetService<IOidRegistrarService>();
-                var gln = oidService.GetOid("GLN");
-                var issuingAuthority = oidService.FindData($"{gln.Oid}.{documentReference.contentOwner?.gln}");
+                var oidService = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>();
+                var gln = oidService.Get("GLN");
+                AssigningAuthority issuingAuthority = null;
+                if (documentReference.contentOwner != null)
+                    issuingAuthority = oidService.Find(o=>o.Oid == $"{gln.Oid}.{documentReference.contentOwner.gln}").FirstOrDefault();
                 if (issuingAuthority == null)
-                    issuingAuthority = oidService.GetOid(this.m_configuration.DefaultContentOwnerAssigningAuthority);
+                    issuingAuthority = oidService.Get(this.m_configuration.DefaultContentOwnerAssigningAuthority);
                 if (issuingAuthority == null)
                     throw new InvalidOperationException("Could not find assigning authority linked with document reference owner. Please specify a default in the configuration");
 
                 int tr = 0;
-                retVal = this.m_actRepository.Find(o => o.ClassConceptKey == ActClassKeys.Supply && o.MoodConceptKey == moodConceptKey && o.Identifiers.Any(i => i.Value == documentReference.entityIdentification && i.Authority.DomainName == issuingAuthority.Mnemonic), 0, 1, out tr).FirstOrDefault();
+                retVal = this.m_actRepository.Find(o => o.ClassConceptKey == ActClassKeys.Supply && o.MoodConceptKey == moodConceptKey && o.Identifiers.Any(i => i.Value == documentReference.entityIdentification && i.AuthorityKey == issuingAuthority.Key), 0, 1, out tr).FirstOrDefault();
             }
             return retVal;
         }
@@ -168,7 +167,7 @@ namespace SanteDB.Messaging.GS1.Model
                 throw new ArgumentNullException(nameof(orderReceivePtcpt), "Missing receiving order participation");
 
             // Quantity code
-            var quantityCode = ApplicationContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(orderReceivePtcpt.LoadProperty<Material>("PlayerEntity").QuantityConceptKey.Value, "UCUM");
+            var quantityCode = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(orderReceivePtcpt.LoadProperty<Material>("PlayerEntity").QuantityConceptKey.Value, "UCUM");
 
             // Does the base material have it? 
             if (quantityCode == null)
@@ -178,7 +177,7 @@ namespace SanteDB.Messaging.GS1.Model
                     throw new InvalidOperationException($"Missing quantity code for {orderReceivePtcpt.LoadProperty<Material>("PlayerEntity").Key}");
                 else
                 {
-                    quantityCode = ApplicationContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(mat.QuantityConceptKey.Value, "UCUM");
+                    quantityCode = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(mat.QuantityConceptKey.Value, "UCUM");
                     if (quantityCode == null)
                         throw new InvalidOperationException($"Missing quantity code for {orderReceivePtcpt.LoadProperty<Material>("PlayerEntity").Key}");
 
@@ -234,7 +233,7 @@ namespace SanteDB.Messaging.GS1.Model
         public OrderLineItemType CreateOrderLineItem(ActParticipation participation)
         {
             var material = participation.LoadProperty<Material>("PlayerEntity");
-            var quantityCode = ApplicationContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(material.QuantityConceptKey.Value, "UCUM");
+            var quantityCode = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(material.QuantityConceptKey.Value, "UCUM");
             return new OrderLineItemType()
             {
                 requestedQuantity = new QuantityType() { Value = (decimal)participation.Quantity, measurementUnitCode = quantityCode?.Mnemonic ?? "dose", codeListVersion = "UCUM" },
@@ -258,7 +257,7 @@ namespace SanteDB.Messaging.GS1.Model
 
             ReferenceTerm cvx = null;
             if (material.TypeConceptKey.HasValue)
-                cvx = ApplicationContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(material.TypeConceptKey.Value, "CVX");
+                cvx = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(material.TypeConceptKey.Value, "CVX");
             var typeItemCode = new ItemTypeCodeType()
             {
                 Value = cvx?.Mnemonic ?? material.TypeConcept?.Mnemonic ?? material.Key.Value.ToString(),
@@ -329,8 +328,8 @@ namespace SanteDB.Messaging.GS1.Model
                 throw new ArgumentException("Trade item is missing GTIN", "tradeItem");
 
 
-            var oidService = ApplicationContext.Current.GetService<IOidRegistrarService>();
-            var gtin = oidService.GetOid("GTIN");
+            var oidService = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>();
+            var gtin = oidService.Get("GTIN");
 
             // Lookup material by lot number / gtin
             int tr = 0;
@@ -349,7 +348,7 @@ namespace SanteDB.Messaging.GS1.Model
                     LotNumber = additionalData.lotNumber,
                     Identifiers = new List<EntityIdentifier>()
                     {
-                        new EntityIdentifier(new AssigningAuthority(gtin.Mnemonic, gtin.Name, gtin.Oid), tradeItem.gtin)
+                        new EntityIdentifier(gtin, tradeItem.gtin)
                     },
                     ExpiryDate = additionalData.itemExpirationDate,
                     Names = new List<EntityName>()
@@ -365,18 +364,18 @@ namespace SanteDB.Messaging.GS1.Model
                 if (tradeItem.additionalTradeItemIdentification != null)
                     foreach (var id in tradeItem.additionalTradeItemIdentification)
                     {
-                        var oid = oidService.GetOid(id.additionalTradeItemIdentificationTypeCode);
+                        var oid = oidService.Get(id.additionalTradeItemIdentificationTypeCode);
                         if (oid == null) continue;
-                        retVal.Identifiers.Add(new EntityIdentifier(new AssigningAuthority(oid.Mnemonic, oid.Name, oid.Oid), id.Value));
+                        retVal.Identifiers.Add(new EntityIdentifier(oid, id.Value));
                     }
 
                 if (String.IsNullOrEmpty(tradeItem.itemTypeCode?.Value))
                     throw new InvalidOperationException("Cannot auto-create material, type code must be specified");
                 else // lookup type code
                 {
-                    var concept = ApplicationContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(tradeItem.itemTypeCode.Value, tradeItem.itemTypeCode.codeListVersion).FirstOrDefault();
+                    var concept = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(tradeItem.itemTypeCode.Value, tradeItem.itemTypeCode.codeListVersion).FirstOrDefault();
                     if (concept == null && tradeItem.itemTypeCode.codeListVersion == "SanteDB-MaterialType")
-                        concept = ApplicationContext.Current.GetService<IConceptRepositoryService>().GetConcept(tradeItem.itemTypeCode.Value);
+                        concept = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConcept(tradeItem.itemTypeCode.Value);
 
                     // Type code not found
                     if (concept == null)
@@ -413,7 +412,7 @@ namespace SanteDB.Messaging.GS1.Model
                 // TODO: Manufacturer won't be known
 
                 // Insert the material && relationship
-                ApplicationContext.Current.GetService<IRepositoryService<Bundle>>().Insert(new Bundle()
+                ApplicationServiceContext.Current.GetService<IRepositoryService<Bundle>>().Insert(new Bundle()
                 {
                     Item = new List<IdentifiedData>()
                     {
@@ -428,11 +427,11 @@ namespace SanteDB.Messaging.GS1.Model
                 bool shouldSave = false;
                 foreach (var id in tradeItem.additionalTradeItemIdentification)
                 {
-                    var oid = oidService.GetOid(id.additionalTradeItemIdentificationTypeCode);
+                    var oid = oidService.Get(id.additionalTradeItemIdentificationTypeCode);
                     if (oid == null) continue;
-                    if (!retVal.Identifiers.Any(o => o.LoadProperty<AssigningAuthority>("Authority").DomainName == oid.Mnemonic))
+                    if (!retVal.Identifiers.Any(o => o.AuthorityKey == oid.Key))
                     {
-                        retVal.Identifiers.Add(new EntityIdentifier(new AssigningAuthority(oid.Mnemonic, oid.Name, oid.Oid), id.Value));
+                        retVal.Identifiers.Add(new EntityIdentifier(oid, id.Value));
                         shouldSave = true;
                     }
                 }
@@ -466,12 +465,12 @@ namespace SanteDB.Messaging.GS1.Model
                 },
                 Sender = senderInformation == null ? new Partner[] {
                         new Partner() {
-                            Identifier = new PartnerIdentification() {  Authority = ApplicationContext.Current.Configuration.Custodianship.Id.AssigningAuthority?.Name, Value = ApplicationContext.Current.Configuration.Custodianship?.Id?.Id },
+                            Identifier = new PartnerIdentification() {  Authority = this.m_configuration.PartnerIdentificationAuthority, Value = this.m_configuration.PartnerIdentification },
                             ContactInformation = new ContactInformation[] {
                                 new ContactInformation()
                                 {
-                                    Contact = ApplicationContext.Current.Configuration.Custodianship?.Name,
-                                    ContactTypeIdentifier = "REGION"
+                                    Contact = this.m_configuration.SenderContactEmail,
+                                    ContactTypeIdentifier = "EMAIL"
                                 }
                             }
                         }
@@ -479,7 +478,7 @@ namespace SanteDB.Messaging.GS1.Model
                     {
                         new Partner()
                         {
-                            Identifier = new PartnerIdentification() { Authority = ApplicationContext.Current.Configuration.Custodianship.Id.AssigningAuthority?.Name, Value = senderInformation.Key.Value.ToString() },
+                            Identifier = new PartnerIdentification() { Authority = this.m_configuration.PartnerIdentificationAuthority, Value = senderInformation.Key.Value.ToString() },
                             ContactInformation = new ContactInformation[]
                             {
                                 new ContactInformation()

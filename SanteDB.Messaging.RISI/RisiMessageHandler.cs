@@ -17,26 +17,24 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core.Services;
+using RestSrvr;
 using SanteDB.Core.Interop;
+using SanteDB.Core.Rest;
+using SanteDB.Core.Rest.Behavior;
+using SanteDB.Core.Rest.Security;
+using SanteDB.Messaging.RISI.Rest;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.ServiceModel.Description;
-using RestSrvr;
-using SanteDB.Core.Rest.Security;
-using SanteDB.Core.Rest;
-using SanteDB.Core.Rest.Behavior;
-using SanteDB.Messaging.RISI.Rest;
 
 namespace SanteDB.Messaging.RISI
 {
-	/// <summary>
-	/// Represents a message handler for reporting services.
-	/// </summary>
+    /// <summary>
+    /// Represents a message handler for reporting services.
+    /// </summary>
     [Description("RISI Message Service")]
 	public class RisiMessageHandler : IDaemonService, IApiEndpointProvider
 	{

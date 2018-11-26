@@ -25,10 +25,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
 {
-	/// <summary>
-	/// Represents a telecommunications address
-	/// </summary>
-	[Table("ent_tel_tbl")]
+    /// <summary>
+    /// Represents a telecommunications address
+    /// </summary>
+    [Table("ent_tel_tbl")]
 	public class DbTelecomAddress : DbEntityVersionedAssociation
 	{
         /// <summary>

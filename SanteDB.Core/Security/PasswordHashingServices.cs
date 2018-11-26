@@ -17,13 +17,10 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core.Services.Security;
+using SanteDB.Core.Security.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Security
 {
@@ -35,7 +32,7 @@ namespace SanteDB.Core.Security
         /// <summary>
         /// Encode a password using the SHA256 encoding
         /// </summary>
-        public string EncodePassword(string password)
+        public string ComputeHash(string password)
         {
             SHA256 hasher = SHA256.Create();
             return BitConverter.ToString(hasher.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-","").ToLower();
@@ -50,7 +47,7 @@ namespace SanteDB.Core.Security
         /// <summary>
         /// Encode a password using the SHA256 encoding
         /// </summary>
-        public string EncodePassword(string password)
+        public string ComputeHash(string password)
         {
             SHA1 hasher = SHA1.Create();
             return BitConverter.ToString(hasher.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-", "").ToLower();
@@ -65,7 +62,7 @@ namespace SanteDB.Core.Security
         /// <summary>
         /// Encode a password using the SHA256 encoding
         /// </summary>
-        public string EncodePassword(string password)
+        public string ComputeHash(string password)
         {
             MD5 hasher = MD5.Create();
             return BitConverter.ToString(hasher.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-", "").ToLower();
@@ -80,7 +77,7 @@ namespace SanteDB.Core.Security
         /// <summary>
         /// Encode a password using the SHA256 encoding
         /// </summary>
-        public string EncodePassword(string password)
+        public string ComputeHash(string password)
         {
             return password;
         }

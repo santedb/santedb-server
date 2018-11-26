@@ -19,10 +19,10 @@
  */
 namespace SanteDB.Persistence.Reporting.PSQL
 {
-	/// <summary>
-	/// Represents reporting persistence constants.
-	/// </summary>
-	public static class ReportingPersistenceConstants
+    /// <summary>
+    /// Represents reporting persistence constants.
+    /// </summary>
+    public static class ReportingPersistenceConstants
 	{
 		/// <summary>
 		/// The configuration section name.

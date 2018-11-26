@@ -17,27 +17,19 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Services;
+using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model;
 using SanteDB.Persistence.Data.ADO.Exceptions;
-using SanteDB.OrmLite;
-
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using MARC.HI.EHRS.SVC.Core.Data;
-using System.Diagnostics;
-using System.Net.Sockets;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -50,7 +42,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     {
 
         // Query persistence
-        protected Core.Services.IQueryPersistenceService m_queryPersistence = ApplicationContext.Current.GetService<Core.Services.IQueryPersistenceService>();
+        protected Core.Services.IQueryPersistenceService m_queryPersistence = ApplicationServiceContext.Current.GetService<Core.Services.IQueryPersistenceService>();
 
         /// <summary>
         /// Get the order by function
@@ -251,11 +243,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                         var resultKeys = context.Query<Guid>(keyQuery.Build());
 
-                        //ApplicationContext.Current.GetService<IThreadPoolService>().QueueNonPooledWorkItem(a => this.m_queryPersistence?.RegisterQuerySet(queryId.ToString(), resultKeys.Select(o => new Identifier<Guid>(o)).ToArray(), query), null);
+                        //ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueNonPooledWorkItem(a => this.m_queryPersistence?.RegisterQuerySet(queryId.ToString(), resultKeys.Select(o => new Guid(o)).ToArray(), query), null);
                         // Another check
                         this.m_queryPersistence?.RegisterQuerySet(queryId, resultKeys.Take(1000).ToArray(), query, resultKeys.Count());
 
-                        ApplicationContext.Current.GetService<IThreadPoolService>().QueueNonPooledWorkItem(o =>
+                        ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueNonPooledWorkItem(o =>
                         {
                             int ofs = 1000;
                             var rkeys = o as Guid[];
@@ -410,7 +402,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             where TAssociation : IdentifiedData, ISimpleAssociation, new()
             where TDomainAssociation : DbAssociation, new()
         {
-            var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TAssociation>>() as AdoBasePersistenceService<TAssociation>;
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TAssociation>>() as AdoBasePersistenceService<TAssociation>;
             if (persistenceService == null)
             {
                 this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Information, 0, "Missing persister for type {0}", typeof(TAssociation).Name);

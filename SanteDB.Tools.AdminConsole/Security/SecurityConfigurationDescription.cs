@@ -17,15 +17,11 @@
  * User: justin
  * Date: 2018-10-24
  */
+using SanteDB.Core.Http;
 using SanteDB.Core.Http.Description;
+using SanteDB.Tools.AdminConsole.Shell;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Http;
-using SanteDB.Tools.AdminConsole.Shell;
-using System.Security.Principal;
 
 namespace SanteDB.Tools.AdminConsole.Security
 {
@@ -45,7 +41,7 @@ namespace SanteDB.Tools.AdminConsole.Security
         {
             get
             {
-                return ApplicationContext.Current.RealmId;
+                return ApplicationServiceContext.Current.RealmId;
             }
         }
 

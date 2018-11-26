@@ -24,16 +24,16 @@ using System.Collections.Generic;
 
 namespace SanteDB.Reporting.Core
 {
-	/// <summary>
-	/// Represents a report handler for a reporting engine.
-	/// </summary>
-	public interface IReportExecutor : IDisposable
+    /// <summary>
+    /// Represents a report handler for a reporting engine.
+    /// </summary>
+    public interface IReportExecutor : IDisposable
 	{
 		/// <summary>
 		/// Gets the configuration.
 		/// </summary>
 		/// <value>The configuration.</value>
-		ReportingConfiguration Configuration { get; }
+		ReportingConfigurationSection Configuration { get; }
 
 		/// <summary>
 		/// Gets or sets the report URI.

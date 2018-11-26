@@ -17,20 +17,15 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB
 {
-	/// <summary>
-	/// Reprsents a service installer.
-	/// </summary>
-	/// <seealso cref="System.Configuration.Install.Installer" />
-	[RunInstaller(true)]
+    /// <summary>
+    /// Reprsents a service installer.
+    /// </summary>
+    /// <seealso cref="System.Configuration.Install.Installer" />
+    [RunInstaller(true)]
     public class ServiceInstaller : System.Configuration.Install.Installer
     {
 

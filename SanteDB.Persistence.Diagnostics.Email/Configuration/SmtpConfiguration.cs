@@ -21,10 +21,10 @@ using System;
 
 namespace SanteDB.Persistence.Diagnostics.Email.Configuration
 {
-	/// <summary>
-	/// Configuration for SMTP
-	/// </summary>
-	public class SmtpConfiguration
+    /// <summary>
+    /// Configuration for SMTP
+    /// </summary>
+    public class SmtpConfiguration
 	{
 		/// <summary>
 		/// SMTP configuration

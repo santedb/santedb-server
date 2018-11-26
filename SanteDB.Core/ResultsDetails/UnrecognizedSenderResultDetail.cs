@@ -19,17 +19,13 @@
  */
 using MARC.Everest.Connectors;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.ResultsDetails
 {
-	/// <summary>
-	/// Represents an unrecognized sender result detail.
-	/// </summary>
-	public class UnrecognizedSenderResultDetail : ResultDetail
+    /// <summary>
+    /// Represents an unrecognized sender result detail.
+    /// </summary>
+    public class UnrecognizedSenderResultDetail : ResultDetail
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="UnrecognizedSenderResultDetail"/> class

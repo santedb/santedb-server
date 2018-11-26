@@ -18,9 +18,6 @@
  * Date: 2018-11-23
  */
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SanteDB.Messaging.FHIR.Attributes
 {

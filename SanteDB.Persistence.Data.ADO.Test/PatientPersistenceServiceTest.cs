@@ -1,19 +1,14 @@
-﻿using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SanteDB.Core.Model.Collection;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SanteDB.Core;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
+using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.ADO.Test
 {
@@ -131,8 +126,8 @@ namespace SanteDB.Persistence.Data.ADO.Test
                 DomainName = "OHIPCARD",
                 Oid = "1.2.3.4.5.67"
             };
-            var aaPersistence = ApplicationContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>();
-            var ohipAuth = aaPersistence.Insert(aa, s_authorization, TransactionMode.Commit);
+            var aaPersistence = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>();
+            var ohipAuth = aaPersistence.Insert(aa, TransactionMode.Commit, s_authorization);
 
             Patient p = new Patient()
             {

@@ -33,6 +33,18 @@
     <Reference Include="MARC.Everest">
       <HintPath>..\Solution Items\MARC.Everest.dll</HintPath>
     </Reference>
+    <Reference Include="NHapi.Base, Version=2.3.0.0, Culture=neutral, PublicKeyToken=d0d8ea960a3440eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Solution Items\NHapi.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="NHapi.Model.V231, Version=2.3.0.0, Culture=neutral, PublicKeyToken=d0d8ea960a3440eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Solution Items\NHapi.Model.V231.dll</HintPath>
+    </Reference>
+    <Reference Include="NHapi.Model.V25, Version=2.3.0.0, Culture=neutral, PublicKeyToken=d0d8ea960a3440eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Solution Items\NHapi.Model.V25.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -43,7 +55,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Client\MllpMessageSender.cs" />
+    <Compile Include="Configuration\Hl7ConfigurationSection.cs" />
     <Compile Include="DataConverter.cs" />
+    <Compile Include="Hl7Constants.cs" />
+    <Compile Include="HL7MessageHandler.cs" />
+    <Compile Include="IHL7MessageHandler.cs" />
     <Compile Include="MessageExtensions.cs" />
     <Compile Include="Messages\AdtMessageHandler.cs" />
     <Compile Include="Messages\MessageHandlerBase.cs" />
@@ -58,11 +75,12 @@
     <Compile Include="Segments\PD1SegmentHandler.cs" />
     <Compile Include="Segments\PIDSegmentHandler.cs" />
     <Compile Include="Segments\SegmentHandlers.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Messaging.HAPI">
-      <Version>2.0.2.9</Version>
-    </PackageReference>
+    <Compile Include="ServiceHandler.cs" />
+    <Compile Include="TransportProtocol\ITransportProtocol.cs" />
+    <Compile Include="TransportProtocol\LlpTransport.cs" />
+    <Compile Include="TransportProtocol\SllpTransport.cs" />
+    <Compile Include="TransportProtocol\TcpTransport.cs" />
+    <Compile Include="TransportProtocol\TransportUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ParameterMap.xml" />

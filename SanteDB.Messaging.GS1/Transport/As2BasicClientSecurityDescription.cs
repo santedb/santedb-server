@@ -17,11 +17,10 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
-using System.Security.Principal;
 using SanteDB.Core.Http;
 using SanteDB.Core.Http.Description;
 using SanteDB.Messaging.GS1.Configuration;
+using System.Security.Principal;
 
 namespace SanteDB.Messaging.GS1.Transport.AS2
 {

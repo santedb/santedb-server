@@ -17,19 +17,14 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Auditing.Data;
+using SanteDB.Core.Auditing;
 using SanteDB.Core.Interfaces;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Security.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Linq.Expressions;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Core.Security;
-using MARC.HI.EHRS.SVC.Core.Data;
-using SanteDB.Core.Security.Attribute;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -73,10 +68,10 @@ namespace SanteDB.Core.Services.Impl
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AccessAuditLog)]
         public IEnumerable<AuditData> Find(Expression<Func<AuditData, bool>> query, int offset, int? count, out int totalResults)
         {
-            var service = ApplicationContext.Current.GetService<IDataPersistenceService<AuditData>>();
+            var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditData>>();
             if (service == null)
                 throw new InvalidOperationException("Cannot find the data persistence service for audits");
-            var results = service.Query(query, offset, count, AuthenticationContext.Current.Principal, out totalResults);
+            var results = service.Query(query, offset, count, out totalResults);
             this.DataDisclosed?.Invoke(this, new AuditDataDisclosureEventArgs(query.ToString(), results));
             return results;
         }
@@ -103,10 +98,10 @@ namespace SanteDB.Core.Services.Impl
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AccessAuditLog)]
         public AuditData Get(Guid key, Guid versionKey)
         {
-            var service = ApplicationContext.Current.GetService<IDataPersistenceService<AuditData>>();
+            var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditData>>();
             if (service == null)
                 throw new InvalidOperationException("Cannot find the data persistence service for audits");
-            var result = service.Get(new MARC.HI.EHRS.SVC.Core.Data.Identifier<Guid>(key, versionKey), AuthenticationContext.Current.Principal, false);
+            var result = service.Get(key, versionKey, false);
             this.DataDisclosed?.Invoke(this, new AuditDataDisclosureEventArgs(key.ToString(), new List<Object>() { result }));
             return result;
         }
@@ -116,10 +111,10 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public AuditData Insert(AuditData audit)
         {
-            var service = ApplicationContext.Current.GetService<IDataPersistenceService<AuditData>>();
+            var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditData>>();
             if (service == null)
                 throw new InvalidOperationException("Cannot find the data persistence service for audits");
-            var result = service.Insert(audit, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+            var result = service.Insert(audit, TransactionMode.Commit);
             this.DataCreated?.Invoke(this, new AuditDataEventArgs(audit));
             return result;
         }
@@ -130,10 +125,10 @@ namespace SanteDB.Core.Services.Impl
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AccessAuditLog)]
         public AuditData Obsolete(Guid key)
         {
-            var service = ApplicationContext.Current.GetService<IDataPersistenceService<AuditData>>();
+            var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditData>>();
             if (service == null)
                 throw new InvalidOperationException("Cannot find the data persistence service for audits");
-            var result = service.Obsolete(new AuditData() { CorrelationToken = key }, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+            var result = service.Obsolete(new AuditData() { Key = key }, TransactionMode.Commit);
             this?.DataObsoleted?.Invoke(this, new AuditDataEventArgs(key));
             return result;
         }
@@ -144,19 +139,19 @@ namespace SanteDB.Core.Services.Impl
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AccessAuditLog)]
         public AuditData Save(AuditData data)
         {
-            var service = ApplicationContext.Current.GetService<IDataPersistenceService<AuditData>>();
+            var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditData>>();
             if (service == null)
                 throw new InvalidOperationException("Cannot find the data persistence service for audits");
 
-            var existing = service.Get(new Identifier<Guid>(data.CorrelationToken, Guid.Empty), AuthenticationContext.Current.Principal, false);
+            var existing = service.Get(data.Key.Value, Guid.Empty, false);
             if (existing == null)
             {
-                data = service.Update(data, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+                data = service.Update(data, TransactionMode.Commit);
                 this.DataUpdated?.Invoke(this, new AuditDataEventArgs(data));
             }
             else
             {
-                data = service.Insert(data, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+                data = service.Insert(data, TransactionMode.Commit);
                 this.DataCreated?.Invoke(this, new AuditDataEventArgs(data));
             }
             return data;

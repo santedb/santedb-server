@@ -17,16 +17,6 @@
  * User: justin
  * Date: 2018-9-25
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Services;
-using NHapi.Base.Model;
-using NHapi.Model.V25.Segment;
 using SanteDB.Core.Extensions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
@@ -35,6 +25,15 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NHapi.Model.V25.Datatype;
+using NHapi.Base.Model;
+using NHapi.Model.V25.Segment;
+using SanteDB.Core;
+using SanteDB.Core.Services;
+using SanteDB.Messaging.HL7.Configuration;
 
 namespace SanteDB.Messaging.HL7.Segments
 {
@@ -50,15 +49,18 @@ namespace SanteDB.Messaging.HL7.Segments
         // Next of kin relationship types
         private Guid[] m_nextOfKinRelationshipTypes;
 
+        // Configuration
+        private Hl7ConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
+
+        /// <summary>
+        /// NOK relationship types
+        /// </summary>
         private Guid[] NextOfKinRelationshipTypes
         {
             get
             {
                 if (this.m_nextOfKinRelationshipTypes == null)
-                    this.m_nextOfKinRelationshipTypes = ApplicationContext.Current.GetService<IDataPersistenceService<Concept>>().Query(
-                        c => c.ConceptSets.Any(s => s.Mnemonic == "FamilyMember"),
-                        AuthenticationContext.SystemPrincipal
-                    ).Select(c => c.Key.Value).ToArray();
+                    this.m_nextOfKinRelationshipTypes = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptSetMembers("FamilyMember").Select(c => c.Key.Value).ToArray();
                 return this.m_nextOfKinRelationshipTypes;
             }
         }
@@ -102,7 +104,7 @@ namespace SanteDB.Messaging.HL7.Segments
             var nk1Segment = segment as NK1;
 
             // Person persistence service
-            var personService = ApplicationContext.Current.GetService<IDataPersistenceService<Person>>();
+            var personService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Person>>();
 
             // Patient to which the parsing belongs
             var patient = context.OfType<Patient>().FirstOrDefault();
@@ -119,18 +121,19 @@ namespace SanteDB.Messaging.HL7.Segments
                 var idnumber = id.IDNumber.Value;
                 var authority = id.AssigningAuthority.ToModel();
                 Guid idguid = Guid.Empty;
+                int tr = 0;
                 Person found = null;
                 if (authority == null &&
-                    id.AssigningAuthority.NamespaceID.Value == ApplicationContext.Current.Configuration.Custodianship.Id.Id)
-                    found = personService.Get(new Identifier<Guid>(Guid.Parse(id.IDNumber.Value)), AuthenticationContext.SystemPrincipal, true);
+                    id.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority?.DomainName)
+                    found = personService.Get(Guid.Parse(id.IDNumber.Value), null, overrideAuth: AuthenticationContext.SystemPrincipal);
                 else if (authority?.IsUnique == true)
                     found = personService.Query(o => o.Identifiers.Any(i => i.Value == idnumber &&
-                        i.AuthorityKey == authority.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                        i.AuthorityKey == authority.Key), 0, 1, out tr, AuthenticationContext.SystemPrincipal).FirstOrDefault();
                 if (found != null)
                 {
                     retVal = found;
                     // Existing relationship?
-                    retValRelation = ApplicationContext.Current.GetService<IDataPersistenceService<EntityRelationship>>().Query(r => r.SourceEntityKey == patient.Key.Value && r.TargetEntityKey == retVal.Key.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault() ?? retValRelation;
+                    retValRelation = ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityRelationship>>().Query(r => r.SourceEntityKey == patient.Key.Value && r.TargetEntityKey == retVal.Key.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault() ?? retValRelation;
                     break;
                 }
             }
@@ -150,7 +153,7 @@ namespace SanteDB.Messaging.HL7.Segments
                     retVal = context.FirstOrDefault(o => o.Key == existingMotherRel.TargetEntityKey) as Person;
                     // Mother isn't in context, load
                     if (retVal == null)
-                        retVal = personService.Get(new Identifier<Guid>(existingMotherRel.TargetEntityKey.Value), AuthenticationContext.SystemPrincipal, true);
+                        retVal = personService.Get(existingMotherRel.TargetEntityKey.Value, null, true, AuthenticationContext.SystemPrincipal);
                     if (retVal == null)
                         throw new InvalidOperationException("Cannot locate described MTH entity on patient record");
                 }
@@ -201,7 +204,7 @@ namespace SanteDB.Messaging.HL7.Segments
             {
                 foreach (var cit in nk1Segment.GetCitizenship())
                 {
-                    var places = ApplicationContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Identifiers.Any(i => i.Value == cit.Identifier.Value && i.AuthorityKey == AssigningAuthorityKeys.Iso3166CountryCode), AuthenticationContext.SystemPrincipal);
+                    var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Identifiers.Any(i => i.Value == cit.Identifier.Value && i.AuthorityKey == AssigningAuthorityKeys.Iso3166CountryCode), AuthenticationContext.SystemPrincipal);
                     if (places.Count() == 1)
                         retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Citizen, places.First().Key));
                 }
@@ -216,7 +219,7 @@ namespace SanteDB.Messaging.HL7.Segments
             // Privacy code
             if (!nk1Segment.ProtectionIndicator.IsEmpty())
             {
-                var pip = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
+                var pip = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
                 if (nk1Segment.ProtectionIndicator.Value == "Y")
                 {
                     var policy = pip.Query(o => o.Oid == DataPolicyIdentifiers.RestrictedInformation, AuthenticationContext.SystemPrincipal).FirstOrDefault();

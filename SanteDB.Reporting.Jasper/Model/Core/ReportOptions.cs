@@ -22,11 +22,11 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.Core
 {
-	/// <summary>
-	/// Class ReportOptions.
-	/// </summary>
-	/// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
-	[XmlType("reportOptions")]
+    /// <summary>
+    /// Class ReportOptions.
+    /// </summary>
+    /// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
+    [XmlType("reportOptions")]
 	[XmlRoot("reportOptions")]
 	public class ReportOptions : ResourceBase
 	{

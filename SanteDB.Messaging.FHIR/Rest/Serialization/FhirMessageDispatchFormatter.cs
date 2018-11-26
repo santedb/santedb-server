@@ -17,31 +17,21 @@
  * User: justin
  * Date: 2018-11-23
  */
+using Hl7.Fhir.Model;
+using Hl7.Fhir.Serialization;
 using Newtonsoft.Json;
+using RestSrvr;
+using RestSrvr.Attributes;
+using RestSrvr.Message;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.ServiceModel;
-using System.ServiceModel.Channels;
-using System.ServiceModel.Description;
-using System.ServiceModel.Dispatcher;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Serialization;
 using System.Reflection;
+using System.Xml;
 using System.Xml.Schema;
-using System.Diagnostics;
-using Newtonsoft.Json.Converters;
-using Hl7.Fhir.Serialization;
-using SanteDB.Messaging.FHIR.Resources;
-using System.Collections.Specialized;
-using Hl7.Fhir.Model;
-using RestSrvr.Attributes;
-using RestSrvr;
-using RestSrvr.Message;
+using System.Xml.Serialization;
 
 namespace SanteDB.Messaging.FHIR.Rest.Serialization
 {

@@ -17,34 +17,27 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core;
+using SanteDB.Core.Event;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Services;
+using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model;
+using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
+using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
+using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
+using SanteDB.Persistence.Data.ADO.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model.DataTypes;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using System.ComponentModel;
-using MARC.HI.EHRS.SVC.Core.Data;
-using SanteDB.Core.Services;
-using SanteDB.Core;
-using System.Reflection;
-using System.Linq.Expressions;
-using SanteDB.Persistence.Data.ADO.Data;
-using SanteDB.Persistence.Data.ADO.Exceptions;
-using SanteDB.OrmLite;
-using MARC.HI.EHRS.SVC.Core.Event;
 using System.Diagnostics;
-using SanteDB.Core.Exceptions;
-using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
-using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
-using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
-using SanteDB.Core.Model.Acts;
-using SanteDB.Core.Model.Entities;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -222,7 +215,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 var resultKeys = context.Query<Guid>(keyQuery.Build());
                 this.m_queryPersistence?.RegisterQuerySet(queryId, resultKeys.Take(1000).ToArray(), query, resultKeys.Count());
 
-                ApplicationContext.Current.GetService<IThreadPoolService>().QueueNonPooledWorkItem(o =>
+                ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueNonPooledWorkItem(o =>
                 {
                     int ofs = 1000;
                     var rkeys = o as Guid[];
@@ -287,16 +280,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Gets the specified object
         /// </summary>
-        public override TModel Get<TIdentifier>(MARC.HI.EHRS.SVC.Core.Data.Identifier<TIdentifier> containerId, IPrincipal principal, bool loadFast)
+        public override TModel Get(Guid containerId, Guid? versionId, bool loadFast, IPrincipal principal = null)
         {
             var tr = 0;
-            var uuid = containerId as Identifier<Guid>;
 
-            if (uuid.Id != Guid.Empty)
+            if (containerId != Guid.Empty)
             {
 
-                var cacheItem = ApplicationContext.Current.GetService<IDataCachingService>()?.GetCacheItem<TModel>(uuid.Id) as TModel;
-                if (cacheItem != null && (cacheItem.VersionKey.HasValue && uuid.VersionId == cacheItem.VersionKey.Value || uuid.VersionId == Guid.Empty) &&
+                var cacheItem = ApplicationServiceContext.Current.GetService<IDataCachingService>()?.GetCacheItem<TModel>(containerId) as TModel;
+                if (cacheItem != null && (cacheItem.VersionKey.HasValue && versionId == cacheItem.VersionKey.Value || versionId == Guid.Empty) &&
                     (loadFast && cacheItem.LoadState >= LoadState.PartialLoad || !loadFast && cacheItem.LoadState == LoadState.FullLoad))
                     return cacheItem;
             }
@@ -306,11 +298,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             sw.Start();
 #endif
 
-            PreRetrievalEventArgs<TModel> preArgs = new PreRetrievalEventArgs<TModel>(containerId);
+            DataRetrievingEventArgs<TModel> preArgs = new DataRetrievingEventArgs<TModel>(containerId, versionId, principal);
             this.FireRetrieving(preArgs);
             if (preArgs.Cancel)
             {
-                this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Pre-Event handler indicates abort retrieve {0}", containerId.Id);
+                this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Pre-Event handler indicates abort retrieve {0}", containerId);
                 return preArgs.OverrideResult;
             }
 
@@ -328,12 +320,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         connection.LoadState = LoadState.FullLoad;
 
                     // Get most recent version
-                    if (uuid.VersionId == Guid.Empty)
-                        retVal = this.Get(connection, uuid.Id);
+                    if (versionId.GetValueOrDefault() == Guid.Empty)
+                        retVal = this.Get(connection, containerId);
                     else
-                        retVal = this.CacheConvert(this.QueryInternal(connection, o => o.Key == uuid.Id && o.VersionKey == uuid.VersionId && o.ObsoletionTime == null || o.ObsoletionTime != null, Guid.Empty, 0, 1, out tr).FirstOrDefault(), connection);
+                        retVal = this.CacheConvert(this.QueryInternal(connection, o => o.Key == containerId && o.VersionKey == versionId && o.ObsoletionTime == null || o.ObsoletionTime != null, Guid.Empty, 0, 1, out tr).FirstOrDefault(), connection);
 
-                    var postData = new PostRetrievalEventArgs<TModel>(retVal);
+                    var postData = new DataRetrievedEventArgs<TModel>(retVal, principal);
                     this.FireRetrieved(postData);
 
                     return retVal;
@@ -365,7 +357,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             where TAssociation : VersionedAssociation<TModel>, new()
             where TDomainAssociation : class, IDbVersionedAssociation, IDbIdentified, new()
         {
-            var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TAssociation>>() as AdoBasePersistenceService<TAssociation>;
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TAssociation>>() as AdoBasePersistenceService<TAssociation>;
             if (persistenceService == null)
             {
                 this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Information, 0, "Missing persister for type {0}", typeof(TAssociation).Name);

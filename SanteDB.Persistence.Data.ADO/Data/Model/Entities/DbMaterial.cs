@@ -26,10 +26,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
 {
-	/// <summary>
-	/// Represents a material in the database
-	/// </summary>
-	[Table("mat_tbl")]
+    /// <summary>
+    /// Represents a material in the database
+    /// </summary>
+    [Table("mat_tbl")]
 	public class DbMaterial : DbEntitySubTable
     {
 

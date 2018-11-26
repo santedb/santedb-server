@@ -17,28 +17,23 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core.Services;
 using RestSrvr;
 using SanteDB.Authentication.OAuth2.Rest;
 using SanteDB.Authentication.OAuth2.Wcf;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Rest;
-using SanteDB.Core.Rest.Security;
+using SanteDB.Core.Services;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.ServiceModel.Description;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Authentication.OAuth2
 {
     /// <summary>
     /// OAuth2 message handler
     /// </summary>
-    public class OAuthMessageHandler : IMessageHandlerService, IApiEndpointProvider
+    public class OAuthMessageHandler : IDaemonService, IApiEndpointProvider
     {
 
         // Trace source

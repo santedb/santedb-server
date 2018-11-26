@@ -30,9 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Auditing.Core" Version="2.0.1.8" />
-    <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0.1" />
-    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -45,8 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\AdoConfiguration.cs" />
-    <Compile Include="Configuration\AdoConfigurationSectionHandler.cs" />
+    <Compile Include="Configuration\AdoConfigurationSection.cs" />
     <Compile Include="Data\Model\DbAuditActor.cs" />
     <Compile Include="Data\Model\DbAuditActorAssociation.cs" />
     <Compile Include="Data\Model\DbAuditCode.cs" />

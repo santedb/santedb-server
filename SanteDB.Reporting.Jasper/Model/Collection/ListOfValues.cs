@@ -22,11 +22,11 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.Collection
 {
-	/// <summary>
-	/// Represents a list of values.
-	/// </summary>
-	/// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
-	[XmlType("listOfValues")]
+    /// <summary>
+    /// Represents a list of values.
+    /// </summary>
+    /// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
+    [XmlType("listOfValues")]
 	public class ListOfValues : ResourceBase
 	{
 		/// <summary>

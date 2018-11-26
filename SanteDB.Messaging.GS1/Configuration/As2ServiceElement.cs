@@ -18,20 +18,17 @@
  * Date: 2018-6-22
  */
 using SanteDB.Core.Http;
-using SanteDB.Core.Http.Description;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace SanteDB.Messaging.GS1.Configuration
 {
 
     /// <summary>
-    /// JIRA Service configuration
+    /// AS2 Service configuration
     /// </summary>
+    [XmlType(nameof(As2ServiceElement), Namespace = "http://santedb.org/configuration/gs1")]
     public class As2ServiceElement : ServiceClientDescription
     {
 
@@ -46,37 +43,33 @@ namespace SanteDB.Messaging.GS1.Configuration
         /// <summary>
         /// Use AS2 standard mime based encoding
         /// </summary>
-        [ConfigurationProperty("useAs2MimeEncoding")]
+        [XmlAttribute("useAs2MimeEncoding")]
         public bool UseAS2MimeEncoding {
-            get { return (bool)this["useAs2MimeEncoding"]; }
-            set { this["useAs2MimeEncoding"] = value; }
+            get;set;
         }
 
         /// <summary>
         /// Gets or sets the username
         /// </summary>
-        [ConfigurationProperty("userName")]
+        [XmlAttribute("userName")]
         public String UserName {
-            get { return (string)this["userName"]; }
-            set { this["userName"] = value; }
+            get;set;
         }
 
         /// <summary>
         /// Gets or sets the password
         /// </summary>
-        [ConfigurationProperty("password")]
+        [ConfigurationProperty("password"), XmlAttribute("password")]
         public String Password {
-            get { return (string)this["password"]; }
-            set { this["password"] = value; }
+            get;set;
         }
 
         /// <summary>
         /// Configuration property for trusted cert
         /// </summary>
-        [ConfigurationProperty("trustedCert")]
+        [ConfigurationProperty("trustedCert"), XmlAttribute("trustedCert")]
         public String TrustedCertificate {
-            get { return (string)this["trustedCert"]; }
-            set { this["trustedCert"] = value; }
+            get;set;
         }
 
 

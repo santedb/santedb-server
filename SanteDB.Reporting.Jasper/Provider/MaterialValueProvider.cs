@@ -17,7 +17,7 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
+using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
@@ -30,10 +30,10 @@ using System.Linq;
 
 namespace SanteDB.Reporting.Jasper.Provider
 {
-	/// <summary>
-	/// Represents a material value provider.
-	/// </summary>
-	public class MaterialValueProvider : IParameterValuesProvider
+    /// <summary>
+    /// Represents a material value provider.
+    /// </summary>
+    public class MaterialValueProvider : IParameterValuesProvider
 	{
 		/// <summary>
 		/// Gets or sets the query identifier.
@@ -50,7 +50,7 @@ namespace SanteDB.Reporting.Jasper.Provider
 		{
 			var results = new List<Material>();
 
-			var materialPersistenceService = ApplicationContext.Current.GetService<IStoredQueryDataPersistenceService<Material>>();
+			var materialPersistenceService = ApplicationServiceContext.Current.GetService<IStoredQueryDataPersistenceService<Material>>();
 
 			if (materialPersistenceService == null)
 			{
@@ -58,7 +58,7 @@ namespace SanteDB.Reporting.Jasper.Provider
 			}
 
 			int totalCount;
-			var materials = materialPersistenceService.Query(m => m.ObsoletionTime == null && m.ClassConceptKey == EntityClassKeys.Material, this.QueryId, 0, null, AuthenticationContext.Current.Principal, out totalCount);
+			var materials = materialPersistenceService.Query(m => m.ObsoletionTime == null && m.ClassConceptKey == EntityClassKeys.Material, this.QueryId, 0, null, out totalCount);
 
 			results.AddRange(materials);
 

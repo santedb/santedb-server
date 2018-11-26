@@ -17,8 +17,6 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Security;
@@ -32,13 +30,13 @@ using TW = Twilio;
 
 namespace SanteDB.Core.Security.Tfa.Twilio
 {
-	/// <summary>
-	/// Represents a TFA mechanism that uses TWILIO
-	/// </summary>
-	public class TfaTwilioMechanism : ITfaMechanism
+    /// <summary>
+    /// Represents a TFA mechanism that uses TWILIO
+    /// </summary>
+    public class TfaTwilioMechanism : ITfaMechanism
 	{
 		// Configuration
-		private MechanismConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("SanteDB.core.security.tfa.twilio") as MechanismConfiguration;
+		private TwilioTfaMechanismConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<TwilioTfaMechanismConfigurationSection>();
 
 		private TraceSource m_tracer = new TraceSource("SanteDB.Core.Security.Tfa.Twilio");
 
@@ -92,7 +90,7 @@ namespace SanteDB.Core.Security.Tfa.Twilio
 			if (toNumber == null)
 			{
 				// Get preferred language for the user
-				var securityService = ApplicationContext.Current.GetService<IRepositoryService<UserEntity>>();
+				var securityService = ApplicationServiceContext.Current.GetService<IRepositoryService<UserEntity>>();
 				var userEntity = securityService?.Find(o => o.SecurityUserKey == user.Key).FirstOrDefault();
 				if (userEntity != null)
 					toNumber = userEntity.Telecoms.FirstOrDefault(o => o.AddressUseKey == TelecomAddressUseKeys.MobileContact)?.Value;

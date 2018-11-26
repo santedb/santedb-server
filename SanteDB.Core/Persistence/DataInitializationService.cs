@@ -17,30 +17,19 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Model;
-using SanteDB.Core.Model.Attributes;
-using SanteDB.Core.Model.EntityLoader;
+using SanteDB.Core.Model.Export;
+using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
-using SanteDB.Core.Model.DataTypes;
-using SanteDB.Core.Model.Interfaces;
-using System.ComponentModel;
-using SanteDB.Core.Model.Export;
 
 namespace SanteDB.Core.Persistence
 {
@@ -109,13 +98,13 @@ namespace SanteDB.Core.Persistence
                     try
                     {
                         this.ProgressChanged?.Invoke(this, new Services.ProgressChangedEventArgs(i++ / (float)ds.Action.Count, ds.Id));
-                        if (ApplicationContext.Current.GetService<IDataCachingService>()?.Size > 10000) // Probably a good idea to clear memcache
-                            ApplicationContext.Current.GetService<IDataCachingService>().Clear();
+                        if (ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Size > 10000) // Probably a good idea to clear memcache
+                            ApplicationServiceContext.Current.GetService<IDataCachingService>().Clear();
 
                         // IDP Type
                         Type idpType = typeof(IDataPersistenceService<>);
                         idpType = idpType.MakeGenericType(new Type[] { itm.Element.GetType() });
-                        var idpInstance = ApplicationContext.Current.GetService(idpType) as IDataPersistenceService;
+                        var idpInstance = ApplicationServiceContext.Current.GetService(idpType) as IDataPersistenceService;
 
                         // Don't insert duplicates
                         var getMethod = idpType.GetMethod("Get");
@@ -125,7 +114,7 @@ namespace SanteDB.Core.Persistence
                         Object target = null, existing = null;
                         if (itm.Element.Key.HasValue)
                         {
-                            ApplicationContext.Current.GetService<IDataCachingService>()?.Remove(itm.Element.Key.Value);
+                            ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(itm.Element.Key.Value);
                             existing = idpInstance.Get(itm.Element.Key.Value);
                         }
                         if (existing != null)
@@ -179,9 +168,9 @@ namespace SanteDB.Core.Persistence
                             while (!stype.IsGenericType || stype.GetGenericTypeDefinition() != typeof(VersionedAssociation<>))
                                 stype = stype.BaseType;
 
-                            ApplicationContext.Current.GetService<IDataCachingService>()?.Remove(ivr.SourceEntityKey.Value);
+                            ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(ivr.SourceEntityKey.Value);
                             var idt = typeof(IDataPersistenceService<>).MakeGenericType(stype.GetGenericArguments()[0]);
-                            var idp = ApplicationContext.Current.GetService(idt) as IDataPersistenceService;
+                            var idp = ApplicationServiceContext.Current.GetService(idt) as IDataPersistenceService;
                             ivr.EffectiveVersionSequenceId = (idp.Get(ivr.SourceEntityKey.Value) as IVersionedEntity)?.VersionSequence;
                             if (ivr.EffectiveVersionSequenceId == null)
                                 throw new KeyNotFoundException($"Dataset contains a reference to an unkown source entity : {ivr.SourceEntityKey}");
@@ -202,7 +191,7 @@ namespace SanteDB.Core.Persistence
                 }
 
                 // Execute the changes
-                var isqlp = ApplicationContext.Current.GetService<ISqlDataPersistenceService>();
+                var isqlp = ApplicationServiceContext.Current.GetService<ISqlDataPersistenceService>();
                 foreach (var de in ds.Exec.Where(o => o.InvariantName == isqlp?.InvariantName))
                 {
                     this.m_traceSource.TraceInformation("Executing post-dataset SQL instructions for {0}...", ds.Id);
@@ -278,7 +267,7 @@ namespace SanteDB.Core.Persistence
             finally
             {
                 this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Un-binding event handler");
-                ApplicationContext.Current.Started -= this.m_persistenceHandler;
+                ApplicationServiceContext.Current.Started -= this.m_persistenceHandler;
             }
         }
 
@@ -288,7 +277,7 @@ namespace SanteDB.Core.Persistence
         public bool Start()
         {
             this.m_traceSource.TraceInformation("Binding to startup...");
-            ApplicationContext.Current.Started += this.m_persistenceHandler;
+            ApplicationServiceContext.Current.Started += this.m_persistenceHandler;
             return true;
         }
 

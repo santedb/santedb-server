@@ -17,26 +17,22 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core;
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
-using SanteDB.Persistence.Data.ADO.Data.Model;
-using System.Security.Principal;
-using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
-using SanteDB.Persistence.Data.ADO.Data;
-using SanteDB.Persistence.Data.ADO.Data.Model.Extensibility;
-using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
-using SanteDB.Core.Model;
-using SanteDB.OrmLite;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services.Policy;
+using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Data;
+using SanteDB.Persistence.Data.ADO.Data.Model;
+using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
+using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
+using SanteDB.Persistence.Data.ADO.Data.Model.Extensibility;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
+using System;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -270,7 +266,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     if (proto == null) // maybe we can retrieve the protocol from the protocol repository?
                     {
                         int t = 0;
-                        proto = ApplicationContext.Current.GetService<IClinicalProtocolRepositoryService>().FindProtocol(o => o.Key == p.ProtocolKey, 0, 1, out t).FirstOrDefault();
+                        proto = ApplicationServiceContext.Current.GetService<IClinicalProtocolRepositoryService>().FindProtocol(o => o.Key == p.ProtocolKey, 0, 1, out t).FirstOrDefault();
                         proto = proto.EnsureExists(context);
                     }
                     if (proto != null)
@@ -290,7 +286,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     var pol = p.Policy?.EnsureExists(context);
                     if(pol == null) // maybe we can retrieve it from the PIP?
                     {
-                        var pipInfo = ApplicationContext.Current.GetService<IPolicyInformationService>().GetPolicy(p.PolicyKey.ToString());
+                        var pipInfo = ApplicationServiceContext.Current.GetService<IPolicyInformationService>().GetPolicy(p.PolicyKey.ToString());
                         if (pipInfo != null)
                         {
                             p.Policy = new Core.Model.Security.SecurityPolicy()

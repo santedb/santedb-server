@@ -27,10 +27,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Extensibility
 {
-	/// <summary>
-	/// Represents a simpe tag (version independent)
-	/// </summary>
-	public abstract class DbTag : DbAssociation, IDbBaseData
+    /// <summary>
+    /// Represents a simpe tag (version independent)
+    /// </summary>
+    public abstract class DbTag : DbAssociation, IDbBaseData
 	{
         /// <summary>
         /// Gets or sets the key

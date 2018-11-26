@@ -41,8 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\ConfigurationSectionHandler.cs" />
-    <Compile Include="Configuration\MdmConfiguration.cs" />
+    <Compile Include="Configuration\MdmConfigurationSection.cs" />
     <Compile Include="Configuration\MdmResourceConfiguration.cs" />
     <Compile Include="MdmConstants.cs" />
     <Compile Include="MdmPermissionPolicyIdentifiers.cs" />
@@ -82,14 +81,6 @@
       <Project>{DB9BC05E-45F1-4F96-A161-F36BDECAF566}</Project>
       <Name>SanteDB.Core</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Configuration">
-      <Version>2.0.0.1</Version>
-    </PackageReference>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Core">
-      <Version>2.0.3</Version>
-    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

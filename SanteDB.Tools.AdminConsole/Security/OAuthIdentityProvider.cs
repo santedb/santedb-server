@@ -17,22 +17,18 @@
  * User: justin
  * Date: 2018-10-24
  */
-using System;
-using System.Linq;
-using System.Security.Principal;
-using System.Security;
-using SanteDB.Core.Http;
-using System.Net;
-using SanteDB.Core.Services;
-using System.Text;
-using SanteDB.Core.Interfaces;
 using SanteDB.Core.Diagnostics;
-using MARC.HI.EHRS.SVC.Core.Event;
-using System.Security.Claims;
-using SanteDB.Core.Security.Claims;
-using SanteDB.Tools.AdminConsole.Shell;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
+using SanteDB.Core.Http;
+using SanteDB.Core.Interfaces;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Claims;
+using SanteDB.Core.Security.Services;
+using SanteDB.Tools.AdminConsole.Shell;
+using System;
+using System.Net;
+using System.Security;
+using System.Security.Claims;
+using System.Security.Principal;
 
 namespace SanteDB.Tools.AdminConsole.Security
 {
@@ -106,7 +102,7 @@ namespace SanteDB.Tools.AdminConsole.Security
 
             try
             {
-                using (IRestClient restClient = ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AuthenticationService))
+                using (IRestClient restClient = ApplicationServiceContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AuthenticationService))
                 {
 
                     // Set credentials
@@ -126,8 +122,8 @@ namespace SanteDB.Tools.AdminConsole.Security
                         restClient.Credentials = new OAuthTokenServiceCredentials(principal);
                     else
                     {
-                        request.ClientId = ApplicationContext.Current.ApplicationName;
-                        request.ClientSecret = ApplicationContext.Current.ApplicationSecret;
+                        request.ClientId = ApplicationServiceContext.Current.ApplicationName;
+                        request.ClientSecret = ApplicationServiceContext.Current.ApplicationSecret;
                     }
 
                     try
@@ -259,7 +255,7 @@ namespace SanteDB.Tools.AdminConsole.Security
             throw new NotImplementedException();
         }
 
-        public void AddClaim(string userName, Claim claim)
+        public void AddClaim(string userName, IClaim claim)
         {
             throw new NotImplementedException();
         }

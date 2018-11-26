@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SanteDB.Core.Model;
 using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model;
 
 namespace SanteDB.Core.Services.Impl
 {

@@ -18,14 +18,8 @@
  * Date: 2018-11-23
  */
 using SharpCompress.Compressors;
-using SharpCompress.Compressors.Deflate;
 using SharpCompress.Compressors.LZMA;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Rest.Compression
 {

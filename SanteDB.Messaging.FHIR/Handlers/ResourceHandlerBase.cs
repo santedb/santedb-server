@@ -18,17 +18,13 @@
  * Date: 2018-6-22
  */
 using MARC.Everest.Connectors;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Messaging.FHIR;
-using SanteDB.Messaging.FHIR.Handlers;
-using SanteDB.Messaging.FHIR.Resources;
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Query;
+using SanteDB.Core.Services;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
@@ -42,13 +38,13 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
-	/// <summary>
-	/// Represents a base FHIR resource handler.
-	/// </summary>
-	/// <typeparam name="TFhirResource">The type of the t FHIR resource.</typeparam>
-	/// <typeparam name="TModel">The type of the t model.</typeparam>
-	/// <seealso cref="SanteDB.Messaging.FHIR.Handlers.IFhirResourceHandler" />
-	public abstract class ResourceHandlerBase<TFhirResource, TModel> : IFhirResourceHandler
+    /// <summary>
+    /// Represents a base FHIR resource handler.
+    /// </summary>
+    /// <typeparam name="TFhirResource">The type of the t FHIR resource.</typeparam>
+    /// <typeparam name="TModel">The type of the t model.</typeparam>
+    /// <seealso cref="SanteDB.Messaging.FHIR.Handlers.IFhirResourceHandler" />
+    public abstract class ResourceHandlerBase<TFhirResource, TModel> : IFhirResourceHandler
 		where TFhirResource : DomainResourceBase, new()
 		where TModel : IdentifiedData, new()
 
@@ -85,7 +81,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			// We want to map from TFhirResource to TModel
 			var modelInstance = this.MapToModel(target as TFhirResource, RestOperationContext.Current);
 			if (modelInstance == null)
-				throw new SyntaxErrorException(ApplicationContext.Current.GetLocaleString("MSGE001"));
+				throw new ArgumentException("Model invalid");
 
 			List<IResultDetail> issues = new List<IResultDetail>();
 			var result = this.Create(modelInstance, issues, mode);
@@ -117,7 +113,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			// Delete
 			var guidId = Guid.Empty;
 			if (!Guid.TryParse(id, out guidId))
-				throw new ArgumentException(ApplicationContext.Current.GetLocaleString("MSGE002"));
+				throw new ArgumentException("Invalid id");
 
 			// Do the deletion
 			List<IResultDetail> details = new List<IResultDetail>();
@@ -221,12 +217,12 @@ namespace SanteDB.Messaging.FHIR.Handlers
 
 			Guid guidId = Guid.Empty, versionGuidId = Guid.Empty;
 			if (!Guid.TryParse(id, out guidId))
-				throw new ArgumentException(ApplicationContext.Current.GetLocaleString("MSGE002"));
+				throw new ArgumentException("Invalid id");
 			if (!String.IsNullOrEmpty(versionId) && !Guid.TryParse(versionId, out versionGuidId))
-				throw new ArgumentException(ApplicationContext.Current.GetLocaleString("MSGE002"));
+				throw new ArgumentException("Invalid versionId");
 
 			List<IResultDetail> details = new List<IResultDetail>();
-			var result = this.Read(new Identifier<Guid>(guidId, versionGuidId), details);
+			var result = this.Read(guidId, versionGuidId, details);
 			if (result == null)
 				throw new KeyNotFoundException();
 
@@ -264,16 +260,16 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			// We want to map from TFhirResource to TModel
 			var modelInstance = this.MapToModel(target as TFhirResource, RestOperationContext.Current);
 			if (modelInstance == null)
-				throw new SyntaxErrorException(ApplicationContext.Current.GetLocaleString("MSGE001"));
+				throw new ArgumentException("Invalid Request");
 
 			// Guid identifier
 			var guidId = Guid.Empty;
 			if (!Guid.TryParse(id, out guidId))
-				throw new ArgumentException(ApplicationContext.Current.GetLocaleString("MSGE002"));
+				throw new ArgumentException("Invalid identifier");
 
 			// Model instance key does not equal path
 			if (modelInstance.Key != Guid.Empty && modelInstance.Key != guidId)
-				throw new AmbiguousMatchException(ApplicationContext.Current.GetLocaleString("MSGE003"));
+				throw new InvalidCastException("Target's key does not equal key on path");
 			else if (modelInstance.Key == Guid.Empty)
 				modelInstance.Key = guidId;
 			else
@@ -339,7 +335,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <param name="id">The identifier.</param>
 		/// <param name="details">The details.</param>
 		/// <returns>Returns the model which matches the given id.</returns>
-		protected abstract TModel Read(Identifier<Guid> id, List<IResultDetail> details);
+		protected abstract TModel Read(Guid id, Guid versionId, List<IResultDetail> details);
 
 		/// <summary>
 		/// Updates the specified model.

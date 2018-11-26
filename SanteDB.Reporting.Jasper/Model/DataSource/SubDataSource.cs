@@ -22,10 +22,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.DataSource
 {
-	/// <summary>
-	/// Represents a sub data source.
-	/// </summary>
-	[XmlType("subDataSource")]
+    /// <summary>
+    /// Represents a sub data source.
+    /// </summary>
+    [XmlType("subDataSource")]
 	public class SubDataSource
 	{
 		/// <summary>

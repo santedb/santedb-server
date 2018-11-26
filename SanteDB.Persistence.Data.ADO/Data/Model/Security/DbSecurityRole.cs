@@ -22,10 +22,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
 {
-	/// <summary>
-	/// Represents a security role
-	/// </summary>
-	[Table("sec_rol_tbl")]
+    /// <summary>
+    /// Represents a security role
+    /// </summary>
+    [Table("sec_rol_tbl")]
 	public class DbSecurityRole : DbNonVersionedBaseData
 	{
 

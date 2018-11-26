@@ -18,20 +18,13 @@
  * Date: 2018-6-22
  */
 using MARC.Everest.Threading;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -173,7 +166,7 @@ namespace SanteDB.Core.Services.Impl
         {
             this.Starting?.Invoke(this, EventArgs.Empty);
 
-            int concurrency = (ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("SanteDB.core") as SanteDBConfiguration)?.ThreadPoolSize ?? Environment.ProcessorCount;
+            int concurrency = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SanteDBServerConfiguration>()?.ThreadPoolSize ?? Environment.ProcessorCount;
             if (this.m_threadPool != null)
                 this.m_threadPool.Dispose();
             this.m_threadPool = new WaitThreadPool(concurrency);

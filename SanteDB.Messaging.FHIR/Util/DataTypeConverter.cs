@@ -17,32 +17,30 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using SanteDB.Messaging.FHIR.DataTypes;
-using SanteDB.Messaging.FHIR.Resources;
+using RestSrvr;
+using SanteDB.Core;
+using SanteDB.Core.Extensions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using RestSrvr;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Core.Model.Acts;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Core.Extensions;
-using SanteDB.Core.Security;
 
 namespace SanteDB.Messaging.FHIR.Util
 {
-	/// <summary>
-	/// Represents a data type converter.
-	/// </summary>
-	public static class DataTypeConverter
+    /// <summary>
+    /// Represents a data type converter.
+    /// </summary>
+    public static class DataTypeConverter
 	{
 		/// <summary>
 		/// The trace source.
@@ -137,7 +135,7 @@ namespace SanteDB.Messaging.FHIR.Util
 				throw new ArgumentNullException(nameof(fhirExtension), "Value cannot be null");
 			}
 
-			var extensionTypeService = ApplicationContext.Current.GetService<IExtensionTypeRepository>();
+			var extensionTypeService = ApplicationServiceContext.Current.GetService<IExtensionTypeRepository>();
 
 			extension.ExtensionType = extensionTypeService.Get(new Uri(fhirExtension.Url));
             //extension.ExtensionValue = fhirExtension.Value;
@@ -171,7 +169,7 @@ namespace SanteDB.Messaging.FHIR.Util
                 throw new ArgumentNullException(nameof(fhirExtension), "Value cannot be null");
             }
 
-            var extensionTypeService = ApplicationContext.Current.GetService<IExtensionTypeRepository>();
+            var extensionTypeService = ApplicationServiceContext.Current.GetService<IExtensionTypeRepository>();
 
             extension.ExtensionType = extensionTypeService.Get(new Uri(fhirExtension.Url));
             //extension.ExtensionValue = fhirExtension.Value;
@@ -232,10 +230,10 @@ namespace SanteDB.Messaging.FHIR.Util
 
             traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping assigning authority");
 
-			var oidRegistrar = ApplicationContext.Current.GetService<IOidRegistrarService>();
-            var oid = oidRegistrar.FindData(fhirSystem.Value);
+			var oidRegistrar = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>();
+            var oid = oidRegistrar.Get(fhirSystem.Value);
 
-            return new AssigningAuthority(oid.Mnemonic, oid.Name, oid.Oid);
+            return oid;
 		}
 
 		/// <summary>
@@ -262,7 +260,7 @@ namespace SanteDB.Messaging.FHIR.Util
         public static Extension ToExtension(IModelExtension ext)
         {
 
-            var extensionTypeService = ApplicationContext.Current.GetService<IExtensionTypeRepository>();
+            var extensionTypeService = ApplicationServiceContext.Current.GetService<IExtensionTypeRepository>();
             var eType = extensionTypeService.Get(ext.ExtensionTypeKey);
 
             var retVal = new Extension()
@@ -310,7 +308,7 @@ namespace SanteDB.Messaging.FHIR.Util
 				return null;
 			}
 
-			var conceptService = ApplicationContext.Current.GetService<IConceptRepositoryService>();
+			var conceptService = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>();
 
 			var system = coding.System ?? defaultSystem;
 
@@ -541,7 +539,7 @@ namespace SanteDB.Messaging.FHIR.Util
                     Text = concept.LoadCollection<ConceptName>(nameof(Concept.ConceptNames)).FirstOrDefault()?.Name
                 };
             else {
-                var codeSystemService = ApplicationContext.Current.GetService<IConceptRepositoryService>();
+                var codeSystemService = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>();
                 var refTerm = codeSystemService.GetConceptReferenceTerm(concept.Key.Value, preferredCodeSystem);
                 if (refTerm == null) // No code in the preferred system, ergo, we will instead use our own
                     return new FhirCodeableConcept
@@ -612,7 +610,7 @@ namespace SanteDB.Messaging.FHIR.Util
 				return null;
 			}
 
-            var imetaService = ApplicationContext.Current.GetService<IAssigningAuthorityRepositoryService>();
+            var imetaService = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>();
             var authority = imetaService.Get(identifier.AuthorityKey.Value);
 			return new FhirIdentifier
 			{

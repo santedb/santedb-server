@@ -17,17 +17,9 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core.Services.Policy;
-using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Security;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SanteDB.Core.Security;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
-using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
-using SanteDB.OrmLite;
 
 namespace SanteDB.Persistence.Data.PSQL.Security
 {
@@ -43,7 +35,7 @@ namespace SanteDB.Persistence.Data.PSQL.Security
         public AdoSecurityPolicyInstance(DbSecurityRolePolicy rolePolicy, DbSecurityPolicy policy, object securable)
         {
             this.Policy = new AdoSecurityPolicy(policy);
-            this.Rule = (PolicyDecisionOutcomeType)rolePolicy.GrantType;
+            this.Rule = (PolicyGrantType)rolePolicy.GrantType;
             this.Securable = securable;
         }
 
@@ -53,7 +45,7 @@ namespace SanteDB.Persistence.Data.PSQL.Security
         public AdoSecurityPolicyInstance(DbSecurityDevicePolicy devicePolicy, DbSecurityPolicy policy, object securable)
         {
             this.Policy = new AdoSecurityPolicy(policy);
-            this.Rule = (PolicyDecisionOutcomeType)devicePolicy.GrantType;
+            this.Rule = (PolicyGrantType)devicePolicy.GrantType;
             this.Securable = securable;
         }
 
@@ -63,7 +55,7 @@ namespace SanteDB.Persistence.Data.PSQL.Security
         public AdoSecurityPolicyInstance(DbSecurityApplicationPolicy applicationPolicy, DbSecurityPolicy policy, object securable)
         {
             this.Policy = new AdoSecurityPolicy(policy);
-            this.Rule = (PolicyDecisionOutcomeType)applicationPolicy.GrantType;
+            this.Rule = (PolicyGrantType)applicationPolicy.GrantType;
             this.Securable = securable;
 
         }
@@ -75,7 +67,7 @@ namespace SanteDB.Persistence.Data.PSQL.Security
         {
             this.Policy = new AdoSecurityPolicy(policy);
             // TODO: Configuration of the policy as opt-in / opt-out
-            this.Rule = PolicyDecisionOutcomeType.Grant;
+            this.Rule = PolicyGrantType.Grant;
             this.Securable = securable;
         }
 
@@ -86,7 +78,7 @@ namespace SanteDB.Persistence.Data.PSQL.Security
         {
             this.Policy = new AdoSecurityPolicy(policy);
             // TODO: Configuration of the policy as opt-in / opt-out
-            this.Rule = PolicyDecisionOutcomeType.Grant;
+            this.Rule = PolicyGrantType.Grant;
             this.Securable = securable;
         }
 
@@ -98,7 +90,7 @@ namespace SanteDB.Persistence.Data.PSQL.Security
         /// <summary>
         /// Policy outcome
         /// </summary>
-        public PolicyDecisionOutcomeType  Rule { get; private set;}
+        public PolicyGrantType  Rule { get; private set;}
 
         /// <summary>
         /// Securable

@@ -17,11 +17,10 @@
  * User: justin
  * Date: 2018-11-23
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Core.Wcf;
 using RestSrvr;
+using SanteDB.Core;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Services;
 using SanteDB.Messaging.FHIR.Backbone;
 using SanteDB.Messaging.FHIR.Handlers;
 using SanteDB.Messaging.FHIR.Resources;
@@ -31,10 +30,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Security.Claims;
-using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Messaging.FHIR.Util
 {
@@ -118,22 +113,22 @@ namespace SanteDB.Messaging.FHIR.Util
         {
             // Security settings
             String security = null;
-            var m_masterConfig = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.core") as SanteDBConfiguration;
-            var authorizationPolicy = m_masterConfig.RestConfiguration.Services.FirstOrDefault(o => o.Name == "FHIR").Behaviors.Select(o => o.GetCustomAttribute<AuthenticationSchemeDescriptionAttribute>()).FirstOrDefault(o => o != null)?.Scheme;
-            if(authorizationPolicy.HasValue)
-                switch(authorizationPolicy.Value)
-                {
-                    case AuthenticationScheme.Basic:
-                        security = "Basic";
-                        break;
-                    case AuthenticationScheme.OAuth:
-                    case AuthenticationScheme.OAuth2:
-                        security = "OAuth";
-                        break;
-                    case AuthenticationScheme.Custom:
-                        security = "SMART-on-FHIR";
-                        break;
-                }
+            var m_masterConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RestConfigurationSection>();
+            //var authorizationPolicy = m_masterConfig.Services.FirstOrDefault(o => o.Name == "FHIR").Behaviors.Select(o => o.GetCustomAttribute<AuthenticationSchemeDescriptionAttribute>()).FirstOrDefault(o => o != null)?.Scheme;
+            //if(authorizationPolicy.HasValue)
+            //    switch(authorizationPolicy.Value)
+            //    {
+            //        case AuthenticationScheme.Basic:
+            //            security = "Basic";
+            //            break;
+            //        case AuthenticationScheme.OAuth:
+            //        case AuthenticationScheme.OAuth2:
+            //            security = "OAuth";
+            //            break;
+            //        case AuthenticationScheme.Custom:
+            //            security = "SMART-on-FHIR";
+            //            break;
+            //    }
 
             var retVal = new RestDefinition()
             {

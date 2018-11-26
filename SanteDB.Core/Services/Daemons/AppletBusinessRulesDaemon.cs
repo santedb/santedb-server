@@ -17,15 +17,10 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.BusinessRules.JavaScript;
+using SanteDB.Core.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Services.Daemons
 {
@@ -70,11 +65,11 @@ namespace SanteDB.Core.Services.Daemons
         public bool Start()
         {
             this.Starting?.Invoke(this, EventArgs.Empty);
-            ApplicationContext.Current.Started += (o, e) =>
+            ApplicationServiceContext.Current.Started += (o, e) =>
             {
-                ApplicationServiceContext.Current = ApplicationContext.Current;
-                if (ApplicationContext.Current.GetService<IDataReferenceResolver>() == null)
-                    ApplicationContext.Current.AddServiceProvider(typeof(AppletDataReferenceResolver));
+                ApplicationServiceContext.Current = ApplicationServiceContext.Current;
+                if (ApplicationServiceContext.Current.GetService<IDataReferenceResolver>() == null)
+                    (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(typeof(AppletDataReferenceResolver));
                 new AppletBusinessRuleLoader().LoadRules();
             };
             this.Started?.Invoke(this, EventArgs.Empty);

@@ -17,20 +17,18 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
-using SanteDB.Core.Model.Entities;
-using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Constants;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
 using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
-using SanteDB.Core.Model.Constants;
+using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Roles
 {
-	/// <summary>
-	/// Represents a patient in the SQLite store
-	/// </summary>
-	[Table("pat_tbl")]
+    /// <summary>
+    /// Represents a patient in the SQLite store
+    /// </summary>
+    [Table("pat_tbl")]
 	public class DbPatient : DbPersonSubTable
 	{
 

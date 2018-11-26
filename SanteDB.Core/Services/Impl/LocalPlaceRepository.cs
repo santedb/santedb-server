@@ -17,22 +17,15 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 
 namespace SanteDB.Core.Services.Impl
 {
-	/// <summary>
-	/// Place repository that uses local persistence
-	/// </summary>
-	public class LocalPlaceRepository : GenericLocalNullifiedRepository<Place>
+    /// <summary>
+    /// Place repository that uses local persistence
+    /// </summary>
+    public class LocalPlaceRepository : GenericLocalNullifiedRepository<Place>
 	{
         protected override string QueryPolicy => PermissionPolicyIdentifiers.ReadPlacesAndOrgs;
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadPlacesAndOrgs;

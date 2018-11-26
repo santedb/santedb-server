@@ -17,26 +17,17 @@
  * User: justin
  * Date: 2018-11-23
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Exceptions;
-using MARC.HI.EHRS.SVC.Core.Services;
 using RestSrvr;
 using RestSrvr.Message;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IdentityModel.Configuration;
 using System.IdentityModel.Tokens;
 using System.Linq;
-using System.Security.Authentication;
-using System.Security.Claims;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Rest.Security
 {
@@ -47,7 +38,7 @@ namespace SanteDB.Core.Rest.Security
     {
 
         // Configuration from main SanteDB
-        private SanteDBConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(SanteDBConstants.SanteDBConfigurationName) as SanteDBConfiguration;
+        private ClaimsAuthorizationConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<ClaimsAuthorizationConfigurationSection>();
 
         // Trace source
         private TraceSource m_traceSource = new TraceSource(SanteDBConstants.SecurityTraceSourceName);
@@ -60,14 +51,14 @@ namespace SanteDB.Core.Rest.Security
         /// <returns>True if authorization is successful</returns>
         private void CheckBearerAccess(string authorizationToken)
         {
-            var session = ApplicationContext.Current.GetService<ISessionProviderService>().Get(
+            var session = ApplicationServiceContext.Current.GetService<ISessionProviderService>().Get(
                 Enumerable.Range(0, authorizationToken.Length)
                                     .Where(x => x % 2 == 0)
                                     .Select(x => Convert.ToByte(authorizationToken.Substring(x, 2), 16))
                                     .ToArray()
             );
 
-            IPrincipal principal = ApplicationContext.Current.GetService<ISessionIdentityProviderService>().Authenticate(session);
+            IPrincipal principal = ApplicationServiceContext.Current.GetService<ISessionIdentityProviderService>().Authenticate(session);
             if (principal == null)
                 throw new SecurityTokenException("Invalid bearer token") ;
 
@@ -86,13 +77,11 @@ namespace SanteDB.Core.Rest.Security
         {
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
 
-            var identityModelConfig = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("system.identityModel") as SystemIdentityModelSection;
-
             if (!handler.CanReadToken(authorizationToken))
                 throw new SecurityTokenException("Token is not in a valid format");
 
             SecurityToken token = null;
-            var identities = handler.ValidateToken(authorizationToken, this.m_configuration?.Security?.ClaimsAuth?.ToConfigurationObject(), out token);
+            var identities = handler.ValidateToken(authorizationToken, this.m_configuration?.ToConfigurationObject(), out token);
 
             // Validate token expiry
             if (token.ValidTo < DateTime.Now.ToUniversalTime())
@@ -128,7 +117,7 @@ namespace SanteDB.Core.Rest.Security
                         return;
                     }
                     else
-                        throw new UnauthorizedRequestException("Missing Authorization header", "Bearer", this.m_configuration.Security.ClaimsAuth.Realm, PermissionPolicyIdentifiers.Login);
+                        throw new UnauthorizedAccessException("Missing Authorization header");
                 }
 
                 // Authorization method
@@ -142,17 +131,11 @@ namespace SanteDB.Core.Rest.Security
                         this.CheckJwtAccess(auth[1]);
                         break;
                     default:
-                        throw new UnauthorizedRequestException("Invalid authentication scheme", "Bearer", this.m_configuration.Security.ClaimsAuth.Realm, this.m_configuration.Security.ClaimsAuth.Audiences.FirstOrDefault());
+                        throw new SecurityTokenException("Invalid authentication scheme");
                 }
 
             }
             catch (UnauthorizedAccessException e)
-            {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Token Error (From: {0}) : {1}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint, e);
-
-                throw;
-            }
-            catch (UnauthorizedRequestException e)
             {
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Token Error (From: {0}) : {1}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint, e);
 
@@ -166,7 +149,7 @@ namespace SanteDB.Core.Rest.Security
             finally
             {
                 // Disposed context so reset the auth
-                RestOperationContext.Current.Disposed += (o, e) => SanteDB.Core.Security.AuthenticationContext.Current = new SanteDB.Core.Security.AuthenticationContext(SanteDB.Core.Security.AuthenticationContext.AnonymousPrincipal);
+                RestOperationContext.Current.Disposed += (o, e) => Core.Security.AuthenticationContext.Current = new Core.Security.AuthenticationContext(Core.Security.AuthenticationContext.AnonymousPrincipal);
             }
         }
         /// <summary>

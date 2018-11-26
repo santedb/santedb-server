@@ -17,13 +17,9 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
+using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Acts
 {

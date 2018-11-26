@@ -17,21 +17,16 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
-using System.Linq;
-using System.Security.Principal;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
-	/// <summary>
-	/// Represents a reference term persistence service.
-	/// </summary>
-	public class ReferenceTermPersistenceService : BaseDataPersistenceService<ReferenceTerm, DbReferenceTerm>
+    /// <summary>
+    /// Represents a reference term persistence service.
+    /// </summary>
+    public class ReferenceTermPersistenceService : BaseDataPersistenceService<ReferenceTerm, DbReferenceTerm>
 	{
 		/// <summary>
 		/// Inserts a reference term.

@@ -21,10 +21,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Core.Configuration
 {
-	/// <summary>
-	/// Represents a username and password credential.
-	/// </summary>
-	[XmlType(nameof(UsernamePasswordCredential), Namespace = "http://santedb.org/reporting")]
+    /// <summary>
+    /// Represents a username and password credential.
+    /// </summary>
+    [XmlType(nameof(UsernamePasswordCredential), Namespace = "http://santedb.org/reporting")]
 	public class UsernamePasswordCredential : CredentialBase
 	{
 		/// <summary>

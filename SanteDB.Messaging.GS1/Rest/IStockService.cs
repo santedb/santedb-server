@@ -17,17 +17,15 @@
  * User: justin
  * Date: 2018-11-23
  */
-using SanteDB.Messaging.GS1.Model;
-using System.ServiceModel;
-using RestSrvr;
 using RestSrvr.Attributes;
+using SanteDB.Messaging.GS1.Model;
 
 namespace SanteDB.Messaging.GS1.Rest
 {
-	/// <summary>
-	/// Stock service request
-	/// </summary>
-	[ServiceContract(Name = "GS1BMS")]
+    /// <summary>
+    /// Stock service request
+    /// </summary>
+    [ServiceContract(Name = "GS1BMS")]
 	public interface IStockService
 	{
 		/// <summary>

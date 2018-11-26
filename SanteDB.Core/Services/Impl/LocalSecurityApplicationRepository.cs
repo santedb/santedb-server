@@ -1,16 +1,7 @@
-﻿using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
-using SanteDB.Core.Interfaces;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Model.Entities;
-using SanteDB.Core.Model.Security;
+﻿using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 namespace SanteDB.Core.Services.Impl
 {
     /// <summary>
@@ -28,7 +19,7 @@ namespace SanteDB.Core.Services.Impl
         public override SecurityApplication Insert(SecurityApplication data)
         {
             if (!String.IsNullOrEmpty(data.ApplicationSecret))
-                data.ApplicationSecret = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().EncodePassword(data.ApplicationSecret);
+                data.ApplicationSecret = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(data.ApplicationSecret);
             return base.Insert(data);
         }
 
@@ -38,7 +29,7 @@ namespace SanteDB.Core.Services.Impl
         public override SecurityApplication Save(SecurityApplication data)
         {
             if (!String.IsNullOrEmpty(data.ApplicationSecret))
-                data.ApplicationSecret = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().EncodePassword(data.ApplicationSecret);
+                data.ApplicationSecret = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(data.ApplicationSecret);
             return base.Save(data);
         }
     }

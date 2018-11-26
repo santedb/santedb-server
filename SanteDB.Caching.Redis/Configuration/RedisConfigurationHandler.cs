@@ -18,11 +18,8 @@
  * Date: 2018-6-22
  */
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace SanteDB.Caching.Redis.Configuration
@@ -38,7 +35,7 @@ namespace SanteDB.Caching.Redis.Configuration
         public object Create(object parent, object configContext, XmlNode section)
         {
             // REDIS configuration
-            return new RedisConfiguration()
+            return new RedisConfigurationSection()
             {
                 Servers = section.SelectNodes("./server/add").OfType<XmlElement>().Select(o=>String.Format("{0}:{1}", o.Attributes["host"]?.Value ?? "localhost", o.Attributes["port"]?.Value ?? "6379")).ToList(),
                 UserName = section.SelectSingleNode("./authentication/@userName")?.Value,

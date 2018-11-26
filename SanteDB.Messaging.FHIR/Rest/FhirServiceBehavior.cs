@@ -18,32 +18,28 @@
  * Date: 2018-11-23
  */
 using MARC.Everest.Connectors;
-using MARC.HI.EHRS.SVC.Auditing.Data;
-using MARC.HI.EHRS.SVC.Auditing.Services;
-using MARC.HI.EHRS.SVC.Core;
+using RestSrvr;
+using RestSrvr.Attributes;
+using SanteDB.Core;
+using SanteDB.Core.Auditing;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.Security.Audit;
+using SanteDB.Core.Services;
+using SanteDB.Messaging.FHIR.Configuration;
 using SanteDB.Messaging.FHIR.Handlers;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
+using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net;
+using System.Reflection;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using System.Reflection;
-using SanteDB.Messaging.FHIR.Configuration;
-using MARC.HI.EHRS.SVC.Core.Services;
-using System.Diagnostics;
-using System.Net;
-using SanteDB.Messaging.FHIR.Resources;
-using MARC.HI.EHRS.SVC.Core.Exceptions;
-using System.ServiceModel;
-using RestSrvr.Attributes;
-using RestSrvr;
-using SanteDB.Rest.Common;
-using SanteDB.Core.Security.Audit;
 
 namespace SanteDB.Messaging.FHIR.Rest
 {
@@ -89,7 +85,7 @@ namespace SanteDB.Messaging.FHIR.Rest
                 RestOperationContext.Current.OutgoingResponse.ContentType = "text/html";
                 RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Disposition", "filename=\"index.html\"");
                 RestOperationContext.Current.OutgoingResponse.SetLastModified(DateTime.UtcNow);
-                FhirServiceConfiguration config = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("SanteDB.Messaging.FHIR") as FhirServiceConfiguration;
+                FhirServiceConfigurationSection config = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<FhirServiceConfigurationSection>();
                 if (!String.IsNullOrEmpty(config.LandingPage))
                 {
                     using (var fs = File.OpenRead(config.LandingPage))
@@ -551,7 +547,7 @@ namespace SanteDB.Messaging.FHIR.Rest
         /// </summary>
         private void ThrowIfNotReady()
         {
-            if (!ApplicationContext.Current.IsRunning)
+            if (!ApplicationServiceContext.Current.IsRunning)
                 throw new DomainStateException();
 
         }

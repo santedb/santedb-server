@@ -22,10 +22,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model
 {
-	/// <summary>
-	/// Represents jasper resources.
-	/// </summary>
-	[XmlRoot("resources")]
+    /// <summary>
+    /// Represents jasper resources.
+    /// </summary>
+    [XmlRoot("resources")]
 	[XmlType("resources")]
 	public class Resources
 	{

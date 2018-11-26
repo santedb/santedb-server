@@ -17,17 +17,9 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model.DataTypes;
-using SanteDB.Persistence.Data.ADO.Data.Model;
-using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
-using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
+using System.Linq;
 
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence

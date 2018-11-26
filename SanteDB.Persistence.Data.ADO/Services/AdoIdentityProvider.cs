@@ -17,37 +17,28 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core.Services.Security;
+using SanteDB.Core;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Security.Claims;
+using SanteDB.Core.Security.Services;
+using SanteDB.Core.Services;
+using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Configuration;
+using SanteDB.Persistence.Data.ADO.Data;
+using SanteDB.Persistence.Data.ADO.Data.Model.Security;
+using SanteDB.Persistence.Data.ADO.Security;
+using SanteDB.Persistence.Data.ADO.Services.Persistence;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Principal;
-using System.Security.Cryptography;
-using System.Security.Claims;
-using System.Security;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Core.Model.Security;
-using MARC.HI.EHRS.SVC.Core.Services.Policy;
-using SanteDB.Persistence.Data.ADO.Configuration;
-using System.Configuration;
-using SanteDB.Persistence.Data.ADO.Data.Model;
-using SanteDB.Core.Security;
-using MARC.HI.EHRS.SVC.Core.Exceptions;
-using MARC.HI.EHRS.SVC.Core.Event;
 using System.Diagnostics;
-using SanteDB.Core.Security.Attribute;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Security.Claims;
-using SanteDB.Core.Services;
-using SanteDB.Persistence.Data.ADO.Security;
-using SanteDB.Persistence.Data.ADO.Data.Model.Security;
-using SanteDB.Persistence.Data.ADO.Data;
-using SanteDB.OrmLite;
-using SanteDB.Persistence.Data.ADO.Services.Persistence;
-using SanteDB.Core.Diagnostics;
+using System.Linq;
+using System.Security;
+using System.Security.Claims;
+using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -64,7 +55,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         private TraceSource m_traceSource = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
 
         // Configuration
-        private AdoConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(AdoDataConstants.ConfigurationSectionName) as AdoConfiguration;
+        private AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
 
         /// <summary>
         /// Fired prior to an authentication request being made
@@ -75,6 +66,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// Fired after an authentication request has been made
         /// </summary>
         public event EventHandler<AuthenticatedEventArgs> Authenticated;
+
 
         /// <summary>
         /// Authenticate the user
@@ -129,8 +121,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 throw new SecurityException("Authentication cancelled");
 
             // Password hasher
-            var hashingService = ApplicationContext.Current.GetService<IPasswordHashingService>();
-            tfaSecret = hashingService.EncodePassword(tfaSecret);
+            var hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
+            tfaSecret = hashingService.ComputeHash(tfaSecret);
 
             // Try to authenticate
             try
@@ -173,7 +165,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             else if (!String.IsNullOrEmpty(password))
                                 retVal = this.Authenticate(userName, password) as ClaimsPrincipal;
                             else
-                                throw new PolicyViolationException(new GenericPrincipal(new GenericIdentity(userName), new string[0]), PermissionPolicyIdentifiers.Login, PolicyDecisionOutcomeType.Deny);
+                                throw new PolicyViolationException(new GenericPrincipal(new GenericIdentity(userName), new string[0]), PermissionPolicyIdentifiers.Login, PolicyGrantType.Deny);
 
                             // Now we want to fire authenticated
                             this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, retVal, true));
@@ -201,17 +193,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Change the user's password
         /// </summary>
-        public void ChangePassword(string userName, string newPassword, IPrincipal principal)
+        public void ChangePassword(string userName, string newPassword)
         {
-            if (principal == null)
-                throw new ArgumentNullException(nameof(principal));
-            else if (!principal.Identity.IsAuthenticated)
-                throw new SecurityException("Authorization context must be authenticated");
-
-            this.m_traceSource.TraceInformation("Change userpassword for {0} to {1} ({2})", userName, newPassword, principal);
-
+            if (!AuthenticationContext.Current.Principal.Identity.IsAuthenticated)
+                throw new SecurityException("Principal must be authenticated");
             // Password failed validation
-            if (ApplicationContext.Current.GetService<IPasswordValidatorService>()?.Validate(newPassword) == false)
+            if (ApplicationServiceContext.Current.GetService<IPasswordValidatorService>()?.Validate(newPassword) == false)
                 throw new SecurityException("Password failed validation");
 
             try
@@ -230,18 +217,18 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 throw new InvalidOperationException(String.Format("Cannot locate user {0}", userName));
 
                             // Security check
-                            var policyDecisionService = ApplicationContext.Current.GetService<IPolicyDecisionService>();
-                            var passwordHashingService = ApplicationContext.Current.GetService<IPasswordHashingService>();
+                            var policyDecisionService = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
+                            var passwordHashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
-                            var pdpOutcome = policyDecisionService?.GetPolicyOutcome(principal, PermissionPolicyIdentifiers.ChangePassword);
-                            if (userName != principal.Identity.Name &&
+                            var pdpOutcome = policyDecisionService?.GetPolicyOutcome(AuthenticationContext.Current.Principal, PermissionPolicyIdentifiers.ChangePassword);
+                            if (userName != AuthenticationContext.Current.Principal.Identity.Name &&
                                 pdpOutcome.HasValue &&
-                                pdpOutcome != PolicyDecisionOutcomeType.Grant)
-                                throw new PolicyViolationException(principal, PermissionPolicyIdentifiers.ChangePassword, pdpOutcome.Value);
+                                pdpOutcome != PolicyGrantType.Grant)
+                                throw new PolicyViolationException(AuthenticationContext.Current.Principal, PermissionPolicyIdentifiers.ChangePassword, pdpOutcome.Value);
 
-                            user.Password = passwordHashingService.EncodePassword(newPassword);
+                            user.Password = passwordHashingService.ComputeHash(newPassword);
                             user.SecurityHash = Guid.NewGuid().ToString();
-                            user.UpdatedByKey = dataContext.EstablishProvenance(principal, null); 
+                            user.UpdatedByKey = dataContext.EstablishProvenance(null); 
 
                             dataContext.Update(user);
                             tx.Commit();
@@ -267,11 +254,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
         public string GenerateTfaSecret(string userName)
         {
             // This is a simple TFA generator
-            var secret = ApplicationContext.Current.GetService<ITwoFactorSecretGenerator>().GenerateTfaSecret();
-            var hashingService = ApplicationContext.Current.GetService<IPasswordHashingService>();
+            var secret = ApplicationServiceContext.Current.GetService<ITwoFactorSecretGenerator>().GenerateTfaSecret();
+            var hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
-            this.AddClaim(userName, new Claim(SanteDBClaimTypes.SanteDBTfaSecretClaim, hashingService.EncodePassword(secret)));
-            this.AddClaim(userName, new Claim(SanteDBClaimTypes.SanteDBTfaSecretExpiry, DateTime.Now.AddMinutes(5).ToString("o")));
+            this.AddClaim(userName, new AdoClaim(SanteDBClaimTypes.SanteDBTfaSecretClaim, hashingService.ComputeHash(secret)));
+            this.AddClaim(userName, new AdoClaim(SanteDBClaimTypes.SanteDBTfaSecretExpiry, DateTime.Now.AddMinutes(5).ToString("o")));
 
             return secret;
         }
@@ -279,19 +266,17 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Create a basic user
         /// </summary>
-        public IIdentity CreateIdentity(string userName, string password, IPrincipal authContext)
+        public IIdentity CreateIdentity(string userName, string password)
         {
 
-            this.VerifyPrincipal(authContext, PermissionPolicyIdentifiers.CreateIdentity);
+            this.VerifyPrincipal(PermissionPolicyIdentifiers.CreateIdentity);
 
             if (String.IsNullOrEmpty(userName))
                 throw new ArgumentNullException(nameof(userName));
             else if (String.IsNullOrEmpty(password))
                 throw new ArgumentNullException(nameof(password));
-            else if (authContext == null)
-                throw new ArgumentNullException(nameof(authContext));
 
-            this.m_traceSource.TraceInformation("Creating identity {0} ({1})", userName, authContext);
+            this.m_traceSource.TraceInformation("Creating identity {0} ({1})", userName, AuthenticationContext.Current.Principal);
 
             try
             {
@@ -303,22 +288,21 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         try
                         {
                             
-                            var hashingService = ApplicationContext.Current.GetService<IPasswordHashingService>();
-                            var pdpService = ApplicationContext.Current.GetService<IPolicyDecisionService>();
+                            var hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
+                            var pdpService = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
 
                             // Demand create identity
-                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.CreateIdentity, authContext).Demand();
+                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.CreateIdentity).Demand();
 
                             // Does this principal have the ability to 
                             DbSecurityUser newIdentityUser = new DbSecurityUser()
                             {
                                 UserName = userName,
-                                Password = hashingService.EncodePassword(password),
+                                Password = hashingService.ComputeHash(password),
                                 SecurityHash = Guid.NewGuid().ToString(),
                                 UserClass = UserClassKeys.HumanUser
                             };
-                            if (authContext != null)
-                                newIdentityUser.CreatedByKey = dataContext.EstablishProvenance(authContext, null);
+                            newIdentityUser.CreatedByKey = dataContext.EstablishProvenance(null);
 
                             dataContext.Insert(newIdentityUser);
                             var retVal = AdoClaimsIdentity.Create(newIdentityUser);
@@ -343,12 +327,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Delete the specified identity
         /// </summary>
-        public void DeleteIdentity(string userName, IPrincipal authContext)
+        public void DeleteIdentity(string userName)
         {
             if (String.IsNullOrEmpty(userName))
                 throw new ArgumentNullException(nameof(userName));
 
-            this.VerifyPrincipal(authContext, PermissionPolicyIdentifiers.AlterIdentity);
+            this.VerifyPrincipal(PermissionPolicyIdentifiers.AlterIdentity);
 
             this.m_traceSource.TraceInformation("Delete identity {0}", userName);
             try
@@ -357,7 +341,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 using (var dataContext = this.m_configuration.Provider.GetWriteConnection())
                 {
                     dataContext.Open();
-                    new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.UnrestrictedAdministration, authContext).Demand();
+                    new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.UnrestrictedAdministration).Demand();
 
                     var user = dataContext.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLower() == userName.ToLower());
                     if (user == null)
@@ -365,7 +349,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     // Obsolete
                     user.ObsoletionTime = DateTimeOffset.Now;
-                    user.ObsoletedByKey = dataContext.EstablishProvenance(authContext, null);
+                    user.ObsoletedByKey = dataContext.EstablishProvenance(null);
                     user.SecurityHash = Guid.NewGuid().ToString();
 
                     dataContext.Update(user);
@@ -382,12 +366,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Set the lockout status
         /// </summary>
-        public void SetLockout(string userName, bool lockout, IPrincipal authContext)
+        public void SetLockout(string userName, bool lockout)
         {
             if (String.IsNullOrEmpty(userName))
                 throw new ArgumentNullException(nameof(userName));
 
-            this.VerifyPrincipal(authContext, PermissionPolicyIdentifiers.AlterIdentity);
+            this.VerifyPrincipal(PermissionPolicyIdentifiers.AlterIdentity);
 
             this.m_traceSource.TraceInformation("Lockout identity {0} = {1}", userName, lockout);
             try
@@ -396,7 +380,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 using (var dataContext = this.m_configuration.Provider.GetWriteConnection())
                 {
                     dataContext.Open();
-                    new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.UnrestrictedAdministration, authContext).Demand();
+                    new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.UnrestrictedAdministration).Demand();
 
                     var user = dataContext.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLower() == userName.ToLower());
                     if (user == null)
@@ -414,14 +398,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     user.ObsoletedByKey = null;
                     user.ObsoletedByKeySpecified = true;
 
-                    user.UpdatedByKey = dataContext.EstablishProvenance(authContext, null);
+                    user.UpdatedByKey = dataContext.EstablishProvenance(null);
                     user.UpdatedTime = DateTimeOffset.Now;
                     user.SecurityHash = Guid.NewGuid().ToString();
 
                     var updatedUser = dataContext.Update(user);
 
 	                var securityUser = new SecurityUserPersistenceService().ToModelInstance(updatedUser, dataContext);
-					ApplicationContext.Current.GetService<IDataCachingService>()?.Add(securityUser);
+					ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(securityUser);
                 }
 
             }
@@ -435,7 +419,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Add a claim to the specified user
         /// </summary>
-        public void AddClaim(string userName, Claim claim)
+        public void AddClaim(string userName, IClaim claim)
         {
             if (userName == null)
                 throw new ArgumentNullException(nameof(userName));
@@ -564,13 +548,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Verify principal
         /// </summary>
-        private void VerifyPrincipal(IPrincipal authPrincipal, String policyId)
+        private void VerifyPrincipal(String policyId)
         {
-            if (authPrincipal == null)
-                throw new ArgumentNullException(nameof(authPrincipal));
-
-            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, policyId, authPrincipal).Demand();
-
+            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, policyId).Demand();
         }
 
     }

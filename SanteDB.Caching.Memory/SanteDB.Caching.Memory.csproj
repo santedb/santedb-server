@@ -35,9 +35,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Solution Items\MARC.Everest.dll</HintPath>
     </Reference>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0.1" />
-    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.3" />
-    <PackageReference Include="MARC.HI.EHRS.SVC.Core.Timer" Version="2.0.0" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -52,7 +49,7 @@
     <Compile Include="CacheEntry.cs" />
     <Compile Include="CacheRegulatorTimerJob.cs" />
     <Compile Include="Configuration\ConfigurationSectionHandler.cs" />
-    <Compile Include="Configuration\MemoryCacheConfiguration.cs" />
+    <Compile Include="Configuration\MemoryCacheConfigurationSection.cs" />
     <Compile Include="Configuration\TypeCacheConfigurationInfo.cs" />
     <Compile Include="MemoryCache.cs" />
     <Compile Include="MemoryCacheService.cs" />

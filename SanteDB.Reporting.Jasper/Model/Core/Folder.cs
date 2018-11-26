@@ -21,10 +21,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.Core
 {
-	/// <summary>
-	/// Represents a folder.
-	/// </summary>
-	[XmlType("folder")]
+    /// <summary>
+    /// Represents a folder.
+    /// </summary>
+    [XmlType("folder")]
 	[XmlRoot("folder")]
 	public class Folder : ResourceBase
 	{

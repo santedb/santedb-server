@@ -19,17 +19,13 @@
  */
 using MARC.Everest.Connectors;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.ResultsDetails
 {
-	/// <summary>
-	/// Represents an unrecognized target domain result detail.
-	/// </summary>
-	public class UnrecognizedTargetDomainResultDetail : ResultDetail
+    /// <summary>
+    /// Represents an unrecognized target domain result detail.
+    /// </summary>
+    public class UnrecognizedTargetDomainResultDetail : ResultDetail
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="UnrecognizedTargetDomainResultDetail"/> class

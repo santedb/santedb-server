@@ -17,13 +17,8 @@
  * User: justin
  * Date: 2018-11-23
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Core.Services;
 using SanteDB.Messaging.FHIR.Resources;
-using MARC.HI.EHRS.SVC.Core.Services;
 using System.Collections.Specialized;
 
 namespace SanteDB.Messaging.FHIR.Handlers

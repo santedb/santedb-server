@@ -17,19 +17,15 @@
  * User: justin
  * Date: 2018-6-22
  */
-using SanteDB.Core.Interop.Clients;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SanteDB.Core;
 using SanteDB.Core.Http;
-using SanteDB.Messaging.GS1.Model;
+using SanteDB.Core.Interop.Clients;
+using SanteDB.Core.Services;
 using SanteDB.Messaging.GS1.Configuration;
-using System.Xml.Serialization;
+using SanteDB.Messaging.GS1.Model;
+using System;
 using System.IO;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
+using System.Xml.Serialization;
 
 namespace SanteDB.Messaging.GS1.Transport.AS2
 {
@@ -40,7 +36,7 @@ namespace SanteDB.Messaging.GS1.Transport.AS2
     {
 
         // Configuration
-        private As2ServiceElement m_configuration = (ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("SanteDB.messaging.gs1") as Gs1ConfigurationSection)?.Gs1BrokerAddress;
+        private As2ServiceElement m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Gs1ConfigurationSection>()?.Gs1BrokerAddress;
 
         /// <summary>
         /// Create the GS1 service client

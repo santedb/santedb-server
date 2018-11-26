@@ -21,11 +21,11 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.Core
 {
-	/// <summary>
-	/// Represents a file.
-	/// </summary>
-	/// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
-	[XmlType("file")]
+    /// <summary>
+    /// Represents a file.
+    /// </summary>
+    /// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
+    [XmlType("file")]
 	[XmlRoot("file")]
 	public class File : ResourceBase
 	{

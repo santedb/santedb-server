@@ -18,13 +18,9 @@
  * Date: 2018-6-22
  */
 using SanteDB.Core.Services;
-using SanteDB.Persistence.Data.ADO.Data;
+using SanteDB.OrmLite;
 using System;
 using System.Collections;
-using System.Security.Principal;
-using SanteDB.Core.Model.Interfaces;
-using SanteDB.OrmLite;
-using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {

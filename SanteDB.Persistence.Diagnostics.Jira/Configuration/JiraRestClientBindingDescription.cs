@@ -17,7 +17,6 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
 using SanteDB.Core.Http;
 using SanteDB.Core.Http.Description;
 
@@ -26,7 +25,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
     /// <summary>
     /// Represents a JIRA REST client binding description
     /// </summary>
-    internal class JiraRestClientBindingDescription : IRestClientBindingDescription
+    public class JiraRestClientBindingDescription : IRestClientBindingDescription
     {
         /// <summary>
         /// Gets the content type mapper

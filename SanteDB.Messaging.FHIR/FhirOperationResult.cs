@@ -17,13 +17,10 @@
  * User: justin
  * Date: 2018-11-23
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SanteDB.Messaging.FHIR.Resources;
 using MARC.Everest.Connectors;
-using MARC.HI.EHRS.SVC.Core.Issues;
+using SanteDB.Core.Services;
+using SanteDB.Messaging.FHIR.Resources;
+using System.Collections.Generic;
 
 namespace SanteDB.Messaging.FHIR
 {
@@ -39,7 +36,6 @@ namespace SanteDB.Messaging.FHIR
         public FhirOperationResult()
         {
             this.Details = new List<IResultDetail>();
-            this.Issues = new List<DetectedIssue>();
             this.Results = new List<DomainResourceBase>();
         }
 
@@ -52,11 +48,6 @@ namespace SanteDB.Messaging.FHIR
         /// Represents the results of the operation
         /// </summary>
         public List<DomainResourceBase> Results { get; set; }
-
-        /// <summary>
-        /// Business violations
-        /// </summary>
-        public List<DetectedIssue> Issues { get; set; }
 
         /// <summary>
         /// Gets the list of details

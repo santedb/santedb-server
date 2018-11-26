@@ -22,10 +22,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.Reference
 {
-	/// <summary>
-	/// Represents a reference.
-	/// </summary>
-	public abstract class ReferenceBase
+    /// <summary>
+    /// Represents a reference.
+    /// </summary>
+    public abstract class ReferenceBase
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ReferenceBase"/> class.

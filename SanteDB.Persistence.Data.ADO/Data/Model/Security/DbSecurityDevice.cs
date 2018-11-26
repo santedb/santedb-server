@@ -24,10 +24,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
 {
-	/// <summary>
-	/// Represents a security device. This table should only have one row (the current device)
-	/// </summary>
-	[Table("sec_dev_tbl")]
+    /// <summary>
+    /// Represents a security device. This table should only have one row (the current device)
+    /// </summary>
+    [Table("sec_dev_tbl")]
 	public class DbSecurityDevice : DbBaseData
 	{
 		

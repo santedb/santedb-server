@@ -21,11 +21,11 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.DataSource
 {
-	/// <summary>
-	/// Represents an Amazon Web Services data source.
-	/// </summary>
-	/// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
-	[XmlType("awsDataSource")]
+    /// <summary>
+    /// Represents an Amazon Web Services data source.
+    /// </summary>
+    /// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
+    [XmlType("awsDataSource")]
 	[XmlRoot("awsDataSource")]
 	public class AwsDataSource : ResourceBase
 	{

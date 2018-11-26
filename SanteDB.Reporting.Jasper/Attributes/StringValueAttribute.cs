@@ -21,10 +21,10 @@ using System;
 
 namespace SanteDB.Reporting.Jasper.Attributes
 {
-	/// <summary>
-	/// Defines an attribute containing a string representation of the member
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Field)]
+    /// <summary>
+    /// Defines an attribute containing a string representation of the member
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field)]
 	public sealed class StringValueAttribute : Attribute
 	{
 		/// <summary>

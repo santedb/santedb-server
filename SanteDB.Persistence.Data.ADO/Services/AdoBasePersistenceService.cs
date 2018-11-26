@@ -17,49 +17,37 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
-using System.Linq;
-using SanteDB.Core.Model.Map;
-using System.Reflection;
+using SanteDB.Core;
+using SanteDB.Core.Event;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Collection;
+using SanteDB.Core.Model.Map;
+using SanteDB.Core.Security;
+using SanteDB.Core.Services;
+using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Configuration;
+using SanteDB.Persistence.Data.ADO.Data;
+using SanteDB.Persistence.Data.ADO.Services.Persistence;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using SanteDB.Core.Exceptions;
-using SanteDB.Core.Model.Query;
-using MARC.HI.EHRS.SVC.Core.Services;
-using System.Diagnostics;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Event;
-using System.Security.Principal;
-using System.Data.SqlClient;
-using SanteDB.Core.Security;
-using MARC.HI.EHRS.SVC.Core.Data;
-using System.Data.Common;
-using SanteDB.Core.Services;
-using SanteDB.Persistence.Data.ADO.Configuration;
-using SanteDB.Persistence.Data.ADO.Data.Model;
 using System.Data;
-using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
-using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Persistence.Data.ADO.Data;
-using SanteDB.OrmLite;
-using SanteDB.Persistence.Data.ADO.Services.Persistence;
-using System.Xml.Serialization;
+using System.Data.Common;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Security.Principal;
 using System.Text;
 using System.Threading;
-using MARC.HI.EHRS.SVC.Core.Attributes;
-using SanteDB.Persistence.Data.ADO.Data.Model.Security;
-using SanteDB.Core.Model.Collection;
+using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
     /// <summary>
     /// Represents a data persistence service which stores data in the local SQLite data store
     /// </summary>
-    [TraceSource(AdoDataConstants.TraceSourceName)]
     public abstract class AdoBasePersistenceService<TData> : IDataPersistenceService<TData>, IStoredQueryDataPersistenceService<TData>, IFastQueryDataPersistenceService<TData>, IAdoPersistenceService where TData : IdentifiedData
     {
 
@@ -73,21 +61,21 @@ namespace SanteDB.Persistence.Data.ADO.Services
         protected TraceSource m_tracer = new TraceSource(AdoDataConstants.TraceSourceName);
 
         // Configuration
-        protected static AdoConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(AdoDataConstants.ConfigurationSectionName) as AdoConfiguration;
+        protected static AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
 
         // Mapper
         protected static ModelMapper m_mapper = AdoPersistenceService.GetMapper();
 
-        public event EventHandler<PrePersistenceEventArgs<TData>> Inserting;
-        public event EventHandler<PostPersistenceEventArgs<TData>> Inserted;
-        public event EventHandler<PrePersistenceEventArgs<TData>> Updating;
-        public event EventHandler<PostPersistenceEventArgs<TData>> Updated;
-        public event EventHandler<PrePersistenceEventArgs<TData>> Obsoleting;
-        public event EventHandler<PostPersistenceEventArgs<TData>> Obsoleted;
-        public event EventHandler<PreRetrievalEventArgs<TData>> Retrieving;
-        public event EventHandler<PostRetrievalEventArgs<TData>> Retrieved;
-        public event EventHandler<PreQueryEventArgs<TData>> Querying;
-        public event EventHandler<PostQueryEventArgs<TData>> Queried;
+        public event EventHandler<DataPersistingEventArgs<TData>> Inserting;
+        public event EventHandler<DataPersistedEventArgs<TData>> Inserted;
+        public event EventHandler<DataPersistingEventArgs<TData>> Updating;
+        public event EventHandler<DataPersistedEventArgs<TData>> Updated;
+        public event EventHandler<DataPersistingEventArgs<TData>> Obsoleting;
+        public event EventHandler<DataPersistedEventArgs<TData>> Obsoleted;
+        public event EventHandler<DataRetrievingEventArgs<TData>> Retrieving;
+        public event EventHandler<DataRetrievedEventArgs<TData>> Retrieved;
+        public event EventHandler<QueryRequestEventArgs<TData>> Querying;
+        public event EventHandler<QueryResultEventArgs<TData>> Queried;
 
         /// <summary>
         /// Maps the data to a model instance
@@ -162,12 +150,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Inserts the specified data
         /// </summary>
-        public TData Insert(TData data, IPrincipal principal, TransactionMode mode)
+        public TData Insert(TData data, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
 
-            PrePersistenceEventArgs<TData> preArgs = new PrePersistenceEventArgs<TData>(data, principal);
+            DataPersistingEventArgs<TData> preArgs = new DataPersistingEventArgs<TData>(data, overrideAuthContext);
             this.Inserting?.Invoke(this, preArgs);
             if (preArgs.Cancel)
             {
@@ -188,7 +176,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         {
 
                             // Disable inserting duplicate classified objects
-                            connection.EstablishProvenance(principal, (data as BaseEntityData)?.CreatedByKey);
+                            connection.EstablishProvenance((data as BaseEntityData)?.CreatedByKey);
                             var existing = data.TryGetExisting(connection, true);
                             if (existing != null)
                             {
@@ -211,15 +199,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             {
                                 tx.Commit();
                                 foreach (var itm in connection.CacheOnCommit)
-                                    ApplicationContext.Current.GetService<IDataCachingService>()?.Add(itm);
+                                    ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(itm);
                             }
                             else
                                 tx.Rollback();
 
-                            var args = new PostPersistenceEventArgs<TData>(data, principal)
-                            {
-                                Mode = mode
-                            };
+                            var args = new DataPersistedEventArgs<TData>(data, overrideAuthContext);
 
                             this.Inserted?.Invoke(this, args);
 
@@ -276,14 +261,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <param name="principal"></param>
         /// <param name="mode"></param>
         /// <returns></returns>
-        public TData Update(TData data, IPrincipal principal, TransactionMode mode)
+        public TData Update(TData data, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
             else if (data.Key == Guid.Empty)
                 throw new InvalidOperationException("Data missing key");
 
-            PrePersistenceEventArgs<TData> preArgs = new PrePersistenceEventArgs<TData>(data, principal);
+            DataPersistingEventArgs<TData> preArgs = new DataPersistingEventArgs<TData>(data, overrideAuthContext);
             this.Updating?.Invoke(this, preArgs);
             if (preArgs.Cancel)
             {
@@ -306,7 +291,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                             this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "UPDATE {0}", data);
 
-                            connection.EstablishProvenance(principal, (data as NonVersionedEntityData)?.UpdatedByKey ?? (data as BaseEntityData)?.CreatedByKey);
+                            connection.EstablishProvenance((data as NonVersionedEntityData)?.UpdatedByKey ?? (data as BaseEntityData)?.CreatedByKey);
                             data = Update(connection, data);
                             data.LoadState = LoadState.FullLoad; // We just persisted this so it is fully loaded
 
@@ -314,16 +299,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             {
                                 tx.Commit();
                                 foreach (var itm in connection.CacheOnCommit)
-                                    ApplicationContext.Current.GetService<IDataCachingService>()?.Add(itm);
+                                    ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(itm);
 
                             }
                             else
                                 tx.Rollback();
 
-                            var args = new PostPersistenceEventArgs<TData>(data, principal)
-                            {
-                                Mode = mode
-                            };
+                            var args = new DataPersistedEventArgs<TData>(data, overrideAuthContext);
 
                             this.Updated?.Invoke(this, args);
 
@@ -464,14 +446,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Obsoletes the specified object
         /// </summary>
-        public TData Obsolete(TData data, IPrincipal principal, TransactionMode mode)
+        public TData Obsolete(TData data, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
             else if (data.Key == Guid.Empty)
                 throw new InvalidOperationException("Data missing key");
 
-            PrePersistenceEventArgs<TData> preArgs = new PrePersistenceEventArgs<TData>(data);
+            DataPersistingEventArgs<TData> preArgs = new DataPersistingEventArgs<TData>(data, overrideAuthContext);
             this.Obsoleting?.Invoke(this, preArgs);
             if (preArgs.Cancel)
             {
@@ -493,22 +475,19 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             //connection.Connection.Open();
 
                             this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "OBSOLETE {0}", data);
-                            connection.EstablishProvenance(principal, (data as BaseEntityData)?.ObsoletedByKey);
+                            connection.EstablishProvenance((data as BaseEntityData)?.ObsoletedByKey);
                             data = this.Obsolete(connection, data);
 
                             if (mode == TransactionMode.Commit)
                             {
                                 tx.Commit();
                                 foreach (var itm in connection.CacheOnCommit)
-                                    ApplicationContext.Current.GetService<IDataCachingService>()?.Remove(itm.Key.Value);
+                                    ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(itm.Key.Value);
                             }
                             else
                                 tx.Rollback();
 
-                            var args = new PostPersistenceEventArgs<TData>(data, principal)
-                            {
-                                Mode = mode
-                            };
+                            var args = new DataPersistedEventArgs<TData>(data, overrideAuthContext);
 
                             this.Obsoleted?.Invoke(this, args);
 
@@ -534,13 +513,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Gets the specified object
         /// </summary>
-        public virtual TData Get<TIdentifier>(MARC.HI.EHRS.SVC.Core.Data.Identifier<TIdentifier> containerId, IPrincipal principal, bool loadFast)
+        public virtual TData Get(Guid containerId, Guid? versionId, bool loadFast = false, IPrincipal overrideAuthContext = null)
         {
-            // Try the cache if available
-            var guidIdentifier = containerId as Identifier<Guid>;
 
-            var cacheItem = ApplicationContext.Current.GetService<IDataCachingService>()?.GetCacheItem<TData>(guidIdentifier.Id) as TData;
-            if (loadFast && cacheItem != null)
+            var cacheItem = ApplicationServiceContext.Current.GetService<IDataCachingService>()?.GetCacheItem<TData>(containerId) as TData;
+            if (loadFast && cacheItem != null && 
+                versionId == Guid.Empty)
             {
                 return cacheItem;
             }
@@ -552,11 +530,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 sw.Start();
 #endif
 
-                PreRetrievalEventArgs<TData> preArgs = new PreRetrievalEventArgs<TData>(containerId, principal);
+                DataRetrievingEventArgs<TData> preArgs = new DataRetrievingEventArgs<TData>(containerId, versionId, overrideAuthContext);
                 this.Retrieving?.Invoke(this, preArgs);
                 if (preArgs.Cancel)
                 {
-                    this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Pre-Event handler indicates abort retrieve {0}", containerId.Id);
+                    this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Pre-Event handler indicates abort retrieve {0}", containerId);
                     return preArgs.OverrideResult;
                 }
 
@@ -576,12 +554,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         else
                             connection.LoadState = LoadState.FullLoad;
 
-                        var result = this.Get(connection, guidIdentifier.Id);
-                        var postData = new PostRetrievalEventArgs<TData>(result, principal);
+                        var result = this.Get(connection, containerId);
+                        var postData = new DataRetrievedEventArgs<TData>(result, overrideAuthContext);
                         this.Retrieved?.Invoke(this, postData);
 
                         foreach (var itm in connection.CacheOnCommit)
-                            ApplicationContext.Current.GetService<IDataCachingService>()?.Add(itm);
+                            ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(itm);
 
                         return result;
 
@@ -609,35 +587,35 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Performs the specified query
         /// </summary>
-        public int Count(Expression<Func<TData, bool>> query, IPrincipal authContext)
+        public long Count(Expression<Func<TData, bool>> query, IPrincipal overrideAuthContext = null)
         {
             var tr = 0;
-            this.Query(query, 0, null, authContext, out tr);
+            this.Query(query, 0, 0, out tr, overrideAuthContext);
             return tr;
         }
 
         /// <summary>
         /// Performs query returning all results
         /// </summary>
-        public virtual IEnumerable<TData> Query(Expression<Func<TData, bool>> query, IPrincipal authContext)
+        public virtual IEnumerable<TData> Query(Expression<Func<TData, bool>> query, IPrincipal overrideAuthContext = null)
         {
             var tr = 0;
-            return this.QueryInternal(query, Guid.Empty, 0, null, authContext, out tr, true);
+            return this.QueryInternal(query, Guid.Empty, 0, null, out tr, true, overrideAuthContext);
 
         }
 
         /// <summary>
         /// Performs the specified query
         /// </summary>
-        public virtual IEnumerable<TData> Query(Expression<Func<TData, bool>> query, int offset, int? count, IPrincipal authContext, out int totalCount)
+        public virtual IEnumerable<TData> Query(Expression<Func<TData, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext = null)
         {
-            return this.QueryInternal(query, Guid.Empty, offset, count, authContext, out totalCount, false);
+            return this.QueryInternal(query, Guid.Empty, offset, count, out totalCount, false, overrideAuthContext);
         }
 
         /// <summary>
         /// Instructs the service 
         /// </summary>
-        protected virtual IEnumerable<TData> QueryInternal(Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, IPrincipal authContext, out int totalCount, bool fastQuery)
+        protected virtual IEnumerable<TData> QueryInternal(Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalCount, bool fastQuery, IPrincipal overrideAuthContext = null)
         {
             if (query == null)
                 throw new ArgumentNullException(nameof(query));
@@ -647,13 +625,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
             sw.Start();
 #endif
 
-            PreQueryEventArgs<TData> preArgs = new PreQueryEventArgs<TData>(query, queryId, offset, count, authContext);
+            QueryRequestEventArgs<TData> preArgs = new QueryRequestEventArgs<TData>(query, offset, count, queryId, overrideAuthContext);
             this.Querying?.Invoke(this, preArgs);
             if (preArgs.Cancel)
             {
                 this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Pre-Event handler indicates abort query {0}", query);
-                totalCount = preArgs.OverrideTotalResults.GetValueOrDefault() ;
-                return preArgs.OverrideResults;
+                totalCount = preArgs.TotalResults;
+                return preArgs.Results;
             }
             
             // Query object
@@ -677,7 +655,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         connection.LoadState = LoadState.FullLoad;
 
                     var results = this.Query(connection, preArgs.Query, queryId, preArgs.Offset, preArgs.Count ?? 1000, out totalCount, true);
-                    var postData = new PostQueryEventArgs<TData>(query, results.AsQueryable(), authContext);
+                    var postData = new QueryResultEventArgs<TData>(query, results.AsQueryable(), offset, count, totalCount, queryId, overrideAuthContext);
                     this.Queried?.Invoke(this, postData);
 
                     var retVal = postData.Results.ToList();
@@ -686,10 +664,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     foreach (var i in retVal.AsParallel().Where(i => i != null))
                         connection.AddCacheCommit(i);
 
-                    ApplicationContext.Current.GetService<IThreadPoolService>()?.QueueUserWorkItem(o =>
+                    ApplicationServiceContext.Current.GetService<IThreadPoolService>()?.QueueUserWorkItem(o =>
                     {
                         foreach (var itm in (o as IEnumerable<IdentifiedData>))
-                            ApplicationContext.Current.GetService<IDataCachingService>()?.Add(itm);
+                            ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(itm);
                     }, connection.CacheOnCommit.ToList());
 
                     this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "Returning {0}..{1} or {2} results", offset, offset + (count ?? 1000), totalCount);
@@ -739,7 +717,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             //// Make sure we're updating the right thing
             //if (data.Key.HasValue)
             //{
-            //    var cacheItem = ApplicationContext.Current.GetService<IDataCachingService>()?.GetCacheItem(data.GetType(), data.Key.Value);
+            //    var cacheItem = ApplicationServiceContext.Current.GetService<IDataCachingService>()?.GetCacheItem(data.GetType(), data.Key.Value);
             //    if (cacheItem != null)
             //    {
             //        cacheItem.CopyObjectData(data);
@@ -813,7 +791,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         object IDataPersistenceService.Insert(object data)
         {
-            return this.Insert((TData)data, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+            return this.Insert((TData)data, TransactionMode.Commit);
         }
 
         /// <summary>
@@ -821,7 +799,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         object IDataPersistenceService.Update(object data)
         {
-            return this.Update((TData)data, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+            return this.Update((TData)data, TransactionMode.Commit);
         }
 
         /// <summary>
@@ -829,7 +807,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         object IDataPersistenceService.Obsolete(object data)
         {
-            return this.Obsolete((TData)data, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+            return this.Obsolete((TData)data, TransactionMode.Commit);
         }
 
         /// <summary>
@@ -837,7 +815,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         object IDataPersistenceService.Get(Guid id)
         {
-            return this.Get(new Identifier<Guid>(id, Guid.Empty), AuthenticationContext.Current.Principal, false);
+            return this.Get(id, Guid.Empty, false);
         }
 
         /// <summary>
@@ -854,7 +832,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         IEnumerable IDataPersistenceService.Query(Expression query, int offset, int? count, out int totalResults)
         {
-            return this.Query((Expression<Func<TData, bool>>)query, offset, count, AuthenticationContext.Current.Principal, out totalResults);
+            return this.Query((Expression<Func<TData, bool>>)query, offset, count, out totalResults);
         }
 
 
@@ -863,7 +841,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Fire retrieving
         /// </summary>
-        protected void FireRetrieving(PreRetrievalEventArgs<TData> e)
+        protected void FireRetrieving(DataRetrievingEventArgs<TData> e)
         {
             this.Retrieving?.Invoke(this, e);
         }
@@ -871,7 +849,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Fire retrieving
         /// </summary>
-        protected void FireRetrieved(PostRetrievalEventArgs<TData> e)
+        protected void FireRetrieved(DataRetrievedEventArgs<TData> e)
         {
             this.Retrieved?.Invoke(this, e);
         }
@@ -879,18 +857,18 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Query from the IMS with specified query id
         /// </summary>
-        public IEnumerable<TData> Query(Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, IPrincipal authContext, out int totalCount)
+        public IEnumerable<TData> Query(Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext = null)
         {
-            return this.QueryInternal(query, queryId, offset, count, authContext, out totalCount, false);
+            return this.QueryInternal(query, queryId, offset, count, out totalCount, false, overrideAuthContext);
 
         }
 
         /// <summary>
         /// Perform a lean query
         /// </summary>
-        public IEnumerable<TData> QueryFast(Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, IPrincipal authContext, out int totalCount)
+        public IEnumerable<TData> QueryFast(Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext = null)
         {
-            return this.QueryInternal(query, queryId, offset, count, authContext, out totalCount, true);
+            return this.QueryInternal(query, queryId, offset, count, out totalCount, true, overrideAuthContext);
         }
 
         #endregion

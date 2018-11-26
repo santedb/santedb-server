@@ -19,10 +19,10 @@
  */
 namespace SanteDB.Reporting.Core.Configuration
 {
-	/// <summary>
-	/// Represents a base credential.
-	/// </summary>
-	public abstract class CredentialBase
+    /// <summary>
+    /// Represents a base credential.
+    /// </summary>
+    public abstract class CredentialBase
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="CredentialBase"/> class.

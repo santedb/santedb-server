@@ -17,15 +17,13 @@
  * User: justin
  * Date: 2018-11-23
  */
-using MARC.HI.EHRS.SVC.Auditing.Data;
+using SanteDB.Core.Auditing;
 using SanteDB.Messaging.FHIR.Attributes;
 using SanteDB.Messaging.FHIR.Backbone;
 using SanteDB.Messaging.FHIR.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Xml.Serialization;
 
 namespace SanteDB.Messaging.FHIR.Resources

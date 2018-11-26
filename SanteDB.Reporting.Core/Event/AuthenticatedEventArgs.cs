@@ -17,16 +17,16 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
 using SanteDB.Reporting.Core.Auth;
+using System;
 
 namespace SanteDB.Reporting.Core.Event
 {
-	/// <summary>
-	/// Represents authenticated event arguments.
-	/// </summary>
-	/// <seealso cref="System.EventArgs" />
-	public class AuthenticatedEventArgs : EventArgs
+    /// <summary>
+    /// Represents authenticated event arguments.
+    /// </summary>
+    /// <seealso cref="System.EventArgs" />
+    public class AuthenticatedEventArgs : EventArgs
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AuthenticatedEventArgs"/> class.

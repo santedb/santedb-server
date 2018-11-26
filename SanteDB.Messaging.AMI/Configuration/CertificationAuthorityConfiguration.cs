@@ -17,26 +17,32 @@
  * User: justin
  * Date: 2018-6-22
  */
+using System.Xml.Serialization;
+
 namespace SanteDB.Messaging.AMI.Configuration
 {
-	/// <summary>
-	/// CA configuration information
-	/// </summary>
-	public class CertificationAuthorityConfiguration
+    /// <summary>
+    /// CA configuration information
+    /// </summary>
+    [XmlType(nameof(CertificationAuthorityConfiguration), Namespace = "http://santedb.org/configuration/ami")]
+    public class CertificationAuthorityConfiguration
 	{
 		/// <summary>
 		/// When true, automatically approve CA
 		/// </summary>
+        [XmlAttribute("autoApprove")]
 		public bool AutoApprove { get; set; }
 
 		/// <summary>
 		/// Gets or sets the name of the certification authority
 		/// </summary>
+        [XmlAttribute("name")]
 		public string Name { get; set; }
 
 		/// <summary>
 		/// Gets or sets the name of the machine
 		/// </summary>
+        [XmlAttribute("server")]
 		public string ServerName { get; set; }
 	}
 }

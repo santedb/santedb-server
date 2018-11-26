@@ -19,15 +19,14 @@
  */
 using System;
 using System.Configuration;
-using System.Linq;
 using System.Xml;
 
 namespace SanteDB.Persistence.Diagnostics.Email.Configuration
 {
-	/// <summary>
-	/// Configuration section handler
-	/// </summary>
-	public class ConfigurationSectionHandler : IConfigurationSectionHandler
+    /// <summary>
+    /// Configuration section handler
+    /// </summary>
+    public class ConfigurationSectionHandler : IConfigurationSectionHandler
 	{
 		/// <summary>
 		/// Creates the specified configuration object
@@ -37,7 +36,7 @@ namespace SanteDB.Persistence.Diagnostics.Email.Configuration
 			XmlElement smtp = section.SelectSingleNode("./*[local-name() = 'smtp']") as XmlElement;
             var recipients = section.SelectNodes("./*[local-name() = 'recipient']/*[local-name() = 'add']");
 
-            DiagnosticEmailServiceConfiguration retVal = new DiagnosticEmailServiceConfiguration();
+            DiagnosticEmailServiceConfigurationSection retVal = new DiagnosticEmailServiceConfigurationSection();
 			if (smtp == null)
 				throw new ConfigurationErrorsException("Missing SMTP configuration", section);
 			else

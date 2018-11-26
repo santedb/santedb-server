@@ -17,25 +17,23 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core.Services;
+using SanteDB.Core;
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
-using SanteDB.Core.Model;
+using SanteDB.Messaging.GS1.Configuration;
 using SanteDB.Messaging.GS1.Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model.Entities;
-using SanteDB.Core.Model.DataTypes;
-using SanteDB.Messaging.GS1.Configuration;
-using System.ComponentModel;
 
 namespace SanteDB.Messaging.GS1
 {
@@ -63,7 +61,7 @@ namespace SanteDB.Messaging.GS1
         private Gs1Util m_gs1Util;
 
         // Configuration
-        private Gs1ConfigurationSection m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("SanteDB.messaging.gs1") as Gs1ConfigurationSection;
+        private Gs1ConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Gs1ConfigurationSection>();
 
         /// <summary>
         /// Daemon is started
@@ -89,12 +87,12 @@ namespace SanteDB.Messaging.GS1
         {
             this.Starting?.Invoke(this, EventArgs.Empty);
 
-            ApplicationContext.Current.Started += (o, e) =>
+            ApplicationServiceContext.Current.Started += (o, e) =>
             {
                 this.m_gs1Util = new Gs1Util();
                 // Application has started let's bind to the events we need
-                ApplicationContext.Current.GetService<IDataPersistenceService<Act>>().Inserted += (xo, xe) => this.NotifyAct(new Act[] { xe.Data });
-                ApplicationContext.Current.GetService<IDataPersistenceService<Bundle>>().Inserted += (xo, xe) => this.NotifyAct(xe.Data.Item.OfType<Act>());
+                ApplicationServiceContext.Current.GetService<IDataPersistenceService<Act>>().Inserted += (xo, xe) => this.NotifyAct(new Act[] { xe.Data });
+                ApplicationServiceContext.Current.GetService<IDataPersistenceService<Bundle>>().Inserted += (xo, xe) => this.NotifyAct(xe.Data.Item.OfType<Act>());
 
             };
 
@@ -184,7 +182,7 @@ namespace SanteDB.Messaging.GS1
 
             orderMessage.StandardBusinessDocumentHeader = this.m_gs1Util.CreateDocumentHeader("order", act.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Authororiginator).LoadProperty<Entity>("PlayerEntity"));
 
-            var type = ApplicationContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(act.TypeConceptKey.Value, "GS1");
+            var type = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(act.TypeConceptKey.Value, "GS1");
 
             Place shipTo = act.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Location)?.LoadProperty<Place>("PlayerEntity"),
                 shipFrom = act.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Distributor)?.LoadProperty<Place>("PlayerEntity");
@@ -232,7 +230,7 @@ namespace SanteDB.Messaging.GS1
         /// </summary>
         private void QueueMessage(object orderMessage)
         {
-            ApplicationContext.Current.GetService<IPersistentQueueService>().Enqueue(this.m_configuration.Gs1QueueName, orderMessage);
+            ApplicationServiceContext.Current.GetService<IPersistentQueueService>().Enqueue(this.m_configuration.Gs1QueueName, orderMessage);
         }
 
         /// <summary>

@@ -24,10 +24,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Extensibility
 {
-	/// <summary>
-	/// Extension types
-	/// </summary>
-	[Table("ext_typ_tbl")]
+    /// <summary>
+    /// Extension types
+    /// </summary>
+    [Table("ext_typ_tbl")]
 	public class DbExtensionType: DbNonVersionedBaseData
 	{
 

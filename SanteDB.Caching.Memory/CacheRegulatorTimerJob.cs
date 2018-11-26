@@ -17,23 +17,62 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Jobs;
 using System;
+using System.Collections.Generic;
 using System.Timers;
-using MARC.HI.EHRS.SVC.Core.Timer;
 
 namespace SanteDB.Caching.Memory
 {
     /// <summary>
     /// Timer job that reduces pressure on the cache
     /// </summary>
-    internal class CacheRegulatorTimerJob : ITimerJob
+    internal class CacheRegulatorTimerJob : IJob
     {
+
+        /// <summary>
+        /// Get the name of the service
+        /// </summary>
+        public string Name => "Memory Cache Pressure Reduction";
+
+        /// <summary>
+        /// Can Cancel?
+        /// </summary>
+        public bool CanCancel => false;
+
+        /// <summary>
+        /// Current status
+        /// </summary>
+        public JobStateType CurrentState { get; private set; }
+
+        /// <summary>
+        /// Get the parameters
+        /// </summary>
+        public IDictionary<string, Type> Parameters => null;
+
+        /// <summary>
+        /// Cancel
+        /// </summary>
+        public void Cancel()
+        {
+            throw new NotSupportedException();
+        }
+
         /// <summary>
         /// Timer has elapsed
         /// </summary>
-        public void Elapsed(object sender, ElapsedEventArgs e)
+        public void Run(object sender, ElapsedEventArgs e, object[] parameters)
         {
-            MemoryCache.Current.ReducePressure();
+            try
+            {
+                this.CurrentState = JobStateType.Running;
+                MemoryCache.Current.ReducePressure();
+                this.CurrentState = JobStateType.Completed;
+            }
+            catch
+            {
+                this.CurrentState = JobStateType.Aborted;
+            }
         }
     }
 }

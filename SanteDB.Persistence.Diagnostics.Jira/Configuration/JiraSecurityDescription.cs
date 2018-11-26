@@ -17,7 +17,6 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
 using SanteDB.Core.Http;
 using SanteDB.Core.Http.Description;
 

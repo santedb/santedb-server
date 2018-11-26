@@ -22,10 +22,10 @@ using System;
 
 namespace SanteDB.Persistence.Reporting.PSQL.Model
 {
-	/// <summary>
-	/// Represents a report definition report format association.
-	/// </summary>
-	[Table("report_definition_report_format_association")]
+    /// <summary>
+    /// Represents a report definition report format association.
+    /// </summary>
+    [Table("report_definition_report_format_association")]
 	public class ReportDefinitionFormatAssociation : DbAssociation
 	{
 		/// <summary>

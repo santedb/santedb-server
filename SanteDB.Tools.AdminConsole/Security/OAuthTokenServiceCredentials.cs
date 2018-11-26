@@ -17,23 +17,20 @@
  * User: justin
  * Date: 2018-10-24
  */
-using System;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text;
-using System.Collections.Generic;
-using System.Security.Principal;
 using SanteDB.Core.Http;
 using SanteDB.Tools.AdminConsole.Shell;
+using System;
+using System.Collections.Generic;
 using System.Security.Claims;
+using System.Security.Principal;
+using System.Text;
 
 namespace SanteDB.Tools.AdminConsole.Security
 {
-	/// <summary>
-	/// Represents credentials for this android application on all requests going to the OAuth service
-	/// </summary>
-	public class OAuthTokenServiceCredentials : Credentials
+    /// <summary>
+    /// Represents credentials for this android application on all requests going to the OAuth service
+    /// </summary>
+    public class OAuthTokenServiceCredentials : Credentials
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SanteDB.Tools.AdminConsole.Security.OAuthTokenServiceCredentials"/> class.
@@ -53,8 +50,8 @@ namespace SanteDB.Tools.AdminConsole.Security
 		{
 			// App ID credentials
 			String appAuthString = String.Format ("{0}:{1}", 
-				ApplicationContext.Current.ApplicationName, 
-				ApplicationContext.Current.ApplicationSecret);
+				ApplicationServiceContext.Current.ApplicationName, 
+				ApplicationServiceContext.Current.ApplicationSecret);
 
 			// TODO: Add claims
 			List<Claim> claims = new List<Claim> () {

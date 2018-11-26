@@ -17,34 +17,29 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.Interfaces;
+using SanteDB.Core.Model;
+using SanteDB.Core.Model.Attributes;
+using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Model.Map;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Services;
+using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Configuration;
+using SanteDB.Persistence.Data.ADO.Data;
+using SanteDB.Persistence.Data.ADO.Data.Hax;
+using SanteDB.Persistence.Data.ADO.Data.Model;
+using SanteDB.Persistence.Data.ADO.Services.Persistence;
 using System;
-
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using SanteDB.Core.Model.Map;
-using SanteDB.Core.Model;
-using System.Collections.Generic;
-using SanteDB.Core.Model.Interfaces;
-using SanteDB.Core.Model.Attributes;
-using SanteDB.Core.Model.Security;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Persistence.Data.ADO.Data;
-using System.Security.Principal;
-using System.Diagnostics;
-using MARC.HI.EHRS.SVC.Core;
-using SanteDB.Core.Exceptions;
-using SanteDB.Persistence.Data.ADO.Configuration;
-using System.Threading;
-using SanteDB.Core.Services;
-using SanteDB.Persistence.Data.ADO.Data.Model;
-using SanteDB.OrmLite;
-using SanteDB.Persistence.Data.ADO.Services.Persistence;
-using System.Collections;
-using SanteDB.OrmLite;
-using SanteDB.Persistence.Data.ADO.Data.Hax;
-using SanteDB.Core.Security.Attribute;
-using SanteDB.Core.Security;
-using System.Data;
 using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Data.ADO.Services
@@ -58,7 +53,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
     {
 
         private static ModelMapper s_mapper;
-        private static AdoConfiguration s_configuration;
+        private static AdoPersistenceConfigurationSection s_configuration;
         // Cache
         private static Dictionary<Type, IAdoPersistenceService> s_persistenceCache = new Dictionary<Type, IAdoPersistenceService>();
 
@@ -68,7 +63,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Get configuration
         /// </summary>
-        public static AdoConfiguration GetConfiguration() { return s_configuration; }
+        public static AdoPersistenceConfigurationSection GetConfiguration() { return s_configuration; }
 
         /// <summary>
         /// Gets the mode mapper
@@ -95,12 +90,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 // Scan type heirarchy as well
                 var sDomain = tDomain;
                 var idpType = typeof(IDataPersistenceService<>).MakeGenericType(sDomain);
-                retVal = ApplicationContext.Current.GetService(idpType) as IAdoPersistenceService;
+                retVal = ApplicationServiceContext.Current.GetService(idpType) as IAdoPersistenceService;
                 while(retVal == null && sDomain != typeof(object))
                 {
                     sDomain = sDomain.BaseType;
                     idpType = typeof(IDataPersistenceService<>).MakeGenericType(sDomain);
-                    retVal = ApplicationContext.Current.GetService(idpType) as IAdoPersistenceService;
+                    retVal = ApplicationServiceContext.Current.GetService(idpType) as IAdoPersistenceService;
                 }
 
                 if (retVal != null)
@@ -117,7 +112,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         static AdoPersistenceService()
         {
             var tracer = new TraceSource(AdoDataConstants.TraceSourceName);
-            s_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(AdoDataConstants.ConfigurationSectionName) as AdoConfiguration;
+            s_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
             try
             {
                 s_mapper = new ModelMapper(typeof(AdoPersistenceService).GetTypeInfo().Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName));
@@ -385,7 +380,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     if(!t.IsGenericType || 
                         t.IsGenericType && (s_configuration.AllowedResources.Count == 0 ||
                         s_configuration.AllowedResources.Contains(t.GetGenericArguments()[0].GetCustomAttribute<XmlTypeAttribute>()?.TypeName)))
-	                    ApplicationContext.Current.AddServiceProvider(t);
+	                    (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(t);
 
 					// Add to cache since we're here anyways
 
@@ -420,7 +415,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     if (modelClassType.IsAbstract || domainClassType.IsAbstract) continue;
 
                     // Already created
-                    if (ApplicationContext.Current.GetService(idpType) != null)
+                    if (ApplicationServiceContext.Current.GetService(idpType) != null)
                         continue;
 
                     this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "Creating map {0} > {1}", modelClassType, domainClassType);
@@ -438,7 +433,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         else
                             pclass = typeof(GenericBasePersistenceService<,>);
                         pclass = pclass.MakeGenericType(modelClassType, domainClassType);
-                        ApplicationContext.Current.AddServiceProvider(pclass);
+                        (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(pclass);
                         // Add to cache since we're here anyways
                         s_persistenceCache.Add(modelClassType, Activator.CreateInstance(pclass) as IAdoPersistenceService);
                     }
@@ -455,7 +450,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             pclass = typeof(GenericIdentityPersistenceService<,>);
 
                         pclass = pclass.MakeGenericType(modelClassType, domainClassType);
-                        ApplicationContext.Current.AddServiceProvider(pclass);
+                        (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(pclass);
                         s_persistenceCache.Add(modelClassType, Activator.CreateInstance(pclass) as IAdoPersistenceService);
                     }
                     else
@@ -470,12 +465,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
 
             // Bind some basic service stuff
-            ApplicationContext.Current.GetService<IDataPersistenceService<Core.Model.Security.SecurityUser>>().Inserting += (o, e) =>
+            ApplicationServiceContext.Current.GetService<IDataPersistenceService<Core.Model.Security.SecurityUser>>().Inserting += (o, e) =>
             {
                 if (String.IsNullOrEmpty(e.Data.SecurityHash))
                     e.Data.SecurityHash = Guid.NewGuid().ToString();
             };
-            ApplicationContext.Current.GetService<IDataPersistenceService<Core.Model.Security.SecurityUser>>().Updating += (o, e) =>
+            ApplicationServiceContext.Current.GetService<IDataPersistenceService<Core.Model.Security.SecurityUser>>().Updating += (o, e) =>
             {
                 e.Data.SecurityHash = Guid.NewGuid().ToString();
             };

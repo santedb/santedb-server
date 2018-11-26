@@ -17,25 +17,15 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using SanteDB.Core.Model.EntityLoader;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB
 {
-	/// <summary>
-	/// SanteDB service.
-	/// </summary>
-	/// <seealso cref="System.ServiceProcess.ServiceBase" />
-	public partial class SanteDB : ServiceBase
+    /// <summary>
+    /// SanteDB service.
+    /// </summary>
+    /// <seealso cref="System.ServiceProcess.ServiceBase" />
+    public partial class SanteDB : ServiceBase
 	{
 
 		/// <summary>

@@ -22,10 +22,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model
 {
-	/// <summary>
-	/// Represents a base resource in jasper.
-	/// </summary>
-	public abstract class ResourceBase
+    /// <summary>
+    /// Represents a base resource in jasper.
+    /// </summary>
+    public abstract class ResourceBase
 	{
 		/// <summary>
 		/// Gets or sets the creation time.

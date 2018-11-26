@@ -17,7 +17,7 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
+using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
@@ -30,10 +30,10 @@ using System.Linq;
 
 namespace SanteDB.Reporting.Jasper.Provider
 {
-	/// <summary>
-	/// Represents a place value provider.
-	/// </summary>
-	public class PlaceValueProvider : IParameterValuesProvider
+    /// <summary>
+    /// Represents a place value provider.
+    /// </summary>
+    public class PlaceValueProvider : IParameterValuesProvider
 	{
 		/// <summary>
 		/// Gets or sets the query identifier.
@@ -50,7 +50,7 @@ namespace SanteDB.Reporting.Jasper.Provider
 		{
 			var results = new List<Place>();
 
-			var placePersistenceService = ApplicationContext.Current.GetService<IStoredQueryDataPersistenceService<Place>>();
+			var placePersistenceService = ApplicationServiceContext.Current.GetService<IStoredQueryDataPersistenceService<Place>>();
 
 			if (placePersistenceService == null)
 			{
@@ -62,7 +62,7 @@ namespace SanteDB.Reporting.Jasper.Provider
 
 			while (offset <= totalCount)
 			{
-				var places = placePersistenceService.Query(p => p.ObsoletionTime == null && p.ClassConceptKey == EntityClassKeys.Place && p.ObsoletionTime == null, this.QueryId, offset, 250, AuthenticationContext.Current.Principal, out totalCount);
+				var places = placePersistenceService.Query(p => p.ObsoletionTime == null && p.ClassConceptKey == EntityClassKeys.Place && p.ObsoletionTime == null, this.QueryId, offset, 250, out totalCount);
 
 				offset += 250;
 

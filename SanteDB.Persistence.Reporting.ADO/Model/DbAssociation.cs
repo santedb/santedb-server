@@ -21,11 +21,11 @@ using System;
 
 namespace SanteDB.Persistence.Reporting.PSQL.Model
 {
-	/// <summary>
-	/// Represents an association.
-	/// </summary>
-	/// <seealso cref="IDbAssociation" />
-	public abstract class DbAssociation : DbIdentified, IDbAssociation
+    /// <summary>
+    /// Represents an association.
+    /// </summary>
+    /// <seealso cref="IDbAssociation" />
+    public abstract class DbAssociation : DbIdentified, IDbAssociation
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DbAssociation"/> class.

@@ -17,13 +17,21 @@
  * User: justin
  * Date: 2018-6-22
  */
+using System.Xml.Serialization;
+
 namespace SanteDB.Core.Security.Tfa.Email.Configuration
 {
-	/// <summary>
-	/// Represents template configuration
-	/// </summary>
-	public class TemplateConfiguration
+    /// <summary>
+    /// Represents template configuration
+    /// </summary>
+    [XmlType(nameof(TemplateConfiguration), Namespace = "http://santedb.org/configuration/tfa/email")]
+    public class TemplateConfiguration
 	{
+
+        public TemplateConfiguration()
+        {
+
+        }
 		/// <summary>
 		/// Template configuration file
 		/// </summary>
@@ -36,11 +44,13 @@ namespace SanteDB.Core.Security.Tfa.Email.Configuration
 		/// <summary>
 		/// Gets the language of the tempalte
 		/// </summary>
+        [XmlAttribute("lang")]
 		public string Language { get; private set; }
 
 		/// <summary>
 		/// Gets the file
 		/// </summary>
+        [XmlAttribute("file")]
 		public string TemplateDefinitionFile { get; private set; }
 	}
 }

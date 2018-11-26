@@ -17,17 +17,16 @@
  * User: justin
  * Date: 2018-10-24
  */
-using System;
-using System.Security.Principal;
 using SanteDB.Core.Http;
 using SanteDB.Core.Security;
+using System.Security.Principal;
 
 namespace SanteDB.Tools.AdminConsole.Security
 {
-	/// <summary>
-	/// Credential providerwhich will identify this application
-	/// </summary>
-	public class OAuth2CredentialProvider : ICredentialProvider
+    /// <summary>
+    /// Credential providerwhich will identify this application
+    /// </summary>
+    public class OAuth2CredentialProvider : ICredentialProvider
 	{
 		#region ICredentialProvider implementation
 		/// <summary>

@@ -66,7 +66,6 @@
     <Compile Include="Security\TokenCredentialProvider.cs" />
     <Compile Include="Security\TokenCredentials.cs" />
     <Compile Include="Security\TokenValidationManager.cs" />
-    <Compile Include="Security\X509CertificateUtils.cs" />
     <Compile Include="Shell\AdminClientEndpointDescription.cs" />
     <Compile Include="Shell\ApplicationContext.cs" />
     <Compile Include="Shell\CmdLets\AppletCmdlet.cs" />
@@ -106,12 +105,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Auditing.Core">
-      <Version>2.0.1.8</Version>
-    </PackageReference>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Core">
-      <Version>2.0.3</Version>
-    </PackageReference>
     <PackageReference Include="SanteDB.Messaging.AMI.Client">
       <Version>1.1.6</Version>
     </PackageReference>

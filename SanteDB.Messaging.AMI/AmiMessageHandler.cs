@@ -17,17 +17,15 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core.Services;
 using RestSrvr;
-using RestSrvr.Bindings;
+using SanteDB.Core;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Rest;
 using SanteDB.Core.Rest.Behavior;
 using SanteDB.Core.Rest.Security;
 using SanteDB.Messaging.AMI.Configuration;
 using SanteDB.Messaging.AMI.Wcf;
-using SanteDB.Rest.AMI;
 using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
@@ -35,8 +33,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.ServiceModel;
-using System.ServiceModel.Description;
 
 namespace SanteDB.Messaging.AMI
 {
@@ -68,7 +64,7 @@ namespace SanteDB.Messaging.AMI
 	{
 
         // Configuration
-        private readonly AmiConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(AmiConstants.ConfigurationName) as AmiConfiguration;
+        private readonly AmiConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AmiConfigurationSection>();
 
         /// <summary>
         /// Resource handler tool
@@ -83,7 +79,7 @@ namespace SanteDB.Messaging.AMI
 		/// <summary>
 		/// The internal reference to the AMI configuration.
 		/// </summary>
-		private AmiConfiguration configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.messaging.ami") as AmiConfiguration;
+		private AmiConfigurationSection configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AmiConfigurationSection>();
 
 		// web host
 		private RestService m_webHost;

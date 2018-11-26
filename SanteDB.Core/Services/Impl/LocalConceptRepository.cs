@@ -17,10 +17,6 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Security;
@@ -28,17 +24,16 @@ using SanteDB.Core.Security.Attribute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Security.Permissions;
 using System.Text.RegularExpressions;
 
 namespace SanteDB.Core.Services.Impl
 {
-	/// <summary>
-	/// Represents a service which is responsible for the
-	/// maintenance of concepts.
-	/// </summary>
-	public class LocalConceptRepository : GenericLocalNullifiedRepository<Concept>, IConceptRepositoryService
+    /// <summary>
+    /// Represents a service which is responsible for the
+    /// maintenance of concepts.
+    /// </summary>
+    public class LocalConceptRepository : GenericLocalNullifiedRepository<Concept>, IConceptRepositoryService
 	{
         protected override string QueryPolicy => PermissionPolicyIdentifiers.ReadMetadata;
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadMetadata;
@@ -110,7 +105,7 @@ namespace SanteDB.Core.Services.Impl
         public ReferenceTerm GetConceptReferenceTerm(Guid conceptId, string codeSystem)
         {
             // Concept is loaded
-            var refTermService = ApplicationContext.Current.GetService<IDataPersistenceService<ConceptReferenceTerm>>();
+            var refTermService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ConceptReferenceTerm>>();
 
             if (refTermService == null)
                 throw new InvalidOperationException("Cannot find concept/reference term service");
@@ -121,12 +116,20 @@ namespace SanteDB.Core.Services.Impl
             Regex oidRegex = new Regex("^(\\d+?\\.){1,}\\d+$");
             Uri uri = null;
             if (oidRegex.IsMatch(codeSystem))
-                refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Oid == codeSystem) && o.SourceEntityKey == conceptId, 0, 1, AuthenticationContext.Current.Principal, out tr).FirstOrDefault();
+                refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Oid == codeSystem) && o.SourceEntityKey == conceptId, 0, 1, out tr).FirstOrDefault();
             else if (Uri.TryCreate(codeSystem, UriKind.Absolute, out uri))
-                refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Url == codeSystem) && o.SourceEntityKey == conceptId, 0, 1, AuthenticationContext.Current.Principal, out tr).FirstOrDefault();
+                refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Url == codeSystem) && o.SourceEntityKey == conceptId, 0, 1, out tr).FirstOrDefault();
             else
-                refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Authority == codeSystem) && o.SourceEntityKey == conceptId, 0, 1, AuthenticationContext.Current.Principal, out tr).FirstOrDefault();
+                refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Authority == codeSystem) && o.SourceEntityKey == conceptId, 0, 1, out tr).FirstOrDefault();
             return refTermEnt.LoadProperty<ReferenceTerm>("ReferenceTerm");
+        }
+
+        /// <summary>
+        /// Get set members for the specified concept set
+        /// </summary>
+        public IEnumerable<Concept> GetConceptSetMembers(string mnemonic)
+        {
+            return this.Find(o => o.ConceptSets.Any(c => c.Mnemonic == mnemonic));
         }
 
         /// <summary>
@@ -149,14 +152,14 @@ namespace SanteDB.Core.Services.Impl
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
 		public bool IsMember(ConceptSet set, Concept concept)
 		{
-			var persistence = ApplicationContext.Current.GetService<IDataPersistenceService<ConceptSet>>();
+			var persistence = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ConceptSet>>();
 
 			if (persistence == null)
 			{
 				throw new InvalidOperationException($"{nameof(IDataPersistenceService<ConceptSet>)} not found");
 			}
 
-			return persistence.Count(o => o.Key == set.Key &&  o.ConceptsXml.Any(c => c == concept.Key), AuthenticationContext.Current.Principal) > 0;
+			return persistence.Count(o => o.Key == set.Key &&  o.ConceptsXml.Any(c => c == concept.Key)) > 0;
 		}
 
         /// <summary>
@@ -169,14 +172,14 @@ namespace SanteDB.Core.Services.Impl
 		[PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         public bool IsMember(Guid set, Guid concept)
         {
-            var persistence = ApplicationContext.Current.GetService<IDataPersistenceService<ConceptSet>>();
+            var persistence = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ConceptSet>>();
 
             if (persistence == null)
             {
                 throw new InvalidOperationException($"{nameof(IDataPersistenceService<ConceptSet>)} not found");
             }
 
-            return persistence.Count(o => o.Key == set &&  o.ConceptsXml.Any(c => c == concept), AuthenticationContext.Current.Principal) > 0;
+            return persistence.Count(o => o.Key == set &&  o.ConceptsXml.Any(c => c == concept)) > 0;
         }
 
 

@@ -18,17 +18,14 @@
  * Date: 2018-10-24
  */
 using MohawkCollege.Util.Console.Parameters;
-using SanteDB.Tools.AdminConsole.Attributes;
 using SanteDB.Core.Security;
+using SanteDB.Tools.AdminConsole.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Tools.AdminConsole.Shell
 {

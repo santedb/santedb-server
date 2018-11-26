@@ -26,10 +26,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
 {
-	/// <summary>
-	/// Represents an entity in the database
-	/// </summary>
-	[Table("ent_tbl")]
+    /// <summary>
+    /// Represents an entity in the database
+    /// </summary>
+    [Table("ent_tbl")]
 	public class DbEntity : DbIdentified
 	{
         /// <summary>

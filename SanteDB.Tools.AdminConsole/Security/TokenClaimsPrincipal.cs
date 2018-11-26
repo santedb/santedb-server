@@ -17,22 +17,22 @@
  * User: justin
  * Date: 2018-10-24
  */
-using System;
-using System.Security.Cryptography.X509Certificates;
-using System.Security;
-using System.Collections.Generic;
-using System.Text;
-using System.Security.Claims;
 using Newtonsoft.Json.Linq;
-using System.Security.Principal;
+using SanteDB.Core.Security;
+using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
+using System.Text;
 
 namespace SanteDB.Tools.AdminConsole.Security
 {
-	/// <summary>
-	/// Token claims principal.
-	/// </summary>
-	public class TokenClaimsPrincipal : ClaimsPrincipal
+    /// <summary>
+    /// Token claims principal.
+    /// </summary>
+    public class TokenClaimsPrincipal : ClaimsPrincipal
 	{
 
         // Claim map

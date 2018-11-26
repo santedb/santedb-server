@@ -17,27 +17,22 @@
  * User: justin
  * Date: 2018-9-25
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Core.Services.Policy;
-using NHapi.Base.Model;
-using NHapi.Base.Parser;
-using NHapi.Model.V25.Segment;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
-using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NHapi.Model.V25.Datatype;
+using NHapi.Base.Model;
+using NHapi.Model.V25.Segment;
+using SanteDB.Core;
 using SanteDB.Core.Services;
+using SanteDB.Messaging.HL7.Configuration;
 
 namespace SanteDB.Messaging.HL7.Segments
 {
@@ -52,6 +47,8 @@ namespace SanteDB.Messaging.HL7.Segments
         private const string MaritalStatusCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.2";
         private const string ReligionCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.6";
         private const string EthnicGroupCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.189";
+
+        private Hl7ConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
 
 
         /// <summary>
@@ -73,7 +70,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 throw new InvalidOperationException($"Cannot convert {data.GetType().Name} to PID");
 
             // Map patient to PID
-            retVal.GetPatientIdentifierList(retVal.PatientIdentifierListRepetitionsUsed).FromModel(new EntityIdentifier(ApplicationContext.Current.Configuration.Custodianship.Id.Id, patient.Key.ToString()));
+            retVal.GetPatientIdentifierList(retVal.PatientIdentifierListRepetitionsUsed).FromModel(new EntityIdentifier(this.m_configuration.LocalAuthority, patient.Key.ToString()));
 
             // Map alternate identifiers
             foreach (var id in patient.LoadCollection<EntityIdentifier>("Identifiers"))
@@ -132,7 +129,7 @@ namespace SanteDB.Messaging.HL7.Segments
         /// <returns>The parsed patient information</returns>
         public IEnumerable<IdentifiedData> Parse(ISegment segment, IEnumerable<IdentifiedData> context)
         {
-            var patientService = ApplicationContext.Current.GetService<IDataPersistenceService<Patient>>();
+            var patientService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>();
 
             var pidSegment = segment as PID;
 
@@ -149,8 +146,8 @@ namespace SanteDB.Messaging.HL7.Segments
                 Guid idguid = Guid.Empty;
                 Patient found = null;
                 if (authority == null &&
-                    id.AssigningAuthority.NamespaceID.Value == ApplicationContext.Current.Configuration.Custodianship.Id.Id)
-                    found = patientService.Get(new Identifier<Guid>(Guid.Parse(id.IDNumber.Value)), AuthenticationContext.SystemPrincipal, true);
+                    id.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority?.DomainName)
+                    found = patientService.Get(Guid.Parse(id.IDNumber.Value), null, true);
                 else if(authority?.IsUnique == true)
                     found = patientService.Query(o => o.Identifiers.Any(i => i.Value == idnumber &&
                         i.AuthorityKey == authority.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
@@ -173,12 +170,12 @@ namespace SanteDB.Messaging.HL7.Segments
             if (pidSegment.MotherSMaidenNameRepetitionsUsed > 0 || pidSegment.MotherSIdentifierRepetitionsUsed > 0)
             {
                 // Attempt to find the mother
-                var personPersistence = ApplicationContext.Current.GetService<IDataPersistenceService<Person>>();
+                var personPersistence = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Person>>();
                 foreach(var id in pidSegment.GetMotherSIdentifier())
                 {
                     var authortiy = id.AssigningAuthority.ToModel(false);
                     if (authortiy?.IsUnique == true)
-                        motherEntity = personPersistence.Query(o => o.Identifiers.Any(i => i.Value == id.IDNumber.Value && i.AuthorityKey == authortiy.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                        motherEntity = personPersistence.Query(o => o.Identifiers.Any(i => i.Value == id.IDNumber.Value && i.AuthorityKey == authortiy.Key)).FirstOrDefault();
                 }
 
                 // Mother doesn't exist, so add it
@@ -244,7 +241,7 @@ namespace SanteDB.Messaging.HL7.Segments
             if(!pidSegment.PatientAccountNumber.IsEmpty())
             {
 
-                var account = ApplicationContext.Current.GetService<IDataPersistenceService<Account>>()?.Query(o => o.Identifiers.Any(i => i.Value == pidSegment.PatientAccountNumber.IDNumber.Value), AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                var account = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Account>>()?.Query(o => o.Identifiers.Any(i => i.Value == pidSegment.PatientAccountNumber.IDNumber.Value), AuthenticationContext.SystemPrincipal).FirstOrDefault();
                 if(account != null)
                     retVal.Participations.Add(new ActParticipation(ActParticipationKey.Holder, retVal) { SourceEntityKey = account.Key });
             }
@@ -252,7 +249,7 @@ namespace SanteDB.Messaging.HL7.Segments
             // Birth place is present
             if(!pidSegment.BirthPlace.IsEmpty()) // We need to find the birthplace relationship
             {
-                var places = ApplicationContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Names.Any(n => n.Component.Any(c => c.Value == pidSegment.BirthPlace.Value)), AuthenticationContext.SystemPrincipal);
+                var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Names.Any(n => n.Component.Any(c => c.Value == pidSegment.BirthPlace.Value)), AuthenticationContext.SystemPrincipal);
                 if (places.Count() == 1)
                     retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Birthplace, places.First().Key));
             }
@@ -268,7 +265,7 @@ namespace SanteDB.Messaging.HL7.Segments
             {
                 foreach (var cit in pidSegment.GetCitizenship())
                 {
-                    var places = ApplicationContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Identifiers.Any(i => i.Value == cit.Identifier.Value && i.AuthorityKey == AssigningAuthorityKeys.Iso3166CountryCode), AuthenticationContext.SystemPrincipal);
+                    var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Identifiers.Any(i => i.Value == cit.Identifier.Value && i.AuthorityKey == AssigningAuthorityKeys.Iso3166CountryCode), AuthenticationContext.SystemPrincipal);
                     if (places.Count() == 1)
                         retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Citizen, places.First().Key));
                 }
@@ -288,7 +285,7 @@ namespace SanteDB.Messaging.HL7.Segments
             //if(!pidSegment.LastUpdateFacility.IsEmpty())
             //{
             //    // Find by user ID
-            //    var user = ApplicationContext.Current.GetService<IDataPersistenceService<SecurityUser>>().Query(u=>u.UserName == pidSegment.LastUpdateFacility.NamespaceID.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault();
+            //    var user = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityUser>>().Query(u=>u.UserName == pidSegment.LastUpdateFacility.NamespaceID.Value).FirstOrDefault();
             //    if (user != null)
             //        retVal.CreatedBy = user;
             //}

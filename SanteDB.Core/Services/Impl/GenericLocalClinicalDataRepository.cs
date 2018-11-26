@@ -1,5 +1,4 @@
 ﻿using SanteDB.Core.Model;
-using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
 

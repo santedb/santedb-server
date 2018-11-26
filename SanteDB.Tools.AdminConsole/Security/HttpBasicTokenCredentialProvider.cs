@@ -17,17 +17,11 @@
  * User: justin
  * Date: 2018-10-24
  */
-using MARC.HI.EHRS.SVC.Core;
 using SanteDB.Core.Http;
 using SanteDB.Core.Security;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security;
 using System.Security.Claims;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Tools.AdminConsole.Security
 {
@@ -53,7 +47,7 @@ namespace SanteDB.Tools.AdminConsole.Security
         /// <param name="context">Context.</param>
         public Credentials Authenticate(IRestClient context)
         {
-            if (SanteDB.Tools.AdminConsole.Shell.ApplicationContext.Current.Authenticate(new HttpBasicIdentityProvider(), context))
+            if (SanteDB.Tools.AdminConsole.Shell.ApplicationServiceContext.Current.Authenticate(new HttpBasicIdentityProvider(), context))
                 return this.GetCredentials(AuthenticationContext.Current.Principal);
             return null;
         }

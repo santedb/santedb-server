@@ -22,8 +22,7 @@ using RestSrvr.Message;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace SanteDB.Core.Rest.Serialization
 {
@@ -49,8 +48,14 @@ namespace SanteDB.Core.Rest.Serialization
     /// <summary>
     /// Represents a setting for one resource
     /// </summary>
+    [XmlType(nameof(CorsResourceSetting), Namespace = "http://santedb.org/configuration/cors")]
     public class CorsResourceSetting
     {
+
+        public CorsResourceSetting()
+        {
+
+        }
 
         /// <summary>
         /// Creates a new resource setting
@@ -68,21 +73,25 @@ namespace SanteDB.Core.Rest.Serialization
         /// <summary>
         /// Gets the name
         /// </summary>
+        [XmlAttribute("resource")]
         public string Name { get; private set; }
 
         /// <summary>
         /// Gets the domain
         /// </summary>
+        [XmlAttribute("domain")]
         public String Domain { get; private set; }
 
         /// <summary>
         /// Gets the verbs allowed
         /// </summary>
+        [XmlArray("verbs"), XmlArrayItem("add")]
         public List<String> Verbs { get; private set; }
 
         /// <summary>
         /// Gets the headers allowed
         /// </summary>
+        [XmlArray("headers"), XmlArrayItem("add")]
         public List<String> Headers { get; private set; }
     }
 

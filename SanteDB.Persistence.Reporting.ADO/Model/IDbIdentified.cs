@@ -21,11 +21,11 @@ using System;
 
 namespace SanteDB.Persistence.Reporting.PSQL.Model
 {
-	/// <summary>
-	/// Represents identified data.
-	/// </summary>
+    /// <summary>
+    /// Represents identified data.
+    /// </summary>
 
-	public interface IDbIdentified
+    public interface IDbIdentified
 	{
 		/// <summary>
 		/// Gets or sets the key.

@@ -32,8 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0.1" />
-    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.3" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -46,8 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\StringValueAttribute.cs" />
-    <Compile Include="Configuration\JasperConfiguration.cs" />
-    <Compile Include="Configuration\JasperConfigurationSectionHandler.cs" />
+    <Compile Include="Configuration\JasperConfigurationSection.cs" />
     <Compile Include="Extensions\StringValueExtensions.cs" />
     <Compile Include="JasperReportExecutor.cs" />
     <Compile Include="Model\Collection\Item.cs" />

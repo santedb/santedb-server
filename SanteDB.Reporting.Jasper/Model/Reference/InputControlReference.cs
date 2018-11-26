@@ -21,11 +21,11 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.Reference
 {
-	/// <summary>
-	/// Represents an input control reference.
-	/// </summary>
-	/// <seealso cref="SanteDB.Reporting.Jasper.Model.Reference.ReferenceBase" />
-	[XmlType("inputControlReference")]
+    /// <summary>
+    /// Represents an input control reference.
+    /// </summary>
+    /// <seealso cref="SanteDB.Reporting.Jasper.Model.Reference.ReferenceBase" />
+    [XmlType("inputControlReference")]
 	public class InputControlReference : ReferenceBase
 	{
 		/// <summary>

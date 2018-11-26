@@ -21,10 +21,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.Error
 {
-	/// <summary>
-	/// Class ErrorParameter.
-	/// </summary>
-	public class ErrorParameter
+    /// <summary>
+    /// Class ErrorParameter.
+    /// </summary>
+    public class ErrorParameter
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ErrorParameter"/> class.

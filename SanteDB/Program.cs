@@ -17,22 +17,17 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
 using MohawkCollege.Util.Console.Parameters;
+using SanteDB.Core;
+using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.EntityLoader;
+using SanteDB.Core.Services.Impl;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core;
-using SanteDB.Core.Services.Impl;
-using SanteDB.Core.Security;
 
 namespace SanteDB
 {
@@ -63,8 +58,7 @@ namespace SanteDB
 
             // Handle Unahndled exception
             AppDomain.CurrentDomain.UnhandledException += (o, e) => {
-                var emergencyString = MARC.HI.EHRS.SVC.Core.ApplicationContext.Current?.GetLocaleString("01189998819991197253");
-                Trace.TraceError(emergencyString ?? "FATAL ERROR", e.ExceptionObject);
+                Trace.TraceError("++++++ FATAL APPLICATION ERROR ++++++++", e.ExceptionObject);
                 Environment.Exit(999);
             };
 
@@ -93,9 +87,9 @@ namespace SanteDB
                     Console.WriteLine("SanteDB (SanteDB) {0} ({1})", entryAsm.GetName().Version, entryAsm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
                     Console.WriteLine("{0}", entryAsm.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright);
                     Console.WriteLine("Complete Copyright information available at http://SanteDB.codeplex.com/wikipage?title=Contributions");
-                    ApplicationServiceContext.Current = MARC.HI.EHRS.SVC.Core.ApplicationContext.Current;
+                    ApplicationServiceContext.Current = ApplicationServiceContext.Current;
                     ServiceUtil.Start(typeof(Program).GUID);
-                    MARC.HI.EHRS.SVC.Core.ApplicationContext.Current.AddServiceProvider(typeof(FileConfigurationService));
+                    (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(typeof(FileConfigurationService));
                     ApplicationServiceContext.HostType = SanteDBHostType.Server;
                     if (!parameters.StartupTest)
                     {

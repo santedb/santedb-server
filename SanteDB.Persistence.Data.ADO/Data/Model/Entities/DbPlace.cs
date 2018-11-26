@@ -25,10 +25,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
 {
-	/// <summary>
-	/// Represents a place in the local database
-	/// </summary>
-	[Table("plc_tbl")]
+    /// <summary>
+    /// Represents a place in the local database
+    /// </summary>
+    [Table("plc_tbl")]
 	public class DbPlace : DbEntitySubTable
     {
 

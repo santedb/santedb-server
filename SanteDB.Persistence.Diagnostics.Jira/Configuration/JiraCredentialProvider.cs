@@ -17,18 +17,16 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
-using System.Security.Principal;
+using SanteDB.Core;
 using SanteDB.Core.Http;
-using System.Configuration;
-using System.Collections.Generic;
+using SanteDB.Core.Services;
 using SanteDB.Persistence.Diagnostics.Jira.Model;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
+using System;
+using System.Collections.Generic;
 
 namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
 {
-   
+
     /// <summary>
     /// Represents a JIRA session credential
     /// </summary>
@@ -36,7 +34,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
     {
 
         // JIRA service configuration
-        private JiraServiceConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("SanteDB.persistence.diagnostics.jira") as JiraServiceConfiguration;
+        private JiraServiceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<JiraServiceConfigurationSection>();
 
         // Authentication
         private JiraAuthenticationResponse m_authentication;

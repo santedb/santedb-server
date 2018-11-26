@@ -17,13 +17,10 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Auditing.Data;
-using MARC.HI.EHRS.SVC.Auditing.Services;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Exceptions;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
 using RestSrvr;
+using SanteDB.Core.Auditing;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
@@ -33,6 +30,7 @@ using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security.Claims;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -40,13 +38,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Security;
-using System.Security.Claims;
 using System.Security.Principal;
-using System.ServiceModel;
-using System.ServiceModel.Channels;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace SanteDB.Core.Security.Audit
@@ -54,7 +47,7 @@ namespace SanteDB.Core.Security.Audit
     /// <summary>
     /// Event type codes
     /// </summary>
-    #pragma warning disable CS1591
+#pragma warning disable CS1591
     public enum EventTypeCodes
     {
         [XmlEnum("SecurityAuditCode-ApplicationActivity")]
@@ -243,7 +236,7 @@ namespace SanteDB.Core.Security.Audit
                     IDTypeCode = idTypeCode,
                     CustomIdTypeCode = idTypeCode == AuditableObjectIdType.Custom ? new AuditCode(o.GetType().Name, o.GetType().Namespace) : null,
                     LifecycleType = lifecycle,
-                    ObjectId = (o as IIdentifiedEntity)?.Key?.ToString() ?? (o as AuditData)?.CorrelationToken.ToString() ?? (o.GetType().GetRuntimeProperty("Id")?.GetValue(o)?.ToString()),
+                    ObjectId = (o as IIdentifiedEntity)?.Key?.ToString() ?? (o as AuditData)?.Key.ToString() ?? (o.GetType().GetRuntimeProperty("Id")?.GetValue(o)?.ToString()),
                     Role = roleCode,
                     Type = objType
                 };
@@ -325,16 +318,16 @@ namespace SanteDB.Core.Security.Audit
         /// </summary>
         public static void SendAudit(AuditData audit)
         {
-            traceSource.TraceInfo("Dispatching Audit - {0}", audit.CorrelationToken);
+            traceSource.TraceInfo("Dispatching Audit - {0}", audit.Key);
             
             // If the current principal is SYSTEM then we don't need to send an audit
-            ApplicationContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(o =>
+            ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(o =>
             {
                 AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
                 // Translate codes to DICOM
                 if (audit.EventTypeCode != null)
                 {
-                    IConceptRepositoryService icpcr = ApplicationContext.Current.GetService<IConceptRepositoryService>();
+                    IConceptRepositoryService icpcr = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>();
                     var concept = icpcr.GetConcept(audit.EventTypeCode.Code);
                     if (concept != null)
                     {
@@ -348,8 +341,8 @@ namespace SanteDB.Core.Security.Audit
 
                 }
 
-                ApplicationContext.Current.GetService<IAuditorService>()?.SendAudit(audit);
-                ApplicationContext.Current.GetService<IAuditRepositoryService>()?.Insert(audit); // insert into local AR 
+                ApplicationServiceContext.Current.GetService<IAuditDispatchService>()?.SendAudit(audit);
+                ApplicationServiceContext.Current.GetService<IAuditRepositoryService>()?.Insert(audit); // insert into local AR 
             });
 
         }
@@ -359,7 +352,7 @@ namespace SanteDB.Core.Security.Audit
         /// </summary>
         internal static void AddUserActor(AuditData audit)
         {
-            var configService = ApplicationContext.Current.GetService<ISecurityRepositoryService>();
+            var configService = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>();
 
             // For the user
             audit.Actors.Add(new AuditActorData()
@@ -425,7 +418,7 @@ namespace SanteDB.Core.Security.Audit
                 NetworkAccessPointId = Dns.GetHostName(),
                 UserName = principal?.Identity?.Name,
                 UserIsRequestor = true,
-                ActorRoleCode = principal == null || principal is ApplicationPrincipal ? new List<AuditCode>() : ApplicationContext.Current.GetService<IRoleProviderService>()?.GetAllRoles(principal.Identity.Name).Select(o =>
+                ActorRoleCode = principal == null || principal is ApplicationPrincipal ? new List<AuditCode>() : ApplicationServiceContext.Current.GetService<IRoleProviderService>()?.GetAllRoles(principal.Identity.Name).Select(o =>
                    new AuditCode(o, null)
                 ).ToList()
             });
@@ -480,7 +473,7 @@ namespace SanteDB.Core.Security.Audit
                 NetworkAccessPointId = Dns.GetHostName(),
                 UserName = principal?.Identity?.Name ?? identityName,
                 UserIsRequestor = true,
-                ActorRoleCode = principal == null || principal is ApplicationPrincipal  ? new List<AuditCode>() : ApplicationContext.Current.GetService<IRoleProviderService>()?.GetAllRoles(principal.Identity.Name).Select(o =>
+                ActorRoleCode = principal == null || principal is ApplicationPrincipal  ? new List<AuditCode>() : ApplicationServiceContext.Current.GetService<IRoleProviderService>()?.GetAllRoles(principal.Identity.Name).Select(o =>
                     new AuditCode(o, null)
                 ).ToList()
             });

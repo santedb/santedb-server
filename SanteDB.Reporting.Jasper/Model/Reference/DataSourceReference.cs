@@ -21,10 +21,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.Reference
 {
-	/// <summary>
-	/// Represents a data source reference.
-	/// </summary>
-	[XmlType("dataSourceReference")]
+    /// <summary>
+    /// Represents a data source reference.
+    /// </summary>
+    [XmlType("dataSourceReference")]
 	public class DataSourceReference : ReferenceBase
 	{
 		/// <summary>

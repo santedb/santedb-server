@@ -17,35 +17,31 @@
  * User: justin
  * Date: 2018-10-24
  */
+using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Http;
+using SanteDB.Core.Interop;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
+using SanteDB.Messaging.AMI.Client;
+using SanteDB.Tools.AdminConsole.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Http;
-using SanteDB.Core.Diagnostics;
-using SanteDB.Tools.AdminConsole.Security;
-using SanteDB.Messaging.AMI.Client;
-using SanteDB.Core.Interop;
 using System.Net;
-using SanteDB.Messaging.HDSI.Client;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
-using SanteDB.Core.Security;
 using System.Security.Claims;
 using System.Security.Principal;
-using SanteDB.Core.Security.Claims;
-using SanteDB.Core.Http;
+using System.Text;
 
 namespace SanteDB.Tools.AdminConsole.Shell
 {
     /// <summary>
     /// Represents a basic application context based on configuration
     /// </summary>
-    public class ApplicationContext : IServiceProvider
+    public class ApplicationServiceContext : IServiceProvider
     {
 
         // Tracer
-        private Tracer m_tracer = Tracer.GetTracer(typeof(ApplicationContext));
+        private Tracer m_tracer = Tracer.GetTracer(typeof(ApplicationServiceContext));
 
         /// <summary>
         /// The configuration
@@ -67,7 +63,7 @@ namespace SanteDB.Tools.AdminConsole.Shell
         /// </summary>
         public static void Initialize(Parameters.ConsoleParameters configuration)
         {
-            ApplicationContext.Current = new ApplicationContext(configuration);
+            ApplicationServiceContext.Current = new ApplicationServiceContext(configuration);
         }
 
         /// <summary>
@@ -81,7 +77,7 @@ namespace SanteDB.Tools.AdminConsole.Shell
         /// <summary>
         /// Creates a new application context
         /// </summary>
-        private ApplicationContext(Parameters.ConsoleParameters configuration)
+        private ApplicationServiceContext(Parameters.ConsoleParameters configuration)
         {
             this.ApplicationName = configuration.AppId ?? "org.openiz.oizac";
             this.ApplicationSecret = configuration.AppSecret ?? "oizac-default-secret";
@@ -91,7 +87,7 @@ namespace SanteDB.Tools.AdminConsole.Shell
         /// <summary>
         /// Gets the current application context
         /// </summary>
-        public static ApplicationContext Current
+        public static ApplicationServiceContext Current
         {
             get; private set;
         }
@@ -212,7 +208,7 @@ namespace SanteDB.Tools.AdminConsole.Shell
         /// <summary>
         /// Authenticate using the authentication provider
         /// </summary>
-        internal bool Authenticate(MARC.HI.EHRS.SVC.Core.Services.Security.IIdentityProviderService authenticationProvider, IRestClient context)
+        internal bool Authenticate(IIdentityProviderService authenticationProvider, IRestClient context)
         {
             bool retVal = false;
             while (!retVal)

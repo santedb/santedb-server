@@ -23,10 +23,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
 {
-	/// <summary>
-	/// Represents an entity in the database
-	/// </summary>
-	[Table("ent_vrsn_tbl")]
+    /// <summary>
+    /// Represents an entity in the database
+    /// </summary>
+    [Table("ent_vrsn_tbl")]
 	public class DbEntityVersion : DbVersionedData
     {
         /// <summary>

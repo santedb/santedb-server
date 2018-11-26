@@ -21,10 +21,10 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace SanteDB.Reporting.Core
 {
-	/// <summary>
-	/// Represents a service which supports certificate based authentication.
-	/// </summary>
-	public interface ISupportCertificateAuthentication : IAuthenticationHandler
+    /// <summary>
+    /// Represents a service which supports certificate based authentication.
+    /// </summary>
+    public interface ISupportCertificateAuthentication : IAuthenticationHandler
 	{
 		/// <summary>
 		/// Authenticates against a remote system using a certificate.

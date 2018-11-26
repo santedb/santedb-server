@@ -22,11 +22,11 @@ using System.Collections.Generic;
 
 namespace SanteDB.Reporting.Jasper
 {
-	/// <summary>
-	/// Represents a report definition equality comparer.
-	/// </summary>
-	/// <seealso cref="System.Collections.Generic.IEqualityComparer{SanteDB.Core.Model.RISI.ReportDefinition}" />
-	public class ReportDefinitionEqualityComparer : IEqualityComparer<ReportDefinition>
+    /// <summary>
+    /// Represents a report definition equality comparer.
+    /// </summary>
+    /// <seealso cref="System.Collections.Generic.IEqualityComparer{SanteDB.Core.Model.RISI.ReportDefinition}" />
+    public class ReportDefinitionEqualityComparer : IEqualityComparer<ReportDefinition>
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ReportDefinitionEqualityComparer"/> class.

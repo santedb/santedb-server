@@ -27,10 +27,10 @@ using System.Security.Principal;
 
 namespace SanteDB.Persistence.Reporting.PSQL.Services
 {
-	/// <summary>
-	/// Represents a report persistence service.
-	/// </summary>
-	public class ReportParameterPersistenceService : CorePersistenceService<ReportParameter, PSQL.Model.ReportParameter, PSQL.Model.ReportParameter>
+    /// <summary>
+    /// Represents a report persistence service.
+    /// </summary>
+    public class ReportParameterPersistenceService : CorePersistenceService<ReportParameter, PSQL.Model.ReportParameter, PSQL.Model.ReportParameter>
 	{
 		/// <summary>
 		/// Converts a model instance to a domain instance.
@@ -39,7 +39,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="context">The context.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the converted model instance.</returns>
-		public override object FromModelInstance(ReportParameter modelInstance, DataContext context, IPrincipal principal)
+		public override object FromModelInstance(ReportParameter modelInstance, DataContext context)
 		{
 			if (modelInstance == null)
 			{
@@ -49,7 +49,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 
 			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(PSQL.Model.ReportParameter) } to { nameof(ReportParameter) }");
 
-			var domainInstance = base.FromModelInstance(modelInstance, context, principal) as Model.ReportParameter;
+			var domainInstance = base.FromModelInstance(modelInstance, context) as Model.ReportParameter;
 
 			if (modelInstance.ReportDefinitionKey != Guid.Empty)
 			{
@@ -72,10 +72,10 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="correlationId">The correlation identifier.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns a report parameter for a given correlation id.</returns>
-		public ReportParameter Get(DataContext context, string correlationId, IPrincipal principal)
+		public ReportParameter Get(DataContext context, string correlationId)
 		{
 			int totalResults;
-			return this.Query(context, r => r.CorrelationId == correlationId, 0, 1, out totalResults, false, principal).FirstOrDefault();
+			return this.Query(context, r => r.CorrelationId == correlationId, 0, 1, out totalResults, false).FirstOrDefault();
 		}
 
 		/// <summary>
@@ -85,7 +85,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="context">The context.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the converted model instance.</returns>
-		public override ReportParameter ToModelInstance(object domainInstance, DataContext context, IPrincipal principal)
+		public override ReportParameter ToModelInstance(object domainInstance, DataContext context)
 		{
 			if (domainInstance == null)
 			{
@@ -100,7 +100,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 
 			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(ReportParameter) } to { nameof(PSQL.Model.ReportParameter) }");
 
-			var modelInstance = base.ToModelInstance(domainInstance, context, principal);
+			var modelInstance = base.ToModelInstance(domainInstance, context);
 
 			modelInstance.ParameterType = new ParameterType(((Model.ReportParameter)domainInstance).ParameterTypeId);
 

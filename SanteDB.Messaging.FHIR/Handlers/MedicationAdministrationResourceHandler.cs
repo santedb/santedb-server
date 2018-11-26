@@ -17,26 +17,23 @@
  * User: justin
  * Date: 2018-6-22
  */
-using SanteDB.Messaging.FHIR.Resources;
+using MARC.Everest.Connectors;
+using RestSrvr;
+using SanteDB.Core;
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Security;
+using SanteDB.Core.Services;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using RestSrvr;
 using System.Linq.Expressions;
-using MARC.Everest.Connectors;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Services;
-using SanteDB.Messaging.FHIR.Util;
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.DataTypes;
-using SanteDB.Core.Model.Entities;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Core.Security;
-using SanteDB.Messaging.FHIR.Backbone;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -80,9 +77,9 @@ namespace SanteDB.Messaging.FHIR.Handlers
                 retVal.Subject = DataTypeConverter.CreateReference<Patient>(rct.LoadProperty<Entity>("PlayerEntity"), RestOperationContext);
 
             // Encounter
-            var erService = ApplicationContext.Current.GetService<IDataPersistenceService<EntityRelationship>>();
+            var erService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityRelationship>>();
             int tr = 0;
-            var enc = erService.Query(o => o.TargetEntityKey == model.Key && o.RelationshipTypeKey == ActRelationshipTypeKeys.HasComponent, 0, 1, AuthenticationContext.Current.Principal, out tr).FirstOrDefault();
+            var enc = erService.Query(o => o.TargetEntityKey == model.Key && o.RelationshipTypeKey == ActRelationshipTypeKeys.HasComponent, 0, 1,  out tr).FirstOrDefault();
             if (enc != null)
             {
                 // TODO: Encounter

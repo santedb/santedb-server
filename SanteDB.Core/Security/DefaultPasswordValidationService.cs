@@ -17,14 +17,9 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core.Configuration;
+using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Security
 {
@@ -36,7 +31,7 @@ namespace SanteDB.Core.Security
         /// <summary>
         /// Local password validation service
         /// </summary>
-        public DefaultPasswordValidationService() : base((ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(SanteDBConstants.SanteDBConfigurationName) as Configuration.SanteDBConfiguration).Security.PasswordRegex ?? RegexPasswordValidator.DefaultPasswordPattern)
+        public DefaultPasswordValidationService() : base(ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>().PasswordRegex ?? RegexPasswordValidator.DefaultPasswordPattern)
         {
             
         }

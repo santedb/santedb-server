@@ -31,8 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Configuration" Version="2.0.0.1" />
-    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -45,11 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\ConfigurationSectionHandler.cs" />
     <Compile Include="Configuration\JiraCredentialProvider.cs" />
     <Compile Include="Configuration\JiraRestClientBindingDescription.cs" />
     <Compile Include="Configuration\JiraSecurityDescription.cs" />
-    <Compile Include="Configuration\JiraServiceConfiguration.cs" />
+    <Compile Include="Configuration\JiraServiceConfigurationSection.cs" />
     <Compile Include="DiagnosticReportPersistenceService.cs" />
     <Compile Include="JiraServiceClient.cs" />
     <Compile Include="Model\JiraAuthenticationRequest.cs" />

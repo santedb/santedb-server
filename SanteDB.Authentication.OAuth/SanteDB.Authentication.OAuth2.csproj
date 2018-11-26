@@ -31,7 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="4.0.4.403061554" />
   </ItemGroup>
@@ -50,8 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\ConfigurationSectionHandler.cs" />
-    <Compile Include="Configuration\OAuthConfiguration.cs" />
+    <Compile Include="Configuration\OAuthConfigurationSection.cs" />
     <Compile Include="Model\OAuthError.cs" />
     <Compile Include="Model\OAuthTokenRequest.cs" />
     <Compile Include="Model\OAuthTokenResponse.cs" />

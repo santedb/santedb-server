@@ -31,7 +31,7 @@ using System.Linq.Expressions;
 namespace SanteDB.Messaging.HDSI.Test
 {
 
-	[TestClass]
+    [TestClass]
 	public class QueryParameterLinqBuilderTest
 	{
 		/// <summary>

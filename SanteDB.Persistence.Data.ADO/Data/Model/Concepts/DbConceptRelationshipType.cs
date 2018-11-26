@@ -24,10 +24,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Concepts
 {
-	/// <summary>
-	/// Concept relationship type.
-	/// </summary>
-	[Table("cd_rel_typ_cdtbl")]
+    /// <summary>
+    /// Concept relationship type.
+    /// </summary>
+    [Table("cd_rel_typ_cdtbl")]
 	public class DbConceptRelationshipType: DbNonVersionedBaseData
 	{
 

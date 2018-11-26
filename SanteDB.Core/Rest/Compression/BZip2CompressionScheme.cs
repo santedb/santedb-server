@@ -18,12 +18,7 @@
  * Date: 2018-11-23
  */
 using SharpCompress.Compressors.BZip2;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Rest.Compression
 {

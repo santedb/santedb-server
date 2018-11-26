@@ -17,12 +17,11 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Event;
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Map;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Reporting.PSQL.Configuration;
 using System;
@@ -37,11 +36,11 @@ using System.Security.Principal;
 
 namespace SanteDB.Persistence.Reporting.PSQL.Services
 {
-	/// <summary>
-	/// Represents a base class for report persistence.
-	/// </summary>
-	/// <typeparam name="TModel">The type of the model.</typeparam>
-	public abstract class ReportPersistenceServiceBase<TModel> : IDataPersistenceService<TModel> where TModel : IdentifiedData
+    /// <summary>
+    /// Represents a base class for report persistence.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model.</typeparam>
+    public abstract class ReportPersistenceServiceBase<TModel> : IDataPersistenceService<TModel> where TModel : IdentifiedData
 	{
 		/// <summary>
 		/// The internal reference to the <see cref="TraceSource"/> instance.
@@ -51,52 +50,52 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <summary>
 		/// Fired after a data type is inserted.
 		/// </summary>
-		public event EventHandler<PostPersistenceEventArgs<TModel>> Inserted;
+		public event EventHandler<DataPersistedEventArgs<TModel>> Inserted;
 
 		/// <summary>
 		/// Fired while a data type is being inserted.
 		/// </summary>
-		public event EventHandler<PrePersistenceEventArgs<TModel>> Inserting;
+		public event EventHandler<DataPersistingEventArgs<TModel>> Inserting;
 
 		/// <summary>
 		/// Fired after a data type is obsoleted.
 		/// </summary>
-		public event EventHandler<PostPersistenceEventArgs<TModel>> Obsoleted;
+		public event EventHandler<DataPersistedEventArgs<TModel>> Obsoleted;
 
 		/// <summary>
 		/// Fired while a data type is being obsoleted.
 		/// </summary>
-		public event EventHandler<PrePersistenceEventArgs<TModel>> Obsoleting;
+		public event EventHandler<DataPersistingEventArgs<TModel>> Obsoleting;
 
 		/// <summary>
 		/// Fired after a data type is queried.
 		/// </summary>
-		public event EventHandler<PostQueryEventArgs<TModel>> Queried;
+		public event EventHandler<QueryResultEventArgs<TModel>> Queried;
 
 		/// <summary>
 		/// Fired while a data type is being queried.
 		/// </summary>
-		public event EventHandler<PreQueryEventArgs<TModel>> Querying;
+		public event EventHandler<QueryRequestEventArgs<TModel>> Querying;
 
 		/// <summary>
 		/// Fired after a data type is been retrieved.
 		/// </summary>
-		public event EventHandler<PostRetrievalEventArgs<TModel>> Retrieved;
+		public event EventHandler<DataRetrievedEventArgs<TModel>> Retrieved;
 
 		/// <summary>
 		/// Fired while a data type is being retrieved.
 		/// </summary>
-		public event EventHandler<PreRetrievalEventArgs<TModel>> Retrieving;
+		public event EventHandler<DataRetrievingEventArgs<TModel>> Retrieving;
 
 		/// <summary>
 		/// Fired after a data type is updated.
 		/// </summary>
-		public event EventHandler<PostPersistenceEventArgs<TModel>> Updated;
+		public event EventHandler<DataPersistedEventArgs<TModel>> Updated;
 
 		/// <summary>
 		/// Fired while a data type is being updated.
 		/// </summary>
-		public event EventHandler<PrePersistenceEventArgs<TModel>> Updating;
+		public event EventHandler<DataPersistingEventArgs<TModel>> Updating;
 
 		/// <summary>
 		/// Gets the configuration.
@@ -116,10 +115,10 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="authContext">The authentication context.</param>
 		/// <returns>System.Int32.</returns>
 		/// <exception cref="System.NotImplementedException"></exception>
-		public int Count(Expression<Func<TModel, bool>> query, IPrincipal authContext)
+		public long Count(Expression<Func<TModel, bool>> query, IPrincipal overrideAuthContext = null)
 		{
 			int totalResults;
-			this.QueryInternal(query, 0, null, authContext, out totalResults, true);
+			this.QueryInternal(query, 0, 0, out totalResults, true, overrideAuthContext);
 			return totalResults;
 		}
 
@@ -130,7 +129,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="context">The context.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the converted model instance.</returns>
-		public abstract object FromModelInstance(TModel modelInstance, DataContext context, IPrincipal principal);
+		public abstract object FromModelInstance(TModel modelInstance, DataContext context);
 
 		/// <summary>
 		/// Gets the specified container identifier.
@@ -140,17 +139,15 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="principal">The principal.</param>
 		/// <param name="loadFast">if set to <c>true</c> [load fast].</param>
 		/// <returns>Returns the model instance.</returns>
-		public TModel Get<TIdentifier>(Identifier<TIdentifier> containerId, IPrincipal principal, bool loadFast)
+		public TModel Get(Guid containerId, Guid? containerVersion, bool loadFast = false, IPrincipal overrideAuthContext = null)
 		{
-			var identifier = containerId as Identifier<Guid>;
-
-			var preRetrievalArgs = new PreRetrievalEventArgs<TModel>(containerId, principal);
+			var preRetrievalArgs = new DataRetrievingEventArgs<TModel>(containerId, null, overrideAuthContext);
 
 			this.Retrieving?.Invoke(this, preRetrievalArgs);
 
 			if (preRetrievalArgs.Cancel)
 			{
-				this.traceSource.TraceEvent(TraceEventType.Warning, 0, $"Pre-event handler indicates abort retrieve: {containerId.Id}");
+				this.traceSource.TraceEvent(TraceEventType.Warning, 0, $"Pre-event handler indicates abort retrieve: {containerId}");
 				return null;
 			}
 
@@ -159,11 +156,11 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 				try
 				{
 					connection.Open();
-					this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"GET: {containerId.Id}");
+					this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"GET: {containerId}");
 
-					var result = this.Get(connection, identifier.Id, principal, loadFast);
+					var result = this.Get(connection, containerId, loadFast);
 
-					var postRetrievalEventArgs = new PostRetrievalEventArgs<TModel>(result, principal);
+					var postRetrievalEventArgs = new DataRetrievedEventArgs<TModel>(result, overrideAuthContext);
 
 					this.Retrieved?.Invoke(this, postRetrievalEventArgs);
 
@@ -185,10 +182,10 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="principal">The principal.</param>
 		/// <param name="loadFast">if set to <c>true</c> [load fast].</param>
 		/// <returns>Returns the model instance.</returns>
-		public virtual TModel Get(DataContext context, Guid key, IPrincipal principal, bool loadFast)
+		public virtual TModel Get(DataContext context, Guid key, bool loadFast = false, IPrincipal overrideAuthContext = null)
 		{
 			int totalResults;
-			return this.QueryInternal(o => o.Key == key, 0, 1, principal, out totalResults, loadFast)?.FirstOrDefault();
+			return this.QueryInternal(o => o.Key == key, 0, 1, out totalResults, loadFast, overrideAuthContext)?.FirstOrDefault();
 		}
 
 		/// <summary>
@@ -198,14 +195,14 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="principal">The principal.</param>
 		/// <param name="mode">The mode.</param>
 		/// <returns>Returns the inserted model instance.</returns>
-		public TModel Insert(TModel storageData, IPrincipal principal, TransactionMode mode)
+		public TModel Insert(TModel storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
 		{
 			if (storageData == null)
 			{
 				throw new ArgumentNullException(nameof(storageData), "Value cannot be null");
 			}
 
-			var preInsertArgs = new PrePersistenceEventArgs<TModel>(storageData, principal);
+			var preInsertArgs = new DataPersistingEventArgs<TModel>(storageData, overrideAuthContext);
 
 			this.Inserting?.Invoke(this, preInsertArgs);
 
@@ -223,22 +220,16 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 				{
 					try
 					{
-						var existing = this.Get(connection, storageData.Key.Value, principal, false);
+						var existing = this.Get(connection, storageData.Key.Value, false, overrideAuthContext);
 
 						if (existing != null)
 						{
-							if (Configuration.AutoUpdateExisting)
-							{
-								this.traceSource.TraceEvent(TraceEventType.Warning, 0, "INSERT WOULD RESULT IN DUPLICATE CLASSIFIER: UPDATING INSTEAD {0}", storageData);
-								storageData = this.Update(connection, storageData, principal);
-							}
-							else
-								throw new DuplicateNameException(storageData.Key?.ToString());
+							throw new DuplicateNameException(storageData.Key?.ToString());
 						}
 						else
 						{
 							this.traceSource.TraceEvent(TraceEventType.Verbose, 0, "INSERT {0}", storageData);
-							storageData = this.Insert(connection, storageData, principal);
+							storageData = this.Insert(connection, storageData);
 						}
 
 						if (mode == TransactionMode.Commit)
@@ -250,10 +241,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 							transaction.Rollback();
 						}
 
-						this.Inserted?.Invoke(this, new PostPersistenceEventArgs<TModel>(storageData, principal)
-						{
-							Mode = mode
-						});
+						this.Inserted?.Invoke(this, new DataPersistedEventArgs<TModel>(storageData, overrideAuthContext));
 
 						return storageData;
 					}
@@ -274,9 +262,9 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="data">The data.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the inserted model instance.</returns>
-		public TModel Insert(DataContext context, TModel data, IPrincipal principal)
+		public TModel Insert(DataContext context, TModel data)
 		{
-			return this.InsertInternal(context, data, principal);
+			return this.InsertInternal(context, data);
 		}
 
 		/// <summary>
@@ -286,7 +274,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="model">The model.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the inserted model.</returns>
-		public abstract TModel InsertInternal(DataContext context, TModel model, IPrincipal principal);
+		public abstract TModel InsertInternal(DataContext context, TModel model);
 
 		/// <summary>
 		/// Obsoletes the specified data.
@@ -295,9 +283,9 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="model">The model.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the obsoleted data.</returns>
-		public TModel Obsolete(DataContext context, TModel model, IPrincipal principal)
+		public TModel Obsolete(DataContext context, TModel model)
 		{
-			return this.ObsoleteInternal(context, model, principal);
+			return this.ObsoleteInternal(context, model);
 		}
 
 		/// <summary>
@@ -307,7 +295,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="principal">The principal.</param>
 		/// <param name="mode">The mode.</param>
 		/// <returns>TModel.</returns>
-		public TModel Obsolete(TModel storageData, IPrincipal principal, TransactionMode mode)
+		public TModel Obsolete(TModel storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
 		{
 			if (storageData == null)
 			{
@@ -319,7 +307,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 				throw new InvalidOperationException("Data missing key");
 			}
 
-			var prePersistenceEventArgs = new PrePersistenceEventArgs<TModel>(storageData);
+			var prePersistenceEventArgs = new DataPersistingEventArgs<TModel>(storageData, overrideAuthContext);
 
 			this.Obsoleting?.Invoke(this, prePersistenceEventArgs);
 
@@ -339,7 +327,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 					{
 						this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"OBSOLETE {storageData}");
 
-						storageData = this.Obsolete(connection, storageData, principal);
+						storageData = this.Obsolete(connection, storageData);
 
 						if (mode == TransactionMode.Commit)
 						{
@@ -350,10 +338,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 							transaction.Rollback();
 						}
 
-						var args = new PostPersistenceEventArgs<TModel>(storageData, principal)
-						{
-							Mode = mode
-						};
+						var args = new DataPersistedEventArgs<TModel>(storageData, overrideAuthContext);
 
 						this.Obsoleted?.Invoke(this, args);
 
@@ -376,7 +361,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="model">The model.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the obsoleted data.</returns>
-		public abstract TModel ObsoleteInternal(DataContext context, TModel model, IPrincipal principal);
+		public abstract TModel ObsoleteInternal(DataContext context, TModel model);
 
 		/// <summary>
 		/// Queries the specified query.
@@ -385,10 +370,10 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="authContext">The authentication context.</param>
 		/// <returns>IEnumerable&lt;TModel&gt;.</returns>
 		/// <exception cref="System.NotImplementedException"></exception>
-		public IEnumerable<TModel> Query(Expression<Func<TModel, bool>> query, IPrincipal authContext)
+		public IEnumerable<TModel> Query(Expression<Func<TModel, bool>> query, IPrincipal overrideAuthContext = null)
 		{
 			int totalResults;
-			return this.QueryInternal(query, 0, null, authContext, out totalResults, true);
+			return this.QueryInternal(query, 0, null, out totalResults, true, overrideAuthContext);
 		}
 
 		/// <summary>
@@ -400,9 +385,9 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="authContext">The authentication context.</param>
 		/// <param name="totalCount">The total count.</param>
 		/// <returns>Returns a list of model instance which match the given query expression.</returns>
-		public IEnumerable<TModel> Query(Expression<Func<TModel, bool>> query, int offset, int? count, IPrincipal authContext, out int totalCount)
+		public IEnumerable<TModel> Query(Expression<Func<TModel, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext = null)
 		{
-			return this.QueryInternal(query, offset, count, authContext, out totalCount, true);
+			return this.QueryInternal(query, offset, count, out totalCount, true, overrideAuthContext);
 		}
 
 		/// <summary>
@@ -416,9 +401,9 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="countResults">if set to <c>true</c> [count results].</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns a list of model instance which match the given query expression.</returns>
-		public IEnumerable<TModel> Query(DataContext context, Expression<Func<TModel, bool>> query, int offset, int count, out int totalResults, bool countResults, IPrincipal principal)
+		public IEnumerable<TModel> Query(DataContext context, Expression<Func<TModel, bool>> query, int offset, int count, out int totalResults, bool countResults)
 		{
-			return this.QueryInternal(context, query, offset, count, out totalResults, countResults, principal);
+			return this.QueryInternal(context, query, offset, count, out totalResults, countResults);
 		}
 
 		/// <summary>
@@ -432,7 +417,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="countResults">if set to <c>true</c> [count results].</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns a list of model instance which match the given query expression.</returns>
-		public abstract IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, int offset, int? count, out int totalResults, bool countResults, IPrincipal principal);
+		public abstract IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, int offset, int? count, out int totalResults, bool countResults);
 
 		/// <summary>
 		/// Queries for the specified model.
@@ -446,14 +431,14 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <returns>Returns a list of the specified model instance which match the given query expression.</returns>
 		/// <exception cref="System.ArgumentNullException">query</exception>
 		/// <exception cref="DataPersistenceException">Cannot perform LINQ query</exception>
-		public virtual IEnumerable<TModel> QueryInternal(Expression<Func<TModel, bool>> query, int offset, int? count, IPrincipal authContext, out int totalCount, bool fastQuery)
+		public virtual IEnumerable<TModel> QueryInternal(Expression<Func<TModel, bool>> query, int offset, int? count, out int totalCount, bool fastQuery, IPrincipal overrideAuthContext)
 		{
 			if (query == null)
 			{
 				throw new ArgumentNullException(nameof(query));
 			}
 
-			var preArgs = new PreQueryEventArgs<TModel>(query, authContext: authContext);
+			var preArgs = new QueryRequestEventArgs<TModel>(query, offset, count, null, overrideAuthContext);
 
 			this.Querying?.Invoke(this, preArgs);
 
@@ -478,9 +463,9 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 					if (fastQuery)
 						connection.AddData("loadFast", true);
 
-					var results = this.Query(connection, query, offset, count ?? 1000, out totalCount, true, authContext);
+					var results = this.Query(connection, query, offset, count ?? 1000, out totalCount, true);
 
-					var postData = new PostQueryEventArgs<TModel>(query, results.AsQueryable(), authContext);
+					var postData = new QueryResultEventArgs<TModel>(query, results.AsQueryable(), offset, count, totalCount, null, overrideAuthContext);
 
 					this.Queried?.Invoke(this, postData);
 
@@ -505,7 +490,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="context">The context.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the converted model instance.</returns>
-		public abstract TModel ToModelInstance(object domainInstance, DataContext context, IPrincipal principal);
+		public abstract TModel ToModelInstance(object domainInstance, DataContext context);
 
 		/// <summary>
 		/// Updates the specified storage data.
@@ -514,7 +499,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="principal">The principal.</param>
 		/// <param name="mode">The mode.</param>
 		/// <returns>Returns the updated model instance.</returns>
-		public TModel Update(TModel storageData, IPrincipal principal, TransactionMode mode)
+		public TModel Update(TModel storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
 		{
 			if (storageData == null)
 			{
@@ -526,7 +511,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 				throw new InvalidOperationException("Data missing key");
 			}
 
-			var preUpdateArgs = new PrePersistenceEventArgs<TModel>(storageData, principal);
+			var preUpdateArgs = new DataPersistingEventArgs<TModel>(storageData, overrideAuthContext);
 
 			this.Updating?.Invoke(this, preUpdateArgs);
 
@@ -546,7 +531,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 					{
 						this.traceSource.TraceEvent(TraceEventType.Verbose, 0, "UPDATE {0}", storageData);
 
-						storageData = this.Update(connection, storageData, principal);
+						storageData = this.Update(connection, storageData);
 
 						if (mode == TransactionMode.Commit)
 						{
@@ -557,10 +542,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 							tx.Rollback();
 						}
 
-						this.Updated?.Invoke(this, new PostPersistenceEventArgs<TModel>(storageData, principal)
-						{
-							Mode = mode
-						});
+						this.Updated?.Invoke(this, new DataPersistedEventArgs<TModel>(storageData, overrideAuthContext));
 
 						return storageData;
 					}
@@ -581,9 +563,9 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="data">The data.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the updated model instance.</returns>
-		public TModel Update(DataContext context, TModel data, IPrincipal principal)
+		public TModel Update(DataContext context, TModel data)
 		{
-			return this.UpdateInternal(context, data, principal);
+			return this.UpdateInternal(context, data);
 		}
 
 		/// <summary>
@@ -593,7 +575,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="model">The model.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the updated model instance.</returns>
-		public abstract TModel UpdateInternal(DataContext context, TModel model, IPrincipal principal);
+		public abstract TModel UpdateInternal(DataContext context, TModel model);
 
 		/// <summary>
 		/// Converts an object to a byte array.

@@ -18,17 +18,8 @@
  * Date: 2018-11-23
  */
 using RestSrvr.Attributes;
-using RestSrvr.Message;
-using SanteDB.Authentication.OAuth2.Model;
-using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
-using System.ServiceModel;
-using System.ServiceModel.Channels;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Authentication.OAuth2.Rest
 {

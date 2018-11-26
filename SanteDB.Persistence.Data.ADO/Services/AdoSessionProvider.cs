@@ -17,31 +17,27 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core;
+using SanteDB.Core.Configuration;
+using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Claims;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
+using SanteDB.Persistence.Data.ADO.Configuration;
+using SanteDB.Persistence.Data.ADO.Data.Model.Security;
+using SanteDB.Persistence.Data.ADO.Security;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Security;
-using System.Security.Claims;
-using System.Security.Principal;
-using SanteDB.Persistence.Data.ADO.Configuration;
+using System.Data;
 using System.Diagnostics;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using System.Security;
-using SanteDB.Persistence.Data.ADO.Data.Model.Security;
-using SanteDB.Core.Security.Claims;
-using SanteDB.Core.Diagnostics;
-using SanteDB.Core.Configuration;
-using System.Security.Cryptography;
 using System.IdentityModel.Tokens;
 using System.IO;
-using System.Data;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
-using System.Threading;
-using SanteDB.Persistence.Data.ADO.Security;
+using System.Linq;
+using System.Security;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -58,10 +54,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
         private TraceSource m_traceSource = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
 
         // Configuration
-        private AdoConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(AdoDataConstants.ConfigurationSectionName) as AdoConfiguration;
+        private AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
 
         // Master configuration
-        private SanteDBConfiguration m_masterConfig = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.core") as SanteDBConfiguration;
+        private SecuritySignatureConfigurationSection m_masterConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecuritySignatureConfigurationSection>();
 
         // Session cache
         private Dictionary<Guid, DbSession> m_sessionCache = new Dictionary<Guid, DbSession>();
@@ -75,17 +71,21 @@ namespace SanteDB.Persistence.Data.ADO.Services
         {
             SigningCredentials retVal = null;
             // Signing credentials
-            if (this.m_masterConfig.Security.SigningCertificate != null)
-                retVal = new X509SigningCredentials(this.m_masterConfig.Security.SigningCertificate);
-            else if (!String.IsNullOrEmpty(this.m_masterConfig.Security.ServerSigningSecret) ||
-                this.m_masterConfig.Security.ServerSigningKey != null)
+            if (this.m_masterConfig.Algorithm == SignatureAlgorithm.RS256)
             {
-                var sha = SHA256.Create();
+                var cert = X509CertificateUtils.FindCertificate(this.m_masterConfig.FindType, this.m_masterConfig.StoreLocation, this.m_masterConfig.StoreName, this.m_masterConfig.FindValue);
+                if (cert == null)
+                    throw new SecurityException("Cannot find certificate to sign JWT tokens!");
+                retVal = new X509SigningCredentials(cert);
+
+            }
+            else if (this.m_masterConfig.Algorithm == SignatureAlgorithm.HS256)
+            {
                 retVal = new SigningCredentials(
-                    new InMemorySymmetricSecurityKey(this.m_masterConfig.Security.ServerSigningKey ?? sha.ComputeHash(Encoding.UTF8.GetBytes(this.m_masterConfig.Security.ServerSigningSecret))),
+                    new InMemorySymmetricSecurityKey(this.m_masterConfig.Secret),
                     "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256",
                     "http://www.w3.org/2001/04/xmlenc#sha256",
-                    new SecurityKeyIdentifier()
+                    new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("keyid", "0"))
                 );
             }
             else
@@ -139,7 +139,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         NotAfter = expiry,
                         RefreshExpiration = expiry.AddMinutes(10),
                         Audience = aud,
-                        RefreshToken = ApplicationContext.Current.GetService<IPasswordHashingService>().EncodePassword(BitConverter.ToString(refreshToken).Replace("-", ""))
+                        RefreshToken = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(BitConverter.ToString(refreshToken).Replace("-", ""))
                     };
 
                     if (dbSession.ApplicationKey == dbSession.UserKey) // SID == Application = Application Grant
@@ -194,7 +194,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     // Get the session to be extended
                     var qToken = BitConverter.ToString(refreshToken.Take(16).ToArray()).Replace("-", "");
-                    qToken = ApplicationContext.Current.GetService<IPasswordHashingService>().EncodePassword(qToken);
+                    qToken = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(qToken);
                     var dbSession = context.SingleOrDefault<DbSession>(o => o.RefreshToken == qToken && o.RefreshExpiration > DateTimeOffset.Now);
                     if (dbSession == null)
                         throw new FileNotFoundException(BitConverter.ToString(refreshToken));
@@ -205,7 +205,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     // Generate a new session for this user
                     dbSession.Key = Guid.Empty;
                     refreshToken = this.CreateRefreshToken();
-                    dbSession.RefreshToken = ApplicationContext.Current.GetService<IPasswordHashingService>().EncodePassword(BitConverter.ToString(refreshToken).Replace("-", ""));
+                    dbSession.RefreshToken = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(BitConverter.ToString(refreshToken).Replace("-", ""));
                     dbSession.NotAfter = DateTimeOffset.Now + (dbSession.NotAfter - dbSession.NotBefore); // Extend for original time
                     dbSession.NotBefore = DateTimeOffset.Now;
                     dbSession.RefreshExpiration = dbSession.NotAfter.AddMinutes(10);

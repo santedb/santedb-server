@@ -21,10 +21,10 @@ using SanteDB.Reporting.Jasper.Attributes;
 
 namespace SanteDB.Reporting.Jasper.Model.Core
 {
-	/// <summary>
-	/// Represents jasper parameter types.
-	/// </summary>
-	public enum ReportParameterType
+    /// <summary>
+    /// Represents jasper parameter types.
+    /// </summary>
+    public enum ReportParameterType
 	{
 		/// <summary>
 		/// Represents a date parameter.

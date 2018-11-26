@@ -17,27 +17,21 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reflection;
-using System.Xml.Serialization;
-using System.Diagnostics;
-using System.Globalization;
-using SanteDB.Core.Model.Attributes;
-using System.Collections;
-using System.IO;
-using SanteDB.Core.Model.DataTypes;
-using SanteDB.Messaging.FHIR;
+using SanteDB.Core;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Query;
-using SanteDB.Messaging.FHIR.Resources;
-using MARC.HI.EHRS.SVC.Core;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Xml.Serialization;
 
 namespace SanteDB.Messaging.FHIR.Util
 {
@@ -336,12 +330,12 @@ namespace SanteDB.Messaging.FHIR.Util
                                 if (codeSystemUri.StartsWith("urn:oid:"))
                                 {
                                     codeSystemUri = codeSystemUri.Substring(8);
-                                    codeSystem = ApplicationContext.Current.GetService<IRepositoryService<CodeSystem>>().Find(o => o.Oid == codeSystemUri).FirstOrDefault();
+                                    codeSystem = ApplicationServiceContext.Current.GetService<IRepositoryService<CodeSystem>>().Find(o => o.Oid == codeSystemUri).FirstOrDefault();
                                 }
                                 else if (codeSystemUri.StartsWith("urn:") || codeSystemUri.StartsWith("http:"))
-                                    codeSystem = ApplicationContext.Current.GetService<IRepositoryService<CodeSystem>>().Find(o => o.Url == codeSystemUri).FirstOrDefault();
+                                    codeSystem = ApplicationServiceContext.Current.GetService<IRepositoryService<CodeSystem>>().Find(o => o.Url == codeSystemUri).FirstOrDefault();
                                 else
-                                    codeSystem = ApplicationContext.Current.GetService<IRepositoryService<CodeSystem>>().Find(o => o.Name == codeSystemUri).FirstOrDefault();
+                                    codeSystem = ApplicationServiceContext.Current.GetService<IRepositoryService<CodeSystem>>().Find(o => o.Name == codeSystemUri).FirstOrDefault();
 
 
                                 s_tracer.TraceInformation("Have translated FHIR domain {0} to {1}", codeSystemUri, codeSystem?.Name);

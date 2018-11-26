@@ -23,11 +23,11 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.Core
 {
-	/// <summary>
-	/// Represents an input control.
-	/// </summary>
-	/// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
-	[XmlType("inputControl")]
+    /// <summary>
+    /// Represents an input control.
+    /// </summary>
+    /// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
+    [XmlType("inputControl")]
 	[XmlRoot("inputControl")]
 	public class InputControl : ResourceBase
 	{

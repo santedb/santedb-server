@@ -21,10 +21,10 @@ using SanteDB.Reporting.Core.Auth;
 
 namespace SanteDB.Reporting.Core
 {
-	/// <summary>
-	/// Represents a service which supports bearer authentication.
-	/// </summary>
-	public interface ISupportBearerAuthentication : IAuthenticationHandler
+    /// <summary>
+    /// Represents a service which supports bearer authentication.
+    /// </summary>
+    public interface ISupportBearerAuthentication : IAuthenticationHandler
 	{
 		/// <summary>
 		/// Authenticates against a remote system using a bearer token.

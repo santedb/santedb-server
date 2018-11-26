@@ -23,7 +23,6 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Security.Claims
 {

@@ -22,10 +22,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model
 {
-	/// <summary>
-	/// Represents a resource lookup.
-	/// </summary>
-	[XmlType("resourceLookup")]
+    /// <summary>
+    /// Represents a resource lookup.
+    /// </summary>
+    [XmlType("resourceLookup")]
 	public class ResourceLookup
 	{
 		/// <summary>

@@ -17,16 +17,16 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core.Event;
+using SanteDB.Core.Security.Services;
 using System;
 using System.Security.Principal;
 
 namespace SanteDB.Core.Services
 {
-	/// <summary>
-	/// Represents a service which retrieves IPrincipal objects for applications.
-	/// </summary>
-	public interface IApplicationIdentityProviderService
+    /// <summary>
+    /// Represents a service which retrieves IPrincipal objects for applications.
+    /// </summary>
+    public interface IApplicationIdentityProviderService
 	{
 		/// <summary>
 		/// Fired after an authentication request has been made.

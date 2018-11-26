@@ -1,20 +1,16 @@
-﻿using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Services;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SanteDB.Core;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
+using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model;
-using SanteDB.Core.Exceptions;
 
 namespace SanteDB.Persistence.Data.ADO.Test
 {
@@ -176,9 +172,9 @@ namespace SanteDB.Persistence.Data.ADO.Test
             Assert.AreEqual(StatusKeys.Active, afterTest.StatusConcept.Key);
 
             // Obsolete
-            var idp = ApplicationContext.Current.GetService<IDataPersistenceService<Entity>>();
-            var afterObsolete = idp.Obsolete(afterTest, s_authorization, TransactionMode.Commit);
-            afterObsolete = idp.Get(new Identifier<Guid>(id.Value), s_authorization, false);
+            var idp = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Entity>>();
+            var afterObsolete = idp.Obsolete(afterTest, TransactionMode.Commit, s_authorization);
+            afterObsolete = idp.Get(id.Value, null, false, s_authorization);
 
             // Assert
             Assert.AreEqual(StatusKeys.Obsolete, afterObsolete.StatusConcept.Key);
@@ -211,7 +207,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             Assert.AreNotEqual(0, query.Count());
 
             // No results
-            var idp = ApplicationContext.Current.GetService<IDataPersistenceService<Entity>>();
+            var idp = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Entity>>();
             query = idp.Query(o => o.CreationTime < DateTimeOffset.MinValue && o.ClassConcept.Key == EntityClassKeys.Place && o.Names.Any(n => n.NameUse.Key == NameUseKeys.Assigned && n.Component.Any(c => c.Value == "Some Clinic")), s_authorization);
             Assert.AreEqual(0, query.Count());
 

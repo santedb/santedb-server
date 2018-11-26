@@ -23,10 +23,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
 {
-	/// <summary>
-	/// Represents one or more entity addresses linked to an Entity
-	/// </summary>
-	[Table("ent_addr_tbl")]
+    /// <summary>
+    /// Represents one or more entity addresses linked to an Entity
+    /// </summary>
+    [Table("ent_addr_tbl")]
 	public class DbEntityAddress : DbEntityVersionedAssociation
 	{
         /// <summary>

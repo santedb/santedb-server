@@ -17,46 +17,39 @@
  * User: justin
  * Date: 2018-11-23
  */
-using SanteDB.Core;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Authentication.OAuth2.Model;
-using System.Diagnostics;
-using SanteDB.Core.Services;
-using MARC.HI.EHRS.SVC.Core;
-using System.ServiceModel;
+using SanteDB.Core.Security.Services;
 using Newtonsoft.Json;
-using System.Security.Principal;
-using System.IdentityModel.Protocols.WSTrust;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
-using SanteDB.Core.Security;
-using System.Security;
-using System.Collections.Specialized;
-using MARC.HI.EHRS.SVC.Core.Services.Policy;
-using System.Security.Claims;
-using System.IdentityModel.Tokens;
-using System.Security.Cryptography;
-using System.ServiceModel.Channels;
-using System.Xml;
-using MARC.HI.EHRS.SVC.Core.Exceptions;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Authentication.OAuth2.Configuration;
 using Newtonsoft.Json.Converters;
-using SanteDB.Core.Security.Claims;
-using System.Security.Authentication;
-using SanteDB.Core.Security.Attribute;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Diagnostics;
-using SanteDB.Core.Configuration;
-using SanteDB.Core.Security.Audit;
 using RestSrvr;
 using RestSrvr.Attributes;
 using RestSrvr.Message;
+using SanteDB.Authentication.OAuth2.Configuration;
+using SanteDB.Authentication.OAuth2.Model;
+using SanteDB.Core;
+using SanteDB.Core.Configuration;
+using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Security;
 using SanteDB.Core.Rest.Security;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Security.Audit;
+using SanteDB.Core.Security.Claims;
+using SanteDB.Core.Security.Services;
+using SanteDB.Core.Services;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Diagnostics;
+using System.IdentityModel.Tokens;
+using System.IO;
+using System.Linq;
+using System.Security;
+using System.Security.Authentication;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Security.Principal;
+using System.Text;
 
 namespace SanteDB.Authentication.OAuth2.Rest
 {
@@ -71,10 +64,10 @@ namespace SanteDB.Authentication.OAuth2.Rest
         private TraceSource m_traceSource = new TraceSource(OAuthConstants.TraceSourceName);
 
         // OAuth configuration
-        private OAuthConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(OAuthConstants.ConfigurationName) as OAuthConfiguration;
+        private OAuthConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<OAuthConfigurationSection>();
 
         // Master configuration
-        private SanteDBConfiguration m_masterConfig = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.core") as SanteDBConfiguration;
+        private SecuritySignatureConfigurationSection m_masterConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecuritySignatureConfigurationSection>();
 
         /// <summary>
         /// OAuth token request
@@ -83,8 +76,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
         {
 
             // Get the client application 
-            IApplicationIdentityProviderService clientIdentityService = ApplicationContext.Current.GetService<IApplicationIdentityProviderService>();
-            IIdentityProviderService identityProvider = ApplicationContext.Current.GetService<IIdentityProviderService>();
+            IApplicationIdentityProviderService clientIdentityService = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
+            IIdentityProviderService identityProvider = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
 
             // Only password grants
             if (tokenRequest["grant_type"] != OAuthConstants.GrantNamePassword &&
@@ -111,7 +104,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
                     try
                     {
-                        clientPrincipal = ApplicationContext.Current.GetService<IApplicationIdentityProviderService>().Authenticate(client_identity, client_secret);
+                        clientPrincipal = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>().Authenticate(client_identity, client_secret);
                     }
                     catch (Exception e)
                     {
@@ -131,7 +124,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 //{
                 //    var claimSet = OperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets.OfType<System.IdentityModel.Claims.X509CertificateClaimSet>().FirstOrDefault();
                 //    if (claimSet != null) // device authenticated with X509 PKI Cert
-                //        devicePrincipal = ApplicationContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(claimSet.X509Certificate);
+                //        devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(claimSet.X509Certificate);
                 //}
                 if (devicePrincipal == null && !String.IsNullOrEmpty(authHead)) // Device is authenticated using basic auth
                 {
@@ -139,7 +132,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         throw new InvalidCastException("X-Device-Authorization must be BASIC scheme");
 
                     var authParts = Encoding.UTF8.GetString(Convert.FromBase64String(authHead.Substring(6).Trim())).Split(':');
-                    devicePrincipal = ApplicationContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(authParts[0], authParts[1]);
+                    devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(authParts[0], authParts[1]);
                 }
 
 
@@ -173,7 +166,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                                     .Where(x => x % 2 == 0)
                                     .Select(x => Convert.ToByte(refreshToken.Substring(x, 2), 16))
                                     .ToArray();
-                        principal = (identityProvider as ISessionIdentityProviderService).Authenticate(ApplicationContext.Current.GetService<ISessionProviderService>().Extend(secret));
+                        principal = (identityProvider as ISessionIdentityProviderService).Authenticate(ApplicationServiceContext.Current.GetService<ISessionProviderService>().Extend(secret));
                         break;
                     default:
                         throw new InvalidOperationException("Invalid grant type");
@@ -209,7 +202,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         private IEnumerable<Claim> ValidateClaims(IPrincipal userPrincipal)
         {
-            IPolicyDecisionService pdp = ApplicationContext.Current.GetService<IPolicyDecisionService>();
+            IPolicyDecisionService pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
 
             List<Claim> retVal = new List<Claim>();
 
@@ -221,7 +214,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 // Claim allowed
                 if (this.m_configuration.AllowedClientClaims == null ||
                     !this.m_configuration.AllowedClientClaims.Contains(itm.Type))
-                    throw new SecurityException(ApplicationContext.Current.GetLocaleString("SECE001"));
+                    throw new SecurityException("Claim is not permitted");
                 else
                 {
                     // Validate the claim
@@ -229,7 +222,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     if (handler == null || handler.Validate(userPrincipal, itm.Value))
                         retVal.Add(itm);
                     else
-                        throw new SecurityException(String.Format(ApplicationContext.Current.GetLocaleString("SECE002"), itm.Type));
+                        throw new SecurityException($"Claim {itm.Type} failed validation");
                 }
             }
 
@@ -243,8 +236,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
         {
             this.m_traceSource.TraceInformation("Will create new ClaimsPrincipal based on existing principal");
             
-            IRoleProviderService roleProvider = ApplicationContext.Current.GetService<IRoleProviderService>();
-            IPolicyInformationService pip = ApplicationContext.Current.GetService<IPolicyInformationService>();
+            IRoleProviderService roleProvider = ApplicationServiceContext.Current.GetService<IRoleProviderService>();
+            IPolicyInformationService pip = ApplicationServiceContext.Current.GetService<IPolicyInformationService>();
 
             // System claims
             List<Claim> claims = new List<Claim>()
@@ -269,7 +262,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 oizPrincipalPolicies.Add(pol.FirstOrDefault(o => (int)o.Rule == pol.Min(r => (int)r.Rule)));
 
             // Scopes user is allowed to access
-            claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyDecisionOutcomeType.Grant).Select(o => new Claim(SanteDBClaimTypes.SanteDBScopeClaim, o.Policy.Oid)));
+            claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyGrantType.Grant).Select(o => new Claim(SanteDBClaimTypes.SanteDBScopeClaim, o.Policy.Oid)));
 
             // Add grant if not exists
             if ((claimsPrincipal)?.FindFirst(ClaimTypes.Actor)?.Value == UserClassKeys.HumanUser.ToString())
@@ -299,7 +292,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         // 3. Person must have override permission
                         new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.OverridePolicyPermission, claimsPrincipal).Demand();
                         // Add elevation objects as GRANT to this session
-                        claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyDecisionOutcomeType.Elevate).Select(o => new Claim(SanteDBClaimTypes.SanteDBScopeClaim, o.Policy.Oid)));
+                        claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyGrantType.Elevate).Select(o => new Claim(SanteDBClaimTypes.SanteDBScopeClaim, o.Policy.Oid)));
 
                         // Audit override
                         AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(';'), true);
@@ -386,7 +379,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             var jwt = this.HydrateToken(claimsPrincipal, scope, additionalClaims, issued, expires);
 
             // Establish the session
-            ISessionProviderService isp = ApplicationContext.Current.GetService<ISessionProviderService>();
+            ISessionProviderService isp = ApplicationServiceContext.Current.GetService<ISessionProviderService>();
             var session = isp.Establish(new ClaimsPrincipal(claimsPrincipal.Identities), expires, aud);
 
             string refreshToken = null, sessionId = null;
@@ -430,14 +423,18 @@ namespace SanteDB.Authentication.OAuth2.Rest
         {
             SigningCredentials retVal = null;
             // Signing credentials
-            if (this.m_masterConfig.Security.SigningCertificate != null)
-                retVal = new X509SigningCredentials(this.m_masterConfig.Security.SigningCertificate);
-            else if (!String.IsNullOrEmpty(this.m_masterConfig.Security.ServerSigningSecret) ||
-                this.m_masterConfig.Security.ServerSigningKey != null)
+            if (this.m_masterConfig.Algorithm == SignatureAlgorithm.RS256)
             {
-                var sha = SHA256.Create();
+                var cert = X509CertificateUtils.FindCertificate(this.m_masterConfig.FindType, this.m_masterConfig.StoreLocation, this.m_masterConfig.StoreName, this.m_masterConfig.FindValue);
+                if (cert == null)
+                    throw new SecurityException("Cannot find certificate to sign JWT tokens!");
+                retVal = new X509SigningCredentials(cert);
+
+            }
+            else if (this.m_masterConfig.Algorithm == SignatureAlgorithm.HS256)
+            {
                 retVal = new SigningCredentials(
-                    new InMemorySymmetricSecurityKey(this.m_masterConfig.Security.ServerSigningKey ?? sha.ComputeHash(Encoding.UTF8.GetBytes(this.m_masterConfig.Security.ServerSigningSecret))),
+                    new InMemorySymmetricSecurityKey(this.m_masterConfig.Secret),
                     "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256",
                     "http://www.w3.org/2001/04/xmlenc#sha256",
                     new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("keyid", "0"))

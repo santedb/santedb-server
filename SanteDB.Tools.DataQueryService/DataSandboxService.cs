@@ -17,19 +17,14 @@
  * User: justin
  * Date: 2018-9-25
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Attributes;
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core.Services;
+using RestSrvr;
+using SanteDB.Core;
+using SanteDB.Core.Rest;
 using SanteDB.Tools.DataSandbox.Wcf;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using RestSrvr;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Rest;
 
 namespace SanteDB.Tools.DataSandbox
 {
@@ -37,7 +32,6 @@ namespace SanteDB.Tools.DataSandbox
     /// Represents a daemon service that exports Swagger documentation
     /// </summary>
     [Description("Debugger: Data Sandbox UI")]
-    [TraceSource("SanteDB.Tools.DataSandbox")]
     public class DataSandboxService : IDaemonService
     {
         // HDSI Trace host
@@ -75,7 +69,7 @@ namespace SanteDB.Tools.DataSandbox
         {
             this.Starting?.Invoke(this, EventArgs.Empty);
 
-            ApplicationContext.Current.Started += (o, e) =>
+            ApplicationServiceContext.Current.Started += (o, e) =>
             {
 
                 this.m_traceSource.TraceInformation("Starting Query Builder Service...");

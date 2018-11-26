@@ -1,11 +1,7 @@
 ﻿using NHapi.Base.Model;
 using NHapi.Base.Parser;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Messaging.HL7.Test
 {

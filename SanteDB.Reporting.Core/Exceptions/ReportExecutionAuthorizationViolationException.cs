@@ -17,20 +17,20 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Reporting.Core.Event;
 using System;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Security;
 using System.Security.Permissions;
 using System.Security.Policy;
-using SanteDB.Reporting.Core.Event;
 
 namespace SanteDB.Reporting.Core.Exceptions
 {
-	/// <summary>
-	/// Thrown when a report execution authorization is violated.
-	/// </summary>
-	public class ReportExecutionAuthorizationViolationException : SecurityException
+    /// <summary>
+    /// Thrown when a report execution authorization is violated.
+    /// </summary>
+    public class ReportExecutionAuthorizationViolationException : SecurityException
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ReportExecutionAuthorizationViolationException"/> class.

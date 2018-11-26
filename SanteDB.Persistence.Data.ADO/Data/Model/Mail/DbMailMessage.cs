@@ -17,22 +17,16 @@
  * User: justin
  * Date: 2018-7-31
  */
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model.Security;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
+using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Mail
 {
-	/// <summary>
-	/// Represents an alert message.
-	/// </summary>
-	[Table("mail_msg_tbl")]
+    /// <summary>
+    /// Represents an alert message.
+    /// </summary>
+    [Table("mail_msg_tbl")]
     [AssociativeTable(typeof(DbSecurityUser), typeof(DbMailMessageRcptTo))]
 	public class DbMailMessage : DbNonVersionedBaseData
 	{

@@ -17,21 +17,21 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Model.RISI;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Reporting.PSQL.Model;
 using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Principal;
-using SanteDB.Core.Security;
 using ReportDefinition = SanteDB.Core.Model.RISI.ReportDefinition;
 
 namespace SanteDB.Persistence.Reporting.PSQL.Services
 {
-	/// <summary>
-	/// Represents a ReportDefinition persistence service.
-	/// </summary>
-	public class ReportDefinitionPersistenceService : CorePersistenceService<ReportDefinition, Model.ReportDefinition, Model.ReportDefinition>
+    /// <summary>
+    /// Represents a ReportDefinition persistence service.
+    /// </summary>
+    public class ReportDefinitionPersistenceService : CorePersistenceService<ReportDefinition, Model.ReportDefinition, Model.ReportDefinition>
 	{
 		/// <summary>
 		/// Converts a model instance to a domain instance.
@@ -40,7 +40,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="context">The context.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the converted model instance.</returns>
-		public override object FromModelInstance(ReportDefinition modelInstance, DataContext context, IPrincipal principal)
+		public override object FromModelInstance(ReportDefinition modelInstance, DataContext context)
 		{
 			if (modelInstance == null)
 			{
@@ -50,20 +50,20 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 
 			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(PSQL.Model.ReportDefinition) } to { nameof(ReportDefinition) }");
 
-			return base.FromModelInstance(modelInstance, context, principal);
+			return base.FromModelInstance(modelInstance, context);
 		}
 
-		/// <summary>
-		/// Gets the specified model.
-		/// </summary>
-		/// <param name="context">The context.</param>
-		/// <param name="key">The key.</param>
-		/// <param name="principal">The principal.</param>
-		/// <param name="loadFast">if set to <c>true</c> [load fast].</param>
-		/// <returns>Returns the model instance.</returns>
-		public override ReportDefinition Get(DataContext context, Guid key, IPrincipal principal, bool loadFast)
+        /// <summary>
+        /// Gets the specified model.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="principal">The principal.</param>
+        /// <param name="loadFast">if set to <c>true</c> [load fast].</param>
+        /// <returns>Returns the model instance.</returns>
+        public override ReportDefinition Get(DataContext context, Guid key, bool loadFast, IPrincipal overrideContext = null)
 		{
-			var reportDefinition = base.Get(context, key, principal, loadFast);
+			var reportDefinition = base.Get(context, key, loadFast);
 
 			if (reportDefinition == null)
 			{
@@ -72,7 +72,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 
 			if (!loadFast)
 			{
-				reportDefinition.Parameters = context.Query<ReportParameter>(r => r.ReportId == key).Select(r => new Core.Model.RISI.ReportParameter
+				reportDefinition.Parameters = context.Query<Model.ReportParameter>(r => r.ReportId == key).Select(r => new Core.Model.RISI.ReportParameter
 				{
 					Key = r.Key,
 					Name = r.Name,
@@ -93,9 +93,9 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the inserted model.</returns>
 		/// <exception cref="System.InvalidOperationException">Domain instance must not be null</exception>
-		public override ReportDefinition InsertInternal(DataContext context, ReportDefinition model, IPrincipal principal)
+		public override ReportDefinition InsertInternal(DataContext context, ReportDefinition model)
 		{
-			var domainInstance = this.FromModelInstance(model, context, principal) as Model.ReportDefinition;
+			var domainInstance = this.FromModelInstance(model, context) as Model.ReportDefinition;
 
 			if (domainInstance == null)
 			{
@@ -113,9 +113,9 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 			model.Key = domainInstance.Key;
 
 			InsertReportFormatAssociations(context, model);
-			UpdateReportParameters(context, principal, model);
+			UpdateReportParameters(context, model);
 
-			return this.ToModelInstance(domainInstance, context, principal);
+			return this.ToModelInstance(domainInstance, context);
 		}
 
 		/// <summary>
@@ -125,16 +125,16 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="model">The model.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the obsoleted data.</returns>
-		public override ReportDefinition ObsoleteInternal(DataContext context, ReportDefinition model, IPrincipal principal)
+		public override ReportDefinition ObsoleteInternal(DataContext context, ReportDefinition model)
 		{
 			// delete the report format associations
 			context.Delete<ReportDefinitionFormatAssociation>(c => c.SourceKey == model.Key.Value);
 
 			// delete the report parameter associations
-			context.Delete<ReportParameter>(c => c.ReportId == model.Key.Value);
+			context.Delete<Model.ReportParameter>(c => c.ReportId == model.Key.Value);
 
 			// delete the actual report definition
-			base.ObsoleteInternal(context, model, principal);
+			base.ObsoleteInternal(context, model);
 
 			return model;
 		}
@@ -146,7 +146,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="context">The context.</param>
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the converted model instance.</returns>
-		public override ReportDefinition ToModelInstance(object domainInstance, DataContext context, IPrincipal principal)
+		public override ReportDefinition ToModelInstance(object domainInstance, DataContext context)
 		{
 			if (domainInstance == null)
 			{
@@ -161,7 +161,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 
 			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(ReportDefinition) } to { nameof(PSQL.Model.ReportDefinition) }");
 
-			return base.ToModelInstance(domainInstance, context, principal);
+			return base.ToModelInstance(domainInstance, context);
 		}
 
 		/// <summary>
@@ -172,9 +172,9 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the updated model instance.</returns>
 		/// <exception cref="System.InvalidOperationException">Domain instance must not be null</exception>
-		public override ReportDefinition UpdateInternal(DataContext context, ReportDefinition model, IPrincipal principal)
+		public override ReportDefinition UpdateInternal(DataContext context, ReportDefinition model)
 		{
-			var domainInstance = base.FromModelInstance(model, context, principal) as Model.ReportDefinition;
+			var domainInstance = base.FromModelInstance(model, context) as Model.ReportDefinition;
 
 			if (domainInstance == null)
 			{
@@ -192,9 +192,9 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 			model.Key = domainInstance.Key;
 
 			InsertReportFormatAssociations(context, model);
-			UpdateReportParameters(context, principal, model);
+			UpdateReportParameters(context, model);
 
-			return this.ToModelInstance(domainInstance, context, principal);
+			return this.ToModelInstance(domainInstance, context);
 		}
 
 		/// <summary>
@@ -223,23 +223,23 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		/// <param name="context">The context.</param>
 		/// <param name="principal">The principal.</param>
 		/// <param name="reportDefinition">The report definition.</param>
-		private static void UpdateReportParameters(DataContext context, IPrincipal principal, ReportDefinition reportDefinition)
+		private static void UpdateReportParameters(DataContext context, ReportDefinition reportDefinition)
 		{
 			var reportParameterPersistenceService = new ReportParameterPersistenceService();
 
 			foreach (var reportParameter in reportDefinition.Parameters)
 			{
-				var existingReportParameter = context.Query<ReportParameter>(c => c.ReportId == reportDefinition.Key.Value && c.CorrelationId == reportParameter.CorrelationId).FirstOrDefault();
+				var existingReportParameter = context.Query<Model.ReportParameter>(c => c.ReportId == reportDefinition.Key.Value && c.CorrelationId == reportParameter.CorrelationId).FirstOrDefault();
 
 				reportParameter.ReportDefinitionKey = reportDefinition.Key.Value;
 
 				if (existingReportParameter == null)
 				{
-					reportParameterPersistenceService.Insert(context, reportParameter, principal);
+					reportParameterPersistenceService.Insert(context, reportParameter);
 				}
 				else
 				{
-					reportParameterPersistenceService.Update(context, reportParameter, principal);
+					reportParameterPersistenceService.Update(context, reportParameter);
 				}
 			}
 		}

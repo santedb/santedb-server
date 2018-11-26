@@ -21,11 +21,11 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.Connection
 {
-	/// <summary>
-	/// Represents an XML/A connection.
-	/// </summary>
-	/// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
-	[XmlType("xmlaConnection")]
+    /// <summary>
+    /// Represents an XML/A connection.
+    /// </summary>
+    /// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
+    [XmlType("xmlaConnection")]
 	[XmlRoot("xmlaConnection")]
 	public class XmlAConnection : ResourceBase
 	{

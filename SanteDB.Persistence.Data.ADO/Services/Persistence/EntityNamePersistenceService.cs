@@ -17,24 +17,18 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Model.Entities;
-using SanteDB.Core.Services;
-using SanteDB.Persistence.Data.ADO.Data.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Persistence.Data.ADO.Data;
-using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
-using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
-using SanteDB.Core.Model.DataTypes;
-using System.Collections;
-using SanteDB.OrmLite;
+using SanteDB.Core;
 using SanteDB.Core.Interfaces;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Entities;
+using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Data;
+using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
+using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
+using System;
+using System.Collections;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -159,7 +153,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 retVal.ValueSequenceId = existing.SequenceId.Value;
             else if (existing == null)
             {
-                var phoneticCoder = ApplicationContext.Current.GetService<IPhoneticAlgorithmHandler>();
+                var phoneticCoder = ApplicationServiceContext.Current.GetService<IPhoneticAlgorithmHandler>();
                 var value = context.Insert(new DbPhoneticValue()
                 {
                     Value = modelInstance.Value,

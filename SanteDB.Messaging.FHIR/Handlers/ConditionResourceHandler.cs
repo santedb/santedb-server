@@ -18,30 +18,30 @@
  * Date: 2018-6-22
  */
 using MARC.Everest.Connectors;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.DataTypes;
-using SanteDB.Messaging.FHIR.Resources;
+using RestSrvr;
+using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
+using SanteDB.Core.Services;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using RestSrvr;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
-	/// <summary>
-	/// Represents a handler for condition observations
-	/// </summary>
-	public class ConditionResourceHandler : RepositoryResourceHandlerBase<Condition, CodedObservation>
+    /// <summary>
+    /// Represents a handler for condition observations
+    /// </summary>
+    public class ConditionResourceHandler : RepositoryResourceHandlerBase<Condition, CodedObservation>
 	{
 		/// <summary>
 		/// Map to FHIR
@@ -66,7 +66,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			retVal.Category.Add(new SanteDB.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/condition-category"), "encounter-diagnosis"));
 
 			// Severity?
-			var actRelationshipService = ApplicationContext.Current.GetService<IDataPersistenceService<ActRelationship>>();
+			var actRelationshipService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ActRelationship>>();
 
 			var severity = actRelationshipService.Query(o => o.SourceEntityKey == model.Key && o.RelationshipTypeKey == ActRelationshipTypeKeys.HasComponent && o.TargetAct.TypeConceptKey == ObservationTypeKeys.Severity, AuthenticationContext.Current.Principal);
 			if (severity == null) // Perhaps we should get from neighbor if this is in an encounter

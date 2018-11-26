@@ -17,17 +17,6 @@
  * User: justin
  * Date: 2018-9-25
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Exceptions;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Messaging.HAPI;
-using MARC.HI.EHRS.SVC.Messaging.HAPI.Configuration;
-using MARC.HI.EHRS.SVC.Messaging.HAPI.TransportProtocol;
-using NHapi.Base.Model;
-using NHapi.Base.Parser;
-using NHapi.Base.Util;
-using NHapi.Model.V25.Message;
-using NHapi.Model.V25.Segment;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Collection;
@@ -47,8 +36,18 @@ using System.Security;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
+using NHapi.Model.V25.Datatype;
+using NHapi.Base.Model;
+using NHapi.Model.V25.Segment;
+using SanteDB.Core;
+using SanteDB.Core.Services;
+using SanteDB.Messaging.HL7.Configuration;
+using SanteDB.Messaging.HL7.TransportProtocol;
+using NHapi.Base.Util;
+using NHapi.Base.Parser;
+using NHapi.Model.V25.Message;
+using SanteDB.Core.Security.Services;
+using System.Security.Authentication;
 
 namespace SanteDB.Messaging.HL7.Messages
 {
@@ -59,17 +58,7 @@ namespace SanteDB.Messaging.HL7.Messages
     {
 
         // Configuration
-        private HL7ConfigurationSection m_configuration;
-
-        private HL7ConfigurationSection Configuration
-        {
-            get
-            {
-                if (this.m_configuration == null)
-                    this.m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("marc.hi.ehrs.svc.messaging.hapi") as HL7ConfigurationSection;
-                return this.m_configuration;
-            }
-        }
+        private Hl7ConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
 
         // Entry ASM hash
         private static String s_entryAsmHash = null;
@@ -189,7 +178,7 @@ namespace SanteDB.Messaging.HL7.Messages
             ClaimsPrincipal principal = null;
             var msh = e.Message.GetStructure("MSH") as MSH;
             var sft = e.Message.GetStructure("SFT") as SFT;
-            var sessionService = ApplicationContext.Current.GetService<ISessionProviderService>();
+            var sessionService = ApplicationServiceContext.Current.GetService<ISessionProviderService>();
 
             // Authenticated args?
             if (msh.Security.Value.StartsWith("sid://")) // Session identifier
@@ -198,7 +187,7 @@ namespace SanteDB.Messaging.HL7.Messages
                                     .Where(x => x % 2 == 0)
                                     .Select(x => Convert.ToByte(msh.Security.Value.Substring(x, 2), 16))
                                     .ToArray());
-                principal = ApplicationContext.Current.GetService<ISessionIdentityProviderService>().Authenticate(session) as ClaimsPrincipal;
+                principal = ApplicationServiceContext.Current.GetService<ISessionIdentityProviderService>().Authenticate(session) as ClaimsPrincipal;
             }
             else if (e is AuthenticatedHl7MessageReceivedEventArgs)
             {
@@ -209,41 +198,41 @@ namespace SanteDB.Messaging.HL7.Messages
                     throw new SecurityException("MSH-4 must be provided for authenticating device");
                 else if (String.IsNullOrEmpty(msh.SendingApplication.NamespaceID.Value))
                     throw new SecurityException("MSH-3 must be provided for authenticating device/application");
-                else if (this.Configuration.Security == SecurityMethod.Sft4 && String.IsNullOrEmpty(sft.SoftwareBinaryID.Value))
+                else if (this.m_configuration.Security == SecurityMethod.Sft4 && String.IsNullOrEmpty(sft.SoftwareBinaryID.Value))
                     throw new SecurityException("SFT-4 must be provided for authenticating application");
-                else if (this.Configuration.Security == SecurityMethod.Msh8 && String.IsNullOrEmpty(msh.Security.Value))
+                else if (this.m_configuration.Security == SecurityMethod.Msh8 && String.IsNullOrEmpty(msh.Security.Value))
                     throw new SecurityException("MSH-8 must be provided for authenticating application");
 
                 String deviceId = $"{msh.SendingApplication.NamespaceID.Value}|{msh.SendingFacility.NamespaceID.Value}",
                     deviceSecret = BitConverter.ToString(auth.AuthorizationToken).Replace("-", ""),
                     applicationId = msh.SendingApplication.NamespaceID.Value,
-                    applicationSecret = this.Configuration.Security == SecurityMethod.Sft4 ? sft.SoftwareBinaryID.Value :
-                        this.Configuration.Security == SecurityMethod.Msh8 ? msh.Security.Value : null;
+                    applicationSecret = this.m_configuration.Security == SecurityMethod.Sft4 ? sft.SoftwareBinaryID.Value :
+                        this.m_configuration.Security == SecurityMethod.Msh8 ? msh.Security.Value : null;
 
-                IPrincipal devicePrincipal = ApplicationContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(deviceId, deviceSecret),
-                    applicationPrincipal = applicationSecret != null ? ApplicationContext.Current.GetService<IApplicationIdentityProviderService>().Authenticate(applicationId, applicationSecret) : null;
+                IPrincipal devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(deviceId, deviceSecret),
+                    applicationPrincipal = applicationSecret != null ? ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>().Authenticate(applicationId, applicationSecret) : null;
                 principal = new ClaimsPrincipal(new IIdentity[] { devicePrincipal.Identity, applicationPrincipal?.Identity }.OfType<ClaimsIdentity>());
             }
-            else if (this.Configuration.Security != SecurityMethod.None)
+            else if (this.m_configuration.Security != SecurityMethod.None)
             {
                 // Ensure proper authentication exists
                 if (String.IsNullOrEmpty(msh.SendingFacility.NamespaceID.Value) || String.IsNullOrEmpty(msh.Security.Value))
                     throw new SecurityException("MSH-4 and MSH-8 must always be provided for authenticating device when SLLP is not used");
                 else if (String.IsNullOrEmpty(msh.SendingFacility.NamespaceID.Value))
                     throw new SecurityException("MSH-3 must be provided for authenticating application");
-                else if (this.Configuration.Security == SecurityMethod.Sft4 && String.IsNullOrEmpty(sft.SoftwareBinaryID.Value))
+                else if (this.m_configuration.Security == SecurityMethod.Sft4 && String.IsNullOrEmpty(sft.SoftwareBinaryID.Value))
                     throw new SecurityException("SFT-4 must be provided for authenticating application");
-                else if (this.Configuration.Security == SecurityMethod.Msh8 && String.IsNullOrEmpty(msh.Security.Value))
+                else if (this.m_configuration.Security == SecurityMethod.Msh8 && String.IsNullOrEmpty(msh.Security.Value))
                     throw new SecurityException("MSH-8 must be provided for authenticating application");
 
                 String deviceId = $"{msh.SendingApplication.NamespaceID.Value}|{msh.SendingFacility.NamespaceID.Value}",
                    deviceSecret = msh.Security.Value,
                    applicationId = msh.SendingApplication.NamespaceID.Value,
-                   applicationSecret = this.Configuration.Security == SecurityMethod.Sft4 ? sft.SoftwareBinaryID.Value :
-                                            this.Configuration.Security == SecurityMethod.Msh8 ? msh.Security.Value : null;
+                   applicationSecret = this.m_configuration.Security == SecurityMethod.Sft4 ? sft.SoftwareBinaryID.Value :
+                                            this.m_configuration.Security == SecurityMethod.Msh8 ? msh.Security.Value : null;
 
-                IPrincipal devicePrincipal = ApplicationContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(deviceId, deviceSecret),
-                    applicationPrincipal = applicationSecret != null ? ApplicationContext.Current.GetService<IApplicationIdentityProviderService>().Authenticate(applicationId, applicationSecret) : null;
+                IPrincipal devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(deviceId, deviceSecret),
+                    applicationPrincipal = applicationSecret != null ? ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>().Authenticate(applicationId, applicationSecret) : null;
 
                 principal = new ClaimsPrincipal(new IIdentity[] { devicePrincipal.Identity, applicationPrincipal?.Identity }.OfType<ClaimsIdentity>());
             }
@@ -300,10 +289,10 @@ namespace SanteDB.Messaging.HL7.Messages
                 retVal = this.CreateACK(nackType, request, "AR", "Security Error");
                 AuditUtil.AuditRestrictedFunction(error, receiveData.ReceiveEndpoint);
             }
-            else if (error is UnauthorizedRequestException || error is UnauthorizedAccessException)
+            else if (error is AuthenticationException || error is UnauthorizedAccessException)
             {
                 retVal = this.CreateACK(nackType, request, "AR", "Unauthorized");
-                AuditUtil.AuditRestrictedFunction(error as UnauthorizedRequestException, receiveData.ReceiveEndpoint);
+                AuditUtil.AuditRestrictedFunction(error as AuthenticationException, receiveData.ReceiveEndpoint);
             }
             else if (error is Newtonsoft.Json.JsonException ||
                 error is System.Xml.XmlException)
@@ -411,10 +400,10 @@ namespace SanteDB.Messaging.HL7.Messages
         /// <param name="inbound">The inbound message</param>
         protected void UpdateMSH(MSH msh, MSH inbound)
         {
-            var config = ApplicationContext.Current.Configuration;
+            var config = this.m_configuration;
             msh.MessageControlID.Value = Guid.NewGuid().ToString();
-            msh.SendingApplication.NamespaceID.Value = config.DeviceName ?? Environment.MachineName;
-            msh.SendingFacility.NamespaceID.Value = config.JurisdictionData?.Name ?? System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().DomainName;
+            msh.SendingApplication.NamespaceID.Value = Environment.MachineName;
+            msh.SendingFacility.NamespaceID.Value = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().DomainName;
             msh.ReceivingApplication.NamespaceID.Value = inbound.SendingApplication.NamespaceID.Value;
             msh.ReceivingFacility.NamespaceID.Value = inbound.SendingFacility.NamespaceID.Value;
             msh.DateTimeOfMessage.Time.Value = DateTime.Now.ToString("yyyyMMddHHmmss");

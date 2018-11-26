@@ -18,11 +18,7 @@
  * Date: 2018-6-22
  */
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Security.Claims
 {

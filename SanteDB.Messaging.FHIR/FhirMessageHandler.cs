@@ -17,32 +17,29 @@
  * User: justin
  * Date: 2018-11-23
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Messaging.FHIR.Configuration;
-using System.Configuration;
-using System.Diagnostics;
-using System.ServiceModel;
-using SanteDB.Messaging.FHIR.Util;
-using SanteDB.Messaging.FHIR.Handlers;
-using System.Reflection;
-using MARC.HI.EHRS.SVC.Core;
-using SanteDB.Messaging.FHIR.Rest;
-using SanteDB.Messaging.FHIR.Rest.Serialization;
-using SanteDB.Messaging.FHIR.Rest.Behavior;
+using SanteDB.Core.Services;
 using RestSrvr;
+using SanteDB.Core;
+using SanteDB.Core.Interop;
 using SanteDB.Core.Rest;
 using SanteDB.Core.Rest.Behavior;
+using SanteDB.Core.Rest.Security;
+using SanteDB.Core.Services;
+using SanteDB.Messaging.FHIR.Configuration;
+using SanteDB.Messaging.FHIR.Handlers;
+using SanteDB.Messaging.FHIR.Rest;
+using SanteDB.Messaging.FHIR.Rest.Behavior;
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 
 namespace SanteDB.Messaging.FHIR
 {
     /// <summary>
     /// Message handler for FHIR
     /// </summary>
-    public class FhirMessageHandler : IMessageHandlerService
+    public class FhirMessageHandler : IDaemonService, IApiEndpointProvider
     {
 
         #region IMessageHandlerService Members
@@ -50,7 +47,7 @@ namespace SanteDB.Messaging.FHIR
         private TraceSource m_traceSource = new TraceSource(FhirConstants.TraceSourceName);
 
         // Configuration
-        private FhirServiceConfiguration m_configuration;
+        private FhirServiceConfigurationSection m_configuration;
 
         // Web host
         private RestService m_webHost;
@@ -77,7 +74,7 @@ namespace SanteDB.Messaging.FHIR
         /// </summary>
         public FhirMessageHandler()
         {
-            this.m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(FhirConstants.ConfigurationSectionName) as FhirServiceConfiguration;
+            this.m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<FhirServiceConfigurationSection>();
         }
 
         /// <summary>
@@ -98,7 +95,7 @@ namespace SanteDB.Messaging.FHIR
                     this.m_traceSource.TraceInformation("Starting FHIR on {0}...", endpoint.Description.ListenUri);
 
                     var corsSettings = new Core.Rest.Serialization.CorsSettings();
-                    corsSettings.Resource.AddRange(this.m_configuration.CorsConfiguration.Select(o => new Core.Rest.Serialization.CorsResourceSetting(o.Key, o.Value.Domain, o.Value.Actions, o.Value.Headers)));
+                    corsSettings.Resource.AddRange(this.m_configuration.CorsConfiguration);
                     endpoint.AddEndpointBehavior(new MessageCompressionEndpointBehavior());
                     endpoint.AddEndpointBehavior(new CorsEndpointBehavior(corsSettings));
                     endpoint.AddEndpointBehavior(new MessageLoggingEndpointBehavior());
@@ -160,5 +157,34 @@ namespace SanteDB.Messaging.FHIR
                 return this.m_webHost != null;
             }
         }
+
+        /// <summary>
+        /// Endpoint API type
+        /// </summary>
+        public ServiceEndpointType ApiType => ServiceEndpointType.Hl7FhirInterface;
+
+        /// <summary>
+        /// Url 
+        /// </summary>
+        public string[] Url => this.m_webHost.Endpoints.Select(o=>o.Description.ListenUri.ToString()).ToArray();
+
+        /// <summary>
+        /// Capabilities 
+        /// </summary>
+        public ServiceEndpointCapabilities Capabilities
+        {
+            get
+            {
+                var caps = ServiceEndpointCapabilities.None;
+                if (this.m_webHost.Endpoints.Any(o => o.Behaviors.OfType<MessageCompressionEndpointBehavior>().Any()))
+                    caps |= ServiceEndpointCapabilities.Compression;
+                if (this.m_webHost.ServiceBehaviors.OfType<BasicAuthorizationAccessBehavior>().Any())
+                    caps |= ServiceEndpointCapabilities.BasicAuth;
+                if (this.m_webHost.ServiceBehaviors.OfType<TokenAuthorizationAccessBehavior>().Any())
+                    caps |= ServiceEndpointCapabilities.BearerAuth;
+                return caps;
+            }
+        }
+
     }
 }

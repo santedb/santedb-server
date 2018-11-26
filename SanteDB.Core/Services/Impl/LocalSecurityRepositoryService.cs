@@ -17,35 +17,25 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
+using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Security.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Security.Cryptography;
 using System.Security.Principal;
-using System.Text;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Interfaces;
-using System.Security.Permissions;
-using MARC.HI.EHRS.SVC.Core.Services.Policy;
 
 namespace SanteDB.Core.Services.Impl
 {
-	/// <summary>
-	/// Represents a security repository service that uses the direct local services
-	/// </summary>
-	public class LocalSecurityRepositoryService : ISecurityRepositoryService, 
-        ISecurityAuditEventSource, 
-        ISecurityInformationService
+    /// <summary>
+    /// Represents a security repository service that uses the direct local services
+    /// </summary>
+    public class LocalSecurityRepositoryService : ISecurityRepositoryService, 
+        ISecurityAuditEventSource
     {
 		private TraceSource m_traceSource = new TraceSource(SanteDBConstants.ServiceTraceSourceName);
 
@@ -57,14 +47,6 @@ namespace SanteDB.Core.Services.Impl
         public event EventHandler<SecurityAuditDataEventArgs> SecurityResourceDeleted;
 
         /// <summary>
-        /// Add users to roles
-        /// </summary>
-        public void AddUsersToRoles(string[] users, string[] roles)
-        {
-            ApplicationContext.Current.GetService<IRoleProviderService>().AddUsersToRoles(users, roles, AuthenticationContext.Current.Principal);
-        }
-
-        /// <summary>
         /// Changes a user's password.
         /// </summary>
         /// <param name="userId">The id of the user.</param>
@@ -73,12 +55,12 @@ namespace SanteDB.Core.Services.Impl
         public SecurityUser ChangePassword(Guid userId, string password)
 		{
             this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Changing user password");
-			var securityUser = ApplicationContext.Current.GetService<IRepositoryService<SecurityUser>>()?.Get(userId);
+			var securityUser = ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityUser>>()?.Get(userId);
 			if (securityUser == null)
 				throw new KeyNotFoundException("Cannot locate security user");
-			var iids = ApplicationContext.Current.GetService<IIdentityProviderService>();
+			var iids = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
 			if (iids == null) throw new InvalidOperationException("Cannot find identity provider service");
-			iids.ChangePassword(securityUser.UserName, password, AuthenticationContext.Current.Principal);
+			iids.ChangePassword(securityUser.UserName, password);
             this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(securityUser, "Password"));
 			return securityUser;
 		}
@@ -88,7 +70,7 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public void ChangePassword(string userName, string password)
         {
-            ApplicationContext.Current.GetService<IIdentityProviderService>().ChangePassword(userName, password, AuthenticationContext.Current.Principal);
+            ApplicationServiceContext.Current.GetService<IIdentityProviderService>().ChangePassword(userName, password);
             this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(userName, "Password"));
         }
         
@@ -102,26 +84,9 @@ namespace SanteDB.Core.Services.Impl
 		public SecurityUser CreateUser(SecurityUser userInfo, string password)
 		{
             userInfo.Password = password;
-            return ApplicationContext.Current.GetService<IRepositoryService<SecurityUser>>().Insert(userInfo);
+            return ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityUser>>().Insert(userInfo);
 		}
-
-        /// <summary>
-        /// Get all active policies
-        /// </summary>
-        public IEnumerable<SecurityPolicyInstance> GetActivePolicies(object securable)
-        {
-            return ApplicationContext.Current.GetService<IPolicyInformationService>().GetActivePolicies(securable).Select(o => o.ToPolicyInstance());
-        }
-
-        /// <summary>
-        /// Get all roles from db
-        /// </summary>
-        public string[] GetAllRoles()
-        {
-            return ApplicationContext.Current.GetService<IRoleProviderService>().GetAllRoles();
-        }
-
-
+        
         /// <summary>
         /// Get the policy information in the model format
         /// </summary>
@@ -129,7 +94,7 @@ namespace SanteDB.Core.Services.Impl
         public SecurityPolicy GetPolicy(string policyOid)
         {
             int tr = 0;
-            return ApplicationContext.Current.GetService<IRepositoryService<SecurityPolicy>>().Find(o => o.Oid == policyOid, 0, 1, out tr).SingleOrDefault();
+            return ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityPolicy>>().Find(o => o.Oid == policyOid, 0, 1, out tr).SingleOrDefault();
         }
 
         /// <summary>
@@ -137,7 +102,7 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public SecurityProvenance GetProvenance(Guid provenanceId)
         {
-            return ApplicationContext.Current.GetService<IDataPersistenceService<SecurityProvenance>>().Get(new Identifier<Guid>(provenanceId), AuthenticationContext.Current.Principal, true);
+            return ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityProvenance>>().Get(provenanceId, null, true);
         }
 
         /// <summary>
@@ -146,7 +111,7 @@ namespace SanteDB.Core.Services.Impl
         public SecurityRole GetRole(string roleName)
         {
             int tr = 0;
-            return ApplicationContext.Current.GetService<IRepositoryService<SecurityRole>>()?.Find(o => o.Name == roleName, 0, 1, out tr).SingleOrDefault();
+            return ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityRole>>()?.Find(o => o.Name == roleName, 0, 1, out tr).SingleOrDefault();
         }
         
         /// <summary>
@@ -159,8 +124,8 @@ namespace SanteDB.Core.Services.Impl
         {
             int tr = 0;
             // As the identity service may be LDAP, best to call it to get an identity name
-            var identity = ApplicationContext.Current.GetService<IIdentityProviderService>().GetIdentity(userName);
-            return ApplicationContext.Current.GetService<IRepositoryService<SecurityUser>>().Find(u => u.UserName == identity.Name, 0, 1, out tr).FirstOrDefault();
+            var identity = ApplicationServiceContext.Current.GetService<IIdentityProviderService>().GetIdentity(userName);
+            return ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityUser>>().Find(u => u.UserName == identity.Name, 0, 1, out tr).FirstOrDefault();
         }
 
         /// <summary>
@@ -178,16 +143,9 @@ namespace SanteDB.Core.Services.Impl
 		public UserEntity GetUserEntity(IIdentity identity)
 		{
             int t = 0;
-            return ApplicationContext.Current.GetService<IRepositoryService<UserEntity>>()?.Find(o=>o.SecurityUser.UserName == identity.Name, 0, 1, out t).FirstOrDefault();
+            return ApplicationServiceContext.Current.GetService<IRepositoryService<UserEntity>>()?.Find(o=>o.SecurityUser.UserName == identity.Name, 0, 1, out t).FirstOrDefault();
 		}
         
-        /// <summary>
-        /// Determine if user is in role
-        /// </summary>
-        public bool IsUserInRole(string user, string role)
-        {
-            return ApplicationContext.Current.GetService<IRoleProviderService>().IsUserInRole(user, role);
-        }
 
         /// <summary>
         /// Locks a specific user.
@@ -198,26 +156,18 @@ namespace SanteDB.Core.Services.Impl
 		{
 			this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Locking user {0}", userId);
 
-			var iids = ApplicationContext.Current.GetService<IIdentityProviderService>();
+			var iids = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
 			if (iids == null)
 				throw new InvalidOperationException("Missing identity provider service");
 
-			var securityUser = ApplicationContext.Current.GetService<IRepositoryService<SecurityUser>>()?.Get(userId);
+			var securityUser = ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityUser>>()?.Get(userId);
             if (securityUser == null)
                 throw new KeyNotFoundException(userId.ToString());
-			iids.SetLockout(securityUser.UserName, true, AuthenticationContext.Current.Principal);
+			iids.SetLockout(securityUser.UserName, true);
             this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(securityUser, "Lockout=True"));
 		}
 
-        /// <summary>
-        /// Remove user from roles
-        /// </summary>
-        public void RemoveUsersFromRoles(string[] users, string[] roles)
-        {
-            ApplicationContext.Current.GetService<IRoleProviderService>().RemoveUsersFromRoles(users, roles, AuthenticationContext.Current.Principal);
-        }
-
-       
+     
 		/// <summary>
 		/// Unlocks a specific user.
 		/// </summary>
@@ -227,14 +177,14 @@ namespace SanteDB.Core.Services.Impl
 		{
 			this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Unlocking user {0}", userId);
 
-			var iids = ApplicationContext.Current.GetService<IIdentityProviderService>();
+			var iids = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
 			if (iids == null)
 				throw new InvalidOperationException("Missing identity provider service");
 
-			var securityUser = ApplicationContext.Current.GetService<IRepositoryService<SecurityUser>>()?.Get(userId);
+			var securityUser = ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityUser>>()?.Get(userId);
             if (securityUser == null)
                 throw new KeyNotFoundException(userId.ToString());
-			iids.SetLockout(securityUser.UserName, false, AuthenticationContext.Current.Principal);
+			iids.SetLockout(securityUser.UserName, false);
             this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(securityUser, "Lockout=False"));
 
         }

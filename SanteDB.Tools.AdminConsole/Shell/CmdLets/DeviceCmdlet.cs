@@ -29,8 +29,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
 {
@@ -57,7 +55,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         }
 
         // Ami client
-        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
+        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationServiceContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
 
         #region Device Add 
 

@@ -17,21 +17,16 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Auditing.Data;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
+using SanteDB.Core.Auditing;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Security.Audit
 {
@@ -82,26 +77,26 @@ namespace SanteDB.Core.Security.Audit
             this.Starting?.Invoke(this, EventArgs.Empty);
 
             this.m_safeToStop = false;
-            ApplicationContext.Current.Stopping += (o, e) =>
+            ApplicationServiceContext.Current.Stopping += (o, e) =>
             {
                 this.m_safeToStop = true;
                 AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStop);
                 this.Stop();
             };
-            ApplicationContext.Current.Started += (o, e) =>
+            ApplicationServiceContext.Current.Started += (o, e) =>
             {
                 try
                 {
                     this.m_tracer.TraceInfo("Binding to service events...");
 
-                    ApplicationContext.Current.GetService<IIdentityProviderService>().Authenticated += (so, se) =>
+                    ApplicationServiceContext.Current.GetService<IIdentityProviderService>().Authenticated += (so, se) =>
                     {
                         AuditUtil.AuditLogin(se.Principal, se.UserName, so as IIdentityProviderService, se.Success);
                     };
                    
 
                     // Scan for IRepositoryServices and bind to their events as well
-                    foreach (var svc in ApplicationContext.Current.GetServices().OfType<IAuditEventSource>())
+                    foreach (var svc in (ApplicationServiceContext.Current as IServiceManager).GetServices().OfType<IAuditEventSource>())
                     {
                         // Audits from the audit repository itself need to be audited however they are not audit data
                         if (svc is IAuditRepositoryService)

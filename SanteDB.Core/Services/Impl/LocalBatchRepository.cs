@@ -17,25 +17,18 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Core.Exceptions;
-using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Collection;
-using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
 using System;
-using System.Linq;
-using SanteDB.Core.Interfaces;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace SanteDB.Core.Services.Impl
 {
-	/// <summary>
-	/// Local batch repository service
-	/// </summary>
-	public class LocalBatchRepository :
+    /// <summary>
+    /// Local batch repository service
+    /// </summary>
+    public class LocalBatchRepository :
         GenericLocalRepository<Bundle>
 	{
        
@@ -80,7 +73,7 @@ namespace SanteDB.Core.Services.Impl
             foreach(var itm in data.Item)
             {
                 var irst = typeof(IRepositoryService<>).MakeGenericType(itm.GetType());
-                var irsi = ApplicationContext.Current.GetService(irst);
+                var irsi = ApplicationServiceContext.Current.GetService(irst);
                 if (irsi is ISecuredRepositoryService)
                     (irsi as ISecuredRepositoryService).DemandWrite(itm);
             }
@@ -106,7 +99,7 @@ namespace SanteDB.Core.Services.Impl
             foreach (var itm in data.Item)
             {
                 var irst = typeof(IRepositoryService<>).MakeGenericType(itm.GetType());
-                var irsi = ApplicationContext.Current.GetService(irst);
+                var irsi = ApplicationServiceContext.Current.GetService(irst);
                 if (irsi is ISecuredRepositoryService)
                     (irsi as ISecuredRepositoryService).DemandAlter(itm);
             }
@@ -114,8 +107,8 @@ namespace SanteDB.Core.Services.Impl
             // Demand permission
             this.DemandAlter(data);
 
-            var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<Bundle>>();
-            var businessRulesService = ApplicationContext.Current.GetBusinessRulesService<Bundle>();
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Bundle>>();
+            var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<Bundle>();
 
             if (persistenceService == null)
                 throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<Bundle>)}");
@@ -123,7 +116,7 @@ namespace SanteDB.Core.Services.Impl
             data = this.Validate(data);
 
             data = businessRulesService?.BeforeUpdate(data) ?? data;
-            data = persistenceService.Update(data, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+            data = persistenceService.Update(data, TransactionMode.Commit);
             businessRulesService?.AfterUpdate(data);
             return data;
         }

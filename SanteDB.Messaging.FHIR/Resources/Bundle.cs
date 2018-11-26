@@ -23,11 +23,8 @@ using SanteDB.Messaging.FHIR.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 using System.Xml;
+using System.Xml.Serialization;
 
 namespace SanteDB.Messaging.FHIR.Resources
 {

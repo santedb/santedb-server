@@ -22,10 +22,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.Error
 {
-	/// <summary>
-	/// Class ErrorDescriptor.
-	/// </summary>
-	[XmlType("errorDescriptor")]
+    /// <summary>
+    /// Class ErrorDescriptor.
+    /// </summary>
+    [XmlType("errorDescriptor")]
 	[XmlRoot("errorDescriptor")]
 	public class ErrorDescriptor
 	{

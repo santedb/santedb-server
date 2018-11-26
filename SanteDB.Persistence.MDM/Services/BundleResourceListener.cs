@@ -17,15 +17,14 @@
  * User: justin
  * Date: 2018-10-14
  */
-using MARC.HI.EHRS.SVC.Core.Event;
+using SanteDB.Core.Event;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Collection;
+using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.MDM.Services
 {
@@ -48,33 +47,33 @@ namespace SanteDB.Persistence.MDM.Services
         /// <summary>
         /// As a bundle, we call the base on the contents of the data
         /// </summary>
-        protected override void OnPrePersistenceValidate(object sender, PrePersistenceEventArgs<Bundle> e)
+        protected override void OnPrePersistenceValidate(object sender, DataPersistingEventArgs<Bundle> e)
         {
-            this.ChainInvoke(sender, e, e.Data, nameof(OnPrePersistenceValidate), typeof(PrePersistenceEventArgs<>));
+            this.ChainInvoke(sender, e, e.Data, nameof(OnPrePersistenceValidate), typeof(DataPersistingEventArgs<>));
         }
 
         /// <summary>
         /// Chain invoke a bundle on inserted
         /// </summary>
-        protected override void OnInserted(object sender, PostPersistenceEventArgs<Bundle> e)
+        protected override void OnInserted(object sender, DataPersistedEventArgs<Bundle> e)
         {
-            this.ChainInvoke(sender, e, e.Data, nameof(OnInserted), typeof(PostPersistenceEventArgs<>));
+            this.ChainInvoke(sender, e, e.Data, nameof(OnInserted), typeof(DataPersistedEventArgs<>));
         }
 
         /// <summary>
         /// Chain invoke a bundle
         /// </summary>
-        protected override void OnUpdated(object sender, PostPersistenceEventArgs<Bundle> e)
+        protected override void OnUpdated(object sender, DataPersistedEventArgs<Bundle> e)
         {
-            this.ChainInvoke(sender, e, e.Data, nameof(OnUpdated), typeof(PostPersistenceEventArgs<>));
+            this.ChainInvoke(sender, e, e.Data, nameof(OnUpdated), typeof(DataPersistedEventArgs<>));
         }
 
         /// <summary>
         /// On obsoleting
         /// </summary>
-        protected override void OnObsoleting(object sender, PrePersistenceEventArgs<Bundle> e)
+        protected override void OnObsoleting(object sender, DataPersistingEventArgs<Bundle> e)
         {
-            this.ChainInvoke(sender, e, e.Data, nameof(OnObsoleting), typeof(PrePersistenceEventArgs<>));
+            this.ChainInvoke(sender, e, e.Data, nameof(OnObsoleting), typeof(DataPersistingEventArgs<>));
         }
 
         /// <summary>
@@ -96,7 +95,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <summary>
         /// Cannot query bundles
         /// </summary>
-        protected override void OnQuerying(object sender, PreQueryEventArgs<Bundle> e)
+        protected override void OnQuerying(object sender, QueryRequestEventArgs<Bundle> e)
         {
             throw new NotSupportedException("Cannot query bundles");
         }
@@ -104,7 +103,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <summary>
         /// Cannot query bundles
         /// </summary>
-        protected override void OnQueried(object sender, PostQueryEventArgs<Bundle> e)
+        protected override void OnQueried(object sender, QueryResultEventArgs<Bundle> e)
         {
             throw new NotSupportedException("Cannot query bundles");
         }
@@ -112,7 +111,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <summary>
         /// Cannot query bundles
         /// </summary>
-        protected override void OnRetrieved(object sender, PostRetrievalEventArgs<Bundle> e)
+        protected override void OnRetrieved(object sender, DataRetrievedEventArgs<Bundle> e)
         {
             throw new NotSupportedException("Cannot retrieve bundles");
         }
@@ -120,7 +119,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <summary>
         /// Cannot query bundles
         /// </summary>
-        protected override void OnRetrieving(object sender, PreRetrievalEventArgs<Bundle> e)
+        protected override void OnRetrieving(object sender, DataRetrievingEventArgs<Bundle> e)
         {
             throw new NotSupportedException("Cannot retrieve bundles");
         }
@@ -144,8 +143,8 @@ namespace SanteDB.Persistence.MDM.Services
                     // Cancel?
                     bundle.Item[i] = evtArgType.GetRuntimeProperty("Data").GetValue(evtArgs) as IdentifiedData;
 
-                    if(eventArgs is PrePersistenceEventArgs<Bundle>)
-                        (eventArgs as PrePersistenceEventArgs<Bundle>).Cancel |= (bool)evtArgType.GetRuntimeProperty("Cancel").GetValue(evtArgs);
+                    if(eventArgs is DataPersistingEventArgs<Bundle>)
+                        (eventArgs as DataPersistingEventArgs<Bundle>).Cancel |= (bool)evtArgType.GetRuntimeProperty("Cancel").GetValue(evtArgs);
 
                 }
             }

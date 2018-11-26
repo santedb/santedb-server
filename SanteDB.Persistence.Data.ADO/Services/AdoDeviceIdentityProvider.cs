@@ -17,33 +17,27 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Security.Services;
+using SanteDB.Core.Services;
+using SanteDB.Persistence.Data.ADO.Configuration;
+using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Event;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
-using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
-using SanteDB.Core.Services;
-using SanteDB.OrmLite;
-using SanteDB.Persistence.Data.ADO.Configuration;
-using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
-	/// <summary>
-	/// Represents a device identity provider.
-	/// </summary>
-	public class AdoDeviceIdentityProvider : IDeviceIdentityProviderService
+    /// <summary>
+    /// Represents a device identity provider.
+    /// </summary>
+    public class AdoDeviceIdentityProvider : IDeviceIdentityProviderService
 	{
 		/// <summary>
 		/// The trace source.
@@ -53,7 +47,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 		/// <summary>
 		/// The configuration.
 		/// </summary>
-		private readonly AdoConfiguration configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(AdoDataConstants.ConfigurationSectionName) as AdoConfiguration;
+		private readonly AdoPersistenceConfigurationSection configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
 
 		/// <summary>
 		/// Fired after an authentication request has been made.
@@ -78,10 +72,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
 				{
 					dataContext.Open();
 
-					var hashService = ApplicationContext.Current.GetService<IPasswordHashingService>();
+					var hashService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
                     // TODO - Allow configuation of max login attempts
-					var client = dataContext.FirstOrDefault<DbSecurityDevice>("auth_dev", deviceId, hashService.EncodePassword(deviceSecret), 5);
+					var client = dataContext.FirstOrDefault<DbSecurityDevice>("auth_dev", deviceId, hashService.ComputeHash(deviceSecret), 5);
 
                     if (client == null)
                         throw new SecurityException("Invalid device credentials");

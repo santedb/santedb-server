@@ -18,16 +18,14 @@
  * Date: 2018-6-22
  */
 using MARC.Everest.Connectors;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Messaging.FHIR.Resources;
+using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
+using SanteDB.Messaging.FHIR.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,10 +34,10 @@ using System.Reflection;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
-	/// <summary>
-	/// Resource handler for acts base
-	/// </summary>
-	public abstract class RepositoryResourceHandlerBase<TFhirResource, TModel> : ResourceHandlerBase<TFhirResource, TModel>
+    /// <summary>
+    /// Resource handler for acts base
+    /// </summary>
+    public abstract class RepositoryResourceHandlerBase<TFhirResource, TModel> : ResourceHandlerBase<TFhirResource, TModel>
 		where TFhirResource : DomainResourceBase, new()
 		where TModel : IdentifiedData, new()
 	{
@@ -51,9 +49,9 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// </summary>
 		public RepositoryResourceHandlerBase()
 		{
-            ApplicationContext.Current.Started += (o, e) =>
+            ApplicationServiceContext.Current.Started += (o, e) =>
             {
-                this.m_repository = ApplicationContext.Current.GetService<IRepositoryService<TModel>>();
+                this.m_repository = ApplicationServiceContext.Current.GetService<IRepositoryService<TModel>>();
 
             };
 		}
@@ -111,7 +109,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 				query = Expression.Lambda<Func<TPredicate, bool>>(Expression.AndAlso(obsoletionReference, query.Body), query.Parameters);
 			}
 
-            var repo = ApplicationContext.Current.GetService<IRepositoryService<TPredicate>>();
+            var repo = ApplicationServiceContext.Current.GetService<IRepositoryService<TPredicate>>();
             if (queryId == Guid.Empty)
                 return repo.Find(query, offset, count, out totalResults);
             else
@@ -121,9 +119,9 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// Perform a read operation
 		/// </summary>
-		protected override TModel Read(Identifier<Guid> id, List<IResultDetail> details)
+		protected override TModel Read(Guid id, Guid versionId, List<IResultDetail> details)
 		{
-			return this.m_repository.Get(id.Id, id.VersionId);
+			return this.m_repository.Get(id, versionId);
 		}
 
 		/// <summary>

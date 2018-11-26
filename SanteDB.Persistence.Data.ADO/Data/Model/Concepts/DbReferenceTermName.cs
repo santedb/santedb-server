@@ -19,12 +19,8 @@
  */
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
+using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Concepts
 {

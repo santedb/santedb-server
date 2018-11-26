@@ -17,8 +17,6 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security.Tfa.Email.Configuration;
@@ -34,13 +32,13 @@ using System.Net.Mail;
 
 namespace SanteDB.Core.Security.Tfa.Email
 {
-	/// <summary>
-	/// Represents a TFA mechanism which can send/receive TFA requests via e-mail
-	/// </summary>
-	public class TfaEmailMechanism : ITfaMechanism
+    /// <summary>
+    /// Represents a TFA mechanism which can send/receive TFA requests via e-mail
+    /// </summary>
+    public class TfaEmailMechanism : ITfaMechanism
 	{
 		// Configuration
-		private MechanismConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("SanteDB.core.security.tfa.email") as MechanismConfiguration;
+		private TfaEmailMechanismConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<TfaEmailMechanismConfigurationSection>();
 
 		// Tracer
 		private TraceSource m_tracer = new TraceSource("SanteDB.Core.Security.Tfa.Email");
@@ -96,7 +94,7 @@ namespace SanteDB.Core.Security.Tfa.Email
 			else
 			{
 				// Get preferred language for the user
-				var securityService = ApplicationContext.Current.GetService<IRepositoryService<UserEntity>>();
+				var securityService = ApplicationServiceContext.Current.GetService<IRepositoryService<UserEntity>>();
 				var userEntity = securityService?.Find(o => o.SecurityUserKey == user.Key).FirstOrDefault();
 
                 this.m_tracer.TraceEvent(TraceEventType.Information, 0, "Password reset has been requested for {0}", userEntity.Key);

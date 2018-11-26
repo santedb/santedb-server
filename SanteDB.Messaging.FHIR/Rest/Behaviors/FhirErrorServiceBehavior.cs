@@ -17,24 +17,22 @@
  * User: justin
  * Date: 2018-11-23
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Exceptions;
-using MARC.HI.EHRS.SVC.Core.Services;
 using RestSrvr;
 using RestSrvr.Exceptions;
 using RestSrvr.Message;
+using SanteDB.Core;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.Services;
 using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Rest.Serialization;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.IdentityModel.Tokens;
 using System.IO;
-using System.Linq;
 using System.Security;
 
 namespace SanteDB.Messaging.FHIR.Rest.Behavior
@@ -46,7 +44,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
     {
 
         private TraceSource m_tracer = new TraceSource("SanteDB.Messaging.FHIR");
-        private SanteDBConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.core") as SanteDBConfiguration;
+        private ClaimsAuthorizationConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<ClaimsAuthorizationConfigurationSection>();
 
         /// <summary>
         /// Apply the service behavior
@@ -79,12 +77,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
             else if (error is SecurityTokenException)
             {
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
-                RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", $"Bearer realm=\"{this.m_configuration.Security.ClaimsAuth.Realm}\"");
-            }
-            else if (error is UnauthorizedRequestException)
-            {
-                RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
-                RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", (error as UnauthorizedRequestException).AuthenticateChallenge);
+                RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", $"Bearer realm=\"{this.m_configuration.Realm}\"");
             }
             else if (error is FaultException)
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)(error as FaultException).StatusCode;
@@ -115,6 +108,15 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
                 ie = ie.InnerException;
             }
 
+            if (error is DetectedIssueException)
+                foreach (var iss in (error as DetectedIssueException).Issues)
+                    errorResult.Issue.Add(new Issue()
+                    {
+                        Diagnostics = iss.Text,
+                        Severity = iss.Priority == DetectedIssuePriorityType.Error ? IssueSeverity.Error :
+                        iss.Priority == DetectedIssuePriorityType.Warning ? IssueSeverity.Warning :
+                        IssueSeverity.Information
+                    });
             // Return error in XML only at this point
             new FhirMessageDispatchFormatter().SerializeResponse(response, null, errorResult);
             return true;

@@ -17,9 +17,8 @@
  * User: justin
  * Date: 2018-9-25
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core;
+using SanteDB.Core.Event;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Collection;
@@ -35,12 +34,10 @@ using SanteDB.Core.Services;
 using SanteDB.Persistence.MDM.Configuration;
 using SanteDB.Persistence.MDM.Model;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Security.Claims;
 using System.Security.Permissions;
 using System.Security.Principal;
@@ -81,7 +78,7 @@ namespace SanteDB.Persistence.MDM.Services
         public MdmResourceListener(MdmResourceConfiguration configuration)
         {
             this.m_resourceConfiguration = configuration;
-            this.m_repository = ApplicationContext.Current.GetService<IDataPersistenceService<T>>();
+            this.m_repository = ApplicationServiceContext.Current.GetService<IDataPersistenceService<T>>();
             if (this.m_repository == null)
                 throw new InvalidOperationException($"Could not find persistence service for {typeof(T)}");
 
@@ -108,7 +105,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// otherwise they will receive the master records.
         /// </para>
         /// </remarks>
-        protected virtual void OnQuerying(object sender, MARC.HI.EHRS.SVC.Core.Event.PreQueryEventArgs<T> e)
+        protected virtual void OnQuerying(object sender, QueryRequestEventArgs<T> e)
         {
             var query = new NameValueCollection(QueryExpressionBuilder.BuildQuery<T>(e.Query).ToArray());
 
@@ -131,10 +128,10 @@ namespace SanteDB.Persistence.MDM.Services
                     // We are wrapping an entity, so we query entity masters
                     int tr = 0;
                     if (typeof(Entity).IsAssignableFrom(typeof(T)))
-                        e.OverrideResults = this.MasterQuery<Entity>(query, e.QueryId.GetValueOrDefault(), e.Offset, e.Count, e.Principal, out tr);
+                        e.Results = this.MasterQuery<Entity>(query, e.QueryId.GetValueOrDefault(), e.Offset, e.Count, e.Principal, out tr);
                     else
-                        e.OverrideResults = this.MasterQuery<Act>(query, e.QueryId.GetValueOrDefault(), e.Offset, e.Count, e.Principal, out tr);
-                    e.OverrideTotalResults = tr;
+                        e.Results = this.MasterQuery<Act>(query, e.QueryId.GetValueOrDefault(), e.Offset, e.Count, e.Principal, out tr);
+                    e.TotalResults = tr;
                 }
             }
         }
@@ -143,10 +140,11 @@ namespace SanteDB.Persistence.MDM.Services
         /// Perform a master query 
         /// </summary>
         private IEnumerable<T> MasterQuery<TMasterType>(NameValueCollection query, Guid queryId, int offset, int? count, IPrincipal principal, out int totalResults)
+            where TMasterType : IdentifiedData
         {
             var masterQuery = QueryExpressionParser.BuildLinqExpression<TMasterType>(query);
             int tr = 0;
-            return ApplicationContext.Current.GetService<IStoredQueryDataPersistenceService<TMasterType>>().Query(masterQuery, queryId, offset, count, principal, out totalResults)
+            return ApplicationServiceContext.Current.GetService<IStoredQueryDataPersistenceService<TMasterType>>().Query(masterQuery, queryId, offset, count, out totalResults, principal)
                 .Select(o => o is Entity ? new EntityMaster<T>((Entity)(object)o).GetMaster(principal) : new ActMaster<T>((Act)(Object)o).GetMaster(principal)).AsParallel().ToList();
         }
 
@@ -157,7 +155,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <param name="e"></param>
         /// <remarks>The MDM provider will ensure that no data from the LOCAL instance which is masked is returned
         /// in the MASTER record</remarks>
-        protected virtual void OnQueried(object sender, MARC.HI.EHRS.SVC.Core.Event.PostQueryEventArgs<T> e)
+        protected virtual void OnQueried(object sender, QueryResultEventArgs<T> e)
         {
             // TODO: Filter master record data based on taboo child records.
 
@@ -172,22 +170,20 @@ namespace SanteDB.Persistence.MDM.Services
         /// which is a master is actually retrieving an entity which has a synthetic record of type Patient. If we 
         /// don't redirect these requests then technically a request to retrieve a master will result in an emtpy / exception
         /// case.</remarks>
-        protected virtual void OnRetrieving(object sender, MARC.HI.EHRS.SVC.Core.Event.PreRetrievalEventArgs<T> e)
+        protected virtual void OnRetrieving(object sender, DataRetrievingEventArgs<T> e)
         {
-            var retrieveId = (Identifier<Guid>)e.Identifier;
-
             // There aren't actually any data in the database which is of this type
-            if ((sender as IDataPersistenceService<T>).Count(o => o.Key == retrieveId.Id, AuthenticationContext.Current.Principal) == 0) //
+            if ((sender as IDataPersistenceService<T>).Count(o => o.Key == e.Id, AuthenticationContext.Current.Principal) == 0) //
             {
                 e.Cancel = true;
                 if (typeof(Entity).IsAssignableFrom(typeof(T)))
                 {
-                    var master = ApplicationContext.Current.GetService<IDataPersistenceService<Entity>>().Get(retrieveId, AuthenticationContext.Current.Principal, false);
+                    var master = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Entity>>().Get(e.Id.Value, null, false, AuthenticationContext.Current.Principal);
                     e.OverrideResult = new EntityMaster<T>(master).GetMaster(AuthenticationContext.Current.Principal);
                 }
                 else if (typeof(Act).IsAssignableFrom(typeof(T)))
                 {
-                    var master = ApplicationContext.Current.GetService<IDataPersistenceService<Act>>().Get(retrieveId, AuthenticationContext.Current.Principal, false);
+                    var master = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Act>>().Get(e.Id.Value, null, false, AuthenticationContext.Current.Principal);
                     e.OverrideResult = new ActMaster<T>(master).GetMaster(AuthenticationContext.Current.Principal);
                 }
             }
@@ -200,7 +196,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <param name="e"></param>
         /// <remarks>MDM provider will ensure that if the retrieved record is a MASTER record, that no 
         /// data from masked LOCAL records is included.</remarks>
-        protected virtual void OnRetrieved(object sender, MARC.HI.EHRS.SVC.Core.Event.PostRetrievalEventArgs<T> e)
+        protected virtual void OnRetrieved(object sender, DataRetrievedEventArgs<T> e)
         {
             // We have retrieved an object from the database. If it is local we have to ensure that 
             // 1. The user actually requested the local
@@ -221,7 +217,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <param name="e"></param>
         /// <remarks>We don't want clients submitting MASTER records, so this method will ensure that all records
         /// being sent with tag of MASTER are indeed sent by the MDM or SYSTEM user.</remarks>
-        protected virtual void OnPrePersistenceValidate(object sender, MARC.HI.EHRS.SVC.Core.Event.PrePersistenceEventArgs<T> e)
+        protected virtual void OnPrePersistenceValidate(object sender, DataPersistingEventArgs<T> e)
         {
             Guid? classConcept = (e.Data as Entity)?.ClassConceptKey ?? (e.Data as Act)?.ClassConceptKey;
             // We are touching a master record and we are not system?
@@ -238,7 +234,7 @@ namespace SanteDB.Persistence.MDM.Services
                 if (eRelationship != null)
                 {
                     // Get existing er if available
-                    var dbRelationship = ApplicationContext.Current.GetService<IDataPersistenceService<EntityRelationship>>().Query(o => o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship || o.RelationshipTypeKey == MdmConstants.DuplicateRecordRelationship && o.SourceEntityKey == identified.Key, 0, 1, e.Principal, out tr);
+                    var dbRelationship = ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityRelationship>>().Query(o => o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship || o.RelationshipTypeKey == MdmConstants.DuplicateRecordRelationship && o.SourceEntityKey == identified.Key, 0, 1, out tr, e.Principal);
                     if (tr == 0 || dbRelationship.First().TargetEntityKey == eRelationship.TargetEntityKey)
                         return;
                     else if (!e.Principal.IsInRole("SYSTEM")) // The target entity is being re-associated make sure the principal is allowed to do this
@@ -256,7 +252,7 @@ namespace SanteDB.Persistence.MDM.Services
                 if (eRelationship != null)
                 {
                     // Get existing er if available
-                    var dbRelationship = ApplicationContext.Current.GetService<IDataPersistenceService<ActRelationship>>().Query(o => o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship || o.RelationshipTypeKey == MdmConstants.DuplicateRecordRelationship && o.SourceEntityKey == identified.Key, 0, 1, e.Principal, out tr);
+                    var dbRelationship = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ActRelationship>>().Query(o => o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship || o.RelationshipTypeKey == MdmConstants.DuplicateRecordRelationship && o.SourceEntityKey == identified.Key, 0, 1, out tr, e.Principal);
                     if (tr == 0 || dbRelationship.First().TargetActKey == eRelationship.TargetActKey)
                         return;
                     else if (!e.Principal.IsInRole("SYSTEM")) // The target entity is being re-associated make sure the principal is allowed to do this
@@ -278,7 +274,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <param name="e"></param>
         /// <remarks>We don't want a MASTER record to be obsoleted under any condition. MASTER records require special permission to 
         /// obsolete and also require that all LOCAL records be either re-assigned or obsoleted as well.</remarks>
-        protected virtual void OnObsoleting(object sender, MARC.HI.EHRS.SVC.Core.Event.PrePersistenceEventArgs<T> e)
+        protected virtual void OnObsoleting(object sender, DataPersistingEventArgs<T> e)
         {
             // Obsoleting a master record requires that the user be a SYSTEM user or has WriteMDM permission
             Guid? classConcept = (e.Data as Entity)?.ClassConceptKey ?? (e.Data as Act)?.ClassConceptKey;
@@ -297,7 +293,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <param name="e"></param>
         /// <remarks>This method will ensure that the record matching service is re-run after an update, and 
         /// that any new links be created/updated.</remarks>
-        protected virtual void OnUpdated(object sender, MARC.HI.EHRS.SVC.Core.Event.PostPersistenceEventArgs<T> e)
+        protected virtual void OnUpdated(object sender, DataPersistedEventArgs<T> e)
         {
 
             // Is this object a ROT, if it is then we do not perform any changes to re-binding
@@ -311,21 +307,21 @@ namespace SanteDB.Persistence.MDM.Services
                 if (identified is Entity && mdmTag == null)
                 {
                     var et = new EntityTag("mdm.type", "L");
-                    ApplicationContext.Current.GetService<ITagPersistenceService>().Save(identified.Key.Value, et);
+                    ApplicationServiceContext.Current.GetService<ITagPersistenceService>().Save(identified.Key.Value, et);
                     (e.Data as Entity).Tags.Add(et);
                     mdmTag = et;
                 }
                 else if (identified is Act && mdmTag == null)
                 {
                     var at = new ActTag("mdm.type", "L");
-                    ApplicationContext.Current.GetService<ITagPersistenceService>().Save(identified.Key.Value, at);
+                    ApplicationServiceContext.Current.GetService<ITagPersistenceService>().Save(identified.Key.Value, at);
                     (e.Data as Act).Tags.Add(at);
                     mdmTag = at;
                 }
 
                 // Perform matching
                 this.PerformMdmMatch(identified);
-                //ApplicationContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(this.PerformMdmMatch, identified);
+                //ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(this.PerformMdmMatch, identified);
             }
 
         }
@@ -337,7 +333,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <param name="e"></param>
         /// <remarks>This method will fire the record matching service and will ensure that duplicates are marked
         /// and merged into any existing MASTER record.</remarks>
-        protected virtual void OnInserted(object sender, MARC.HI.EHRS.SVC.Core.Event.PostPersistenceEventArgs<T> e)
+        protected virtual void OnInserted(object sender, DataPersistedEventArgs<T> e)
         {
 
             // Gather tags to determine whether the object has been linked to a master
@@ -349,14 +345,14 @@ namespace SanteDB.Persistence.MDM.Services
                 if (identified is Entity)
                 {
                     var et = new EntityTag("mdm.type", "L");
-                    ApplicationContext.Current.GetService<ITagPersistenceService>().Save(identified.Key.Value, et);
+                    ApplicationServiceContext.Current.GetService<ITagPersistenceService>().Save(identified.Key.Value, et);
                     (e.Data as Entity).Tags.Add(et);
                     mdmTag = et;
                 }
                 else if (identified is Act)
                 {
                     var at = new ActTag("mdm.type", "L");
-                    ApplicationContext.Current.GetService<ITagPersistenceService>().Save(identified.Key.Value, at);
+                    ApplicationServiceContext.Current.GetService<ITagPersistenceService>().Save(identified.Key.Value, at);
                     (e.Data as Act).Tags.Add(at);
                     mdmTag = at;
                 }
@@ -365,7 +361,7 @@ namespace SanteDB.Persistence.MDM.Services
             // Find records for which this record could be match // async
             if (mdmTag?.Value == "L")
                 this.PerformMdmMatch(identified);
-                //ApplicationContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(this.PerformMdmMatch, identified);
+                //ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(this.PerformMdmMatch, identified);
 
         }
 
@@ -374,14 +370,14 @@ namespace SanteDB.Persistence.MDM.Services
         /// </summary>
         private void PerformMdmMatch(object state)
         {
-            var matchService = ApplicationContext.Current.GetService<IRecordMatchingService>();
+            var matchService = ApplicationServiceContext.Current.GetService<IRecordMatchingService>();
             if (matchService == null)
                 return; // Cannot make determination of matching
 
             var identified = (IdentifiedData)state;
             var taggable = (ITaggable)state;
             var relationshipType = identified is Entity ? typeof(EntityRelationship) : typeof(ActRelationship);
-            var relationshipService = ApplicationContext.Current.GetService(typeof(IDataPersistenceService<>).MakeGenericType(relationshipType)) as IDataPersistenceService;
+            var relationshipService = ApplicationServiceContext.Current.GetService(typeof(IDataPersistenceService<>).MakeGenericType(relationshipType)) as IDataPersistenceService;
             var matchingRecords = matchService.Match(identified, this.m_resourceConfiguration.MatchConfiguration);
 
             // Matching records can only match with MASTER records
@@ -466,7 +462,7 @@ namespace SanteDB.Persistence.MDM.Services
                         if (tr == 0) // no other records point at the old master, obsolete it
                         {
                             var idt = typeof(IDataPersistenceService<>).MakeGenericType(typeof(Entity).IsAssignableFrom(typeof(T)) ? typeof(Entity) : typeof(Act));
-                            var ids = ApplicationContext.Current.GetService(idt) as IDataPersistenceService;
+                            var ids = ApplicationServiceContext.Current.GetService(idt) as IDataPersistenceService;
                             ids.Obsolete(ids.Get(oldMasterId));
                         }
                     }
@@ -494,7 +490,7 @@ namespace SanteDB.Persistence.MDM.Services
                     // Is this the only record in the current master relationship?
                     var oldMasterRel = rels.OfType<IdentifiedData>().SingleOrDefault().Clone();
                     var oldMasterId = (Guid)oldMasterRel.GetType().GetQueryProperty("target").GetValue(oldMasterRel);
-                    ApplicationContext.Current.GetService<IDataCachingService>()?.Remove(oldMasterRel.Key.Value);
+                    ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(oldMasterRel.Key.Value);
 
                     // Query for other masters
                     query = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })
@@ -524,10 +520,10 @@ namespace SanteDB.Persistence.MDM.Services
                     .Select(m => this.CreateRelationship(relationshipType, MdmConstants.DuplicateRecordRelationship, identified.Key, m.Record.Key, (identified as IVersionedEntity).VersionSequence)));
 
             // Insert relationships
-            ApplicationContext.Current.GetService<IDataPersistenceService<Bundle>>().Insert(new Bundle()
+            ApplicationServiceContext.Current.GetService<IDataPersistenceService<Bundle>>().Insert(new Bundle()
             {
                 Item = insertData
-            }, AuthenticationContext.SystemPrincipal, TransactionMode.Commit);
+            }, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
         }
 
         /// <summary>
@@ -590,10 +586,10 @@ namespace SanteDB.Persistence.MDM.Services
         {
             // Relationship type
             var relationshipType = master is Entity ? typeof(EntityRelationship) : typeof(ActRelationship);
-            var relationshipService = ApplicationContext.Current.GetService(typeof(IDataPersistenceService<>).MakeGenericType(relationshipType)) as IDataPersistenceService;
+            var relationshipService = ApplicationServiceContext.Current.GetService(typeof(IDataPersistenceService<>).MakeGenericType(relationshipType)) as IDataPersistenceService;
 
             // Ensure that MASTER is in fact a master
-            IDataPersistenceService masterService = master is Entity ? ApplicationContext.Current.GetService<IDataPersistenceService<Entity>>() as IDataPersistenceService : ApplicationContext.Current.GetService<IDataPersistenceService<Act>>() as IDataPersistenceService;
+            IDataPersistenceService masterService = master is Entity ? ApplicationServiceContext.Current.GetService<IDataPersistenceService<Entity>>() as IDataPersistenceService : ApplicationServiceContext.Current.GetService<IDataPersistenceService<Act>>() as IDataPersistenceService;
             var masterData = masterService.Get(master.Key.Value) as IClassifiable;
             if (masterData.ClassConceptKey == MdmConstants.MasterRecordClassification && !AuthenticationContext.Current.Principal.IsInRole("SYSTEM"))
                 new PolicyPermission(PermissionState.Unrestricted, MdmPermissionPolicyIdentifiers.WriteMdmMaster).Demand();
@@ -639,7 +635,7 @@ namespace SanteDB.Persistence.MDM.Services
                         // Now we want to mark LMASTER replaced by MASTER
                         var mrel = this.CreateRelationship(relationshipType, EntityRelationshipTypeKeys.Replaces, master.Key, ldpl.Key, (master as IVersionedEntity).VersionSequence);
                         relationshipService.Insert(mrel);
-                        ApplicationContext.Current.GetService<IDataPersistenceService<T>>().Obsolete(ldpl, AuthenticationContext.SystemPrincipal, TransactionMode.Commit);
+                        ApplicationServiceContext.Current.GetService<IDataPersistenceService<T>>().Obsolete(ldpl, TransactionMode.Commit);
                     }
                     else // LOCAL <> LOCAL
                     {
@@ -657,7 +653,7 @@ namespace SanteDB.Persistence.MDM.Services
                         // Now we want to set replaces relationship
                         var mrel = this.CreateRelationship(relationshipType, EntityRelationshipTypeKeys.Replaces, master.Key, ldpl.Key, (master as IVersionedEntity).VersionSequence);
                         relationshipService.Insert(mrel);
-                        ApplicationContext.Current.GetService<IDataPersistenceService<T>>().Obsolete(ldpl, AuthenticationContext.SystemPrincipal, TransactionMode.Commit);
+                        ApplicationServiceContext.Current.GetService<IDataPersistenceService<T>>().Obsolete(ldpl, TransactionMode.Commit);
 
                         // Check if the master is orphaned, if so obsolete it
                         existingMasterQry = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })

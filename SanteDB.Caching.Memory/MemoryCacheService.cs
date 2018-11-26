@@ -17,10 +17,9 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Event;
-using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Caching.Memory.Configuration;
+using SanteDB.Core;
+using SanteDB.Core.Jobs;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Attributes;
@@ -28,16 +27,12 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
-using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace SanteDB.Caching.Memory
@@ -55,7 +50,7 @@ namespace SanteDB.Caching.Memory
         private EventHandler<ModelMapEventArgs> m_mappedHandler = null;
 
         // Memory cache configuration
-        private MemoryCacheConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.caching.memory") as MemoryCacheConfiguration;
+        private MemoryCacheConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<MemoryCacheConfigurationSection>();
         private TraceSource m_tracer = new TraceSource("SanteDB.Caching.Memory");
 	    private static object s_lock = new object();
 
@@ -130,7 +125,7 @@ namespace SanteDB.Caching.Memory
             
 
             // Now we start timers
-            var timerService = ApplicationContext.Current.GetService<ITimerService>();
+            var timerService = ApplicationServiceContext.Current.GetService<IJobManagerService>();
             if(timerService != null && this.m_configuration.Types.Count > 0)
             {
                 if (timerService.IsRunning)

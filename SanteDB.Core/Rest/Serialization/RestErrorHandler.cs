@@ -17,37 +17,27 @@
  * User: justin
  * Date: 2018-11-23
  */
-using MARC.HI.EHRS.SVC.Core.Exceptions;
 using RestSrvr;
 using RestSrvr.Exceptions;
 using RestSrvr.Message;
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Model.Security;
+using SanteDB.Core.Rest.Security;
 using SanteDB.Core.Security.Audit;
-using SanteDB.Core.Rest.Serialization;
+using SanteDB.Core.Services;
+using SanteDB.Rest.Common.Fault;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Linq;
-using System.Diagnostics;
 using System.IdentityModel.Tokens;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Runtime.Serialization;
 using System.Security;
 using System.Security.Authentication;
-using System.ServiceModel;
-using System.ServiceModel.Channels;
-using System.ServiceModel.Dispatcher;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-using SanteDB.Rest.Common.Fault;
-using SanteDB.Core.Configuration;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services.Policy;
 
 namespace SanteDB.Core.Rest.Serialization
 {
@@ -59,7 +49,7 @@ namespace SanteDB.Core.Rest.Serialization
 
         // Error tracer
         private Tracer m_traceSource = Tracer.GetTracer(typeof(RestErrorHandler));
-        private SanteDBConfiguration m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection("santedb.core") as SanteDBConfiguration;
+        private ClaimsAuthorizationConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<ClaimsAuthorizationConfigurationSection>();
 
         /// <summary>
         /// Handle error
@@ -86,12 +76,12 @@ namespace SanteDB.Core.Rest.Serialization
             else if (error is PolicyViolationException)
             {
                 var pve = error as PolicyViolationException;
-                if (pve.PolicyDecision == PolicyDecisionOutcomeType.Elevate)
+                if (pve.PolicyDecision == PolicyGrantType.Elevate)
                 {
                     // Ask the user to elevate themselves
                     faultMessage.StatusCode = 401;
-                    var authHeader = $"{(this.m_configuration.Security.BasicAuth != null ? "Basic" : "Bearer")} realm=\"{RestOperationContext.Current.IncomingRequest.Url.Host}\" error=\"insufficient_scope\" scope=\"{pve.PolicyId}\"  error_description=\"{error.Message}\"";
-                    AuditUtil.AuditRestrictedFunction(error as UnauthorizedRequestException, uriMatched, authHeader);
+                    var authHeader = $"{(RestOperationContext.Current.AppliedPolicies.OfType<BasicAuthorizationAccessBehavior>().Any() ? "Basic" : "Bearer")} realm=\"{RestOperationContext.Current.IncomingRequest.Url.Host}\" error=\"insufficient_scope\" scope=\"{pve.PolicyId}\"  error_description=\"{error.Message}\"";
+                    AuditUtil.AuditRestrictedFunction(error as PolicyViolationException, uriMatched, authHeader);
                     RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", authHeader);
 
                 }
@@ -110,7 +100,7 @@ namespace SanteDB.Core.Rest.Serialization
                 // TODO: Audit this
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
                 var authHeader = $"Bearer realm=\"{RestOperationContext.Current.IncomingRequest.Url.Host}\" error=\"invalid_token\" error_description=\"{error.Message}\"";
-                AuditUtil.AuditRestrictedFunction(error as UnauthorizedRequestException, uriMatched, authHeader);
+                AuditUtil.AuditRestrictedFunction(error as SecurityTokenException, uriMatched, authHeader);
                 RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", authHeader );
             }
             else if (error is LimitExceededException)
@@ -120,10 +110,10 @@ namespace SanteDB.Core.Rest.Serialization
                 faultMessage.StatusDescription = "Too Many Requests";
                 faultMessage.Headers.Add("Retry-After", "1200");
             }
-            else if (error is UnauthorizedRequestException)
+            else if (error is AuthenticationException)
             {
-                var authHeader = (error as UnauthorizedRequestException).AuthenticateChallenge;
-                AuditUtil.AuditRestrictedFunction(error as UnauthorizedRequestException, uriMatched, authHeader);
+                var authHeader = $"{(RestOperationContext.Current.AppliedPolicies.OfType<BasicAuthorizationAccessBehavior>().Any() ? "Basic" : "Bearer")} realm=\"{RestOperationContext.Current.IncomingRequest.Url.Host}\" error=\"invalid_token\" error_description=\"{error.Message}\"";
+                AuditUtil.AuditRestrictedFunction(error as AuthenticationException, uriMatched, authHeader);
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
                 RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", authHeader);
             }

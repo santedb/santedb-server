@@ -19,17 +19,12 @@
  */
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Roles;
+using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
-using SanteDB.Persistence.Data.ADO.Data.Model;
 using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
 using SanteDB.Persistence.Data.ADO.Data.Model.Roles;
-using SanteDB.OrmLite;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {

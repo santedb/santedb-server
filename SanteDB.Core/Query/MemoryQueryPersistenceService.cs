@@ -17,18 +17,15 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Jobs;
+using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MARC.HI.EHRS.SVC.Core.Data;
 using System.Diagnostics;
-using SanteDB.Core.Diagnostics;
-using MARC.HI.EHRS.SVC.Core.Timer;
+using System.Linq;
+using System.Threading;
 using System.Timers;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
 
 namespace SanteDB.Core.Query
 {
@@ -37,7 +34,7 @@ namespace SanteDB.Core.Query
     /// <summary>
     /// Represents a simple query persistence service that uses local memory for query continuation
     /// </summary>
-    public class MemoryQueryPersistenceService : SanteDB.Core.Services.IQueryPersistenceService, ITimerJob, IDaemonService
+    public class MemoryQueryPersistenceService : SanteDB.Core.Services.IQueryPersistenceService, IJob, IDaemonService
     {
 
         /// <summary>
@@ -110,6 +107,42 @@ namespace SanteDB.Core.Query
                 return true;
             }
         }
+
+        /// <summary>
+        /// Name of the job
+        /// </summary>
+        public string Name => "Memory Query Persistence Cleaner";
+
+        /// <summary>
+        /// Can cancel job?
+        /// </summary>
+        public bool CanCancel => false;
+
+        /// <summary>
+        /// Current state
+        /// </summary>
+        public JobStateType CurrentState
+        {
+            get
+            {
+                try
+                {
+                    if (Monitor.TryEnter(this.m_syncObject, 10))
+                        return JobStateType.Completed;
+                    else 
+                        return JobStateType.Running;
+                }
+                finally
+                {
+                    if(Monitor.IsEntered(this.m_syncObject)) Monitor.Exit(this.m_syncObject);
+                }
+            }
+        }
+            
+        /// <summary>
+        /// Parameters
+        /// </summary>
+        public IDictionary<string, Type> Parameters => null;
 
         /// <summary>
         /// Clear
@@ -216,9 +249,9 @@ namespace SanteDB.Core.Query
         {
             this.Starting?.Invoke(this, EventArgs.Empty);
 
-            ApplicationContext.Current.Started += (o, e) =>
+            ApplicationServiceContext.Current.Started += (o, e) =>
             {
-                var timerService = ApplicationContext.Current.GetService<ITimerService>();
+                var timerService = ApplicationServiceContext.Current.GetService<IJobManagerService>();
                 if (timerService?.IsJobRegistered(typeof(MemoryQueryPersistenceService)) == false)
                     timerService.AddJob(this, new TimeSpan(4, 0, 0));
             };
@@ -240,7 +273,7 @@ namespace SanteDB.Core.Query
         /// <summary>
         /// Timer has elapsed
         /// </summary>
-        public void Elapsed(object sender, ElapsedEventArgs e)
+        public void Run(object sender, ElapsedEventArgs e, object[] parameters)
         {
 #if DEBUG
             this.m_tracer.TraceInformation("Cleaning stale queries from memory...");
@@ -278,6 +311,14 @@ namespace SanteDB.Core.Query
             MemoryQueryInfo queryInfo = null;
             if (this.m_queryCache.TryGetValue(queryId, out queryInfo))
                 queryInfo.QueryTag = tagValue;
+        }
+
+        /// <summary>
+        /// Cancel the job
+        /// </summary>
+        public void Cancel()
+        {
+            throw new NotSupportedException();
         }
     }
 }

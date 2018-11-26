@@ -17,16 +17,12 @@
  * User: justin
  * Date: 2018-10-24
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Principal;
-using System.Security.Claims;
-using MARC.HI.EHRS.SVC.Core.Event;
+using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
+using SanteDB.Core.Security.Services;
+using System;
+using System.Security.Claims;
+using System.Security.Principal;
 
 namespace SanteDB.Tools.AdminConsole.Security
 {
@@ -38,7 +34,7 @@ namespace SanteDB.Tools.AdminConsole.Security
         public event EventHandler<AuthenticatedEventArgs> Authenticated;
         public event EventHandler<AuthenticatingEventArgs> Authenticating;
 
-        public void AddClaim(string userName, Claim claim)
+        public void AddClaim(string userName, IClaim claim)
         {
             throw new NotImplementedException();
         }
@@ -53,17 +49,17 @@ namespace SanteDB.Tools.AdminConsole.Security
             return new ClaimsPrincipal(new ClaimsIdentity(new GenericIdentity(userName), new Claim[] { new Claim("passwd", password), new Claim(SanteDBClaimTypes.SanteDBTfaSecretClaim, tfaSecret) }));
         }
 
-        public void ChangePassword(string userName, string newPassword, IPrincipal authContext)
+        public void ChangePassword(string userName, string newPassword)
         {
             throw new NotImplementedException();
         }
 
-        public IIdentity CreateIdentity(string userName, string password, IPrincipal authContext)
+        public IIdentity CreateIdentity(string userName, string password)
         {
             throw new NotImplementedException();
         }
 
-        public void DeleteIdentity(string userName, IPrincipal authContext)
+        public void DeleteIdentity(string userName)
         {
             throw new NotImplementedException();
         }
@@ -83,7 +79,7 @@ namespace SanteDB.Tools.AdminConsole.Security
             throw new NotImplementedException();
         }
 
-        public void SetLockout(string userName, bool lockout, IPrincipal authContext)
+        public void SetLockout(string userName, bool lockout)
         {
             throw new NotImplementedException();
         }

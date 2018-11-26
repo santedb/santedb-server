@@ -17,22 +17,20 @@
  * User: justin
  * Date: 2018-6-22
  */
-using SanteDB.Messaging.FHIR.Resources;
+using RestSrvr;
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Roles;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
+using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Messaging.FHIR.Backbone;
-using RestSrvr;
-using SanteDB.Messaging.FHIR.Util;
-using SanteDB.Core.Model.DataTypes;
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Model.Entities;
-using SanteDB.Messaging.FHIR.DataTypes;
-using SanteDB.Core.Model.Roles;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {

@@ -19,10 +19,10 @@
  */
 namespace SanteDB.Reporting.Core.Configuration
 {
-	/// <summary>
-	/// Represents a collection of credential types.
-	/// </summary>
-	public enum CredentialType
+    /// <summary>
+    /// Represents a collection of credential types.
+    /// </summary>
+    public enum CredentialType
 	{
 		/// <summary>
 		/// Certificate credentials.

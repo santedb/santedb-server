@@ -17,25 +17,22 @@
  * User: justin
  * Date: 2018-7-31
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Data;
-using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Mail;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq.Expressions;
-using SanteDB.Core.Mail;
-using SanteDB.Core.Model.Query;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace SanteDB.Core.Services.Impl
 {
-	/// <summary>
-	/// Represents a local alert service.
-	/// </summary>
-	public class LocalMailMessageRepository : IMailMessageRepositoryService,
+    /// <summary>
+    /// Represents a local alert service.
+    /// </summary>
+    public class LocalMailMessageRepository : IMailMessageRepositoryService,
         IRepositoryService<MailMessage>
 	{
 		/// <summary>
@@ -72,7 +69,7 @@ namespace SanteDB.Core.Services.Impl
 		/// <returns>Returns a list of alerts.</returns>
 		public IEnumerable<MailMessage> Find(Expression<Func<MailMessage, bool>> predicate, int offset, int? count, out int totalCount)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<MailMessage>>();
+			var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<MailMessage>>();
 
 			if (persistenceService == null)
 			{
@@ -83,7 +80,7 @@ namespace SanteDB.Core.Services.Impl
             var qry = new NameValueCollection(QueryExpressionBuilder.BuildQuery(predicate).ToArray());
             if (!qry.ContainsKey("flags"))
                 qry.Add("flags", $"!{(int)MailMessageFlags.Archived}");
-			return persistenceService.Query(QueryExpressionParser.BuildLinqExpression<MailMessage>(qry), offset, count, AuthenticationContext.Current.Principal, out totalCount);
+			return persistenceService.Query(QueryExpressionParser.BuildLinqExpression<MailMessage>(qry), offset, count,  out totalCount);
 		}
 
 		/// <summary>
@@ -93,14 +90,14 @@ namespace SanteDB.Core.Services.Impl
 		/// <returns>Returns an alert.</returns>
 		public MailMessage Get(Guid id)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<MailMessage>>();
+			var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<MailMessage>>();
 
 			if (persistenceService == null)
 			{
 				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<MailMessage>)));
 			}
 
-			return persistenceService.Get<Guid>(new Identifier<Guid>(id), AuthenticationContext.Current.Principal, false);
+			return persistenceService.Get(id, null, false);
 		}
 
 		/// <summary>
@@ -110,7 +107,7 @@ namespace SanteDB.Core.Services.Impl
 		/// <returns>Returns the inserted alert.</returns>
 		public MailMessage Insert(MailMessage message)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<MailMessage>>();
+			var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<MailMessage>>();
 
 			if (persistenceService == null)
 			{
@@ -121,7 +118,7 @@ namespace SanteDB.Core.Services.Impl
 
 			try
 			{
-				alert = persistenceService.Insert(message, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+				alert = persistenceService.Insert(message, TransactionMode.Commit);
 				this.Received?.Invoke(this, new MailMessageEventArgs(alert));
 			}
 			catch (Exception e)
@@ -143,7 +140,7 @@ namespace SanteDB.Core.Services.Impl
 		/// <param name="message">The alert message to be saved.</param>
 		public MailMessage Save(MailMessage message)
 		{
-			var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<MailMessage>>();
+			var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<MailMessage>>();
 
 			if (persistenceService == null)
 			{
@@ -156,14 +153,14 @@ namespace SanteDB.Core.Services.Impl
 			{
 				// obsolete the alert
 				alert = message.ObsoletionTime.HasValue ? 
-					persistenceService.Obsolete(message, AuthenticationContext.Current.Principal, TransactionMode.Commit) : 
-					persistenceService.Update(message, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+					persistenceService.Obsolete(message, TransactionMode.Commit) : 
+					persistenceService.Update(message, TransactionMode.Commit);
 
 				this.Received?.Invoke(this, new MailMessageEventArgs(alert));
 			}
 			catch (DataPersistenceException)
 			{
-				alert = persistenceService.Insert(message, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+				alert = persistenceService.Insert(message, TransactionMode.Commit);
 				this.Received?.Invoke(this, new MailMessageEventArgs(alert));
 			}
 

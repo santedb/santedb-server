@@ -18,40 +18,29 @@
  * Date: 2018-11-23
  */
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.ServiceModel;
-using System.ServiceModel.Channels;
-using System.ServiceModel.Description;
-using System.ServiceModel.Dispatcher;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Serialization;
-using System.Reflection;
+using Newtonsoft.Json.Converters;
+using RestSrvr;
+using RestSrvr.Attributes;
+using RestSrvr.Message;
+using SanteDB.Core.Applets.Services;
+using SanteDB.Core.Applets.ViewModel.Description;
+using SanteDB.Core.Applets.ViewModel.Json;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model;
-using System.Xml.Schema;
+using SanteDB.Core.Model.Collection;
+using SanteDB.Core.Model.Json.Formatter;
 using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Security;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using SanteDB.Core.Model.Collection;
-using Newtonsoft.Json.Converters;
-using SanteDB.Core.Model.EntityLoader;
-using SanteDB.Core.Rest.Compression;
-using SanteDB.Core.Model.Query;
-using MARC.HI.EHRS.SVC.Core;
-using SanteDB.Core.Applets.Services;
-using SanteDB.Core.Applets.ViewModel.Json;
-using SanteDB.Core.Model.Json.Formatter;
-using SanteDB.Core.Applets.ViewModel.Description;
-using SanteDB.Core.Diagnostics;
-using RestSrvr;
-using SanteDB.Core.Rest.Serialization;
-using RestSrvr.Message;
-using RestSrvr.Attributes;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace SanteDB.Core.Rest.Serialization
 {
@@ -199,7 +188,7 @@ namespace SanteDB.Core.Rest.Serialization
 
                         if (!String.IsNullOrEmpty(viewModel))
                         {
-                            var viewModelDescription = ApplicationContext.Current.GetService<IAppletManagerService>()?.Applets.GetViewModelDescription(viewModel);
+                            var viewModelDescription = ApplicationServiceContext.Current.GetService<IAppletManagerService>()?.Applets.GetViewModelDescription(viewModel);
                             viewModelSerializer.ViewModel = viewModelDescription;
                         }
                         else
@@ -269,7 +258,7 @@ namespace SanteDB.Core.Rest.Serialization
 
                         if (!String.IsNullOrEmpty(viewModel))
                         {
-                            var viewModelDescription = ApplicationContext.Current.GetService<IAppletManagerService>()?.Applets.GetViewModelDescription(viewModel);
+                            var viewModelDescription = ApplicationServiceContext.Current.GetService<IAppletManagerService>()?.Applets.GetViewModelDescription(viewModel);
                             viewModelSerializer.ViewModel = viewModelDescription;
                         }
                         else

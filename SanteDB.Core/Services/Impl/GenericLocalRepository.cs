@@ -17,23 +17,16 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Attribute;
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using SanteDB.Core.Model.Entities;
-using MARC.HI.EHRS.SVC.Core.Data;
-using System.Linq;
-using SanteDB.Core.Exceptions;
-using SanteDB.Core.Model.Roles;
-using SanteDB.Core.Interfaces;
-using MARC.HI.EHRS.SVC.Auditing.Data;
-using SanteDB.Core.Model.Collection;
-using SanteDB.Core.Security.Attribute;
 using System.Diagnostics;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -83,20 +76,20 @@ namespace SanteDB.Core.Services.Impl
             // Demand permission
             this.DemandQuery();
 
-            var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TEntity>>();
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TEntity>>();
 
             if (persistenceService == null)
             {
                 throw new InvalidOperationException($"Unable to locate {typeof(IDataPersistenceService<TEntity>).FullName}");
             }
 
-            var businessRulesService = ApplicationContext.Current.GetBusinessRulesService<TEntity>();
+            var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
             IEnumerable<TEntity> results = null;
             if (queryId != Guid.Empty && persistenceService is IStoredQueryDataPersistenceService<TEntity>)
-                results = (persistenceService as IStoredQueryDataPersistenceService<TEntity>).Query(query, queryId, offset, count, AuthenticationContext.Current.Principal, out totalResults);
+                results = (persistenceService as IStoredQueryDataPersistenceService<TEntity>).Query(query, queryId, offset, count,  out totalResults);
             else
-                results = persistenceService.Query(query, offset, count, AuthenticationContext.Current.Principal, out totalResults);
+                results = persistenceService.Query(query, offset, count,  out totalResults);
 
             var retVal = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
 
@@ -111,7 +104,7 @@ namespace SanteDB.Core.Services.Impl
             // Demand permission
             this.DemandWrite(data);
 
-            var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TEntity>>();
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TEntity>>();
 
             if (persistenceService == null)
             {
@@ -120,11 +113,11 @@ namespace SanteDB.Core.Services.Impl
 
             data = this.Validate(data);
 
-            var businessRulesService = ApplicationContext.Current.GetBusinessRulesService<TEntity>();
+            var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
             data = businessRulesService?.BeforeInsert(data) ?? data;
 
-            data = persistenceService.Insert(data, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+            data = persistenceService.Insert(data, TransactionMode.Commit);
 
             businessRulesService?.AfterInsert(data);
 
@@ -139,24 +132,24 @@ namespace SanteDB.Core.Services.Impl
             // Demand permission
             this.DemandDelete(key);
 
-            var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TEntity>>();
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TEntity>>();
 
             if (persistenceService == null)
             {
                 throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<TEntity>)}");
             }
 
-            var entity = persistenceService.Get(new Identifier<Guid>(key), AuthenticationContext.Current.Principal, true);
+            var entity = persistenceService.Get(key, null,  true);
 
             if (entity == null)
             {
                 throw new KeyNotFoundException($"Entity {key} not found");
             }
 
-            var businessRulesService = ApplicationContext.Current.GetBusinessRulesService<TEntity>();
+            var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
             entity = businessRulesService?.BeforeObsolete(entity) ?? entity;
-            entity = persistenceService.Obsolete(entity, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+            entity = persistenceService.Obsolete(entity, TransactionMode.Commit);
             return businessRulesService?.AfterObsolete(entity) ?? entity;
         }
 
@@ -175,16 +168,16 @@ namespace SanteDB.Core.Services.Impl
         {
             // Demand permission
             this.DemandRead(key);
-            var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TEntity>>();
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TEntity>>();
 
             if (persistenceService == null)
             {
                 throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<TEntity>)}");
             }
 
-            var businessRulesService = ApplicationContext.Current.GetBusinessRulesService<TEntity>();
+            var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
-            var result = persistenceService.Get(new Identifier<Guid>(key, versionKey), AuthenticationContext.Current.Principal, true);
+            var result = persistenceService.Get(key, versionKey,  true);
 
             var retVal = businessRulesService?.AfterRetrieve(result) ?? result;
             return retVal;
@@ -198,7 +191,7 @@ namespace SanteDB.Core.Services.Impl
             // Demand permission
             this.DemandAlter(data);
 
-            var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<TEntity>>();
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TEntity>>();
 
             if (persistenceService == null)
             {
@@ -207,19 +200,19 @@ namespace SanteDB.Core.Services.Impl
 
             data=this.Validate(data);
 
-            var businessRulesService = ApplicationContext.Current.GetBusinessRulesService<TEntity>();
+            var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
             try
             {
                 data = businessRulesService?.BeforeUpdate(data) ?? data;
-                data = persistenceService.Update(data, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+                data = persistenceService.Update(data, TransactionMode.Commit);
                 businessRulesService?.AfterUpdate(data);
                 return data;
             }
             catch (KeyNotFoundException)
             {
                 data = businessRulesService?.BeforeInsert(data) ?? data;
-                data = persistenceService.Insert(data, AuthenticationContext.Current.Principal, TransactionMode.Commit);
+                data = persistenceService.Insert(data, TransactionMode.Commit);
                 businessRulesService?.AfterInsert(data);
                 return data;
             }
@@ -232,7 +225,7 @@ namespace SanteDB.Core.Services.Impl
         {
             p = (TEntity)p.Clean(); // clean up messy data
 
-            var businessRulesService = ApplicationContext.Current.GetBusinessRulesService<TEntity>();
+            var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
             var details = businessRulesService?.Validate(p) ?? new List<DetectedIssue>();
 
@@ -249,7 +242,7 @@ namespace SanteDB.Core.Services.Impl
                 {
                     var itm = bundle.Item[i];
                     var vrst = typeof(IValidatingRepositoryService<>).MakeGenericType(itm.GetType());
-                    var vrsi = ApplicationContext.Current.GetService(vrst);
+                    var vrsi = ApplicationServiceContext.Current.GetService(vrst);
                     
                     if (vrsi != null)
                         bundle.Item[i] = vrsi.GetType().GetMethod(nameof(Validate)).Invoke(vrsi, new object[] { itm }) as IdentifiedData;
@@ -266,17 +259,17 @@ namespace SanteDB.Core.Services.Impl
             // Demand permission
             this.DemandQuery();
 
-            var persistenceService = ApplicationContext.Current.GetService<IFastQueryDataPersistenceService<TEntity>>();
+            var persistenceService = ApplicationServiceContext.Current.GetService<IFastQueryDataPersistenceService<TEntity>>();
 
             if (persistenceService == null)
             {
                 return this.Find(query, offset, count, out totalResults, queryId);
             }
 
-            var businessRulesService = ApplicationContext.Current.GetBusinessRulesService<TEntity>();
+            var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
             IEnumerable<TEntity> results = null;
-            results = persistenceService.QueryFast(query, queryId, offset, count, AuthenticationContext.Current.Principal, out totalResults);
+            results = persistenceService.QueryFast(query, queryId, offset, count, out totalResults);
 
             results = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
             return results;

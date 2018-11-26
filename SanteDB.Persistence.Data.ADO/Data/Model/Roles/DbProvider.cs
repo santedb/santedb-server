@@ -17,18 +17,18 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
+using SanteDB.Core.Model.Constants;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
-using SanteDB.Core.Model.Constants;
 using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
+using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Roles
 {
-	/// <summary>
-	/// Represents a health care provider in the database
-	/// </summary>
-	[Table("pvdr_tbl")]
+    /// <summary>
+    /// Represents a health care provider in the database
+    /// </summary>
+    [Table("pvdr_tbl")]
 	public class DbProvider : DbPersonSubTable
     {
 

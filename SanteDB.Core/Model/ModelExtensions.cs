@@ -17,15 +17,11 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core.Data;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Core.Model
 {
@@ -34,24 +30,7 @@ namespace SanteDB.Core.Model
     /// </summary>
     public static class ModelExtensions
     {
-
-        /// <summary>
-        /// Get the identifier
-        /// </summary>
-        public static Identifier<Guid> Id(this IIdentifiedEntity me)
-        {
-            // TODO: My AA
-            return new Identifier<Guid>(me.Key.Value);
-        }
-
-        /// <summary>
-        /// Get the identifier
-        /// </summary>
-        public static Identifier<Guid> Id(this IVersionedEntity me)
-        {
-            return new Identifier<Guid>(me.Key.Value, me.VersionKey.Value);
-        }
-
+        
         /// <summary>
         /// Validates that this object has a target entity
         /// </summary>
@@ -70,24 +49,6 @@ namespace SanteDB.Core.Model
         {
             return new List<ValidationResultDetail>();
         }
-
-        /// <summary>
-        /// Convert this AA to OID Data for configuration purposes
-        /// </summary>
-        public static OidData ToOidData(this AssigningAuthority me)
-        {
-            return new OidData()
-            {
-                Name = me.Name,
-                Description = me.Description,
-                Oid = me.Oid,
-                Ref = new Uri(String.IsNullOrEmpty(me.Url) ? String.Format("urn:uuid:{0}", me.Oid) : me.Url),
-                Attributes = new System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, string>>()
-                {
-                    new System.Collections.Generic.KeyValuePair<string, string>("HL7CX4", me.DomainName)
-                    //new System.Collections.Generic.KeyValuePair<string, string>("AssigningDevFacility", this.AssigningDevice.DeviceEvidence)
-                }
-            };
-        }
+        
     }
 }

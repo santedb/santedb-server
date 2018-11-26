@@ -17,26 +17,26 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.Resources;
+using RestSrvr;
+using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
+using SanteDB.Messaging.FHIR.Backbone;
+using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RestSrvr;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
-	/// <summary>
-	/// Represents a resource handler that can handle substances
-	/// </summary>
-	public class SubstanceResourceHandler : RepositoryResourceHandlerBase<Substance, Material>
+    /// <summary>
+    /// Represents a resource handler that can handle substances
+    /// </summary>
+    public class SubstanceResourceHandler : RepositoryResourceHandlerBase<Substance, Material>
 	{
 		/// <summary>
 		/// Map the substance to FHIR
@@ -69,7 +69,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			// TODO: Instance or kind
 			if (model.DeterminerConceptKey == DeterminerKeys.Specific)
 			{
-				var conceptRepo = ApplicationContext.Current.GetService<IConceptRepositoryService>();
+				var conceptRepo = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>();
 				retVal.Instance = new List<SanteDB.Messaging.FHIR.Backbone.SubstanceInstance>()
 				{
 					new SanteDB.Messaging.FHIR.Backbone.SubstanceInstance()

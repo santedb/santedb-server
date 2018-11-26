@@ -17,30 +17,23 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.Model;
+using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Collection;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Services;
+using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Data;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Persistence.Data.ADO.Data.Model;
 using System.Linq.Expressions;
-using System.Security.Principal;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Core;
 using System.Reflection;
-using MARC.HI.EHRS.SVC.Core.Services.Policy;
-using SanteDB.Core.Model;
-using SanteDB.Persistence.Data.ADO.Data;
-using SanteDB.OrmLite;
-using SanteDB.Core.Services;
-using SanteDB.Core.Model.Entities;
-using SanteDB.Core.Model.Acts;
-using SanteDB.Core.Model.Constants;
-using System.Security;
-using SanteDB.Core.Exceptions;
-using SanteDB.Core.Diagnostics;
+using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -249,10 +242,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             foreach (var itm in data.Item)
             {
                 var idp = typeof(IDataPersistenceService<>).MakeGenericType(new Type[] { itm.GetType() });
-                var svc = ApplicationContext.Current.GetService(idp);
+                var svc = ApplicationServiceContext.Current.GetService(idp);
                 var mi = svc.GetType().GetRuntimeMethod("Obsolete", new Type[] { typeof(DataContext), itm.GetType(), typeof(IPrincipal) });
 
-                itm.CopyObjectData(mi.Invoke(ApplicationContext.Current.GetService(idp), new object[] { context, itm }));
+                itm.CopyObjectData(mi.Invoke(ApplicationServiceContext.Current.GetService(idp), new object[] { context, itm }));
             }
             return data;
         }

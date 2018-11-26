@@ -17,15 +17,13 @@
  * User: justin
  * Date: 2018-11-23
  */
+using SanteDB.Messaging.FHIR.Attributes;
+using SanteDB.Messaging.FHIR.DataTypes;
+using SanteDB.Messaging.FHIR.Resources;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SanteDB.Messaging.FHIR.DataTypes;
-using System.Xml.Serialization;
 using System.ComponentModel;
-using SanteDB.Messaging.FHIR.Attributes;
-using SanteDB.Messaging.FHIR.Resources;
+using System.Xml.Serialization;
 
 namespace SanteDB.Messaging.FHIR.Backbone
 {

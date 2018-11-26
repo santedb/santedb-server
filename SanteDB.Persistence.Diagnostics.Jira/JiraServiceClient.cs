@@ -17,15 +17,12 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Http;
 using SanteDB.Core.Interop.Clients;
+using SanteDB.Persistence.Diagnostics.Jira.Configuration;
+using SanteDB.Persistence.Diagnostics.Jira.Model;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Http;
-using SanteDB.Persistence.Diagnostics.Jira.Model;
-using SanteDB.Persistence.Diagnostics.Jira.Configuration;
 
 namespace SanteDB.Persistence.Diagnostics.Jira
 {

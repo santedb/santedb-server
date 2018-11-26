@@ -1,0 +1,115 @@
+﻿/*
+ * Copyright 2015-2018 Mohawk College of Applied Arts and Technology
+ *
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you 
+ * may not use this file except in compliance with the License. You may 
+ * obtain a copy of the License at 
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0 
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ * License for the specific language governing permissions and limitations under 
+ * the License.
+ * 
+ * User: justin
+ * Date: 2018-11-23
+ */
+using SanteDB.Core.Configuration;
+using SanteDB.Core.Rest.Serialization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Serialization;
+
+namespace SanteDB.Messaging.FHIR.Configuration
+{
+    /// <summary>
+    /// FHIR service configuration
+    /// </summary>
+    [XmlType(nameof(FhirServiceConfigurationSection), Namespace = "http://santedb.org/configuration/fhir")]
+    public class FhirServiceConfigurationSection : IConfigurationSection
+    {
+
+        /// <summary>
+        /// Creates a new instance of the WcfEndpoint
+        /// </summary>
+        public FhirServiceConfigurationSection()
+        {
+        }
+
+        /// <summary>
+        /// Gets the WCF endpoint name that the FHIR service listens on
+        /// </summary>
+        [XmlAttribute("restEndpoint")]
+        public string WcfEndpoint { get; set; }
+
+        /// <summary>
+        /// The landing page file
+        /// </summary>
+        [XmlAttribute("index")]
+        public string LandingPage { get; set; }
+
+        /// <summary>
+        /// Gets the resource handlers registered
+        /// </summary>
+        [XmlIgnore]
+        public List<Type> ResourceHandlers { get; set; }
+
+        /// <summary>
+        /// XML for resource handlers
+        /// </summary>
+        [XmlArray("resources"), XmlArrayItem("add")]
+        public List<String> ResourceHandlersXml
+        {
+            get => this.ResourceHandlers?.Select(o => o.AssemblyQualifiedName).ToList();
+            set => this.ResourceHandlers = value?.Select(o => Type.GetType(o)).Where(o => o != null).ToList();
+        }
+
+        /// <summary>
+        /// Gets the CORS configuration
+        /// </summary>
+        [XmlArray("cors"), XmlArrayItem("add")]
+        public List<CorsResourceSetting> CorsConfiguration { get;  private set; }
+
+        /// <summary>
+        /// When set, describes the base uri for all resources on this FHIR service.
+        /// </summary>
+        [XmlElement("base")]
+        public String ResourceBaseUri { get; private set; }
+    }
+
+    /// <summary>
+    /// FHIR CORS configuration
+    /// </summary>
+    [XmlType(nameof(FhirCorsConfiguration), Namespace = "http://santedb.org/configuration/fhir")]
+    public class FhirCorsConfiguration
+    {
+
+        /// <summary>
+        /// Gets or sets the domain from which CORS is allowed
+        /// </summary>
+        [XmlAttribute("domain")]
+        public String Domain { get; set; }
+
+        /// <summary>
+        /// Gets or sets the rsource
+        /// </summary>
+        [XmlAttribute("resource")]
+        public String Resource { get; set; }
+
+        /// <summary>
+        /// Gets or sets the allowed operations
+        /// </summary>
+        [XmlArray("actions"), XmlArrayItem("add")]
+        public List<String> Actions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the allowed headers
+        /// </summary>
+        [XmlArray("headers"), XmlArrayItem("add")]
+        public List<String> Headers { get; set; }
+    }
+}

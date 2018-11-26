@@ -22,10 +22,10 @@ using System.Xml;
 
 namespace SanteDB.Core.Security.Tfa.Twilio.Configuration
 {
-	/// <summary>
-	/// Configuration section handler
-	/// </summary>
-	public class ConfigurationSectionHandler : IConfigurationSectionHandler
+    /// <summary>
+    /// Configuration section handler
+    /// </summary>
+    public class ConfigurationSectionHandler : IConfigurationSectionHandler
 	{
 		/// <summary>
 		/// Creates the specified configuration object
@@ -34,7 +34,7 @@ namespace SanteDB.Core.Security.Tfa.Twilio.Configuration
 		{
 			XmlElement sms = section.SelectSingleNode("./*[local-name() = 'sms']") as XmlElement;
 
-			MechanismConfiguration configuration = new MechanismConfiguration();
+			TwilioTfaMechanismConfigurationSection configuration = new TwilioTfaMechanismConfigurationSection();
 
 			if (sms == null)
 				throw new ConfigurationErrorsException("Missing SMS configuration", section);

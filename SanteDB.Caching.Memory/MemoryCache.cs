@@ -18,16 +18,13 @@
  * Date: 2018-6-22
  */
 using MARC.Everest.Threading;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Event;
-using MARC.HI.EHRS.SVC.Core.Services;
 using SanteDB.Caching.Memory.Configuration;
+using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Event;
 using SanteDB.Core.Model;
-using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Model.Collection;
-using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
@@ -38,9 +35,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace SanteDB.Caching.Memory
 {
@@ -66,7 +61,7 @@ namespace SanteDB.Caching.Memory
         private object m_lock = new object();
 
         // Configuration of the ccache
-        private MemoryCacheConfiguration m_configuration = ApplicationContext.Current?.GetService<IConfigurationManager>()?.GetSection("SanteDB.caching.memory") as MemoryCacheConfiguration ?? new MemoryCacheConfiguration();
+        private MemoryCacheConfigurationSection m_configuration = ApplicationServiceContext.Current?.GetService<IConfigurationManager>()?.GetSection<MemoryCacheConfigurationSection>();
 
         // Tracer for logging
         private TraceSource m_tracer = new TraceSource("SanteDB.Caching.Memory");
@@ -101,13 +96,13 @@ namespace SanteDB.Caching.Memory
             {
                 this.RegisterCacheType(t.Type);
                 // TODO: Initialize the cache
-                ApplicationContext.Current.Started += (o, e) =>
+                ApplicationServiceContext.Current.Started += (o, e) =>
                 {
-                    ApplicationContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(x =>
+                    ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(x =>
                     {
                         var xt = (x as TypeCacheConfigurationInfo);
                         this.m_tracer.TraceEvent(TraceEventType.Information, 0, "Initialize cache for {0}", xt.Type);
-                        var idpInstance = ApplicationContext.Current.GetService(typeof(IDataPersistenceService<>).MakeGenericType(xt.Type)) as IDataPersistenceService;
+                        var idpInstance = ApplicationServiceContext.Current.GetService(typeof(IDataPersistenceService<>).MakeGenericType(xt.Type)) as IDataPersistenceService;
                         if (idpInstance != null)
                             foreach (var itm in xt.SeedQueries)
                             {
@@ -338,11 +333,11 @@ namespace SanteDB.Caching.Memory
 
             // We want to subscribe when this object is changed so we can keep the cache fresh
             var idpType = typeof(IDataPersistenceService<>).MakeGenericType(t);
-            var ppeArgType = typeof(PostPersistenceEventArgs<>).MakeGenericType(t);
-            var pqeArgType = typeof(PostQueryEventArgs<>).MakeGenericType(t);
+            var ppeArgType = typeof(DataPersistedEventArgs<>).MakeGenericType(t);
+            var pqeArgType = typeof(QueryResultEventArgs<>).MakeGenericType(t);
             var evtHdlrType = typeof(EventHandler<>).MakeGenericType(ppeArgType);
             var qevtHdlrType = typeof(EventHandler<>).MakeGenericType(pqeArgType);
-            var svcInstance = ApplicationContext.Current.GetService(idpType);
+            var svcInstance = ApplicationServiceContext.Current.GetService(idpType);
 
             if (svcInstance != null)
             {

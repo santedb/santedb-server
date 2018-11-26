@@ -21,10 +21,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.Reference
 {
-	/// <summary>
-	/// Represents a base resource file reference.
-	/// </summary>
-	[XmlType("resource")]
+    /// <summary>
+    /// Represents a base resource file reference.
+    /// </summary>
+    [XmlType("resource")]
 	public class ResourceFileReference
 	{
 		/// <summary>

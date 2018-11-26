@@ -22,10 +22,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Concepts
 {
-	/// <summary>
-	/// Represents concept relationships
-	/// </summary>
-	[Table("cd_rel_assoc_tbl")]
+    /// <summary>
+    /// Represents concept relationships
+    /// </summary>
+    [Table("cd_rel_assoc_tbl")]
 	public class DbConceptRelationship : DbVersionedAssociation
 	{
         /// <summary>

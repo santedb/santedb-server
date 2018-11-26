@@ -17,25 +17,15 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
-using SanteDB.Core.Model.Security;
-using System.Linq.Expressions;
-using System.Linq;
 using SanteDB.Core.Model;
-using System.Text;
-using System.Collections.Generic;
-using SanteDB.Persistence.Data.ADO.Data.Model;
-using System.Security.Principal;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Core.Model.Interfaces;
-using SanteDB.Core;
-using System.Reflection;
-using SanteDB.Core.Services;
-using SanteDB.Persistence.Data.ADO.Data;
-using SanteDB.Persistence.Data.ADO.Exceptions;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Data.Model;
+using SanteDB.Persistence.Data.ADO.Exceptions;
+using System;
+using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {

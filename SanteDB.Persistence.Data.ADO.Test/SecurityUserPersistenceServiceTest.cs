@@ -1,17 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SanteDB.Core.Model.Security;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Core;
-using System.IO;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
-using SanteDB.Core.Security;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SanteDB.Core;
 using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
+using System;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Test
 {
@@ -58,13 +52,13 @@ namespace SanteDB.Persistence.Data.ADO.Test
         public void TestUpdateValidSecurityUser()
         {
 
-            IPasswordHashingService hashingService = ApplicationContext.Current.GetService<IPasswordHashingService>();
+            IPasswordHashingService hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
             SecurityUser userUnderTest = new SecurityUser()
             {
                 Email = "update@test.com",
                 EmailConfirmed = false,
-                Password = hashingService.EncodePassword("password"),
+                Password = hashingService.ComputeHash("password"),
                 SecurityHash = "cert",
                 UserName = "updateTest",
                 UserClass = UserClassKeys.HumanUser
@@ -72,10 +66,10 @@ namespace SanteDB.Persistence.Data.ADO.Test
             };
             
             // Store user
-            IIdentityProviderService identityService = ApplicationContext.Current.GetService<IIdentityProviderService>();
+            IIdentityProviderService identityService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
             var authContext = AuthenticationContext.SystemPrincipal;
             Assert.IsNotNull(authContext);
-            var userAfterUpdate = base.DoTestUpdate(userUnderTest, authContext, "PhoneNumber");
+            var userAfterUpdate = base.DoTestUpdate(userUnderTest, "PhoneNumber", authContext);
 
             // Update
             Assert.IsNotNull(userAfterUpdate.UpdatedTime);
@@ -90,13 +84,13 @@ namespace SanteDB.Persistence.Data.ADO.Test
         public void TestQueryValidResult()
         {
 
-            IPasswordHashingService hashingService = ApplicationContext.Current.GetService<IPasswordHashingService>();
+            IPasswordHashingService hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
             String securityHash = Guid.NewGuid().ToString();
             SecurityUser userUnderTest = new SecurityUser()
             {
                 Email = "query@test.com",
                 EmailConfirmed = false,
-                Password = hashingService.EncodePassword("password"),
+                Password = hashingService.ComputeHash("password"),
                 SecurityHash = securityHash,
                 UserName = "queryTest",
                 UserClass = UserClassKeys.HumanUser
@@ -104,8 +98,8 @@ namespace SanteDB.Persistence.Data.ADO.Test
             };
 
             var testUser = base.DoTestInsert(userUnderTest);
-            IIdentityProviderService identityService = ApplicationContext.Current.GetService<IIdentityProviderService>();
-            var results = base.DoTestQuery(o => o.Email == "query@test.com", testUser.Key, AuthenticationContext.SystemPrincipal);
+            IIdentityProviderService identityService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
+            var results = base.DoTestQuery(o => o.Email == "query@test.com", testUser.Key);
             Assert.AreEqual(1, results.Count());
             Assert.AreEqual(userUnderTest.Email, results.First().Email);
         }
@@ -116,13 +110,13 @@ namespace SanteDB.Persistence.Data.ADO.Test
         [TestMethod]
         public void TestDelayLoadUserProperties()
         {
-            IPasswordHashingService hashingService = ApplicationContext.Current.GetService<IPasswordHashingService>();
+            IPasswordHashingService hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
             String securityHash = Guid.NewGuid().ToString();
             SecurityUser userUnderTest = new SecurityUser()
             {
                 Email = "query@test.com",
                 EmailConfirmed = false,
-                Password = hashingService.EncodePassword("password"),
+                Password = hashingService.ComputeHash("password"),
                 SecurityHash = securityHash,
                 UserName = "delayLoadTest",
                 UserClass = UserClassKeys.HumanUser
@@ -130,15 +124,15 @@ namespace SanteDB.Persistence.Data.ADO.Test
 
 
             var userAfterInsert = base.DoTestInsert(userUnderTest, null);
-            var roleProvider = ApplicationContext.Current.GetService<IRoleProviderService>();
-            var identityProvider = ApplicationContext.Current.GetService<IIdentityProviderService>();
+            var roleProvider = ApplicationServiceContext.Current.GetService<IRoleProviderService>();
+            var identityProvider = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
 
             // Allow login
-            roleProvider.AddUsersToRoles(new string[] { "delayLoadTest" }, new string[] { "USERS" }, AuthenticationContext.SystemPrincipal);
+            roleProvider.AddUsersToRoles(new string[] { "delayLoadTest" }, new string[] { "USERS" });
 
             var auth = identityProvider.Authenticate("delayLoadTest", "password");
-            roleProvider.CreateRole("TestDelayLoadUserPropertiesGroup", AuthenticationContext.SystemPrincipal);
-            roleProvider.AddUsersToRoles(new String[] { "delayLoadTest" }, new String[] { "TestDelayLoadUserPropertiesGroup" }, AuthenticationContext.SystemPrincipal);
+            roleProvider.CreateRole("TestDelayLoadUserPropertiesGroup");
+            roleProvider.AddUsersToRoles(new String[] { "delayLoadTest" }, new String[] { "TestDelayLoadUserPropertiesGroup" });
 
             // Now trigger a delay load
             var userForTest = base.DoTestQuery(u => u.UserName == "delayLoadTest", userAfterInsert.Key, auth).First();

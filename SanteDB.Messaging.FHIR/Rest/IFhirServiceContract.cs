@@ -20,11 +20,7 @@
 using RestSrvr.Attributes;
 using SanteDB.Messaging.FHIR.Resources;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Schema;
 
 namespace SanteDB.Messaging.FHIR.Rest

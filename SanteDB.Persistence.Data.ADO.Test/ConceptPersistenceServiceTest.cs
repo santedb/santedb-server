@@ -1,21 +1,13 @@
-﻿using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Core.Services.Security;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
-using SanteDB.Core.Model.EntityLoader;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
-using System;
-using System.Collections.Generic;
-using System.IO;
+using SanteDB.Core.Services;
 using System.Linq;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.ADO.Test
 {
@@ -120,8 +112,8 @@ namespace SanteDB.Persistence.Data.ADO.Test
             });
 
             // Insert
-            var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<Concept>>();
-            var afterTest = persistenceService.Insert(namedConcept, s_authorization, TransactionMode.Commit);
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Concept>>();
+            var afterTest = persistenceService.Insert(namedConcept, TransactionMode.Commit, s_authorization);
 
             Assert.AreEqual("TESTCODE3", afterTest.Mnemonic);
             Assert.AreEqual("Other", afterTest.LoadProperty<ConceptClass>("Class").Mnemonic);
@@ -143,7 +135,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
                 PhoneticCode = "E"
             });
             afterTest.Mnemonic = "TESTCODE3_A";
-            afterTest = persistenceService.Update(afterTest, s_authorization, TransactionMode.Commit);
+            afterTest = persistenceService.Update(afterTest, TransactionMode.Commit, s_authorization);
             Assert.AreEqual(3, afterTest.LoadCollection<ConceptName>("ConceptNames").Count());
             Assert.AreEqual("TESTCODE3_A", afterTest.Mnemonic);
             Assert.IsNotNull(afterTest.GetPreviousVersion());
@@ -153,7 +145,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             // Verify 2: Remove a name
             afterTest.ConceptNames.RemoveAt(1);
             afterTest.ConceptNames[0].Language = "fr";
-            afterTest = persistenceService.Update(afterTest, s_authorization, TransactionMode.Commit);
+            afterTest = persistenceService.Update(afterTest, TransactionMode.Commit, s_authorization);
             Assert.AreEqual(2, afterTest.LoadCollection<ConceptName>("ConceptNames").Count());
             Assert.IsTrue(afterTest.LoadCollection<ConceptName>("ConceptNames").Any(n => n.Language == "fr"));
             Assert.IsNotNull(afterTest.GetPreviousVersion());
@@ -245,8 +237,8 @@ namespace SanteDB.Persistence.Data.ADO.Test
             });
 
             // Insert
-            var persistenceService = ApplicationContext.Current.GetService<IDataPersistenceService<Concept>>();
-            var afterTest = persistenceService.Insert(refTermConcept, s_authorization, TransactionMode.Commit);
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Concept>>();
+            var afterTest = persistenceService.Insert(refTermConcept, TransactionMode.Commit, s_authorization);
 
             Assert.AreEqual("TESTCODE6", afterTest.Mnemonic);
             Assert.AreEqual("Other", afterTest.LoadProperty<ConceptClass>("Class").Mnemonic);
@@ -271,13 +263,13 @@ namespace SanteDB.Persistence.Data.ADO.Test
                     Mnemonic = "X-4039503-408"
                 }
             });
-            afterTest = persistenceService.Update(afterTest, s_authorization, TransactionMode.Commit);
+            afterTest = persistenceService.Update(afterTest, TransactionMode.Commit, s_authorization);
             Assert.AreEqual(2, afterTest.LoadCollection<ConceptReferenceTerm>("ReferenceTerms").Count());
             Assert.IsTrue(afterTest.ReferenceTerms.Any(o => o.ReferenceTerm.Mnemonic == "X-4039503-408"));
 
             // Remove one
             afterTest.ReferenceTerms.RemoveAt(0);
-            afterTest = persistenceService.Update(afterTest, s_authorization, TransactionMode.Commit);
+            afterTest = persistenceService.Update(afterTest, TransactionMode.Commit, s_authorization);
             Assert.AreEqual(1, afterTest.LoadCollection<ConceptReferenceTerm>("ReferenceTerms").Count());
 
         }

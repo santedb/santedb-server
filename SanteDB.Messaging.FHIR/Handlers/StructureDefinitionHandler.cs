@@ -17,16 +17,13 @@
  * User: justin
  * Date: 2018-11-23
  */
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core.Services;
 using SanteDB.Messaging.FHIR.Backbone;
 using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -49,7 +46,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Create the specified definition
         /// </summary>
-        public FhirOperationResult Create(DomainResourceBase target, MARC.HI.EHRS.SVC.Core.Services.TransactionMode mode)
+        public FhirOperationResult Create(DomainResourceBase target, Core.Services.TransactionMode mode)
         {
             throw new NotSupportedException();
         }
@@ -57,7 +54,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Delete
         /// </summary>
-        public FhirOperationResult Delete(string id, MARC.HI.EHRS.SVC.Core.Services.TransactionMode mode)
+        public FhirOperationResult Delete(string id, Core.Services.TransactionMode mode)
         {
             throw new NotSupportedException();
         }
@@ -121,7 +118,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Update
         /// </summary>
-        public FhirOperationResult Update(string id, DomainResourceBase target, MARC.HI.EHRS.SVC.Core.Services.TransactionMode mode)
+        public FhirOperationResult Update(string id, DomainResourceBase target, Core.Services.TransactionMode mode)
         {
             throw new NotSupportedException();
         }

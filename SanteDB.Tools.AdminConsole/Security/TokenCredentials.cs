@@ -17,18 +17,16 @@
  * User: justin
  * Date: 2018-10-24
  */
-using System;
-using SanteDB.Tools.AdminConsole.Security;
-using System.Security.Permissions;
-using System.Security.Principal;
 using SanteDB.Core.Http;
+using System;
+using System.Security.Principal;
 
 namespace SanteDB.Tools.AdminConsole.Security
 {
-	/// <summary>
-	/// Represents a Credential which is a token credential
-	/// </summary>
-	public class TokenCredentials : Credentials
+    /// <summary>
+    /// Represents a Credential which is a token credential
+    /// </summary>
+    public class TokenCredentials : Credentials
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SanteDB.Tools.AdminConsole.Security.TokenCredentials"/> class.

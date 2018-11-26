@@ -17,34 +17,29 @@
  * User: justin
  * Date: 2018-6-22
  */
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
+using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Services;
+using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data.Model;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using SanteDB.Persistence.Data.ADO.Services;
-using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Services.Persistence;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Security;
 using System.Security.Claims;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Serialization;
-using SanteDB.Persistence.Data.ADO.Services.Persistence;
-using SanteDB.Core.Security;
-using SanteDB.Core.Diagnostics;
-using SanteDB.Core.Security.Claims;
 
 namespace SanteDB.Persistence.Data.ADO.Data
 {
@@ -113,7 +108,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
             // Forcing from database load from
             if (forceDatabase && me.Key.HasValue)
                 // HACK: This should really hit the database instead of just clearing the cache
-                ApplicationContext.Current.GetService<IDataCachingService>()?.Remove(me.Key.Value);
+                ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(me.Key.Value);
                 //var tableType = AdoPersistenceService.GetMapper().MapModelType(me.GetType());
                 //if (me.GetType() != tableType)
                 //{
@@ -466,10 +461,10 @@ namespace SanteDB.Persistence.Data.ADO.Data
         /// <summary>
         /// Establish provenance for the specified connection
         /// </summary>
-        public static Guid EstablishProvenance(this DataContext me, IPrincipal principal, Guid? externalRef)
+        public static Guid EstablishProvenance(this DataContext me, Guid? externalRef)
         {
             // First, we want to get the identities
-            var cprincipal = principal as ClaimsPrincipal;
+            var cprincipal = AuthenticationContext.Current.Principal as ClaimsPrincipal;
             DbSecurityProvenance retVal = new DbSecurityProvenance()
             {
                 Key = me.ContextId,

@@ -17,15 +17,16 @@
  * User: justin
  * Date: 2018-9-25
  */
-using SanteDB.Core.Model;
 using MARC.Everest.Connectors;
-using MARC.HI.EHRS.SVC.Core;
 using NHapi.Base.Model;
 using NHapi.Base.Parser;
 using NHapi.Model.V25.Datatype;
+using SanteDB.Core;
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace SanteDB.Messaging.HL7
 {
@@ -80,7 +80,7 @@ namespace SanteDB.Messaging.HL7
 		public static IEnumerable<EntityAddress> ToModel(this XAD[] addresses)
         {
             var entityAddresses = new List<EntityAddress>();
-            var conceptService = ApplicationContext.Current.GetService<IConceptRepositoryService>();
+            var conceptService = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>();
 
             if (addresses.Length == 0)
                 return entityAddresses.AsEnumerable();
@@ -144,7 +144,7 @@ namespace SanteDB.Messaging.HL7
         /// </summary>
         public static XAD FromModel(this XAD me, EntityAddress addr)
         {
-            var refTerm = ApplicationContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(addr.AddressUseKey.GetValueOrDefault(), AddressUseCodeSystem);
+            var refTerm = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(addr.AddressUseKey.GetValueOrDefault(), AddressUseCodeSystem);
             if (refTerm != null)
                 me.AddressType.Value = refTerm.Mnemonic;
 
@@ -205,7 +205,7 @@ namespace SanteDB.Messaging.HL7
 		public static IEnumerable<EntityName> ToModel(this XPN[] names)
         {
             var entityNames = new List<EntityName>();
-            var conceptService = ApplicationContext.Current.GetService<IConceptRepositoryService>();
+            var conceptService = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>();
 
             if (names.Length == 0)
                 return entityNames.AsEnumerable();
@@ -267,7 +267,7 @@ namespace SanteDB.Messaging.HL7
         /// </summary>
         public static XPN FromModel(this XPN me, EntityName name)
         {
-            var refTerm = ApplicationContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(name.NameUseKey.GetValueOrDefault(), NameUseCodeSystem);
+            var refTerm = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(name.NameUseKey.GetValueOrDefault(), NameUseCodeSystem);
             if (refTerm != null)
                 me.NameTypeCode.Value = refTerm.Mnemonic;
 
@@ -302,7 +302,7 @@ namespace SanteDB.Messaging.HL7
 		/// <returns>Returns the converted assigning authority.</returns>
 		public static AssigningAuthority ToModel(this HD id, bool throwIfNotFound = true)
         {
-            var assigningAuthorityRepositoryService = ApplicationContext.Current.GetService<IAssigningAuthorityRepositoryService>();
+            var assigningAuthorityRepositoryService = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>();
             AssigningAuthority assigningAuthority = null;
 
             if (id == null)
@@ -359,7 +359,8 @@ namespace SanteDB.Messaging.HL7
 
                 if (!String.IsNullOrEmpty(cx.IdentifierTypeCode.Value))
                 {
-                    var idType = ApplicationContext.Current.GetService<IRepositoryService<IdentifierType>>().Find(o => o.TypeConcept.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == cx.IdentifierTypeCode.Value && r.ReferenceTerm.CodeSystem.Oid == IdentifierTypeCodeSystem)).FirstOrDefault();
+                    int tr = 0;
+                    var idType = ApplicationServiceContext.Current.GetService<IDataPersistenceService<IdentifierType>>().Query(o => o.TypeConcept.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == cx.IdentifierTypeCode.Value && r.ReferenceTerm.CodeSystem.Oid == IdentifierTypeCodeSystem), 0, 1, out tr, AuthenticationContext.SystemPrincipal).FirstOrDefault();
                     id.IdentifierTypeKey = idType?.Key;
                 }
 
@@ -465,7 +466,7 @@ namespace SanteDB.Messaging.HL7
 
             if (!string.IsNullOrEmpty(xtn.TelecommunicationUseCode.Value))
             {
-                var concept = ApplicationContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(xtn.TelecommunicationUseCode.Value, TelecomUseCodeSystem).FirstOrDefault();
+                var concept = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(xtn.TelecommunicationUseCode.Value, TelecomUseCodeSystem).FirstOrDefault();
 
                 if (concept == null)
                     throw new ArgumentException($"Telecom use code {xtn.TelecommunicationUseCode.Value} not known");
@@ -516,7 +517,7 @@ namespace SanteDB.Messaging.HL7
         /// </summary>
         public static Concept ToConcept(this IS me, String domain)
         {
-            return ApplicationContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(me.Value, domain).FirstOrDefault();
+            return ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(me.Value, domain).FirstOrDefault();
         }
 
         /// <summary>
@@ -524,7 +525,7 @@ namespace SanteDB.Messaging.HL7
         /// </summary>
         public static Concept ToConcept(this ID me, String domain)
         {
-            return ApplicationContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(me.Value, domain).FirstOrDefault();
+            return ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(me.Value, domain).FirstOrDefault();
         }
 
         /// <summary>
@@ -540,7 +541,7 @@ namespace SanteDB.Messaging.HL7
         /// </summary>
         public static IEnumerable<Concept> ToModel(this CE[] me, String preferredDomain = null, bool throwIfNotFound = true)
         {
-            var termService = ApplicationContext.Current.GetService<IConceptRepositoryService>();
+            var termService = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>();
             List<Concept> retval = new List<Concept>();
 
             foreach (var code in me)
@@ -571,7 +572,7 @@ namespace SanteDB.Messaging.HL7
             // Identifier type
             if (id.IdentifierType?.TypeConceptKey.HasValue == true)
             {
-                var refTerm = ApplicationContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(id.IdentifierType.TypeConceptKey.Value, IdentifierTypeCodeSystem);
+                var refTerm = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(id.IdentifierType.TypeConceptKey.Value, IdentifierTypeCodeSystem);
                 me.IdentifierTypeCode.Value = refTerm?.Mnemonic;
             }
             return me;

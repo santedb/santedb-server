@@ -17,32 +17,29 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Model;
+using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security;
+using SanteDB.Core.Services;
 using System;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using MARC.HI.EHRS.SVC.Core.Services.Policy;
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.Security;
-using SanteDB.Core.Security;
-using SanteDB.Core.Services;
 
 namespace SanteDB.Core
 {
-	/// <summary>
-	/// Represents a series of extension methods for the <see cref="ApplicationContext" /> class.
-	/// </summary>
-	public static class ExtensionMethods
+    /// <summary>
+    /// Represents a series of extension methods for the <see cref="ApplicationServiceContext" /> class.
+    /// </summary>
+    public static class ExtensionMethods
 	{
 		/// <summary>
 		/// Get application provider service
 		/// </summary>
 		/// <param name="me">The current application context.</param>
 		/// <returns>Returns an instance of the <see cref="IApplicationIdentityProviderService"/>.</returns>
-		public static IApplicationIdentityProviderService GetApplicationProviderService(this ApplicationContext me)
+		public static IApplicationIdentityProviderService GetApplicationProviderService(this IApplicationServiceContext me)
 		{
 			return me.GetService<IApplicationIdentityProviderService>();
 		}
@@ -52,7 +49,7 @@ namespace SanteDB.Core
 		/// </summary>
 		/// <param name="me">The current application context.</param>
 		/// <returns>Returns an instance of the <see cref="IAssigningAuthorityRepositoryService"/>.</returns>
-		public static IAssigningAuthorityRepositoryService GetAssigningAuthorityService(this ApplicationContext me)
+		public static IAssigningAuthorityRepositoryService GetAssigningAuthorityService(this IApplicationServiceContext me)
 		{
 			return me.GetService<IAssigningAuthorityRepositoryService>();
 		}
@@ -63,7 +60,7 @@ namespace SanteDB.Core
 		/// <typeparam name="T">The type of information for which to retrieve the business rules engine instance.</typeparam>
 		/// <param name="me">The application context.</param>
 		/// <returns>Returns an instance of the business rules service.</returns>
-		public static IBusinessRulesService<T> GetBusinessRulesService<T>(this ApplicationContext me) where T : IdentifiedData
+		public static IBusinessRulesService<T> GetBusinessRulesService<T>(this IApplicationServiceContext me) where T : IdentifiedData
 		{
 			return me.GetService<IBusinessRulesService<T>>();
 		}
@@ -73,7 +70,7 @@ namespace SanteDB.Core
 		/// </summary>
 		/// <param name="me">The current application context.</param>
 		/// <returns>Returns an instance of the <see cref="IConceptRepositoryService"/>.</returns>
-		public static IConceptRepositoryService GetConceptService(this ApplicationContext me)
+		public static IConceptRepositoryService GetConceptService(this IApplicationServiceContext me)
 		{
 			return me.GetService<IConceptRepositoryService>();
 		}
@@ -110,31 +107,7 @@ namespace SanteDB.Core
 
 			return userId;
 		}
-
-		/// <summary>
-		/// Gets a locale string value for a given string id.
-		/// </summary>
-		/// <param name="me">The current application context.</param>
-		/// <param name="stringId">The string identifier.</param>
-		/// <returns>Returns a locale string.</returns>
-		public static string GetLocaleString(this ApplicationContext me, string stringId)
-		{
-			var locale = me.GetService<ILocalizationService>();
-
-			if (stringId == SanteDBConstants.GeneralPanicErrorCode)
-			{
-				return SanteDBConstants.GeneralPanicErrorText;
-			}
-			else if (locale == null)
-			{
-				return stringId;
-			}
-			else
-			{
-				return locale.GetString(stringId);
-			}
-		}
-
+        
         /// <summary>
         /// Convert to policy instance
         /// </summary>

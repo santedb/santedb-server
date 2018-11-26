@@ -17,22 +17,19 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System.Security.Principal;
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.Entities;
-using SanteDB.Core.Model.Interfaces;
-using SanteDB.Persistence.Data.ADO.Data.Model;
-using MARC.HI.EHRS.SVC.Core.Data;
-using System;
-using MARC.HI.EHRS.SVC.Core;
-using SanteDB.Core.Services;
-using System.Linq;
-using SanteDB.Persistence.Data.ADO.Data;
-using MARC.HI.EHRS.SVC.Core.Event;
-using System.Diagnostics;
+using SanteDB.Core;
+using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Model;
+using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
-using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
+using SanteDB.Persistence.Data.ADO.Data;
+using SanteDB.Persistence.Data.ADO.Data.Model;
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -63,7 +60,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     cacheItem.LoadAssociations(context);
                     cacheService?.Add(cacheItem);
                 }
-                    return cacheItem;
+                return cacheItem;
             }
             else
             {
@@ -79,36 +76,33 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Gets the specified object taking version of the entity into consideration
         /// </summary>
-        public override TModel Get<TIdentifier>(MARC.HI.EHRS.SVC.Core.Data.Identifier<TIdentifier> containerId, IPrincipal principal, bool loadFast)
+        public override TModel Get(Guid containerId, Guid? versionId, bool loadFast, IPrincipal overrideAuthContext = null)
         {
             var tr = 0;
-            var uuid = containerId as Identifier<Guid>;
-
-            if (uuid.Id == Guid.Empty)
+            if (containerId == Guid.Empty)
                 return default(TModel);
 
-            PreRetrievalEventArgs<TModel> preArgs = new PreRetrievalEventArgs<TModel>(containerId);
+            DataRetrievingEventArgs<TModel> preArgs = new DataRetrievingEventArgs<TModel>(containerId, versionId, overrideAuthContext);
             this.FireRetrieving(preArgs);
             if (preArgs.Cancel)
             {
-                this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Pre-Event handler indicates abort retrieve {0}", containerId.Id);
+                this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Pre-Event handler indicates abort retrieve {0}", containerId);
                 return preArgs.OverrideResult;
             }
 
-            if (uuid.Id != Guid.Empty)
-            {
-                var cacheItem = ApplicationContext.Current.GetService<IDataCachingService>()?.GetCacheItem<TModel>(uuid.Id) as TModel;
-                if (cacheItem != null && (cacheItem.VersionKey.HasValue && uuid.VersionId == cacheItem.VersionKey.Value || uuid.VersionId == Guid.Empty) &&
-                    (loadFast && cacheItem.LoadState >= LoadState.PartialLoad || !loadFast && cacheItem.LoadState == LoadState.FullLoad))
-                    return cacheItem;
-            }
+
+            var cacheItem = ApplicationServiceContext.Current.GetService<IDataCachingService>()?.GetCacheItem<TModel>(containerId) as TModel;
+            if (cacheItem != null && (cacheItem.VersionKey.HasValue && versionId == cacheItem.VersionKey.Value || versionId == Guid.Empty) &&
+                (loadFast && cacheItem.LoadState >= LoadState.PartialLoad || !loadFast && cacheItem.LoadState == LoadState.FullLoad))
+                return cacheItem;
+
 
 #if DEBUG
             Stopwatch sw = new Stopwatch();
             sw.Start();
 #endif
 
-            
+
             // Query object
             using (var connection = m_configuration.Provider.GetReadonlyConnection())
                 try
@@ -119,12 +113,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     TModel retVal = null;
                     connection.LoadState = LoadState.FullLoad;
                     // Get most recent version
-                    if (uuid.VersionId == Guid.Empty)
-                        retVal = this.Get(connection, uuid.Id);
+                    if (versionId.GetValueOrDefault() == Guid.Empty)
+                        retVal = this.Get(connection, containerId);
                     else
-                        retVal = this.CacheConvert(this.QueryInternal(connection, o => o.Key == uuid.Id && o.VersionKey == uuid.VersionId, Guid.Empty, 0, 1, out tr).FirstOrDefault(), connection);
+                        retVal = this.CacheConvert(this.QueryInternal(connection, o => o.Key == containerId && o.VersionKey == versionId, Guid.Empty, 0, 1, out tr).FirstOrDefault(), connection);
 
-                    var postData = new PostRetrievalEventArgs<TModel>(retVal);
+                    var postData = new DataRetrievedEventArgs<TModel>(retVal, overrideAuthContext);
                     this.FireRetrieved(postData);
 
                     return retVal;

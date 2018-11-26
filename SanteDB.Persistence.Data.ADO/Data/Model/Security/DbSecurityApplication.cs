@@ -24,10 +24,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
 {
-	/// <summary>
-	/// Security applicationDb Should only be one entry here as well
-	/// </summary>
-	[Table("sec_app_tbl")]
+    /// <summary>
+    /// Security applicationDb Should only be one entry here as well
+    /// </summary>
+    [Table("sec_app_tbl")]
 	public class DbSecurityApplication : DbBaseData
 	{
 

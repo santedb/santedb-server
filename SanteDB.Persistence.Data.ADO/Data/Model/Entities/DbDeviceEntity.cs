@@ -25,10 +25,10 @@ using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
 {
-	/// <summary>
-	/// Represents the entity representation of an object
-	/// </summary>
-	[Table("dev_ent_tbl")]
+    /// <summary>
+    /// Represents the entity representation of an object
+    /// </summary>
+    [Table("dev_ent_tbl")]
 	public class DbDeviceEntity : DbEntitySubTable
     {
 

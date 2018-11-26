@@ -17,16 +17,12 @@
  * User: justin
  * Date: 2018-6-22
  */
-using SanteDB.Core.Model.Acts;
-using SanteDB.Core.Model.DataTypes;
-using SanteDB.Persistence.Data.ADO.Data;
-using SanteDB.Persistence.Data.ADO.Data.Model;
-using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
-using SanteDB.OrmLite;
-using System;
-using System.Linq;
-using System.Security.Principal;
 using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.DataTypes;
+using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Data;
+using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
+using System;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {

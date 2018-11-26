@@ -17,12 +17,15 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Http.Description;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
-using SharpCompress.Compressors.BZip2;
-using SharpCompress.Compressors.LZMA;
+using SanteDB.Core.Services;
 using SharpCompress.Compressors;
+using SharpCompress.Compressors.BZip2;
+using SharpCompress.Compressors.Deflate;
+using SharpCompress.Compressors.LZMA;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -31,10 +34,6 @@ using System.Net;
 using System.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using SharpCompress.Compressors.Deflate;
-using MARC.HI.EHRS.SVC.Core;
-using MARC.HI.EHRS.SVC.Core.Services;
-using SanteDB.Core.Configuration;
 
 namespace SanteDB.Core.Http
 {
@@ -109,9 +108,9 @@ namespace SanteDB.Core.Http
             else
                 retVal.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) =>
                 {
-                    var configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection(SanteDBConstants.SanteDBConfigurationName) as SanteDBConfiguration;
+                    var configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
                     this.traceSource.TraceEvent(TraceEventType.Warning, 0, "Checking for certificate override for {0}", (certificate as X509Certificate2).Thumbprint);
-                    if (configuration.Security.TrustedPublishers.Contains((certificate as X509Certificate2).Thumbprint))
+                    if (configuration.TrustedPublishers.Contains((certificate as X509Certificate2).Thumbprint))
                         return true;
                     else return false;
                 };

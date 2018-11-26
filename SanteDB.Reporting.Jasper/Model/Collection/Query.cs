@@ -22,11 +22,11 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Jasper.Model.Collection
 {
-	/// <summary>
-	/// Represents a query.
-	/// </summary>
-	/// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
-	[XmlType("query")]
+    /// <summary>
+    /// Represents a query.
+    /// </summary>
+    /// <seealso cref="SanteDB.Reporting.Jasper.Model.ResourceBase" />
+    [XmlType("query")]
 	[XmlRoot("query")]
 	public class Query : ResourceBase
 	{

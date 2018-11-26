@@ -32,7 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MARC.HI.EHRS.SVC.Core" Version="2.0.3" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -48,8 +47,7 @@
     <Compile Include="Configuration\CredentialBase.cs" />
     <Compile Include="Configuration\Credentials.cs" />
     <Compile Include="Configuration\CredentialType.cs" />
-    <Compile Include="Configuration\ReportingConfiguration.cs" />
-    <Compile Include="Configuration\ReportingConfigurationSectionHandler.cs" />
+    <Compile Include="Configuration\ReportingConfigurationSection.cs" />
     <Compile Include="Configuration\UsernamePasswordCredential.cs" />
     <Compile Include="Event\AuthenticatedEventArgs.cs" />
     <Compile Include="Event\AuthenticatingEventArgs.cs" />
@@ -70,6 +68,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
+      <Project>{3A45F695-47A2-464C-ACE6-BDABBFA39FBC}</Project>
+      <Name>SanteDB.Core.Api</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
       <Project>{f1a82a4f-4a57-47d7-ae76-444c8a4ff54a}</Project>
       <Name>SanteDB.Core.Model</Name>

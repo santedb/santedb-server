@@ -22,10 +22,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Reporting.Core.Configuration
 {
-	/// <summary>
-	/// Represents a certificate credential.
-	/// </summary>
-	[XmlType(nameof(CertificateCredential), Namespace = "http://santedb.org/reporting")]
+    /// <summary>
+    /// Represents a certificate credential.
+    /// </summary>
+    [XmlType(nameof(CertificateCredential), Namespace = "http://santedb.org/reporting")]
 	public class CertificateCredential : CredentialBase
 	{
 		/// <summary>

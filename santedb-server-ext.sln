@@ -109,6 +109,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Rest.Common", "sant
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Rest.HDSI", "santedb-restsvc\SanteDB.Rest.HDSI\SanteDB.Rest.HDSI.csproj", "{903E2E75-7B62-4C42-A001-404DC0235A6B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Messaging.Atna", "SanteDB.Messaging.Atna\SanteDB.Messaging.Atna.csproj", "{976E1627-B0DA-4237-977D-9B3020B60DC1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -283,6 +285,10 @@ Global
 		{903E2E75-7B62-4C42-A001-404DC0235A6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{903E2E75-7B62-4C42-A001-404DC0235A6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{903E2E75-7B62-4C42-A001-404DC0235A6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{976E1627-B0DA-4237-977D-9B3020B60DC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{976E1627-B0DA-4237-977D-9B3020B60DC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{976E1627-B0DA-4237-977D-9B3020B60DC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{976E1627-B0DA-4237-977D-9B3020B60DC1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -332,6 +338,7 @@ Global
 		{F14023E2-F8DF-4EBC-B2C4-34A825E3790E} = {5506BB6D-FFA3-40A2-83F5-425C6149DFF4}
 		{786BD0EE-1806-4158-BA45-80249AC6DFE7} = {5506BB6D-FFA3-40A2-83F5-425C6149DFF4}
 		{903E2E75-7B62-4C42-A001-404DC0235A6B} = {5506BB6D-FFA3-40A2-83F5-425C6149DFF4}
+		{976E1627-B0DA-4237-977D-9B3020B60DC1} = {FE92CEE3-7E0D-4041-8F95-DA2855A50B7A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E73A1AED-8AB7-492C-A4F0-C71FCC5C393C}

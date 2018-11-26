@@ -21,10 +21,10 @@ using SanteDB.Reporting.Core.Auth;
 
 namespace SanteDB.Reporting.Core
 {
-	/// <summary>
-	/// Represents a service which supports basic authentication.
-	/// </summary>
-	public interface ISupportBasicAuthentication : IAuthenticationHandler
+    /// <summary>
+    /// Represents a service which supports basic authentication.
+    /// </summary>
+    public interface ISupportBasicAuthentication : IAuthenticationHandler
 	{
 		/// <summary>
 		/// Authenticates against a remote system using a username and password.

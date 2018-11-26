@@ -17,10 +17,9 @@
  * User: justin
  * Date: 2018-6-22
  */
-using SanteDB.Caching.Memory;
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SanteDB.Core.Model.DataTypes;
+using System;
 using System.Threading;
 
 namespace SanteDB.Caching.Memory.Test

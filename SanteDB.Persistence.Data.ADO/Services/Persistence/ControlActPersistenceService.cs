@@ -17,14 +17,8 @@
  * User: justin
  * Date: 2018-6-22
  */
-using SanteDB.Core.Model.Acts;
-using SanteDB.Persistence.Data.ADO.Data;
-using SanteDB.Persistence.Data.ADO.Data.Model;
-using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
 using SanteDB.OrmLite;
-
-using System.Linq;
-using System.Security.Principal;
+using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
