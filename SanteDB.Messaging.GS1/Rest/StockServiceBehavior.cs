@@ -301,7 +301,7 @@ namespace SanteDB.Messaging.GS1.Rest
 
                     // What are the relationships of held entities
                     var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityRelationship>>();
-                    var relationships = persistenceService.Query(o=>o.RelationshipTypeKey == EntityRelationshipTypeKeys.OwnedEntity && o.SourceEntityKey == place.Key.Value);
+                    var relationships = persistenceService.Query(o=>o.RelationshipTypeKey == EntityRelationshipTypeKeys.OwnedEntity && o.SourceEntityKey == place.Key.Value, AuthenticationContext.Current.Principal);
                     relationships.AsParallel().ForAll(rel =>
                     {
                         AuthenticationContext.Current = masterAuthContext;

@@ -176,7 +176,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         {
 
                             // Disable inserting duplicate classified objects
-                            connection.EstablishProvenance((data as BaseEntityData)?.CreatedByKey);
+                            connection.EstablishProvenance(overrideAuthContext, (data as BaseEntityData)?.CreatedByKey);
                             var existing = data.TryGetExisting(connection, true);
                             if (existing != null)
                             {
@@ -291,7 +291,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                             this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "UPDATE {0}", data);
 
-                            connection.EstablishProvenance((data as NonVersionedEntityData)?.UpdatedByKey ?? (data as BaseEntityData)?.CreatedByKey);
+                            connection.EstablishProvenance(overrideAuthContext, (data as NonVersionedEntityData)?.UpdatedByKey ?? (data as BaseEntityData)?.CreatedByKey);
                             data = Update(connection, data);
                             data.LoadState = LoadState.FullLoad; // We just persisted this so it is fully loaded
 
@@ -475,7 +475,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             //connection.Connection.Open();
 
                             this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "OBSOLETE {0}", data);
-                            connection.EstablishProvenance((data as BaseEntityData)?.ObsoletedByKey);
+                            connection.EstablishProvenance(overrideAuthContext, (data as BaseEntityData)?.ObsoletedByKey);
                             data = this.Obsolete(connection, data);
 
                             if (mode == TransactionMode.Commit)

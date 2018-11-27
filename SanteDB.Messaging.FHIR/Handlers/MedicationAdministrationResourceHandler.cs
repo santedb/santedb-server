@@ -79,7 +79,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
             // Encounter
             var erService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityRelationship>>();
             int tr = 0;
-            var enc = erService.Query(o => o.TargetEntityKey == model.Key && o.RelationshipTypeKey == ActRelationshipTypeKeys.HasComponent, 0, 1,  out tr).FirstOrDefault();
+            var enc = erService.Query(o => o.TargetEntityKey == model.Key && o.RelationshipTypeKey == ActRelationshipTypeKeys.HasComponent, 0, 1,  out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
             if (enc != null)
             {
                 // TODO: Encounter

@@ -72,7 +72,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             var persister = ApplicationServiceContext.Current.GetService<IDataPersistenceService<DiagnosticReport>>();
             if (persister == null)
                 throw new InvalidOperationException("Cannot find appriopriate persister");
-            return persister.Insert(report, TransactionMode.Commit);
+            return persister.Insert(report, TransactionMode.Commit, AuthenticationContext.Current.Principal);
         }
 
         /// <summary>
@@ -242,7 +242,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             if (resetInfo.Purpose == "PasswordReset")
             {
                 new PolicyPermission(PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService);
-                identityProvider.AddClaim(securityUser.UserName, new GenericClaim(SanteDBClaimTypes.SanteDBPasswordlessAuth, "true"));
+                identityProvider.AddClaim(securityUser.UserName, new GenericClaim(SanteDBClaimTypes.SanteDBPasswordlessAuth, "true"), AuthenticationContext.SystemPrincipal);
             }
 
             var tfaRelay = ApplicationServiceContext.Current.GetService<ITfaRelayService>();

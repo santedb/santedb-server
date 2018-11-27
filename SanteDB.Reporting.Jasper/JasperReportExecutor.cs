@@ -262,7 +262,7 @@ namespace SanteDB.Reporting.Jasper
                 throw new InvalidOperationException($"Unable to locate persistence service: {nameof(IDataPersistenceService<ParameterType>)}");
             }
 
-            return persistenceService.Insert(parameterType, TransactionMode.Commit);
+            return persistenceService.Insert(parameterType, TransactionMode.Commit, AuthenticationContext.Current.Principal);
         }
 
         /// <summary>
@@ -291,7 +291,7 @@ namespace SanteDB.Reporting.Jasper
                 throw new InvalidOperationException($"Unable to locate persistence service: {nameof(IDataPersistenceService<ReportFormat>)}");
             }
 
-            return persistenceService.Insert(reportFormat, TransactionMode.Commit);
+            return persistenceService.Insert(reportFormat, TransactionMode.Commit, AuthenticationContext.Current.Principal);
         }
 
         /// <summary>
@@ -367,7 +367,7 @@ namespace SanteDB.Reporting.Jasper
                 throw new InvalidOperationException($"Unable to locate service: {nameof(IDataPersistenceService<ParameterType>)}");
             }
 
-            return new RisiCollection<ParameterType>(persistenceService.Query(r => r.Key != null));
+            return new RisiCollection<ParameterType>(persistenceService.Query(r => r.Key != null, AuthenticationContext.Current.Principal));
         }
 
         /// <summary>
@@ -386,7 +386,7 @@ namespace SanteDB.Reporting.Jasper
                 throw new InvalidOperationException($"Unable to locate persistence service: {nameof(IDataPersistenceService<ParameterType>)}");
             }
 
-            return persistenceService.Get(id, Guid.Empty);
+            return persistenceService.Get(id,  Guid.Empty, false, AuthenticationContext.Current.Principal);
         }
 
         /// <summary>
@@ -405,7 +405,7 @@ namespace SanteDB.Reporting.Jasper
                 throw new InvalidOperationException($"Unable to locate persistence service: {nameof(IDataPersistenceService<ReportDefinition>)}");
             }
 
-            var reportDefinition = persistenceService.Get(id, Guid.Empty);
+            var reportDefinition = persistenceService.Get(id,  Guid.Empty, false, AuthenticationContext.Current.Principal);
 
             if (reportDefinition == null)
             {
@@ -495,7 +495,7 @@ namespace SanteDB.Reporting.Jasper
 
                             var totalCount = 0;
 
-                            var userEntityId = ApplicationServiceContext.Current.GetService<IDataPersistenceService<UserEntity>>().Query(c => c.SecurityUserKey == securityUserId, 0, 1, out totalCount)?.FirstOrDefault()?.Key;
+                            var userEntityId = ApplicationServiceContext.Current.GetService<IDataPersistenceService<UserEntity>>().Query(c => c.SecurityUserKey == securityUserId, 0, 1, out totalCount, AuthenticationContext.Current.Principal)?.FirstOrDefault()?.Key;
 
                             query.Value = query.Value.Replace("${Userid}", $"'{userEntityId}'");
                             query.Value = query.Value.Replace("$P{Userid}", $"'{userEntityId}'");
@@ -533,7 +533,7 @@ namespace SanteDB.Reporting.Jasper
                 }
 
                 int totalResults;
-                reportParameter.Key = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ReportParameter>>()?.Query(r => r.CorrelationId == inputControl.Uri, 0, null, out totalResults).FirstOrDefault(r => r.CorrelationId == inputControl.Uri && r.ReportDefinitionKey == id)?.Key;
+                reportParameter.Key = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ReportParameter>>()?.Query(r => r.CorrelationId == inputControl.Uri, 0, null, out totalResults, AuthenticationContext.Current.Principal).FirstOrDefault(r => r.CorrelationId == inputControl.Uri && r.ReportDefinitionKey == id)?.Key;
                 reportDefinition.Parameters.Add(reportParameter);
             }
 
@@ -634,12 +634,12 @@ namespace SanteDB.Reporting.Jasper
             {
                 int totalResults;
 
-                var existingReport = reportDefinitionPersistenceService.Query(r => r.CorrelationId == report.CorrelationId, 0, 1, out totalResults).FirstOrDefault();
+                var existingReport = reportDefinitionPersistenceService.Query(r => r.CorrelationId == report.CorrelationId, 0, 1, out totalResults, AuthenticationContext.Current.Principal).FirstOrDefault();
 
                 // does the report already exist?
                 if (existingReport == null)
                 {
-                    reportDefinitionPersistenceService.Insert(report, TransactionMode.Commit);
+                    reportDefinitionPersistenceService.Insert(report, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                 }
                 else
                 {
@@ -656,12 +656,12 @@ namespace SanteDB.Reporting.Jasper
                     existingReport.Name = report.Name;
 
                     // update the report definition
-                    reportDefinitionPersistenceService.Update(existingReport, TransactionMode.Commit);
+                    reportDefinitionPersistenceService.Update(existingReport, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                 }
             }
 
             // load the reports from the database.
-            var dbReports = reportDefinitionPersistenceService.Query(r => r.Key != null).ToList();
+            var dbReports = reportDefinitionPersistenceService.Query(r => r.Key != null, AuthenticationContext.Current.Principal).ToList();
 
             // find the reports which have been removed from the jasper server
             var reportsToRemove = dbReports.Except(reports, new ReportDefinitionEqualityComparer()).ToList();
@@ -672,7 +672,7 @@ namespace SanteDB.Reporting.Jasper
             // delete the reports from the db which no longer exist on the jasper server
             foreach (var reportDefinition in reportsToRemove)
             {
-                reportDefinitionPersistenceService.Obsolete(reportDefinition, TransactionMode.Commit);
+                reportDefinitionPersistenceService.Obsolete(reportDefinition, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             }
 
             return new RisiCollection<ReportDefinition>(dbReports);
@@ -693,7 +693,7 @@ namespace SanteDB.Reporting.Jasper
                 throw new InvalidOperationException($"Unable to locate persistence service: {nameof(IDataPersistenceService<ReportFormat>)}");
             }
 
-            return persistenceService.Get(id, Guid.Empty);
+            return persistenceService.Get(id,  Guid.Empty, false, AuthenticationContext.Current.Principal);
         }
 
         /// <summary>
@@ -709,7 +709,7 @@ namespace SanteDB.Reporting.Jasper
                 throw new InvalidOperationException($"Unable to locate persistence service: {nameof(IDataPersistenceService<ReportFormat>)}");
             }
 
-            return new RisiCollection<ReportFormat>(persistenceService.Query(r => r.Key != null));
+            return new RisiCollection<ReportFormat>(persistenceService.Query(r => r.Key != null, AuthenticationContext.Current.Principal));
         }
 
         /// <summary>
@@ -727,7 +727,7 @@ namespace SanteDB.Reporting.Jasper
                 throw new InvalidOperationException($"Unable to locate persistence service: {nameof(IDataPersistenceService<ReportParameter>)}");
             }
 
-            return persistenceService.Get(id, Guid.Empty);
+            return persistenceService.Get(id,  Guid.Empty, false, AuthenticationContext.Current.Principal);
         }
 
         /// <summary>
@@ -745,7 +745,7 @@ namespace SanteDB.Reporting.Jasper
                 throw new InvalidOperationException($"Unable to locate persistence service: {nameof(IDataPersistenceService<ReportDefinition>)}");
             }
 
-            var reportDefinition = persistenceService.Get(id, Guid.Empty);
+            var reportDefinition = persistenceService.Get(id,  Guid.Empty, false, AuthenticationContext.Current.Principal);
 
             var reportUnit = this.LookupResource<ReportUnit>(reportDefinition.CorrelationId);
 
@@ -798,7 +798,7 @@ namespace SanteDB.Reporting.Jasper
                 throw new InvalidOperationException($"Unable to locate persistence service: {nameof(IDataPersistenceService<ReportDefinition>)}");
             }
 
-            var reportDefinition = persistenceService.Get(id, Guid.Empty);
+            var reportDefinition = persistenceService.Get(id,  Guid.Empty, false, AuthenticationContext.Current.Principal);
 
             var reportUnit = this.LookupResource<ReportUnit>(reportDefinition?.CorrelationId);
             var reportParameter = reportDefinition?.Parameters.FirstOrDefault(c => c.Key == parameterId);
@@ -833,7 +833,7 @@ namespace SanteDB.Reporting.Jasper
 
                             var totalCount = 0;
 
-                            var userEntityId = ApplicationServiceContext.Current.GetService<IDataPersistenceService<UserEntity>>().Query(c => c.SecurityUserKey == securityUserId, 0, 1, out totalCount)?.FirstOrDefault()?.Key;
+                            var userEntityId = ApplicationServiceContext.Current.GetService<IDataPersistenceService<UserEntity>>().Query(c => c.SecurityUserKey == securityUserId, 0, 1, out totalCount, AuthenticationContext.Current.Principal)?.FirstOrDefault()?.Key;
 
                             query.Value = query.Value.Replace("${Userid}", $"'{userEntityId}'");
                             query.Value = query.Value.Replace("$P{Userid}", $"'{userEntityId}'");
@@ -888,7 +888,7 @@ namespace SanteDB.Reporting.Jasper
                 throw new InvalidOperationException($"Unable to locate persistence service: {nameof(IDataPersistenceService<ReportDefinition>)}");
             }
 
-            var reportDefinition = persistenceService.Get(id, Guid.Empty);
+            var reportDefinition = persistenceService.Get(id,  Guid.Empty, false, AuthenticationContext.Current.Principal);
 
             if (reportDefinition == null)
             {
@@ -932,14 +932,14 @@ namespace SanteDB.Reporting.Jasper
                 throw new InvalidOperationException($"Unable to locate persistence service: {nameof(IDataPersistenceService<ReportDefinition>)}");
             }
 
-            var reportFormat = reportFormatPersistenceService.Get(reportFormatId, Guid.Empty);
+            var reportFormat = reportFormatPersistenceService.Get(reportFormatId,  Guid.Empty, false, AuthenticationContext.Current.Principal);
 
             if (reportFormat == null)
             {
                 throw new InvalidOperationException($"Unable to locate report format using id: {reportFormatId}");
             }
 
-            var reportDefinition = persistenceService.Get(reportId, Guid.Empty);
+            var reportDefinition = persistenceService.Get(reportId,  Guid.Empty, false, AuthenticationContext.Current.Principal);
 
             if (reportDefinition == null)
             {
@@ -962,7 +962,7 @@ namespace SanteDB.Reporting.Jasper
                 throw new InvalidOperationException($"Unable to locate persistence service: {nameof(IDataPersistenceService<ReportParameter>)}");
             }
 
-            var reportParameters = parameters.Select(reportParameter => reportParameterPersistenceService.Get(reportParameter.Key.Value, Guid.Empty)).ToList();
+            var reportParameters = parameters.Select(reportParameter => reportParameterPersistenceService.Get(reportParameter.Key.Value,  Guid.Empty, false, AuthenticationContext.Current.Principal)).ToList();
 
             foreach (var reportParameter in reportParameters.Where(p => reportDefinition.Parameters.Select(r => r.Key).Contains(p.Key)).OrderBy(r => r.Position))
             {
@@ -1017,7 +1017,7 @@ namespace SanteDB.Reporting.Jasper
                 throw new InvalidOperationException($"Unable to locate persistence service: {nameof(IDataPersistenceService<ParameterType>)}");
             }
 
-            return parameterTypePersistenceService.Update(parameterType ,  TransactionMode.Commit);
+            return parameterTypePersistenceService.Update(parameterType ,  TransactionMode.Commit, AuthenticationContext.Current.Principal);
         }
 
         /// <summary>

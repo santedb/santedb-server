@@ -75,7 +75,6 @@
     <Compile Include="Http\DefaultRestClient.cs" />
     <Compile Include="Http\ServiceClientDescription.cs" />
     <Compile Include="Jobs\JobStateType.cs" />
-    <Compile Include="Model\EntityLoader\PersistenceServiceEntitySource.cs" />
     <Compile Include="Model\ModelExtensions.cs" />
     <Compile Include="Configuration\SanteDBServerConfiguration.cs" />
     <Compile Include="Rest\Behavior\CorsEndpointBehavior.cs" />

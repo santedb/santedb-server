@@ -60,7 +60,7 @@ namespace SanteDB.Core.Services.Impl
 				throw new KeyNotFoundException("Cannot locate security user");
 			var iids = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
 			if (iids == null) throw new InvalidOperationException("Cannot find identity provider service");
-			iids.ChangePassword(securityUser.UserName, password);
+			iids.ChangePassword(securityUser.UserName, password, AuthenticationContext.Current.Principal);
             this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(securityUser, "Password"));
 			return securityUser;
 		}
@@ -70,7 +70,7 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public void ChangePassword(string userName, string password)
         {
-            ApplicationServiceContext.Current.GetService<IIdentityProviderService>().ChangePassword(userName, password);
+            ApplicationServiceContext.Current.GetService<IIdentityProviderService>().ChangePassword(userName, password, AuthenticationContext.Current.Principal);
             this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(userName, "Password"));
         }
         
@@ -102,7 +102,7 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public SecurityProvenance GetProvenance(Guid provenanceId)
         {
-            return ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityProvenance>>().Get(provenanceId, null, true);
+            return ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityProvenance>>().Get(provenanceId, null, true, AuthenticationContext.Current.Principal);
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace SanteDB.Core.Services.Impl
 			var securityUser = ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityUser>>()?.Get(userId);
             if (securityUser == null)
                 throw new KeyNotFoundException(userId.ToString());
-			iids.SetLockout(securityUser.UserName, true);
+			iids.SetLockout(securityUser.UserName, true, AuthenticationContext.Current.Principal);
             this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(securityUser, "Lockout=True"));
 		}
 
@@ -184,7 +184,7 @@ namespace SanteDB.Core.Services.Impl
 			var securityUser = ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityUser>>()?.Get(userId);
             if (securityUser == null)
                 throw new KeyNotFoundException(userId.ToString());
-			iids.SetLockout(securityUser.UserName, false);
+			iids.SetLockout(securityUser.UserName, false, AuthenticationContext.Current.Principal);
             this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(securityUser, "Lockout=False"));
 
         }

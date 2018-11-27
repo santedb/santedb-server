@@ -87,9 +87,9 @@ namespace SanteDB.Core.Services.Impl
 
             IEnumerable<TEntity> results = null;
             if (queryId != Guid.Empty && persistenceService is IStoredQueryDataPersistenceService<TEntity>)
-                results = (persistenceService as IStoredQueryDataPersistenceService<TEntity>).Query(query, queryId, offset, count,  out totalResults);
+                results = (persistenceService as IStoredQueryDataPersistenceService<TEntity>).Query(query, queryId, offset, count,  out totalResults, AuthenticationContext.Current.Principal);
             else
-                results = persistenceService.Query(query, offset, count,  out totalResults);
+                results = persistenceService.Query(query, offset, count,  out totalResults, AuthenticationContext.Current.Principal);
 
             var retVal = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
 
@@ -117,7 +117,7 @@ namespace SanteDB.Core.Services.Impl
 
             data = businessRulesService?.BeforeInsert(data) ?? data;
 
-            data = persistenceService.Insert(data, TransactionMode.Commit);
+            data = persistenceService.Insert(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
             businessRulesService?.AfterInsert(data);
 
@@ -139,7 +139,7 @@ namespace SanteDB.Core.Services.Impl
                 throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<TEntity>)}");
             }
 
-            var entity = persistenceService.Get(key, null,  true);
+            var entity = persistenceService.Get(key, null,  true, AuthenticationContext.Current.Principal);
 
             if (entity == null)
             {
@@ -149,7 +149,7 @@ namespace SanteDB.Core.Services.Impl
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
             entity = businessRulesService?.BeforeObsolete(entity) ?? entity;
-            entity = persistenceService.Obsolete(entity, TransactionMode.Commit);
+            entity = persistenceService.Obsolete(entity, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             return businessRulesService?.AfterObsolete(entity) ?? entity;
         }
 
@@ -177,7 +177,7 @@ namespace SanteDB.Core.Services.Impl
 
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
-            var result = persistenceService.Get(key, versionKey,  true);
+            var result = persistenceService.Get(key, versionKey,  true, AuthenticationContext.Current.Principal);
 
             var retVal = businessRulesService?.AfterRetrieve(result) ?? result;
             return retVal;
@@ -205,14 +205,14 @@ namespace SanteDB.Core.Services.Impl
             try
             {
                 data = businessRulesService?.BeforeUpdate(data) ?? data;
-                data = persistenceService.Update(data, TransactionMode.Commit);
+                data = persistenceService.Update(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                 businessRulesService?.AfterUpdate(data);
                 return data;
             }
             catch (KeyNotFoundException)
             {
                 data = businessRulesService?.BeforeInsert(data) ?? data;
-                data = persistenceService.Insert(data, TransactionMode.Commit);
+                data = persistenceService.Insert(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                 businessRulesService?.AfterInsert(data);
                 return data;
             }

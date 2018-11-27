@@ -38,7 +38,7 @@ namespace SanteDB.Core.Services.Impl
             var iids = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
 
             // Create the identity
-            var id = iids.CreateIdentity(data.UserName, data.Password);
+            var id = iids.CreateIdentity(data.UserName,  data.Password, AuthenticationContext.Current.Principal);
 
             // Now ensure local db record exists
             int tr = 0;
@@ -74,7 +74,7 @@ namespace SanteDB.Core.Services.Impl
         {
             if (!String.IsNullOrEmpty(data.Password))
             {
-                ApplicationServiceContext.Current.GetService<IIdentityProviderService>().ChangePassword(data.UserName, data.Password);
+                ApplicationServiceContext.Current.GetService<IIdentityProviderService>().ChangePassword(data.UserName, data.Password, AuthenticationContext.Current.Principal);
             }
             return base.Save(data);
         }

@@ -88,7 +88,7 @@ namespace SanteDB.Messaging.HL7.Segments
                     if (authority == null && xon.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority.DomainName)
                         place = sdlRepo.Get(Guid.Parse(idnumber), null, true, AuthenticationContext.SystemPrincipal);
                     else
-                        place = sdlRepo.Query(o => o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation && o.Identifiers.Any(i => i.Value == idnumber && i.AuthorityKey == authority.Key)).SingleOrDefault();
+                        place = sdlRepo.Query(o => o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation && o.Identifiers.Any(i => i.Value == idnumber && i.AuthorityKey == authority.Key), AuthenticationContext.SystemPrincipal).SingleOrDefault();
                     if (place != null)
                         retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation, place));
 
@@ -109,7 +109,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 var pip = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
                 if (pd1Segment.ProtectionIndicator.Value == "Y")
                 {
-                    var policy = pip.Query(o => o.Oid == DataPolicyIdentifiers.RestrictedInformation).FirstOrDefault();
+                    var policy = pip.Query(o => o.Oid == DataPolicyIdentifiers.RestrictedInformation, AuthenticationContext.SystemPrincipal).FirstOrDefault();
                     retVal.Policies.Add(new SecurityPolicyInstance(policy, PolicyGrantType.Grant));
                 }
                 else

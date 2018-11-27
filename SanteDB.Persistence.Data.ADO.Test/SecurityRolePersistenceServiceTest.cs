@@ -28,11 +28,11 @@ namespace SanteDB.Persistence.Data.ADO.Test
 
             AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
             IIdentityProviderService identityProvider = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
-            var identity = identityProvider.CreateIdentity(nameof(SecurityRolePersistenceServiceTest), "password");
+            var identity = identityProvider.CreateIdentity(nameof(SecurityRolePersistenceServiceTest),  "password", AuthenticationContext.Current.Principal);
 
             // Give this identity the administrative functions group
             IRoleProviderService roleProvider = ApplicationServiceContext.Current.GetService<IRoleProviderService>();
-            roleProvider.AddUsersToRoles(new string[] { identity.Name }, new string[] { "ADMINISTRATORS" });
+            roleProvider.AddUsersToRoles(new string[] { identity.Name },  new string[] { "ADMINISTRATORS" }, AuthenticationContext.Current.Principal);
 
             // Authorize
             s_authorization = identityProvider.Authenticate(nameof(SecurityRolePersistenceServiceTest), "password");

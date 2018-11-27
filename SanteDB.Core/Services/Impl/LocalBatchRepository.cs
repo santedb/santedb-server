@@ -116,7 +116,7 @@ namespace SanteDB.Core.Services.Impl
             data = this.Validate(data);
 
             data = businessRulesService?.BeforeUpdate(data) ?? data;
-            data = persistenceService.Update(data, TransactionMode.Commit);
+            data = persistenceService.Update(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             businessRulesService?.AfterUpdate(data);
             return data;
         }

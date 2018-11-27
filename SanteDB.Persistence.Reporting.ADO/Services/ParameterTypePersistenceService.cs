@@ -19,6 +19,7 @@
  */
 using SanteDB.Core;
 using SanteDB.Core.Model.RISI;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using System;
@@ -65,7 +66,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		{
 			var parameterTypeService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ReportParameter>>();
 
-			var results = parameterTypeService.Query(r => r.ParameterType.Key == model.Key);
+			var results = parameterTypeService.Query(r => r.ParameterType.Key == model.Key, AuthenticationContext.Current.Principal);
 
 			if (!results.Any())
 			{

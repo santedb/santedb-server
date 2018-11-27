@@ -193,7 +193,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Change the user's password
         /// </summary>
-        public void ChangePassword(string userName, string newPassword)
+        public void ChangePassword(string userName, string newPassword, IPrincipal principal)
         {
             if (!AuthenticationContext.Current.Principal.Identity.IsAuthenticated)
                 throw new SecurityException("Principal must be authenticated");
@@ -228,7 +228,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                             user.Password = passwordHashingService.ComputeHash(newPassword);
                             user.SecurityHash = Guid.NewGuid().ToString();
-                            user.UpdatedByKey = dataContext.EstablishProvenance(null); 
+                            user.UpdatedByKey = dataContext.EstablishProvenance(principal, null); 
 
                             dataContext.Update(user);
                             tx.Commit();
@@ -257,8 +257,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
             var secret = ApplicationServiceContext.Current.GetService<ITwoFactorSecretGenerator>().GenerateTfaSecret();
             var hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
-            this.AddClaim(userName, new AdoClaim(SanteDBClaimTypes.SanteDBTfaSecretClaim, hashingService.ComputeHash(secret)));
-            this.AddClaim(userName, new AdoClaim(SanteDBClaimTypes.SanteDBTfaSecretExpiry, DateTime.Now.AddMinutes(5).ToString("o")));
+            this.AddClaim(userName, new AdoClaim(SanteDBClaimTypes.SanteDBTfaSecretClaim, hashingService.ComputeHash(secret)), AuthenticationContext.SystemPrincipal);
+            this.AddClaim(userName, new AdoClaim(SanteDBClaimTypes.SanteDBTfaSecretExpiry, DateTime.Now.AddMinutes(5).ToString("o")), AuthenticationContext.SystemPrincipal);
 
             return secret;
         }
@@ -266,10 +266,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Create a basic user
         /// </summary>
-        public IIdentity CreateIdentity(string userName, string password)
+        public IIdentity CreateIdentity(string userName,  string password, IPrincipal principal)
         {
 
-            this.VerifyPrincipal(PermissionPolicyIdentifiers.CreateIdentity);
+            this.VerifyPrincipal(principal, PermissionPolicyIdentifiers.CreateIdentity);
 
             if (String.IsNullOrEmpty(userName))
                 throw new ArgumentNullException(nameof(userName));
@@ -302,7 +302,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 SecurityHash = Guid.NewGuid().ToString(),
                                 UserClass = UserClassKeys.HumanUser
                             };
-                            newIdentityUser.CreatedByKey = dataContext.EstablishProvenance(null);
+                            newIdentityUser.CreatedByKey = dataContext.EstablishProvenance(principal, null);
 
                             dataContext.Insert(newIdentityUser);
                             var retVal = AdoClaimsIdentity.Create(newIdentityUser);
@@ -327,12 +327,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Delete the specified identity
         /// </summary>
-        public void DeleteIdentity(string userName)
+        public void DeleteIdentity(string userName, IPrincipal principal)
         {
             if (String.IsNullOrEmpty(userName))
                 throw new ArgumentNullException(nameof(userName));
 
-            this.VerifyPrincipal(PermissionPolicyIdentifiers.AlterIdentity);
+            this.VerifyPrincipal(principal, PermissionPolicyIdentifiers.CreateIdentity);
 
             this.m_traceSource.TraceInformation("Delete identity {0}", userName);
             try
@@ -349,7 +349,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     // Obsolete
                     user.ObsoletionTime = DateTimeOffset.Now;
-                    user.ObsoletedByKey = dataContext.EstablishProvenance(null);
+                    user.ObsoletedByKey = dataContext.EstablishProvenance(principal, null);
                     user.SecurityHash = Guid.NewGuid().ToString();
 
                     dataContext.Update(user);
@@ -366,12 +366,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Set the lockout status
         /// </summary>
-        public void SetLockout(string userName, bool lockout)
+        public void SetLockout(string userName, bool lockout, IPrincipal principal)
         {
             if (String.IsNullOrEmpty(userName))
                 throw new ArgumentNullException(nameof(userName));
 
-            this.VerifyPrincipal(PermissionPolicyIdentifiers.AlterIdentity);
+            this.VerifyPrincipal(principal, PermissionPolicyIdentifiers.AlterIdentity);
 
             this.m_traceSource.TraceInformation("Lockout identity {0} = {1}", userName, lockout);
             try
@@ -398,7 +398,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     user.ObsoletedByKey = null;
                     user.ObsoletedByKeySpecified = true;
 
-                    user.UpdatedByKey = dataContext.EstablishProvenance(null);
+                    user.UpdatedByKey = dataContext.EstablishProvenance(principal, null);
                     user.UpdatedTime = DateTimeOffset.Now;
                     user.SecurityHash = Guid.NewGuid().ToString();
 
@@ -419,13 +419,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Add a claim to the specified user
         /// </summary>
-        public void AddClaim(string userName, IClaim claim)
+        public void AddClaim(string userName, IClaim claim, IPrincipal principal)
         {
             if (userName == null)
                 throw new ArgumentNullException(nameof(userName));
             else if (claim == null)
                 throw new ArgumentNullException(nameof(claim));
 
+            this.VerifyPrincipal(principal, PermissionPolicyIdentifiers.AlterIdentity);
            
             try
             {
@@ -471,13 +472,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Remove the specified claim
         /// </summary>
-        public void RemoveClaim(string userName, string claimType)
+        public void RemoveClaim(string userName, string claimType, IPrincipal principal)
         {
             if (userName == null)
                 throw new ArgumentNullException(nameof(userName));
             else if (claimType == null)
                 throw new ArgumentNullException(nameof(claimType));
 
+            this.VerifyPrincipal(principal, PermissionPolicyIdentifiers.AlterIdentity);
             
             try
             {
@@ -548,10 +550,22 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Verify principal
         /// </summary>
-        private void VerifyPrincipal(String policyId)
+        private void VerifyPrincipal(IPrincipal principal, String policyId)
         {
-            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, policyId).Demand();
+            if (principal is null)
+                throw new ArgumentNullException(nameof(principal));
+
+            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, policyId, principal).Demand();
         }
 
+        /// <summary>
+        /// Re-Authenticates the principal (extending its time)
+        /// </summary>
+        public IPrincipal ReAuthenticate(IPrincipal principal)
+        {
+            if (!principal.Identity.IsAuthenticated)
+                throw new InvalidOperationException("Cannot re-authenticate this principal");
+            throw new NotImplementedException();
+        }
     }
 }

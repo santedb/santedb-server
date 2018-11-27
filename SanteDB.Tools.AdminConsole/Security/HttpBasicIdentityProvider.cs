@@ -34,7 +34,7 @@ namespace SanteDB.Tools.AdminConsole.Security
         public event EventHandler<AuthenticatedEventArgs> Authenticated;
         public event EventHandler<AuthenticatingEventArgs> Authenticating;
 
-        public void AddClaim(string userName, IClaim claim)
+        public void AddClaim(string userName, IClaim claim, IPrincipal principal)
         {
             throw new NotImplementedException();
         }
@@ -49,17 +49,17 @@ namespace SanteDB.Tools.AdminConsole.Security
             return new ClaimsPrincipal(new ClaimsIdentity(new GenericIdentity(userName), new Claim[] { new Claim("passwd", password), new Claim(SanteDBClaimTypes.SanteDBTfaSecretClaim, tfaSecret) }));
         }
 
-        public void ChangePassword(string userName, string newPassword)
+        public void ChangePassword(string userName, string newPassword, IPrincipal principal)
         {
             throw new NotImplementedException();
         }
 
-        public IIdentity CreateIdentity(string userName, string password)
+        public IIdentity CreateIdentity(string userName,  string password, IPrincipal principal)
         {
             throw new NotImplementedException();
         }
 
-        public void DeleteIdentity(string userName)
+        public void DeleteIdentity(string userName, IPrincipal principal)
         {
             throw new NotImplementedException();
         }
@@ -74,12 +74,17 @@ namespace SanteDB.Tools.AdminConsole.Security
             throw new NotImplementedException();
         }
 
-        public void RemoveClaim(string userName, string claimType)
+        public IPrincipal ReAuthenticate(IPrincipal principal)
         {
             throw new NotImplementedException();
         }
 
-        public void SetLockout(string userName, bool lockout)
+        public void RemoveClaim(string userName, string claimType, IPrincipal principal)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetLockout(string userName, bool lockout, IPrincipal principal)
         {
             throw new NotImplementedException();
         }

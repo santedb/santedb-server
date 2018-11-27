@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SanteDB.Core;
+using SanteDB.Core.Data;
 using SanteDB.Core.Model.EntityLoader;
 using SanteDB.Persistence.Data.ADO.Services;
 using System;
@@ -39,7 +40,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
                    "DataDirectory",
                    Path.Combine(context.TestDeploymentDir, string.Empty));
 
-                EntitySource.Current = new EntitySource(new PersistenceServiceEntitySource());
+                EntitySource.Current = new EntitySource(new PersistenceEntitySource());
                 ApplicationContext.Current.Start();
                 var f = typeof(FirebirdSql.Data.FirebirdClient.FirebirdClientFactory).AssemblyQualifiedName;
 

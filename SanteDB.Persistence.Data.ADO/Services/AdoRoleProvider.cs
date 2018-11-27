@@ -51,8 +51,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Verify principal
         /// </summary>
-        private void VerifyPrincipal(String policyId)
+        private void VerifyPrincipal(IPrincipal principal, String policyId)
         {
+            if (principal == null)
+                throw new ArgumentNullException(nameof(principal));
             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, policyId).Demand();
 
         }
@@ -60,9 +62,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Adds the specified users to the specified roles
         /// </summary>
-        public void AddUsersToRoles(string[] users, string[] roles)
+        public void AddUsersToRoles(string[] users,  string[] roles, IPrincipal principal)
         {
-            this.VerifyPrincipal(PermissionPolicyIdentifiers.AlterRoles);
+            this.VerifyPrincipal(principal, PermissionPolicyIdentifiers.AlterRoles);
 
             // Add users to role
             using (DataContext dataContext = this.m_configuration.Provider.GetWriteConnection())
@@ -111,10 +113,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Create a role
         /// </summary>
-        public void CreateRole(string roleName)
+        public void CreateRole(string roleName, IPrincipal principal)
         {
 
-            this.VerifyPrincipal(PermissionPolicyIdentifiers.CreateRoles);
+            this.VerifyPrincipal(principal, PermissionPolicyIdentifiers.CreateRoles);
 
             // Add users to role
             using (DataContext dataContext = this.m_configuration.Provider.GetWriteConnection())
@@ -126,7 +128,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     {
                         try
                         {
-                            DbSecurityUser user = dataContext.SingleOrDefault<DbSecurityUser>(u => u.UserName.ToLower() == AuthenticationContext.Current.Principal.Identity.Name.ToLower());
+                            DbSecurityUser user = dataContext.SingleOrDefault<DbSecurityUser>(u => u.UserName.ToLower() == principal.Identity.Name.ToLower());
 
                             // Insert
                             dataContext.Insert(new DbSecurityRole()
@@ -267,9 +269,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Remove users from roles
         /// </summary>
-        public void RemoveUsersFromRoles(string[] users, string[] roles)
+        public void RemoveUsersFromRoles(string[] users, string[] roles, IPrincipal principal)
         {
-            this.VerifyPrincipal(PermissionPolicyIdentifiers.AlterRoles);
+            this.VerifyPrincipal(principal, PermissionPolicyIdentifiers.AlterRoles);
 
             using (DataContext dataContext = this.m_configuration.Provider.GetWriteConnection())
                 try

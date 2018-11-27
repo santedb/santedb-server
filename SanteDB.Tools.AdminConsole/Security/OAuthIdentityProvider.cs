@@ -192,32 +192,23 @@ namespace SanteDB.Tools.AdminConsole.Security
         /// <param name="userName">The username of the user.</param>
         /// <param name="newPassword">The new password of the user.</param>
         /// <param name="principal">The authentication principal (the user that is changing the password).</param>
-        public void ChangePassword(string userName, string newPassword, System.Security.Principal.IPrincipal principal)
+        public void ChangePassword(string userName, string newPassword, IPrincipal principal)
         {
             throw new NotImplementedException();
         }
-
-        /// <summary>
-        /// Changes the users password.
-        /// </summary>
-        /// <param name="userName">The username of the user.</param>
-        /// <param name="password">The new password of the user.</param>
-        public void ChangePassword(string userName, string password)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         /// <summary>
         /// Creates an identity
         /// </summary>
-        public IIdentity CreateIdentity(string userName, string password)
+        public IIdentity CreateIdentity(string userName,  string password, IPrincipal principal)
         {
             throw new NotImplementedException();
         }
+
         /// <summary>
         /// Sets the user's lockout status
         /// </summary>
-        public void SetLockout(string userName, bool v)
+        public void SetLockout(string userName, bool v, IPrincipal principal)
         {
             throw new NotImplementedException();
         }
@@ -225,42 +216,33 @@ namespace SanteDB.Tools.AdminConsole.Security
         /// <summary>
         /// Deletes the specified identity
         /// </summary>
-        public void DeleteIdentity(string userName)
+        public void DeleteIdentity(string userName, IPrincipal principal)
         {
             throw new NotImplementedException();
         }
 
-        public IIdentity CreateIdentity(Guid sid, string userName, string password)
+        public IIdentity CreateIdentity(Guid sid, string userName,  string password, IPrincipal auth)
         {
             throw new NotImplementedException();
         }
-
-        public IIdentity CreateIdentity(string userName, string password, IPrincipal authContext)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         public string GenerateTfaSecret(string userName)
         {
             throw new NotImplementedException();
         }
-
-        public void DeleteIdentity(string userName, IPrincipal authContext)
+        
+        public void AddClaim(string userName, IClaim claim, IPrincipal principal)
         {
             throw new NotImplementedException();
         }
 
-        public void SetLockout(string userName, bool lockout, IPrincipal authContext)
+        public void RemoveClaim(string userName, string claimType, IPrincipal principal)
         {
             throw new NotImplementedException();
         }
 
-        public void AddClaim(string userName, IClaim claim)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RemoveClaim(string userName, string claimType)
+        public IPrincipal ReAuthenticate(IPrincipal principal)
         {
             throw new NotImplementedException();
         }

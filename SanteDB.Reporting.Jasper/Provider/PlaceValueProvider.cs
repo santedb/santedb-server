@@ -62,7 +62,7 @@ namespace SanteDB.Reporting.Jasper.Provider
 
 			while (offset <= totalCount)
 			{
-				var places = placePersistenceService.Query(p => p.ObsoletionTime == null && p.ClassConceptKey == EntityClassKeys.Place && p.ObsoletionTime == null, this.QueryId, offset, 250, out totalCount);
+				var places = placePersistenceService.Query(p => p.ObsoletionTime == null && p.ClassConceptKey == EntityClassKeys.Place && p.ObsoletionTime == null, this.QueryId, offset, 250, out totalCount, AuthenticationContext.Current.Principal);
 
 				offset += 250;
 

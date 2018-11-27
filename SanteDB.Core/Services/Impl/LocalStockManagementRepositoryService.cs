@@ -79,7 +79,7 @@ namespace SanteDB.Core.Services.Impl
 
             return persistenceService.Query(o => o.ClassConceptKey == ActClassKeys.AccountManagement && o.ActTime >= startPeriod.Value && o.ActTime <= endPeriod.Value &&
                 o.Participations.Where(guard=>guard.ParticipationRole.Mnemonic == "Location").Any(p=>p.PlayerEntityKey == placeKey) &&
-                o.Participations.Where(guard=>guard.ParticipationRole.Mnemonic == "Consumable").Any(p=>p.PlayerEntityKey == manufacturedMaterialKey));
+                o.Participations.Where(guard=>guard.ParticipationRole.Mnemonic == "Consumable").Any(p=>p.PlayerEntityKey == manufacturedMaterialKey), AuthenticationContext.Current.Principal);
 
         }
 
@@ -92,7 +92,7 @@ namespace SanteDB.Core.Services.Impl
             if (persistenceService == null)
                 throw new InvalidOperationException($"Unabled to locate persistence service for ActParticipations");
 
-            return persistenceService.Query(o => o.ParticipationRoleKey == ActParticipationKey.Consumable && o.PlayerEntityKey == manufacturedMaterialKey && o.Act.ActTime >= startPeriod  && o.Act.ActTime <= endPeriod && o.Act.Participations.Where(p => p.ParticipationRole.Mnemonic == "Location").Any(p => p.PlayerEntityKey == placeKey));
+            return persistenceService.Query(o => o.ParticipationRoleKey == ActParticipationKey.Consumable && o.PlayerEntityKey == manufacturedMaterialKey && o.Act.ActTime >= startPeriod  && o.Act.ActTime <= endPeriod && o.Act.Participations.Where(p => p.ParticipationRole.Mnemonic == "Location").Any(p => p.PlayerEntityKey == placeKey), AuthenticationContext.Current.Principal);
         }
     }
 }

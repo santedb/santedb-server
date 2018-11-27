@@ -128,11 +128,11 @@ namespace SanteDB.Persistence.Data.ADO.Test
             var identityProvider = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
 
             // Allow login
-            roleProvider.AddUsersToRoles(new string[] { "delayLoadTest" }, new string[] { "USERS" });
+            roleProvider.AddUsersToRoles(new string[] { "delayLoadTest" },  new string[] { "USERS" },  AuthenticationContext.Current.Principal);
 
             var auth = identityProvider.Authenticate("delayLoadTest", "password");
-            roleProvider.CreateRole("TestDelayLoadUserPropertiesGroup");
-            roleProvider.AddUsersToRoles(new String[] { "delayLoadTest" }, new String[] { "TestDelayLoadUserPropertiesGroup" });
+            roleProvider.CreateRole("TestDelayLoadUserPropertiesGroup", auth);
+            roleProvider.AddUsersToRoles(new String[] { "delayLoadTest" },  new String[] { "TestDelayLoadUserPropertiesGroup" }, AuthenticationContext.Current.Principal);
 
             // Now trigger a delay load
             var userForTest = base.DoTestQuery(u => u.UserName == "delayLoadTest", userAfterInsert.Key, auth).First();

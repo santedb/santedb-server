@@ -19,6 +19,7 @@
  */
 using SanteDB.Core;
 using SanteDB.Core.Model.RISI;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using System;
@@ -88,7 +89,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		{
 			var reportDefinitionService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ReportDefinition>>();
 
-			var results = reportDefinitionService.Query(r => r.Formats.Any(f => f.Format == model.Format));
+			var results = reportDefinitionService.Query(r => r.Formats.Any(f => f.Format == model.Format), AuthenticationContext.Current.Principal);
 
 			if (!results.Any())
 			{

@@ -635,7 +635,7 @@ namespace SanteDB.Persistence.MDM.Services
                         // Now we want to mark LMASTER replaced by MASTER
                         var mrel = this.CreateRelationship(relationshipType, EntityRelationshipTypeKeys.Replaces, master.Key, ldpl.Key, (master as IVersionedEntity).VersionSequence);
                         relationshipService.Insert(mrel);
-                        ApplicationServiceContext.Current.GetService<IDataPersistenceService<T>>().Obsolete(ldpl, TransactionMode.Commit);
+                        ApplicationServiceContext.Current.GetService<IDataPersistenceService<T>>().Obsolete(ldpl, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
                     }
                     else // LOCAL <> LOCAL
                     {
@@ -653,7 +653,7 @@ namespace SanteDB.Persistence.MDM.Services
                         // Now we want to set replaces relationship
                         var mrel = this.CreateRelationship(relationshipType, EntityRelationshipTypeKeys.Replaces, master.Key, ldpl.Key, (master as IVersionedEntity).VersionSequence);
                         relationshipService.Insert(mrel);
-                        ApplicationServiceContext.Current.GetService<IDataPersistenceService<T>>().Obsolete(ldpl, TransactionMode.Commit);
+                        ApplicationServiceContext.Current.GetService<IDataPersistenceService<T>>().Obsolete(ldpl, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
 
                         // Check if the master is orphaned, if so obsolete it
                         existingMasterQry = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression), new Type[] { relationshipType }, new Type[] { typeof(NameValueCollection) })

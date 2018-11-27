@@ -45,41 +45,41 @@ namespace SanteDB.Core.Services.Impl
             {
                 var idp = ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityTag>>();
                 int tr = 0;
-                var existing = idp.Query(o => o.SourceEntityKey == sourceKey && o.TagKey == tag.TagKey, 0, 1, out tr).FirstOrDefault();
+                var existing = idp.Query(o => o.SourceEntityKey == sourceKey && o.TagKey == tag.TagKey, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
                 if (existing != null)
                 {
                     existing.Value = tag.Value;
                     if (existing.Value == null)
-                        idp.Obsolete(existing, TransactionMode.Commit);
+                        idp.Obsolete(existing, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                     else
-                        idp.Update(existing as EntityTag, TransactionMode.Commit);
+                        idp.Update(existing as EntityTag, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                 }
                 else
                 {
                     if (!tag.SourceEntityKey.HasValue)
                         tag.SourceEntityKey = sourceKey;
-                    idp.Insert(tag as EntityTag, TransactionMode.Commit);
+                    idp.Insert(tag as EntityTag, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                 }
             }
             else if (tag is ActTag)
             {
                 var idp = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ActTag>>();
                 int tr = 0;
-                var existing = idp.Query(o => o.SourceEntityKey == sourceKey && o.TagKey == tag.TagKey, 0, 1, out tr).FirstOrDefault();
+                var existing = idp.Query(o => o.SourceEntityKey == sourceKey && o.TagKey == tag.TagKey, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
                 tag.SourceEntityKey = tag.SourceEntityKey ?? sourceKey;
                 if (existing != null)
                 {
                     existing.Value = tag.Value;
                     if (existing.Value == null)
-                        idp.Obsolete(existing, TransactionMode.Commit);
+                        idp.Obsolete(existing, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                     else
-                        idp.Update(existing as ActTag, TransactionMode.Commit);
+                        idp.Update(existing as ActTag, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                 }
                 else
                 {
                     if (!tag.SourceEntityKey.HasValue)
                         tag.SourceEntityKey = sourceKey;
-                    idp.Insert(tag as ActTag, TransactionMode.Commit);
+                    idp.Insert(tag as ActTag, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                 }
             }
 

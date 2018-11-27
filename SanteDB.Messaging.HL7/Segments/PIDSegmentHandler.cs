@@ -147,7 +147,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 Patient found = null;
                 if (authority == null &&
                     id.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority?.DomainName)
-                    found = patientService.Get(Guid.Parse(id.IDNumber.Value), null, true);
+                    found = patientService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.Current.Principal);
                 else if(authority?.IsUnique == true)
                     found = patientService.Query(o => o.Identifiers.Any(i => i.Value == idnumber &&
                         i.AuthorityKey == authority.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
@@ -175,7 +175,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 {
                     var authortiy = id.AssigningAuthority.ToModel(false);
                     if (authortiy?.IsUnique == true)
-                        motherEntity = personPersistence.Query(o => o.Identifiers.Any(i => i.Value == id.IDNumber.Value && i.AuthorityKey == authortiy.Key)).FirstOrDefault();
+                        motherEntity = personPersistence.Query(o => o.Identifiers.Any(i => i.Value == id.IDNumber.Value && i.AuthorityKey == authortiy.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
                 }
 
                 // Mother doesn't exist, so add it

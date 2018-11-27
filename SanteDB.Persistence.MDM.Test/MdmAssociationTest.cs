@@ -62,7 +62,7 @@ namespace SanteDB.Persistence.MDM.Test
             Patient createdPatient = null;
             try
             {
-                createdPatient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Insert(patientUnderTest, TransactionMode.Commit);
+                createdPatient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Insert(patientUnderTest, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             }
             catch (Exception e)
             {
@@ -74,7 +74,7 @@ namespace SanteDB.Persistence.MDM.Test
             //Thread.Sleep(1000);
 
             // Now attempt to query for the record just created, it should be a synthetic MASTER record
-            var masterPatient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "TC-1"));
+            var masterPatient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "TC-1"), AuthenticationContext.Current.Principal);
             Assert.AreEqual(1, masterPatient.Count());
             Assert.AreEqual("TC-1", masterPatient.First().Identifiers.First().Value);
             Assert.AreEqual("M", masterPatient.First().Tags.First().Value);
@@ -82,7 +82,7 @@ namespace SanteDB.Persistence.MDM.Test
             Assert.AreEqual(createdPatient.Key, masterPatient.First().Relationships.First().SourceEntityKey); // Ensure master is pointed properly
 
             // Should redirect a retrieve request
-            var masterGet = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Get(masterPatient.First().Key.Value, Guid.Empty, true);
+            var masterGet = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Get(masterPatient.First().Key.Value, Guid.Empty, true, AuthenticationContext.Current.Principal);
             Assert.AreEqual(masterPatient.First().Key, masterGet.Key);
             Assert.AreEqual("TC-1", masterGet.Identifiers.First().Value);
             Assert.AreEqual("M", masterGet.Tags.First().Value);
@@ -112,12 +112,12 @@ namespace SanteDB.Persistence.MDM.Test
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198"),
                 MultipleBirthOrder = 0
             };
-            var localPatient1 = pservice.Insert(patient1, TransactionMode.Commit);
+            var localPatient1 = pservice.Insert(patient1, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
             // Wait for master
             //Thread.Sleep(1000);
             // Assert that a master record was created
-            var masterPatient1 = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "TC-2")).FirstOrDefault();
+            var masterPatient1 = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "TC-2"), AuthenticationContext.Current.Principal).FirstOrDefault();
             Assert.IsNotNull(masterPatient1);
             Assert.AreEqual("TC-2", masterPatient1.Identifiers.First().Value);
             Assert.AreEqual("M", masterPatient1.Tags.First().Value);
@@ -139,10 +139,10 @@ namespace SanteDB.Persistence.MDM.Test
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198"),
                 MultipleBirthOrder = 0
             };
-            var localPatient2 = pservice.Insert(patient2, TransactionMode.Commit);
+            var localPatient2 = pservice.Insert(patient2, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             //Thread.Sleep(1000);
             // Assert that master was linked
-            var masterPatient2 = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "TC-2B")).FirstOrDefault();
+            var masterPatient2 = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "TC-2B"), AuthenticationContext.Current.Principal).FirstOrDefault();
             Assert.IsNotNull(masterPatient2);
             Assert.AreEqual(masterPatient1.Key, masterPatient2.Key);
             Assert.AreEqual(2, masterPatient2.Identifiers.Count()); // has both identifiers
@@ -177,12 +177,12 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
-            var localPatient1 = pservice.Insert(patient1, TransactionMode.Commit);
+            var localPatient1 = pservice.Insert(patient1, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
             // Wait for master
             //Thread.Sleep(1000);
             // Assert that a master record was created
-            var masterPatientPre = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "TC-3")).SingleOrDefault();
+            var masterPatientPre = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "TC-3"), AuthenticationContext.Current.Principal).SingleOrDefault();
             Assert.IsNotNull(masterPatientPre);
             Assert.AreEqual("TC-3", masterPatientPre.Identifiers.First().Value);
             Assert.AreEqual("M", masterPatientPre.Tags.First().Value);
@@ -191,11 +191,11 @@ namespace SanteDB.Persistence.MDM.Test
 
             patient1.DateOfBirth = new DateTime(1984, 05, 22);
             patient1.Names.First().Component.First().Value = "Smithie";
-            localPatient1 = pservice.Update(patient1, TransactionMode.Commit);
+            localPatient1 = pservice.Update(patient1, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
             // After updating the MASTER should reflect the newest data for the local
             //Thread.Sleep(1000);
-            var masterPatientPost = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "TC-3")).SingleOrDefault();
+            var masterPatientPost = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "TC-3"), AuthenticationContext.Current.Principal).SingleOrDefault();
             Assert.AreEqual(masterPatientPre.Key, masterPatientPost.Key);
             Assert.AreEqual("Smithie", masterPatientPost.Names.First().Component.First().Value);
             Assert.AreEqual("1984-05-22", masterPatientPost.DateOfBirth.Value.ToString("yyyy-MM-dd"));
@@ -223,7 +223,7 @@ namespace SanteDB.Persistence.MDM.Test
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198"),
                 MultipleBirthOrder = 1
             };
-            var localPatient1 = pservice.Insert(patient1, TransactionMode.Commit);
+            var localPatient1 = pservice.Insert(patient1, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             var patient2 = new Patient()
             {
                 DateOfBirth = DateTime.Parse("1984-01-04"),
@@ -238,11 +238,11 @@ namespace SanteDB.Persistence.MDM.Test
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198"),
                 MultipleBirthOrder = 2
             };
-            var localPatient2 = pservice.Insert(patient2, TransactionMode.Commit);
+            var localPatient2 = pservice.Insert(patient2, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
             // There should be two masters
             //Thread.Sleep(1000);
-            var masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-4")));
+            var masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-4")), AuthenticationContext.Current.Principal);
             Assert.AreEqual(2, masters.Count());
 
             // Insert a local record that will trigger a MATCH with both local patients
@@ -260,13 +260,13 @@ namespace SanteDB.Persistence.MDM.Test
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198"),
                 MultipleBirthOrder = null
             };
-            var localPatient3 = pservice.Insert(patient3, TransactionMode.Commit);
+            var localPatient3 = pservice.Insert(patient3, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             //Thread.Sleep(1000);
 
             // The previous insert should result in a new MASTER being created
-            masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-4")));
+            masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-4")), AuthenticationContext.Current.Principal);
             Assert.AreEqual(3, masters.Count());
-            var patient3Master = pservice.Query(o => o.Identifiers.Any(i => i.Value == "TC-4C")).SingleOrDefault();
+            var patient3Master = pservice.Query(o => o.Identifiers.Any(i => i.Value == "TC-4C"), AuthenticationContext.Current.Principal).SingleOrDefault();
             Assert.IsNotNull(patient3Master);
 
             // There should be 2 probables
@@ -295,7 +295,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
-            var localPatient1 = pservice.Insert(patient1, TransactionMode.Commit);
+            var localPatient1 = pservice.Insert(patient1, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             var patient2 = new Patient()
             {
                 DateOfBirth = DateTime.Parse("1985-01-05"),
@@ -309,18 +309,18 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
-            var localPatient2 = pservice.Insert(patient2, TransactionMode.Commit);
+            var localPatient2 = pservice.Insert(patient2, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
             // There should be two masters
             //Thread.Sleep(1000);
-            var masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-5")));
+            var masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-5")), AuthenticationContext.Current.Principal);
             Assert.AreEqual(2, masters.Count());
 
             // Now update patient 2 
             patient2.DateOfBirth = new DateTime(1985, 01, 04);
-            localPatient2 = pservice.Update(patient2, TransactionMode.Commit);
+            localPatient2 = pservice.Update(patient2, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             //Thread.Sleep(1000);
-            masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-5")));
+            masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-5")), AuthenticationContext.Current.Principal);
             // There should now be one master
             Assert.AreEqual(1, masters.Count());
             Assert.AreEqual(2, masters.First().Relationships.Count(r => r.RelationshipTypeKey == MdmConstants.MasterRecordRelationship));
@@ -348,7 +348,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
-            var localPatient1 = pservice.Insert(patient1, TransactionMode.Commit);
+            var localPatient1 = pservice.Insert(patient1, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             var patient2 = new Patient()
             {
                 DateOfBirth = DateTime.Parse("1985-06-04"),
@@ -362,19 +362,19 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
-            var localPatient2 = pservice.Insert(patient2, TransactionMode.Commit);
+            var localPatient2 = pservice.Insert(patient2, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
             // There should be one masters
             //Thread.Sleep(1000);
-            var masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-6")));
+            var masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-6")), AuthenticationContext.Current.Principal);
             Assert.AreEqual(1, masters.Count());
 
             // Now we want to update the second local patient
             // The expected behavior is that there will be two masters with the second detached
             patient2.DateOfBirth = new DateTime(1985, 06, 06);
-            localPatient2 = pservice.Update(patient2, TransactionMode.Commit);
+            localPatient2 = pservice.Update(patient2, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             //Thread.Sleep(1000);
-            masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-6")));
+            masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-6")), AuthenticationContext.Current.Principal);
             Assert.AreEqual(2, masters.Count());
 
         }
@@ -399,7 +399,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
-            var localPatient1 = pservice.Insert(patient1, TransactionMode.Commit);
+            var localPatient1 = pservice.Insert(patient1, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             var patient2 = new Patient()
             {
                 DateOfBirth = DateTime.Parse("1985-06-04"),
@@ -413,10 +413,10 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
-            var localPatient2 = pservice.Insert(patient2, TransactionMode.Commit);
+            var localPatient2 = pservice.Insert(patient2, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
             // Thread.Sleep(1000);
-            var masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-7")));
+            var masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-7")), AuthenticationContext.Current.Principal);
             Assert.AreEqual(1, masters.Count());
             Assert.AreEqual(1, masters.First().Names.Count);
             Assert.AreEqual(0, masters.First().Addresses.Count);
@@ -425,10 +425,10 @@ namespace SanteDB.Persistence.MDM.Test
             patient2.Names.Clear();
             patient2.Names.Add(new EntityName(NameUseKeys.OfficialRecord, "SMITH", "JOHN"));
             patient2.Addresses.Add(new EntityAddress(AddressUseKeys.HomeAddress, "123 Main Street West", "Hamilton", "ON", "CA", "L8K5N2"));
-            localPatient2 = pservice.Update(patient2, TransactionMode.Commit);
+            localPatient2 = pservice.Update(patient2, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
             // Thread.Sleep(1000);
-            masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-7")));
+            masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-7")), AuthenticationContext.Current.Principal);
             Assert.AreEqual(1, masters.Count());
             Assert.AreEqual(2, masters.First().Names.Count);
             Assert.IsTrue(masters.First().Names.Any(n => n.Component.Any(c => c.Value == "SMITH")));
@@ -457,7 +457,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
-            var localPatient1 = pservice.Insert(patient1, TransactionMode.Commit);
+            var localPatient1 = pservice.Insert(patient1, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
             // Here patient 2 has some unique identifier information for an HIV clinic including his HIV alias name
             var patient2 = new Patient()
@@ -474,10 +474,10 @@ namespace SanteDB.Persistence.MDM.Test
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
             patient2.AddPolicy(DataPolicyIdentifiers.RestrictedInformation);
-            var localPatient2 = pservice.Insert(patient2, TransactionMode.Commit);
+            var localPatient2 = pservice.Insert(patient2, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
             // Thread.Sleep(1000);
-            var masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-8")));
+            var masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-8")), AuthenticationContext.Current.Principal);
             Assert.AreEqual(1, masters.Count());
             // Note that only one identifier from the locals can be in the master synthetic
             Assert.AreEqual(1, masters.First().Names.Count);
@@ -494,13 +494,13 @@ namespace SanteDB.Persistence.MDM.Test
             AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
             // Create a user and authenticate as that user which has access to taboo information
             var roleService = ApplicationServiceContext.Current.GetService<IRoleProviderService>();
-            roleService.CreateRole("RESTRICTED_USERS");
+            roleService.CreateRole("RESTRICTED_USERS", AuthenticationContext.SystemPrincipal);
             var userService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
-            userService.CreateIdentity("RESTRICTED", "TEST123");
-            roleService.AddUsersToRoles(new string[] { "RESTRICTED" }, new string[] { "RESTRICTED_USERS", "CLINICAL_STAFF" });
+            userService.CreateIdentity("RESTRICTED",  "TEST123", AuthenticationContext.SystemPrincipal);
+            roleService.AddUsersToRoles(new string[] { "RESTRICTED" }, new string[] { "RESTRICTED_USERS",  "CLINICAL_STAFF" }, AuthenticationContext.SystemPrincipal);
             // Add security policy to the newly created role
             var role = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>().GetRole("RESTRICTED_USERS");
-            ApplicationServiceContext.Current.GetService<IPolicyInformationService>().AddPolicies(role, PolicyGrantType.Grant, DataPolicyIdentifiers.RestrictedInformation);
+            ApplicationServiceContext.Current.GetService<IPolicyInformationService>().AddPolicies(role, PolicyGrantType.Grant, AuthenticationContext.SystemPrincipal, DataPolicyIdentifiers.RestrictedInformation);
 
              // Now we're going insert two patients, one with HIV data
             var pservice = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>();
@@ -517,7 +517,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
-            var localPatient1 = pservice.Insert(patient1, TransactionMode.Commit);
+            var localPatient1 = pservice.Insert(patient1, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
             // Here patient 2 has some unique identifier information for an HIV clinic including his HIV alias name
             var patient2 = new Patient()
@@ -534,11 +534,11 @@ namespace SanteDB.Persistence.MDM.Test
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
             patient2.AddPolicy(DataPolicyIdentifiers.RestrictedInformation);
-            var localPatient2 = pservice.Insert(patient2, TransactionMode.Commit);
+            var localPatient2 = pservice.Insert(patient2, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
             // Thread.Sleep(1000);
             // When running as SYSTEM - A user which does not have access
-            var masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-9")));
+            var masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-9")), AuthenticationContext.Current.Principal);
             Assert.AreEqual(1, masters.Count());
             // Note that only one identifier from the locals can be in the master synthetic
             Assert.AreEqual(1, masters.First().Names.Count);
@@ -549,7 +549,7 @@ namespace SanteDB.Persistence.MDM.Test
             // When running as our user
             var restrictedUser = userService.Authenticate("RESTRICTED", "TEST123");
             AuthenticationContext.Current = new AuthenticationContext(restrictedUser);
-            masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-9")));
+            masters = pservice.Query(o => o.Identifiers.Any(i => i.Value.Contains("TC-9")), AuthenticationContext.Current.Principal);
             Assert.AreEqual(1, masters.Count());
             // Note that two identifiers from the locals should be in the synthetic
             Assert.AreEqual(2, masters.First().Names.Count);
@@ -584,7 +584,7 @@ namespace SanteDB.Persistence.MDM.Test
                 ApplicationServiceContext.Current.GetService<IDataPersistenceService<Bundle>>().Insert(new Bundle()
                 {
                     Item = { patientUnderTest }
-                }, TransactionMode.Commit);
+                }, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             }
             catch (Exception e)
             {
@@ -595,7 +595,7 @@ namespace SanteDB.Persistence.MDM.Test
             //Thread.Sleep(1000);
 
             // Now attempt to query for the record just created, it should be a synthetic MASTER record
-            var masterPatient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "TC-10"));
+            var masterPatient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "TC-10"), AuthenticationContext.Current.Principal);
             Assert.AreEqual(1, masterPatient.Count());
             Assert.AreEqual("TC-10", masterPatient.First().Identifiers.First().Value);
             Assert.AreEqual("M", masterPatient.First().Tags.First().Value);
@@ -603,7 +603,7 @@ namespace SanteDB.Persistence.MDM.Test
             Assert.AreEqual(patientUnderTest.Key, masterPatient.First().Relationships.First().SourceEntityKey); // Ensure master is pointed properly
 
             // Should redirect a retrieve request
-            var masterGet = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Get(masterPatient.First().Key.Value, Guid.Empty, true);
+            var masterGet = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Get(masterPatient.First().Key.Value, Guid.Empty, true, AuthenticationContext.Current.Principal);
             Assert.AreEqual(masterPatient.First().Key, masterGet.Key);
             Assert.AreEqual("TC-10", masterGet.Identifiers.First().Value);
             Assert.AreEqual("M", masterGet.Tags.First().Value);

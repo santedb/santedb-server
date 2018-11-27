@@ -58,7 +58,7 @@ namespace SanteDB.Reporting.Jasper.Provider
 			}
 
 			int totalCount;
-			var materials = materialPersistenceService.Query(m => m.ObsoletionTime == null && m.ClassConceptKey == EntityClassKeys.Material, this.QueryId, 0, null, out totalCount);
+			var materials = materialPersistenceService.Query(m => m.ObsoletionTime == null && m.ClassConceptKey == EntityClassKeys.Material, this.QueryId, 0, null, out totalCount, AuthenticationContext.Current.Principal);
 
 			results.AddRange(materials);
 

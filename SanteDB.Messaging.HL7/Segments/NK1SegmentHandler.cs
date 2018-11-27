@@ -125,7 +125,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 Person found = null;
                 if (authority == null &&
                     id.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority?.DomainName)
-                    found = personService.Get(Guid.Parse(id.IDNumber.Value), null, overrideAuth: AuthenticationContext.SystemPrincipal);
+                    found = personService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.SystemPrincipal);
                 else if (authority?.IsUnique == true)
                     found = personService.Query(o => o.Identifiers.Any(i => i.Value == idnumber &&
                         i.AuthorityKey == authority.Key), 0, 1, out tr, AuthenticationContext.SystemPrincipal).FirstOrDefault();

@@ -461,10 +461,10 @@ namespace SanteDB.Persistence.Data.ADO.Data
         /// <summary>
         /// Establish provenance for the specified connection
         /// </summary>
-        public static Guid EstablishProvenance(this DataContext me, Guid? externalRef)
+        public static Guid EstablishProvenance(this DataContext me, IPrincipal principal, Guid? externalRef)
         {
             // First, we want to get the identities
-            var cprincipal = AuthenticationContext.Current.Principal as ClaimsPrincipal;
+            var cprincipal = (principal ?? AuthenticationContext.Current.Principal) as ClaimsPrincipal;
             DbSecurityProvenance retVal = new DbSecurityProvenance()
             {
                 Key = me.ContextId,

@@ -19,6 +19,7 @@
  */
 using MohawkCollege.Util.Console.Parameters;
 using SanteDB.Core;
+using SanteDB.Core.Data;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.EntityLoader;
 using SanteDB.Core.Services.Impl;
@@ -71,7 +72,7 @@ namespace SanteDB
             try
             {
                 var parameters = parser.Parse(args);
-                EntitySource.Current = new EntitySource(new PersistenceServiceEntitySource());
+                EntitySource.Current = new EntitySource(new PersistenceEntitySource());
 
                 // What to do?
                 if (parameters.ShowHelp)

@@ -80,7 +80,7 @@ namespace SanteDB.Core.Services.Impl
             var qry = new NameValueCollection(QueryExpressionBuilder.BuildQuery(predicate).ToArray());
             if (!qry.ContainsKey("flags"))
                 qry.Add("flags", $"!{(int)MailMessageFlags.Archived}");
-			return persistenceService.Query(QueryExpressionParser.BuildLinqExpression<MailMessage>(qry), offset, count,  out totalCount);
+			return persistenceService.Query(QueryExpressionParser.BuildLinqExpression<MailMessage>(qry), offset, count,  out totalCount, AuthenticationContext.Current.Principal);
 		}
 
 		/// <summary>
@@ -97,7 +97,7 @@ namespace SanteDB.Core.Services.Impl
 				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<MailMessage>)));
 			}
 
-			return persistenceService.Get(id, null, false);
+			return persistenceService.Get(id, null, false, AuthenticationContext.Current.Principal);
 		}
 
 		/// <summary>
@@ -118,7 +118,7 @@ namespace SanteDB.Core.Services.Impl
 
 			try
 			{
-				alert = persistenceService.Insert(message, TransactionMode.Commit);
+				alert = persistenceService.Insert(message, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 				this.Received?.Invoke(this, new MailMessageEventArgs(alert));
 			}
 			catch (Exception e)
@@ -153,14 +153,14 @@ namespace SanteDB.Core.Services.Impl
 			{
 				// obsolete the alert
 				alert = message.ObsoletionTime.HasValue ? 
-					persistenceService.Obsolete(message, TransactionMode.Commit) : 
-					persistenceService.Update(message, TransactionMode.Commit);
+					persistenceService.Obsolete(message, TransactionMode.Commit, AuthenticationContext.Current.Principal) : 
+					persistenceService.Update(message, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
 				this.Received?.Invoke(this, new MailMessageEventArgs(alert));
 			}
 			catch (DataPersistenceException)
 			{
-				alert = persistenceService.Insert(message, TransactionMode.Commit);
+				alert = persistenceService.Insert(message, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 				this.Received?.Invoke(this, new MailMessageEventArgs(alert));
 			}
 

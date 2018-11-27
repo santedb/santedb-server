@@ -23,7 +23,7 @@ namespace SanteDB.Persistence.MDM.Test
         {
             if (input.GetType() == typeof(Patient)) {
                 Patient p = (Patient)((Object)input);
-                return ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.DateOfBirth == p.DateOfBirth && o.Key != p.Key).OfType<T>();
+                return ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.DateOfBirth == p.DateOfBirth && o.Key != p.Key, AuthenticationContext.Current.Principal).OfType<T>();
             }
             return new List<T>();
         }
