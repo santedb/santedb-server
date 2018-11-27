@@ -43,7 +43,13 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         /// Gets or sets the expiry time
         /// </summary>
         [XmlElement("validityTime")]
-        public TimeSpan ValidityTime { get; set; }
+        public string ValidityTimeXml { get; set; }
+
+        /// <summary>
+        /// Ignore this
+        /// </summary>
+        [XmlIgnore]
+        public TimeSpan ValidityTime => TimeSpan.Parse(this.ValidityTimeXml);
 
         /// <summary>
         /// Gets or sets whether the ACS will validate client claims

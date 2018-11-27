@@ -29,7 +29,7 @@
     <add type="SanteDB.Messaging.Atna.Configuration.AtnaConfigurationSection, SanteDB.Messaging.Atna, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
   </sections>
   <section xsi:type="OAuthConfigurationSection" issuerName="http://localhost:8080/auth">
-    <validityTime>00:01:00:00</validityTime>
+    <validityTime>01:00:00</validityTime>
     <allowedClaims>
       <add>scope</add>
       <add>urn:santedb:org:override</add>

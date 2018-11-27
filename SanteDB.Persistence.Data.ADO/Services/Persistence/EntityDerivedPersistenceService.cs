@@ -120,14 +120,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (containerId != Guid.Empty)
             {
                 var cacheItem = ApplicationServiceContext.Current.GetService<IDataCachingService>()?.GetCacheItem<TModel>(containerId) as TModel;
-                if (cacheItem != null && (cacheItem.VersionKey.HasValue && versionId == cacheItem.VersionKey.Value || versionId == Guid.Empty) &&
+                if (cacheItem != null && (cacheItem.VersionKey.HasValue && versionId == cacheItem.VersionKey.Value || versionId.GetValueOrDefault() == Guid.Empty) &&
                     (loadFast && cacheItem.LoadState >= LoadState.PartialLoad || !loadFast && cacheItem.LoadState == LoadState.FullLoad))
                     return cacheItem;
             }
 
             // Get most recent version
             TModel result = default(TModel);
-            if (versionId == Guid.Empty)
+            if (versionId.GetValueOrDefault() == Guid.Empty)
                 result = base.Query(o => o.Key == containerId && o.ObsoletionTime == null, 0, 1, out tr, principal).FirstOrDefault();
             else
                 result = base.Query(o => o.Key == containerId && o.VersionKey == versionId, 0, 1, out tr, principal).FirstOrDefault();

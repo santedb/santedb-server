@@ -140,7 +140,8 @@ namespace SanteDB.Core.Security.Privacy
                     var senderParm = Expression.Parameter(typeof(Object), "o");
                     var eventParm = Expression.Parameter(pqeArgType, "e");
                     var delegateData = Expression.Convert(Expression.MakeMemberAccess(eventParm, pqeArgType.GetRuntimeProperty("Results")), typeof(IEnumerable));
-                    var queriedInstanceDelegate = Expression.Lambda(qevtHdlrType, Expression.Assign(delegateData.Operand, Expression.Convert(Expression.Call(Expression.Constant(this), typeof(LocalPolicyEnforcementPointService).GetRuntimeMethod(nameof(HandlePostQueryEvent), new Type[] { typeof(IEnumerable) }), delegateData), pqeArgType.GetRuntimeProperty("Results").PropertyType)), senderParm, eventParm).Compile();
+                    var ofTypeMethod = typeof(Enumerable).GetGenericMethod(nameof(Enumerable.OfType), new Type[] { t }, new Type[] { typeof(IEnumerable) }) as MethodInfo;
+                    var queriedInstanceDelegate = Expression.Lambda(qevtHdlrType, Expression.Assign(delegateData.Operand, Expression.Convert(Expression.Call(ofTypeMethod, Expression.Call(Expression.Constant(this), typeof(LocalPolicyEnforcementPointService).GetRuntimeMethod(nameof(HandlePostQueryEvent), new Type[] { typeof(IEnumerable) }), delegateData)), delegateData.Operand.Type)), senderParm, eventParm).Compile();
 
                     // Bind to events
                     svcType.GetRuntimeEvent("Queried").AddEventHandler(svcInstance, queriedInstanceDelegate);
@@ -171,6 +172,7 @@ namespace SanteDB.Core.Security.Privacy
         {
             // this is a very simple PEP which will enforce active policies in the result set.
             var pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
+
             var decisions = results.OfType<Object>().Select(o=>new { Securable = o, Decision = pdp.GetPolicyDecision(AuthenticationContext.Current.Principal, o) });
             
             return decisions
