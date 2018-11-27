@@ -27,9 +27,14 @@ namespace SanteDB.Core.Services.Daemons
     /// <summary>
     /// A daemon which loads business rules from the applet manager
     /// </summary>
-    [Description("Applet JavaScript BRE Source")]
+    [ServiceProvider("Applet JavaScript BRE Source")]
     public class AppletBusinessRulesDaemon : IDaemonService
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "Applet JavaScript BRE Binding Service";
 
         /// <summary>
         /// Indicates whether the service is running

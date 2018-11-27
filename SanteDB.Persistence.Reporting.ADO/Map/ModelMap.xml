@@ -22,7 +22,7 @@
 
   <!-- Report Definitions -->
   <class modelClass="SanteDB.Core.Model.RISI.ReportDefinition, SanteDB.Core.Model.RISI, Version=0.6.0.0"
-		domainClass="SanteDB.Persistence.Reporting.PSQL.Model.ReportDefinition, SanteDB.Persistence.Reporting.PSQL, Version=0.6.0.0">
+		domainClass="SanteDB.Persistence.Reporting.ADO.Model.ReportDefinition, SanteDB.Persistence.Reporting.ADO, Version=0.6.0.0">
     <property modelName="Key" domainName="Key" />
     <property modelName="Name" domainName="Name" />
     <property modelName="CreationTime" domainName="CreationTime" />
@@ -32,7 +32,7 @@
 
   <!-- Report Parameters -->
   <class modelClass="SanteDB.Core.Model.RISI.ReportParameter, SanteDB.Core.Model.RISI, Version=0.6.0.0"
-		domainClass="SanteDB.Persistence.Reporting.PSQL.Model.ReportParameter, SanteDB.Persistence.Reporting.PSQL, Version=0.6.0.0">
+		domainClass="SanteDB.Persistence.Reporting.ADO.Model.ReportParameter, SanteDB.Persistence.Reporting.ADO, Version=0.6.0.0">
     <property modelName="Key" domainName="Key" />
     <property modelName="CorrelationId" domainName="CorrelationId" />
     <property modelName="Description" domainName="Description" />
@@ -46,7 +46,7 @@
 
   <!-- Parameter Types -->
   <class modelClass="SanteDB.Core.Model.RISI.ParameterType, SanteDB.Core.Model.RISI, Version=0.6.0.0"
-		domainClass="SanteDB.Persistence.Reporting.PSQL.Model.ParameterType, SanteDB.Persistence.Reporting.PSQL, Version=0.6.0.0">
+		domainClass="SanteDB.Persistence.Reporting.ADO.Model.ParameterType, SanteDB.Persistence.Reporting.ADO, Version=0.6.0.0">
     <property modelName="Key" domainName="Key" />
     <property modelName="CreationTime" domainName="CreationTime" />
     <property modelName="ValuesProvider" domainName="ValuesProvider" />
@@ -54,7 +54,7 @@
 
   <!-- Report Formats -->
   <class modelClass="SanteDB.Core.Model.RISI.ReportFormat, SanteDB.Core.Model.RISI, Version=0.6.0.0"
-  domainClass="SanteDB.Persistence.Reporting.PSQL.Model.ReportFormat, SanteDB.Persistence.Reporting.PSQL, Version=0.6.0.0">
+  domainClass="SanteDB.Persistence.Reporting.ADO.Model.ReportFormat, SanteDB.Persistence.Reporting.ADO, Version=0.6.0.0">
     <property modelName="Key" domainName="Key" />
     <property modelName="Format" domainName="Name" />
   </class>

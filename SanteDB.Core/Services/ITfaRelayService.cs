@@ -54,7 +54,7 @@ namespace SanteDB.Core.Services
     /// <summary>
     /// Represents a two-factor authentication relay service
     /// </summary>
-    public interface ITfaRelayService
+    public interface ITfaRelayService : IServiceImplementation
     {
 
         /// <summary>

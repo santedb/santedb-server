@@ -79,7 +79,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 		/// </summary>
 		public virtual void Start(IPEndPoint bind, ServiceHandler handler)
 		{
-			this.m_timeout = handler.Definition.ReceiveTimeout;
+			this.m_timeout = new TimeSpan(0,0,0,handler.Definition.ReceiveTimeout);
 			this.m_listener = new TcpListener(bind);
 
 			this.m_listener.Start();

@@ -18,6 +18,7 @@
  * Date: 2018-6-22
  */
 using SanteDB.Core.Security.Services;
+using SanteDB.Core.Services;
 using System;
 
 namespace SanteDB.Core.Security
@@ -25,8 +26,14 @@ namespace SanteDB.Core.Security
     /// <summary>
     /// Represents a TFA secret generator which uses the server's clock
     /// </summary>
+    [ServiceProvider("Simple TFA Secret Generator")]
     public class SimpleTfaSecretGenerator : ITwoFactorSecretGenerator
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public String ServiceName => "Simple TFA Secret Generator";
+
         /// <summary>
         /// Gets the name
         /// </summary>

@@ -34,7 +34,7 @@ namespace SanteDB.Core.Configuration
     /// <summary>
     /// Represents claims authorization configuration
     /// </summary>
-    [XmlType(nameof(ClaimsAuthorizationConfigurationSection), Namespace = "http://santedb.org/configuration/security")]
+    [XmlType(nameof(ClaimsAuthorizationConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class ClaimsAuthorizationConfigurationSection : IConfigurationSection
     {
 
@@ -87,7 +87,7 @@ namespace SanteDB.Core.Configuration
         /// Represents the issuer key 
         /// </summary>
         [XmlArray("issuer"), XmlArrayItem("add")]
-        public List<SecuritySignatureConfigurationSection> IssuerKeysXml { get; set; }
+        public List<SecuritySignatureConfiguration> IssuerKeysXml { get; set; }
 
         /// <summary>
         /// Gets or sets the allowed audiences 
@@ -99,7 +99,7 @@ namespace SanteDB.Core.Configuration
         /// Gets or sets the realm
         /// </summary>
         [XmlAttribute("realm")]
-        public string Realm { get; internal set; }
+        public string Realm { get; set; }
 
 
         /// <summary>

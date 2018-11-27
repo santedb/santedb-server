@@ -33,9 +33,14 @@ namespace SanteDB.Messaging.GS1.Transport.AS2
     /// <summary>
     /// GS1 Stock Integration Service
     /// </summary>
-    [Description("GS1 AS2(ish) Integration Service")]
+    [ServiceProvider("GS1 AS2(ish) Integration Service")]
     public class As2IntegrationService : IDaemonService
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "GS1 AS.2 Integration Service";
 
         // The event handler
         private EventHandler<PersistentQueueEventArgs> m_handler;

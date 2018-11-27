@@ -27,7 +27,7 @@ namespace SanteDB.Core.Configuration
     /// <summary>
     /// Represents a single behavior configuration element
     /// </summary>
-    [XmlType(nameof(RestBehaviorConfiguration), Namespace = "http://santedb.org/configuraton/rest")]
+    [XmlType(nameof(RestBehaviorConfiguration), Namespace = "http://santedb.org/configuration")]
     [JsonObject]
     public class RestBehaviorConfiguration
     {

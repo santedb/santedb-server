@@ -26,7 +26,7 @@ namespace SanteDB.Caching.Memory.Configuration
     /// <summary>
     /// Create memory cache configuration
     /// </summary>
-    [XmlType(nameof(MemoryCacheConfigurationSection), Namespace = "http://santedb.org/configuration/cache")]
+    [XmlType(nameof(MemoryCacheConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class MemoryCacheConfigurationSection: IConfigurationSection
     {
 

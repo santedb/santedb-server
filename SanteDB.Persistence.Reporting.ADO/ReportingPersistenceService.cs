@@ -24,23 +24,31 @@ using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
-using SanteDB.Persistence.Reporting.PSQL.Configuration;
+using SanteDB.Persistence.Reporting.ADO.Configuration;
 using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using SanteDB.Core.Diagnostics;
 
-namespace SanteDB.Persistence.Reporting.PSQL
+namespace SanteDB.Persistence.Reporting.ADO
 {
     /// <summary>
     /// Represents a persistence service for reporting services.
     /// </summary>
+    [ServiceProvider("ADO.NET Report/Wareouse Persistence")]
     public class ReportingPersistenceService : IDaemonService
 	{
-		/// <summary>
-		/// The internal reference to the trace source.
-		/// </summary>
-		private readonly TraceSource traceSource = new TraceSource(ReportingPersistenceConstants.TraceName);
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "ADO.NET Report/Wareouse Persistence Service";
+
+        /// <summary>
+        /// The internal reference to the trace source.
+        /// </summary>
+        private readonly TraceSource traceSource = new TraceSource(ReportingPersistenceConstants.TraceName);
 
 		static ReportingPersistenceService()
 		{
@@ -56,6 +64,8 @@ namespace SanteDB.Persistence.Reporting.PSQL
 			catch (ModelMapValidationException e)
 			{
 				tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error validating model map: {0}", e);
+                foreach (var err in e.ValidationDetails)
+                    tracer.TraceError("{0} : {1} @ {2}", err.Level, err.Message, err.Location);
 				throw;
 			}
 			catch (Exception e)
@@ -136,7 +146,7 @@ namespace SanteDB.Persistence.Reporting.PSQL
 				this.traceSource.TraceEvent(TraceEventType.Information, 0, $"Reporting configuration loaded, using connection string: { Configuration.ReadWriteConnectionString }");
 
 				// Iterate the persistence services
-				foreach (var t in typeof(ReportingPersistenceService).GetTypeInfo().Assembly.DefinedTypes.Where(o => o.Namespace == "SanteDB.Persistence.Reporting.PSQL.Services" && !o.GetTypeInfo().IsAbstract && !o.IsGenericTypeDefinition))
+				foreach (var t in typeof(ReportingPersistenceService).GetTypeInfo().Assembly.DefinedTypes.Where(o => o.Namespace == "SanteDB.Persistence.Reporting.ADO.Services" && !o.GetTypeInfo().IsAbstract && !o.IsGenericTypeDefinition))
 				{
 					try
 					{

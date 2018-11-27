@@ -33,6 +33,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using SanteDB.Rest.AMI.Resources;
 
 namespace SanteDB.Messaging.AMI
 {
@@ -59,9 +60,13 @@ namespace SanteDB.Messaging.AMI
     /// <summary>
     /// AMI Message handler
     /// </summary>
-    [Description("AMI Message Service")]
-	public class AmiMessageHandler : IDaemonService, IApiEndpointProvider
-	{
+    [ServiceProvider("Administrative REST Daemon")]
+    public class AmiMessageHandler : IDaemonService, IApiEndpointProvider
+    {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "Administrative Management Interface Daemon";
 
         // Configuration
         private readonly AmiConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AmiConfigurationSection>();
@@ -76,96 +81,91 @@ namespace SanteDB.Messaging.AMI
         /// </summary>
         private readonly TraceSource m_traceSource = new TraceSource(AmiConstants.TraceSourceName);
 
-		/// <summary>
-		/// The internal reference to the AMI configuration.
-		/// </summary>
-		private AmiConfigurationSection configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AmiConfigurationSection>();
+        /// <summary>
+        /// The internal reference to the AMI configuration.
+        /// </summary>
+        private AmiConfigurationSection configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AmiConfigurationSection>();
 
-		// web host
-		private RestService m_webHost;
+        // web host
+        private RestService m_webHost;
 
-		/// <summary>
-		/// Fired when the object is starting up.
-		/// </summary>
-		public event EventHandler Started;
+        /// <summary>
+        /// Fired when the object is starting up.
+        /// </summary>
+        public event EventHandler Started;
 
-		/// <summary>
-		/// Fired when the object is starting.
-		/// </summary>
-		public event EventHandler Starting;
+        /// <summary>
+        /// Fired when the object is starting.
+        /// </summary>
+        public event EventHandler Starting;
 
-		/// <summary>
-		/// Fired when the service has stopped.
-		/// </summary>
-		public event EventHandler Stopped;
+        /// <summary>
+        /// Fired when the service has stopped.
+        /// </summary>
+        public event EventHandler Stopped;
 
-		/// <summary>
-		/// Fired when the service is stopping.
-		/// </summary>
-		public event EventHandler Stopping;
+        /// <summary>
+        /// Fired when the service is stopping.
+        /// </summary>
+        public event EventHandler Stopping;
 
-		/// <summary>
-		/// Gets the API type
-		/// </summary>
-		public ServiceEndpointType ApiType
-		{
-			get
-			{
-				return ServiceEndpointType.AdministrationIntegrationService;
-			}
-		}
+        /// <summary>
+        /// Gets the API type
+        /// </summary>
+        public ServiceEndpointType ApiType
+        {
+            get
+            {
+                return ServiceEndpointType.AdministrationIntegrationService;
+            }
+        }
 
-		/// <summary>
-		/// Capabilities
-		/// </summary>
-		public ServiceEndpointCapabilities Capabilities
-		{
-			get
-			{
-				var caps = ServiceEndpointCapabilities.Compression;
-                if (this.m_webHost.ServiceBehaviors.OfType<BasicAuthorizationAccessBehavior>().Any())
-                    caps |= ServiceEndpointCapabilities.BasicAuth;
-                if (this.m_webHost.ServiceBehaviors.OfType<TokenAuthorizationAccessBehavior>().Any())
-                    caps |= ServiceEndpointCapabilities.BearerAuth;
+        /// <summary>
+        /// Capabilities
+        /// </summary>
+        public ServiceEndpointCapabilities Capabilities
+        {
+            get
+            {
+                return this.m_webHost.GetCapabilities();
+            }
+        }
 
-                return caps;
-			}
-		}
+        /// <summary>
+        /// True if running
+        /// </summary>
+        public bool IsRunning
+        {
+            get
+            {
+                return this.m_webHost?.IsRunning == true;
+            }
+        }
 
-		/// <summary>
-		/// True if running
-		/// </summary>
-		public bool IsRunning
-		{
-			get
-			{
-				return this.m_webHost?.IsRunning == true;
-			}
-		}
+        /// <summary>
+        /// URL of the service
+        /// </summary>
+        public string[] Url
+        {
+            get
+            {
+                return this.m_webHost.Endpoints.OfType<ServiceEndpoint>().Select(o => o.Description.ListenUri.ToString()).ToArray();
+            }
+        }
 
-		/// <summary>
-		/// URL of the service
-		/// </summary>
-		public string[] Url
-		{
-			get
-			{
-				return this.m_webHost.Endpoints.OfType<ServiceEndpoint>().Select(o => o.Description.ListenUri.ToString()).ToArray();
-			}
-		}
-
-		/// <summary>
-		/// Start the service
-		/// </summary>
-		public bool Start()
-		{
+        /// <summary>
+        /// Start the service
+        /// </summary>
+        public bool Start()
+        {
             // Don't startup unless in SanteDB
             if (Assembly.GetEntryAssembly().GetName().Name != "SanteDB")
                 return true;
 
             try
             {
-				this.Starting?.Invoke(this, EventArgs.Empty);
+                this.Starting?.Invoke(this, EventArgs.Empty);
+
 
                 this.m_webHost = RestServiceTool.CreateService(typeof(AmiServiceBehavior));
                 this.m_webHost.AddServiceBehavior(new ErrorServiceBehavior());
@@ -174,42 +174,46 @@ namespace SanteDB.Messaging.AMI
                 foreach (ServiceEndpoint endpoint in this.m_webHost.Endpoints)
                 {
                     this.m_traceSource.TraceInformation("Starting AMI on {0}...", endpoint.Description.ListenUri);
-                    endpoint.AddEndpointBehavior(new MessageCompressionEndpointBehavior());
-                    endpoint.AddEndpointBehavior(new MessageDispatchFormatterBehavior());
-                    endpoint.AddEndpointBehavior(new MessageLoggingEndpointBehavior());
-
                 }
 
                 // Start the webhost
                 this.m_webHost.Start();
 
-                AmiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.configuration.ResourceHandlers);
-				this.Started?.Invoke(this, EventArgs.Empty);
-				return true;
-			}
-			catch (Exception e)
-			{
-				this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
-				return false;
-			}
-		}
+                if (this.m_configuration.ResourceHandlers.Count() > 0)
+                    AmiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.configuration.ResourceHandlers);
+                else
+                    AmiMessageHandler.ResourceHandler = new ResourceHandlerTool(
+                        typeof(SecurityUserResourceHandler).Assembly.ExportedTypes
+                        .Where(t => !t.IsAbstract && !t.IsInterface && typeof(IResourceHandler).IsAssignableFrom(t))
+                        .ToList()
+                    );
 
-		/// <summary>
-		/// Stop the HDSI service
-		/// </summary>
-		public bool Stop()
-		{
-			this.Stopping?.Invoke(this, EventArgs.Empty);
+                this.Started?.Invoke(this, EventArgs.Empty);
+                return true;
+            }
+            catch (Exception e)
+            {
+                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                return false;
+            }
+        }
 
-			if (this.m_webHost != null)
-			{
-				this.m_webHost.Stop();
-				this.m_webHost = null;
-			}
+        /// <summary>
+        /// Stop the HDSI service
+        /// </summary>
+        public bool Stop()
+        {
+            this.Stopping?.Invoke(this, EventArgs.Empty);
 
-			this.Stopped?.Invoke(this, EventArgs.Empty);
+            if (this.m_webHost != null)
+            {
+                this.m_webHost.Stop();
+                this.m_webHost = null;
+            }
 
-			return true;
-		}
-	}
+            this.Stopped?.Invoke(this, EventArgs.Empty);
+
+            return true;
+        }
+    }
 }

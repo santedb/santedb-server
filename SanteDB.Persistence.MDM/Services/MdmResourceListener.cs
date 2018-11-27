@@ -63,6 +63,11 @@ namespace SanteDB.Persistence.MDM.Services
         where T : IdentifiedData, new()
     {
 
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => $"MDM Data Listener for {typeof(T).FullName}";
+
         // Configuration
         private MdmResourceConfiguration m_resourceConfiguration;
 

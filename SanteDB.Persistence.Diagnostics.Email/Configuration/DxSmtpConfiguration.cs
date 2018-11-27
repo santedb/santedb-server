@@ -18,20 +18,27 @@
  * Date: 2018-6-22
  */
 using System;
+using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Diagnostics.Email.Configuration
 {
     /// <summary>
     /// Configuration for SMTP
     /// </summary>
-    public class SmtpConfiguration
+    [XmlType(nameof(DxSmtpConfiguration), Namespace = "http://santedb.org/configuration")]
+    public class DxSmtpConfiguration
 	{
+
+        public DxSmtpConfiguration()
+        {
+
+        }
 		/// <summary>
 		/// SMTP configuration
 		/// </summary>
-		public SmtpConfiguration(Uri server, String userName, String password, bool ssl, String from)
+		public DxSmtpConfiguration(Uri server, String userName, String password, bool ssl, String from)
 		{
-			this.Server = server;
+			this.ServerXml = server.ToString();
 			this.Username = userName;
 			this.Password = password;
 			this.Ssl = ssl;
@@ -41,26 +48,37 @@ namespace SanteDB.Persistence.Diagnostics.Email.Configuration
         /// <summary>
         /// Gets the from address
         /// </summary>
-        public string From { get; private set; }
+        [XmlAttribute("from")]
+        public string From { get; set; }
 
         /// <summary>
         /// Gets the password
         /// </summary>
-        public string Password { get; private set; }
+        [XmlAttribute("password")]
+        public string Password { get; set; }
 
 		/// <summary>
 		/// Gets the SMTP server
 		/// </summary>
-		public Uri Server { get; private set; }
+        [XmlAttribute("server")]
+        public String ServerXml { get; set; }
 
-		/// <summary>
-		/// Get the SSL setting
-		/// </summary>
-		public bool Ssl { get; private set; }
+        /// <summary>
+        /// Gets the server
+        /// </summary>
+        [XmlIgnore]
+        public Uri Server => new Uri(this.ServerXml);
+
+        /// <summary>
+        /// Get the SSL setting
+        /// </summary>
+        [XmlAttribute("ssl")]
+        public bool Ssl { get; set; }
 
 		/// <summary>
 		/// Gets the username for connecting to the server
 		/// </summary>
-		public string Username { get; private set; }
+        [XmlAttribute("username")]
+		public string Username { get; set; }
 	}
 }

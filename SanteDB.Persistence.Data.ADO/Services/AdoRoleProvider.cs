@@ -37,8 +37,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// <summary>
     /// Local role provider
     /// </summary>
+    [ServiceProvider("ADO.NET Role Provider Service")]
     public class AdoRoleProvider : IRoleProviderService
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public String ServiceName => "ADO.NET Role Provider Service";
 
         // Tracer
         private TraceSource m_tracer = new TraceSource(AdoDataConstants.IdentityTraceSourceName);

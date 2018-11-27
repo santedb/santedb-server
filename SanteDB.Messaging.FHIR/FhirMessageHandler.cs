@@ -39,8 +39,14 @@ namespace SanteDB.Messaging.FHIR
     /// <summary>
     /// Message handler for FHIR
     /// </summary>
+    [ServiceProvider("HL7 FHIR R3 API Endpoint")]
     public class FhirMessageHandler : IDaemonService, IApiEndpointProvider
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "HL7 FHIR R3 API Endpoint";
 
         #region IMessageHandlerService Members
 
@@ -93,17 +99,10 @@ namespace SanteDB.Messaging.FHIR
                 foreach (var endpoint in this.m_webHost.Endpoints)
                 {
                     this.m_traceSource.TraceInformation("Starting FHIR on {0}...", endpoint.Description.ListenUri);
-
-                    var corsSettings = new Core.Rest.Serialization.CorsSettings();
-                    corsSettings.Resource.AddRange(this.m_configuration.CorsConfiguration);
-                    endpoint.AddEndpointBehavior(new MessageCompressionEndpointBehavior());
-                    endpoint.AddEndpointBehavior(new CorsEndpointBehavior(corsSettings));
-                    endpoint.AddEndpointBehavior(new MessageLoggingEndpointBehavior());
-
                 }
 
                 // Configuration 
-                foreach (Type t in this.m_configuration.ResourceHandlers)
+                foreach (Type t in this.m_configuration.ResourceHandlers.Select(o=>o.Type))
                 {
                     ConstructorInfo ci = t.GetConstructor(Type.EmptyTypes);
                     if (ci == null || t.IsAbstract)
@@ -175,14 +174,7 @@ namespace SanteDB.Messaging.FHIR
         {
             get
             {
-                var caps = ServiceEndpointCapabilities.None;
-                if (this.m_webHost.Endpoints.Any(o => o.Behaviors.OfType<MessageCompressionEndpointBehavior>().Any()))
-                    caps |= ServiceEndpointCapabilities.Compression;
-                if (this.m_webHost.ServiceBehaviors.OfType<BasicAuthorizationAccessBehavior>().Any())
-                    caps |= ServiceEndpointCapabilities.BasicAuth;
-                if (this.m_webHost.ServiceBehaviors.OfType<TokenAuthorizationAccessBehavior>().Any())
-                    caps |= ServiceEndpointCapabilities.BearerAuth;
-                return caps;
+                return this.m_webHost.GetCapabilities();
             }
         }
 

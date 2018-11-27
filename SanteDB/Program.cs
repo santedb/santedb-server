@@ -19,16 +19,26 @@
  */
 using MohawkCollege.Util.Console.Parameters;
 using SanteDB.Core;
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Data;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.EntityLoader;
+using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.ServiceProcess;
+using System.Xml.Serialization;
+using SanteDB.Core.Model;
+using System.Collections;
+using SanteDB.Core.Model.Attributes;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace SanteDB
 {
@@ -77,6 +87,37 @@ namespace SanteDB
                 // What to do?
                 if (parameters.ShowHelp)
                     parser.WriteHelp(Console.Out);
+                else if(parameters.GenConfig)
+                {
+
+                    SanteDBConfiguration configuration = new SanteDBConfiguration();
+                    SanteDBServerConfiguration serverConfiguration = new SanteDBServerConfiguration();
+                    Console.WriteLine("Will generate full default configuration...");
+                    foreach(var file in Directory.GetFiles(Path.GetDirectoryName(typeof(Program).Assembly.Location), "*.dll"))
+                    {
+                        try
+                        {
+                            var asm = Assembly.LoadFile(file);
+                            Console.WriteLine("Adding service providers from {0}...", file);
+                            serverConfiguration.ServiceProviders.AddRange(asm.ExportedTypes.Where(t => typeof(IServiceImplementation).IsAssignableFrom(t) && !t.IsAbstract && !t.ContainsGenericParameters && t.GetCustomAttribute<ServiceProviderAttribute>() != null).Select(o => new TypeReferenceConfiguration(o)));
+                            Console.WriteLine("Adding sections from {0}...", file);
+                            configuration.Sections.AddRange(asm.ExportedTypes.Where(t => typeof(IConfigurationSection).IsAssignableFrom(t)).Select(t => CreateFullXmlObject(t)));
+                        }
+                        catch(Exception e)
+                        {
+                            Console.WriteLine("Skipping {0} due to {1}", file, e.Message);
+                        }
+                    }
+
+                    configuration.RemoveSection<SanteDBServerConfiguration>();
+                    serverConfiguration.ThreadPoolSize = Environment.ProcessorCount;
+                    configuration.AddSection(serverConfiguration);
+
+                    using (var fs = File.Create(Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), "default.config.xml")))
+                        configuration.Save(fs);
+
+
+                }
                 else if(parameters.ConsoleMode)
                 {
 #if DEBUG
@@ -88,7 +129,7 @@ namespace SanteDB
                     Console.WriteLine("SanteDB (SanteDB) {0} ({1})", entryAsm.GetName().Version, entryAsm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
                     Console.WriteLine("{0}", entryAsm.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright);
                     Console.WriteLine("Complete Copyright information available at http://SanteDB.codeplex.com/wikipage?title=Contributions");
-                    ApplicationServiceContext.Current = ApplicationServiceContext.Current;
+                    ApplicationServiceContext.Current = ApplicationContext.Current;
                     ServiceUtil.Start(typeof(Program).GUID);
                     (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(typeof(FileConfigurationService));
                     ApplicationServiceContext.HostType = SanteDBHostType.Server;
@@ -120,6 +161,106 @@ namespace SanteDB
 
             }
 
+        }
+
+        /// <summary>
+        /// Create a full XML object
+        /// </summary>
+        private static object CreateFullXmlObject(Type t)
+        {
+            var instance = Activator.CreateInstance(t);
+            foreach(var prop in t.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+            {
+                try
+                {
+                    if (prop.GetCustomAttribute<XmlAttributeAttribute>() != null)
+                    {
+                        prop.SetValue(instance, GetDefaultValue(prop.PropertyType));
+                    }
+                    else if (prop.GetCustomAttributes<XmlElementAttribute>().Count() > 0 ||
+                        prop.GetCustomAttribute<XmlArrayAttribute>() != null)
+                    {
+                        var xeType = prop.GetCustomAttributes<XmlElementAttribute>().FirstOrDefault()?.Type;
+                        // List object
+                        if (typeof(IList).IsAssignableFrom(prop.PropertyType))
+                        {
+                            var value = Activator.CreateInstance(prop.PropertyType) as IList;
+                            prop.SetValue(instance, value);
+                            var defaultValue = GetDefaultValue(prop.PropertyType.GetGenericArguments()[0]);
+                            if (defaultValue != null)
+                                value.Add(defaultValue);
+                            else
+                                value.Add(CreateFullXmlObject(xeType ?? prop.PropertyType.GetGenericArguments()[0]));
+
+                        }
+                        else
+                        {
+                            // TODO : Choice
+                            var defaultValue = GetDefaultValue(prop.PropertyType);
+                            if (defaultValue != null)
+                                prop.SetValue(instance, defaultValue);
+                            else
+                                prop.SetValue(instance, CreateFullXmlObject(xeType ?? prop.PropertyType));
+                        }
+
+                    }
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine("\tSkipping {0}.{1} > {2}", t.FullName, prop.Name, e.Message);
+                }
+            }
+            return instance;
+        }
+
+        /// <summary>
+        /// Get default value for XML
+        /// </summary>
+        private static object GetDefaultValue(Type propertyType)
+        {
+            if(propertyType == typeof(byte[]))
+            {
+                Console.Write("Data for byte[] value:");
+                var data = Console.ReadLine();
+                return SHA256.Create().ComputeHash(Console.InputEncoding.GetBytes(data));
+            }
+            else
+            switch (propertyType.StripNullable().Name.ToLower())
+            {
+                case "bool":
+                case "boolean":
+                    return false;
+                case "string":
+                    return "value";
+                case "guid":
+                    return Guid.Empty;
+                case "int":
+                case "int32":
+                case "int64":
+                case "long":
+                case "short":
+                case "int16":
+                    return 0;
+                case "double":
+                case "float":
+                    return 0.0f;
+                case "datetime":
+                    return DateTime.MinValue;
+                case "timespan":
+                    return TimeSpan.MinValue;
+                case "storename":
+                    return StoreName.My;
+                case "storelocation":
+                    return StoreLocation.CurrentUser;
+                case "x509findtype":
+                    return X509FindType.FindByThumbprint;
+                default:
+                    if (propertyType.IsEnum)
+                    {
+                        return Enum.ToObject(propertyType, 0);
+                    }
+                    return null;
+            }
         }
     }
 }

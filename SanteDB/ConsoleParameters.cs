@@ -51,5 +51,12 @@ namespace SanteDB
         [Parameter("test-start")]
         public bool StartupTest { get; set; }
 
+        /// <summary>
+        /// Generate configuartion
+        /// </summary>
+        [Parameter("genconfig")]
+        [Description("Generates a default configuration file called config.default.xml given the plugins available")]
+        public bool GenConfig { get; set; }
+
     }
 }

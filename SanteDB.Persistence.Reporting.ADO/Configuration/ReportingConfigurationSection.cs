@@ -24,12 +24,12 @@ using SanteDB.OrmLite.Configuration;
 using SanteDB.OrmLite.Providers;
 using System.Xml.Serialization;
 
-namespace SanteDB.Persistence.Reporting.PSQL.Configuration
+namespace SanteDB.Persistence.Reporting.ADO.Configuration
 {
     /// <summary>
     /// Represents reporting configuration.
     /// </summary>
-    [XmlType(nameof(ReportingConfiguration), Namespace = "http://santedb.org/configuration/reporting")]
+    [XmlType(nameof(ReportingConfiguration), Namespace = "http://santedb.org/configuration")]
     public class ReportingConfiguration : OrmConfigurationBase, IConfigurationSection
     {
         /// <summary>

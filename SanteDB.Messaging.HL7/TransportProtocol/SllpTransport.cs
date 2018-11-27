@@ -19,6 +19,7 @@
 
 using SanteDB.Core;
 using SanteDB.Core.Auditing;
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
@@ -49,12 +50,10 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 		/// <summary>
 		/// SLLP configuration object
 		/// </summary>
-        [XmlType(nameof(SllpConfigurationObject), Namespace = "http://santedb.org/configuration/hl7")]
+        [XmlType(nameof(SllpConfigurationObject), Namespace = "http://santedb.org/configuration")]
 		public class SllpConfigurationObject
 		{
-            private X509Certificate2 m_serverCertificate;
-            private X509Certificate2 m_caCertificate;
-
+          
             /// <summary>
             /// Check CRL
             /// </summary>
@@ -63,84 +62,21 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 				this.CheckCrl = true;
 			}
 
-			/// <summary>
-			/// Identifies the location of the server's certificate
-			/// </summary>
-			[Category("Server Certificate")]
-			[Description("Identifies the location of the server's certificate")]
-            [XmlAttribute("storeLocation")]
-            public StoreLocation ServerCertificateLocation { get; set; }
-
-			/// <summary>
-			/// Identifies the store name of the server's certificate
-			/// </summary>
-			[Category("Server Certificate")]
-			[Description("Identifies the store name of the server's certificate")]
-            [XmlAttribute("storeName")]
-            public StoreName ServerCertificateStore { get; set; }
-
-			/// <summary>
-			/// Identifies the certificate to be used
-			/// </summary>
-			[Category("Server Certificate")]
-			[Description("Identifies the certificate to be used by the server")]
-            [XmlAttribute("certificateThumbprint")]
-            public String ServerCertificateThumbprint { get; set; }
-
-            
             /// <summary>
-            /// Server certificate
+            /// Gets the server certificate
             /// </summary>
-            public X509Certificate2 ServerCertificate
-            {
-                get
-                {
-                    if (this.m_serverCertificate == null)
-                        this.m_serverCertificate = X509CertificateUtils.FindCertificate(X509FindType.FindByThumbprint, this.ServerCertificateLocation, this.ServerCertificateStore, this.ServerCertificateThumbprint);
-                    return this.m_serverCertificate;
-                }
-            }
+            [XmlElement("serverCertificate")]
+            public X509ConfigurationElement ServerCertificate { get; set; }
 
             /// <summary>
-            /// Server certificate
+            /// Gets the server certificate
             /// </summary>
-            public X509Certificate2 TrustedCaCertificate
-            {
-                get
-                {
-                    if (this.m_caCertificate == null)
-                        this.m_caCertificate = X509CertificateUtils.FindCertificate(X509FindType.FindByThumbprint, this.TrustedCaCertificateLocation, this.TrustedCaCertificateStore, this.TrustedCaCertificateThumbprint);
-                    return this.m_caCertificate;
-                }
-            }
+            [XmlElement("clientAuthorityCertificate")]
+            public X509ConfigurationElement ClientCaCertificate { get; set; }
 
             /// <summary>
-            /// Identifies the location of the certificate which client certs should be issued from
+            /// Check revocation status
             /// </summary>
-            [Category("Trusted Client Certificate")]
-			[Description("Identifies the location of a certificate used for client authentication")]
-            [XmlAttribute("caCertificateLocation")]
-            public StoreLocation TrustedCaCertificateLocation { get; set; }
-
-			/// <summary>
-			/// Identifies the store name of the server's certificate
-			/// </summary>
-			[Category("Trusted Client Certificate")]
-			[Description("Identifies the store of a certificate used for client authentication")]
-            [XmlAttribute("caCertificateStore")]
-            public StoreName TrustedCaCertificateStore { get; set; }
-
-			/// <summary>
-			/// Identifies the certificate to be used
-			/// </summary>
-			[Category("Trusted Client Certificate")]
-			[Description("Identifies the certificate of the CA which clients must carry to be authenticated")]
-            [XmlAttribute("caCertificateThumbprint")]
-            public String TrustedCaCertificateThumbprint { get; set; }
-
-			/// <summary>
-			/// Check revocation status
-			/// </summary>
             [XmlAttribute("checkCrl")]
 			public bool CheckCrl { get; set; }
 
@@ -171,7 +107,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 		/// </summary>
 		public override void Start(IPEndPoint bind, ServiceHandler handler)
 		{
-			this.m_timeout = handler.Definition.ReceiveTimeout;
+			this.m_timeout = new TimeSpan(0,0,0,0, handler.Definition.ReceiveTimeout);
 			this.m_listener = new TcpListener(bind);
 			this.m_listener.Start();
 			this.m_traceSource.TraceInformation("SLLP Transport bound to {0}", bind);
@@ -227,7 +163,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 				bool isValid = false;
 				foreach (var cer in chain.ChainElements)
 				{
-					if (cer.Certificate.Thumbprint == this.m_configuration.TrustedCaCertificate.Thumbprint)
+					if (cer.Certificate.Thumbprint == this.m_configuration.ClientCaCertificate.GetCertificate().Thumbprint)
 						isValid = true;
 				}
 				if (!isValid)
@@ -255,7 +191,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 				Uri remoteEndpoint = new Uri(String.Format("sllp://{0}:{1}", remoteEp.Address, remoteEp.Port));
 				this.m_traceSource.TraceInformation("Accepted TCP connection from {0} > {1}", remoteEndpoint, localEndpoint);
 
-				stream.AuthenticateAsServer(this.m_configuration.ServerCertificate, this.m_configuration.EnableClientCertNegotiation, System.Security.Authentication.SslProtocols.Tls, this.m_configuration.CheckCrl);
+				stream.AuthenticateAsServer(this.m_configuration.ServerCertificate.GetCertificate(), this.m_configuration.EnableClientCertNegotiation, System.Security.Authentication.SslProtocols.Tls, this.m_configuration.CheckCrl);
 
 				// Now read to a string
 				NHapi.Base.Parser.PipeParser parser = new NHapi.Base.Parser.PipeParser();

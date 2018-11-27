@@ -30,7 +30,7 @@ namespace SanteDB.Messaging.AMI.Configuration
     /// <summary>
     /// AMI Configuration
     /// </summary>
-    [XmlType(nameof(AmiConfigurationSection), Namespace = "http://santedb.org/configuration/ami")]
+    [XmlType(nameof(AmiConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class AmiConfigurationSection : IConfigurationSection
 	{
         /// <summary>
@@ -64,12 +64,12 @@ namespace SanteDB.Messaging.AMI.Configuration
         /// Certification authority configuration
         /// </summary>
         [XmlElement("msftCertAuth")]
-        public CertificationAuthorityConfiguration CaConfiguration { get; private set; }
+        public CertificationAuthorityConfiguration CaConfiguration { get; set; }
 
 		/// <summary>
 		/// Extra endpoints
 		/// </summary>
         [XmlArray("endpoints"), XmlArrayItem("add")]
-		public List<ServiceEndpointOptions> Endpoints { get; private set; }
+		public List<ServiceEndpointOptions> Endpoints { get; set; }
 	}
 }

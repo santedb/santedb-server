@@ -40,9 +40,14 @@ namespace SanteDB.Messaging.GS1
     /// <summary>
     /// Represents a notification service that listens to stock events and then prepares them for broadcast
     /// </summary>
-    [Description("GS1 Stock Event Subscriber")]
+    [ServiceProvider("GS1 Stock Event Subscriber")]
     public class StockSubscriber : IDaemonService
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "GS1 Stock Events Subscription Service";
+
         /// <summary>
         /// True if running
         /// </summary>

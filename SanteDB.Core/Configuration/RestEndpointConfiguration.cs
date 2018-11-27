@@ -27,7 +27,7 @@ namespace SanteDB.Core.Configuration
     /// <summary>
     /// Represents an endpoint configuration
     /// </summary>
-    [XmlType(nameof(RestEndpointConfiguration), Namespace = "http://santedb.org/configuraton/rest")]
+    [XmlType(nameof(RestEndpointConfiguration), Namespace = "http://santedb.org/configuration")]
     [JsonObject]
     public class RestEndpointConfiguration
     {
@@ -65,7 +65,7 @@ namespace SanteDB.Core.Configuration
         /// <summary>
         /// Gets the bindings 
         /// </summary>
-        [XmlArray("behavior"), XmlArrayItem("add"), JsonProperty("behavior")]
+        [XmlArray("behaviors"), XmlArrayItem("add"), JsonProperty("behaviors")]
         public List<RestBehaviorConfiguration> Behaviors { get; set; }
 
     }

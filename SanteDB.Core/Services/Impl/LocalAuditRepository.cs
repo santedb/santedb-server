@@ -31,8 +31,15 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Represents an audit repository which stores and queries audit data.
     /// </summary>
+    [ServiceProvider("Default Audit Repository")]
     public class LocalAuditRepository : IAuditRepositoryService, IAuditEventSource
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public String ServiceName => "Default Audit Repository";
+
         /// <summary>
         /// Fired when data has been created
         /// </summary>

@@ -18,102 +18,138 @@
  * Date: 13-8-2012
  */
 using SanteDB.Core;
+using SanteDB.Core.Interop;
+using SanteDB.Core.Rest;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.HL7.Configuration;
+using SanteDB.Messaging.HL7.TransportProtocol;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 
 namespace SanteDB.Messaging.HL7
 {
-	/// <summary>
-	/// Message handler service
-	/// </summary>
-	public class HL7MessageHandler : IDaemonService
-	{
+    /// <summary>
+    /// Message handler service
+    /// </summary>
+    [ServiceProvider("HL7v2 API Endpoint")]
+    public class HL7MessageHandler : IDaemonService, IApiEndpointProvider
+    {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "HL7v2 API Endpoint Provider";
+
         #region IMessageHandlerService Members
 
         // HL7 Trace source name
         private TraceSource m_traceSource = new TraceSource(Hl7Constants.TraceSourceName);
-		// Configuration
-		private Hl7ConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
+        // Configuration
+        private Hl7ConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
 
-		// Threads that are listening for messages
-		private List<ServiceHandler> m_listenerThreads = new List<ServiceHandler>();
+        // Threads that are listening for messages
+        private List<ServiceHandler> m_listenerThreads = new List<ServiceHandler>();
 
-		/// <summary>
-		/// Start the v2 message handler
-		/// </summary>
-		public bool Start()
-		{
-			this.Starting?.Invoke(this, EventArgs.Empty);
+        /// <summary>
+        /// Start the v2 message handler
+        /// </summary>
+        public bool Start()
+        {
+            this.Starting?.Invoke(this, EventArgs.Empty);
 
-			foreach (var sd in this.m_configuration.Services)
-			{
-				var sh = new ServiceHandler(sd);
-				Thread thdSh = new Thread(sh.Run);
-				thdSh.IsBackground = true;
+            foreach (var sd in this.m_configuration.Services)
+            {
+                var sh = new ServiceHandler(sd);
+                Thread thdSh = new Thread(sh.Run);
+                thdSh.IsBackground = true;
                 thdSh.Name = $"HL7v2-{sd.Name}";
-				this.m_listenerThreads.Add(sh);
-				this.m_traceSource.TraceInformation("Starting HL7 Service '{0}'...", sd.Name);
-				thdSh.Start();
-			}
+                this.m_listenerThreads.Add(sh);
+                this.m_traceSource.TraceInformation("Starting HL7 Service '{0}'...", sd.Name);
+                thdSh.Start();
+            }
 
-			this.Started?.Invoke(this, EventArgs.Empty);
+            this.Started?.Invoke(this, EventArgs.Empty);
 
-			return true;
-		}
+            return true;
+        }
 
-		/// <summary>
-		/// Stop the v2 message handler
-		/// </summary>
-		public bool Stop()
-		{
-			this.Stopping?.Invoke(this, EventArgs.Empty);
+        /// <summary>
+        /// Stop the v2 message handler
+        /// </summary>
+        public bool Stop()
+        {
+            this.Stopping?.Invoke(this, EventArgs.Empty);
             foreach (var thd in this.m_listenerThreads)
             {
                 thd.Abort();
             }
             this.m_traceSource.TraceInformation("All threads shutdown");
-			this.Stopped?.Invoke(this, EventArgs.Empty);
-			return true;
-		}
+            this.Stopped?.Invoke(this, EventArgs.Empty);
+            return true;
+        }
 
-		#endregion IMessageHandlerService Members
+        #endregion IMessageHandlerService Members
 
-		// Host context
-		private IServiceProvider m_context;
+        // Host context
+        private IServiceProvider m_context;
 
-		/// <summary>
-		/// Fired when the service has stopped
-		/// </summary>
-		public event EventHandler Started;
+        /// <summary>
+        /// Fired when the service has stopped
+        /// </summary>
+        public event EventHandler Started;
 
-		/// <summary>
-		/// Fired when the service is starting
-		/// </summary>
-		public event EventHandler Starting;
+        /// <summary>
+        /// Fired when the service is starting
+        /// </summary>
+        public event EventHandler Starting;
 
-		/// <summary>
-		/// Fired when the service has stopped
-		/// </summary>
-		public event EventHandler Stopped;
+        /// <summary>
+        /// Fired when the service has stopped
+        /// </summary>
+        public event EventHandler Stopped;
 
-		/// <summary>
-		/// Fired when the service is stopping
-		/// </summary>
-		public event EventHandler Stopping;
+        /// <summary>
+        /// Fired when the service is stopping
+        /// </summary>
+        public event EventHandler Stopping;
 
-		/// <summary>
-		/// Returns true with the service is running
-		/// </summary>
-		public bool IsRunning
-		{
-			get
-			{
-				return this.m_listenerThreads?.Count > 0;
-			}
-		}
-	}
+        /// <summary>
+        /// Returns true with the service is running
+        /// </summary>
+        public bool IsRunning
+        {
+            get
+            {
+                return this.m_listenerThreads?.Count > 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets the API type
+        /// </summary>
+        public ServiceEndpointType ApiType => ServiceEndpointType.Hl7v2Interface;
+
+        /// <summary>
+        /// Get the URL
+        /// </summary>
+        public string[] Url => this.m_listenerThreads.Select(o => o.Definition.AddressXml).ToArray();
+
+        /// <summary>
+        /// Capabilities
+        /// </summary>
+        public ServiceEndpointCapabilities Capabilities {
+            get
+            {
+                var retVal = ServiceEndpointCapabilities.None;
+                if (this.m_listenerThreads.Any(o => o.Definition.Configuration is SllpTransport.SllpConfigurationObject))
+                    retVal |= ServiceEndpointCapabilities.CertificateAuth;
+                else if (this.m_configuration.Security == SecurityMethod.Msh8)
+                    retVal |= ServiceEndpointCapabilities.BearerAuth;
+                return retVal;
+            }
+        }
+    }
 }

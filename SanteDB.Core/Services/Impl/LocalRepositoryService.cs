@@ -33,8 +33,14 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Daemon service which adds all the repositories for acts
     /// </summary>
+    [ServiceProvider("Local (database) repository service")]
     public class LocalRepositoryService : IDaemonService
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "Local (database) repository service";
+
         // Trace source
         private TraceSource m_tracer = new TraceSource(SanteDBConstants.DataTraceSourceName);
 
@@ -103,7 +109,7 @@ namespace SanteDB.Core.Services.Impl
 
             ApplicationServiceContext.Current.Started += (o, e) =>
             {
-                foreach (var t in AppDomain.CurrentDomain.GetAssemblies().Where(a=>!a.IsDynamic).SelectMany(a => a.GetExportedTypes()).Where(t => typeof(IdentifiedData).IsAssignableFrom(t) && !t.IsAbstract && t.GetCustomAttribute<XmlRootAttribute>() != null))
+                foreach (var t in AppDomain.CurrentDomain.GetAssemblies().Where(a=>!a.IsDynamic).SelectMany(a => a.GetExportedTypes()).Where(t => typeof(IdentifiedData).IsAssignableFrom(t) && !t.IsAbstract && t.GetCustomAttribute<XmlRootAttribute>() != null && !t.ContainsGenericParameters))
                 {
                     var irst = typeof(IRepositoryService<>).MakeGenericType(t);
                     var irsi = ApplicationServiceContext.Current.GetService(irst);

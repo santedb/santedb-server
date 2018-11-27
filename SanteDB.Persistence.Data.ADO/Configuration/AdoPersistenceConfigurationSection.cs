@@ -32,7 +32,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
     /// <summary>
     /// Configuration section handler
     /// </summary>
-    [XmlType(nameof(AdoPersistenceConfigurationSection), Namespace = "http://www.santedb.org/configuration")]
+    [XmlType(nameof(AdoPersistenceConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class AdoPersistenceConfigurationSection : OrmConfigurationBase, IConfigurationSection
     {
         /// <summary>

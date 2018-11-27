@@ -38,7 +38,7 @@ namespace SanteDB.Core
     /// </summary>
     /// <remarks>Allows components to be communicate with each other via a loosely coupled
     /// broker system.</remarks>
-    public class ApplicationContext : IServiceProvider, IServiceManager, IDisposable
+    public class ApplicationContext : IServiceProvider, IServiceManager, IDisposable, IApplicationServiceContext
     {
 
         // Lock object
@@ -102,7 +102,6 @@ namespace SanteDB.Core
         private ApplicationContext()
         {
             ContextId = Guid.NewGuid();
-            this.m_configuration = ConfigurationManager.GetSection("santedb.core") as SanteDBServerConfiguration;
         }
 
         #region IServiceProvider Members
@@ -136,25 +135,28 @@ namespace SanteDB.Core
                     this.Starting(this, null);
 
                 // If there is no configuration manager then add the local
+                Trace.TraceInformation("STAGE0 START: Load Configuration");
                 this.m_serviceInstances.Add(new FileConfigurationService());
-                m_configuration = ConfigurationManager.GetSection("santedb.core") as SanteDBServerConfiguration;
+                this.m_configuration = this.GetService<IConfigurationManager>().GetSection<SanteDBServerConfiguration>();
 
-                Trace.TraceInformation("Loading services");
+                Trace.TraceInformation("STAGE1 START: Loading services");
                 foreach (var svc in this.m_configuration.ServiceProviders)
                 {
-                    Trace.TraceInformation("Loaded service {0}...", svc.Name);
-                    var instance = Activator.CreateInstance(svc);
+                    var instance = Activator.CreateInstance(svc.Type);
                     this.m_serviceInstances.Add(instance);
                 }
 
-               
 
+                Trace.TraceInformation("STAGE2 START: Starting Daemons");
                 foreach (var dc in this.m_serviceInstances.OfType<IDaemonService>().ToArray())
-                    dc.Start();
+                    if (!dc.Start())
+                        throw new Exception($"Could not start {dc} successfully");
 
+                Trace.TraceInformation("STAGE3 START: Notify ApplicationContext has started");
                 if (this.Started != null)
                     this.Started(this, null);
 
+                Trace.TraceInformation("SanteDB Started Successfully...");
                 this.m_running = true;
 
             }
@@ -239,8 +241,6 @@ namespace SanteDB.Core
         /// </summary>
         public void AddServiceProvider(Type serviceType)
         {
-
-            this.m_configuration.ServiceProviders.Add(serviceType);
             lock (this.m_serviceInstances)
                 this.m_serviceInstances.Add(Activator.CreateInstance(serviceType));
         }
@@ -250,7 +250,6 @@ namespace SanteDB.Core
         /// </summary>
         public void RemoveServiceProvider(Type serviceType)
         {
-            this.m_configuration.ServiceProviders.Remove(serviceType);
             if (this.m_cachedServices.ContainsKey(serviceType))
                 this.m_cachedServices.Remove(serviceType);
             this.m_serviceInstances.RemoveAll(o => serviceType.IsAssignableFrom(o.GetType()));
@@ -268,7 +267,7 @@ namespace SanteDB.Core
         /// </summary>
         public void Dispose()
         {
-            foreach (var kv in this.m_configuration.ServiceProviders)
+            foreach (var kv in this.m_serviceInstances)
                 if (kv is IDisposable)
                     (kv as IDisposable).Dispose();
             this.m_disposed = true;

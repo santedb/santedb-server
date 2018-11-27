@@ -27,7 +27,7 @@ namespace SanteDB.Authentication.OAuth2.Configuration
     /// <summary>
     /// OAuth2 configuration
     /// </summary>
-    [XmlType(nameof(OAuthConfigurationSection), Namespace = "http://santedb.org/configuration/oauth")]
+    [XmlType(nameof(OAuthConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class OAuthConfigurationSection : IConfigurationSection
     {
 
@@ -42,7 +42,7 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         /// <summary>
         /// Gets or sets the expiry time
         /// </summary>
-        [XmlAttribute("validityTime")]
+        [XmlElement("validityTime")]
         public TimeSpan ValidityTime { get; set; }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         /// Gets or sets the token type to use
         /// </summary>
         [XmlElement("tokenType")]
-        public string TokenType { get; internal set; }
+        public string TokenType { get; set; }
 
     }
 }

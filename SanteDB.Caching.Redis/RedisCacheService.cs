@@ -43,9 +43,14 @@ namespace SanteDB.Caching.Redis
     /// <summary>
     /// Redis memory caching service
     /// </summary>
-    [Description("REDIS Data Caching Service")]
+    [ServiceProvider("REDIS Data Caching Service")]
     public class RedisCacheService : IDataCachingService, IDaemonService
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "REDIS Data Caching Service";
 
         // Redis trace source
         private TraceSource m_tracer = new TraceSource("SanteDB.Caching.Redis");

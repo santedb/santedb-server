@@ -20,6 +20,7 @@
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
+using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,8 +32,13 @@ namespace SanteDB.Core.Security
     /// <summary>
     /// Local policy decision service
     /// </summary>
+    [ServiceProvider("Default PDP Service")]
     public class DefaultPolicyDecisionService : IPolicyDecisionService
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public String ServiceName => "Default PDP Decision Service";
 
         /// <summary>
         /// Get a policy decision 

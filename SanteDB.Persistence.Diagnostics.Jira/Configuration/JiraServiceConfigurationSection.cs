@@ -29,7 +29,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
     /// <summary>
     /// JIRA Service configuration
     /// </summary>
-    [XmlType(nameof(JiraServiceConfigurationSection), Namespace = "http://santedb.org/configuration/jira")]
+    [XmlType(nameof(JiraServiceConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class JiraServiceConfigurationSection : IConfigurationSection, IRestClientDescription
     {
         /// <summary>
@@ -73,6 +73,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
         /// <summary>
         /// Get the endpoint
         /// </summary>
+        [XmlIgnore]
         List<IRestClientEndpointDescription> IRestClientDescription.Endpoint => new List<IRestClientEndpointDescription>()
         {
             new ServiceClientEndpointDescription(this.Endpoint)
@@ -81,6 +82,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
         /// <summary>
         /// Rest binding
         /// </summary>
+        [XmlIgnore]
         IRestClientBindingDescription IRestClientDescription.Binding => new JiraRestClientBindingDescription();
     }
 }

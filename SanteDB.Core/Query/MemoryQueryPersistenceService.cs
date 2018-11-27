@@ -34,8 +34,13 @@ namespace SanteDB.Core.Query
     /// <summary>
     /// Represents a simple query persistence service that uses local memory for query continuation
     /// </summary>
+    [ServiceProvider("Memory-Based Query Persistence Service")]
     public class MemoryQueryPersistenceService : SanteDB.Core.Services.IQueryPersistenceService, IJob, IDaemonService
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "Memory-Based Query Persistence / Continuation Service";
 
         /// <summary>
         /// Memory based query information

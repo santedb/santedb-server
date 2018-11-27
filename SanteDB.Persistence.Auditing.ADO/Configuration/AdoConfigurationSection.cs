@@ -30,7 +30,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Configuration
     /// <summary>
     /// Configuration section handler
     /// </summary>
-    [XmlType(nameof(AdoAuditConfigurationSection), Namespace = "http://santedb.org/configuration/audit")]
+    [XmlType(nameof(AdoAuditConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class AdoAuditConfigurationSection : OrmConfigurationBase, IConfigurationSection
     {
         /// <summary>

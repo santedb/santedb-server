@@ -29,7 +29,7 @@ namespace SanteDB.Messaging.FHIR.Configuration
     /// <summary>
     /// FHIR service configuration
     /// </summary>
-    [XmlType(nameof(FhirServiceConfigurationSection), Namespace = "http://santedb.org/configuration/fhir")]
+    [XmlType(nameof(FhirServiceConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class FhirServiceConfigurationSection : IConfigurationSection
     {
 
@@ -53,38 +53,25 @@ namespace SanteDB.Messaging.FHIR.Configuration
         public string LandingPage { get; set; }
 
         /// <summary>
-        /// Gets the resource handlers registered
-        /// </summary>
-        [XmlIgnore]
-        public List<Type> ResourceHandlers { get; set; }
-
-        /// <summary>
         /// XML for resource handlers
         /// </summary>
-        [XmlArray("resources"), XmlArrayItem("add")]
-        public List<String> ResourceHandlersXml
+        [XmlArray("resourceHandlers"), XmlArrayItem("add")]
+        public List<TypeReferenceConfiguration> ResourceHandlers
         {
-            get => this.ResourceHandlers?.Select(o => o.AssemblyQualifiedName).ToList();
-            set => this.ResourceHandlers = value?.Select(o => Type.GetType(o)).Where(o => o != null).ToList();
+            get;set;
         }
-
-        /// <summary>
-        /// Gets the CORS configuration
-        /// </summary>
-        [XmlArray("cors"), XmlArrayItem("add")]
-        public List<CorsResourceSetting> CorsConfiguration { get;  private set; }
 
         /// <summary>
         /// When set, describes the base uri for all resources on this FHIR service.
         /// </summary>
         [XmlElement("base")]
-        public String ResourceBaseUri { get; private set; }
+        public String ResourceBaseUri { get; set; }
     }
 
     /// <summary>
     /// FHIR CORS configuration
     /// </summary>
-    [XmlType(nameof(FhirCorsConfiguration), Namespace = "http://santedb.org/configuration/fhir")]
+    [XmlType(nameof(FhirCorsConfiguration), Namespace = "http://santedb.org/configuration")]
     public class FhirCorsConfiguration
     {
 

@@ -26,7 +26,7 @@ namespace SanteDB.Core.Security.Tfa.Email.Configuration
     /// <summary>
     /// Represents the configuration for the TFA mecahnism
     /// </summary>
-    [XmlType(nameof(TfaEmailMechanismConfigurationSection), Namespace = "http://santedb.org/configuration/tfa/email")]
+    [XmlType(nameof(TfaEmailMechanismConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class TfaEmailMechanismConfigurationSection : IConfigurationSection
 	{
 		/// <summary>
@@ -41,7 +41,7 @@ namespace SanteDB.Core.Security.Tfa.Email.Configuration
 		/// SMTP configuration
 		/// </summary>
         [XmlElement("smtp")]
-		public SmtpConfiguration Smtp { get; set; }
+		public TfaSmtpConfiguration Smtp { get; set; }
 
 		/// <summary>
 		/// Template configuration

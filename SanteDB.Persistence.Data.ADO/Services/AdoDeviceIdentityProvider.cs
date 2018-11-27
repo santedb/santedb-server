@@ -37,12 +37,18 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// <summary>
     /// Represents a device identity provider.
     /// </summary>
+    [ServiceProvider("ADO.NET Device Identity Provider")]
     public class AdoDeviceIdentityProvider : IDeviceIdentityProviderService
 	{
-		/// <summary>
-		/// The trace source.
-		/// </summary>
-		private readonly TraceSource traceSource = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public String ServiceName => "ADO.NET Device Identity Provider";
+
+        /// <summary>
+        /// The trace source.
+        /// </summary>
+        private readonly TraceSource traceSource = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
 
 		/// <summary>
 		/// The configuration.

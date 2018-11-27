@@ -20,7 +20,7 @@
 using SanteDB.OrmLite.Attributes;
 using System;
 
-namespace SanteDB.Persistence.Reporting.PSQL.Model
+namespace SanteDB.Persistence.Reporting.ADO.Model
 {
     /// <summary>
     /// Represents a report format.

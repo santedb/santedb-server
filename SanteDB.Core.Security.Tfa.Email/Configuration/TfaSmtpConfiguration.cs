@@ -25,21 +25,21 @@ namespace SanteDB.Core.Security.Tfa.Email.Configuration
     /// <summary>
     /// Configuration for SMTP
     /// </summary>
-    [XmlType(nameof(SmtpConfiguration), Namespace = "http://santedb.org/configuration/tfa/email")]
-    public class SmtpConfiguration
+    [XmlType(nameof(TfaSmtpConfiguration), Namespace = "http://santedb.org/configuration")]
+    public class TfaSmtpConfiguration
 	{
 
         /// <summary>
         /// Create new smtp configuration
         /// </summary>
-        public SmtpConfiguration()
+        public TfaSmtpConfiguration()
         {
 
         }
 		/// <summary>
 		/// SMTP configuration
 		/// </summary>
-		public SmtpConfiguration(Uri server, String userName, String password, bool ssl, String from)
+		public TfaSmtpConfiguration(Uri server, String userName, String password, bool ssl, String from)
 		{
 			this.ServerXml = server.ToString();
 			this.Username = userName;
@@ -82,12 +82,12 @@ namespace SanteDB.Core.Security.Tfa.Email.Configuration
 		/// Get the SSL setting
 		/// </summary>
         [XmlAttribute("ssl")]
-		public bool Ssl { get; private set; }
+		public bool Ssl { get; set; }
 
 		/// <summary>
 		/// Gets the username for connecting to the server
 		/// </summary>
         [XmlAttribute("username")]
-		public string Username { get; private set; }
+		public string Username { get; set; }
 	}
 }

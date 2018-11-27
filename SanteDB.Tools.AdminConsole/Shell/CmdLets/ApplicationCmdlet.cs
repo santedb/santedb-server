@@ -112,7 +112,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
 
             if (String.IsNullOrEmpty(parms.Secret))
             {
-                parms.Secret = BitConverter.ToString(Guid.NewGuid().ToByteArray()).Replace("-", "").Substring(0, 12);
+                parms.Secret = BitConverter.ToString(Guid.NewGuid().ToByteArray()).Replace("-","").Substring(0, 12);
                 Console.WriteLine("Application secret: {0}", parms.Secret);
             }
 

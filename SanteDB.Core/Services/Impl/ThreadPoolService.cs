@@ -31,9 +31,14 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Represents a thread pool service
     /// </summary>
-    [Description("SanteDB PCL ThreadPool Provider")]
+    [ServiceProvider("SanteDB PCL ThreadPool Provider")]
     public class ThreadPoolService : IDaemonService, IDisposable, IThreadPoolService
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "SanteDB Thread Pool Provider";
 
         // Constructs a thread pool
         private WaitThreadPool m_threadPool = new WaitThreadPool();

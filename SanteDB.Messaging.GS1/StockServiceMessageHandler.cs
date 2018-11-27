@@ -35,11 +35,16 @@ namespace SanteDB.Messaging.GS1
     /// <summary>
     /// Stock service message handler
     /// </summary>
-    [Description("GS1 Stock Service")]
+    [ServiceProvider("GS1 BMS XML3.3 API Endpoint")]
 	public class StockServiceMessageHandler : IDaemonService, IApiEndpointProvider
 	{
-		// HDSI Trace host
-		private readonly TraceSource traceSource = new TraceSource("SanteDB.Messaging.GS1");
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "GS1 BMS XML3.3 API (Rest) Endpoint";
+
+        // HDSI Trace host
+        private readonly TraceSource traceSource = new TraceSource("SanteDB.Messaging.GS1");
 
 		// web host
 		private RestService webHost;
@@ -99,12 +104,8 @@ namespace SanteDB.Messaging.GS1
         {
             get
             {
-                var caps = ServiceEndpointCapabilities.None;
-                if (this.webHost.ServiceBehaviors.OfType<BasicAuthorizationAccessBehavior>().Any())
-                    caps |= ServiceEndpointCapabilities.BasicAuth;
-                if (this.webHost.ServiceBehaviors.OfType<TokenAuthorizationAccessBehavior>().Any())
-                    caps |= ServiceEndpointCapabilities.BearerAuth;
-                return caps;
+                return this.webHost.GetCapabilities();
+
             }
         }
 

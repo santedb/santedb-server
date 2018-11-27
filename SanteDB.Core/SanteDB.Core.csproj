@@ -63,12 +63,12 @@
     <Compile Include="Configuration\RestConfigurationSection.cs" />
     <Compile Include="Configuration\RestEndpointConfiguration.cs" />
     <Compile Include="Configuration\RestServiceConfiguration.cs" />
-    <Compile Include="Configuration\SecuritySignatureConfigurationSection.cs" />
+    <Compile Include="Configuration\SecuritySignatureConfiguration.cs" />
     <Compile Include="Configuration\ServiceTool.cs" />
+    <Compile Include="Configuration\X509ConfigurationElement.cs" />
     <Compile Include="Diagnostics\DiagnosticExtensions.cs" />
     <Compile Include="Diagnostics\LogTraceWriter.cs" />
     <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="Configuration\ConfigurationSectionHandler.cs" />
     <Compile Include="Configuration\BasicAuthorizationConfigurationSection.cs" />
     <Compile Include="Configuration\ClaimsAuthorizationConfigurationSection.cs" />
     <Compile Include="Configuration\SecurityConfigurationSection.cs" />
@@ -95,7 +95,6 @@
     <Compile Include="Rest\Serialization\RestErrorHandler.cs" />
     <Compile Include="Rest\Serialization\RestCompressionMessageInspector.cs" />
     <Compile Include="Rest\Serialization\RestMessageDispatchFormatter.cs" />
-    <Compile Include="Rest\Services\IApiEndpointProvider.cs" />
     <Compile Include="SanteDBConstants.cs" />
     <Compile Include="Persistence\DataInitializationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -172,6 +171,7 @@
     <Compile Include="Jobs\IJob.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Rest\Services\" />
     <Folder Include="Security\Wcf\" />
   </ItemGroup>
   <ItemGroup>

@@ -21,6 +21,9 @@ using RestSrvr;
 using RestSrvr.Attributes;
 using RestSrvr.Bindings;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Interop;
+using SanteDB.Core.Rest.Behavior;
+using SanteDB.Core.Rest.Security;
 using SanteDB.Core.Services;
 using System;
 using System.Linq;
@@ -35,6 +38,27 @@ namespace SanteDB.Core.Rest
     {
         // Master configuration
         private static RestConfigurationSection s_config = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RestConfigurationSection>();
+
+        /// <summary>
+        /// Get capabilities
+        /// </summary>
+        public static ServiceEndpointCapabilities GetCapabilities(this RestService me)
+        {
+            var retVal = ServiceEndpointCapabilities.None;
+            // Any of the capabilities are for security?
+            if (me.Endpoints.Any(e => e.Behaviors.OfType<TokenAuthorizationAccessBehavior>().Any()))
+                retVal |= ServiceEndpointCapabilities.BearerAuth;
+            if (me.Endpoints.Any(e => e.Behaviors.OfType<BasicAuthorizationAccessBehavior>().Any()))
+                retVal |= ServiceEndpointCapabilities.BasicAuth;
+            if (me.Endpoints.Any(e => e.Behaviors.OfType<MessageCompressionEndpointBehavior>().Any()))
+                retVal |= ServiceEndpointCapabilities.Compression;
+            if (me.Endpoints.Any(e => e.Behaviors.OfType<CorsEndpointBehavior>().Any()))
+                retVal |= ServiceEndpointCapabilities.Cors;
+            if (me.Endpoints.Any(e => e.Behaviors.OfType<MessageDispatchFormatterBehavior>().Any()))
+                retVal |= ServiceEndpointCapabilities.ViewModel;
+            return retVal;
+
+        }
 
         /// <summary>
         /// Create the rest service

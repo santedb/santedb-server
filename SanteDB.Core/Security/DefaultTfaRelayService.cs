@@ -30,8 +30,14 @@ namespace SanteDB.Core.Security
     /// Represents a default implementation of a TFA relay service which scans the entire application domain for 
     /// mechanisms and allows calling of them all
     /// </summary>
+    [ServiceProvider("Default TFA Relay Provider")]
     public class DefaultTfaRelayService : ITfaRelayService
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "Default TFA Relay Provider";
 
         /// <summary>
         /// Construct the default relay service

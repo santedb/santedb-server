@@ -42,9 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\ConfigurationSectionHandler.cs" />
     <Compile Include="Configuration\DiagnosticEmailServiceConfigurationSection.cs" />
-    <Compile Include="Configuration\SmtpConfiguration.cs" />
+    <Compile Include="Configuration\DxSmtpConfiguration.cs" />
     <Compile Include="DiagnosticReportPersistenceService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

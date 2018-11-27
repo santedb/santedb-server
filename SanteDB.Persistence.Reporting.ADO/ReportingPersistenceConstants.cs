@@ -17,7 +17,7 @@
  * User: justin
  * Date: 2018-6-22
  */
-namespace SanteDB.Persistence.Reporting.PSQL
+namespace SanteDB.Persistence.Reporting.ADO
 {
     /// <summary>
     /// Represents reporting persistence constants.
@@ -32,11 +32,11 @@ namespace SanteDB.Persistence.Reporting.PSQL
 		/// <summary>
 		/// The map resource name.
 		/// </summary>
-		public const string MapResourceName = "SanteDB.Persistence.Reporting.PSQL.Map.ModelMap.xml";
+		public const string MapResourceName = "SanteDB.Persistence.Reporting.ADO.Map.ModelMap.xml";
 
 		/// <summary>
 		/// The trace name.
 		/// </summary>
-		public const string TraceName = "SanteDB.Persistence.Reporting.PSQL";
+		public const string TraceName = "SanteDB.Persistence.Reporting.ADO";
 	}
 }

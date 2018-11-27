@@ -44,8 +44,13 @@ namespace SanteDB.Persistence.Diagnostics.Jira
     /// Diagnostic report persistence service.
     /// </summary>
 #pragma warning disable CS0067
+    [ServiceProvider("JIRA Based Diagnostic (Bug) Report Submissions")]
     public class DiagnosticReportPersistenceService : IDataPersistenceService<DiagnosticReport>
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "JIRA Diagnostic Report Submission";
 
         // Trace source
         private TraceSource m_traceSource = new TraceSource("SanteDB.Persistence.Diagnostics.Jira");

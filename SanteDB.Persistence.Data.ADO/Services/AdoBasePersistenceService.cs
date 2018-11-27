@@ -51,6 +51,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
     public abstract class AdoBasePersistenceService<TData> : IDataPersistenceService<TData>, IStoredQueryDataPersistenceService<TData>, IFastQueryDataPersistenceService<TData>, IAdoPersistenceService where TData : IdentifiedData
     {
 
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => $"ADO.NET Data Persistence Service for {typeof(TData).FullName}";
+
         // Current requests
         private static long m_currentRequests = 0;
 

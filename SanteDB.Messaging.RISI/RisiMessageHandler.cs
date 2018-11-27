@@ -35,13 +35,18 @@ namespace SanteDB.Messaging.RISI
     /// <summary>
     /// Represents a message handler for reporting services.
     /// </summary>
-    [Description("RISI Message Service")]
+    [ServiceProvider("RISI API Daemon")]
 	public class RisiMessageHandler : IDaemonService, IApiEndpointProvider
 	{
-		/// <summary>
-		/// The internal reference to the trace source.
-		/// </summary>
-		private readonly TraceSource traceSource = new TraceSource("SanteDB.Messaging.RISI");
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "Report Integration Service API Daemon";
+
+        /// <summary>
+        /// The internal reference to the trace source.
+        /// </summary>
+        private readonly TraceSource traceSource = new TraceSource("SanteDB.Messaging.RISI");
 
 		/// <summary>
 		/// The internal reference to the web host.
@@ -86,13 +91,7 @@ namespace SanteDB.Messaging.RISI
 		{
 			get
 			{
-				var caps = ServiceEndpointCapabilities.None;
-                if (this.webHost.ServiceBehaviors.OfType<BasicAuthorizationAccessBehavior>().Any())
-                    caps |= ServiceEndpointCapabilities.BasicAuth;
-                if (this.webHost.ServiceBehaviors.OfType<TokenAuthorizationAccessBehavior>().Any())
-                    caps |= ServiceEndpointCapabilities.BearerAuth;
-
-                return caps;
+                return this.webHost.GetCapabilities();
 			}
 		}
 
@@ -132,9 +131,6 @@ namespace SanteDB.Messaging.RISI
 				foreach (var endpoint in this.webHost.Endpoints)
 				{
 					this.traceSource.TraceInformation("Starting RISI on {0}...", endpoint.Description.ListenUri);
-                    endpoint.AddEndpointBehavior(new MessageCompressionEndpointBehavior());
-                    endpoint.AddEndpointBehavior(new MessageDispatchFormatterBehavior());
-                    endpoint.AddEndpointBehavior(new MessageLoggingEndpointBehavior());
 				}
 
 				// Start the webhost

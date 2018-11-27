@@ -42,6 +42,11 @@ namespace SanteDB.Core.Services.Impl
     {
 
         /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => $"Local repository service for {typeof(TEntity).FullName}";
+
+        /// <summary>
         /// Trace source
         /// </summary>
         protected TraceSource m_traceSource = new TraceSource(SanteDBConstants.DataTraceSourceName);

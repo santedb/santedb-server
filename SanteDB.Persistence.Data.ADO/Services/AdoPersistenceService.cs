@@ -49,8 +49,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// <summary>
     /// Represents a dummy service which just adds the persistence services to the context
     /// </summary>
+    [ServiceProvider("ADO.NET Data Persistence Service")]
     public class AdoPersistenceService : IDaemonService, ISqlDataPersistenceService
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "ADO.NET Data Persistence Service";
 
         private static ModelMapper s_mapper;
         private static AdoPersistenceConfigurationSection s_configuration;

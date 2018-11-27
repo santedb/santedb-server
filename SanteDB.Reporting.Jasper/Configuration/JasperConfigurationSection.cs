@@ -25,7 +25,7 @@ namespace SanteDB.Reporting.Jasper.Configuration
     /// <summary>
     /// Represents a jasper configuration.
     /// </summary>
-    [XmlType(nameof(JasperConfigurationSection), Namespace = "http://santedb.org/configuration/jasper")]
+    [XmlType(nameof(JasperConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class JasperConfigurationSection : IConfigurationSection
 	{
 		/// <summary>

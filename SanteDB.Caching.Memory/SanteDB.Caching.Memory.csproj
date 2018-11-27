@@ -48,7 +48,6 @@
     <Compile Include="CacheCleanupTimerJob.cs" />
     <Compile Include="CacheEntry.cs" />
     <Compile Include="CacheRegulatorTimerJob.cs" />
-    <Compile Include="Configuration\ConfigurationSectionHandler.cs" />
     <Compile Include="Configuration\MemoryCacheConfigurationSection.cs" />
     <Compile Include="Configuration\TypeCacheConfigurationInfo.cs" />
     <Compile Include="MemoryCache.cs" />

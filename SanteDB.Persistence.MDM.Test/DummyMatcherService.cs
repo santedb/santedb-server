@@ -17,6 +17,11 @@ namespace SanteDB.Persistence.MDM.Test
     public class DummyMatcherService : IRecordMatchingService
     {
         /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "";
+
+        /// <summary>
         /// Perform blocking
         /// </summary>
         public IEnumerable<T> Block<T>(T input, string configurationName) where T : IdentifiedData

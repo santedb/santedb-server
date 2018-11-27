@@ -32,7 +32,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using SdbAudit = SanteDB.Core.Auditing;
-
+using SanteDB.Core.Exceptions;
 
 namespace SanteDB.Messaging.Atna
 {
@@ -40,9 +40,14 @@ namespace SanteDB.Messaging.Atna
     /// Represents an audit service that communicates Audits via
     /// RFC3881 (ATNA style) audits
     /// </summary>
-    [Description("RFC3881 Audit Service")]
+    [ServiceProvider("IHE ATNA Audit Dispatcher")]
     public class AtnaAuditService : IAuditDispatchService
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "IHE ATNA Audit Dispatcher";
 
         /// <summary>
         /// Is the audit data running
@@ -61,17 +66,43 @@ namespace SanteDB.Messaging.Atna
         public AtnaAuditService()
         {
             this.m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AtnaConfigurationSection>();
+            
+            switch(this.m_configuration.Transport)
+            {
+                case AtnaTransportType.File:
+                    this.m_transporter = new FileSyslogTransport()
+                    {
+                        EndPoint = this.m_configuration.AuditTarget,
+                        MessageFormat = this.m_configuration.Format
+                    };
+                    break;
+                case AtnaTransportType.Stcp:
+                    this.m_transporter = new STcpSyslogTransport()
+                    {
+                        ClientCertificate = this.m_configuration?.ClientCertificate?.GetCertificate(),
+                        EndPoint = this.m_configuration.AuditTarget,
+                        MessageFormat = this.m_configuration.Format,
+                        ServerCertificate = this.m_configuration?.ServerCertificate?.GetCertificate()
+                    };
+                    break;
+                case AtnaTransportType.Tcp:
+                    this.m_transporter = new TcpSyslogTransport()
+                    {
+                        EndPoint = this.m_configuration.AuditTarget,
+                        MessageFormat = this.m_configuration.Format,
+                    };
+                    break;
+                case AtnaTransportType.Udp:
+                    this.m_transporter = new UdpSyslogTransport()
+                    {
+                        EndPoint = this.m_configuration.AuditTarget,
+                        MessageFormat = this.m_configuration.Format,
+                    };
+                    break;
+                default:
+                    throw new ConfigurationException($"Invalid transport type {this.m_configuration.Transport}");
+            }
 
-            // Create the transporter
-            var epData = this.m_configuration.AuditTarget.Split(':');
-            var targetAddress = new IPEndPoint(
-                IPAddress.Parse(epData[0]),
-                epData.Length == 1 ? 514 : Int32.Parse(epData[1])
-            );
-            this.m_transporter = Activator.CreateInstance(this.m_configuration.MessagePublisher, targetAddress) as ITransporter;
-            this.m_transporter.MessageFormat = this.m_configuration.Format;
-            if (this.m_transporter is STcpSyslogTransport)
-                (this.m_transporter as STcpSyslogTransport).ClientCertificate = X509CertificateUtils.FindCertificate(X509FindType.FindByThumbprint, StoreLocation.LocalMachine, StoreName.My, this.m_configuration.CertificateThumprint);
 
         }
 

@@ -18,7 +18,11 @@
  * Date: 2018-11-23
  */
 using RestSrvr;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Rest.Serialization;
+using System.IO;
+using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace SanteDB.Core.Rest.Behavior
 {
@@ -29,12 +33,22 @@ namespace SanteDB.Core.Rest.Behavior
     {
 
         // Settings
-        private CorsSettings m_settings;
+        private CorsEndpointBehaviorConfiguration m_settings;
 
+        /// <summary>
+        /// CORS endpoint behavior as configured from endpoint behavior
+        /// </summary>
+        public CorsEndpointBehavior(XElement xe)
+        {
+            if (xe == null)
+                throw new ConfigurationException("Missing CorsEndpointBehaviorConfiguration");
+            using (var sr = new StringReader(xe.ToString()))
+                this.m_settings = new XmlSerializer(typeof(CorsEndpointBehaviorConfiguration)).Deserialize(sr) as CorsEndpointBehaviorConfiguration;
+        }
         /// <summary>
         /// Creates a new CORS endpoint behavior
         /// </summary>
-        public CorsEndpointBehavior(CorsSettings settings)
+        public CorsEndpointBehavior(CorsEndpointBehaviorConfiguration settings)
         {
             this.m_settings = settings;
         }

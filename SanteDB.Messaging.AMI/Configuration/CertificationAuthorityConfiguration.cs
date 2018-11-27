@@ -24,7 +24,7 @@ namespace SanteDB.Messaging.AMI.Configuration
     /// <summary>
     /// CA configuration information
     /// </summary>
-    [XmlType(nameof(CertificationAuthorityConfiguration), Namespace = "http://santedb.org/configuration/ami")]
+    [XmlType(nameof(CertificationAuthorityConfiguration), Namespace = "http://santedb.org/configuration")]
     public class CertificationAuthorityConfiguration
 	{
 		/// <summary>

@@ -43,8 +43,14 @@ namespace SanteDB.Warehouse.ADO
     /// Represents a simple ADO ad-hoc data warehouse
     /// </summary>
 #pragma warning disable CS0067
+    [ServiceProvider("ADO.NET Ad-Hoc Data Warehouse Service")]
     public class ADODataWarehouse : IAdHocDatawarehouseService
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "ADO.NET Ad-Hoc Data Warehouse Service";
 
         private AdoWarehouseConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoWarehouseConfigurationSection>();
 

@@ -106,7 +106,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
 
             if (String.IsNullOrEmpty(parms.Secret))
             {
-                parms.Secret = BitConverter.ToString(Guid.NewGuid().ToByteArray()).Replace("-", "");
+                parms.Secret = BitConverter.ToString(Guid.NewGuid().ToByteArray()).Replace("-","");
                 Console.WriteLine("Device secret: {0}", parms.Secret);
             }
 

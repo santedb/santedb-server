@@ -37,6 +37,11 @@ namespace SanteDB.Tools.AdminConsole.Security
     /// </summary>
     public class OAuthIdentityProvider : IIdentityProviderService, ISecurityAuditEventSource
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public String ServiceName => "OAUTH 2.0 Identity Provider";
+
         // Tracer
         private Tracer m_tracer = Tracer.GetTracer(typeof(OAuthIdentityProvider));
 

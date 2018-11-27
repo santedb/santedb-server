@@ -39,8 +39,14 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Represents an applet manager service that uses the local file system
     /// </summary>
+    [ServiceProvider("Local Applet Repository/Manager")]
     public class LocalAppletManagerService : IAppletManagerService, IAppletSolutionManagerService, IDaemonService
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "Local Applet Repository/Manager";
 
         // Solutions registered
         private List<AppletSolution> m_solutions = new List<AppletSolution>();

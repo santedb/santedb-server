@@ -42,9 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\ConfigurationSectionHandler.cs" />
     <Compile Include="Configuration\TfaEmailMechanismConfigurationSection.cs" />
-    <Compile Include="Configuration\SmtpConfiguration.cs" />
+    <Compile Include="Configuration\TfaSmtpConfiguration.cs" />
     <Compile Include="Configuration\TemplateConfiguration.cs" />
     <Compile Include="Resources\Strings.Designer.cs">
       <AutoGen>True</AutoGen>

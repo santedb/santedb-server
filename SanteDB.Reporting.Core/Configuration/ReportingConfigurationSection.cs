@@ -26,7 +26,7 @@ namespace SanteDB.Reporting.Core.Configuration
     /// <summary>
     /// Represents a configuration for a RISI configuration.
     /// </summary>
-    [XmlType(nameof(ReportingConfigurationSection), Namespace = "http://santedb.org/configuration/reporting")]
+    [XmlType(nameof(ReportingConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class ReportingConfigurationSection : IConfigurationSection
 	{
 		/// <summary>

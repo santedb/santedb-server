@@ -17,48 +17,21 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml.Serialization;
 
 namespace SanteDB.Core.Configuration
 {
-
     /// <summary>
-    /// Represents the type of signature algorithms
+    /// Represents a base configuration for a X509 cert
     /// </summary>
-    [XmlType(nameof(SignatureAlgorithm), Namespace = "http://santedb.org/configuration/security")]
-    public enum SignatureAlgorithm
-    {
-        [XmlEnum("RSA_256")]
-        RS256,
-        [XmlEnum("HMAC_256")]
-        HS256
-    }
-
-    /// <summary>
-    /// Represents a signature collection
-    /// </summary>
-    [XmlType(nameof(SecuritySignatureConfigurationSection), Namespace = "http://santedb.org/configuration/security")]
-    public class SecuritySignatureConfigurationSection : IConfigurationSection
+    [XmlType(nameof(X509ConfigurationElement), Namespace = "http://santedb.org/configuration")]
+    public class X509ConfigurationElement
     {
 
-        /// <summary>
-        /// The unique name for the signer
-        /// </summary>
-        [XmlAttribute("name")]
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Signature mode
-        /// </summary>
-        [XmlAttribute("alg")]
-        public SignatureAlgorithm Algorithm { get; set; }
-
-        /// <summary>
-        /// When using HMAC256 signing this represents the server's secret
-        /// </summary>
-        [XmlAttribute("hmacKey")]
-        public byte[] Secret { get; set; }
+        // Certificate
+        private X509Certificate2 m_certificate;
 
         /// <summary>
         /// The find type
@@ -84,5 +57,14 @@ namespace SanteDB.Core.Configuration
         [XmlAttribute("findValue")]
         public string FindValue { get; set; }
 
+        /// <summary>
+        /// Get the certificate
+        /// </summary>
+        public X509Certificate2 GetCertificate()
+        {
+            if(this.m_certificate != null)
+                this.m_certificate = X509CertificateUtils.FindCertificate(this.FindType, this.StoreLocation, this.StoreName, this.FindValue);
+            return this.m_certificate;
+        }
     }
 }

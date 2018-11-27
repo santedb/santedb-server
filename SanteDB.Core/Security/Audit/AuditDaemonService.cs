@@ -33,9 +33,14 @@ namespace SanteDB.Core.Security.Audit
     /// <summary>
     /// A daemon service which listens to audit sources and forwards them to the auditor
     /// </summary>
-    [Description("SECURITY AUDIT SERVICE")]
+    [ServiceProvider("SECURITY AUDIT SERVICE")]
     public class AuditDaemonService : IDaemonService
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "Detailed Persistence Layer Audit Subscription Service";
+
         private bool m_safeToStop = false;
 
         // Tracer class

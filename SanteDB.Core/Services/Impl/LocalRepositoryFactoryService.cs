@@ -6,8 +6,14 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Represents a generic resource repository factory
     /// </summary>
+    [ServiceProvider("Local Data Repository Factory")]
     public class LocalRepositoryFactoryService : IRepositoryServiceFactory
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "Local Data Repository Factory";
+
         /// <summary>
         /// Create the specified resource service factory
         /// </summary>

@@ -65,7 +65,7 @@ namespace SanteDB.Core.Services
     /// <summary>
     /// Identifies a structure for message persistence service implementations
     /// </summary>
-    public interface IMessagePersistenceService
+    public interface IMessagePersistenceService : IServiceImplementation
     {
 
         /// <summary>

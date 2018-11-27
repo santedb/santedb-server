@@ -30,8 +30,13 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Represents a file system queue that monitors directories
     /// </summary>
+    [ServiceProvider("File System Message Queue")]
     public class FileSystemQueueService : IPersistentQueueService, IDisposable
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "File System Message Queue";
 
         /// <summary>
         /// Queue entry

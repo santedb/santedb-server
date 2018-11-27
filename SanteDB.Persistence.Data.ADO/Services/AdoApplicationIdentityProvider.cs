@@ -38,8 +38,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// Sql Application IdP
     /// </summary>
 #pragma warning disable CS0067
+    [ServiceProvider("ADO.NET Application Identity Provider")]
     public class AdoApplicationIdentityProvider : IApplicationIdentityProviderService
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "ADO.NET Application Identity Provider";
+
         // Trace source
         private TraceSource m_traceSource = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
 

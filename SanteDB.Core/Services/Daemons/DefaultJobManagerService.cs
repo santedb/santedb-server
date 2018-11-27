@@ -34,9 +34,14 @@ namespace SanteDB.Core.Services
     /// <summary>
     /// Represents the default implementation of the timer
     /// </summary>
-    [Description("Default Job Service")]
+    [ServiceProvider("Default Job Manager Service")]
     public class DefaultJobManagerService  : IJobManagerService
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "Default Job Manager Service";
+
         /// <summary>
         /// Timer configuration
         /// </summary>
@@ -103,9 +108,9 @@ namespace SanteDB.Core.Services
                     this.m_log.Add(jobInstance, DateTime.MinValue);
 
                 // Timer setup
-                if (job.Timeout != TimeSpan.MaxValue) // Not a real job just run on demand
+                if (job.Interval != -1) // Not a real job just run on demand
                 {
-                    var timer = new System.Timers.Timer(job.Timeout.TotalMilliseconds)
+                    var timer = new System.Timers.Timer(job.Interval)
                     {
                         AutoReset = true,
                         Enabled = true

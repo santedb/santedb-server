@@ -25,12 +25,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Principal;
 
-namespace SanteDB.Persistence.Reporting.PSQL.Services
+namespace SanteDB.Persistence.Reporting.ADO.Services
 {
     /// <summary>
     /// Represents a report persistence service.
     /// </summary>
-    public class ReportParameterPersistenceService : CorePersistenceService<ReportParameter, PSQL.Model.ReportParameter, PSQL.Model.ReportParameter>
+    public class ReportParameterPersistenceService : CorePersistenceService<ReportParameter, ADO.Model.ReportParameter, ADO.Model.ReportParameter>
 	{
 		/// <summary>
 		/// Converts a model instance to a domain instance.
@@ -47,7 +47,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 				return null;
 			}
 
-			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(PSQL.Model.ReportParameter) } to { nameof(ReportParameter) }");
+			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(ADO.Model.ReportParameter) } to { nameof(ReportParameter) }");
 
 			var domainInstance = base.FromModelInstance(modelInstance, context) as Model.ReportParameter;
 
@@ -93,12 +93,12 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 				return null;
 			}
 
-			if (!(domainInstance is PSQL.Model.ReportParameter))
+			if (!(domainInstance is ADO.Model.ReportParameter))
 			{
-				throw new ArgumentException($"Invalid type: {nameof(domainInstance)} is not of type {nameof(PSQL.Model.ReportParameter)}");
+				throw new ArgumentException($"Invalid type: {nameof(domainInstance)} is not of type {nameof(ADO.Model.ReportParameter)}");
 			}
 
-			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(ReportParameter) } to { nameof(PSQL.Model.ReportParameter) }");
+			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(ReportParameter) } to { nameof(ADO.Model.ReportParameter) }");
 
 			var modelInstance = base.ToModelInstance(domainInstance, context);
 

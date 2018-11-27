@@ -36,10 +36,14 @@ namespace SanteDB.Core.Persistence
     /// <summary>
     /// Data initialization service
     /// </summary>
-    [Description("Dataset Installation Service")]
+    [ServiceProvider("Dataset Installation Service")]
     #pragma warning disable CS0067
     public class DataInitializationService : IDaemonService, IReportProgressChanged
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "DataSet Initialization Service";
 
         // Trace source
         private TraceSource m_traceSource = new TraceSource(SanteDBConstants.DatasetInstallSourceName);

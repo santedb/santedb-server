@@ -24,7 +24,7 @@ namespace SanteDB.Core.Security.Tfa.Email.Configuration
     /// <summary>
     /// Represents template configuration
     /// </summary>
-    [XmlType(nameof(TemplateConfiguration), Namespace = "http://santedb.org/configuration/tfa/email")]
+    [XmlType(nameof(TemplateConfiguration), Namespace = "http://santedb.org/configuration")]
     public class TemplateConfiguration
 	{
 
@@ -45,12 +45,12 @@ namespace SanteDB.Core.Security.Tfa.Email.Configuration
 		/// Gets the language of the tempalte
 		/// </summary>
         [XmlAttribute("lang")]
-		public string Language { get; private set; }
+		public string Language { get; set; }
 
 		/// <summary>
 		/// Gets the file
 		/// </summary>
         [XmlAttribute("file")]
-		public string TemplateDefinitionFile { get; private set; }
+		public string TemplateDefinitionFile { get; set; }
 	}
 }

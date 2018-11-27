@@ -29,8 +29,16 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Tag persistence service for act
     /// </summary>
+    [ServiceProvider("Local Tag Persistence")]
     public class LocalTagPersistenceService : ITagPersistenceService
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "Local Tag Persistence";
+        
+
         /// <summary>
         /// Save tag
         /// </summary>

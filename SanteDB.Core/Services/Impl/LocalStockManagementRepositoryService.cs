@@ -31,18 +31,25 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Represents a stock management repository service.
     /// </summary>
+    [ServiceProvider("Local Stock Management Repository")]
     public class LocalStockManagementRepositoryService : IStockManagementRepositoryService
 	{
-		/// <summary>
-		/// Performs a stock adjustment for the specified facility and material.
-		/// </summary>
-		/// <param name="manufacturedMaterial">The manufactured material to be adjusted.</param>
-		/// <param name="place">The facility for which the stock is to be adjusted.</param>
-		/// <param name="quantity">The quantity to be adjusted.</param>
-		/// <param name="reason">The reason for the stock to be adjusted.</param>
-		/// <returns>Act.</returns>
-		/// <exception cref="System.NotImplementedException"></exception>
-		public Act Adjust(ManufacturedMaterial manufacturedMaterial, Place place, int quantity, Concept reason)
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "Local Stock Management Repository";
+
+        /// <summary>
+        /// Performs a stock adjustment for the specified facility and material.
+        /// </summary>
+        /// <param name="manufacturedMaterial">The manufactured material to be adjusted.</param>
+        /// <param name="place">The facility for which the stock is to be adjusted.</param>
+        /// <param name="quantity">The quantity to be adjusted.</param>
+        /// <param name="reason">The reason for the stock to be adjusted.</param>
+        /// <returns>Act.</returns>
+        /// <exception cref="System.NotImplementedException"></exception>
+        public Act Adjust(ManufacturedMaterial manufacturedMaterial, Place place, int quantity, Concept reason)
 		{
 			throw new NotImplementedException();
 		}

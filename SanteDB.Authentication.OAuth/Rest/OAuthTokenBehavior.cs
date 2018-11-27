@@ -67,7 +67,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         private OAuthConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<OAuthConfigurationSection>();
 
         // Master configuration
-        private SecuritySignatureConfigurationSection m_masterConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecuritySignatureConfigurationSection>();
+        private SecurityConfigurationSection m_masterConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
 
         /// <summary>
         /// OAuth token request
@@ -423,18 +423,18 @@ namespace SanteDB.Authentication.OAuth2.Rest
         {
             SigningCredentials retVal = null;
             // Signing credentials
-            if (this.m_masterConfig.Algorithm == SignatureAlgorithm.RS256)
+            if (this.m_masterConfig.Signatures.Algorithm == SignatureAlgorithm.RS256)
             {
-                var cert = X509CertificateUtils.FindCertificate(this.m_masterConfig.FindType, this.m_masterConfig.StoreLocation, this.m_masterConfig.StoreName, this.m_masterConfig.FindValue);
+                var cert = X509CertificateUtils.FindCertificate(this.m_masterConfig.Signatures.FindType, this.m_masterConfig.Signatures.StoreLocation, this.m_masterConfig.Signatures.StoreName, this.m_masterConfig.Signatures.FindValue);
                 if (cert == null)
                     throw new SecurityException("Cannot find certificate to sign JWT tokens!");
                 retVal = new X509SigningCredentials(cert);
 
             }
-            else if (this.m_masterConfig.Algorithm == SignatureAlgorithm.HS256)
+            else if (this.m_masterConfig.Signatures.Algorithm == SignatureAlgorithm.HS256)
             {
                 retVal = new SigningCredentials(
-                    new InMemorySymmetricSecurityKey(this.m_masterConfig.Secret),
+                    new InMemorySymmetricSecurityKey(this.m_masterConfig.Signatures.Secret),
                     "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256",
                     "http://www.w3.org/2001/04/xmlenc#sha256",
                     new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("keyid", "0"))

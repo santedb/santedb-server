@@ -18,20 +18,19 @@
  - Date: 2018-6-22
  -->
 <modelMap xmlns="http://santedb.org/model/map">
-  <class modelClass="SanteDB.Core.Auditing.AuditData, MARC.HI.EHRS.SVC.Auditing.Core, Version=1.1.0.0"
+  <class modelClass="SanteDB.Core.Auditing.AuditData, SanteDB.Core.Model, Version=1.1.0.0"
 		domainClass="SanteDB.Persistence.Auditing.ADO.Data.Model.DbAuditData, SanteDB.Persistence.Auditing.ADO, Version=0.5.0.0">
-    <property modelName="CorrelationToken" domainName="Key"/>
   </class>
 
-  <class modelClass="SanteDB.Core.Auditing.AuditActorData, MARC.HI.EHRS.SVC.Auditing.Core, Version=1.1.0.0"
+  <class modelClass="SanteDB.Core.Auditing.AuditActorData, SanteDB.Core.Model, Version=1.1.0.0"
   domainClass="SanteDB.Persistence.Auditing.ADO.Data.Model.DbAuditActor, SanteDB.Persistence.Auditing.ADO, Version=0.5.0.0">
   </class>
 
-  <class modelClass="SanteDB.Core.Auditing.AuditableObject, MARC.HI.EHRS.SVC.Auditing.Core, Version=1.1.0.0"
+  <class modelClass="SanteDB.Core.Auditing.AuditableObject, SanteDB.Core.Model, Version=1.1.0.0"
 domainClass="SanteDB.Persistence.Auditing.ADO.Data.Model.DbAuditObject, SanteDB.Persistence.Auditing.ADO, Version=0.5.0.0">
   </class>
 
-  <class modelClass="SanteDB.Core.Auditing.AuditCode, MARC.HI.EHRS.SVC.Auditing.Core, Version=1.1.0.0"
+  <class modelClass="SanteDB.Core.Auditing.AuditCode, SanteDB.Core.Model, Version=1.1.0.0"
 domainClass="SanteDB.Persistence.Auditing.ADO.Data.Model.DbAuditCode, SanteDB.Persistence.Auditing.ADO, Version=0.5.0.0">
   </class>
   

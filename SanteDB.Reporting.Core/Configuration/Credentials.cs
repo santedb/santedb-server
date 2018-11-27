@@ -24,7 +24,7 @@ namespace SanteDB.Reporting.Core.Configuration
     /// <summary>
     /// Represents a set of credentials.
     /// </summary>
-    [XmlType(nameof(Credentials), Namespace = "http://santedb.org/configuration/reporting")]
+    [XmlType(nameof(Credentials), Namespace = "http://santedb.org/configuration")]
 	public class Credentials
 	{
 		/// <summary>

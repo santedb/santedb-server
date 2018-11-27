@@ -27,7 +27,7 @@ namespace SanteDB.Persistence.MDM.Configuration
     /// <summary>
     /// Represents configuration for one resource
     /// </summary>
-    [XmlType(nameof(MdmResourceConfiguration), Namespace = "http://santedb.org/configuration/mdm")]
+    [XmlType(nameof(MdmResourceConfiguration), Namespace = "http://santedb.org/configuration")]
     public class MdmResourceConfiguration
     {
         /// <summary>

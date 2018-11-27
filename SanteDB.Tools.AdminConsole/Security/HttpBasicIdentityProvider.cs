@@ -31,6 +31,11 @@ namespace SanteDB.Tools.AdminConsole.Security
     /// </summary>
     public class HttpBasicIdentityProvider : IIdentityProviderService
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public String ServiceName => "HTTP Basic Identity Provider";
+
         public event EventHandler<AuthenticatedEventArgs> Authenticated;
         public event EventHandler<AuthenticatingEventArgs> Authenticating;
 

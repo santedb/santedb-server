@@ -43,10 +43,14 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
     /// <summary>
     /// Represents a service which is responsible for the storage of audits
     /// </summary>
-    [Description("ADO Audit Repository")]
+    [ServiceProvider("ADO.NET Audit Repository")]
     #pragma warning disable CS0067
     public class AdoAuditRepositoryService : IDataPersistenceService<AuditData>
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "ADO.NET Audit Repository";
 
         // Confiugration
         private AdoAuditConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoAuditConfigurationSection>();

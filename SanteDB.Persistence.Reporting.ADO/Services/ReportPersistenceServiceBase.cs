@@ -23,7 +23,7 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
-using SanteDB.Persistence.Reporting.PSQL.Configuration;
+using SanteDB.Persistence.Reporting.ADO.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -34,7 +34,7 @@ using System.Linq.Expressions;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Principal;
 
-namespace SanteDB.Persistence.Reporting.PSQL.Services
+namespace SanteDB.Persistence.Reporting.ADO.Services
 {
     /// <summary>
     /// Represents a base class for report persistence.
@@ -42,10 +42,15 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
     /// <typeparam name="TModel">The type of the model.</typeparam>
     public abstract class ReportPersistenceServiceBase<TModel> : IDataPersistenceService<TModel> where TModel : IdentifiedData
 	{
-		/// <summary>
-		/// The internal reference to the <see cref="TraceSource"/> instance.
-		/// </summary>
-		protected readonly TraceSource traceSource = new TraceSource(ReportingPersistenceConstants.TraceName);
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => $"Report Persister for {typeof(TModel).FullName}";
+
+        /// <summary>
+        /// The internal reference to the <see cref="TraceSource"/> instance.
+        /// </summary>
+        protected readonly TraceSource traceSource = new TraceSource(ReportingPersistenceConstants.TraceName);
 
 		/// <summary>
 		/// Fired after a data type is inserted.

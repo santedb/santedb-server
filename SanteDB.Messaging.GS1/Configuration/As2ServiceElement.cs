@@ -17,6 +17,7 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Http;
 using System;
 using System.Configuration;
@@ -28,7 +29,7 @@ namespace SanteDB.Messaging.GS1.Configuration
     /// <summary>
     /// AS2 Service configuration
     /// </summary>
-    [XmlType(nameof(As2ServiceElement), Namespace = "http://santedb.org/configuration/gs1")]
+    [XmlType(nameof(As2ServiceElement), Namespace = "http://santedb.org/configuration")]
     public class As2ServiceElement : ServiceClientDescription
     {
 
@@ -59,7 +60,7 @@ namespace SanteDB.Messaging.GS1.Configuration
         /// <summary>
         /// Gets or sets the password
         /// </summary>
-        [ConfigurationProperty("password"), XmlAttribute("password")]
+        [XmlAttribute("password")]
         public String Password {
             get;set;
         }
@@ -67,8 +68,8 @@ namespace SanteDB.Messaging.GS1.Configuration
         /// <summary>
         /// Configuration property for trusted cert
         /// </summary>
-        [ConfigurationProperty("trustedCert"), XmlAttribute("trustedCert")]
-        public String TrustedCertificate {
+        [XmlElement("clientCertificate")]
+        public X509ConfigurationElement ClientCertificate {
             get;set;
         }
 

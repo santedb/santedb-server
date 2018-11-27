@@ -45,8 +45,15 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// <summary>
     /// Represents a PIP fed from SQL Server tables
     /// </summary>
+    [ServiceProvider("ADO.NET Policy Information Service")]
     public class AdoPolicyInformationService : IPolicyInformationService
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public String ServiceName => "ADO.NET Policy Information Service";
+
         // Get the SQL configuration
         private AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
 

@@ -32,13 +32,19 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Represents a local alert service.
     /// </summary>
+    [ServiceProvider("Local Mail Message")]
     public class LocalMailMessageRepository : IMailMessageRepositoryService,
         IRepositoryService<MailMessage>
 	{
-		/// <summary>
-		/// The internal reference to the <see cref="TraceSource"/> instance.
-		/// </summary>
-		private TraceSource traceSource = new TraceSource("SanteDB.Core");
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "Local Mail Message Repository";
+
+        /// <summary>
+        /// The internal reference to the <see cref="TraceSource"/> instance.
+        /// </summary>
+        private TraceSource traceSource = new TraceSource("SanteDB.Core");
 
 		/// <summary>
 		/// Fired when an alert was raised and is being processed.

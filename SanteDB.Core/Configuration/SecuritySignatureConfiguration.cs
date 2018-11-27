@@ -17,44 +17,49 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System;
-using System.Collections.ObjectModel;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml.Serialization;
 
 namespace SanteDB.Core.Configuration
 {
+
     /// <summary>
-    /// SanteDB Security configuration
+    /// Represents the type of signature algorithms
     /// </summary>
-    [XmlType(nameof(SecurityConfigurationSection), Namespace = "http://santedb.org/configuration")]
-    public class SecurityConfigurationSection : IConfigurationSection
+    [XmlType(nameof(SignatureAlgorithm), Namespace = "http://santedb.org/configuration")]
+    public enum SignatureAlgorithm
+    {
+        [XmlEnum("rsa")]
+        RS256,
+        [XmlEnum("hmac")]
+        HS256
+    }
+
+    /// <summary>
+    /// Represents a signature collection
+    /// </summary>
+    [XmlType(nameof(SecuritySignatureConfiguration), Namespace = "http://santedb.org/configuration")]
+    public class SecuritySignatureConfiguration : X509ConfigurationElement
     {
 
         /// <summary>
-        /// Password regex
+        /// The unique name for the signer
         /// </summary>
-        [XmlAttribute("passwordRegex")]
-        public string PasswordRegex { get; set; }
+        [XmlAttribute("name")]
+        public string Name { get; set; }
 
         /// <summary>
-        /// Allow unsigned applets to be installed
+        /// Signature mode
         /// </summary>
-        [XmlAttribute("allowUnsignedApplets")]
-        public bool AllowUnsignedApplets { get; set; }
-        
-        /// <summary>
-        /// Trusted publishers
-        /// </summary>
-        [XmlArray("trustedPublishers"), XmlArrayItem("add")]
-        public ObservableCollection<string> TrustedPublishers { get; set; }
+        [XmlAttribute("alg")]
+        public SignatureAlgorithm Algorithm { get; set; }
 
         /// <summary>
-        /// Signature configuration
+        /// When using HMAC256 signing this represents the server's secret
         /// </summary>
-        [XmlElement("signing")]
-        public SecuritySignatureConfiguration Signatures { get; set; }
+        [XmlAttribute("hmacKey")]
+        public byte[] Secret { get; set; }
 
-        
+
     }
 }

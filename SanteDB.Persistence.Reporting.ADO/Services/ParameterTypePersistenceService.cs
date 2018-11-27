@@ -27,15 +27,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Principal;
 
-namespace SanteDB.Persistence.Reporting.PSQL.Services
+namespace SanteDB.Persistence.Reporting.ADO.Services
 {
     /// <summary>
     /// Represents a data type persistence service.
     /// </summary>
-    public class ParameterTypePersistenceService : CorePersistenceService<ParameterType, PSQL.Model.ParameterType, PSQL.Model.ParameterType>
+    public class ParameterTypePersistenceService : CorePersistenceService<ParameterType, ADO.Model.ParameterType, ADO.Model.ParameterType>
 	{
 		/// <summary>
-		/// Maps a <see cref="ParameterType" /> instance to a <see cref="PSQL.Model.ParameterType" /> instance.
+		/// Maps a <see cref="ParameterType" /> instance to a <see cref="ADO.Model.ParameterType" /> instance.
 		/// </summary>
 		/// <param name="modelInstance">The model instance.</param>
 		/// <param name="context">The context.</param>
@@ -49,7 +49,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 				return null;
 			}
 
-			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(PSQL.Model.ParameterType) } to { nameof(ParameterType) }");
+			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(ADO.Model.ParameterType) } to { nameof(ParameterType) }");
 
 			return base.FromModelInstance(modelInstance, context);
 		}
@@ -77,7 +77,7 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 		}
 
 		/// <summary>
-		/// Maps a <see cref="PSQL.Model.ParameterType" /> instance to an <see cref="ParameterType" /> instance.
+		/// Maps a <see cref="ADO.Model.ParameterType" /> instance to an <see cref="ParameterType" /> instance.
 		/// </summary>
 		/// <param name="domainInstance">The domain instance.</param>
 		/// <param name="context">The context.</param>
@@ -92,12 +92,12 @@ namespace SanteDB.Persistence.Reporting.PSQL.Services
 				return null;
 			}
 
-			if (!(domainInstance is PSQL.Model.ParameterType))
+			if (!(domainInstance is ADO.Model.ParameterType))
 			{
-				throw new ArgumentException($"Invalid type: {nameof(domainInstance)} is not of type {nameof(PSQL.Model.ParameterType)}");
+				throw new ArgumentException($"Invalid type: {nameof(domainInstance)} is not of type {nameof(ADO.Model.ParameterType)}");
 			}
 
-			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(ParameterType) } to { nameof(PSQL.Model.ParameterType) }");
+			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(ParameterType) } to { nameof(ADO.Model.ParameterType) }");
 
 			return base.ToModelInstance(domainInstance, context);
 		}

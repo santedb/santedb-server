@@ -29,7 +29,7 @@ namespace SanteDB.Messaging.HDSI.Configuration
     /// <summary>
     /// Configuration class for HDSI configuration
     /// </summary>
-    [XmlType(nameof(HdsiConfigurationSection), Namespace = "http://santedb.org/configuration/hdsi")]
+    [XmlType(nameof(HdsiConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class HdsiConfigurationSection : IConfigurationSection
     {
 

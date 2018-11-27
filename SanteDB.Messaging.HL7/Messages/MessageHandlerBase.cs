@@ -204,7 +204,7 @@ namespace SanteDB.Messaging.HL7.Messages
                     throw new SecurityException("MSH-8 must be provided for authenticating application");
 
                 String deviceId = $"{msh.SendingApplication.NamespaceID.Value}|{msh.SendingFacility.NamespaceID.Value}",
-                    deviceSecret = BitConverter.ToString(auth.AuthorizationToken).Replace("-", ""),
+                    deviceSecret = BitConverter.ToString(auth.AuthorizationToken).Replace("-",""),
                     applicationId = msh.SendingApplication.NamespaceID.Value,
                     applicationSecret = this.m_configuration.Security == SecurityMethod.Sft4 ? sft.SoftwareBinaryID.Value :
                         this.m_configuration.Security == SecurityMethod.Msh8 ? msh.Security.Value : null;
@@ -381,7 +381,7 @@ namespace SanteDB.Messaging.HL7.Messages
                 {
                     using (var md5 = MD5.Create())
                     using (var stream = File.OpenRead(Assembly.GetEntryAssembly().Location))
-                        s_entryAsmHash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "");
+                        s_entryAsmHash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-","");
                 }
 
                 if (s_installDate == null)

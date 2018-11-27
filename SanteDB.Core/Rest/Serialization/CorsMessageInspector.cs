@@ -29,12 +29,14 @@ namespace SanteDB.Core.Rest.Serialization
     /// <summary>
     /// CORS settings
     /// </summary>
-    public class CorsSettings
+    [XmlRoot(nameof(CorsEndpointBehaviorConfiguration), Namespace = "http://santedb.org/configuration")]
+    [XmlType(nameof(CorsEndpointBehaviorConfiguration), Namespace = "http://santedb.org/configuration")]
+    public class CorsEndpointBehaviorConfiguration
     {
         /// <summary>
         /// Resources
         /// </summary>
-        public CorsSettings()
+        public CorsEndpointBehaviorConfiguration()
         {
             this.Resource = new List<CorsResourceSetting>();
         }
@@ -42,13 +44,14 @@ namespace SanteDB.Core.Rest.Serialization
         /// <summary>
         /// Gets the resource settings
         /// </summary>
+        [XmlElement("resource")]
         public List<CorsResourceSetting> Resource { get; private set; }
     }
 
     /// <summary>
     /// Represents a setting for one resource
     /// </summary>
-    [XmlType(nameof(CorsResourceSetting), Namespace = "http://santedb.org/configuration/cors")]
+    [XmlType(nameof(CorsResourceSetting), Namespace = "http://santedb.org/configuration")]
     public class CorsResourceSetting
     {
 
@@ -73,26 +76,26 @@ namespace SanteDB.Core.Rest.Serialization
         /// <summary>
         /// Gets the name
         /// </summary>
-        [XmlAttribute("resource")]
-        public string Name { get; private set; }
+        [XmlAttribute("name")]
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets the domain
         /// </summary>
         [XmlAttribute("domain")]
-        public String Domain { get; private set; }
+        public String Domain { get; set; }
 
         /// <summary>
         /// Gets the verbs allowed
         /// </summary>
         [XmlArray("verbs"), XmlArrayItem("add")]
-        public List<String> Verbs { get; private set; }
+        public List<String> Verbs { get; set; }
 
         /// <summary>
         /// Gets the headers allowed
         /// </summary>
         [XmlArray("headers"), XmlArrayItem("add")]
-        public List<String> Headers { get; private set; }
+        public List<String> Headers { get; set; }
     }
 
     /// <summary>
@@ -102,12 +105,12 @@ namespace SanteDB.Core.Rest.Serialization
     {
 
         // Settings for CORs
-        private CorsSettings m_settings;
+        private CorsEndpointBehaviorConfiguration m_settings;
 
         /// <summary>
         /// Create a new message inspector
         /// </summary>
-        public CorsMessageInspector(CorsSettings settings)
+        public CorsMessageInspector(CorsEndpointBehaviorConfiguration settings)
         {
             this.m_settings = settings;
         }

@@ -138,8 +138,6 @@ namespace SanteDB.Tools.DataSandbox.Wcf
         /// </summary>
         private string GetContentType(string filename)
         {
-
-
             string extension = Path.GetExtension(filename);
             switch (extension.Substring(1).ToLower())
             {

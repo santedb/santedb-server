@@ -37,7 +37,13 @@ namespace SanteDB.Core.Services.Impl
     public class LocalSecurityRepositoryService : ISecurityRepositoryService, 
         ISecurityAuditEventSource
     {
-		private TraceSource m_traceSource = new TraceSource(SanteDBConstants.ServiceTraceSourceName);
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "Local Security Repository Service";
+
+        private TraceSource m_traceSource = new TraceSource(SanteDBConstants.ServiceTraceSourceName);
 
         /// <summary>
         /// Indicates security attributes have changed

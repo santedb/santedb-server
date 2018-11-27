@@ -45,8 +45,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// <summary>
     /// Identity provider service
     /// </summary>
+    [ServiceProvider("ADO.NET Identity Provider")]
     public sealed class AdoIdentityProvider : ISessionIdentityProviderService
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public String ServiceName => "ADO.NET Identity Provider";
 
         // Sync lock
         private Object m_syncLock = new object();

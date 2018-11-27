@@ -26,9 +26,25 @@ using System.Xml.Serialization;
 namespace SanteDB.Messaging.Atna.Configuration
 {
     /// <summary>
+    /// Classifies the audit transport
+    /// </summary>
+    [XmlType(nameof(AtnaTransportType), Namespace = "http://santedb.org/configuration")]
+    public enum AtnaTransportType
+    {
+        [XmlEnum("udp")]
+        Udp,
+        [XmlEnum("tcp")]
+        Tcp,
+        [XmlEnum("stcp")]
+        Stcp,
+        [XmlEnum("file")]
+        File
+    }
+
+    /// <summary>
     /// Audit configuration
     /// </summary>
-    [XmlType(nameof(AtnaConfigurationSection), Namespace = "http://santedb.org/configuration/atna")]
+    [XmlType(nameof(AtnaConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class AtnaConfigurationSection : IConfigurationSection
     {
         
@@ -39,31 +55,28 @@ namespace SanteDB.Messaging.Atna.Configuration
         public String AuditTarget { get; set; }
 
         /// <summary>
-        /// Gets or sets the message publisher to use for this audit
-        /// </summary>
-        [XmlIgnore]
-        public Type MessagePublisher { get; set; }
-
-        /// <summary>
         /// Gets or sets the publisher type
         /// </summary>
-        [XmlAttribute("publisher"), ConfigurationRequired]
-        public string PublisherType {
-            get => this.MessagePublisher?.GetType().AssemblyQualifiedName;
-            set => this.MessagePublisher = Type.GetType(value);
-        }
+        [XmlAttribute("transport"), ConfigurationRequired]
+        public AtnaTransportType Transport { get; set; }
 
         /// <summary>
         /// Enterprise site ID
         /// </summary>
-        [XmlAttribute("EnterpriseSiteID"), ConfigurationRequired]
+        [XmlAttribute("enterpriseSiteID"), ConfigurationRequired]
         public string EnterpriseSiteId { get; set; }
 
         /// <summary>
         /// Gets or sets the certificate thumbprint
         /// </summary>
-        [XmlElement("certificateThumbprint")]
-        public string CertificateThumprint { get; set; }
+        [XmlElement("clientCertificate")]
+        public X509ConfigurationElement ClientCertificate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the certificate thumbprint
+        /// </summary>
+        [XmlElement("serverCertificate")]
+        public X509ConfigurationElement ServerCertificate { get; set; }
 
         /// <summary>
         /// Message format

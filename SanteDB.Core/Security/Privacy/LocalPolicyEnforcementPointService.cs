@@ -38,8 +38,13 @@ namespace SanteDB.Core.Security.Privacy
     /// <summary>
     /// Local policy enforcement point service
     /// </summary>
+    [ServiceProvider("Default Policy Enforcement Service")]
     public class LocalPolicyEnforcementPointService : IDaemonService
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "Default Policy Enforcement Service";
 
         // Set to true when the application context has stopped
         private bool m_safeToStop = false;
@@ -135,17 +140,18 @@ namespace SanteDB.Core.Security.Privacy
                     var senderParm = Expression.Parameter(typeof(Object), "o");
                     var eventParm = Expression.Parameter(pqeArgType, "e");
                     var delegateData = Expression.Convert(Expression.MakeMemberAccess(eventParm, pqeArgType.GetRuntimeProperty("Results")), typeof(IEnumerable));
-                    var queriedInstanceDelegate = Expression.Lambda(qevtHdlrType, Expression.Assign(delegateData, Expression.Convert(Expression.Call(Expression.Constant(this), typeof(LocalPolicyEnforcementPointService).GetRuntimeMethod(nameof(HandlePostQueryEvent), new Type[] { typeof(IEnumerable) }), delegateData), pqeArgType.GetRuntimeProperty("Results").PropertyType)), senderParm, eventParm).Compile();
+                    var queriedInstanceDelegate = Expression.Lambda(qevtHdlrType, Expression.Assign(delegateData.Operand, Expression.Convert(Expression.Call(Expression.Constant(this), typeof(LocalPolicyEnforcementPointService).GetRuntimeMethod(nameof(HandlePostQueryEvent), new Type[] { typeof(IEnumerable) }), delegateData), pqeArgType.GetRuntimeProperty("Results").PropertyType)), senderParm, eventParm).Compile();
 
                     // Bind to events
                     svcType.GetRuntimeEvent("Queried").AddEventHandler(svcInstance, queriedInstanceDelegate);
 
                     // Construct delegate for retrieve
                     pqeArgType = typeof(DataRetrievedEventArgs<>).MakeGenericType(t);
+                    qevtHdlrType = typeof(EventHandler<>).MakeGenericType(pqeArgType);
                     senderParm = Expression.Parameter(typeof(Object), "o");
                     eventParm = Expression.Parameter(pqeArgType, "e");
                     delegateData = Expression.Convert(Expression.MakeMemberAccess(eventParm, pqeArgType.GetRuntimeProperty("Data")), t);
-                    var retrievedInstanceDelegate = Expression.Lambda(qevtHdlrType, Expression.Assign(delegateData, Expression.Call(Expression.Constant(this), typeof(LocalPolicyEnforcementPointService).GetRuntimeMethod(nameof(HandlePostRetrieveEvent), new Type[] { t }), delegateData)), senderParm, eventParm).Compile();
+                    var retrievedInstanceDelegate = Expression.Lambda(qevtHdlrType, Expression.Assign(delegateData.Operand, Expression.Convert(Expression.Call(Expression.Constant(this), typeof(LocalPolicyEnforcementPointService).GetRuntimeMethod(nameof(HandlePostRetrieveEvent), new Type[] { t }), delegateData), t)), senderParm, eventParm).Compile();
 
                     // Bind to events
                     svcType.GetRuntimeEvent("Retrieved").AddEventHandler(svcInstance, retrievedInstanceDelegate);

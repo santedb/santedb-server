@@ -209,7 +209,7 @@ angular.module('santedb', [])
                     var baseUrl = attrs.url;
                     var filter = {}, defaultFilter = {};
                     if (filterString !== undefined &&
-                        filterString != "")
+                        filterString != ")
                         filter = JSON.parse(filterString);
 
                     if (modelType != "SecurityUser" && modelType != "SecurityRole" && modelType != "ConceptSet" && !filter.statusConcept)

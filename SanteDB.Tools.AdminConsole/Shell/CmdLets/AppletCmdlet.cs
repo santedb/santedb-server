@@ -85,7 +85,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
                 var applet = m_client.GetApplet(itm);
 
                 Console.WriteLine("====== <START {0}>\r\nKey Token: {1}\r\nName: {2}\r\nAuthor: {3}\r\nVersion: {4}\r\nHash: {6}\r\nDependencies:",
-                    applet.AppletInfo.Id, applet.AppletInfo.PublicKeyToken, applet.AppletInfo.GetName("en", true), applet.AppletInfo.Author, applet.AppletInfo.Version, BitConverter.ToString(applet.AppletInfo.Signature).Replace("-",""), BitConverter.ToString(applet.AppletInfo.Hash).Replace("-", ""));
+                    applet.AppletInfo.Id, applet.AppletInfo.PublicKeyToken, applet.AppletInfo.GetName("en", true), applet.AppletInfo.Author, applet.AppletInfo.Version, BitConverter.ToString(applet.AppletInfo.Signature).Replace("-",""), BitConverter.ToString(applet.AppletInfo.Hash).Replace("-",""));
                 foreach (var i in applet.AppletInfo.Dependencies)
                     Console.WriteLine("\t- {0} (>= {1})", i.Id, i.Version);
 

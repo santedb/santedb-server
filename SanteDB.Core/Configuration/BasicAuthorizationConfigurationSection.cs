@@ -25,7 +25,7 @@ namespace SanteDB.Core.Configuration
     /// <summary>
     /// Basic authorization configuration
     /// </summary>
-    [XmlType(nameof(BasicAuthorizationConfigurationSection), Namespace = "http://santedb.org/configuration/security")]
+    [XmlType(nameof(BasicAuthorizationConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class BasicAuthorizationConfigurationSection : IConfigurationSection
     {
 

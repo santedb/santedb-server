@@ -31,9 +31,14 @@ namespace SanteDB.Tools.DataSandbox
     /// <summary>
     /// Represents a daemon service that exports Swagger documentation
     /// </summary>
-    [Description("Debugger: Data Sandbox UI")]
+    [ServiceProvider("Debugger: Data Sandbox UI")]
     public class DataSandboxService : IDaemonService
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "Debug Environment UI";
+
         // HDSI Trace host
         private TraceSource m_traceSource = new TraceSource("SanteDB.Tools.DataSandbox");
 

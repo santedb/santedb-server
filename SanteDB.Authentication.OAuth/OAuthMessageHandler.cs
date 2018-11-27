@@ -33,8 +33,13 @@ namespace SanteDB.Authentication.OAuth2
     /// <summary>
     /// OAuth2 message handler
     /// </summary>
+    [ServiceProvider("OAuth 2.0 Token Service")]
     public class OAuthMessageHandler : IDaemonService, IApiEndpointProvider
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "OAuth 2.0 Token Service";
 
         // Trace source
         private TraceSource m_traceSource = new TraceSource(OAuthConstants.TraceSourceName);

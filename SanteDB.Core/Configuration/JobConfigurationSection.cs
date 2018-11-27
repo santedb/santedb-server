@@ -10,7 +10,7 @@ namespace SanteDB.Core.Configuration
     /// <summary>
     /// Represents a simple job configuration
     /// </summary>
-    [XmlType(nameof(JobConfigurationSection), Namespace = "http://santedb.org/configuration/jobs")]
+    [XmlType(nameof(JobConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class JobConfigurationSection : IConfigurationSection
     {
 
@@ -46,7 +46,7 @@ namespace SanteDB.Core.Configuration
         /// <summary>
         /// Gets or sets the timeout of the job
         /// </summary>
-        [XmlAttribute("timeout")]
-        public TimeSpan Timeout { get; set; }
+        [XmlAttribute("interval")]
+        public int Interval { get; set; }
     }
 }

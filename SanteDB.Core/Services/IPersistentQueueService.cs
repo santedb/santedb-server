@@ -52,7 +52,7 @@ namespace SanteDB.Core.Services
     /// <summary>
     /// Represents a persistent queue where data can be stored and retrieved
     /// </summary>
-    public interface IPersistentQueueService
+    public interface IPersistentQueueService : IServiceImplementation
     {
         /// <summary>
         /// Opens the specified queue name and enables subscriptions

@@ -30,7 +30,7 @@ namespace SanteDB.Core.Configuration
     /// <summary>
     /// Represents configuration of a single AGS service
     /// </summary>
-    [XmlType(nameof(RestServiceConfiguration), Namespace = "http://santedb.org/configuraton/rest")]
+    [XmlType(nameof(RestServiceConfiguration), Namespace = "http://santedb.org/configuration")]
     [JsonObject]
     public class RestServiceConfiguration
     {
@@ -74,7 +74,7 @@ namespace SanteDB.Core.Configuration
         /// <summary>
         /// Gets or sets the behavior of the AGS endpoint
         /// </summary>
-        [XmlArray("behavior"), XmlArrayItem("add"), JsonProperty("behavior")]
+        [XmlArray("behaviors"), XmlArrayItem("add"), JsonProperty("behaviors")]
         public List<RestBehaviorConfiguration> Behaviors { get; set; }
 
         /// <summary>

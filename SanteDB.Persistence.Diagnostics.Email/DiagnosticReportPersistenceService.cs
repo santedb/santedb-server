@@ -46,8 +46,14 @@ namespace SanteDB.Persistence.Diagnostics.Email
     /// Persistence service for diagnostics
     /// </summary>
 #pragma warning disable CS0067
+    [ServiceProvider("E-Mail Diagnostic (Bug) Report Submission")]
     public class DiagnosticReportPersistenceService : IDataPersistenceService<DiagnosticReport>
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "E-Mail Diagnostic Report Submission";
 
         // Trace source
         private TraceSource m_traceSource = new TraceSource("SanteDB.Persistence.Diagnostics.Email");

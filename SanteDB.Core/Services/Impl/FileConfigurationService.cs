@@ -30,8 +30,14 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Provides a redirected configuration service which reads configuration from a different file
     /// </summary>
+    [ServiceProvider("Local Configuration Manager")]
     public class FileConfigurationService : IConfigurationManager
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "Local Configuration Manager";
+
         /// <summary>
         /// Get the configuration
         /// </summary>
@@ -47,7 +53,7 @@ namespace SanteDB.Core.Services.Impl
         {
             try
             {
-                var configFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "config.xml");
+                var configFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.config.xml");
                 using (var s = File.OpenRead(configFile))
                     this.Configuration = SanteDBConfiguration.Load(s);
                 ExeConfigurationFileMap fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "SanteDB.exe.config") }; //Path to your config file

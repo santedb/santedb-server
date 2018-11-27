@@ -20,6 +20,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace SanteDB.Core.Configuration
@@ -27,14 +29,19 @@ namespace SanteDB.Core.Configuration
     /// <summary>
     /// SanteDB server configuration 
     /// </summary>
-    [XmlType(nameof(SanteDBServerConfiguration), Namespace = "http://santedb.org/configuration/server")]
+    [XmlType(nameof(SanteDBServerConfiguration), Namespace = "http://santedb.org/configuration")]
     public class SanteDBServerConfiguration : IConfigurationSection
     {
+
+        // Service providers
+        private IEnumerable<Type> m_serviceProviders;
+
         /// <summary>
         /// Create new santedb configuration object
         /// </summary>
         public SanteDBServerConfiguration()
         {
+            this.ServiceProviders = new List<TypeReferenceConfiguration>();
         }
 
         /// <summary>
@@ -42,11 +49,12 @@ namespace SanteDB.Core.Configuration
         /// </summary>
         [XmlAttribute("threadPoolSize")]
         public int ThreadPoolSize { get; set; }
-    
+
         /// <summary>
-        /// Service providers
+        /// Gets the service providers from XML
         /// </summary>
-        [XmlIgnore]
-        public List<Type> ServiceProviders { get; internal set; }
+        [XmlArray("serviceProviders"), XmlArrayItem("add")]
+        public List<TypeReferenceConfiguration> ServiceProviders { get; set; }
+
     }
 }

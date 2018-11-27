@@ -26,6 +26,7 @@ namespace SanteDB.Core.Security
     /// <summary>
     /// Represents a local regex password validator
     /// </summary>
+    [ServiceProvider("Default Password Validator")]
     public class DefaultPasswordValidationService : RegexPasswordValidator
     {
         /// <summary>

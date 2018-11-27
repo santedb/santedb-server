@@ -27,7 +27,7 @@ namespace SanteDB.Caching.Redis.Configuration
     /// <summary>
     /// Represents a simple redis configuration
     /// </summary>
-    [XmlType(nameof(RedisConfigurationSection), Namespace = "http://santedb.org/configuration/redis")]
+    [XmlType(nameof(RedisConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class RedisConfigurationSection : IConfigurationSection
     {
 

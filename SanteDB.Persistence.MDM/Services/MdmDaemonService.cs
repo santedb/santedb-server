@@ -30,8 +30,14 @@ namespace SanteDB.Persistence.MDM.Services
     /// The MdmRecordDaemon is responsible for subscribing to MDM targets in the configuration 
     /// and linking/creating master records whenever a record of that type is created.
     /// </summary>
+    [ServiceProvider("MDM Data Repository")]
     public class MdmDaemonService : IDaemonService, IDisposable
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "MDM Daemon";
 
         // TRace source
         private TraceSource m_traceSource = new TraceSource(MdmConstants.TraceSourceName);

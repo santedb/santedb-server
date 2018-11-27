@@ -19,7 +19,7 @@
  */
 using SanteDB.Core.Model;
 using SanteDB.OrmLite;
-using SanteDB.Persistence.Reporting.PSQL.Model;
+using SanteDB.Persistence.Reporting.ADO.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -27,7 +27,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Principal;
 
-namespace SanteDB.Persistence.Reporting.PSQL.Services
+namespace SanteDB.Persistence.Reporting.ADO.Services
 {
     /// <summary>
     /// Represents a core persistence service.

@@ -27,7 +27,7 @@ namespace SanteDB.Messaging.GS1.Configuration
     /// <summary>
     /// GS1 configuration 
     /// </summary>
-    [XmlType(nameof(Gs1ConfigurationSection), Namespace = "http://santedb.org/configuration/gs1")]
+    [XmlType(nameof(Gs1ConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class Gs1ConfigurationSection  : IConfigurationSection
     {
         /// <summary>

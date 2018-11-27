@@ -14,7 +14,7 @@ namespace SanteDB.Messaging.HL7.Configuration
     /// <summary>
     /// Represents the HL7 configuration
     /// </summary>
-    [XmlType(nameof(Hl7ConfigurationSection), Namespace = "http://santedb.org/configuration/hl7")]
+    [XmlType(nameof(Hl7ConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class Hl7ConfigurationSection : IConfigurationSection
     {
 
@@ -44,7 +44,7 @@ namespace SanteDB.Messaging.HL7.Configuration
     /// <summary>
 	/// Handler definition
 	/// </summary>
-    [XmlType(nameof(HandlerDefinition), Namespace = "http://santedb.org/configuration/hl7")]
+    [XmlType(nameof(HandlerDefinition), Namespace = "http://santedb.org/configuration")]
     public class HandlerDefinition
     {
         /// <summary>
@@ -109,7 +109,7 @@ namespace SanteDB.Messaging.HL7.Configuration
     /// <summary>
     /// Security methods
     /// </summary>
-    [XmlType(nameof(SecurityMethod), Namespace = "http://santedb.org/configuration/hl7")]
+    [XmlType(nameof(SecurityMethod), Namespace = "http://santedb.org/configuration")]
     public enum SecurityMethod
     {
         /// <summary>
@@ -129,7 +129,7 @@ namespace SanteDB.Messaging.HL7.Configuration
     /// <summary>
     /// Message definition
     /// </summary>
-    [XmlType(nameof(MessageDefinition), Namespace = "http://santedb.org/configuration/hl7")]
+    [XmlType(nameof(MessageDefinition), Namespace = "http://santedb.org/configuration")]
     public class MessageDefinition
     {
         /// <summary>
@@ -148,7 +148,7 @@ namespace SanteDB.Messaging.HL7.Configuration
     /// <summary>
     /// Service definition
     /// </summary>
-    [XmlType(nameof(ServiceDefinition), Namespace = "http://santedb.org/configuration/hl7")]
+    [XmlType(nameof(ServiceDefinition), Namespace = "http://santedb.org/configuration")]
     public class ServiceDefinition
     {
         /// <summary>
@@ -193,7 +193,7 @@ namespace SanteDB.Messaging.HL7.Configuration
         /// Gets or sets the timeout
         /// </summary>
         [XmlAttribute("receiveTimeout")]
-        public TimeSpan ReceiveTimeout { get; set; }
+        public int ReceiveTimeout { get; set; }
     }
 
 }

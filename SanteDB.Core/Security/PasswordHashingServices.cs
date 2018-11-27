@@ -18,6 +18,7 @@
  * Date: 2018-6-22
  */
 using SanteDB.Core.Security.Services;
+using SanteDB.Core.Services;
 using System;
 using System.Security.Cryptography;
 using System.Text;
@@ -27,8 +28,14 @@ namespace SanteDB.Core.Security
     /// <summary>
     /// SHA256 password generator service
     /// </summary>
+    [ServiceProvider("SHA256 Password Encoding Service")]
     public class SHA256PasswordHashingService : IPasswordHashingService
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public String ServiceName => "SHA256 Password Encoding Service";
+
         /// <summary>
         /// Encode a password using the SHA256 encoding
         /// </summary>
@@ -42,38 +49,59 @@ namespace SanteDB.Core.Security
     /// <summary>
     /// SHA1 password generator service
     /// </summary>
+    [ServiceProvider("SHA1 Password Encoding Service")]
     public class SHA1PasswordHashingService : IPasswordHashingService
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public String ServiceName => "SHA1 Password Encoding Service";
+
         /// <summary>
         /// Encode a password using the SHA256 encoding
         /// </summary>
         public string ComputeHash(string password)
         {
             SHA1 hasher = SHA1.Create();
-            return BitConverter.ToString(hasher.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-", "").ToLower();
+            return BitConverter.ToString(hasher.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-","").ToLower();
         }
     }
 
     /// <summary>
     /// SHA1 password generator service
     /// </summary>
+    [ServiceProvider("MD5 Password Encoding Service")]
     public class MD5PasswordHashingService : IPasswordHashingService
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public String ServiceName => "MD5 Password Encoding Service";
+
         /// <summary>
         /// Encode a password using the SHA256 encoding
         /// </summary>
         public string ComputeHash(string password)
         {
             MD5 hasher = MD5.Create();
-            return BitConverter.ToString(hasher.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-", "").ToLower();
+            return BitConverter.ToString(hasher.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-","").ToLower();
         }
     }
 
     /// <summary>
     /// Plaintext password generator service
     /// </summary>
+    [ServiceProvider("Plaintext Password Encode")]
     public class PlainPasswordHashingService : IPasswordHashingService
     {
+
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public String ServiceName => "Plaintext Password Encoding Service";
+
         /// <summary>
         /// Encode a password using the SHA256 encoding
         /// </summary>

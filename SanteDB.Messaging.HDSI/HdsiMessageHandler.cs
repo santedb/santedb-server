@@ -27,6 +27,7 @@ using SanteDB.Core.Services;
 using SanteDB.Messaging.HDSI.Configuration;
 using SanteDB.Messaging.HDSI.Wcf;
 using SanteDB.Rest.Common;
+using SanteDB.Rest.HDSI.Resources;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -39,9 +40,13 @@ namespace SanteDB.Messaging.HDSI
     /// <summary>
     /// The HDSI Message Handler Daemon class
     /// </summary>
-    [Description("HDSI Message Service")]
+    [ServiceProvider("iCDR Message Service")]
     public class HdsiMessageHandler : IDaemonService, IApiEndpointProvider
     {
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "iCDR Primary Clinical Messaging Interface";
 
         /// <summary>
         /// Resource handler tool
@@ -115,13 +120,7 @@ namespace SanteDB.Messaging.HDSI
         {
             get
             {
-                var caps = ServiceEndpointCapabilities.Compression;
-                if (this.m_webHost.ServiceBehaviors.OfType<BasicAuthorizationAccessBehavior>().Any())
-                    caps |= ServiceEndpointCapabilities.BasicAuth;
-                if (this.m_webHost.ServiceBehaviors.OfType<TokenAuthorizationAccessBehavior>().Any())
-                    caps |= ServiceEndpointCapabilities.BearerAuth;
-
-                return caps;
+                return this.m_webHost.GetCapabilities();
             }
         }
 
@@ -139,7 +138,14 @@ namespace SanteDB.Messaging.HDSI
                 this.Starting?.Invoke(this, EventArgs.Empty);
 
                 // Force startup
-                HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.m_configuration.ResourceHandlers);
+                if(this.m_configuration.ResourceHandlers.Count() > 0)
+                    HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.m_configuration.ResourceHandlers);
+                else 
+                    HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(
+                        typeof(PatientResourceHandler).Assembly.ExportedTypes
+                        .Where(t => !t.IsAbstract && !t.IsInterface && typeof(IResourceHandler).IsAssignableFrom(t))
+                        .ToList()
+                        );
 
                 this.m_webHost = RestServiceTool.CreateService(typeof(HdsiServiceBehavior));
                 this.m_webHost.AddServiceBehavior(new ErrorServiceBehavior());
@@ -148,10 +154,6 @@ namespace SanteDB.Messaging.HDSI
                 foreach (ServiceEndpoint endpoint in this.m_webHost.Endpoints)
                 {
                     this.m_traceSource.TraceInformation("Starting HDSI on {0}...", endpoint.Description.ListenUri);
-                    endpoint.AddEndpointBehavior(new MessageCompressionEndpointBehavior());
-                    endpoint.AddEndpointBehavior(new MessageDispatchFormatterBehavior());
-                    endpoint.AddEndpointBehavior(new MessageLoggingEndpointBehavior());
-
                 }
 
                 // Start the webhost

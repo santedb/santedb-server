@@ -26,8 +26,8 @@ namespace SanteDB.Core.Services
     /// <summary>
     /// Represents a service which retrieves IPrincipal objects for applications.
     /// </summary>
-    public interface IApplicationIdentityProviderService
-	{
+    public interface IApplicationIdentityProviderService : IServiceImplementation
+    {
 		/// <summary>
 		/// Fired after an authentication request has been made.
 		/// </summary>

@@ -26,7 +26,7 @@ namespace SanteDB.Caching.Memory.Configuration
     /// <summary>
     /// Represents type cache configuration
     /// </summary>
-    [XmlType(nameof(TypeCacheConfigurationInfo), Namespace = "http://santedb.org/configuration/cache")]
+    [XmlType(nameof(TypeCacheConfigurationInfo), Namespace = "http://santedb.org/configuration")]
     public class TypeCacheConfigurationInfo
     {
 

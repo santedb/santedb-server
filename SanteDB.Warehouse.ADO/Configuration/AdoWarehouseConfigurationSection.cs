@@ -30,7 +30,7 @@ namespace SanteDB.Warehouse.ADO.Configuration
     /// <summary>
     /// Configuration section handler
     /// </summary>
-    [XmlType(nameof(AdoWarehouseConfigurationSection), Namespace = "http://santedb.org/configuration/warehouse")]
+    [XmlType(nameof(AdoWarehouseConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class AdoWarehouseConfigurationSection : OrmConfigurationBase , IConfigurationSection
     {
         /// <summary>
