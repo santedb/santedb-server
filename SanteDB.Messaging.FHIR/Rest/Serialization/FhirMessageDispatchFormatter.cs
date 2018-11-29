@@ -155,7 +155,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
                     // The request was in JSON or the accept is JSON
                     if (accepts?.StartsWith("application/fhir+json") == true ||
                         contentType?.StartsWith("application/fhir+json") == true ||
-                        formatParm.Contains("application/fhir+json"))
+                        formatParm?.Contains("application/fhir+json") == true)
                     {
 
                         // Parse XML object

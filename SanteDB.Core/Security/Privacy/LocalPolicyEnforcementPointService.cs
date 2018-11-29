@@ -206,8 +206,8 @@ namespace SanteDB.Core.Security.Privacy
         {
             foreach(var i in this.m_subscribedListeners)
             {
-                i.GetType().GetRuntimeEvent("Queried").RemoveEventHandler(i.Key, i.Value.Key);
-                i.GetType().GetRuntimeEvent("Retrieved").RemoveEventHandler(i.Key, i.Value.Value);
+                i.Key.GetType().GetRuntimeEvent("Queried").RemoveEventHandler(i.Key, i.Value.Key);
+                i.Key.GetType().GetRuntimeEvent("Retrieved").RemoveEventHandler(i.Key, i.Value.Value);
             }
         }
     }

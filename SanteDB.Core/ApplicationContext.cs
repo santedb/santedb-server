@@ -130,33 +130,42 @@ namespace SanteDB.Core
         {
             if (!this.m_running)
             {
+                Stopwatch startWatch = new Stopwatch();
 
-                if (this.Starting != null)
-                    this.Starting(this, null);
-
-                // If there is no configuration manager then add the local
-                Trace.TraceInformation("STAGE0 START: Load Configuration");
-                this.m_serviceInstances.Add(new FileConfigurationService());
-                this.m_configuration = this.GetService<IConfigurationManager>().GetSection<SanteDBServerConfiguration>();
-
-                Trace.TraceInformation("STAGE1 START: Loading services");
-                foreach (var svc in this.m_configuration.ServiceProviders)
+                try
                 {
-                    var instance = Activator.CreateInstance(svc.Type);
-                    this.m_serviceInstances.Add(instance);
+                    startWatch.Start();
+
+                    if (this.Starting != null)
+                        this.Starting(this, null);
+
+                    // If there is no configuration manager then add the local
+                    Trace.TraceInformation("STAGE0 START: Load Configuration");
+                    this.m_serviceInstances.Add(new FileConfigurationService());
+                    this.m_configuration = this.GetService<IConfigurationManager>().GetSection<SanteDBServerConfiguration>();
+
+                    Trace.TraceInformation("STAGE1 START: Loading services");
+                    foreach (var svc in this.m_configuration.ServiceProviders)
+                    {
+                        var instance = Activator.CreateInstance(svc.Type);
+                        this.m_serviceInstances.Add(instance);
+                    }
+
+
+                    Trace.TraceInformation("STAGE2 START: Starting Daemons");
+                    foreach (var dc in this.m_serviceInstances.OfType<IDaemonService>().ToArray())
+                        if (!dc.Start())
+                            throw new Exception($"Could not start {dc} successfully");
+
+                    Trace.TraceInformation("STAGE3 START: Notify ApplicationContext has started");
+                    if (this.Started != null)
+                        this.Started(this, null);
                 }
-
-
-                Trace.TraceInformation("STAGE2 START: Starting Daemons");
-                foreach (var dc in this.m_serviceInstances.OfType<IDaemonService>().ToArray())
-                    if (!dc.Start())
-                        throw new Exception($"Could not start {dc} successfully");
-
-                Trace.TraceInformation("STAGE3 START: Notify ApplicationContext has started");
-                if (this.Started != null)
-                    this.Started(this, null);
-
-                Trace.TraceInformation("SanteDB Started Successfully...");
+                finally
+                {
+                    startWatch.Stop();
+                }
+                Trace.TraceInformation("SanteDB startup completed successfully in {0} ms...", startWatch.ElapsedMilliseconds);
                 this.m_running = true;
 
             }

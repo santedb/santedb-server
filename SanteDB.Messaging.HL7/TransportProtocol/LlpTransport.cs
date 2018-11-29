@@ -87,11 +87,19 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 
 			while (m_run) // run the service
 			{
-				var client = this.m_listener.AcceptTcpClient();
-				Thread clientThread = new Thread(OnReceiveMessage);
-				clientThread.IsBackground = true;
-                clientThread.Name = "HL7Worker-" + Thread.CurrentThread.Name;
-				clientThread.Start(client);
+                try
+                {
+                    var client = this.m_listener.AcceptTcpClient();
+                    Thread clientThread = new Thread(OnReceiveMessage);
+                    clientThread.IsBackground = true;
+                    clientThread.Name = "HL7Worker-" + Thread.CurrentThread.Name;
+                    clientThread.Start(client);
+                }
+                catch(Exception e)
+                {
+                    if (this.m_run)
+                        this.m_traceSource.TraceError("Error on HL7 worker {0} - {1}", this.m_listener.LocalEndpoint, e);
+                }
 			}
 		}
 

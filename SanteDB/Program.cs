@@ -69,7 +69,7 @@ namespace SanteDB
 
             // Handle Unahndled exception
             AppDomain.CurrentDomain.UnhandledException += (o, e) => {
-                Trace.TraceError("++++++ FATAL APPLICATION ERROR ++++++++", e.ExceptionObject);
+                Trace.TraceError("++++++ FATAL APPLICATION ERROR ++++++++\r\n{0}", e.ExceptionObject);
                 Environment.Exit(999);
             };
 
