@@ -19,7 +19,6 @@
  */
 using SanteDB.Core;
 using SanteDB.Core.Interop;
-using SanteDB.Core.Rest;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.HL7.Configuration;
 using SanteDB.Messaging.HL7.TransportProtocol;

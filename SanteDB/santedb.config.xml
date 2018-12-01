@@ -166,7 +166,7 @@
     </audiences>
   </section>
   <!-- Represents this server's internal security configuration -->
-  <section xsi:type="SecurityConfigurationSection" passwordRegex="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,8}$" allowUnsignedApplets="true">
+  <section xsi:type="SecurityConfigurationSection" passwordRegex="^(?=.*\d){1,}(?=.*[a-z]){1,}(?=.*[A-Z]){1,}(?=.*[^\w\d]){1,}.{6,}$" allowUnsignedApplets="true">
     <!-- Sets the thumbprints of publishers that should be trusted to run code-->
     <trustedPublishers>
       <add>84BD51F0584A1F708D604CF0B8074A68D3BEB973</add>
@@ -351,7 +351,8 @@
       <add type="SanteDB.Core.Services.DefaultJobManagerService, SanteDB.Core, Version=1.9.0.24160, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Services.Impl.ThreadPoolService, SanteDB.Core, Version=1.9.0.24160, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Services.Impl.FileSystemQueueService, SanteDB.Core, Version=1.9.0.31437, Culture=neutral, PublicKeyToken=null" />
-
+      <add type="SanteDB.Core.Rest.RestServiceFactory, SanteDB.Core, Version=1.9.0.31437, Culture=neutral, PublicKeyToken=null"/>
+      <add type="SanteDB.Core.Services.Impl.DefaultNetworkInformationService, SanteDB.Core, Version=1.9.0.31437, Culture=neutral, PublicKeyToken=null"/>
       <!-- Security Services -->
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoApplicationIdentityProvider, SanteDB.Persistence.Data.ADO, Version=1.9.0.31831, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoDeviceIdentityProvider, SanteDB.Persistence.Data.ADO, Version=1.9.0.31831, Culture=neutral, PublicKeyToken=null" />

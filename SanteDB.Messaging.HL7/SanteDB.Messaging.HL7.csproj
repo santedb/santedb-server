@@ -30,16 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MARC.Everest">
-      <HintPath>..\Solution Items\MARC.Everest.dll</HintPath>
-    </Reference>
     <Reference Include="NHapi.Base, Version=2.3.0.0, Culture=neutral, PublicKeyToken=d0d8ea960a3440eb, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Solution Items\NHapi.Base.dll</HintPath>
-    </Reference>
-    <Reference Include="NHapi.Model.V231, Version=2.3.0.0, Culture=neutral, PublicKeyToken=d0d8ea960a3440eb, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Solution Items\NHapi.Model.V231.dll</HintPath>
     </Reference>
     <Reference Include="NHapi.Model.V25, Version=2.3.0.0, Culture=neutral, PublicKeyToken=d0d8ea960a3440eb, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -57,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Client\MllpMessageSender.cs" />
     <Compile Include="Configuration\Hl7ConfigurationSection.cs" />
+    <Compile Include="Configuration\X509ConfigurationElement.cs" />
     <Compile Include="DataConverter.cs" />
     <Compile Include="Hl7Constants.cs" />
     <Compile Include="HL7MessageHandler.cs" />
@@ -81,6 +75,7 @@
     <Compile Include="TransportProtocol\SllpTransport.cs" />
     <Compile Include="TransportProtocol\TcpTransport.cs" />
     <Compile Include="TransportProtocol\TransportUtil.cs" />
+    <Compile Include="Utils\X509CertificateUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ParameterMap.xml" />
@@ -123,6 +118,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
+    <None Include="SanteDB.Messaging.HL7.nuspec" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
@@ -132,10 +128,6 @@
     <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
       <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
       <Name>SanteDB.Core.Model</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
-      <Project>{DB9BC05E-45F1-4F96-A161-F36BDECAF566}</Project>
-      <Name>SanteDB.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

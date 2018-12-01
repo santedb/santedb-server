@@ -22,6 +22,7 @@ using SanteDB.Core.Http.Description;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.Rest.Common.Fault;
 using SharpCompress.Compressors;
 using SharpCompress.Compressors.BZip2;
 using SharpCompress.Compressors.Deflate;
@@ -65,7 +66,7 @@ namespace SanteDB.Core.Http
             if (config.Binding?.Security?.ClientCertificate != null)
             {
                 this.ClientCertificates = new X509Certificate2Collection();
-                var cert = SecurityUtils.FindCertificate(config.Binding.Security.ClientCertificate.FindType,
+                var cert = X509CertificateUtils.FindCertificate(config.Binding.Security.ClientCertificate.FindType,
                               config.Binding.Security.ClientCertificate.StoreLocation,
                               config.Binding.Security.ClientCertificate.StoreName,
                               config.Binding.Security.ClientCertificate.FindValue);
@@ -322,65 +323,49 @@ namespace SanteDB.Core.Http
                         case WebExceptionStatus.ProtocolError:
 
                             // Deserialize
-                            TResult result = default(TResult);
+                            object errorResult = null;
                             var errorResponse = (e.Response as HttpWebResponse);
                             var responseContentType = errorResponse.ContentType;
                             if (responseContentType.Contains(";"))
                                 responseContentType = responseContentType.Substring(0, responseContentType.IndexOf(";"));
+
                             try
                             {
                                 var serializer = this.Description.Binding.ContentTypeMapper.GetSerializer(responseContentType, typeof(TResult));
+
                                 switch (errorResponse.Headers[HttpResponseHeader.ContentEncoding])
                                 {
                                     case "deflate":
                                         using (DeflateStream df = new DeflateStream(errorResponse.GetResponseStream(), CompressionMode.Decompress, leaveOpen: true))
-                                            result = (TResult)serializer.DeSerialize(df);
+                                            errorResult = serializer.DeSerialize(df);
                                         break;
-
                                     case "gzip":
                                         using (GZipStream df = new GZipStream(errorResponse.GetResponseStream(), CompressionMode.Decompress, leaveOpen: true))
-                                            result = (TResult)serializer.DeSerialize(df);
+                                            errorResult = serializer.DeSerialize(df);
                                         break;
                                     case "bzip2":
                                         using (var bzs = new BZip2Stream(errorResponse.GetResponseStream(), CompressionMode.Decompress, leaveOpen: true))
-                                            result = (TResult)serializer.DeSerialize(bzs);
+                                            errorResult = serializer.DeSerialize(bzs);
                                         break;
                                     case "lzma":
                                         using (var lzmas = new LZipStream(errorResponse.GetResponseStream(), CompressionMode.Decompress, leaveOpen: true))
-                                            result = (TResult)serializer.DeSerialize(lzmas);
-
+                                            errorResult = serializer.DeSerialize(lzmas);
                                         break;
                                     default:
-                                        result = (TResult)serializer.DeSerialize(errorResponse.GetResponseStream());
+                                        errorResult = serializer.DeSerialize(errorResponse.GetResponseStream());
                                         break;
                                 }
                             }
-                            catch (Exception dse)
+                            catch
                             {
-                                this.traceSource.TraceEvent(TraceEventType.Error, 0, "Could not de-serialize error response! {0}", dse);
+                                errorResult = new RestServiceFault(e);
                             }
 
-                            switch (errorResponse.StatusCode)
-                            {
-                                case HttpStatusCode.Unauthorized: // Validate the response
-                                    if (this.ValidateResponse(errorResponse) != ServiceClientErrorType.Valid)
-                                        throw new RestClientException<TResult>(
-                                            result,
-                                            e,
-                                            e.Status,
-                                            e.Response);
-
-                                    break;
-
-                                default:
-                                    throw new RestClientException<TResult>(
-                                        result,
-                                        e,
-                                        e.Status,
-                                        e.Response);
-                            }
-                            break;
-
+                            if (errorResult is TResult)
+                                throw new RestClientException<TResult>((TResult)errorResult, e, e.Status, e.Response);
+                            else
+                                throw new RestClientException<RestServiceFault>((RestServiceFault)errorResult, e, e.Status, e.Response);
+                            
                         default:
                             throw;
                     }

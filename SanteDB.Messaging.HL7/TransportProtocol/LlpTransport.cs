@@ -98,7 +98,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
                 catch(Exception e)
                 {
                     if (this.m_run)
-                        this.m_traceSource.TraceError("Error on HL7 worker {0} - {1}", this.m_listener.LocalEndpoint, e);
+                        this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error on HL7 worker {0} - {1}", this.m_listener.LocalEndpoint, e);
                 }
 			}
 		}
@@ -219,7 +219,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 			}
 			catch (Exception e)
 			{
-				this.m_traceSource.TraceError(e.ToString());
+				this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
 			}
 			finally
 			{

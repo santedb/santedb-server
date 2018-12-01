@@ -20,6 +20,7 @@
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Interop;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.FHIR.Backbone;
 using SanteDB.Messaging.FHIR.Handlers;
@@ -68,7 +69,7 @@ namespace SanteDB.Messaging.FHIR.Util
         {
             try
             {
-                
+
                 // No output of any exceptions
                 Assembly entryAssembly = Assembly.GetEntryAssembly();
 
@@ -93,15 +94,15 @@ namespace SanteDB.Messaging.FHIR.Util
                     Status = PublicationStatus.Active,
                     Copyright = entryAssembly.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright
                 };
-                
+
                 // Generate the rest description
                 // TODO: Reflect the current WCF context and get all the types of communication supported
                 s_conformance.Rest.Add(CreateRestDefinition());
                 s_conformance.Text = null;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                s_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error building conformance statement: {0}",  e.Message);
+                s_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error building conformance statement: {0}", e.Message);
                 throw;
             }
         }
@@ -113,22 +114,12 @@ namespace SanteDB.Messaging.FHIR.Util
         {
             // Security settings
             String security = null;
-            var m_masterConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RestConfigurationSection>();
+            //var m_masterConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RestConfigurationSection>();
             //var authorizationPolicy = m_masterConfig.Services.FirstOrDefault(o => o.Name == "FHIR").Behaviors.Select(o => o.GetCustomAttribute<AuthenticationSchemeDescriptionAttribute>()).FirstOrDefault(o => o != null)?.Scheme;
-            //if(authorizationPolicy.HasValue)
-            //    switch(authorizationPolicy.Value)
-            //    {
-            //        case AuthenticationScheme.Basic:
-            //            security = "Basic";
-            //            break;
-            //        case AuthenticationScheme.OAuth:
-            //        case AuthenticationScheme.OAuth2:
-            //            security = "OAuth";
-            //            break;
-            //        case AuthenticationScheme.Custom:
-            //            security = "SMART-on-FHIR";
-            //            break;
-            //    }
+            if (ApplicationServiceContext.Current.GetService<FhirMessageHandler>().Capabilities.HasFlag(ServiceEndpointCapabilities.BasicAuth))
+                security = "Basic";
+            if (ApplicationServiceContext.Current.GetService<FhirMessageHandler>().Capabilities.HasFlag(ServiceEndpointCapabilities.BearerAuth))
+                security = "OAuth";
 
             var retVal = new RestDefinition()
             {
@@ -137,7 +128,7 @@ namespace SanteDB.Messaging.FHIR.Util
                 Security = new SecurityDefinition()
                 {
                     Cors = true,
-                    Service = security == null ? null : new List<DataTypes.FhirCodeableConcept>() {  new DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/restful-security-service"), security) }
+                    Service = security == null ? null : new List<DataTypes.FhirCodeableConcept>() { new DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/restful-security-service"), security) }
                 },
                 Resource = FhirResourceHandlerUtil.GetRestDefinition().ToList()
             };

@@ -18,6 +18,7 @@
  * Date: 2018-6-22
  */
 using SanteDB.Core;
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Security;
@@ -204,7 +205,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 throw new SecurityException("Principal must be authenticated");
             // Password failed validation
             if (ApplicationServiceContext.Current.GetService<IPasswordValidatorService>()?.Validate(newPassword) == false)
-                throw new SecurityException("Password failed validation");
+                throw new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, "err.password", DetectedIssueKeys.SecurityIssue));
 
             try
             {

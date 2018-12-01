@@ -17,6 +17,7 @@
  * User: justin
  * Date: 2018-6-22
  */
+using RestSrvr;
 using SanteDB.Core.Auditing;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
@@ -96,7 +97,7 @@ namespace SanteDB.Core.Security.Audit
 
                     ApplicationServiceContext.Current.GetService<IIdentityProviderService>().Authenticated += (so, se) =>
                     {
-                        AuditUtil.AuditLogin(se.Principal, se.UserName, so as IIdentityProviderService, se.Success);
+                        AuditUtil.AuditLogin(se.Principal, se.UserName, so as IIdentityProviderService, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), se.Success);
                     };
                    
 
@@ -106,21 +107,21 @@ namespace SanteDB.Core.Security.Audit
                         // Audits from the audit repository itself need to be audited however they are not audit data
                         if (svc is IAuditRepositoryService)
                         {
-                            svc.DataUpdated += (so, se) => AuditUtil.AuditDataAction<AuditData>(EventTypeCodes.AuditLogUsed, ActionType.Update, AuditableObjectLifecycle.Amendment, EventIdentifierType.ApplicationActivity, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, null, se.Objects.OfType<AuditData>().ToArray());
-                            svc.DataObsoleted += (so, se) => AuditUtil.AuditDataAction<AuditData>(EventTypeCodes.AuditLogUsed, ActionType.Delete, AuditableObjectLifecycle.Archiving, EventIdentifierType.ApplicationActivity, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, null, se.Objects.OfType<AuditData>().ToArray());
-                            svc.DataDisclosed += (so, se) => AuditUtil.AuditDataAction<AuditData>(EventTypeCodes.AuditLogUsed, ActionType.Execute, AuditableObjectLifecycle.Access, EventIdentifierType.Query, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, se.Query, se.Objects.OfType<AuditData>().ToArray());
+                            svc.DataUpdated += (so, se) => AuditUtil.AuditDataAction<AuditData>(EventTypeCodes.AuditLogUsed, ActionType.Update, AuditableObjectLifecycle.Amendment, EventIdentifierType.ApplicationActivity, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, null, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), se.Objects.OfType<AuditData>().ToArray());
+                            svc.DataObsoleted += (so, se) => AuditUtil.AuditDataAction<AuditData>(EventTypeCodes.AuditLogUsed, ActionType.Delete, AuditableObjectLifecycle.Archiving, EventIdentifierType.ApplicationActivity, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, null, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), se.Objects.OfType<AuditData>().ToArray());
+                            svc.DataDisclosed += (so, se) => AuditUtil.AuditDataAction<AuditData>(EventTypeCodes.AuditLogUsed, ActionType.Execute, AuditableObjectLifecycle.Access, EventIdentifierType.Query, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, se.Query, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), se.Objects.OfType<AuditData>().ToArray());
                         }
                         else {
-                            svc.DataCreated += (so, se) => AuditUtil.AuditDataAction(EventTypeCodes.PatientRecord, ActionType.Create, AuditableObjectLifecycle.Creation, EventIdentifierType.PatientRecord, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, null, se.Objects.OfType<IdentifiedData>().ToArray());
-                            svc.DataUpdated += (so, se) => AuditUtil.AuditDataAction(EventTypeCodes.PatientRecord, ActionType.Update, AuditableObjectLifecycle.Amendment, EventIdentifierType.PatientRecord, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, null, se.Objects.OfType<IdentifiedData>().ToArray());
-                            svc.DataObsoleted += (so, se) => AuditUtil.AuditDataAction(EventTypeCodes.PatientRecord, ActionType.Delete, AuditableObjectLifecycle.LogicalDeletion, EventIdentifierType.PatientRecord, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, null, se.Objects.OfType<IdentifiedData>().ToArray());
-                            svc.DataDisclosed += (so, se) => AuditUtil.AuditDataAction<IdentifiedData>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Query, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, se.Query);
+                            svc.DataCreated += (so, se) => AuditUtil.AuditDataAction(EventTypeCodes.PatientRecord, ActionType.Create, AuditableObjectLifecycle.Creation, EventIdentifierType.PatientRecord, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, null, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), se.Objects.OfType<IdentifiedData>().ToArray());
+                            svc.DataUpdated += (so, se) => AuditUtil.AuditDataAction(EventTypeCodes.PatientRecord, ActionType.Update, AuditableObjectLifecycle.Amendment, EventIdentifierType.PatientRecord, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, null, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), se.Objects.OfType<IdentifiedData>().ToArray());
+                            svc.DataObsoleted += (so, se) => AuditUtil.AuditDataAction(EventTypeCodes.PatientRecord, ActionType.Delete, AuditableObjectLifecycle.LogicalDeletion, EventIdentifierType.PatientRecord, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), null, se.Objects.OfType<IdentifiedData>().ToArray());
+                            svc.DataDisclosed += (so, se) => AuditUtil.AuditDataAction<IdentifiedData>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Query, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, se.Query, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString());
 
                             if (svc is ISecurityAuditEventSource)
                             {
-                                (svc as ISecurityAuditEventSource).SecurityAttributesChanged += (so, se) => AuditUtil.AuditSecurityAttributeAction(se.Objects, se.Success, se.ChangedProperties.ToArray());
-                                (svc as ISecurityAuditEventSource).SecurityResourceCreated += (so, se) => AuditUtil.AuditSecurityCreationAction(se.Objects, se.Success, se.ChangedProperties);
-                                (svc as ISecurityAuditEventSource).SecurityResourceDeleted += (so, se) => AuditUtil.AuditSecurityDeletionAction(se.Objects, se.Success, se.ChangedProperties);
+                                (svc as ISecurityAuditEventSource).SecurityAttributesChanged += (so, se) => AuditUtil.AuditSecurityAttributeAction(se.Objects, se.Success, se.ChangedProperties.ToArray(), RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString());
+                                (svc as ISecurityAuditEventSource).SecurityResourceCreated += (so, se) => AuditUtil.AuditSecurityCreationAction(se.Objects, se.Success, se.ChangedProperties, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString());
+                                (svc as ISecurityAuditEventSource).SecurityResourceDeleted += (so, se) => AuditUtil.AuditSecurityDeletionAction(se.Objects, se.Success, se.ChangedProperties, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString());
                             }
                         }
                     }
@@ -149,7 +150,7 @@ namespace SanteDB.Core.Security.Audit
             if (!this.m_safeToStop)
             {
                 AuditData securityAlertData = new AuditData(DateTime.Now, ActionType.Execute, OutcomeIndicator.EpicFail, EventIdentifierType.SecurityAlert, AuditUtil.CreateAuditActionCode(EventTypeCodes.UseOfARestrictedFunction));
-                AuditUtil.AddDeviceActor(securityAlertData);
+                AuditUtil.AddLocalDeviceActor(securityAlertData);
                 AuditUtil.SendAudit(securityAlertData);
             }
 

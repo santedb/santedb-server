@@ -18,6 +18,7 @@
  * Date: 2018-6-22
  */
 using SanteDB.Core;
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
@@ -172,16 +173,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                             externProv != externProvRef)
                         {
                             this.m_tracer.TraceError("PROVENANCE OF OBJECT DOES NOT MATCH: EXPECTED {0} GOT {1} (OBJECT #{2})", externProvRef, externProv, i);
-
                             // Throw a detected issue exception
-                            throw new DetectedIssueException(new List<DetectedIssue>()
-                            {
-                                new DetectedIssue()
-                                {
-                                    Priority = DetectedIssuePriorityType.Error,
-                                    Text = $"PROVENANCE OF OBJECT DOES NOT MATCH: EXPECTED {externProvRef} GOT {externProv} (OBJECT #{i})"
-                                }
-                           });
+                            throw new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, $"PROVENANCE OF OBJECT DOES NOT MATCH: EXPECTED {externProvRef} GOT {externProv} (OBJECT #{i})", DetectedIssueKeys.SecurityIssue));
                         }
                         this.m_tracer.TraceInformation("Will update {0} object from bundle...", itm);
                         data.Item[i] = svc.Update(context, itm) as IdentifiedData;
@@ -196,16 +189,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                             externProv != externProvRef)
                         {
                             this.m_tracer.TraceError("PROVENANCE OF OBJECT DOES NOT MATCH: EXPECTED {0} GOT {1} (OBJECT #{2})", externProvRef, externProv, i);
-
-                            // Throw a detected issue exception
-                            throw new DetectedIssueException(new List<DetectedIssue>()
-                            {
-                                new DetectedIssue()
-                                {
-                                    Priority = DetectedIssuePriorityType.Error,
-                                    Text = $"PROVENANCE OF OBJECT DOES NOT MATCH: EXPECTED {externProvRef} GOT {externProv} (OBJECT #{i})"
-                                }
-                           });
+                            throw new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, $"PROVENANCE OF OBJECT DOES NOT MATCH: EXPECTED {externProvRef} GOT {externProv} (OBJECT #{i})", DetectedIssueKeys.SecurityIssue));
                         }
 
                         this.m_tracer.TraceInformation("Will insert {0} object from bundle...", itm);

@@ -19,6 +19,7 @@
  */
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Tools.AdminConsole.Attributes;
+using SanteDB.Tools.AdminConsole.Util;
 using System;
 using System.ComponentModel;
 
@@ -83,6 +84,24 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         }
 
         /// <summary>
+        /// Get thread information
+        /// </summary>
+        [AdminCommand("server.threads", "Shows the server thread information")]
+        [Description("This command will show the running threads in the connected IMS instance")]
+        public static void ServiceThreadInformation ()
+        {
+            var diagReport = m_client.GetServerDiagnoticReport();
+            DisplayUtil.TablePrint(diagReport.Threads,
+                new String[] { "Name", "CPU Time", "State", "Task" },
+                new int[] { 32, 10, 10, 32 },
+                o => o.Name,
+                o =>o.CpuTime,
+                o => o.State,
+                o => o.TaskInfo
+            );
+        }
+
+        /// <summary>
         /// Get assembly info from server
         /// </summary>
         [AdminCommand("server.services", "Shows the server service information")]
@@ -91,16 +110,13 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         {
             var diagReport = m_client.GetServerDiagnoticReport().ApplicationInfo;
 
-            // Loaded assemblies
-            Console.WriteLine("Services:\r\nService{0}Status", new String(' ', 35));
-            foreach (var itm in diagReport.ServiceInfo)
-            {
-                string name = itm.Description ?? itm.Type;
-                Console.WriteLine("{0}{1}{2}",
-                    name.Length > 37 ? name.Substring(0, 37) + "..." : name,
-                    name.Length > 37 ? "  " : new string(' ', 42 - name.Length),
-                    itm.IsRunning ? "Running" : "Stopped");
-            }
+            DisplayUtil.TablePrint(diagReport.ServiceInfo,
+                new String[] { "Service", "Classification", "Running" },
+                new int[] { 60, 20, 10 },
+                o => o.Description,
+                o=> o.Class,
+                o => o.IsRunning
+            );
         }
 
     }

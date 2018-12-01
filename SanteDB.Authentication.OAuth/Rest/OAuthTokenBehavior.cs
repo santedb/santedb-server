@@ -208,7 +208,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             // HACK: Find a better way to make claims
             // Claims are stored as X-SanteDBACS-Claim headers
-            foreach (var itm in SanteDBClaimTypes.ExtractClaims(RestOperationContext.Current.IncomingRequest.Headers))
+            foreach (var itm in SanteDBClaimsUtil.ExtractClaims(RestOperationContext.Current.IncomingRequest.Headers))
             {
 
                 // Claim allowed
@@ -218,7 +218,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 else
                 {
                     // Validate the claim
-                    var handler = SanteDBClaimTypes.GetHandler(itm.Type);
+                    var handler = SanteDBClaimsUtil.GetHandler(itm.Type);
                     if (handler == null || handler.Validate(userPrincipal, itm.Value))
                         retVal.Add(itm);
                     else
@@ -295,11 +295,11 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyGrantType.Elevate).Select(o => new Claim(SanteDBClaimTypes.SanteDBScopeClaim, o.Policy.Oid)));
 
                         // Audit override
-                        AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(';'), true);
+                        AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(';'), true, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString());
                     }
                     catch (Exception e)
                     {
-                        AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(';'), false);
+                        AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(';'), false, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString());
                         throw;
                     }
                 }

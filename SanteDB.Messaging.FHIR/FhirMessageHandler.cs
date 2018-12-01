@@ -21,9 +21,6 @@ using SanteDB.Core.Services;
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Interop;
-using SanteDB.Core.Rest;
-using SanteDB.Core.Rest.Behavior;
-using SanteDB.Core.Rest.Security;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.FHIR.Configuration;
 using SanteDB.Messaging.FHIR.Handlers;
@@ -93,7 +90,7 @@ namespace SanteDB.Messaging.FHIR
 
                 this.Starting?.Invoke(this, EventArgs.Empty);
 
-                this.m_webHost = RestServiceTool.CreateService(typeof(FhirServiceBehavior));
+                this.m_webHost = ApplicationServiceContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(FhirServiceBehavior));
                 this.m_webHost.AddServiceBehavior(new FhirErrorEndpointBehavior());
 
                 foreach (var endpoint in this.m_webHost.Endpoints)
@@ -174,7 +171,7 @@ namespace SanteDB.Messaging.FHIR
         {
             get
             {
-                return this.m_webHost.GetCapabilities();
+                return (ServiceEndpointCapabilities)ApplicationServiceContext.Current.GetService<IRestServiceFactory>().GetServiceCapabilities(this.m_webHost);
             }
         }
 

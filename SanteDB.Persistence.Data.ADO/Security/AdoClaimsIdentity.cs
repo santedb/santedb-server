@@ -47,7 +47,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
     /// <summary>
     /// Represents a user prinicpal based on a SecurityUser domain model 
     /// </summary>
-    public class AdoClaimsIdentity : IIdentity, ISession
+    public class AdoClaimsIdentity : ClaimsIdentity, IIdentity, ISession, IClaimsIdentity
     {
         // Trace source
         private static TraceSource s_traceSource = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
@@ -281,6 +281,11 @@ namespace SanteDB.Persistence.Data.ADO.Security
         }
 
         /// <summary>
+        /// Claims
+        /// </summary>
+        IEnumerable<IClaim> IClaimsIdentity.Claims => this.Claims.Select(o => new AdoClaim(o.Type, o.Value));
+
+        /// <summary>
         /// Create an authorization context
         /// </summary>
         public ClaimsPrincipal CreateClaimsPrincipal(IEnumerable<ClaimsIdentity> otherIdentities = null)
@@ -317,7 +322,10 @@ namespace SanteDB.Persistence.Data.ADO.Security
                     claims.Add(new Claim(ClaimTypes.IsPersistent, "true"));
                     claims.Add(new Claim(SanteDBClaimTypes.SanteDBSessionIdClaim, (this.m_session as AdoSecuritySession)?.Key.ToString() ?? BitConverter.ToString(this.SessionToken).Replace("-","")));
                 }
-                var identities = new ClaimsIdentity[] { new ClaimsIdentity(this, claims.AsReadOnly(), AuthenticationTypes.Password, ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType) };
+
+                this.AddClaims(claims);
+
+                var identities = new ClaimsIdentity[] { this };
                 if (otherIdentities != null)
                     identities = identities.Union(otherIdentities).ToArray();
 

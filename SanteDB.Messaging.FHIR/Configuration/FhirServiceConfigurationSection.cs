@@ -18,7 +18,6 @@
  * Date: 2018-11-23
  */
 using SanteDB.Core.Configuration;
-using SanteDB.Core.Rest.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;

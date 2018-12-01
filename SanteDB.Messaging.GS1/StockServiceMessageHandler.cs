@@ -29,6 +29,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using SanteDB.Core;
 
 namespace SanteDB.Messaging.GS1
 {
@@ -104,7 +105,7 @@ namespace SanteDB.Messaging.GS1
         {
             get
             {
-                return this.webHost.GetCapabilities();
+                return (ServiceEndpointCapabilities)ApplicationServiceContext.Current.GetService<IRestServiceFactory>().GetServiceCapabilities(this.webHost);
 
             }
         }
@@ -122,7 +123,7 @@ namespace SanteDB.Messaging.GS1
 			{
 				this.Starting?.Invoke(this, EventArgs.Empty);
 
-				this.webHost = RestServiceTool.CreateService(typeof(StockServiceBehavior));
+				this.webHost = ApplicationServiceContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(StockServiceBehavior));
                 this.webHost.AddServiceBehavior(new ErrorServiceBehavior());
 				foreach (ServiceEndpoint endpoint in this.webHost.Endpoints)
 				{

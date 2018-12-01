@@ -79,7 +79,7 @@ namespace SanteDB.Tools.DataSandbox
 
                 this.m_traceSource.TraceInformation("Starting Query Builder Service...");
                 
-                this.m_webHost = RestServiceTool.CreateService(typeof(DataSandboxTool));
+                this.m_webHost = ApplicationServiceContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(DataSandboxTool));
                 this.m_webHost.Start();
                 this.Started?.Invoke(this, EventArgs.Empty);
             };

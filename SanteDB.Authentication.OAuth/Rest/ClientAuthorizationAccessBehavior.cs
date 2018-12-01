@@ -22,6 +22,7 @@ using RestSrvr.Message;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 using System.Diagnostics;

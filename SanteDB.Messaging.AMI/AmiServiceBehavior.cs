@@ -17,6 +17,7 @@
  * User: justin
  * Date: 2018-11-23
  */
+using Microsoft.Diagnostics.Runtime;
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Exceptions;
@@ -174,14 +175,17 @@ namespace SanteDB.Messaging.AMI.Wcf
             retVal.ApplicationInfo = new DiagnosticApplicationInfo(Assembly.GetEntryAssembly());
             retVal.CreatedByKey = Guid.Parse(AuthenticationContext.SystemUserSid);
             retVal.Threads = new List<DiagnosticThreadInfo>();
+
             foreach (ProcessThread thd in Process.GetCurrentProcess().Threads)
                 retVal.Threads.Add(new DiagnosticThreadInfo()
                 {
                     Name = thd.Id.ToString(),
                     CpuTime = thd.UserProcessorTime,
                     WaitReason = null,
-                    State = thd.ThreadState.ToString()
+                    State = thd.ThreadState.ToString(),
+                    TaskInfo = thd.ThreadState == ThreadState.Wait ? thd.WaitReason.ToString() : "N/A"
                 });
+
             retVal.ApplicationInfo.Assemblies = AppDomain.CurrentDomain.GetAssemblies().Select(o => new DiagnosticVersionInfo(o)).ToList();
             retVal.ApplicationInfo.EnvironmentInfo = new DiagnosticEnvironmentInfo()
             {
@@ -191,7 +195,7 @@ namespace SanteDB.Messaging.AMI.Wcf
                 UsedMemory = GC.GetTotalMemory(false),
                 Version = Environment.Version.ToString(),
             };
-            retVal.ApplicationInfo.ServiceInfo = (ApplicationServiceContext.Current as IServiceManager).GetServices().OfType<IDaemonService>().Select(o => new DiagnosticServiceInfo(o)).ToList();
+            retVal.ApplicationInfo.ServiceInfo = (ApplicationServiceContext.Current as IServiceManager).GetServices().Distinct().Select(o => new DiagnosticServiceInfo(o)).ToList();
             return retVal;
         }
 
@@ -319,7 +323,7 @@ namespace SanteDB.Messaging.AMI.Wcf
         {
             return base.ResourceOptions(resourceType);
         }
-         
+
         /// <summary>
         /// Performs a search of the specified AMI resource
         /// </summary>

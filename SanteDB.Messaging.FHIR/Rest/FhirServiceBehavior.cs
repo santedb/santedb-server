@@ -186,7 +186,7 @@ namespace SanteDB.Messaging.FHIR.Rest
                 else if (result.Outcome != ResultCode.Accepted)
                     throw new DataException("Update failed");
 
-                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Import, ActionType.Update, AuditableObjectLifecycle.Amendment, EventIdentifierType.Import, OutcomeIndicator.Success, id, result.Results.ToArray());
+                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Import, ActionType.Update, AuditableObjectLifecycle.Amendment, EventIdentifierType.Import, OutcomeIndicator.Success, id, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
 
                 String baseUri = RestOperationContext.Current.IncomingRequest.Url.AbsoluteUri;
                 RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Location", String.Format("{0}{1}/{2}/_history/{3}", baseUri, resourceType, result.Results[0].Id, result.Results[0].VersionId));
@@ -232,7 +232,7 @@ namespace SanteDB.Messaging.FHIR.Rest
                 else if (result.Outcome != ResultCode.Accepted)
                     throw new DataException("Delete failed");
 
-                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Import, ActionType.Delete, AuditableObjectLifecycle.LogicalDeletion, EventIdentifierType.Import, OutcomeIndicator.Success, id, result.Results.ToArray());
+                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Import, ActionType.Delete, AuditableObjectLifecycle.LogicalDeletion, EventIdentifierType.Import, OutcomeIndicator.Success, id, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
 
 
                 return null;
@@ -240,7 +240,7 @@ namespace SanteDB.Messaging.FHIR.Rest
             }
             catch (Exception e)
             {
-                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Import, ActionType.Delete, AuditableObjectLifecycle.LogicalDeletion, EventIdentifierType.Import, OutcomeIndicator.EpicFail, id, result.Results.ToArray());
+                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Import, ActionType.Delete, AuditableObjectLifecycle.LogicalDeletion, EventIdentifierType.Import, OutcomeIndicator.EpicFail, id, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
 
                 throw;
             }
@@ -277,7 +277,7 @@ namespace SanteDB.Messaging.FHIR.Rest
                 else if (result.Outcome != ResultCode.Accepted)
                     throw new DataException("Create failed");
 
-                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Import, ActionType.Create, AuditableObjectLifecycle.Creation, EventIdentifierType.Import, OutcomeIndicator.Success, null, result.Results.ToArray());
+                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Import, ActionType.Create, AuditableObjectLifecycle.Creation, EventIdentifierType.Import, OutcomeIndicator.Success, null, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
 
                 String baseUri = RestOperationContext.Current.IncomingRequest.Url.AbsoluteUri;
                 RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Location", String.Format("{0}{1}/{2}/_history/{3}", baseUri, resourceType, result.Results[0].Id, result.Results[0].VersionId));
@@ -290,7 +290,7 @@ namespace SanteDB.Messaging.FHIR.Rest
             }
             catch (Exception e)
             {
-                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Import, ActionType.Create, AuditableObjectLifecycle.Creation, EventIdentifierType.Import, OutcomeIndicator.EpicFail, null, result.Results.ToArray());
+                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Import, ActionType.Create, AuditableObjectLifecycle.Creation, EventIdentifierType.Import, OutcomeIndicator.EpicFail, null, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
 
                 throw;
             }
@@ -373,14 +373,14 @@ namespace SanteDB.Messaging.FHIR.Rest
                 else if (result.Outcome != ResultCode.Accepted)
                     throw new DataException("Query failed");
 
-                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Export, OutcomeIndicator.Success, RestOperationContext.Current.IncomingRequest.Url.Query, result.Results.ToArray());
+                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Export, OutcomeIndicator.Success, RestOperationContext.Current.IncomingRequest.Url.Query, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
                 // Create the Atom feed
                 return MessageUtil.CreateBundle(result);
 
             }
             catch (Exception e)
             {
-                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Export, OutcomeIndicator.EpicFail, RestOperationContext.Current.IncomingRequest.Url.Query, result.Results.ToArray());
+                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Export, OutcomeIndicator.EpicFail, RestOperationContext.Current.IncomingRequest.Url.Query, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
 
                 throw;
             }
@@ -488,7 +488,7 @@ namespace SanteDB.Messaging.FHIR.Rest
                 else if (result.Outcome != ResultCode.Accepted)
                     throw new DataException("Read failed");
 
-                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Export, OutcomeIndicator.Success, $"_id={id}&_versionId={vid}", result.Results.ToArray());
+                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Export, OutcomeIndicator.Success, $"_id={id}&_versionId={vid}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
 
                 // Create the result
                 if (result.Results != null && result.Results.Count > 0 )
@@ -502,7 +502,7 @@ namespace SanteDB.Messaging.FHIR.Rest
             }
             catch (Exception e)
             {
-                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Export, OutcomeIndicator.EpicFail, $"_id={id}&_versionId={vid}", result.Results.ToArray());
+                AuditUtil.AuditDataAction<DomainResourceBase>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Export, OutcomeIndicator.EpicFail, $"_id={id}&_versionId={vid}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
 
                 throw;
             }

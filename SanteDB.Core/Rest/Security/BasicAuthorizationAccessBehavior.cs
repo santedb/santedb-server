@@ -83,14 +83,14 @@ namespace SanteDB.Core.Rest.Security
                 if (principal is ClaimsPrincipal)
                     claims.AddRange((principal as ClaimsPrincipal).Claims);
 
-                var clientClaims = SanteDBClaimTypes.ExtractClaims(httpRequest.Headers);
+                var clientClaims = SanteDBClaimsUtil.ExtractClaims(httpRequest.Headers);
                 foreach (var claim in clientClaims)
                 {
                     if (this.m_configuration?.AllowedClientClaims?.Contains(claim.Type) == false)
                         throw new SecurityException("Claim not allowed");
                     else
                     {
-                        var handler = SanteDBClaimTypes.GetHandler(claim.Type);
+                        var handler = SanteDBClaimsUtil.GetHandler(claim.Type);
                         if (handler == null ||
                             handler.Validate(principal, claim.Value))
                             claims.Add(claim);

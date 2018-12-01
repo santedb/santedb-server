@@ -100,6 +100,10 @@
       <Project>{f1a82a4f-4a57-47d7-ae76-444c8a4ff54a}</Project>
       <Name>SanteDB.Core.Model</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
+      <Project>{786BD0EE-1806-4158-BA45-80249AC6DFE7}</Project>
+      <Name>SanteDB.Rest.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
       <Name>SanteDB.Core</Name>
@@ -107,10 +111,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="SanteDB.Messaging.AMI.Client">
-      <Version>1.9.14</Version>
+      <Version>1.9.15</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.Messaging.HDSI.Client">
-      <Version>1.9.14</Version>
+      <Version>1.9.15</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

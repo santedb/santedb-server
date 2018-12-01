@@ -15,23 +15,21 @@
     <copyright>Copyright (C) 2018, Mohawk College of Applied Arts and Technology</copyright>
     <tags>cdr santedb server</tags>
     <dependencies>
-      <dependency id="AtnaApi" version="1.9.0.0" />
-      <dependency id="MARC.HI.EHRS.SVC.Core" version="2.0.0.0" />
-      <dependency id="SanteDB.Core.Api" version="1.2.0.0" />
-      <dependency id="SanteDB.Core.Model" version="1.0.0.0" />
-      <dependency id="SanteDB.OrmLite" version="1.0.0.0"/>
+      <dependency id="AtnaApi" version="1.1.0.0" />
+      <dependency id="SanteDB.Core.Api" version="1.9.14.0" />
+      <dependency id="SanteDB.Core.Model" version="1.9.14.0" />
+      <dependency id="SanteDB.OrmLite" version="1.9.14.0"/>
+      <dependency id="SanteDB.Rest.Common" version="1.9.14.0"/>
     </dependencies>
     <references>
       <group targetFramework="net45">
         <reference file="SanteDB.Core.dll"/>
         <reference file="MARC.Everest.dll"/>
-        <reference file="SanteDB.Messaging.Common.dll"/>
       </group>
     </references>
   </metadata>
   <files>
     <file src="..\Solution Items\MARC.Everest.dll" target="lib\net45"/>
-    <file src="..\bin\Release\SanteDB.Messaging.Common.dll" target="lib\net45"/>
     <file src="..\Solution Items\plugin.xml" target="content"/>
   </files>
 </package>

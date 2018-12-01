@@ -55,7 +55,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 			}
 			catch (Exception e)
 			{
-                new TraceSource(Hl7Constants.TraceSourceName).TraceError(e.ToString());
+                new TraceSource(Hl7Constants.TraceSourceName).TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
 			}
 		}
 

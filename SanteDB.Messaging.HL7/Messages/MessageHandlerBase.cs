@@ -289,12 +289,12 @@ namespace SanteDB.Messaging.HL7.Messages
             else if (error is PolicyViolationException || error is SecurityException)
             {
                 retVal = this.CreateACK(nackType, request, "AR", "Security Error");
-                AuditUtil.AuditRestrictedFunction(error, receiveData.ReceiveEndpoint);
+                AuditUtil.AuditRestrictedFunction(error, receiveData.ReceiveEndpoint, receiveData.SolicitorEndpoint.ToString());
             }
             else if (error is AuthenticationException || error is UnauthorizedAccessException)
             {
                 retVal = this.CreateACK(nackType, request, "AR", "Unauthorized");
-                AuditUtil.AuditRestrictedFunction(error as AuthenticationException, receiveData.ReceiveEndpoint);
+                AuditUtil.AuditRestrictedFunction(error as AuthenticationException, receiveData.ReceiveEndpoint, receiveData.SolicitorEndpoint.ToString());
             }
             else if (error is Newtonsoft.Json.JsonException ||
                 error is System.Xml.XmlException)
@@ -326,7 +326,7 @@ namespace SanteDB.Messaging.HL7.Messages
                 {
                     var err = retVal.GetStructure("ERR", erc++) as ERR;
                     err.HL7ErrorCode.Identifier.Value = "207";
-                    err.Severity.Value = itm.Priority == Core.Services.DetectedIssuePriorityType.Error ? "E" : itm.Priority == Core.Services.DetectedIssuePriorityType.Warning ? "W" : "I";
+                    err.Severity.Value = itm.Priority == Core.BusinessRules.DetectedIssuePriorityType.Error ? "E" : itm.Priority == Core.BusinessRules.DetectedIssuePriorityType.Warning ? "W" : "I";
                     err.GetErrorCodeAndLocation(err.ErrorCodeAndLocationRepetitionsUsed).CodeIdentifyingError.Text.Value = itm.Text;
                 }
             }

@@ -62,6 +62,10 @@
     <Folder Include="Jobs\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
+      <Project>{16EF1840-0361-439D-806C-92D0411122EB}</Project>
+      <Name>RestSrvr</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
       <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
       <Name>SanteDB.Core.Api</Name>

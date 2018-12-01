@@ -17,7 +17,6 @@
  * User: justin
  * Date: 2018-9-25
  */
-using MARC.Everest.Connectors;
 using NHapi.Base.Model;
 using NHapi.Base.Parser;
 using NHapi.Model.V25.Datatype;
@@ -383,12 +382,7 @@ namespace SanteDB.Messaging.HL7
             if (timestamp.Time.Value == null)
                 return result;
 
-            object dateTime = null;
-            if (Util.TryFromWireFormat(timestamp.Time.Value, typeof(MARC.Everest.DataTypes.TS), out dateTime))
-                result = ((MARC.Everest.DataTypes.TS)dateTime).DateValue;
-            else
-                throw new InvalidOperationException($"Timestamp {timestamp.Time.Value} is not in a recognizable format");
-            return result;
+            return timestamp.Time.GetAsDate();
         }
 
         /// <summary>

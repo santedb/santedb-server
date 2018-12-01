@@ -29,6 +29,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using SanteDB.Core;
 
 namespace SanteDB.Messaging.RISI
 {
@@ -91,7 +92,7 @@ namespace SanteDB.Messaging.RISI
 		{
 			get
 			{
-                return this.webHost.GetCapabilities();
+                return (ServiceEndpointCapabilities)ApplicationServiceContext.Current.GetService<IRestServiceFactory>().GetServiceCapabilities(this.webHost);
 			}
 		}
 
@@ -126,7 +127,7 @@ namespace SanteDB.Messaging.RISI
 			{
 				this.Starting?.Invoke(this, EventArgs.Empty);
 
-				this.webHost = RestServiceTool.CreateService(typeof(RisiBehavior));
+				this.webHost = ApplicationServiceContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(RisiBehavior));
                 this.webHost.AddServiceBehavior(new ErrorServiceBehavior());
 				foreach (var endpoint in this.webHost.Endpoints)
 				{

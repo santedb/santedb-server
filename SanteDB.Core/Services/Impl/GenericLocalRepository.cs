@@ -17,6 +17,7 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Collection;

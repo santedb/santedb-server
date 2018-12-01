@@ -34,15 +34,15 @@ namespace SanteDB.Core.Rest
     /// <summary>
     /// Rest service tool to create rest services
     /// </summary>
-    public static class RestServiceTool
+    public class RestServiceFactory : IRestServiceFactory
     {
         // Master configuration
-        private static RestConfigurationSection s_config = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RestConfigurationSection>();
+        private RestConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RestConfigurationSection>();
 
         /// <summary>
         /// Get capabilities
         /// </summary>
-        public static ServiceEndpointCapabilities GetCapabilities(this RestService me)
+        public int GetServiceCapabilities(RestService me)
         {
             var retVal = ServiceEndpointCapabilities.None;
             // Any of the capabilities are for security?
@@ -56,18 +56,18 @@ namespace SanteDB.Core.Rest
                 retVal |= ServiceEndpointCapabilities.Cors;
             if (me.Endpoints.Any(e => e.Behaviors.OfType<MessageDispatchFormatterBehavior>().Any()))
                 retVal |= ServiceEndpointCapabilities.ViewModel;
-            return retVal;
+            return (int)retVal;
 
         }
 
         /// <summary>
         /// Create the rest service
         /// </summary>
-        public static RestService CreateService(Type serviceType)
+        public RestService CreateService(Type serviceType)
         {
             // Get the configuration
             var sname = serviceType.GetCustomAttribute<ServiceBehaviorAttribute>()?.Name ?? serviceType.FullName;
-            var config = s_config.Services.FirstOrDefault(o => o.Name == sname);
+            var config = m_configuration.Services.FirstOrDefault(o => o.Name == sname);
             if (config == null)
                 throw new InvalidOperationException($"Cannot find configuration for {sname}");
             var retVal = new RestService(serviceType);

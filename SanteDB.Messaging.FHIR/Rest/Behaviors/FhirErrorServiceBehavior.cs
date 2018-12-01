@@ -21,6 +21,7 @@ using RestSrvr;
 using RestSrvr.Exceptions;
 using RestSrvr.Message;
 using SanteDB.Core;
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Security;
@@ -46,7 +47,6 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
     {
 
         private TraceSource m_tracer = new TraceSource("SanteDB.Messaging.FHIR");
-        private ClaimsAuthorizationConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<ClaimsAuthorizationConfigurationSection>();
 
         /// <summary>
         /// Apply the service behavior
@@ -94,7 +94,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
             else if (error is SecurityTokenException )
             {
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
-                RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", $"Bearer realm=\"{this.m_configuration.Realm}\"");
+                RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", $"Bearer");
             }
             else if (error is FaultException)
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)(error as FaultException).StatusCode;

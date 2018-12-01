@@ -18,7 +18,9 @@
  * Date: 2018-10-24
  */
 using MohawkCollege.Util.Console.Parameters;
+using SanteDB.Core.Http;
 using SanteDB.Core.Security;
+using SanteDB.Rest.Common.Fault;
 using SanteDB.Tools.AdminConsole.Attributes;
 using System;
 using System.Collections.Generic;
@@ -90,6 +92,14 @@ namespace SanteDB.Tools.AdminConsole.Shell
             while (i != null)
             {
                 Console.WriteLine("\t{0}:{1}", l++, i.Message);
+
+                var svcFault = i as RestClientException<RestServiceFault>;
+                if (svcFault != null)
+                {
+                    Console.WriteLine("\t\tREMOTE: {0}", svcFault.Result.Message);
+                    foreach (var itm in svcFault.Result.Rules ?? new List<Core.BusinessRules.DetectedIssue>())
+                        Console.WriteLine("\t\tREMOTE: RULE: {0} {1}", itm.Priority.ToString(), itm.Text);
+                }
                 i = i.InnerException;
             }
         }

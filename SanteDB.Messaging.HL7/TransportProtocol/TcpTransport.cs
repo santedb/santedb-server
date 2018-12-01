@@ -176,7 +176,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 			}
 			catch (Exception e)
 			{
-				this.m_traceSource.TraceError(e.ToString());
+				this.m_traceSource.TraceEvent(TraceEventType.Error, 0, e.ToString());
 				// TODO: NACK
 			}
 			finally

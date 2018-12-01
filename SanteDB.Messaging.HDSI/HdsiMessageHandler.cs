@@ -120,7 +120,7 @@ namespace SanteDB.Messaging.HDSI
         {
             get
             {
-                return this.m_webHost.GetCapabilities();
+                return (ServiceEndpointCapabilities)ApplicationServiceContext.Current.GetService<IRestServiceFactory>().GetServiceCapabilities(this.m_webHost);
             }
         }
 
@@ -147,7 +147,7 @@ namespace SanteDB.Messaging.HDSI
                         .ToList()
                         );
 
-                this.m_webHost = RestServiceTool.CreateService(typeof(HdsiServiceBehavior));
+                this.m_webHost = ApplicationContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(HdsiServiceBehavior));
                 this.m_webHost.AddServiceBehavior(new ErrorServiceBehavior());
 
                 // Add service behaviors

@@ -20,6 +20,7 @@
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 using System.Globalization;

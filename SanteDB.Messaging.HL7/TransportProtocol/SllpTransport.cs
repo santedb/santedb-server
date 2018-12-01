@@ -144,14 +144,14 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 			}
 			else
 			{
-				this.m_traceSource.TraceWarning("Didn't get a chain, so I'm making my own");
+				this.m_traceSource.TraceEvent(System.Diagnostics.TraceEventType.Warning, 0, "Didn't get a chain, so I'm making my own");
 				chain = new X509Chain(true);
 				X509Certificate2 cert2 = new X509Certificate2(certificate.GetRawCertData());
 				chain.Build(cert2);
 			}
 			if (sslPolicyErrors != SslPolicyErrors.None)
 			{
-				this.m_traceSource.TraceError("SSL Policy Error : {0}", sslPolicyErrors);
+				this.m_traceSource.TraceEvent(System.Diagnostics.TraceEventType.Error, 0, "SSL Policy Error : {0}", sslPolicyErrors);
 			}
 
 #endif
@@ -167,9 +167,9 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 						isValid = true;
 				}
 				if (!isValid)
-					this.m_traceSource.TraceError("Certification authority from the supplied certificate doesn't match the expected thumbprint of the CA");
+					this.m_traceSource.TraceEvent(System.Diagnostics.TraceEventType.Error, 0, "Certification authority from the supplied certificate doesn't match the expected thumbprint of the CA");
 				foreach (var stat in chain.ChainStatus)
-					this.m_traceSource.TraceWarning("Certificate chain validation error: {0}", stat.StatusInformation);
+					this.m_traceSource.TraceEvent(System.Diagnostics.TraceEventType.Warning, 0, "Certificate chain validation error: {0}", stat.StatusInformation);
 				//isValid &= chain.ChainStatus.Length == 0;
 				return isValid;
 			}
@@ -213,7 +213,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 
 					if (llpByte != START_TX) // first byte must be HT
 					{
-						this.m_traceSource.TraceWarning("Invalid LLP First Byte expected 0x{0:x} got 0x{1:x} from {2}", START_TX, llpByte, remoteEndpoint);
+						this.m_traceSource.TraceEvent(System.Diagnostics.TraceEventType.Warning, 0, "Invalid LLP First Byte expected 0x{0:x} got 0x{1:x} from {2}", START_TX, llpByte, remoteEndpoint);
 						break;
 					}
 					//                        throw new InvalidOperationException("Invalid LLP First Byte");
@@ -326,13 +326,13 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 					}
 				};
 
-                ApplicationContext.Current.GetService<IAuditRepositoryService>()?.Insert(ad);
-                ApplicationContext.Current.GetService<IAuditDispatchService>()?.SendAudit(ad);
-				this.m_traceSource.TraceError(e.ToString());
+                ApplicationServiceContext.Current.GetService<IAuditRepositoryService>()?.Insert(ad);
+                ApplicationServiceContext.Current.GetService<IAuditDispatchService>()?.SendAudit(ad);
+				this.m_traceSource.TraceEvent(System.Diagnostics.TraceEventType.Error, e.HResult, e.ToString());
 			}
 			catch (Exception e)
 			{
-				this.m_traceSource.TraceError(e.ToString());
+				this.m_traceSource.TraceEvent(System.Diagnostics.TraceEventType.Error, e.HResult, e.ToString());
 				// TODO: NACK
 			}
 			finally
