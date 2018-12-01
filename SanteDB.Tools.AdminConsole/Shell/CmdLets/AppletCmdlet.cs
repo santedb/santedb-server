@@ -21,9 +21,11 @@ using MohawkCollege.Util.Console.Parameters;
 using SanteDB.Core.Model.AMI.Applet;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Tools.AdminConsole.Attributes;
+using SanteDB.Tools.AdminConsole.Util;
 using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 
 namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
@@ -51,49 +53,50 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         }
 
         // Ami client
-        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationServiceContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
+        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
 
+        static AppletCmdlet()
+        {
+            m_client.Client.ProgressChanged += (o, e) =>
+            {
+                Console.CursorLeft = 1;
+                Console.Write("{0:%}", e.Progress);
+            };
+        }
         /// <summary>
         /// List applets
         /// </summary>
-        [AdminCommand("lsapp", "Lists all applets installed on the server")]
+        [AdminCommand("applet.list", "Lists all applets installed on the server")]
         public static void ListApplets()
         {
             var applets = m_client.GetApplets();
-            Console.WriteLine("ID{0}Name{1}Ver", new String(' ', 23), new String(' ', 36), new String(' ', 21));
-            foreach(var itm in applets.CollectionItem.OfType<AppletManifestInfo>())
-            {
-                var name = itm.AppletInfo.GetName("en", true);
-                Console.WriteLine("{0}{1}{2}{3}{4}",
-                    itm.AppletInfo.Id,
-                    new String(' ', 25 - itm.AppletInfo.Id.Length),
-                    name.Length > 38 ? name.Substring(0, 38) : name,
-                    new String(' ', name.Length > 38 ? 2 : 40 - name.Length),
-                    itm.AppletInfo.Version);
-            }
+            DisplayUtil.TablePrint(applets.CollectionItem.OfType<AppletManifestInfo>(),
+                new String[] { "ID", "Name", "Version", "Publisher", "S" },
+                new int[] { 25, 25, 10, 58, 2 },
+                o => o.AppletInfo.Id,
+                o => o.AppletInfo.Names.FirstOrDefault().Value,
+                o => o.AppletInfo.Version,
+                o => o.AppletInfo.Author,
+                o => o.PublisherData != null ? "*" : null
+            );
+
         }
 
         /// <summary>
         /// Get a specific applet information
         /// </summary>
-        [AdminCommand("appinfo", "Get applet information")]
+        [AdminCommand("applet.download", "Download the applet")]
         public static void GetApplet(AppletParameter parms)
         {
-
             foreach (var itm in parms.AppletId)
             {
-                var applet = m_client.GetApplet(itm);
-
-                Console.WriteLine("====== <START {0}>\r\nKey Token: {1}\r\nName: {2}\r\nAuthor: {3}\r\nVersion: {4}\r\nHash: {6}\r\nDependencies:",
-                    applet.AppletInfo.Id, applet.AppletInfo.PublicKeyToken, applet.AppletInfo.GetName("en", true), applet.AppletInfo.Author, applet.AppletInfo.Version, BitConverter.ToString(applet.AppletInfo.Signature).Replace("-",""), BitConverter.ToString(applet.AppletInfo.Hash).Replace("-",""));
-                foreach (var i in applet.AppletInfo.Dependencies)
-                    Console.WriteLine("\t- {0} (>= {1})", i.Id, i.Version);
-
-                if(applet.PublisherData != null)
-                {
-                    Console.WriteLine("Signature:\r\n\tIssued By: {0}\r\n\tIssued To: {1}\r\n\tNot Before: {2}\r\n\tExpiration: {3}", applet.PublisherData.Issuer, applet.PublisherData.Subject, applet.PublisherData.NotBefore, applet.PublisherData.NotAfter);
-                }
-                Console.WriteLine("====== <END {0}>", applet.AppletInfo.Id);
+                Console.Write("(    )   Downloading {0} > {0}.pak", itm);
+                using (var rmtstream = m_client.DownloadApplet(itm))
+                using (var stream = File.Create(itm + ".pak"))
+                    rmtstream.CopyTo(stream);
+                Console.CursorLeft = 1;
+                Console.Write("100%");
+                Console.WriteLine();
             }
 
 

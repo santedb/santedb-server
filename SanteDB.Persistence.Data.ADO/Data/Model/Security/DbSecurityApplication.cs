@@ -58,6 +58,24 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// </summary>
         [Column("rplc_app_id")]
         public Guid? ReplacesApplicationKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the lockout
+        /// </summary>
+        [Column("locked")]
+        public DateTimeOffset? Lockout { get; set; }
+
+        /// <summary>
+        /// Gets or sets the lockout
+        /// </summary>
+        [Column("fail_auth")]
+        public int? InvalidAuthAttempts { get; set; }
+
+        /// <summary>
+        /// Gets the last authenticated time
+        /// </summary>
+        [Column("last_auth_utc")]
+        public DateTimeOffset? LastAuthentication { get; set; }
     }
 }
 

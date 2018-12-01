@@ -19,11 +19,13 @@
  */
 using MohawkCollege.Util.Console.Parameters;
 using SanteDB.Core.Model.AMI.Auth;
+using SanteDB.Core.Model.AMI.Collections;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Tools.AdminConsole.Attributes;
+using SanteDB.Tools.AdminConsole.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -55,7 +57,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         }
 
         // Ami client
-        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationServiceContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
+        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
 
 
         #region Add Role
@@ -93,17 +95,17 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// Add a role
         /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateRoles)]
-        [AdminCommand("roleadd", "Adds a role to the current SanteDB instance")]
+        [AdminCommand("role.add", "Adds a role to the current SanteDB instance")]
         internal static void AddRole(AddRoleParms parms)
         {
             var policies = new List<SecurityPolicyInfo>();
 
             if (parms.GrantPolicies?.Count > 0)
-                policies = parms.GrantPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Name == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o)).ToList();
+                policies = parms.GrantPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o)).ToList();
             if (parms.DenyPolicies?.Count > 0)
-                policies = policies.Union(parms.DenyPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Name == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o))).ToList();
+                policies = policies.Union(parms.DenyPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o))).ToList();
 
-            policies.ForEach(o => o.Grant = parms.GrantPolicies?.Contains(o.Name) == true ? Core.Model.Security.PolicyGrantType.Grant : PolicyGrantType.Deny);
+            policies.ForEach(o => o.Grant = parms.GrantPolicies?.Contains(o.Oid) == true ? Core.Model.Security.PolicyGrantType.Grant : PolicyGrantType.Deny);
 
             m_client.CreateRole(new Core.Model.AMI.Auth.SecurityRoleInfo()
             {
@@ -117,6 +119,71 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
 
         }
 
+
+        /// <summary>
+        /// User list parameters
+        /// </summary>
+        internal class RoleListParams
+        {
+
+            /// <summary>
+            /// Locked
+            /// </summary>
+            [Description("Include non-active roles")]
+            [Parameter("a")]
+            public bool Active { get; set; }
+
+
+        }
+
+
+        [AdminCommand("role.list", "List Security Roles")]
+        [Description("This command will list all security roles in the SanteDB instance")]
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
+        internal static void ListRoles(RoleListParams parms)
+        {
+            AmiCollection list = null;
+            int tr = 0;
+            if (parms.Active)
+                list = m_client.Query<SecurityRole>(o => o.ObsoletionTime != null, 0, 100, out tr);
+            else
+                list = m_client.Query<SecurityRole>(o => o.ObsoletionTime == null, 0, 100, out tr);
+
+            DisplayUtil.TablePrint(list.CollectionItem.OfType<SecurityRoleInfo>(),
+                new String[] { "SID", "Name", "Description", "A" },
+                new int[] { 38, 20, 48, 2 },
+                o => o.Entity.Key,
+                o => o.Entity.Name,
+                o => o.Entity.Description,
+                o => !o.Entity.ObsoletionTime.HasValue ? "*" : null);
+        }
+
+        /// <summary>
+        /// User information
+        /// </summary>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterRoles)]
+        [AdminCommand("role.info", "Displays detailed information about the role")]
+        [Description("This command will display detailed information about the specified security role")]
+        internal static void RoleInfo(GenericRoleParms parms)
+        {
+
+            if (parms.RoleName == null)
+                throw new InvalidOperationException("Must specify a role");
+
+            var role = m_client.GetRoles(o => o.Name == parms.RoleName).CollectionItem.FirstOrDefault() as SecurityRoleInfo;
+            if (role == null)
+                throw new KeyNotFoundException($"Role {parms.RoleName} not found");
+
+            DisplayUtil.PrintPolicies(role,
+                new string[] { "Name", "SID", "Description", "Created", "Updated", "De-Activated" },
+                u => u.Name,
+                u => u.Key,
+                u => u.Description,
+                u => String.Format("{0} ({1})", u.CreationTimeXml, m_client.GetUser(m_client.GetProvenance(u.CreatedByKey.Value).UserKey.Value).Entity.UserName),
+                u => String.Format("{0} ({1})", u.UpdatedTimeXml, m_client.GetUser(m_client.GetProvenance(u.UpdatedByKey.Value).UserKey.Value).Entity.UserName),
+                u => String.Format("{0} ({1})", u.ObsoletionTimeXml, m_client.GetUser(m_client.GetProvenance(u.ObsoletedByKey.Value).UserKey.Value).Entity.UserName)
+            );
+        }
         #endregion
 
 

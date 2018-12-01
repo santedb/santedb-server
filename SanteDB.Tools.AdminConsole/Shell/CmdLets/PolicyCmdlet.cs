@@ -21,6 +21,7 @@ using MohawkCollege.Util.Console.Parameters;
 using SanteDB.Core.Model.Security;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Tools.AdminConsole.Attributes;
+using SanteDB.Tools.AdminConsole.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -35,7 +36,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
     public static class PolicyCmdlet
     {
 
-        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationServiceContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
+        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
 
         /// <summary>
         /// List policy parameters
@@ -62,7 +63,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// List all policies
         /// </summary>
-        [AdminCommand("pollist", "List security policies")]
+        [AdminCommand("policy.list", "List security policies")]
         [Description("Lists all security policies configured on the server")]
         internal static void ListPolicies(ListPolicyParms parms)
         {
@@ -77,16 +78,13 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
                 policies = m_client.GetPolicies(o => o.Name != null).CollectionItem.OfType<SecurityPolicy>();
 
             // Now output
-            Console.WriteLine("SID{0}Name{1}Oid", new String(' ', 37), new String(' ', 25));
-            foreach(var itm in policies)
-            {
-                Console.WriteLine("{0}{1}{2}{3}{4}",
-                    itm.Key,
-                    new String(' ', 4),
-                    itm.Name.Length > 20 ? itm.Name.Substring(0, 20) + "...  " : itm.Name,
-                    itm.Name.Length < 20 ? new String(' ', 25 - itm.Name.Length) : "",
-                    itm.Oid);
-            }
+            DisplayUtil.TablePrint(policies,
+                new String[] { "SID", "Name", "Oid" },
+                new int[] { 38, 38, 44 },
+                p=>p.Key,
+                p=>p.Name,
+                p=>p.Oid
+            );
         }
     }
 }

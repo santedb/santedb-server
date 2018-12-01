@@ -117,7 +117,7 @@ namespace SanteDB.Core.Rest.Security
                         return;
                     }
                     else
-                        throw new UnauthorizedAccessException("Missing Authorization header");
+                        throw new SecurityTokenException("Missing Authorization header");
                 }
 
                 // Authorization method

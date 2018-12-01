@@ -17,6 +17,7 @@
  * User: justin
  * Date: 2018-10-24
  */
+using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Http;
 using SanteDB.Core.Interop;
@@ -37,7 +38,7 @@ namespace SanteDB.Tools.AdminConsole.Shell
     /// <summary>
     /// Represents a basic application context based on configuration
     /// </summary>
-    public class ApplicationServiceContext : IServiceProvider
+    public class ApplicationContext : IServiceProvider , IApplicationServiceContext
     {
 
         // Tracer
@@ -58,12 +59,17 @@ namespace SanteDB.Tools.AdminConsole.Shell
         /// </summary>
         private Dictionary<ServiceEndpointType, IRestClient> m_restClients = new Dictionary<ServiceEndpointType, IRestClient>();
 
+        public event EventHandler Starting;
+        public event EventHandler Started;
+        public event EventHandler Stopping;
+        public event EventHandler Stopped;
+
         /// <summary>
         /// Initialize the application context
         /// </summary>
         public static void Initialize(Parameters.ConsoleParameters configuration)
         {
-            ApplicationServiceContext.Current = new ApplicationServiceContext(configuration);
+            ApplicationContext.Current = new ApplicationContext(configuration);
         }
 
         /// <summary>
@@ -77,7 +83,7 @@ namespace SanteDB.Tools.AdminConsole.Shell
         /// <summary>
         /// Creates a new application context
         /// </summary>
-        private ApplicationServiceContext(Parameters.ConsoleParameters configuration)
+        private ApplicationContext(Parameters.ConsoleParameters configuration)
         {
             this.ApplicationName = configuration.AppId ?? "org.openiz.oizac";
             this.ApplicationSecret = configuration.AppSecret ?? "oizac-default-secret";
@@ -87,7 +93,7 @@ namespace SanteDB.Tools.AdminConsole.Shell
         /// <summary>
         /// Gets the current application context
         /// </summary>
-        public static ApplicationServiceContext Current
+        public static ApplicationContext Current
         {
             get; private set;
         }
@@ -107,6 +113,8 @@ namespace SanteDB.Tools.AdminConsole.Shell
         /// </summary>
         public string RealmId { get { return this.m_configuration.RealmId; } }
 
+        public bool IsRunning => true;
+
         /// <summary>
         /// Start the application context
         /// </summary>
@@ -117,6 +125,7 @@ namespace SanteDB.Tools.AdminConsole.Shell
             String scheme = this.m_configuration.UseTls ? "https" : "http",
                 host = $"{scheme}://{this.m_configuration.RealmId}:{this.m_configuration.Port}/";
 
+            ApplicationServiceContext.Current = this;
             this.m_tracer.TraceInfo("Contacting {0}", host);
             try
             {

@@ -21,6 +21,7 @@ using SanteDB.Messaging.FHIR.Attributes;
 using SanteDB.Messaging.FHIR.DataTypes;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace SanteDB.Messaging.FHIR.Resources
@@ -55,5 +56,18 @@ namespace SanteDB.Messaging.FHIR.Resources
         [FhirElement(MinOccurs = 1)]
         public List<Issue> Issue { get; set; }
 
+
+        internal override void WriteText(XmlWriter w)
+        {
+            w.WriteStartElement("ul", NS_XHTML);
+            foreach(var iss in this.Issue)
+            {
+                w.WriteStartElement("li", NS_XHTML);
+                w.WriteElementString("strong", NS_XHTML, iss.Severity.Value.ToString());
+                w.WriteString($" {iss.Diagnostics.Value} ({iss.Code?.Display})");
+                w.WriteEndElement();
+            }
+            w.WriteEndElement();
+        }
     }
 }

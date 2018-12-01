@@ -50,8 +50,8 @@ namespace SanteDB.Tools.AdminConsole.Security
 		{
 			// App ID credentials
 			String appAuthString = String.Format ("{0}:{1}", 
-				ApplicationServiceContext.Current.ApplicationName, 
-				ApplicationServiceContext.Current.ApplicationSecret);
+				ApplicationContext.Current.ApplicationName, 
+				ApplicationContext.Current.ApplicationSecret);
 
 			// TODO: Add claims
 			List<Claim> claims = new List<Claim> () {

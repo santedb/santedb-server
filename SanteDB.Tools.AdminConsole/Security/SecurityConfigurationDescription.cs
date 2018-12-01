@@ -41,7 +41,7 @@ namespace SanteDB.Tools.AdminConsole.Security
         {
             get
             {
-                return ApplicationServiceContext.Current.RealmId;
+                return ApplicationContext.Current.RealmId;
             }
         }
 

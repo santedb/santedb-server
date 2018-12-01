@@ -78,6 +78,7 @@
     <Compile Include="Shell\CmdLets\UserCmdlet.cs" />
     <Compile Include="Shell\ConsoleTraceWriter.cs" />
     <Compile Include="Shell\InteractiveShell.cs" />
+    <Compile Include="Util\DisplayUtil.cs" />
     <Compile Include="Util\LogEvent.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -100,16 +101,16 @@
       <Name>SanteDB.Core.Model</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
-      <Project>{DB9BC05E-45F1-4F96-A161-F36BDECAF566}</Project>
+      <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
       <Name>SanteDB.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="SanteDB.Messaging.AMI.Client">
-      <Version>1.1.6</Version>
+      <Version>1.9.14</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.Messaging.HDSI.Client">
-      <Version>1.1.6</Version>
+      <Version>1.9.14</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

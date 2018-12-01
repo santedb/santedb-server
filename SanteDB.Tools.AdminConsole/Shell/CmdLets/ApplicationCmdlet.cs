@@ -19,11 +19,13 @@
  */
 using MohawkCollege.Util.Console.Parameters;
 using SanteDB.Core.Model.AMI.Auth;
+using SanteDB.Core.Model.AMI.Collections;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Tools.AdminConsole.Attributes;
+using SanteDB.Tools.AdminConsole.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -55,7 +57,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         }
 
         // Ami client
-        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationServiceContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
+        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
 
         #region Application Add 
 
@@ -93,7 +95,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
             public String Description { get; set; }
         }
 
-        [AdminCommand("appadd", "Add security application")]
+        [AdminCommand("application.add", "Add security application")]
         [Description("This command will create a new security application which can be used to access the SanteDB instance")]
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateApplication)]
         internal static void AddApplication(AddApplicationParms parms)
@@ -101,11 +103,11 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
             var policies = new List<SecurityPolicyInfo>();
 
             if (parms.GrantPolicies?.Count > 0)
-                policies = parms.GrantPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Name == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o)).ToList();
+                policies = parms.GrantPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o)).ToList();
             if (parms.DenyPolicies?.Count > 0)
-                policies = policies.Union(parms.DenyPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Name == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o))).ToList();
+                policies = policies.Union(parms.DenyPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o))).ToList();
 
-            policies.ForEach(o => o.Grant = parms.GrantPolicies?.Contains(o.Name) == true ? Core.Model.Security.PolicyGrantType.Grant : PolicyGrantType.Deny);
+            policies.ForEach(o => o.Grant = parms.GrantPolicies?.Contains(o.Oid) == true ? Core.Model.Security.PolicyGrantType.Grant : PolicyGrantType.Deny);
 
             if (policies.Count != (parms.DenyPolicies?.Count ?? 0) + (parms.GrantPolicies?.Count ?? 0))
                 throw new InvalidOperationException("Could not find one or more policies");
@@ -125,7 +127,90 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
                     ApplicationSecret = parms.Secret
                 }
             });
+            Console.WriteLine("CREATE {0}", parms.ApplictionId[0]);
 
+        }
+
+        /// <summary>
+        /// User list parameters
+        /// </summary>
+        internal class ApplicationListParams
+        {
+
+            /// <summary>
+            /// Locked
+            /// </summary>
+            [Description("Filter on locked status")]
+            [Parameter("l")]
+            public bool Locked { get; set; }
+
+            /// <summary>
+            /// Locked
+            /// </summary>
+            [Description("Include non-active application")]
+            [Parameter("a")]
+            public bool Active { get; set; }
+
+
+        }
+
+
+        [AdminCommand("application.list", "List Security Applications")]
+        [Description("This command will list all security applications in the SanteDB instance")]
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
+        internal static void ListRoles(ApplicationListParams parms)
+        {
+            AmiCollection list = null;
+            int tr = 0;
+            if (parms.Active)
+                list = m_client.Query<SecurityApplication>(o => o.ObsoletionTime.HasValue, 0, 100, out tr);
+            else if (parms.Locked)
+                list = m_client.Query<SecurityApplication>(o => o.Lockout.HasValue, 0, 100, out tr);
+            else
+                list = m_client.Query<SecurityApplication>(o => o.ObsoletionTime == null, 0, 100, out tr);
+
+            DisplayUtil.TablePrint(list.CollectionItem.OfType<SecurityApplicationInfo>(),
+                new String[] { "SID", "Name", "Last Auth.", "Lockout", "ILA", "A" },
+                new int[] { 38, 24, 22, 22, 4, 2 },
+                o => o.Entity.Key,
+                o => o.Entity.Name,
+                o => o.Entity.LastAuthenticationXml,
+                o => o.Entity.LockoutXml,
+                o => o.Entity.InvalidAuthAttempts ?? 0,
+                o => !o.Entity.ObsoletionTime.HasValue ? "*" : null);
+        }
+
+        /// <summary>
+        /// Detail security information
+        /// </summary>
+        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateApplication)]
+        [AdminCommand("application.info", "Displays detailed information about the application")]
+        [Description("This command will display detailed information about the specified security application account. It will status, and effective policies")]
+        internal static void ApplicationInfo(GenericApplicationParms parms)
+        {
+
+            if (parms.ApplictionId == null)
+                throw new InvalidOperationException("Must specify a application");
+
+            foreach (var un in parms.ApplictionId)
+            {
+                var device = m_client.GetApplications(o => o.Name == un).CollectionItem.FirstOrDefault() as SecurityApplicationInfo;
+                if (device == null)
+                    throw new KeyNotFoundException($"Application {un} not found");
+
+                DisplayUtil.PrintPolicies(device,
+                    new string[] { "Name", "SID", "Invalid Auth", "Lockout", "Last Auth", "Created", "Updated", "De-Activated" },
+                    u => u.Name,
+                    u => u.Key,
+                    u => u.InvalidAuthAttempts,
+                    u => u.LockoutXml,
+                    u => u.LastAuthenticationXml,
+                    u => String.Format("{0} ({1})", u.CreationTimeXml, m_client.GetUser(m_client.GetProvenance(u.CreatedByKey.Value).UserKey.Value).Entity.UserName),
+                    u => String.Format("{0} ({1})", u.UpdatedTimeXml, m_client.GetUser(m_client.GetProvenance(u.UpdatedByKey.Value).UserKey.Value).Entity.UserName),
+                    u => String.Format("{0} ({1})", u.ObsoletionTimeXml, m_client.GetUser(m_client.GetProvenance(u.ObsoletedByKey.Value).UserKey.Value).Entity.UserName)
+                );
+
+            }
         }
         #endregion
     }

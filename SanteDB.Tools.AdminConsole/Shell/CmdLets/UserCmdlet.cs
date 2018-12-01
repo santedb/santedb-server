@@ -26,6 +26,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Tools.AdminConsole.Attributes;
+using SanteDB.Tools.AdminConsole.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -58,7 +59,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         }
 
         // Ami client
-        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationServiceContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
+        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
 
         #region User Add
         internal class UseraddParms : GenericUserParms
@@ -89,7 +90,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// Useradd parameters
         /// </summary>
-        [AdminCommand("useradd", "Adds a user to the SanteDB instance")]
+        [AdminCommand("user.add", "Adds a user to the SanteDB instance")]
         [Description("This command add the specified user to the SanteDB IMS instance")]
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateIdentity)]
         internal static void Useradd(UseraddParms parms)
@@ -141,7 +142,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// Useradd parameters
         /// </summary>
-        [AdminCommand("userdel", "De-activates a user to the SanteDB instance")]
+        [AdminCommand("user.del", "De-activates a user to the SanteDB instance")]
         [Description("This command change the obsoletion time of the user effectively de-activating it")]
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
         internal static void Userdel(GenericUserParms parms)
@@ -163,7 +164,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// Useradd parameters
         /// </summary>
-        [AdminCommand("userundel", "Re-activates a user to the SanteDB instance")]
+        [AdminCommand("user.undel", "Re-activates a user to the SanteDB instance")]
         [Description("This command will undo a de-activation and will reset the user's obsoletion time")]
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
         internal static void Userudel(GenericUserParms parms)
@@ -188,7 +189,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// Useradd parameters
         /// </summary>
-        [AdminCommand("userlock", "Engages or disengages the user lock")]
+        [AdminCommand("user.lock", "Engages or disengages the user lock")]
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
         [Description("This command will change lock status of the user, either setting it or un-setting it")]
         internal static void Userlock(UserLockParms parms)
@@ -204,7 +205,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
 
                 user.Entity.Lockout = !parms.Locked ? null : (DateTime?)DateTime.MaxValue;
 
-                if(parms.Locked)
+                if (parms.Locked)
                     m_client.Client.Lock<SecurityUserInfo>($"SecurityUser/{user.Key}");
                 else
                     m_client.Client.Unlock<SecurityUserInfo>($"SecurityUser/{user.Key}");
@@ -231,7 +232,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
             /// <summary>
             /// Locked
             /// </summary>
-            [Description("Filter on active status")]
+            [Description("Show obsolete non-active status")]
             [Parameter("a")]
             public bool Active { get; set; }
 
@@ -253,7 +254,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// List users
         /// </summary>
-        [AdminCommand("userlist", "Lists users in the SanteDB instance")]
+        [AdminCommand("user.list", "Lists users in the SanteDB instance")]
         [Description("This command lists all users in the user database regardless of their status, or class. To filter use the filter parameters listed.")]
         internal static void Userlist(UserListParms parms)
         {
@@ -267,28 +268,21 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
                 users = m_client.GetUsers(o => o.UserName != null);
 
             if (parms.Active)
-                users.CollectionItem = users.CollectionItem.OfType<SecurityUserInfo>().Where(o => !o.Entity.ObsoletionTime.HasValue).OfType<object>().ToList();
+                users.CollectionItem = users.CollectionItem.OfType<SecurityUserInfo>().Where(o => o.Entity.ObsoletionTime.HasValue).OfType<object>().ToList();
             if (parms.Human)
                 users.CollectionItem = users.CollectionItem.OfType<SecurityUserInfo>().Where(o => o.Entity.UserClass == UserClassKeys.HumanUser).OfType<object>().ToList();
             else if (parms.System)
                 users.CollectionItem = users.CollectionItem.OfType<SecurityUserInfo>().Where(o => o.Entity.UserClass != UserClassKeys.HumanUser).OfType<object>().ToList();
-
-            Console.WriteLine("SID{0}UserName{1}Last Lgn{2}Lockout{2} ILA  A", new String(' ', 37), new String(' ', 32), new String(' ', 13));
-            foreach (var usr in users.CollectionItem.OfType<SecurityUserInfo>())
-            {
-                Console.WriteLine("{0}{1}{2}{3}{4}{5}{6}{5}{7}{8}{9}",
-                    usr.Entity.Key.Value.ToString("B"),
-                    new String(' ', 2),
-                    usr.Entity.UserName.Length > 38 ? usr.Entity.UserName.Substring(0, 38) : usr.Entity.UserName,
-                    new String(' ', usr.Entity.UserName.Length > 38 ? 2 : 40 - usr.Entity.UserName.Length),
-                    usr.Entity.LastLoginTime.HasValue ? usr.Entity.LastLoginTime?.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss") : new String(' ', 19),
-                    "  ",
-                    usr.Entity.Lockout.HasValue ? usr.Entity.Lockout?.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss") : new string(' ', 19),
-                    usr.Entity.InvalidLoginAttempts,
-                    new String(' ', 4 - usr.Entity.InvalidLoginAttempts.ToString().Length),
-                    usr.Entity.ObsoletionTime.HasValue ? "  " : " *"
-                    );
-            }
+            DisplayUtil.TablePrint(users.CollectionItem.OfType<SecurityUserInfo>(),
+                new String[] { "SID", "Name", "Last Auth", "Lockout", "ILA", "A" },
+                new int[] { 38, 24, 22, 22, 4, 2 },
+                o => o.Entity.Key,
+                o => o.Entity.UserName,
+                o => o.Entity.LastLoginTimeXml,
+                o => o.Entity.LockoutXml,
+                o => o.Entity.InvalidLoginAttempts,
+                o => o.Entity.ObsoletionTime.HasValue ? null : "*"
+            );
         }
         #endregion
 
@@ -308,7 +302,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// Gets or sets roles
         /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
-        [AdminCommand("chrole", "Change roles for a user")]
+        [AdminCommand("user.roles", "Change roles for a user")]
         [Description("This command is used to assign roles for the specified user to the specified roles. Note that the role list provided replaces the current role list of the user")]
         internal static void ChangeRoles(ChangeRoleParms parms)
         {
@@ -349,7 +343,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// Set user password
         /// </summary>
-        [AdminCommand("passwd", "Changes a users password")]
+        [AdminCommand("user.password", "Changes a users password")]
         [Description("This command will change the specified user's password the specified password. The server will reject this command if the password does not meet complixity requirements")]
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ChangePassword)]
         internal static void SetPassword(UserPasswordParms parms)
@@ -374,7 +368,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// User information
         /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
-        [AdminCommand("userinfo", "Displays detailed information about the user")]
+        [AdminCommand("user.info", "Displays detailed information about the user")]
         [Description("This command will display detailed information about the specified security user account. It will show groups, status, and effective policies")]
         internal static void UserInfo(GenericUserParms parms)
         {
@@ -388,45 +382,21 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
                 if (user == null)
                     throw new KeyNotFoundException($"User {un} not found");
 
-                Console.WriteLine("User: {0}", user.Entity.UserName);
-                Console.WriteLine("\tSID: {0}", user.Entity.Key);
-                Console.WriteLine("\tEmail: {0}", user.Entity.Email);
-                Console.WriteLine("\tPhone: {0}", user.Entity.PhoneNumber);
-                Console.WriteLine("\tInvalid Logins: {0}", user.Entity.InvalidLoginAttempts);
-                Console.WriteLine("\tLockout: {0}", user.Entity.Lockout);
-                Console.WriteLine("\tLast Login: {0}", user.Entity.LastLoginTime);
-                Console.WriteLine("\tCreated: {0} ({1})", user.Entity.CreationTime, m_client.GetUser(m_client.GetProvenance(user.Entity.CreatedByKey.Value).UserKey.Value).Entity.UserName);
-                if (user.Entity.UpdatedTime.HasValue)
-                    Console.WriteLine("\tLast Updated: {0} ({1})", user.Entity.UpdatedTime, m_client.GetUser(m_client.GetProvenance(user.Entity.UpdatedByKey.Value).UserKey.Value).Entity.UserName);
-                if (user.Entity.ObsoletionTime.HasValue)
-                    Console.WriteLine("\tDeActivated: {0} ({1})", user.Entity.ObsoletionTime, m_client.GetUser(m_client.GetProvenance(user.Entity.ObsoletedByKey.Value).UserKey.Value).Entity.UserName);
-                Console.WriteLine("\tGroups: {0}", String.Join(";", user.Roles));
+                DisplayUtil.PrintPolicies(user,
+                    new string[] { "Name", "SID", "Email", "Phone", "Invalid Logins", "Lockout", "Last Login", "Created", "Updated", "De-Activated", "Roles" },
+                    u => u.UserName,
+                    u => u.Key,
+                    u => u.Email,
+                    u => u.PhoneNumber,
+                    u => u.InvalidLoginAttempts,
+                    u => u.LockoutXml,
+                    u => u.LastLoginTimeXml,
+                    u => String.Format("{0} ({1})", u.CreationTimeXml, m_client.GetUser(m_client.GetProvenance(u.CreatedByKey.Value).UserKey.Value).Entity.UserName),
+                    u => String.Format("{0} ({1})", u.UpdatedTimeXml, m_client.GetUser(m_client.GetProvenance(u.UpdatedByKey.Value).UserKey.Value).Entity.UserName),
+                    u => String.Format("{0} ({1})", u.ObsoletionTimeXml, m_client.GetUser(m_client.GetProvenance(u.ObsoletedByKey.Value).UserKey.Value).Entity.UserName),
+                    u => String.Join(" , ", user.Roles)
+                );
 
-                List<SecurityPolicyInfo> policies = m_client.GetPolicies(o => o.ObsoletionTime == null).CollectionItem.OfType<SecurityPolicy>().OrderBy(o => o.Oid).Select(o=>new SecurityPolicyInfo(o)).ToList();
-                policies.ForEach(o => o.Grant = (PolicyGrantType)10);
-                foreach (var rol in user.Roles)
-                    foreach (var pol in m_client.GetRole(rol).Policies)
-                    {
-                        var existing = policies.FirstOrDefault(o => o.Oid == pol.Oid);
-                        if (pol.Grant < existing.Grant)
-                            existing.Grant = pol.Grant;
-                    }
-
-                Console.WriteLine("\tEffective Policies:");
-                foreach (var itm in policies)
-                {
-                    Console.Write("\t\t{0} : ", itm.Name);
-                    if (itm.Grant == (PolicyGrantType)10) // Lookup parent
-                    {
-                        var parent = policies.LastOrDefault(o => itm.Oid.StartsWith(o.Oid + ".") && itm.Oid != o.Oid);
-                        if (parent != null && parent.Grant <= PolicyGrantType.Grant)
-                            Console.WriteLine("{0} (inherited from {1})", parent.Grant, parent.Name);
-                        else
-                            Console.WriteLine("Deny (automatic)");
-                    }
-                    else
-                        Console.WriteLine("{0} (explicit)", itm.Grant);
-                }
             }
         }
 

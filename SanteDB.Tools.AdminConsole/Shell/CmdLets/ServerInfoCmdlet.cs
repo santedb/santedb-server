@@ -32,7 +32,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
     {
 
         // Ami client
-        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationServiceContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
+        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
 
         /// <summary>
         /// Get server information
@@ -51,7 +51,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// Get diagnostic info from server
         /// </summary>
-        [AdminCommand("sinfo", "Gets diagnostic information from the server")]
+        [AdminCommand("server.info", "Gets diagnostic information from the server")]
         public static void ServerVersionQuery()
         {
             var diagReport = m_client.GetServerDiagnoticReport().ApplicationInfo;
@@ -63,7 +63,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// Get assembly info from server
         /// </summary>
-        [AdminCommand("sasm", "Shows the server assembly information")]
+        [AdminCommand("server.asm", "Shows the server assembly information")]
         public static void ServerAssemblyQuery()
         {
             var diagReport = m_client.GetServerDiagnoticReport().ApplicationInfo;
@@ -85,7 +85,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// Get assembly info from server
         /// </summary>
-        [AdminCommand("svci", "Shows the server service information")]
+        [AdminCommand("server.services", "Shows the server service information")]
         [Description("This command will show the running daemon services in the connected IMS instance")]
         public static void ServiceInformation()
         {

@@ -181,6 +181,8 @@ namespace SanteDB.Messaging.HL7.Messages
             var sessionService = ApplicationServiceContext.Current.GetService<ISessionProviderService>();
 
             // Authenticated args?
+            if (String.IsNullOrEmpty(msh.Security.Value) && this.m_configuration.Security == SecurityMethod.Msh8)
+                throw new SecurityException("Must carry MSH-8 authorization token information");
             if (msh.Security.Value.StartsWith("sid://")) // Session identifier
             {
                 var session = sessionService.Get(Enumerable.Range(5, msh.Security.Value.Length - 5)

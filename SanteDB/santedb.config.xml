@@ -153,7 +153,7 @@
   <!-- Used for authorizing clients using a claims token -->
   <section xsi:type="ClaimsAuthorizationConfigurationSection" realm="127.0.0.1">
     <issuer>
-      <add name="127.0.0.1" alg="hmac" hmacKey="mNrvAnR+Pj9GdMBu7oZnd2cRTzjKMd1VQwn6+E0J5X8=" />
+      <add name="127.0.0.1" alg="hmac" hmacKey="uuNQ0pAkW+M2uxHjK1pisFZBFYjvkgveJcGtDy2E8i8=" />
       <!-- To validate a sender using X509 certs -->
       <!--<add name="127.0.0.1" alg="rsa" findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />-->
     </issuer>
@@ -172,7 +172,7 @@
       <add>84BD51F0584A1F708D604CF0B8074A68D3BEB973</add>
     </trustedPublishers>
     <!-- SanteDB signs a lot of data when communicating it, this is used for configuring how this server signs data -->
-    <signing alg="hmac" hmacKey="mNrvAnR+Pj9GdMBu7oZnd2cRTzjKMd1VQwn6+E0J5X8="/>
+    <signing alg="hmac" hmacKey="uuNQ0pAkW+M2uxHjK1pisFZBFYjvkgveJcGtDy2E8i8="/>
     <!-- To Configure X509 Signatures -->
     <!--<signing alg="rsa" findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />-->
   </section>

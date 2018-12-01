@@ -107,7 +107,7 @@ namespace SanteDB.Tools.AdminConsole.Security
 
             try
             {
-                using (IRestClient restClient = ApplicationServiceContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AuthenticationService))
+                using (IRestClient restClient = ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AuthenticationService))
                 {
 
                     // Set credentials
@@ -123,12 +123,12 @@ namespace SanteDB.Tools.AdminConsole.Security
                         request = new OAuthTokenRequest(principal.Identity.Name, null, scope);
 
                     // Set credentials
-                    if (restClient.Description.Binding.Security.Mode == Core.Http.Description.SecurityScheme.Basic)
+                    if (restClient.Description.Binding.Security?.Mode == Core.Http.Description.SecurityScheme.Basic)
                         restClient.Credentials = new OAuthTokenServiceCredentials(principal);
                     else
                     {
-                        request.ClientId = ApplicationServiceContext.Current.ApplicationName;
-                        request.ClientSecret = ApplicationServiceContext.Current.ApplicationSecret;
+                        request.ClientId = ApplicationContext.Current.ApplicationName;
+                        request.ClientSecret = ApplicationContext.Current.ApplicationSecret;
                     }
 
                     try

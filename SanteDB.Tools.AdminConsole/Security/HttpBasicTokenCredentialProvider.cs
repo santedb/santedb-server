@@ -47,7 +47,7 @@ namespace SanteDB.Tools.AdminConsole.Security
         /// <param name="context">Context.</param>
         public Credentials Authenticate(IRestClient context)
         {
-            if (SanteDB.Tools.AdminConsole.Shell.ApplicationServiceContext.Current.Authenticate(new HttpBasicIdentityProvider(), context))
+            if (SanteDB.Tools.AdminConsole.Shell.ApplicationContext.Current.Authenticate(new HttpBasicIdentityProvider(), context))
                 return this.GetCredentials(AuthenticationContext.Current.Principal);
             return null;
         }

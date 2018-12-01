@@ -135,8 +135,12 @@ namespace SanteDB
                     ApplicationServiceContext.HostType = SanteDBHostType.Server;
                     if (!parameters.StartupTest)
                     {
-                        Console.WriteLine("Press [ENTER] to stop...");
-                        Console.ReadLine();
+                        Console.WriteLine("Type [stop] to stop service...");
+                        String input = null;
+                        while (input != "stop")
+                        {
+                            input = Console.ReadLine();
+                        }
                     }
                     Console.WriteLine("Shutting down service...");
                     ServiceUtil.Stop();

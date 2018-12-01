@@ -17,7 +17,9 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.Export;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
@@ -96,103 +98,113 @@ namespace SanteDB.Core.Persistence
                 this.m_traceSource.TraceInformation("Applying {0} ({1} objects)...", ds.Id, ds.Action.Count);
 
                 int i = 0;
-                foreach (var itm in ds.Action.Where(o=>o.Element != null))
+                // Can this dataset be installed as a bundle?
+                if(ds.Action.All(o=>o is DataUpdate && (o as DataUpdate).InsertIfNotExists && !(o.Element is IVersionedAssociation)))
                 {
-
-                    try
+                    this.m_traceSource.TraceVerbose("Will install as a bundle");
+                    var bundle = new Bundle()
                     {
-                        this.ProgressChanged?.Invoke(this, new Services.ProgressChangedEventArgs(i++ / (float)ds.Action.Count, ds.Id));
-                        if (ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Size > 10000) // Probably a good idea to clear memcache
-                            ApplicationServiceContext.Current.GetService<IDataCachingService>().Clear();
-
-                        // IDP Type
-                        Type idpType = typeof(IDataPersistenceService<>);
-                        idpType = idpType.MakeGenericType(new Type[] { itm.Element.GetType() });
-                        var idpInstance = ApplicationServiceContext.Current.GetService(idpType) as IDataPersistenceService;
-
-                        // Don't insert duplicates
-                        var getMethod = idpType.GetMethod("Get");
-
-                        this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "{0} {1}", itm.ActionName, itm.Element);
-
-                        Object target = null, existing = null;
-                        if (itm.Element.Key.HasValue)
+                        Item = ds.Action.Select(o => o.Element).ToList()
+                    };
+                    ApplicationServiceContext.Current.GetService<IDataPersistenceService<Bundle>>().Insert(bundle, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+                }
+                else 
+                    foreach (var itm in ds.Action.Where(o=>o.Element != null))
+                    {
+                        try
                         {
-                            ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(itm.Element.Key.Value);
-                            existing = idpInstance.Get(itm.Element.Key.Value);
-                        }
-                        if (existing != null)
-                        {
-                            if ((itm as DataInsert)?.SkipIfExists == true) continue;
-                            target = (existing as IdentifiedData).Clone();
-                            target.CopyObjectData(itm.Element);
-                        }
-                        else
-                            target = itm.Element;
+                            this.ProgressChanged?.Invoke(this, new Services.ProgressChangedEventArgs(i++ / (float)ds.Action.Count, ds.Id));
+                            if (ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Size > 10000) // Probably a good idea to clear memcache
+                                ApplicationServiceContext.Current.GetService<IDataCachingService>().Clear();
 
-                        // Association
-                        if (itm.Association != null)
-                            foreach (var ascn in itm.Association)
+                            // IDP Type
+                            Type idpType = typeof(IDataPersistenceService<>);
+                            idpType = idpType.MakeGenericType(new Type[] { itm.Element.GetType() });
+                            var idpInstance = ApplicationServiceContext.Current.GetService(idpType) as IDataPersistenceService;
+
+                            // Don't insert duplicates
+                            var getMethod = idpType.GetMethod("Get");
+
+                            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "{0} {1}", itm.ActionName, itm.Element);
+
+                            Object target = null, existing = null;
+                            if (itm.Element.Key.HasValue)
                             {
-                                var pi = target.GetType().GetRuntimeProperty(ascn.PropertyName);
-                                var mi = pi.PropertyType.GetRuntimeMethod("Add", new Type[] { ascn.Element.GetType() });
-                                mi.Invoke(pi.GetValue(target), new object[] { ascn.Element });
+                                ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(itm.Element.Key.Value);
+                                existing = idpInstance.Get(itm.Element.Key.Value);
+                            }
+                            if (existing != null)
+                            {
+                                if ((itm as DataInsert)?.SkipIfExists == true) continue;
+                                target = (existing as IdentifiedData).Clone();
+                                target.CopyObjectData(itm.Element);
+                            }
+                            else
+                                target = itm.Element;
+
+                            // Association
+                            if (itm.Association != null)
+                                foreach (var ascn in itm.Association)
+                                {
+                                    var pi = target.GetType().GetRuntimeProperty(ascn.PropertyName);
+                                    var mi = pi.PropertyType.GetRuntimeMethod("Add", new Type[] { ascn.Element.GetType() });
+                                    mi.Invoke(pi.GetValue(target), new object[] { ascn.Element });
+                                }
+
+                            // ensure version sequence is set
+                            // the reason this exists is because in FHIR code system values have the same mnemonic values in different code systems
+                            // since we cannot insert duplicate mnemonic values, we want to associate the existing concept with the new reference term
+                            // for the new code system
+                            //
+                            // i.e.
+                            //
+                            // Code System Address Use has the following codes:
+                            // home
+                            // work
+                            // temp
+                            // old
+                            // we want to insert reference terms and concepts so we can find an associated concept
+                            // for a given reference term and code system
+                            // 
+                            // Code System Contact Point Use has the following codes:
+                            // home
+                            // work
+                            // temp
+                            // old
+                            // mobile
+                            //
+                            // we can insert new reference terms for these reference terms, but cannot insert new concept using the same values for the mnemonic
+                            // so we associate the new reference term and the concept
+                            if (target is IVersionedAssociation)
+                            {
+                                var ivr = target as IVersionedAssociation;
+
+                                // Get the type this is bound to
+                                Type stype = target.GetType();
+                                while (!stype.IsGenericType || stype.GetGenericTypeDefinition() != typeof(VersionedAssociation<>))
+                                    stype = stype.BaseType;
+
+                                ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(ivr.SourceEntityKey.Value);
+                                var idt = typeof(IDataPersistenceService<>).MakeGenericType(stype.GetGenericArguments()[0]);
+                                var idp = ApplicationServiceContext.Current.GetService(idt) as IDataPersistenceService;
+                                ivr.EffectiveVersionSequenceId = (idp.Get(ivr.SourceEntityKey.Value) as IVersionedEntity)?.VersionSequence;
+                                if (ivr.EffectiveVersionSequenceId == null)
+                                    throw new KeyNotFoundException($"Dataset contains a reference to an unkown source entity : {ivr.SourceEntityKey}");
+                                target = ivr;
                             }
 
-                        // ensure version sequence is set
-                        // the reason this exists is because in FHIR code system values have the same mnemonic values in different code systems
-                        // since we cannot insert duplicate mnemonic values, we want to associate the existing concept with the new reference term
-                        // for the new code system
-                        //
-                        // i.e.
-                        //
-                        // Code System Address Use has the following codes:
-                        // home
-                        // work
-                        // temp
-                        // old
-                        // we want to insert reference terms and concepts so we can find an associated concept
-                        // for a given reference term and code system
-                        // 
-                        // Code System Contact Point Use has the following codes:
-                        // home
-                        // work
-                        // temp
-                        // old
-                        // mobile
-                        //
-                        // we can insert new reference terms for these reference terms, but cannot insert new concept using the same values for the mnemonic
-                        // so we associate the new reference term and the concept
-                        if (target is IVersionedAssociation)
-                        {
-                            var ivr = target as IVersionedAssociation;
-
-                            // Get the type this is bound to
-                            Type stype = target.GetType();
-                            while (!stype.IsGenericType || stype.GetGenericTypeDefinition() != typeof(VersionedAssociation<>))
-                                stype = stype.BaseType;
-
-                            ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(ivr.SourceEntityKey.Value);
-                            var idt = typeof(IDataPersistenceService<>).MakeGenericType(stype.GetGenericArguments()[0]);
-                            var idp = ApplicationServiceContext.Current.GetService(idt) as IDataPersistenceService;
-                            ivr.EffectiveVersionSequenceId = (idp.Get(ivr.SourceEntityKey.Value) as IVersionedEntity)?.VersionSequence;
-                            if (ivr.EffectiveVersionSequenceId == null)
-                                throw new KeyNotFoundException($"Dataset contains a reference to an unkown source entity : {ivr.SourceEntityKey}");
-                            target = ivr;
+                            if (existing == null && (itm is DataInsert || (itm is DataUpdate && (itm as DataUpdate).InsertIfNotExists)))
+                                idpInstance.Insert(target);
+                            else if (!(itm is DataInsert))
+                                typeof(IDataPersistenceService).GetMethod(itm.ActionName, new Type[] { typeof(Object) }).Invoke(idpInstance, new object[] { target });
                         }
-
-                        if (existing == null && (itm is DataInsert || (itm is DataUpdate && (itm as DataUpdate).InsertIfNotExists)))
-                            idpInstance.Insert(target);
-                        else if (!(itm is DataInsert))
-                            typeof(IDataPersistenceService).GetMethod(itm.ActionName, new Type[] { typeof(Object) }).Invoke(idpInstance, new object[] { target });
+                        catch(Exception e)
+                        {
+                            this.m_traceSource.TraceEvent(TraceEventType.Verbose, e.HResult, "There was an issue in the dataset file {0} : {1} ", ds.Id, e);
+                            if (!itm.IgnoreErrors)
+                                throw;
+                        }
                     }
-                    catch(Exception e)
-                    {
-                        this.m_traceSource.TraceEvent(TraceEventType.Verbose, e.HResult, "There was an issue in the dataset file {0} : {1} ", ds.Id, e);
-                        if (!itm.IgnoreErrors)
-                            throw;
-                    }
-                }
 
                 // Execute the changes
                 var isqlp = ApplicationServiceContext.Current.GetService<ISqlDataPersistenceService>();

@@ -52,9 +52,11 @@ namespace SanteDB.Tools.AdminConsole
                     else
                         Tracer.AddWriter(new ConsoleTraceWriter("Error"), EventLevel.Error);
 
-                    ApplicationServiceContext.Initialize(options);
-                    if (ApplicationServiceContext.Current.Start())
+                    ApplicationContext.Initialize(options);
+                    if (ApplicationContext.Current.Start())
+                    {
                         new InteractiveShell().Exec();
+                    }
                 }
                 catch (Exception e)
                 {

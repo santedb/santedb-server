@@ -174,7 +174,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         throw new KeyNotFoundException(String.Format("Role {0} not found", role));
 
                     var query = dataContext.CreateSqlStatement<DbSecurityUserRole>().SelectFrom()
-                        .InnerJoin<DbSecurityUser, DbSecurityUserRole>()
+                        .AutoJoin<DbSecurityUser, DbSecurityUserRole>()
                         .Where(o => o.RoleKey == securityRole.Key);
 
                     return dataContext.Query<DbSecurityUser>(query).Select(o => o.UserName).ToArray();
@@ -222,7 +222,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         throw new KeyNotFoundException(String.Format("User {0} not found", userName));
 
                     var query = dataContext.CreateSqlStatement<DbSecurityUserRole>().SelectFrom(typeof(DbSecurityRole), typeof(DbSecurityUserRole))
-                        .InnerJoin<DbSecurityRole, DbSecurityUserRole>()
+                        .AutoJoin<DbSecurityRole, DbSecurityUserRole>()
                         .Where(o => o.UserKey == securityUser.Key);
 
                     return dataContext.Query<DbSecurityRole>(query).Select(o => o.Name).ToArray();

@@ -475,21 +475,29 @@ namespace SanteDB.Persistence.Data.ADO.Data
             };
 
             // Identities
-            foreach(var ident in cprincipal.Identities)
+            if (cprincipal != null) // claims principal? 
             {
-                if (ident is DeviceIdentity)
-                    retVal.DeviceKey = ident.GetKey(me);
-                else if (ident is Core.Security.ApplicationIdentity)
-                    retVal.ApplicationKey = ident.GetKey(me).Value;
-                else
-                    retVal.UserKey = ident.GetKey(me);
-            }
+                foreach (var ident in cprincipal.Identities)
+                {
+                    if (ident is DeviceIdentity)
+                        retVal.DeviceKey = ident.GetKey(me);
+                    else if (ident is Core.Security.ApplicationIdentity)
+                        retVal.ApplicationKey = ident.GetKey(me).Value;
+                    else
+                        retVal.UserKey = ident.GetKey(me);
+                }
+                // Session identifier 
+                var sidClaim = cprincipal?.FindFirst(SanteDBClaimTypes.SanteDBSessionIdClaim)?.Value;
+                Guid sid = Guid.Empty;
+                if (Guid.TryParse(sidClaim, out sid))
+                    retVal.SessionKey = sid;
 
-            // Session identifier 
-            var sidClaim = cprincipal?.FindFirst(SanteDBClaimTypes.SanteDBSessionIdClaim)?.Value;
-            Guid sid = Guid.Empty;
-            if (Guid.TryParse(sidClaim, out sid))
-                retVal.SessionKey = sid;
+            }
+            else if (principal.Identity.Name == AuthenticationContext.SystemPrincipal.Identity.Name)
+                retVal.UserKey = Guid.Parse(AuthenticationContext.SystemUserSid);
+            else if (principal.Identity.Name == AuthenticationContext.AnonymousPrincipal.Identity.Name)
+                retVal.UserKey = Guid.Parse(AuthenticationContext.AnonymousUserSid);
+
             // Context 
             try
             {

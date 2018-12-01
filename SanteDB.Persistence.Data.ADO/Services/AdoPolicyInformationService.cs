@@ -195,13 +195,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     if (securable is Core.Model.Security.SecurityDevice)
                     {
                         var query = context.CreateSqlStatement<DbSecurityDevicePolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityDevicePolicy))
-                            .InnerJoin<DbSecurityPolicy, DbSecurityDevicePolicy>();
+                            .AutoJoin<DbSecurityPolicy, DbSecurityDevicePolicy>();
 
                         if (securable is DevicePrincipal)
-                            query.InnerJoin<DbSecurityDevice, DbSecurityDevice>()
+                            query.AutoJoin<DbSecurityDevice, DbSecurityDevice>()
                                     .Where(o => o.PublicId == (securable as DevicePrincipal).Identity.Name);
                         else
-                            query.Where(o => o.Key == (securable as IdentifiedData).Key);
+                            query.Where(o => o.SourceKey == (securable as IdentifiedData).Key);
 
                         var retVal = context.Query<CompositeResult<DbSecurityPolicy, DbSecurityDevicePolicy>>(query)
                                                     .Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable)).ToList();
@@ -220,7 +220,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 var claim = Guid.Parse(appClaim.Value);
 
                                 var aquery = context.CreateSqlStatement<DbSecurityApplicationPolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityApplicationPolicy))
-                                   .InnerJoin<DbSecurityPolicy, DbSecurityApplicationPolicy>()
+                                   .AutoJoin<DbSecurityPolicy, DbSecurityApplicationPolicy>()
                                    .Where(o => o.SourceKey == claim);
 
                                 retVal.AddRange(context.Query<CompositeResult<DbSecurityPolicy, DbSecurityApplicationPolicy>>(aquery).Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable)).Where(p => retVal.Any(r => r.Policy.Oid == p.Policy.Oid)));
@@ -232,7 +232,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     else if (securable is Core.Model.Security.SecurityRole)
                     {
                         var query = context.CreateSqlStatement<DbSecurityRolePolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityRolePolicy))
-                            .InnerJoin<DbSecurityPolicy, DbSecurityRolePolicy>()
+                            .AutoJoin<DbSecurityPolicy, DbSecurityRolePolicy>()
                             .Where(o => o.SourceKey == (securable as IdentifiedData).Key);
 
                         return context.Query<CompositeResult<DbSecurityPolicy, DbSecurityRolePolicy>>(query)
@@ -241,13 +241,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     else if (securable is Core.Model.Security.SecurityApplication)
                     {
                         var query = context.CreateSqlStatement<DbSecurityApplicationPolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityApplicationPolicy))
-                            .InnerJoin<DbSecurityPolicy, DbSecurityApplicationPolicy>();
+                            .AutoJoin<DbSecurityPolicy, DbSecurityApplicationPolicy>();
 
                         if (securable is ApplicationPrincipal)
-                            query.InnerJoin<DbSecurityApplication, DbSecurityApplication>()
+                            query.AutoJoin<DbSecurityApplication, DbSecurityApplication>()
                                     .Where(o => o.PublicId == (securable as ApplicationPrincipal).Identity.Name);
                         else
-                            query.Where(o => o.Key == (securable as IdentifiedData).Key);
+                            query.Where(o => o.SourceKey == (securable as IdentifiedData).Key);
 
                         return context.Query<CompositeResult<DbSecurityPolicy, DbSecurityApplicationPolicy>>(query)
                             .Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable));
@@ -286,7 +286,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 var claim = Guid.Parse(appClaim.Value);
 
                                 query = context.CreateSqlStatement<DbSecurityApplicationPolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityApplicationPolicy))
-                                   .InnerJoin<DbSecurityPolicy, DbSecurityApplicationPolicy>()
+                                   .AutoJoin<DbSecurityPolicy, DbSecurityApplicationPolicy>()
                                    .Where(o => o.SourceKey == claim);
 
                                 retVal.AddRange(context.Query<CompositeResult<DbSecurityPolicy, DbSecurityApplicationPolicy>>(query).Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, user)).Where(p=> user == null || retVal.Any(r=>r.Policy.Oid == p.Policy.Oid)));
@@ -298,7 +298,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 var claim = Guid.Parse(devClaim.Value);
 
                                 query = context.CreateSqlStatement<DbSecurityDevicePolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityDevicePolicy))
-                                   .InnerJoin<DbSecurityPolicy, DbSecurityDevicePolicy>()
+                                   .AutoJoin<DbSecurityPolicy, DbSecurityDevicePolicy>()
                                    .Where(o => o.SourceKey == claim);
 
                                 retVal.AddRange(context.Query<CompositeResult<DbSecurityPolicy, DbSecurityDevicePolicy>>(query).Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, user)).Where(p => user == null || retVal.Any(r =>r.Policy.Oid == p.Policy.Oid)));
@@ -314,7 +314,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     {
                         var pAct = securable as Core.Model.Acts.Act;
                         var query = context.CreateSqlStatement<DbActSecurityPolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbActSecurityPolicy))
-                                  .InnerJoin<DbSecurityPolicy, DbActSecurityPolicy>()
+                                  .AutoJoin<DbSecurityPolicy, DbActSecurityPolicy>()
                                   .Where(o => o.SourceKey == pAct.Key);
 
                         return context.Query<CompositeResult<DbSecurityPolicy, DbActSecurityPolicy>>(query)
@@ -324,11 +324,30 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     {
                         var pEntity = securable as Core.Model.Entities.Entity;
                         var query = context.CreateSqlStatement<DbEntitySecurityPolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbEntitySecurityPolicy))
-                                  .InnerJoin<DbSecurityPolicy, DbEntitySecurityPolicy>()
+                                  .AutoJoin<DbSecurityPolicy, DbEntitySecurityPolicy>()
                                   .Where(o => o.SourceKey == pEntity.Key);
 
                         return context.Query<CompositeResult<DbSecurityPolicy, DbEntitySecurityPolicy>>(query)
                             .Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable));
+                    }
+                    else if(securable is SecurityUser)
+                    {
+                        var pUser = securable as SecurityUser;
+                        // Join for policies
+                        var query = context.CreateSqlStatement<DbSecurityUserRole>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityRolePolicy))
+                            .InnerJoin<DbSecurityUserRole, DbSecurityRolePolicy>(
+                                o => o.RoleKey,
+                                o => o.SourceKey
+                            )
+                            .InnerJoin<DbSecurityRolePolicy, DbSecurityPolicy>(
+                                o => o.PolicyKey,
+                                o => o.Key
+                            )
+                            .Where<DbSecurityUserRole>(o => o.UserKey == pUser.Key);
+
+                        return context.Query<CompositeResult<DbSecurityPolicy, DbSecurityRolePolicy>>(query)
+                            .Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable));
+
                     }
                     else
                         return new List<IPolicyInstance>();

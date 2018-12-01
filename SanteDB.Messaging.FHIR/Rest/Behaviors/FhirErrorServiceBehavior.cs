@@ -23,6 +23,7 @@ using RestSrvr.Message;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Rest.Serialization;
@@ -33,6 +34,7 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.IdentityModel.Tokens;
 using System.IO;
+using System.Linq;
 using System.Security;
 
 namespace SanteDB.Messaging.FHIR.Rest.Behavior
@@ -40,7 +42,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
     /// <summary>
     /// Service behavior
     /// </summary>
-    public class FhirErrorEndpointBehavior : IServiceBehavior, IServiceErrorHandler
+    public class FhirErrorEndpointBehavior :  IServiceBehavior, IServiceErrorHandler
     {
 
         private TraceSource m_tracer = new TraceSource("SanteDB.Messaging.FHIR");
@@ -72,9 +74,24 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
             // Formulate appropriate response
             if (error is DomainStateException)
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.ServiceUnavailable;
-            else if (error is PolicyViolationException || error is SecurityException)
+            else if (error is PolicyViolationException)
+            {
+                var pve = error as PolicyViolationException;
+                if (pve.PolicyDecision == PolicyGrantType.Elevate)
+                {
+                    // Ask the user to elevate themselves
+                    RestOperationContext.Current.OutgoingResponse.StatusCode = 401;
+                    var authHeader = $"{(RestOperationContext.Current.AppliedPolicies.Any(o=>o.GetType().Name.Contains("Basic")) ? "Basic" : "Bearer")} realm=\"{RestOperationContext.Current.IncomingRequest.Url.Host}\" error=\"insufficient_scope\" scope=\"{pve.PolicyId}\"  error_description=\"{error.Message}\"";
+                    RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", authHeader);
+                }
+                else
+                {
+                    RestOperationContext.Current.OutgoingResponse.StatusCode = 403;
+                }
+            }
+            else if (error is SecurityException || error is UnauthorizedAccessException)
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
-            else if (error is SecurityTokenException)
+            else if (error is SecurityTokenException )
             {
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
                 RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", $"Bearer realm=\"{this.m_configuration.Realm}\"");

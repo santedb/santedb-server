@@ -59,7 +59,7 @@ namespace SanteDB.Tools.AdminConsole.Security
                 if (DateTime.TryParse(tokenCredentials.FindFirst(o => o.Type == ClaimTypes.Expiration).Value, out expiryTime) &&
                     expiryTime < DateTime.Now)
                 {
-                    var idp = ApplicationServiceContext.Current.GetService(typeof(IIdentityProviderService)) as IIdentityProviderService;
+                    var idp = ApplicationContext.Current.GetService(typeof(IIdentityProviderService)) as IIdentityProviderService;
                     var principal = idp.Authenticate(null, null);   // Force a re-issue
                     AuthenticationContext.Current = new AuthenticationContext(principal);
                     //XamarinApplicationServiceContext.Current.SetDefaultPrincipal(principal);
@@ -71,7 +71,7 @@ namespace SanteDB.Tools.AdminConsole.Security
             }
             else
             {
-                if (ApplicationServiceContext.Current.Authenticate(new OAuthIdentityProvider(), context))
+                if (ApplicationContext.Current.Authenticate(new OAuthIdentityProvider(), context))
                     return this.GetCredentials(AuthenticationContext.Current.Principal);
             }
             return null;

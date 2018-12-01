@@ -103,12 +103,12 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         }
 
         // Ami client
-        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationServiceContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
+        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
 
         /// <summary>
         /// List logs
         /// </summary>
-        [AdminCommand("dmesg", "Outputs the most recent log file")]
+        [AdminCommand("log.messages", "Outputs the most recent log file")]
         public static void Dmesg(DisplayOptions logOptions)
         {
 
@@ -126,7 +126,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// List logs
         /// </summary>
-        [AdminCommand("loglist", "Lists the available log files")]
+        [AdminCommand("log.list", "Lists the available log files")]
         public static void LogList()
         {
 
@@ -155,7 +155,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// List logs
         /// </summary>
-        [AdminCommand("logcat", "Lists the contents of the specified file")]
+        [AdminCommand("log.cat", "Lists the contents of the specified file")]
         public static void LogCat(LogCatDisplayOptions logOptions)
         {
 
