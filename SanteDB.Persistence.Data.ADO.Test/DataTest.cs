@@ -23,38 +23,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
     [DeploymentItem(@"plugins\engine12.dll", "plugins")]
     public abstract class DataTest
     {
-
-        public static class DataTestUtil
-        {
-            static bool started = false;
-
-            /// <summary>
-            /// Start the test context
-            /// </summary>
-            public static void Start(TestContext context)
-            {
-
-                if (started) return;
-
-                AppDomain.CurrentDomain.SetData(
-                   "DataDirectory",
-                   Path.Combine(context.TestDeploymentDir, string.Empty));
-
-                EntitySource.Current = new EntitySource(new PersistenceEntitySource());
-                ApplicationContext.Current.Start();
-                var f = typeof(FirebirdSql.Data.FirebirdClient.FirebirdClientFactory).AssemblyQualifiedName;
-
-                // Start the daemon services
-                var adoPersistenceService = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
-                if (!adoPersistenceService.IsRunning)
-                {
-                    //adoPersistenceService.Start();
-                    ApplicationContext.Current.Start();
-                }
-                started = true;
-            }
-        }
-
+        
         /// <summary>
         /// Starts the data test 
         /// </summary>

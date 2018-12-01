@@ -75,7 +75,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="SanteDB.Persistence.ADO.nuspec" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
@@ -90,9 +89,17 @@
       <Project>{407c87e6-a1f3-45e6-b883-a8176b350817}</Project>
       <Name>SanteDB.OrmLite</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Caching.Memory\SanteDB.Caching.Memory.csproj">
+      <Project>{8553abc7-abfa-4a21-b0e8-68b7de76129d}</Project>
+      <Name>SanteDB.Caching.Memory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
       <Name>SanteDB.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Persistence.ADO.Test.Core\SanteDB.Persistence.ADO.Test.Core.csproj">
+      <Project>{AD73DB46-CBB3-4746-B406-40FC435AB3DB}</Project>
+      <Name>SanteDB.Persistence.ADO.Test.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Persistence.Data.ADO\SanteDB.Persistence.Data.ADO.csproj">
       <Project>{f38ed54c-e4e4-499a-882e-736289f332c0}</Project>

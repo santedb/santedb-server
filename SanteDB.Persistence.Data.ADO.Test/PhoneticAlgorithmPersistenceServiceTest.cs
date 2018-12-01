@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Persistence.ADO.Test.Core;
 using System.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Test
@@ -14,7 +15,9 @@ namespace SanteDB.Persistence.Data.ADO.Test
         [ClassInitialize]
         public static void ClassSetup(TestContext context)
         {
-            DataTestUtil.Start(context);
+            TestApplicationContext.TestAssembly = typeof(AdoIdentityProviderTest).Assembly;
+            TestApplicationContext.Initialize(context.DeploymentDirectory);
+
         }
 
         /// <summary>

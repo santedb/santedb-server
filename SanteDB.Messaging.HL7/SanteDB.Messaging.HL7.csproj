@@ -50,7 +50,7 @@
   <ItemGroup>
     <Compile Include="Client\MllpMessageSender.cs" />
     <Compile Include="Configuration\Hl7ConfigurationSection.cs" />
-    <Compile Include="Configuration\X509ConfigurationElement.cs" />
+    <Compile Include="Configuration\Hl7X509ConfigurationElement.cs" />
     <Compile Include="DataConverter.cs" />
     <Compile Include="Hl7Constants.cs" />
     <Compile Include="HL7MessageHandler.cs" />

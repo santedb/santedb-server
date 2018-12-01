@@ -4,6 +4,7 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
+using SanteDB.Persistence.ADO.Test.Core;
 using System;
 using System.Linq;
 
@@ -19,7 +20,9 @@ namespace SanteDB.Persistence.Data.ADO.Test
         [ClassInitialize]
         public static void ClassSetup(TestContext context)
         {
-            DataTestUtil.Start(context);
+            TestApplicationContext.TestAssembly = typeof(AdoIdentityProviderTest).Assembly;
+            TestApplicationContext.Initialize(context.DeploymentDirectory);
+
             AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
 
         }

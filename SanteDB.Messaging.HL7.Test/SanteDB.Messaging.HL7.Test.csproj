@@ -73,6 +73,10 @@
       <Project>{c1f86ea3-fc84-456f-a9d9-0bf8db0d48d3}</Project>
       <Name>SanteDB.Messaging.HL7</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Persistence.ADO.Test.Core\SanteDB.Persistence.ADO.Test.Core.csproj">
+      <Project>{AD73DB46-CBB3-4746-B406-40FC435AB3DB}</Project>
+      <Name>SanteDB.Persistence.ADO.Test.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Persistence.Data.ADO.Test\SanteDB.Persistence.Data.ADO.Test.csproj">
       <Project>{11407adb-e336-4c0c-af8e-ea6b601ba69e}</Project>
       <Name>SanteDB.Persistence.Data.ADO.Test</Name>

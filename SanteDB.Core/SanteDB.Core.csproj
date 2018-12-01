@@ -68,6 +68,7 @@
     <Compile Include="Configuration\X509ConfigurationElement.cs" />
     <Compile Include="Diagnostics\DiagnosticExtensions.cs" />
     <Compile Include="Diagnostics\LogTraceWriter.cs" />
+    <Compile Include="Diagnostics\RollOverTextWriterTraceListener.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Configuration\BasicAuthorizationConfigurationSection.cs" />
     <Compile Include="Configuration\ClaimsAuthorizationConfigurationSection.cs" />

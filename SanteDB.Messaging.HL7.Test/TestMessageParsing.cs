@@ -8,6 +8,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.HL7.Messages;
 using SanteDB.Messaging.HL7.TransportProtocol;
+using SanteDB.Persistence.ADO.Test.Core;
 using SanteDB.Persistence.Data.ADO.Test;
 using System;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace SanteDB.Messaging.HL7.Test
         [ClassInitialize]
         public static void Initialize(TestContext context)
         {
-            DataTest.DataTestUtil.Start(context);
+            TestApplicationContext.Initialize(context.DeploymentDirectory);
 
             // Create the test harness device / application
             var securityDevService = ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityDevice>>();

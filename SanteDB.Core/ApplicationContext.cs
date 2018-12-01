@@ -45,7 +45,7 @@ namespace SanteDB.Core
         private static Object s_lockObject = new object();
 
         // Context
-        private static ApplicationContext s_context = null;
+        protected static ApplicationContext s_context = null;
 
         /// <summary>
         /// Singleton accessor
@@ -60,6 +60,10 @@ namespace SanteDB.Core
                             s_context = new ApplicationContext();
                 return s_context;
             }
+            protected set
+            {
+                s_context = value;
+            }
         }
 
         /// <summary>
@@ -70,7 +74,7 @@ namespace SanteDB.Core
         /// <summary>
         /// Gets the identifier for this context
         /// </summary>
-        public Guid ContextId { get; private set; }
+        public Guid ContextId { get; protected set; }
 
         /// <summary>
         /// Gets whether the domain is running
@@ -99,9 +103,10 @@ namespace SanteDB.Core
         /// <summary>
         /// Creates a new instance of the host context
         /// </summary>
-        private ApplicationContext()
+        protected ApplicationContext()
         {
             ContextId = Guid.NewGuid();
+            this.m_serviceInstances.Add(new FileConfigurationService());
         }
 
         #region IServiceProvider Members
@@ -141,14 +146,19 @@ namespace SanteDB.Core
 
                     // If there is no configuration manager then add the local
                     Trace.TraceInformation("STAGE0 START: Load Configuration");
-                    this.m_serviceInstances.Add(new FileConfigurationService());
+                    
                     this.m_configuration = this.GetService<IConfigurationManager>().GetSection<SanteDBServerConfiguration>();
 
                     Trace.TraceInformation("STAGE1 START: Loading services");
                     foreach (var svc in this.m_configuration.ServiceProviders)
                     {
-                        var instance = Activator.CreateInstance(svc.Type);
-                        this.m_serviceInstances.Add(instance);
+                        if (svc.Type == null)
+                            Trace.TraceWarning("Cannot find service {0}, skipping", svc.TypeXml);
+                        else
+                        {
+                            var instance = Activator.CreateInstance(svc.Type);
+                            this.m_serviceInstances.Add(instance);
+                        }
                     }
 
 

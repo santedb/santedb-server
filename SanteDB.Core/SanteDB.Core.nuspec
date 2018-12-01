@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
-    <id>SanteDB.Plugin</id>
+    <id>SanteDB.Server.Plugin</id>
     <version>1.9.0.0</version>
     <title>SanteDB Server Plugin Support</title>
     <authors>SanteDB Community</authors>

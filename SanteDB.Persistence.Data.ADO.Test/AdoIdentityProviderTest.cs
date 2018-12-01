@@ -4,6 +4,7 @@ using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
+using SanteDB.Persistence.ADO.Test.Core;
 using System.Security.Authentication;
 
 namespace SanteDB.Persistence.Data.ADO.Test
@@ -20,8 +21,8 @@ namespace SanteDB.Persistence.Data.ADO.Test
         public static void ClassSetup(TestContext context)
         {
 
-
-            DataTestUtil.Start(context);
+            TestApplicationContext.TestAssembly = typeof(AdoIdentityProviderTest).Assembly;
+            TestApplicationContext.Initialize(context.DeploymentDirectory);
             IPasswordHashingService hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
             AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
             var dataService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();

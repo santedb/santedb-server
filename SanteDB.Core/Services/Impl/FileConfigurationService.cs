@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Specialized;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Xml;
@@ -60,7 +61,9 @@ namespace SanteDB.Core.Services.Impl
                 this.m_configuration = System.Configuration.ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
 
             }
-            catch { }
+            catch (Exception e) {
+                Trace.TraceError("Error loading configuration: {0}", e);
+            }
         }
         
         /// <summary>

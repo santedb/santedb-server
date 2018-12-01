@@ -71,6 +71,10 @@
       <Project>{DB9BC05E-45F1-4F96-A161-F36BDECAF566}</Project>
       <Name>SanteDB.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Persistence.ADO.Test.Core\SanteDB.Persistence.ADO.Test.Core.csproj">
+      <Project>{AD73DB46-CBB3-4746-B406-40FC435AB3DB}</Project>
+      <Name>SanteDB.Persistence.ADO.Test.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Persistence.Data.ADO.Test\SanteDB.Persistence.Data.ADO.Test.csproj">
       <Project>{11407adb-e336-4c0c-af8e-ea6b601ba69e}</Project>
       <Name>SanteDB.Persistence.Data.ADO.Test</Name>
@@ -82,6 +86,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="santedb.config.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="TestConfig.xml" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

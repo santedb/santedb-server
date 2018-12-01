@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using SanteDB.Persistence.ADO.Test.Core;
 
 namespace SanteDB.Persistence.MDM.Test
 {
@@ -36,7 +37,8 @@ namespace SanteDB.Persistence.MDM.Test
         {
             typeof(MdmDaemonService).Equals(null); // Trick - Force test context to load
             typeof(MemoryCacheService).Equals(null);
-            DataTest.DataTestUtil.Start(context);
+            TestApplicationContext.TestAssembly = typeof(MdmAssociationTest).Assembly;
+            TestApplicationContext.Initialize(context.DeploymentDirectory);
         }
 
         /// <summary>

@@ -66,13 +66,13 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
             /// Gets the server certificate
             /// </summary>
             [XmlElement("serverCertificate")]
-            public X509ConfigurationElement ServerCertificate { get; set; }
+            public Hl7X509ConfigurationElement ServerCertificate { get; set; }
 
             /// <summary>
             /// Gets the server certificate
             /// </summary>
             [XmlElement("clientAuthorityCertificate")]
-            public X509ConfigurationElement ClientCaCertificate { get; set; }
+            public Hl7X509ConfigurationElement ClientCaCertificate { get; set; }
 
             /// <summary>
             /// Check revocation status
