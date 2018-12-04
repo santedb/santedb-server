@@ -47,7 +47,9 @@
     <Compile Include="TestConfigurationService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="SanteDB.Persistence.ADO.Test.nuspec" />
+    <None Include="SanteDB.Persistence.ADO.Test.nuspec">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TestConfig.xml" />
@@ -69,11 +71,6 @@
       <Project>{F38ED54C-E4E4-499A-882E-736289F332C0}</Project>
       <Name>SanteDB.Persistence.Data.ADO</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient">
-      <Version>5.12.1</Version>
-    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

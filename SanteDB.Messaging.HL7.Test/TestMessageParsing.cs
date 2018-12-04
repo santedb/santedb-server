@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NHapi.Base.Model;
 using NHapi.Model.V25.Segment;
 using SanteDB.Core;
 using SanteDB.Core.Model.Constants;
@@ -26,6 +27,9 @@ namespace SanteDB.Messaging.HL7.Test
         [ClassInitialize]
         public static void Initialize(TestContext context)
         {
+            // Force load of the DLL
+            var p = FirebirdSql.Data.FirebirdClient.FbCharset.Ascii;
+            TestApplicationContext.TestAssembly = typeof(TestMessageParsing).Assembly;
             TestApplicationContext.Initialize(context.DeploymentDirectory);
 
             // Create the test harness device / application
@@ -121,6 +125,7 @@ namespace SanteDB.Messaging.HL7.Test
             Assert.AreEqual(1, patient.Relationships.Count(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother));
             Assert.AreEqual(2, patient.Relationships.Count(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Citizen));
             Assert.AreEqual(1, patient.Policies.Count);
+           
         }
 
         /// <summary>
@@ -137,10 +142,31 @@ namespace SanteDB.Messaging.HL7.Test
             msg = TestUtil.GetMessage("QBP_SIMPLE");
             var message = new QbpMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
             var messageStr = TestUtil.ToString(message);
+            Assert.AreEqual("SMITH", (message.GetStructure("PID") as PID).GetMotherSMaidenName(0).FamilyName.Surname.Value);
             Assert.AreEqual("AA", (message.GetStructure("MSA") as MSA).AcknowledgmentCode.Value);
-            Assert.AreEqual("AA", (message.GetStructure("QAK") as QAK).QueryResponseStatus.Value);
+            Assert.AreEqual("OK", (message.GetStructure("QAK") as QAK).QueryResponseStatus.Value);
             Assert.AreEqual("K22", (message.GetStructure("MSH") as MSH).MessageType.TriggerEvent.Value);
         }
 
+        /// <summary>
+        /// Tests that a query actually occurs
+        /// </summary>
+        [TestMethod]
+        public void TestCrossReference()
+        {
+            AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
+            var msg = TestUtil.GetMessage("QBP_XREF_PRE");
+            new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
+            var patient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "HL7-4"), AuthenticationContext.Current.Principal).SingleOrDefault();
+            Assert.IsNotNull(patient);
+            msg = TestUtil.GetMessage("QBP_XREF");
+            var message = new QbpMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
+            var messageStr = TestUtil.ToString(message);
+            // TODO : Assert that id is present
+            Assert.IsTrue(((message.GetStructure("QUERY_RESPONSE") as AbstractGroup).GetStructure("PID") as PID).GetPatientIdentifierList().Any(i => i.IDNumber.Value == patient.Key.ToString() && i.AssigningAuthority.NamespaceID.Value == "KEY"));
+            Assert.AreEqual("AA", (message.GetStructure("MSA") as MSA).AcknowledgmentCode.Value);
+            Assert.AreEqual("OK", (message.GetStructure("QAK") as QAK).QueryResponseStatus.Value);
+            Assert.AreEqual("K23", (message.GetStructure("MSH") as MSH).MessageType.TriggerEvent.Value);
+        }
     }
 }

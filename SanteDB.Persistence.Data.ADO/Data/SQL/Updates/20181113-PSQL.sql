@@ -18,6 +18,7 @@ alter table alrt_tbl rename to mail_msg_tbl;
 alter table mail_msg_tbl rename alrt_id to mail_msg_id;
 alter table alrt_rcpt_to_tbl rename to mail_msg_rcpt_to_tbl;
 alter table mail_msg_rcpt_to_tbl rename alrt_id to mail_msg_id;
+
 SELECT REG_PATCH('20181113-01');
 
 COMMIT;

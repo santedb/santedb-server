@@ -19,13 +19,22 @@
  -->
 <Hl7QueryParameterMap xmlns="http://santedb.org/model/hl7">
   <messageType trigger="Q22" name="Find Candidates Query" response="RSP_K21" responseTrigger="K22" queryTarget="Patient"
-               resultHandler="SanteDB.Messaging.HL7.Query.FindCandidatesQueryResultHandler, SanteDB.Messaging.HL7, Version=1.0.0.0"
+               queryHandler="SanteDB.Messaging.HL7.Query.FindCandidatesQueryHandler, SanteDB.Messaging.HL7, Version=1.0.0.0"
                matchConfiguration="default">
     <parameter hl7="@PID.5.1.1" model="name.component[Family].value" type="string"/>
     <parameter hl7="@PID.5.2.1" model="name.component[Given].value"  type="string"/>
+    <parameter hl7="@PID.6.1.1" model="relationship[Mother].target@Person.name.component[Family].value"  type="string"/>
+    <parameter hl7="@PID.6.2.1" model="relationship[Mother].target@Person.name.component[Given].value"  type="string"/>
+    <parameter hl7="@PID.7.1.1" model="dateOfBirth" />
     <parameter hl7="@PID.8.1.1" model="genderConcept" type="concept"/>
+    <parameter hl7="@PID.13.4.1" model="telecom.value" type="concept"/>
+    <parameter hl7="@PID.13.12.1" model="telecom[MobileContact|EmergencyContact].value" type="concept"/>
     <parameter hl7="@PID.3.1.1" model="identifier.value"/>
     <parameter hl7="@PID.3.4.1" model="identifier.authority.domainName"/>
     <parameter hl7="@PID.3.4.2" model="identifier.authority.oid"/>
+  </messageType>
+  <messageType trigger="Q23" name="Cross Reference Identifiers" response="RSP_K23" responseTrigger="K23" queryTarget="Patient"
+               queryHandler="SanteDB.Messaging.HL7.Query.CrossReferenceQueryHandler, SanteDB.Messaging.HL7, Version=1.0.0.0"
+               matchConfiguration="default">
   </messageType>
 </Hl7QueryParameterMap>

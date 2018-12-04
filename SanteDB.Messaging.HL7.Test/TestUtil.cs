@@ -1,5 +1,6 @@
 ﻿using NHapi.Base.Model;
 using NHapi.Base.Parser;
+using SanteDB.Messaging.HL7.Utils;
 using System;
 using System.IO;
 
@@ -16,9 +17,10 @@ namespace SanteDB.Messaging.HL7.Test
         /// </summary>
         public static IMessage GetMessage(String messageName)
         {
-            using (var s = typeof(TestUtil).Assembly.GetManifestResourceStream($"SanteDB.Messaging.HL7.Test.Resources.{messageName}.txt"))
+            string originalVersion = null;
+            using (var s = typeof(TestUtil).Assembly.GetManifestResourceStream($"SanteDB.Messaging.HL7.Test.Resources.{messageName}.txt")) 
             using (var sw = new StreamReader(s))
-                return new PipeParser().Parse(sw.ReadToEnd().Replace("2.3.1", "2.5"));
+                return MessageUtils.ParseMessage(sw.ReadToEnd(), out originalVersion);
         }
 
         /// <summary>
@@ -26,7 +28,8 @@ namespace SanteDB.Messaging.HL7.Test
         /// </summary>
         public static String ToString(IMessage msg)
         {
-            return new PipeParser().Encode(msg);
+            
+            return MessageUtils.EncodeMessage(msg, "2.5.1");
         }
     }
 }

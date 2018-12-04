@@ -360,8 +360,8 @@
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoSessionProvider, SanteDB.Persistence.Data.ADO, Version=1.9.0.31438, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPolicyInformationService, SanteDB.Persistence.Data.ADO, Version=1.9.0.31831, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoRoleProvider, SanteDB.Persistence.Data.ADO, Version=1.9.0.31831, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Persistence.Auditing.ADO.Services.AdoAuditRepositoryService, SanteDB.Persistence.Auditing.ADO, Version=1.9.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.Privacy.LocalPolicyEnforcementPointService, SanteDB.Core, Version=1.9.0.24160, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Persistence.Auditing.ADO.Services.AdoAuditRepositoryService, SanteDB.Persistence.Auditing.ADO, Version=1.9.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.SimpleTfaSecretGenerator, SanteDB.Core, Version=1.9.0.31830, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.DefaultTfaRelayService, SanteDB.Core, Version=1.9.0.31437, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.DefaultPasswordValidationService, SanteDB.Core, Version=1.9.0.31830, Culture=neutral, PublicKeyToken=null" />

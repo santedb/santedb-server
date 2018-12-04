@@ -17,6 +17,7 @@
  * User: justin
  * Date: 2018-6-22
  */
+using Newtonsoft.Json;
 using SanteDB.Core.Security;
 using SanteDB.Messaging.HL7.Utils;
 using System.Security.Cryptography.X509Certificates;
@@ -37,25 +38,25 @@ namespace SanteDB.Messaging.HL7.Configuration
         /// <summary>
         /// The find type
         /// </summary>
-        [XmlAttribute("findType")]
+        [XmlAttribute("findType"), JsonProperty("findType")]
         public X509FindType FindType { get; set; }
 
         /// <summary>
         /// The store name
         /// </summary>
-        [XmlAttribute("storeName")]
+        [XmlAttribute("storeName"), JsonProperty("storeName")]
         public StoreName StoreName { get; set; }
 
         /// <summary>
         /// The store location
         /// </summary>
-        [XmlAttribute("storeLocation")]
+        [XmlAttribute("storeLocation"), JsonProperty("storeLocation")]
         public StoreLocation StoreLocation { get; set; }
 
         /// <summary>
         /// The find value
         /// </summary>
-        [XmlAttribute("findValue")]
+        [XmlAttribute("findValue"), JsonProperty("findValue")]
         public string FindValue { get; set; }
 
         /// <summary>

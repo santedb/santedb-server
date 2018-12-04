@@ -51,6 +51,11 @@ namespace SanteDB.Messaging.HL7.Messages
         private static Hl7QueryParameterMap s_map;
 
         /// <summary>
+        /// Gets the supported triggers
+        /// </summary>
+        public override string[] SupportedTriggers => s_map.Map.Select(o => $"QBP^{o.Trigger}").ToArray();
+
+        /// <summary>
         /// Qbp Message handler CTOR
         /// </summary>
         static QbpMessageHandler()
@@ -102,11 +107,11 @@ namespace SanteDB.Messaging.HL7.Messages
 
                 // First, process the query parameters
                 var qpd = e.Message.GetStructure("QPD") as QPD;
-                var query = this.RewriteQuery(qpd, map);
+                var query = map.QueryHandler.ParseQuery(qpd, map);
 
                 // Control?
                 var rcp = e.Message.GetStructure("RCP") as RCP;
-                int? count = 0, offset = 0;
+                int? count = null, offset = 0;
                 Guid queryId = Guid.NewGuid();
                 if (!String.IsNullOrEmpty(rcp.QuantityLimitedRequest.Quantity.Value))
                     count = Int32.Parse(rcp.QuantityLimitedRequest.Quantity.Value);
@@ -140,7 +145,7 @@ namespace SanteDB.Messaging.HL7.Messages
 
                 // Now we want to query
                 object[] parameters = { filterQuery, offset.Value, (int?)count, null, queryId };
-                var findMethod = repoService.GetType().GetMethod("Find", new Type[] { filterQuery.GetType(), typeof(int), typeof(int?), typeof(int), typeof(Guid) });
+                var findMethod = repoService.GetType().GetMethod("Find", new Type[] { filterQuery.GetType(), typeof(int), typeof(int?), typeof(int).MakeByRefType(), typeof(Guid) });
                 IEnumerable results = findMethod.Invoke(repoService, parameters) as IEnumerable;
                 int totalResults = (int)parameters[3];
 
@@ -158,7 +163,7 @@ namespace SanteDB.Messaging.HL7.Messages
                 omsh.MessageType.TriggerEvent.Value = map.ResponseTrigger;
                 qak.HitCount.Value = totalResults.ToString();
                 qak.HitsRemaining.Value = (totalResults - offset - count > 0 ? totalResults - offset - count : 0).ToString();
-                qak.QueryResponseStatus.Value = "AA";
+                qak.QueryResponseStatus.Value = totalResults == 0 ? "NF" : "OK";
                 qak.ThisPayload.Value = results.OfType<Object>().Count().ToString();
 
                 if (ApplicationServiceContext.Current.GetService<Core.Services.IQueryPersistenceService>() != null)
@@ -168,7 +173,7 @@ namespace SanteDB.Messaging.HL7.Messages
                 }
 
                 // Process results
-                retVal = map.ResultHandler.AppendQueryResult(results, filterQuery, retVal, e, map.ScoreConfiguration, offset.GetValueOrDefault());
+                retVal = map.QueryHandler.AppendQueryResult(results, filterQuery, retVal, e, map.ScoreConfiguration, offset.GetValueOrDefault());
                 return retVal;
             }
             catch(Exception ex)
@@ -181,99 +186,7 @@ namespace SanteDB.Messaging.HL7.Messages
         }
 
 
-        /// <summary>
-        /// Rewrite a QPD query to an HDSI query
-        /// </summary>
-        private NameValueCollection RewriteQuery(QPD qpd, Hl7QueryParameterType map)
-        {
-            NameValueCollection retVal = new NameValueCollection();
-
-            // Control of strength
-            String strStrength = (qpd.GetField(4, 0) as Varies)?.Data.ToString(),
-                algorithm = (qpd.GetField(5, 0) as Varies)?.Data.ToString();
-            Double? strength = String.IsNullOrEmpty(strStrength) ? null : (double?)Double.Parse(strStrength);
-
-            // Query parameters
-            foreach (var qp in qpd.GetField(3).OfType<Varies>())
-            {
-                var composite = qp.Data as GenericComposite;
-
-                // Parse the parameters
-                var qfield = (composite.Components[0] as Varies)?.Data?.ToString();
-                var qvalue = (composite.Components[1] as Varies)?.Data?.ToString();
-
-                // Attempt to find the query parameter and map
-                var parm = map.Parameters.Where(o => o.Hl7Name == qfield || o.Hl7Name == qfield + ".1" || o.Hl7Name == qfield + ".1.1").OrderBy(o=>o.Hl7Name.Length - qfield.Length).FirstOrDefault();
-                if (parm == null)
-                    throw new ArgumentOutOfRangeException($"{qfield} not mapped to query parameter");
-
-                switch(parm.ParameterType)
-                {
-                    case "concept":
-                        retVal.Add($"{parm.ModelName}.referenceTerm.term.mnemonic", qvalue);
-                        break;
-                    case "string": // Enables phonetic matching
-                        String transform = null;
-                        switch(algorithm.ToLower())
-                        {
-                            case "exact":
-                                transform = "{0}";
-                                break;
-                            case "soundex":
-                                if (strength.HasValue)
-                                    transform = ":(soundex){0}";
-                                else
-                                    transform = $":(phonetic_diff|{{0}},soundex)<={strength * qvalue.Length}";
-                                break;
-                            case "metaphone":
-                                if (strength.HasValue)
-                                    transform = ":(metaphone){0}";
-                                else
-                                    transform = $":(phonetic_diff|{{0}},metaphone)<={strength * qvalue.Length}";
-                                break;
-                            case "dmetaphone":
-                                if (strength.HasValue)
-                                    transform = ":(dmetaphone){0}";
-                                else
-                                    transform = $":(phonetic_diff|{{0}},dmetaphone)<={strength * qvalue.Length}";
-                                break;
-                            case "alias":
-                                transform = $":(alias|{{0}})>={strength ?? 3}";
-                                break;
-                            default:
-                                transform = $":(phonetic_diff|{{0}})<={strength * qvalue.Length},:(alias|{{0}})>={strength ?? 3}";
-                                break;
-                        }
-                        retVal.Add(parm.ModelName, transform.Split(',').Select(tx => String.Format(tx, qvalue)).ToList());
-                        break;
-                    default:
-                        var txv = parm.ValueTransform ?? "{0}";
-                        retVal.Add(parm.ModelName, txv.Split(',').Select(tx => String.Format(tx, qvalue)).ToList());
-                        break;
-                }
-            }
-
-            // Return domains
-            foreach(var rt in qpd.GetField(8).OfType<Varies>())
-            {
-                var rid = new CX(qpd.Message);
-                DeepCopy.copy(rt.Data as GenericComposite, rid);
-
-                if (String.IsNullOrEmpty(rid.AssigningAuthority.NamespaceID.Value)) // lookup by AA 
-                {
-                    var aa = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>().Query(o => o.Oid == rid.AssigningAuthority.UniversalID.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                    if (aa == null)
-                        throw new InvalidOperationException($"Domain {rid.AssigningAuthority.UniversalID.Value} is unknown");
-                    else
-                        retVal.Add($"identifier[{aa.DomainName}]", "!null");
-                }
-                else
-                    retVal.Add($"identifier[{rid.AssigningAuthority.NamespaceID.Value}]", "!null");
-            }
-
-            
-            return retVal;
-        }
+       
 
         /// <summary>
         /// Validate that this message can be processed

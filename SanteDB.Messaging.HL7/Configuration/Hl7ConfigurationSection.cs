@@ -1,4 +1,5 @@
-﻿using SanteDB.Core.Configuration;
+﻿using Newtonsoft.Json;
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Messaging.HL7.TransportProtocol;
 using System;
@@ -21,14 +22,14 @@ namespace SanteDB.Messaging.HL7.Configuration
         /// <summary>
         /// Represents the local domain
         /// </summary>
-        [XmlElement("localAuthority")]
+        [XmlElement("localAuthority"), JsonProperty("localAuthority")]
         public AssigningAuthority LocalAuthority { get; set; }
 
 
         /// <summary>
         /// Security method
         /// </summary>
-        [XmlAttribute("security")]
+        [XmlAttribute("security"), JsonProperty("security")]
         public SecurityMethod Security { get; set; }
 
 
@@ -36,9 +37,14 @@ namespace SanteDB.Messaging.HL7.Configuration
         /// The address to which to bind
         /// </summary>
         /// <remarks>A full Uri is required and must be tcp:// or mllp://</remarks>
-        [XmlArray("services"), XmlArrayItem("add")]
+        [XmlArray("services"), XmlArrayItem("add"), JsonProperty("services")]
         public List<ServiceDefinition> Services { get; set; }
 
+        /// <summary>
+        /// Gets or sets the facilit
+        /// </summary>
+        [XmlElement("facility"), JsonProperty("facility")]
+        public Guid LocalFacility { get; set; }
     }
 
     /// <summary>
@@ -63,7 +69,7 @@ namespace SanteDB.Messaging.HL7.Configuration
         /// <summary>
         /// Gets or sets the handler
         /// </summary>
-        [XmlIgnore]
+        [XmlIgnore, JsonIgnore]
         public IHL7MessageHandler Handler {
             get
             {
@@ -85,13 +91,13 @@ namespace SanteDB.Messaging.HL7.Configuration
         /// <summary>
         /// Type name of the handler
         /// </summary>
-        [XmlAttribute("type")]
+        [XmlAttribute("type"), JsonProperty("type")]
         public string HandlerType { get; set; }
 
         /// <summary>
         /// Message types that trigger this (MSH-9)
         /// </summary>
-        [XmlElement("message")]
+        [XmlElement("message"), JsonProperty("message")]
         public List<MessageDefinition> Types { get; set; }
 
         /// <summary>
@@ -135,13 +141,13 @@ namespace SanteDB.Messaging.HL7.Configuration
         /// <summary>
         /// Gets or sets a value identifying whether this is a query
         /// </summary>
-        [XmlAttribute("isQuery")]
+        [XmlAttribute("isQuery"), JsonProperty("isQuery")]
         public bool IsQuery { get; set; }
 
         /// <summary>
         /// Gets or sets the name
         /// </summary>
-        [XmlAttribute("name")]
+        [XmlAttribute("name"), JsonProperty("name")]
         public string Name { get; set; }
     }
 
@@ -162,37 +168,37 @@ namespace SanteDB.Messaging.HL7.Configuration
         /// <summary>
         /// Gets or sets the address of the service
         /// </summary>
-        [XmlAttribute("address")]
+        [XmlAttribute("address"), JsonProperty("address")]
         public String AddressXml { get; set; }
 
         /// <summary>
         /// Gets the listening address
         /// </summary>
-        [XmlIgnore]
+        [XmlIgnore, JsonIgnore]
         public Uri Address => new Uri(this.AddressXml);
 
         /// <summary>
         /// Attributes
         /// </summary>
-        [XmlElement("sllp", Type = typeof(SllpTransport.SllpConfigurationObject))]
+        [XmlElement("sllp", Type = typeof(SllpTransport.SllpConfigurationObject)), JsonProperty("sllpConfiguration")]
         public object Configuration { get; set; }
 
         /// <summary>
         /// Gets or sets the handlers
         /// </summary>
-        [XmlArray("handler"), XmlArrayItem("add")]
+        [XmlArray("handler"), XmlArrayItem("add"), JsonProperty("handlers")]
         public List<HandlerDefinition> Handlers { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the defintiion
         /// </summary>
-        [XmlAttribute("name")]
+        [XmlAttribute("name"), JsonProperty("name")]
         public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the timeout
         /// </summary>
-        [XmlAttribute("receiveTimeout")]
+        [XmlAttribute("receiveTimeout"), JsonProperty("receiveTimeout")]
         public int ReceiveTimeout { get; set; }
     }
 

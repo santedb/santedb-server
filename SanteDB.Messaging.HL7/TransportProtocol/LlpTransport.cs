@@ -19,6 +19,7 @@
 
 using SanteDB.Core.Diagnostics;
 using SanteDB.Messaging.HL7.Configuration;
+using SanteDB.Messaging.HL7.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -113,9 +114,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 			try
 			{
 				// Now read to a string
-				NHapi.Base.Parser.PipeParser parser = new NHapi.Base.Parser.PipeParser();
-
-				DateTime lastReceive = DateTime.Now;
+                DateTime lastReceive = DateTime.Now;
 
 				while (DateTime.Now.Subtract(lastReceive) < this.m_timeout)
 				{
@@ -169,7 +168,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 
 					// Use the nHAPI parser to process the data
 					Hl7MessageReceivedEventArgs messageArgs = null;
-
+                    String originalVersion = null;
 					try
 					{
 						// Setup local and remote receive endpoint data for auditing
@@ -184,7 +183,8 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 
 						// HACK: nHAPI doesn't like URLs ... Will fix this later
 						string messageString = messageData.ToString().Replace("|URL|", "|ST|");
-						var message = parser.Parse(messageString);
+
+						var message = MessageUtils.ParseMessage(messageString, out originalVersion);
 						messageArgs = new Hl7MessageReceivedEventArgs(message, localEndpoint, remoteEndpoint, DateTime.Now);
 
 						// Call any bound event handlers that there is a message available
@@ -200,7 +200,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 								memoryWriter.Write(new byte[] { START_TX }, 0, 1); // header
 								if (messageArgs != null && messageArgs.Response != null)
 								{
-									var strMessage = parser.Encode(messageArgs.Response);
+									var strMessage = MessageUtils.EncodeMessage(messageArgs.Response, originalVersion);
 #if DEBUG
 									this.m_traceSource.TraceInformation("Sending message to llp://{0} : {1}", tcpClient.Client.RemoteEndPoint, strMessage);
 #endif

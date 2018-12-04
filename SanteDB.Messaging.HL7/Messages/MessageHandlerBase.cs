@@ -48,6 +48,7 @@ using NHapi.Base.Parser;
 using NHapi.Model.V25.Message;
 using SanteDB.Core.Security.Services;
 using System.Security.Authentication;
+using SanteDB.Core.Model.Entities;
 
 namespace SanteDB.Messaging.HL7.Messages
 {
@@ -58,7 +59,7 @@ namespace SanteDB.Messaging.HL7.Messages
     {
 
         // Configuration
-        private Hl7ConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
+        private Hl7ConfigurationSection m_configuration = ApplicationServiceContext.Current?.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
 
         // Entry ASM hash
         private static String s_entryAsmHash = null;
@@ -67,6 +68,11 @@ namespace SanteDB.Messaging.HL7.Messages
         private static DateTime? s_installDate = null;
 
         protected TraceSource m_traceSource = new TraceSource("SanteDB.Messaging.HL7");
+
+        /// <summary>
+        /// Get the supported triggers
+        /// </summary>
+        public abstract string[] SupportedTriggers { get; }
 
         /// <summary>
         /// Allows overridden classes to implement the message handling logic
@@ -212,7 +218,11 @@ namespace SanteDB.Messaging.HL7.Messages
                         this.m_configuration.Security == SecurityMethod.Msh8 ? msh.Security.Value : null;
 
                 IPrincipal devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(deviceId, deviceSecret),
-                    applicationPrincipal = applicationSecret != null ? ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>().Authenticate(applicationId, applicationSecret) : null;
+                    applicationPrincipal = applicationSecret != null ? ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>()?.Authenticate(applicationId, applicationSecret) : null;
+
+                if (applicationPrincipal == null && ApplicationServiceContext.HostType == SanteDBHostType.Server)
+                    throw new UnauthorizedAccessException("Server requires authenticated application");
+
                 principal = new ClaimsPrincipal(new IIdentity[] { devicePrincipal.Identity, applicationPrincipal?.Identity }.OfType<ClaimsIdentity>());
             }
             else if (this.m_configuration.Security != SecurityMethod.None)
@@ -234,8 +244,10 @@ namespace SanteDB.Messaging.HL7.Messages
                                             this.m_configuration.Security == SecurityMethod.Msh8 ? msh.Security.Value : null;
 
                 IPrincipal devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(deviceId, deviceSecret),
-                    applicationPrincipal = applicationSecret != null ? ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>().Authenticate(applicationId, applicationSecret) : null;
+                    applicationPrincipal = applicationSecret != null ? ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>()?.Authenticate(applicationId, applicationSecret) : null;
 
+                if (applicationPrincipal == null && ApplicationServiceContext.HostType == SanteDBHostType.Server)
+                    throw new UnauthorizedAccessException("Server requires authenticated application");
                 principal = new ClaimsPrincipal(new IIdentity[] { devicePrincipal.Identity, applicationPrincipal?.Identity }.OfType<ClaimsIdentity>());
             }
 
@@ -404,11 +416,14 @@ namespace SanteDB.Messaging.HL7.Messages
         {
             var config = this.m_configuration;
             msh.MessageControlID.Value = Guid.NewGuid().ToString();
-            msh.SendingApplication.NamespaceID.Value = Environment.MachineName;
-            msh.SendingFacility.NamespaceID.Value = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().DomainName;
+            msh.SendingApplication.NamespaceID.Value = ApplicationServiceContext.Current.GetService<INetworkInformationService>()?.GetMachineName();
+            msh.SendingFacility.UniversalID.Value = this.m_configuration.LocalFacility.ToString();
+            msh.SendingFacility.UniversalIDType.Value = "GUID";
             msh.ReceivingApplication.NamespaceID.Value = inbound.SendingApplication.NamespaceID.Value;
             msh.ReceivingFacility.NamespaceID.Value = inbound.SendingFacility.NamespaceID.Value;
             msh.DateTimeOfMessage.Time.Value = DateTime.Now.ToString("yyyyMMddHHmmss");
         }
+
+       
     }
 }

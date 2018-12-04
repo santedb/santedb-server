@@ -19,6 +19,7 @@
  */
 using SanteDB.Core;
 using SanteDB.Core.Interop;
+using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.HL7.Configuration;
 using SanteDB.Messaging.HL7.TransportProtocol;
@@ -42,12 +43,16 @@ namespace SanteDB.Messaging.HL7
         /// </summary>
         public string ServiceName => "HL7v2 API Endpoint Provider";
 
+
+        // The local facility
+        private Place m_localFacility;
+
         #region IMessageHandlerService Members
 
         // HL7 Trace source name
         private TraceSource m_traceSource = new TraceSource(Hl7Constants.TraceSourceName);
         // Configuration
-        private Hl7ConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
+        private Hl7ConfigurationSection m_configuration;
 
         // Threads that are listening for messages
         private List<ServiceHandler> m_listenerThreads = new List<ServiceHandler>();
@@ -57,7 +62,13 @@ namespace SanteDB.Messaging.HL7
         /// </summary>
         public bool Start()
         {
+             this.m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
             this.Starting?.Invoke(this, EventArgs.Empty);
+
+            ApplicationServiceContext.Current.Started += (o, e) =>
+            {
+                this.m_localFacility = ApplicationServiceContext.Current.GetService<IRepositoryService<Place>>().Get(this.m_configuration.LocalFacility);
+            };
 
             foreach (var sd in this.m_configuration.Services)
             {

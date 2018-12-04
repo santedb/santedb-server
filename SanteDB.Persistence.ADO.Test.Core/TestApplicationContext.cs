@@ -50,11 +50,10 @@ namespace SanteDB.Persistence.ADO.Test.Core
             EntitySource.Current = new EntitySource(new PersistenceEntitySource());
             ApplicationServiceContext.Current = ApplicationContext.Current = new TestApplicationContext();
             ApplicationContext.Current.Start();
-            var f = typeof(FirebirdSql.Data.FirebirdClient.FirebirdClientFactory).AssemblyQualifiedName;
 
             // Start the daemon services
             var adoPersistenceService = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
-            if (!adoPersistenceService.IsRunning)
+            if (adoPersistenceService?.IsRunning == false)
             {
                 //adoPersistenceService.Start();
                 TestApplicationContext.Current.Start();

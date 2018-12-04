@@ -122,16 +122,16 @@ namespace SanteDB.Messaging.HL7.ParameterMap
         /// Gets or sets the result handler
         /// </summary>
         [XmlIgnore]
-        public IQueryResultHandler ResultHandler { get; set; }
+        public IQueryHandler QueryHandler { get; set; }
 
         /// <summary>
         /// The name of the fuzzy probabalistic algorithm to score matches
         /// </summary>
-        [XmlAttribute("resultHandler")]
-        public String ResultHandlerXml
+        [XmlAttribute("queryHandler")]
+        public String QueryHandlerXml
         {
-            get { return this.ResultHandler.GetType().AssemblyQualifiedName; }
-            set { this.ResultHandler = Activator.CreateInstance(Type.GetType(value)) as IQueryResultHandler; }
+            get { return this.QueryHandler.GetType().AssemblyQualifiedName; }
+            set { this.QueryHandler = Activator.CreateInstance(Type.GetType(value)) as IQueryHandler; }
         }
 
         /// <summary>

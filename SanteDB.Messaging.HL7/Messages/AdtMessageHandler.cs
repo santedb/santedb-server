@@ -35,6 +35,12 @@ namespace SanteDB.Messaging.HL7.Messages
     /// </summary> 
     public class AdtMessageHandler : MessageHandlerBase
     {
+
+        /// <summary>
+        /// Supported triggers
+        /// </summary>
+        public override string[] SupportedTriggers => new string[] { "ADT^A01", "ADT^A04", "ADT^A08", "ADT^A40" };
+
         /// <summary>
         /// Handle the message internally
         /// </summary>

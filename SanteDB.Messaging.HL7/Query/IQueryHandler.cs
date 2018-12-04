@@ -18,6 +18,9 @@
  * Date: 2018-10-14
  */
 using NHapi.Base.Model;
+using NHapi.Model.V25.Segment;
+using SanteDB.Core.Model.Query;
+using SanteDB.Messaging.HL7.ParameterMap;
 using SanteDB.Messaging.HL7.TransportProtocol;
 using System;
 using System.Collections;
@@ -28,7 +31,7 @@ namespace SanteDB.Messaging.HL7.Query
     /// <summary>
     /// Represents a query result handler
     /// </summary>
-    public interface IQueryResultHandler
+    public interface IQueryHandler
     {
 
         /// <summary>
@@ -40,6 +43,12 @@ namespace SanteDB.Messaging.HL7.Query
         /// <param name="evt"></param>
         /// <returns></returns>
         IMessage AppendQueryResult(IEnumerable results, Expression queryDefinition, IMessage currentResponse, Hl7MessageReceivedEventArgs evt, String scoreConfiguration = null, int offset = 0);
+
+        /// <summary>
+        /// Rewrite the specified query
+        /// </summary>
+        NameValueCollection ParseQuery(QPD qpd, Hl7QueryParameterType map);
+
 
     }
 }

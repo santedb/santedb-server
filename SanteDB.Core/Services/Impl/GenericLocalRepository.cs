@@ -36,6 +36,7 @@ namespace SanteDB.Core.Services.Impl
     /// </summary>
     public class GenericLocalRepository<TEntity> :
         IValidatingRepositoryService<TEntity>,
+        IRepositoryService<TEntity>,
         IPersistableQueryRepositoryService<TEntity>,
         IFastQueryRepositoryService<TEntity>,
         ISecuredRepositoryService
@@ -55,23 +56,23 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Gets the policy required for querying
         /// </summary>
-        protected virtual String QueryPolicy => PermissionPolicyIdentifiers.Login;
+        protected virtual String QueryPolicy => PermissionPolicyIdentifiers.LoginAsService;
         /// <summary>
         /// Gets the policy required for reading
         /// </summary>
-        protected virtual String ReadPolicy => PermissionPolicyIdentifiers.Login;
+        protected virtual String ReadPolicy => PermissionPolicyIdentifiers.LoginAsService;
         /// <summary>
         /// Gets the policy required for writing
         /// </summary>
-        protected virtual String WritePolicy => PermissionPolicyIdentifiers.Login;
+        protected virtual String WritePolicy => PermissionPolicyIdentifiers.LoginAsService;
         /// <summary>
         /// Gets the policy required for deleting
         /// </summary>
-        protected virtual String DeletePolicy => PermissionPolicyIdentifiers.Login;
+        protected virtual String DeletePolicy => PermissionPolicyIdentifiers.LoginAsService;
         /// <summary>
         /// Gets the policy for altering
         /// </summary>
-        protected virtual String AlterPolicy => PermissionPolicyIdentifiers.Login;
+        protected virtual String AlterPolicy => PermissionPolicyIdentifiers.LoginAsService;
 
         /// <summary>
         /// Find with stored query parameters

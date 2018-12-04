@@ -31,5 +31,10 @@ namespace SanteDB.Messaging.HL7
 		/// Handle a message
 		/// </summary>
 		IMessage HandleMessage(Hl7MessageReceivedEventArgs e);
+
+        /// <summary>
+        /// The triggers the handler supports
+        /// </summary>
+        string[] SupportedTriggers { get; }
 	}
 }

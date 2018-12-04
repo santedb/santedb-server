@@ -47,7 +47,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// Identity provider service
     /// </summary>
     [ServiceProvider("ADO.NET Identity Provider")]
-    public sealed class AdoIdentityProvider : ISessionIdentityProviderService
+    public sealed class AdoIdentityProvider : ISessionIdentityProviderService, IIdentityProviderService
     {
         /// <summary>
         /// Gets the service name

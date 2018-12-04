@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>SanteDB.Messaging.HL7</id>
-    <version>1.9.14.0</version>
+    <version>1.9.18.6</version>
     <title>HL7 v2 Bindings for SanteDB</title>
     <authors>SanteDB Community</authors>
     <owners>santedb.org</owners>
@@ -15,9 +15,9 @@
     <copyright>Copyright (C) 2018, Mohawk College of Applied Arts and Technology</copyright>
     <tags>cdr santedb hl7</tags>
     <dependencies>
-      <dependency id="SanteDB.Core.Api" version="1.9.14.0" />
-      <dependency id="SanteDB.Core.Model" version="1.9.14.0" />
-      <dependency id="SanteDB.Rest.Common" version="1.9.14.0" />
+      <dependency id="SanteDB.Core.Api" version="1.9.18.0" />
+      <dependency id="SanteDB.Core.Model" version="1.9.18.0" />
+      <dependency id="SanteDB.Rest.Common" version="1.9.18.0" />
     </dependencies>
     <references>
       <group targetFramework="net45">

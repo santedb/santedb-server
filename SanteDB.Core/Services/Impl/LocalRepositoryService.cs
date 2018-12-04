@@ -22,6 +22,7 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Roles;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -83,11 +84,13 @@ namespace SanteDB.Core.Services.Impl
                 typeof(GenericLocalMetadataRepository<AssigningAuthority>),
                 typeof(GenericLocalMetadataRepository<ExtensionType>),
                 typeof(GenericLocalMetadataRepository<TemplateDefinition>),
+                typeof(LocalBatchRepository),
                 typeof(LocalMaterialRepository),
                 typeof(LocalManufacturedMaterialRepository),
                 typeof(LocalOrganizationRepository),
                 typeof(LocalPlaceRepository),
                 typeof(LocalEntityRelationshipRepository),
+                typeof(LocalPatientRepository),
                 typeof(LocalExtensionTypeRepository),
                 typeof(LocalSecurityApplicationRepository),
                 typeof(LocalSecurityDeviceRepository),
