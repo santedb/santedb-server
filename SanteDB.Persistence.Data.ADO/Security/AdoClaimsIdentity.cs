@@ -39,7 +39,7 @@ using System.IO;
 using System.Linq;
 using System.Security;
 using System.Security.Authentication;
-using System.Security.Claims;
+
 using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.ADO.Security
@@ -47,16 +47,14 @@ namespace SanteDB.Persistence.Data.ADO.Security
     /// <summary>
     /// Represents a user prinicpal based on a SecurityUser domain model 
     /// </summary>
-    public class AdoClaimsIdentity : ClaimsIdentity, IIdentity, ISession, IClaimsIdentity
+    public class AdoClaimsIdentity : SanteDBClaimsIdentity, IIdentity, ISession, IClaimsIdentity
     {
         // Trace source
         private static TraceSource s_traceSource = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
 
         // Lock object
         private static Object s_lockObject = new object();
-
-        // Whether the user is authenticated
-        private bool m_isAuthenticated;
+        
         // The security user
         private DbSecurityUser m_securityUser;
         // The authentication type
@@ -230,45 +228,12 @@ namespace SanteDB.Persistence.Data.ADO.Security
         /// Private ctor
         /// </summary>
         private AdoClaimsIdentity(DbSecurityUser user, IEnumerable<DbSecurityRole> roles, bool isAuthenticated)
+            : base(user.UserName, isAuthenticated, "LOCAL")
         {
-            this.m_isAuthenticated = isAuthenticated;
             this.m_securityUser = user;
             this.m_roles = roles.ToList();
         }
-
-        /// <summary>
-        /// Gets the authentication type
-        /// </summary>
-        public string AuthenticationType
-        {
-            get
-            {
-                return this.m_authenticationType;
-            }
-        }
-
-        /// <summary>
-        /// Whether the principal is autheticated
-        /// </summary>
-        public bool IsAuthenticated
-        {
-            get
-            {
-                return this.m_isAuthenticated;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the name of the user
-        /// </summary>
-        public string Name
-        {
-            get
-            {
-                return this.m_securityUser.UserName;
-            }
-        }
-
+        
         /// <summary>
         /// Gets the original user upon which this principal is based
         /// </summary>
@@ -281,56 +246,49 @@ namespace SanteDB.Persistence.Data.ADO.Security
         }
 
         /// <summary>
-        /// Claims
-        /// </summary>
-        IEnumerable<IClaim> IClaimsIdentity.Claims => this.Claims.Select(o => new AdoClaim(o.Type, o.Value));
-
-        /// <summary>
         /// Create an authorization context
         /// </summary>
-        public ClaimsPrincipal CreateClaimsPrincipal(IEnumerable<ClaimsIdentity> otherIdentities = null)
+        public IClaimsPrincipal CreateClaimsPrincipal(IEnumerable<IClaimsIdentity> otherIdentities = null)
         {
 
-            if (!this.m_isAuthenticated)
+            if (!this.IsAuthenticated)
                 throw new SecurityException("Principal is not authenticated");
 
             try
             {
 
                 // System claims
-                List<Claim> claims = new List<Claim>(
-                    this.m_roles.Select(r => new Claim(ClaimsIdentity.DefaultRoleClaimType, r.Name))
+                List<IClaim> claims = new List<IClaim>(
+                    this.m_roles.Select(r => new SanteDBClaim(SanteDBClaimTypes.DefaultRoleClaimType, r.Name))
                 )
                 {
-                    new Claim(ClaimTypes.Authentication, nameof(AdoClaimsIdentity)),
-                    new Claim(ClaimTypes.AuthorizationDecision, this.m_isAuthenticated ? "GRANT" : "DENY"),
-                    new Claim(ClaimTypes.AuthenticationInstant, this.NotBefore.ToString("o")), // TODO: Fix this
-                    new Claim(ClaimTypes.AuthenticationMethod, this.m_authenticationType ?? "LOCAL"),
-                    new Claim(ClaimTypes.Expiration, this.NotAfter.ToString("o")), // TODO: Move this to configuration
-                    new Claim(ClaimTypes.Name, this.m_securityUser.UserName),
-                    new Claim(ClaimTypes.Sid, this.m_securityUser.Key.ToString()),
-                    new Claim(ClaimTypes.NameIdentifier, this.m_securityUser.Key.ToString()),
-                    new Claim(ClaimTypes.Actor, this.m_securityUser.UserClass.ToString()),
+                    new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, this.NotBefore.ToString("o")), // TODO: Fix this
+                    new SanteDBClaim(SanteDBClaimTypes.AuthenticationMethod, this.m_authenticationType ?? "LOCAL"),
+                    new SanteDBClaim(SanteDBClaimTypes.Expiration, this.NotAfter.ToString("o")), // TODO: Move this to configuration
+                    new SanteDBClaim(SanteDBClaimTypes.Name, this.m_securityUser.UserName),
+                    new SanteDBClaim(SanteDBClaimTypes.Sid, this.m_securityUser.Key.ToString()),
+                    new SanteDBClaim(SanteDBClaimTypes.NameIdentifier, this.m_securityUser.Key.ToString()),
+                    new SanteDBClaim(SanteDBClaimTypes.Actor, this.m_securityUser.UserClass.ToString()),
                 };
 
                 if (this.m_securityUser.Email != null)
-                    claims.Add(new Claim(ClaimTypes.Email, this.m_securityUser.Email));
+                    claims.Add(new SanteDBClaim(SanteDBClaimTypes.Email, this.m_securityUser.Email));
                 if (this.m_securityUser.PhoneNumber != null)
-                    claims.Add(new Claim(ClaimTypes.MobilePhone, this.m_securityUser.PhoneNumber));
+                    claims.Add(new SanteDBClaim(SanteDBClaimTypes.Telephone, this.m_securityUser.PhoneNumber));
 
                 if (this.SessionToken != null) {
-                    claims.Add(new Claim(ClaimTypes.IsPersistent, "true"));
-                    claims.Add(new Claim(SanteDBClaimTypes.SanteDBSessionIdClaim, (this.m_session as AdoSecuritySession)?.Key.ToString() ?? BitConverter.ToString(this.SessionToken).Replace("-","")));
+                    claims.Add(new SanteDBClaim(SanteDBClaimTypes.IsPersistent, "true"));
+                    claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, (this.m_session as AdoSecuritySession)?.Key.ToString() ?? BitConverter.ToString(this.SessionToken).Replace("-","")));
                 }
 
                 this.AddClaims(claims);
 
-                var identities = new ClaimsIdentity[] { this };
+                var identities = new IClaimsIdentity[] { this };
                 if (otherIdentities != null)
                     identities = identities.Union(otherIdentities).ToArray();
 
                 // TODO: Demographic data for the user
-                var retVal = new ClaimsPrincipal(
+                var retVal = new SanteDBClaimsPrincipal(
                         identities
                     );
                 s_traceSource.TraceInformation("Created security principal from identity {0} > {1}", this, AdoClaimsIdentity.PrincipalToString(retVal));
@@ -342,19 +300,11 @@ namespace SanteDB.Persistence.Data.ADO.Security
                 throw new Exception("Creating principal from identity failed", e);
             }
         }
-
-        /// <summary>
-        /// Return string representation of the identity
-        /// </summary>
-        public override string ToString()
-        {
-            return String.Format("SqlClaimsIdentity(name={0}, auth={1}, mode={2})", this.Name, this.IsAuthenticated, this.AuthenticationType);
-        }
-
+        
         /// <summary>
         /// Represent principal as a string
         /// </summary>
-        private static String PrincipalToString(ClaimsPrincipal retVal)
+        private static String PrincipalToString(IClaimsPrincipal retVal)
         {
             using (StringWriter sw = new StringWriter())
             {

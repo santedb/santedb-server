@@ -33,14 +33,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security;
-using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using NHapi.Model.V25.Datatype;
 using NHapi.Base.Model;
 using NHapi.Model.V25.Segment;
 using SanteDB.Core;
-using SanteDB.Core.Services;
 using SanteDB.Messaging.HL7.Configuration;
 using SanteDB.Messaging.HL7.TransportProtocol;
 using NHapi.Base.Util;
@@ -49,6 +47,7 @@ using NHapi.Model.V25.Message;
 using SanteDB.Core.Security.Services;
 using System.Security.Authentication;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Security.Claims;
 
 namespace SanteDB.Messaging.HL7.Messages
 {
@@ -181,7 +180,7 @@ namespace SanteDB.Messaging.HL7.Messages
         /// </summary>
         private void Authenticate(Hl7MessageReceivedEventArgs e)
         {
-            ClaimsPrincipal principal = null;
+            IClaimsPrincipal principal = null;
             var msh = e.Message.GetStructure("MSH") as MSH;
             var sft = e.Message.GetStructure("SFT") as SFT;
             var sessionService = ApplicationServiceContext.Current.GetService<ISessionProviderService>();
@@ -195,7 +194,7 @@ namespace SanteDB.Messaging.HL7.Messages
                                     .Where(x => x % 2 == 0)
                                     .Select(x => Convert.ToByte(msh.Security.Value.Substring(x, 2), 16))
                                     .ToArray());
-                principal = ApplicationServiceContext.Current.GetService<ISessionIdentityProviderService>().Authenticate(session) as ClaimsPrincipal;
+                principal = ApplicationServiceContext.Current.GetService<ISessionIdentityProviderService>().Authenticate(session) as IClaimsPrincipal;
             }
             else if (e is AuthenticatedHl7MessageReceivedEventArgs)
             {
@@ -223,7 +222,7 @@ namespace SanteDB.Messaging.HL7.Messages
                 if (applicationPrincipal == null && ApplicationServiceContext.HostType == SanteDBHostType.Server)
                     throw new UnauthorizedAccessException("Server requires authenticated application");
 
-                principal = new ClaimsPrincipal(new IIdentity[] { devicePrincipal.Identity, applicationPrincipal?.Identity }.OfType<ClaimsIdentity>());
+                principal = new SanteDBClaimsPrincipal(new IIdentity[] { devicePrincipal.Identity, applicationPrincipal?.Identity }.OfType<IClaimsIdentity>());
             }
             else if (this.m_configuration.Security != SecurityMethod.None)
             {
@@ -248,7 +247,7 @@ namespace SanteDB.Messaging.HL7.Messages
 
                 if (applicationPrincipal == null && ApplicationServiceContext.HostType == SanteDBHostType.Server)
                     throw new UnauthorizedAccessException("Server requires authenticated application");
-                principal = new ClaimsPrincipal(new IIdentity[] { devicePrincipal.Identity, applicationPrincipal?.Identity }.OfType<ClaimsIdentity>());
+                principal = new SanteDBClaimsPrincipal(new IIdentity[] { devicePrincipal.Identity, applicationPrincipal?.Identity }.OfType<IClaimsIdentity>());
             }
 
             // Pricipal

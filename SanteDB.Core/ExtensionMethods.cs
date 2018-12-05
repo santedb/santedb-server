@@ -20,12 +20,13 @@
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 using System.Globalization;
 using System.Linq;
-using System.Security.Claims;
+
 using System.Security.Principal;
 
 namespace SanteDB.Core
@@ -99,7 +100,7 @@ namespace SanteDB.Core
 
 			var userId = default(T);
 
-			var nameIdentifierClaimValue = (source as ClaimsIdentity)?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+			var nameIdentifierClaimValue = (source as IClaimsIdentity)?.Claims.FirstOrDefault(c => c.Type == SanteDBClaimTypes.NameIdentifier)?.Value;
 
 			if (nameIdentifierClaimValue != null)
 			{

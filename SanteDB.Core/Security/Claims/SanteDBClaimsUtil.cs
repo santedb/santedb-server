@@ -21,7 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Security.Claims;
+
 using System.Text;
 
 namespace SanteDB.Core.Security.Claims
@@ -68,13 +68,13 @@ namespace SanteDB.Core.Security.Claims
         /// <summary>
         /// Extract claims
         /// </summary>
-        public static List<Claim> ExtractClaims(NameValueCollection headers)
+        public static List<IClaim> ExtractClaims(NameValueCollection headers)
         {
             var claimsHeaders = headers[SanteDBConstants.BasicHttpClientClaimHeaderName];
             if (claimsHeaders == null)
-                return new List<Claim>();
+                return new List<IClaim>();
             else
-                return claimsHeaders.Split(',').Select(o => Encoding.UTF8.GetString(Convert.FromBase64String(o)).Split('=')).Select(c => new Claim(c[0], c[1])).ToList();
+                return claimsHeaders.Split(',').Select(o => Encoding.UTF8.GetString(Convert.FromBase64String(o)).Split('=')).Select(c => new SanteDBClaim(c[0], c[1])).OfType<IClaim>().ToList();
         } 
     }
 }

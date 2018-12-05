@@ -38,7 +38,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Security;
-using System.Security.Claims;
+
 using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.ADO.Services
@@ -154,7 +154,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 throw new InvalidOperationException("Cannot find appropriate claims for TFA");
 
                             // Expiry check
-                            ClaimsPrincipal retVal = null;
+                            IClaimsPrincipal retVal = null;
                             DateTime expiryDate = DateTime.Parse(tfaExpiry.ClaimValue);
                             if (expiryDate < DateTime.Now)
                                 throw new SecurityException("TFA secret expired");
@@ -163,13 +163,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 tfaSecret == tfaClaim.ClaimValue) // Last known password hash sent as password, this is a password reset token - It will be set to expire ASAP
                             {
                                 retVal = AdoClaimsIdentity.Create(user, true, "Tfa+LastPasswordHash").CreateClaimsPrincipal();
-                                (retVal.Identity as ClaimsIdentity).AddClaim(new Claim(SanteDBClaimTypes.SanteDBGrantedPolicyClaim, PermissionPolicyIdentifiers.ChangePassword));
-                                (retVal.Identity as ClaimsIdentity).RemoveClaim(retVal.FindFirst(ClaimTypes.Expiration));
+                                (retVal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBGrantedPolicyClaim, PermissionPolicyIdentifiers.ChangePassword));
+                                (retVal.Identity as IClaimsIdentity).RemoveClaim(retVal.FindFirst(SanteDBClaimTypes.Expiration));
                                 // TODO: Add to configuration
-                                (retVal.Identity as ClaimsIdentity).AddClaim(new Claim(ClaimTypes.Expiration, DateTime.Now.AddMinutes(5).ToString("o")));
+                                (retVal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, DateTime.Now.AddMinutes(5).ToString("o")));
                             }
                             else if (!String.IsNullOrEmpty(password))
-                                retVal = this.Authenticate(userName, password) as ClaimsPrincipal;
+                                retVal = this.Authenticate(userName, password) as IClaimsPrincipal;
                             else
                                 throw new PolicyViolationException(new GenericPrincipal(new GenericIdentity(userName), new string[0]), PermissionPolicyIdentifiers.Login, PolicyGrantType.Deny);
 
@@ -263,8 +263,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
             var secret = ApplicationServiceContext.Current.GetService<ITwoFactorSecretGenerator>().GenerateTfaSecret();
             var hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
-            this.AddClaim(userName, new AdoClaim(SanteDBClaimTypes.SanteDBTfaSecretClaim, hashingService.ComputeHash(secret)), AuthenticationContext.SystemPrincipal);
-            this.AddClaim(userName, new AdoClaim(SanteDBClaimTypes.SanteDBTfaSecretExpiry, DateTime.Now.AddMinutes(5).ToString("o")), AuthenticationContext.SystemPrincipal);
+            this.AddClaim(userName, new SanteDBClaim(SanteDBClaimTypes.SanteDBTfaSecretClaim, hashingService.ComputeHash(secret)), AuthenticationContext.SystemPrincipal);
+            this.AddClaim(userName, new SanteDBClaim(SanteDBClaimTypes.SanteDBTfaSecretExpiry, DateTime.Now.AddMinutes(5).ToString("o")), AuthenticationContext.SystemPrincipal);
 
             return secret;
         }
@@ -530,15 +530,15 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     var auth = context.FirstOrDefault<CompositeResult<DbSession, DbSecurityApplication, DbSecurityUser, DbSecurityDevice>>(sql);
 
                     // Identities
-                    List<ClaimsIdentity> identities = new List<ClaimsIdentity>(3);
+                    List<IClaimsIdentity> identities = new List<IClaimsIdentity>(3);
                     if (auth.Object2?.Key != null)
                         identities.Add(new Core.Security.ApplicationIdentity(auth.Object2.Key, auth.Object2.PublicId, true));
                     if (auth.Object1.DeviceKey.HasValue)
                         identities.Add(new DeviceIdentity(auth.Object4.Key, auth.Object4.PublicId, true));
-                    identities.First().AddClaim(new Claim(ClaimTypes.AuthenticationInstant, session.NotBefore.ToString("o")));
-                    identities.First().AddClaim(new Claim(ClaimTypes.Expiration, session.NotAfter.ToString("o")));
+                    identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, session.NotBefore.ToString("o")));
+                    identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, session.NotAfter.ToString("o")));
                     var principal = auth.Object1.UserKey.GetValueOrDefault() == Guid.Empty ?
-                        new ClaimsPrincipal(identities) : AdoClaimsIdentity.Create(auth.Object3, true, "SESSION", session).CreateClaimsPrincipal(identities);
+                        new SanteDBClaimsPrincipal(identities) : AdoClaimsIdentity.Create(auth.Object3, true, "SESSION", session).CreateClaimsPrincipal(identities);
                     
                     // TODO: Load additional claims made about the user on the session
                     return principal;

@@ -27,7 +27,7 @@ using SanteDB.Tools.AdminConsole.Shell;
 using System;
 using System.Net;
 using System.Security;
-using System.Security.Claims;
+
 using System.Security.Principal;
 
 namespace SanteDB.Tools.AdminConsole.Security

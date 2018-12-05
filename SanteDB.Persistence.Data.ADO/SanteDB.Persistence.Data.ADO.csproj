@@ -86,7 +86,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Locale.resx</DependentUpon>
     </Compile>
-    <Compile Include="Security\AdoClaim.cs" />
     <Compile Include="Security\AdoSecuritySession.cs" />
     <Compile Include="Services\AdoBasePersistenceService.cs" />
     <Compile Include="Data\Model\Concepts\DbCodeSystem.cs" />

@@ -37,7 +37,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Claims;
+
 using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.ADO.Services
@@ -211,7 +211,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         {
                             var cp = securable as DevicePrincipal;
 
-                            var appClaim = cp.Identities.OfType<Core.Security.ApplicationIdentity>().SingleOrDefault()?.FindAll(ClaimTypes.Sid).SingleOrDefault() ??
+                            var appClaim = cp.Identities.OfType<Core.Security.ApplicationIdentity>().SingleOrDefault()?.FindAll(SanteDBClaimTypes.Sid).SingleOrDefault() ??
                                    cp.FindAll(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim).SingleOrDefault();
                             
                             // There is an application claim so we want to add the application policies - most restrictive
@@ -271,12 +271,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         }
 
                         // Claims principal, then we want device and app SID
-                        if (securable is ClaimsPrincipal)
+                        if (securable is IClaimsPrincipal)
                         {
-                            var cp = securable as ClaimsPrincipal;
-                            var appClaim = cp.Identities.OfType<Core.Security.ApplicationIdentity>().SingleOrDefault()?.FindAll(ClaimTypes.Sid).SingleOrDefault() ??
+                            var cp = securable as IClaimsPrincipal;
+                            var appClaim = cp.Identities.OfType<Core.Security.ApplicationIdentity>().SingleOrDefault()?.FindAll(SanteDBClaimTypes.Sid).SingleOrDefault() ??
                                 cp.FindAll(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim).SingleOrDefault();
-                            var devClaim = cp.Identities.OfType<Core.Security.DeviceIdentity>().SingleOrDefault()?.FindAll(ClaimTypes.Sid).SingleOrDefault() ?? 
+                            var devClaim = cp.Identities.OfType<Core.Security.DeviceIdentity>().SingleOrDefault()?.FindAll(SanteDBClaimTypes.Sid).SingleOrDefault() ?? 
                                 cp.FindAll(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim).SingleOrDefault();
 
 

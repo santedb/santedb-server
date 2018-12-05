@@ -21,7 +21,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using System;
-using System.Security.Claims;
+
 using System.Security.Principal;
 
 namespace SanteDB.Tools.AdminConsole.Security
@@ -51,7 +51,7 @@ namespace SanteDB.Tools.AdminConsole.Security
 
         public IPrincipal Authenticate(string userName, string password, string tfaSecret)
         {
-            return new ClaimsPrincipal(new ClaimsIdentity(new GenericIdentity(userName), new Claim[] { new Claim("passwd", password), new Claim(SanteDBClaimTypes.SanteDBTfaSecretClaim, tfaSecret) }));
+            return new SanteDBClaimsPrincipal(new SanteDBClaimsIdentity(userName, false, "LOCAL_AUTHORITY", new IClaim[] { new SanteDBClaim("passwd", password), new SanteDBClaim(SanteDBClaimTypes.SanteDBTfaSecretClaim, tfaSecret) }));
         }
 
         public void ChangePassword(string userName, string newPassword, IPrincipal principal)

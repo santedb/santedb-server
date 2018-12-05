@@ -22,13 +22,14 @@ using RestSrvr.Message;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 using System.Diagnostics;
 using System.Security;
 using System.Security.Authentication;
-using System.Security.Claims;
+
 using System.Text;
 
 namespace SanteDB.Authentication.OAuth2.Wcf
@@ -79,7 +80,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                 }
                 else
                 {
-                    (AuthenticationContext.Current.Principal as ClaimsPrincipal).AddIdentity(principal.Identity as ClaimsIdentity);
+                    (AuthenticationContext.Current.Principal as IClaimsPrincipal).AddIdentity(principal.Identity);
                 }
 
                 // Disposed context so reset the auth

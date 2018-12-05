@@ -17,7 +17,8 @@
  * User: justin
  * Date: 2018-6-22
  */
-using System.Security.Claims;
+
+using SanteDB.Core.Security.Claims;
 using System.Security.Principal;
 
 namespace SanteDB.Core.Security
@@ -26,7 +27,7 @@ namespace SanteDB.Core.Security
     /// Represents a device principal.
     /// </summary>
     /// <seealso cref="System.Security.Claims.ClaimsPrincipal" />
-    public class DevicePrincipal : ClaimsPrincipal
+    public class DevicePrincipal : SanteDBClaimsPrincipal
     {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DevicePrincipal"/> class.

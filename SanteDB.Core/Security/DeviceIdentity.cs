@@ -17,8 +17,10 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Security.Claims;
+using SanteDB.Core.Security.Principal;
 using System;
-using System.Security.Claims;
+
 
 namespace SanteDB.Core.Security
 {
@@ -26,7 +28,7 @@ namespace SanteDB.Core.Security
     /// Represents a device identity.
     /// </summary>
     /// <seealso cref="System.Security.Claims.ClaimsIdentity" />
-    public class DeviceIdentity : ClaimsIdentity
+    public class DeviceIdentity : SanteDBClaimsIdentity, IDeviceIdentity
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DeviceIdentity"/> class.
@@ -34,27 +36,12 @@ namespace SanteDB.Core.Security
 		/// <param name="sid">The sid.</param>
 		/// <param name="name">The name.</param>
 		/// <param name="isAuthenticated">if set to <c>true</c> [is authenticated].</param>
-		public DeviceIdentity(Guid sid, string name, bool isAuthenticated)
+		public DeviceIdentity(Guid sid, string name, bool isAuthenticated) :
+            base(name, isAuthenticated, "SYSTEM")
 		{
-			this.IsAuthenticated = isAuthenticated;
-			this.Name = name;
-			this.AddClaim(new Claim(ClaimTypes.Sid, sid.ToString()));
+			this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Sid, sid.ToString()));
 		}
 
-		/// <summary>
-		/// Gets a value that indicates whether the identity has been authenticated.
-		/// </summary>
-		/// <returns>
-		/// true if the identity has been authenticated; otherwise, false.
-		/// </returns>
-		public override bool IsAuthenticated { get; }
-
-		/// <summary>
-		/// Gets the name of this claims identity.
-		/// </summary>
-		/// <returns>
-		/// The name or null.
-		/// </returns>
-		public override string Name { get; }
+	
 	}
 }

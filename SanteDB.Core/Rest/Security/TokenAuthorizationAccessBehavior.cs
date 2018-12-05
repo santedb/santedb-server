@@ -21,6 +21,7 @@ using RestSrvr;
 using RestSrvr.Message;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Services;
 using System;
 using System.Diagnostics;
@@ -89,7 +90,10 @@ namespace SanteDB.Core.Rest.Security
             else if (token.ValidFrom > DateTime.Now.ToUniversalTime())
                 throw new SecurityTokenException("Token not yet valid");
 
-            Core.Security.AuthenticationContext.Current = new Core.Security.AuthenticationContext(identities);
+            // Copy to a SanteDBClaimsId
+            Core.Security.AuthenticationContext.Current = new Core.Security.AuthenticationContext(new SanteDBClaimsPrincipal(
+                new SanteDBClaimsIdentity(identities.Identity.Name, identities.Identity.IsAuthenticated, identities.Identity.AuthenticationType, identities.Claims.Select(o=>new SanteDBClaim(o.Type, o.Value)))
+            ));
 
             this.m_traceSource.TraceInformation("User {0} authenticated via JWT", identities.Identity.Name);
             

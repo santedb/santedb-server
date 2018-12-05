@@ -19,11 +19,12 @@
  */
 using SanteDB.Core.Http;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using SanteDB.Tools.AdminConsole.Shell;
 using System;
 using System.Security;
-using System.Security.Claims;
+
 using System.Security.Principal;
 
 namespace SanteDB.Tools.AdminConsole.Security
@@ -56,7 +57,7 @@ namespace SanteDB.Tools.AdminConsole.Security
             if (tokenCredentials != null)
             {
                 var expiryTime = DateTime.MinValue;
-                if (DateTime.TryParse(tokenCredentials.FindFirst(o => o.Type == ClaimTypes.Expiration).Value, out expiryTime) &&
+                if (DateTime.TryParse(tokenCredentials.FindFirst(SanteDBClaimTypes.Expiration).Value, out expiryTime) &&
                     expiryTime < DateTime.Now)
                 {
                     var idp = ApplicationContext.Current.GetService(typeof(IIdentityProviderService)) as IIdentityProviderService;

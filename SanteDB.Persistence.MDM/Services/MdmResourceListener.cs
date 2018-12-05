@@ -30,6 +30,7 @@ using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.MDM.Configuration;
 using SanteDB.Persistence.MDM.Model;
@@ -38,7 +39,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Claims;
+
 using System.Security.Permissions;
 using System.Security.Principal;
 
@@ -716,7 +717,7 @@ namespace SanteDB.Persistence.MDM.Services
         private void EnsureProvenance(T master, IPrincipal principal)
         {
             var provenance = (master as BaseEntityData)?.LoadProperty<SecurityProvenance>("CreatedBy");
-            var claimsPrincipal = principal as ClaimsPrincipal;
+            var claimsPrincipal = principal as IClaimsPrincipal;
             var applicationPrincipal = claimsPrincipal.Identities.OfType<Core.Security.ApplicationIdentity>().SingleOrDefault();
             if (applicationPrincipal != null &&
                 applicationPrincipal.Name != provenance?.LoadProperty<SecurityApplication>("Application")?.Name // was not the original author

@@ -24,7 +24,7 @@ using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
+
 using System.Security.Principal;
 
 namespace SanteDB.Core.Security
@@ -89,7 +89,7 @@ namespace SanteDB.Core.Security
                 throw new ArgumentNullException(nameof(policyId));
 
             // Can we make this decision based on the claims? 
-            if (principal is ClaimsPrincipal && (principal as ClaimsPrincipal).HasClaim(c => c.Type == SanteDBClaimTypes.SanteDBGrantedPolicyClaim && policyId.StartsWith(c.Value)))
+            if (principal is IClaimsPrincipal && (principal as IClaimsPrincipal).HasClaim(c => c.Type == SanteDBClaimTypes.SanteDBGrantedPolicyClaim && policyId.StartsWith(c.Value)))
                 return PolicyGrantType.Grant;
 
             // Get the user object from the principal

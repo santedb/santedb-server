@@ -19,10 +19,11 @@
  */
 using Newtonsoft.Json.Linq;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Claims;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens;
-using System.Security.Claims;
+
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
@@ -32,19 +33,19 @@ namespace SanteDB.Tools.AdminConsole.Security
     /// <summary>
     /// Token claims principal.
     /// </summary>
-    public class TokenClaimsPrincipal : ClaimsPrincipal
+    public class TokenClaimsPrincipal : SanteDBClaimsPrincipal
 	{
 
         // Claim map
         private readonly Dictionary<String, String> claimMap = new Dictionary<string, string>() {
-            { "unique_name", ClaimsIdentity.DefaultNameClaimType },
-            { "role", ClaimsIdentity.DefaultRoleClaimType },
-            { "sub", ClaimTypes.Sid },
-            { "authmethod", ClaimTypes.AuthenticationMethod },
-            { "exp", ClaimTypes.Expiration },
-            { "nbf", ClaimTypes.AuthenticationInstant },
-            { "email", ClaimTypes.Email },
-            { "tel", ClaimTypes.OtherPhone }
+            { "unique_name", SanteDBClaimTypes.DefaultNameClaimType },
+            { "role", SanteDBClaimTypes.DefaultRoleClaimType },
+            { "sub", SanteDBClaimTypes.Sid },
+            { "authmethod", SanteDBClaimTypes.AuthenticationMethod },
+            { "exp", SanteDBClaimTypes.Expiration },
+            { "nbf", SanteDBClaimTypes.AuthenticationInstant },
+            { "email", SanteDBClaimTypes.Email },
+            { "tel", SanteDBClaimTypes.Telephone }
         };
 
         // The token
@@ -100,7 +101,7 @@ namespace SanteDB.Tools.AdminConsole.Security
             }
 
             // Parse the jwt
-            List<Claim> claims = new List<Claim>();
+            List<IClaim> claims = new List<IClaim>();
 
             foreach (var kf in body)
             {
@@ -111,8 +112,8 @@ namespace SanteDB.Tools.AdminConsole.Security
                     claims.AddRange(this.ProcessClaim(kf, claimName));
             }
 
-            Claim expiryClaim = claims.Find(o => o.Type == ClaimTypes.Expiration),
-                notBeforeClaim = claims.Find(o => o.Type == ClaimTypes.AuthenticationInstant);
+            IClaim expiryClaim = claims.Find(o => o.Type == SanteDBClaimTypes.Expiration),
+                notBeforeClaim = claims.Find(o => o.Type == SanteDBClaimTypes.AuthenticationInstant);
 
             if (expiryClaim == null || notBeforeClaim == null)
                 throw new SecurityTokenException("Missing NBF or EXP claim");
@@ -129,23 +130,22 @@ namespace SanteDB.Tools.AdminConsole.Security
                     throw new SecurityTokenException("Token cannot yet be used (issued in the future)");
             }
             this.RefreshToken = refreshToken;
-            this.AddIdentity(new ClaimsIdentity(new GenericIdentity(body["unique_name"]?.Value<String>().ToLower() ?? body["sub"]?.Value<String>().ToLower(), "OAUTH"), claims, "OAUTH2", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType));
+            this.AddIdentity(new SanteDBClaimsIdentity(body["unique_name"]?.Value<String>().ToLower() ?? body["sub"]?.Value<String>().ToLower(), true, "OAUTH", claims));
         }
-
-
+        
         /// <summary>
         /// Processes the claim.
         /// </summary>
         /// <returns>The claim.</returns>
         /// <param name="jwtClaim">Jwt claim.</param>
-        public IEnumerable<Claim> ProcessClaim(KeyValuePair<String, JToken> jwtClaim, String claimType)
+        public IEnumerable<IClaim> ProcessClaim(KeyValuePair<String, JToken> jwtClaim, String claimType)
         {
-            List<Claim> retVal = new List<Claim>();
+            List<IClaim> retVal = new List<IClaim>();
             if (jwtClaim.Value is JArray)
                 foreach (var val in jwtClaim.Value as JArray)
-                    retVal.Add(new Claim(claimType, (String)val));
+                    retVal.Add(new SanteDBClaim(claimType, (String)val));
             else
-                retVal.Add(new Claim(claimType, jwtClaim.Value.ToString()));
+                retVal.Add(new SanteDBClaim(claimType, jwtClaim.Value.ToString()));
             return retVal;
         }
 

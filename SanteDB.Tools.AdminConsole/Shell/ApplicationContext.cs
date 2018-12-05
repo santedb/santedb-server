@@ -22,6 +22,7 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Http;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Tools.AdminConsole.Security;
@@ -29,7 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Security.Claims;
+
 using System.Security.Principal;
 using System.Text;
 
@@ -271,7 +272,7 @@ namespace SanteDB.Tools.AdminConsole.Shell
                 try
                 {
                     var principal = (authenticationProvider as OAuthIdentityProvider)?.Authenticate(
-                        new ClaimsPrincipal(new ClaimsIdentity(new GenericIdentity(this.m_configuration.User, "RQO"), null, "OAUTH2", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType)), this.m_configuration.Password) ??
+                        new SanteDBClaimsPrincipal(new SanteDBClaimsIdentity(this.m_configuration.User, false, "OAUTH2")), this.m_configuration.Password) ??
                         authenticationProvider.Authenticate(this.m_configuration.User, this.m_configuration.Password);
                     if (principal != null)
                     {

@@ -18,10 +18,11 @@
  * Date: 2018-10-24
  */
 using SanteDB.Core.Http;
+using SanteDB.Core.Security.Claims;
 using SanteDB.Tools.AdminConsole.Shell;
 using System;
 using System.Collections.Generic;
-using System.Security.Claims;
+
 using System.Security.Principal;
 using System.Text;
 
@@ -54,12 +55,12 @@ namespace SanteDB.Tools.AdminConsole.Security
 				ApplicationContext.Current.ApplicationSecret);
 
 			// TODO: Add claims
-			List<Claim> claims = new List<Claim> () {
+			List<IClaim> claims = new List<IClaim> () {
 			};
 
 			//// Additional claims?
-			//if (this.Principal is ClaimsPrincipal) {
-			//	claims.AddRange ((this.Principal as ClaimsPrincipal).Claims);
+			//if (this.Principal is IClaimsPrincipal) {
+			//	claims.AddRange ((this.Principal as IClaimsPrincipal).Claims);
 			//}
 
 			// Build the claim string

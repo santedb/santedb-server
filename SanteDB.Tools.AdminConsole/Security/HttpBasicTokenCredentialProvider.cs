@@ -19,8 +19,9 @@
  */
 using SanteDB.Core.Http;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Claims;
 using System;
-using System.Security.Claims;
+
 using System.Security.Principal;
 
 namespace SanteDB.Tools.AdminConsole.Security
@@ -57,8 +58,8 @@ namespace SanteDB.Tools.AdminConsole.Security
         /// </summary>
         public Credentials GetCredentials(IPrincipal principal)
         {
-            if (principal is ClaimsPrincipal)
-                return new HttpBasicCredentials(principal, (principal as ClaimsPrincipal)?.FindFirst(o=>o.Type == "passwd")?.Value);
+            if (principal is IClaimsPrincipal)
+                return new HttpBasicCredentials(principal, (principal as IClaimsPrincipal)?.FindFirst("passwd")?.Value);
             else
                 throw new InvalidOperationException("Cannot create basic principal from non-claims principal");
         }

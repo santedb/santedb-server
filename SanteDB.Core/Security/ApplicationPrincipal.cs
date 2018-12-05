@@ -19,7 +19,7 @@
  */
 using SanteDB.Core.Security.Claims;
 using System;
-using System.Security.Claims;
+
 using System.Security.Principal;
 
 namespace SanteDB.Core.Security
@@ -28,7 +28,7 @@ namespace SanteDB.Core.Security
     /// <summary>
     /// Application identity
     /// </summary>
-    public class ApplicationIdentity : ClaimsIdentity
+    public class ApplicationIdentity : SanteDBClaimsIdentity
     {
         // Member variables
         private string m_name;
@@ -37,39 +37,20 @@ namespace SanteDB.Core.Security
         /// <summary>
         /// Application identity ctor
         /// </summary>
-        public ApplicationIdentity(Guid sid, String name, Boolean isAuthenticated)
+        public ApplicationIdentity(Guid sid, String name, Boolean isAuthenticated) 
+            : base(name, isAuthenticated, "SYSTEM")
         {
             this.m_name = name.ToString();
             this.m_isAuthenticated = isAuthenticated;
-            this.AddClaim(new Claim(ClaimTypes.Sid, sid.ToString()));
-            this.AddClaim(new Claim(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim, sid.ToString()));
+            this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Sid, sid.ToString()));
+            this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim, sid.ToString()));
         }
-
-        /// <summary>
-        /// Identity for an application
-        /// </summary>
-        public override string AuthenticationType
-        {
-            get
-            {
-                return "SYSTEM";
-            }
-        }
-
-        /// <summary>
-        /// True if is authenticated
-        /// </summary>
-        public override bool IsAuthenticated { get { return this.m_isAuthenticated; }  }
-
-        /// <summary>
-        /// Gets or sets the name
-        /// </summary>
-        public override string Name { get { return this.m_name; } }
+        
     }
     /// <summary>
     /// Represents an IPrincipal related to an application
     /// </summary>
-    public class ApplicationPrincipal : ClaimsPrincipal
+    public class ApplicationPrincipal : SanteDBClaimsPrincipal
     {
 
         /// <summary>

@@ -32,7 +32,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security;
 using System.Security.Authentication;
-using System.Security.Claims;
+
 using System.Text;
 
 namespace SanteDB.Core.Rest.Security
@@ -79,9 +79,9 @@ namespace SanteDB.Core.Rest.Security
                     throw new AuthenticationException("Invalid username/password");
 
                 // Add claims made by the client
-                var claims = new List<System.Security.Claims.Claim>();
-                if (principal is ClaimsPrincipal)
-                    claims.AddRange((principal as ClaimsPrincipal).Claims);
+                var claims = new List<IClaim>();
+                if (principal is IClaimsPrincipal)
+                    claims.AddRange((principal as IClaimsPrincipal).Claims);
 
                 var clientClaims = SanteDBClaimsUtil.ExtractClaims(httpRequest.Headers);
                 foreach (var claim in clientClaims)
@@ -101,10 +101,10 @@ namespace SanteDB.Core.Rest.Security
 
                 // Claim headers built in
                 if (pipService != null)
-                    claims.AddRange(pipService.GetActivePolicies(principal).Where(o => o.Rule == PolicyGrantType.Grant).Select(o => new System.Security.Claims.Claim(SanteDBClaimTypes.SanteDBGrantedPolicyClaim, o.Policy.Oid)));
+                    claims.AddRange(pipService.GetActivePolicies(principal).Where(o => o.Rule == PolicyGrantType.Grant).Select(o => new SanteDBClaim(SanteDBClaimTypes.SanteDBGrantedPolicyClaim, o.Policy.Oid)));
 
                 // Finally validate the client 
-                var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(principal.Identity, claims));
+                var claimsPrincipal = new SanteDBClaimsPrincipal(new SanteDBClaimsIdentity(principal.Identity, claims));
 
                 if (this.m_configuration?.RequireClientAuth == true)
                 {
@@ -117,7 +117,7 @@ namespace SanteDB.Core.Rest.Security
                         String clientAuthString = clientAuth.Substring(clientAuth.IndexOf("basic", StringComparison.InvariantCultureIgnoreCase) + 5).Trim();
                         String[] authComps = Encoding.UTF8.GetString(Convert.FromBase64String(clientAuthString)).Split(':');
                         var applicationPrincipal = ApplicationServiceContext.Current.GetApplicationProviderService().Authenticate(authComps[0], authComps[1]);
-                        claimsPrincipal.AddIdentity(applicationPrincipal.Identity as ClaimsIdentity);
+                        claimsPrincipal.AddIdentity(applicationPrincipal.Identity as IClaimsIdentity);
                     }
                 }
 

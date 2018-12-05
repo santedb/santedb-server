@@ -35,7 +35,7 @@ using System.IdentityModel.Tokens;
 using System.IO;
 using System.Linq;
 using System.Security;
-using System.Security.Claims;
+
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
@@ -122,10 +122,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 throw new ArgumentNullException(nameof(principal));
             else if (!principal.Identity.IsAuthenticated)
                 throw new InvalidOperationException("Cannot create a session for a non-authenticated principal");
-            else if (!(principal is ClaimsPrincipal))
+            else if (!(principal is IClaimsPrincipal))
                 throw new ArgumentException("Principal must be ClaimsPrincipal", nameof(principal));
 
-            var cprincipal = principal as ClaimsPrincipal;
+            var cprincipal = principal as IClaimsPrincipal;
 
             try
             {
@@ -134,11 +134,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     context.Open();
                     var refreshToken = this.CreateRefreshToken();
 
-                    var applicationKey = cprincipal.Identities.OfType<Core.Security.ApplicationIdentity>()?.FirstOrDefault()?.FindFirst(ClaimTypes.Sid)?.Value ??
+                    var applicationKey = cprincipal.Identities.OfType<Core.Security.ApplicationIdentity>()?.FirstOrDefault()?.FindFirst(SanteDBClaimTypes.Sid)?.Value ??
                         cprincipal.FindFirst(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim)?.Value;
-                    var deviceKey = cprincipal.Identities.OfType<Core.Security.DeviceIdentity>()?.FirstOrDefault()?.FindFirst(ClaimTypes.Sid)?.Value ??
+                    var deviceKey = cprincipal.Identities.OfType<Core.Security.DeviceIdentity>()?.FirstOrDefault()?.FindFirst(SanteDBClaimTypes.Sid)?.Value ??
                         cprincipal.FindFirst(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim)?.Value;
-                    var userKey = cprincipal.FindFirst(ClaimTypes.Sid).Value;
+                    var userKey = cprincipal.FindFirst(SanteDBClaimTypes.Sid).Value;
 
                     var dbSession = new DbSession()
                     {

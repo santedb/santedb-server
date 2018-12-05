@@ -37,7 +37,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Security;
-using System.Security.Claims;
+
 using System.Security.Principal;
 using System.Xml.Serialization;
 
@@ -464,7 +464,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
         public static Guid EstablishProvenance(this DataContext me, IPrincipal principal, Guid? externalRef)
         {
             // First, we want to get the identities
-            var cprincipal = (principal ?? AuthenticationContext.Current.Principal) as ClaimsPrincipal;
+            var cprincipal = (principal ?? AuthenticationContext.Current.Principal) as IClaimsPrincipal;
             DbSecurityProvenance retVal = new DbSecurityProvenance()
             {
                 Key = me.ContextId,
