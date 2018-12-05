@@ -119,6 +119,7 @@ namespace SanteDB.Messaging.HL7.Segments
                     }
             }
 
+            // TODO: Contact information
             return new ISegment[] { retVal };
         }
 

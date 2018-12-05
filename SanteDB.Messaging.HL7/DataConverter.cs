@@ -29,6 +29,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -381,8 +382,11 @@ namespace SanteDB.Messaging.HL7
 
             if (timestamp.Time.Value == null)
                 return result;
-
-            return timestamp.Time.GetAsDate();
+            else
+            {
+                String format = "yyyyMMddHHmmss.FFFFZ";
+                return DateTime.ParseExact(timestamp.Time.Value, format.Substring(0,timestamp.Time.Value.Length), CultureInfo.InvariantCulture);
+            }
         }
 
         /// <summary>

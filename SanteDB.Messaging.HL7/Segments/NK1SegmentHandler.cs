@@ -84,7 +84,7 @@ namespace SanteDB.Messaging.HL7.Segments
             List<ISegment> retVal = new List<ISegment>();
             var patient = data as Patient;
 
-            foreach (var itm in patient.Relationships.Where(o => NextOfKinRelationshipTypes.Contains(o.RelationshipTypeKey.Value)))
+            foreach (var itm in patient.LoadCollection<EntityRelationship>("Relationships").Where(o => NextOfKinRelationshipTypes.Contains(o.RelationshipTypeKey.Value)))
             {
                 var nk1 = context.GetStructure("NK1", context.GetAll("NK1").Length) as NK1;
 

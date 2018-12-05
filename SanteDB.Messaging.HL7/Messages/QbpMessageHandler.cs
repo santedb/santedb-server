@@ -150,7 +150,8 @@ namespace SanteDB.Messaging.HL7.Messages
                 int totalResults = (int)parameters[3];
 
                 // Save the tag
-                if (dsc.ContinuationPointer.Value != queryId.ToString())
+                if (dsc.ContinuationPointer.Value != queryId.ToString() &&
+                    offset.Value + count.GetValueOrDefault() < totalResults)
                     ApplicationServiceContext.Current.GetService<Core.Services.IQueryPersistenceService>()?.SetQueryTag(queryId, count);
 
                 // Query basics
@@ -166,7 +167,8 @@ namespace SanteDB.Messaging.HL7.Messages
                 qak.QueryResponseStatus.Value = totalResults == 0 ? "NF" : "OK";
                 qak.ThisPayload.Value = results.OfType<Object>().Count().ToString();
 
-                if (ApplicationServiceContext.Current.GetService<Core.Services.IQueryPersistenceService>() != null)
+                if (ApplicationServiceContext.Current.GetService<Core.Services.IQueryPersistenceService>() != null &&
+                    qak.HitsRemaining.Vaue > 0)
                 {
                     odsc.ContinuationPointer.Value = queryId.ToString();
                     odsc.ContinuationStyle.Value = "RD";
