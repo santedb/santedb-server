@@ -118,7 +118,7 @@
   <class modelClass="SanteDB.Core.Model.DataTypes.CodeSystem, SanteDB.Core.Model, Version=0.6.0.0"
          domainClass="SanteDB.Persistence.Data.ADO.Data.Model.Concepts.DbCodeSystem, SanteDB.Persistence.Data.ADO, Version=0.6.0.0">
     <property modelName="Authority" domainName="Domain"/>
-    
+    <property modelName="ModifiedOn" domainName="UpdatedTime"/>
   </class>
 
   <class modelClass="SanteDB.Core.Model.DataTypes.ConceptRelationshipType, SanteDB.Core.Model, Version=0.6.0.0"
@@ -135,6 +135,9 @@
 
   <class modelClass="SanteDB.Core.Model.DataTypes.ReferenceTerm, SanteDB.Core.Model, Version=0.6.0.0"
         domainClass="SanteDB.Persistence.Data.ADO.Data.Model.Concepts.DbReferenceTerm, SanteDB.Persistence.Data.ADO, Version=0.6.0.0">
+        <property modelName="ModifiedOn" domainName="UpdatedTime"/>
+
+  
   </class>
 
   <class modelClass="SanteDB.Core.Model.DataTypes.ReferenceTermName, SanteDB.Core.Model, Version=0.6.0.0"

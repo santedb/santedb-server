@@ -259,7 +259,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         List<IPolicyInstance> retVal = new List<IPolicyInstance>();
 
                         SqlStatement query = null;
-                        if (user != null) // Is this a user based claim?
+                        if (user != null &&
+                            !(identity is Core.Security.ApplicationIdentity) &&
+                            !(identity is DeviceIdentity)) // Is this a user based claim?
                         {
                             // Role policies
                             query = context.CreateSqlStatement<DbSecurityRolePolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityRolePolicy))

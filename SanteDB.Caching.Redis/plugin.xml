@@ -24,7 +24,7 @@
 		<name>REDIS Memory Cache</name>
 		<description>Provides shared memory caching using a REDIS server</description>
 		<author>Mohawk College of Applied Arts and Technology</author>
-		<version>1.9.0</version>
+		<version>1.9.20.0</version>
 		<default>false</default>
 	</meta>
   <dependencies>

@@ -167,6 +167,8 @@ namespace SanteDB.Core.Rest.Serialization
 
                             Type eType = s_knownTypes.FirstOrDefault(o => o.GetCustomAttribute<XmlRootAttribute>()?.ElementName == bodyReader.LocalName &&
                                 o.GetCustomAttribute<XmlRootAttribute>()?.Namespace == bodyReader.NamespaceURI);
+                            if (eType == null)
+                                eType = new ModelSerializationBinder().BindToType(null, bodyReader.LocalName); // Try to find by rooot element
                             if (!s_serializers.TryGetValue(eType, out serializer))
                             {
                                 serializer = new XmlSerializer(eType);

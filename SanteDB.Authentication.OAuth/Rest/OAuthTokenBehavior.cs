@@ -376,8 +376,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 RestOperationContext.Current.IncomingRequest.Headers["X-Forwarded-For"] ??
                 RestOperationContext.Current.IncomingRequest.RemoteEndPoint.Address.ToString();
 
-            var jwt = this.HydrateToken(claimsPrincipal, scope, additionalClaims, issued, expires);
-
             // Establish the session
             ISessionProviderService isp = ApplicationServiceContext.Current.GetService<ISessionProviderService>();
             var session = isp.Establish(new SanteDBClaimsPrincipal(claimsPrincipal.Identities), expires, aud);
@@ -386,9 +384,11 @@ namespace SanteDB.Authentication.OAuth2.Rest
             if (session != null)
             {
                 sessionId = BitConverter.ToString(session.Id).Replace("-", "");
-                (jwt.Claims as List<IClaim>).Add(new SanteDBClaim("jti", sessionId));
+                (claimsPrincipal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim("jti", sessionId));
                 refreshToken = BitConverter.ToString(session.RefreshToken).Replace("-", "");
             }
+
+            var jwt = this.HydrateToken(claimsPrincipal, scope, additionalClaims, issued, expires);
 
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
             RestOperationContext.Current.OutgoingResponse.ContentType = "application/json";

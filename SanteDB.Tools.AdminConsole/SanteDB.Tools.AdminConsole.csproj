@@ -69,6 +69,7 @@
     <Compile Include="Shell\AdminClientEndpointDescription.cs" />
     <Compile Include="Shell\ApplicationContext.cs" />
     <Compile Include="Shell\CmdLets\AppletCmdlet.cs" />
+    <Compile Include="Shell\CmdLets\AssigningAuthorityCmdlet.cs" />
     <Compile Include="Shell\CmdLets\DeviceCmdlet.cs" />
     <Compile Include="Shell\CmdLets\ApplicationCmdlet.cs" />
     <Compile Include="Shell\CmdLets\LogCmdlet.cs" />

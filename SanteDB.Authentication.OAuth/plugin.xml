@@ -23,7 +23,7 @@
 		<name>OAuth 2.0 Token Service</name>
 		<description>Represents a OAUTH 2.0 Token Service which uses the SanteDB authentication directory</description>
 		<author>Mohawk College of Applied Arts and Technology</author>
-		<version>1.9.0</version>
+		<version>1.9.20.0</version>
 		<default>true</default>
 	</meta>
 	<files>
