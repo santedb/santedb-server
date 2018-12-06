@@ -84,6 +84,13 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
             [Parameter("s")]
             [Description("The scope of the identity (Patient, Provider, Person, etc.)")]
             public StringCollection Scope { get; set; }
+
+            /// <summary>
+            /// Indicates the AA is uuq
+            /// </summary>
+            [Parameter("q")]
+            [Description("Inidicate the authority is unique")]
+            public bool Unique { get; set; }
         }
 
         /// <summary>
@@ -124,7 +131,8 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
                 {
                     Url = parms.Url,
                     AuthorityScope = scope,
-                    AssigningApplication = assigner?.Entity
+                    AssigningApplication = assigner?.Entity,
+                    IsUnique = parms.Unique
                 };
                 aa = m_amiClient.CreateAssigningAuthority(aa);
                 Console.WriteLine("CREATE AUTHORITY {0} = {1}", aa.DomainName, aa.Key);

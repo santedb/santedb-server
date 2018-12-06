@@ -155,6 +155,12 @@ namespace SanteDB.Messaging.HL7.Segments
                 if (found != null)
                 {
                     retVal = found;
+                    retVal.Names.Clear();
+                    retVal.Addresses.Clear();
+                    retVal.Telecoms.Clear();
+                    retVal.Identifiers.Clear();
+                    retVal.Extensions.Clear();
+                    retVal.Relationships.Clear();
                     break;
                 }
             }

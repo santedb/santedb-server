@@ -162,6 +162,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 });
                 retVal.ValueSequenceId = value.SequenceId.Value;
             }
+            else System.Diagnostics.Debugger.Break();
 
             return retVal;
         }
@@ -215,7 +216,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId)
         {
             int tr = 0;
-            return this.QueryInternal(context, base.BuildSourceQuery<EntityNameComponent>(id), Guid.Empty, 0, null, out tr, false).Select(o => this.CacheConvert(o, context)).ToList();
+            return this.QueryInternal(context, base.BuildSourceQuery<EntityNameComponent>(id), Guid.Empty, 0, null, out tr, false).ToList();
         }
     }
 }

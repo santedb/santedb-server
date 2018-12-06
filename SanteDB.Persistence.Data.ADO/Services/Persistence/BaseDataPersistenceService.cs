@@ -55,13 +55,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override TModel InsertInternal(DataContext context, TModel data)
         {
             if (data.CreatedBy != null) data.CreatedBy = data.CreatedBy?.EnsureExists(context) as SecurityProvenance;
-            data.CreatedByKey = data.CreatedBy?.Key ?? data.CreatedByKey ?? context.ContextId;
 
             // HACK: For now, modified on can only come from one property, some non-versioned data elements are bound on UpdatedTime
             var nvd = data as NonVersionedEntityData;
             if (nvd != null)
             {
-                nvd.UpdatedByKey = nvd.UpdatedByKey ?? context.ContextId;
+                nvd.UpdatedByKey = context.ContextId;
                 nvd.UpdatedTime = DateTimeOffset.Now;
             }
 
@@ -71,7 +70,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var domainObject = this.FromModelInstance(data, context) as TDomain;
 
             // Ensure created by exists
-            data.CreatedByKey = domainObject.CreatedByKey = domainObject.CreatedByKey == Guid.Empty ? context.ContextId : domainObject.CreatedByKey;
+            data.CreatedByKey = domainObject.CreatedByKey = context.ContextId;
             domainObject = context.Insert<TDomain>(domainObject);
             data.CreationTime = (DateTimeOffset)domainObject.CreationTime;
             data.Key = domainObject.Key;
@@ -89,8 +88,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var nvd = data as NonVersionedEntityData;
             if (nvd != null)
             {
-                if (nvd.UpdatedBy != null) nvd.UpdatedBy = nvd.UpdatedBy?.EnsureExists(context) as SecurityProvenance;
-                nvd.UpdatedByKey = nvd.UpdatedBy?.Key ?? nvd.UpdatedByKey;
+                nvd.UpdatedByKey = context.ContextId;
             }
 
             // Check for key
@@ -108,7 +106,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var vobject = domainObject as IDbNonVersionedBaseData;
             if (vobject != null)
             {
-                nvd.UpdatedByKey = vobject.UpdatedByKey = nvd.UpdatedByKey ?? context.ContextId;
+                nvd.UpdatedByKey = context.ContextId;
                 nvd.UpdatedTime = vobject.UpdatedTime = DateTimeOffset.Now;
             }
 
@@ -141,8 +139,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (data.Key == Guid.Empty)
                 throw new AdoFormalConstraintException(AdoFormalConstraintType.NonIdentityUpdate);
 
-            if (data.ObsoletedBy != null) data.ObsoletedBy = data.ObsoletedBy?.EnsureExists(context) as SecurityProvenance;
-            data.ObsoletedByKey = data.ObsoletedBy?.Key ?? data.ObsoletedByKey;
+            data.ObsoletedByKey = context.ContextId;
 
             // Current object
             var currentObject = context.FirstOrDefault<TDomain>(o => o.Key == data.Key);
@@ -150,7 +147,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 throw new KeyNotFoundException(data.Key.ToString());
 
             //data.ObsoletedBy?.EnsureExists(context);
-            data.ObsoletedByKey = currentObject.ObsoletedByKey = data.ObsoletedBy?.Key ?? context.ContextId;
+            data.ObsoletedByKey = currentObject.ObsoletedByKey = context.ContextId;
             data.ObsoletionTime = currentObject.ObsoletionTime = currentObject.ObsoletionTime ?? DateTimeOffset.Now;
 
             context.Update(currentObject);

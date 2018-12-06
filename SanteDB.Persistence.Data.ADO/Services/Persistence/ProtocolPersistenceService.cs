@@ -67,7 +67,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 existingHandler = new DbProtocolHandler()
                 {
                     Key = Guid.NewGuid(),
-                    CreatedByKey = modelInstance.CreatedByKey ?? context.ContextId,
+                    CreatedByKey = context.ContextId,
                     CreationTime = DateTime.Now,
                     IsActive = true,
                     Name = modelInstance.HandlerClass.Name,
@@ -80,7 +80,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             return new DbProtocol()
             {
                 Key = modelInstance.Key ?? Guid.NewGuid(),
-                CreatedByKey = modelInstance.CreatedByKey ?? context.ContextId,
+                CreatedByKey = context.ContextId,
                 CreationTime = modelInstance.CreationTime,
                 Name = modelInstance.Name,
                 ObsoletedByKey = modelInstance.ObsoletedByKey,

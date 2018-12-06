@@ -24,6 +24,7 @@ using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Configuration;
+using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using System;
 using System.Collections.Generic;
@@ -129,6 +130,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 try
                 {
                     dataContext.Open();
+                    dataContext.EstablishProvenance(principal, null);
                     using (var tx = dataContext.BeginTransaction())
                     {
                         try
@@ -138,7 +140,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             // Insert
                             dataContext.Insert(new DbSecurityRole()
                             {
-                                CreatedByKey = user.Key,
+                                CreatedByKey = dataContext.ContextId,
                                 Name = roleName
                             });
                             tx.Commit();

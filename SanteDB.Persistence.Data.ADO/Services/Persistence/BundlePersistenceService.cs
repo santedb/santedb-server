@@ -152,12 +152,18 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (AdoPersistenceService.GetConfiguration().PrepareStatements)
                 context.PrepareStatements = true;
 
-            Guid? externProvRef = null;
+            // Ensure that provenance objects match
+            var operationalItems = data.Item.Where(o => !data.ExpansionKeys.Any(k => o.Key == k)).ToArray();
+            var provenance = operationalItems.OfType<NonVersionedEntityData>().Select(o => o.UpdatedByKey.GetValueOrDefault()).Union(operationalItems.OfType<BaseEntityData>().Select(o => o.CreatedByKey.GetValueOrDefault())).Where(o => o != Guid.Empty);
+            if(provenance.Distinct().Count() > 1)
+                this.m_tracer.TraceError("PROVENANCE OF OBJECTS DO NOT MATCH. WHEN A BUNDLE IS PERSISTED PROVENANCE DATA MUST BE NULL OR MUST MATCH. {0}", String.Join(",", provenance.Distinct().Select(o=>o.ToString())));
 
             for (int i = 0; i < data.Item.Count; i++)
             {
                 var itm = data.Item[i];
                 var svc = AdoPersistenceService.GetPersister(itm.GetType());
+
+                if (data.ExpansionKeys.Any(k => itm.Key == k)) continue; // skip refs
 
                 this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)(i + 1) / data.Item.Count, itm));
                 try
@@ -166,32 +172,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         throw new InvalidOperationException($"Cannot find persister for {itm.GetType()}");
                     if (itm.TryGetExisting(context, true) != null)
                     {
-                        var externProv = (itm as NonVersionedEntityData)?.UpdatedByKey ?? (itm as BaseEntityData)?.CreatedByKey;
-                        if (!externProvRef.HasValue)
-                            externProvRef = externProv;
-                        if (externProv.HasValue && externProvRef.HasValue &&
-                            externProv != externProvRef)
-                        {
-                            this.m_tracer.TraceError("PROVENANCE OF OBJECT DOES NOT MATCH: EXPECTED {0} GOT {1} (OBJECT #{2})", externProvRef, externProv, i);
-                            // Throw a detected issue exception
-                            throw new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, $"PROVENANCE OF OBJECT DOES NOT MATCH: EXPECTED {externProvRef} GOT {externProv} (OBJECT #{i})", DetectedIssueKeys.SecurityIssue));
-                        }
                         this.m_tracer.TraceInformation("Will update {0} object from bundle...", itm);
                         data.Item[i] = svc.Update(context, itm) as IdentifiedData;
                     }
                     else
                     {
-                        // Validate bundle : All objects must carry the same CREATED BY key or not carry a CREATED BY key at all
-                        var externProv = (itm as BaseEntityData)?.CreatedByKey;
-                        if (!externProvRef.HasValue)
-                            externProvRef = externProv;
-                        if (externProv.HasValue && externProvRef.HasValue &&
-                            externProv != externProvRef)
-                        {
-                            this.m_tracer.TraceError("PROVENANCE OF OBJECT DOES NOT MATCH: EXPECTED {0} GOT {1} (OBJECT #{2})", externProvRef, externProv, i);
-                            throw new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, $"PROVENANCE OF OBJECT DOES NOT MATCH: EXPECTED {externProvRef} GOT {externProv} (OBJECT #{i})", DetectedIssueKeys.SecurityIssue));
-                        }
-
                         this.m_tracer.TraceInformation("Will insert {0} object from bundle...", itm);
                         data.Item[i] = svc.Insert(context, itm) as IdentifiedData;
                     }

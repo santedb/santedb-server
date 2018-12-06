@@ -168,7 +168,7 @@ namespace SanteDB.Messaging.HL7.Messages
                 qak.ThisPayload.Value = results.OfType<Object>().Count().ToString();
 
                 if (ApplicationServiceContext.Current.GetService<Core.Services.IQueryPersistenceService>() != null &&
-                    qak.HitsRemaining.Vaue > 0)
+                    Int32.Parse(qak.HitsRemaining.Value) > 0)
                 {
                     odsc.ContinuationPointer.Value = queryId.ToString();
                     odsc.ContinuationStyle.Value = "RD";
