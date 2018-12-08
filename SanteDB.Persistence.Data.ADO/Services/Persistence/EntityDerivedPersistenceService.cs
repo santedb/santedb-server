@@ -114,7 +114,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (preArgs.Cancel)
             {
                 this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Warning, 0, "Pre-event args indicate cancel : {0}", containerId);
-                return preArgs.OverrideResult;
+                return preArgs.Result;
             }
 
             if (containerId != Guid.Empty)

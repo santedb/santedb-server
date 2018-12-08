@@ -62,7 +62,7 @@ namespace SanteDB.Messaging.HL7.Segments
         /// <param name="data">The data to be created</param>
         /// <param name="context">The message in which the segment is created</param>
         /// <returns>The segments to add to the messge</returns>
-        public IEnumerable<ISegment> Create(IdentifiedData data, IGroup context)
+        public IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, string[] exportDomains)
         {
             var retVal = context.GetStructure("PID") as PID;
             var patient = data as Patient;
@@ -70,11 +70,13 @@ namespace SanteDB.Messaging.HL7.Segments
                 throw new InvalidOperationException($"Cannot convert {data.GetType().Name} to PID");
 
             // Map patient to PID
-            retVal.GetPatientIdentifierList(retVal.PatientIdentifierListRepetitionsUsed).FromModel(new EntityIdentifier(this.m_configuration.LocalAuthority, patient.Key.ToString()));
+            if(exportDomains == null || exportDomains.Contains(this.m_configuration.LocalAuthority.DomainName) == true)
+                retVal.GetPatientIdentifierList(retVal.PatientIdentifierListRepetitionsUsed).FromModel(new EntityIdentifier(this.m_configuration.LocalAuthority, patient.Key.ToString()));
 
             // Map alternate identifiers
             foreach (var id in patient.LoadCollection<EntityIdentifier>("Identifiers"))
-                retVal.GetPatientIdentifierList(retVal.PatientIdentifierListRepetitionsUsed).FromModel(id);
+                if (exportDomains == null || exportDomains.Contains(id.LoadProperty<AssigningAuthority>("Authority").DomainName) == true)
+                    retVal.GetPatientIdentifierList(retVal.PatientIdentifierListRepetitionsUsed).FromModel(id);
 
             // Addresses
             foreach (var addr in patient.LoadCollection<EntityAddress>("Addresses"))
@@ -98,6 +100,8 @@ namespace SanteDB.Messaging.HL7.Segments
                         break;
                 }
             }
+
+            retVal.AdministrativeSex.FromModel(patient.LoadProperty<Concept>("GenderConcept"), AdministrativeGenderCodeSystem);
 
             // Deceased date
             if(patient.DeceasedDate.HasValue)
@@ -140,36 +144,46 @@ namespace SanteDB.Messaging.HL7.Segments
             retVal.CreationAct = context.OfType<ControlAct>().FirstOrDefault();
 
             // Existing patient?
-            foreach (var id in pidSegment.GetPatientIdentifierList())
-            {
-                var idnumber = id.IDNumber.Value;
-                var authority = id.AssigningAuthority.ToModel();
-                Guid idguid = Guid.Empty;
-                Patient found = null;
-                if (authority == null &&
-                    id.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority?.DomainName)
-                    found = patientService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.Current.Principal);
-                else if(authority?.IsUnique == true)
-                    found = patientService.Query(o => o.Identifiers.Any(i => i.Value == idnumber &&
-                        i.AuthorityKey == authority.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                if (found != null)
+            if(pidSegment.Message.GetStructureName().StartsWith("ADT"))
+                foreach (var id in pidSegment.GetPatientIdentifierList())
                 {
-                    retVal = found;
-                    retVal.Names.Clear();
-                    retVal.Addresses.Clear();
-                    retVal.Telecoms.Clear();
-                    retVal.Identifiers.Clear();
-                    retVal.Extensions.Clear();
-                    retVal.Relationships.Clear();
-                    break;
+                    var idnumber = id.IDNumber.Value;
+                    var authority = id.AssigningAuthority.ToModel();
+                    Guid idguid = Guid.Empty;
+                    Patient found = null;
+                    if (authority == null &&
+                        id.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority?.DomainName)
+                        found = patientService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.Current.Principal);
+                    else if(authority?.IsUnique == true)
+                        found = patientService.Query(o => o.Identifiers.Any(i => i.Value == idnumber &&
+                            i.AuthorityKey == authority.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                    if (found != null)
+                    {
+                        retVal = found;
+                        retVal.Names.Clear();
+                        retVal.Addresses.Clear();
+                        retVal.Telecoms.Clear();
+                        retVal.Identifiers.Clear();
+                        retVal.Extensions.Clear();
+                        retVal.Relationships.Clear();
+                        break;
+                    }
                 }
-            }
             
 
             if (!pidSegment.PatientID.IsEmpty())
                 retVal.Identifiers.Add(pidSegment.PatientID.ToModel());
             if (pidSegment.PatientIdentifierListRepetitionsUsed > 0)
                 retVal.Identifiers.AddRange(pidSegment.GetPatientIdentifierList().ToModel());
+
+            // Find the key for the patient 
+            var keyId = pidSegment.GetPatientIdentifierList().FirstOrDefault(o => o.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority.DomainName);
+            if (keyId != null)
+                retVal.Key = Guid.Parse(keyId.IDNumber.Value);
+
+            if (retVal.Identifiers.Count == 0)
+                throw new InvalidOperationException("Couldn't understand any patient identity");
+
             if (pidSegment.PatientNameRepetitionsUsed > 0)
                 retVal.Names.AddRange(pidSegment.GetPatientName().ToModel());
 

@@ -18,6 +18,8 @@
  * Date: 2018-6-22
  */
 using SanteDB.Core;
+using SanteDB.Core.BusinessRules;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
@@ -320,7 +322,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         var dups = data.Identifiers.Where(id => id.AuthorityKey == auth.Key).SelectMany(id => context.Query<DbEntityIdentifier>(c => c.SourceKey != data.Key && c.AuthorityKey == auth.Key && c.Value == id.Value && c.ObsoleteVersionSequenceId == null));
                         if (dups.Any(did => !data.Relationships.Any(o=> o.RelationshipTypeKey == EntityRelationshipTypeKeys.Replaces && o.TargetEntityKey == did.SourceKey))) 
                             // TODO: Ensure that the duplicate is also not a RELATED to the via a MASTER
-                            throw new DuplicateNameException(String.Join(",", dups.Select(o => o.ToString())));
+                            throw new DetectedIssueException(
+                                new DetectedIssue(DetectedIssuePriorityType.Error, $"Identifiers for {String.Join(",", dups.Select(o => o.Value.ToString()))} in domain {auth.DomainName} violate unique constraint", DetectedIssueKeys.FormalConstraintIssue)
+                            );
                     }
                     else if(auth.AssigningApplicationKey.HasValue) // Must have permission
                     {

@@ -54,6 +54,23 @@ namespace SanteDB.Core.Services.Impl
         protected TraceSource m_traceSource = new TraceSource(SanteDBConstants.DataTraceSourceName);
 
         /// <summary>
+        /// Fired after data is inserted
+        /// </summary>
+        public event EventHandler<RepositoryEventArgs<TEntity>> Inserted;
+        /// <summary>
+        /// Fired after data is saved
+        /// </summary>
+        public event EventHandler<RepositoryEventArgs<TEntity>> Saved;
+        /// <summary>
+        /// Fired after data was retrieved
+        /// </summary>
+        public event EventHandler<RepositoryEventArgs<TEntity>> Retrieved;
+        /// <summary>
+        /// Fired after data was queried
+        /// </summary>
+        public event EventHandler<RepositoryEventArgs<IEnumerable<TEntity>>> Queried;
+
+        /// <summary>
         /// Gets the policy required for querying
         /// </summary>
         protected virtual String QueryPolicy => PermissionPolicyIdentifiers.LoginAsService;
@@ -99,7 +116,7 @@ namespace SanteDB.Core.Services.Impl
                 results = persistenceService.Query(query, offset, count,  out totalResults, AuthenticationContext.Current.Principal);
 
             var retVal = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
-
+            this.Queried?.Invoke(this, new RepositoryEventArgs<IEnumerable<TEntity>>(retVal));
             return retVal;
         }
 
@@ -128,6 +145,7 @@ namespace SanteDB.Core.Services.Impl
 
             businessRulesService?.AfterInsert(data);
 
+            this.Inserted?.Invoke(this, new RepositoryEventArgs<TEntity>(data));
             return data;
         }
 
@@ -157,7 +175,11 @@ namespace SanteDB.Core.Services.Impl
 
             entity = businessRulesService?.BeforeObsolete(entity) ?? entity;
             entity = persistenceService.Obsolete(entity, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-            return businessRulesService?.AfterObsolete(entity) ?? entity;
+            entity = businessRulesService?.AfterObsolete(entity) ?? entity;
+
+            this.Inserted?.Invoke(this, new RepositoryEventArgs<TEntity>(entity));
+
+            return entity;
         }
 
         /// <summary>
@@ -187,6 +209,7 @@ namespace SanteDB.Core.Services.Impl
             var result = persistenceService.Get(key, versionKey,  true, AuthenticationContext.Current.Principal);
 
             var retVal = businessRulesService?.AfterRetrieve(result) ?? result;
+            this.Retrieved?.Invoke(this, new RepositoryEventArgs<TEntity>(retVal));
             return retVal;
         }
 
@@ -214,6 +237,7 @@ namespace SanteDB.Core.Services.Impl
                 data = businessRulesService?.BeforeUpdate(data) ?? data;
                 data = persistenceService.Update(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                 businessRulesService?.AfterUpdate(data);
+                this.Saved?.Invoke(this, new RepositoryEventArgs<TEntity>(data));
                 return data;
             }
             catch (KeyNotFoundException)
@@ -221,6 +245,7 @@ namespace SanteDB.Core.Services.Impl
                 data = businessRulesService?.BeforeInsert(data) ?? data;
                 data = persistenceService.Insert(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                 businessRulesService?.AfterInsert(data);
+                this.Saved?.Invoke(this, new RepositoryEventArgs<TEntity>(data));
                 return data;
             }
         }
@@ -279,6 +304,7 @@ namespace SanteDB.Core.Services.Impl
             results = persistenceService.QueryFast(query, queryId, offset, count, out totalResults);
 
             results = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
+            this.Queried?.Invoke(this, new RepositoryEventArgs<IEnumerable<TEntity>>(results));
             return results;
         }
 

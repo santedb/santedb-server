@@ -40,7 +40,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandlers
     /// <summary>
     /// Represents a certificate resource handler for AMI
     /// </summary>
-    public class CertificateResourceHandler : IResourceHandler
+    public class CertificateResourceHandler : IApiResourceHandler
     {
 
         // Certificate tool 

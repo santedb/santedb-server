@@ -104,7 +104,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 		/// <summary>
 		/// Setup configuration
 		/// </summary>
-		public void SetupConfiguration(ServiceDefinition definition)
+		public void SetupConfiguration(Hl7ServiceDefinition definition)
 		{
 		}
 

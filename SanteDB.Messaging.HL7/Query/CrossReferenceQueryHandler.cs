@@ -61,12 +61,12 @@ namespace SanteDB.Messaging.HL7.Query
             var rqo = evt.Message as QBP_Q21;
 
             // Return domains
-            List<CX> returnDomains = new List<CX>();
+            List<String> returnDomains = new List<String>();
             foreach (var rt in rqo.QPD.GetField(4).OfType<Varies>())
             {
                 var rid = new CX(rqo.Message);
                 DeepCopy.copy(rt.Data as GenericComposite, rid);
-                returnDomains.Add(rid);
+                returnDomains.Add(rid.AssigningAuthority.NamespaceID.Value);
             }
 
             var matchService = ApplicationServiceContext.Current.GetService<IRecordMatchingService>();
@@ -77,25 +77,38 @@ namespace SanteDB.Messaging.HL7.Query
             foreach (var itm in patients)
             {
                 var queryInstance = retVal.QUERY_RESPONSE;
-                queryInstance.PID.SetIDPID.Value = (i++).ToString();
-                queryInstance.PID.GetPatientName(0).NameTypeCode.Value = "S";
+
+                // No match?
+
 
                 foreach(var id in itm.LoadCollection<EntityIdentifier>("Identifiers"))
-                    if (returnDomains.Any(o=>o.AssigningAuthority.NamespaceID.Value == id.LoadProperty<AssigningAuthority>("Authority").DomainName ||
-                    o.AssigningAuthority.UniversalID.Value == id.LoadProperty<AssigningAuthority>("Authority").Oid) || returnDomains.Count == 0)
+                    if (returnDomains.Any(o=>o == id.LoadProperty<AssigningAuthority>("Authority").DomainName || returnDomains.Count == 0))
                         queryInstance.PID.GetPatientIdentifierList(queryInstance.PID.PatientIdentifierListRepetitionsUsed).FromModel(id);
 
-                if (returnDomains.Any(rid => rid.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority.DomainName ||
-                    rid.AssigningAuthority.UniversalID.Value == this.m_configuration.LocalAuthority.Oid))
+                if (returnDomains.Any(rid => rid == this.m_configuration.LocalAuthority.DomainName))
                 {
                     int idx = queryInstance.PID.PatientAddressRepetitionsUsed;
                     queryInstance.PID.GetPatientIdentifierList(idx).IDNumber.Value = itm.Key.Value.ToString();
                     queryInstance.PID.GetPatientIdentifierList(idx).AssigningAuthority.NamespaceID.Value = this.m_configuration.LocalAuthority.DomainName;
                     queryInstance.PID.GetPatientIdentifierList(idx).AssigningAuthority.UniversalID.Value = this.m_configuration.LocalAuthority.Oid;
                     queryInstance.PID.GetPatientIdentifierList(idx).AssigningAuthority.UniversalIDType.Value = "ISO";
-
                 }
+
+                if (queryInstance.PID.AlternatePatientIDPIDRepetitionsUsed > 0)
+                {
+                    queryInstance.PID.SetIDPID.Value = (i++).ToString();
+                    queryInstance.PID.GetPatientName(0).NameTypeCode.Value = "S";
+                }
+                else
+                {
+                    (currentResponse.GetStructure("QAK") as QAK).HitCount.Value = "0";
+                    (currentResponse.GetStructure("QAK") as QAK).HitsRemaining.Value = "0";
+                    (currentResponse.GetStructure("QAK") as QAK).ThisPayload.Value = "0";
+                    (currentResponse.GetStructure("QAK") as QAK).QueryResponseStatus.Value = "NF";
+                }
+
             }
+
 
             return retVal;
         }

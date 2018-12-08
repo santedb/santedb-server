@@ -22,6 +22,8 @@ CREATE TABLE IF NOT EXISTS ENT_POL_ASSOC_TBL (
 	CONSTRAINT FK_ENT_POL_OBSLT_VRSN_SEQ_ID FOREIGN KEY (OBSLT_VRSN_SEQ_ID) REFERENCES ENT_VRSN_TBL(VRSN_SEQ_ID),
 	CONSTRAINT FK_ENT_POL_POL_ID FOREIGN KEY (POL_ID) REFERENCES SEC_POL_TBL(POL_ID)
 );
+DROP INDEX IF EXISTS ENT_POL_ASSOC_POL_ID_IDX ;
+DROP INDEX IF EXISTS ENT_POL_ASSOC_VRSN_IDX ;
 
 CREATE INDEX ENT_POL_ASSOC_POL_ID_IDX ON ENT_POL_ASSOC_TBL(POL_ID);
 CREATE INDEX ENT_POL_ASSOC_VRSN_IDX ON ENT_POL_ASSOC_TBL(EFFT_VRSN_SEQ_ID, OBSLT_VRSN_SEQ_ID);
@@ -185,6 +187,15 @@ alter table act_pol_assoc_tbl alter efft_vrsn_seq_id type integer;
 alter table act_pol_assoc_tbl alter obslt_vrsn_seq_id type integer;
 alter table act_note_tbl alter efft_vrsn_seq_id type integer;
 alter table act_note_tbl alter obslt_vrsn_seq_id type integer;
+alter table act_vrsn_tbl alter vrsn_seq_id type integer;
+
+alter table cd_name_tbl alter efft_vrsn_seq_id type integer;
+alter table cd_name_tbl alter obslt_vrsn_seq_id type integer;
+alter table cd_ref_term_assoc_tbl alter efft_vrsn_seq_id type integer;
+alter table cd_ref_term_assoc_tbl alter obslt_vrsn_seq_id type integer;
+alter table cd_rel_assoc_tbl alter efft_vrsn_seq_id type integer;
+alter table cd_rel_assoc_tbl alter obslt_vrsn_seq_id type integer;
+alter table cd_vrsn_tbl alter crsn_seq_id type integer;
 
 -- CURRENT CONCEPT VERSION VIEW
 CREATE VIEW CD_CUR_VRSN_VW AS

@@ -48,6 +48,7 @@ using SanteDB.Core.Security.Services;
 using System.Security.Authentication;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security.Claims;
+using SanteDB.Messaging.HL7.Utils;
 
 namespace SanteDB.Messaging.HL7.Messages
 {
@@ -88,73 +89,6 @@ namespace SanteDB.Messaging.HL7.Messages
         protected abstract bool Validate(IMessage message);
 
         /// <summary>
-        /// Parses the specified message components
-        /// </summary>
-        /// <param name="message">The message to be parsed</param>
-        /// <returns>The parsed message</returns>
-        protected virtual Bundle Parse(IGroup message)
-        {
-
-            Bundle retVal = new Bundle();
-            var finder = new SegmentFinder(message);
-            while (finder.hasNextChild())
-            {
-                finder.nextChild();
-                foreach (var current in finder.CurrentChildReps)
-                {
-                    if (current is AbstractGroupItem)
-                        foreach (var s in (current as AbstractGroupItem)?.Structures.OfType<IGroup>())
-                        {
-                            var parsed = this.Parse(s);
-                            retVal.Item.AddRange(parsed.Item.Select(i =>
-                            {
-                                var ret = i.Clone();
-                                (ret as ITaggable)?.AddTag(".v2.group", current.GetStructureName());
-                                return ret;
-                            }));
-                            retVal.ExpansionKeys.AddRange(parsed.ExpansionKeys);
-                        }
-                    else if (current is AbstractSegment)
-                    {
-                        // Empty, don't parse
-                        if (PipeParser.Encode(current as AbstractSegment, new EncodingCharacters('|', "^~\\&")).Length == 3)
-                            continue;
-                        var handler = SegmentHandlers.GetSegmentHandler(current.GetStructureName());
-                        if (handler != null)
-                        {
-                            var parsed = handler.Parse(current as AbstractSegment, retVal.Item);
-                            if (parsed.Any())
-                            {
-                                retVal.ExpansionKeys.Add(parsed.First().Key.GetValueOrDefault());
-                                retVal.Item.AddRange(parsed.Select(i =>
-                                {
-                                    var ret = i.Clone();
-                                    (ret as ITaggable)?.AddTag(".v2.segment", current.GetStructureName());
-                                    return ret;
-                                }));
-                            }
-                        }
-                    }
-                    else if (current is AbstractGroup)
-                    {
-                        var subObject = this.Parse(current as AbstractGroup);
-                        retVal.Item.AddRange(subObject.Item.Select(i =>
-                        {
-                            var ret = i.Clone();
-                            (ret as ITaggable)?.AddTag(".v2.group", current.GetStructureName());
-                            return ret;
-                        }));
-                        retVal.ExpansionKeys.AddRange(subObject.ExpansionKeys);
-                    }
-
-                    // Tag the objects 
-                }
-            }
-            return retVal;
-        }
-
-
-        /// <summary>
         /// Handle the message generic handler
         /// </summary>
         /// <param name="e">The message event information</param>
@@ -167,10 +101,11 @@ namespace SanteDB.Messaging.HL7.Messages
                 if (!this.Validate(e.Message))
                     throw new ArgumentException("Invalid message");
 
-                return this.HandleMessageInternal(e, this.Parse(e.Message));
+                return this.HandleMessageInternal(e, MessageUtils.Parse(e.Message));
             }
             catch (Exception ex)
             {
+                this.m_traceSource.TraceEvent(TraceEventType.Error, ex.HResult, "Error processing message: {0}", ex);
                 return this.CreateNACK(typeof(ACK), e.Message, ex, e);
             }
         }
@@ -367,8 +302,9 @@ namespace SanteDB.Messaging.HL7.Messages
         protected IMessage CreateACK(Type ackType, IMessage request, String ackCode, String ackMessage)
         {
             var retVal = Activator.CreateInstance(ackType) as IMessage;
-            this.UpdateMSH(retVal.GetStructure("MSH") as MSH, request.GetStructure("MSH") as MSH);
-            this.UpdateSFT(retVal.GetStructure("SFT") as SFT);
+            (retVal.GetStructure("MSH") as MSH).SetDefault(request.GetStructure("MSH") as MSH);
+            if((request.GetStructure("MSH") as MSH).VersionID.VersionID.Value == "2.5")
+                (retVal.GetStructure("SFT") as SFT).SetDefault();
             var msa = retVal.GetStructure("MSA") as MSA;
             msa.MessageControlID.Value = (request.GetStructure("MSH") as MSH).MessageControlID.Value;
             msa.AcknowledgmentCode.Value = ackCode;
@@ -376,53 +312,7 @@ namespace SanteDB.Messaging.HL7.Messages
             return retVal;
         }
 
-        /// <summary>
-        /// Add software information
-        /// </summary>
-        private void UpdateSFT(SFT sftSegment)
-        {
-            if (Assembly.GetEntryAssembly() == null) return;
-            sftSegment.SoftwareVendorOrganization.OrganizationName.Value = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyCompanyAttribute>()?.Company;
-            sftSegment.SoftwareVendorOrganization.OrganizationNameTypeCode.Value = "D";
-            sftSegment.SoftwareCertifiedVersionOrReleaseNumber.Value = Assembly.GetEntryAssembly().GetName().Version.ToString();
-            sftSegment.SoftwareProductName.Value = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyProductAttribute>()?.Product;
-
-            // SFT info
-            if (!String.IsNullOrEmpty(Assembly.GetEntryAssembly().Location) && File.Exists(Assembly.GetEntryAssembly().Location))
-            {
-                if (s_entryAsmHash == null)
-                {
-                    using (var md5 = MD5.Create())
-                    using (var stream = File.OpenRead(Assembly.GetEntryAssembly().Location))
-                        s_entryAsmHash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-","");
-                }
-
-                if (s_installDate == null)
-                    s_installDate = new FileInfo(Assembly.GetEntryAssembly().Location).CreationTime;
-
-                sftSegment.SoftwareBinaryID.Value = s_entryAsmHash;
-                sftSegment.SoftwareInstallDate.Time.SetLongDate(s_installDate.Value);
-            }
-
-        }
-
-        /// <summary>
-        /// Update the MSH on the specified MSH segment
-        /// </summary>
-        /// <param name="msh">The message header to be updated</param>
-        /// <param name="inbound">The inbound message</param>
-        protected void UpdateMSH(MSH msh, MSH inbound)
-        {
-            var config = this.m_configuration;
-            msh.MessageControlID.Value = Guid.NewGuid().ToString();
-            msh.SendingApplication.NamespaceID.Value = ApplicationServiceContext.Current.GetService<INetworkInformationService>()?.GetMachineName();
-            msh.SendingFacility.UniversalID.Value = this.m_configuration.LocalFacility.ToString();
-            msh.SendingFacility.UniversalIDType.Value = "GUID";
-            msh.ReceivingApplication.NamespaceID.Value = inbound.SendingApplication.NamespaceID.Value;
-            msh.ReceivingFacility.NamespaceID.Value = inbound.SendingFacility.NamespaceID.Value;
-            msh.DateTimeOfMessage.Time.Value = DateTime.Now.ToString("yyyyMMddHHmmss");
-        }
-
+        
        
     }
 }

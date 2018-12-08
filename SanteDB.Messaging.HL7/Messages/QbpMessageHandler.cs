@@ -32,6 +32,7 @@ using SanteDB.Messaging.HL7.ParameterMap;
 using SanteDB.Messaging.HL7.TransportProtocol;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -99,7 +100,7 @@ namespace SanteDB.Messaging.HL7.Messages
             var msh = e.Message.GetStructure("MSH") as MSH;
             var trigger = msh.MessageType.TriggerEvent.Value;
             var map = s_map.Map.First(o => o.Trigger == trigger);
-            
+
             try
             {
                 if (map.ResponseType == null)
@@ -138,17 +139,35 @@ namespace SanteDB.Messaging.HL7.Messages
                     throw new InvalidOperationException($"Cannot find repository service for {map.QueryTargetXml}");
 
                 // Build query
-                var queryMethod = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression),
-                    new Type[] { map.QueryTarget },
-                    new Type[] { typeof(NameValueCollection) });
-                var filterQuery = queryMethod.Invoke(null, new object[] { query }) as Expression;
+                int totalResults = 0;
+                IEnumerable results = null;
+                Expression filterQuery = null;
 
-                // Now we want to query
-                object[] parameters = { filterQuery, offset.Value, (int?)count, null, queryId };
-                var findMethod = repoService.GetType().GetMethod("Find", new Type[] { filterQuery.GetType(), typeof(int), typeof(int?), typeof(int).MakeByRefType(), typeof(Guid) });
-                IEnumerable results = findMethod.Invoke(repoService, parameters) as IEnumerable;
-                int totalResults = (int)parameters[3];
+                if (query.ContainsKey("_id"))
+                {
+                    Guid id = Guid.Parse(query["_id"][0]);
+                    object result = repoService.GetType().GetMethod("Get", new Type[] { typeof(Guid) }).Invoke(repoService, new object[] { id });
+                    results = new List<IdentifiedData>();
 
+                    if (result != null)
+                    {
+                        (results as IList).Add(result);
+                        totalResults = 1;
+                    }
+                }
+                else
+                {
+                    var queryMethod = typeof(QueryExpressionParser).GetGenericMethod(nameof(QueryExpressionParser.BuildLinqExpression),
+                        new Type[] { map.QueryTarget },
+                        new Type[] { typeof(NameValueCollection) });
+                    filterQuery = queryMethod.Invoke(null, new object[] { query }) as Expression;
+
+                    // Now we want to query
+                    object[] parameters = { filterQuery, offset.Value, (int?)count, null, queryId };
+                    var findMethod = repoService.GetType().GetMethod("Find", new Type[] { filterQuery.GetType(), typeof(int), typeof(int?), typeof(int).MakeByRefType(), typeof(Guid) });
+                    results = findMethod.Invoke(repoService, parameters) as IEnumerable;
+                    totalResults = (int)parameters[3];
+                }
                 // Save the tag
                 if (dsc.ContinuationPointer.Value != queryId.ToString() &&
                     offset.Value + count.GetValueOrDefault() < totalResults)
@@ -178,7 +197,7 @@ namespace SanteDB.Messaging.HL7.Messages
                 retVal = map.QueryHandler.AppendQueryResult(results, filterQuery, retVal, e, map.ScoreConfiguration, offset.GetValueOrDefault());
                 return retVal;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.m_traceSource.TraceEvent(TraceEventType.Error, ex.HResult, "Error executing query: {0}", ex);
 
@@ -188,7 +207,7 @@ namespace SanteDB.Messaging.HL7.Messages
         }
 
 
-       
+
 
         /// <summary>
         /// Validate that this message can be processed

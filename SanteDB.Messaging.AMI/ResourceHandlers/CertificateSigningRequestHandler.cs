@@ -37,7 +37,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandlers
     /// <summary>
     /// Represents a handler which is capable of storing and interacting with the windows CSR store
     /// </summary>
-    public class CertificateSigningRequestHandler : IResourceHandler
+    public class CertificateSigningRequestHandler : IApiResourceHandler
     {
 
         // Certificate tool

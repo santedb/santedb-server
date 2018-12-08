@@ -18,7 +18,7 @@ namespace SanteDB.Messaging.HL7
 	public class ServiceHandler
 	{
 		// The service definition
-		private ServiceDefinition m_serviceDefinition;
+		private Hl7ServiceDefinition m_serviceDefinition;
 
         private TraceSource m_traceSource = new TraceSource(Hl7Constants.TraceSourceName);
 
@@ -28,7 +28,7 @@ namespace SanteDB.Messaging.HL7
 		/// <summary>
 		/// Constructs the new service handler
 		/// </summary>
-		public ServiceHandler(ServiceDefinition serviceDefinition)
+		public ServiceHandler(Hl7ServiceDefinition serviceDefinition)
 		{
 			this.m_serviceDefinition = serviceDefinition;
 			this.m_transport = TransportUtil.CreateTransport(this.m_serviceDefinition.Address.Scheme);
@@ -38,7 +38,7 @@ namespace SanteDB.Messaging.HL7
 		/// <summary>
 		/// Gets the service definition for this handler
 		/// </summary>
-		public ServiceDefinition Definition { get { return this.m_serviceDefinition; } }
+		public Hl7ServiceDefinition Definition { get { return this.m_serviceDefinition; } }
 
 		/// <summary>
 		/// Start the service handler

@@ -87,7 +87,16 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public void QueueNonPooledWorkItem(Action<object> action, object parm)
         {
-            Thread thd = new Thread(new ParameterizedThreadStart(action));
+            Thread thd = new Thread(new ParameterizedThreadStart((o)=> {
+                try
+                {
+                    action(o);
+                }
+                catch(Exception e)
+                {
+                    this.m_traceSource.TraceError("THREAD DEATH: {0}", e);
+                }
+                }));
             thd.IsBackground = true;
             thd.Name = $"SanteDBBackground-{action}";
             thd.Start(parm);

@@ -55,12 +55,28 @@ namespace SanteDB.Core.Services.Impl
 		/// Fired when an alert is received.
 		/// </summary>
 		public event EventHandler<MailMessageEventArgs> Received;
+        /// <summary>
+        /// Inserted
+        /// </summary>
+        public event EventHandler<RepositoryEventArgs<MailMessage>> Inserted;
+        /// <summary>
+        /// Saved
+        /// </summary>
+        public event EventHandler<RepositoryEventArgs<MailMessage>> Saved;
+        /// <summary>
+        /// Retrieved
+        /// </summary>
+        public event EventHandler<RepositoryEventArgs<MailMessage>> Retrieved;
+        /// <summary>
+        /// Queried
+        /// </summary>
+        public event EventHandler<RepositoryEventArgs<IEnumerable<MailMessage>>> Queried;
 
-		/// <summary>
-		/// Broadcasts an alert.
-		/// </summary>
-		/// <param name="message">The alert message to be broadcast.</param>
-		public void Broadcast(MailMessage message)
+        /// <summary>
+        /// Broadcasts an alert.
+        /// </summary>
+        /// <param name="message">The alert message to be broadcast.</param>
+        public void Broadcast(MailMessage message)
 		{
 			this.Committed?.Invoke(this, new MailMessageEventArgs(message));
 		}
@@ -86,7 +102,9 @@ namespace SanteDB.Core.Services.Impl
             var qry = new NameValueCollection(QueryExpressionBuilder.BuildQuery(predicate).ToArray());
             if (!qry.ContainsKey("flags"))
                 qry.Add("flags", $"!{(int)MailMessageFlags.Archived}");
-			return persistenceService.Query(QueryExpressionParser.BuildLinqExpression<MailMessage>(qry), offset, count,  out totalCount, AuthenticationContext.Current.Principal);
+			var retVal =  persistenceService.Query(QueryExpressionParser.BuildLinqExpression<MailMessage>(qry), offset, count,  out totalCount, AuthenticationContext.Current.Principal);
+            this.Queried?.Invoke(this, new RepositoryEventArgs<IEnumerable<MailMessage>>(retVal));
+            return retVal;
 		}
 
 		/// <summary>
@@ -103,7 +121,9 @@ namespace SanteDB.Core.Services.Impl
 				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<MailMessage>)));
 			}
 
-			return persistenceService.Get(id, null, false, AuthenticationContext.Current.Principal);
+			var retVal = persistenceService.Get(id, null, false, AuthenticationContext.Current.Principal);
+            this.Retrieved?.Invoke(this, new RepositoryEventArgs<MailMessage>(retVal));
+            return retVal;
 		}
 
 		/// <summary>
@@ -126,6 +146,7 @@ namespace SanteDB.Core.Services.Impl
 			{
 				alert = persistenceService.Insert(message, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 				this.Received?.Invoke(this, new MailMessageEventArgs(alert));
+                this.Inserted?.Invoke(this, new RepositoryEventArgs<MailMessage>(alert));
 			}
 			catch (Exception e)
 			{
@@ -163,14 +184,16 @@ namespace SanteDB.Core.Services.Impl
 					persistenceService.Update(message, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
 				this.Received?.Invoke(this, new MailMessageEventArgs(alert));
+                this.Saved?.Invoke(this, new RepositoryEventArgs<MailMessage>(alert));
 			}
 			catch (DataPersistenceException)
 			{
 				alert = persistenceService.Insert(message, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 				this.Received?.Invoke(this, new MailMessageEventArgs(alert));
-			}
+                this.Saved?.Invoke(this, new RepositoryEventArgs<MailMessage>(alert));
+            }
 
-			return alert;
+            return alert;
 		}
 
         /// <summary>

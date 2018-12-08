@@ -143,7 +143,7 @@ namespace SanteDB.Messaging.HDSI
                 else 
                     HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(
                         typeof(PatientResourceHandler).Assembly.ExportedTypes
-                        .Where(t => !t.IsAbstract && !t.IsInterface && typeof(IResourceHandler).IsAssignableFrom(t))
+                        .Where(t => !t.IsAbstract && !t.IsInterface && typeof(IApiResourceHandler).IsAssignableFrom(t))
                         .ToList()
                         );
 

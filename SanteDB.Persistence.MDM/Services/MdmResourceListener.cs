@@ -185,12 +185,12 @@ namespace SanteDB.Persistence.MDM.Services
                 if (typeof(Entity).IsAssignableFrom(typeof(T)))
                 {
                     var master = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Entity>>().Get(e.Id.Value, null, false, AuthenticationContext.Current.Principal);
-                    e.OverrideResult = new EntityMaster<T>(master).GetMaster(AuthenticationContext.Current.Principal);
+                    e.Result = new EntityMaster<T>(master).GetMaster(AuthenticationContext.Current.Principal);
                 }
                 else if (typeof(Act).IsAssignableFrom(typeof(T)))
                 {
                     var master = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Act>>().Get(e.Id.Value, null, false, AuthenticationContext.Current.Principal);
-                    e.OverrideResult = new ActMaster<T>(master).GetMaster(AuthenticationContext.Current.Principal);
+                    e.Result = new ActMaster<T>(master).GetMaster(AuthenticationContext.Current.Principal);
                 }
             }
         }

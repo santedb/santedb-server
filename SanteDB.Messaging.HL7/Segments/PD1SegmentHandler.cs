@@ -53,7 +53,7 @@ namespace SanteDB.Messaging.HL7.Segments
         /// <summary>
         /// Create PD1
         /// </summary>
-        public IEnumerable<ISegment> Create(IdentifiedData data, IGroup context)
+        public IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, string[] exportDomains)
         {
             var retVal = context.GetStructure("PD1") as PD1;
 

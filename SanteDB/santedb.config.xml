@@ -234,11 +234,11 @@
     <base>http://localhost:8080/fhir</base>
   </section>
   <!-- Configurations Related to GS1 -->
-  <section xsi:type="Gs1ConfigurationSection" 
-           autoCreateMaterials="true" 
-           defaultAuthority="1.2.3.4.5.6.7" 
-           queueName="gs1" 
-           partnerAuthority="urn:oid:1.2.3.4.5.6.7" 
+  <section xsi:type="Gs1ConfigurationSection"
+           autoCreateMaterials="true"
+           defaultAuthority="1.2.3.4.5.6.7"
+           queueName="gs1"
+           partnerAuthority="urn:oid:1.2.3.4.5.6.7"
            partnerIdentification="SanteDB">
     <broker useAs2MimeEncoding="false" userName="bobby" password="fluffy_penguins">
       <binding optimize="false" />
@@ -260,10 +260,22 @@
   <!-- Controls the HL7 v2 LLP Handler -->
   <section xsi:type="Hl7ConfigurationSection" security="Msh8">
     <localAuthority>
-      <domainName xmlns="http://santedb.org/model">SanteDBDEMO</domainName>
-      <oid xmlns="http://santedb.org/model">1.2.3.4.5.6.7.8</oid>
+      <domainName xmlns="http://santedb.org/model">DCG_OID</domainName>
+      <oid xmlns="http://santedb.org/model">1.3.6.1.4.1.52820.9.1.1.1.9</oid>
       <url xmlns="http://santedb.org/model">http://demo.santesuite.net</url>
     </localAuthority>
+    <interceptors>
+      <add type="SanteDB.Messaging.HL7.Interceptors.AdtPatientPassthroughInterceptor, SanteDB.Messaging.HL7, Version=1.9.0.0, Culture=neurtral, PublicKeyToken=null" hl7version="2.3.1">
+        <endpoints>
+          <add address="llp://127.0.0.1:2200" receiveTimeout="30000" securityToken="145B3622BB609D4CB6BD47B0836D3C1B" receivingFacility="MM" receivingDevice="MM_MPI"/>
+        </endpoints>
+        <domains>
+          <add>DCG_OID</add>
+          <add>NHID</add>
+          <add>HIVID</add>
+        </domains>
+      </add>
+    </interceptors>
     <services>
       <add address="llp://0.0.0.0:2100" name="LLP" receiveTimeout="20000">
         <!-- If you want to enable security Encryption
@@ -291,20 +303,20 @@
     <!--<clientCertificate findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />-->
   </section>
   <!-- This section controls the audit repository for ADO.NET -->
-  <section xsi:type="AdoAuditConfigurationSection" 
-           readWriteConnectionString="PSQL_AUDIT" 
-           readOnlyConnectionString="PSQL_AUDIT" 
-           traceSql="false" 
+  <section xsi:type="AdoAuditConfigurationSection"
+           readWriteConnectionString="PSQL_AUDIT"
+           readOnlyConnectionString="PSQL_AUDIT"
+           traceSql="false"
            providerType="SanteDB.OrmLite.Providers.Postgres.PostgreSQLProvider, SanteDB.OrmLite, Version=1.9.1.0" />
   <!-- This section controls the persistence for ADO.NET -->
-  <section xsi:type="AdoPersistenceConfigurationSection" 
-           readWriteConnectionString="FBSQL" 
-           readOnlyConnectionString="FBSQL" 
-           traceSql="false" 
-           providerType="SanteDB.OrmLite.Providers.Firebird.FirebirdSQLProvider, SanteDB.OrmLite, Version=1.9.1.0" 
-           staOnly="false"  
-           autoUpdateExisting="true" 
-           autoInsertChildren="true" 
+  <section xsi:type="AdoPersistenceConfigurationSection"
+           readWriteConnectionString="FBSQL"
+           readOnlyConnectionString="FBSQL"
+           traceSql="false"
+           providerType="SanteDB.OrmLite.Providers.Firebird.FirebirdSQLProvider, SanteDB.OrmLite, Version=1.9.1.0"
+           staOnly="false"
+           autoUpdateExisting="true"
+           autoInsertChildren="true"
            prepareStatements="true">
     <!-- Any corrective handlers should be added here 
     <corrections>
@@ -332,20 +344,20 @@
     </resources>
   </section>
   <!-- Reporting configuration -->
-  <section xsi:type="ReportingConfiguration" 
-           readWriteConnectionString="PSQL_RPT" 
-           readOnlyConnectionString="PSQL_RPT" 
-           traceSql="false" 
+  <section xsi:type="ReportingConfiguration"
+           readWriteConnectionString="PSQL_RPT"
+           readOnlyConnectionString="PSQL_RPT"
+           traceSql="false"
            providerType="SanteDB.OrmLite.Providers.Postgres.PostgreSQLProvider, SanteDB.OrmLite, Version=1.9.1.0" />
   <!-- Data Warehouse Configuration -->
-  <section xsi:type="AdoWarehouseConfigurationSection" 
-           readWriteConnectionString="SanteDBWarehouse" 
-           readOnlyConnectionString="SanteDBWarehouse" 
-           traceSql="false" 
+  <section xsi:type="AdoWarehouseConfigurationSection"
+           readWriteConnectionString="SanteDBWarehouse"
+           readOnlyConnectionString="SanteDBWarehouse"
+           traceSql="false"
            providerType="SanteDB.OrmLite.Providers.Postgres.PostgreSQLProvider, SanteDB.OrmLite, Version=1.9.1.0" />
   <section xsi:type="SanteDBServerConfiguration" threadPoolSize="4">
     <serviceProviders>
-      
+
       <!-- Core Services -->
       <add type="SanteDB.Core.Services.Impl.FileConfigurationService, SanteDB.Core, Version=1.9.0.24160, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Services.DefaultJobManagerService, SanteDB.Core, Version=1.9.0.24160, Culture=neutral, PublicKeyToken=null" />

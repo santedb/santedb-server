@@ -19,6 +19,7 @@
  */
 using NHapi.Base.Model;
 using NHapi.Base.Parser;
+using SanteDB.Messaging.HL7.Utils;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -33,7 +34,7 @@ namespace SanteDB.Messaging.HL7.Client
 	/// <summary>
 	/// Represents an MLLP message sender.
 	/// </summary>
-	internal class MllpMessageSender
+	public class MllpMessageSender
 	{
 		/// <summary>
 		/// The internal reference to the client certificate.
@@ -135,8 +136,7 @@ namespace SanteDB.Messaging.HL7.Client
 		public IMessage SendAndReceive(IMessage message)
 		{
 			// Encode the message
-			var parser = new PipeParser();
-			var strMessage = parser.Encode(message);
+			var strMessage = MessageUtils.EncodeMessage(message, (message.GetStructure("MSH") as NHapi.Model.V25.Segment.MSH).VersionID.VersionID.Value);
 
 #if DEBUG
 			this.tracer.TraceEvent(TraceEventType.Information, 0, strMessage);
@@ -204,7 +204,8 @@ namespace SanteDB.Messaging.HL7.Client
 #if DEBUG
 						this.tracer.TraceEvent(TraceEventType.Information, 0, response.ToString());
 #endif
-						return parser.Parse(response.ToString());
+                        String version = null;
+						return MessageUtils.ParseMessage(response.ToString(), out version);
 					}
 				}
 				catch (Exception e)

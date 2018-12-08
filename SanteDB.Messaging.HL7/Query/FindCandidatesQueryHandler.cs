@@ -34,6 +34,7 @@ using SanteDB.Messaging.HL7.TransportProtocol;
 using SanteDB.Messaging.HL7.Utils;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -59,14 +60,29 @@ namespace SanteDB.Messaging.HL7.Query
             var matchService = ApplicationServiceContext.Current.GetService<IRecordMatchingService>();
             var matchConfigService = ApplicationServiceContext.Current.GetService<IRecordMatchingConfigurationService>();
 
+            // Return domains
+            var rqo = evt.Message as QBP_Q21;
+            List<String> returnDomains = new List<String>();
+            foreach (var rt in rqo.QPD.GetField(8).OfType<Varies>())
+            {
+                var rid = new CX(rqo.Message);
+                DeepCopy.copy(rt.Data as GenericComposite, rid);
+
+                if(String.IsNullOrEmpty(rid.AssigningAuthority.NamespaceID.Value))
+                    rid.AssigningAuthority.NamespaceID.Value = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>().Get(new Uri("urn:oid:" + rid.AssigningAuthority.UniversalID.Value)).DomainName;
+                returnDomains.Add(rid.AssigningAuthority.NamespaceID.Value);
+            }
+            if (returnDomains.Count == 0)
+                returnDomains = null;
+            
             // Process results
             int i = offset + 1;
             foreach (var itm in patients)
             {
                 var queryInstance = retVal.GetQUERY_RESPONSE(retVal.QUERY_RESPONSERepetitionsUsed);
-                pidHandler.Create(itm, queryInstance);
-                pd1Handler.Create(itm, queryInstance);
-                nokHandler.Create(itm, queryInstance);
+                pidHandler.Create(itm, queryInstance, returnDomains?.ToArray());
+                pd1Handler.Create(itm, queryInstance, null);
+                nokHandler.Create(itm, queryInstance, null);
                 queryInstance.PID.SetIDPID.Value = (i++).ToString();
                 // QRI?
                 if(matchService != null && !String.IsNullOrEmpty(matchConfiguration))

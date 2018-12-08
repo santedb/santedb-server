@@ -25,26 +25,30 @@ namespace SanteDB.Messaging.HL7.Configuration
         [XmlElement("localAuthority"), JsonProperty("localAuthority")]
         public AssigningAuthority LocalAuthority { get; set; }
 
-
         /// <summary>
         /// Security method
         /// </summary>
         [XmlAttribute("security"), JsonProperty("security")]
         public SecurityMethod Security { get; set; }
-
-
+        
         /// <summary>
         /// The address to which to bind
         /// </summary>
         /// <remarks>A full Uri is required and must be tcp:// or mllp://</remarks>
         [XmlArray("services"), XmlArrayItem("add"), JsonProperty("services")]
-        public List<ServiceDefinition> Services { get; set; }
+        public List<Hl7ServiceDefinition> Services { get; set; }
 
         /// <summary>
         /// Gets or sets the facilit
         /// </summary>
         [XmlElement("facility"), JsonProperty("facility")]
         public Guid LocalFacility { get; set; }
+
+        /// <summary>
+        /// Gets or sets the notifications
+        /// </summary>
+        [XmlArray("interceptors"), XmlArrayItem("add"), JsonProperty("interceptors")]
+        public List<Hl7InterceptorConfigurationElement> Interceptors { get; set; }
     }
 
     /// <summary>
@@ -154,34 +158,17 @@ namespace SanteDB.Messaging.HL7.Configuration
     /// <summary>
     /// Service definition
     /// </summary>
-    [XmlType(nameof(ServiceDefinition), Namespace = "http://santedb.org/configuration")]
-    public class ServiceDefinition
+    [XmlType(nameof(Hl7ServiceDefinition), Namespace = "http://santedb.org/configuration")]
+    public class Hl7ServiceDefinition : Hl7EndpointConfiguration
     {
         /// <summary>
         /// Service defn ctor
         /// </summary>
-        public ServiceDefinition()
+        public Hl7ServiceDefinition()
         {
             this.Handlers = new List<HandlerDefinition>();
         }
 
-        /// <summary>
-        /// Gets or sets the address of the service
-        /// </summary>
-        [XmlAttribute("address"), JsonProperty("address")]
-        public String AddressXml { get; set; }
-
-        /// <summary>
-        /// Gets the listening address
-        /// </summary>
-        [XmlIgnore, JsonIgnore]
-        public Uri Address => new Uri(this.AddressXml);
-
-        /// <summary>
-        /// Attributes
-        /// </summary>
-        [XmlElement("sllp", Type = typeof(SllpTransport.SllpConfigurationObject)), JsonProperty("sllpConfiguration")]
-        public object Configuration { get; set; }
 
         /// <summary>
         /// Gets or sets the handlers
@@ -195,11 +182,6 @@ namespace SanteDB.Messaging.HL7.Configuration
         [XmlAttribute("name"), JsonProperty("name")]
         public string Name { get; set; }
 
-        /// <summary>
-        /// Gets or sets the timeout
-        /// </summary>
-        [XmlAttribute("receiveTimeout"), JsonProperty("receiveTimeout")]
-        public int ReceiveTimeout { get; set; }
     }
 
 }

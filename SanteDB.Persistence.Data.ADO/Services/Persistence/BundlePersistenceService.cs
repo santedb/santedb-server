@@ -186,6 +186,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Error, e.HResult, "Error inserting bundle: {0}", e);
                     throw e.InnerException;
                 }
+                catch(DetectedIssueException e)
+                {
+                    this.m_tracer.TraceError("### Error Inserting Bundle[{0}]:", i);
+                    foreach (var iss in e.Issues)
+                        this.m_tracer.TraceError("\t{0}: {1}", iss.Priority, iss.Text);
+                    throw new DetectedIssueException(e.Issues, $"Could not insert bundle due to sub-object persistence (at item {i})", e);
+                }
                 catch (Exception e)
                 {
                     throw new Exception($"Could not insert bundle due to sub-object persistence (bundle item {i})", e);

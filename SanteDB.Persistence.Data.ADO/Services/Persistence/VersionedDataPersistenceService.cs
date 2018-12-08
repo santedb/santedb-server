@@ -295,7 +295,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (preArgs.Cancel)
             {
                 this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Pre-Event handler indicates abort retrieve {0}", containerId);
-                return preArgs.OverrideResult;
+                return preArgs.Result;
             }
 
             // Query object

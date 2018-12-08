@@ -263,6 +263,28 @@ namespace SanteDB.Messaging.HL7
         }
 
         /// <summary>
+        /// From a model
+        /// </summary>
+        public static IS FromModel(this IS me, Concept concept, String domain)
+        {
+            if (concept == null) return me;
+            var refTerm = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(concept.Key.Value, domain);
+            me.Value = refTerm?.Mnemonic;
+            return me;
+        }
+
+        /// <summary>
+        /// From a model
+        /// </summary>
+        public static ID FromModel(this ID me, Concept concept, String domain)
+        {
+            if (concept == null) return me;
+            var refTerm = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(concept.Key.Value, domain);
+            me.Value = refTerm?.Mnemonic;
+            return me;
+        }
+
+        /// <summary>
         /// Convert name to XPN
         /// </summary>
         public static XPN FromModel(this XPN me, EntityName name)
@@ -354,22 +376,39 @@ namespace SanteDB.Messaging.HL7
 
             foreach (var cx in identifiers)
             {
-                var assigningAuthority = cx.AssigningAuthority.ToModel();
-                var id = new EntityIdentifier(assigningAuthority, cx.IDNumber.Value);
-
-                if (!String.IsNullOrEmpty(cx.IdentifierTypeCode.Value))
+                var assigningAuthority = cx.AssigningAuthority.ToModel(cx.Message.GetStructureName().StartsWith("ADT"));
+                if (assigningAuthority != null)
                 {
-                    int tr = 0;
-                    var idType = ApplicationServiceContext.Current.GetService<IDataPersistenceService<IdentifierType>>().Query(o => o.TypeConcept.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == cx.IdentifierTypeCode.Value && r.ReferenceTerm.CodeSystem.Oid == IdentifierTypeCodeSystem), 0, 1, out tr, AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                    id.IdentifierTypeKey = idType?.Key;
-                }
+                    var id = new EntityIdentifier(assigningAuthority, cx.IDNumber.Value);
 
-                entityIdentifiers.Add(id);
+                    if (!String.IsNullOrEmpty(cx.IdentifierTypeCode.Value))
+                    {
+                        int tr = 0;
+                        var idType = ApplicationServiceContext.Current.GetService<IDataPersistenceService<IdentifierType>>().Query(o => o.TypeConcept.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == cx.IdentifierTypeCode.Value && r.ReferenceTerm.CodeSystem.Oid == IdentifierTypeCodeSystem), 0, 1, out tr, AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                        id.IdentifierTypeKey = idType?.Key;
+                    }
+
+                    entityIdentifiers.Add(id);
+                }
             }
 
             return entityIdentifiers.AsEnumerable();
         }
 
+        private static Dictionary<int, string> m_precisionFormats = new Dictionary<int, string>()
+        {
+            { 8, "yyyyMMdd" },
+            { 23, "yyyyMMddHHmmss.fffzzzz" },
+            { 18, "yyyyMMddHHmmss.fff" },
+            { 15, "yyyyMMddHHzzzz" },
+            { 10, "yyyyMMddHH" },
+            { 17, "yyyyMMddHHmmzzzz" },
+            { 12, "yyyyMMddHHmm" },
+            { 6, "yyyyMM" },
+            { 19, "yyyyMMddHHmmsszzzz" },
+            { 14, "yyyyMMddHHmmss" },
+            { 4, "yyyy" }
+        };
 
         /// <summary>
 		/// Converts a <see cref="TS"/> instance to a <see cref="DateTime"/> instance.
@@ -384,8 +423,63 @@ namespace SanteDB.Messaging.HL7
                 return result;
             else
             {
-                String format = "yyyyMMddHHmmss.FFFFZ";
-                return DateTime.ParseExact(timestamp.Time.Value, format.Substring(0,timestamp.Time.Value.Length), CultureInfo.InvariantCulture);
+
+                string value = timestamp.Time.Value;
+                int datePrecision = value.Length;
+
+                // Parse a correct precision 
+                try
+                {
+
+                    // HACK: Correct timezone as some CDA instances instances have only 3
+                    if (value.Contains("+") || value.Contains("-"))
+                    {
+                        int sTz = value.Contains("+") ? value.IndexOf("+") : value.IndexOf("-");
+                        string tzValue = value.Substring(sTz + 1);
+                        int iTzValue = 0;
+                        if (!Int32.TryParse(tzValue, out iTzValue)) // Invalid timezone can't even fix this
+                            throw new FormatException("Invalid timezone!");
+                        else if (iTzValue < 24)
+                            value = value.Substring(0, sTz + 1) + iTzValue.ToString("00") + "00";
+                        else
+                            value = value.Substring(0, sTz + 1) + iTzValue.ToString("0000");
+                    }
+
+
+                    // HACK: Correct the milliseonds to be three digits if four are passed into the parse function
+                    if (datePrecision == 24 || datePrecision == 19 && value.Contains("."))
+                    {
+                        int eMs = value.Contains("-") ? value.IndexOf("-") - 1 : value.Contains("+") ? value.IndexOf("+") - 1 : value.Length - 1;
+                        value = value.Remove(eMs, 1);
+                    }
+                    else if (datePrecision > 19 && value.Contains(".")) // HACK: sometimes milliseconds can be one or two digits
+                    {
+                        int eMs = value.Contains("-") ? value.IndexOf("-") - 1 : value.Contains("+") ? value.IndexOf("+") : value.Length - 1;
+                        int sMs = value.IndexOf(".");
+                        value = value.Insert(eMs + 1, new string('0', 3 - (eMs - sMs)));
+                    }
+                    datePrecision = value.Length;
+
+                }
+                catch (Exception) { datePrecision = 23; }
+
+                string flavorFormat = null;
+                if (!m_precisionFormats.TryGetValue(datePrecision, out flavorFormat))
+                    flavorFormat = "yyyyMMddHHmmss.fffzzzz";
+
+
+                // Now parse the date string
+                try
+                {
+                    if (value.Length > flavorFormat.Length)
+                        return DateTime.ParseExact(value.Substring(0, flavorFormat.Length + (flavorFormat.Contains("z") ? 1 : 0)), flavorFormat, CultureInfo.InvariantCulture);
+                    else
+                        return DateTime.ParseExact(value, flavorFormat.Substring(0, value.Length), CultureInfo.InvariantCulture);
+                }
+                catch(Exception e)
+                {
+                    throw new FormatException($"Date {value} was not valid according to format {flavorFormat}");
+                }
             }
         }
 

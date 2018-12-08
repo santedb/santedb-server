@@ -50,11 +50,16 @@
   <ItemGroup>
     <Compile Include="Client\MllpMessageSender.cs" />
     <Compile Include="Configuration\Hl7ConfigurationSection.cs" />
+    <Compile Include="Configuration\Hl7EndpointConfiguration.cs" />
     <Compile Include="Configuration\Hl7X509ConfigurationElement.cs" />
     <Compile Include="DataConverter.cs" />
     <Compile Include="Hl7Constants.cs" />
     <Compile Include="HL7MessageHandler.cs" />
     <Compile Include="IHL7MessageHandler.cs" />
+    <Compile Include="Interceptors\AdtPatientPassthroughInterceptor.cs" />
+    <Compile Include="Interceptors\AdtPatientRegistrationInterceptor.cs" />
+    <Compile Include="Configuration\Hl7InterceptorConfigurationElement.cs" />
+    <Compile Include="Interceptors\InterceptorBase.cs" />
     <Compile Include="MessageExtensions.cs" />
     <Compile Include="Messages\AdtMessageHandler.cs" />
     <Compile Include="Messages\MessageHandlerBase.cs" />
@@ -65,7 +70,6 @@
     <Compile Include="Query\FindCandidatesQueryHandler.cs" />
     <Compile Include="Query\IQueryHandler.cs" />
     <Compile Include="Utils\MessageUtils.cs" />
-    <Compile Include="Segments\EVNSegmentHandler.cs" />
     <Compile Include="Segments\ISegmentHandler.cs" />
     <Compile Include="Segments\NK1SegmentHandler.cs" />
     <Compile Include="Segments\PD1SegmentHandler.cs" />
@@ -132,5 +136,6 @@
       <Name>SanteDB.Core.Model</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

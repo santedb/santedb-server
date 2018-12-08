@@ -130,8 +130,7 @@ namespace SanteDB.Core.Services.Impl
         {
             int tr = 0;
             // As the identity service may be LDAP, best to call it to get an identity name
-            var identity = ApplicationServiceContext.Current.GetService<IIdentityProviderService>().GetIdentity(userName);
-            return ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityUser>>().Find(u => u.UserName == identity.Name, 0, 1, out tr).FirstOrDefault();
+            return ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityUser>>().Find(u => u.UserName == userName, 0, 1, out tr).FirstOrDefault();
         }
 
         /// <summary>

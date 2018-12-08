@@ -79,7 +79,7 @@ namespace SanteDB.Messaging.HL7.Segments
         /// <summary>
         /// Create next of kin relationship
         /// </summary>
-        public IEnumerable<ISegment> Create(IdentifiedData data, IGroup context)
+        public IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, String[] exportDomains)
         {
             List<ISegment> retVal = new List<ISegment>();
             var patient = data as Patient;
@@ -119,7 +119,7 @@ namespace SanteDB.Messaging.HL7.Segments
             foreach (var id in nk1Segment.GetNextOfKinAssociatedPartySIdentifiers())
             {
                 var idnumber = id.IDNumber.Value;
-                var authority = id.AssigningAuthority.ToModel();
+                var authority = id.AssigningAuthority.ToModel(id.Message.GetStructureName().StartsWith("ADT"));
                 Guid idguid = Guid.Empty;
                 int tr = 0;
                 Person found = null;

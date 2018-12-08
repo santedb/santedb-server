@@ -25,6 +25,10 @@ using System.Collections.Generic;
 using NHapi.Model.V25.Datatype;
 using NHapi.Base.Model;
 using NHapi.Model.V25.Segment;
+using SanteDB.Core.Model.Entities;
+using System.Linq;
+using SanteDB.Core.Model.DataTypes;
+
 namespace SanteDB.Messaging.HL7.Segments
 {
     /// <summary>
@@ -41,9 +45,40 @@ namespace SanteDB.Messaging.HL7.Segments
         /// </summary>
         public string Name => "EVN";
 
-        public IEnumerable<ISegment> Create(IdentifiedData data, IGroup context)
+        /// <summary>
+        /// Create the event data
+        /// </summary>
+        public IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, string[] exportDomains)
         {
-            throw new NotImplementedException();
+            if (data is Entity)
+                data = (data as Entity).LoadProperty<Act>("CreationAct");
+
+            // Data is null?
+            if (data == null)
+                return new ISegment[0];
+
+            // Set event properties
+            var evn = context.GetStructure("EVN") as EVN;
+            var act = data as Act;
+            evn.RecordedDateTime.Time.SetLongDateWithFractionOfSecond(act.CreationTime.DateTime);
+
+            // Is there a participation for location
+            var location = act.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Location)?.PlayerEntityKey;
+            if (location.HasValue)
+            {
+                evn.EventFacility.UniversalID.Value = location.Value.ToString();
+                evn.EventFacility.UniversalIDType.Value = "GUID";
+            }
+
+            /// Planned event time
+            if(act.MoodConceptKey == ActMoodKeys.Eventoccurrence)
+                evn.EventOccurred.Time.SetLongDateWithFractionOfSecond(act.ActTime.DateTime);
+            else if(act.MoodConceptKey == ActMoodKeys.Intent)
+                evn.DateTimePlannedEvent.Time.SetLongDateWithFractionOfSecond(act.ActTime.DateTime);
+
+            evn.EventReasonCode.FromModel(act.LoadProperty<Concept>("ReasonConcept"), EventReasonCodeSystem);
+            evn.EventTypeCode.FromModel(act.LoadProperty<Concept>("TypeConcept"), EventTriggerCodeSystem);
+            return new ISegment[] { evn };
         }
 
         /// <summary>
