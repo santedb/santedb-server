@@ -39,6 +39,7 @@ namespace SanteDB.Core.Services.Impl
         IRepositoryService<TEntity>,
         IPersistableQueryRepositoryService<TEntity>,
         IFastQueryRepositoryService<TEntity>,
+        INotifyRepositoryService<TEntity>,
         ISecuredRepositoryService
         where TEntity : IdentifiedData
     {

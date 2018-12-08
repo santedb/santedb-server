@@ -25,7 +25,7 @@
     <name>SanteDB Core</name>
     <description>The core of the SanteDB clinical data repository service</description>
     <author>Mohawk College of Applied Arts and Technology</author>
-    <version>1.9.20.0</version>
+    <version>1.10.0.0</version>
     <default>true</default>
   </meta>
   <files>
