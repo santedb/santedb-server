@@ -181,6 +181,7 @@ namespace SanteDB.Messaging.HL7.Messages
                 var oqpd = retVal.GetStructure("QPD") as QPD;
                 DeepCopy.copy(qpd, oqpd);
                 omsh.MessageType.TriggerEvent.Value = map.ResponseTrigger;
+                omsh.MessageType.MessageStructure.Value = map.ResponseTypeXml;
                 qak.HitCount.Value = totalResults.ToString();
                 qak.HitsRemaining.Value = (totalResults - offset - count > 0 ? totalResults - offset - count : 0).ToString();
                 qak.QueryResponseStatus.Value = totalResults == 0 ? "NF" : "OK";
