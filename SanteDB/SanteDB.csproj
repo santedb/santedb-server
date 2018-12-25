@@ -203,7 +203,9 @@
     <None Include="Data\000-PlaceTypeConceptSet.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Content Include="Configuration\PluginConfigurationPage.xslt" />
+    <Content Include="Configuration\PluginConfigurationPage.xslt">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="santedb.config.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
