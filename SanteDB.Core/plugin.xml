@@ -39,7 +39,7 @@
     <add>
       <class>SanteDB.Core.Services.Impl.FileConfigurationService, SanteDB.Core</class>
       <provides>IConfigurationManager</provides>
-      <configuration sectionName="santedb.core" handler="SanteDB.Core.Configuration.ConfigurationSectionHandler, SanteDB.Core">
+      <configuration sectionName="santedb.core" sectionType="SanteDB.Core.Configuration.ConfigurationSectionHandler, SanteDB.Core">
         <group name="threading" required="true">
           <setting name="poolSize" type="number">
             <label>Thread Pool Size</label>

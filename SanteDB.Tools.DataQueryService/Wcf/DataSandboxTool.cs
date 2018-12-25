@@ -108,13 +108,13 @@ namespace SanteDB.Tools.DataSandbox.Wcf
 
                     if (!typeof(DataSandboxTool).Assembly.GetManifestResourceNames().Contains(contentPath))
                     {
-                        RestOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
+                        RestOperationContext.Current.OutgoingResponse.StatusCode = 404;
                         return null;
                     }
                     else
                     {
 
-                        RestOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.OK;
+                        RestOperationContext.Current.OutgoingResponse.StatusCode = 200; /// HttpStatusCode.OK;
                         //RestOperationContext.Current.OutgoingResponse.ContentLength = new FileInfo(contentPath).Length;
                         RestOperationContext.Current.OutgoingResponse.ContentType = this.GetContentType(contentPath);
 

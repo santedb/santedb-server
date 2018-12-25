@@ -37,7 +37,7 @@
 		<add>
 			<class>SanteDB.Caching.Redis.MemoryCacheService, SanteDB.Caching.Memory</class>
 			<provides>IDataCachingService</provides>
-			<configuration sectionName="santedb.caching.memory" handler="SanteDB.Caching.Memory.Configuration.ConfigurationSectionHandler, SanteDB.Caching.Memory">
+			<configuration sectionType="SanteDB.Caching.Memory.Configuration.MemoryCacheConfigurationSection, SanteDB.Caching.Memory">
 				<group maxOccurs="1" required="true">
 					<label>Core Properties</label>
 					<setting name="maxAge" type="time" required="true">
@@ -48,7 +48,7 @@
 						<label>Maximum Cache Size</label>
 						<description>Identifies the maximum size of the memory cache</description>
 					</setting>
-					<setting name="autoRegister" type="boolean" default="true" required="true">
+					<setting name="autoSubscribe" type="boolean" default="true" required="true">
 						<label>Automatically Enrol Types</label>
 						<description>When true, indicates that the memory cache should store all types of data</description>
 					</setting>

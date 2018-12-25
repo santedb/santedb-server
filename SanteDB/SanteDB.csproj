@@ -115,7 +115,7 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="App.Config.Sample">
+    <None Include="App.Config.Demo">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\000-AssigningAuthorities.dataset">
@@ -220,17 +220,165 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
+      <Project>{16ef1840-0361-439d-806c-92d0411122eb}</Project>
+      <Name>RestSrvr</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
       <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
       <Name>SanteDB.Core.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-applets\SanteDB.Core.Applets\SanteDB.Core.Applets.csproj">
+      <Project>{39e61451-f4fe-493d-b754-5f06eb284aac}</Project>
+      <Name>SanteDB.Core.Applets</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-bre-js\SanteDB.BusinessRules.JavaScript\SanteDB.BusinessRules.JavaScript.csproj">
+      <Project>{3bfd6ee6-0267-4d82-be7d-9b48b2f6f3d4}</Project>
+      <Name>SanteDB.BusinessRules.JavaScript</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-cdss\SanteDB.Cdss.Xml\SanteDB.Cdss.Xml.csproj">
+      <Project>{cad6bcb7-758b-4aa4-a5fe-a9fab8a4cf2f}</Project>
+      <Name>SanteDB.Cdss.Xml</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-match\SanteDB.Matcher\SanteDB.Matcher.csproj">
+      <Project>{a37bb496-739d-440e-ab64-e2939a759898}</Project>
+      <Name>SanteDB.Matcher</Name>
     </ProjectReference>
     <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
       <Project>{f1a82a4f-4a57-47d7-ae76-444c8a4ff54a}</Project>
       <Name>SanteDB.Core.Model</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-orm\SanteDB.OrmLite\SanteDB.OrmLite.csproj">
+      <Project>{407c87e6-a1f3-45e6-b883-a8176b350817}</Project>
+      <Name>SanteDB.OrmLite</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Core.Model.AMI\SanteDB.Core.Model.AMI.csproj">
+      <Project>{65ef51c6-5cb8-43b8-ae65-4a68f0b44ad2}</Project>
+      <Name>SanteDB.Core.Model.AMI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Core.Model.RISI\SanteDB.Core.Model.RISI.csproj">
+      <Project>{f3d2fa84-c398-4390-9834-1272cc2d6f89}</Project>
+      <Name>SanteDB.Core.Model.RISI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.AMI\SanteDB.Rest.AMI.csproj">
+      <Project>{f14023e2-f8df-4ebc-b2c4-34a825e3790e}</Project>
+      <Name>SanteDB.Rest.AMI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
+      <Project>{786bd0ee-1806-4158-ba45-80249ac6dfe7}</Project>
+      <Name>SanteDB.Rest.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.HDSI\SanteDB.Rest.HDSI.csproj">
+      <Project>{903e2e75-7b62-4c42-a001-404dc0235a6b}</Project>
+      <Name>SanteDB.Rest.HDSI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Authentication.OAuth\SanteDB.Authentication.OAuth2.csproj">
+      <Project>{a3975c6f-4fdb-43be-81ab-3357b86173f1}</Project>
+      <Name>SanteDB.Authentication.OAuth2</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Caching.Memory\SanteDB.Caching.Memory.csproj">
+      <Project>{8553abc7-abfa-4a21-b0e8-68b7de76129d}</Project>
+      <Name>SanteDB.Caching.Memory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Caching.Redis\SanteDB.Caching.Redis.csproj">
+      <Project>{86672094-25cc-4cd5-b085-240e50ec4a5e}</Project>
+      <Name>SanteDB.Caching.Redis</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Core.Model.ViewModelSerializers\SanteDB.Core.Model.ViewModelSerializers.csproj">
+      <Project>{ece9b280-9647-4092-babf-eb2e25084670}</Project>
+      <Name>SanteDB.Core.Model.ViewModelSerializers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Core.Security.Tfa.Email\SanteDB.Core.Security.Tfa.Email.csproj">
+      <Project>{23699f04-da75-4889-aa00-7f6f4b5fcfbb}</Project>
+      <Name>SanteDB.Core.Security.Tfa.Email</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Core.Security.Tfa.Twilio\SanteDB.Core.Security.Tfa.Twilio.csproj">
+      <Project>{5a60d6e2-72dd-478a-91a6-e928208ca1ba}</Project>
+      <Name>SanteDB.Core.Security.Tfa.Twilio</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
       <Name>SanteDB.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Messaging.AMI\SanteDB.Messaging.AMI.csproj">
+      <Project>{d882323c-2bc9-4a1d-b70f-d833cf2e91a1}</Project>
+      <Name>SanteDB.Messaging.AMI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Messaging.Atna\SanteDB.Messaging.Atna.csproj">
+      <Project>{976e1627-b0da-4237-977d-9b3020b60dc1}</Project>
+      <Name>SanteDB.Messaging.Atna</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Messaging.FHIR\SanteDB.Messaging.FHIR.csproj">
+      <Project>{33836324-c699-4139-ab9c-7524570a04d5}</Project>
+      <Name>SanteDB.Messaging.FHIR</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Messaging.GS1\SanteDB.Messaging.GS1.csproj">
+      <Project>{ebf0386e-b082-47c3-9e2a-ab228e2035b3}</Project>
+      <Name>SanteDB.Messaging.GS1</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Messaging.HDSI\SanteDB.Messaging.HDSI.csproj">
+      <Project>{04e3c581-5a04-4691-82ac-f339947fce75}</Project>
+      <Name>SanteDB.Messaging.HDSI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Messaging.HL7.Test\SanteDB.Messaging.HL7.Test.csproj">
+      <Project>{f187fefc-0112-43df-a854-271496e0ac42}</Project>
+      <Name>SanteDB.Messaging.HL7.Test</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Messaging.HL7\SanteDB.Messaging.HL7.csproj">
+      <Project>{c1f86ea3-fc84-456f-a9d9-0bf8db0d48d3}</Project>
+      <Name>SanteDB.Messaging.HL7</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Messaging.RISI\SanteDB.Messaging.RISI.csproj">
+      <Project>{265614d8-df9d-4ac8-bb31-8766a0b0ca20}</Project>
+      <Name>SanteDB.Messaging.RISI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Persistence.ADO.Test.Core\SanteDB.Persistence.ADO.Test.Core.csproj">
+      <Project>{ad73db46-cbb3-4746-b406-40fc435ab3db}</Project>
+      <Name>SanteDB.Persistence.ADO.Test.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Persistence.Auditing.ADO\SanteDB.Persistence.Auditing.ADO.csproj">
+      <Project>{45ea67a6-48f6-4906-84ec-5c13c80c9cc4}</Project>
+      <Name>SanteDB.Persistence.Auditing.ADO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Persistence.Data.ADO\SanteDB.Persistence.Data.ADO.csproj">
+      <Project>{f38ed54c-e4e4-499a-882e-736289f332c0}</Project>
+      <Name>SanteDB.Persistence.Data.ADO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Persistence.Diagnostics.Email\SanteDB.Persistence.Diagnostics.Email.csproj">
+      <Project>{2a5cea66-8bb3-4567-bdfa-9c174fc215f7}</Project>
+      <Name>SanteDB.Persistence.Diagnostics.Email</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Persistence.Diagnostics.Jira\SanteDB.Persistence.Diagnostics.Jira.csproj">
+      <Project>{18a9f102-023e-4e17-8a70-a91365e1510d}</Project>
+      <Name>SanteDB.Persistence.Diagnostics.Jira</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Persistence.MDM\SanteDB.Persistence.MDM.csproj">
+      <Project>{20960967-3647-41a2-9df6-3e15e2aa7019}</Project>
+      <Name>SanteDB.Persistence.MDM</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Persistence.Reporting.ADO\SanteDB.Persistence.Reporting.ADO.csproj">
+      <Project>{aa364bac-ba47-4548-bd4b-31c0a73277b7}</Project>
+      <Name>SanteDB.Persistence.Reporting.ADO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Reporting.Core\SanteDB.Reporting.Core.csproj">
+      <Project>{f2b51ac4-4710-4b45-8bf7-e480f375fc90}</Project>
+      <Name>SanteDB.Reporting.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Reporting.Jasper\SanteDB.Reporting.Jasper.csproj">
+      <Project>{5e587d57-fbb9-4064-9444-47b40c4bad8f}</Project>
+      <Name>SanteDB.Reporting.Jasper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Tools.AdminConsole\SanteDB.Tools.AdminConsole.csproj">
+      <Project>{98c8b04a-82de-4eef-a0a0-bf098be53ee4}</Project>
+      <Name>SanteDB.Tools.AdminConsole</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Tools.DataQueryService\SanteDB.Tools.DataSandbox.csproj">
+      <Project>{5660297c-6db6-45fe-bf1d-de254e35a5b3}</Project>
+      <Name>SanteDB.Tools.DataSandbox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Warehouse.ADO\SanteDB.Warehouse.ADO.csproj">
+      <Project>{bfc58f38-9023-4700-b35c-aa933a608e43}</Project>
+      <Name>SanteDB.Warehouse.ADO</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

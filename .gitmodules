@@ -27,3 +27,6 @@
 [submodule "santedb-restsvc"]
 	path = santedb-restsvc
 	url = https://github.com/santedb/santedb-restsvc
+[submodule "santedb-match"]
+	path = santedb-match
+	url = https://github.com/santedb/santedb-match

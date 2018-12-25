@@ -38,7 +38,7 @@
 		<add>
 			<class>SanteDB.Caching.Redis.RedisCacheService, SanteDB.Caching.Redis</class>
 			<provides>IDataCachingService</provides>
-			<configuration sectionName="santedb.caching.redis" handler="SanteDB.Caching.Redis.Configuration.RedisConfigurationHandler, SanteDB.Caching.Redis">
+			<configuration sectionType="SanteDB.Caching.Redis.Configuration.RedisConfigurationHandler, SanteDB.Caching.Redis">
 				<group name="server" maxOccurs="*"  required="true">
 					<label>REDIS Server</label>
 					<setting name="host" type="text" default="localhost" required="true">
