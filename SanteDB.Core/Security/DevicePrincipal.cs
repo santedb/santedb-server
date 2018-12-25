@@ -17,7 +17,6 @@
  * User: justin
  * Date: 2018-6-22
  */
-
 using SanteDB.Core.Security.Claims;
 using System.Security.Principal;
 

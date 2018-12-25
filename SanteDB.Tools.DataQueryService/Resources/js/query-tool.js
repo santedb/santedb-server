@@ -18,7 +18,6 @@
  * User: justin
  * Date: 2018-9-25
  */
-
 var QueryTool = {
     $authentication: null,
     authenticate: function (url, controlData) {

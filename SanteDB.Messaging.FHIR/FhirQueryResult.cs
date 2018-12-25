@@ -17,7 +17,6 @@
  * User: justin
  * Date: 2018-11-23
  */
-
 namespace SanteDB.Messaging.FHIR
 {
     /// <summary>

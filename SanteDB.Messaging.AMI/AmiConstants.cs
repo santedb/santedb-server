@@ -17,7 +17,6 @@
  * User: justin
  * Date: 2018-6-22
  */
-
 namespace SanteDB.Messaging.AMI
 {
     /// <summary>

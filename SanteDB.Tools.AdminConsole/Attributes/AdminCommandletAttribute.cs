@@ -17,7 +17,6 @@
  * User: justin
  * Date: 2018-10-24
  */
-
 namespace SanteDB.Tools.AdminConsole.Attributes
 {
     /// <summary>
