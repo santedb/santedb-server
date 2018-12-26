@@ -70,8 +70,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
 		/// <param name="deviceId">The device identifier.</param>
 		/// <param name="deviceSecret">The device secret.</param>
 		/// <returns>Returns the authenticated device principal.</returns>
-		public IPrincipal Authenticate(string deviceId, string deviceSecret)
+		public IPrincipal Authenticate(string deviceId, string deviceSecret, AuthenticationMethod authMethod = AuthenticationMethod.Any)
 		{
+            if (!authMethod.HasFlag(AuthenticationMethod.Local))
+                throw new InvalidOperationException("ADO.NET provider only supports local authentication");
+
 			using (var dataContext = this.configuration.Provider.GetWriteConnection())
 			{
 				try

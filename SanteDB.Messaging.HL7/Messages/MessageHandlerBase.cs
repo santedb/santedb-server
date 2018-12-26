@@ -151,7 +151,7 @@ namespace SanteDB.Messaging.HL7.Messages
                     applicationSecret = this.m_configuration.Security == SecurityMethod.Sft4 ? sft.SoftwareBinaryID.Value :
                         this.m_configuration.Security == SecurityMethod.Msh8 ? msh.Security.Value : null;
 
-                IPrincipal devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(deviceId, deviceSecret),
+                IPrincipal devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(deviceId, deviceSecret, AuthenticationMethod.Local),
                     applicationPrincipal = applicationSecret != null ? ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>()?.Authenticate(applicationId, applicationSecret) : null;
 
                 if (applicationPrincipal == null && ApplicationServiceContext.HostType == SanteDBHostType.Server)
@@ -177,7 +177,7 @@ namespace SanteDB.Messaging.HL7.Messages
                    applicationSecret = this.m_configuration.Security == SecurityMethod.Sft4 ? sft.SoftwareBinaryID.Value :
                                             this.m_configuration.Security == SecurityMethod.Msh8 ? msh.Security.Value : null;
 
-                IPrincipal devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(deviceId, deviceSecret),
+                IPrincipal devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(deviceId, deviceSecret, AuthenticationMethod.Local),
                     applicationPrincipal = applicationSecret != null ? ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>()?.Authenticate(applicationId, applicationSecret) : null;
 
                 if (applicationPrincipal == null && ApplicationServiceContext.HostType == SanteDBHostType.Server)

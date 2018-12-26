@@ -360,10 +360,6 @@
       <Project>{5e587d57-fbb9-4064-9444-47b40c4bad8f}</Project>
       <Name>SanteDB.Reporting.Jasper</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Tools.AdminConsole\SanteDB.Tools.AdminConsole.csproj">
-      <Project>{98c8b04a-82de-4eef-a0a0-bf098be53ee4}</Project>
-      <Name>SanteDB.Tools.AdminConsole</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Tools.DataQueryService\SanteDB.Tools.DataSandbox.csproj">
       <Project>{5660297c-6db6-45fe-bf1d-de254e35a5b3}</Project>
       <Name>SanteDB.Tools.DataSandbox</Name>
