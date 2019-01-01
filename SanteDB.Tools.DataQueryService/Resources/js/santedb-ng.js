@@ -1,7 +1,7 @@
 ﻿/// <reference path="santedb.js"/>
 /*
  * Copyright 2015-2018 Mohawk College of Applied Arts and Technology
- *
+ * 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you 
  * may not use this file except in compliance with the License. You may 
@@ -15,8 +15,14 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: justin
- * Date: 2018-9-25
+ * User: fyfej
+ * Date: 2017-10-30
+ */
+
+/**
+ * @version 0.9.6 (Edmonton)
+ * @copyright (C) 2015-2017, Mohawk College of Applied Arts and Technology
+ * @license Apache 2.0
  */
 
 /**
@@ -242,7 +248,7 @@ angular.module('santedb', [])
                             delay: 500,
                             method: "GET",
                             headers: {
-                                "Accept": "application/json+sdb-viewmodel"
+                                "Accept" : "application/json+sdb-viewmodel"
                             },
                             cache: false,
                             data: function (params) {
@@ -367,7 +373,7 @@ angular.module('santedb', [])
                             }
                             else if (result.classConcept == SanteDBModel.EntityClassKeys.ServiceDeliveryLocation && result.name != null && result.typeConceptModel != null && result.typeConceptModel.name != null) {
                                 retVal = "<div class='label label-info'>" +
-                                    result.typeConceptModel.name[SanteDB.Localization.getLocale()] + "</div> " + SanteDB.UserInterface.renderName(result.name.OfficialRecord || result.name.Assigned || result.name.$other);
+                                   result.typeConceptModel.name[SanteDB.Localization.getLocale()] + "</div> " + SanteDB.UserInterface.renderName(result.name.OfficialRecord || result.name.Assigned || result.name.$other);
                                 if (result.relationship && result.relationship.Parent && result.relationship.Parent.targetModel && result.relationship.Parent.targetModel.name)
                                     retVal += " - <small>(<i class='fa fa-map-marker'></i> " + SanteDB.UserInterface.renderName(result.relationship.Parent.targetModel.name.OfficialRecord || result.relationship.Parent.targetModel.name.Assigned) + ")</small>";
                                 if (result.address)
@@ -427,3 +433,4 @@ angular.module('santedb', [])
             }
         };
     });
+    

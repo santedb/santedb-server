@@ -33,6 +33,7 @@
     <parameter hl7="@PID.3.4.1" model="identifier.authority.domainName"/>
     <parameter hl7="@PID.3.4.2" model="identifier.authority.oid"/>
     <parameter hl7="@PID.3.1.1" model="id" />
+    <parameter hl7="@PID.11.4.1" model="address.component[State].value"/>
     <parameter hl7="@PID.33" model="modifiedOn" type="date"/>
   </messageType>
   <messageType trigger="Q23" name="Cross Reference Identifiers" response="RSP_K23" responseTrigger="K23" queryTarget="Patient"

@@ -204,6 +204,7 @@ namespace SanteDB.Messaging.HL7.Interceptors
                             Terser.Set(queryRequest.QPD, 3, q, 2, 1, dval);
                             break;
                     }
+                    q++;
                 }
             }
 

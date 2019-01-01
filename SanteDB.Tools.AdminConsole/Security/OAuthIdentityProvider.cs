@@ -139,7 +139,7 @@ namespace SanteDB.Tools.AdminConsole.Security
                                 p.AdditionalHeaders.Add("X-SanteDB-TfaSecret", tfaSecret);
                         };
 
-                        OAuthTokenResponse response = restClient.Post<OAuthTokenRequest, OAuthTokenResponse>("oauth2_token", "application/x-www-urlform-encoded", request);
+                        OAuthTokenResponse response = restClient.Post<OAuthTokenRequest, OAuthTokenResponse>("oauth2_token", "application/x-www-form-urlencoded", request);
                         retVal = new TokenClaimsPrincipal(response.AccessToken, response.IdToken, response.TokenType, response.RefreshToken);
                         this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(principal.Identity.Name, retVal, true));
 

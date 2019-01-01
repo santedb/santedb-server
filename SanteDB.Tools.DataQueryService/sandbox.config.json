@@ -419,6 +419,18 @@
         "Organization"
       ]
     },
+    "address.component[StateOrProvince].value": {
+      "name": "Address (State)",
+      "type": "text",
+      "scope": [
+        "Patient",
+        "Person",
+        "Place",
+        "Entity",
+        "UserEntity",
+        "Organization"
+      ]
+    },
     "tag.key": {
       "name": "Has a Tag named",
       "type": "text",
@@ -446,7 +458,7 @@
     "classConcept": {
       "name": "Classification Context",
       "type": "concept",
-      "searchFilter" : "{\"conceptSet.mnemonic\":\"ActClass\",\"conceptSet.mnemonic\":\"EntityClass\"}",
+      "searchFilter": "{\"conceptSet.mnemonic\":\"ActClass\",\"conceptSet.mnemonic\":\"EntityClass\"}",
       "scope": [
         "Act",
         "QuantityObservation",
