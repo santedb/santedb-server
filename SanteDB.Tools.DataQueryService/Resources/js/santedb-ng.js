@@ -209,7 +209,7 @@ angular.module('santedb', [])
                     var baseUrl = attrs.url;
                     var filter = {}, defaultFilter = {};
                     if (filterString !== undefined &&
-                        filterString != ")
+                        filterString != "")
                         filter = JSON.parse(filterString);
 
                     if (modelType != "SecurityUser" && modelType != "SecurityRole" && modelType != "ConceptSet" && !filter.statusConcept)
@@ -242,7 +242,7 @@ angular.module('santedb', [])
                             delay: 500,
                             method: "GET",
                             headers: {
-                                "Accept" : "application/json+sdb-viewmodel"
+                                "Accept": "application/json+sdb-viewmodel"
                             },
                             cache: false,
                             data: function (params) {
@@ -367,7 +367,7 @@ angular.module('santedb', [])
                             }
                             else if (result.classConcept == SanteDBModel.EntityClassKeys.ServiceDeliveryLocation && result.name != null && result.typeConceptModel != null && result.typeConceptModel.name != null) {
                                 retVal = "<div class='label label-info'>" +
-                                   result.typeConceptModel.name[SanteDB.Localization.getLocale()] + "</div> " + SanteDB.UserInterface.renderName(result.name.OfficialRecord || result.name.Assigned || result.name.$other);
+                                    result.typeConceptModel.name[SanteDB.Localization.getLocale()] + "</div> " + SanteDB.UserInterface.renderName(result.name.OfficialRecord || result.name.Assigned || result.name.$other);
                                 if (result.relationship && result.relationship.Parent && result.relationship.Parent.targetModel && result.relationship.Parent.targetModel.name)
                                     retVal += " - <small>(<i class='fa fa-map-marker'></i> " + SanteDB.UserInterface.renderName(result.relationship.Parent.targetModel.name.OfficialRecord || result.relationship.Parent.targetModel.name.Assigned) + ")</small>";
                                 if (result.address)
@@ -427,4 +427,3 @@ angular.module('santedb', [])
             }
         };
     });
-    

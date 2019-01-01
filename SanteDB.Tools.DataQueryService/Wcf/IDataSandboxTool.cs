@@ -28,6 +28,13 @@ namespace SanteDB.Tools.DataSandbox.Wcf
     [ServiceContract]
     public interface IDataSandboxTool
     {
+
+        /// <summary>
+        /// Create dataset 
+        /// </summary>
+        [RestInvoke(Method = "POST", UriTemplate = "/dataset")]
+        Stream CreateDataset(Stream datasetSource);
+
         /// <summary>
         /// Get static content 
         /// </summary>
@@ -36,10 +43,5 @@ namespace SanteDB.Tools.DataSandbox.Wcf
         [RestInvoke(Method = "GET", UriTemplate = "/{*content}")]
         Stream StaticContent(string content);
 
-        /// <summary>
-        /// Create dataset 
-        /// </summary>
-        [RestInvoke(Method = "POST", UriTemplate = "/dataset")]
-        Stream CreateDataset(Stream datasetSource);
     }
 }
