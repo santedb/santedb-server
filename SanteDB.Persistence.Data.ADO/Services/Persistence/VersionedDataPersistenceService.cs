@@ -24,6 +24,7 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
@@ -161,14 +162,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         /// <param name="rawQuery"></param>
         /// <returns></returns>
-        protected override SqlStatement AppendOrderBy(SqlStatement rawQuery)
+        protected override SqlStatement AppendOrderBy(SqlStatement rawQuery, ModelSort<TModel>[] orderBy)
         {
+            rawQuery = base.AppendOrderBy(rawQuery, orderBy);
             return rawQuery.OrderBy<TDomain>(o => o.VersionSequenceId, Core.Model.Map.SortOrderType.OrderByDescending);
         }
         /// <summary>
         /// Query internal
         /// </summary>
-        protected override IEnumerable<Object> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = true)
+        protected override IEnumerable<Object> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TModel>[] orderBy, bool countResults = true)
         {
             // Is obsoletion time already specified?
             if (!query.ToString().Contains("ObsoletionTime"))
@@ -186,7 +188,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
 
             SqlStatement domainQuery = null;
-            var expr = m_mapper.MapModelExpression<TModel, TDomain>(query, false);
+            var expr = m_mapper.MapModelExpression<TModel, TDomain, bool>(query, false);
             if (expr != null)
                 domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(typeof(TDomain), typeof(TDomainKey))
                     .InnerJoin<TDomain, TDomainKey>(o => o.Key, o => o.Key)
@@ -195,7 +197,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 domainQuery = AdoPersistenceService.GetQueryBuilder().CreateQuery(query).Build();
 
 
-            domainQuery = this.AppendOrderBy(domainQuery);
+            domainQuery = this.AppendOrderBy(domainQuery, orderBy);
 
 
             // Query id just get the UUIDs in the db
@@ -315,7 +317,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     if (versionId.GetValueOrDefault() == Guid.Empty)
                         retVal = this.Get(connection, containerId);
                     else
-                        retVal = this.CacheConvert(this.QueryInternal(connection, o => o.Key == containerId && o.VersionKey == versionId && o.ObsoletionTime == null || o.ObsoletionTime != null, Guid.Empty, 0, 1, out tr).FirstOrDefault(), connection);
+                        retVal = this.CacheConvert(this.QueryInternal(connection, o => o.Key == containerId && o.VersionKey == versionId && o.ObsoletionTime == null || o.ObsoletionTime != null, Guid.Empty, 0, 1, out tr, null).FirstOrDefault(), connection);
 
                     var postData = new DataRetrievedEventArgs<TModel>(retVal, principal);
                     this.FireRetrieved(postData);

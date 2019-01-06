@@ -18,6 +18,7 @@
  * Date: 2018-6-22
  */
 using SanteDB.Core.Model.Collection;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
 using System;
 using System.Collections.Generic;
@@ -43,7 +44,7 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Find the specfied bundle (not supported)
         /// </summary>
-        public override IEnumerable<Bundle> Find(Expression<Func<Bundle, bool>> query, int offset, int? count, out int totalResults)
+        public override IEnumerable<Bundle> Find(Expression<Func<Bundle, bool>> query, int offset, int? count, out int totalResults, params ModelSort<Bundle>[] orderBy)
         {
             throw new NotSupportedException();
         }

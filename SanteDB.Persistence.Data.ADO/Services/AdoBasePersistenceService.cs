@@ -43,6 +43,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Xml.Serialization;
+using SanteDB.Core.Model.Query;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -123,7 +124,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="query">Query.</param>
-        public abstract IEnumerable<TData> QueryInternal(DataContext context, Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = true);
+        public abstract IEnumerable<TData> QueryInternal(DataContext context, Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TData>[] orderBy, bool countResults = true);
 
         /// <summary>
         /// Get the specified key.
@@ -146,7 +147,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
             else
             {
-                cacheItem = this.QueryInternal(context, o => o.Key == key, Guid.Empty, 0, 1, out tr, false)?.FirstOrDefault();
+                cacheItem = this.QueryInternal(context, o => o.Key == key, Guid.Empty, 0, 1, out tr, null, countResults: false)?.FirstOrDefault();
                 if (cacheService != null)
                     cacheService.Add(cacheItem);
                 return cacheItem;
@@ -583,22 +584,22 @@ namespace SanteDB.Persistence.Data.ADO.Services
         public virtual IEnumerable<TData> Query(Expression<Func<TData, bool>> query, IPrincipal overrideAuthContext)
         {
             var tr = 0;
-            return this.QueryInternal(query, Guid.Empty, 0, null, out tr, true, overrideAuthContext);
+            return this.QueryInternal(query, Guid.Empty, 0, null, out tr, true, overrideAuthContext, null);
 
         }
 
         /// <summary>
         /// Performs the specified query
         /// </summary>
-        public virtual IEnumerable<TData> Query(Expression<Func<TData, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext)
+        public virtual IEnumerable<TData> Query(Expression<Func<TData, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext, params ModelSort<TData>[] orderBy)
         {
-            return this.QueryInternal(query, Guid.Empty, offset, count, out totalCount, false, overrideAuthContext);
+            return this.QueryInternal(query, Guid.Empty, offset, count, out totalCount, false, overrideAuthContext, orderBy);
         }
 
         /// <summary>
         /// Instructs the service 
         /// </summary>
-        protected virtual IEnumerable<TData> QueryInternal(Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalCount, bool fastQuery, IPrincipal overrideAuthContext)
+        protected virtual IEnumerable<TData> QueryInternal(Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalCount, bool fastQuery, IPrincipal overrideAuthContext, ModelSort<TData>[] orderBy)
         {
             if (query == null)
                 throw new ArgumentNullException(nameof(query));
@@ -637,7 +638,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     else
                         connection.LoadState = LoadState.FullLoad;
 
-                    var results = this.Query(connection, preArgs.Query, queryId, preArgs.Offset, preArgs.Count ?? 1000, out totalCount, true);
+                    var results = this.Query(connection, preArgs.Query, queryId, preArgs.Offset, preArgs.Count ?? 1000, out totalCount, orderBy, true);
                     var postData = new QueryResultEventArgs<TData>(query, results.AsQueryable(), offset, count, totalCount, queryId, overrideAuthContext);
                     this.Queried?.Invoke(this, postData);
 
@@ -731,9 +732,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         /// <param name="context">Context.</param>
         /// <param name="query">Query.</param>
-        public IEnumerable<TData> Query(DataContext context, Expression<Func<TData, bool>> query, Guid queryId, int offset, int count, out int totalResults, bool countResults)
+        public IEnumerable<TData> Query(DataContext context, Expression<Func<TData, bool>> query, Guid queryId, int offset, int count, out int totalResults, ModelSort<TData>[] orderBy, bool countResults)
         {
-            var retVal = this.QueryInternal(context, query, queryId, offset, count, out totalResults, countResults);
+            var retVal = this.QueryInternal(context, query, queryId, offset, count, out totalResults, orderBy, countResults);
             return retVal;
         }
 
@@ -840,9 +841,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Query from the IMS with specified query id
         /// </summary>
-        public IEnumerable<TData> Query(Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext)
+        public IEnumerable<TData> Query(Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext, params ModelSort<TData>[] orderBy)
         {
-            return this.QueryInternal(query, queryId, offset, count, out totalCount, false, overrideAuthContext);
+            return this.QueryInternal(query, queryId, offset, count, out totalCount, false, overrideAuthContext, orderBy);
 
         }
 
@@ -851,7 +852,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public IEnumerable<TData> QueryFast(Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext)
         {
-            return this.QueryInternal(query, queryId, offset, count, out totalCount, true, overrideAuthContext);
+            return this.QueryInternal(query, queryId, offset, count, out totalCount, true, overrideAuthContext, null);
         }
 
         #endregion

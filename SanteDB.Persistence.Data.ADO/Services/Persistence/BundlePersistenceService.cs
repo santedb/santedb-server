@@ -35,6 +35,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Principal;
+using SanteDB.Core.Model.Query;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -229,7 +230,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Query the specified object
         /// </summary>
-        public override IEnumerable<Bundle> QueryInternal(DataContext context, Expression<Func<Bundle, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = true)
+        public override IEnumerable<Bundle> QueryInternal(DataContext context, Expression<Func<Bundle, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<Bundle>[] orderBy, bool countResults = true)
         {
             totalResults = 0;
             return new List<Bundle>().AsQueryable();

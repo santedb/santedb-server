@@ -6,6 +6,7 @@
 #define MyAppURL "http://santesuite.org"
 #define MyAppVersion "1.0.0.0"   
 #define x64      
+
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -250,7 +251,7 @@ Source: ..\bin\release\Phonix.dll; DestDir: {app}; Components: match
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Run]
-Filename: "{app}\ConfigTool.exe"; Flags: postinstall; Description: "Configure Open Immunize"
+; Filename: "{app}\ConfigTool.exe"; Flags: postinstall; Description: "Configure Open Immunize"
 
 [UninstallRun]
 #ifdef BUNDLED

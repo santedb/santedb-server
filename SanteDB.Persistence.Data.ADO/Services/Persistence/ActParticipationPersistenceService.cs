@@ -20,6 +20,7 @@
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
@@ -27,6 +28,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using SanteDB.Core.Model.Query;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -41,15 +43,16 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId)
         {
             int tr = 0;
-            return this.QueryInternal(context, base.BuildSourceQuery<ActParticipation>(id, versionSequenceId), Guid.Empty, 0, null, out tr, false).ToList();
+            return this.QueryInternal(context, base.BuildSourceQuery<ActParticipation>(id, versionSequenceId), Guid.Empty, 0, null, out tr, null, false).ToList();
 
         }
 
         /// <summary>
         /// Append orderby
         /// </summary>
-        protected override SqlStatement AppendOrderBy(SqlStatement rawQuery)
+        protected override SqlStatement AppendOrderBy(SqlStatement rawQuery, ModelSort<ActParticipation>[] orderBy)
         {
+            rawQuery = base.AppendOrderBy(rawQuery, orderBy);
             return rawQuery.OrderBy<DbActParticipation>(o => o.SequenceId);
         }
 

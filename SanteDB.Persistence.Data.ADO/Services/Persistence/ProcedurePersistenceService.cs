@@ -22,6 +22,7 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
+using SanteDB.Core.Model.Query;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {

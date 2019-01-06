@@ -39,6 +39,7 @@ using SanteDB.Core.Model.Attributes;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 
 namespace SanteDB
 {
@@ -129,10 +130,7 @@ namespace SanteDB
                     Console.WriteLine("SanteDB (SanteDB) {0} ({1})", entryAsm.GetName().Version, entryAsm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
                     Console.WriteLine("{0}", entryAsm.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright);
                     Console.WriteLine("Complete Copyright information available at http://SanteDB.codeplex.com/wikipage?title=Contributions");
-                    ApplicationServiceContext.Current = ApplicationContext.Current;
                     ServiceUtil.Start(typeof(Program).GUID);
-                    (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(typeof(FileConfigurationService));
-                    ApplicationServiceContext.HostType = SanteDBHostType.Server;
                     if (!parameters.StartupTest)
                     {
                         Console.WriteLine("Type [stop] to stop service...");
@@ -147,6 +145,7 @@ namespace SanteDB
                 }
                 else
                 {
+                    Thread.Sleep(10000);
                     hasConsole = false;
                     ServiceBase[] servicesToRun = new ServiceBase[] { new SanteDB() };
                     ServiceBase.Run(servicesToRun);

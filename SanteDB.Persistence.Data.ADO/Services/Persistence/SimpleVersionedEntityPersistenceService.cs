@@ -116,7 +116,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     if (versionId.GetValueOrDefault() == Guid.Empty)
                         retVal = this.Get(connection, containerId);
                     else
-                        retVal = this.CacheConvert(this.QueryInternal(connection, o => o.Key == containerId && o.VersionKey == versionId, Guid.Empty, 0, 1, out tr).FirstOrDefault(), connection);
+                        retVal = this.CacheConvert(this.QueryInternal(connection, o => o.Key == containerId && o.VersionKey == versionId, Guid.Empty, 0, 1, out tr, null).FirstOrDefault(), connection);
 
                     var postData = new DataRetrievedEventArgs<TModel>(retVal, overrideAuthContext);
                     this.FireRetrieved(postData);

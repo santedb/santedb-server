@@ -18,6 +18,7 @@
  * Date: 2018-6-22
  */
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Query;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data.Model;
 using SanteDB.Persistence.Data.ADO.Exceptions;
@@ -134,9 +135,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Performs the actual query
         /// </summary>
-        public override IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = false)
+        public override IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TModel>[] orderBy, bool countResults = false)
         {
-            return this.DoQueryInternal(context, query, queryId, offset, count, out totalResults, countResults).Select(o => o is Guid ? this.Get(context, (Guid)o) : this.CacheConvert(o, context));
+            return this.DoQueryInternal(context, query, queryId, offset, count, out totalResults, orderBy, countResults).Select(o => o is Guid ? this.Get(context, (Guid)o) : this.CacheConvert(o, context));
         }
 
         /// <summary>

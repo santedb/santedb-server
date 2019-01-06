@@ -21,7 +21,6 @@ using SanteDB.Core.Model.Acts;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data.Model;
 using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
-
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
     /// <summary>

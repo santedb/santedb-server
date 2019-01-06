@@ -38,6 +38,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Principal;
+using SanteDB.Core.Model.Query;
 
 namespace SanteDB.Persistence.Auditing.ADO.Services
 {
@@ -404,7 +405,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Executes a query for the specified objects
         /// </summary>
-        public IEnumerable<AuditData> Query(Expression<Func<AuditData, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext = null)
+        public IEnumerable<AuditData> Query(Expression<Func<AuditData, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext = null, params ModelSort<AuditData>[] orderBy)
         {
 
             var preEvtData = new QueryRequestEventArgs<AuditData>(query, offset: offset, count: count, queryId: null, principal: overrideAuthContext);
@@ -423,7 +424,12 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     context.Open();
 
                     var sql = this.m_builder.CreateQuery(query).Build();
-                    sql = sql.OrderBy<DbAuditData>(o => o.Timestamp, SortOrderType.OrderByDescending);
+
+                    if (orderBy != null && orderBy.Length > 0)
+                        foreach (var ob in orderBy)
+                            sql = sql.OrderBy<DbAuditData>(this.m_mapper.MapModelExpression<AuditData, DbAuditData, dynamic>(ob.SortProperty), ob.SortOrder);
+                    else
+                        sql = sql.OrderBy<DbAuditData>(o => o.Timestamp, SortOrderType.OrderByDescending);
 
                     // Total results
                     totalCount = context.Count(sql);

@@ -37,6 +37,7 @@ using System.Security.Permissions;
 using System.Security.Principal;
 using System.Text;
 using System.Xml.Serialization;
+using SanteDB.Core.Model.Query;
 
 namespace SanteDB.Persistence.Diagnostics.Jira
 {
@@ -219,7 +220,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         /// <summary>
         /// Not supported
         /// </summary>
-        public IEnumerable<DiagnosticReport> Query(Expression<Func<DiagnosticReport, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext = null)
+        public IEnumerable<DiagnosticReport> Query(Expression<Func<DiagnosticReport, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext, params ModelSort<DiagnosticReport>[] orderBy)
         {
             throw new NotImplementedException();
         }

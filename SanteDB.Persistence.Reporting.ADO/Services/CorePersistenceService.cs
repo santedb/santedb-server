@@ -104,7 +104,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 				// Domain query
 				SqlStatement domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom();
 
-				var expression = ModelMapper.MapModelExpression<TModel, TDomain>(query, false);
+				var expression = ModelMapper.MapModelExpression<TModel, TDomain, bool>(query, false);
 
 				if (expression != null)
 				{

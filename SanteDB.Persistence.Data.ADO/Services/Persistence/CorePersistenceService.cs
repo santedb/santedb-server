@@ -20,6 +20,7 @@
 using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
@@ -30,6 +31,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using SanteDB.Core.Model.Query;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -47,8 +49,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Get the order by function
         /// </summary>
-        protected virtual SqlStatement AppendOrderBy(SqlStatement rawQuery)
+        protected virtual SqlStatement AppendOrderBy(SqlStatement rawQuery, ModelSort<TModel>[] orderBy)
         {
+            if (orderBy != null)
+                foreach (var ob in orderBy)
+                {
+                    var sorter = m_mapper.MapModelExpression<TModel, TDomain, dynamic>(ob.SortProperty, false);
+                    if(sorter != null)
+                        rawQuery = rawQuery.OrderBy(sorter, ob.SortOrder);
+                }
             return rawQuery;
         }
 
@@ -120,10 +129,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Performs the actual query
         /// </summary>
-        public override IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = true)
+        public override IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TModel>[] orderBy, bool countResults = true)
         {
             int resultCount = 0;
-            var results = this.DoQueryInternal(context, query, queryId, offset, count, out resultCount, countResults).ToList();
+            var results = this.DoQueryInternal(context, query, queryId, offset, count, out resultCount, orderBy, countResults).ToList();
             totalResults = resultCount;
 
             if (!AdoPersistenceService.GetConfiguration().SingleThreadFetch)
@@ -165,7 +174,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Perform the query 
         /// </summary>
-        protected virtual IEnumerable<Object> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool incudeCount = true)
+        protected virtual IEnumerable<Object> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TModel>[] orderBy, bool incudeCount = true)
         {
 #if DEBUG
             Stopwatch sw = new Stopwatch();
@@ -197,7 +206,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     selectTypes = selectTypes[0].GenericTypeArguments;
 
                 domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(selectTypes);
-                var expression = m_mapper.MapModelExpression<TModel, TDomain>(query, false);
+                var expression = m_mapper.MapModelExpression<TModel, TDomain, bool>(query, false);
                 if (expression != null)
                 {
                     Type lastJoined = typeof(TDomain);
@@ -215,13 +224,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 else
                 {
                     m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "Will use slow query construction due to complex mapped fields");
-                    domainQuery = AdoPersistenceService.GetQueryBuilder().CreateQuery(query);
+                    domainQuery = AdoPersistenceService.GetQueryBuilder().CreateQuery(query, orderBy);
                 }
 
                 // Count = 0 means we're not actually fetching anything so just hit the db
                 if (count != 0)
                 {
-                    domainQuery = this.AppendOrderBy(domainQuery);
+                    domainQuery = this.AppendOrderBy(domainQuery, orderBy);
 
                     // Query id just get the UUIDs in the db
                     if (queryId != Guid.Empty && count != 0)
@@ -239,7 +248,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         else
                             pkColumn = TableMapping.Get(typeof(TQueryReturn)).Columns.SingleOrDefault(o => o.IsPrimaryKey);
 
-                        var keyQuery = AdoPersistenceService.GetQueryBuilder().CreateQuery(query, pkColumn).Build();
+                        var keyQuery = AdoPersistenceService.GetQueryBuilder().CreateQuery(query, orderBy, pkColumn).Build();
 
                         var resultKeys = context.Query<Guid>(keyQuery.Build());
 

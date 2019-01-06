@@ -18,7 +18,9 @@
  * Date: 2018-6-22
  */
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model;
@@ -123,9 +125,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// Query the specified object ordering by creation time
         /// </summary>
         /// <returns></returns>
-        public override IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = true)
+        public override IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TModel>[] orderBy, bool countResults = true)
         {
-            var qresult = this.DoQueryInternal(context, query, queryId, offset, count, out totalResults, countResults);
+            var qresult = this.DoQueryInternal(context, query, queryId, offset, count, out totalResults, orderBy, countResults);
             return qresult.Select(o => o is Guid ? this.Get(context, (Guid)o) : this.CacheConvert(o, context)).ToList();
         }
 

@@ -18,6 +18,7 @@
  * Date: 2018-6-22
  */
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
 using System;
 using System.Collections.Generic;
@@ -41,9 +42,9 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Finds the specified metadata
         /// </summary>
-        public override IEnumerable<TMetadata> Find(Expression<Func<TMetadata, bool>> query, int offset, int? count, out int totalResults, Guid queryId)
+        public override IEnumerable<TMetadata> Find(Expression<Func<TMetadata, bool>> query, int offset, int? count, out int totalResults, Guid queryId, params ModelSort<TMetadata>[] orderBy)
         {
-            return base.Find(query, offset, count, out totalResults, queryId);
+            return base.Find(query, offset, count, out totalResults, queryId, orderBy);
         }
 
         /// <summary>
@@ -57,9 +58,9 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Finds the specified metadata
         /// </summary>
-        public override IEnumerable<TMetadata> Find(Expression<Func<TMetadata, bool>> query, int offset, int? count, out int totalResults)
+        public override IEnumerable<TMetadata> Find(Expression<Func<TMetadata, bool>> query, int offset, int? count, out int totalResults, params ModelSort<TMetadata>[] orderBy)
         {
-            return base.Find(query, offset, count, out totalResults);
+            return base.Find(query, offset, count, out totalResults, orderBy);
         }
 
         /// <summary>

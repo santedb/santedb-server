@@ -21,6 +21,7 @@ using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Map;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Reporting.ADO.Configuration;
@@ -390,7 +391,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// <param name="authContext">The authentication context.</param>
 		/// <param name="totalCount">The total count.</param>
 		/// <returns>Returns a list of model instance which match the given query expression.</returns>
-		public IEnumerable<TModel> Query(Expression<Func<TModel, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext = null)
+		public IEnumerable<TModel> Query(Expression<Func<TModel, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext, params ModelSort<TModel>[] orderBy)
 		{
 			return this.QueryInternal(query, offset, count, out totalCount, true, overrideAuthContext);
 		}

@@ -18,7 +18,9 @@
  * Date: 2018-6-22
  */
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
@@ -63,7 +65,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Querying for provenance is not supported
         /// </summary>
-        protected override IEnumerable<object> DoQueryInternal(DataContext context, Expression<Func<SecurityProvenance, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool incudeCount = true)
+        protected override IEnumerable<object> DoQueryInternal(DataContext context, Expression<Func<SecurityProvenance, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<SecurityProvenance>[] orderBy, bool incudeCount = true)
         {
             throw new NotSupportedException();
         }
@@ -449,9 +451,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <param name="principal">The principal.</param>
 		/// <param name="countResults">if set to <c>true</c> [count results].</param>
 		/// <returns>IEnumerable&lt;SecurityUser&gt;.</returns>
-		public override IEnumerable<SecurityUser> QueryInternal(DataContext context, Expression<Func<SecurityUser, bool>> query, Guid queryId, int offset, int? count, out int totalResults, bool countResults = true)
+		public override IEnumerable<SecurityUser> QueryInternal(DataContext context, Expression<Func<SecurityUser, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<SecurityUser>[] orderBy, bool countResults = true)
 		{
-			var results = base.QueryInternal(context, query, queryId, offset, count, out totalResults, countResults);
+			var results = base.QueryInternal(context, query, queryId, offset, count, out totalResults, orderBy, countResults);
 
 			var users = new List<SecurityUser>();
 

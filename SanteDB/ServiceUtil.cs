@@ -18,6 +18,8 @@
  * Date: 2018-11-26
  */
 using SanteDB.Core;
+using SanteDB.Core.Interfaces;
+using SanteDB.Core.Services.Impl;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -53,6 +55,10 @@ namespace SanteDB
             try
             {
                 // Initialize 
+                ApplicationServiceContext.Current = ApplicationContext.Current;
+                (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(typeof(FileConfigurationService));
+                ApplicationServiceContext.HostType = SanteDBHostType.Server;
+
                 Trace.TraceInformation("Getting default message handler service.");
                 if (ApplicationContext.Current.Start())
                 {

@@ -22,6 +22,8 @@ using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Query;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
@@ -135,8 +137,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class EntityNameComponentPersistenceService : IdentifiedPersistenceService<Core.Model.Entities.EntityNameComponent, DbEntityNameComponent, CompositeResult<DbEntityNameComponent, DbPhoneticValue>>, IAdoAssociativePersistenceService
     {
 
-        protected override SqlStatement AppendOrderBy(SqlStatement rawQuery)
+        /// <summary>
+        /// Append order by
+        /// </summary>
+        protected override SqlStatement AppendOrderBy(SqlStatement rawQuery, ModelSort<EntityNameComponent>[] orderBy)
         {
+            rawQuery = base.AppendOrderBy(rawQuery, orderBy);            
             return rawQuery.OrderBy<DbEntityNameComponent>(o => o.Sequence);
         }
 
@@ -216,7 +222,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId)
         {
             int tr = 0;
-            return this.QueryInternal(context, base.BuildSourceQuery<EntityNameComponent>(id), Guid.Empty, 0, null, out tr, false).ToList();
+            return this.QueryInternal(context, base.BuildSourceQuery<EntityNameComponent>(id), Guid.Empty, 0, null, out tr, null, false).ToList();
         }
     }
 }
