@@ -184,7 +184,7 @@
     </trace>
   </system.diagnostics>
   <connectionStrings>
-    <add name="FBSQL" connectionString="initial catalog=sdb_base.fdb;server type=Embedded;user id=sysdba" providerName="Fbsql"/>
+    <add name="FBSQL" connectionString="initial catalog=|DataDirectory|\sdb_base.fdb;server type=Embedded;user id=sysdba" providerName="Fbsql"/>
   </connectionStrings>
   <startup>
     <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.5"/>

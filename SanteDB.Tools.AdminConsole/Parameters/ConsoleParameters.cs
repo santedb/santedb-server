@@ -36,8 +36,8 @@ namespace SanteDB.Tools.AdminConsole.Parameters
         {
             this.RealmId = "localhost";
             this.UseTls = false;
-            this.AppId = "org.santedb.sdbac";
-            this.AppSecret = "sdbac-secret";
+            this.AppId = "org.santedb.administration";
+            this.AppSecret = "Mohawk123";
             this.Port = "8080";
         }
 

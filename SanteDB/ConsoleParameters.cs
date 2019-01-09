@@ -58,5 +58,18 @@ namespace SanteDB
         [Description("Generates a default configuration file called config.default.xml given the plugins available")]
         public bool GenConfig { get; set; }
 
+        /// <summary>
+        /// Install the service
+        /// </summary>
+        [Parameter("install")]
+        [Description("Register the service in Windows")]
+        public bool Install { get; set; }
+
+        /// <summary>
+        /// Uninstall the service
+        /// </summary>
+        [Parameter("uninstall")]
+        [Description("Unregister the service in Windows")]
+        public bool UnInstall { get; set; }
     }
 }

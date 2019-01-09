@@ -4,8 +4,6 @@
 #define MyAppName "SanteDB Server"
 #define MyAppPublisher "Mohawk College mHealth & eHealth Development and Innovation Centre"
 #define MyAppURL "http://santesuite.org"
-#define MyAppVersion "1.0.0.0"   
-#define x64      
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -20,9 +18,9 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 #ifdef x64
-DefaultDirName={pf64}\SanteSuite\SanteDB
+DefaultDirName={pf64}\SanteSuite\SanteDB\Server
 #else
-DefaultDirName={pf32}\SanteSuite\SanteDB
+DefaultDirName={pf32}\SanteSuite\SanteDB\Server
 #endif
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
@@ -44,9 +42,11 @@ WizardImageFile=.\install.bmp
 #ifdef DEBUG
 Compression = none
 #else
-Compression = lzma2/ultra 
+Compression = bzip
 #endif
 AppCopyright = Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+SignTool=default sign $f
+SignedUninstaller=yes
 
 [Types]
 Name: full; Description: Complete Installation
@@ -251,12 +251,16 @@ Source: ..\bin\release\Phonix.dll; DestDir: {app}; Components: match
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Run]
-; Filename: "{app}\ConfigTool.exe"; Flags: postinstall; Description: "Configure Open Immunize"
+Filename: "{app}\SanteDB.exe"; Parameters:"--console --test-start"; Flags: runhidden runascurrentuser waituntilterminated; StatusMsg: "Initializing Sample Data Environment"; Components: demo
+Filename: "{app}\SanteDB.exe"; Parameters:"--install"; Flags: runhidden runascurrentuser; StatusMsg: "Registering SanteDB Service"
+Filename: "net.exe"; Parameters: "start santedb"; Flags: postinstall nowait runascurrentuser; Description: "Start SanteDB Service With Demo Data"; Components: demo
 
 [UninstallRun]
 #ifdef BUNDLED
 Filename: "{app}\postgresql\uninstall-postgresql.exe"; Parameters: "--mode unattended"; StatusMsg: "Un-registering PostgreSQL 9.4"; Flags:runhidden;
 #endif
+Filename: "net.exe"; Parameters: "stop santedb"; StatusMsg: "Stopping SanteDB"; Flags: waituntilterminated runascurrentuser;
+Filename: "{app}\SanteDB.exe"; Parameters: "--uninstall"; StatusMsg: "Un-registering SanteDB"; Flags:runhidden runascurrentuser;
 
 
 [Icons]

@@ -66,20 +66,21 @@ namespace SanteDB
 
             AppDomain.CurrentDomain.SetData(
                "DataDirectory",
-               Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), "Data"));
+               Path.GetDirectoryName(typeof(Program).Assembly.Location));
 
             // Handle Unahndled exception
-            AppDomain.CurrentDomain.UnhandledException += (o, e) => {
+            AppDomain.CurrentDomain.UnhandledException += (o, e) =>
+            {
                 Trace.TraceError("++++++ FATAL APPLICATION ERROR ++++++++\r\n{0}", e.ExceptionObject);
                 Environment.Exit(999);
             };
 
-            
+
             // Parser
             ParameterParser<ConsoleParameters> parser = new ParameterParser<ConsoleParameters>();
-           
+
             bool hasConsole = true;
-            
+
             try
             {
                 var parameters = parser.Parse(args);
@@ -88,13 +89,24 @@ namespace SanteDB
                 // What to do?
                 if (parameters.ShowHelp)
                     parser.WriteHelp(Console.Out);
-                else if(parameters.GenConfig)
+                else if (parameters.Install && !ServiceTools.ServiceInstaller.ServiceIsInstalled("SanteDB"))
+                {
+                    Console.WriteLine("Installing Service...");
+                    ServiceTools.ServiceInstaller.Install("SanteDB", "SanteDB Host Process", Assembly.GetEntryAssembly().Location, null, null, ServiceTools.ServiceBootFlag.AutoStart);
+                }
+                else if (parameters.UnInstall && ServiceTools.ServiceInstaller.ServiceIsInstalled("SanteDB"))
+                {
+                    Console.WriteLine("Un-Installing Service...");
+                    ServiceTools.ServiceInstaller.StopService("SanteDB");
+                    ServiceTools.ServiceInstaller.Uninstall("SanteDB");
+                }
+                else if (parameters.GenConfig)
                 {
 
                     SanteDBConfiguration configuration = new SanteDBConfiguration();
                     SanteDBServerConfiguration serverConfiguration = new SanteDBServerConfiguration();
                     Console.WriteLine("Will generate full default configuration...");
-                    foreach(var file in Directory.GetFiles(Path.GetDirectoryName(typeof(Program).Assembly.Location), "*.dll"))
+                    foreach (var file in Directory.GetFiles(Path.GetDirectoryName(typeof(Program).Assembly.Location), "*.dll"))
                     {
                         try
                         {
@@ -104,7 +116,7 @@ namespace SanteDB
                             Console.WriteLine("Adding sections from {0}...", file);
                             configuration.Sections.AddRange(asm.ExportedTypes.Where(t => typeof(IConfigurationSection).IsAssignableFrom(t)).Select(t => CreateFullXmlObject(t)));
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             Console.WriteLine("Skipping {0} due to {1}", file, e.Message);
                         }
@@ -119,7 +131,7 @@ namespace SanteDB
 
 
                 }
-                else if(parameters.ConsoleMode)
+                else if (parameters.ConsoleMode)
                 {
 #if DEBUG
                     Core.Diagnostics.Tracer.AddWriter(new Core.Diagnostics.LogTraceWriter(System.Diagnostics.Tracing.EventLevel.LogAlways, "SanteDB.data"), System.Diagnostics.Tracing.EventLevel.LogAlways);
@@ -145,13 +157,12 @@ namespace SanteDB
                 }
                 else
                 {
-                    Thread.Sleep(10000);
                     hasConsole = false;
                     ServiceBase[] servicesToRun = new ServiceBase[] { new SanteDB() };
                     ServiceBase.Run(servicesToRun);
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
 #if DEBUG
                 Trace.TraceError("011 899 981 199 911 9725 3!!! {0}", e.ToString());
@@ -172,7 +183,7 @@ namespace SanteDB
         private static object CreateFullXmlObject(Type t)
         {
             var instance = Activator.CreateInstance(t);
-            foreach(var prop in t.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+            foreach (var prop in t.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
                 try
                 {
@@ -208,7 +219,7 @@ namespace SanteDB
 
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine("\tSkipping {0}.{1} > {2}", t.FullName, prop.Name, e.Message);
                 }
@@ -221,49 +232,49 @@ namespace SanteDB
         /// </summary>
         private static object GetDefaultValue(Type propertyType)
         {
-            if(propertyType == typeof(byte[]))
+            if (propertyType == typeof(byte[]))
             {
                 Console.Write("Data for byte[] value:");
                 var data = Console.ReadLine();
                 return SHA256.Create().ComputeHash(Console.InputEncoding.GetBytes(data));
             }
             else
-            switch (propertyType.StripNullable().Name.ToLower())
-            {
-                case "bool":
-                case "boolean":
-                    return false;
-                case "string":
-                    return "value";
-                case "guid":
-                    return Guid.Empty;
-                case "int":
-                case "int32":
-                case "int64":
-                case "long":
-                case "short":
-                case "int16":
-                    return 0;
-                case "double":
-                case "float":
-                    return 0.0f;
-                case "datetime":
-                    return DateTime.MinValue;
-                case "timespan":
-                    return TimeSpan.MinValue;
-                case "storename":
-                    return StoreName.My;
-                case "storelocation":
-                    return StoreLocation.CurrentUser;
-                case "x509findtype":
-                    return X509FindType.FindByThumbprint;
-                default:
-                    if (propertyType.IsEnum)
-                    {
-                        return Enum.ToObject(propertyType, 0);
-                    }
-                    return null;
-            }
+                switch (propertyType.StripNullable().Name.ToLower())
+                {
+                    case "bool":
+                    case "boolean":
+                        return false;
+                    case "string":
+                        return "value";
+                    case "guid":
+                        return Guid.Empty;
+                    case "int":
+                    case "int32":
+                    case "int64":
+                    case "long":
+                    case "short":
+                    case "int16":
+                        return 0;
+                    case "double":
+                    case "float":
+                        return 0.0f;
+                    case "datetime":
+                        return DateTime.MinValue;
+                    case "timespan":
+                        return TimeSpan.MinValue;
+                    case "storename":
+                        return StoreName.My;
+                    case "storelocation":
+                        return StoreLocation.CurrentUser;
+                    case "x509findtype":
+                        return X509FindType.FindByThumbprint;
+                    default:
+                        if (propertyType.IsEnum)
+                        {
+                            return Enum.ToObject(propertyType, 0);
+                        }
+                        return null;
+                }
         }
     }
 }

@@ -19,6 +19,7 @@
  */
 using SanteDB.Core.Auditing;
 using SanteDB.Core.Interfaces;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security.Services;
@@ -73,12 +74,12 @@ namespace SanteDB.Core.Services.Impl
         /// Find with query controls
         /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AccessAuditLog)]
-        public IEnumerable<AuditData> Find(Expression<Func<AuditData, bool>> query, int offset, int? count, out int totalResults)
+        public IEnumerable<AuditData> Find(Expression<Func<AuditData, bool>> query, int offset, int? count, out int totalResults, params ModelSort<AuditData>[] orderBy)
         {
             var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditData>>();
             if (service == null)
                 throw new InvalidOperationException("Cannot find the data persistence service for audits");
-            var results = service.Query(query, offset, count, out totalResults, AuthenticationContext.Current.Principal);
+            var results = service.Query(query, offset, count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
             this.DataDisclosed?.Invoke(this, new AuditDataDisclosureEventArgs(query.ToString(), results));
             return results;
         }
