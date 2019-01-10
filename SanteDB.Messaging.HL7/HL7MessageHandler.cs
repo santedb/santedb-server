@@ -59,19 +59,20 @@ namespace SanteDB.Messaging.HL7
         private List<ServiceHandler> m_listenerThreads = new List<ServiceHandler>();
 
         // Interceptors
-        private List<InterceptorBase> m_intercetpros = new List<InterceptorBase>();
+        private List<InterceptorBase> m_interceptors = new List<InterceptorBase>();
 
         /// <summary>
         /// Start the v2 message handler
         /// </summary>
         public bool Start()
         {
-             this.m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
+
+            this.m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
             this.Starting?.Invoke(this, EventArgs.Empty);
 
             ApplicationServiceContext.Current.Started += (o, e) =>
             {
-                this.m_localFacility = ApplicationServiceContext.Current.GetService<IRepositoryService<Place>>().Get(this.m_configuration.LocalFacility);
+                this.m_localFacility = ApplicationServiceContext.Current.GetService<IRepositoryService<Place>>()?.Get(this.m_configuration.LocalFacility);
             };
 
             foreach (var sd in this.m_configuration.Services)
@@ -91,7 +92,7 @@ namespace SanteDB.Messaging.HL7
                 .OfType<InterceptorBase>())
             {
                 this.m_traceSource.TraceInformation("Starting Interceptor {0}...", incptr.GetType().FullName);
-                this.m_intercetpros.Add(incptr);
+                this.m_interceptors.Add(incptr);
                 incptr.Attach();
             }
 
@@ -112,7 +113,7 @@ namespace SanteDB.Messaging.HL7
             }
 
             // Interceptors
-            foreach (var incptr in this.m_intercetpros)
+            foreach (var incptr in this.m_interceptors)
             {
                 this.m_traceSource.TraceInformation("Detaching {0}...", incptr.GetType().FullName);
                 incptr.Detach();
