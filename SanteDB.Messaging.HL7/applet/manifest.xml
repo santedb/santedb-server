@@ -1,0 +1,43 @@
+<!--
+ - Copyright 2015-2018 Mohawk College of Applied Arts and Technology
+ -
+ - 
+ - Licensed under the Apache License, Version 2.0 (the "License"); you 
+ - may not use this file except in compliance with the License. You may 
+ - obtain a copy of the License at 
+ - 
+ - http://www.apache.org/licenses/LICENSE-2.0 
+ - 
+ - Unless required by applicable law or agreed to in writing, software
+ - distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ - License for the specific language governing permissions and limitations under 
+ - the License.
+ - 
+ - User: justin
+ - Date: 2018-7-23
+ -->
+<AppletManifest xmlns="http://santedb.org/applet">
+  <info id="org.santedb.hl7" version="1.0.0.0">
+    <icon>/org.santedb.core/img/icon.png</icon>
+    <name lang="en">SanteDB HL7v2 Receiver</name>
+    <author>Mohawk College of Applied Arts and Technology - mHealth &amp; eHealth Development &amp; Innovation Centre</author>
+  </info>
+
+  <strings lang="en">
+    <string key="org.santedb.hl7">HL7v2 / LLP</string>
+
+    <!-- Configuration  -->
+    <string key="ui.config.hl7.noConfig">There was no configuration or service to send/receive HL7 messages. This panel has been disabled</string>
+    <string key="ui.config.hl7.localAuth.label">Local Identity Authority</string>
+    <string key="ui.config.hl7.localAuth.help">This disconnected gateway will generate UUIDs for the patient. Specify the name of that authority here</string>
+    <string key="ui.config.hl7.place.label">Sending Facility</string>
+    <string key="ui.config.hl7.place.help">Specify the MSH-4 value of response messages</string>
+    <string key="ui.config.hl7.security.label">Application Auth</string>
+    <string key="ui.config.hl7.security.help">Indicate the authentication scheme for applications (note MSH-8 is always required for DEVICE prinicipals)</string>
+    <string key="ui.config.hl7.endpoint.label">Endpoint</string>
+    <string key="ui.config.hl7.endpoint.help">Indicate the endpoint where clients will send their HL7v2 messages to this DCG instance.</string>
+
+
+  </strings>
+</AppletManifest>
