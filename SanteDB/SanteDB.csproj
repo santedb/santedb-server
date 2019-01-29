@@ -260,10 +260,6 @@
       <Project>{f3d2fa84-c398-4390-9834-1272cc2d6f89}</Project>
       <Name>SanteDB.Core.Model.RISI</Name>
     </ProjectReference>
-    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.AMI\SanteDB.Rest.AMI.csproj">
-      <Project>{f14023e2-f8df-4ebc-b2c4-34a825e3790e}</Project>
-      <Name>SanteDB.Rest.AMI</Name>
-    </ProjectReference>
     <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
       <Project>{786bd0ee-1806-4158-ba45-80249ac6dfe7}</Project>
       <Name>SanteDB.Rest.Common</Name>
