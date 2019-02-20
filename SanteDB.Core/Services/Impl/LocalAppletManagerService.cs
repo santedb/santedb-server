@@ -268,7 +268,16 @@ namespace SanteDB.Core.Services.Impl
                         if (package.PublicKey != null)
                         {
                             var embCert = new X509Certificate2(package.PublicKey);
-                            if (!this.m_configuration.TrustedPublishers.Contains(embCert.Thumbprint) && !embCert.Verify())
+                            // Build the certificate chain
+                            var embChain = new X509Chain();
+                            embChain.Build(embCert);
+
+                            // Validate the chain elements
+                            bool isTrusted = false;
+                            foreach (var itm in embChain.ChainElements)
+                                isTrusted |= this.m_configuration.TrustedPublishers.Contains(itm.Certificate.Thumbprint);
+
+                            if (!isTrusted || embChain.ChainStatus.Any(o=>o.Status != X509ChainStatusFlags.RevocationStatusUnknown))
                                 throw new SecurityException($"Cannot verify identity of publisher {embCert.Subject}");
                             else
                                 cert = new X509Certificate2Collection(embCert);

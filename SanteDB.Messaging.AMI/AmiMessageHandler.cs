@@ -184,9 +184,11 @@ namespace SanteDB.Messaging.AMI
                 else
                     AmiMessageHandler.ResourceHandler = new ResourceHandlerTool(
                         typeof(SecurityUserResourceHandler).Assembly.ExportedTypes
+                        .Union(AppDomain.CurrentDomain.GetAssemblies().Where(a=>!a.IsDynamic).SelectMany(a=>a.ExportedTypes))
                         .Where(t => !t.IsAbstract && !t.IsInterface && typeof(IApiResourceHandler).IsAssignableFrom(t))
                         .ToList()
                     );
+                
 
                 this.Started?.Invoke(this, EventArgs.Empty);
                 return true;

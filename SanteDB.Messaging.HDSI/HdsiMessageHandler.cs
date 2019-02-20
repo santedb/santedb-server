@@ -140,12 +140,13 @@ namespace SanteDB.Messaging.HDSI
                 // Force startup
                 if(this.m_configuration.ResourceHandlers.Count() > 0)
                     HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.m_configuration.ResourceHandlers);
-                else 
+                else
                     HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(
                         typeof(PatientResourceHandler).Assembly.ExportedTypes
+                        .Union(AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic).SelectMany(a => a.ExportedTypes))
                         .Where(t => !t.IsAbstract && !t.IsInterface && typeof(IApiResourceHandler).IsAssignableFrom(t))
                         .ToList()
-                        );
+                    );
 
                 this.m_webHost = ApplicationContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(HdsiServiceBehavior));
                 this.m_webHost.AddServiceBehavior(new ErrorServiceBehavior());
