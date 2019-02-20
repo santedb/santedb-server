@@ -283,7 +283,7 @@
       <oid xmlns="http://santedb.org/model">1.3.6.1.4.1.52820.9.1.1.1.9</oid>
       <url xmlns="http://santedb.org/model">http://demo.santesuite.net</url>
     </localAuthority>
-    <interceptors>
+    <!--<interceptors>
       <add type="SanteDB.Messaging.HL7.Interceptors.AdtPatientPassthroughInterceptor, SanteDB.Messaging.HL7, Version=1.10.0.0, Culture=neurtral, PublicKeyToken=null" hl7version="2.3.1">
         <endpoints>
           <add address="llp://127.0.0.1:2200" receiveTimeout="30000" securityToken="145B3622BB609D4CB6BD47B0836D3C1B" receivingFacility="MM" receivingDevice="MM_MPI"/>
@@ -294,7 +294,7 @@
           <add>HIVID</add>
         </domains>
       </add>
-    </interceptors>
+    </interceptors>-->
     <services>
       <add address="llp://0.0.0.0:2100" name="LLP" receiveTimeout="20000">
         <!-- If you want to enable security Encryption

@@ -195,7 +195,7 @@ alter table cd_ref_term_assoc_tbl alter efft_vrsn_seq_id type integer;
 alter table cd_ref_term_assoc_tbl alter obslt_vrsn_seq_id type integer;
 alter table cd_rel_assoc_tbl alter efft_vrsn_seq_id type integer;
 alter table cd_rel_assoc_tbl alter obslt_vrsn_seq_id type integer;
-alter table cd_vrsn_tbl alter crsn_seq_id type integer;
+alter table cd_vrsn_tbl alter vrsn_seq_id type integer;
 
 -- CURRENT CONCEPT VERSION VIEW
 CREATE VIEW CD_CUR_VRSN_VW AS
