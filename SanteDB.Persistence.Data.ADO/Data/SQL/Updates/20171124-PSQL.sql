@@ -1,9 +1,9 @@
 ﻿/** 
- * <update id="20171123-01" applyRange="0.9.0.0-0.9.0.11"  invariantName="npgsql">
- *	<summary>Add entity relationship validation for providers and state/county</summary>
+ * <feature scope="SanteDB.Persistence.Data.ADO" id="20171123-01" name="Update:20171123-01" applyRange="0.9.0.0-0.9.0.11"  invariantName="npgsql">
+ *	<summary>Update: Add entity relationship validation for providers and state/county</summary>
  *	<remarks></remarks>
  *	<isInstalled>select ck_patch('20171123-01')</isInstalled>
- * </update>
+ * </feature>
  */
 
 BEGIN TRANSACTION ;

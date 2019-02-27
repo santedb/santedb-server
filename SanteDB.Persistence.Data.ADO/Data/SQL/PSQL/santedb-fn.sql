@@ -1,4 +1,11 @@
-﻿-- RETURNS WHETHER THE USER ACCOUNT IS LOCKED
+﻿/** 
+ * <feature scope="SanteDB.Persistence.Data.ADO" id="0-003" name="Core Functions" invariantName="npgsql">
+ *	<summary>Install Core Functions</summary>
+ *	<remarks>Installs the core SanteDB database functions</remarks>
+ *  <isInstalled>SELECT IS_USR_LOCK('SYSTEM') IS NULL;</isInstalled>
+ * </feature>
+ */
+ -- RETURNS WHETHER THE USER ACCOUNT IS LOCKED
 CREATE OR REPLACE FUNCTION IS_USR_LOCK(
 	USR_NAME_IN IN TEXT
 ) RETURNS BOOLEAN AS 

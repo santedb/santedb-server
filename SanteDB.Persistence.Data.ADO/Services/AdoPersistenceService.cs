@@ -49,7 +49,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// <summary>
     /// Represents a dummy service which just adds the persistence services to the context
     /// </summary>
-    [ServiceProvider("ADO.NET Data Persistence Service")]
+    [ServiceProvider("ADO.NET Data Persistence Service", Configuration = typeof(AdoPersistenceConfigurationSection))]
     public class AdoPersistenceService : IDaemonService, ISqlDataPersistenceService
     {
 
@@ -117,6 +117,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         static AdoPersistenceService()
         {
+            // We are in the configuration
+            if (ApplicationServiceContext.Current?.HostType == SanteDBHostType.Other)
+                return;
+
             var tracer = new TraceSource(AdoDataConstants.TraceSourceName);
             s_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
             try
@@ -344,7 +348,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Gets the invariant name
         /// </summary>
-        public string InvariantName => s_configuration.Provider.Name;
+        public string InvariantName => s_configuration.Provider.Invariant;
 
         /// <summary>
         /// Start the service and bind all of the sub-services
@@ -366,7 +370,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     if (oizVer < dbVer)
                         throw new InvalidOperationException(String.Format("Invalid Schema Version. SanteDB version {0} is older than the database schema version {1}", oizVer, dbVer));
-                    this.m_tracer.TraceInformation("SanteDB Schema Version {0} on {1}", dbVer, s_configuration.Provider.Name);
+                    this.m_tracer.TraceInformation("SanteDB Schema Version {0} on {1}", dbVer, s_configuration.Provider.Invariant);
                 }
             }
             catch (Exception e)

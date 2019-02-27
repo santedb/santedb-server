@@ -69,7 +69,7 @@ namespace SanteDB.Core
         /// <summary>
         /// Get the host configuration
         /// </summary>
-        public SanteDBServerConfiguration Configuration { get { return this.m_configuration; } }
+        public ApplicationServiceContextConfigurationSection Configuration { get { return this.m_configuration; } }
 
         /// <summary>
         /// Gets the identifier for this context
@@ -80,11 +80,41 @@ namespace SanteDB.Core
         /// Gets whether the domain is running
         /// </summary>
         public bool IsRunning { get { return this.m_running; } }
-        
+
+        /// <summary>
+        /// Get the operating system type
+        /// </summary>
+        public OperatingSystemID OperatingSystem
+        {
+            get
+            {
+                switch(Environment.OSVersion.Platform)
+                {
+                    case PlatformID.MacOSX:
+                        return OperatingSystemID.MacOS;
+                    case PlatformID.Unix:
+                        return OperatingSystemID.Linux;
+                    case PlatformID.Win32NT:
+                    case PlatformID.Win32S:
+                    case PlatformID.Win32Windows:
+                    case PlatformID.WinCE:
+                    case PlatformID.Xbox:
+                        return OperatingSystemID.Win32;
+                    default:
+                        throw new InvalidOperationException("Invalid platform");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the host type
+        /// </summary>
+        public SanteDBHostType HostType => SanteDBHostType.Server;
+
         /// <summary>
         /// Configuration
         /// </summary>
-        private SanteDBServerConfiguration m_configuration;
+        private ApplicationServiceContextConfigurationSection m_configuration;
 
         // True with the object has been disposed
         private bool m_disposed = false;
@@ -146,8 +176,8 @@ namespace SanteDB.Core
 
                     // If there is no configuration manager then add the local
                     Trace.TraceInformation("STAGE0 START: Load Configuration");
-                    
-                    this.m_configuration = this.GetService<IConfigurationManager>().GetSection<SanteDBServerConfiguration>();
+
+                    this.m_configuration = this.GetService<IConfigurationManager>().GetSection<ApplicationServiceContextConfigurationSection>();
 
                     Trace.TraceInformation("STAGE1 START: Loading services");
                     foreach (var svc in this.m_configuration.ServiceProviders)

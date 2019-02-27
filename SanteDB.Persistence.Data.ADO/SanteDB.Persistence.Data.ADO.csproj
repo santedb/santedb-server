@@ -77,10 +77,8 @@
     <Compile Include="Data\Model\Security\DbSecurityProvenance.cs" />
     <Compile Include="Data\Model\Security\DbSession.cs" />
     <Compile Include="Data\Model\Security\DbSessionClaim.cs" />
-    <Compile Include="Data\SQL\AdoCodeDataFeature.cs" />
-    <Compile Include="Data\SQL\AdoCoreDataFeature.cs" />
-    <Compile Include="Data\SQL\AdoDataInitialization.cs" />
     <Compile Include="Exceptions\AdoFormalConstraintException.cs" />
+    <Compile Include="Configuration\Features\AdoPersistenceFeature.cs" />
     <Compile Include="Resources\Locale.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -252,7 +250,7 @@
     <EmbeddedResource Include="Data\SQL\FBSQL\santedb-fn.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <Content Include="Data\SQL\FBSQL\santedb-init.sql" />
+    <EmbeddedResource Include="Data\SQL\FBSQL\santedb-init.sql" />
     <EmbeddedResource Include="Data\SQL\Updates\20180126-PSQL.sql" />
     <EmbeddedResource Include="Data\SQL\Updates\20180211-PSQL.sql" />
     <EmbeddedResource Include="Data\SQL\Updates\20180131-PSQL.sql" />

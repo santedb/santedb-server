@@ -25,6 +25,7 @@ using System.IO;
 using System.Reflection;
 using System.Xml;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Configuration.Data;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -79,18 +80,41 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public string GetAppSetting(string key)
         {
-            return this.m_configuration.AppSettings.Settings[key]?.Value;
+            // Use configuration setting 
+            String retVal = null;
+            try
+            {
+                retVal = this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>()?.AppSettings.Find(o => o.Key == key)?.Value;
+            }
+            catch {
+            }
+
+            if(retVal == null)
+                retVal = this.m_configuration.AppSettings.Settings[key]?.Value;
+            return retVal;
+
         }
 
         /// <summary>
         /// Get connection string
         /// </summary>
-        public ConnectionStringInfo GetConnectionString(string key)
+        public ConnectionString GetConnectionString(string key)
         {
-            var cs = this.m_configuration.ConnectionStrings.ConnectionStrings[key];
-            if(cs != null)
+            // Use configuration setting 
+            ConnectionString retVal = null;
+            try
             {
-                return new ConnectionStringInfo(cs.ProviderName, cs.ConnectionString);
+                retVal = this.Configuration.GetSection<DataConfigurationSection>()?.ConnectionString.Find(o => o.Name == key);
+            }
+            catch { }
+
+            if (retVal == null)
+            {
+                var cs = this.m_configuration.ConnectionStrings.ConnectionStrings[key];
+                if (cs != null)
+                {
+                    return new ConnectionString(cs.ProviderName, cs.ConnectionString);
+                }
             }
             return null;
         }

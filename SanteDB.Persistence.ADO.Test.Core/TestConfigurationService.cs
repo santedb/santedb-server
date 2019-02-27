@@ -1,4 +1,5 @@
 ﻿using SanteDB.Core.Configuration;
+using SanteDB.Core.Configuration.Data;
 using SanteDB.Core.Services;
 using System;
 using System.Configuration;
@@ -64,11 +65,11 @@ namespace SanteDB.Persistence.ADO.Test.Core
         /// <summary>
         /// Get connection string
         /// </summary>
-        public ConnectionStringInfo GetConnectionString(string key)
+        public ConnectionString GetConnectionString(string key)
         {
             var cs = ConfigurationManager.ConnectionStrings[key];
             if (cs != null)
-                return new ConnectionStringInfo(cs.ProviderName, cs.ConnectionString);
+                return new ConnectionString(cs.ProviderName, cs.ConnectionString);
             return null;
         }
 

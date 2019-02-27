@@ -37,7 +37,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Configuration
         /// </summary>
         protected override string ResolveConnectionString(string connectionStringName)
         {
-            return ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetConnectionString(connectionStringName)?.ConnectionString;
+            return ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetConnectionString(connectionStringName)?.Value;
         }
     }
 }

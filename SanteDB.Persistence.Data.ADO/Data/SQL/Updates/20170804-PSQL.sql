@@ -1,9 +1,9 @@
 ﻿/** 
- * <update id="20170804-01" applyRange="0.2.0.0-0.9.0.2"  invariantName="npgsql">
- *	<summary>Fixes an issue with locked accounts set to 9999 as date</summary>
+ * <feature scope="SanteDB.Persistence.Data.ADO" id="20170804-01" name="Update:20170804-01" applyRange="0.2.0.0-0.9.0.2"  invariantName="npgsql">
+ *	<summary>Update: Fixes an issue with locked accounts set to 9999 as date</summary>
  *	<remarks>Fixes issue with locked accounts</remarks>
  *	<isInstalled>select ck_patch('20170804-01')</isInstalled>
- * </update>
+ * </feature>
  */
 
  BEGIN TRANSACTION ;

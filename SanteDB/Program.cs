@@ -104,7 +104,7 @@ namespace SanteDB
                 {
 
                     SanteDBConfiguration configuration = new SanteDBConfiguration();
-                    SanteDBServerConfiguration serverConfiguration = new SanteDBServerConfiguration();
+                    ApplicationServiceContextConfigurationSection serverConfiguration = new ApplicationServiceContextConfigurationSection();
                     Console.WriteLine("Will generate full default configuration...");
                     foreach (var file in Directory.GetFiles(Path.GetDirectoryName(typeof(Program).Assembly.Location), "*.dll"))
                     {
@@ -122,7 +122,7 @@ namespace SanteDB
                         }
                     }
 
-                    configuration.RemoveSection<SanteDBServerConfiguration>();
+                    configuration.RemoveSection<ApplicationServiceContextConfigurationSection>();
                     serverConfiguration.ThreadPoolSize = Environment.ProcessorCount;
                     configuration.AddSection(serverConfiguration);
 

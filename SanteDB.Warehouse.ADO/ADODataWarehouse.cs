@@ -826,7 +826,7 @@ namespace SanteDB.Warehouse.ADO
             // Not interested
             if (dmQuery == null) throw new ArgumentOutOfRangeException(nameof(queryDefinition));
 
-            var mySql = dmQuery.Definition.FirstOrDefault(o => o.ProviderId == this.m_configuration.Provider.Name);
+            var mySql = dmQuery.Definition.FirstOrDefault(o => o.ProviderId == this.m_configuration.Provider.Invariant);
 
             if (mySql == null) return null;
             else if (!mySql.Query.Trim().StartsWith("select", StringComparison.OrdinalIgnoreCase))

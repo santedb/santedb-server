@@ -21,7 +21,6 @@ namespace SanteDB.Persistence.Data.ADO.Test
         [ClassInitialize]
         public static void ClassSetup(TestContext context)
         {
-
             TestApplicationContext.TestAssembly = typeof(AdoIdentityProviderTest).Assembly;
             TestApplicationContext.Initialize(context.DeploymentDirectory);
 

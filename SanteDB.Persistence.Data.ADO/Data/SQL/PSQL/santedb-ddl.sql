@@ -1,4 +1,12 @@
-﻿-- CREATE EXTENSIONS
+﻿/** 
+ * <feature scope="SanteDB.Persistence.Data.ADO" name="Core Schema" id="0-001" invariantName="npgsql">
+ *	<summary>Install Schema</summary>
+ *	<remarks>Install the core SanteDB data structures</remarks>
+ *	<isInstalled>SELECT COUNT(1) > 0 FROM SEC_USR_TBL</isInstalled>
+ *	<url>https://help.santesuite.org/ops/santedb/rim</url>
+ * </feature>
+ */
+-- CREATE EXTENSIONS
 CREATE EXTENSION IF NOT EXISTS PGCRYPTO;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS CITEXT;

@@ -1,9 +1,9 @@
 ﻿/** 
- * <update id="20171011-01" applyRange="0.2.0.4-0.9.0.5"  invariantName="npgsql">
- *	<summary>Adds trigger constraints to ensure that relationships are of proper type</summary>
+ * <feature scope="SanteDB.Persistence.Data.ADO" id="20171011-01" name="Update:20171011-01" applyRange="0.2.0.4-0.9.0.5"  invariantName="npgsql">
+ *	<summary>Update: Adds trigger constraints to ensure that relationships are of proper type</summary>
  *	<remarks></remarks>
  *	<isInstalled>select ck_patch('20171011-01')</isInstalled>
- * </update>
+ * </feature>
  */
 
 BEGIN TRANSACTION ;

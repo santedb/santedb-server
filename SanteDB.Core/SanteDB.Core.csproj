@@ -65,6 +65,7 @@
     <Compile Include="Configuration\RestServiceConfiguration.cs" />
     <Compile Include="Configuration\SecuritySignatureConfiguration.cs" />
     <Compile Include="Configuration\ServiceTool.cs" />
+    <Compile Include="Configuration\Features\WindowsServiceFeature.cs" />
     <Compile Include="Configuration\X509ConfigurationElement.cs" />
     <Compile Include="Diagnostics\DiagnosticExtensions.cs" />
     <Compile Include="Diagnostics\LogTraceWriter.cs" />
@@ -77,7 +78,6 @@
     <Compile Include="Http\ServiceClientDescription.cs" />
     <Compile Include="Jobs\JobStateType.cs" />
     <Compile Include="Model\ModelExtensions.cs" />
-    <Compile Include="Configuration\SanteDBServerConfiguration.cs" />
     <Compile Include="Rest\Behavior\CorsEndpointBehavior.cs" />
     <Compile Include="Rest\Behavior\MessageCompressionEndpointBehavior.cs" />
     <Compile Include="Rest\Behavior\ErrorServiceBehavior.cs" />

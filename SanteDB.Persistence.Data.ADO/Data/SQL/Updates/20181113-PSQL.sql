@@ -1,9 +1,9 @@
 ﻿/** 
- * <update id="20181113-01" applyRange="1.0.0.0-1.9.0.0"  invariantName="npgsql">
- *	<summary>Adds more space-efficient indexing</summary>
+ * <feature scope="SanteDB.Persistence.Data.ADO" id="20181113-01" name="Update:20181113-01" applyRange="1.0.0.0-1.9.0.0"  invariantName="npgsql">
+ *	<summary>Update: Optimize check constraints</summary>
  *	<remarks>Adds a more space efficient unique check on the act relationship, entity and participation tables</remarks>
  *	<isInstalled>select ck_patch('20181113-01')</isInstalled>
- * </update>
+ * </feature>
  */
 
  BEGIN TRANSACTION;

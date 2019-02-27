@@ -57,7 +57,6 @@ namespace SanteDB
                 // Initialize 
                 ApplicationServiceContext.Current = ApplicationContext.Current;
                 (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(typeof(FileConfigurationService));
-                ApplicationServiceContext.HostType = SanteDBHostType.Server;
 
                 Trace.TraceInformation("Getting default message handler service.");
                 if (ApplicationContext.Current.Start())

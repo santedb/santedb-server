@@ -1,11 +1,11 @@
 ﻿/** 
- * <update id="20170721-01" applyRange="0.2.0.0-0.9.0.0" invariantName="npgsql">
- *	<summary>Installs additional entity relationships to database</summary>
+ * <feature scope="SanteDB.Persistence.Data.ADO" id="20170721-01" name="Update:20170721-01" applyRange="0.2.0.0-0.9.0.0" invariantName="npgsql">
+ *	<summary>Update: Installs additional entity relationships to database</summary>
  *	<remarks>This update will install two new entity relationship types: INSTANCE and LOCATED ENTITY. INSTANCE replaces the old MANUFACTURED_PRODUCT relationship
  *	type, and is used to indicate a manufactured material is an instance of a material kind. LOCATED ENTITY is used to indicate that a particular entity is physically
  *	located in another entity</remarks>
  *  <isInstalled>select string_to_array(get_sch_vrsn(), '.')::int[] >= string_to_array('0.9.0.1', '.')::int[]</isInstalled>
- * </update>
+ * </feature>
  */
 BEGIN TRANSACTION;
 

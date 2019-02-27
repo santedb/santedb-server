@@ -43,7 +43,7 @@ namespace SanteDB.Caching.Redis
     /// <summary>
     /// Redis memory caching service
     /// </summary>
-    [ServiceProvider("REDIS Data Caching Service")]
+    [ServiceProvider("REDIS Data Caching Service", Configuration = typeof(RedisConfigurationSection))]
     public class RedisCacheService : IDataCachingService, IDaemonService
     {
 

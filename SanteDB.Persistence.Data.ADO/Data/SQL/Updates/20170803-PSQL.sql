@@ -1,10 +1,10 @@
 ﻿/** 
- * <update id="20170803-01" applyRange="0.2.0.0-0.9.0.2"  invariantName="npgsql">
- *	<summary>Adds sequencing to the participation table</summary>
+ * <feature scope="SanteDB.Persistence.Data.ADO" id="20170803-01" name="Update:20170803-01" applyRange="0.2.0.0-0.9.0.2"  invariantName="npgsql">
+ *	<summary>Update: Adds sequencing to the participation table</summary>
  *	<remarks>This will add sequence identifiers to the participation table so that data can be returned 
  *	in proper order</remarks>
  *	<isInstalled>select ck_patch('20170803-01')</isInstalled>
- * </update>
+ * </feature>
  */
 
  BEGIN TRANSACTION ;

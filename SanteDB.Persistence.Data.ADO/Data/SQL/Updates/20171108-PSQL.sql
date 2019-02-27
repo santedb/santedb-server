@@ -1,9 +1,9 @@
 ﻿/** 
- * <update id="20171108-01" applyRange="0.9.0.0-1.1.0.0"  invariantName="npgsql">
- *	<summary>Add relationship types between patients and locations</summary>
+ * <feature scope="SanteDB.Persistence.Data.ADO" id="20171108-01"  name="Update:20171108-01" applyRange="0.9.0.0-1.1.0.0"  invariantName="npgsql">
+ *	<summary>Update: Add relationship types between patients and locations</summary>
  *	<remarks></remarks>
  *	<check>select ck_patch('20171108-01')</check>
- * </update>
+ * </feature>
  */
 
 BEGIN TRANSACTION ;

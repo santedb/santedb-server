@@ -39,7 +39,7 @@ namespace SanteDB.Tools.AdminConsole.Shell
     /// <summary>
     /// Represents a basic application context based on configuration
     /// </summary>
-    public class ApplicationContext : IServiceProvider , IApplicationServiceContext
+    public class ApplicationContext : IServiceProvider, IApplicationServiceContext
     {
 
         // Tracer
@@ -115,6 +115,16 @@ namespace SanteDB.Tools.AdminConsole.Shell
         public string RealmId { get { return this.m_configuration.RealmId; } }
 
         public bool IsRunning => true;
+
+        /// <summary>
+        /// Get the operating system
+        /// </summary>
+        public OperatingSystemID OperatingSystem => OperatingSystemID.Other;
+
+        /// <summary>
+        /// Represents the client host
+        /// </summary>
+        public SanteDBHostType HostType => SanteDBHostType.Client;
 
         /// <summary>
         /// Start the application context

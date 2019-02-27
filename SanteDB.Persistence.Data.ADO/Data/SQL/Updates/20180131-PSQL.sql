@@ -1,9 +1,9 @@
 ﻿/** 
- * <update id="20180131-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
- *	<summary>Add relationship "replaces" between all entities of the same class</summary>
+ * <feature scope="SanteDB.Persistence.Data.ADO" id="20180131-01" name="Update:20180131-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ *	<summary>Update: Add relationship "replaces" between all entities of the same class</summary>
  *	<remarks>Any entity is technically allowed to replace itself :)</remarks>
  *	<check>select ck_patch('20180131-01')</check>
- * </update>
+ * </feature>
  */
 
 BEGIN TRANSACTION ;

@@ -1,12 +1,18 @@
-﻿-- RETURNS WHETHER THE USER ACCOUNT IS LOCKED
-SET TERM !! ;
-
+﻿/** 
+ * <feature scope="SanteDB.Persistence.Data.ADO" id="0-003" name="Core Functions" invariantName="fbsql">
+ *	<summary>Install Database Functions</summary>
+ *	<remarks>Install the core database functions required for SanteDB operation</remarks>
+ *  <isInstalled>SELECT IS_USR_LOCK('SYSTEM') IS NULL FROM RDB$DATABASE;</isInstalled>
+ * </feature>
+ */
+ -- RETURNS WHETHER THE USER ACCOUNT IS LOCKED
 CREATE FUNCTION IS_USR_LOCK(
 	USR_NAME_IN VARCHAR(64)
 ) RETURNS BOOLEAN AS 
 BEGIN
 	RETURN (SELECT (LOCKED > CURRENT_TIMESTAMP) FROM SEC_USR_TBL WHERE USR_NAME = :USR_NAME_IN);
-END!!
+END
+--#!
 
 -- AUTHENTICATES THE USER IF APPLICABLE
 CREATE PROCEDURE AUTH_USR (
@@ -109,7 +115,8 @@ BEGIN
 	DO BEGIN
 		SUSPEND;
 	END
-END	!!
+END;
+--#!
 
 -- AUTHENTICATE AN APPICATION
 CREATE PROCEDURE AUTH_APP (
@@ -146,7 +153,8 @@ BEGIN
 	DO BEGIN
 		SUSPEND;
 	END
-END!!
+END
+--#!
 
 -- AUTHENTICATE A DEVICE
 CREATE PROCEDURE AUTH_DEV (
@@ -183,6 +191,4 @@ BEGIN
 	DO BEGIN
 		SUSPEND;
 	END
-END!!
-
-SET TERM ; !!
+END--#!

@@ -180,7 +180,7 @@ namespace SanteDB.Core.Services.Impl
         {
             this.Starting?.Invoke(this, EventArgs.Empty);
 
-            int concurrency = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SanteDBServerConfiguration>()?.ThreadPoolSize ?? Environment.ProcessorCount;
+            int concurrency = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<ApplicationServiceContextConfigurationSection>()?.ThreadPoolSize ?? Environment.ProcessorCount;
             if (this.m_threadPool != null)
                 this.m_threadPool.Dispose();
             this.m_threadPool = new WaitThreadPool(concurrency);

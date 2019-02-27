@@ -17,6 +17,7 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Attributes;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -52,3 +53,6 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.10.0.*")]
 [assembly: AssemblyFileVersion("1.10.0.0")]
+
+[assembly:Plugin(Group = "Performance", Environment = PluginEnvironment.Server, EnableByDefault = false)]
+[assembly:PluginDependency("SanteDB.Core, 1.10.0")]

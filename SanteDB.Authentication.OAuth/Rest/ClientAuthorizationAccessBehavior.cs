@@ -41,7 +41,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
     {
 
         // Configuration from main SanteDB
-        private SanteDBServerConfiguration m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SanteDBServerConfiguration>();
+        private ApplicationServiceContextConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<ApplicationServiceContextConfigurationSection>();
 
         // Trace source
         private TraceSource m_traceSource = new TraceSource(OAuthConstants.TraceSourceName);

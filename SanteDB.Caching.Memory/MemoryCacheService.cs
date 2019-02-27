@@ -40,7 +40,7 @@ namespace SanteDB.Caching.Memory
     /// <summary>
     /// Memory cache service
     /// </summary>
-    [ServiceProvider("Memory Cache Service")]
+    [ServiceProvider("Memory Cache Service", Configuration = typeof(MemoryCacheConfigurationSection))]
     public class MemoryCacheService : IDataCachingService, IDaemonService
     {
         /// <summary>

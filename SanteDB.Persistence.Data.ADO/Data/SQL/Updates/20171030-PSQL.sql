@@ -1,9 +1,9 @@
 ﻿/** 
- * <update id="20171030-01" applyRange="0.2.0.7-1.1.0.0"  invariantName="npgsql">
- *	<summary>Adds the SQUASH_DB() command to database</summary>
+ * <feature scope="SanteDB.Persistence.Data.ADO" id="20171030-01" name="Update:20171030-01" applyRange="0.2.0.7-1.1.0.0"  invariantName="npgsql">
+ *	<summary>Update: Adds the SQUASH_DB() command to database</summary>
  *	<remarks></remarks>
  *	<isInstalled>select ck_patch('20171030-01')</isInstalled>
- * </update>
+ * </feature>
  */
 BEGIN TRANSACTION;
 
