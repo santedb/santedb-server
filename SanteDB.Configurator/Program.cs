@@ -55,39 +55,45 @@ namespace SanteDB.Configurator
             }
 
             // Load the current configuration
-            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
-            splash.NotifyStatus("Loading Configuration....", 0.6f);
-            if (!File.Exists(ConfigurationContext.Current.ConfigurationFile))
+            try
             {
-                splash.NotifyStatus("Preparing initial configuration...", 1f); // TOOD: Launch initial configuration
-                splash.Close();
+                AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+                splash.NotifyStatus("Loading Configuration....", 0.6f);
+                if (!File.Exists(ConfigurationContext.Current.ConfigurationFile))
+                {
+                    splash.NotifyStatus("Preparing initial configuration...", 1f); // TOOD: Launch initial configuration
+                    splash.Close();
 
-                var init = new frmInitialConfig();
-                if (init.ShowDialog() == DialogResult.Cancel)
+                    var init = new frmInitialConfig();
+                    if (init.ShowDialog() == DialogResult.Cancel)
+                        return;
+                }
+                else if (!ConfigurationContext.Current.LoadConfiguration(ConfigurationContext.Current.ConfigurationFile))
+                {
+                    splash.Close();
                     return;
-            }
-            else if (!ConfigurationContext.Current.LoadConfiguration(ConfigurationContext.Current.ConfigurationFile))
-            {
-                splash.Close();
-                return;
-            }
-            else
-            {
-                splash.NotifyStatus("Loading Configuration...", -1f);
-                ConfigurationContext.Current.Start();
-                splash.Close();
-            }
+                }
+                else
+                {
+                    splash.NotifyStatus("Loading Configuration...", -1f);
+                    ConfigurationContext.Current.Start();
+                    splash.Close();
+                }
 
-            // Check for updates
-            foreach(var t in ConfigurationContext.Current.Features
-                .Where(o => o.Flags.HasFlag(FeatureFlags.AlwaysConfigure))
-                .SelectMany(o => o.CreateInstallTasks())
-                .Where(o => o.VerifyState(ConfigurationContext.Current.Configuration)))
-                ConfigurationContext.Current.ConfigurationTasks.Add(t);
-            ConfigurationContext.Current.Apply();
+                // Check for updates
+                foreach (var t in ConfigurationContext.Current.Features
+                    .Where(o => o.Flags.HasFlag(FeatureFlags.AlwaysConfigure))
+                    .SelectMany(o => o.CreateInstallTasks())
+                    .Where(o => o.VerifyState(ConfigurationContext.Current.Configuration)))
+                    ConfigurationContext.Current.ConfigurationTasks.Add(t);
+                ConfigurationContext.Current.Apply();
 
-            Application.Run(new frmMain());
-            Environment.Exit(0);
+                Application.Run(new frmMain());
+            }
+            finally
+            {
+                Environment.Exit(0);
+            }
         }
 
         /// <summary>

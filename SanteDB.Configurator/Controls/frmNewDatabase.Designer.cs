@@ -311,6 +311,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "frmNewDatabase";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Create Database";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();

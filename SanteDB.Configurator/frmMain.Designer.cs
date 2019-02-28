@@ -31,29 +31,29 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.tbMain = new System.Windows.Forms.TabControl();
+            this.tpSettings = new System.Windows.Forms.TabPage();
+            this.spMainControl = new System.Windows.Forms.SplitContainer();
+            this.trvFeatures = new System.Windows.Forms.TreeView();
+            this.imlMain = new System.Windows.Forms.ImageList(this.components);
             this.tpAdvanced = new System.Windows.Forms.TabPage();
             this.spEditor = new System.Windows.Forms.SplitContainer();
             this.lsvConfigSections = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.imlMain = new System.Windows.Forms.ImageList(this.components);
             this.pbEditor = new SanteDB.Configurator.Controls.PropertyGridEx();
             this.label2 = new System.Windows.Forms.Label();
-            this.tpSettings = new System.Windows.Forms.TabPage();
-            this.spMainControl = new System.Windows.Forms.SplitContainer();
-            this.trvFeatures = new System.Windows.Forms.TreeView();
             this.tspMain = new System.Windows.Forms.ToolStrip();
             this.btnApply = new System.Windows.Forms.ToolStripButton();
             this.btnRestart = new System.Windows.Forms.ToolStripButton();
             this.tbMain.SuspendLayout();
+            this.tpSettings.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.spMainControl)).BeginInit();
+            this.spMainControl.Panel1.SuspendLayout();
+            this.spMainControl.SuspendLayout();
             this.tpAdvanced.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.spEditor)).BeginInit();
             this.spEditor.Panel1.SuspendLayout();
             this.spEditor.Panel2.SuspendLayout();
             this.spEditor.SuspendLayout();
-            this.tpSettings.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.spMainControl)).BeginInit();
-            this.spMainControl.Panel1.SuspendLayout();
-            this.spMainControl.SuspendLayout();
             this.tspMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -70,6 +70,55 @@
             this.tbMain.SelectedIndex = 0;
             this.tbMain.Size = new System.Drawing.Size(744, 428);
             this.tbMain.TabIndex = 0;
+            // 
+            // tpSettings
+            // 
+            this.tpSettings.Controls.Add(this.spMainControl);
+            this.tpSettings.ImageIndex = 0;
+            this.tpSettings.Location = new System.Drawing.Point(4, 4);
+            this.tpSettings.Name = "tpSettings";
+            this.tpSettings.Padding = new System.Windows.Forms.Padding(3);
+            this.tpSettings.Size = new System.Drawing.Size(736, 401);
+            this.tpSettings.TabIndex = 0;
+            this.tpSettings.Text = "Settings";
+            this.tpSettings.UseVisualStyleBackColor = true;
+            // 
+            // spMainControl
+            // 
+            this.spMainControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.spMainControl.Location = new System.Drawing.Point(3, 3);
+            this.spMainControl.Name = "spMainControl";
+            // 
+            // spMainControl.Panel1
+            // 
+            this.spMainControl.Panel1.Controls.Add(this.trvFeatures);
+            this.spMainControl.Size = new System.Drawing.Size(730, 395);
+            this.spMainControl.SplitterDistance = 191;
+            this.spMainControl.TabIndex = 0;
+            // 
+            // trvFeatures
+            // 
+            this.trvFeatures.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.trvFeatures.FullRowSelect = true;
+            this.trvFeatures.HideSelection = false;
+            this.trvFeatures.ImageIndex = 0;
+            this.trvFeatures.ImageList = this.imlMain;
+            this.trvFeatures.Location = new System.Drawing.Point(0, 0);
+            this.trvFeatures.Name = "trvFeatures";
+            this.trvFeatures.SelectedImageIndex = 0;
+            this.trvFeatures.Size = new System.Drawing.Size(191, 395);
+            this.trvFeatures.TabIndex = 0;
+            // 
+            // imlMain
+            // 
+            this.imlMain.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imlMain.ImageStream")));
+            this.imlMain.TransparentColor = System.Drawing.Color.Magenta;
+            this.imlMain.Images.SetKeyName(0, "ServerSettings_16x_24.bmp");
+            this.imlMain.Images.SetKeyName(1, "SettingsGroup_16x_24.bmp");
+            this.imlMain.Images.SetKeyName(2, "SettingsPanel_16x_24.bmp");
+            this.imlMain.Images.SetKeyName(3, "XMLIntellisenseElement_16x_24.bmp");
+            this.imlMain.Images.SetKeyName(4, "StatusWarning_cyan_12x_16x_24.bmp");
+            this.imlMain.Images.SetKeyName(5, "StatusInfoTip_16x_24.bmp");
             // 
             // tpAdvanced
             // 
@@ -125,17 +174,6 @@
             this.columnHeader1.Text = "Section";
             this.columnHeader1.Width = 239;
             // 
-            // imlMain
-            // 
-            this.imlMain.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imlMain.ImageStream")));
-            this.imlMain.TransparentColor = System.Drawing.Color.Magenta;
-            this.imlMain.Images.SetKeyName(0, "ServerSettings_16x_24.bmp");
-            this.imlMain.Images.SetKeyName(1, "SettingsGroup_16x_24.bmp");
-            this.imlMain.Images.SetKeyName(2, "SettingsPanel_16x_24.bmp");
-            this.imlMain.Images.SetKeyName(3, "XMLIntellisenseElement_16x_24.bmp");
-            this.imlMain.Images.SetKeyName(4, "StatusWarning_cyan_12x_16x_24.bmp");
-            this.imlMain.Images.SetKeyName(5, "StatusInfoTip_16x_24.bmp");
-            // 
             // pbEditor
             // 
             this.pbEditor.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -161,44 +199,6 @@
             this.label2.Size = new System.Drawing.Size(730, 26);
             this.label2.TabIndex = 1;
             this.label2.Text = "      Editing the values in this panel can damage your installation of SanteDB";
-            // 
-            // tpSettings
-            // 
-            this.tpSettings.Controls.Add(this.spMainControl);
-            this.tpSettings.ImageIndex = 0;
-            this.tpSettings.Location = new System.Drawing.Point(4, 4);
-            this.tpSettings.Name = "tpSettings";
-            this.tpSettings.Padding = new System.Windows.Forms.Padding(3);
-            this.tpSettings.Size = new System.Drawing.Size(736, 401);
-            this.tpSettings.TabIndex = 0;
-            this.tpSettings.Text = "Settings";
-            this.tpSettings.UseVisualStyleBackColor = true;
-            // 
-            // spMainControl
-            // 
-            this.spMainControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.spMainControl.Location = new System.Drawing.Point(3, 3);
-            this.spMainControl.Name = "spMainControl";
-            // 
-            // spMainControl.Panel1
-            // 
-            this.spMainControl.Panel1.Controls.Add(this.trvFeatures);
-            this.spMainControl.Size = new System.Drawing.Size(730, 395);
-            this.spMainControl.SplitterDistance = 191;
-            this.spMainControl.TabIndex = 0;
-            // 
-            // trvFeatures
-            // 
-            this.trvFeatures.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.trvFeatures.FullRowSelect = true;
-            this.trvFeatures.HideSelection = false;
-            this.trvFeatures.ImageIndex = 0;
-            this.trvFeatures.ImageList = this.imlMain;
-            this.trvFeatures.Location = new System.Drawing.Point(0, 0);
-            this.trvFeatures.Name = "trvFeatures";
-            this.trvFeatures.SelectedImageIndex = 0;
-            this.trvFeatures.Size = new System.Drawing.Size(191, 395);
-            this.trvFeatures.TabIndex = 0;
             // 
             // tspMain
             // 
@@ -239,17 +239,18 @@
             this.Controls.Add(this.tbMain);
             this.Controls.Add(this.tspMain);
             this.Name = "frmMain";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SanteDB Configuration Editor";
             this.tbMain.ResumeLayout(false);
+            this.tpSettings.ResumeLayout(false);
+            this.spMainControl.Panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.spMainControl)).EndInit();
+            this.spMainControl.ResumeLayout(false);
             this.tpAdvanced.ResumeLayout(false);
             this.spEditor.Panel1.ResumeLayout(false);
             this.spEditor.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.spEditor)).EndInit();
             this.spEditor.ResumeLayout(false);
-            this.tpSettings.ResumeLayout(false);
-            this.spMainControl.Panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.spMainControl)).EndInit();
-            this.spMainControl.ResumeLayout(false);
             this.tspMain.ResumeLayout(false);
             this.tspMain.PerformLayout();
             this.ResumeLayout(false);

@@ -59,7 +59,7 @@ namespace SanteDB.Core.Configuration.Features
             };
 
             // Get all updates
-            foreach (var f in Directory.GetFiles(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "data"), "*.dataset"))
+            foreach (var f in Directory.GetFiles(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "data"), "*.dataset").OrderBy(o=>Path.GetFileName(o)))
             {
                 if (!File.Exists(Path.ChangeExtension(f, "completed")))
                 {

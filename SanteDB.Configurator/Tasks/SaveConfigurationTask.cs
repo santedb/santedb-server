@@ -45,7 +45,7 @@ namespace SanteDB.Configurator.Tasks
         public bool Execute(SanteDBConfiguration configuration)
         {
             // First we backup the configuration
-            this.m_backupFile = $"{ConfigurationContext.Current.ConfigurationFile}.bak.{DateTime.Now.ToString("yyyyMMddHHmmss")}";
+            this.m_backupFile = $"{ConfigurationContext.Current.ConfigurationFile}_{DateTime.Now.ToString("yyyyMMddHHmmss")}.bak";
             if(File.Exists(ConfigurationContext.Current.ConfigurationFile))
                 File.Copy(ConfigurationContext.Current.ConfigurationFile, this.m_backupFile, true);
 

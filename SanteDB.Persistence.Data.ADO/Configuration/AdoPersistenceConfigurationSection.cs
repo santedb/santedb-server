@@ -54,6 +54,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         public AdoPersistenceConfigurationSection()
         {
             this.DataCorrectionKeys = new List<string>();
+            this.AllowedResources = new List<string>();
         }
 
         /// <summary>
