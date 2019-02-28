@@ -61,6 +61,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
         // Current requests
         private static long m_currentRequests = 0;
 
+        // Get the ado persistence service
+        protected AdoPersistenceService m_persistenceService;
+
         // Lock for editing 
         protected object m_synkLock = new object();
 
@@ -71,7 +74,16 @@ namespace SanteDB.Persistence.Data.ADO.Services
         protected static AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
 
         // Mapper
-        protected static ModelMapper m_mapper = AdoPersistenceService.GetMapper();
+        protected ModelMapper m_mapper;
+
+        /// <summary>
+        /// ADO Base persistence service
+        /// </summary>
+        public AdoBasePersistenceService()
+        {
+            this.m_persistenceService = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
+            this.m_mapper = this.m_persistenceService.GetMapper();
+        }
 
         public event EventHandler<DataPersistingEventArgs<TData>> Inserting;
         public event EventHandler<DataPersistedEventArgs<TData>> Inserted;
@@ -254,8 +266,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         private void ThrowIfExceeded()
         {
-            if (AdoPersistenceService.GetConfiguration().MaxRequests == 0 ||
-                Interlocked.Read(ref m_currentRequests) < AdoPersistenceService.GetConfiguration().MaxRequests)
+            if (this.m_persistenceService.GetConfiguration().MaxRequests == 0 ||
+                Interlocked.Read(ref m_currentRequests) < this.m_persistenceService.GetConfiguration().MaxRequests)
                 Interlocked.Increment(ref m_currentRequests);
             else
                 throw new LimitExceededException("Data layer restricted maximum system requests");
@@ -628,7 +640,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "QUERY {0}", query);
 
                     // Is there an obsoletion item already specified?
-                    if ((count ?? 1000) > 25 && AdoPersistenceService.GetConfiguration().PrepareStatements)
+                    if ((count ?? 1000) > 25 && this.m_persistenceService.GetConfiguration().PrepareStatements)
                         connection.PrepareStatements = true;
                     if (fastQuery)
                     {

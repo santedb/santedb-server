@@ -28,53 +28,68 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label2 = new System.Windows.Forms.Label();
+            this.components = new System.ComponentModel.Container();
+            this.lblAction = new System.Windows.Forms.Label();
             this.pgAction = new System.Windows.Forms.ProgressBar();
-            this.label1 = new System.Windows.Forms.Label();
+            this.lblOverall = new System.Windows.Forms.Label();
             this.pgMain = new System.Windows.Forms.ProgressBar();
+            this.tmrPB = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
-            // label2
+            // lblAction
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 13);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(104, 13);
-            this.label2.TabIndex = 7;
-            this.label2.Text = "Performing Actions...";
+            this.lblAction.AutoSize = true;
+            this.lblAction.Location = new System.Drawing.Point(12, 13);
+            this.lblAction.Name = "lblAction";
+            this.lblAction.Size = new System.Drawing.Size(104, 13);
+            this.lblAction.TabIndex = 7;
+            this.lblAction.Text = "Performing Actions...";
             // 
             // pgAction
             // 
+            this.pgAction.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.pgAction.Location = new System.Drawing.Point(12, 34);
             this.pgAction.Name = "pgAction";
-            this.pgAction.Size = new System.Drawing.Size(468, 23);
+            this.pgAction.Size = new System.Drawing.Size(343, 23);
+            this.pgAction.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.pgAction.TabIndex = 6;
             // 
-            // label1
+            // lblOverall
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 60);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(93, 13);
-            this.label1.TabIndex = 5;
-            this.label1.Text = "Overall Progress...";
+            this.lblOverall.AutoSize = true;
+            this.lblOverall.Location = new System.Drawing.Point(12, 60);
+            this.lblOverall.Name = "lblOverall";
+            this.lblOverall.Size = new System.Drawing.Size(93, 13);
+            this.lblOverall.TabIndex = 5;
+            this.lblOverall.Text = "Overall Progress...";
             // 
             // pgMain
             // 
+            this.pgMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.pgMain.Location = new System.Drawing.Point(12, 80);
             this.pgMain.Name = "pgMain";
-            this.pgMain.Size = new System.Drawing.Size(468, 23);
+            this.pgMain.Size = new System.Drawing.Size(343, 23);
+            this.pgMain.Step = 1;
+            this.pgMain.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.pgMain.TabIndex = 4;
+            // 
+            // tmrPB
+            // 
+            this.tmrPB.Enabled = true;
+            this.tmrPB.Interval = 350;
+            this.tmrPB.Tick += new System.EventHandler(this.tmrPB_Tick);
             // 
             // frmProgress
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(495, 124);
+            this.ClientSize = new System.Drawing.Size(367, 124);
             this.ControlBox = false;
-            this.Controls.Add(this.label2);
+            this.Controls.Add(this.lblAction);
             this.Controls.Add(this.pgAction);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.lblOverall);
             this.Controls.Add(this.pgMain);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
@@ -84,6 +99,7 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Configuring Service";
+            this.TopMost = true;
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -91,9 +107,10 @@
 
         #endregion
 
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label lblAction;
         private System.Windows.Forms.ProgressBar pgAction;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblOverall;
         private System.Windows.Forms.ProgressBar pgMain;
+        private System.Windows.Forms.Timer tmrPB;
     }
 }

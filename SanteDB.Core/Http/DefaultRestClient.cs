@@ -111,7 +111,7 @@ namespace SanteDB.Core.Http
                 {
                     var configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
                     this.traceSource.TraceEvent(TraceEventType.Warning, 0, "Checking for certificate override for {0}", (certificate as X509Certificate2).Thumbprint);
-                    if (configuration.TrustedPublishers.Contains((certificate as X509Certificate2).Thumbprint))
+                    if (configuration.TrustedCertificates.Contains((certificate as X509Certificate2).Thumbprint))
                         return true;
                     else return false;
                 };

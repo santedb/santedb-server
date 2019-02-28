@@ -57,6 +57,7 @@
     <Compile Include="Controls\PropertyGridEx.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Features\IEnhancedConfigurationFeature.cs" />
     <Compile Include="frmInitialConfig.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -95,6 +96,8 @@
     <Compile Include="Controls\ucDatabaseSelector.Designer.cs">
       <DependentUpon>ucDatabaseSelector.cs</DependentUpon>
     </Compile>
+    <Compile Include="Tasks\RestartServiceTask.cs" />
+    <Compile Include="Tasks\SaveConfigurationTask.cs" />
     <Compile Include="Util\DynamicPropertyValue.cs" />
     <EmbeddedResource Include="Controls\frmNewDatabase.resx">
       <DependentUpon>frmNewDatabase.cs</DependentUpon>

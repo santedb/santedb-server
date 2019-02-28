@@ -19,6 +19,7 @@
  */
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml.Serialization;
 
@@ -35,26 +36,21 @@ namespace SanteDB.Core.Configuration
         /// Password regex
         /// </summary>
         [XmlAttribute("passwordRegex")]
+        [Description("Identifies the password regular expression")]
         public string PasswordRegex { get; set; }
-
-        /// <summary>
-        /// Allow unsigned applets to be installed
-        /// </summary>
-        [XmlAttribute("allowUnsignedApplets")]
-        public bool AllowUnsignedApplets { get; set; }
-        
-        /// <summary>
-        /// Trusted publishers
-        /// </summary>
-        [XmlArray("trustedPublishers"), XmlArrayItem("add")]
-        public ObservableCollection<string> TrustedPublishers { get; set; }
 
         /// <summary>
         /// Signature configuration
         /// </summary>
         [XmlElement("signing")]
+        [Description("Describes the algorithm and key for signing data originating from this server")]
         public SecuritySignatureConfiguration Signatures { get; set; }
 
-        
+        /// <summary>
+        /// Trusted publishers
+        /// </summary>
+        [XmlArray("trustedCertificates"), XmlArrayItem("add")]
+        [Description("Individual X.509 certificate thumbprints to trust")]
+        public ObservableCollection<string> TrustedCertificates { get; set; }
     }
 }

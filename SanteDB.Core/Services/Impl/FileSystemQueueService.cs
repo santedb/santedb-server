@@ -17,6 +17,7 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,7 +31,7 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Represents a file system queue that monitors directories
     /// </summary>
-    [ServiceProvider("File System Message Queue")]
+    [ServiceProvider("File System Message Queue", Configuration = typeof(FileSystemQueueConfigurationSection))]
     public class FileSystemQueueService : IPersistentQueueService, IDisposable
     {
         /// <summary>
@@ -113,7 +114,7 @@ namespace SanteDB.Core.Services.Impl
         }
 
         // Queue root directory
-        private readonly string QueueRootDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "queue");
+        private FileSystemQueueConfigurationSection m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection<FileSystemQueueConfigurationSection>();
 
         // Watchers
         private Dictionary<String, IDisposable> m_watchers = new Dictionary<string, IDisposable>();
@@ -128,8 +129,8 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public FileSystemQueueService()
         {
-            if (!Directory.Exists(QueueRootDirectory))
-                Directory.CreateDirectory(QueueRootDirectory);
+            if (!Directory.Exists(this.m_configuration.QueuePath))
+                Directory.CreateDirectory(this.m_configuration.QueuePath);
         }
 
         /// <summary>
@@ -149,7 +150,7 @@ namespace SanteDB.Core.Services.Impl
             // Open the queue
             this.Open(queueName);
 
-            String queueDirectory = Path.Combine(this.QueueRootDirectory, queueName);
+            String queueDirectory = Path.Combine(this.m_configuration.QueuePath, queueName);
 
             // Serialize
             var queueFile = Directory.GetFiles(queueDirectory).FirstOrDefault();
@@ -179,7 +180,7 @@ namespace SanteDB.Core.Services.Impl
             // Open the queue
             this.Open(queueName);
 
-            String queueDirectory = Path.Combine(this.QueueRootDirectory, queueName);
+            String queueDirectory = Path.Combine(this.m_configuration.QueuePath, queueName);
 
             // Serialize
             long tick = DateTime.Now.Ticks;
@@ -206,7 +207,7 @@ namespace SanteDB.Core.Services.Impl
             if (this.m_watchers.ContainsKey(queueName))
                 return; // already open
 
-            String queueDirectory = Path.Combine(this.QueueRootDirectory, queueName);
+            String queueDirectory = Path.Combine(this.m_configuration.QueuePath, queueName);
             if (!Directory.Exists(queueDirectory))
                 Directory.CreateDirectory(queueDirectory);
 

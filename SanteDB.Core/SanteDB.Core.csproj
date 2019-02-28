@@ -58,7 +58,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationContext.cs" />
+    <Compile Include="Configuration\Features\AppletBusinessRulesFeature.cs" />
+    <Compile Include="Configuration\Features\CoreServerFeatures.cs" />
+    <Compile Include="Configuration\Features\DatasetInstallFeature.cs" />
+    <Compile Include="Configuration\Features\FileSystemQueueFeature.cs" />
+    <Compile Include="Configuration\Features\JobManagerFeature.cs" />
+    <Compile Include="Configuration\Features\LocalAppletManagerFeature.cs" />
+    <Compile Include="Configuration\FileSystemQueueConfigurationSection.cs" />
     <Compile Include="Configuration\JobConfigurationSection.cs" />
+    <Compile Include="Configuration\AppletConfigurationSection.cs" />
     <Compile Include="Configuration\RestBehaviorConfiguration.cs" />
     <Compile Include="Configuration\RestConfigurationSection.cs" />
     <Compile Include="Configuration\RestEndpointConfiguration.cs" />

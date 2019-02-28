@@ -45,11 +45,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration.Features
             var conf = this.Configuration as OrmConfigurationBase;
 
             foreach (var feature in SqlFeatureUtil.GetFeatures(conf.Provider.Invariant).OfType<SqlFeature>().Where(o => o.Scope == "SanteDB.Persistence.Data.ADO").OrderBy(o=>o.Id))
-            {
-                var task = new SqlMigrationTask(this, feature);
-                if (task.VerifyState(null))
-                    retVal.Add(task);
-            }
+                retVal.Add(new SqlMigrationTask(this, feature));
             return retVal;
         }
     }

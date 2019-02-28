@@ -34,7 +34,7 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Daemon service which adds all the repositories for acts
     /// </summary>
-    [ServiceProvider("Local (database) repository service")]
+    [ServiceProvider("Local (database) repository service", Dependencies = new Type[] { typeof(IDataPersistenceService) })]
     public class LocalRepositoryService : IDaemonService
     {
         /// <summary>

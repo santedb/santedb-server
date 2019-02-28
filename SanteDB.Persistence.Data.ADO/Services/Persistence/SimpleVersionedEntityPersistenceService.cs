@@ -64,7 +64,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
             else
             {
-                var domainQuery = AdoPersistenceService.GetQueryBuilder().CreateQuery<TModel>(o => o.Key == key && o.ObsoletionTime == null).Build();
+                var domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery<TModel>(o => o.Key == key && o.ObsoletionTime == null).Build();
                 domainQuery.OrderBy<TRootEntity>(o => o.VersionSequenceId, Core.Model.Map.SortOrderType.OrderByDescending);
                 cacheItem = this.ToModelInstance(context.FirstOrDefault<TQueryReturn>(domainQuery), context);
                 if (cacheService != null)

@@ -100,7 +100,8 @@ namespace SanteDB.Persistence.Data.ADO.Data
         {
 
             // Is there a classifier?
-            var idpInstance = AdoPersistenceService.GetPersister(me.GetType()) as IAdoPersistenceService;
+            var serviceInstance = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
+            var idpInstance = serviceInstance.GetPersister(me.GetType()) as IAdoPersistenceService;
             var cacheService = new AdoPersistenceCache(context);
 
             IIdentifiedEntity existing = null;
@@ -125,7 +126,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
             {
 
                 // Get the domain type
-                var dataType = AdoPersistenceService.GetMapper().MapModelType(me.GetType());
+                var dataType = serviceInstance.GetMapper().MapModelType(me.GetType());
                 var tableMap = TableMapping.Get(dataType);
 
                 // Get the classifier attribute value
@@ -140,7 +141,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
                 }
 
                 // Column 
-                var column = tableMap.GetColumn(AdoPersistenceService.GetMapper().MapModelProperty(me.GetType(), dataType, classProperty));
+                var column = tableMap.GetColumn(serviceInstance.GetMapper().MapModelProperty(me.GetType(), dataType, classProperty));
                 // Now we want to query 
                 SqlStatement stmt = context.CreateSqlStatement().SelectFrom(dataType)
                     .Where($"{column.Name} = ?", classifierValue);
@@ -200,14 +201,15 @@ namespace SanteDB.Persistence.Data.ADO.Data
             if (me == null) return null;
 
             // Me
+            var serviceInstance = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
             var vMe = me as IVersionedEntity;
             String dkey = String.Format("{0}.{1}", me.GetType().FullName, me.Key);
 
             IIdentifiedEntity existing = me.TryGetExisting(context);
-            var idpInstance = AdoPersistenceService.GetPersister(me.GetType());
+            var idpInstance = serviceInstance.GetPersister(me.GetType());
 
             // Don't touch the child just return reference
-            if (!AdoPersistenceService.GetConfiguration().AutoInsertChildren)
+            if (!serviceInstance.GetConfiguration().AutoInsertChildren)
             {
                 if (existing != null)
                 {
@@ -324,6 +326,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
             else if (context.Transaction != null) // kk.. I haz a transaction
                 return;
 
+            var serviceInstance = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
 #if DEBUG
             /*
              * Me neez all the timez
@@ -387,7 +390,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
                     continue;
 
                 // Map model type to domain
-                var adoPersister = AdoPersistenceService.GetPersister(pi.PropertyType.StripGeneric());
+                var adoPersister = serviceInstance.GetPersister(pi.PropertyType.StripGeneric());
 
                 // Loading associations, so what is the associated type?
                 if (typeof(IList).IsAssignableFrom(pi.PropertyType) &&

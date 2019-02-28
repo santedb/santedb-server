@@ -1,8 +1,10 @@
-﻿using SanteDB.Core;
+﻿using SanteDB.Configurator.Tasks;
+using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Data;
 using SanteDB.Core.Configuration.Features;
 using SanteDB.Core.Configuration.Tasks;
+using SanteDB.Core.Interfaces;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -13,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -21,8 +24,14 @@ namespace SanteDB.Configurator
     /// <summary>
     /// Configuration Context
     /// </summary>
-    public class ConfigurationContext : INotifyPropertyChanged, IApplicationServiceContext, IConfigurationManager
+    public class ConfigurationContext : INotifyPropertyChanged, IApplicationServiceContext, IConfigurationManager, IServiceManager
     {
+
+
+        /// <summary>
+        /// Services
+        /// </summary>
+        private List<Object> m_services = new List<object>();
 
         // Configuration
         private SanteDBConfiguration m_configuration;
@@ -55,7 +64,8 @@ namespace SanteDB.Configurator
         /// <summary>
         /// Gets or sets the configuration handler
         /// </summary>
-        public SanteDBConfiguration Configuration {
+        public SanteDBConfiguration Configuration
+        {
             get => this.m_configuration;
             set
             {
@@ -80,12 +90,12 @@ namespace SanteDB.Configurator
                 }
                 return this.m_features;
             }
-        } 
+        }
 
         /// <summary>
         /// Get the configuration tasks
         /// </summary>
-        public List<IConfigurationTask> ConfigurationTasks
+        public ObservableCollection<IConfigurationTask> ConfigurationTasks
         {
             get;
             private set;
@@ -119,7 +129,7 @@ namespace SanteDB.Configurator
         private ConfigurationContext()
         {
             this.PluginAssemblies = new ObservableCollection<Assembly>();
-            this.ConfigurationTasks = new List<IConfigurationTask>();
+            this.ConfigurationTasks = new ObservableCollection<IConfigurationTask>();
         }
 
         /// <summary>
@@ -200,36 +210,129 @@ namespace SanteDB.Configurator
             if (this.ConfigurationTasks.Count == 0)
                 return;
 
+            // Add the save task
+            this.ConfigurationTasks.Add(new SaveConfigurationTask());
+            // Is the WindowsService installed?
+            if (this.Features.OfType<WindowsServiceFeature>().First().QueryState(this.Configuration) == FeatureInstallState.Installed)
+                this.ConfigurationTasks.Add(new RestartServiceTask());
+
+            var confirmDlg = new frmTaskList();
+            if (confirmDlg.ShowDialog() != DialogResult.OK)
+                return;
+
             var progress = new frmProgress();
             progress.Show();
 
             try
             {
 
-                // Do work here
-                int i = 0, t = this.ConfigurationTasks.Count;
-                foreach(var ct in this.ConfigurationTasks)
+                // Do work in background thread here
+                bool complete = false;
+                Exception errCode = null;
+                var exeThd = new Thread(() =>
                 {
-                    ct.ProgressChanged += (o, e) =>
+                    try
                     {
-                        progress.ActionStatusText = e.State?.ToString() ?? "...";
-                        progress.ActionStatus = (int)(e.Progress * 100);
-                        Application.DoEvents();
-                    };
+                        int i = 0, t = this.ConfigurationTasks.Count;
+                        var tasks = this.ConfigurationTasks.ToArray();
+                        foreach (var ct in tasks)
+                        {
+                            ct.ProgressChanged += (o, e) =>
+                            {
+                                progress.ActionStatusText = e.State?.ToString() ?? "...";
+                                progress.ActionStatus = (int)(e.Progress * 100);
+                                progress.OverallStatus = (int)((((float)i / t) + (e.Progress * 1.0f / t)) * 100);
+                            };
 
-                    progress.OverallStatusText = $"Applying {ct.Feature.Name}";
-                    ct.Execute(this.Configuration);
-                    progress.OverallStatus = (int)(((float)++i / t) * 100.0);
-                }
+                            progress.OverallStatusText = $"Applying {ct.Feature.Name}";
+                            if (ct.VerifyState(this.Configuration))
+                                ct.Execute(this.Configuration);
+                            this.ConfigurationTasks.Remove(ct);
+                            progress.OverallStatus = (int)(((float)++i / t) * 100.0);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        errCode = e;
+                    }
+                    finally
+                    {
+                        complete = true;
+                    }
+                });
 
-                using (var fs = File.OpenWrite(this.ConfigurationFile))
-                    this.Configuration.Save(fs);
+                exeThd.Start();
+                while (!complete) Application.DoEvents();
+
+                if (errCode != null) throw errCode;
+
+                progress.OverallStatusText = "Reloading Configuration...";
+                progress.OverallStatus = 100;
+                progress.ActionStatusText = "Reloading Configuration...";
+                progress.ActionStatus = 50;
+                this.RestartContext();
+                progress.ActionStatusText = "Reloading Configuration...";
+                progress.ActionStatus = 100;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
+                // TODO: Rollback
                 MessageBox.Show($"Error applying configuration: {e.Message}");
+                Trace.TraceError("Error applying configuration: {0}", e);
             }
-            progress.Close();
+            finally
+            {
+                progress.Close();
+            }
+        }
+
+        /// <summary>
+        /// Restart the service context
+        /// </summary>
+        public void RestartContext()
+        {
+            this.Stop();
+            this.Start();
+        }
+
+        /// <summary>
+        /// Stop the service
+        /// </summary>
+        public void Stop()
+        {
+            this.Stopping?.Invoke(this, EventArgs.Empty);
+
+            foreach (var itm in this.m_services.OfType<IDisposable>())
+            {
+                itm.Dispose();
+                Application.DoEvents();
+            }
+            this.m_services.Clear();
+
+            this.Stopped?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Start this service
+        /// </summary>
+        public void Start()
+        {
+            this.Starting?.Invoke(this, EventArgs.Empty);
+
+            foreach (var itm in this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders)
+            {
+                this.GetService(itm.Type);
+                Application.DoEvents();
+            }
+
+            foreach (var itm in this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.Where(s => typeof(IDaemonService).IsAssignableFrom(s.Type)))
+            {
+                var svc = this.GetService(itm.Type) as IDaemonService;
+                Application.DoEvents();
+                svc.Start();
+            }
+
+            this.Started?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -240,7 +343,18 @@ namespace SanteDB.Configurator
             if (serviceType == typeof(IConfigurationManager))
                 return this;
             else
-                return null;
+            {
+                var candidate = this.m_services.FirstOrDefault(o => serviceType.IsAssignableFrom(o.GetType()));
+                if (candidate == null)
+                {
+                    var dt = this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.FirstOrDefault(o => serviceType.IsAssignableFrom(o.Type))?.Type;
+                    if (dt != null)
+                        candidate = Activator.CreateInstance(dt);
+                    if (candidate != null)
+                        this.m_services.Add(candidate);
+                }
+                return candidate;
+            }
         }
 
         /// <summary>
@@ -287,6 +401,30 @@ namespace SanteDB.Configurator
         public void Reload()
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Add a service provider to this context
+        /// </summary>
+        public void AddServiceProvider(Type serviceType)
+        {
+            this.m_services.Add(Activator.CreateInstance(serviceType));
+        }
+
+        /// <summary>
+        /// Get all services
+        /// </summary>
+        public IEnumerable<object> GetServices()
+        {
+            return this.m_services;
+        }
+
+        /// <summary>
+        /// Remove a service provider
+        /// </summary>
+        public void RemoveServiceProvider(Type serviceType)
+        {
+            this.m_services.RemoveAll(o => o.GetType() == serviceType);
         }
     }
 }

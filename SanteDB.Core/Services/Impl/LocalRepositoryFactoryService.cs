@@ -18,6 +18,7 @@
  * Date: 2018-11-24
  */
 using SanteDB.Core.Model;
+using System;
 using System.Diagnostics;
 
 namespace SanteDB.Core.Services.Impl
@@ -25,7 +26,7 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Represents a generic resource repository factory
     /// </summary>
-    [ServiceProvider("Local Data Repository Factory")]
+    [ServiceProvider("Local Data Repository Factory", Dependencies = new Type[] { typeof(IDataPersistenceService) })]
     public class LocalRepositoryFactoryService : IRepositoryServiceFactory
     {
         /// <summary>

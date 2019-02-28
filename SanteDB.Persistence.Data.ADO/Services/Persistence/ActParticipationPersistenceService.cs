@@ -79,7 +79,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             if (context.LoadState == Core.Model.LoadState.FullLoad)
             {
-                var concept = AdoPersistenceService.GetPersister(typeof(Concept)).Get(participationPart.ParticipationRoleKey);
+                var concept = this.m_persistenceService.GetPersister(typeof(Concept)).Get(participationPart.ParticipationRoleKey);
                 if (concept != null)
                     retVal.ParticipationRole = concept as Concept;
             }

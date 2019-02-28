@@ -354,7 +354,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (data.Participations != null)
             {
                 // Correct mixed keys
-                if(AdoPersistenceService.GetConfiguration().DataCorrectionKeys.Contains("edmonton-participation-keyfix"))
+                if(this.m_persistenceService.GetConfiguration().DataCorrectionKeys.Contains("edmonton-participation-keyfix"))
                 {
                     // Obsolete all
                     foreach(var itm in context.Query<DbActParticipation>(o=>o.SourceKey == retVal.Key && o.ObsoleteVersionSequenceId == null && o.ParticipationRoleKey == ActParticipationKey.Consumable)) {

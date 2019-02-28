@@ -35,6 +35,7 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Represents a base class for entity repository services
     /// </summary>
+    [ServiceProvider("Local repository service")]
     public class GenericLocalRepository<TEntity> :
         IValidatingRepositoryService<TEntity>,
         IRepositoryService<TEntity>,

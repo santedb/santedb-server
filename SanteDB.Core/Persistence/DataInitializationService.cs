@@ -228,10 +228,11 @@ namespace SanteDB.Core.Persistence
         /// </summary>
         public DataInitializationService()
         {
-            this.m_persistenceHandler = (o, e) => {
+            if(ApplicationServiceContext.Current.HostType == SanteDBHostType.Server)
+                this.m_persistenceHandler = (o, e) => {
 
-                this.InstallDataDirectory();
-            };
+                    this.InstallDataDirectory();
+                };
         }
 
         /// <summary>
