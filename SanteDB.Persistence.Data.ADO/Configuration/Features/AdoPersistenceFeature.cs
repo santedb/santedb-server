@@ -31,11 +31,6 @@ namespace SanteDB.Persistence.Data.ADO.Configuration.Features
         }
 
         /// <summary>
-        /// Flags are for auto setup
-        /// </summary>
-        public override FeatureFlags Flags => FeatureFlags.AutoSetup;
-
-        /// <summary>
         /// Create the installation tasks
         /// </summary>
         public override IEnumerable<IConfigurationTask> CreateInstallTasks()

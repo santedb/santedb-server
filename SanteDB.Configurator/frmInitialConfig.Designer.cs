@@ -1,4 +1,4 @@
-﻿using SanteDB.Configurator.Controls;
+﻿using SanteDB.Configuration.Controls;
 
 namespace SanteDB.Configurator
 {
@@ -38,7 +38,7 @@ namespace SanteDB.Configurator
             this.rdoEasy = new System.Windows.Forms.RadioButton();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.dbSelector = new SanteDB.Configurator.Controls.ucDatabaseSelector();
+            this.dbSelector = new SanteDB.Configuration.Controls.ucDatabaseSelector();
             this.btnContinue = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();

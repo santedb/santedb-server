@@ -7,7 +7,7 @@
     <ProjectGuid>{1B0374EA-A3A3-46A5-97DA-9E04AE517694}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>SanteDB.Configurator</RootNamespace>
-    <AssemblyName>SanteDB.Configurator</AssemblyName>
+    <AssemblyName>ConfigTool</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -46,18 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConfigurationContext.cs" />
-    <Compile Include="Controls\DatabaseNameEditor.cs" />
-    <Compile Include="Controls\frmNewDatabase.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\frmNewDatabase.Designer.cs">
-      <DependentUpon>frmNewDatabase.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\PropertyGridEx.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Features\IEnhancedConfigurationFeature.cs" />
+    <Compile Include="ConfigurationContextExtensions.cs" />
     <Compile Include="frmInitialConfig.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -90,18 +79,8 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Controls\ucDatabaseSelector.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\ucDatabaseSelector.Designer.cs">
-      <DependentUpon>ucDatabaseSelector.cs</DependentUpon>
-    </Compile>
     <Compile Include="Tasks\RestartServiceTask.cs" />
     <Compile Include="Tasks\SaveConfigurationTask.cs" />
-    <Compile Include="Util\DynamicPropertyValue.cs" />
-    <EmbeddedResource Include="Controls\frmNewDatabase.resx">
-      <DependentUpon>frmNewDatabase.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="frmInitialConfig.resx">
       <DependentUpon>frmInitialConfig.cs</DependentUpon>
     </EmbeddedResource>
@@ -127,9 +106,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="Controls\ucDatabaseSelector.resx">
-      <DependentUpon>ucDatabaseSelector.cs</DependentUpon>
-    </EmbeddedResource>
+    <EmbeddedResource Include="License.rtf" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -163,11 +140,17 @@
       <Project>{407C87E6-A1F3-45E6-B883-A8176B350817}</Project>
       <Name>SanteDB.OrmLite</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Configuration\SanteDB.Configuration.csproj">
+      <Project>{032ABF00-6C76-47C7-9ECA-A840915A17EA}</Project>
+      <Name>SanteDB.Configuration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
-      <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
+      <Project>{DB9BC05E-45F1-4F96-A161-F36BDECAF566}</Project>
       <Name>SanteDB.Core</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Util\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

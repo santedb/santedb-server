@@ -1,4 +1,4 @@
-﻿namespace SanteDB.Configurator.Controls
+﻿namespace SanteDB.Configuration.Controls
 {
     partial class ucDatabaseSelector
     {
@@ -30,7 +30,7 @@
         {
             this.label5 = new System.Windows.Forms.Label();
             this.cbxProviderType = new System.Windows.Forms.ComboBox();
-            this.pgProperties = new SanteDB.Configurator.Controls.PropertyGridEx();
+            this.pgProperties = new SanteDB.Configuration.Controls.PropertyGridEx();
             this.SuspendLayout();
             // 
             // label5

@@ -91,7 +91,7 @@ namespace SanteDB.Core.Configuration.Features
         /// </summary>
         public FeatureInstallState QueryState(SanteDBConfiguration configuration)
         {
-            return configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.Any(o => o.Type == typeof(DatasetInstallFeature)) ? FeatureInstallState.Installed : FeatureInstallState.NotInstalled;
+            return configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.Any(o => o.Type == typeof(DataInitializationService)) ? FeatureInstallState.Installed : FeatureInstallState.NotInstalled;
         }
 
         /// <summary>

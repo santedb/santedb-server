@@ -23,11 +23,7 @@ namespace SanteDB.Core.Configuration
         public AppletConfigurationSection()
         {
             this.AppletDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "applets");
-            this.TrustedPublishers = new ObservableCollection<string>()
-            {
-                "82C63E1E9B87578D0727E871D7613F2F0FAF683B", // SanteDB APPCA Signature (must be installed)
-                "4326A4421216AC254DA93DC61B93160B08925BB1" // SanteDB Community Applications
-            };
+            this.TrustedPublishers = new List<string>();
 
 #if DEBUG
             this.AllowUnsignedApplets = true;
@@ -50,7 +46,7 @@ namespace SanteDB.Core.Configuration
         /// Trusted publishers
         /// </summary>
         [XmlArray("trustedPublishers"), XmlArrayItem("add")]
-        public ObservableCollection<string> TrustedPublishers { get; set; }
+        public List<string> TrustedPublishers { get; set; }
 
     }
 }

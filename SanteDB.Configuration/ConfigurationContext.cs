@@ -1,9 +1,7 @@
-﻿using SanteDB.Configurator.Tasks;
-using SanteDB.Core;
+﻿using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Data;
 using SanteDB.Core.Configuration.Features;
-using SanteDB.Core.Configuration.Tasks;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Services;
 using System;
@@ -19,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SanteDB.Configurator
+namespace SanteDB.Configuration
 {
     /// <summary>
     /// Configuration Context
@@ -198,91 +196,6 @@ namespace SanteDB.Configurator
             {
                 Trace.TraceError("Could not load configuration file {0}: {1}", filename, e);
                 return false;
-            }
-        }
-
-        /// <summary>
-        /// Apply the tasks specified in the current task queue
-        /// </summary>
-        public void Apply()
-        {
-
-            if (this.ConfigurationTasks.Count == 0)
-                return;
-
-            // Add the save task
-            this.ConfigurationTasks.Add(new SaveConfigurationTask());
-            // Is the WindowsService installed?
-            if (this.Features.OfType<WindowsServiceFeature>().First().QueryState(this.Configuration) == FeatureInstallState.Installed)
-                this.ConfigurationTasks.Add(new RestartServiceTask());
-
-            var confirmDlg = new frmTaskList();
-            if (confirmDlg.ShowDialog() != DialogResult.OK)
-                return;
-
-            var progress = new frmProgress();
-            progress.Show();
-
-            try
-            {
-
-                // Do work in background thread here
-                bool complete = false;
-                Exception errCode = null;
-                var exeThd = new Thread(() =>
-                {
-                    try
-                    {
-                        int i = 0, t = this.ConfigurationTasks.Count;
-                        var tasks = this.ConfigurationTasks.ToArray();
-                        foreach (var ct in tasks)
-                        {
-                            ct.ProgressChanged += (o, e) =>
-                            {
-                                progress.ActionStatusText = e.State?.ToString() ?? "...";
-                                progress.ActionStatus = (int)(e.Progress * 100);
-                                progress.OverallStatus = (int)((((float)i / t) + (e.Progress * 1.0f / t)) * 100);
-                            };
-
-                            progress.OverallStatusText = $"Applying {ct.Feature.Name}";
-                            if (ct.VerifyState(this.Configuration))
-                                ct.Execute(this.Configuration);
-                            this.ConfigurationTasks.Remove(ct);
-                            progress.OverallStatus = (int)(((float)++i / t) * 100.0);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        errCode = e;
-                    }
-                    finally
-                    {
-                        complete = true;
-                    }
-                });
-
-                exeThd.Start();
-                while (!complete) Application.DoEvents();
-
-                if (errCode != null) throw errCode;
-
-                progress.OverallStatusText = "Reloading Configuration...";
-                progress.OverallStatus = 100;
-                progress.ActionStatusText = "Reloading Configuration...";
-                progress.ActionStatus = 50;
-                this.RestartContext();
-                progress.ActionStatusText = "Reloading Configuration...";
-                progress.ActionStatus = 100;
-            }
-            catch (Exception e)
-            {
-                // TODO: Rollback
-                MessageBox.Show($"Error applying configuration: {e.Message}");
-                Trace.TraceError("Error applying configuration: {0}", e);
-            }
-            finally
-            {
-                progress.Close();
             }
         }
 

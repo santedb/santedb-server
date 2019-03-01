@@ -1,4 +1,4 @@
-﻿namespace SanteDB.Configurator.Controls
+﻿namespace SanteDB.Configuration.Editors
 {
     partial class frmNewDatabase
     {
@@ -36,8 +36,6 @@
             this.label7 = new System.Windows.Forms.Label();
             this.txtDatabaseAddress = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.cbxProviderType = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -64,7 +62,7 @@
             this.panel1.Controls.Add(this.label8);
             this.panel1.Controls.Add(this.label7);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Location = new System.Drawing.Point(0, 120);
+            this.panel1.Location = new System.Drawing.Point(0, 94);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(406, 68);
             this.panel1.TabIndex = 1;
@@ -115,7 +113,7 @@
             this.txtDatabaseAddress.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtDatabaseAddress.Enabled = false;
-            this.txtDatabaseAddress.Location = new System.Drawing.Point(117, 34);
+            this.txtDatabaseAddress.Location = new System.Drawing.Point(117, 9);
             this.txtDatabaseAddress.Name = "txtDatabaseAddress";
             this.txtDatabaseAddress.Size = new System.Drawing.Size(266, 20);
             this.txtDatabaseAddress.TabIndex = 2;
@@ -125,32 +123,11 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(32, 37);
+            this.label9.Location = new System.Drawing.Point(32, 12);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(79, 13);
             this.label9.TabIndex = 46;
             this.label9.Text = "Server Address";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(13, 10);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(98, 13);
-            this.label5.TabIndex = 43;
-            this.label5.Text = "Database Software";
-            // 
-            // cbxProviderType
-            // 
-            this.cbxProviderType.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbxProviderType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxProviderType.Enabled = false;
-            this.cbxProviderType.FormattingEnabled = true;
-            this.cbxProviderType.Location = new System.Drawing.Point(117, 7);
-            this.cbxProviderType.Name = "cbxProviderType";
-            this.cbxProviderType.Size = new System.Drawing.Size(266, 21);
-            this.cbxProviderType.TabIndex = 0;
             // 
             // label1
             // 
@@ -158,7 +135,7 @@
             this.label1.Dock = System.Windows.Forms.DockStyle.Top;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.label1.Location = new System.Drawing.Point(0, 188);
+            this.label1.Location = new System.Drawing.Point(0, 162);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(406, 20);
             this.label1.TabIndex = 1;
@@ -171,7 +148,7 @@
             this.label2.Dock = System.Windows.Forms.DockStyle.Top;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.label2.Location = new System.Drawing.Point(0, 87);
+            this.label2.Location = new System.Drawing.Point(0, 61);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(406, 20);
             this.label2.TabIndex = 2;
@@ -182,7 +159,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Dock = System.Windows.Forms.DockStyle.Top;
-            this.label3.Location = new System.Drawing.Point(0, 107);
+            this.label3.Location = new System.Drawing.Point(0, 81);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(383, 13);
             this.label3.TabIndex = 3;
@@ -191,13 +168,11 @@
             // panel2
             // 
             this.panel2.Controls.Add(this.txtDatabaseAddress);
-            this.panel2.Controls.Add(this.cbxProviderType);
-            this.panel2.Controls.Add(this.label5);
             this.panel2.Controls.Add(this.label9);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel2.Location = new System.Drawing.Point(0, 20);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(406, 67);
+            this.panel2.Size = new System.Drawing.Size(406, 41);
             this.panel2.TabIndex = 0;
             // 
             // label4
@@ -220,7 +195,7 @@
             this.pnlNewDb.Controls.Add(this.cbxDatabase);
             this.pnlNewDb.Controls.Add(this.label6);
             this.pnlNewDb.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlNewDb.Location = new System.Drawing.Point(0, 208);
+            this.pnlNewDb.Location = new System.Drawing.Point(0, 182);
             this.pnlNewDb.Name = "pnlNewDb";
             this.pnlNewDb.Size = new System.Drawing.Size(406, 61);
             this.pnlNewDb.TabIndex = 2;
@@ -268,7 +243,7 @@
             // btnOk
             // 
             this.btnOk.Enabled = false;
-            this.btnOk.Location = new System.Drawing.Point(238, 275);
+            this.btnOk.Location = new System.Drawing.Point(238, 249);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 12;
@@ -279,7 +254,7 @@
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(319, 275);
+            this.btnCancel.Location = new System.Drawing.Point(319, 249);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 14;
@@ -297,7 +272,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(406, 307);
+            this.ClientSize = new System.Drawing.Size(406, 281);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.pnlNewDb);
@@ -334,8 +309,6 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.ComboBox cbxProviderType;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;

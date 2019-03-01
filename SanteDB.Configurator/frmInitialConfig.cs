@@ -1,4 +1,5 @@
-﻿using SanteDB.Core.Configuration;
+﻿using SanteDB.Configuration;
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Data;
 using SanteDB.Core.Configuration.Tasks;
 using System;

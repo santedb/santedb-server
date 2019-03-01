@@ -58,7 +58,6 @@
             this.pgMain.Step = 1;
             this.pgMain.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.pgMain.TabIndex = 4;
-            this.pgMain.Value = 50;
             // 
             // tmrPB
             // 
@@ -73,6 +72,7 @@
             this.colProgress});
             this.lsvStatus.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lsvStatus.Location = new System.Drawing.Point(12, 12);
+            this.lsvStatus.MultiSelect = false;
             this.lsvStatus.Name = "lsvStatus";
             this.lsvStatus.OwnerDraw = true;
             this.lsvStatus.Size = new System.Drawing.Size(453, 237);
@@ -86,7 +86,7 @@
             // colTask
             // 
             this.colTask.Text = "Task";
-            this.colTask.Width = 300;
+            this.colTask.Width = 250;
             // 
             // colProgress
             // 

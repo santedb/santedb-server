@@ -16,7 +16,7 @@ namespace SanteDB.Core.Configuration.Features
         /// <summary>
         /// Gets the group
         /// </summary>
-        public override string Group => "Queueing";
+        public override string Group => "Message Queue";
 
     }
 }

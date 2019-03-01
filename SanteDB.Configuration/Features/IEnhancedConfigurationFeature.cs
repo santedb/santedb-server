@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SanteDB.Configurator.Features
+namespace SanteDB.Configuration.Features
 {
     /// <summary>
     /// Represents a configuration panel with a configuration panel

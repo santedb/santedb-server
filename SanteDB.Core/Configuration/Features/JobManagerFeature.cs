@@ -25,6 +25,11 @@ namespace SanteDB.Core.Configuration.Features
         }
 
         /// <summary>
+        /// Setup the job manager
+        /// </summary>
+        public override FeatureFlags Flags => FeatureFlags.AutoSetup; 
+
+        /// <summary>
         /// Gets the description
         /// </summary>
         public override string Description => "Allows SanteDB to run scheduled or ad-hoc 'jobs' (such as compression, warehousing, backup)";

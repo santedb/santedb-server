@@ -8,11 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using SanteDB.Core.Configuration.Data;
-using SanteDB.Configurator.Util;
 using System.Drawing.Design;
 using SanteDB.Core.Configuration;
+using SanteDB.Configuration.Editors;
 
-namespace SanteDB.Configurator.Controls
+namespace SanteDB.Configuration.Controls
 {
     public partial class ucDatabaseSelector : UserControl
     {
@@ -51,7 +51,7 @@ namespace SanteDB.Configurator.Controls
             set {
                 this.m_connectionString = value;
                 // Select provider
-                this.cbxProviderType.SelectedItem = this.cbxProviderType.Items.OfType<ProviderWrapper>().FirstOrDefault(o => o.Provider.Invariant == value.Provider);
+                this.cbxProviderType.SelectedItem = this.cbxProviderType.Items.OfType<DataProviderWrapper>().FirstOrDefault(o => o.Provider.Invariant == value.Provider);
             }
         }
 
@@ -61,7 +61,7 @@ namespace SanteDB.Configurator.Controls
         public IDataConfigurationProvider Provider {
             get
             {
-                return (this.cbxProviderType.SelectedItem as ProviderWrapper)?.Provider as IDataConfigurationProvider;
+                return (this.cbxProviderType.SelectedItem as DataProviderWrapper)?.Provider as IDataConfigurationProvider;
             }
         }
 
@@ -71,7 +71,7 @@ namespace SanteDB.Configurator.Controls
         private void cbxProviderType_DropDown(object sender, EventArgs e)
         {
             if (cbxProviderType.Items.Count == 0)
-                cbxProviderType.Items.AddRange(ConfigurationContext.Current.DataProviders.Select(p => new ProviderWrapper(p)).ToArray());
+                cbxProviderType.Items.AddRange(ConfigurationContext.Current.DataProviders.Select(p => new DataProviderWrapper(p)).ToArray());
         }
 
         /// <summary>
@@ -132,31 +132,4 @@ namespace SanteDB.Configurator.Controls
 
     }
 
-    /// <summary>
-    /// Provider wrapper
-    /// </summary>
-    internal class ProviderWrapper
-    {
-
-        /// <summary>
-        /// Gets the provider
-        /// </summary>
-        public IDataConfigurationProvider Provider { get; }
-
-        /// <summary>
-        /// Creates a new provider wrapper
-        /// </summary>
-        public ProviderWrapper(IDataConfigurationProvider p)
-        {
-            this.Provider = p;
-        }
-
-        /// <summary>
-        /// Represent the provider as a string
-        /// </summary>
-        public override string ToString()
-        {
-            return this.Provider.Name;
-        }
-    }
 }

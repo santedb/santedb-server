@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SanteDB.Configurator")]
+[assembly: AssemblyTitle("SanteDB.Configuration")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SanteDB.Configurator")]
+[assembly: AssemblyProduct("SanteDB.Configuration")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("1b0374ea-a3a3-46a5-97da-9e04ae517694")]
+[assembly: Guid("032abf00-6c76-47c7-9eca-a840915a17ea")]
 
 // Version information for an assembly consists of the following four values:
 //

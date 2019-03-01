@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace SanteDB.Configurator.Controls
+namespace SanteDB.Configuration.Editors
 {
-    public partial class frmNewDatabase : Form
+    internal partial class frmNewDatabase : Form
     {
 
         // Connection string
@@ -19,11 +19,11 @@ namespace SanteDB.Configurator.Controls
         /// <summary>
         /// Create a new database
         /// </summary>
-        public frmNewDatabase(ConnectionString connectionString)
+        public frmNewDatabase(ConnectionString connectionString, IDataConfigurationProvider provider)
         {
             InitializeComponent();
-            PopulateConfigurators();
             this.ConnectionString = connectionString;
+            this.Provider = provider;
         }
 
         /// <summary>
@@ -42,20 +42,13 @@ namespace SanteDB.Configurator.Controls
                 this.txtPassword.Text = value.GetComponent("password");
                 this.txtDatabaseAddress.Text = value.GetComponent("host") ?? value.GetComponent("server");
                 this.cbxDatabase.SelectedValue = value.GetComponent("initial catalog") ?? value.GetComponent("database");
-                this.cbxProviderType.SelectedItem = this.cbxProviderType.Items.OfType<ProviderWrapper>().FirstOrDefault(o => o.Provider.Invariant == value.Provider);
             }
         }
 
-
         /// <summary>
-        /// Populate configurators
+        /// Gets or sets the provider reference
         /// </summary>
-        private void PopulateConfigurators()
-        {
-            if (cbxProviderType.Items.Count == 0)
-                cbxProviderType.Items.AddRange(ConfigurationContext.Current.DataProviders.Select(p => new ProviderWrapper(p)).ToArray());
-        }
-
+        public IDataConfigurationProvider Provider { get; }
 
         /// <summary>
         /// Drop down
@@ -63,10 +56,9 @@ namespace SanteDB.Configurator.Controls
         private void cbxDatabase_DropDown(object sender, EventArgs e)
         {
             cbxDatabase.Items.Clear();
-            var conf = (cbxProviderType.SelectedItem as ProviderWrapper).Provider;
             try
             {
-                cbxDatabase.Items.AddRange(conf.GetDatabases(this.ConnectionString).OfType<Object>().ToArray());
+                cbxDatabase.Items.AddRange(this.Provider.GetDatabases(this.ConnectionString).OfType<Object>().ToArray());
             }
             catch (Exception ex)
             {
@@ -89,13 +81,7 @@ namespace SanteDB.Configurator.Controls
         /// </summary>
         private void btnOk_Click(object sender, EventArgs e)
         {
-            var conf = (cbxProviderType.SelectedItem as ProviderWrapper).Provider;
-            if (cbxProviderType.SelectedItem == null)
-            {
-                errMain.SetError(cbxProviderType, "Database provider not selected");
-                return;
-            }
-            else if (txtUserName.Text == "")
+            if (txtUserName.Text == "")
             {
                 errMain.SetError(txtUserName, "Superuser must be provided");
                 return;
@@ -112,7 +98,7 @@ namespace SanteDB.Configurator.Controls
             try
             {
 
-                this.m_connectionString = conf.CreateDatabase(this.ConnectionString, this.cbxDatabase.Text, this.txtOwner.Text);
+                this.m_connectionString = this.Provider.CreateDatabase(this.ConnectionString, this.cbxDatabase.Text, this.txtOwner.Text);
                 this.DialogResult = System.Windows.Forms.DialogResult.OK;
                 this.Close();
             }

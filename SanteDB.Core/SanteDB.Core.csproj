@@ -72,7 +72,6 @@
     <Compile Include="Configuration\RestEndpointConfiguration.cs" />
     <Compile Include="Configuration\RestServiceConfiguration.cs" />
     <Compile Include="Configuration\SecuritySignatureConfiguration.cs" />
-    <Compile Include="Configuration\ServiceTool.cs" />
     <Compile Include="Configuration\Features\WindowsServiceFeature.cs" />
     <Compile Include="Configuration\X509ConfigurationElement.cs" />
     <Compile Include="Diagnostics\DiagnosticExtensions.cs" />
@@ -202,6 +201,10 @@
     <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
       <Project>{786BD0EE-1806-4158-BA45-80249AC6DFE7}</Project>
       <Name>SanteDB.Rest.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Configuration\SanteDB.Configuration.csproj">
+      <Project>{032ABF00-6C76-47C7-9ECA-A840915A17EA}</Project>
+      <Name>SanteDB.Configuration</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core.Model.ViewModelSerializers\SanteDB.Core.Model.ViewModelSerializers.csproj">
       <Project>{ECE9B280-9647-4092-BABF-EB2E25084670}</Project>

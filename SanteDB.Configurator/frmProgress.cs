@@ -1,4 +1,5 @@
-﻿using SanteDB.Core.Configuration;
+﻿using SanteDB.Configuration;
+using SanteDB.Core.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
