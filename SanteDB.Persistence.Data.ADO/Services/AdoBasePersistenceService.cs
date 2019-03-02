@@ -50,6 +50,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// <summary>
     /// Represents a data persistence service which stores data in the local SQLite data store
     /// </summary>
+    [ServiceProvider("ADO.NET Generic Persistence Provider")]
     public abstract class AdoBasePersistenceService<TData> : IDataPersistenceService<TData>, IStoredQueryDataPersistenceService<TData>, IFastQueryDataPersistenceService<TData>, IAdoPersistenceService where TData : IdentifiedData
     {
 
