@@ -322,6 +322,16 @@ namespace SanteDB.Core
             this.m_disposed = true;
         }
 
+        /// <summary>
+        /// Get all types
+        /// </summary>
+        public IEnumerable<Type> GetAllTypes()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => a.IsDynamic)
+                .SelectMany(a => a.ExportedTypes);
+        }
+
         #endregion
 
     }

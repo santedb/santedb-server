@@ -1,16 +1,22 @@
 ﻿using SanteDB.Configuration;
+using SanteDB.Configuration.Controls;
+using SanteDB.Configuration.Converters;
+using SanteDB.Configuration.Editors;
 using SanteDB.Configuration.Features;
 using SanteDB.Configurator.Tasks;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Configuration.Features;
 using SanteDB.Core.Configuration.Tasks;
 using SanteDB.Core.Services;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Design;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -126,7 +132,51 @@ namespace SanteDB.Configurator
                     tcSettings.TabPages[0].Controls.Add((feature as IEnhancedConfigurationFeature).ConfigurationPanel);
                 }
 
-                if (feature.ConfigurationType != null)
+                var state = feature.QueryState(ConfigurationContext.Current.Configuration);
+
+                // Confiugration 
+                if (feature.ConfigurationType == typeof(GenericFeatureConfiguration))
+                {
+                    var descriptor = new DynamicPropertyClass();
+                    var gc = feature.Configuration as GenericFeatureConfiguration;
+                    foreach(var itm in gc.Options)
+                    {
+                        var value = itm.Value();
+                        var type = typeof(String);
+                        Attribute[] attribute = null;
+                        UITypeEditor uiEditor = null;
+
+                        if (value is ConfigurationOptionType)
+                            switch ((ConfigurationOptionType)value)
+                            {
+                                case ConfigurationOptionType.Boolean:
+                                    type = typeof(bool);
+                                    break;
+                                case ConfigurationOptionType.Numeric:
+                                    type = typeof(Int32);
+                                    break;
+                                case ConfigurationOptionType.Password:
+                                    attribute = new Attribute[] { new PasswordPropertyTextAttribute() };
+                                    break;
+                                case ConfigurationOptionType.FileName:
+                                    uiEditor = new System.Windows.Forms.Design.FileNameEditor();
+                                    break;
+                            }
+                        else if (value is IEnumerable)
+                        {
+                            if ((value as IEnumerable).OfType<Type>().Any())
+                                attribute = new Attribute[]
+                                {
+                                    new TypeConverterAttribute(typeof(ServiceProviderTypeConverter))
+                                };
+                            uiEditor = new DropDownValueEditor(value as IEnumerable);
+                        }
+
+                        descriptor.Add(itm.Key, type, uiEditor, attribute, gc.Values[itm.Key]);
+                    }
+                    pgConfiguration.SelectedObject = descriptor;
+                }
+                else if (feature.ConfigurationType != null)
                 {
                     if (feature.Configuration == null)
                         feature.Configuration = ConfigurationContext.Current.Configuration.GetSection(feature.ConfigurationType) ?? Activator.CreateInstance(feature.ConfigurationType);
@@ -139,10 +189,11 @@ namespace SanteDB.Configurator
                     pgConfiguration.Visible = false;
 
                 // Now detect the necessary bars
-                switch (feature.QueryState(ConfigurationContext.Current.Configuration))
+                switch (state)
                 {
                     case FeatureInstallState.Installed:
-                        tcSettings.Enabled = btnDisable.Visible = lblEnabled.Visible = !feature.Flags.HasFlag(FeatureFlags.NoRemove);
+                        tcSettings.Enabled = true;
+                        btnDisable.Visible = lblEnabled.Visible = !feature.Flags.HasFlag(FeatureFlags.NoRemove);
                         lblDisabled.Visible = btnEnable.Visible = false;
                         break;
                     default:

@@ -253,7 +253,7 @@ namespace SanteDB.Configuration
         /// </summary>
         public object GetService(Type serviceType)
         {
-            if (serviceType == typeof(IConfigurationManager))
+            if (serviceType.IsAssignableFrom(typeof(ConfigurationContext)))
                 return this;
             else
             {
@@ -338,6 +338,16 @@ namespace SanteDB.Configuration
         public void RemoveServiceProvider(Type serviceType)
         {
             this.m_services.RemoveAll(o => o.GetType() == serviceType);
+        }
+
+        /// <summary>
+        /// Get all types
+        /// </summary>
+        public IEnumerable<Type> GetAllTypes()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => !a.IsDynamic)
+                .SelectMany(o => o.ExportedTypes);
         }
     }
 }

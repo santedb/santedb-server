@@ -20,6 +20,7 @@
 using SanteDB.Core.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -52,6 +53,16 @@ namespace SanteDB.Core.Services.Impl
         public void RemoveServiceProvider(Type serviceType)
         {
             ApplicationContext.Current.RemoveServiceProvider(serviceType);
+        }
+
+        /// <summary>
+        /// Get all types
+        /// </summary>
+        public IEnumerable<Type> GetAllTypes()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => a.IsDynamic)
+                .SelectMany(a => a.ExportedTypes);
         }
     }
 }

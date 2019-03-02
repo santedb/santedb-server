@@ -55,11 +55,13 @@
     <Compile Include="Controls\ucDatabaseSelector.Designer.cs">
       <DependentUpon>ucDatabaseSelector.cs</DependentUpon>
     </Compile>
+    <Compile Include="Converters\ServiceProviderTypeConverter.cs" />
     <Compile Include="Converters\StringCollectionRenderConverter.cs" />
     <Compile Include="Converters\DataProviderConverter.cs" />
     <Compile Include="Editors\ConnectionStringEditor.cs" />
     <Compile Include="Editors\DatabaseNameEditor.cs" />
     <Compile Include="Editors\DataProviderEditor.cs" />
+    <Compile Include="Editors\DropDownValueEditor.cs" />
     <Compile Include="Editors\frmConnectionString.cs">
       <SubType>Form</SubType>
     </Compile>
