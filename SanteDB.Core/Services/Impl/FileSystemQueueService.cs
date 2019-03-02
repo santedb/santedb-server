@@ -114,7 +114,7 @@ namespace SanteDB.Core.Services.Impl
         }
 
         // Queue root directory
-        private FileSystemQueueConfigurationSection m_configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection<FileSystemQueueConfigurationSection>();
+        private FileSystemQueueConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<FileSystemQueueConfigurationSection>();
 
         // Watchers
         private Dictionary<String, IDisposable> m_watchers = new Dictionary<string, IDisposable>();
