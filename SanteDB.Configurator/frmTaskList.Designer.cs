@@ -74,7 +74,7 @@
             this.lsvActions.HideSelection = false;
             this.lsvActions.Location = new System.Drawing.Point(0, 22);
             this.lsvActions.Name = "lsvActions";
-            this.lsvActions.Size = new System.Drawing.Size(325, 168);
+            this.lsvActions.Size = new System.Drawing.Size(279, 178);
             this.lsvActions.SmallImageList = this.imlMain;
             this.lsvActions.StateImageList = this.imlState;
             this.lsvActions.TabIndex = 1;
@@ -97,6 +97,9 @@
             // 
             // splitContainer1
             // 
+            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.splitContainer1.Location = new System.Drawing.Point(15, 25);
             this.splitContainer1.Name = "splitContainer1";
             // 
@@ -109,8 +112,8 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.wbHelp);
             this.splitContainer1.Panel2.Controls.Add(this.label3);
-            this.splitContainer1.Size = new System.Drawing.Size(751, 190);
-            this.splitContainer1.SplitterDistance = 325;
+            this.splitContainer1.Size = new System.Drawing.Size(646, 200);
+            this.splitContainer1.SplitterDistance = 279;
             this.splitContainer1.TabIndex = 2;
             // 
             // label2
@@ -122,7 +125,7 @@
             this.label2.Location = new System.Drawing.Point(0, 0);
             this.label2.Name = "label2";
             this.label2.Padding = new System.Windows.Forms.Padding(3);
-            this.label2.Size = new System.Drawing.Size(325, 22);
+            this.label2.Size = new System.Drawing.Size(279, 22);
             this.label2.TabIndex = 0;
             this.label2.Text = "Configuration Tasks";
             // 
@@ -132,7 +135,7 @@
             this.wbHelp.Location = new System.Drawing.Point(0, 22);
             this.wbHelp.MinimumSize = new System.Drawing.Size(20, 20);
             this.wbHelp.Name = "wbHelp";
-            this.wbHelp.Size = new System.Drawing.Size(422, 168);
+            this.wbHelp.Size = new System.Drawing.Size(363, 178);
             this.wbHelp.TabIndex = 2;
             this.wbHelp.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this.wbHelp_Navigating);
             // 
@@ -145,13 +148,14 @@
             this.label3.Location = new System.Drawing.Point(0, 0);
             this.label3.Name = "label3";
             this.label3.Padding = new System.Windows.Forms.Padding(3);
-            this.label3.Size = new System.Drawing.Size(422, 22);
+            this.label3.Size = new System.Drawing.Size(363, 22);
             this.label3.TabIndex = 1;
             this.label3.Text = "Task Info";
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(610, 229);
+            this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnOk.Location = new System.Drawing.Point(505, 239);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 15;
@@ -161,8 +165,9 @@
             // 
             // btnCancel
             // 
+            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(691, 229);
+            this.btnCancel.Location = new System.Drawing.Point(586, 239);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 16;
@@ -176,17 +181,15 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(778, 264);
+            this.ClientSize = new System.Drawing.Size(673, 276);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.label1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "frmTaskList";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Confirm Application";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Confirm Tasks";
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();

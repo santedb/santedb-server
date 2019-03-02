@@ -18,6 +18,7 @@
  * Date: 2018-6-22
  */
 using SanteDB.BusinessRules.JavaScript;
+using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Interfaces;
 using System;
 using System.ComponentModel;
@@ -27,14 +28,14 @@ namespace SanteDB.Core.Services.Daemons
     /// <summary>
     /// A daemon which loads business rules from the applet manager
     /// </summary>
-    [ServiceProvider("Applet JavaScript BRE Source")]
+    [ServiceProvider("Applet JavaScript BRE", Dependencies = new Type[] { typeof(IAppletManagerService) })]
     public class AppletBusinessRulesDaemon : IDaemonService
     {
 
         /// <summary>
         /// Gets the service name
         /// </summary>
-        public string ServiceName => "Applet JavaScript BRE Binding Service";
+        public string ServiceName => "Applet JavaScript BRE";
 
         /// <summary>
         /// Indicates whether the service is running

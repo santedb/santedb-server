@@ -1,4 +1,4 @@
-﻿using SanteDB.Configurator.Controls;
+﻿using SanteDB.Configuration.Controls;
 
 namespace SanteDB.Configurator
 {
@@ -30,6 +30,7 @@ namespace SanteDB.Configurator
         /// </summary>
         private void InitializeComponent()
         {
+            SanteDB.Core.Configuration.Data.ConnectionString connectionString1 = new SanteDB.Core.Configuration.Data.ConnectionString();
             this.pnlLogo = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.lblText = new System.Windows.Forms.Label();
@@ -37,11 +38,13 @@ namespace SanteDB.Configurator
             this.rdoEasy = new System.Windows.Forms.RadioButton();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.dbSelector = new SanteDB.Configurator.Controls.ucDatabaseSelector();
+            this.dbSelector = new SanteDB.Configuration.Controls.ucDatabaseSelector();
             this.btnContinue = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.rdoAdvanced = new System.Windows.Forms.RadioButton();
+            this.label4 = new System.Windows.Forms.Label();
+            this.txtInstance = new System.Windows.Forms.TextBox();
             this.pnlLogo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -115,6 +118,8 @@ namespace SanteDB.Configurator
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.txtInstance);
+            this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.dbSelector);
             this.groupBox1.Location = new System.Drawing.Point(10, 130);
             this.groupBox1.Name = "groupBox1";
@@ -128,9 +133,13 @@ namespace SanteDB.Configurator
             this.dbSelector.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            connectionString1.Name = null;
+            connectionString1.Provider = "";
+            connectionString1.Value = "";
+            this.dbSelector.ConnectionString = connectionString1;
             this.dbSelector.Location = new System.Drawing.Point(6, 19);
             this.dbSelector.Name = "dbSelector";
-            this.dbSelector.Size = new System.Drawing.Size(478, 240);
+            this.dbSelector.Size = new System.Drawing.Size(478, 208);
             this.dbSelector.TabIndex = 1;
             this.dbSelector.ConfigurationChanged += new System.EventHandler(this.dbSelector_Configured);
             // 
@@ -178,6 +187,23 @@ namespace SanteDB.Configurator
             this.rdoAdvanced.Text = "Advanced Configuration";
             this.rdoAdvanced.UseVisualStyleBackColor = true;
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(18, 233);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(79, 13);
+            this.label4.TabIndex = 2;
+            this.label4.Text = "Instance Name";
+            // 
+            // txtInstance
+            // 
+            this.txtInstance.Location = new System.Drawing.Point(114, 230);
+            this.txtInstance.Name = "txtInstance";
+            this.txtInstance.Size = new System.Drawing.Size(364, 20);
+            this.txtInstance.TabIndex = 3;
+            this.txtInstance.Text = "SanteDB";
+            // 
             // frmInitialConfig
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -201,6 +227,7 @@ namespace SanteDB.Configurator
             this.pnlLogo.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -220,5 +247,7 @@ namespace SanteDB.Configurator
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.RadioButton rdoAdvanced;
+        private System.Windows.Forms.TextBox txtInstance;
+        private System.Windows.Forms.Label label4;
     }
 }

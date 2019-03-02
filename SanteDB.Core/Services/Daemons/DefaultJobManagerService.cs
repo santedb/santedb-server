@@ -34,13 +34,13 @@ namespace SanteDB.Core.Services
     /// <summary>
     /// Represents the default implementation of the timer
     /// </summary>
-    [ServiceProvider("Default Job Manager Service")]
+    [ServiceProvider("Default Job Manager", Configuration = typeof(JobConfigurationSection))]
     public class DefaultJobManagerService  : IJobManagerService
     {
         /// <summary>
         /// Gets the service name
         /// </summary>
-        public string ServiceName => "Default Job Manager Service";
+        public string ServiceName => "Default Job Manager";
 
         /// <summary>
         /// Timer configuration

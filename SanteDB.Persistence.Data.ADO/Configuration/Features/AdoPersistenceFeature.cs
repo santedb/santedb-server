@@ -31,11 +31,6 @@ namespace SanteDB.Persistence.Data.ADO.Configuration.Features
         }
 
         /// <summary>
-        /// Flags are for auto setup
-        /// </summary>
-        public override FeatureFlags Flags => FeatureFlags.AutoSetup;
-
-        /// <summary>
         /// Create the installation tasks
         /// </summary>
         public override IEnumerable<IConfigurationTask> CreateInstallTasks()
@@ -45,11 +40,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration.Features
             var conf = this.Configuration as OrmConfigurationBase;
 
             foreach (var feature in SqlFeatureUtil.GetFeatures(conf.Provider.Invariant).OfType<SqlFeature>().Where(o => o.Scope == "SanteDB.Persistence.Data.ADO").OrderBy(o=>o.Id))
-            {
-                var task = new SqlMigrationTask(this, feature);
-                if (task.VerifyState(null))
-                    retVal.Add(task);
-            }
+                retVal.Add(new SqlMigrationTask(this, feature));
             return retVal;
         }
     }

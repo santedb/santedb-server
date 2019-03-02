@@ -194,7 +194,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     .InnerJoin<TDomain, TDomainKey>(o => o.Key, o => o.Key)
                     .Where<TDomain>(expr).Build();
             else
-                domainQuery = AdoPersistenceService.GetQueryBuilder().CreateQuery(query).Build();
+                domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query).Build();
 
 
             domainQuery = this.AppendOrderBy(domainQuery, orderBy);
@@ -205,7 +205,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
                 ColumnMapping pkColumn = TableMapping.Get(typeof(TDomainKey)).Columns.SingleOrDefault(o => o.IsPrimaryKey);
 
-                var keyQuery = AdoPersistenceService.GetQueryBuilder().CreateQuery(query, pkColumn).Build();
+                var keyQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, pkColumn).Build();
                 var resultKeys = context.Query<Guid>(keyQuery.Build());
                 this.m_queryPersistence?.RegisterQuerySet(queryId, resultKeys.Take(1000).ToArray(), query, resultKeys.Count());
 

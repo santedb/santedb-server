@@ -1,5 +1,7 @@
-﻿using SanteDB.Core.Configuration;
+﻿using SanteDB.Configuration;
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Data;
+using SanteDB.Core.Configuration.Tasks;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -40,6 +42,7 @@ namespace SanteDB.Configurator
         private void btnContinue_Click(object sender, EventArgs e)
         {
 
+            ConfigurationContext.Current.ConfigurationTasks.Clear();
             // Create a default configuration with minimal sections
             ConfigurationContext.Current.Configuration = new SanteDBConfiguration()
             {
@@ -48,6 +51,9 @@ namespace SanteDB.Configurator
                     new DataConfigurationSection(),
                     new DiagnosticsConfigurationSection(),
                     new ApplicationServiceContextConfigurationSection()
+                    {
+                        ThreadPoolSize = Environment.ProcessorCount
+                    }
                 }
             };
 
@@ -57,7 +63,14 @@ namespace SanteDB.Configurator
                 // Create feature
                 dbSelector.ConnectionString.Name = "main";
                 ConfigurationContext.Current.Configuration.GetSection<DataConfigurationSection>().ConnectionString.Add(dbSelector.ConnectionString);
-                
+
+                // Configuration of windows service parameters
+                ConfigurationContext.Current.Features.OfType<WindowsServiceFeature>().FirstOrDefault().Configuration = new WindowsServiceFeature.Options()
+                {
+                    ServiceName = txtInstance.Text,
+                    StartBehavior = ServiceTools.ServiceBootFlag.AutoStart
+                };
+
                 // Set all data connections
                 var autoFeatures = ConfigurationContext.Current.Features.Where(o => o.Flags.HasFlag(FeatureFlags.AutoSetup) );
                 foreach(var ftr in autoFeatures)
@@ -70,15 +83,11 @@ namespace SanteDB.Configurator
                         ormConfig.TraceSql = false;
                     }
                     // Add configuration 
-                    foreach(var tsk in ftr.CreateInstallTasks())
+                    foreach(var tsk in ftr.CreateInstallTasks().Where(o=>o.VerifyState(ConfigurationContext.Current.Configuration)))
                         ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
                 }
 
-                var confirmDlg = new frmTaskList();
-                if (confirmDlg.ShowDialog() == DialogResult.OK)
-                    ConfigurationContext.Current.Apply();
-                else
-                    return;
+                ConfigurationContext.Current.Apply();
             }
 
             this.DialogResult = DialogResult.OK;

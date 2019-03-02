@@ -7,12 +7,41 @@ using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using SanteDB.Core.Configuration.Data;
 
-namespace SanteDB.Configurator.Controls
+namespace SanteDB.Configuration.Editors
 {
+
+    /// <summary>
+    /// Provider wrapper
+    /// </summary>
+    public class DataProviderWrapper
+    {
+
+        /// <summary>
+        /// Gets the provider
+        /// </summary>
+        public IDataConfigurationProvider Provider { get; }
+
+        /// <summary>
+        /// Creates a new provider wrapper
+        /// </summary>
+        public DataProviderWrapper(IDataConfigurationProvider p)
+        {
+            this.Provider = p;
+        }
+
+        /// <summary>
+        /// Represent the provider as a string
+        /// </summary>
+        public override string ToString()
+        {
+            return this.Provider.Name;
+        }
+    }
+
     /// <summary>
     /// Creates a database name editor
     /// </summary>
-    internal class DatabaseNameEditor : UITypeEditor
+    public class DatabaseNameEditor : UITypeEditor
     {
 
         /// <summary>
@@ -67,7 +96,7 @@ namespace SanteDB.Configurator.Controls
                 {
                     if (list.SelectedItem.ToString() == "New...")
                     {
-                        var frmNewDatabase = new frmNewDatabase(this.m_connectionString);
+                        var frmNewDatabase = new frmNewDatabase(this.m_connectionString, this.m_provider);
                         if (frmNewDatabase.ShowDialog() == DialogResult.OK)
                             return frmNewDatabase.ConnectionString.GetComponent("database") ?? frmNewDatabase.ConnectionString.GetComponent("initial catalog");
                         else

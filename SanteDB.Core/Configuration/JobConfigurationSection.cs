@@ -58,7 +58,7 @@ namespace SanteDB.Core.Configuration
         /// </summary>
         [XmlIgnore]
         public Type Type {
-            get => Type.GetType(this.TypeXml);
+            get => !String.IsNullOrEmpty(this.TypeXml) ? Type.GetType(this.TypeXml) : null;
             set => this.TypeXml = value?.AssemblyQualifiedName;
         }
 

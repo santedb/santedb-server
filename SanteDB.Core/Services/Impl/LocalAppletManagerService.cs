@@ -39,7 +39,7 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Represents an applet manager service that uses the local file system
     /// </summary>
-    [ServiceProvider("Local Applet Repository/Manager")]
+    [ServiceProvider("Local Applet Repository/Manager", Configuration = typeof(AppletConfigurationSection))]
     public class LocalAppletManagerService : IAppletManagerService, IAppletSolutionManagerService, IDaemonService
     {
 
@@ -61,7 +61,7 @@ namespace SanteDB.Core.Services.Impl
         private Dictionary<String, String> m_fileDictionary = new Dictionary<string, string>();
 
         // Config file
-        private SecurityConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
+        private AppletConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AppletConfigurationSection>();
 
         // Tracer
         private TraceSource m_tracer = new TraceSource(SanteDBConstants.ServiceTraceSourceName);
@@ -121,7 +121,7 @@ namespace SanteDB.Core.Services.Impl
             this.m_tracer.TraceInformation("Retrieving package {0}", appletId);
 
             // Save the applet
-            var appletDir = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "applets");
+            var appletDir = this.m_configuration.AppletDirectory;
             if (!Directory.Exists(appletDir))
                 Directory.CreateDirectory(appletDir);
 
@@ -268,19 +268,27 @@ namespace SanteDB.Core.Services.Impl
                         if (package.PublicKey != null)
                         {
                             var embCert = new X509Certificate2(package.PublicKey);
-                            // Build the certificate chain
-                            var embChain = new X509Chain();
-                            embChain.Build(embCert);
 
-                            // Validate the chain elements
-                            bool isTrusted = false;
-                            foreach (var itm in embChain.ChainElements)
-                                isTrusted |= this.m_configuration.TrustedPublishers.Contains(itm.Certificate.Thumbprint);
+                            // Not explicitly trusted to we need to build a chain
+                            if (!this.m_configuration.TrustedPublishers.Contains(embCert.Thumbprint))
+                            {
+                                // Build the certificate chain
+                                var embChain = new X509Chain();
+                                embChain.Build(embCert);
 
-                            if (!isTrusted || embChain.ChainStatus.Any(o=>o.Status != X509ChainStatusFlags.RevocationStatusUnknown))
-                                throw new SecurityException($"Cannot verify identity of publisher {embCert.Subject}");
+                                // Validate the chain elements if possible
+                                bool isTrusted = false;
+                                foreach (var itm in embChain.ChainElements)
+                                    isTrusted |= this.m_configuration.TrustedPublishers.Contains(itm.Certificate.Thumbprint);
+
+                                if (!isTrusted || embChain.ChainStatus.Any(o => o.Status != X509ChainStatusFlags.RevocationStatusUnknown) && !this.m_configuration.TrustedPublishers.Contains(embCert.Issuer))
+                                    throw new SecurityException($"Cannot verify identity of publisher {embCert.Subject}");
+                                else
+                                    cert = new X509Certificate2Collection(embCert);
+                            }
                             else
                                 cert = new X509Certificate2Collection(embCert);
+
                         }
                         else
                             throw new SecurityException($"Cannot find public key of publisher information for {package.Meta.PublicKeyToken} or the local certificate is invalid");

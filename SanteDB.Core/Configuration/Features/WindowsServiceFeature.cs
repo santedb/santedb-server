@@ -18,6 +18,14 @@ namespace SanteDB.Core.Configuration.Tasks
     public class WindowsServiceFeature : IFeature
     {
         /// <summary>
+        /// Windows service feature ctor
+        /// </summary>
+        public WindowsServiceFeature()
+        {
+            this.Configuration = new Options();
+        }
+
+        /// <summary>
         /// Gets the name
         /// </summary>
         public string Name => "Windows Service";
@@ -69,9 +77,11 @@ namespace SanteDB.Core.Configuration.Tasks
         /// <summary>
         /// Return true if the service is configured
         /// </summary>
-        public bool IsConfigured(SanteDBConfiguration configuration)
+        public FeatureInstallState QueryState(SanteDBConfiguration configuration)
         {
-            return ServiceTools.ServiceInstaller.ServiceIsInstalled("SanteDB");
+            var options = this.Configuration as Options;
+            options.ServiceName = configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.FirstOrDefault(o => o.Key == "w32instance.name")?.Value ?? options.ServiceName;
+            return ServiceTools.ServiceInstaller.ServiceIsInstalled(options.ServiceName) ? FeatureInstallState.Installed : FeatureInstallState.NotInstalled;
         }
 
         /// <summary>
@@ -129,7 +139,7 @@ namespace SanteDB.Core.Configuration.Tasks
             /// <summary>
             /// Gets the description
             /// </summary>
-            public String Description => "This will install SanteDB as a Windows Service";
+            public String Description => $"Install instance {this.m_options.ServiceName} on this machine";
 
             /// <summary>
             /// Options for configuration
@@ -162,11 +172,14 @@ namespace SanteDB.Core.Configuration.Tasks
             {
                 this.ProgressChanged?.Invoke(this, new Services.ProgressChangedEventArgs(0.0f, $"Installing Windows Service {this.m_options.ServiceName}..."));
                 if (!ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName))
+                {
                     ServiceInstaller.Install(this.m_options.ServiceName, "SanteDB Host Process",
                         Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.exe"),
                         this.m_options.User,
                         this.m_options.Password,
                         this.m_options.StartBehavior);
+                    configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.Add(new AppSettingKeyValuePair("w32instance.name", this.m_options.ServiceName));
+                }
                 this.ProgressChanged?.Invoke(this, new Services.ProgressChangedEventArgs(1.0f, null));
                 return true;
             }
@@ -180,6 +193,7 @@ namespace SanteDB.Core.Configuration.Tasks
                 {
                     ServiceInstaller.StopService(this.m_options.ServiceName);
                     ServiceInstaller.Uninstall(this.m_options.ServiceName);
+                    configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.RemoveAll(o=>o.Key == "w32instance.name");
                 }
                 return true;
             }
@@ -203,7 +217,7 @@ namespace SanteDB.Core.Configuration.Tasks
             /// <summary>
             /// Gets the description
             /// </summary>
-            public String Description => "This will remove SanteDB from the Windows Services";
+            public String Description => $"Remove instance {this.m_options} from this machine";
 
             /// <summary>
             /// Options for configuration
@@ -239,6 +253,7 @@ namespace SanteDB.Core.Configuration.Tasks
                 {
                     ServiceInstaller.StopService(this.m_options.ServiceName);
                     ServiceInstaller.Uninstall(this.m_options.ServiceName);
+                    configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.RemoveAll(o => o.Key == "w32instance.name");
                 }
                 this.ProgressChanged?.Invoke(this, new Services.ProgressChangedEventArgs(1.0f, null));
                 return true;

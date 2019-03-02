@@ -59,7 +59,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 ObsoleteVersionSequenceId = entPart.ObsoleteVersionSequenceId,
                 HolderKey = entPart.SourceKey,
                 TargetEntityKey = entPart.TargetKey,
-                RelationshipType = context.LoadState == Core.Model.LoadState.FullLoad ?  AdoPersistenceService.GetPersister(typeof(Concept)).Get(entPart.RelationshipTypeKey) as Concept : null,
+                RelationshipType = context.LoadState == Core.Model.LoadState.FullLoad ? this.m_persistenceService.GetPersister(typeof(Concept)).Get(entPart.RelationshipTypeKey) as Concept : null,
                 RelationshipTypeKey = entPart.RelationshipTypeKey,
                 Quantity = entPart.Quantity,
                 LoadState = context.LoadState,

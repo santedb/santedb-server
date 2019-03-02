@@ -36,8 +36,6 @@ namespace SanteDB.Core.Rest
     /// </summary>
     public class RestServiceFactory : IRestServiceFactory
     {
-        // Master configuration
-        private RestConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RestConfigurationSection>();
 
         /// <summary>
         /// Get capabilities
@@ -66,8 +64,9 @@ namespace SanteDB.Core.Rest
         public RestService CreateService(Type serviceType)
         {
             // Get the configuration
+            var configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RestConfigurationSection>();
             var sname = serviceType.GetCustomAttribute<ServiceBehaviorAttribute>()?.Name ?? serviceType.FullName;
-            var config = m_configuration.Services.FirstOrDefault(o => o.Name == sname);
+            var config = configuration.Services.FirstOrDefault(o => o.Name == sname);
             if (config == null)
                 throw new InvalidOperationException($"Cannot find configuration for {sname}");
             var retVal = new RestService(serviceType);

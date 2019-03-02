@@ -135,7 +135,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var results = this.DoQueryInternal(context, query, queryId, offset, count, out resultCount, orderBy, countResults).ToList();
             totalResults = resultCount;
 
-            if (!AdoPersistenceService.GetConfiguration().SingleThreadFetch)
+            if (!this.m_persistenceService.GetConfiguration().SingleThreadFetch)
                 return results.AsParallel().Select(o =>
                 {
                     var subContext = context;
@@ -211,7 +211,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 {
                     Type lastJoined = typeof(TDomain);
                     if (typeof(CompositeResult).IsAssignableFrom(typeof(TQueryReturn)))
-                        foreach (var p in typeof(TQueryReturn).GenericTypeArguments.Select(o => AdoPersistenceService.GetMapper().MapModelType(o)))
+                        foreach (var p in typeof(TQueryReturn).GenericTypeArguments.Select(o => this.m_persistenceService.GetMapper().MapModelType(o)))
                             if (p != typeof(TDomain))
                             {
                                 // Find the FK to join
@@ -224,7 +224,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 else
                 {
                     m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "Will use slow query construction due to complex mapped fields");
-                    domainQuery = AdoPersistenceService.GetQueryBuilder().CreateQuery(query, orderBy);
+                    domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, orderBy);
                 }
 
                 // Count = 0 means we're not actually fetching anything so just hit the db
@@ -238,7 +238,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         ColumnMapping pkColumn = null;
                         if (typeof(CompositeResult).IsAssignableFrom(typeof(TQueryReturn)))
                         {
-                            foreach (var p in typeof(TQueryReturn).GenericTypeArguments.Select(o => AdoPersistenceService.GetMapper().MapModelType(o)))
+                            foreach (var p in typeof(TQueryReturn).GenericTypeArguments.Select(o => this.m_persistenceService.GetMapper().MapModelType(o)))
                                 if (!typeof(DbSubTable).IsAssignableFrom(p) && !typeof(IDbVersionedData).IsAssignableFrom(p))
                                 {
                                     pkColumn = TableMapping.Get(p).Columns.SingleOrDefault(o => o.IsPrimaryKey);
@@ -248,7 +248,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         else
                             pkColumn = TableMapping.Get(typeof(TQueryReturn)).Columns.SingleOrDefault(o => o.IsPrimaryKey);
 
-                        var keyQuery = AdoPersistenceService.GetQueryBuilder().CreateQuery(query, orderBy, pkColumn).Build();
+                        var keyQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, orderBy, pkColumn).Build();
 
                         var resultKeys = context.Query<Guid>(keyQuery.Build());
 

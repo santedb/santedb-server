@@ -58,40 +58,44 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public string ServiceName => "ADO.NET Data Persistence Service";
 
-        private static ModelMapper s_mapper;
-        private static AdoPersistenceConfigurationSection s_configuration;
+        private ModelMapper m_mapper;
+        private AdoPersistenceConfigurationSection m_configuration;
         // Cache
-        private static Dictionary<Type, IAdoPersistenceService> s_persistenceCache = new Dictionary<Type, IAdoPersistenceService>();
+        private Dictionary<Type, IAdoPersistenceService> m_persistenceCache = new Dictionary<Type, IAdoPersistenceService>();
 
         // Query builder
-        private static QueryBuilder s_queryBuilder;
+        private QueryBuilder m_queryBuilder;
 
         /// <summary>
         /// Get configuration
         /// </summary>
-        public static AdoPersistenceConfigurationSection GetConfiguration() { return s_configuration; }
+        public AdoPersistenceConfigurationSection GetConfiguration() {
+            if(m_configuration == null)
+                m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>(); 
+            return m_configuration;
+        }
 
         /// <summary>
         /// Gets the mode mapper
         /// </summary>
         /// <returns></returns>
-        public static ModelMapper GetMapper() { return s_mapper; }
+        public ModelMapper GetMapper() { return this.m_mapper; }
 
         /// <summary>
         /// Get query builder
         /// </summary>
-        public static QueryBuilder GetQueryBuilder()
+        public QueryBuilder GetQueryBuilder()
         {
-            return s_queryBuilder;
+            return this.m_queryBuilder;
         }
 
         /// <summary>
         /// Get the specified persister type
         /// </summary>
-        public static IAdoPersistenceService GetPersister(Type tDomain)
+        public IAdoPersistenceService GetPersister(Type tDomain)
         {
             IAdoPersistenceService retVal = null;
-            if (!s_persistenceCache.TryGetValue(tDomain, out retVal))
+            if (!this.m_persistenceCache.TryGetValue(tDomain, out retVal))
             {
                 // Scan type heirarchy as well
                 var sDomain = tDomain;
@@ -105,36 +109,32 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
 
                 if (retVal != null)
-                    lock (s_persistenceCache)
-                        if (!s_persistenceCache.ContainsKey(tDomain))
-                            s_persistenceCache.Add(tDomain, retVal);
+                    lock (this.m_persistenceCache)
+                        if (!this.m_persistenceCache.ContainsKey(tDomain))
+                            this.m_persistenceCache.Add(tDomain, retVal);
             }
             return retVal;
         }
 
         /// <summary>
-        /// Static CTOR
+        /// Creates a new instance of the ADO cache
         /// </summary>
-        static AdoPersistenceService()
+        public AdoPersistenceService()
         {
-            // We are in the configuration
-            if (ApplicationServiceContext.Current?.HostType == SanteDBHostType.Other)
-                return;
-
             var tracer = new TraceSource(AdoDataConstants.TraceSourceName);
-            s_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
+
             try
             {
-                s_mapper = new ModelMapper(typeof(AdoPersistenceService).GetTypeInfo().Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName));
+                this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).GetTypeInfo().Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName));
 
-                List<IQueryBuilderHack> hax = new List<IQueryBuilderHack>() { new RelationshipQueryHack(), new CreationTimeQueryHack(s_mapper), new EntityAddressNameQueryHack() };
-                if (s_configuration.DataCorrectionKeys.Any(k => k == "ConceptQueryHack"))
-                    hax.Add(new ConceptQueryHack(s_mapper));
+                List<IQueryBuilderHack> hax = new List<IQueryBuilderHack>() { new RelationshipQueryHack(), new CreationTimeQueryHack(this.m_mapper), new EntityAddressNameQueryHack() };
+                if (this.GetConfiguration().DataCorrectionKeys.Any(k => k == "ConceptQueryHack"))
+                    hax.Add(new ConceptQueryHack(this.m_mapper));
 
-                s_queryBuilder = new QueryBuilder(s_mapper, s_configuration.Provider,
-                    hax.Where(o=>o != null).ToArray()    
+                this.m_queryBuilder = new QueryBuilder(this.m_mapper, this.GetConfiguration().Provider,
+                    hax.Where(o => o != null).ToArray()
                 );
-                
+
             }
             catch (ModelMapValidationException ex)
             {
@@ -147,7 +147,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 throw ex;
             }
         }
-
 
         /// <summary>
         /// Generic versioned persister service for any non-customized persister
@@ -348,7 +347,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Gets the invariant name
         /// </summary>
-        public string InvariantName => s_configuration.Provider.Invariant;
+        public string InvariantName => this.GetConfiguration().Provider.Invariant;
 
         /// <summary>
         /// Start the service and bind all of the sub-services
@@ -362,7 +361,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             try
             {
                 // Verify schema version
-                using (DataContext mdc = s_configuration.Provider.GetReadonlyConnection())
+                using (DataContext mdc = this.GetConfiguration().Provider.GetReadonlyConnection())
                 {
                     mdc.Open();
                     Version dbVer = new Version(mdc.FirstOrDefault<String>("get_sch_vrsn")),
@@ -370,7 +369,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     if (oizVer < dbVer)
                         throw new InvalidOperationException(String.Format("Invalid Schema Version. SanteDB version {0} is older than the database schema version {1}", oizVer, dbVer));
-                    this.m_tracer.TraceInformation("SanteDB Schema Version {0} on {1}", dbVer, s_configuration.Provider.Invariant);
+                    this.m_tracer.TraceInformation("SanteDB Schema Version {0} on {1}", dbVer, this.GetConfiguration().Provider.Invariant);
                 }
             }
             catch (Exception e)
@@ -388,8 +387,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     // If the persistence service is generic then we should check if we're allowed
                     if(!t.IsGenericType || 
-                        t.IsGenericType && (s_configuration.AllowedResources.Count == 0 ||
-                        s_configuration.AllowedResources.Contains(t.GetGenericArguments()[0].GetCustomAttribute<XmlTypeAttribute>()?.TypeName)))
+                        t.IsGenericType && (this.GetConfiguration().AllowedResources.Count == 0 ||
+                        this.GetConfiguration().AllowedResources.Contains(t.GetGenericArguments()[0].GetCustomAttribute<XmlTypeAttribute>()?.TypeName)))
 	                    (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(t);
 
 					// Add to cache since we're here anyways
@@ -416,8 +415,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         domainClassType = Type.GetType(itm.DomainClass);
 
                     // Make sure we're allowed to run this
-                    if (s_configuration.AllowedResources.Count > 0 &&
-                        !s_configuration.AllowedResources.Contains(modelClassType.GetCustomAttribute<XmlTypeAttribute>()?.TypeName))
+                    if (this.GetConfiguration().AllowedResources.Count > 0 &&
+                        !this.GetConfiguration().AllowedResources.Contains(modelClassType.GetCustomAttribute<XmlTypeAttribute>()?.TypeName))
                         continue;
 
                     idpType = idpType.MakeGenericType(modelClassType);
@@ -445,7 +444,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         pclass = pclass.MakeGenericType(modelClassType, domainClassType);
                         (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(pclass);
                         // Add to cache since we're here anyways
-                        s_persistenceCache.Add(modelClassType, Activator.CreateInstance(pclass) as IAdoPersistenceService);
+                        this.m_persistenceCache.Add(modelClassType, Activator.CreateInstance(pclass) as IAdoPersistenceService);
                     }
                     else if (modelClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IIdentifiedEntity)) &&
                         domainClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDbIdentified)))
@@ -461,7 +460,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                         pclass = pclass.MakeGenericType(modelClassType, domainClassType);
                         (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(pclass);
-                        s_persistenceCache.Add(modelClassType, Activator.CreateInstance(pclass) as IAdoPersistenceService);
+                        this.m_persistenceCache.Add(modelClassType, Activator.CreateInstance(pclass) as IAdoPersistenceService);
                     }
                     else
                         this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Classmap {0}>{1} cannot be created, ignoring", modelClassType, domainClassType);
@@ -484,6 +483,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
             {
                 e.Data.SecurityHash = Guid.NewGuid().ToString();
             };
+
+            // Unload configuration when app domain unloads
+            ApplicationServiceContext.Current.Stopped += (o, e) => this.m_configuration = null;
 
             // Attempt to cache concepts
             this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "Caching concept dictionary...");
@@ -510,7 +512,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public void Execute(string sql)
         {
-            using (var conn = s_configuration.Provider.GetWriteConnection())
+            using (var conn = this.GetConfiguration().Provider.GetWriteConnection())
             {
                 IDbTransaction tx = null;
                 try

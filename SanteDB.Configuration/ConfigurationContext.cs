@@ -2,7 +2,7 @@
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Data;
 using SanteDB.Core.Configuration.Features;
-using SanteDB.Core.Configuration.Tasks;
+using SanteDB.Core.Interfaces;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -13,16 +13,23 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SanteDB.Configurator
+namespace SanteDB.Configuration
 {
     /// <summary>
     /// Configuration Context
     /// </summary>
-    public class ConfigurationContext : INotifyPropertyChanged, IApplicationServiceContext, IConfigurationManager
+    public class ConfigurationContext : INotifyPropertyChanged, IApplicationServiceContext, IConfigurationManager, IServiceManager
     {
+
+
+        /// <summary>
+        /// Services
+        /// </summary>
+        private List<Object> m_services = new List<object>();
 
         // Configuration
         private SanteDBConfiguration m_configuration;
@@ -55,7 +62,8 @@ namespace SanteDB.Configurator
         /// <summary>
         /// Gets or sets the configuration handler
         /// </summary>
-        public SanteDBConfiguration Configuration {
+        public SanteDBConfiguration Configuration
+        {
             get => this.m_configuration;
             set
             {
@@ -80,12 +88,12 @@ namespace SanteDB.Configurator
                 }
                 return this.m_features;
             }
-        } 
+        }
 
         /// <summary>
         /// Get the configuration tasks
         /// </summary>
-        public List<IConfigurationTask> ConfigurationTasks
+        public ObservableCollection<IConfigurationTask> ConfigurationTasks
         {
             get;
             private set;
@@ -119,7 +127,7 @@ namespace SanteDB.Configurator
         private ConfigurationContext()
         {
             this.PluginAssemblies = new ObservableCollection<Assembly>();
-            this.ConfigurationTasks = new List<IConfigurationTask>();
+            this.ConfigurationTasks = new ObservableCollection<IConfigurationTask>();
         }
 
         /// <summary>
@@ -192,44 +200,52 @@ namespace SanteDB.Configurator
         }
 
         /// <summary>
-        /// Apply the tasks specified in the current task queue
+        /// Restart the service context
         /// </summary>
-        public void Apply()
+        public void RestartContext()
         {
+            this.Stop();
+            this.Start();
+        }
 
-            if (this.ConfigurationTasks.Count == 0)
-                return;
+        /// <summary>
+        /// Stop the service
+        /// </summary>
+        public void Stop()
+        {
+            this.Stopping?.Invoke(this, EventArgs.Empty);
 
-            var progress = new frmProgress();
-            progress.Show();
-
-            try
+            foreach (var itm in this.m_services.OfType<IDisposable>())
             {
-
-                // Do work here
-                int i = 0, t = this.ConfigurationTasks.Count;
-                foreach(var ct in this.ConfigurationTasks)
-                {
-                    ct.ProgressChanged += (o, e) =>
-                    {
-                        progress.ActionStatusText = e.State?.ToString() ?? "...";
-                        progress.ActionStatus = (int)(e.Progress * 100);
-                        Application.DoEvents();
-                    };
-
-                    progress.OverallStatusText = $"Applying {ct.Feature.Name}";
-                    ct.Execute(this.Configuration);
-                    progress.OverallStatus = (int)(((float)++i / t) * 100.0);
-                }
-
-                using (var fs = File.OpenWrite(this.ConfigurationFile))
-                    this.Configuration.Save(fs);
+                itm.Dispose();
+                Application.DoEvents();
             }
-            catch(Exception e)
+            this.m_services.Clear();
+
+            this.Stopped?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Start this service
+        /// </summary>
+        public void Start()
+        {
+            this.Starting?.Invoke(this, EventArgs.Empty);
+
+            foreach (var itm in this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders)
             {
-                MessageBox.Show($"Error applying configuration: {e.Message}");
+                this.GetService(itm.Type);
+                Application.DoEvents();
             }
-            progress.Close();
+
+            foreach (var itm in this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.Where(s => typeof(IDaemonService).IsAssignableFrom(s.Type)))
+            {
+                var svc = this.GetService(itm.Type) as IDaemonService;
+                Application.DoEvents();
+                svc.Start();
+            }
+
+            this.Started?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -240,7 +256,18 @@ namespace SanteDB.Configurator
             if (serviceType == typeof(IConfigurationManager))
                 return this;
             else
-                return null;
+            {
+                var candidate = this.m_services.FirstOrDefault(o => serviceType.IsAssignableFrom(o.GetType()));
+                if (candidate == null)
+                {
+                    var dt = this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.FirstOrDefault(o => serviceType.IsAssignableFrom(o.Type))?.Type;
+                    if (dt != null)
+                        candidate = Activator.CreateInstance(dt);
+                    if (candidate != null)
+                        this.m_services.Add(candidate);
+                }
+                return candidate;
+            }
         }
 
         /// <summary>
@@ -287,6 +314,30 @@ namespace SanteDB.Configurator
         public void Reload()
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Add a service provider to this context
+        /// </summary>
+        public void AddServiceProvider(Type serviceType)
+        {
+            this.m_services.Add(Activator.CreateInstance(serviceType));
+        }
+
+        /// <summary>
+        /// Get all services
+        /// </summary>
+        public IEnumerable<object> GetServices()
+        {
+            return this.m_services;
+        }
+
+        /// <summary>
+        /// Remove a service provider
+        /// </summary>
+        public void RemoveServiceProvider(Type serviceType)
+        {
+            this.m_services.RemoveAll(o => o.GetType() == serviceType);
         }
     }
 }

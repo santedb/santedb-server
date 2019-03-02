@@ -114,7 +114,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
 
                     // Old versions of the mobile had an issue with missing record targets
-                    if (AdoPersistenceService.GetConfiguration().DataCorrectionKeys.Contains("correct-missing-rct"))
+                    if (this.m_persistenceService.GetConfiguration().DataCorrectionKeys.Contains("correct-missing-rct"))
                     {
                         var patientEncounter = bundle.Item.OfType<PatientEncounter>().FirstOrDefault();
 
@@ -150,7 +150,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             data = this.ReorganizeForInsert(data);
             this.m_tracer.TraceInformation("After reorganization has {0} objects...", data.Item.Count);
 
-            if (AdoPersistenceService.GetConfiguration().PrepareStatements)
+            if (this.m_persistenceService.GetConfiguration().PrepareStatements)
                 context.PrepareStatements = true;
 
             // Ensure that provenance objects match
@@ -162,7 +162,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             for (int i = 0; i < data.Item.Count; i++)
             {
                 var itm = data.Item[i];
-                var svc = AdoPersistenceService.GetPersister(itm.GetType());
+                var svc = this.m_persistenceService.GetPersister(itm.GetType());
 
                 if (data.ExpansionKeys.Any(k => itm.Key == k)) continue; // skip refs
 

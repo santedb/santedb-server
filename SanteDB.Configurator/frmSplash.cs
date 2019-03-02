@@ -20,9 +20,23 @@ namespace SanteDB.Configurator
             lblVersion.Text = $"v.{Assembly.GetEntryAssembly().GetName().Version} ({Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion})";
         }
 
+        /// <summary>
+        /// Notify status
+        /// </summary>
+        /// <param name="statusText"></param>
+        /// <param name="status"></param>
         public void NotifyStatus(String statusText, float status)
         {
-            this.pbStatus.Value = (int)(status * this.pbStatus.Maximum);
+            if (status < 0)
+            {
+                this.pbStatus.Style = ProgressBarStyle.Marquee;
+                this.pbStatus.Value = 100;
+            }
+            else
+            {
+                this.pbStatus.Style = ProgressBarStyle.Blocks;
+                this.pbStatus.Value = (int)(status * this.pbStatus.Maximum);
+            }
             this.lblStatus.Text = statusText;
             Application.DoEvents();
         }

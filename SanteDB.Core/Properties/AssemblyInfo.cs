@@ -17,6 +17,7 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Attributes;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -54,3 +55,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyInformationalVersion("Gananoque")]
 [assembly: AssemblyFileVersion("1.10.0.0")]
 
+[assembly: Plugin(EnableByDefault = true, Environment = PluginEnvironment.Server, Group = "System")]
