@@ -121,6 +121,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configuration", "Configurat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Configuration", "SanteDB.Configuration\SanteDB.Configuration.csproj", "{032ABF00-6C76-47C7-9ECA-A840915A17EA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Persistence.Diagnostics.OpenProject", "SanteDB.Persistence.Diagnostics.OpenProject\SanteDB.Persistence.Diagnostics.OpenProject.csproj", "{A789EAD3-97F2-4277-8C69-9DF013F56500}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -315,6 +317,10 @@ Global
 		{032ABF00-6C76-47C7-9ECA-A840915A17EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{032ABF00-6C76-47C7-9ECA-A840915A17EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{032ABF00-6C76-47C7-9ECA-A840915A17EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A789EAD3-97F2-4277-8C69-9DF013F56500}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A789EAD3-97F2-4277-8C69-9DF013F56500}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A789EAD3-97F2-4277-8C69-9DF013F56500}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A789EAD3-97F2-4277-8C69-9DF013F56500}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -369,6 +375,7 @@ Global
 		{A37BB496-739D-440E-AB64-E2939A759898} = {66328BE7-81CC-4820-99E9-8C5C534B4A2B}
 		{1B0374EA-A3A3-46A5-97DA-9E04AE517694} = {F833B4D4-332A-403F-9754-EC00EB6B5CB7}
 		{032ABF00-6C76-47C7-9ECA-A840915A17EA} = {F833B4D4-332A-403F-9754-EC00EB6B5CB7}
+		{A789EAD3-97F2-4277-8C69-9DF013F56500} = {66328BE7-81CC-4820-99E9-8C5C534B4A2B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E73A1AED-8AB7-492C-A4F0-C71FCC5C393C}
