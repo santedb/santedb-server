@@ -116,7 +116,7 @@ namespace SanteDB.Core.Services.Impl
                     return new ConnectionString(cs.ProviderName, cs.ConnectionString);
                 }
             }
-            return null;
+            return retVal;
         }
 
         /// <summary>
