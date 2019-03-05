@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2015-2018 Mohawk College of Applied Arts and Technology
+ * Copyright 2015-2019 Mohawk College of Applied Arts and Technology
  *
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you 
@@ -14,8 +14,8 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: justin
- * Date: 2018-11-23
+ * User: JustinFyfe
+ * Date: 2019-1-22
  */
 using SanteDB.Messaging.FHIR.DataTypes;
 using SanteDB.Messaging.FHIR.Resources;
