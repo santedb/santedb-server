@@ -177,7 +177,13 @@ namespace SanteDB.Core
                     // If there is no configuration manager then add the local
                     Trace.TraceInformation("STAGE0 START: Load Configuration");
 
+                    if (this.GetService<IConfigurationManager>() == null)
+                        throw new InvalidOperationException("Cannot find configuration manager!");
+
                     this.m_configuration = this.GetService<IConfigurationManager>().GetSection<ApplicationServiceContextConfigurationSection>();
+
+                    if (this.m_configuration == null)
+                        throw new InvalidOperationException("Cannot load configuration, perhaps the services aren't installed?");
 
                     Trace.TraceInformation("STAGE1 START: Loading services");
                     foreach (var svc in this.m_configuration.ServiceProviders)

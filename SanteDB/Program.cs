@@ -145,6 +145,14 @@ namespace SanteDB
                     ServiceUtil.Start(typeof(Program).GUID);
                     if (!parameters.StartupTest)
                     {
+
+                        // Did the service start properly?
+                        if(!ApplicationContext.Current.IsRunning)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Application context did not start properly and is in maintenance mode...");
+                            Console.ResetColor();
+                        }
                         Console.WriteLine("Type [stop] to stop service...");
                         String input = null;
                         while (input != "stop")

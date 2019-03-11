@@ -41,7 +41,7 @@ namespace SanteDB.Core.Services.Impl
         public string ServiceName => "SanteDB Thread Pool Provider";
 
         // Constructs a thread pool
-        private WaitThreadPool m_threadPool = new WaitThreadPool();
+        private WaitThreadPool m_threadPool = null;
 
         private TraceSource m_traceSource = new TraceSource(SanteDBConstants.ServiceTraceSourceName);
 
