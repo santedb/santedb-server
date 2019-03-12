@@ -41,8 +41,33 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Model\SwaggerSchemaDefinition.cs" />
+    <Compile Include="Model\SwaggerDocument.cs" />
+    <Compile Include="Model\SwaggerParameter.cs" />
+    <Compile Include="Model\SwaggerPath.cs" />
+    <Compile Include="Model\SwaggerPathDefinition.cs" />
+    <Compile Include="Model\SwaggerPathSecurity.cs" />
+    <Compile Include="Model\SwaggerSchemaElement.cs" />
+    <Compile Include="Model\SwaggerSecurityDefinition.cs" />
+    <Compile Include="Model\SwaggerServiceInfo.cs" />
+    <Compile Include="Model\SwaggerTag.cs" />
+    <Compile Include="OpenApiMessageHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
+      <Project>{16ef1840-0361-439d-806c-92d0411122eb}</Project>
+      <Name>RestSrvr</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
+      <Project>{3A45F695-47A2-464C-ACE6-BDABBFA39FBC}</Project>
+      <Name>SanteDB.Core.Api</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>11.0.2</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
