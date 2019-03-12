@@ -107,6 +107,9 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="License.rtf" />
+    <None Include="..\SanteDB.licenseheader">
+      <Link>SanteDB.licenseheader</Link>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

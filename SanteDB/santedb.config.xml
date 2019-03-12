@@ -51,12 +51,12 @@
     <add type="SanteDB.Messaging.Atna.Configuration.AtnaConfigurationSection, SanteDB.Messaging.Atna, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.FileSystemQueueConfigurationSection, SanteDB.Core, Version=1.10.0.29461, Culture=neutral, PublicKeyToken=null" />
   </sections>
-  <section xsi:type="FileSystemQueueConfigurationSection" queueRoot="C:\Users\justi\source\repos\santedb\santedb-server\bin\Debug\queue" />
+  <section xsi:type="FileSystemQueueConfigurationSection" queueRoot=".\queue" />
   <section xsi:type="DataConfigurationSection">
     <connectionString name="FBSQL" value="initial catalog=|DataDirectory|\sdb_base.fdb;server type=Embedded;user id=sysdba" provider="Fbsql" />
     <connectionString name="AUDIT" value="server=localhost;port=5433; database=santedb; user id=postgres; password=postgres; pooling=true; MinPoolSize=10; MaxPoolSize=30; Timeout=10; " provider="Npgsql"/>
   </section>
-  <section xsi:type="AppletConfigurationSection" appletDirectory="C:\Users\justi\source\repos\santedb\santedb-server\bin\Debug\applets" allowUnsignedApplets="true">
+  <section xsi:type="AppletConfigurationSection" appletDirectory=".\applets" allowUnsignedApplets="true">
     <trustedPublishers>
       <add>82C63E1E9B87578D0727E871D7613F2F0FAF683B</add>
       <add>4326A4421216AC254DA93DC61B93160B08925BB1</add>
