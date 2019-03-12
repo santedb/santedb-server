@@ -36,7 +36,15 @@ if exist %nuget% (
 	FOR /R %cwd% %%G IN (*.nuspec) DO (
 		echo Packing %%~pG
 		pushd %%~pG
-		rem %nuget% pack -OutputDirectory %localappdata%\NugetStaging -prop Configuration=Release
+		if [%1] == [] (
+			%nuget% pack -OutputDirectory %localappdata%\NugetStaging -prop Configuration=Release 
+		) else (
+			echo Publishing NUPKG
+			%nuget% pack -prop Configuration=Release 
+			FOR /R %%F IN (*.nupkg) do (
+				%nuget% push %%F -Source https://api.nuget.org/v3/index.json -ApiKey %1
+			)
+		) 
 		popd
 	)
 
