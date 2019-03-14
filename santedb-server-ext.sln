@@ -123,7 +123,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Configuration", "Sa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Persistence.Diagnostics.OpenProject", "SanteDB.Persistence.Diagnostics.OpenProject\SanteDB.Persistence.Diagnostics.OpenProject.csproj", "{A789EAD3-97F2-4277-8C69-9DF013F56500}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Messaging.OpenAPI", "SanteDB.Messaging.OpenAPI\SanteDB.Messaging.OpenAPI.csproj", "{1B690052-ED2E-4389-838D-9B9FB188F541}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Messaging.Metadata", "SanteDB.Messaging.OpenAPI\SanteDB.Messaging.Metadata.csproj", "{1B690052-ED2E-4389-838D-9B9FB188F541}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

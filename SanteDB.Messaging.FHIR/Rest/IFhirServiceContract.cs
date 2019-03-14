@@ -26,14 +26,15 @@ using System.Xml.Schema;
 namespace SanteDB.Messaging.FHIR.Rest
 {
     /// <summary>
-    /// FHIR Service Contract
+    /// HL7 FHIR API Contract
     /// </summary>
+    /// <remarks>
+    /// This contract provides a wrapper for HL7 Fast Health Interoperability Resources (FHIR) STU3 resources.
+    /// </remarks>
     [ServiceContract(Name = "FHIR")]
     [ServiceKnownResource(typeof(Patient))]
     [ServiceKnownResource(typeof(Organization))]
-    [ServiceKnownResource(typeof(Picture))]
     [ServiceKnownResource(typeof(Practitioner))]
-    [ServiceKnownResource(typeof(OperationOutcome))]
     [ServiceKnownResource(typeof(ValueSet))]
     [ServiceKnownResource(typeof(StructureDefinition))]
     [ServiceKnownResource(typeof(Bundle))]
@@ -47,6 +48,10 @@ namespace SanteDB.Messaging.FHIR.Rest
     [ServiceKnownResource(typeof(MedicationAdministration))]
     [ServiceKnownResource(typeof(Location))]
     [ServiceKnownResource(typeof(AllergyIntolerance))]
+    [ServiceProduces("application/fhir+json")]
+    [ServiceProduces("application/fhir+xml")]
+    [ServiceConsumes("application/fhir+json")]
+    [ServiceConsumes("application/fhir+xml")]
     public interface IFhirServiceContract
     {
 

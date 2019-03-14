@@ -149,7 +149,8 @@ namespace SanteDB.Messaging.AMI.Wcf
                     {
                         BaseUrl = o.Url,
                         ServiceType = o.ApiType,
-                        Capabilities = o.Capabilities
+                        Capabilities = o.Capabilities,
+                        Contract = new Core.Configuration.TypeReferenceConfiguration(o.ContractType)
                     }
                 ).ToList()
             };

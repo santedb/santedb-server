@@ -75,6 +75,10 @@ namespace SanteDB.Messaging.GS1
 		/// </summary>
 		public bool IsRunning => this.webHost?.IsRunning == true;
 
+        /// <summary>
+        /// Gets the contract type
+        /// </summary>
+        public Type ContractType => typeof(IStockService);
 
         /// <summary>
         /// Gets the API type

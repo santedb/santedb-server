@@ -44,6 +44,10 @@ namespace SanteDB.Messaging.HL7
         /// </summary>
         public string ServiceName => "HL7v2 API Endpoint Provider";
 
+        /// <summary>
+        /// Gets the contract type
+        /// </summary>
+        public Type ContractType => null;
 
         // The local facility
         private Place m_localFacility;

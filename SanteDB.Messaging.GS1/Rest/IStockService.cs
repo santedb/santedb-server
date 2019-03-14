@@ -23,20 +23,32 @@ using SanteDB.Messaging.GS1.Model;
 namespace SanteDB.Messaging.GS1.Rest
 {
     /// <summary>
-    /// Stock service request
+    /// GS1 BMS Contract
     /// </summary>
+    /// <remarks>
+    /// This contract represents an implementation of the GS1 Business Messaging Standard (BMS) 3.3 over REST.
+    /// </remarks>
     [ServiceContract(Name = "GS1BMS")]
+    [ServiceProduces("application/xml")]
+    [ServiceConsumes("application/xml")]
 	public interface IStockService
 	{
 		/// <summary>
-		/// Represents a request for issuance of an inventory report
+		/// Request for issuance of an inventory report
 		/// </summary>
+        /// <remarks>
+        /// This method requests the SanteDB server to compose an inventory report according to the parameters supplied.
+        /// </remarks>
+        /// <param name="parameters">The logistics inventory filters to use</param>
 		[RestInvoke(Method = "POST", UriTemplate = "/inventoryReport")]
 		LogisticsInventoryReportMessageType IssueInventoryReportRequest(LogisticsInventoryReportRequestMessageType parameters);
 
         /// <summary>
         /// Represents a request to issue despatch advice
         /// </summary>
+        /// <remarks>
+        /// This method is used to indicate that a previously issued order has been despatched from the sender (i.e. is on the way).
+        /// </remarks>
         [RestInvoke(Method = "POST", UriTemplate = "/despatchAdvice")]
         void IssueDespatchAdvice(DespatchAdviceMessageType advice);
 
@@ -57,6 +69,9 @@ namespace SanteDB.Messaging.GS1.Rest
         /// <summary>
         /// Issues order response
         /// </summary>
+        /// <remarks>
+        /// This message is sent whenever the order receiver wishes to issue a response (confirmation, acceptance, etc.) of a previously sent order.
+        /// </remarks>
         [RestInvoke(Method = "POST", UriTemplate = "/orderResponse")]
         void IssueOrderResponse(OrderResponseMessageType orderResponse);
     }

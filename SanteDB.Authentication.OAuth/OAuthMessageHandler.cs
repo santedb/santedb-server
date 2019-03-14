@@ -49,6 +49,11 @@ namespace SanteDB.Authentication.OAuth2
         private RestService m_serviceHost;
 
         /// <summary>
+        /// Gets the contract type
+        /// </summary>
+        public Type ContractType => typeof(IOAuthTokenContract);
+
+        /// <summary>
         /// True if is running
         /// </summary>
         public bool IsRunning

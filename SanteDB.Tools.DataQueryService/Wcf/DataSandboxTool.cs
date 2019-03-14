@@ -20,6 +20,7 @@
 using RestSrvr;
 using RestSrvr.Attributes;
 using SanteDB.Core.Applets.ViewModel.Json;
+using SanteDB.Core.Http;
 using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.Export;
 using System;
@@ -80,7 +81,7 @@ namespace SanteDB.Tools.DataSandbox.Wcf
                 if (filename == "config.json")
                 {
                     var cpath = Path.Combine(Path.GetDirectoryName(typeof(DataSandboxTool).Assembly.Location), "sandbox.config.json");
-                    RestOperationContext.Current.OutgoingResponse.ContentType = this.GetContentType(cpath);
+                    RestOperationContext.Current.OutgoingResponse.ContentType = DefaultContentTypeMapper.GetContentType(cpath);
                     return File.OpenRead(cpath);
                 }
                 else
@@ -99,7 +100,7 @@ namespace SanteDB.Tools.DataSandbox.Wcf
 
                         RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.OK;
                         RestOperationContext.Current.OutgoingResponse.ContentLength64 = new FileInfo(contentPath).Length;
-                        RestOperationContext.Current.OutgoingResponse.ContentType = this.GetContentType(contentPath);
+                        RestOperationContext.Current.OutgoingResponse.ContentType = DefaultContentTypeMapper.GetContentType(contentPath);
 
                         return File.OpenRead(contentPath);
                     }
@@ -133,41 +134,6 @@ namespace SanteDB.Tools.DataSandbox.Wcf
 
         }
 
-        /// <summary>
-        /// Get the content type of the file
-        /// </summary>
-        private string GetContentType(string filename)
-        {
-            string extension = Path.GetExtension(filename);
-            switch (extension.Substring(1).ToLower())
-            {
-                case "htm":
-                case "html":
-                    return "text/html";
-                case "js":
-                    return "application/javascript";
-                case "css":
-                    return "text/css";
-                case "svg":
-                    return "image/svg+xml";
-                case "ttf":
-                    return "application/x-font-ttf";
-                case "eot":
-                    return "application/vnd.ms-fontobject";
-                case "woff":
-                    return "application/font-woff";
-                case "woff2":
-                    return "application/font-woff2";
-                case "gif":
-                    return "image/gif";
-                case "ico":
-                    return "image/x-icon";
-                case "png":
-                    return "image/png";
-                default:
-                    return "application/x-octet-stream";
-            }
-
-        }
+        
     }
 }

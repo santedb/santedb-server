@@ -7,8 +7,8 @@
     <ProjectGuid>{1B690052-ED2E-4389-838D-9B9FB188F541}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SanteDB.Messaging.OpenAPI</RootNamespace>
-    <AssemblyName>SanteDB.Messaging.OpenAPI</AssemblyName>
+    <RootNamespace>SanteDB.Messaging.Metadata</RootNamespace>
+    <AssemblyName>SanteDB.Messaging.Metadata</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -41,18 +41,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model\SwaggerSchemaDefinition.cs" />
-    <Compile Include="Model\SwaggerDocument.cs" />
-    <Compile Include="Model\SwaggerParameter.cs" />
-    <Compile Include="Model\SwaggerPath.cs" />
-    <Compile Include="Model\SwaggerPathDefinition.cs" />
-    <Compile Include="Model\SwaggerPathSecurity.cs" />
-    <Compile Include="Model\SwaggerSchemaElement.cs" />
-    <Compile Include="Model\SwaggerSecurityDefinition.cs" />
-    <Compile Include="Model\SwaggerServiceInfo.cs" />
-    <Compile Include="Model\SwaggerTag.cs" />
-    <Compile Include="OpenApiMessageHandler.cs" />
+    <Compile Include="Composer\MetadataComposerUtil.cs" />
+    <Compile Include="Composer\IMetadataComposer.cs" />
+    <Compile Include="Composer\SwaggerMetadataComposer.cs" />
+    <Compile Include="Configuration\MetadataConfigurationSection.cs" />
+    <Compile Include="Model\Swagger\SwaggerPath.cs" />
+    <Compile Include="Model\Swagger\SwaggerSchemaDefinition.cs" />
+    <Compile Include="Model\Swagger\SwaggerDocument.cs" />
+    <Compile Include="Model\Swagger\SwaggerParameter.cs" />
+    <Compile Include="Model\Swagger\SwaggerPathDefinition.cs" />
+    <Compile Include="Model\Swagger\SwaggerPathSecurity.cs" />
+    <Compile Include="Model\Swagger\SwaggerSchemaElement.cs" />
+    <Compile Include="Model\Swagger\SwaggerSecurityDefinition.cs" />
+    <Compile Include="Model\Swagger\SwaggerServiceInfo.cs" />
+    <Compile Include="Model\Swagger\SwaggerTag.cs" />
+    <Compile Include="MetadataConstants.cs" />
+    <Compile Include="MetadataMessageHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rest\IMetadataServiceContract.cs" />
+    <Compile Include="Rest\MetadataServiceBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
@@ -63,11 +70,35 @@
       <Project>{3A45F695-47A2-464C-ACE6-BDABBFA39FBC}</Project>
       <Name>SanteDB.Core.Api</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
+      <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
+      <Name>SanteDB.Core.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
+      <Project>{786BD0EE-1806-4158-BA45-80249AC6DFE7}</Project>
+      <Name>SanteDB.Rest.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json">
       <Version>11.0.2</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Docs\favicon-16x16.png" />
+    <EmbeddedResource Include="Docs\favicon-32x32.png" />
+    <EmbeddedResource Include="Docs\index.html" />
+    <EmbeddedResource Include="Docs\oauth2-redirect.html" />
+    <EmbeddedResource Include="Docs\swagger-ui-bundle.js" />
+    <EmbeddedResource Include="Docs\swagger-ui-standalone-preset.js" />
+    <EmbeddedResource Include="Docs\swagger-ui.css" />
+    <EmbeddedResource Include="Docs\swagger-ui.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Docs\swagger-ui-bundle.js.map" />
+    <EmbeddedResource Include="Docs\swagger-ui-standalone-preset.js.map" />
+    <EmbeddedResource Include="Docs\swagger-ui.css.map" />
+    <EmbeddedResource Include="Docs\swagger-ui.js.map" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

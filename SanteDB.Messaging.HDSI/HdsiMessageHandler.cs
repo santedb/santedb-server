@@ -27,6 +27,7 @@ using SanteDB.Core.Services;
 using SanteDB.Messaging.HDSI.Configuration;
 using SanteDB.Messaging.HDSI.Wcf;
 using SanteDB.Rest.Common;
+using SanteDB.Rest.HDSI;
 using SanteDB.Rest.HDSI.Resources;
 using System;
 using System.ComponentModel;
@@ -47,6 +48,11 @@ namespace SanteDB.Messaging.HDSI
         /// Gets the service name
         /// </summary>
         public string ServiceName => "iCDR Primary Clinical Messaging Interface";
+
+        /// <summary>
+        /// Gets the contract type
+        /// </summary>
+        public Type ContractType => typeof(IHdsiServiceContract);
 
         /// <summary>
         /// Resource handler tool

@@ -1,0 +1,283 @@
+﻿using Newtonsoft.Json;
+using RestSrvr;
+using RestSrvr.Attributes;
+using SanteDB.Core.Interop;
+using SanteDB.Core.Model.Attributes;
+using SanteDB.Messaging.Metadata.Composer;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml.Serialization;
+
+namespace SanteDB.Messaging.Metadata.Model.Swagger
+{
+    /// <summary>
+    /// Represents the root swagger document
+    /// </summary>
+    [JsonObject(nameof(SwaggerDocument))]
+    public class SwaggerDocument
+    {
+        /// <summary>
+        /// Gets the version of the swagger document
+        /// </summary>
+        public SwaggerDocument()
+        {
+            this.Version = "2.0";
+            this.Tags = new List<SwaggerTag>();
+            this.Definitions = new Dictionary<String, SwaggerSchemaDefinition>();
+            this.SecurityDefinitions = new Dictionary<String, SwaggerSecurityDefinition>();
+            this.Paths = new Dictionary<string, SwaggerPath>();
+            this.Schemes = new List<string>();
+            this.Produces = new List<string>();
+            this.Consumes = new List<string>();
+        }
+
+        /// <summary>
+        /// Create new swagger document
+        /// </summary>
+        public SwaggerDocument(ServiceEndpointOptions service) : this()
+        {
+            this.BasePath = new Uri(service.BaseUrl.First()).AbsolutePath;
+            this.Info = new SwaggerServiceInfo()
+            {
+                Title = MetadataComposerUtil.GetElementDocumentation(service.Contract.Type, MetaDataElementType.Summary) ?? service.Contract.Type.GetCustomAttribute<ServiceContractAttribute>()?.Name,
+                Description = MetadataComposerUtil.GetElementDocumentation(service.Contract.Type, MetaDataElementType.Remarks),
+                Version = service.Contract.Type.Assembly.GetName().Version.ToString()
+            };
+            this.Host = $"{RestOperationContext.Current?.IncomingRequest.Url.Host}:{RestOperationContext.Current?.IncomingRequest.Url.Port}";
+
+            this.Schemes = service.BaseUrl.Select(o => new Uri(o).Scheme).ToList();
+
+            // Construct the paths
+            var operations = service.Contract.Type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .Select(o => new { Rest = o.GetCustomAttribute<RestInvokeAttribute>(), Property = o })
+                .Where(o => o.Rest != null);
+
+            this.Produces.AddRange(service.Contract.Type.GetCustomAttributes<ServiceProducesAttribute>().Select(o => o.MimeType));
+            this.Consumes.AddRange(service.Contract.Type.GetCustomAttributes<ServiceConsumesAttribute>().Select(o => o.MimeType));
+
+            // Resource types
+            var resourceTypes = service.Contract.Type.GetCustomAttributes<ServiceKnownResourceAttribute>().Select(o => new { Type = o.Type, Name = o.Type.GetCustomAttribute<XmlRootAttribute>()?.ElementName }).Where(o => !String.IsNullOrEmpty(o.Name)).ToList();
+
+            if (operations.Any(o => o.Rest.UriTemplate.Contains("{resourceType}")))
+                this.Tags = resourceTypes.Select(o => new SwaggerTag(o.Name, MetadataComposerUtil.GetElementDocumentation(o.Type, MetaDataElementType.Summary))).ToList();
+
+            // Process operations
+            foreach (var operation in operations.GroupBy(o => o.Rest.UriTemplate.StartsWith("/") ? o.Rest.UriTemplate : "/" + o.Rest.UriTemplate))
+            {
+                // If the path does not contain {resourceType} and there are no ServiceKnownTypes then proceed
+                var path = new SwaggerPath();
+                foreach (var val in operation)
+                {
+                    var pathDefinition = new SwaggerPathDefinition(val.Property);
+                    path.Add(val.Rest.Method.ToLower(), pathDefinition);
+                    if (pathDefinition.Consumes.Count == 0)
+                        pathDefinition.Consumes.AddRange(this.Consumes);
+                    if (pathDefinition.Produces.Count == 0)
+                        pathDefinition.Produces.AddRange(this.Produces);
+
+                    // Any faults?
+                    foreach (var flt in service.Contract.Type.GetCustomAttributes<ServiceFaultAttribute>())
+                        pathDefinition.Responses.Add(flt.StatusCode, new SwaggerSchemaElement()
+                        {
+                            Description = flt.Condition,
+                            Schema = new SwaggerSchemaDefinition()
+                            {
+                                Reference = $"#/definitions/{MetadataComposerUtil.CreateSchemaReference(flt.FaultType)}",
+                                NetType = flt.FaultType
+                            }
+                        });
+
+
+                }
+
+                if (operation.Key.Contains("{resourceType}"))
+                    foreach (var resource in resourceTypes)
+                    {
+                        var resourcePath = operation.Key.Replace("{resourceType}", resource.Name);
+                        if (this.Paths.ContainsKey(resourcePath)) continue;
+
+                        var subPath = new SwaggerPath(path);
+                        foreach (var v in subPath)
+                        {
+                            v.Value.Tags.Add(resource.Name);
+                            v.Value.Parameters.RemoveAll(o => o.Name == "resourceType");
+                            // Query parameters?
+                            if ((v.Key == "get" || v.Key == "head") && v.Value.Parameters.Count == 0)
+                            {
+                                // Build query parameters
+                                v.Value.Parameters = resource.Type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                                    .Where(o => o.GetCustomAttributes<XmlElementAttribute>().Any() || o.GetCustomAttribute<QueryParameterAttribute>() != null)
+                                    .Select(o => new SwaggerParameter(o))
+                                    .ToList();
+                                v.Value.Parameters.AddRange(new SwaggerParameter[]
+                                {
+                                    new SwaggerParameter()
+                                    {
+                                        Name = "_offset",
+                                        Type = SwaggerSchemaElementType.number,
+                                        Description = "Offset of query results",
+                                        Location = SwaggerParameterLocation.query
+                                    },
+                                    new SwaggerParameter()
+                                    {
+                                        Name = "_count",
+                                        Type = SwaggerSchemaElementType.number,
+                                        Description = "Count of query results to include in result set",
+                                        Location = SwaggerParameterLocation.query
+                                    },
+                                    new SwaggerParameter()
+                                    {
+                                        Name = "_lean",
+                                        Type = SwaggerSchemaElementType.boolean,
+                                        Description = "When true, only return minimal data",
+                                        Location = SwaggerParameterLocation.query
+                                    },
+                                    new SwaggerParameter()
+                                    {
+                                        Name = "_orderBy",
+                                        Type = SwaggerSchemaElementType.@string,
+                                        Description = "Indicates a series of parameters to order the result set by",
+                                        Location = SwaggerParameterLocation.query
+                                    },
+                                    new SwaggerParameter()
+                                    {
+                                        Name = "_queryId",
+                                        Type = SwaggerSchemaElementType.@string,
+                                        Description = "The unique identifier for the query (for continuation)",
+                                        Location = SwaggerParameterLocation.query
+                                    },
+                                    new SwaggerParameter()
+                                    {
+                                        Name = "_viewModel",
+                                        Type = SwaggerSchemaElementType.@string,
+                                        Description = "When using the view-model content-type, the view model to use",
+                                        Location = SwaggerParameterLocation.query,
+                                        Enum = new List<string>()
+                                        {
+                                            "min",
+                                            "max"
+                                        }
+                                    }
+                                });
+
+
+                            }
+
+                            // Replace the response if necessary
+                            var resourceSchemaRef = new SwaggerSchemaDefinition()
+                            {
+                                NetType = resource.Type,
+                                Reference = $"#/definitions/{MetadataComposerUtil.CreateSchemaReference(resource.Type)}"
+                            };
+                            SwaggerSchemaElement schema = null;
+                            if (v.Value.Responses.TryGetValue(200, out schema))
+                                schema.Schema = resourceSchemaRef;
+                            if (v.Value.Responses.TryGetValue(201, out schema))
+                                schema.Schema = resourceSchemaRef;
+
+                            // Replace the body if necessary
+                            var bodyParm = v.Value.Parameters.FirstOrDefault(o => o.Location == SwaggerParameterLocation.body && o.Schema?.NetType?.IsAssignableFrom(resource.Type) == true);
+                            if (bodyParm != null)
+                                bodyParm.Schema = resourceSchemaRef;
+                        }
+                        this.Paths.Add(resourcePath, subPath);
+                    }
+                else
+                {
+                   this.Paths.Add(operation.Key, path);
+                }
+            }
+
+            // Now we want to add a definition for all references
+            // This LINQ expression allows for scanning of any properties where there is currently no definition for a particular type
+            var missingDefns = this.Paths.SelectMany(
+                    o => o.Value.SelectMany(p => p.Value?.Parameters.Select(r => r.Schema))
+                        .Union(o.Value.SelectMany(p => p.Value?.Responses?.Values?.Select(r => r.Schema))))
+                .Union(this.Definitions.Where(o=>o.Value.Properties != null).SelectMany(o => o.Value.Properties.Select(p => p.Value.Items ?? p.Value.Schema)))
+                .Union(this.Definitions.Where(o=>o.Value.AllOf != null).SelectMany(o => o.Value.AllOf))
+                .Select(s => s?.NetType)
+                .Where(o => o != null && !this.Definitions.ContainsKey(MetadataComposerUtil.CreateSchemaReference(o)))
+                .Distinct();
+            while (missingDefns.Count() > 0)
+                foreach (var def in missingDefns.ToList())
+                {
+                    var name = MetadataComposerUtil.CreateSchemaReference(def);
+                    if(!this.Definitions.ContainsKey(name))
+                        this.Definitions.Add(name, new SwaggerSchemaDefinition(def));
+                }
+            // Create the definitions
+            
+        }
+
+        /// <summary>
+        /// Gets or sets the service info
+        /// </summary>
+        [JsonProperty("info")]
+        public SwaggerServiceInfo Info { get; set; }
+
+        /// <summary>
+        /// Gets or sets the base-path
+        /// </summary>
+        [JsonProperty("basePath")]
+        public String BasePath { get; set; }
+
+        /// <summary>
+        /// Gets the host of this swagger
+        /// </summary>
+        [JsonProperty("host")]
+        public String Host { get; set; }
+
+        /// <summary>
+        /// Gets the schemes
+        /// </summary>
+        [JsonProperty("schemes")]
+        public List<String> Schemes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the version
+        /// </summary>
+        [JsonProperty("swagger")]
+        public String Version { get; set; }
+
+        /// <summary>
+        /// Gets or sets the paths
+        /// </summary>
+        [JsonProperty("paths")]
+        public Dictionary<String, SwaggerPath> Paths { get; set; }
+
+        /// <summary>
+        /// Gets or sets the definitions
+        /// </summary>
+        [JsonProperty("definitions")]
+        public Dictionary<String, SwaggerSchemaDefinition> Definitions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the security definitions
+        /// </summary>
+        [JsonProperty("securityDefinitions")]
+        public Dictionary<String, SwaggerSecurityDefinition> SecurityDefinitions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the tags
+        /// </summary>
+        [JsonProperty("tags")]
+        public List<SwaggerTag> Tags { get; set; }
+
+        /// <summary>
+        /// Gets the list of types this service produces
+        /// </summary>
+        [JsonProperty("produces")]
+        public List<String> Produces { get; set; }
+
+        /// <summary>
+        /// Gets the list of types this ervice consumes
+        /// </summary>
+        [JsonProperty("consumes")]
+        public List<String> Consumes { get; set; }
+
+    }
+}

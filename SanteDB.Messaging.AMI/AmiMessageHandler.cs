@@ -34,6 +34,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using SanteDB.Rest.AMI.Resources;
+using SanteDB.Rest.AMI;
 
 namespace SanteDB.Messaging.AMI
 {
@@ -67,6 +68,11 @@ namespace SanteDB.Messaging.AMI
         /// Gets the service name
         /// </summary>
         public string ServiceName => "Administrative Management Interface Daemon";
+
+        /// <summary>
+        /// Gets the contract type
+        /// </summary>
+        public Type ContractType => typeof(IAmiServiceContract);
 
         // Configuration
         private readonly AmiConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AmiConfigurationSection>();

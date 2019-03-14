@@ -20,6 +20,7 @@
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.10.0.23074" xmlns="http://santedb.org/configuration">
   <sections>
+    <add type="SanteDB.Messaging.Metadata.Configuration.MetadataConfigurationSection, SanteDB.Messaging.Metadata, Version=1.0.0.0"/>
     <add type="SanteDB.Core.Configuration.AppletConfigurationSection, SanteDB.Core, Version=1.10.0.29461, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.ApplicationServiceContextConfigurationSection, SanteDB.Core.Api, Version=1.11.0.29460, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.Data.DataConfigurationSection, SanteDB.Core.Api, Version=1.11.0.29460, Culture=neutral, PublicKeyToken=null" />
@@ -51,6 +52,7 @@
     <add type="SanteDB.Messaging.Atna.Configuration.AtnaConfigurationSection, SanteDB.Messaging.Atna, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.FileSystemQueueConfigurationSection, SanteDB.Core, Version=1.10.0.29461, Culture=neutral, PublicKeyToken=null" />
   </sections>
+  <section xsi:type="MetadataConfigurationSection"/>
   <section xsi:type="FileSystemQueueConfigurationSection" queueRoot=".\queue" />
   <section xsi:type="DataConfigurationSection">
     <connectionString name="FBSQL" value="initial catalog=|DataDirectory|\sdb_base.fdb;server type=Embedded;user id=sysdba" provider="Fbsql" />
@@ -88,6 +90,11 @@
     </jobs>-->
   </section>
   <section xsi:type="RestConfigurationSection">
+    <service name="META">
+      <endpoint address="http://0.0.0.0:8080/api-docs" contract="SanteDB.Messaging.Metadata.Rest.IMetadataServiceContract, SanteDB.Messaging.Metadata, Version=1.0.0.0">
+        <add type="SanteDB.Core.Rest.Behavior.MessageCompressionEndpointBehavior, SanteDB.Core, Version=1.10.0.0"/>
+      </endpoint>
+    </service>
     <service name="HDSI">
       <behaviors>
         <add type="SanteDB.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Core, Version=1.10.0.0"/>
@@ -456,6 +463,7 @@
       <add type="SanteDB.Persistence.Diagnostics.Jira.DiagnosticReportPersistenceService, SanteDB.Persistence.Diagnostics.Jira, Version=1.1.2.24168, Culture=neutral, PublicKeyToken=null" />
       <!--<add type="SanteDB.Persistence.Reporting.ADO.ReportingPersistenceService, SanteDB.Persistence.Reporting.ADO, Version=1.10.0.24164, Culture=neutral, PublicKeyToken=null" />-->
       <add type="SanteDB.Warehouse.ADO.ADODataWarehouse, SanteDB.Warehouse.ADO, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Messaging.Metadata.MetadataMessageHandler, SanteDB.Messaging.Metadata, Version=1.0.0.0"/>
     </serviceProviders>
   </section>
 </SanteDBConfiguration>

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System;
 
-namespace SanteDB.Messaging.OpenAPI.Model
+namespace SanteDB.Messaging.Metadata.Model.Swagger
 {
     [JsonObject(nameof(SwaggerServiceInfo))]
     public class SwaggerServiceInfo

@@ -27,6 +27,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
     /// OAuth2.0 Contract
     /// </summary>
     [ServiceContract(Name = "OAuth2")]
+    [ServiceProduces("application/json")]
+    [ServiceConsumes("application/x-www-form-urlencoded")]
     public interface IOAuthTokenContract 
     {
 

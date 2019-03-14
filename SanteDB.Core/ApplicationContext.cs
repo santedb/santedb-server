@@ -185,6 +185,9 @@ namespace SanteDB.Core
                     if (this.m_configuration == null)
                         throw new InvalidOperationException("Cannot load configuration, perhaps the services aren't installed?");
 
+                    // Add this
+                    this.m_serviceInstances.Add(this);
+
                     Trace.TraceInformation("STAGE1 START: Loading services");
                     foreach (var svc in this.m_configuration.ServiceProviders)
                     {
@@ -196,7 +199,6 @@ namespace SanteDB.Core
                             this.m_serviceInstances.Add(instance);
                         }
                     }
-
 
                     Trace.TraceInformation("STAGE2 START: Starting Daemons");
                     foreach (var dc in this.m_serviceInstances.OfType<IDaemonService>().ToArray())
@@ -334,7 +336,7 @@ namespace SanteDB.Core
         public IEnumerable<Type> GetAllTypes()
         {
             return AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => a.IsDynamic)
+                .Where(a => !a.IsDynamic)
                 .SelectMany(a => a.ExportedTypes);
         }
 

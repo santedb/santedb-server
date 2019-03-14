@@ -7,14 +7,20 @@ using System.Threading.Tasks;
 using RestSrvr;
 using SanteDB.Core.Interop;
 using SanteDB.Core;
+using SanteDB.Messaging.Metadata.Configuration;
+using SanteDB.Messaging.Metadata.Rest;
+using System.Diagnostics;
 
-namespace SanteDB.Messaging.OpenAPI
+namespace SanteDB.Messaging.Metadata
 {
     /// <summary>
-    /// Represents the daemon service that starts/stops the OpenAPI information file
+    /// Represents the daemon service that starts/stops the OpenApi information file
     /// </summary>
-    public class OpenApiMessageHandler : IDaemonService, IApiEndpointProvider
+    public class MetadataMessageHandler : IDaemonService, IApiEndpointProvider
     {
+
+        // Trace source for logs
+        private TraceSource m_traceSource = new TraceSource(MetadataConstants.TraceSourceName);
 
         /// <summary>
         /// Represents a rest service
@@ -26,10 +32,18 @@ namespace SanteDB.Messaging.OpenAPI
         /// </summary>
         public bool IsRunning => this.m_webHost?.IsRunning == true;
 
+        // Configuration section
+        public MetadataConfigurationSection Configuration { get; }
+
         /// <summary>
         /// Get the name of this service
         /// </summary>
-        public string ServiceName => "OpenAPI Metadata Service";
+        public string ServiceName => "SanteDB Metadata Service";
+
+        /// <summary>
+        /// Gets the contract type
+        /// </summary>
+        public Type ContractType => typeof(IMetadataServiceContract);
 
         /// <summary>
         /// Gets the API type
@@ -45,6 +59,14 @@ namespace SanteDB.Messaging.OpenAPI
         /// Get capabilities of this endpoint
         /// </summary>
         public ServiceEndpointCapabilities Capabilities => (ServiceEndpointCapabilities)ApplicationServiceContext.Current.GetService<IRestServiceFactory>().GetServiceCapabilities(this.m_webHost);
+
+        /// <summary>
+        /// Default ctor
+        /// </summary>
+        public MetadataMessageHandler()
+        {
+            this.Configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<MetadataConfigurationSection>();
+        }
 
         /// <summary>
         /// Fired when the service is starting
@@ -70,6 +92,14 @@ namespace SanteDB.Messaging.OpenAPI
         {
             this.Starting?.Invoke(this, EventArgs.Empty);
 
+            this.m_webHost = ApplicationServiceContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(MetadataServiceBehavior));
+
+            // Add service behaviors
+            foreach (ServiceEndpoint endpoint in this.m_webHost.Endpoints)
+                this.m_traceSource.TraceInformation("Starting MetadataExchange on {0}...", endpoint.Description.ListenUri);
+
+            // Start the webhost
+            this.m_webHost.Start();
             this.Started?.Invoke(this, EventArgs.Empty);
             return true;
         }

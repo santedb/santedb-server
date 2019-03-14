@@ -30,6 +30,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using SanteDB.Core;
+using SanteDB.Rest.RISI;
 
 namespace SanteDB.Messaging.RISI
 {
@@ -43,6 +44,11 @@ namespace SanteDB.Messaging.RISI
         /// Gets the service name
         /// </summary>
         public string ServiceName => "Report Integration Service API Daemon";
+
+        /// <summary>
+        /// Gets the contract type
+        /// </summary>
+        public Type ContractType => typeof(IRisiServiceContract);
 
         /// <summary>
         /// The internal reference to the trace source.

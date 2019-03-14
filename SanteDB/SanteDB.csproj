@@ -260,6 +260,10 @@
       <Project>{f3d2fa84-c398-4390-9834-1272cc2d6f89}</Project>
       <Name>SanteDB.Core.Model.RISI</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.AMI\SanteDB.Rest.AMI.csproj">
+      <Project>{f14023e2-f8df-4ebc-b2c4-34a825e3790e}</Project>
+      <Name>SanteDB.Rest.AMI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
       <Project>{786bd0ee-1806-4158-ba45-80249ac6dfe7}</Project>
       <Name>SanteDB.Rest.Common</Name>
@@ -323,6 +327,10 @@
     <ProjectReference Include="..\SanteDB.Messaging.HL7\SanteDB.Messaging.HL7.csproj">
       <Project>{c1f86ea3-fc84-456f-a9d9-0bf8db0d48d3}</Project>
       <Name>SanteDB.Messaging.HL7</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Messaging.OpenAPI\SanteDB.Messaging.Metadata.csproj">
+      <Project>{1b690052-ed2e-4389-838d-9b9fb188f541}</Project>
+      <Name>SanteDB.Messaging.Metadata</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Messaging.RISI\SanteDB.Messaging.RISI.csproj">
       <Project>{265614d8-df9d-4ac8-bb31-8766a0b0ca20}</Project>

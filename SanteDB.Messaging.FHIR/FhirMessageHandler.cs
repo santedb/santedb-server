@@ -45,6 +45,11 @@ namespace SanteDB.Messaging.FHIR
         /// </summary>
         public string ServiceName => "HL7 FHIR R3 API Endpoint";
 
+        /// <summary>
+        /// Gets the contract type
+        /// </summary>
+        public Type ContractType => typeof(IFhirServiceContract);
+
         #region IMessageHandlerService Members
 
         private TraceSource m_traceSource = new TraceSource(FhirConstants.TraceSourceName);
