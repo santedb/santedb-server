@@ -324,10 +324,12 @@ namespace SanteDB.Core
         /// </summary>
         public void Dispose()
         {
+            if (this.m_disposed) return;
+
+            this.m_disposed = true;
             foreach (var kv in this.m_serviceInstances)
                 if (kv is IDisposable)
                     (kv as IDisposable).Dispose();
-            this.m_disposed = true;
         }
 
         /// <summary>

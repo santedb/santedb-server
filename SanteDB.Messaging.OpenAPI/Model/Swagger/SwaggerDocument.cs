@@ -4,6 +4,7 @@ using RestSrvr.Attributes;
 using SanteDB.Core;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Model.Attributes;
+using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
@@ -66,12 +67,6 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
             this.Produces.AddRange(service.Contracts.SelectMany(c=>c.Type.GetCustomAttributes<ServiceProducesAttribute>().Select(o => o.MimeType)));
             this.Consumes.AddRange(service.Contracts.SelectMany(c => c.Type.GetCustomAttributes<ServiceConsumesAttribute>().Select(o => o.MimeType)));
 
-            // Resource types
-            var resourceTypes = service.Contracts.SelectMany(c=>c.Type.GetCustomAttributes<ServiceKnownResourceAttribute>().Select(o => new { Type = o.Type, Name = o.Type.GetCustomAttribute<XmlRootAttribute>()?.ElementName }).Where(o => !String.IsNullOrEmpty(o.Name))).ToList();
-
-            // Create tags
-            if (operations.Any(o => o.Rest.UriTemplate.Contains("{resourceType}")))
-                this.Tags = resourceTypes.Select(o => new SwaggerTag(o.Name, MetadataComposerUtil.GetElementDocumentation(o.Type, MetaDataElementType.Summary))).ToList();
 
             // Security requires us to peek into the runtime environment ... 
             var serviceCaps = MetadataComposerUtil.GetServiceCapabilities(service.ServiceType);
@@ -95,6 +90,8 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
             }
 
             // Is there an options() method that can be called?
+            List<KeyValuePair<String, Type>> resourceTypes = null;
+
             var optionsMethod = service.Behavior.Type.GetRuntimeMethod("Options", Type.EmptyTypes);
             ServiceOptions serviceOptions = null;
             if (optionsMethod != null)
@@ -102,8 +99,17 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                 var behaviorInstance = Activator.CreateInstance(service.Behavior.Type);
                 serviceOptions = optionsMethod.Invoke(behaviorInstance, null) as ServiceOptions;
                 if (serviceOptions != null) // Remove unused resources
-                    resourceTypes.RemoveAll(o => !serviceOptions.Resources.Any(r => r.ResourceName == o.Name));
+                    resourceTypes = serviceOptions.Resources.Select(o => new KeyValuePair<string, Type>(o.ResourceName, o.ResourceType)).ToList();
             }
+            else
+            {
+                // Resource types
+                resourceTypes = service.Contracts.SelectMany(c => c.Type.GetCustomAttributes<ServiceKnownResourceAttribute>().Select(o => new KeyValuePair<String, Type>(o.Type.GetCustomAttribute<XmlRootAttribute>()?.ElementName, o.Type)).Where(o => !String.IsNullOrEmpty(o.Key))).ToList();
+            }
+
+            // Create tags
+            if (operations.Any(o => o.Rest.UriTemplate.Contains("{resourceType}")))
+                this.Tags = resourceTypes.Select(o => new SwaggerTag(o.Key, MetadataComposerUtil.GetElementDocumentation(o.Value, MetaDataElementType.Summary))).ToList();
 
             // Process operations
             foreach (var operation in operations.GroupBy(o => o.Rest.UriTemplate.StartsWith("/") ? o.Rest.UriTemplate : "/" + o.Rest.UriTemplate))
@@ -138,14 +144,15 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                 if (operation.Key.Contains("{resourceType}"))
                     foreach (var resource in resourceTypes)
                     {
-                        var resourcePath = operation.Key.Replace("{resourceType}", resource.Name);
-                        if (this.Paths.ContainsKey(resourcePath)) continue;
+                        var resourcePath = operation.Key.Replace("{resourceType}", resource.Key);
+                        if (this.Paths.ContainsKey(resourcePath) ||
+                            resourcePath.Contains("history") && !typeof(IVersionedEntity).IsAssignableFrom(resource.Value)) continue;
 
                         // Create a copy of the path and customize it to the resource
                         List<String> unsupportedVerbs = new List<string>();
 
                         // Get the resource options for this resource
-                        ServiceResourceOptions resourceOptions = serviceOptions?.Resources.FirstOrDefault(o => o.ResourceName == resource.Name);
+                        ServiceResourceOptions resourceOptions = serviceOptions?.Resources.FirstOrDefault(o => o.ResourceName == resource.Key);
 
                         var subPath = new SwaggerPath(path);
                         foreach (var v in subPath)
@@ -160,7 +167,7 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                             }
 
                             // Add tags for resource
-                            v.Value.Tags.Add(resource.Name);
+                            v.Value.Tags.Add(resource.Key);
                             v.Value.Parameters.RemoveAll(o => o.Name == "resourceType");
 
                             // Security? 
@@ -179,7 +186,7 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                             if ((v.Key == "get" || v.Key == "head") && v.Value.Parameters.Count == 0)
                             {
                                 // Build query parameters
-                                v.Value.Parameters = resource.Type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                                v.Value.Parameters = resource.Value.GetProperties(BindingFlags.Instance | BindingFlags.Public)
                                     .Where(o => o.GetCustomAttributes<XmlElementAttribute>().Any() || o.GetCustomAttribute<QueryParameterAttribute>() != null)
                                     .Select(o => new SwaggerParameter(o))
                                     .ToList();
@@ -240,8 +247,8 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                             // Replace the response if necessary
                             var resourceSchemaRef = new SwaggerSchemaDefinition()
                             {
-                                NetType = resource.Type,
-                                Reference = $"#/definitions/{MetadataComposerUtil.CreateSchemaReference(resource.Type)}"
+                                NetType = resource.Value,
+                                Reference = $"#/definitions/{MetadataComposerUtil.CreateSchemaReference(resource.Value)}"
                             };
                             SwaggerSchemaElement schema = null;
                             if (v.Value.Responses.TryGetValue(200, out schema))
@@ -250,7 +257,7 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                                 schema.Schema = resourceSchemaRef;
 
                             // Replace the body if necessary
-                            var bodyParm = v.Value.Parameters.FirstOrDefault(o => o.Location == SwaggerParameterLocation.body && o.Schema?.NetType?.IsAssignableFrom(resource.Type) == true);
+                            var bodyParm = v.Value.Parameters.FirstOrDefault(o => o.Location == SwaggerParameterLocation.body && o.Schema?.NetType?.IsAssignableFrom(resource.Value) == true);
                             if (bodyParm != null)
                                 bodyParm.Schema = resourceSchemaRef;
                         } // foreach subpath

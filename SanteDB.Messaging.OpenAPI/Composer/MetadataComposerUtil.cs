@@ -207,7 +207,7 @@ namespace SanteDB.Messaging.Metadata.Composer
             switch(verb.ToLower())
             {
                 case "get":
-                    return ResourceCapabilityType.Search;
+                    return ResourceCapabilityType.Get;
                 case "post":
                     return ResourceCapabilityType.Create;
                 case "put":

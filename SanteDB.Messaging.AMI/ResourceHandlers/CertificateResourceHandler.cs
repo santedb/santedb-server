@@ -45,6 +45,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandlers
 
         // Certificate tool 
         private CertTool m_certTool = null;
+
         // Configuration
         private readonly AmiConfigurationSection configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AmiConfigurationSection>();
 

@@ -255,7 +255,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <param name="resourceType">The type of resource being created</param>
         /// <param name="data">The resource data being created</param>
         /// <returns>The created the data</returns>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
         public override Object Create(string resourceType, Object data)
         {
             return base.Create(resourceType, data);
@@ -264,7 +263,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <summary>
         /// Create or update the specific resource
         /// </summary>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
         public override Object CreateUpdate(string resourceType, string key, Object data)
         {
             return base.CreateUpdate(resourceType, key, data);
@@ -273,7 +271,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <summary>
         /// Delete the specified resource
         /// </summary>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
         public override Object Delete(string resourceType, string key)
         {
             return base.Delete(resourceType, key);
@@ -282,7 +279,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <summary>
         /// Get the specified resource
         /// </summary>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
         public override Object Get(string resourceType, string key)
         {
             return base.Get(resourceType, key);
@@ -291,7 +287,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <summary>
         /// Get a specific version of the resource 
         /// </summary>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
         public override Object GetVersion(string resourceType, string key, string versionKey)
         {
             return base.GetVersion(resourceType, key, versionKey);
@@ -300,7 +295,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <summary>
         /// Get the complete history of a resource 
         /// </summary>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
         public override AmiCollection History(string resourceType, string key)
         {
             return base.History(resourceType, key);
@@ -309,7 +303,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <summary>
         /// Get options / capabilities of a specific object
         /// </summary>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
         public override ServiceResourceOptions ResourceOptions(string resourceType)
         {
             return base.ResourceOptions(resourceType);
@@ -318,7 +311,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <summary>
         /// Performs a search of the specified AMI resource
         /// </summary>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
         public override AmiCollection Search(string resourceType)
         {
             return base.Search(resourceType);
@@ -327,7 +319,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <summary>
         /// Updates the specified object on the server
         /// </summary>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
         public override Object Update(string resourceType, string key, Object data)
         {
             return base.Update(resourceType, key, data);
@@ -338,7 +329,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// </summary>
         /// <param name="resourceType">The resource type</param>
         /// <param name="id">The id of the resource</param>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
         public override void Head(string resourceType, string id)
         {
             base.Head(resourceType, id);
@@ -356,7 +346,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <summary>
         /// Lock resource
         /// </summary>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
         public override object Lock(string resourceType, string key)
         {
             return base.Lock(resourceType, key);
@@ -365,7 +354,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <summary>
         /// Unlock resource
         /// </summary>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
         public override object UnLock(string resourceType, string key)
         {
             return base.UnLock(resourceType, key);
