@@ -26,7 +26,7 @@ using System.Xml.Schema;
 namespace SanteDB.Messaging.FHIR.Rest
 {
     /// <summary>
-    /// HL7 FHIR API Contract
+    /// HL7 Fast Health Interoperability Resources (FHIR)
     /// </summary>
     /// <remarks>
     /// This contract provides a wrapper for HL7 Fast Health Interoperability Resources (FHIR) STU3 resources.

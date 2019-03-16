@@ -48,7 +48,7 @@ namespace SanteDB.Messaging.FHIR
         /// <summary>
         /// Gets the contract type
         /// </summary>
-        public Type ContractType => typeof(IFhirServiceContract);
+        public Type BehaviorType => typeof(FhirServiceBehavior);
 
         #region IMessageHandlerService Members
 

@@ -23,7 +23,7 @@ using SanteDB.Messaging.GS1.Model;
 namespace SanteDB.Messaging.GS1.Rest
 {
     /// <summary>
-    /// GS1 BMS Contract
+    /// GS1 Business Messaging Standard (BMS) 3.3
     /// </summary>
     /// <remarks>
     /// This contract represents an implementation of the GS1 Business Messaging Standard (BMS) 3.3 over REST.

@@ -51,7 +51,7 @@ namespace SanteDB.Authentication.OAuth2
         /// <summary>
         /// Gets the contract type
         /// </summary>
-        public Type ContractType => typeof(IOAuthTokenContract);
+        public Type BehaviorType => typeof(OAuthTokenBehavior);
 
         /// <summary>
         /// True if is running

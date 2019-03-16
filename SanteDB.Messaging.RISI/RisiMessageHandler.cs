@@ -48,7 +48,7 @@ namespace SanteDB.Messaging.RISI
         /// <summary>
         /// Gets the contract type
         /// </summary>
-        public Type ContractType => typeof(IRisiServiceContract);
+        public Type BehaviorType => typeof(RisiBehavior);
 
         /// <summary>
         /// The internal reference to the trace source.

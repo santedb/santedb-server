@@ -7,7 +7,7 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
     /// <summary>
     /// Represents a single instance of security data on a path
     /// </summary>
-    [JsonObject(nameof(SwaggerPathSecurity))]
+    [JsonDictionary(nameof(SwaggerPathSecurity))]
     public class SwaggerPathSecurity : Dictionary<string, List<string>>
     {
 

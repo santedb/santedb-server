@@ -61,7 +61,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandlers
         /// <summary>
         /// Gets the capabilities of the current handler
         /// </summary>
-        public ResourceCapability Capabilities => ResourceCapability.Create | ResourceCapability.Search | ResourceCapability.Get | ResourceCapability.Delete;
+        public ResourceCapabilityType Capabilities => ResourceCapabilityType.Create | ResourceCapabilityType.Search | ResourceCapabilityType.Get | ResourceCapabilityType.Delete;
 
         /// <summary>
         /// Gets the name of the resource

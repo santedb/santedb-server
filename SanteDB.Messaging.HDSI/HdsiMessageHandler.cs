@@ -52,7 +52,7 @@ namespace SanteDB.Messaging.HDSI
         /// <summary>
         /// Gets the contract type
         /// </summary>
-        public Type ContractType => typeof(IHdsiServiceContract);
+        public Type BehaviorType => typeof(HdsiServiceBehavior);
 
         /// <summary>
         /// Resource handler tool
@@ -145,13 +145,13 @@ namespace SanteDB.Messaging.HDSI
 
                 // Force startup
                 if(this.m_configuration.ResourceHandlers.Count() > 0)
-                    HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.m_configuration.ResourceHandlers);
+                    HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.m_configuration.ResourceHandlers, typeof(IHdsiServiceContract));
                 else
                     HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(
                         typeof(PatientResourceHandler).Assembly.ExportedTypes
                         .Union(AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic).SelectMany(a => a.ExportedTypes))
                         .Where(t => !t.IsAbstract && !t.IsInterface && typeof(IApiResourceHandler).IsAssignableFrom(t))
-                        .ToList()
+                        .ToList(), typeof(IHdsiServiceContract)
                     );
 
                 this.m_webHost = ApplicationContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(HdsiServiceBehavior));

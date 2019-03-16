@@ -47,7 +47,7 @@ namespace SanteDB.Messaging.HL7
         /// <summary>
         /// Gets the contract type
         /// </summary>
-        public Type ContractType => null;
+        public Type BehaviorType => null;
 
         // The local facility
         private Place m_localFacility;

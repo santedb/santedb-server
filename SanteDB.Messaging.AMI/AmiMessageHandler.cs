@@ -72,7 +72,7 @@ namespace SanteDB.Messaging.AMI
         /// <summary>
         /// Gets the contract type
         /// </summary>
-        public Type ContractType => typeof(IAmiServiceContract);
+        public Type BehaviorType => typeof(AmiServiceBehavior);
 
         // Configuration
         private readonly AmiConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AmiConfigurationSection>();
@@ -186,13 +186,14 @@ namespace SanteDB.Messaging.AMI
                 this.m_webHost.Start();
 
                 if (this.m_configuration.ResourceHandlers.Count() > 0)
-                    AmiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.configuration.ResourceHandlers);
+                    AmiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.configuration.ResourceHandlers, typeof(IAmiServiceContract));
                 else
                     AmiMessageHandler.ResourceHandler = new ResourceHandlerTool(
                         typeof(SecurityUserResourceHandler).Assembly.ExportedTypes
                         .Union(AppDomain.CurrentDomain.GetAssemblies().Where(a=>!a.IsDynamic).SelectMany(a=>a.ExportedTypes))
                         .Where(t => !t.IsAbstract && !t.IsInterface && typeof(IApiResourceHandler).IsAssignableFrom(t))
-                        .ToList()
+                        .ToList(),
+                        typeof(IAmiServiceContract)
                     );
                 
 

@@ -78,7 +78,7 @@ namespace SanteDB.Messaging.GS1
         /// <summary>
         /// Gets the contract type
         /// </summary>
-        public Type ContractType => typeof(IStockService);
+        public Type BehaviorType => typeof(StockServiceBehavior);
 
         /// <summary>
         /// Gets the API type

@@ -43,7 +43,7 @@ namespace SanteDB.Messaging.Metadata
         /// <summary>
         /// Gets the contract type
         /// </summary>
-        public Type ContractType => typeof(IMetadataServiceContract);
+        public Type BehaviorType => typeof(MetadataServiceBehavior);
 
         /// <summary>
         /// Gets the API type

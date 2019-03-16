@@ -107,6 +107,15 @@ namespace SanteDB.Messaging.Metadata.Composer
         }
 
         /// <summary>
+        /// Get the service capabilities
+        /// </summary>
+        public static ServiceEndpointCapabilities GetServiceCapabilities(ServiceEndpointType endpointType)
+        {
+            var svc = ApplicationServiceContext.Current.GetService<IServiceManager>().GetServices().OfType<IApiEndpointProvider>().FirstOrDefault(o => o.ApiType == endpointType);
+            return svc.Capabilities;
+        }
+
+        /// <summary>
         /// Create a schema reference
         /// </summary>
         public static String CreateSchemaReference(Type type)
@@ -188,6 +197,28 @@ namespace SanteDB.Messaging.Metadata.Composer
             // Now, get summary
             lock(documentation)
                 return documentation.SelectSingleNode($"/doc/members/member[@name='{docKey}']/{docPath}/text()")?.Value?.Trim();
+        }
+
+        /// <summary>
+        /// Converts an HTTP verb to a capability
+        /// </summary>
+        public static ResourceCapabilityType VerbToCapability(string verb)
+        {
+            switch(verb.ToLower())
+            {
+                case "get":
+                    return ResourceCapabilityType.Search;
+                case "post":
+                    return ResourceCapabilityType.Create;
+                case "put":
+                    return ResourceCapabilityType.Update;
+                case "delete":
+                    return ResourceCapabilityType.Delete;
+                case "patch":
+                    return ResourceCapabilityType.Patch;
+                default:
+                    return ResourceCapabilityType.None;
+            }
         }
 
         /// <summary>

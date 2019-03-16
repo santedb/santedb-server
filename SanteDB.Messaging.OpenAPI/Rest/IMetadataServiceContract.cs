@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace SanteDB.Messaging.Metadata.Rest
 {
     /// <summary>
-    /// Represents an OpenApi contract
+    /// Metadata Exchange Service
     /// </summary>
     [ServiceContract(Name = "Metadata Service")]
     public interface IMetadataServiceContract

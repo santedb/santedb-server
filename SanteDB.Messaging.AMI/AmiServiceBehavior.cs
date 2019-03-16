@@ -129,38 +129,28 @@ namespace SanteDB.Messaging.AMI.Wcf
             RestOperationContext.Current.OutgoingResponse.Headers.Add("Allow", $"GET, PUT, POST, OPTIONS, HEAD, DELETE{(ApplicationServiceContext.Current.GetService<IPatchService>() != null ? ", PATCH" : null)}");
 
             if (ApplicationServiceContext.Current.GetService<IPatchService>() != null)
-            {
-                RestOperationContext.Current.OutgoingResponse.Headers.Add("Accept-Patch", "application/xml+oiz-patch");
-            }
+                RestOperationContext.Current.OutgoingResponse.Headers.Add("Accept-Patch", "application/xml+sdb-patch");
 
             var serviceOptions = new ServiceOptions
             {
                 InterfaceVersion = "1.0.0.0",
-                Services = new List<ServiceResourceOptions>
-                {
-                    new ServiceResourceOptions
-                    {
-                        ResourceName = "time",
-                        Capabilities = ResourceCapability.Get
-                    }
-                },
                 Endpoints = (ApplicationServiceContext.Current as IServiceManager).GetServices().OfType<IApiEndpointProvider>().Select(o =>
-                    new ServiceEndpointOptions
-                    {
-                        BaseUrl = o.Url,
-                        ServiceType = o.ApiType,
-                        Capabilities = o.Capabilities,
-                        Contract = new Core.Configuration.TypeReferenceConfiguration(o.ContractType)
-                    }
+                    new ServiceEndpointOptions(o)
                 ).ToList()
             };
 
             // Get endpoints
-
             var config = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AmiConfigurationSection>();
 
             if (config?.Endpoints != null)
                 serviceOptions.Endpoints.AddRange(config.Endpoints);
+
+            // Get the resources which are supported
+            foreach (var itm in this.m_resourceHandler.Handlers)
+            {
+                var svc = this.ResourceOptions(itm.ResourceName);
+                serviceOptions.Resources.Add(svc);
+            }
 
             return serviceOptions;
         }

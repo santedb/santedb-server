@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using RestSrvr.Attributes;
 using SanteDB.Messaging.Metadata.Composer;
+using SanteDB.Rest.Common.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,9 +38,9 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
             this.Tags = new List<string>(copy.Tags);
             this.Produces = new List<string>(copy.Produces);
             this.Consumes = new List<string>(copy.Consumes);
-            this.Parameters = copy.Parameters?.Select(o=>new SwaggerParameter(o)).ToList();
-            this.Security = copy.Security?.Select(o=>new SwaggerPathSecurity(o)).ToList();
-            this.Responses = copy.Responses.ToDictionary(o=>o.Key, o=>new SwaggerSchemaElement(o.Value));
+            this.Parameters = copy.Parameters?.Select(o => new SwaggerParameter(o)).ToList();
+            this.Security = copy.Security?.Select(o => new SwaggerPathSecurity(o)).ToList();
+            this.Responses = copy.Responses.ToDictionary(o => o.Key, o => new SwaggerSchemaElement(o.Value));
             this.Summary = copy.Summary;
             this.Description = copy.Description;
         }
@@ -47,24 +48,34 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
         /// <summary>
         /// Creates a new path definition 
         /// </summary>
-        public SwaggerPathDefinition(MethodInfo method) : this()
+        public SwaggerPathDefinition(MethodInfo behaviorMethod, MethodInfo contractMethod) : this()
         {
-            var operationAtt = method.GetCustomAttribute<RestInvokeAttribute>();
-            this.Summary = MetadataComposerUtil.GetElementDocumentation(method, MetaDataElementType.Summary) ?? method.Name;
-            this.Description = MetadataComposerUtil.GetElementDocumentation(method, MetaDataElementType.Remarks);
-            this.Produces.AddRange(method.GetCustomAttributes<ServiceProducesAttribute>().Select(o => o.MimeType));
-            this.Consumes.AddRange(method.GetCustomAttributes<ServiceConsumesAttribute>().Select(o => o.MimeType));
+            var operationAtt = contractMethod.GetCustomAttribute<RestInvokeAttribute>();
+            this.Summary = MetadataComposerUtil.GetElementDocumentation(behaviorMethod, MetaDataElementType.Summary) ?? MetadataComposerUtil.GetElementDocumentation(contractMethod, MetaDataElementType.Summary) ?? behaviorMethod.Name;
+            this.Description = MetadataComposerUtil.GetElementDocumentation(behaviorMethod, MetaDataElementType.Remarks) ?? MetadataComposerUtil.GetElementDocumentation(contractMethod, MetaDataElementType.Remarks);
+            this.Produces.AddRange(contractMethod.GetCustomAttributes<ServiceProducesAttribute>().Select(o => o.MimeType));
+            this.Consumes.AddRange(contractMethod.GetCustomAttributes<ServiceConsumesAttribute>().Select(o => o.MimeType));
 
-            var parms = method.GetParameters();
+            var parms = behaviorMethod.GetParameters();
             if (parms.Length > 0)
-                this.Parameters = parms.Select(o => new SwaggerParameter(method, o, operationAtt)).ToList();
+                this.Parameters = parms.Select(o => new SwaggerParameter(behaviorMethod, o, operationAtt)).ToList();
+
+            var demands = behaviorMethod.GetCustomAttributes<DemandAttribute>();
+            if (demands.Count() > 0)
+                this.Security = new List<SwaggerPathSecurity>()
+                {
+                        new SwaggerPathSecurity()
+                        {
+                            { "oauth_user", demands.Select(o=>o.PolicyId).ToList() }
+                        }
+                };
 
             // Return type is not void
-            if (method.ReturnType != typeof(void))
+            if (behaviorMethod.ReturnType != typeof(void))
             {
                 SwaggerSchemaElementType type = SwaggerSchemaElementType.@object;
 
-                if (SwaggerSchemaElement.m_typeMap.TryGetValue(method.ReturnType, out type))
+                if (SwaggerSchemaElement.m_typeMap.TryGetValue(behaviorMethod.ReturnType, out type))
                     this.Responses.Add(200, new SwaggerSchemaElement()
                     {
                         Type = SwaggerSchemaElementType.@object,
@@ -79,8 +90,8 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                         Description = "Operation was completed successfully",
                         Schema = new SwaggerSchemaDefinition()
                         {
-                            NetType = method.ReturnType,
-                            Reference = $"#/definitions/{MetadataComposerUtil.CreateSchemaReference(method.ReturnType)}"
+                            NetType = behaviorMethod.ReturnType,
+                            Reference = $"#/definitions/{MetadataComposerUtil.CreateSchemaReference(behaviorMethod.ReturnType)}"
                         }
                     });
                 }
@@ -92,7 +103,7 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                 });
 
             // Any faults?
-            foreach (var flt in method.GetCustomAttributes<ServiceFaultAttribute>())
+            foreach (var flt in contractMethod.GetCustomAttributes<ServiceFaultAttribute>())
                 this.Responses.Add(flt.StatusCode, new SwaggerSchemaElement()
                 {
                     Description = flt.Condition,
