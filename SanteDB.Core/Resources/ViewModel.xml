@@ -29,6 +29,7 @@
   </type>
   <type type="IdentifiedData" all="true">
     <property name="etag" behavior="never"/>
+    <property name="modifiedOn" behavior="never"/>
   </type>
 
   <type type="EntityName" all="true">
@@ -36,15 +37,20 @@
     <property name="component" all="true" behavior="always">
       <property name="*" all="true"/>
     </property>
+    <property name="effectiveVersionSequence" behavior="never"/>
+    <property name="useModel" behavior="never"/>
   </type>
   <type type="EntityAddress" all="true">
     <property name="source" behavior="never"/>
     <property name="component" all="true" behavior="always">
       <property name="*" all="true"/>
     </property>
+    <property name="effectiveVersionSequence" behavior="never"/>
+    <property name="useModel" behavior="never"/>
   </type>
   <type type="EntityIdentifier" all="true">
     <property name="source" behavior="never"/>
+    <property name="effectiveVersionSequence" behavior="never"/>
   </type>
   <type type="Bundle" all="true">
     <property name="item" all="true"/>
@@ -59,6 +65,7 @@
     <property name="statusConceptModel" behavior="never"/>
     <property name="previousVersion" behavior="never"/>
     <property name="previousVersionModel" behavior="never"/>
+    <property name="referenceTerm" behavior="never"/>
   </type>
 
   <!-- Assigning Authorities -->

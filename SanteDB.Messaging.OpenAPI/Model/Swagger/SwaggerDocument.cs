@@ -46,17 +46,22 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
         /// </summary>
         public SwaggerDocument(ServiceEndpointOptions service) : this()
         {
-            this.BasePath = new Uri(service.BaseUrl.First()).AbsolutePath;
+            var listen = new Uri(service.BaseUrl.First());
+            this.BasePath = listen.AbsolutePath;
+            listen = new Uri(ApplicationServiceContext.Current.GetService<MetadataMessageHandler>().Configuration.ApiHost ?? listen.ToString());
             this.Info = new SwaggerServiceInfo()
             {
                 Title = MetadataComposerUtil.GetElementDocumentation(service.Behavior.Type, MetaDataElementType.Summary) ?? service.Behavior.Type.GetCustomAttribute<ServiceBehaviorAttribute>()?.Name,
                 Description = MetadataComposerUtil.GetElementDocumentation(service.Behavior.Type, MetaDataElementType.Remarks),
                 Version = $"{service.Behavior.Type.Assembly.GetName().Version.ToString()} ({service.Behavior.Type.Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion})"
             };
-            this.Host = $"{RestOperationContext.Current?.IncomingRequest.Url.Host}:{RestOperationContext.Current?.IncomingRequest.Url.Port}";
+            this.Host = $"{listen.Host}:{listen.Port}".Replace("0.0.0.0", RestOperationContext.Current.IncomingRequest.Url.Host);
 
             // Get the schemes
-            this.Schemes = service.BaseUrl.Select(o => new Uri(o).Scheme).ToList();
+            this.Schemes = new List<string>()
+            {
+                listen.Scheme
+            };
 
             // Construct the paths
             var operations = service.Contracts.SelectMany(c=>c.Type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
@@ -73,6 +78,10 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
             if (serviceCaps.HasFlag(ServiceEndpointCapabilities.BearerAuth))
             {
                 var bauth = AuthenticationContext.Current;
+                var tokenUrl = new Uri(MetadataComposerUtil.ResolveService("acs").BaseUrl.FirstOrDefault());
+                if(tokenUrl.Host == "0.0.0.0") // Host is vanialla
+                    tokenUrl = new Uri($"{listen.Scheme}://{listen.Host}:{listen.Port}{tokenUrl.AbsolutePath}");
+
                 AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
                 this.SecurityDefinitions = new Dictionary<string, SwaggerSecurityDefinition>()
                 {
@@ -80,7 +89,7 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                         {
                             Flow = SwaggerSecurityFlow.password,
                             Scopes = ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityPolicy>>()?.Find(o=>o.ObsoletionTime == null).ToDictionary(o=>o.Oid, o=>o.Name),
-                            TokenUrl = $"{MetadataComposerUtil.ResolveService("acs").BaseUrl.FirstOrDefault().Replace("0.0.0.0",RestOperationContext.Current.IncomingRequest.Url.Host)}/oauth2_token",
+                            TokenUrl = $"{tokenUrl.ToString().Replace("0.0.0.0", RestOperationContext.Current.IncomingRequest.Url.Host)}/oauth2_token",
                             Type = SwaggerSecurityType.oauth2
                         }
                     }
@@ -159,7 +168,7 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                         {
 
                             // Check that this resource is supported
-                            var resourceCaps = resourceOptions.Capabilities.FirstOrDefault(c => c.Capability == MetadataComposerUtil.VerbToCapability(v.Key));
+                            var resourceCaps = resourceOptions?.Capabilities.FirstOrDefault(c => c.Capability == MetadataComposerUtil.VerbToCapability(v.Key));
                             if (resourceOptions != null && resourceCaps == null)
                             {
                                 unsupportedVerbs.Add(v.Key);

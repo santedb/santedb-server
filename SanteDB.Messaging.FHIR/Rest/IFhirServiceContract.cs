@@ -55,12 +55,7 @@ namespace SanteDB.Messaging.FHIR.Rest
     public interface IFhirServiceContract
     {
 
-        /// <summary>
-        /// Get index page
-        /// </summary>
-        [Get("/")]
-        Stream Index();
-
+     
         /// <summary>
         /// Get the schema
         /// </summary>
@@ -77,38 +72,38 @@ namespace SanteDB.Messaging.FHIR.Rest
         /// <summary>
         /// Read a resource
         /// </summary>
-        [Get("/{resourceType}/{id}?_format={mimeType}")]
-        DomainResourceBase ReadResource(string resourceType, string id, string mimeType);
+        [Get("/{resourceType}/{id}")]
+        DomainResourceBase ReadResource(string resourceType, string id);
 
         /// <summary>
         /// Version read a resource
         /// </summary>
-        [Get("/{resourceType}/{id}/_history/{vid}?_format={mimeType}")]
-        DomainResourceBase VReadResource(string resourceType, string id, string vid, string mimeType);
+        [Get("/{resourceType}/{id}/_history/{vid}")]
+        DomainResourceBase VReadResource(string resourceType, string id, string vid);
 
         /// <summary>
         /// Update a resource
         /// </summary>
-        [RestInvoke(UriTemplate = "/{resourceType}/{id}?_format={mimeType}", Method = "PUT")]
-        DomainResourceBase UpdateResource(string resourceType, string id, string mimeType, DomainResourceBase target);
+        [RestInvoke(UriTemplate = "/{resourceType}/{id}", Method = "PUT")]
+        DomainResourceBase UpdateResource(string resourceType, string id, DomainResourceBase target);
 
         /// <summary>
         /// Delete a resource
         /// </summary>
-        [RestInvoke(UriTemplate = "/{resourceType}/{id}?_format={mimeType}", Method = "DELETE")]
-        DomainResourceBase DeleteResource(string resourceType, string id, string mimeType);
+        [RestInvoke(UriTemplate = "/{resourceType}/{id}", Method = "DELETE")]
+        DomainResourceBase DeleteResource(string resourceType, string id);
 
         /// <summary>
         /// Create a resource
         /// </summary>
-        [RestInvoke(UriTemplate = "/{resourceType}?_format={mimeType}", Method = "POST")]
-        DomainResourceBase CreateResource(string resourceType, string mimeType, DomainResourceBase target);
+        [RestInvoke(UriTemplate = "/{resourceType}", Method = "POST")]
+        DomainResourceBase CreateResource(string resourceType, DomainResourceBase target);
 
         /// <summary>
         /// Create a resource
         /// </summary>
-        [RestInvoke(UriTemplate = "/{resourceType}/{id}?_format={mimeType}", Method = "POST")]
-        DomainResourceBase CreateUpdateResource(string resourceType, string id, string mimeType, DomainResourceBase target);
+        [RestInvoke(UriTemplate = "/{resourceType}/{id}", Method = "POST")]
+        DomainResourceBase CreateUpdateResource(string resourceType, string id, DomainResourceBase target);
 
         /// <summary>
         /// Validate a resource
@@ -150,20 +145,26 @@ namespace SanteDB.Messaging.FHIR.Rest
         /// <summary>
         /// Get history
         /// </summary>
-        [Get("/{resourceType}/{id}/_history?_format={mimeType}")]
-        Bundle GetResourceInstanceHistory(string resourceType, string id, string mimeType);
+        [Get("/{resourceType}/{id}/_history")]
+        Bundle GetResourceInstanceHistory(string resourceType, string id);
 
         /// <summary>
         /// Get history
         /// </summary>
-        [Get("/{resourceType}/_history?_format={mimeType}")]
-        Bundle GetResourceHistory(string resourceType, string mimeType);
+        [Get("/{resourceType}/_history")]
+        Bundle GetResourceHistory(string resourceType);
 
         /// <summary>
         /// Get history for all
         /// </summary>
-        [Get("/_history?_format={mimeType}")]
+        [Get("/_history")]
         Bundle GetHistory(string mimeType);
+
+        /// <summary>
+        /// Get index page
+        /// </summary>
+        [Get("/")]
+        Stream Index();
 
     }
 

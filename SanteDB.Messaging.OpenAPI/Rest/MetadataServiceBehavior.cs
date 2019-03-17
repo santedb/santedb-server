@@ -21,8 +21,9 @@ using SanteDB.Rest.Common.Fault;
 namespace SanteDB.Messaging.Metadata.Rest
 {
     /// <summary>
-    /// Represents the OpenApi Behavior
+    /// Metadata Exchange
     /// </summary>
+    /// <remarks>An implementation of a metadata exchange endpoint</remarks>
     [ServiceBehavior(Name = "META")]
     public class MetadataServiceBehavior : IMetadataServiceContract
     {

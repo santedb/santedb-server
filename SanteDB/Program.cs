@@ -57,7 +57,7 @@ namespace SanteDB
         {
             // Trace copyright information
             Assembly entryAsm = Assembly.GetEntryAssembly();
-
+            
             // Dump some info
             Trace.TraceInformation("SanteDB Startup : v{0}", entryAsm.GetName().Version);
             Trace.TraceInformation("SanteDB Working Directory : {0}", entryAsm.Location);
@@ -153,11 +153,21 @@ namespace SanteDB
                             Console.WriteLine("Application context did not start properly and is in maintenance mode...");
                             Console.ResetColor();
                         }
-                        Console.WriteLine("Type [stop] to stop service...");
-                        String input = null;
-                        while (input != "stop")
+
+                        ManualResetEvent quitEvent = new ManualResetEvent(false);
+                        Console.CancelKeyPress += (o, e) => quitEvent.Set();
+
+                        if (parameters.Forever)
                         {
-                            input = Console.ReadLine();
+                            Console.WriteLine("Service started...");
+                            quitEvent.WaitOne();
+                        }
+                        else
+                        {
+                            Console.WriteLine("Type [stop] to stop service...");
+                            String input = null;
+                            while (input != "stop")
+                                input = Console.ReadLine();
                         }
                     }
                     Console.WriteLine("Shutting down service...");

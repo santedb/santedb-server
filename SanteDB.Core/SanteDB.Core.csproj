@@ -98,6 +98,7 @@
     <Compile Include="Rest\Compression\LzmaCompressionScheme.cs" />
     <Compile Include="Rest\RestServiceFactory.cs" />
     <Compile Include="Rest\Security\BasicAuthorizationAccessBehavior.cs" />
+    <Compile Include="Rest\Security\OperationDemandPolicyBehavior.cs" />
     <Compile Include="Rest\Security\TokenAuthorizationAccessBehavior.cs" />
     <Compile Include="Rest\Serialization\CorsMessageInspector.cs" />
     <Compile Include="Rest\Serialization\RestErrorHandler.cs" />

@@ -97,9 +97,9 @@ namespace SanteDB.Messaging.FHIR
 
                 this.m_webHost = ApplicationServiceContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(FhirServiceBehavior));
                 this.m_webHost.AddServiceBehavior(new FhirErrorEndpointBehavior());
-
                 foreach (var endpoint in this.m_webHost.Endpoints)
                 {
+                    endpoint.AddEndpointBehavior(new FhirMessageDispatchFormatterEndpointBehavior());
                     this.m_traceSource.TraceInformation("Starting FHIR on {0}...", endpoint.Description.ListenUri);
                 }
 

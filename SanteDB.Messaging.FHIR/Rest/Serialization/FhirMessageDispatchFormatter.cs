@@ -147,7 +147,14 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
                 if (result?.GetType().GetCustomAttribute<XmlTypeAttribute>() != null ||
                     result?.GetType().GetCustomAttribute<JsonObjectAttribute>() != null)
                 {
-                    XmlSerializer xsz = s_serializers[result.GetType()];
+                    XmlSerializer xsz = null;
+                    if (!s_serializers.TryGetValue(result.GetType(), out xsz))
+                    {
+                        xsz = new XmlSerializer(result.GetType());
+                        lock (s_serializers)
+                            if (!s_serializers.ContainsKey(result.GetType()))
+                                s_serializers.Add(result.GetType(), xsz);
+                    }
                     MemoryStream ms = new MemoryStream();
                     xsz.Serialize(ms, result);
                     contentType = "application/fhir+xml";

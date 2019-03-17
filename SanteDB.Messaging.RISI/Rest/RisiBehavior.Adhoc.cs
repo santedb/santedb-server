@@ -31,8 +31,9 @@ using System.Linq;
 namespace SanteDB.Messaging.RISI.Rest
 {
     /// <summary>
-    /// Represents the RISI behavior implementation
+    /// Reports Integration Service Interface (RISI)
     /// </summary>
+    /// <remarks>Represents the SanteDB Server implementation of the Report Integration Service Interface (RISI) contract</remarks>
     public partial class RisiBehavior
 	{
 		/// <summary>

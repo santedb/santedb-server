@@ -40,8 +40,9 @@ using System.Linq;
 namespace SanteDB.Messaging.GS1.Rest
 {
     /// <summary>
-    /// Stock service behavior
+    /// GS1 BMS 3.3
     /// </summary>
+    /// <remarks>The SanteDB server implementation of the GS1 BMS 3.3 interface over REST</remarks>
     [ServiceBehavior(Name = "GS1BMS", InstanceMode = ServiceInstanceMode.PerCall)]
     public class StockServiceBehavior : IStockService
     {

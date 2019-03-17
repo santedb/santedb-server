@@ -76,14 +76,19 @@ namespace SanteDB.Core.Rest
                     Activator.CreateInstance(bhvr.Type) as IServiceBehavior :
                     Activator.CreateInstance(bhvr.Type, bhvr.Configuration) as IServiceBehavior);
 
+            var demandPolicy = new OperationDemandPolicyBehavior(serviceType);
+
             foreach (var ep in config.Endpoints)
             {
                 var se = retVal.AddServiceEndpoint(new Uri(ep.Address), ep.Contract, new RestHttpBinding());
-                foreach(var bhvr in ep.Behaviors)
+                foreach (var bhvr in ep.Behaviors)
+                {
                     se.AddEndpointBehavior(
                         bhvr.Configuration == null ?
-                        Activator.CreateInstance(bhvr.Type) as IEndpointBehavior:
+                        Activator.CreateInstance(bhvr.Type) as IEndpointBehavior :
                         Activator.CreateInstance(bhvr.Type, bhvr.Configuration) as IEndpointBehavior);
+                    se.AddEndpointBehavior(demandPolicy);
+                }
             }
             return retVal;
 

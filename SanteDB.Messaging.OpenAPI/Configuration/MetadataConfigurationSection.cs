@@ -24,5 +24,10 @@ namespace SanteDB.Messaging.Metadata.Configuration
         [XmlArray("services"), XmlArrayItem("add"), JsonProperty("services")]
         public List<ServiceEndpointOptions> Services { get; set; }
 
+        /// <summary>
+        /// Gets or sets the default host to apply
+        /// </summary>
+        [XmlElement("host"), JsonProperty("host")]
+        public String ApiHost { get; set; }
     }
 }

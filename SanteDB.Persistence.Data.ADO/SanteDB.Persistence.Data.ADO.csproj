@@ -208,10 +208,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Data\SQL\Updates\20170721-PSQL.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Data\SQL\Updates\20170725-PSQL.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Data\Map\ModelMap.xml" />
     <EmbeddedResource Include="Data\SQL\PSQL\santedb-codes.sql">
@@ -230,17 +230,21 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Data\SQL\Updates\20170803-PSQL.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Data\SQL\Updates\20170804-PSQL.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Data\SQL\Updates\20181113-PSQL.sql" />
-    <EmbeddedResource Include="Data\SQL\Updates\20181112-PSQL.sql" />
+    <EmbeddedResource Include="Data\SQL\Updates\20181113-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\Updates\20181112-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Data\SQL\FBSQL\santedb-ddl.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -251,17 +255,39 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Data\SQL\FBSQL\santedb-init.sql" />
-    <EmbeddedResource Include="Data\SQL\Updates\20180126-PSQL.sql" />
-    <EmbeddedResource Include="Data\SQL\Updates\20180211-PSQL.sql" />
-    <EmbeddedResource Include="Data\SQL\Updates\20180131-PSQL.sql" />
-    <EmbeddedResource Include="Data\SQL\Updates\20171030-PSQL.sql" />
-    <EmbeddedResource Include="Data\SQL\Updates\20171023-PSQL.sql" />
-    <EmbeddedResource Include="Data\SQL\Updates\20171011-PSQL.sql" />
-    <EmbeddedResource Include="Data\SQL\Updates\20171003-PSQL.sql" />
-    <EmbeddedResource Include="Data\SQL\Updates\20170913-PSQL.sql" />
-    <EmbeddedResource Include="Data\SQL\Updates\20171016-PSQL.sql" />
-    <EmbeddedResource Include="Data\SQL\Updates\20171124-PSQL.sql" />
-    <EmbeddedResource Include="Data\SQL\Updates\20171108-PSQL.sql" />
+    <EmbeddedResource Include="Data\SQL\Updates\20180126-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\Updates\20180211-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\Updates\20180131-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\Updates\20171030-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\Updates\20171023-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\Updates\20171011-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\Updates\20171003-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\Updates\20170913-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\Updates\20171016-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\Updates\20171124-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\Updates\20171108-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">

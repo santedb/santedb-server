@@ -32,8 +32,9 @@ using System.Security.Permissions;
 namespace SanteDB.Messaging.HDSI.Wcf
 {
     /// <summary>
-    /// Data implementation
+    /// Health Data Service Interface (HDSI)
     /// </summary>
+    /// <remarks>Represents SanteDB Server implementation of the the Health Data Service Interface (HDSI) contract</remarks>
     public class HdsiServiceBehavior : HdsiServiceBehaviorBase
     {
         // Trace source

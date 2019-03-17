@@ -48,8 +48,9 @@ using System.Security.Permissions;
 namespace SanteDB.Messaging.AMI.Wcf
 {
     /// <summary>
-    /// Implementation of the AMI service behavior
+    /// Administration Management Interface (AMI)
     /// </summary>
+    /// <remarks>Represents the SanteDB Server implementation of the Administrative Management Interface (AMI) contract</remarks>
     public class AmiServiceBehavior : AmiServiceBehaviorBase
     {
 

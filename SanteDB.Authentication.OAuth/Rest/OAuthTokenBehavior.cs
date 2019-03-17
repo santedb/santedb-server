@@ -54,8 +54,9 @@ using System.Text;
 namespace SanteDB.Authentication.OAuth2.Rest
 {
     /// <summary>
-    /// OAuth Token Service
+    /// OAuth2 Access Control Service
     /// </summary>
+    /// <remarks>An Access Control Service and Token Service implemented using OAUTH 2.0</remarks>
     [ServiceBehavior(Name = "OAuth2")]
     public class OAuthTokenBehavior : IOAuthTokenContract
     {

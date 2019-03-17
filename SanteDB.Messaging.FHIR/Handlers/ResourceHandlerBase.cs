@@ -23,6 +23,7 @@ using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Query;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
@@ -189,12 +190,23 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			var hdsiResults = this.Query(predicate, issues, query.QueryId, query.Start, query.Quantity, out totalResults);
 			var restOperationContext = RestOperationContext.Current;
 
+            var auth = AuthenticationContext.Current;
 			// Return FHIR query result
 			return new FhirQueryResult()
 			{
 				Details = issues,
 				Outcome = ResultCode.Accepted,
-				Results = hdsiResults.AsParallel().Select(o => this.MapToFhir(o, restOperationContext)).OfType<DomainResourceBase>().ToList(),
+				Results = hdsiResults.AsParallel().Select(o => {
+                    try
+                    {
+                        AuthenticationContext.Current = auth;
+                        return this.MapToFhir(o, restOperationContext);
+                    }
+                    finally
+                    {
+                        AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.AnonymousPrincipal);
+                    }
+                }).OfType<DomainResourceBase>().ToList(),
 				Query = query,
 				TotalResults = totalResults
 			};

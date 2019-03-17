@@ -30,8 +30,9 @@ using System.IO;
 namespace SanteDB.Messaging.RISI.Rest
 {
     /// <summary>
-    /// Provides operations for running and managing reports.
+    /// Reports Integration Service Interface (RISI)
     /// </summary>
+    /// <remarks>Represents the SanteDB Server implementation of the Report Integration Service Interface (RISI) contract</remarks>
     [ServiceBehavior(Name = "RISI")]
 	public partial class RisiBehavior : IRisiServiceContract
 	{
