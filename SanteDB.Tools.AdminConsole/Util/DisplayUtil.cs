@@ -164,5 +164,41 @@ namespace SanteDB.Tools.AdminConsole.Util
                     Console.WriteLine("{0} (explicit)", itm.Grant);
             }
         }
+
+        /// <summary>
+        /// Prompt for a masked password prompt
+        /// </summary>
+        internal static string PasswordPrompt(string prompt)
+        {
+            Console.Write(prompt);
+
+            var c = (ConsoleKey)0;
+            StringBuilder passwd = new StringBuilder();
+            while (c != ConsoleKey.Enter)
+            {
+                var ki = Console.ReadKey();
+                c = ki.Key;
+
+                if (c == ConsoleKey.Backspace)
+                {
+                    if (passwd.Length > 0)
+                    {
+                        passwd = passwd.Remove(passwd.Length - 1, 1);
+                        Console.Write(" \b");
+                    }
+                    else
+                        Console.CursorLeft = Console.CursorLeft + 1;
+                }
+                else if (c == ConsoleKey.Escape)
+                    return String.Empty;
+                else if (c != ConsoleKey.Enter)
+                {
+                    passwd.Append(ki.KeyChar);
+                    Console.Write("\b*");
+                }
+            }
+            Console.WriteLine();
+            return passwd.ToString();
+        }
     }
 }

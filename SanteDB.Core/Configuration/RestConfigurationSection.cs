@@ -41,6 +41,12 @@ namespace SanteDB.Core.Configuration
         }
 
         /// <summary>
+        /// Gets the base address
+        /// </summary>
+        [XmlElement("baseAddress"), JsonProperty("baseAddress")]
+        public string ExternalHostPort { get; set; }
+
+        /// <summary>
         /// Gets or sets the service configuration
         /// </summary>
         [XmlElement("service"), JsonProperty("service")]

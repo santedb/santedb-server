@@ -20,6 +20,7 @@
 using Microsoft.Diagnostics.Runtime;
 using RestSrvr;
 using SanteDB.Core;
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Interop;
@@ -132,11 +133,26 @@ namespace SanteDB.Messaging.AMI.Wcf
             if (ApplicationServiceContext.Current.GetService<IPatchService>() != null)
                 RestOperationContext.Current.OutgoingResponse.Headers.Add("Accept-Patch", "application/xml+sdb-patch");
 
+            // mex configuration
+            var mexConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RestConfigurationSection>();
+            String boundHostPort = $"{RestOperationContext.Current.IncomingRequest.Url.Scheme}://{RestOperationContext.Current.IncomingRequest.Url.Host}:{RestOperationContext.Current.IncomingRequest.Url.Port}";
+            if(!String.IsNullOrEmpty(mexConfig.ExternalHostPort))
+            {
+                var tUrl = new Uri(mexConfig.ExternalHostPort);
+                boundHostPort = $"{tUrl.Scheme}://{tUrl.Host}:{tUrl.Port}";
+            }
+
             var serviceOptions = new ServiceOptions
             {
                 InterfaceVersion = "1.0.0.0",
                 Endpoints = (ApplicationServiceContext.Current as IServiceManager).GetServices().OfType<IApiEndpointProvider>().Select(o =>
                     new ServiceEndpointOptions(o)
+                    {
+                        BaseUrl = o.Url.Select(url => {
+                            var turi = new Uri(url);
+                            return $"{boundHostPort}{turi.AbsolutePath}";
+                        }).ToArray()
+                    }
                 ).ToList()
             };
 

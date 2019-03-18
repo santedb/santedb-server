@@ -357,9 +357,26 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
                 if (user == null)
                     throw new KeyNotFoundException($"User {un} not found");
 
-                user.Entity.Password = parms.Password;
+                if (String.IsNullOrEmpty(parms.Password))
+                {
+                    var passwd = DisplayUtil.PasswordPrompt($"NEW Password for {user.Entity.UserName}:");
+                    if (String.IsNullOrEmpty(passwd))
+                    {
+                        Console.WriteLine("Aborted");
+                        continue;
+                    }
+                    else if(passwd != DisplayUtil.PasswordPrompt($"CONFIRM Password for {user.Entity.UserName}:"))
+                    {
+                        Console.WriteLine("Passwords do not match!");
+                        continue;
+                    }
+                    user.Entity.Password = passwd;
+                }
+                else
+                    user.Entity.Password = parms.Password;
                 user.PasswordOnly = true;
                 m_client.UpdateUser(user.Entity.Key.Value, user);
+
                 break;
             }
         }

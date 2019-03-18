@@ -26,6 +26,7 @@ using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Tools.AdminConsole.Security;
+using SanteDB.Tools.AdminConsole.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,8 +87,8 @@ namespace SanteDB.Tools.AdminConsole.Shell
         /// </summary>
         private ApplicationContext(Parameters.ConsoleParameters configuration)
         {
-            this.ApplicationName = configuration.AppId ?? "org.openiz.oizac";
-            this.ApplicationSecret = configuration.AppSecret ?? "oizac-default-secret";
+            this.ApplicationName = configuration.AppId ?? "org.santedb.sdbac";
+            this.ApplicationSecret = configuration.AppSecret ?? "sdbac-default-secret";
             this.m_configuration = configuration;
         }
 
@@ -244,35 +245,9 @@ namespace SanteDB.Tools.AdminConsole.Shell
 
                 if (String.IsNullOrEmpty(this.m_configuration.Password))
                 {
-                    Console.Write("Password:");
-
-                    var c = (ConsoleKey)0;
-                    StringBuilder passwd = new StringBuilder();
-                    while (c != ConsoleKey.Enter)
-                    {
-                        var ki = Console.ReadKey();
-                        c = ki.Key;
-
-                        if (c == ConsoleKey.Backspace )
-                        {
-                            if (passwd.Length > 0)
-                            {
-                                passwd = passwd.Remove(passwd.Length - 1, 1);
-                                Console.Write(" \b");
-                            }
-                            else
-                                Console.CursorLeft = Console.CursorLeft + 1;
-                        }
-                        else if (c == ConsoleKey.Escape)
-                            return false;
-                        else if (c != ConsoleKey.Enter)
-                        {
-                            passwd.Append(ki.KeyChar);
-                            Console.Write("\b*");
-                        }
-                    }
-                    this.m_configuration.Password = passwd.ToString();
-                    Console.WriteLine();
+                    this.m_configuration.Password = DisplayUtil.PasswordPrompt("Password:");
+                    if (String.IsNullOrEmpty(this.m_configuration.Password))
+                        return false;
                 }
                 else
                     Console.WriteLine("Password:{0}", new String('*', this.m_configuration.Password.Length * 2));
