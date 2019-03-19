@@ -109,11 +109,15 @@ namespace SanteDB.Core.Http
             else
                 retVal.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) =>
                 {
-                    var configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
-                    this.traceSource.TraceEvent(TraceEventType.Warning, 0, "Checking for certificate override for {0}", (certificate as X509Certificate2).Thumbprint);
-                    if (configuration.TrustedCertificates.Contains((certificate as X509Certificate2).Thumbprint))
+                    if (sslPolicyErrors == System.Net.Security.SslPolicyErrors.None)
                         return true;
-                    else return false;
+                    else { 
+                        var configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
+                        this.traceSource.TraceEvent(TraceEventType.Warning, 0, "Checking for certificate override for {0}", (certificate as X509Certificate2).Thumbprint);
+                        if (configuration.TrustedCertificates.Contains((certificate as X509Certificate2).Thumbprint))
+                            return true;
+                        else return false;
+                    }
                 };
 
 

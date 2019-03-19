@@ -184,15 +184,25 @@ namespace SanteDB.Messaging.AMI.Wcf
             retVal.CreatedByKey = Guid.Parse(AuthenticationContext.SystemUserSid);
             retVal.Threads = new List<DiagnosticThreadInfo>();
 
-            foreach (ProcessThread thd in Process.GetCurrentProcess().Threads)
-                retVal.Threads.Add(new DiagnosticThreadInfo()
-                {
-                    Name = thd.Id.ToString(),
-                    CpuTime = thd.UserProcessorTime,
-                    WaitReason = null,
-                    State = thd.ThreadState.ToString(),
-                    TaskInfo = thd.ThreadState == ThreadState.Wait ? thd.WaitReason.ToString() : "N/A"
-                });
+            try
+            {
+                if (Process.GetCurrentProcess()?.Threads == null)
+                    this.m_traceSource.TraceEvent(TraceEventType.Warning, 0, "Threading information is not available for this instance");
+                else 
+                    foreach (ProcessThread thd in Process.GetCurrentProcess().Threads.OfType<ProcessThread>().Where(o=>o != null))
+                        retVal.Threads.Add(new DiagnosticThreadInfo()
+                        {
+                            Name = thd.Id.ToString(),
+                            CpuTime = thd.UserProcessorTime,
+                            WaitReason = null,
+                            State = thd.ThreadState.ToString(),
+                            TaskInfo = thd.ThreadState == ThreadState.Wait ? thd.WaitReason.ToString() : "N/A"
+                        });
+            }
+            catch(Exception e)
+            {
+                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error gathering thread information: {0}", e);
+            }
 
             retVal.ApplicationInfo.Assemblies = AppDomain.CurrentDomain.GetAssemblies().Select(o => new DiagnosticVersionInfo(o)).ToList();
             retVal.ApplicationInfo.EnvironmentInfo = new DiagnosticEnvironmentInfo()
