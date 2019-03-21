@@ -23,9 +23,11 @@ using Newtonsoft.Json;
 using RestSrvr;
 using RestSrvr.Attributes;
 using RestSrvr.Message;
+using SanteDB.Core.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -42,7 +44,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
     {
 
         // Trace source
-        private TraceSource m_traceSource = new TraceSource("SanteDB.Messaging.FHIR");
+        private Tracer m_traceSource = new Tracer("SanteDB.Messaging.FHIR");
         // Known types
         private static Type[] s_knownTypes = typeof(IFhirServiceContract).GetCustomAttributes<ServiceKnownResourceAttribute>().Select(o=>o.Type).ToArray();
 
@@ -124,7 +126,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 throw;
             }
 
@@ -205,7 +207,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 throw;
             }
         }

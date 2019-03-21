@@ -30,6 +30,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using SanteDB.Core.Diagnostics;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Persistence.Reporting.ADO
 {
@@ -48,11 +49,11 @@ namespace SanteDB.Persistence.Reporting.ADO
         /// <summary>
         /// The internal reference to the trace source.
         /// </summary>
-        private readonly TraceSource traceSource = new TraceSource(ReportingPersistenceConstants.TraceName);
+        private readonly Tracer traceSource = new Tracer(ReportingPersistenceConstants.TraceName);
 
 		static ReportingPersistenceService()
 		{
-			var tracer = new TraceSource(ReportingPersistenceConstants.TraceName);
+			var tracer = new Tracer(ReportingPersistenceConstants.TraceName);
 
 			Configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<ReportingConfiguration>();
 
@@ -63,14 +64,14 @@ namespace SanteDB.Persistence.Reporting.ADO
 			}
 			catch (ModelMapValidationException e)
 			{
-				tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error validating model map: {0}", e);
+				tracer.TraceEvent(EventLevel.Error, "Error validating model map: {0}", e);
                 foreach (var err in e.ValidationDetails)
                     tracer.TraceError("{0} : {1} @ {2}", err.Level, err.Message, err.Location);
 				throw;
 			}
 			catch (Exception e)
 			{
-				tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error validating model map: {0}", e);
+				tracer.TraceEvent(EventLevel.Error,  "Error validating model map: {0}", e);
 				throw;
 			}
 		}
@@ -136,26 +137,26 @@ namespace SanteDB.Persistence.Reporting.ADO
 						throw new InvalidOperationException($"Invalid schema version. SanteDB version {SanteDBVersion} is older than the database schema version: {databaseVersion}");
 					}
 
-					traceSource.TraceEvent(TraceEventType.Information, 0, $"SanteDB Reporting schema version: {databaseVersion}");
+					traceSource.TraceEvent(EventLevel.Informational,  $"SanteDB Reporting schema version: {databaseVersion}");
 				}
 
-				this.traceSource.TraceEvent(TraceEventType.Information, 0, "Loading reporting persistence services");
+				this.traceSource.TraceEvent(EventLevel.Informational,  "Loading reporting persistence services");
 
 				this.Starting?.Invoke(this, EventArgs.Empty);
 
-				this.traceSource.TraceEvent(TraceEventType.Information, 0, $"Reporting configuration loaded, using connection string: { Configuration.ReadWriteConnectionString }");
+				this.traceSource.TraceEvent(EventLevel.Informational,  $"Reporting configuration loaded, using connection string: { Configuration.ReadWriteConnectionString }");
 
 				// Iterate the persistence services
 				foreach (var t in typeof(ReportingPersistenceService).GetTypeInfo().Assembly.DefinedTypes.Where(o => o.Namespace == "SanteDB.Persistence.Reporting.ADO.Services" && !o.GetTypeInfo().IsAbstract && !o.IsGenericTypeDefinition))
 				{
 					try
 					{
-						this.traceSource.TraceEvent(TraceEventType.Verbose, 0, "Loading {0}...", t.AssemblyQualifiedName);
+						this.traceSource.TraceEvent(EventLevel.Verbose, "Loading {0}...", t.AssemblyQualifiedName);
 						(ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(t);
 					}
 					catch (Exception e)
 					{
-						this.traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error adding service {0} : {1}", t.AssemblyQualifiedName, e);
+						this.traceSource.TraceEvent(EventLevel.Error,  "Error adding service {0} : {1}", t.AssemblyQualifiedName, e);
 					}
 				}
 
@@ -163,7 +164,7 @@ namespace SanteDB.Persistence.Reporting.ADO
 			}
 			catch (Exception e)
 			{
-				this.traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+				this.traceSource.TraceEvent(EventLevel.Error,  e.ToString());
 				throw;
 			}
 

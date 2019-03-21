@@ -20,6 +20,7 @@
 using MARC.Everest.Connectors;
 using RestSrvr;
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Query;
@@ -53,7 +54,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// The trace source instance.
 		/// </summary>
-		protected TraceSource traceSource = new TraceSource("SanteDB.Messaging.FHIR");
+		protected Tracer traceSource = new Tracer("SanteDB.Messaging.FHIR");
 
 		/// <summary>
 		/// Gets the name of the resource.
@@ -72,7 +73,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <exception cref="System.Data.SyntaxErrorException"></exception>
 		public virtual FhirOperationResult Create(DomainResourceBase target, TransactionMode mode)
 		{
-			this.traceSource.TraceInformation("Creating resource {0} ({1})", this.ResourceName, target);
+			this.traceSource.TraceInfo("Creating resource {0} ({1})", this.ResourceName, target);
 
 			if (target == null)
 				throw new ArgumentNullException(nameof(target));
@@ -109,7 +110,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			if (String.IsNullOrEmpty(id))
 				throw new ArgumentNullException(nameof(id));
 
-			this.traceSource.TraceInformation("Deleting resource {0}/{1}", this.ResourceName, id);
+			this.traceSource.TraceInfo("Deleting resource {0}/{1}", this.ResourceName, id);
 
 			// Delete
 			var guidId = Guid.Empty;
@@ -262,7 +263,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <exception cref="System.Collections.Generic.KeyNotFoundException"></exception>
 		public FhirOperationResult Update(string id, DomainResourceBase target, TransactionMode mode)
 		{
-			this.traceSource.TraceInformation("Updating resource {0}/{1} ({2})", this.ResourceName, id, target);
+			this.traceSource.TraceInfo("Updating resource {0}/{1} ({2})", this.ResourceName, id, target);
 
 			if (target == null)
 				throw new ArgumentNullException(nameof(target));

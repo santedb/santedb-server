@@ -34,6 +34,7 @@ using SanteDB.Core.Security;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -95,7 +96,7 @@ namespace SanteDB.Core.Rest.Serialization
         private String m_version = Assembly.GetEntryAssembly().GetName().Version.ToString();
         private String m_versionName = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "Unnamed";
         // Trace source
-        private TraceSource m_traceSource = new TraceSource(SanteDBConstants.WcfTraceSourceName);
+        private Tracer m_traceSource = new Tracer(SanteDBConstants.WcfTraceSourceName);
         // Known types
         private static Type[] s_knownTypes = typeof(TContract).GetCustomAttributes<ServiceKnownResourceAttribute>().Select(t => t.Type).ToArray();
         // Serializers
@@ -107,7 +108,7 @@ namespace SanteDB.Core.Rest.Serialization
         static RestMessageDispatchFormatter()
         {
             m_defaultViewModel = ViewModelDescription.Load(typeof(RestMessageDispatchFormatter<>).Assembly.GetManifestResourceStream("SanteDB.Core.Resources.ViewModel.xml"));
-            var tracer = new TraceSource(SanteDBConstants.WcfTraceSourceName);
+            var tracer = new Tracer(SanteDBConstants.WcfTraceSourceName);
 
 
             tracer.TraceInfo("Will generate serializer for {0}", typeof(TContract).FullName);
@@ -141,7 +142,7 @@ namespace SanteDB.Core.Rest.Serialization
             try
             {
 #if DEBUG
-                this.m_traceSource.TraceEvent(TraceEventType.Information, 0, "Received request from: {0}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint);
+                this.m_traceSource.TraceEvent(EventLevel.Informational,  "Received request from: {0}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint);
 #endif
 
                 var httpRequest = RestOperationContext.Current.IncomingRequest;
@@ -226,7 +227,7 @@ namespace SanteDB.Core.Rest.Serialization
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 throw;
             }
 
@@ -355,7 +356,7 @@ namespace SanteDB.Core.Rest.Serialization
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 new RestErrorHandler().ProvideFault(e, response);
             }
         }

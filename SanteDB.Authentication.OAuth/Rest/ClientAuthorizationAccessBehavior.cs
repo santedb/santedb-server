@@ -21,12 +21,14 @@ using RestSrvr;
 using RestSrvr.Message;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Security;
 using System.Security.Authentication;
 
@@ -44,7 +46,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
         private ApplicationServiceContextConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<ApplicationServiceContextConfigurationSection>();
 
         // Trace source
-        private TraceSource m_traceSource = new TraceSource(OAuthConstants.TraceSourceName);
+        private Tracer m_traceSource = new Tracer(OAuthConstants.TraceSourceName);
 
         /// <summary>
         /// Apply the policy to the request
@@ -53,7 +55,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
         {
             try
             {
-                this.m_traceSource.TraceInformation("Entering OAuth BasicAuthorizationAccessPolicy");
+                this.m_traceSource.TraceInfo("Entering OAuth BasicAuthorizationAccessPolicy");
 
                 // Role service
                 var identityService = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
@@ -88,7 +90,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
             }
         }
 

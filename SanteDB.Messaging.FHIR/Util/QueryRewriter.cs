@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Query;
@@ -62,7 +63,7 @@ namespace SanteDB.Messaging.FHIR.Util
     /// </summary>
     public class QueryRewriter
     {
-        private static TraceSource s_tracer = new TraceSource("SanteDB.Messaging.FHIR");
+        private static Tracer s_tracer = new Tracer("SanteDB.Messaging.FHIR");
 
         // The query parameter map
         private static QueryParameterMap s_map;
@@ -338,7 +339,7 @@ namespace SanteDB.Messaging.FHIR.Util
                                     codeSystem = ApplicationServiceContext.Current.GetService<IRepositoryService<CodeSystem>>().Find(o => o.Name == codeSystemUri).FirstOrDefault();
 
 
-                                s_tracer.TraceInformation("Have translated FHIR domain {0} to {1}", codeSystemUri, codeSystem?.Name);
+                                s_tracer.TraceInfo("Have translated FHIR domain {0} to {1}", codeSystemUri, codeSystem?.Name);
 
                                 if (codeSystem != null)
                                     hdsiQuery.Add(String.Format("{0}.referenceTerm[{1}].term.mnemonic", parmMap.ModelName, codeSystem.Name), segs[1]);

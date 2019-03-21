@@ -30,6 +30,7 @@ using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Interfaces;
+using SanteDB.Core.Diagnostics;
 
 namespace SanteDB.Core
 {
@@ -185,10 +186,16 @@ namespace SanteDB.Core
                     if (this.m_configuration == null)
                         throw new InvalidOperationException("Cannot load configuration, perhaps the services aren't installed?");
 
+                    // Assign diagnostics
+                    var config = this.GetService<IConfigurationManager>().GetSection<DiagnosticsConfigurationSection>();
+                    foreach (var writer in config.TraceWriter)
+                        Tracer.AddWriter(writer.TraceWriter, writer.Filter);
+                    
                     // Add this
                     this.m_serviceInstances.Add(this);
 
                     Trace.TraceInformation("STAGE1 START: Loading services");
+
                     foreach (var svc in this.m_configuration.ServiceProviders)
                     {
                         if (svc.Type == null)

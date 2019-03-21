@@ -35,6 +35,8 @@ using System.Linq;
 using System.Reflection;
 using SanteDB.Rest.AMI.Resources;
 using SanteDB.Rest.AMI;
+using SanteDB.Core.Diagnostics;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Messaging.AMI
 {
@@ -85,7 +87,7 @@ namespace SanteDB.Messaging.AMI
         /// <summary>
         /// The internal reference to the trace source.
         /// </summary>
-        private readonly TraceSource m_traceSource = new TraceSource(AmiConstants.TraceSourceName);
+        private readonly Tracer m_traceSource = new Tracer(AmiConstants.TraceSourceName);
 
         /// <summary>
         /// The internal reference to the AMI configuration.
@@ -179,7 +181,7 @@ namespace SanteDB.Messaging.AMI
                 // Add service behaviors
                 foreach (ServiceEndpoint endpoint in this.m_webHost.Endpoints)
                 {
-                    this.m_traceSource.TraceInformation("Starting AMI on {0}...", endpoint.Description.ListenUri);
+                    this.m_traceSource.TraceInfo("Starting AMI on {0}...", endpoint.Description.ListenUri);
                 }
 
                 // Start the webhost
@@ -202,7 +204,7 @@ namespace SanteDB.Messaging.AMI
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 return false;
             }
         }

@@ -36,6 +36,7 @@ using SanteDB.Persistence.Data.ADO.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Principal;
@@ -296,7 +297,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             this.FireRetrieving(preArgs);
             if (preArgs.Cancel)
             {
-                this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Pre-Event handler indicates abort retrieve {0}", containerId);
+                this.m_tracer.TraceEvent(EventLevel.Warning, "Pre-Event handler indicates abort retrieve {0}", containerId);
                 return preArgs.Result;
             }
 
@@ -305,7 +306,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 try
                 {
                     connection.Open();
-                    this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "GET {0}", containerId);
+                    this.m_tracer.TraceEvent(EventLevel.Verbose, "GET {0}", containerId);
 
                     TModel retVal = null;
                     if (loadFast)
@@ -331,14 +332,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(TraceEventType.Error, 0, "Error : {0}", e);
+                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error : {0}", e);
                     throw;
                 }
                 finally
                 {
 #if DEBUG
                     sw.Stop();
-                    this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "Retrieve took {0} ms", sw.ElapsedMilliseconds);
+                    this.m_tracer.TraceEvent(EventLevel.Verbose, "Retrieve took {0} ms", sw.ElapsedMilliseconds);
 #endif
                 }
 
@@ -354,7 +355,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TAssociation>>() as AdoBasePersistenceService<TAssociation>;
             if (persistenceService == null)
             {
-                this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Information, 0, "Missing persister for type {0}", typeof(TAssociation).Name);
+                this.m_tracer.TraceEvent(EventLevel.Informational,  "Missing persister for type {0}", typeof(TAssociation).Name);
                 return;
             }
 
@@ -407,7 +408,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     obsVersion = source.VersionSequence.GetValueOrDefault();
 
 #if DEBUG
-                this.m_tracer.TraceInformation("----- OBSOLETING {0} {1} ---- ", del.GetType().Name, del.Key);
+                this.m_tracer.TraceInfo("----- OBSOLETING {0} {1} ---- ", del.GetType().Name, del.Key);
 #endif
                 del.ObsoleteVersionSequenceId = obsVersion;
                 context.Update<TDomainAssociation>(del);

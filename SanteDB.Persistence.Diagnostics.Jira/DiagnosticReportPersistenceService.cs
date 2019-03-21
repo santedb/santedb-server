@@ -38,6 +38,8 @@ using System.Security.Principal;
 using System.Text;
 using System.Xml.Serialization;
 using SanteDB.Core.Model.Query;
+using SanteDB.Core.Diagnostics;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Persistence.Diagnostics.Jira
 {
@@ -54,7 +56,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         public string ServiceName => "JIRA Diagnostic Report Submission";
 
         // Trace source
-        private TraceSource m_traceSource = new TraceSource("SanteDB.Persistence.Diagnostics.Jira");
+        private Tracer m_traceSource = new Tracer("SanteDB.Persistence.Diagnostics.Jira");
 
         // Configuration
         private JiraServiceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<JiraServiceConfigurationSection>();
@@ -133,7 +135,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira
             this.Inserting?.Invoke(this, persistenceArgs);
             if (persistenceArgs.Cancel)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Warning, 0, "Pre-persistence event cancelled the insertion");
+                this.m_traceSource.TraceEvent(EventLevel.Warning, "Pre-persistence event cancelled the insertion");
                 return persistenceArgs.Data;
             }
 
@@ -195,7 +197,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira
             }
             catch (Exception ex)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, ex.HResult, "Error sending to JIRA: {0}", ex);
+                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error sending to JIRA: {0}", ex);
                 throw;
             }
 

@@ -23,6 +23,7 @@ using SanteDB.Persistence.Reporting.ADO.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Principal;
@@ -122,7 +123,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 				}
 				else
 				{
-					this.traceSource.TraceEvent(TraceEventType.Verbose, 0, "Will use slow query construction due to complex mapped fields");
+					this.traceSource.TraceEvent(EventLevel.Verbose, "Will use slow query construction due to complex mapped fields");
 					domainQuery = ReportingPersistenceService.QueryBuilder.CreateQuery(query);
 				}
 
@@ -131,8 +132,8 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 
 				if (Configuration.TraceSql)
 				{
-					traceSource.TraceEvent(TraceEventType.Verbose, 0, "Trace SQL flag is set to true, printing SQL statement");
-					traceSource.TraceEvent(TraceEventType.Verbose, 0, $"GENERATED SQL STATEMENT: {domainQuery.SQL}");
+					traceSource.TraceEvent(EventLevel.Verbose, "Trace SQL flag is set to true, printing SQL statement");
+					traceSource.TraceEvent(EventLevel.Verbose, $"GENERATED SQL STATEMENT: {domainQuery.SQL}");
 				}
 
 				if (offset > 0)
@@ -151,7 +152,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 			}
 			catch (Exception e)
 			{
-				traceSource.TraceEvent(TraceEventType.Error, 0, $"Unable to query: {e}");
+				traceSource.TraceEvent(EventLevel.Error,  $"Unable to query: {e}");
 				throw;
 			}
 		}

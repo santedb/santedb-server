@@ -32,6 +32,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -64,7 +65,7 @@ namespace SanteDB.Caching.Memory
         private MemoryCacheConfigurationSection m_configuration = ApplicationServiceContext.Current?.GetService<IConfigurationManager>()?.GetSection<MemoryCacheConfigurationSection>();
 
         // Tracer for logging
-        private TraceSource m_tracer = new TraceSource("SanteDB.Caching.Memory");
+        private Tracer m_tracer = new Tracer(MemoryCacheConstants.TraceSourceName);
 
         // Current singleton
         private static MemoryCache s_current = null;
@@ -86,7 +87,7 @@ namespace SanteDB.Caching.Memory
         /// </summary>
         private MemoryCache()
         {
-            m_tracer.TraceInformation("Binding initial collections...");
+            m_tracer.TraceInfo("Binding initial collections...");
 
             // Look for non-cached types
             foreach (var itm in typeof(IdentifiedData).Assembly.GetTypes().Where(o => o.GetCustomAttribute<NonCachedAttribute>() != null))
@@ -101,12 +102,12 @@ namespace SanteDB.Caching.Memory
                     ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(x =>
                     {
                         var xt = (x as TypeCacheConfigurationInfo);
-                        this.m_tracer.TraceEvent(TraceEventType.Information, 0, "Initialize cache for {0}", xt.Type);
+                        this.m_tracer.TraceEvent(EventLevel.Informational, "Initialize cache for {0}", xt.Type);
                         var idpInstance = ApplicationServiceContext.Current.GetService(typeof(IDataPersistenceService<>).MakeGenericType(xt.Type)) as IDataPersistenceService;
                         if (idpInstance != null)
                             foreach (var itm in xt.SeedQueries)
                             {
-                                this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, itm);
+                                this.m_tracer.TraceEvent(EventLevel.Verbose, itm);
                                 var query = typeof(QueryExpressionParser).GetGenericMethod("BuildLinqExpression", new Type[] { xt.Type }, new Type[] { typeof(NameValueCollection) }).Invoke(null, new object[] { NameValueCollection.ParseQueryString(itm) }) as Expression;
                                 int offset = 0, totalResults = 1;
                                 while (offset < totalResults)
@@ -372,7 +373,7 @@ namespace SanteDB.Caching.Memory
                     if (conf == null) return;
                     foreach (var sd in conf.SeedQueries)
                     {
-                        this.m_tracer.TraceInformation("Seeding cache with {0}", sd);
+                        this.m_tracer.TraceInfo("Seeding cache with {0}", sd);
                         // TODO: Seed cache initial data
                     }
                 }

@@ -17,11 +17,13 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security.Services;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Security;
 using System.Security.Permissions;
 using System.Security.Principal;
@@ -35,7 +37,7 @@ namespace SanteDB.Core.Security.Attribute
     /// </summary>
     public class PolicyPermissionAttribute : CodeAccessSecurityAttribute
     {
-        private TraceSource m_traceSource = new TraceSource(SanteDBConstants.SecurityTraceSourceName);
+        private Tracer m_traceSource = new Tracer(SanteDBConstants.SecurityTraceSourceName);
 
         /// <summary>
         /// Creates a policy permission attribute
@@ -85,14 +87,14 @@ namespace SanteDB.Core.Security.Attribute
         private IPrincipal m_principal;
 
         // Security
-        private TraceSource m_traceSource = new TraceSource(SanteDBConstants.SecurityTraceSourceName);
+        private Tracer m_traceSource = new Tracer(SanteDBConstants.SecurityTraceSourceName);
 
         /// <summary>
         /// Policy permission
         /// </summary>
         public PolicyPermission(PermissionState state, String policyId, IPrincipal principal)
         {
-            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Create PolicyPermission - {0}", principal.Identity.Name);
+            this.m_traceSource.TraceEvent(EventLevel.Verbose, "Create PolicyPermission - {0}", principal.Identity.Name);
             this.m_isUnrestricted = state == PermissionState.Unrestricted;
             this.m_policyId = policyId;
             this.m_principal = principal;
@@ -135,7 +137,7 @@ namespace SanteDB.Core.Security.Attribute
             else if (pdp != null)
                 action = pdp.GetPolicyOutcome(principal, this.m_policyId);
 
-            this.m_traceSource.TraceInformation("Policy Enforce: {0}({1}) = {2}", principal?.Identity?.Name, this.m_policyId, action);
+            this.m_traceSource.TraceInfo("Policy Enforce: {0}({1}) = {2}", principal?.Identity?.Name, this.m_policyId, action);
 
             if (action != PolicyGrantType.Grant)
                 throw new PolicyViolationException(principal, this.m_policyId, action);

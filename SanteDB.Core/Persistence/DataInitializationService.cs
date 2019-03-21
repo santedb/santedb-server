@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -48,7 +49,7 @@ namespace SanteDB.Core.Persistence
         public string ServiceName => "DataSet Initialization Service";
 
         // Trace source
-        private TraceSource m_traceSource = new TraceSource(SanteDBConstants.DatasetInstallSourceName);
+        private Tracer m_traceSource = new Tracer(SanteDBConstants.DatasetInstallSourceName);
 
         /// <summary>
         /// True when the service is running
@@ -95,7 +96,7 @@ namespace SanteDB.Core.Persistence
             try
             {
 
-                this.m_traceSource.TraceInformation("Applying {0} ({1} objects)...", ds.Id, ds.Action.Count);
+                this.m_traceSource.TraceInfo("Applying {0} ({1} objects)...", ds.Id, ds.Action.Count);
 
                 int i = 0;
                 // Can this dataset be installed as a bundle?
@@ -125,7 +126,7 @@ namespace SanteDB.Core.Persistence
                             // Don't insert duplicates
                             var getMethod = idpType.GetMethod("Get");
 
-                            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "{0} {1}", itm.ActionName, itm.Element);
+                            this.m_traceSource.TraceEvent(EventLevel.Verbose, "{0} {1}", itm.ActionName, itm.Element);
 
                             Object target = null, existing = null;
                             if (itm.Element.Key.HasValue)
@@ -200,7 +201,7 @@ namespace SanteDB.Core.Persistence
                         }
                         catch(Exception e)
                         {
-                            this.m_traceSource.TraceEvent(TraceEventType.Verbose, e.HResult, "There was an issue in the dataset file {0} : {1} ", ds.Id, e);
+                            this.m_traceSource.TraceEvent(EventLevel.Verbose, "There was an issue in the dataset file {0} : {1} ", ds.Id, e);
                             if (!itm.IgnoreErrors)
                                 throw;
                         }
@@ -210,15 +211,15 @@ namespace SanteDB.Core.Persistence
                 var isqlp = ApplicationServiceContext.Current.GetService<ISqlDataPersistenceService>();
                 foreach (var de in ds.Exec.Where(o => o.InvariantName == isqlp?.InvariantName))
                 {
-                    this.m_traceSource.TraceInformation("Executing post-dataset SQL instructions for {0}...", ds.Id);
+                    this.m_traceSource.TraceInfo("Executing post-dataset SQL instructions for {0}...", ds.Id);
                     isqlp.Execute(de.QueryText);
                 }
-                this.m_traceSource.TraceInformation("Applied {0} changes", ds.Action.Count);
+                this.m_traceSource.TraceInfo("Applied {0} changes", ds.Action.Count);
 
             }
             catch(Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error applying dataset {0}: {1}", ds.Id, e);
+                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error applying dataset {0}: {1}", ds.Id, e);
                 throw;
             }
         }
@@ -246,7 +247,7 @@ namespace SanteDB.Core.Persistence
                 AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
 
                 String dataDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Data");
-                this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Scanning Directory {0} for datasets", dataDirectory);
+                this.m_traceSource.TraceEvent(EventLevel.Verbose, "Scanning Directory {0} for datasets", dataDirectory);
 
                 XmlSerializer xsz = new XmlSerializer(typeof(Dataset));
                 var datasetFiles = Directory.GetFiles(dataDirectory, "*.dataset");
@@ -267,7 +268,7 @@ namespace SanteDB.Core.Persistence
                         {
                             var ds = xsz.Deserialize(fs) as Dataset;
                             fileProgress?.Invoke(this, new Services.ProgressChangedEventArgs(++i / (float)datasetFiles.Length, ds.Id));
-                            this.m_traceSource.TraceEvent(TraceEventType.Information, 0, "Installing {0}...", Path.GetFileName(f));
+                            this.m_traceSource.TraceEvent(EventLevel.Informational,  "Installing {0}...", Path.GetFileName(f));
                             this.InstallDataset(ds);
                         }
 
@@ -276,14 +277,14 @@ namespace SanteDB.Core.Persistence
                     }
                     catch (Exception ex)
                     {
-                        this.m_traceSource.TraceEvent(TraceEventType.Verbose, ex.HResult, "Error applying {0}: {1}", f, ex);
+                        this.m_traceSource.TraceEvent(EventLevel.Verbose, "Error applying {0}: {1}", f, ex);
                         throw;
                     }
                 }
             }
             finally
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Un-binding event handler");
+                this.m_traceSource.TraceEvent(EventLevel.Verbose, "Un-binding event handler");
                 ApplicationServiceContext.Current.Started -= this.m_persistenceHandler;
             }
         }
@@ -293,7 +294,7 @@ namespace SanteDB.Core.Persistence
         /// </summary>
         public bool Start()
         {
-            this.m_traceSource.TraceInformation("Binding to startup...");
+            this.m_traceSource.TraceInfo("Binding to startup...");
             ApplicationServiceContext.Current.Started += this.m_persistenceHandler;
             return true;
         }

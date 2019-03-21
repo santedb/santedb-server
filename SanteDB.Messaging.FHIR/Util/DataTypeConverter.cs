@@ -19,6 +19,7 @@
  */
 using RestSrvr;
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Extensions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
@@ -33,6 +34,7 @@ using SanteDB.Messaging.FHIR.Resources;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 
 namespace SanteDB.Messaging.FHIR.Util
@@ -45,7 +47,7 @@ namespace SanteDB.Messaging.FHIR.Util
 		/// <summary>
 		/// The trace source.
 		/// </summary>
-		private static readonly TraceSource traceSource = new TraceSource("SanteDB.Messaging.FHIR");
+		private static readonly Tracer traceSource = new Tracer("SanteDB.Messaging.FHIR");
 
 		/// <summary>
 		/// Creates a FHIR reference.
@@ -126,7 +128,7 @@ namespace SanteDB.Messaging.FHIR.Util
         /// <exception cref="System.ArgumentNullException">fhirExtension - Value cannot be null</exception>
         public static ActExtension ToActExtension(Extension fhirExtension)
 		{
-			traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping FHIR extension");
+			traceSource.TraceEvent(EventLevel.Verbose, "Mapping FHIR extension");
 
 			var extension = new ActExtension();
 
@@ -160,7 +162,7 @@ namespace SanteDB.Messaging.FHIR.Util
         /// <exception cref="System.ArgumentNullException">fhirExtension - Value cannot be null</exception>
         public static EntityExtension ToEntityExtension(Extension fhirExtension)
         {
-            traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping FHIR extension");
+            traceSource.TraceEvent(EventLevel.Verbose, "Mapping FHIR extension");
 
             var extension = new EntityExtension();
 
@@ -193,7 +195,7 @@ namespace SanteDB.Messaging.FHIR.Util
         /// <returns>Returns the converted act identifier instance.</returns>
         public static ActIdentifier ToActIdentifier(FhirIdentifier fhirIdentifier)
 		{
-			traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping FHIR identifier");
+			traceSource.TraceEvent(EventLevel.Verbose, "Mapping FHIR identifier");
 
 			if (fhirIdentifier == null)
 			{
@@ -228,7 +230,7 @@ namespace SanteDB.Messaging.FHIR.Util
 				return null;
 			}
 
-            traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping assigning authority");
+            traceSource.TraceEvent(EventLevel.Verbose, "Mapping assigning authority");
 
 			var oidRegistrar = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>();
             var oid = oidRegistrar.Get(fhirSystem.Value);
@@ -248,7 +250,7 @@ namespace SanteDB.Messaging.FHIR.Util
 				return null;
 			}
 
-			traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping reference term");
+			traceSource.TraceEvent(EventLevel.Verbose, "Mapping reference term");
 
             var cs = referenceTerm.LoadProperty<CodeSystem>(nameof(ReferenceTerm.CodeSystem));
 			return new FhirCoding(new Uri(cs.Url ?? String.Format("urn:oid:{0}", cs.Oid)), referenceTerm.Mnemonic);
@@ -286,7 +288,7 @@ namespace SanteDB.Messaging.FHIR.Util
         /// <returns>Returns a concept.</returns>
         public static Concept ToConcept(FhirCodeableConcept codeableConcept)
 		{
-			traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping codeable concept");
+			traceSource.TraceEvent(EventLevel.Verbose, "Mapping codeable concept");
 			return codeableConcept?.Coding.Select(o => DataTypeConverter.ToConcept(o)).FirstOrDefault(o => o != null);
 		}
 
@@ -317,7 +319,7 @@ namespace SanteDB.Messaging.FHIR.Util
 				throw new InvalidOperationException("Coding must have system attached");
 			}
 
-			traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping FHIR coding");
+			traceSource.TraceEvent(EventLevel.Verbose, "Mapping FHIR coding");
 
 			// Lookup
 			return conceptService.FindConceptsByReferenceTerm(coding.Code, coding.System.Value).FirstOrDefault();
@@ -348,7 +350,7 @@ namespace SanteDB.Messaging.FHIR.Util
 				throw new ArgumentNullException(nameof(system), "Value cannot be null");
 			}
 
-			traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping FHIR code");
+			traceSource.TraceEvent(EventLevel.Verbose, "Mapping FHIR code");
 
 			return ToConcept(new FhirCoding(new Uri(system), code.Value.ToString()));
 		}
@@ -360,7 +362,7 @@ namespace SanteDB.Messaging.FHIR.Util
 		/// <returns>Returns an entity address instance.</returns>
 		public static EntityAddress ToEntityAddress(FhirAddress fhirAddress)
 		{
-			traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping FHIR address");
+			traceSource.TraceEvent(EventLevel.Verbose, "Mapping FHIR address");
 
 			var address = new EntityAddress
 			{
@@ -402,7 +404,7 @@ namespace SanteDB.Messaging.FHIR.Util
 		/// <returns>Returns an entity identifier instance.</returns>
 		public static EntityIdentifier ToEntityIdentifier(FhirIdentifier fhirId)
 		{
-			traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping FHIR identifier");
+			traceSource.TraceEvent(EventLevel.Verbose, "Mapping FHIR identifier");
 
 			if (fhirId == null)
 			{
@@ -432,7 +434,7 @@ namespace SanteDB.Messaging.FHIR.Util
 		/// <exception cref="System.InvalidOperationException">Unable to locate service</exception>
 		public static EntityName ToEntityName(FhirHumanName fhirHumanName)
 		{
-			traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping FHIR human name");
+			traceSource.TraceEvent(EventLevel.Verbose, "Mapping FHIR human name");
 
 			var name = new EntityName
 			{
@@ -464,7 +466,7 @@ namespace SanteDB.Messaging.FHIR.Util
 		/// <returns>Returns an entity telecom address.</returns>
 		public static EntityTelecomAddress ToEntityTelecomAddress(FhirTelecom fhirTelecom)
 		{
-			traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping FHIR telecom");
+			traceSource.TraceEvent(EventLevel.Verbose, "Mapping FHIR telecom");
 
 			return new EntityTelecomAddress
 			{
@@ -480,7 +482,7 @@ namespace SanteDB.Messaging.FHIR.Util
 		/// <returns>Returns a FHIR address.</returns>
 		public static FhirAddress ToFhirAddress(EntityAddress address)
 		{
-			traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping entity address");
+			traceSource.TraceEvent(EventLevel.Verbose, "Mapping entity address");
 
 			if (address == null) return null;
 
@@ -525,7 +527,7 @@ namespace SanteDB.Messaging.FHIR.Util
 		/// <returns>Returns a FHIR codeable concept.</returns>
 		public static FhirCodeableConcept ToFhirCodeableConcept(Concept concept, String preferredCodeSystem = null)
 		{
-			traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping concept");
+			traceSource.TraceEvent(EventLevel.Verbose, "Mapping concept");
 
 			if (concept == null)
 			{
@@ -563,7 +565,7 @@ namespace SanteDB.Messaging.FHIR.Util
 		/// <returns>Returns the mapped FHIR human name.</returns>
 		public static FhirHumanName ToFhirHumanName(EntityName entityName)
 		{
-			traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping entity name");
+			traceSource.TraceEvent(EventLevel.Verbose, "Mapping entity name");
 
 			if (entityName == null)
 			{
@@ -603,7 +605,7 @@ namespace SanteDB.Messaging.FHIR.Util
 		/// <returns>Returns the mapped FHIR identifier.</returns>
 		public static FhirIdentifier ToFhirIdentifier<TBoundModel>(IdentifierBase<TBoundModel> identifier) where TBoundModel : VersionedEntityData<TBoundModel>, new()
 		{
-			traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping entity identifier");
+			traceSource.TraceEvent(EventLevel.Verbose, "Mapping entity identifier");
 
 			if (identifier == null)
 			{
@@ -627,7 +629,7 @@ namespace SanteDB.Messaging.FHIR.Util
 		/// <returns>Returns the mapped FHIR telecom.</returns>
 		public static FhirTelecom ToFhirTelecom(EntityTelecomAddress telecomAddress)
 		{
-			traceSource.TraceEvent(TraceEventType.Verbose, 0, "Mapping entity telecom address");
+			traceSource.TraceEvent(EventLevel.Verbose, "Mapping entity telecom address");
 
 			return new FhirTelecom()
 			{

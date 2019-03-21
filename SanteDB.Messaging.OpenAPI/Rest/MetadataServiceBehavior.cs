@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -11,6 +12,7 @@ using RestSrvr;
 using RestSrvr.Attributes;
 using RestSrvr.Exceptions;
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Http;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Interop;
@@ -31,7 +33,7 @@ namespace SanteDB.Messaging.Metadata.Rest
         /// <summary>
         /// Gets the trace source
         /// </summary>
-        private TraceSource m_traceSource = new TraceSource(MetadataConstants.TraceSourceName);
+        private Tracer m_traceSource = new Tracer(MetadataConstants.TraceSourceName);
 
         /// <summary>
         /// Get the swagger documentation
@@ -45,7 +47,7 @@ namespace SanteDB.Messaging.Metadata.Rest
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Could not get documentation due to exception: {0}", e);
+                this.m_traceSource.TraceEvent(EventLevel.Error,  "Could not get documentation due to exception: {0}", e);
                 throw e;
             }
         }
@@ -114,7 +116,7 @@ namespace SanteDB.Messaging.Metadata.Rest
             {
                 RestOperationContext.Current.OutgoingResponse.StatusCode = 500;
 
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 return null;
             }
         }

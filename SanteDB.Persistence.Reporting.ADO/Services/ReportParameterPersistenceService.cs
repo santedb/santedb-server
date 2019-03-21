@@ -22,6 +22,7 @@ using SanteDB.Core.Model.RISI.Constants;
 using SanteDB.OrmLite;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Security.Principal;
 
@@ -43,11 +44,11 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		{
 			if (modelInstance == null)
 			{
-				this.traceSource.TraceEvent(TraceEventType.Warning, 0, "Model instance is null, exiting map");
+				this.traceSource.TraceEvent(EventLevel.Warning, "Model instance is null, exiting map");
 				return null;
 			}
 
-			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(ADO.Model.ReportParameter) } to { nameof(ReportParameter) }");
+			this.traceSource.TraceEvent(EventLevel.Verbose, $"Mapping { nameof(ADO.Model.ReportParameter) } to { nameof(ReportParameter) }");
 
 			var domainInstance = base.FromModelInstance(modelInstance, context) as Model.ReportParameter;
 
@@ -89,7 +90,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		{
 			if (domainInstance == null)
 			{
-				this.traceSource.TraceEvent(TraceEventType.Warning, 0, "Domain instance is null, exiting mapper");
+				this.traceSource.TraceEvent(EventLevel.Warning, "Domain instance is null, exiting mapper");
 				return null;
 			}
 
@@ -98,7 +99,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 				throw new ArgumentException($"Invalid type: {nameof(domainInstance)} is not of type {nameof(ADO.Model.ReportParameter)}");
 			}
 
-			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(ReportParameter) } to { nameof(ADO.Model.ReportParameter) }");
+			this.traceSource.TraceEvent(EventLevel.Verbose, $"Mapping { nameof(ReportParameter) } to { nameof(ADO.Model.ReportParameter) }");
 
 			var modelInstance = base.ToModelInstance(domainInstance, context);
 

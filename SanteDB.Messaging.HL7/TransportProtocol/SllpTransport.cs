@@ -29,6 +29,7 @@ using SanteDB.Messaging.HL7.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Net;
 using System.Net.Security;
@@ -110,7 +111,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 			this.m_timeout = new TimeSpan(0,0,0,0, handler.Definition.ReceiveTimeout);
 			this.m_listener = new TcpListener(bind);
 			this.m_listener.Start();
-			this.m_traceSource.TraceInformation("SLLP Transport bound to {0}", bind);
+			this.m_traceSource.TraceInfo("SLLP Transport bound to {0}", bind);
 
             // Setup certificate
             this.m_configuration = handler.Definition.Configuration as SllpConfigurationObject;
@@ -134,24 +135,24 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 			// First Validate the chain
 #if DEBUG
 			if (certificate != null)
-				this.m_traceSource.TraceInformation("Received client certificate with subject {0}", certificate.Subject);
+				this.m_traceSource.TraceInfo("Received client certificate with subject {0}", certificate.Subject);
 			if (chain != null)
 			{
-				this.m_traceSource.TraceInformation("Client certificate is chained with {0}", chain.ChainElements.Count);
+				this.m_traceSource.TraceInfo("Client certificate is chained with {0}", chain.ChainElements.Count);
 
 				foreach (var el in chain.ChainElements)
-					this.m_traceSource.TraceInformation("\tChain Element : {0}", el.Certificate.Subject);
+					this.m_traceSource.TraceInfo("\tChain Element : {0}", el.Certificate.Subject);
 			}
 			else
 			{
-				this.m_traceSource.TraceEvent(System.Diagnostics.TraceEventType.Warning, 0, "Didn't get a chain, so I'm making my own");
+				this.m_traceSource.TraceEvent(EventLevel.Warning, "Didn't get a chain, so I'm making my own");
 				chain = new X509Chain(true);
 				X509Certificate2 cert2 = new X509Certificate2(certificate.GetRawCertData());
 				chain.Build(cert2);
 			}
 			if (sslPolicyErrors != SslPolicyErrors.None)
 			{
-				this.m_traceSource.TraceEvent(System.Diagnostics.TraceEventType.Error, 0, "SSL Policy Error : {0}", sslPolicyErrors);
+				this.m_traceSource.TraceEvent(EventLevel.Error,  "SSL Policy Error : {0}", sslPolicyErrors);
 			}
 
 #endif
@@ -167,9 +168,9 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 						isValid = true;
 				}
 				if (!isValid)
-					this.m_traceSource.TraceEvent(System.Diagnostics.TraceEventType.Error, 0, "Certification authority from the supplied certificate doesn't match the expected thumbprint of the CA");
+					this.m_traceSource.TraceEvent(EventLevel.Error,  "Certification authority from the supplied certificate doesn't match the expected thumbprint of the CA");
 				foreach (var stat in chain.ChainStatus)
-					this.m_traceSource.TraceEvent(System.Diagnostics.TraceEventType.Warning, 0, "Certificate chain validation error: {0}", stat.StatusInformation);
+					this.m_traceSource.TraceEvent(EventLevel.Warning, "Certificate chain validation error: {0}", stat.StatusInformation);
 				//isValid &= chain.ChainStatus.Length == 0;
 				return isValid;
 			}
@@ -189,7 +190,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 				var remoteEp = tcpClient.Client.RemoteEndPoint as IPEndPoint;
 				Uri localEndpoint = new Uri(String.Format("sllp://{0}:{1}", localEp.Address, localEp.Port));
 				Uri remoteEndpoint = new Uri(String.Format("sllp://{0}:{1}", remoteEp.Address, remoteEp.Port));
-				this.m_traceSource.TraceInformation("Accepted TCP connection from {0} > {1}", remoteEndpoint, localEndpoint);
+				this.m_traceSource.TraceInfo("Accepted TCP connection from {0} > {1}", remoteEndpoint, localEndpoint);
 
 				stream.AuthenticateAsServer(this.m_configuration.ServerCertificate.GetCertificate(), this.m_configuration.EnableClientCertNegotiation, System.Security.Authentication.SslProtocols.Tls, this.m_configuration.CheckCrl);
 
@@ -213,7 +214,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 
 					if (llpByte != START_TX) // first byte must be HT
 					{
-						this.m_traceSource.TraceEvent(System.Diagnostics.TraceEventType.Warning, 0, "Invalid LLP First Byte expected 0x{0:x} got 0x{1:x} from {2}", START_TX, llpByte, remoteEndpoint);
+						this.m_traceSource.TraceEvent(EventLevel.Warning, "Invalid LLP First Byte expected 0x{0:x} got 0x{1:x} from {2}", START_TX, llpByte, remoteEndpoint);
 						break;
 					}
 					//                        throw new InvalidOperationException("Invalid LLP First Byte");
@@ -255,7 +256,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 						var message = parser.Parse(messageData.ToString());
 
 #if DEBUG
-						this.m_traceSource.TraceInformation("Received message from sllp://{0} : {1}", tcpClient.Client.RemoteEndPoint, messageData.ToString());
+						this.m_traceSource.TraceInfo("Received message from sllp://{0} : {1}", tcpClient.Client.RemoteEndPoint, messageData.ToString());
 #endif
 
 						messageArgs = new AuthenticatedHl7MessageReceivedEventArgs(message, localEndpoint, remoteEndpoint, DateTime.Now, stream.RemoteCertificate.GetPublicKey());
@@ -275,7 +276,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 								{
 									var strMessage = parser.Encode(messageArgs.Response);
 #if DEBUG
-									this.m_traceSource.TraceInformation("Sending message to sllp://{0} : {1}", tcpClient.Client.RemoteEndPoint, strMessage);
+									this.m_traceSource.TraceInfo("Sending message to sllp://{0} : {1}", tcpClient.Client.RemoteEndPoint, strMessage);
 #endif
 									// Since nHAPI only emits a string we just send that along the stream
 									streamWriter.Write(strMessage);
@@ -328,11 +329,11 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 
                 ApplicationServiceContext.Current.GetService<IAuditRepositoryService>()?.Insert(ad);
                 ApplicationServiceContext.Current.GetService<IAuditDispatchService>()?.SendAudit(ad);
-				this.m_traceSource.TraceEvent(System.Diagnostics.TraceEventType.Error, e.HResult, e.ToString());
+				this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
 			}
 			catch (Exception e)
 			{
-				this.m_traceSource.TraceEvent(System.Diagnostics.TraceEventType.Error, e.HResult, e.ToString());
+				this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
 				// TODO: NACK
 			}
 			finally

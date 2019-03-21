@@ -21,6 +21,7 @@ using Microsoft.Diagnostics.Runtime;
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Interop;
@@ -40,6 +41,7 @@ using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -56,7 +58,7 @@ namespace SanteDB.Messaging.AMI.Wcf
     {
 
         // The trace source for logging
-        private TraceSource m_traceSource = new TraceSource(AmiConstants.TraceSourceName);
+        private Tracer m_traceSource = new Tracer(AmiConstants.TraceSourceName);
 
         /// <summary>
         /// Create a new ami service behavior
@@ -187,7 +189,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             try
             {
                 if (Process.GetCurrentProcess()?.Threads == null)
-                    this.m_traceSource.TraceEvent(TraceEventType.Warning, 0, "Threading information is not available for this instance");
+                    this.m_traceSource.TraceEvent(EventLevel.Warning, "Threading information is not available for this instance");
                 else 
                     foreach (ProcessThread thd in Process.GetCurrentProcess().Threads.OfType<ProcessThread>().Where(o=>o != null))
                         retVal.Threads.Add(new DiagnosticThreadInfo()
@@ -201,7 +203,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             }
             catch(Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error gathering thread information: {0}", e);
+                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error gathering thread information: {0}", e);
             }
 
             retVal.ApplicationInfo.Assemblies = AppDomain.CurrentDomain.GetAssemblies().Select(o => new DiagnosticVersionInfo(o)).ToList();
@@ -251,7 +253,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             // this is to make sure that people cannot guess users
             if (securityUser == null)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Warning, 0, "Attempt to get TFA reset code for {0} which is not a valid user", resetInfo.UserName);
+                this.m_traceSource.TraceEvent(EventLevel.Warning, "Attempt to get TFA reset code for {0} which is not a valid user", resetInfo.UserName);
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.NoContent;
                 return;
             }

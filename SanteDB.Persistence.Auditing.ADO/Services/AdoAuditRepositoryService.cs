@@ -39,6 +39,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Principal;
 using SanteDB.Core.Model.Query;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Persistence.Auditing.ADO.Services
 {
@@ -64,7 +65,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         private QueryBuilder m_builder;
 
         // Trace source name
-        private TraceSource m_traceSource = new TraceSource(AuditConstants.TraceSourceName);
+        private Tracer m_traceSource = new Tracer(AuditConstants.TraceSourceName);
 
         /// <summary>
         /// Fired when data is being inserted
@@ -224,7 +225,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             this.Inserting?.Invoke(this, preEvtData);
             if (preEvtData.Cancel)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Warning, 0, "Pre-Event handler indicates abort insert {0}", storageData);
+                this.m_traceSource.TraceEvent(EventLevel.Warning, "Pre-Event handler indicates abort insert {0}", storageData);
                 return storageData;
             }
 

@@ -23,6 +23,7 @@ using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security.Services;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 
 namespace SanteDB.Core.Services.Impl
@@ -52,7 +53,7 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public override SecurityUser Insert(SecurityUser data)
         {
-            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Creating user {0}", data);
+            this.m_traceSource.TraceEvent(EventLevel.Verbose, "Creating user {0}", data);
 
             var iids = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
 

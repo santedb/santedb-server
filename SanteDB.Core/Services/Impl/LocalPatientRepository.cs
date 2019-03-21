@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Model.Roles;
 using System;
@@ -33,7 +34,7 @@ namespace SanteDB.Core.Services.Impl
 		/// <summary>
 		/// The trace source instance.
 		/// </summary>
-		private readonly TraceSource traceSource = new TraceSource("SanteDB.Core");
+		private readonly Tracer traceSource = new Tracer("SanteDB.Core");
         
 		/// <summary>
 		/// Merges two patients together

@@ -90,7 +90,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			var recordTarget = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget);
             if (recordTarget != null)
             {
-                this.traceSource.TraceInformation("RCT: {0}", recordTarget.PlayerEntityKey);
+                this.traceSource.TraceInfo("RCT: {0}", recordTarget.PlayerEntityKey);
                 retVal.Subject = DataTypeConverter.CreateReference<Patient>(recordTarget.LoadProperty<Entity>("PlayerEntity"), RestOperationContext);
             }
 			// Onset

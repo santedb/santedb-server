@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using SanteDB.Core.Model;
+using SanteDB.Core.Diagnostics;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Messaging.Metadata.Composer
 {
@@ -36,7 +38,7 @@ namespace SanteDB.Messaging.Metadata.Composer
         /// <summary>
         /// Trace source name
         /// </summary>
-        private static TraceSource s_traceSource = new TraceSource(MetadataConstants.TraceSourceName);
+        private static Tracer s_traceSource = new Tracer(MetadataConstants.TraceSourceName);
 
         // Composers
         private static Dictionary<String, IMetadataComposer> s_composers = null;
@@ -189,7 +191,7 @@ namespace SanteDB.Messaging.Metadata.Composer
                 }
                 catch (Exception e)
                 {
-                    s_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Could not load documentation file {0}: {1}", docFile, e);
+                    s_traceSource.TraceEvent(EventLevel.Error,  "Could not load documentation file {0}: {1}", docFile, e);
                     throw;
                 }
             }

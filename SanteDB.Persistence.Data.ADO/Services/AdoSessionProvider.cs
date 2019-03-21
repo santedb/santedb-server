@@ -57,7 +57,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         private Object m_syncLock = new object();
 
         // Trace source
-        private TraceSource m_traceSource = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
+        private Tracer m_traceSource = new Tracer(AdoDataConstants.IdentityTraceSourceName);
 
         // Configuration
         private AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();

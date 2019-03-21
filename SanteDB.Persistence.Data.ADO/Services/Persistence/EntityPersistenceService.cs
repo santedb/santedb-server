@@ -40,6 +40,7 @@ using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using System;
 using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Security;
 
@@ -204,7 +205,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
 #if DEBUG
             sw.Stop();
-            this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "Basic conversion took: {0}", sw.ElapsedMilliseconds);
+            this.m_tracer.TraceEvent(EventLevel.Verbose, "Basic conversion took: {0}", sw.ElapsedMilliseconds);
 #endif 
             retVal.LoadAssociations(context);
             return retVal;

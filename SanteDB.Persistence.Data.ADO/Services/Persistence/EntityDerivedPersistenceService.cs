@@ -25,6 +25,7 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data.Model;
 using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
 using System;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Security.Principal;
 
@@ -113,7 +114,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             this.FireRetrieving(preArgs);
             if (preArgs.Cancel)
             {
-                this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Warning, 0, "Pre-event args indicate cancel : {0}", containerId);
+                this.m_tracer.TraceEvent(EventLevel.Warning, "Pre-event args indicate cancel : {0}", containerId);
                 return preArgs.Result;
             }
 

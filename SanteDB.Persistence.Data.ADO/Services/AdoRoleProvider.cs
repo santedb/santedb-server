@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security.Services;
@@ -29,6 +30,7 @@ using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Security;
 using System.Security.Principal;
@@ -47,7 +49,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         public String ServiceName => "ADO.NET Role Provider Service";
 
         // Tracer
-        private TraceSource m_tracer = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
+        private Tracer m_tracer = new Tracer(AdoDataConstants.IdentityTraceSourceName);
 
         /// <summary>
         /// Configuration 
@@ -110,7 +112,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error adding {0} to {1} : {2}", String.Join(",", users), String.Join(",", roles), e);
+                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error adding {0} to {1} : {2}", String.Join(",", users), String.Join(",", roles), e);
                     throw;
                 }
             }
@@ -154,7 +156,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error creating role {0} : {1}", roleName, e);
+                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error creating role {0} : {1}", roleName, e);
                     throw;
                 }
             }
@@ -183,7 +185,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error finding users for role {0} : {1}", role, e);
+                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error finding users for role {0} : {1}", role, e);
                     throw;
                 }
             }
@@ -203,7 +205,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error executing GetAllRoles() : {0}", e);
+                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error executing GetAllRoles() : {0}", e);
                     throw;
                 }
         }
@@ -231,7 +233,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error executing getting roles for {0} : {1}", userName, e);
+                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error executing getting roles for {0} : {1}", userName, e);
                     throw;
                 }
             }
@@ -267,7 +269,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error determining role membership of user {0} in {1} : {2}", userName, roleName, e);
+                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error determining role membership of user {0} in {1} : {2}", userName, roleName, e);
                     throw;
                 }
             }
@@ -315,7 +317,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error removing {0} from {1} : {2}", String.Join(",", users), String.Join(",", roles), e);
+                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error removing {0} from {1} : {2}", String.Join(",", users), String.Join(",", roles), e);
                     throw;
                 }
         }

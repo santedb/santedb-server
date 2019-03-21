@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security.Services;
@@ -26,6 +27,7 @@ using SanteDB.Persistence.Data.ADO.Configuration;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Security;
 using System.Security.Authentication;
@@ -48,7 +50,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// The trace source.
         /// </summary>
-        private readonly TraceSource traceSource = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
+        private readonly Tracer traceSource = new Tracer(AdoDataConstants.IdentityTraceSourceName);
 
 		/// <summary>
 		/// The configuration.
@@ -99,7 +101,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 				}
 				catch (Exception e)
 				{
-					this.traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error authenticating {0} : {1}", deviceId, e);
+					this.traceSource.TraceEvent(EventLevel.Error,  "Error authenticating {0} : {1}", deviceId, e);
 					throw new AuthenticationException("Error authenticating application", e);
 				}
 			}
@@ -135,7 +137,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 				}
 				catch (Exception e)
 				{
-					this.traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error getting identity data for {0} : {1}", name, e);
+					this.traceSource.TraceEvent(EventLevel.Error,  "Error getting identity data for {0} : {1}", name, e);
 					throw;
 				}
 			}

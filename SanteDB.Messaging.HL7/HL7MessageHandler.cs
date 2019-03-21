@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
@@ -55,7 +56,7 @@ namespace SanteDB.Messaging.HL7
         #region IMessageHandlerService Members
 
         // HL7 Trace source name
-        private TraceSource m_traceSource = new TraceSource(Hl7Constants.TraceSourceName);
+        private Tracer m_traceSource = new Tracer(Hl7Constants.TraceSourceName);
         // Configuration
         private Hl7ConfigurationSection m_configuration;
 
@@ -86,7 +87,7 @@ namespace SanteDB.Messaging.HL7
                 thdSh.IsBackground = true;
                 thdSh.Name = $"HL7v2-{sd.Name}";
                 this.m_listenerThreads.Add(sh);
-                this.m_traceSource.TraceInformation("Starting HL7 Service '{0}'...", sd.Name);
+                this.m_traceSource.TraceInfo("Starting HL7 Service '{0}'...", sd.Name);
                 thdSh.Start();
             }
 
@@ -95,7 +96,7 @@ namespace SanteDB.Messaging.HL7
                 .Select(i=> Activator.CreateInstance(i.InterceptorClass, i))
                 .OfType<InterceptorBase>())
             {
-                this.m_traceSource.TraceInformation("Starting Interceptor {0}...", incptr.GetType().FullName);
+                this.m_traceSource.TraceInfo("Starting Interceptor {0}...", incptr.GetType().FullName);
                 this.m_interceptors.Add(incptr);
                 incptr.Attach();
             }
@@ -119,11 +120,11 @@ namespace SanteDB.Messaging.HL7
             // Interceptors
             foreach (var incptr in this.m_interceptors)
             {
-                this.m_traceSource.TraceInformation("Detaching {0}...", incptr.GetType().FullName);
+                this.m_traceSource.TraceInfo("Detaching {0}...", incptr.GetType().FullName);
                 incptr.Detach();
             }
 
-            this.m_traceSource.TraceInformation("All threads shutdown");
+            this.m_traceSource.TraceInfo("All threads shutdown");
             this.Stopped?.Invoke(this, EventArgs.Empty);
             return true;
         }

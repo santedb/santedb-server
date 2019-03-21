@@ -45,7 +45,7 @@ namespace SanteDB.Core.Security.Audit
         private bool m_safeToStop = false;
 
         // Tracer class
-        private TraceSource m_tracer = new TraceSource(SanteDBConstants.SecurityTraceSourceName);
+        private Tracer m_tracer = new Tracer(SanteDBConstants.SecurityTraceSourceName);
 
         /// <summary>
         ///  True if the service is running

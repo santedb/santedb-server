@@ -22,6 +22,7 @@ using RestSrvr;
 using RestSrvr.Attributes;
 using SanteDB.Core;
 using SanteDB.Core.Auditing;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
@@ -54,7 +55,7 @@ namespace SanteDB.Messaging.FHIR.Rest
     {
 
         
-        private TraceSource m_tracer = new TraceSource("SanteDB.Messaging.FHIR");
+        private Tracer m_tracer = new Tracer("SanteDB.Messaging.FHIR");
 
         #region IFhirServiceContract Members
 

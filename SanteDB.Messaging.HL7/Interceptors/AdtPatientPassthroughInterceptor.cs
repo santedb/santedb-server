@@ -47,6 +47,8 @@ using System.Xml.Serialization;
 using SanteDB.Messaging.HL7.ParameterMap;
 using SanteDB.Core.Model.Query;
 using NHapi.Base.Util;
+using SanteDB.Core.Diagnostics;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Messaging.HL7.Interceptors
 {
@@ -58,7 +60,7 @@ namespace SanteDB.Messaging.HL7.Interceptors
     {
 
         // Tracer
-        private TraceSource m_tracer = new TraceSource(Hl7Constants.TraceSourceName);
+        private Tracer m_tracer = new Tracer(Hl7Constants.TraceSourceName);
 
         // Coniguration
         private Hl7ConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
@@ -233,7 +235,7 @@ namespace SanteDB.Messaging.HL7.Interceptors
             }
             catch (Exception ex)
             {
-                this.m_tracer.TraceEvent(TraceEventType.Error, ex.HResult, "Error dispatching HL7 query {0}", ex);
+                this.m_tracer.TraceEvent(EventLevel.Error,  "Error dispatching HL7 query {0}", ex);
             }
         }
 
@@ -353,7 +355,7 @@ namespace SanteDB.Messaging.HL7.Interceptors
                 }
                 catch (Exception ex)
                 {
-                    this.m_tracer.TraceEvent(TraceEventType.Error, ex.HResult, "Error dispatching message {0} to {1}: {2} \r\n {3}", pat, itm.Address, ex, new PipeParser().Encode(notificationMessage));
+                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error dispatching message {0} to {1}: {2} \r\n {3}", pat, itm.Address, ex, new PipeParser().Encode(notificationMessage));
                 }
             }
 

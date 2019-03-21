@@ -58,7 +58,7 @@ namespace SanteDB.Warehouse.ADO
         private bool m_disposed = false;
 
         // Tracer
-        private TraceSource m_tracer = new TraceSource(DataWarehouseConstants.TraceSourceName);
+        private Tracer m_tracer = new Tracer(DataWarehouseConstants.TraceSourceName);
 
         /// <summary>
         /// Daemon is starting

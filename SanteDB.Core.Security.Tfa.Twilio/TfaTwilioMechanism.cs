@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Security;
@@ -25,6 +26,7 @@ using SanteDB.Core.Security.Tfa.Twilio.Resources;
 using SanteDB.Core.Services;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using TW = Twilio;
 
@@ -38,7 +40,7 @@ namespace SanteDB.Core.Security.Tfa.Twilio
 		// Configuration
 		private TwilioTfaMechanismConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<TwilioTfaMechanismConfigurationSection>();
 
-		private TraceSource m_tracer = new TraceSource("SanteDB.Core.Security.Tfa.Twilio");
+		private Tracer m_tracer = new Tracer("SanteDB.Core.Security.Tfa.Twilio");
 
 		/// <summary>
 		/// Challenge string
@@ -99,7 +101,7 @@ namespace SanteDB.Core.Security.Tfa.Twilio
 			// To numbers fail
 			if (toNumber == null || challengeResponse.Length != 4 || !toNumber.EndsWith(challengeResponse))
 			{
-				this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Validation of {0} failed", user.UserName);
+				this.m_tracer.TraceEvent(EventLevel.Warning, "Validation of {0} failed", user.UserName);
 			}
 			else
 			{
@@ -113,7 +115,7 @@ namespace SanteDB.Core.Security.Tfa.Twilio
 				}
 				catch (Exception ex)
 				{
-					this.m_tracer.TraceEvent(TraceEventType.Error, ex.HResult, "Error sending SMS: {0}", ex);
+					this.m_tracer.TraceEvent(EventLevel.Error,  "Error sending SMS: {0}", ex);
 				}
 			}
 		}

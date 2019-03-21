@@ -43,6 +43,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -58,7 +59,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 	public class TcpTransport : ITransportProtocol
 	{
 
-        protected TraceSource m_traceSource = new TraceSource(Hl7Constants.TraceSourceName);
+        protected Tracer m_traceSource = new Tracer(Hl7Constants.TraceSourceName);
 
         #region ITransportProtocol Members
 
@@ -115,7 +116,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 		{
 			this.m_listener = new TcpListener(bind);
 			this.m_listener.Start();
-			this.m_traceSource.TraceInformation("TCP Transport bound to {0}", bind);
+			this.m_traceSource.TraceInfo("TCP Transport bound to {0}", bind);
 
 			while (m_run) // run the service
 			{
@@ -134,7 +135,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 		{
 			this.m_run = false;
 			this.m_listener.Stop();
-			this.m_traceSource.TraceInformation("TCP Transport stopped");
+			this.m_traceSource.TraceInfo("TCP Transport stopped");
 		}
 
 		/// <summary>
@@ -176,7 +177,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 			}
 			catch (Exception e)
 			{
-				this.m_traceSource.TraceEvent(TraceEventType.Error, 0, e.ToString());
+				this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
 				// TODO: NACK
 			}
 			finally

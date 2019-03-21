@@ -57,3 +57,4 @@ using System.Runtime.InteropServices;
 
 [assembly: Plugin(Group = "Performance", Environment = PluginEnvironment.Server, EnableByDefault = true)]
 [assembly: PluginDependency("SanteDB.Core, Version=1.10.0.0")]
+[assembly: PluginTraceSource(SanteDB.Caching.Memory.MemoryCacheConstants.TraceSourceName)]

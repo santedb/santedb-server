@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Model;
@@ -38,7 +39,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
     public class HdsiServiceBehavior : HdsiServiceBehaviorBase
     {
         // Trace source
-        private TraceSource m_traceSource = new TraceSource("SanteDB.Messaging.HDSI");
+        private Tracer m_traceSource = new Tracer("SanteDB.Messaging.HDSI");
 
         /// <summary>
         /// Creates a new HDSI service behavior

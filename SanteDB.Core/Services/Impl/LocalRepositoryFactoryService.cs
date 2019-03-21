@@ -17,9 +17,11 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Core.Services.Impl
 {
@@ -39,7 +41,7 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public IRepositoryService<T> CreateRepository<T>() where T : IdentifiedData
         {
-            new TraceSource(SanteDBConstants.DataTraceSourceName).TraceEvent(TraceEventType.Warning, 666, "Creating generic repository for {0}. Security may be compromised! Please register an appropriate repository service with the host", typeof(T).FullName);
+            new Tracer(SanteDBConstants.DataTraceSourceName).TraceEvent(EventLevel.Warning, "Creating generic repository for {0}. Security may be compromised! Please register an appropriate repository service with the host", typeof(T).FullName);
             return new GenericLocalRepository<T>();
         }
 

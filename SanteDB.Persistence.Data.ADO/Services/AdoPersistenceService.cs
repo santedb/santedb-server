@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
@@ -38,6 +39,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
@@ -121,7 +123,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public AdoPersistenceService()
         {
-            var tracer = new TraceSource(AdoDataConstants.TraceSourceName);
+            var tracer = new Tracer(AdoDataConstants.TraceSourceName);
 
             try
             {
@@ -138,12 +140,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
             catch (ModelMapValidationException ex)
             {
-                tracer.TraceEvent(TraceEventType.Error, ex.HResult, "Error validating model map: {0}", ex);
+                tracer.TraceEvent(EventLevel.Error,  "Error validating model map: {0}", ex);
                 throw ex;
             }
             catch (Exception ex)
             {
-                tracer.TraceEvent(TraceEventType.Error, ex.HResult, "Error validating model map: {0}", ex);
+                tracer.TraceEvent(EventLevel.Error,  "Error validating model map: {0}", ex);
                 throw ex;
             }
         }
@@ -312,7 +314,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
 
         // Tracer
-        private TraceSource m_tracer = new TraceSource(AdoDataConstants.TraceSourceName);
+        private Tracer m_tracer = new Tracer(AdoDataConstants.TraceSourceName);
 
         // When service is running
         private bool m_running = false;
@@ -369,12 +371,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     if (oizVer < dbVer)
                         throw new InvalidOperationException(String.Format("Invalid Schema Version. SanteDB version {0} is older than the database schema version {1}", oizVer, dbVer));
-                    this.m_tracer.TraceInformation("SanteDB Schema Version {0} on {1}", dbVer, this.GetConfiguration().Provider.Invariant);
+                    this.m_tracer.TraceInfo("SanteDB Schema Version {0} on {1}", dbVer, this.GetConfiguration().Provider.Invariant);
                 }
             }
             catch (Exception e)
             {
-                this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error starting ADO provider: {0}", e);
+                this.m_tracer.TraceEvent(EventLevel.Error,  "Error starting ADO provider: {0}", e);
                 throw;
             }
 
@@ -383,7 +385,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             {
                 try
                 {
-                    this.m_tracer.TraceEvent(TraceEventType.Information, 0, "Loading {0}...", t.AssemblyQualifiedName);
+                    this.m_tracer.TraceEvent(EventLevel.Informational,  "Loading {0}...", t.AssemblyQualifiedName);
 
                     // If the persistence service is generic then we should check if we're allowed
                     if(!t.IsGenericType || 
@@ -397,14 +399,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
 				}
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error adding service {0} : {1}", t.AssemblyQualifiedName, e);
+                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error adding service {0} : {1}", t.AssemblyQualifiedName, e);
                 }
             }
 
             // Now iterate through the map file and ensure we have all the mappings, if a class does not exist create it
             try
             {
-                this.m_tracer.TraceEvent(TraceEventType.Information, 0, "Creating secondary model maps...");
+                this.m_tracer.TraceEvent(EventLevel.Informational,  "Creating secondary model maps...");
 
                 var map = ModelMap.Load(typeof(AdoPersistenceService).GetTypeInfo().Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName));
                 foreach (var itm in map.Class)
@@ -427,7 +429,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     if (ApplicationServiceContext.Current.GetService(idpType) != null)
                         continue;
 
-                    this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "Creating map {0} > {1}", modelClassType, domainClassType);
+                    this.m_tracer.TraceEvent(EventLevel.Verbose, "Creating map {0} > {1}", modelClassType, domainClassType);
 
 
                     if (modelClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IBaseEntityData)) &&
@@ -463,13 +465,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         this.m_persistenceCache.Add(modelClassType, Activator.CreateInstance(pclass) as IAdoPersistenceService);
                     }
                     else
-                        this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Classmap {0}>{1} cannot be created, ignoring", modelClassType, domainClassType);
+                        this.m_tracer.TraceEvent(EventLevel.Warning, "Classmap {0}>{1} cannot be created, ignoring", modelClassType, domainClassType);
 
                 }
             }
             catch (Exception e)
             {
-                this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error initializing local persistence: {0}", e);
+                this.m_tracer.TraceEvent(EventLevel.Error,  "Error initializing local persistence: {0}", e);
                 throw e;
             }
 
@@ -488,7 +490,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             ApplicationServiceContext.Current.Stopped += (o, e) => this.m_configuration = null;
 
             // Attempt to cache concepts
-            this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "Caching concept dictionary...");
+            this.m_tracer.TraceEvent(EventLevel.Verbose, "Caching concept dictionary...");
             this.m_running = true;
             this.Started?.Invoke(this, EventArgs.Empty);
 
@@ -533,7 +535,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 catch(Exception e)
                 {
                     tx.Rollback();
-                    this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Could not execute SQL: {0}", e);
+                    this.m_tracer.TraceEvent(EventLevel.Error,  "Could not execute SQL: {0}", e);
                     throw;
                 }
             }

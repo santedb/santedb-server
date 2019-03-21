@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
@@ -43,7 +44,7 @@ namespace SanteDB.Core.Services.Impl
         public string ServiceName => "Local (database) repository service";
 
         // Trace source
-        private TraceSource m_tracer = new TraceSource(SanteDBConstants.DataTraceSourceName);
+        private Tracer m_tracer = new Tracer(SanteDBConstants.DataTraceSourceName);
 
         /// <summary>
         /// Return true if the act repository service is running
@@ -106,7 +107,7 @@ namespace SanteDB.Core.Services.Impl
 
             foreach (var t in repositoryServices)
             {
-                this.m_tracer.TraceInformation("Adding repository service for {0}...", t);
+                this.m_tracer.TraceInfo("Adding repository service for {0}...", t);
                 (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(t);
             }
 
@@ -120,13 +121,13 @@ namespace SanteDB.Core.Services.Impl
                     {
                         if (typeof(Act).IsAssignableFrom(t))
                         {
-                            this.m_tracer.TraceInformation("Adding Act repository service for {0}...", t.Name);
+                            this.m_tracer.TraceInfo("Adding Act repository service for {0}...", t.Name);
                             var mrst = typeof(GenericLocalActRepository<>).MakeGenericType(t);
                             (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(mrst);
                         }
                         else if (typeof(Entity).IsAssignableFrom(t))
                         {
-                            this.m_tracer.TraceInformation("Adding Entity repository service for {0}...", t.Name);
+                            this.m_tracer.TraceInfo("Adding Entity repository service for {0}...", t.Name);
                             var mrst = typeof(GenericLocalClinicalDataRepository<>).MakeGenericType(t);
                             (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(mrst);
                         }

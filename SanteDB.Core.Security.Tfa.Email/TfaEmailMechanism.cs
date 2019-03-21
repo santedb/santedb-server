@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security.Tfa.Email.Configuration;
@@ -25,6 +26,7 @@ using SanteDB.Core.Security.Tfa.Email.Template;
 using SanteDB.Core.Services;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -41,7 +43,7 @@ namespace SanteDB.Core.Security.Tfa.Email
 		private TfaEmailMechanismConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<TfaEmailMechanismConfigurationSection>();
 
 		// Tracer
-		private TraceSource m_tracer = new TraceSource("SanteDB.Core.Security.Tfa.Email");
+		private Tracer m_tracer = new Tracer("SanteDB.Core.Security.Tfa.Email");
 
 		/// <summary>
 		/// Gets the challenge text
@@ -89,7 +91,7 @@ namespace SanteDB.Core.Security.Tfa.Email
 			// Verify
 			if (!user.Email.StartsWith(challengeResponse + "@"))
 			{
-				this.m_tracer.TraceEvent(TraceEventType.Warning, 0, $"User {user.UserName} reset challenge failed");
+				this.m_tracer.TraceEvent(EventLevel.Warning, $"User {user.UserName} reset challenge failed");
 			}
 			else
 			{
@@ -97,7 +99,7 @@ namespace SanteDB.Core.Security.Tfa.Email
 				var securityService = ApplicationServiceContext.Current.GetService<IRepositoryService<UserEntity>>();
 				var userEntity = securityService?.Find(o => o.SecurityUserKey == user.Key).FirstOrDefault();
 
-                this.m_tracer.TraceEvent(TraceEventType.Information, 0, "Password reset has been requested for {0}", userEntity.Key);
+                this.m_tracer.TraceEvent(EventLevel.Informational,  "Password reset has been requested for {0}", userEntity.Key);
 
 				// We want to send the data
 				var templateConfiguration = this.m_configuration.Templates.FirstOrDefault(o => o.Language == (userEntity?.LanguageCommunication?.FirstOrDefault(l => l.IsPreferred)?.LanguageCode ?? CultureInfo.CurrentCulture.TwoLetterISOLanguageName));
@@ -117,7 +119,7 @@ namespace SanteDB.Core.Security.Tfa.Email
 				resetMessage.Subject = template.Subject;
 				resetMessage.Body = String.Format(template.Body, tfaSecret);
 
-                this.m_tracer.TraceInformation("Sending password reset to {0} from {1}", user.Email, template.From);
+                this.m_tracer.TraceInfo("Sending password reset to {0} from {1}", user.Email, template.From);
 				try
 				{
 					SmtpClient smtpClient = new SmtpClient(this.m_configuration.Smtp.Server.Host, this.m_configuration.Smtp.Server.Port);
@@ -127,17 +129,17 @@ namespace SanteDB.Core.Security.Tfa.Email
 						smtpClient.Credentials = new NetworkCredential(this.m_configuration.Smtp.Username, this.m_configuration.Smtp.Password);
 					smtpClient.SendCompleted += (o, e) =>
 					{
-                        this.m_tracer.TraceInformation("Successfully sent message to {0}", resetMessage.To);
+                        this.m_tracer.TraceInfo("Successfully sent message to {0}", resetMessage.To);
 						if (e.Error != null)
-							this.m_tracer.TraceEvent(TraceEventType.Error, 0, e.Error.ToString());
+							this.m_tracer.TraceEvent(EventLevel.Error,  e.Error.ToString());
 						(o as IDisposable).Dispose();
 					};
-                    this.m_tracer.TraceInformation("Sending password reset email message to {0}", resetMessage.To);
+                    this.m_tracer.TraceInfo("Sending password reset email message to {0}", resetMessage.To);
                     smtpClient.Send(resetMessage);
 				}
 				catch (Exception e)
 				{
-					this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, $"Error sending TFA secret: {e.Message}\r\n{e.ToString()}");
+					this.m_tracer.TraceEvent(EventLevel.Error,  $"Error sending TFA secret: {e.Message}\r\n{e.ToString()}");
 				}
 			}
 		}

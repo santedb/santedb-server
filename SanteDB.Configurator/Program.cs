@@ -40,6 +40,24 @@ namespace SanteDB.Configurator
         [STAThread]
         static void Main()
         {
+            // Check whether the user is in Windows Admin mode
+#if !DEBUG
+                WindowsIdentity identity = WindowsIdentity.GetCurrent();
+                WindowsPrincipal principal = new WindowsPrincipal(identity);
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT && 
+                    !principal.IsInRole(WindowsBuiltInRole.Administrator))
+                {
+                    string cmdLine = Environment.CommandLine.Substring(Environment.CommandLine.IndexOf(".exe") + 4);
+                    cmdLine = cmdLine.Contains(' ') ? cmdLine.Substring(cmdLine.IndexOf(" ")) : null;
+                    ProcessStartInfo psi = new ProcessStartInfo(Assembly.GetEntryAssembly().Location, cmdLine);
+                    psi.Verb = "runas";
+                    Trace.TraceInformation("Not administrator!");
+                    Process proc = Process.Start(psi);
+                    Application.Exit();
+                    return;
+                }
+#endif
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 

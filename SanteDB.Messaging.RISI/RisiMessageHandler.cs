@@ -31,6 +31,8 @@ using System.Linq;
 using System.Reflection;
 using SanteDB.Core;
 using SanteDB.Rest.RISI;
+using SanteDB.Core.Diagnostics;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Messaging.RISI
 {
@@ -53,7 +55,7 @@ namespace SanteDB.Messaging.RISI
         /// <summary>
         /// The internal reference to the trace source.
         /// </summary>
-        private readonly TraceSource traceSource = new TraceSource("SanteDB.Messaging.RISI");
+        private readonly Tracer traceSource = new Tracer("SanteDB.Messaging.RISI");
 
 		/// <summary>
 		/// The internal reference to the web host.
@@ -137,20 +139,20 @@ namespace SanteDB.Messaging.RISI
                 this.webHost.AddServiceBehavior(new ErrorServiceBehavior());
 				foreach (var endpoint in this.webHost.Endpoints)
 				{
-					this.traceSource.TraceInformation("Starting RISI on {0}...", endpoint.Description.ListenUri);
+					this.traceSource.TraceInfo("Starting RISI on {0}...", endpoint.Description.ListenUri);
 				}
 
 				// Start the webhost
 				this.webHost.Start();
 
-				this.traceSource.TraceEvent(TraceEventType.Information, 0, "RISI message handler started successfully");
+				this.traceSource.TraceEvent(EventLevel.Informational, "RISI message handler started successfully");
 
 				this.Started?.Invoke(this, EventArgs.Empty);
 			}
 			catch (Exception e)
 			{
-				this.traceSource.TraceEvent(TraceEventType.Information, 0, "Unable to start RISI message handler");
-				this.traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+				this.traceSource.TraceEvent(EventLevel.Informational, "Unable to start RISI message handler");
+				this.traceSource.TraceEvent(EventLevel.Error,  e.ToString());
 
 			}
 

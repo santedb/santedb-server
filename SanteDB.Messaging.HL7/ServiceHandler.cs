@@ -28,6 +28,7 @@ using System.Threading;
 using System.Diagnostics;
 using SanteDB.Core;
 using SanteDB.Core.Services;
+using SanteDB.Core.Diagnostics;
 
 namespace SanteDB.Messaging.HL7
 {
@@ -39,7 +40,7 @@ namespace SanteDB.Messaging.HL7
 		// The service definition
 		private Hl7ServiceDefinition m_serviceDefinition;
 
-        private TraceSource m_traceSource = new TraceSource(Hl7Constants.TraceSourceName);
+        private Tracer m_traceSource = new Tracer(Hl7Constants.TraceSourceName);
 
         // Transport
         private ITransportProtocol m_transport;

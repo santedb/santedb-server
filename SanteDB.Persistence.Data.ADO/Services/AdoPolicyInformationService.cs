@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Entities;
@@ -36,6 +37,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 
 using System.Security.Principal;
@@ -57,7 +59,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         // Get the SQL configuration
         private AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
 
-        private TraceSource m_traceSource = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
+        private Tracer m_traceSource = new Tracer(AdoDataConstants.IdentityTraceSourceName);
 
         /// <summary>
         /// Adds the specified policies to the specified object
@@ -176,7 +178,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 catch (Exception e)
                 {
                     tx.Rollback();
-                    this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error adding policies to {0}: {1}", securable, e);
+                    this.m_traceSource.TraceEvent(EventLevel.Error,  "Error adding policies to {0}: {1}", securable, e);
                     throw;
                 }
             }
@@ -308,7 +310,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                         }
 
-                        this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Principal {0} effective policy set {1}", identity?.Name, String.Join(",", retVal.Select(o => $"{o.Policy.Oid} [{o.Rule}]")));
+                        this.m_traceSource.TraceEvent(EventLevel.Verbose, "Principal {0} effective policy set {1}", identity?.Name, String.Join(",", retVal.Select(o => $"{o.Policy.Oid} [{o.Rule}]")));
                         // TODO: Most restrictive
                         return retVal;
                     }
@@ -356,7 +358,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error getting active policies for {0} : {1}", securable, e);
+                    this.m_traceSource.TraceEvent(EventLevel.Error,  "Error getting active policies for {0} : {1}", securable, e);
                     throw;
                 }
         }
@@ -374,7 +376,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error getting policies: {0}", e);
+                    this.m_traceSource.TraceEvent(EventLevel.Error,  "Error getting policies: {0}", e);
                     throw;
                 }
         }
@@ -396,7 +398,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error getting policy {0} : {1}", policyOid, e);
+                    this.m_traceSource.TraceEvent(EventLevel.Error,  "Error getting policy {0} : {1}", policyOid, e);
                     throw;
                 }
             }

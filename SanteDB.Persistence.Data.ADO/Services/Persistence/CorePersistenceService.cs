@@ -32,6 +32,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using SanteDB.Core.Model.Query;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -71,7 +72,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var dInstance = (dataInstance as CompositeResult)?.Values.OfType<TDomain>().FirstOrDefault() ?? dataInstance as TDomain;
             var retVal = m_mapper.MapDomainInstance<TDomain, TModel>(dInstance);
             retVal.LoadAssociations(context);
-            this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "Model instance {0} created", dataInstance);
+            this.m_tracer.TraceEvent(EventLevel.Verbose, "Model instance {0} created", dataInstance);
 
             return retVal;
         }
@@ -152,7 +153,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     }
                     catch (Exception e)
                     {
-                        this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error performing sub-query: {0}", e);
+                        this.m_tracer.TraceEvent(EventLevel.Error,  "Error performing sub-query: {0}", e);
                         throw;
                     }
                     finally
@@ -223,7 +224,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
                 else
                 {
-                    m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "Will use slow query construction due to complex mapped fields");
+                    m_tracer.TraceEvent(EventLevel.Verbose, "Will use slow query construction due to complex mapped fields");
                     domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, orderBy);
                 }
 
@@ -302,7 +303,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             catch (Exception ex)
             {
                 if(domainQuery != null)
-                    this.m_tracer.TraceEvent(TraceEventType.Error, ex.HResult, context.GetQueryLiteral(domainQuery.Build()));
+                    this.m_tracer.TraceEvent(EventLevel.Error,  context.GetQueryLiteral(domainQuery.Build()));
                 context.Dispose(); // No longer important
 
                 throw;
@@ -414,7 +415,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TAssociation>>() as AdoBasePersistenceService<TAssociation>;
             if (persistenceService == null)
             {
-                this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Information, 0, "Missing persister for type {0}", typeof(TAssociation).Name);
+                this.m_tracer.TraceEvent(EventLevel.Informational,  "Missing persister for type {0}", typeof(TAssociation).Name);
                 return;
             }
             // Ensure the source key is set

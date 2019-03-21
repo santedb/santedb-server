@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
@@ -29,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -51,7 +53,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
         /// <summary>
         /// The internal reference to the <see cref="TraceSource"/> instance.
         /// </summary>
-        protected readonly TraceSource traceSource = new TraceSource(ReportingPersistenceConstants.TraceName);
+        protected readonly Tracer traceSource = new Tracer(ReportingPersistenceConstants.TraceName);
 
 		/// <summary>
 		/// Fired after a data type is inserted.
@@ -153,7 +155,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 
 			if (preRetrievalArgs.Cancel)
 			{
-				this.traceSource.TraceEvent(TraceEventType.Warning, 0, $"Pre-event handler indicates abort retrieve: {containerId}");
+				this.traceSource.TraceEvent(EventLevel.Warning, $"Pre-event handler indicates abort retrieve: {containerId}");
 				return null;
 			}
 
@@ -162,7 +164,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 				try
 				{
 					connection.Open();
-					this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"GET: {containerId}");
+					this.traceSource.TraceEvent(EventLevel.Verbose, $"GET: {containerId}");
 
 					var result = this.Get(connection, containerId, loadFast);
 
@@ -174,7 +176,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 				}
 				catch (Exception e)
 				{
-					this.traceSource.TraceEvent(TraceEventType.Error, 0, $"Error: {e}");
+					this.traceSource.TraceEvent(EventLevel.Error,  $"Error: {e}");
 					throw;
 				}
 			}
@@ -214,7 +216,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 
 			if (preInsertArgs.Cancel)
 			{
-				traceSource.TraceEvent(TraceEventType.Warning, 0, $"Pre-event handler indicates abort insert for : {storageData}");
+				traceSource.TraceEvent(EventLevel.Warning, $"Pre-event handler indicates abort insert for : {storageData}");
 				return storageData;
 			}
 
@@ -234,7 +236,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 						}
 						else
 						{
-							this.traceSource.TraceEvent(TraceEventType.Verbose, 0, "INSERT {0}", storageData);
+							this.traceSource.TraceEvent(EventLevel.Verbose, "INSERT {0}", storageData);
 							storageData = this.Insert(connection, storageData);
 						}
 
@@ -253,7 +255,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 					}
 					catch (Exception e)
 					{
-						this.traceSource.TraceEvent(TraceEventType.Error, 0, "Error : {0}", e);
+						this.traceSource.TraceEvent(EventLevel.Error,  "Error : {0}", e);
 						transaction?.Rollback();
 						throw new DataPersistenceException(e.Message, e);
 					}
@@ -319,7 +321,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 
 			if (prePersistenceEventArgs.Cancel)
 			{
-				traceSource.TraceEvent(TraceEventType.Warning, 0, $"Pre-event handler indicates abort for {storageData}");
+				traceSource.TraceEvent(EventLevel.Warning, $"Pre-event handler indicates abort for {storageData}");
 				return storageData;
 			}
 
@@ -331,7 +333,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 				{
 					try
 					{
-						this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"OBSOLETE {storageData}");
+						this.traceSource.TraceEvent(EventLevel.Verbose, $"OBSOLETE {storageData}");
 
 						storageData = this.Obsolete(connection, storageData);
 
@@ -352,7 +354,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 					}
 					catch (Exception e)
 					{
-						traceSource.TraceEvent(TraceEventType.Error, 0, $"Error obsoleting: {storageData}");
+						traceSource.TraceEvent(EventLevel.Error,  $"Error obsoleting: {storageData}");
 						transaction.Rollback();
 						throw new DataPersistenceException(e.Message, e);
 					}
@@ -450,7 +452,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 
 			if (preArgs.Cancel)
 			{
-				this.traceSource.TraceEvent(TraceEventType.Warning, 0, "Pre-Event handler indicates abort query {0}", query);
+				this.traceSource.TraceEvent(EventLevel.Warning, "Pre-Event handler indicates abort query {0}", query);
 				totalCount = 0;
 				return null;
 			}
@@ -462,7 +464,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 				{
 					connection.Open();
 
-					this.traceSource.TraceEvent(TraceEventType.Verbose, 0, "QUERY {0}", query);
+					this.traceSource.TraceEvent(EventLevel.Verbose, "QUERY {0}", query);
 
 					if ((count ?? 1000) > 25)
 						connection.PrepareStatements = true;
@@ -477,13 +479,13 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 
 					var retVal = postData.Results.AsParallel().ToList();
 
-					this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Returning {offset}..{offset + (count ?? 1000)} or {totalCount} results");
+					this.traceSource.TraceEvent(EventLevel.Verbose, $"Returning {offset}..{offset + (count ?? 1000)} or {totalCount} results");
 
 					return retVal;
 				}
 				catch (Exception e)
 				{
-					this.traceSource.TraceEvent(TraceEventType.Error, 0, $"Error: {e}");
+					this.traceSource.TraceEvent(EventLevel.Error,  $"Error: {e}");
 					throw;
 				}
 			}
@@ -523,7 +525,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 
 			if (preUpdateArgs.Cancel)
 			{
-				traceSource.TraceEvent(TraceEventType.Warning, 0, $"Pre-event handler indicates abort update for : {storageData}");
+				traceSource.TraceEvent(EventLevel.Warning, $"Pre-event handler indicates abort update for : {storageData}");
 				return storageData;
 			}
 
@@ -535,7 +537,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 				{
 					try
 					{
-						this.traceSource.TraceEvent(TraceEventType.Verbose, 0, "UPDATE {0}", storageData);
+						this.traceSource.TraceEvent(EventLevel.Verbose, "UPDATE {0}", storageData);
 
 						storageData = this.Update(connection, storageData);
 
@@ -554,7 +556,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 					}
 					catch (Exception e)
 					{
-						this.traceSource.TraceEvent(TraceEventType.Error, 0, "Error : {0}", e);
+						this.traceSource.TraceEvent(EventLevel.Error,  "Error : {0}", e);
 						tx?.Rollback();
 						throw new DataPersistenceException(e.Message, e);
 					}

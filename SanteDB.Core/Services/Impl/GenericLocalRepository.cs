@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core.BusinessRules;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Collection;
@@ -54,7 +55,7 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Trace source
         /// </summary>
-        protected TraceSource m_traceSource = new TraceSource(SanteDBConstants.DataTraceSourceName);
+        protected Tracer m_traceSource = new Tracer(SanteDBConstants.DataTraceSourceName);
 
         /// <summary>
         /// Fired after data is inserted

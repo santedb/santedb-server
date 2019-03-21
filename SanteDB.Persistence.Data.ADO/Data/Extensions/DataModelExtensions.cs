@@ -34,6 +34,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Reflection;
 using System.Security;
@@ -52,7 +53,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
     {
         
         // Trace source
-        private static TraceSource s_traceSource = new TraceSource(AdoDataConstants.TraceSourceName);
+        private static Tracer s_traceSource = new Tracer(AdoDataConstants.TraceSourceName);
         
         // Field cache
         private static Dictionary<Type, FieldInfo[]> s_fieldCache = new Dictionary<Type, FieldInfo[]>();
@@ -454,7 +455,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
             }
 #if DEBUG
             sw.Stop();
-            s_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Load associations for {0} took {1} ms", me, sw.ElapsedMilliseconds);
+            s_traceSource.TraceEvent(EventLevel.Verbose, "Load associations for {0} took {1} ms", me, sw.ElapsedMilliseconds);
 #endif
 
             if (me.LoadState == LoadState.New)

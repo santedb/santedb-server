@@ -25,6 +25,7 @@ using SanteDB.Tools.DataSandbox.Wcf;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using SanteDB.Core.Diagnostics;
 
 namespace SanteDB.Tools.DataSandbox
 {
@@ -40,7 +41,7 @@ namespace SanteDB.Tools.DataSandbox
         public string ServiceName => "Debug Environment UI";
 
         // HDSI Trace host
-        private TraceSource m_traceSource = new TraceSource("SanteDB.Tools.DataSandbox");
+        private Tracer m_traceSource = new Tracer("SanteDB.Tools.DataSandbox");
 
         // web host
         private RestService m_webHost;
@@ -77,7 +78,7 @@ namespace SanteDB.Tools.DataSandbox
             ApplicationServiceContext.Current.Started += (o, e) =>
             {
 
-                this.m_traceSource.TraceInformation("Starting Query Builder Service...");
+                this.m_traceSource.TraceInfo("Starting Query Builder Service...");
                 
                 this.m_webHost = ApplicationServiceContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(DataSandboxTool));
                 this.m_webHost.Start();
@@ -96,7 +97,7 @@ namespace SanteDB.Tools.DataSandbox
 
             if (this.IsRunning)
             {
-                this.m_traceSource.TraceInformation("Stopping Query Builder Tool...");
+                this.m_traceSource.TraceInfo("Stopping Query Builder Tool...");
                 this.m_webHost.Stop();
                 this.m_webHost = null;
             }

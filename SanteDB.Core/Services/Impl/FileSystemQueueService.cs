@@ -18,9 +18,11 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -122,7 +124,7 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Queue file
         /// </summary>
-        private TraceSource m_tracer = new TraceSource("SanteDB.Core.Queue.File");
+        private Tracer m_tracer = new Tracer("SanteDB.Core.Queue.File");
 
         /// <summary>
         /// Initializes the file system queue
@@ -156,7 +158,7 @@ namespace SanteDB.Core.Services.Impl
             var queueFile = Directory.GetFiles(queueDirectory).FirstOrDefault();
             if (queueFile == null) return null;
 
-            this.m_tracer.TraceInformation("Will dequeue {0}", Path.GetFileNameWithoutExtension(queueFile));
+            this.m_tracer.TraceInfo("Will dequeue {0}", Path.GetFileNameWithoutExtension(queueFile));
             object retVal = null;
             using (var fs = File.OpenRead(queueFile))
             {
@@ -196,7 +198,7 @@ namespace SanteDB.Core.Services.Impl
 
             using (var fs = File.Create(filePath))
                 QueueEntry.Create(data).Save(fs);
-            this.m_tracer.TraceInformation("Successfulled queued {0}", fname);
+            this.m_tracer.TraceInfo("Successfulled queued {0}", fname);
         }
 
         /// <summary>
@@ -211,7 +213,7 @@ namespace SanteDB.Core.Services.Impl
             if (!Directory.Exists(queueDirectory))
                 Directory.CreateDirectory(queueDirectory);
 
-            this.m_tracer.TraceInformation("Opening queue {0}... Exhausing existing items...", queueDirectory);
+            this.m_tracer.TraceInfo("Opening queue {0}... Exhausing existing items...", queueDirectory);
 
             // Watchers
             lock (this.m_watchers)
@@ -226,7 +228,7 @@ namespace SanteDB.Core.Services.Impl
                     }
                     catch (Exception ex)
                     {
-                        this.m_tracer.TraceEvent(TraceEventType.Error, ex.HResult, "FileSystem Watcher reported error on queue (Changed) -> {0}", ex);
+                        this.m_tracer.TraceEvent(EventLevel.Error,  "FileSystem Watcher reported error on queue (Changed) -> {0}", ex);
                     }
 
                 };
@@ -238,7 +240,7 @@ namespace SanteDB.Core.Services.Impl
                     }
                     catch (Exception ex)
                     {
-                        this.m_tracer.TraceEvent(TraceEventType.Error, ex.HResult, "FileSystem Watcher reported error on queue (Changed) -> {0}", ex);
+                        this.m_tracer.TraceEvent(EventLevel.Error,  "FileSystem Watcher reported error on queue (Changed) -> {0}", ex);
                     }
                 };
                 fsWatch.EnableRaisingEvents = true;
@@ -248,7 +250,7 @@ namespace SanteDB.Core.Services.Impl
             // If there's anything in the directory notify
             foreach (var itm in Directory.GetFiles(queueDirectory, "*"))
             {
-                this.m_tracer.TraceInformation(">>++>> {0}", Path.GetFileNameWithoutExtension(itm));
+                this.m_tracer.TraceInfo(">>++>> {0}", Path.GetFileNameWithoutExtension(itm));
                 this.Queued?.Invoke(this, new PersistentQueueEventArgs(queueName, Path.GetFileNameWithoutExtension(itm)));
             }
 
@@ -262,7 +264,7 @@ namespace SanteDB.Core.Services.Impl
         {
             foreach (var itm in this.m_watchers)
             {
-                this.m_tracer.TraceInformation("Disposing queue {0}", itm.Key);
+                this.m_tracer.TraceInfo("Disposing queue {0}", itm.Key);
                 itm.Value.Dispose();
             }
         }

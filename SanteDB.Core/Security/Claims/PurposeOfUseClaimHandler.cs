@@ -17,9 +17,11 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Services;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Security.Principal;
 
 namespace SanteDB.Core.Security.Claims
@@ -30,7 +32,7 @@ namespace SanteDB.Core.Security.Claims
     public class PurposeOfUseClaimHandler : IClaimTypeHandler
     {
 
-        private TraceSource m_traceSource = new TraceSource(SanteDBConstants.SecurityTraceSourceName);
+        private Tracer m_traceSource = new Tracer(SanteDBConstants.SecurityTraceSourceName);
 
         /// <summary>
         /// Gets the name of the claim being validated
@@ -59,7 +61,7 @@ namespace SanteDB.Core.Security.Claims
             }
             catch(Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 throw;
             }
         }

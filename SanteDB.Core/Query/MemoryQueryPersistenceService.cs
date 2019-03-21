@@ -77,7 +77,7 @@ namespace SanteDB.Core.Query
         }
 
         // Tracer
-        private TraceSource m_tracer = new TraceSource("SanteDB.Core.Query.MemoryQueryPersistence");
+        private Tracer m_tracer = new Tracer("SanteDB.Core.Query.MemoryQueryPersistence");
 
         // Memory cache of queries
         private Dictionary<Guid, MemoryQueryInfo> m_queryCache = new Dictionary<Guid, MemoryQueryInfo>(10);
@@ -281,7 +281,7 @@ namespace SanteDB.Core.Query
         public void Run(object sender, ElapsedEventArgs e, object[] parameters)
         {
 #if DEBUG
-            this.m_tracer.TraceInformation("Cleaning stale queries from memory...");
+            this.m_tracer.TraceInfo("Cleaning stale queries from memory...");
 #endif
 
             try

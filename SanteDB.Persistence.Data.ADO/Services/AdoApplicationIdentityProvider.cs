@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security.Services;
@@ -27,6 +28,7 @@ using SanteDB.Persistence.Data.ADO.Configuration;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Security;
 using System.Security.Authentication;
@@ -47,7 +49,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         public string ServiceName => "ADO.NET Application Identity Provider";
 
         // Trace source
-        private TraceSource m_traceSource = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
+        private Tracer m_traceSource = new Tracer(AdoDataConstants.IdentityTraceSourceName);
 
         // Configuration
         private AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
@@ -87,7 +89,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error authenticating {0} : {1}", applicationId, e);
+                    this.m_traceSource.TraceEvent(EventLevel.Error,  "Error authenticating {0} : {1}", applicationId, e);
                     throw new AuthenticationException("Error authenticating application", e);
                 }
             }
@@ -111,7 +113,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error getting identity data for {0} : {1}", name, e);
+                    this.m_traceSource.TraceEvent(EventLevel.Error,  "Error getting identity data for {0} : {1}", name, e);
                     throw;
                 }
 

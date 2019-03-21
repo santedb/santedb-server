@@ -28,6 +28,7 @@ using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Security.Principal;
 
@@ -86,7 +87,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             this.FireRetrieving(preArgs);
             if (preArgs.Cancel)
             {
-                this.m_tracer.TraceEvent(TraceEventType.Warning, 0, "Pre-Event handler indicates abort retrieve {0}", containerId);
+                this.m_tracer.TraceEvent(EventLevel.Warning, "Pre-Event handler indicates abort retrieve {0}", containerId);
                 return preArgs.Result;
             }
 
@@ -108,7 +109,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 try
                 {
                     connection.Open();
-                    this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "GET {0}", containerId);
+                    this.m_tracer.TraceEvent(EventLevel.Verbose, "GET {0}", containerId);
 
                     TModel retVal = null;
                     connection.LoadState = LoadState.FullLoad;
@@ -130,14 +131,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(TraceEventType.Error, 0, "Error : {0}", e);
+                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error : {0}", e);
                     throw;
                 }
                 finally
                 {
 #if DEBUG
                     sw.Stop();
-                    this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "Retrieve took {0} ms", sw.ElapsedMilliseconds);
+                    this.m_tracer.TraceEvent(EventLevel.Verbose, "Retrieve took {0} ms", sw.ElapsedMilliseconds);
 #endif
                 }
         }

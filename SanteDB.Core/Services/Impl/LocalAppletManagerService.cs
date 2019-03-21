@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Linq;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -64,7 +65,7 @@ namespace SanteDB.Core.Services.Impl
         private AppletConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AppletConfigurationSection>();
 
         // Tracer
-        private TraceSource m_tracer = new TraceSource(SanteDBConstants.ServiceTraceSourceName);
+        private Tracer m_tracer = new Tracer(SanteDBConstants.ServiceTraceSourceName);
 
         /// <summary>
         /// Indicates whether the service is running 
@@ -118,7 +119,7 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public byte[] GetPackage(String appletId)
         {
-            this.m_tracer.TraceInformation("Retrieving package {0}", appletId);
+            this.m_tracer.TraceInfo("Retrieving package {0}", appletId);
 
             // Save the applet
             var appletDir = this.m_configuration.AppletDirectory;
@@ -139,7 +140,7 @@ namespace SanteDB.Core.Services.Impl
         public bool UnInstall(String packageId)
         {
 
-            this.m_tracer.TraceInformation("Un-installing {0}", packageId);
+            this.m_tracer.TraceInfo("Un-installing {0}", packageId);
             // Applet check
             var applet = this.m_appletCollection.FirstOrDefault(o => o.Info.Id == packageId);
             if (applet == null) // Might be solution
@@ -179,7 +180,7 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public bool Install(AppletPackage package, bool isUpgrade = false)
         {
-            this.m_tracer.TraceInformation("Installing {0}", package.Meta);
+            this.m_tracer.TraceInfo("Installing {0}", package.Meta);
 
             // TODO: Verify package hash / signature
             if (!this.VerifyPackage(package))
@@ -217,7 +218,7 @@ namespace SanteDB.Core.Services.Impl
             this.m_appletCollection.Add(pkg);
 
             // We want to install the templates & protocols into the DB
-            this.m_tracer.TraceInformation("Installing templates...");
+            this.m_tracer.TraceInfo("Installing templates...");
 
             // Install templates
             var idp = ApplicationServiceContext.Current.GetService<ITemplateDefinitionRepositoryService>();
@@ -254,7 +255,7 @@ namespace SanteDB.Core.Services.Impl
 
             if (package.Meta.Signature != null)
             {
-                this.m_tracer.TraceInformation("Will verify package {0}", package.Meta.Id.ToString());
+                this.m_tracer.TraceInfo("Will verify package {0}", package.Meta.Id.ToString());
 
                 // Get the public key 
                 var x509Store = new X509Store(StoreName.TrustedPublisher, StoreLocation.LocalMachine);
@@ -303,7 +304,7 @@ namespace SanteDB.Core.Services.Impl
 
                     if(retVal == true)
                     {
-                        this.m_tracer.TraceEvent(TraceEventType.Information, 0, "SUCCESSFULLY VALIDATED: {0} v.{1}\r\n" +
+                        this.m_tracer.TraceEvent(EventLevel.Informational,  "SUCCESSFULLY VALIDATED: {0} v.{1}\r\n" +
                             "\tKEY TOKEN: {2}\r\n" +
                             "\tSIGNED BY: {3}\r\n" +
                             "\tVALIDITY: {4:yyyy-MMM-dd} - {5:yyyy-MMM-dd}\r\n" +
@@ -312,7 +313,7 @@ namespace SanteDB.Core.Services.Impl
                     }
                     else
                     {
-                        this.m_tracer.TraceEvent(TraceEventType.Critical, 0, ">> SECURITY ALERT : {0} v.{1} <<\r\n" +
+                        this.m_tracer.TraceEvent(EventLevel.Critical, ">> SECURITY ALERT : {0} v.{1} <<\r\n" +
                             "\tPACKAGE HAS BEEN TAMPERED WITH\r\n" + 
                             "\tKEY TOKEN (CLAIMED): {2}\r\n" +
                             "\tSIGNED BY  (CLAIMED): {3}\r\n" +
@@ -329,12 +330,12 @@ namespace SanteDB.Core.Services.Impl
             }
             else if (this.m_configuration.AllowUnsignedApplets)
             {
-                this.m_tracer.TraceEvent(TraceEventType.Warning, 1099, "Package {0} v.{1} (publisher: {2}) is not signed. To prevent unsigned applets from being installed disable the configuration option", package.Meta.Id, package.Meta.Version, package.Meta.Author);
+                this.m_tracer.TraceEvent(EventLevel.Warning, "Package {0} v.{1} (publisher: {2}) is not signed. To prevent unsigned applets from being installed disable the configuration option", package.Meta.Id, package.Meta.Version, package.Meta.Author);
                 return true;
             }
             else
             {
-                this.m_tracer.TraceEvent(TraceEventType.Critical, 1097, "Package {0} v.{1} (publisher: {2}) is not signed and cannot be installed", package.Meta.Id, package.Meta.Version, package.Meta.Author);
+                this.m_tracer.TraceEvent(EventLevel.Critical, "Package {0} v.{1} (publisher: {2}) is not signed and cannot be installed", package.Meta.Id, package.Meta.Version, package.Meta.Author);
                 return false;
             }
         }
@@ -345,7 +346,7 @@ namespace SanteDB.Core.Services.Impl
         public bool Start()
         {
 
-            this.m_tracer.TraceInformation("Starting applet manager service...");
+            this.m_tracer.TraceInfo("Starting applet manager service...");
 
             this.Starting?.Invoke(this, EventArgs.Empty);
 
@@ -357,11 +358,11 @@ namespace SanteDB.Core.Services.Impl
                     this.m_tracer.TraceWarning("Applet directory {0} doesn't exist, no applets will be loaded", appletDir);
                 else
                 {
-                    this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "Scanning {0} for applets...", appletDir);
+                    this.m_tracer.TraceEvent(EventLevel.Verbose, "Scanning {0} for applets...", appletDir);
                     foreach (var f in Directory.GetFiles(appletDir))
                     {
                         // Try to open the file
-                        this.m_tracer.TraceInformation("Loading {0}...", f);
+                        this.m_tracer.TraceInfo("Loading {0}...", f);
                         using (var fs = File.OpenRead(f))
                         {
                             var pkg = AppletPackage.Load(fs);
@@ -370,7 +371,7 @@ namespace SanteDB.Core.Services.Impl
                             {
                                 if (this.m_solutions.Any(o => o.Meta.Id == pkg.Meta.Id))
                                 {
-                                    this.m_tracer.TraceEvent(TraceEventType.Critical, 1096, "Duplicate solution {0} is not permitted", pkg.Meta.Id);
+                                    this.m_tracer.TraceEvent(EventLevel.Critical, "Duplicate solution {0} is not permitted", pkg.Meta.Id);
                                     throw new DuplicateKeyException(pkg.Meta.Id);
                                 }
                                 else if(!this.Install(pkg as AppletSolution, true))
@@ -380,7 +381,7 @@ namespace SanteDB.Core.Services.Impl
                             }
                             else if (this.m_fileDictionary.ContainsKey(pkg.Meta.Id))
                             {
-                                this.m_tracer.TraceEvent(TraceEventType.Critical, 1096, "Duplicate package {0} is not permitted", pkg.Meta.Id);
+                                this.m_tracer.TraceEvent(EventLevel.Critical, "Duplicate package {0} is not permitted", pkg.Meta.Id);
                                 throw new DuplicateKeyException(pkg.Meta.Id);
                             }
                             else if (this.Install(pkg, true))
@@ -390,7 +391,7 @@ namespace SanteDB.Core.Services.Impl
                             }
                             else
                             {
-                                this.m_tracer.TraceEvent(TraceEventType.Critical, 1098, "Cannot proceed while untrusted applets are present");
+                                this.m_tracer.TraceEvent(EventLevel.Critical, "Cannot proceed while untrusted applets are present");
                                 throw new SecurityException("Cannot proceed while untrusted applets are present");
                             }
                         }
@@ -400,12 +401,12 @@ namespace SanteDB.Core.Services.Impl
 	        }
 	        catch (SecurityException e)
 	        {
-				this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error loading applets: {0}", e);
+				this.m_tracer.TraceEvent(EventLevel.Error,  "Error loading applets: {0}", e);
 		        throw new InvalidOperationException("Cannot proceed while untrusted applets are present");
 			}
             catch (Exception ex)
             {
-                this.m_tracer.TraceEvent(TraceEventType.Error, ex.HResult, "Error loading applets: {0}", ex);
+                this.m_tracer.TraceEvent(EventLevel.Error,  "Error loading applets: {0}", ex);
 	            throw;
             }
 
@@ -448,7 +449,7 @@ namespace SanteDB.Core.Services.Impl
         /// <returns></returns>
         public bool Install(AppletSolution solution, bool isUpgrade = false)
         {
-            this.m_tracer.TraceInformation("Installing solution {0}", solution.Meta);
+            this.m_tracer.TraceInfo("Installing solution {0}", solution.Meta);
 
             // TODO: Verify package hash / signature
             if (!this.VerifyPackage(solution))

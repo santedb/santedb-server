@@ -20,11 +20,13 @@
 using RestSrvr;
 using RestSrvr.Attributes;
 using SanteDB.Core.Applets.ViewModel.Json;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Http;
 using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.Export;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -39,7 +41,7 @@ namespace SanteDB.Tools.DataSandbox.Wcf
     public class DataSandboxTool : IDataSandboxTool
     {
 
-        private TraceSource m_traceSource = new TraceSource("SanteDB.Tools.DataSandbox");
+        private Tracer m_traceSource = new Tracer("SanteDB.Tools.DataSandbox");
 
         /// <summary>
         /// Create dataset
@@ -128,7 +130,7 @@ namespace SanteDB.Tools.DataSandbox.Wcf
             {
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 return null;
             }
 

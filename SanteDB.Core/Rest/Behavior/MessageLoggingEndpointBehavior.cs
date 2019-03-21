@@ -19,9 +19,11 @@
  */
 using RestSrvr;
 using RestSrvr.Message;
+using SanteDB.Core.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Core.Rest.Behavior
 {
@@ -32,7 +34,7 @@ namespace SanteDB.Core.Rest.Behavior
     {
 
         // Trace source name
-        private TraceSource m_traceSource = new TraceSource(SanteDBConstants.WcfTraceSourceName);
+        private Tracer m_traceSource = new Tracer(SanteDBConstants.WcfTraceSourceName);
 
         // Correlation id
         [ThreadStatic]
@@ -54,7 +56,7 @@ namespace SanteDB.Core.Rest.Behavior
                     usage = cpuCounter.NextValue();
             }
 
-            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "HTTP RQO {0} : {1} {2} ({3}) - {4} (CPU {5}%)",
+            this.m_traceSource.TraceEvent(EventLevel.Verbose, "HTTP RQO {0} : {1} {2} ({3}) - {4} (CPU {5}%)",
                 RestOperationContext.Current.IncomingRequest.RemoteEndPoint,
                 request.Method,
                 request.Url,
@@ -87,7 +89,7 @@ namespace SanteDB.Core.Rest.Behavior
                     usage = cpuCounter.NextValue();
             }
 
-            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "HTTP RSP {0} : {1} ({2} ms - CPU {3}%)",
+            this.m_traceSource.TraceEvent(EventLevel.Verbose, "HTTP RSP {0} : {1} ({2} ms - CPU {3}%)",
                 httpCorrelation.Key,
                 response.StatusCode,
                 processingTime.TotalMilliseconds,

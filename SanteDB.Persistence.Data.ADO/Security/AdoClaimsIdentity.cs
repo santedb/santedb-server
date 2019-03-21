@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Security;
@@ -35,6 +36,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Security;
@@ -50,7 +52,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
     public class AdoClaimsIdentity : SanteDBClaimsIdentity, IIdentity, ISession, IClaimsIdentity
     {
         // Trace source
-        private static TraceSource s_traceSource = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
+        private static Tracer s_traceSource = new Tracer(AdoDataConstants.IdentityTraceSourceName);
 
         // Lock object
         private static Object s_lockObject = new object();
@@ -165,12 +167,12 @@ namespace SanteDB.Persistence.Data.ADO.Security
             }
             catch (DbException e)
             {
-                s_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Database Error Creating Identity: {0}", e);
+                s_traceSource.TraceEvent(EventLevel.Error,  "Database Error Creating Identity: {0}", e);
                 throw new AuthenticationException(e.Message, e);
             }
             catch (Exception e)
             {
-                s_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                s_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 throw new Exception("Creating identity failed", e);
             }
         }
@@ -219,7 +221,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
             }
             catch (Exception e)
             {
-                s_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                s_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 throw new Exception("Creating unauthorized identity failed", e);
             }
         }
@@ -291,12 +293,12 @@ namespace SanteDB.Persistence.Data.ADO.Security
                 var retVal = new SanteDBClaimsPrincipal(
                         identities
                     );
-                s_traceSource.TraceInformation("Created security principal from identity {0} > {1}", this, AdoClaimsIdentity.PrincipalToString(retVal));
+                s_traceSource.TraceInfo("Created security principal from identity {0} > {1}", this, AdoClaimsIdentity.PrincipalToString(retVal));
                 return retVal;
             }
             catch (Exception e)
             {
-                s_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                s_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 throw new Exception("Creating principal from identity failed", e);
             }
         }

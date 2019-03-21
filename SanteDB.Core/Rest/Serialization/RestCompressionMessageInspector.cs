@@ -19,9 +19,11 @@
  */
 using RestSrvr;
 using RestSrvr.Message;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Rest.Compression;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 
 namespace SanteDB.Core.Rest.Serialization
@@ -33,7 +35,7 @@ namespace SanteDB.Core.Rest.Serialization
     public class RestCompressionMessageInspector : IMessageInspector
     {
         // Trace source
-        private TraceSource m_traceSource = new TraceSource(SanteDBConstants.WcfTraceSourceName);
+        private Tracer m_traceSource = new Tracer(SanteDBConstants.WcfTraceSourceName);
         
         /// <summary>
         /// After request is received
@@ -50,7 +52,7 @@ namespace SanteDB.Core.Rest.Serialization
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
             }
         }
         
@@ -105,13 +107,13 @@ namespace SanteDB.Core.Rest.Serialization
                     }
                     catch (Exception e)
                     {
-                        this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                        this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                     }
                 }
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
             }
         }
     }

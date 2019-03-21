@@ -18,6 +18,7 @@
  * Date: 2018-6-22
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
@@ -39,6 +40,7 @@ using SanteDB.Reporting.Jasper.Model.Reference;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
@@ -118,7 +120,7 @@ namespace SanteDB.Reporting.Jasper
         /// <summary>
         /// The internal reference to the trace source.
         /// </summary>
-        private readonly TraceSource tracer = new TraceSource("SanteDB.Reporting.Jasper");
+        private readonly Tracer tracer = new Tracer("SanteDB.Reporting.Jasper");
 
         /// <summary>
         /// The username.
@@ -207,7 +209,7 @@ namespace SanteDB.Reporting.Jasper
 
             this.Authenticating?.Invoke(this, new AuthenticatingEventArgs());
 
-            tracer.TraceEvent(TraceEventType.Information, 0, "Authenticating against jasper server");
+            tracer.TraceEvent(EventLevel.Informational, "Authenticating against jasper server");
 
             var response = this.client.PostAsync($"{this.ReportUri}{JasperAuthenticationPath}", content).Result;
 
@@ -233,8 +235,8 @@ namespace SanteDB.Reporting.Jasper
                     }
                 }
 
-                this.tracer.TraceEvent(TraceEventType.Information, 0, "Successfully authenticated against jasper server");
-                this.tracer.TraceEvent(TraceEventType.Verbose, 0, token);
+                this.tracer.TraceEvent(EventLevel.Informational, "Successfully authenticated against jasper server");
+                this.tracer.TraceEvent(EventLevel.Verbose, token);
 
                 this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(new AuthenticationResult(token)));
             }
@@ -244,7 +246,7 @@ namespace SanteDB.Reporting.Jasper
 
                 this.OnAuthenticationError?.Invoke(this, new AuthenticationErrorEventArgs(message));
 
-                this.tracer.TraceEvent(TraceEventType.Error, 0, message);
+                this.tracer.TraceEvent(EventLevel.Error, message);
 
                 throw new AuthenticationException(message);
             }
@@ -480,7 +482,7 @@ namespace SanteDB.Reporting.Jasper
                 {
                     var query = this.LookupResource<Query>(inputControl.Query.Uri);
 
-                    this.tracer.TraceEvent(TraceEventType.Verbose, 0, $"Jasper Query: {query.Value}");
+                    this.tracer.TraceEvent(EventLevel.Verbose, $"Jasper Query: {query.Value}");
 
                     var warehouseService = ApplicationServiceContext.Current.GetService<IAdHocDatawarehouseService>();
 
@@ -514,7 +516,7 @@ namespace SanteDB.Reporting.Jasper
                     }
                     catch (Exception e)
                     {
-                        tracer.TraceEvent(TraceEventType.Warning, 0, $"Unable to execute query: {e}");
+                        tracer.TraceEvent(EventLevel.Warning, $"Unable to execute query: {e}");
                     }
 
                     var sourceDefinition = new ListAutoCompleteSourceDefinition();
@@ -532,7 +534,7 @@ namespace SanteDB.Reporting.Jasper
                         }
                         catch (Exception e)
                         {
-                            tracer.TraceEvent(TraceEventType.Error, 0, $"Error: {e}");
+                            tracer.TraceEvent(EventLevel.Error, $"Error: {e}");
                         }
                     }
                 }
@@ -558,13 +560,13 @@ namespace SanteDB.Reporting.Jasper
 
             if (!string.IsNullOrEmpty(FolderPath) && !string.IsNullOrWhiteSpace(FolderPath))
             {
-                this.tracer.TraceEvent(TraceEventType.Verbose, 0, $"Mapping folder path: {this.FolderPath}");
+                this.tracer.TraceEvent(EventLevel.Verbose, $"Mapping folder path: {this.FolderPath}");
                 url += $"&folderUri={FolderPath}";
             }
 
             var response = client.GetAsync(url).Result;
 
-            tracer.TraceEvent(TraceEventType.Information, 0, $"Jasper report server response: {response.Content}");
+            tracer.TraceEvent(EventLevel.Informational, $"Jasper report server response: {response.Content}");
 
             Resources resources;
 
@@ -818,7 +820,7 @@ namespace SanteDB.Reporting.Jasper
                 {
                     var query = this.LookupResource<Query>(inputControl.Query.Uri);
 
-                    this.tracer.TraceEvent(TraceEventType.Verbose, 0, $"Jasper Query: {query.Value}");
+                    this.tracer.TraceEvent(EventLevel.Verbose, $"Jasper Query: {query.Value}");
 
                     var warehouseService = ApplicationServiceContext.Current.GetService<IAdHocDatawarehouseService>();
 
@@ -856,7 +858,7 @@ namespace SanteDB.Reporting.Jasper
                     }
                     catch (Exception e)
                     {
-                        tracer.TraceEvent(TraceEventType.Warning, 0, $"Unable to execute query: {e}");
+                        tracer.TraceEvent(EventLevel.Warning, $"Unable to execute query: {e}");
                     }
 
                     if (queryResult != null)
@@ -867,7 +869,7 @@ namespace SanteDB.Reporting.Jasper
                         }
                         catch (Exception e)
                         {
-                            tracer.TraceEvent(TraceEventType.Error, 0, $"Error: {e}");
+                            tracer.TraceEvent(EventLevel.Error, $"Error: {e}");
                         }
                     }
                 }

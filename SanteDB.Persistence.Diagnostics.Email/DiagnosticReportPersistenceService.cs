@@ -40,6 +40,8 @@ using System.Security.Principal;
 using System.Text;
 using System.Xml.Serialization;
 using SanteDB.Core.Model.Query;
+using SanteDB.Core.Diagnostics;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Persistence.Diagnostics.Email
 {
@@ -57,7 +59,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
         public string ServiceName => "E-Mail Diagnostic Report Submission";
 
         // Trace source
-        private TraceSource m_traceSource = new TraceSource("SanteDB.Persistence.Diagnostics.Email");
+        private Tracer m_traceSource = new Tracer("SanteDB.Persistence.Diagnostics.Email");
 
         // Configuration
         private DiagnosticEmailServiceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<DiagnosticEmailServiceConfigurationSection>();
@@ -128,7 +130,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
             this.Inserting?.Invoke(this, persistenceArgs);
             if (persistenceArgs.Cancel)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Warning, 0, "Pre-persistence event cancelled the insertion");
+                this.m_traceSource.TraceEvent(EventLevel.Warning, "Pre-persistence event cancelled the insertion");
                 return persistenceArgs.Data;
             }
 
@@ -175,12 +177,12 @@ namespace SanteDB.Persistence.Diagnostics.Email
                     smtpClient.Credentials = new NetworkCredential(this.m_configuration.Smtp.Username, this.m_configuration.Smtp.Password);
                 smtpClient.SendCompleted += (o, e) =>
                 {
-                    this.m_traceSource.TraceInformation("Successfully sent message to {0}", bugMessage.To);
+                    this.m_traceSource.TraceInfo("Successfully sent message to {0}", bugMessage.To);
                     if (e.Error != null)
-                        this.m_traceSource.TraceEvent(TraceEventType.Error, 0, e.Error.ToString());
+                        this.m_traceSource.TraceEvent(EventLevel.Error, e.Error.ToString());
                     (o as IDisposable).Dispose();
                 };
-                this.m_traceSource.TraceInformation("Sending bug email message to {0}", bugMessage.To);
+                this.m_traceSource.TraceInfo("Sending bug email message to {0}", bugMessage.To);
                 smtpClient.Send(bugMessage);
 
                 // Invoke
@@ -191,7 +193,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
             }
             catch (Exception ex)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, ex.HResult, "Error sending to JIRA: {0}", ex);
+                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error sending to JIRA: {0}", ex);
                 throw;
             }
 

@@ -32,6 +32,7 @@ using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
 using SanteDB.Persistence.Data.ADO.Data.Model.Extensibility;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using System;
+using System.Diagnostics.Tracing;
 using System.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
@@ -91,7 +92,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     var dbObs = (dataInstance as CompositeResult)?.Values.OfType<DbObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbObservation>(o => o.ParentKey == dbActVersion.VersionKey);
                     if (dbObs == null)
                     {
-                        this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Warning, -10293, "Observation {0} is missing observation data! Even though class code is {1}", dbAct.Key, dbAct.ClassConceptKey);
+                        this.m_tracer.TraceEvent(EventLevel.Warning, "Observation {0} is missing observation data! Even though class code is {1}", dbAct.Key, dbAct.ClassConceptKey);
                         retVal = this.ToModelInstance<Core.Model.Acts.Act>(dbActVersion, dbAct, context);
                     }
                     else

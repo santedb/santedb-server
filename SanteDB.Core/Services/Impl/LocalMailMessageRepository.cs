@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Mail;
 using SanteDB.Core.Model.Query;
@@ -24,6 +25,7 @@ using SanteDB.Core.Security;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -44,7 +46,7 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// The internal reference to the <see cref="TraceSource"/> instance.
         /// </summary>
-        private TraceSource traceSource = new TraceSource("SanteDB.Core");
+        private Tracer traceSource = new Tracer("SanteDB.Core");
 
 		/// <summary>
 		/// Fired when an alert was raised and is being processed.
@@ -151,9 +153,9 @@ namespace SanteDB.Core.Services.Impl
 			catch (Exception e)
 			{
 #if DEBUG
-				this.traceSource.TraceEvent(TraceEventType.Error, 0, e.StackTrace);
+				this.traceSource.TraceEvent(EventLevel.Error,  e.StackTrace);
 #endif
-				this.traceSource.TraceEvent(TraceEventType.Error, 0, e.Message);
+				this.traceSource.TraceEvent(EventLevel.Error,  e.Message);
 
 				throw;
 			}

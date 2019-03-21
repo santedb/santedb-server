@@ -23,6 +23,7 @@ using RestSrvr.Message;
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
@@ -33,6 +34,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IdentityModel.Tokens;
 using System.IO;
 using System.Linq;
@@ -46,7 +48,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
     public class FhirErrorEndpointBehavior :  IServiceBehavior, IServiceErrorHandler
     {
 
-        private TraceSource m_tracer = new TraceSource("SanteDB.Messaging.FHIR");
+        private Tracer m_tracer = new Tracer("SanteDB.Messaging.FHIR");
 
         /// <summary>
         /// Apply the service behavior
@@ -70,7 +72,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
         /// </summary>
         public bool ProvideFault(Exception error, RestResponseMessage response)
         {
-            this.m_tracer.TraceEvent(TraceEventType.Error, error.HResult, "Error on WCF FHIR Pipeline: {0}", error);
+            this.m_tracer.TraceEvent(EventLevel.Error, "Error on WCF FHIR Pipeline: {0}", error);
             // Formulate appropriate response
             if (error is DomainStateException)
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.ServiceUnavailable;

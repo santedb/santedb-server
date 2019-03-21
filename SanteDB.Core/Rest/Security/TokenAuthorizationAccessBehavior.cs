@@ -20,11 +20,13 @@
 using RestSrvr;
 using RestSrvr.Message;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Services;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IdentityModel.Configuration;
 using System.IdentityModel.Tokens;
 using System.Linq;
@@ -42,7 +44,7 @@ namespace SanteDB.Core.Rest.Security
         private ClaimsAuthorizationConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<ClaimsAuthorizationConfigurationSection>();
 
         // Trace source
-        private TraceSource m_traceSource = new TraceSource(SanteDBConstants.SecurityTraceSourceName);
+        private Tracer m_traceSource = new Tracer(SanteDBConstants.SecurityTraceSourceName);
 
         /// <summary>
         /// Checks bearer access token
@@ -65,7 +67,7 @@ namespace SanteDB.Core.Rest.Security
 
             Core.Security.AuthenticationContext.Current = new Core.Security.AuthenticationContext(principal);
 
-            this.m_traceSource.TraceInformation("User {0} authenticated via SESSION BEARER", principal.Identity.Name);
+            this.m_traceSource.TraceInfo("User {0} authenticated via SESSION BEARER", principal.Identity.Name);
         }
 
         /// <summary>
@@ -95,7 +97,7 @@ namespace SanteDB.Core.Rest.Security
                 new SanteDBClaimsIdentity(identities.Identity.Name, identities.Identity.IsAuthenticated, identities.Identity.AuthenticationType, identities.Claims.Select(o=>new SanteDBClaim(o.Type, o.Value)))
             ));
 
-            this.m_traceSource.TraceInformation("User {0} authenticated via JWT", identities.Identity.Name);
+            this.m_traceSource.TraceInfo("User {0} authenticated via JWT", identities.Identity.Name);
             
         }
 
@@ -106,7 +108,7 @@ namespace SanteDB.Core.Rest.Security
         {
             try
             {
-                this.m_traceSource.TraceInformation("CheckAccess");
+                this.m_traceSource.TraceInfo("CheckAccess");
 
                 // Http message inbound
                 var httpMessage = RestOperationContext.Current.IncomingRequest;
@@ -141,13 +143,13 @@ namespace SanteDB.Core.Rest.Security
             }
             catch (UnauthorizedAccessException e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Token Error (From: {0}) : {1}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint, e);
+                this.m_traceSource.TraceEvent(EventLevel.Error,  "Token Error (From: {0}) : {1}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint, e);
 
                 throw;
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Token Error (From: {0}) : {1}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint, e);
+                this.m_traceSource.TraceEvent(EventLevel.Error,  "Token Error (From: {0}) : {1}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint, e);
                 throw new SecurityTokenException(e.Message, e);
             }
             finally

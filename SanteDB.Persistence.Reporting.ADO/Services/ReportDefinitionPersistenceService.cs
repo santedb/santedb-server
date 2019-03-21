@@ -22,6 +22,7 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Reporting.ADO.Model;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Security.Principal;
 using ReportDefinition = SanteDB.Core.Model.RISI.ReportDefinition;
@@ -44,11 +45,11 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		{
 			if (modelInstance == null)
 			{
-				this.traceSource.TraceEvent(TraceEventType.Warning, 0, "Model instance is null, exiting map");
+				this.traceSource.TraceEvent(EventLevel.Warning, "Model instance is null, exiting map");
 				return null;
 			}
 
-			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(ADO.Model.ReportDefinition) } to { nameof(ReportDefinition) }");
+			this.traceSource.TraceEvent(EventLevel.Verbose, $"Mapping { nameof(ADO.Model.ReportDefinition) } to { nameof(ReportDefinition) }");
 
 			return base.FromModelInstance(modelInstance, context);
 		}
@@ -99,7 +100,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 
 			if (domainInstance == null)
 			{
-				this.traceSource.TraceEvent(TraceEventType.Error, 0, "Domain instance must not be null");
+				this.traceSource.TraceEvent(EventLevel.Error,  "Domain instance must not be null");
 				throw new InvalidOperationException("Domain instance must not be null");
 			}
 
@@ -150,7 +151,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		{
 			if (domainInstance == null)
 			{
-				this.traceSource.TraceEvent(TraceEventType.Warning, 0, "Domain instance is null, exiting mapper");
+				this.traceSource.TraceEvent(EventLevel.Warning, "Domain instance is null, exiting mapper");
 				return null;
 			}
 
@@ -159,7 +160,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 				throw new ArgumentException($"Invalid type: {nameof(domainInstance)} is not of type {nameof(ADO.Model.ReportDefinition)}");
 			}
 
-			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(ReportDefinition) } to { nameof(ADO.Model.ReportDefinition) }");
+			this.traceSource.TraceEvent(EventLevel.Verbose, $"Mapping { nameof(ReportDefinition) } to { nameof(ADO.Model.ReportDefinition) }");
 
 			return base.ToModelInstance(domainInstance, context);
 		}
@@ -178,7 +179,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 
 			if (domainInstance == null)
 			{
-				this.traceSource.TraceEvent(TraceEventType.Error, 0, "Domain instance must not be null");
+				this.traceSource.TraceEvent(EventLevel.Error,  "Domain instance must not be null");
 				throw new InvalidOperationException("Domain instance must not be null");
 			}
 

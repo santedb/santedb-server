@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.MDM.Configuration;
 using System;
@@ -40,7 +41,7 @@ namespace SanteDB.Persistence.MDM.Services
         public string ServiceName => "MDM Daemon";
 
         // TRace source
-        private TraceSource m_traceSource = new TraceSource(MdmConstants.TraceSourceName);
+        private Tracer m_traceSource = new Tracer(MdmConstants.TraceSourceName);
 
         // Configuration
         private MdmConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<MdmConfigurationSection>();
@@ -93,7 +94,7 @@ namespace SanteDB.Persistence.MDM.Services
 
                 foreach(var itm in this.m_configuration.ResourceTypes)
                 {
-                    this.m_traceSource.TraceInformation("Adding MDM listener for {0}...", itm.ResourceType.Name);
+                    this.m_traceSource.TraceInfo("Adding MDM listener for {0}...", itm.ResourceType.Name);
                     var idt = typeof(MdmResourceListener<>).MakeGenericType(itm.ResourceType);
                     this.m_listeners.Add(Activator.CreateInstance(idt, itm) as MdmResourceListener);
                 }

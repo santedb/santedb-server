@@ -23,6 +23,7 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
 using System;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -40,7 +41,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (retVal == null) return null;
             else if(sbadmInstance == null)
             {
-                this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Warning, -0493043, "SBADM is missing SBADM data: {0}", actInstance.Key);
+                this.m_tracer.TraceEvent(EventLevel.Warning, "SBADM is missing SBADM data: {0}", actInstance.Key);
                 return null;
             }
 

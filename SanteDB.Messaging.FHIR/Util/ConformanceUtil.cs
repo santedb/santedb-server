@@ -20,6 +20,7 @@
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.FHIR.Backbone;
@@ -29,6 +30,7 @@ using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Reflection;
 
@@ -45,7 +47,7 @@ namespace SanteDB.Messaging.FHIR.Util
         private static Object s_syncLock = new object();
 
         // FHIR trace source
-        private static TraceSource s_traceSource = new TraceSource("MARC.HI.EHRS.Messaging.FHIR");
+        private static Tracer s_traceSource = new Tracer("MARC.HI.EHRS.Messaging.FHIR");
 
         /// <summary>
         /// Get Conformance Statement from FHIR service
@@ -102,7 +104,7 @@ namespace SanteDB.Messaging.FHIR.Util
             }
             catch (Exception e)
             {
-                s_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error building conformance statement: {0}", e.Message);
+                s_traceSource.TraceEvent(EventLevel.Error,  "Error building conformance statement: {0}", e.Message);
                 throw;
             }
         }

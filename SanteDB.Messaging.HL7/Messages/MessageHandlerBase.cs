@@ -49,6 +49,8 @@ using System.Security.Authentication;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Messaging.HL7.Utils;
+using SanteDB.Core.Diagnostics;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Messaging.HL7.Messages
 {
@@ -67,7 +69,7 @@ namespace SanteDB.Messaging.HL7.Messages
         // Installation date
         private static DateTime? s_installDate = null;
 
-        protected TraceSource m_traceSource = new TraceSource("SanteDB.Messaging.HL7");
+        protected Tracer m_traceSource = new Tracer("SanteDB.Messaging.HL7");
 
         /// <summary>
         /// Get the supported triggers
@@ -105,7 +107,7 @@ namespace SanteDB.Messaging.HL7.Messages
             }
             catch (Exception ex)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, ex.HResult, "Error processing message: {0}", ex);
+                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error processing message: {0}", ex);
                 return this.CreateNACK(typeof(ACK), e.Message, ex, e);
             }
         }

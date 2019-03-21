@@ -34,6 +34,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using SanteDB.Core.Diagnostics;
 
 namespace SanteDB.Messaging.GS1
 {
@@ -61,7 +62,7 @@ namespace SanteDB.Messaging.GS1
         }
 
         // Tracer
-        private TraceSource m_tracer = new TraceSource("SanteDB.Messaging.GS1");
+        private Tracer m_tracer = new Tracer("SanteDB.Messaging.GS1");
 
         // GS1 utility
         private Gs1Util m_gs1Util;

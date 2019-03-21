@@ -21,11 +21,13 @@ using RestSrvr;
 using SanteDB.Authentication.OAuth2.Rest;
 using SanteDB.Authentication.OAuth2.Wcf;
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Rest;
 using SanteDB.Core.Services;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Reflection;
 
@@ -43,7 +45,7 @@ namespace SanteDB.Authentication.OAuth2
         public string ServiceName => "OAuth 2.0 Token Service";
 
         // Trace source
-        private TraceSource m_traceSource = new TraceSource(OAuthConstants.TraceSourceName);
+        private Tracer m_traceSource = new Tracer(OAuthConstants.TraceSourceName);
 
         // Service host
         private RestService m_serviceHost;
@@ -142,7 +144,7 @@ namespace SanteDB.Authentication.OAuth2
             }
             catch(Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error, e.ToString());
                 return false;
             }
         }

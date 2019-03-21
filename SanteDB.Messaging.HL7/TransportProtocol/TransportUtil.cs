@@ -21,6 +21,7 @@ using SanteDB.Core.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Reflection;
 
 namespace SanteDB.Messaging.HL7.TransportProtocol
@@ -55,7 +56,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 			}
 			catch (Exception e)
 			{
-                new TraceSource(Hl7Constants.TraceSourceName).TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                new Tracer(Hl7Constants.TraceSourceName).TraceEvent(EventLevel.Error, e.ToString());
 			}
 		}
 

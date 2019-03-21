@@ -21,8 +21,10 @@ using Newtonsoft.Json;
 using RestSrvr;
 using RestSrvr.Message;
 using SanteDB.Authentication.OAuth2.Model;
+using SanteDB.Core.Diagnostics;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Text;
 
@@ -34,7 +36,8 @@ namespace SanteDB.Authentication.OAuth2
     internal class OAuthErrorBehavior : IServiceBehavior, IServiceErrorHandler
     {
 
-        private TraceSource m_tracer = new TraceSource(OAuthConstants.TraceSourceName);
+        private Tracer m_tracer = new Tracer(OAuthConstants.TraceSourceName);
+
         /// <summary>
         /// Apply the service behavior
         /// </summary>
@@ -58,7 +61,7 @@ namespace SanteDB.Authentication.OAuth2
         public bool ProvideFault(Exception error, RestResponseMessage response)
         {
 
-            this.m_tracer.TraceEvent(TraceEventType.Error, error.HResult ,"Error on OAUTH Pipeline: {0}", error);
+            this.m_tracer.TraceEvent(EventLevel.Error, "Error on OAUTH Pipeline: {0}", error);
 
             // Error
             OAuthError err = new OAuthError()

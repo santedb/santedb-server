@@ -53,7 +53,7 @@ namespace SanteDB.Caching.Redis
         public string ServiceName => "REDIS Data Caching Service";
 
         // Redis trace source
-        private TraceSource m_tracer = new TraceSource("SanteDB.Caching.Redis");
+        private Tracer m_tracer = new Tracer("SanteDB.Caching.Redis");
 
         // Serializer
         private Dictionary<Type, XmlSerializer> m_serializerCache = new Dictionary<Type, XmlSerializer>();

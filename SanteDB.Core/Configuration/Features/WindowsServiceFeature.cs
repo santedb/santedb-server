@@ -23,6 +23,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using SanteDB.Core.Services;
@@ -98,6 +99,7 @@ namespace SanteDB.Core.Configuration.Tasks
         /// </summary>
         public FeatureInstallState QueryState(SanteDBConfiguration configuration)
         {
+
             var options = this.Configuration as Options;
             options.ServiceName = configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.FirstOrDefault(o => o.Key == "w32instance.name")?.Value ?? options.ServiceName;
             return ServiceTools.ServiceInstaller.ServiceIsInstalled(options.ServiceName) ? FeatureInstallState.Installed : FeatureInstallState.NotInstalled;
@@ -212,7 +214,7 @@ namespace SanteDB.Core.Configuration.Tasks
                 {
                     ServiceInstaller.StopService(this.m_options.ServiceName);
                     ServiceInstaller.Uninstall(this.m_options.ServiceName);
-                    configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.RemoveAll(o=>o.Key == "w32instance.name");
+                    configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.RemoveAll(o => o.Key == "w32instance.name");
                 }
                 return true;
             }
@@ -220,7 +222,14 @@ namespace SanteDB.Core.Configuration.Tasks
             /// <summary>
             /// Verify state
             /// </summary>
-            public bool VerifyState(SanteDBConfiguration configuration) => !ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName);
+            public bool VerifyState(SanteDBConfiguration configuration) {
+                WindowsIdentity identity = WindowsIdentity.GetCurrent();
+                WindowsPrincipal principal = new WindowsPrincipal(identity);
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT && 
+                    principal.IsInRole(WindowsBuiltInRole.Administrator))
+                    return ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName);
+                return false;
+            }
         }
 
         /// <summary>

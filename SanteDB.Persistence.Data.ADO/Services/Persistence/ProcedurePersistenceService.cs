@@ -23,6 +23,7 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
 using SanteDB.Core.Model.Query;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -40,7 +41,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (retVal == null) return null;
             else if(procedureInstance == null)
             {
-                this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Warning, -0493043, "PROC is missing PROC data: {0}", actInstance.Key);
+                this.m_tracer.TraceEvent(EventLevel.Warning, "PROC is missing PROC data: {0}", actInstance.Key);
                 return null;
             }
 

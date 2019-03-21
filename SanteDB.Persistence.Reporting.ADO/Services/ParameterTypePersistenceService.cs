@@ -24,6 +24,7 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Security.Principal;
 
@@ -45,11 +46,11 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		{
 			if (modelInstance == null)
 			{
-				this.traceSource.TraceEvent(TraceEventType.Warning, 0, "Model instance is null, exiting map");
+				this.traceSource.TraceEvent(EventLevel.Warning, "Model instance is null, exiting map");
 				return null;
 			}
 
-			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(ADO.Model.ParameterType) } to { nameof(ParameterType) }");
+			this.traceSource.TraceEvent(EventLevel.Verbose, $"Mapping { nameof(ADO.Model.ParameterType) } to { nameof(ParameterType) }");
 
 			return base.FromModelInstance(modelInstance, context);
 		}
@@ -88,7 +89,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		{
 			if (domainInstance == null)
 			{
-				this.traceSource.TraceEvent(TraceEventType.Warning, 0, "Domain instance is null, exiting mapper");
+				this.traceSource.TraceEvent(EventLevel.Warning, "Domain instance is null, exiting mapper");
 				return null;
 			}
 
@@ -97,7 +98,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 				throw new ArgumentException($"Invalid type: {nameof(domainInstance)} is not of type {nameof(ADO.Model.ParameterType)}");
 			}
 
-			this.traceSource.TraceEvent(TraceEventType.Verbose, 0, $"Mapping { nameof(ParameterType) } to { nameof(ADO.Model.ParameterType) }");
+			this.traceSource.TraceEvent(EventLevel.Verbose, $"Mapping { nameof(ParameterType) } to { nameof(ADO.Model.ParameterType) }");
 
 			return base.ToModelInstance(domainInstance, context);
 		}

@@ -19,6 +19,7 @@
  */
 using SanteDB.Caching.Memory.Configuration;
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Jobs;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
@@ -56,7 +57,7 @@ namespace SanteDB.Caching.Memory
 
         // Memory cache configuration
         private MemoryCacheConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<MemoryCacheConfigurationSection>();
-        private TraceSource m_tracer = new TraceSource("SanteDB.Caching.Memory");
+        private Tracer m_tracer = new Tracer(MemoryCacheConstants.TraceSourceName);
 	    private static object s_lock = new object();
 
         // Non cached types
@@ -101,7 +102,7 @@ namespace SanteDB.Caching.Memory
         /// <returns></returns>
         public bool Start()
         {
-            this.m_tracer.TraceInformation("Starting Memory Caching Service...");
+            this.m_tracer.TraceInfo("Starting Memory Caching Service...");
 
             this.Starting?.Invoke(this, EventArgs.Empty);
 

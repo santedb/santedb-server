@@ -19,6 +19,7 @@
  */
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Security;
@@ -36,6 +37,7 @@ using SanteDB.Persistence.Data.ADO.Services.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Security;
 
@@ -58,7 +60,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         private Object m_syncLock = new object();
 
         // Trace source
-        private TraceSource m_traceSource = new TraceSource(AdoDataConstants.IdentityTraceSourceName);
+        private Tracer m_traceSource = new Tracer(AdoDataConstants.IdentityTraceSourceName);
 
         // Configuration
         private AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
@@ -93,9 +95,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Verbose, e.HResult, "Invalid credentials : {0}/{1}", userName, password);
+                this.m_traceSource.TraceEvent(EventLevel.Verbose, "Invalid credentials : {0}/{1}", userName, password);
 
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, null, false));
                 throw;
             }
@@ -189,8 +191,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Verbose, e.HResult, "Invalid credentials : {0}/{1}", userName, password);
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Verbose, "Invalid credentials : {0}/{1}", userName, password);
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, null, false));
                 throw;
             }
@@ -249,7 +251,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 throw;
             }
         }
@@ -282,7 +284,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             else if (String.IsNullOrEmpty(password))
                 throw new ArgumentNullException(nameof(password));
 
-            this.m_traceSource.TraceInformation("Creating identity {0} ({1})", userName, AuthenticationContext.Current.Principal);
+            this.m_traceSource.TraceInfo("Creating identity {0} ({1})", userName, AuthenticationContext.Current.Principal);
 
             try
             {
@@ -324,7 +326,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 throw;
             }
 
@@ -340,7 +342,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
             this.VerifyPrincipal(principal, PermissionPolicyIdentifiers.CreateIdentity);
 
-            this.m_traceSource.TraceInformation("Delete identity {0}", userName);
+            this.m_traceSource.TraceInfo("Delete identity {0}", userName);
             try
             {
                 // submit the changes
@@ -364,7 +366,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 throw;
             }
         }
@@ -379,7 +381,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
             this.VerifyPrincipal(principal, PermissionPolicyIdentifiers.AlterIdentity);
 
-            this.m_traceSource.TraceInformation("Lockout identity {0} = {1}", userName, lockout);
+            this.m_traceSource.TraceInfo("Lockout identity {0} = {1}", userName, lockout);
             try
             {
                 // submit the changes
@@ -417,7 +419,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 throw;
             }
         }
@@ -470,7 +472,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 throw;
             }
         }
@@ -502,7 +504,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 throw;
             }
         }
@@ -546,8 +548,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Verbose, e.HResult, "Invalid session auth: {0}", e.Message);
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Verbose, "Invalid session auth: {0}", e.Message);
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(null, null, false));
                 throw;
             }

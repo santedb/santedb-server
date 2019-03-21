@@ -21,6 +21,7 @@ using RestSrvr;
 using RestSrvr.Message;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
@@ -29,6 +30,7 @@ using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Security;
 using System.Security.Authentication;
@@ -47,7 +49,7 @@ namespace SanteDB.Core.Rest.Security
         private BasicAuthorizationConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<BasicAuthorizationConfigurationSection>();
 
         // Trace source
-        private TraceSource m_traceSource = new TraceSource(SanteDBConstants.SecurityTraceSourceName);
+        private Tracer m_traceSource = new Tracer(SanteDBConstants.SecurityTraceSourceName);
 
         /// <summary>
         /// Apply the policy to the request
@@ -56,7 +58,7 @@ namespace SanteDB.Core.Rest.Security
         {
             try
             {
-                this.m_traceSource.TraceInformation("Entering BasicAuthorizationAccessPolicy");
+                this.m_traceSource.TraceInfo("Entering BasicAuthorizationAccessPolicy");
 
                 // Role service
                 var roleService = ApplicationServiceContext.Current.GetService<IRoleProviderService>();
@@ -125,7 +127,7 @@ namespace SanteDB.Core.Rest.Security
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
             }
             finally
             {

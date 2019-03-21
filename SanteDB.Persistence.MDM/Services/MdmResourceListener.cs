@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
@@ -73,7 +74,7 @@ namespace SanteDB.Persistence.MDM.Services
         private MdmResourceConfiguration m_resourceConfiguration;
 
         // Tracer
-        private TraceSource m_traceSource = new TraceSource(MdmConstants.TraceSourceName);
+        private Tracer m_traceSource = new Tracer(MdmConstants.TraceSourceName);
 
         // The repository that this listener is attached to
         private IDataPersistenceService<T> m_repository;

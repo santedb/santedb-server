@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Http.Description;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
@@ -29,6 +30,7 @@ using SharpCompress.Compressors.Deflate;
 using SharpCompress.Compressors.LZMA;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -46,7 +48,7 @@ namespace SanteDB.Core.Http
         /// <summary>
         /// The trace source.
         /// </summary>
-        private readonly TraceSource traceSource = new TraceSource("SanteDB.Core.Http");
+        private readonly Tracer traceSource = new Tracer("SanteDB.Core.Http");
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RestClient"/> class.
@@ -113,7 +115,7 @@ namespace SanteDB.Core.Http
                         return true;
                     else { 
                         var configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
-                        this.traceSource.TraceEvent(TraceEventType.Warning, 0, "Checking for certificate override for {0}", (certificate as X509Certificate2).Thumbprint);
+                        this.traceSource.TraceEvent(EventLevel.Warning, "Checking for certificate override for {0}", (certificate as X509Certificate2).Thumbprint);
                         if (configuration.TrustedCertificates.Contains((certificate as X509Certificate2).Thumbprint))
                             return true;
                         else return false;
@@ -258,7 +260,7 @@ namespace SanteDB.Core.Http
                         var validationResult = this.ValidateResponse(response);
                         if (validationResult != ServiceClientErrorType.Valid)
                         {
-                            this.traceSource.TraceEvent(TraceEventType.Error, 0, "Response failed validation : {0}", validationResult);
+                            this.traceSource.TraceEvent(EventLevel.Error,  "Response failed validation : {0}", validationResult);
                             throw new WebException("Response failed validation", null, WebExceptionStatus.Success, response);
                         }
                         // De-serialize
@@ -314,12 +316,12 @@ namespace SanteDB.Core.Http
                 }
                 catch (TimeoutException e)
                 {
-                    this.traceSource.TraceEvent(TraceEventType.Error, 0, "Request timed out:{0}", e);
+                    this.traceSource.TraceEvent(EventLevel.Error,  "Request timed out:{0}", e);
                     throw;
                 }
                 catch (WebException e)
                 {
-                    this.traceSource.TraceEvent(TraceEventType.Error, 0, e.ToString());
+                    this.traceSource.TraceEvent(EventLevel.Error,  e.ToString());
 
                     // status
                     switch (e.Status)

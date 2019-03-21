@@ -46,7 +46,7 @@ namespace SanteDB.Messaging.GS1.Transport.AS2
         private EventHandler<PersistentQueueEventArgs> m_handler;
 
         // Tracer
-        private TraceSource m_tracer = new TraceSource("SanteDB.Messaging.GS1");
+        private Tracer m_tracer = new Tracer("SanteDB.Messaging.GS1");
 
         // Configuration
         private Gs1ConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Gs1ConfigurationSection>();

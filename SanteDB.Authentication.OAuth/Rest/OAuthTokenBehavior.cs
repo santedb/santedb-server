@@ -50,6 +50,7 @@ using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Authentication.OAuth2.Rest
 {
@@ -62,7 +63,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
     {
 
         // Trace source name
-        private TraceSource m_traceSource = new TraceSource(OAuthConstants.TraceSourceName);
+        private Tracer m_traceSource = new Tracer(OAuthConstants.TraceSourceName);
 
         // OAuth configuration
         private OAuthConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<OAuthConfigurationSection>();
@@ -183,17 +184,17 @@ namespace SanteDB.Authentication.OAuth2.Rest
             catch (AuthenticationException e)
             {
 
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error generating token: {0}", e);
+                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error generating token: {0}", e);
                 return this.CreateErrorCondition(OAuthErrorType.invalid_grant, e.Message);
             }
             catch (SecurityException e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error generating token: {0}", e);
+                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error generating token: {0}", e);
                 return this.CreateErrorCondition(OAuthErrorType.invalid_grant, e.Message);
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error generating token: {0}", e);
+                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error generating token: {0}", e);
                 return this.CreateErrorCondition(OAuthErrorType.invalid_request, e.Message);
             }
         }
@@ -235,7 +236,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         private JwtSecurityToken HydrateToken(IClaimsPrincipal claimsPrincipal, String scope, IEnumerable<IClaim> additionalClaims, DateTime issued, DateTime expires)
         {
-            this.m_traceSource.TraceInformation("Will create new ClaimsPrincipal based on existing principal");
+            this.m_traceSource.TraceInfo("Will create new ClaimsPrincipal based on existing principal");
             
             IRoleProviderService roleProvider = ApplicationServiceContext.Current.GetService<IRoleProviderService>();
             IPolicyInformationService pip = ApplicationServiceContext.Current.GetService<IPolicyInformationService>();
@@ -451,7 +452,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         private Stream CreateErrorCondition(OAuthErrorType errorType, String message)
         {
-            this.m_traceSource.TraceEvent(TraceEventType.Error, (int)errorType, message);
+            this.m_traceSource.TraceEvent(EventLevel.Error, message);
             RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
             OAuthError err = new OAuthError()
             {

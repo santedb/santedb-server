@@ -30,6 +30,8 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using SanteDB.Core.Diagnostics;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Messaging.FHIR
 {
@@ -52,7 +54,7 @@ namespace SanteDB.Messaging.FHIR
 
         #region IMessageHandlerService Members
 
-        private TraceSource m_traceSource = new TraceSource(FhirConstants.TraceSourceName);
+        private Tracer m_traceSource = new Tracer(FhirConstants.TraceSourceName);
 
         // Configuration
         private FhirServiceConfigurationSection m_configuration;
@@ -100,7 +102,7 @@ namespace SanteDB.Messaging.FHIR
                 foreach (var endpoint in this.m_webHost.Endpoints)
                 {
                     endpoint.AddEndpointBehavior(new FhirMessageDispatchFormatterEndpointBehavior());
-                    this.m_traceSource.TraceInformation("Starting FHIR on {0}...", endpoint.Description.ListenUri);
+                    this.m_traceSource.TraceInfo("Starting FHIR on {0}...", endpoint.Description.ListenUri);
                 }
 
                 // Configuration 
@@ -109,7 +111,7 @@ namespace SanteDB.Messaging.FHIR
                     ConstructorInfo ci = t.GetConstructor(Type.EmptyTypes);
                     if (ci == null || t.IsAbstract)
                     {
-                        this.m_traceSource.TraceEvent(TraceEventType.Warning, 0, "Type {0} has no default constructor", t.FullName);
+                        this.m_traceSource.TraceEvent(EventLevel.Warning, "Type {0} has no default constructor", t.FullName);
                         continue;
                     }
                     FhirResourceHandlerUtil.RegisterResourceHandler(ci.Invoke(null) as IFhirResourceHandler);
@@ -124,7 +126,7 @@ namespace SanteDB.Messaging.FHIR
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 return false;
             }
             

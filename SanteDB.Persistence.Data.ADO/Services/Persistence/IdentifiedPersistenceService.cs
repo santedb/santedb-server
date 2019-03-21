@@ -25,6 +25,7 @@ using SanteDB.Persistence.Data.ADO.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -67,7 +68,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
             catch (DbException ex)
             {
-                this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Error, ex.HResult, "Error inserting {0} - {1}", data, ex.Message);
+                this.m_tracer.TraceEvent(EventLevel.Error,  "Error inserting {0} - {1}", data, ex.Message);
                 throw;
             }
         }
@@ -97,7 +98,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
             catch (DbException ex)
             {
-                this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Error, ex.HResult, "Error updating {0} - {1}", data, ex.Message);
+                this.m_tracer.TraceEvent(EventLevel.Error,  "Error updating {0} - {1}", data, ex.Message);
                 throw;
             }
 
@@ -126,7 +127,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
             catch (DbException ex)
             {
-                this.m_tracer.TraceEvent(System.Diagnostics.TraceEventType.Error, ex.HResult, "Error obsoleting {0} - {1}", data, ex.Message);
+                this.m_tracer.TraceEvent(EventLevel.Error,  "Error obsoleting {0} - {1}", data, ex.Message);
                 throw;
             }
 

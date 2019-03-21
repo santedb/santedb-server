@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
@@ -50,7 +51,7 @@ namespace SanteDB.Core.Security.Privacy
         private bool m_safeToStop = false;
 
         // Security tracer
-        private TraceSource m_tracer = new TraceSource(SanteDBConstants.SecurityTraceSourceName);
+        private Tracer m_tracer = new Tracer(SanteDBConstants.SecurityTraceSourceName);
 
         // Subscribed listeners
         private Dictionary<IDataPersistenceService, KeyValuePair<Delegate, Delegate>> m_subscribedListeners = new Dictionary<IDataPersistenceService, KeyValuePair<Delegate, Delegate>>();
@@ -121,7 +122,7 @@ namespace SanteDB.Core.Security.Privacy
         {
             var svcManager = (ApplicationServiceContext.Current as IServiceManager);
 
-            this.m_tracer.TraceInformation("Starting bind to persistence services...");
+            this.m_tracer.TraceInfo("Starting bind to persistence services...");
 
             foreach (var t in typeof(Act).Assembly.GetTypes().Where(o => typeof(Act).IsAssignableFrom(o)))
             {
@@ -132,7 +133,7 @@ namespace SanteDB.Core.Security.Privacy
                 // Now comes the tricky dicky part - We need to subscribe to a generic event
                 if (svcInstance != null)
                 {
-                    this.m_tracer.TraceInformation("Binding to {0}...", svcType);
+                    this.m_tracer.TraceInfo("Binding to {0}...", svcType);
 
                     // Construct the delegate for query
                     var pqeArgType = typeof(QueryResultEventArgs<>).MakeGenericType(t);

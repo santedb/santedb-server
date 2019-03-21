@@ -19,6 +19,7 @@
  */
 using RestSrvr;
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Rest;
 using SanteDB.Core.Rest.Behavior;
@@ -32,6 +33,7 @@ using SanteDB.Rest.HDSI.Resources;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Reflection;
 
@@ -60,7 +62,7 @@ namespace SanteDB.Messaging.HDSI
         internal static ResourceHandlerTool ResourceHandler { get; private set; }
 
         // HDSI Trace host
-        private TraceSource m_traceSource = new TraceSource("SanteDB.Messaging.HDSI");
+        private Tracer m_traceSource = new Tracer("SanteDB.Messaging.HDSI");
 
         // configuration
         private HdsiConfigurationSection m_configuration= ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<HdsiConfigurationSection>();
@@ -160,7 +162,7 @@ namespace SanteDB.Messaging.HDSI
                 // Add service behaviors
                 foreach (ServiceEndpoint endpoint in this.m_webHost.Endpoints)
                 {
-                    this.m_traceSource.TraceInformation("Starting HDSI on {0}...", endpoint.Description.ListenUri);
+                    this.m_traceSource.TraceInfo("Starting HDSI on {0}...", endpoint.Description.ListenUri);
                 }
 
                 // Start the webhost
@@ -171,7 +173,7 @@ namespace SanteDB.Messaging.HDSI
             }
             catch(Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 return false;
             }
         }

@@ -40,6 +40,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using SanteDB.Core.Diagnostics;
 
 namespace SanteDB
 {
@@ -133,11 +134,6 @@ namespace SanteDB
                 }
                 else if (parameters.ConsoleMode)
                 {
-#if DEBUG
-                    Core.Diagnostics.Tracer.AddWriter(new Core.Diagnostics.LogTraceWriter(System.Diagnostics.Tracing.EventLevel.LogAlways, "SanteDB.data"), System.Diagnostics.Tracing.EventLevel.LogAlways);
-#else
-                    Core.Diagnostics.Tracer.AddWriter(new Core.Diagnostics.LogTraceWriter(System.Diagnostics.Tracing.EventLevel.LogAlways, "SanteDB.data"), System.Diagnostics.Tracing.EventLevel.LogAlways);
-#endif
 
                     Console.WriteLine("SanteDB (SanteDB) {0} ({1})", entryAsm.GetName().Version, entryAsm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
                     Console.WriteLine("{0}", entryAsm.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright);
@@ -156,19 +152,9 @@ namespace SanteDB
 
                         ManualResetEvent quitEvent = new ManualResetEvent(false);
                         Console.CancelKeyPress += (o, e) => quitEvent.Set();
-
-                        if (parameters.Forever)
-                        {
-                            Console.WriteLine("Service started...");
-                            quitEvent.WaitOne();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Type [stop] to stop service...");
-                            String input = null;
-                            while (input != "stop")
-                                input = Console.ReadLine();
-                        }
+                        
+                        Console.WriteLine("Service started (CTRL+C to stop)...");
+                        quitEvent.WaitOne();
                     }
                     Console.WriteLine("Shutting down service...");
                     ServiceUtil.Stop();

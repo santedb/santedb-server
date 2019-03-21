@@ -18,6 +18,7 @@
  * Date: 2019-3-5
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Http;
 using SanteDB.Core.Model.AMI.Diagnostics;
@@ -31,6 +32,7 @@ using SanteDB.Persistence.Diagnostics.OpenProject.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -54,7 +56,7 @@ namespace SanteDB.Persistence.Diagnostics.OpenProject
         public string ServiceName => "OpenProject Diagnostic Persister";
 
         // Trace source
-        private TraceSource m_traceSource = new TraceSource("SanteDB.Persistence.Diagnostics.OpenProject");
+        private Tracer m_traceSource = new Tracer("SanteDB.Persistence.Diagnostics.OpenProject");
 
         /// <summary>
         /// Gets the api
@@ -116,7 +118,7 @@ namespace SanteDB.Persistence.Diagnostics.OpenProject
             this.Inserting?.Invoke(this, persistenceArgs);
             if (persistenceArgs.Cancel)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Warning, 0, "Pre-persistence event cancelled the insertion");
+                this.m_traceSource.TraceEvent(EventLevel.Warning, "Pre-persistence event cancelled the insertion");
                 return persistenceArgs.Data;
             }
 
@@ -169,7 +171,7 @@ namespace SanteDB.Persistence.Diagnostics.OpenProject
             }
             catch (Exception ex)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, ex.HResult, "Error sending to JIRA: {0}", ex);
+                this.m_traceSource.TraceEvent(EventLevel.Error, "Error sending to JIRA: {0}", ex);
                 throw;
             }
 

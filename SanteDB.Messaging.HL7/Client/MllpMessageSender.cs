@@ -19,9 +19,11 @@
  */
 using NHapi.Base.Model;
 using NHapi.Base.Parser;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Messaging.HL7.Utils;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Net.Security;
@@ -54,7 +56,7 @@ namespace SanteDB.Messaging.HL7.Client
 		/// <summary>
 		/// The internal reference to the <see cref="TraceSource"/> instance.
 		/// </summary>
-		private readonly TraceSource tracer = new TraceSource("SanteDB.Messaging.HL7");
+		private readonly Tracer tracer = new Tracer("SanteDB.Messaging.HL7");
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MllpMessageSender"/> class
@@ -83,21 +85,21 @@ namespace SanteDB.Messaging.HL7.Client
 #if DEBUG
 			if (certificate != null)
 			{
-				this.tracer.TraceEvent(TraceEventType.Information, 0, "Received client certificate with subject {0}", certificate.Subject);
+				this.tracer.TraceEvent(EventLevel.Informational,  "Received client certificate with subject {0}", certificate.Subject);
 			}
 			if (chain != null)
 			{
-				this.tracer.TraceEvent(TraceEventType.Information, 0, "Client certificate is chained with {0}", chain.ChainElements.Count);
+				this.tracer.TraceEvent(EventLevel.Informational,  "Client certificate is chained with {0}", chain.ChainElements.Count);
 
 				foreach (var chainElement in chain.ChainElements)
 				{
-					this.tracer.TraceEvent(TraceEventType.Information, 0, "\tChain Element : {0}", chainElement.Certificate.Subject);
+					this.tracer.TraceEvent(EventLevel.Informational,  "\tChain Element : {0}", chainElement.Certificate.Subject);
 				}
 			}
 
 			if (sslPolicyErrors != SslPolicyErrors.None)
 			{
-				this.tracer.TraceEvent(TraceEventType.Error, 0, "SSL Policy Error : {0}", sslPolicyErrors);
+				this.tracer.TraceEvent(EventLevel.Error,  "SSL Policy Error : {0}", sslPolicyErrors);
 			}
 #endif
 
@@ -118,12 +120,12 @@ namespace SanteDB.Messaging.HL7.Client
 
 				if (!isValid)
 				{
-					this.tracer.TraceEvent(TraceEventType.Error, 0, "Certification authority from the supplied certificate doesn't match the expected thumbprint of the CA");
+					this.tracer.TraceEvent(EventLevel.Error,  "Certification authority from the supplied certificate doesn't match the expected thumbprint of the CA");
 				}
 
 				foreach (var stat in chain.ChainStatus)
 				{
-					this.tracer.TraceEvent(TraceEventType.Warning, 0, "Certificate chain validation error: {0}", stat.StatusInformation);
+					this.tracer.TraceEvent(EventLevel.Warning, "Certificate chain validation error: {0}", stat.StatusInformation);
 				}
 
 				return isValid;
@@ -139,7 +141,7 @@ namespace SanteDB.Messaging.HL7.Client
 			var strMessage = MessageUtils.EncodeMessage(message, (message.GetStructure("MSH") as NHapi.Model.V25.Segment.MSH).VersionID.VersionID.Value);
 
 #if DEBUG
-			this.tracer.TraceEvent(TraceEventType.Information, 0, strMessage);
+			this.tracer.TraceEvent(EventLevel.Informational,  strMessage);
 #endif
 
 			// Open a TCP port
@@ -202,7 +204,7 @@ namespace SanteDB.Messaging.HL7.Client
 						}
 
 #if DEBUG
-						this.tracer.TraceEvent(TraceEventType.Information, 0, response.ToString());
+						this.tracer.TraceEvent(EventLevel.Informational,  response.ToString());
 #endif
                         String version = null;
 						return MessageUtils.ParseMessage(response.ToString(), out version);
@@ -211,9 +213,9 @@ namespace SanteDB.Messaging.HL7.Client
 				catch (Exception e)
 				{
 #if DEBUG
-					this.tracer.TraceEvent(TraceEventType.Error, 0, e.StackTrace);
+					this.tracer.TraceEvent(EventLevel.Error,  e.StackTrace);
 #endif
-					this.tracer.TraceEvent(TraceEventType.Error, 0, e.Message);
+					this.tracer.TraceEvent(EventLevel.Error,  e.Message);
 
 					throw;
 				}

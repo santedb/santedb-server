@@ -34,6 +34,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -200,7 +201,7 @@ namespace SanteDB.Messaging.HL7.Messages
             }
             catch (Exception ex)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, ex.HResult, "Error executing query: {0}", ex);
+                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error executing query: {0}", ex);
 
                 // Now we construct the response
                 return this.CreateNACK(map.ResponseType, e.Message, ex, e);

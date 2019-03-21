@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -38,7 +39,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 	[Description("ER7 over LLP")]
 	public class LlpTransport : ITransportProtocol
 	{
-        protected TraceSource m_traceSource = new TraceSource(Hl7Constants.TraceSourceName);
+        protected Tracer m_traceSource = new Tracer(Hl7Constants.TraceSourceName);
 
         /// <summary>
         /// Start transmission
@@ -84,7 +85,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 			this.m_listener = new TcpListener(bind);
 
 			this.m_listener.Start();
-			this.m_traceSource.TraceInformation("LLP Transport bound to {0}", bind);
+			this.m_traceSource.TraceInfo("LLP Transport bound to {0}", bind);
 
 			while (m_run) // run the service
 			{
@@ -99,7 +100,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
                 catch(Exception e)
                 {
                     if (this.m_run)
-                        this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, "Error on HL7 worker {0} - {1}", this.m_listener.LocalEndpoint, e);
+                        this.m_traceSource.TraceEvent(EventLevel.Error,  "Error on HL7 worker {0} - {1}", this.m_listener.LocalEndpoint, e);
                 }
 			}
 		}
@@ -178,7 +179,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 						Uri remoteEndpoint = new Uri(String.Format("llp://{0}:{1}", remoteEp.Address, remoteEp.Port));
 
 #if DEBUG
-						this.m_traceSource.TraceInformation("Received message from llp://{0}:{1} : {2}", remoteEp.Address, remoteEp.Port, messageData);
+						this.m_traceSource.TraceInfo("Received message from llp://{0}:{1} : {2}", remoteEp.Address, remoteEp.Port, messageData);
 #endif
 
 						// HACK: nHAPI doesn't like URLs ... Will fix this later
@@ -202,7 +203,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 								{
 									var strMessage = MessageUtils.EncodeMessage(messageArgs.Response, originalVersion);
 #if DEBUG
-									this.m_traceSource.TraceInformation("Sending message to llp://{0} : {1}", tcpClient.Client.RemoteEndPoint, strMessage);
+									this.m_traceSource.TraceInfo("Sending message to llp://{0} : {1}", tcpClient.Client.RemoteEndPoint, strMessage);
 #endif
 									// Since nHAPI only emits a string we just send that along the stream
 									streamWriter.Write(strMessage);
@@ -219,7 +220,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 			}
 			catch (Exception e)
 			{
-				this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+				this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
 			}
 			finally
 			{
@@ -245,7 +246,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 		{
 			this.m_run = false;
 			this.m_listener.Stop();
-			this.m_traceSource.TraceInformation("LLP Transport stopped");
+			this.m_traceSource.TraceInfo("LLP Transport stopped");
 		}
 
 		/// <summary>

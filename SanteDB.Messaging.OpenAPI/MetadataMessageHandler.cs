@@ -10,6 +10,7 @@ using SanteDB.Core;
 using SanteDB.Messaging.Metadata.Configuration;
 using SanteDB.Messaging.Metadata.Rest;
 using System.Diagnostics;
+using SanteDB.Core.Diagnostics;
 
 namespace SanteDB.Messaging.Metadata
 {
@@ -20,7 +21,7 @@ namespace SanteDB.Messaging.Metadata
     {
 
         // Trace source for logs
-        private TraceSource m_traceSource = new TraceSource(MetadataConstants.TraceSourceName);
+        private Tracer m_traceSource = new Tracer(MetadataConstants.TraceSourceName);
 
         /// <summary>
         /// Represents a rest service
@@ -96,7 +97,7 @@ namespace SanteDB.Messaging.Metadata
 
             // Add service behaviors
             foreach (ServiceEndpoint endpoint in this.m_webHost.Endpoints)
-                this.m_traceSource.TraceInformation("Starting MetadataExchange on {0}...", endpoint.Description.ListenUri);
+                this.m_traceSource.TraceInfo("Starting MetadataExchange on {0}...", endpoint.Description.ListenUri);
 
             // Start the webhost
             this.m_webHost.Start();

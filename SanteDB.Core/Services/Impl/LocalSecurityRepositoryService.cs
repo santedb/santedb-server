@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Security;
@@ -26,6 +27,7 @@ using SanteDB.Core.Security.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Security.Principal;
 
@@ -43,7 +45,7 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public string ServiceName => "Local Security Repository Service";
 
-        private TraceSource m_traceSource = new TraceSource(SanteDBConstants.ServiceTraceSourceName);
+        private Tracer m_traceSource = new Tracer(SanteDBConstants.ServiceTraceSourceName);
 
         /// <summary>
         /// Indicates security attributes have changed
@@ -60,7 +62,7 @@ namespace SanteDB.Core.Services.Impl
         /// <returns>Returns the updated user.</returns>
         public SecurityUser ChangePassword(Guid userId, string password)
 		{
-            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Changing user password");
+            this.m_traceSource.TraceEvent(EventLevel.Verbose, "Changing user password");
 			var securityUser = ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityUser>>()?.Get(userId);
 			if (securityUser == null)
 				throw new KeyNotFoundException("Cannot locate security user");
@@ -159,7 +161,7 @@ namespace SanteDB.Core.Services.Impl
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
 		public void LockUser(Guid userId)
 		{
-			this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Locking user {0}", userId);
+			this.m_traceSource.TraceEvent(EventLevel.Verbose, "Locking user {0}", userId);
 
 			var iids = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
 			if (iids == null)
@@ -180,7 +182,7 @@ namespace SanteDB.Core.Services.Impl
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
 		public void UnlockUser(Guid userId)
 		{
-			this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Unlocking user {0}", userId);
+			this.m_traceSource.TraceEvent(EventLevel.Verbose, "Unlocking user {0}", userId);
 
 			var iids = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
 			if (iids == null)

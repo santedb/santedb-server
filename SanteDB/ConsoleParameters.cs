@@ -72,11 +72,5 @@ namespace SanteDB
         [Description("Unregister the service in Windows")]
         public bool UnInstall { get; set; }
 
-        /// <summary>
-        /// Run the service forever
-        /// </summary>
-        [Parameter("forever")]
-        [Description("Instructs the console mode application to run until interrupted by the Operating System (LINUX DAEMON MODE)")]
-        public bool Forever { get; set; }
     }
 }

@@ -64,7 +64,7 @@ namespace SanteDB.Messaging.GS1.Rest
         private Gs1Util m_gs1Util;
 
         // Tracer
-        private TraceSource m_tracer = new TraceSource("SanteDB.Messaging.GS1");
+        private Tracer m_tracer = new Tracer("SanteDB.Messaging.GS1");
 
         /// <summary>
         /// Default ctor setting services
@@ -80,7 +80,7 @@ namespace SanteDB.Messaging.GS1.Rest
         }
 
         // HDSI Trace host
-        private readonly TraceSource traceSource = new TraceSource("SanteDB.Messaging.GS1");
+        private readonly Tracer traceSource = new Tracer("SanteDB.Messaging.GS1");
 
         /// <summary>
         /// The issue despactch advice message will insert a new shipped order into the TImR system.

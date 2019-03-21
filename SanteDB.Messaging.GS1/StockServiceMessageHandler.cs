@@ -30,6 +30,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
+using System.Diagnostics.Tracing;
 
 namespace SanteDB.Messaging.GS1
 {
@@ -45,7 +47,7 @@ namespace SanteDB.Messaging.GS1
         public string ServiceName => "GS1 BMS XML3.3 API (Rest) Endpoint";
 
         // HDSI Trace host
-        private readonly TraceSource traceSource = new TraceSource("SanteDB.Messaging.GS1");
+        private readonly Tracer traceSource = new Tracer("SanteDB.Messaging.GS1");
 
 		// web host
 		private RestService webHost;
@@ -131,7 +133,7 @@ namespace SanteDB.Messaging.GS1
                 this.webHost.AddServiceBehavior(new ErrorServiceBehavior());
 				foreach (ServiceEndpoint endpoint in this.webHost.Endpoints)
 				{
-					this.traceSource.TraceInformation("Starting GS1 on {0}...", endpoint.Description.ListenUri);
+					this.traceSource.TraceInfo("Starting GS1 on {0}...", endpoint.Description.ListenUri);
                     endpoint.AddEndpointBehavior(new MessageLoggingEndpointBehavior());
                 }
 				// Start the webhost
@@ -142,7 +144,7 @@ namespace SanteDB.Messaging.GS1
 			}
 			catch (Exception e)
 			{
-				this.traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+				this.traceSource.TraceEvent(EventLevel.Error,  e.ToString());
 				return false;
 			}
 		}
