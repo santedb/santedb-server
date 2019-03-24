@@ -55,7 +55,7 @@ namespace SanteDB.Messaging.FHIR.Rest
     {
 
         
-        private Tracer m_tracer = new Tracer("SanteDB.Messaging.FHIR");
+        private Tracer m_tracer = new Tracer(FhirConstants.TraceSourceName);
 
         #region IFhirServiceContract Members
 

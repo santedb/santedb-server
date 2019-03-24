@@ -46,7 +46,7 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// The internal reference to the <see cref="TraceSource"/> instance.
         /// </summary>
-        private Tracer traceSource = new Tracer("SanteDB.Core");
+        private Tracer traceSource = new Tracer(SanteDBConstants.ServiceTraceSourceName);
 
 		/// <summary>
 		/// Fired when an alert was raised and is being processed.

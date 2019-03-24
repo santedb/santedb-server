@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Jobs;
 using SanteDB.Core.Services;
@@ -27,7 +28,7 @@ using System.Linq;
 using System.Threading;
 using System.Timers;
 
-namespace SanteDB.Core.Query
+namespace SanteDB.Caching.Memory
 {
 
 
@@ -77,7 +78,7 @@ namespace SanteDB.Core.Query
         }
 
         // Tracer
-        private Tracer m_tracer = new Tracer("SanteDB.Core.Query.MemoryQueryPersistence");
+        private Tracer m_tracer = new Tracer(MemoryCacheConstants.QueryTraceSourceName);
 
         // Memory cache of queries
         private Dictionary<Guid, MemoryQueryInfo> m_queryCache = new Dictionary<Guid, MemoryQueryInfo>(10);

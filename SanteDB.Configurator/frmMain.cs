@@ -83,6 +83,7 @@ namespace SanteDB.Configurator
             trvFeatures.Nodes.Clear();
             foreach(var ftr in ConfigurationContext.Current.Features)
             {
+                if (ftr.ConfigurationType == null) continue;
                 // Add the features
                 var trvParent = trvFeatures.Nodes.Find(ftr.Group, false).FirstOrDefault();
                 if(trvParent == null)
@@ -156,43 +157,8 @@ namespace SanteDB.Configurator
                 // Confiugration 
                 if (feature.ConfigurationType == typeof(GenericFeatureConfiguration))
                 {
-                    var descriptor = new DynamicPropertyClass();
-                    var gc = feature.Configuration as GenericFeatureConfiguration;
-                    foreach(var itm in gc.Options)
-                    {
-                        var value = itm.Value();
-                        var type = typeof(String);
-                        Attribute[] attribute = null;
-                        UITypeEditor uiEditor = null;
+                    var descriptor = new DynamicPropertyClass(feature.Configuration as GenericFeatureConfiguration);
 
-                        if (value is ConfigurationOptionType)
-                            switch ((ConfigurationOptionType)value)
-                            {
-                                case ConfigurationOptionType.Boolean:
-                                    type = typeof(bool);
-                                    break;
-                                case ConfigurationOptionType.Numeric:
-                                    type = typeof(Int32);
-                                    break;
-                                case ConfigurationOptionType.Password:
-                                    attribute = new Attribute[] { new PasswordPropertyTextAttribute() };
-                                    break;
-                                case ConfigurationOptionType.FileName:
-                                    uiEditor = new System.Windows.Forms.Design.FileNameEditor();
-                                    break;
-                            }
-                        else if (value is IEnumerable)
-                        {
-                            if ((value as IEnumerable).OfType<Type>().Any())
-                                attribute = new Attribute[]
-                                {
-                                    new TypeConverterAttribute(typeof(ServiceProviderTypeConverter))
-                                };
-                            uiEditor = new DropDownValueEditor(value as IEnumerable);
-                        }
-
-                        descriptor.Add(itm.Key, type, uiEditor, attribute, gc.Values[itm.Key]);
-                    }
                     pgConfiguration.SelectedObject = descriptor;
                 }
                 else if (feature.ConfigurationType != null)
@@ -207,6 +173,7 @@ namespace SanteDB.Configurator
                 else
                     pgConfiguration.Visible = false;
 
+                lblDescription.Text = $"     {feature.Description}";
                 // Now detect the necessary bars
                 switch (state)
                 {
@@ -240,7 +207,14 @@ namespace SanteDB.Configurator
 
             // If there is no tasks then we must save
             if (ConfigurationContext.Current.ConfigurationTasks.Count == 0)
+            {
+                foreach(var tsk in ConfigurationContext.Current.Features.Where(o => 
+                        o.Flags.HasFlag(FeatureFlags.AlwaysConfigure))
+                    .SelectMany(o => o.CreateInstallTasks()))
+                    ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
+                
                 ConfigurationContext.Current.ConfigurationTasks.Add(new SaveConfigurationTask());
+            }
             ConfigurationContext.Current.Apply();
         }
     }

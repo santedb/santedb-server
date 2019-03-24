@@ -84,7 +84,7 @@ namespace SanteDB.Core.Diagnostics
             this.m_dispatchThread.IsBackground = true;
             this.m_dispatchThread.Start();
 
-            this.WriteTrace(EventLevel.Informational, "Startup", "SanteDB.DisconnectedClient.Core Version: {0} logging at level [{1}]", typeof(ApplicationContext).Assembly.GetName().Version, filter);
+            this.WriteTrace(EventLevel.Informational, "Startup", "{0} Version: {1} logging at level [{2}]", Assembly.GetEntryAssembly().GetName().Name, typeof(ApplicationContext).Assembly.GetName().Version, filter);
         }
 
         /// <summary>

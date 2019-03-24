@@ -22,6 +22,7 @@ using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
@@ -43,6 +44,17 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         where TRootEntity : class, IDbVersionedData, new()
         where TQueryReturn : CompositeResult
     {
+
+        /// <summary>
+        /// Append order by query
+        /// </summary>
+        protected override SqlStatement AppendOrderBy(SqlStatement rawQuery, ModelSort<TModel>[] orderBy)
+        {
+            if (orderBy == null || orderBy.Length == 0)
+                return rawQuery.Append(" ORDER BY vrsn_seq_id DESC ");
+            else
+                return base.AppendOrderBy(rawQuery, orderBy);
+        }
 
         /// <summary>
         /// Get the specified object

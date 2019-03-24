@@ -63,7 +63,7 @@ namespace SanteDB.Messaging.FHIR.Util
     /// </summary>
     public class QueryRewriter
     {
-        private static Tracer s_tracer = new Tracer("SanteDB.Messaging.FHIR");
+        private static Tracer s_tracer = new Tracer(FhirConstants.TraceSourceName);
 
         // The query parameter map
         private static QueryParameterMap s_map;

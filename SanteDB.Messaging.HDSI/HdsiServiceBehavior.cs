@@ -39,7 +39,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
     public class HdsiServiceBehavior : HdsiServiceBehaviorBase
     {
         // Trace source
-        private Tracer m_traceSource = new Tracer("SanteDB.Messaging.HDSI");
+        private Tracer m_traceSource = new Tracer(HdsiConstants.TraceSourceName);
 
         /// <summary>
         /// Creates a new HDSI service behavior
@@ -192,4 +192,5 @@ namespace SanteDB.Messaging.HDSI.Wcf
             new PolicyPermission(PermissionState.Unrestricted, policyId).Demand();
         }
     }
+
 }

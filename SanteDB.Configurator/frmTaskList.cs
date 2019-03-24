@@ -47,11 +47,14 @@ namespace SanteDB.Configurator
         {
             foreach(var itm in ConfigurationContext.Current.ConfigurationTasks)
             {
-                int imgidx = itm is SqlMigrationTask ? 0 : 1;
-                var lvi = lsvActions.Items.Add(Guid.NewGuid().ToString(), itm.Name, imgidx);
-                lvi.SubItems.Add(itm.Description);
-                lvi.Checked = true;
-                lvi.Tag = itm;
+                if (!itm.Feature.Flags.HasFlag(FeatureFlags.SystemFeature))
+                {
+                    int imgidx = itm is SqlMigrationTask ? 0 : 1;
+                    var lvi = lsvActions.Items.Add(Guid.NewGuid().ToString(), itm.Name, imgidx);
+                    lvi.SubItems.Add(itm.Description);
+                    lvi.Checked = true;
+                    lvi.Tag = itm;
+                }
             }
 
             base.OnShown(e);

@@ -31,6 +31,7 @@ using SanteDB.Core.Services.Impl;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Diagnostics;
+using System.Security.Principal;
 
 namespace SanteDB.Core
 {

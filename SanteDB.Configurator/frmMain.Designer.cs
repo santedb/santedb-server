@@ -36,6 +36,9 @@
             this.trvFeatures = new System.Windows.Forms.TreeView();
             this.imlMain = new System.Windows.Forms.ImageList(this.components);
             this.pnlInfo = new System.Windows.Forms.Panel();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.rtbLicense = new System.Windows.Forms.RichTextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.lblInstanceName = new System.Windows.Forms.Label();
             this.lblSupport = new System.Windows.Forms.LinkLabel();
             this.lblCopyright = new System.Windows.Forms.Label();
@@ -58,11 +61,9 @@
             this.tspMain = new System.Windows.Forms.ToolStrip();
             this.btnApply = new System.Windows.Forms.ToolStripButton();
             this.btnRestart = new System.Windows.Forms.ToolStripButton();
+            this.lblDescription = new System.Windows.Forms.Label();
             this.pgConfiguration = new SanteDB.Configuration.Controls.PropertyGridEx();
             this.pbEditor = new SanteDB.Configuration.Controls.PropertyGridEx();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.rtbLicense = new System.Windows.Forms.RichTextBox();
             this.tbMain.SuspendLayout();
             this.tpSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.spMainControl)).BeginInit();
@@ -70,6 +71,7 @@
             this.spMainControl.Panel2.SuspendLayout();
             this.spMainControl.SuspendLayout();
             this.pnlInfo.SuspendLayout();
+            this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.pnlFeature.SuspendLayout();
             this.tcSettings.SuspendLayout();
@@ -80,7 +82,6 @@
             this.spEditor.Panel2.SuspendLayout();
             this.spEditor.SuspendLayout();
             this.tspMain.SuspendLayout();
-            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tbMain
@@ -173,6 +174,43 @@
             this.pnlInfo.Size = new System.Drawing.Size(590, 386);
             this.pnlInfo.TabIndex = 1;
             // 
+            // panel1
+            // 
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Controls.Add(this.rtbLicense);
+            this.panel1.Controls.Add(this.label1);
+            this.panel1.Location = new System.Drawing.Point(4, 97);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(586, 286);
+            this.panel1.TabIndex = 9;
+            // 
+            // rtbLicense
+            // 
+            this.rtbLicense.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.rtbLicense.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.rtbLicense.Location = new System.Drawing.Point(0, 22);
+            this.rtbLicense.Name = "rtbLicense";
+            this.rtbLicense.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
+            this.rtbLicense.Size = new System.Drawing.Size(586, 264);
+            this.rtbLicense.TabIndex = 10;
+            this.rtbLicense.Text = "";
+            // 
+            // label1
+            // 
+            this.label1.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.label1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.label1.Location = new System.Drawing.Point(0, 0);
+            this.label1.Name = "label1";
+            this.label1.Padding = new System.Windows.Forms.Padding(3);
+            this.label1.Size = new System.Drawing.Size(586, 22);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "License Notice(s)";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // lblInstanceName
             // 
             this.lblInstanceName.AutoSize = true;
@@ -236,8 +274,9 @@
             this.pnlFeature.Controls.Add(this.btnDisable);
             this.pnlFeature.Controls.Add(this.btnEnable);
             this.pnlFeature.Controls.Add(this.tcSettings);
-            this.pnlFeature.Controls.Add(this.lblEnabled);
+            this.pnlFeature.Controls.Add(this.lblDescription);
             this.pnlFeature.Controls.Add(this.lblDisabled);
+            this.pnlFeature.Controls.Add(this.lblEnabled);
             this.pnlFeature.Controls.Add(this.lblSelectedOption);
             this.pnlFeature.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlFeature.Location = new System.Drawing.Point(0, 0);
@@ -275,10 +314,10 @@
             this.tcSettings.Controls.Add(this.tpSetting);
             this.tcSettings.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tcSettings.ImageList = this.imlMain;
-            this.tcSettings.Location = new System.Drawing.Point(0, 74);
+            this.tcSettings.Location = new System.Drawing.Point(0, 100);
             this.tcSettings.Name = "tcSettings";
             this.tcSettings.SelectedIndex = 0;
-            this.tcSettings.Size = new System.Drawing.Size(590, 312);
+            this.tcSettings.Size = new System.Drawing.Size(590, 286);
             this.tcSettings.TabIndex = 8;
             // 
             // tpSetting
@@ -288,7 +327,7 @@
             this.tpSetting.Location = new System.Drawing.Point(4, 4);
             this.tpSetting.Name = "tpSetting";
             this.tpSetting.Padding = new System.Windows.Forms.Padding(3);
-            this.tpSetting.Size = new System.Drawing.Size(582, 285);
+            this.tpSetting.Size = new System.Drawing.Size(582, 259);
             this.tpSetting.TabIndex = 0;
             this.tpSetting.Text = "Configuration";
             this.tpSetting.UseVisualStyleBackColor = true;
@@ -302,7 +341,7 @@
             this.lblEnabled.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
             this.lblEnabled.ImageIndex = 9;
             this.lblEnabled.ImageList = this.imlMain;
-            this.lblEnabled.Location = new System.Drawing.Point(0, 48);
+            this.lblEnabled.Location = new System.Drawing.Point(0, 22);
             this.lblEnabled.Name = "lblEnabled";
             this.lblEnabled.Padding = new System.Windows.Forms.Padding(3);
             this.lblEnabled.Size = new System.Drawing.Size(590, 26);
@@ -316,9 +355,9 @@
             this.lblDisabled.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblDisabled.ForeColor = System.Drawing.SystemColors.InfoText;
             this.lblDisabled.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.lblDisabled.ImageIndex = 5;
+            this.lblDisabled.ImageIndex = 4;
             this.lblDisabled.ImageList = this.imlMain;
-            this.lblDisabled.Location = new System.Drawing.Point(0, 22);
+            this.lblDisabled.Location = new System.Drawing.Point(0, 48);
             this.lblDisabled.Name = "lblDisabled";
             this.lblDisabled.Padding = new System.Windows.Forms.Padding(3);
             this.lblDisabled.Size = new System.Drawing.Size(590, 26);
@@ -440,13 +479,28 @@
             this.btnRestart.Text = "Restart Service";
             this.btnRestart.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             // 
+            // lblDescription
+            // 
+            this.lblDescription.BackColor = System.Drawing.SystemColors.Control;
+            this.lblDescription.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblDescription.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDescription.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.lblDescription.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.lblDescription.ImageIndex = 5;
+            this.lblDescription.ImageList = this.imlMain;
+            this.lblDescription.Location = new System.Drawing.Point(0, 74);
+            this.lblDescription.Name = "lblDescription";
+            this.lblDescription.Padding = new System.Windows.Forms.Padding(3);
+            this.lblDescription.Size = new System.Drawing.Size(590, 26);
+            this.lblDescription.TabIndex = 14;
+            // 
             // pgConfiguration
             // 
             this.pgConfiguration.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pgConfiguration.Location = new System.Drawing.Point(3, 3);
             this.pgConfiguration.Name = "pgConfiguration";
             this.pgConfiguration.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.pgConfiguration.Size = new System.Drawing.Size(576, 279);
+            this.pgConfiguration.Size = new System.Drawing.Size(576, 253);
             this.pgConfiguration.TabIndex = 1;
             this.pgConfiguration.ToolbarVisible = false;
             // 
@@ -459,43 +513,6 @@
             this.pbEditor.Size = new System.Drawing.Size(533, 360);
             this.pbEditor.TabIndex = 0;
             this.pbEditor.ToolbarVisible = false;
-            // 
-            // panel1
-            // 
-            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel1.Controls.Add(this.rtbLicense);
-            this.panel1.Controls.Add(this.label1);
-            this.panel1.Location = new System.Drawing.Point(4, 97);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(586, 286);
-            this.panel1.TabIndex = 9;
-            // 
-            // label1
-            // 
-            this.label1.BackColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.label1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.label1.Location = new System.Drawing.Point(0, 0);
-            this.label1.Name = "label1";
-            this.label1.Padding = new System.Windows.Forms.Padding(3);
-            this.label1.Size = new System.Drawing.Size(586, 22);
-            this.label1.TabIndex = 9;
-            this.label1.Text = "License Notice(s)";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // rtbLicense
-            // 
-            this.rtbLicense.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.rtbLicense.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.rtbLicense.Location = new System.Drawing.Point(0, 22);
-            this.rtbLicense.Name = "rtbLicense";
-            this.rtbLicense.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.rtbLicense.Size = new System.Drawing.Size(586, 264);
-            this.rtbLicense.TabIndex = 10;
-            this.rtbLicense.Text = "";
             // 
             // frmMain
             // 
@@ -515,6 +532,7 @@
             this.spMainControl.ResumeLayout(false);
             this.pnlInfo.ResumeLayout(false);
             this.pnlInfo.PerformLayout();
+            this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.pnlFeature.ResumeLayout(false);
             this.pnlFeature.PerformLayout();
@@ -527,7 +545,6 @@
             this.spEditor.ResumeLayout(false);
             this.tspMain.ResumeLayout(false);
             this.tspMain.PerformLayout();
-            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -568,6 +585,7 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.RichTextBox rtbLicense;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblDescription;
     }
 }
 

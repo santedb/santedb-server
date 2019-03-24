@@ -19,6 +19,7 @@
  */
 using SanteDB.Configuration;
 using SanteDB.Configurator.Tasks;
+using SanteDB.Core.Security;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -70,6 +71,7 @@ namespace SanteDB.Configurator
                 {
                     try
                     {
+                        AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
                         int i = 0, t = me.ConfigurationTasks.Count;
                         var tasks = me.ConfigurationTasks.ToArray();
                         foreach (var ct in tasks)
@@ -90,6 +92,7 @@ namespace SanteDB.Configurator
                     }
                     catch (Exception e)
                     {
+                        Trace.TraceError($"Error on component: {e}");
                         errCode = e;
                     }
                     finally

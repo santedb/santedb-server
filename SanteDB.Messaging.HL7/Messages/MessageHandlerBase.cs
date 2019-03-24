@@ -69,7 +69,7 @@ namespace SanteDB.Messaging.HL7.Messages
         // Installation date
         private static DateTime? s_installDate = null;
 
-        protected Tracer m_traceSource = new Tracer("SanteDB.Messaging.HL7");
+        protected Tracer m_traceSource = new Tracer(Hl7Constants.TraceSourceName);
 
         /// <summary>
         /// Get the supported triggers

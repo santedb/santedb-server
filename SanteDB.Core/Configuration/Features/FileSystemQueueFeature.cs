@@ -48,7 +48,7 @@ namespace SanteDB.Core.Configuration.Features
         /// <summary>
         /// Gets the group
         /// </summary>
-        public override string Group => "Message Queue";
+        public override string Group => FeatureGroup.System;
 
     }
 }

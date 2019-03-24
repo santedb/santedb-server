@@ -48,7 +48,7 @@ namespace SanteDB.Core.Http
         /// <summary>
         /// The trace source.
         /// </summary>
-        private readonly Tracer traceSource = new Tracer("SanteDB.Core.Http");
+        private readonly Tracer traceSource = new Tracer(SanteDBConstants.WcfTraceSourceName);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RestClient"/> class.

@@ -17,7 +17,10 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using System.ComponentModel;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Xml.Serialization;
 
 namespace SanteDB.Core.Configuration
@@ -42,24 +45,51 @@ namespace SanteDB.Core.Configuration
     public class SecuritySignatureConfiguration : X509ConfigurationElement
     {
 
+        // Algorithm
+        private SignatureAlgorithm m_algorithm = SignatureAlgorithm.HS256;
+
         /// <summary>
         /// The unique name for the signer
         /// </summary>
         [XmlAttribute("name")]
-        public string Name { get; set; }
+        [Description("The name of the signature authority this represents")]
+        public string IssuerName { get; set; }
 
         /// <summary>
         /// Signature mode
         /// </summary>
         [XmlAttribute("alg")]
-        public SignatureAlgorithm Algorithm { get; set; }
+        [Description("The type of signature algorithm to use")]
+        public SignatureAlgorithm Algorithm {
+            get => this.m_algorithm;
+            set {
+                this.m_algorithm = value;
+                this.FindTypeSpecified = this.StoreLocationSpecified = this.StoreNameSpecified = this.m_algorithm == SignatureAlgorithm.RS256;
+                if(value == SignatureAlgorithm.HS256)
+                {
+                    this.FindValue = null;
+                }
+                else
+                {
+                    this.HmacSecret = null;
+                }
+            }
+        }
 
         /// <summary>
         /// When using HMAC256 signing this represents the server's secret
         /// </summary>
         [XmlAttribute("hmacKey")]
+        [ReadOnly(true)]
         public byte[] Secret { get; set; }
 
+        /// <summary>
+        /// Plaintext editor for secret
+        /// </summary>
+        [XmlIgnore]
+        [Description("When using HS256 signing the secret to use")]
+        [PasswordPropertyText(true)]
+        public string HmacSecret { get => "none"; set => this.Secret = value == null ? null : SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(value)); }
 
     }
 }

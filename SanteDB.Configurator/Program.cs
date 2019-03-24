@@ -21,12 +21,14 @@ using SanteDB.Configuration;
 using SanteDB.Core;
 using SanteDB.Core.Attributes;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Security;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -65,6 +67,7 @@ namespace SanteDB.Configurator
                "DataDirectory",
                Path.GetDirectoryName(typeof(Program).Assembly.Location));
             ApplicationServiceContext.Current = ConfigurationContext.Current;
+            AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
 
             // Current dir
             var cwd = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
@@ -120,7 +123,7 @@ namespace SanteDB.Configurator
 
                 // Check for updates
                 foreach (var t in ConfigurationContext.Current.Features
-                    .Where(o => o.Flags.HasFlag(FeatureFlags.AlwaysConfigure))
+                    .Where(o => o.Flags.HasFlag(FeatureFlags.AlwaysConfigure) && !o.Flags.HasFlag(FeatureFlags.SystemFeature))
                     .SelectMany(o => o.CreateInstallTasks())
                     .Where(o => o.VerifyState(ConfigurationContext.Current.Configuration)))
                     ConfigurationContext.Current.ConfigurationTasks.Add(t);

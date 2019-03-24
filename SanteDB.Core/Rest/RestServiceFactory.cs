@@ -36,7 +36,6 @@ namespace SanteDB.Core.Rest
     /// </summary>
     public class RestServiceFactory : IRestServiceFactory
     {
-
         /// <summary>
         /// Get capabilities
         /// </summary>

@@ -47,7 +47,7 @@ namespace SanteDB.Messaging.FHIR.Util
         private static Object s_syncLock = new object();
 
         // FHIR trace source
-        private static Tracer s_traceSource = new Tracer("MARC.HI.EHRS.Messaging.FHIR");
+        private static Tracer s_traceSource = new Tracer(FhirConstants.TraceSourceName);
 
         /// <summary>
         /// Get Conformance Statement from FHIR service

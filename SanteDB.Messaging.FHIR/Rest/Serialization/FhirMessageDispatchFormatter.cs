@@ -44,7 +44,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
     {
 
         // Trace source
-        private Tracer m_traceSource = new Tracer("SanteDB.Messaging.FHIR");
+        private Tracer m_traceSource = new Tracer(FhirConstants.TraceSourceName);
         // Known types
         private static Type[] s_knownTypes = typeof(IFhirServiceContract).GetCustomAttributes<ServiceKnownResourceAttribute>().Select(o=>o.Type).ToArray();
 

@@ -17,7 +17,9 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Caching.Redis;
 using SanteDB.Core.Attributes;
+using SanteDB.Core.Configuration;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -51,8 +53,9 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.28.*")]
-[assembly: AssemblyVersion("1.28.0.*")]
-[assembly: AssemblyFileVersion("1.28.0.0")]
+[assembly: AssemblyVersion("1.31.0.*")]
+[assembly: AssemblyFileVersion("1.31.0.0")]
 
-[assembly:Plugin(Group = "Performance", Environment = PluginEnvironment.Server, EnableByDefault = false)]
+[assembly:Plugin(Group = FeatureGroup.Performance, Environment = PluginEnvironment.Server, EnableByDefault = false)]
 [assembly:PluginDependency("SanteDB.Core, 1.10.0")]
+[assembly: PluginTraceSource(RedisCacheConstants.TraceSourceName)]

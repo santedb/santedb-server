@@ -56,7 +56,7 @@ namespace SanteDB.Messaging.HL7.Client
 		/// <summary>
 		/// The internal reference to the <see cref="TraceSource"/> instance.
 		/// </summary>
-		private readonly Tracer tracer = new Tracer("SanteDB.Messaging.HL7");
+		private readonly Tracer tracer = new Tracer(Hl7Constants.TraceSourceName);
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MllpMessageSender"/> class

@@ -21,9 +21,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SanteDB.Configuration.Converters;
+using SanteDB.Configuration.Editors;
+using SanteDB.Core.Configuration;
+using SanteDB.Core.Configuration.Features;
 
 namespace SanteDB.Configuration.Controls
 {
@@ -32,23 +37,46 @@ namespace SanteDB.Configuration.Controls
     /// </summary>
     public class DynamicPropertyValue
     {
+
+        /// <summary>
+        /// Updatetarget
+        /// </summary>
+        private Dictionary<String, object> m_updateTarget;
+
+        /// <summary>
+        /// The value
+        /// </summary>
+        private Object m_value;
+
         public String Name { get; set; }
         public Type ExtensionType { get; set; }
-        public Object Value { get; set; }
+
+        public Object Value
+        {
+            get => this.m_value;
+            set
+            {
+                this.m_value = value;
+                if (this.m_updateTarget != null)
+                    this.m_updateTarget[this.Name] = value;
+            }
+        }
+
         public AttributeCollection Attributes { get; set; }
         public Object Editor { get; set; }
 
         /// <summary>
         /// Extension value ctor
         /// </summary>
-        public DynamicPropertyValue(string name, Type type, Object editor, Attribute[] attribute, Object value)
+        public DynamicPropertyValue(string name, Type type, Object editor, Attribute[] attribute, Object value, Dictionary<string, object> updateTarget)
         {
             this.Editor = editor;
-            if(attribute != null)
+            if (attribute != null)
                 this.Attributes = new AttributeCollection(attribute);
             this.Name = name;
             this.ExtensionType = type;
             this.Value = value;
+            this.m_updateTarget = updateTarget;
         }
     }
 
@@ -150,12 +178,75 @@ namespace SanteDB.Configuration.Controls
     /// </summary>
     public class DynamicPropertyClass : CollectionBase, ICustomTypeDescriptor
     {
+
+        // Configuration
+        private GenericFeatureConfiguration m_config;
+
+        /// <summary>
+        /// Creates a new generic feature configuration
+        /// </summary>
+        public DynamicPropertyClass(GenericFeatureConfiguration genericFeatureConfiguration)
+        {
+            this.m_config = genericFeatureConfiguration;
+            foreach (var itm in genericFeatureConfiguration.Options)
+            {
+                var value = itm.Value();
+                var type = typeof(String);
+                Attribute[] attribute = null;
+                UITypeEditor uiEditor = null;
+
+                if (value is ConfigurationOptionType)
+                    switch ((ConfigurationOptionType)value)
+                    {
+                        case ConfigurationOptionType.Boolean:
+                            type = typeof(bool);
+                            break;
+                        case ConfigurationOptionType.Numeric:
+                            type = typeof(Int32);
+                            break;
+                        case ConfigurationOptionType.Password:
+                            attribute = new Attribute[] { new PasswordPropertyTextAttribute() };
+                            break;
+                        case ConfigurationOptionType.FileName:
+                            uiEditor = new System.Windows.Forms.Design.FileNameEditor();
+                            break;
+                        case ConfigurationOptionType.Object:
+                            attribute = new Attribute[] {
+                                        new TypeConverterAttribute(typeof(ExpandableObjectConverter))
+                                    };
+                            type = typeof(Object);
+                            break;
+                    }
+                else if (value is IEnumerable)
+                {
+                    if ((value as IEnumerable).OfType<Type>().Any())
+                        attribute = new Attribute[]
+                        {
+                             new TypeConverterAttribute(typeof(ServiceProviderTypeConverter))
+                        };
+                    uiEditor = new DropDownValueEditor(value as IEnumerable);
+                }
+
+                var cat = genericFeatureConfiguration.Categories.FirstOrDefault(c => c.Value.Any(o => o == itm.Key));
+                if (!String.IsNullOrEmpty(cat.Key))
+                    attribute = (attribute ?? new Attribute[0]).Union(new Attribute[] { new CategoryAttribute(cat.Key) }).ToArray();
+                this.Add(itm.Key, type, uiEditor, attribute, genericFeatureConfiguration.Values[itm.Key]);
+            }
+        }
+
+        /// <summary>
+        /// Default ctor
+        /// </summary>
+        public DynamicPropertyClass()
+        {
+        }
+
         /// <summary>
         /// Add extensions
         /// </summary>
         public void Add(String extensionName, Type extensionType, Object editor, Attribute[] attribute, Object value)
         {
-            base.List.Add(new DynamicPropertyValue(extensionName, extensionType, editor, attribute, value));
+            base.List.Add(new DynamicPropertyValue(extensionName, extensionType, editor, attribute, value, this.m_config?.Values));
         }
 
         /// <summary>

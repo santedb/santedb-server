@@ -19,6 +19,8 @@
  */
 using SanteDB.Core.Persistence;
 using SanteDB.Core.Rest;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Privacy;
 using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl;
 using System;
@@ -45,7 +47,12 @@ namespace SanteDB.Core.Configuration.Features
             typeof(DefaultNetworkInformationService),
             typeof(RestServiceFactory),
             typeof(LocalRepositoryFactoryService),
-            typeof(LocalRepositoryService)
+            typeof(LocalRepositoryService),
+            typeof(LocalPolicyEnforcementPointService),
+            typeof(LocalMailMessageRepository),
+            typeof(LocalStockManagementRepositoryService),
+            typeof(LocalTagPersistenceService),
+
         };
 
         /// <summary>
@@ -61,7 +68,7 @@ namespace SanteDB.Core.Configuration.Features
         /// <summary>
         /// Get the group
         /// </summary>
-        public string Group => "System";
+        public string Group => FeatureGroup.System;
 
         /// <summary>
         /// Gets the configuration type

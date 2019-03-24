@@ -74,10 +74,10 @@ namespace SanteDB.Core.Configuration
             {
                 if(this.m_keys == null)
                     this.m_keys = this.IssuerKeysXml.ToDictionary(
-                        o => o.Name,
+                        o => o.IssuerName,
                         o => o.Algorithm == SignatureAlgorithm.HS256 ?
                             (SecurityKey)new InMemorySymmetricSecurityKey(o.Secret) :
-                            new X509AsymmetricSecurityKey(X509CertificateUtils.FindCertificate(o.FindType, o.StoreLocation, o.StoreName, o.FindValue))
+                            new X509AsymmetricSecurityKey(o.Certificate)
                         );
                 return this.m_keys;
             }

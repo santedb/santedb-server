@@ -47,7 +47,7 @@ namespace SanteDB.Messaging.GS1
         public string ServiceName => "GS1 BMS XML3.3 API (Rest) Endpoint";
 
         // HDSI Trace host
-        private readonly Tracer traceSource = new Tracer("SanteDB.Messaging.GS1");
+        private readonly Tracer traceSource = new Tracer(Gs1Constants.TraceSourceName);
 
 		// web host
 		private RestService webHost;

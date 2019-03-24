@@ -47,7 +47,7 @@ namespace SanteDB.Messaging.FHIR.Util
 		/// <summary>
 		/// The trace source.
 		/// </summary>
-		private static readonly Tracer traceSource = new Tracer("SanteDB.Messaging.FHIR");
+		private static readonly Tracer traceSource = new Tracer(FhirConstants.TraceSourceName);
 
 		/// <summary>
 		/// Creates a FHIR reference.

@@ -69,7 +69,7 @@ namespace SanteDB.Configurator.Tasks
             if(File.Exists(ConfigurationContext.Current.ConfigurationFile))
                 File.Copy(ConfigurationContext.Current.ConfigurationFile, this.m_backupFile, true);
 
-            using (var fs = File.OpenWrite(ConfigurationContext.Current.ConfigurationFile))
+            using (var fs = File.Create(ConfigurationContext.Current.ConfigurationFile))
                 configuration.Save(fs);
             return true;
         }

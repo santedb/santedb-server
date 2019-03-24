@@ -55,7 +55,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 .Where<DbEntityAddress>(o=>o.SourceKey == id && o.ObsoleteVersionSequenceId == null);
 
             /// Yowza! But it appears to be faster than the other way 
-            return this.DomainQueryInternal<CompositeResult<DbEntityAddressComponent, DbEntityAddress, DbEntityAddressComponentValue>>(context, addrLookupQuery, ref tr)
+            return this.DomainQueryInternal<CompositeResult<DbEntityAddressComponent, DbEntityAddress, DbEntityAddressComponentValue>>(context, addrLookupQuery, out tr)
                 .GroupBy(o=>o.Object2.Key)
                 .Select(o =>
                     new EntityAddress()

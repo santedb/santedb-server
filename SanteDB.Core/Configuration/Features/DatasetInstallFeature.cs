@@ -55,7 +55,7 @@ namespace SanteDB.Core.Configuration.Features
         /// <summary>
         /// Gets the group
         /// </summary>
-        public string Group => "System";
+        public string Group => FeatureGroup.System;
 
         /// <summary>
         /// Configuration type
@@ -130,7 +130,7 @@ namespace SanteDB.Core.Configuration.Features
             /// <summary>
             /// Service task name
             /// </summary>
-            public string Name => "Enable Dataset Update";
+            public string Name => "Configure Updates";
 
             /// <summary>
             /// Gets the description

@@ -54,7 +54,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// The trace source instance.
 		/// </summary>
-		protected Tracer traceSource = new Tracer("SanteDB.Messaging.FHIR");
+		protected Tracer traceSource = new Tracer(FhirConstants.TraceSourceName);
 
 		/// <summary>
 		/// Gets the name of the resource.

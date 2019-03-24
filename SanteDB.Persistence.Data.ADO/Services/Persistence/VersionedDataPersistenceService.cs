@@ -168,8 +168,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             rawQuery = base.AppendOrderBy(rawQuery, orderBy);
             return rawQuery.OrderBy<TDomain>(o => o.VersionSequenceId, Core.Model.Map.SortOrderType.OrderByDescending);
         }
+
         /// <summary>
-        /// Query internal
+        /// Query internal for versioned data elements
         /// </summary>
         protected override IEnumerable<Object> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TModel>[] orderBy, bool countResults = true)
         {
@@ -179,6 +180,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
                 query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
             }
+
 
             // Query has been registered?
             if (this.m_queryPersistence?.IsRegistered(queryId) == true)
@@ -200,55 +202,17 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             domainQuery = this.AppendOrderBy(domainQuery, orderBy);
 
-
-            // Query id just get the UUIDs in the db
-            if (queryId != Guid.Empty)
-            {
-                ColumnMapping pkColumn = TableMapping.Get(typeof(TDomainKey)).Columns.SingleOrDefault(o => o.IsPrimaryKey);
-
-                var keyQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, pkColumn).Build();
-                var resultKeys = context.Query<Guid>(keyQuery.Build());
-                this.m_queryPersistence?.RegisterQuerySet(queryId, resultKeys.Take(1000).ToArray(), query, resultKeys.Count());
-
-                ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueNonPooledWorkItem(o =>
-                {
-                    int ofs = 1000;
-                    var rkeys = o as Guid[];
-                    if (rkeys == null)
-                    {
-                        return;
-                    }
-                    while (ofs < rkeys.Length)
-                    {
-                        this.m_queryPersistence?.AddResults(queryId, rkeys.Skip(ofs).Take(1000).ToArray());
-                        ofs += 1000;
-                    }
-                }, resultKeys.ToArray());
-
-                if (countResults)
-                    totalResults = (int)resultKeys.Count();
-                else
-                    totalResults = 0;
-
-                var retVal = resultKeys.Skip(offset);
-                if (count.HasValue)
-                    retVal = retVal.Take(count.Value);
-                return retVal.OfType<Object>();
-            }
-            else if (countResults)
-            {
-                totalResults = context.Count(domainQuery);
-                if (totalResults == 0)
-                    return new List<CompositeResult<TDomain, TDomainKey>>();
-            }
-            else
-                totalResults = 0;
-
             if (offset > 0)
                 domainQuery.Offset(offset);
             if (count.HasValue)
                 domainQuery.Limit(count.Value);
-            return context.Query<CompositeResult<TDomain, TDomainKey>>(domainQuery).OfType<Object>();
+
+            var retVal = context.QueryCount<CompositeResult<TDomain, TDomainKey>>(domainQuery, out totalResults).OfType<Object>();
+
+            // Query id just get the UUIDs in the db
+            if (queryId != Guid.Empty) 
+                    this.AddQueryResults<TDomainKey>(context, query, queryId, offset, retVal, totalResults, orderBy);
+            return retVal;
 
         }
 

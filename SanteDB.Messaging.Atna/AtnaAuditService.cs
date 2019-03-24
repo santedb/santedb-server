@@ -79,10 +79,10 @@ namespace SanteDB.Messaging.Atna
                 case AtnaTransportType.Stcp:
                     this.m_transporter = new STcpSyslogTransport()
                     {
-                        ClientCertificate = this.m_configuration?.ClientCertificate?.GetCertificate(),
+                        ClientCertificate = this.m_configuration?.ClientCertificate?.Certificate,
                         EndPoint = this.m_configuration.AuditTarget,
                         MessageFormat = this.m_configuration.Format,
-                        ServerCertificate = this.m_configuration?.ServerCertificate?.GetCertificate()
+                        ServerCertificate = this.m_configuration?.ServerCertificate?.Certificate
                     };
                     break;
                 case AtnaTransportType.Tcp:

@@ -18,6 +18,7 @@
  * Date: 2019-3-5
  */
 using SanteDB.Core.Attributes;
+using SanteDB.Core.Configuration;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -52,7 +53,8 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.28.*")]
-[assembly: AssemblyVersion("1.28.0.0")]
-[assembly: AssemblyFileVersion("1.28.0.0")]
-[assembly: Plugin(EnableByDefault = false, Environment = PluginEnvironment.Server, Group = "Diagnostics")]
+[assembly: AssemblyVersion("1.31.0.0")]
+[assembly: AssemblyFileVersion("1.31.0.0")]
+[assembly: Plugin(EnableByDefault = false, Environment = PluginEnvironment.Server, Group = FeatureGroup.Diagnostics)]
 [assembly:PluginDependency("SanteDB.Core, Version=1.10.0.0")]
+[assembly: PluginTraceSource("SanteDB.Persistence.Diagnostics.OpenProject")]

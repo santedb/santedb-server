@@ -62,7 +62,7 @@ namespace SanteDB.Messaging.HDSI
         internal static ResourceHandlerTool ResourceHandler { get; private set; }
 
         // HDSI Trace host
-        private Tracer m_traceSource = new Tracer("SanteDB.Messaging.HDSI");
+        private Tracer m_traceSource = new Tracer(HdsiConstants.TraceSourceName);
 
         // configuration
         private HdsiConfigurationSection m_configuration= ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<HdsiConfigurationSection>();

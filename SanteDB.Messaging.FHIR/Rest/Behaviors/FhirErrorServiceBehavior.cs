@@ -48,7 +48,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
     public class FhirErrorEndpointBehavior :  IServiceBehavior, IServiceErrorHandler
     {
 
-        private Tracer m_tracer = new Tracer("SanteDB.Messaging.FHIR");
+        private Tracer m_tracer = new Tracer(FhirConstants.TraceSourceName);
 
         /// <summary>
         /// Apply the service behavior

@@ -18,6 +18,8 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core.Security;
+using System.ComponentModel;
+using System.Drawing.Design;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml.Serialization;
 
@@ -52,15 +54,71 @@ namespace SanteDB.Core.Configuration
         public StoreLocation StoreLocation { get; set; }
 
         /// <summary>
+        /// Whether the find type was provided
+        /// </summary>
+        [XmlIgnore]
+        [Browsable(false)]
+        public bool FindTypeSpecified { get; set; }
+
+        /// <summary>
+        /// Whether the store name was provided
+        /// </summary>
+        [XmlIgnore]
+        [Browsable(false)]
+        public bool StoreNameSpecified { get; set; }
+
+        /// <summary>
+        /// Whether the store location was provided
+        /// </summary>
+        [XmlIgnore]
+        [Browsable(false)]
+        public bool StoreLocationSpecified { get; set; }
+
+        /// <summary>
         /// The find value
         /// </summary>
         [XmlAttribute("findValue")]
+        [ReadOnly(true)]
         public string FindValue { get; set; }
 
         /// <summary>
         /// Get the certificate
         /// </summary>
-        public X509Certificate2 GetCertificate()
+        [XmlIgnore]
+        [Description("The X509 certificate to use")]
+        [Editor("SanteDB.Configuration.Editors.X509Certificate2Editor, SanteDB.Configuration, Version=1.0.0.0", typeof(UITypeEditor))]
+        public X509Certificate2 Certificate
+        {
+            get => this.GetCertificate();
+            set
+            {
+                if (value == null)
+                    this.FindValue = null;
+                else
+                    switch(this.FindType)
+                    {
+                        case X509FindType.FindBySubjectName:
+                            this.FindValue = value.Subject;
+                            break;
+                        case X509FindType.FindByThumbprint:
+                            this.FindValue = value.Thumbprint;
+                            break;
+                        case X509FindType.FindBySerialNumber:
+                            this.FindValue = value.SerialNumber;
+                            break;
+                        default:
+                            this.FindType = X509FindType.FindByThumbprint;
+                            this.FindValue = value.Thumbprint;
+                            this.FindTypeSpecified = true;
+                            break;
+                    }
+            }
+        }
+
+        /// <summary>
+        /// Get the certificate
+        /// </summary>
+        private X509Certificate2 GetCertificate()
         {
             if(this.m_certificate != null)
                 this.m_certificate = X509CertificateUtils.FindCertificate(this.FindType, this.StoreLocation, this.StoreName, this.FindValue);

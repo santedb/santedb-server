@@ -62,7 +62,7 @@ namespace SanteDB.Messaging.GS1
         }
 
         // Tracer
-        private Tracer m_tracer = new Tracer("SanteDB.Messaging.GS1");
+        private Tracer m_tracer = new Tracer(Gs1Constants.TraceSourceName);
 
         // GS1 utility
         private Gs1Util m_gs1Util;

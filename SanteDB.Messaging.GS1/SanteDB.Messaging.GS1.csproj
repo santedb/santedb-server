@@ -59,6 +59,7 @@
     <Compile Include="StockServiceMessageHandler.cs" />
     <Compile Include="Rest\IStockService.cs" />
     <Compile Include="Rest\StockServiceBehavior.cs" />
+    <Compile Include="Gs1Constants.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

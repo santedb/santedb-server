@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Services.Impl;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -33,6 +34,16 @@ namespace SanteDB.Core.Configuration
     {
 
         /// <summary>
+        /// Security configuration section
+        /// </summary>
+        public SecurityConfigurationSection()
+        {
+            this.Signatures = new SecuritySignatureConfiguration();
+            this.PasswordRegex = RegexPasswordValidator.DefaultPasswordPattern;
+            this.TrustedCertificates = new ObservableCollection<string>();
+        }
+
+        /// <summary>
         /// Password regex
         /// </summary>
         [XmlAttribute("passwordRegex")]
@@ -44,6 +55,7 @@ namespace SanteDB.Core.Configuration
         /// </summary>
         [XmlElement("signing")]
         [Description("Describes the algorithm and key for signing data originating from this server")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         public SecuritySignatureConfiguration Signatures { get; set; }
 
         /// <summary>

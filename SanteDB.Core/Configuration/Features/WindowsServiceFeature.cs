@@ -68,7 +68,7 @@ namespace SanteDB.Core.Configuration.Tasks
         /// <summary>
         /// Gets the group name
         /// </summary>
-        public String Group => "Daemons";
+        public String Group => FeatureGroup.OperatingSystem;
 
         /// <summary>
         /// Gets or sets the configuration

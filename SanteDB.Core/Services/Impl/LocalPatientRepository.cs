@@ -34,7 +34,7 @@ namespace SanteDB.Core.Services.Impl
 		/// <summary>
 		/// The trace source instance.
 		/// </summary>
-		private readonly Tracer traceSource = new Tracer("SanteDB.Core");
+		private readonly Tracer traceSource = new Tracer(SanteDBConstants.ServiceTraceSourceName);
         
 		/// <summary>
 		/// Merges two patients together

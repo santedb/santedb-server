@@ -16,5 +16,10 @@ namespace SanteDB.Caching.Memory
         /// Trace source name
         /// </summary>
         public const string TraceSourceName = "SanteDB.Caching.Memory";
+
+        /// <summary>
+        /// Memory query persistence
+        /// </summary>
+        public const string QueryTraceSourceName = TraceSourceName + ".Query";
     }
 }

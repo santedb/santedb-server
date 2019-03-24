@@ -43,6 +43,11 @@ namespace SanteDB.Configuration.Converters
             return sourceType == typeof(String) || sourceType == typeof(Type);
         }
 
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+        {
+            return base.ConvertFrom(context, culture, value);
+        }
+
         /// <summary>
         /// Convert to 
         /// </summary>

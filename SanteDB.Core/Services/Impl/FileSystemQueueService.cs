@@ -124,7 +124,7 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Queue file
         /// </summary>
-        private Tracer m_tracer = new Tracer("SanteDB.Core.Queue.File");
+        private Tracer m_tracer = new Tracer(SanteDBConstants.QueueTraceSourceName);
 
         /// <summary>
         /// Initializes the file system queue
