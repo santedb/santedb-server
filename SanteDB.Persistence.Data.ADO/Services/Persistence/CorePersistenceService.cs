@@ -330,7 +330,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (initialResults.Count() < totalResults)
                 ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueNonPooledWorkItem((parm) =>
                 {
-                    var keyQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, pkColumn);
+                    var keyQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, orderBy, pkColumn);
                     keyQuery = this.AppendOrderBy(keyQuery, orderBy);
                     int ofs = offset == 0 ? step : 0;
                     while (ofs < totalResults)

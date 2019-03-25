@@ -89,6 +89,9 @@
     </sources>
     <writers>
       <add name="main" initializationData="santedb.log" filter="Verbose">
+        <writer>SanteDB.Core.Diagnostics.RolloverTextWriterTraceWriter, SanteDB.Core, Version=1.31.0.23444, Culture=neutral, PublicKeyToken=null</writer>
+      </add>
+      <add name="console" initializationData="santedb.log" filter="Verbose">
         <writer>SanteDB.Core.Diagnostics.ConsoleTraceWriter, SanteDB.Core, Version=1.31.0.23444, Culture=neutral, PublicKeyToken=null</writer>
       </add>
     </writers>
