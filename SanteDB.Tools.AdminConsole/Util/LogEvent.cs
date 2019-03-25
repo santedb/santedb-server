@@ -89,7 +89,7 @@ namespace SanteDB.Tools.AdminConsole.Util
             Regex v1Regex = new Regex(@"^(.*)?(\s)?[\s][\[\<](.*?)[\]\>]\s\[(.*?)\]\s?:(.*)$"),
              v2Regex = new Regex(@"^(.*)?@(.*)?\s[\[\<](.*)?[\>\]]\s\[(.*?)\]\:\s(.*)$"),
              serverOld = new Regex(@"^([0-9\-\s\:APM\/]*?)?\s:\s(.*)\s(Information|Warning|Error|Fatal|Verbose):\s-?\d{1,10}?\s:(.*)$"),
-             server = new Regex(@"^([0-9\-\s\:APM\/]*?)\[@(\d*)\]?\s:\s(.*)\s(Information|Warning|Error|Fatal|Verbose):\s-?\d{1,10}?\s:(.*)$"),
+             server = new Regex(@"^([0-9\-\s\:APM\/]*?)\[(.*?)\]?\s:\s(.*)\s(Informational|Warning|Error|Fatal|Verbose):\s-?\d{1,10}?\s:(.*)$"),
              logCat = new Regex(@"^(\d{2}\-\d{2}\s\d{2}\:\d{2}\:\d{2}\.\d{3})\s*(\d*)?\s*(\d*)?\s([IVDEW])\s([\w\-\s]*):\s(.*)$");
 
             List<LogEvent> retVal = new List<LogEvent>();

@@ -69,7 +69,7 @@ namespace SanteDB.Core.Diagnostics
 
             lock (this.m_logBacklog)
             {
-                this.m_logBacklog.Enqueue(new KeyValuePair<ConsoleColor, String>(color, String.Format("[{0} {1:yyyy/MM/dd HH:mm:ss}] {2} : {3}", level, DateTime.Now, source, String.Format(format, args))));
+                this.m_logBacklog.Enqueue(new KeyValuePair<ConsoleColor, String>(color, String.Format("{0:yyyy/MM/dd HH:mm:ss} [{1}] : {2} {3}: 0 : {4}", DateTime.Now, String.IsNullOrEmpty(Thread.CurrentThread.Name) ? $"@{Thread.CurrentThread.ManagedThreadId}" : Thread.CurrentThread.Name, source, level, String.Format(format, args))));
                 Monitor.Pulse(this.m_logBacklog);
             }
         }
@@ -92,6 +92,7 @@ namespace SanteDB.Core.Diagnostics
                         Monitor.Exit(this.m_logBacklog);
                         Console.ForegroundColor = dq.Key;
                         Console.WriteLine(dq.Value);
+                        Console.ResetColor();
                         Monitor.Enter(this.m_logBacklog);
                     }
                 }

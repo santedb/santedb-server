@@ -184,16 +184,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             // Query has been registered?
             if (this.m_queryPersistence?.IsRegistered(queryId) == true)
-            {
-                totalResults = (int)this.m_queryPersistence.QueryResultTotalQuantity(queryId);
-                var keyResults = this.m_queryPersistence.GetQueryResults(queryId, offset, count.Value);
-                return keyResults.OfType<Object>();
-            }
+                return this.GetStoredQueryResults(queryId, offset, count, out totalResults);
 
             SqlStatement domainQuery = null;
             var expr = m_mapper.MapModelExpression<TModel, TDomain, bool>(query, false);
             if (expr != null)
-                domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(typeof(TDomain), typeof(TDomainKey))
+                domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(countResults, typeof(TDomain), typeof(TDomainKey))
                     .InnerJoin<TDomain, TDomainKey>(o => o.Key, o => o.Key)
                     .Where<TDomain>(expr).Build();
             else
@@ -211,7 +207,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             // Query id just get the UUIDs in the db
             if (queryId != Guid.Empty) 
-                    this.AddQueryResults<TDomainKey>(context, query, queryId, offset, retVal, totalResults, orderBy);
+                    this.AddQueryResults<CompositeResult<TDomain, TDomainKey>>(context, query, queryId, offset, retVal, totalResults, orderBy);
             return retVal;
 
         }
