@@ -324,7 +324,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             }
 
-            int step = initialResults.Count();
+            int step = initialResults.Count() * 2;
 
             // Build query for additional keys to query store if needed
             if (initialResults.Count() < totalResults)

@@ -150,52 +150,95 @@ drop view if exists  act_cur_vrsn_vw cascade;
 drop view if exists  cd_cur_vrsn_vw cascade;
 drop view if exists ent_cur_vrsn_vw cascade;
 drop view if exists ent_cur_id_vw cascade;
-
+--#!
 alter table ent_pol_assoc_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table ent_pol_assoc_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table ent_rel_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table ent_rel_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table ent_addr_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table ent_addr_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table ent_ext_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table ent_ext_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table ent_id_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table ent_id_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table ent_name_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table ent_name_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table ent_note_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table ent_note_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table ent_rel_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table ent_rel_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table ent_tel_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table ent_tel_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table plc_svc_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table plc_svc_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table psn_lng_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table psn_lng_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table ent_vrsn_tbl alter vrsn_seq_id type integer;
+--#!
 
 alter table act_id_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table act_id_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table act_ext_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table act_ext_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table act_rel_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table act_rel_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table act_ptcpt_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table act_ptcpt_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table act_pol_assoc_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table act_pol_assoc_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table act_note_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table act_note_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table act_vrsn_tbl alter vrsn_seq_id type integer;
+--#!
 
 alter table cd_name_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table cd_name_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table cd_ref_term_assoc_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table cd_ref_term_assoc_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table cd_rel_assoc_tbl alter efft_vrsn_seq_id type integer;
+--#!
 alter table cd_rel_assoc_tbl alter obslt_vrsn_seq_id type integer;
+--#!
 alter table cd_vrsn_tbl alter vrsn_seq_id type integer;
+--#!
 
 -- CURRENT CONCEPT VERSION VIEW
 CREATE VIEW CD_CUR_VRSN_VW AS
