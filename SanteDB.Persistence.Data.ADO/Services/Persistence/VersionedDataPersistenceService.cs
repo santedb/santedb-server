@@ -189,7 +189,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             SqlStatement domainQuery = null;
             var expr = m_mapper.MapModelExpression<TModel, TDomain, bool>(query, false);
             if (expr != null)
-                domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(countResults, typeof(TDomain), typeof(TDomainKey))
+                domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(typeof(TDomain), typeof(TDomainKey))
                     .InnerJoin<TDomain, TDomainKey>(o => o.Key, o => o.Key)
                     .Where<TDomain>(expr).Build();
             else
@@ -198,17 +198,22 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             domainQuery = this.AppendOrderBy(domainQuery, orderBy);
 
-            if (offset > 0)
-                domainQuery.Offset(offset);
-            if (count.HasValue)
-                domainQuery.Limit(count.Value);
+            //totalResults = context.Count(domainQuery);
+            if (count <= 1)
+                domainQuery.Offset(offset).Limit(count.Value);
 
-            var retVal = context.QueryCount<CompositeResult<TDomain, TDomainKey>>(domainQuery, out totalResults).OfType<Object>();
+            var retVal = context.Query<CompositeResult<TDomain, TDomainKey>>(domainQuery);
+
+            if (countResults)
+                totalResults = retVal.Count();
+            else
+                totalResults = 0;
 
             // Query id just get the UUIDs in the db
             if (queryId != Guid.Empty) 
                     this.AddQueryResults<CompositeResult<TDomain, TDomainKey>>(context, query, queryId, offset, retVal, totalResults, orderBy);
-            return retVal;
+
+            return retVal.Skip(offset).Take(count ?? 100);
 
         }
 

@@ -138,19 +138,20 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             totalResults = resultCount;
 
             if (!this.m_persistenceService.GetConfiguration().SingleThreadFetch)
+            {
                 return results.AsParallel().Select(o =>
                 {
                     var subContext = context;
                     var newSubContext = results.Count() > 1;
-
+                    var idx = results.IndexOf(o);
                     try
                     {
                         if (newSubContext) subContext = subContext.OpenClonedContext();
 
                         if (o is Guid)
-                            return this.Get(subContext, (Guid)o);
+                            return new { order = idx, data = this.Get(subContext, (Guid)o) };
                         else
-                            return this.CacheConvert(o, subContext);
+                            return new { order = idx, data = this.CacheConvert(o, subContext) };
                     }
                     catch (Exception e)
                     {
@@ -162,7 +163,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         if (newSubContext)
                             subContext.Dispose();
                     }
-                });
+                }).OrderBy(o=>o.order).Select(o=>o.data);
+            }
             else
                 return results.Select(o =>
                 {
@@ -203,7 +205,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 if (selectTypes[0].IsConstructedGenericType)
                     selectTypes = selectTypes[0].GenericTypeArguments;
 
-                domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(includeCount, selectTypes);
+                domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(selectTypes);
                 var expression = m_mapper.MapModelExpression<TModel, TDomain, bool>(query, false);
                 if (expression != null)
                 {
@@ -230,22 +232,21 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 {
                     domainQuery = this.AppendOrderBy(domainQuery, orderBy);
 
-                    if (offset > 0)
-                        domainQuery.Offset(offset);
-                    if (count.HasValue)
-                    {
-                        if (queryId != Guid.Empty && count != 0) // Fetch 2x rows 
-                            domainQuery.Limit(count.Value * 2);
-                        else
-                            domainQuery.Limit(count.Value);
-                    }
+                    if (count <= 1)
+                        domainQuery.Offset(offset).Limit(count.Value);
+
                     var retVal = this.DomainQueryInternal<TQueryReturn>(context, domainQuery, out totalResults).OfType<Object>();
+                    
+                    if (includeCount)
+                        totalResults = retVal.Count();
+                    else
+                        totalResults = 0;
 
                     // We have a query identifier and this is the first frame, freeze the query identifiers
                     if (queryId != Guid.Empty && count != 0)
                         this.AddQueryResults<TQueryReturn>(context, query, queryId, offset, retVal, totalResults, orderBy);
 
-                    return retVal.Take(count ?? 100);
+                    return retVal.Skip(offset).Take(count ?? 100);
                 }
                 else
                 {
@@ -276,13 +277,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             totalResults = (int)this.m_queryPersistence.QueryResultTotalQuantity(queryId);
             var keyResults = this.m_queryPersistence.GetQueryResults(queryId, offset, count.Value);
-            int rtr = 0;
-            while (rtr++ < 10 && keyResults.Count() == 0 && offset < totalResults)
-            {
-                this.m_tracer.TraceWarning("Query {0} is dehydrated, will wait for hydration before retry", queryId);
-                Thread.Sleep(250);
-                keyResults = this.m_queryPersistence.GetQueryResults(queryId, offset, count.Value);
-            }
             return keyResults.OfType<Object>();
         }
 
@@ -294,6 +288,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             // Get PK Column to select keys
             ColumnMapping pkColumn = null;
+            IEnumerable<Guid> keyResults = null;
+
             if (typeof(CompositeResult).IsAssignableFrom(typeof(TKeySearch)))
             {
                 int keyObj = 0;
@@ -308,39 +304,40 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
 
                 // Extract keys from composite
-                if(offset == 0) // Offset is 0, so our result set is the head of the query
-                    this.m_queryPersistence?.RegisterQuerySet(queryId, initialResults.OfType<CompositeResult>().Select(i => (Guid)pkColumn.SourceProperty.GetValue(i.Values[keyObj], null)).ToArray(), query, totalResults);
-                else
-                    this.m_queryPersistence?.RegisterQuerySet(queryId, new Guid[0], query, totalResults);
-
+                Func<CompositeResult, Guid> selector = i => (Guid)pkColumn.SourceProperty.GetValue(i.Values[keyObj], null);
+                keyResults = initialResults.OfType<CompositeResult>().Select(selector);
+                
             }
             else
             {
                 pkColumn = TableMapping.Get(typeof(TKeySearch)).Columns.SingleOrDefault(o => o.IsPrimaryKey);
-                if(offset == 0)
-                    this.m_queryPersistence?.RegisterQuerySet(queryId, initialResults.OfType<IDbIdentified>().Select(i => (Guid)pkColumn.SourceProperty.GetValue(i, null)).ToArray(), query, totalResults);
-                else
-                    this.m_queryPersistence?.RegisterQuerySet(queryId, new Guid[0], query, totalResults);
-
+                Func<IDbIdentified, Guid> selector = i => (Guid)pkColumn.SourceProperty.GetValue(i, null);
+                keyResults = initialResults.OfType<IDbIdentified>().Select(selector);
             }
 
-            int step = initialResults.Count() * 2;
+            this.m_queryPersistence?.RegisterQuerySet(queryId, keyResults.ToArray(), query, totalResults);
 
-            // Build query for additional keys to query store if needed
-            if (initialResults.Count() < totalResults)
-                ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueNonPooledWorkItem((parm) =>
-                {
-                    var keyQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, orderBy, pkColumn);
-                    keyQuery = this.AppendOrderBy(keyQuery, orderBy);
-                    int ofs = offset == 0 ? step : 0;
-                    while (ofs < totalResults)
-                    {
-                        var resultKeys = (parm as DataContext).Query<Guid>(keyQuery.Build().Offset(ofs).Limit(step));
-                        this.m_queryPersistence?.AddResults(queryId, resultKeys.ToArray());
-                        ofs += step;
-                    }
-                }, context.OpenClonedContext());
-                
+            //int step = initialResults.Count();
+
+            //// Build query for additional keys to query store if needed
+            //if (initialResults.Count() < totalResults)
+            //    ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueNonPooledWorkItem((parm) =>
+            //    {
+            //        var keyQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, orderBy, pkColumn);
+            //        keyQuery = this.AppendOrderBy(keyQuery, orderBy);
+            //        int ofs = offset == 0 ? step : 0;
+            //        //while (ofs < totalResults)
+            //        //{
+            //        this.m_tracer.TraceVerbose("Hydrating query {0} ({1}..{2})", queryId, ofs, totalResults);
+            //        var resultKeys = (parm as DataContext).Query<Guid>(keyQuery.Build().Offset(ofs));
+            //        ofs = 0;
+            //        while(ofs< totalResults) { 
+            //            this.m_tracer.TraceVerbose("Registering results {0} ({1}..{2})", queryId, ofs, ofs + step);
+            //            this.m_queryPersistence?.AddResults(queryId, resultKeys.Skip(ofs).Take(step).ToArray());
+            //            ofs += step;
+            //        }
+            //    }, context.OpenClonedContext());
+
         }
 
         /// <summary>
@@ -351,21 +348,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             // Build and see if the query already exists on the stack???
             domainQuery = domainQuery.Build();
-            var cachedQueryResults = context.CacheQuery(domainQuery);
-            if (cachedQueryResults != null)
-            {
-                totalResults = cachedQueryResults.Count();
-                return cachedQueryResults.OfType<TResult>();
-            }
 
-            var results = context.QueryCount<TResult>(domainQuery, out totalResults).ToList();
+            var results = context.Query<TResult>(domainQuery);
+            totalResults = results.Count();
 
             // Cache query result
-            context.AddQuery(domainQuery, results.OfType<Object>());
             return results;
 
         }
-
 
         /// <summary>
         /// Build source query

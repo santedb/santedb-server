@@ -151,13 +151,16 @@ namespace SanteDB
                         }
 
                         ManualResetEvent quitEvent = new ManualResetEvent(false);
-                        Console.CancelKeyPress += (o, e) => quitEvent.Set();
+                        Console.CancelKeyPress += (o, e) =>
+                        {
+                            Console.WriteLine("Service shutting down...");
+                            ServiceUtil.Stop();
+                            quitEvent.Set();
+                        };
                         
                         Console.WriteLine("Service started (CTRL+C to stop)...");
                         quitEvent.WaitOne();
                     }
-                    Console.WriteLine("Shutting down service...");
-                    ServiceUtil.Stop();
                 }
                 else
                 {

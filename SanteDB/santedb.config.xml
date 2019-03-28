@@ -52,46 +52,52 @@
     <add type="SanteDB.Core.Configuration.SanteDBServerConfiguration, SanteDB.Core, Version=1.10.0.24599, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Messaging.Atna.Configuration.AtnaConfigurationSection, SanteDB.Messaging.Atna, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.FileSystemQueueConfigurationSection, SanteDB.Core, Version=1.10.0.29461, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Caching.Redis.Configuration.RedisConfigurationSection, SanteDB.Caching.Redis, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
   </sections>
+  <section xsi:type="RedisConfigurationSection">
+    <servers>
+      <add>localhost:6379</add>
+    </servers>
+  </section>
   <section xsi:type="DiagnosticsConfigurationSection">
     <sources>
-      <add name="SanteDB.Authentication.OAuth2" filter="Informational" />
-      <add name="SanteDB.Caching.Memory" filter="Informational" />
-      <add name="SanteDB.Caching.Memory.Query" filter="Informational" />
-      <add name="SanteDB.Caching.Redis" filter="Informational" />
-      <add name="SanteDB.Core.HttpRest" filter="Informational" />
-      <add name="SanteDB.Core.Data" filter="Informational" />
-      <add name="SanteDB.Core.Map" filter="Informational" />
-      <add name="SanteDB.Core.Security" filter="Informational" />
-      <add name="SanteDB.Core" filter="Informational" />
-      <add name="SanteDB.Core.Queue" filter="Informational" />
-      <add name="SanteDB.Core.Security.Tfa.Email" filter="Informational" />
-      <add name="SanteDB.Core.Security.Tfa.Twilio" filter="Informational" />
-      <add name="SanteDB.Messaging.AMI" filter="Informational" />
-      <add name="SanteDB.Messaging.FHIR" filter="Informational" />
-      <add name="SanteDB.Messaging.GS1" filter="Informational" />
-      <add name="SanteDB.Messaging.HDSI" filter="Informational" />
-      <add name="SanteDB.Messaging.HL7" filter="Informational" />
-      <add name="SanteDB.Messaging.Metadata" filter="Informational" />
-      <add name="SanteDB.Messaging.RISI" filter="Informational" />
-      <add name="SanteDB.OrmLite.PostgreSQL" filter="Informational" />
-      <add name="SanteDB.OrmLite.Sqlite" filter="Informational" />
-      <add name="SanteDB.OrmLite.FirebirdSQL" filter="Informational" />
-      <add name="SanteDB.OrmLite" filter="Informational" />
-      <add name="SanteDB.Auditing.ADO" filter="Informational" />
-      <add name="SanteDB.Persistence.Data.ADO.Identity" filter="Informational" />
-      <add name="SanteDB.Persistence.Data.ADO" filter="Informational" />
-      <add name="SanteDB.Persistence.Diagnostics.Email" filter="Informational" />
-      <add name="SanteDB.Persistence.Diagnostics.Jira" filter="Informational" />
-      <add name="SanteDB.Persistence.MDM" filter="Informational" />
-      <add name="SanteDB.Tools.DataSandbox" filter="Informational" />
-      <add name="SanteDB.Warehouse.ADO" filter="Informational" />
+      <add name="SanteDB.Authentication.OAuth2" filter="Warning" />
+      <add name="SanteDB.Caching.Memory" filter="Warning" />
+      <add name="SanteDB.Caching.Memory.Query" filter="Warning" />
+      <add name="SanteDB.Caching.Redis" filter="Warning" />
+      <add name="SanteDB.Core.HttpRest" filter="Warning" />
+      <add name="SanteDB.Core.Data" filter="Warning" />
+      <add name="SanteDB.Core.Map" filter="Warning" />
+      <add name="SanteDB.Core.Security" filter="Warning" />
+      <add name="SanteDB.Core" filter="Warning" />
+      <add name="SanteDB.Core.Queue" filter="Warning" />
+      <add name="SanteDB.Core.Security.Tfa.Email" filter="Warning" />
+      <add name="SanteDB.Core.Security.Tfa.Twilio" filter="Warning" />
+      <add name="SanteDB.Messaging.AMI" filter="Warning" />
+      <add name="SanteDB.Messaging.FHIR" filter="Warning" />
+      <add name="SanteDB.Messaging.GS1" filter="Warning" />
+      <add name="SanteDB.Messaging.HDSI" filter="Warning" />
+      <add name="SanteDB.Messaging.HL7" filter="Warning" />
+      <add name="SanteDB.Messaging.Metadata" filter="Warning" />
+      <add name="SanteDB.Messaging.RISI" filter="Warning" />
+      <add name="SanteDB.OrmLite.PostgreSQL" filter="Warning" />
+      <add name="SanteDB.OrmLite.Sqlite" filter="Warning" />
+      <add name="SanteDB.OrmLite.FirebirdSQL" filter="Warning" />
+      <add name="SanteDB.OrmLite" filter="Warning" />
+      <add name="SanteDB.Auditing.ADO" filter="Warning" />
+      <add name="SanteDB.Persistence.Data.ADO.Identity" filter="Warning" />
+      <add name="SanteDB.Persistence.Data.ADO" filter="Verbose" />
+      <add name="SanteDB.Persistence.Diagnostics.Email" filter="Warning" />
+      <add name="SanteDB.Persistence.Diagnostics.Jira" filter="Warning" />
+      <add name="SanteDB.Persistence.MDM" filter="Warning" />
+      <add name="SanteDB.Tools.DataSandbox" filter="Warning" />
+      <add name="SanteDB.Warehouse.ADO" filter="Warning" />
     </sources>
     <writers>
-      <add name="main" initializationData="santedb.log" filter="Verbose">
+      <add name="main" initializationData="santedb.log" filter="Warning">
         <writer>SanteDB.Core.Diagnostics.RolloverTextWriterTraceWriter, SanteDB.Core, Version=1.31.0.23444, Culture=neutral, PublicKeyToken=null</writer>
       </add>
-      <add name="console" initializationData="santedb.log" filter="Verbose">
+      <add name="console" initializationData="santedb.log" filter="Warning">
         <writer>SanteDB.Core.Diagnostics.ConsoleTraceWriter, SanteDB.Core, Version=1.31.0.23444, Culture=neutral, PublicKeyToken=null</writer>
       </add>
     </writers>
@@ -100,7 +106,7 @@
   <section xsi:type="FileSystemQueueConfigurationSection" queueRoot=".\queue" />
   <section xsi:type="DataConfigurationSection">
     <connectionString name="FBSQL" value="initial catalog=|DataDirectory|\sdb_base.fdb;server type=Embedded;user id=sysdba" provider="Fbsql" />
-    <connectionString name="PSQL" value="server=localhost; port=5432; database=timr_upgrade; user id=postgres; password=postgres; pooling=true; MinPoolSize=10; MaxPoolSize=30; Timeout=10" provider="Npgsql" />
+    <connectionString name="PSQL" value="server=localhost; port=5432; database=timr_upgrade; user id=postgres; password=postgres; pooling=true; MinPoolSize=10; MaxPoolSize=30; Timeout=120; Command Timeout=120" provider="Npgsql" />
     <connectionString name="AUDIT" value="server=localhost;port=5433; database=santedb; user id=postgres; password=postgres; pooling=true; MinPoolSize=10; MaxPoolSize=30; Timeout=10; " provider="Npgsql"/>
   </section>
   <section xsi:type="AppletConfigurationSection" appletDirectory=".\applets" allowUnsignedApplets="true">
@@ -252,7 +258,10 @@
     </audiences>
   </section>
   <!-- Represents this server's internal security configuration -->
-  <section xsi:type="SecurityConfigurationSection" passwordRegex="^(?=.*\d){1,}(?=.*[a-z]){1,}(?=.*[A-Z]){1,}(?=.*[^\w\d]){1,}.{6,}$" allowUnsignedApplets="true">
+  <section xsi:type="SecurityConfigurationSection"
+           passwordRegex="^(?=.*\d){1,}(?=.*[a-z]){1,}(?=.*[A-Z]){1,}(?=.*[^\w\d]){1,}.{6,}$" 
+           allowUnsignedApplets="true"
+           pepExemptionPolicy="devices">
     <!-- Sets the thumbprints of publishers that should be trusted to run code-->
     <trustedPublishers>
       <add>82C63E1E9B87578D0727E871D7613F2F0FAF683B</add>
@@ -468,8 +477,8 @@
       <add type="SanteDB.Messaging.Atna.AtnaAuditService, SanteDB.Messaging.Atna, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
 
       <!-- Data Services -->
-      <add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />
-      <!--<add type="SanteDB.Caching.Redis.RedisCacheService, SanteDB.Caching.Redis, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />-->
+      <!--<add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />-->
+      <add type="SanteDB.Caching.Redis.RedisCacheService, SanteDB.Caching.Redis, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Caching.Memory.MemoryQueryPersistenceService, SanteDB.Caching.Memory, Version=1.10.0.24160, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPersistenceService, SanteDB.Persistence.Data.ADO, Version=1.10.0.24162, Culture=neutral, PublicKeyToken=null" />
 

@@ -246,7 +246,12 @@ namespace SanteDB.Core.Rest.Serialization
                     contentType = httpRequest.Headers["Content-Type"];
 
                 // Result is serializable
-                if (result?.GetType().GetCustomAttribute<XmlTypeAttribute>() != null ||
+                if(result == null)
+                {
+                    if (response.StatusCode != 304)
+                        response.StatusCode = 204;
+                }
+                else if (result?.GetType().GetCustomAttribute<XmlTypeAttribute>() != null ||
                     result?.GetType().GetCustomAttribute<JsonObjectAttribute>() != null)
                 {
                     // The request was in JSON or the accept is JSON

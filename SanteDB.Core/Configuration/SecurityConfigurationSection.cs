@@ -26,6 +26,35 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Core.Configuration
 {
+
+    /// <summary>
+    /// Identifies the policy enforcement exception
+    /// </summary>
+    [XmlType(nameof(PolicyEnforcementExemptionPolicy), Namespace = "http://santedb.org/configuration")]
+    public enum PolicyEnforcementExemptionPolicy
+    {
+        /// <summary>
+        /// No exemptions
+        /// </summary>
+        [XmlEnum("none")]
+        NoExemptions = 0,
+        /// <summary>
+        /// Devices exempt
+        /// </summary>
+        [XmlEnum("devices")]
+        DevicePrincipalsExempt = 0x1,
+        /// <summary>
+        /// Users exempt
+        /// </summary>
+        [XmlEnum("humans")]
+        UserPrincipalsExempt = 0x2,
+        /// <summary>
+        /// Devices and humans are exempt
+        /// </summary>
+        [XmlEnum("all")]
+        AllExempt = DevicePrincipalsExempt | UserPrincipalsExempt
+    }
+
     /// <summary>
     /// SanteDB Security configuration
     /// </summary>
@@ -49,6 +78,13 @@ namespace SanteDB.Core.Configuration
         [XmlAttribute("passwordRegex")]
         [Description("Identifies the password regular expression")]
         public string PasswordRegex { get; set; }
+
+        /// <summary>
+        /// Policy enforcement policy
+        /// </summary>
+        [XmlAttribute("pepExemptionPolicy")]
+        [Description("Identifies the policy enforcement exception")]
+        public PolicyEnforcementExemptionPolicy PepExemptionPolicy { get; set; }
 
         /// <summary>
         /// Signature configuration

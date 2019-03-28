@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Interfaces;
@@ -52,6 +53,9 @@ namespace SanteDB.Core.Security.Privacy
 
         // Security tracer
         private Tracer m_tracer = new Tracer(SanteDBConstants.SecurityTraceSourceName);
+
+        // Security configuration
+        private SecurityConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
 
         // Subscribed listeners
         private Dictionary<IDataPersistenceService, KeyValuePair<Delegate, Delegate>> m_subscribedListeners = new Dictionary<IDataPersistenceService, KeyValuePair<Delegate, Delegate>>();
@@ -171,10 +175,25 @@ namespace SanteDB.Core.Security.Privacy
         /// </summary>
         public IEnumerable HandlePostQueryEvent(IEnumerable results)
         {
+            // If the current authentication context is a device (not a user) then we should allow the data to flow to the device
+            switch(this.m_configuration.PepExemptionPolicy)
+            {
+                case PolicyEnforcementExemptionPolicy.AllExempt:
+                    return results;
+                case PolicyEnforcementExemptionPolicy.DevicePrincipalsExempt:
+                    if (AuthenticationContext.Current.Principal.Identity is DeviceIdentity || AuthenticationContext.Current.Principal.Identity is ApplicationIdentity)
+                        return results;
+                    break;
+                case PolicyEnforcementExemptionPolicy.UserPrincipalsExempt:
+                    if (!(AuthenticationContext.Current.Principal.Identity is DeviceIdentity || AuthenticationContext.Current.Principal.Identity is ApplicationIdentity))
+                        return results;
+                    break;
+            }
+
             // this is a very simple PEP which will enforce active policies in the result set.
             var pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
 
-            var decisions = results.OfType<Object>().Select(o=>new { Securable = o, Decision = pdp.GetPolicyDecision(AuthenticationContext.Current.Principal, o) });
+            var decisions = results.OfType<Object>().AsParallel().Select(o=>new { Securable = o, Decision = pdp.GetPolicyDecision(AuthenticationContext.Current.Principal, o) });
             
             return decisions
                 // We want to mask ELEVATE

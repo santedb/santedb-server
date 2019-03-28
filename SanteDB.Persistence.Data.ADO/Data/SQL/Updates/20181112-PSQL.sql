@@ -239,7 +239,8 @@ alter table cd_rel_assoc_tbl alter obslt_vrsn_seq_id type integer;
 --#!
 alter table cd_vrsn_tbl alter vrsn_seq_id type integer;
 --#!
-
+alter table act_ptcpt_tbl alter ptcpt_seq_id type integer;
+--#!
 -- CURRENT CONCEPT VERSION VIEW
 CREATE VIEW CD_CUR_VRSN_VW AS
 	SELECT CD_VRSN_TBL.*, CD_TBL.IS_SYS, CD_CLS_TBL.MNEMONIC AS CLS_MNEMONIC 
