@@ -40,8 +40,6 @@ namespace SanteDB.Persistence.MDM.Model
         where T : IdentifiedData, new()
     {
 
-        // The constructed master
-        private T m_master;
         // The master record
         private Entity m_masterRecord;
         // Local records
@@ -73,29 +71,31 @@ namespace SanteDB.Persistence.MDM.Model
         /// </summary>
         public T GetMaster(IPrincipal principal)
         {
-            if (this.m_master == null)
+            var master = new T();
+            master.CopyObjectData<IdentifiedData>(this.m_masterRecord);
+
+            // Is there a relationship which is the record of truth
+            var rot = this.LoadCollection<EntityRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == MdmConstants.MasterRecordOfTruthRelationship);
+            var pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
+            var locals = this.LocalRecords.Where(o => pdp.GetPolicyDecision(principal, o).Outcome == PolicyGrantType.Grant).ToArray();
+
+            if (locals.Length == 0) // Not a single local can be viewed
+                return null;
+            else if (rot == null) // We have to create a synthetic record 
             {
-                this.m_master = new T();
-                this.m_master.CopyObjectData<IdentifiedData>(this.m_masterRecord);
-
-                // Is there a relationship which is the record of truth
-                var rot = this.LoadCollection<EntityRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == MdmConstants.MasterRecordOfTruthRelationship);
-                var pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
-
-                if (rot == null) // We have to create a synthetic record 
-                {
-                    this.m_master.SemanticCopy(this.LocalRecords.Where(o => pdp.GetPolicyDecision(principal, o).Outcome == PolicyGrantType.Grant).ToArray());
-                }
-                else // there is a ROT so use it to override the values
-                {
-                    this.m_master.SemanticCopy(rot.LoadProperty<T>("TargetEntity"));
-                    this.m_master.SemanticCopyNullFields(this.LocalRecords.Where(o => pdp.GetPolicyDecision(principal, o).Outcome == PolicyGrantType.Grant).ToArray());
-                }
-                (this.m_master as Entity).Policies = this.LocalRecords.SelectMany(o => (o as Entity).Policies).Select(o=>new SecurityPolicyInstance(o.Policy, (PolicyGrantType)(int)pdp.GetPolicyOutcome(principal, o.Policy.Oid))).Where(o => o.GrantType == PolicyGrantType.Grant || o.Policy.CanOverride).ToList();
-                (this.m_master as Entity).Tags.RemoveAll(o => o.TagKey == "mdm.type");
-                (this.m_master as Entity).Tags.Add(new EntityTag("mdm.type", "M"));
+                master.SemanticCopy(locals);
             }
-            return this.m_master;
+            else // there is a ROT so use it to override the values
+            {
+                master.SemanticCopy(rot.LoadProperty<T>("TargetEntity"));
+                master.SemanticCopyNullFields(locals);
+            }
+            
+            (master as Entity).Policies = this.LocalRecords.SelectMany(o => (o as Entity).Policies).Select(o => new SecurityPolicyInstance(o.Policy, (PolicyGrantType)(int)pdp.GetPolicyOutcome(principal, o.Policy.Oid))).Where(o => o.GrantType == PolicyGrantType.Grant || o.Policy.CanOverride).ToList();
+            (master as Entity).Tags.RemoveAll(o => o.TagKey == "mdm.type");
+            (master as Entity).Tags.Add(new EntityTag("mdm.type", "M"));
+
+            return master;
         }
 
         /// <summary>
@@ -106,8 +106,8 @@ namespace SanteDB.Persistence.MDM.Model
         {
             get
             {
-                if(this.m_localRecords == null)
-                    this.m_localRecords = EntitySource.Current.Provider.Query<EntityRelationship>(o=>o.TargetEntityKey == this.Key && o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship).Select(o => o.LoadProperty<T>("SourceEntity")).OfType<T>().ToList();
+                if (this.m_localRecords == null)
+                    this.m_localRecords = EntitySource.Current.Provider.Query<EntityRelationship>(o => o.TargetEntityKey == this.Key && o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship).Select(o => o.LoadProperty<T>("SourceEntity")).OfType<T>().ToList();
                 return this.m_localRecords;
             }
         }

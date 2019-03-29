@@ -189,11 +189,16 @@ namespace SanteDB.Core
 
                     // Assign diagnostics
                     var config = this.GetService<IConfigurationManager>().GetSection<DiagnosticsConfigurationSection>();
-                    foreach (var writer in config.TraceWriter)
-                        Tracer.AddWriter(writer.TraceWriter, writer.Filter);
-                    
-                    // Add this
-                    this.m_serviceInstances.Add(this);
+
+                    if (config != null)
+                        foreach (var writer in config.TraceWriter)
+                            Tracer.AddWriter(writer.TraceWriter, writer.Filter);
+#if DEBUG
+                    else
+                        Tracer.AddWriter(new SystemDiagnosticsTraceWriter(), System.Diagnostics.Tracing.EventLevel.LogAlways);
+#endif
+                        // Add this
+                        this.m_serviceInstances.Add(this);
 
                     Trace.TraceInformation("STAGE1 START: Loading services");
 

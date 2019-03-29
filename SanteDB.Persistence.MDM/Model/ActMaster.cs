@@ -40,8 +40,6 @@ namespace SanteDB.Persistence.MDM.Model
         where T : IdentifiedData, new()
     {
 
-        // The constructed master
-        private T m_master;
         // The master record
         private Act m_masterRecord;
         // Local records
@@ -72,29 +70,29 @@ namespace SanteDB.Persistence.MDM.Model
         /// </summary>
         public T GetMaster(IPrincipal principal)
         {
-            if (this.m_master == null)
+            var master = new T();
+            master.CopyObjectData<IdentifiedData>(this.m_masterRecord);
+
+            // Is there a relationship which is the record of truth
+            var rot = this.LoadCollection<ActRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == MdmConstants.MasterRecordOfTruthRelationship);
+            var pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
+            var locals = this.LocalRecords.Where(o => pdp.GetPolicyDecision(principal, o).Outcome == PolicyGrantType.Grant).ToArray();
+
+            if (locals.Length == 0) // Not a single local can be viewed
+                return null;
+            else if (rot == null) // We have to create a synthetic record 
             {
-                this.m_master = new T();
-                this.m_master.CopyObjectData<IdentifiedData>(this.m_masterRecord);
-
-                // Is there a relationship which is the record of truth
-                var rot = this.LoadCollection<ActRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == MdmConstants.MasterRecordOfTruthRelationship);
-                var pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
-
-                if (rot == null) // We have to create a synthetic record 
-                {
-                    this.m_master.SemanticCopy(this.LocalRecords.Where(o => pdp.GetPolicyDecision(principal, o).Outcome == PolicyGrantType.Grant).ToArray());
-                }
-                else // there is a ROT so use it to override the values
-                {
-                    this.m_master.SemanticCopy(rot.LoadProperty<T>("TargetAct"));
-                    this.m_master.SemanticCopyNullFields(this.LocalRecords.Where(o => pdp.GetPolicyDecision(principal, o).Outcome == PolicyGrantType.Grant).ToArray());
-                }
-                (this.m_master as Act).Policies = this.LocalRecords.SelectMany(o => (o as Act).Policies).Where(o => o.Policy.CanOverride).ToList();
-                (this.m_master as Act).Tags.RemoveAll(o => o.TagKey == "mdm.type");
-                (this.m_master as Act).Tags.Add(new ActTag("mdm.type", "M"));
+                master.SemanticCopy(locals);
             }
-            return this.m_master;
+            else // there is a ROT so use it to override the values
+            {
+                master.SemanticCopy(rot.LoadProperty<T>("TargetAct"));
+                master.SemanticCopyNullFields(locals);
+            }
+                (master as Act).Policies = this.LocalRecords.SelectMany(o => (o as Act).Policies).Where(o => o.Policy.CanOverride).ToList();
+            (master as Act).Tags.RemoveAll(o => o.TagKey == "mdm.type");
+            (master as Act).Tags.Add(new ActTag("mdm.type", "M"));
+            return master;
         }
 
 

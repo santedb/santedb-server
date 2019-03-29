@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0"?>
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.10.0.23074" xmlns="http://santedb.org/configuration">
   <sections>
+    <add type="SanteDB.Core.Configuration.ApplicationServiceContextConfigurationSection, SanteDB.Core.Api, Version=1.11.0.29460, Culture=neutral, PublicKeyToken=null" />
+
+    <add type="SanteDB.Core.Configuration.DiagnosticsConfigurationSection, SanteDB.Core.Api, Version=1.30.0.23443, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Authentication.OAuth2.Configuration.OAuthConfigurationSection, SanteDB.Authentication.OAuth2, Version=1.10.0.24602, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Caching.Memory.Configuration.MemoryCacheConfigurationSection, SanteDB.Caching.Memory, Version=1.10.0.24600, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Caching.Redis.Configuration.RedisConfigurationSection, SanteDB.Caching.Redis, Version=1.10.0.24601, Culture=neutral, PublicKeyToken=null" />
@@ -54,10 +57,10 @@
   <!-- Master Data Management Configuration -->
   <section xsi:type="MdmConfigurationSection">
     <resources>
-      <add type="Patient" matchConfiguration="default" autoMerge="false" />
+      <add type="Patient" matchConfiguration="default" autoMerge="true" />
     </resources>
   </section>
-  <section xsi:type="SanteDBServerConfiguration" threadPoolSize="4">
+  <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="4">
     <serviceProviders>
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPersistenceService, SanteDB.Persistence.Data.ADO, Version=0.6.0.0" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPolicyInformationService, SanteDB.Persistence.Data.ADO, Version=0.6.0.0" />
@@ -65,7 +68,7 @@
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoIdentityProvider, SanteDB.Persistence.Data.ADO, Version=0.6.0.0" />
       <add type="SanteDB.Core.Security.SHA256PasswordHashingService, SanteDB.Core, Version=0.6.0.0" />
       <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core, Version=0.6.0.0" />
-      <add type="SanteDB.Core.Services.Impl.LocalSecurityRepositoryService, SanteDB.Core, Version=0.6.0.0" />
+      <add type="SanteDB.Core.Services.Impl.LocalRepositoryService, SanteDB.Core, Version=0.6.0.0"/>
       <add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory, Version=0.6.0.0" />
       <add type="SanteDB.Core.Services.Impl.ThreadPoolService, SanteDB.Core, Version=0.6.0.0" />
       <add type="SanteDB.Persistence.MDM.Test.DummyMatcherService, SanteDB.Persistence.MDM.Test, Version=1.0.0.0"/>

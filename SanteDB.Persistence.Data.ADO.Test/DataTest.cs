@@ -21,6 +21,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
     [DeploymentItem(@"icuin52.dll")]
     [DeploymentItem(@"icuuc52.dll")]
     [DeploymentItem(@"plugins\engine12.dll", "plugins")]
+    [DeploymentItem(@"FirebirdSql.Data.FirebirdClient.dll")]
     public abstract class DataTest
     {
         

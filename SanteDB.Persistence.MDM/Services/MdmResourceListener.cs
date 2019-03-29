@@ -152,7 +152,7 @@ namespace SanteDB.Persistence.MDM.Services
             var masterQuery = QueryExpressionParser.BuildLinqExpression<TMasterType>(query);
             int tr = 0;
             return ApplicationServiceContext.Current.GetService<IStoredQueryDataPersistenceService<TMasterType>>().Query(masterQuery, queryId, offset, count, out totalResults, principal)
-                .Select(o => o is Entity ? new EntityMaster<T>((Entity)(object)o).GetMaster(principal) : new ActMaster<T>((Act)(Object)o).GetMaster(principal)).AsParallel().ToList();
+                .AsParallel().Select(o => o is Entity ? new EntityMaster<T>((Entity)(object)o).GetMaster(principal) : new ActMaster<T>((Act)(Object)o).GetMaster(principal)).OfType<T>().ToList();
         }
 
         /// <summary>
