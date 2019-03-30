@@ -48,14 +48,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId)
         {
-            int tr = 0;
             var addrLookupQuery = context.CreateSqlStatement<DbEntityAddressComponent>().SelectFrom(typeof(DbEntityAddressComponent), typeof(DbEntityAddress), typeof(DbEntityAddressComponentValue))
                 .InnerJoin<DbEntityAddress>(o=>o.SourceKey, o=>o.Key)
                 .InnerJoin<DbEntityAddressComponentValue>(o=>o.ValueSequenceId, o=>o.SequenceId)
                 .Where<DbEntityAddress>(o=>o.SourceKey == id && o.ObsoleteVersionSequenceId == null);
 
             /// Yowza! But it appears to be faster than the other way 
-            return this.DomainQueryInternal<CompositeResult<DbEntityAddressComponent, DbEntityAddress, DbEntityAddressComponentValue>>(context, addrLookupQuery, out tr)
+            return this.DomainQueryInternal<CompositeResult<DbEntityAddressComponent, DbEntityAddress, DbEntityAddressComponentValue>>(context, addrLookupQuery)
                 .GroupBy(o=>o.Object2.Key)
                 .Select(o =>
                     new EntityAddress()

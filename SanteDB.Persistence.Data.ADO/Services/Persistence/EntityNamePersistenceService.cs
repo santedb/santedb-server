@@ -60,7 +60,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 .Where<DbEntityName>(o => o.SourceKey == id && o.ObsoleteVersionSequenceId == null);
 
             /// Yowza! But it appears to be faster than the other way 
-            return this.DomainQueryInternal<CompositeResult<DbEntityNameComponent, DbEntityName, DbPhoneticValue>>(context, addrLookupQuery, out tr)
+            return this.DomainQueryInternal<CompositeResult<DbEntityNameComponent, DbEntityName, DbPhoneticValue>>(context, addrLookupQuery)
                 .GroupBy(o => o.Object2.Key)
                 .Select(o =>
                     new EntityName()

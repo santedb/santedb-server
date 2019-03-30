@@ -232,21 +232,29 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 {
                     domainQuery = this.AppendOrderBy(domainQuery, orderBy);
 
-                    if (count <= 1)
-                        domainQuery.Offset(offset).Limit(count.Value);
-
-                    var retVal = this.DomainQueryInternal<TQueryReturn>(context, domainQuery, out totalResults).OfType<Object>();
-                    
-                    if (includeCount)
-                        totalResults = retVal.Count();
+                    // Only one is requested, or there is no future query coming back so no savings in querying the entire dataset
+                    if (count <= 1 || queryId == Guid.Empty)
+                    {
+                        if (includeCount)
+                            totalResults = context.Count(domainQuery);
+                        else
+                            totalResults = 0;
+                        domainQuery = domainQuery.Offset(offset).Limit(count ?? 100);
+                        return this.DomainQueryInternal<TQueryReturn>(context, domainQuery).OfType<Object>();
+                    }
                     else
-                        totalResults = 0;
+                    {
+                        var retVal = this.DomainQueryInternal<TQueryReturn>(context, domainQuery).OfType<Object>();
+                        if (includeCount)
+                            totalResults = retVal.Count();
+                        else
+                            totalResults = 0;
 
-                    // We have a query identifier and this is the first frame, freeze the query identifiers
-                    if (queryId != Guid.Empty && count != 0)
+                        // We have a query identifier and this is the first frame, freeze the query identifiers
                         this.AddQueryResults<TQueryReturn>(context, query, queryId, offset, retVal, totalResults, orderBy);
 
-                    return retVal.Skip(offset).Take(count ?? 100);
+                        return retVal.Skip(offset).Take(count ?? 100);
+                    }
                 }
                 else
                 {
@@ -343,14 +351,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Perform a domain query
         /// </summary>
-        protected IEnumerable<TResult> DomainQueryInternal<TResult>(DataContext context, SqlStatement domainQuery, out int totalResults)
+        protected IEnumerable<TResult> DomainQueryInternal<TResult>(DataContext context, SqlStatement domainQuery)
         {
 
             // Build and see if the query already exists on the stack???
             domainQuery = domainQuery.Build();
 
             var results = context.Query<TResult>(domainQuery);
-            totalResults = results.Count();
 
             // Cache query result
             return results;

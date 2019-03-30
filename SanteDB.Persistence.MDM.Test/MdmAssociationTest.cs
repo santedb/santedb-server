@@ -546,7 +546,7 @@ namespace SanteDB.Persistence.MDM.Test
             Assert.AreEqual(1, masters.First().Names.Count);
             Assert.AreEqual(1, masters.First().Identifiers.Count);
             Assert.IsFalse(masters.First().Identifiers.Any(o => o.Value == "TC-9B")); // Shoudl not contain the HIV identifier
-            Assert.AreEqual(0, masters.First().Policies.Count);  // Should not contains any policies
+            Assert.AreEqual(1, masters.First().Policies.Count);  // Should not contains any policies
 
             // When running as our user which has access
             var restrictedUser = userService.Authenticate("RESTRICTED", "TEST123");
