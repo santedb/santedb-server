@@ -60,7 +60,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ConceptPersistenceServiceTest.cs" />
-    <Compile Include="DataTest.cs" />
     <Compile Include="EntityPersistenceServiceTest.cs" />
     <Compile Include="ManufacturedMaterialPersistenceTest.cs" />
     <Compile Include="PatientPersistenceServiceTest.cs" />

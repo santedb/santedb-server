@@ -2,8 +2,8 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>SanteDB.Server.TestFramework</id>
-    <version>1.33.0.0</version>
-    <title>SanteDB Server Plugin Unit Test Core</title>
+    <version>1.34.0.0</version>
+    <title>SanteDB Server Plugin Unit Test Data Tests Core</title>
     <authors>SanteDB Community</authors>
     <owners>santedb.org</owners>
     <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
@@ -15,12 +15,26 @@
     <copyright>Copyright (C) 2018, Mohawk College of Applied Arts and Technology</copyright>
     <tags>cdr santedb server ado</tags>
     <dependencies>
-      <dependency id="SanteDB.Core.Api" version="1.33.0.0" />
-      <dependency id="SanteDB.Core.Model" version="1.33.0.0" />
-      <dependency id="SanteDB.OrmLite" version="1.33.0.0"/>
-      <dependency id="SanteDB.Server.Plugin" version="1.33.0.0"/>
-      <dependency id="SanteDB.Server.Plugin.Data" version="1.33.0.0"/>
+      <dependency id="SanteDB.Core.Api" version="1.34.0.0" />
+      <dependency id="SanteDB.Core.Model" version="1.34.0.0" />
+      <dependency id="SanteDB.OrmLite" version="1.34.0.0"/>
+      <dependency id="SanteDB.Server.Plugin" version="1.34.0.0"/>
+      <dependency id="SanteDB.Server.Plugin.Data" version="1.34.0.0"/>
+      <dependency id="FirebirdSql.Data.FirebirdClient" version="5.12.1"/>
     </dependencies>
   </metadata>
+  <files>
+    <file src="..\Solution Items\santedb_test.fdb" target="build\net45"/>
+    <file src="SanteDB.Server.TestFramework.targets" target="build\net45"/>
+    <file src="bin\$configuration$\fbclient.dll" target="build\net45"/>
+    <file src="bin\$configuration$\firebird.conf" target="build\net45"/>
+    <file src="bin\$configuration$\firebird.msg" target="build\net45"/>
+    <file src="bin\$configuration$\ib_util.dll" target="build\net45"/>
+    <file src="bin\$configuration$\icudt52.dll" target="build\net45"/>
+    <file src="bin\$configuration$\icudt52l.dat" target="build\net45"/>
+    <file src="bin\$configuration$\icuin52.dll" target="build\net45"/>
+    <file src="bin\$configuration$\icuuc52.dll" target="build\net45"/>
+    <file src="bin\$configuration$\plugins\engine12.dll" target="build\net45\plugins"/>
+  </files>
   <!-- TODO: Include FDB, FDB DLLS and App.Config -->
 </package>

@@ -1,12 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SanteDB.Core;
-using SanteDB.Core.Data;
-using SanteDB.Core.Model.EntityLoader;
-using SanteDB.Persistence.Data.ADO.Services;
 using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace SanteDB.Persistence.Data.ADO.Test
+namespace SanteDB.Core.TestFramework
 {
     /// <summary>
     /// Represents an abstract data test tool
@@ -24,7 +23,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
     [DeploymentItem(@"FirebirdSql.Data.FirebirdClient.dll")]
     public abstract class DataTest
     {
-        
+
         /// <summary>
         /// Starts the data test 
         /// </summary>

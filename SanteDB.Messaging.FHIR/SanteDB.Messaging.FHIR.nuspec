@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>SanteDB.Messaging.FHIR</id>
-    <version>1.29.0.0</version>
+    <version>1.34.0.0</version>
     <title>HL7 FHIR Bindings for SanteDB Server</title>
     <authors>SanteDB Community</authors>
     <owners>santedb.org</owners>
@@ -15,12 +15,12 @@
     <copyright>Copyright (C) 2018, Mohawk College of Applied Arts and Technology</copyright>
     <tags>cdr santedb fhir</tags>
     <dependencies>
-      <dependency id="SanteDB.Core.Api" version="1.25.0.0" />
-      <dependency id="SanteDB.Core.Model" version="1.29.0.0" />
+      <dependency id="SanteDB.Core.Api" version="1.34.0.0" />
+      <dependency id="SanteDB.Core.Model" version="1.34.0.0" />
       <dependency id="Hl7.Fhr.STU3" version="0.96.0" />
       <dependency id="Newtonsoft.Json" version="11.02.0" />
-      <dependency id="Restsrvr" version="1.29.0.0" />
-      <dependency id="SanteDB.Rest.Common" version="1.29.0.0" />
+      <dependency id="Restsrvr" version="1.34.0.0" />
+      <dependency id="SanteDB.Rest.Common" version="1.34.0.0" />
     </dependencies>
   </metadata>
 </package>
