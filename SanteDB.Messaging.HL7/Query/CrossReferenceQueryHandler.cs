@@ -87,14 +87,14 @@ namespace SanteDB.Messaging.HL7.Query
 
                 if (returnDomains.Any(rid => rid == this.m_configuration.LocalAuthority.DomainName))
                 {
-                    int idx = queryInstance.PID.PatientAddressRepetitionsUsed;
+                    int idx = queryInstance.PID.PatientIdentifierListRepetitionsUsed;
                     queryInstance.PID.GetPatientIdentifierList(idx).IDNumber.Value = itm.Key.Value.ToString();
                     queryInstance.PID.GetPatientIdentifierList(idx).AssigningAuthority.NamespaceID.Value = this.m_configuration.LocalAuthority.DomainName;
                     queryInstance.PID.GetPatientIdentifierList(idx).AssigningAuthority.UniversalID.Value = this.m_configuration.LocalAuthority.Oid;
                     queryInstance.PID.GetPatientIdentifierList(idx).AssigningAuthority.UniversalIDType.Value = "ISO";
                 }
 
-                if (queryInstance.PID.AlternatePatientIDPIDRepetitionsUsed > 0)
+                if (queryInstance.PID.PatientIdentifierListRepetitionsUsed > 0)
                 {
                     queryInstance.PID.SetIDPID.Value = (i++).ToString();
                     queryInstance.PID.GetPatientName(0).NameTypeCode.Value = "S";

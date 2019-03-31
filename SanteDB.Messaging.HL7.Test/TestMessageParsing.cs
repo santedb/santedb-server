@@ -142,7 +142,7 @@ namespace SanteDB.Messaging.HL7.Test
             msg = TestUtil.GetMessage("QBP_SIMPLE");
             var message = new QbpMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
             var messageStr = TestUtil.ToString(message);
-            Assert.AreEqual("SMITH", (message.GetStructure("PID") as PID).GetMotherSMaidenName(0).FamilyName.Surname.Value);
+            Assert.AreEqual("SMITH", ((message.GetStructure("QUERY_RESPONSE") as AbstractGroup).GetStructure("PID") as PID).GetMotherSMaidenName(0).FamilyName.Surname.Value);
             Assert.AreEqual("AA", (message.GetStructure("MSA") as MSA).AcknowledgmentCode.Value);
             Assert.AreEqual("OK", (message.GetStructure("QAK") as QAK).QueryResponseStatus.Value);
             Assert.AreEqual("K22", (message.GetStructure("MSH") as MSH).MessageType.TriggerEvent.Value);

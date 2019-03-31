@@ -123,6 +123,16 @@ namespace SanteDB.Messaging.HL7.Segments
                     }
             }
 
+            // Mother's info
+            var motherRelation = patient.LoadCollection<EntityRelationship>(nameof(Entity.Relationships)).FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother);
+            if(motherRelation != null)
+            {
+                var mother = motherRelation.LoadProperty(nameof(EntityRelationship.TargetEntity)) as Person;
+                foreach (var nam in mother.LoadCollection<EntityName>(nameof(Entity.Names)))
+                    retVal.GetMotherSMaidenName(retVal.MotherSMaidenNameRepetitionsUsed).FromModel(nam);
+                foreach (var id in mother.LoadCollection<EntityIdentifier>(nameof(Entity.Identifiers)))
+                    retVal.GetMotherSIdentifier(retVal.MotherSIdentifierRepetitionsUsed).FromModel(id);
+            }
             // TODO: Contact information
             return new ISegment[] { retVal };
         }

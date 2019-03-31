@@ -164,8 +164,8 @@ namespace SanteDB.Messaging.HL7.Messages
                     filterQuery = queryMethod.Invoke(null, new object[] { query }) as Expression;
 
                     // Now we want to query
-                    object[] parameters = { filterQuery, offset.Value, (int?)count, null, queryId };
-                    var findMethod = repoService.GetType().GetMethod("Find", new Type[] { filterQuery.GetType(), typeof(int), typeof(int?), typeof(int).MakeByRefType(), typeof(Guid) });
+                    object[] parameters = { filterQuery, offset.Value, (int?)count, null, queryId, null };
+                    var findMethod = repoService.GetType().GetMethod("Find", new Type[] { filterQuery.GetType(), typeof(int), typeof(int?), typeof(int).MakeByRefType(), typeof(Guid), typeof(ModelSort<>).MakeGenericType(map.QueryTarget).MakeArrayType() });
                     results = findMethod.Invoke(repoService, parameters) as IEnumerable;
                     totalResults = (int)parameters[3];
                 }
