@@ -1,47 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0"?>
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.10.0.23074" xmlns="http://santedb.org/configuration">
   <sections>
     <add type="SanteDB.Core.Configuration.ApplicationServiceContextConfigurationSection, SanteDB.Core.Api, Version=1.11.0.29460, Culture=neutral, PublicKeyToken=null" />
-
-    <add type="SanteDB.Authentication.OAuth2.Configuration.OAuthConfigurationSection, SanteDB.Authentication.OAuth2, Version=1.10.0.24602, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Caching.Memory.Configuration.MemoryCacheConfigurationSection, SanteDB.Caching.Memory, Version=1.10.0.24600, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Caching.Redis.Configuration.RedisConfigurationSection, SanteDB.Caching.Redis, Version=1.10.0.24601, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Core.Configuration.JobConfigurationSection, SanteDB.Core, Version=1.10.0.24599, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Core.Configuration.RestConfigurationSection, SanteDB.Core, Version=1.10.0.24599, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Core.Configuration.BasicAuthorizationConfigurationSection, SanteDB.Core, Version=1.10.0.24599, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Core.Configuration.ClaimsAuthorizationConfigurationSection, SanteDB.Core, Version=1.10.0.24599, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Core.Configuration.SecurityConfigurationSection, SanteDB.Core, Version=1.10.0.24599, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Core.Security.Tfa.Email.Configuration.TfaEmailMechanismConfigurationSection, SanteDB.Core.Security.Tfa.Email, Version=1.10.0.24602, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Core.Security.Tfa.Twilio.Configuration.TwilioTfaMechanismConfigurationSection, SanteDB.Core.Security.Tfa.Twilio, Version=1.10.0.24602, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Messaging.AMI.Configuration.AmiConfigurationSection, SanteDB.Messaging.AMI, Version=1.10.0.24603, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Messaging.FHIR.Configuration.FhirServiceConfigurationSection, SanteDB.Messaging.FHIR, Version=1.10.0.24603, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Messaging.GS1.Configuration.Gs1ConfigurationSection, SanteDB.Messaging.GS1, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Messaging.HDSI.Configuration.HdsiConfigurationSection, SanteDB.Messaging.HDSI, Version=1.10.0.24600, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Messaging.HL7.Configuration.Hl7ConfigurationSection, SanteDB.Messaging.HL7, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Persistence.Auditing.ADO.Configuration.AdoAuditConfigurationSection, SanteDB.Persistence.Auditing.ADO, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Core.Configuration.DiagnosticsConfigurationSection, SanteDB.Core.Api, Version=1.30.0.23443, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Persistence.Data.ADO.Configuration.AdoPersistenceConfigurationSection, SanteDB.Persistence.Data.ADO, Version=1.10.0.24600, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Persistence.Diagnostics.Email.Configuration.DiagnosticEmailServiceConfigurationSection, SanteDB.Persistence.Diagnostics.Email, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Persistence.Diagnostics.Jira.Configuration.JiraServiceConfigurationSection, SanteDB.Persistence.Diagnostics.Jira, Version=1.1.2.24606, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Persistence.MDM.Configuration.MdmConfigurationSection, SanteDB.Persistence.MDM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Persistence.Reporting.ADO.Configuration.ReportingConfiguration, SanteDB.Persistence.Reporting.ADO, Version=1.10.0.24602, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Reporting.Core.Configuration.ReportingConfigurationSection, SanteDB.Reporting.Core, Version=1.10.0.24600, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Reporting.Jasper.Configuration.JasperConfigurationSection, SanteDB.Reporting.Jasper, Version=1.10.0.24601, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Warehouse.ADO.Configuration.AdoWarehouseConfigurationSection, SanteDB.Warehouse.ADO, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Core.Configuration.SanteDBServerConfiguration, SanteDB.Core, Version=1.10.0.24599, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Messaging.Atna.Configuration.AtnaConfigurationSection, SanteDB.Messaging.Atna, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
   </sections>
-  <section xsi:type="MemoryCacheConfigurationSection" autoSubscribe="true" maxSize="10000" maxAge="3600" />
-  <!-- Represents this server's internal security configuration -->
-  <section xsi:type="SecurityConfigurationSection" passwordRegex="^(?=.*\d){1,}(?=.*[a-z]){1,}(?=.*[A-Z]){1,}(?=.*[^\w\d]){1,}.{6,}$" allowUnsignedApplets="true">
-    <!-- Sets the thumbprints of publishers that should be trusted to run code-->
-    <trustedPublishers>
-      <add>84BD51F0584A1F708D604CF0B8074A68D3BEB973</add>
-    </trustedPublishers>
-    <!-- SanteDB signs a lot of data when communicating it, this is used for configuring how this server signs data -->
-    <signing alg="hmac" hmacKey="uuNQ0pAkW+M2uxHjK1pisFZBFYjvkgveJcGtDy2E8i8="/>
-    <!-- To Configure X509 Signatures -->
-    <!--<signing alg="rsa" findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />-->
-  </section>
   <!-- This section controls the persistence for ADO.NET -->
   <section xsi:type="AdoPersistenceConfigurationSection"
            readWriteConnectionString="TEST_CONNECTION"
@@ -52,15 +15,6 @@
            autoUpdateExisting="true"
            autoInsertChildren="true"
            prepareStatements="true">
-    <!-- Any corrective handlers should be added here 
-    <corrections>
-      <add>value</add>
-    </corrections>
-    To limit the resources that can be persisted in ADO.NET add them here
-    <resources>
-      <add>value</add>
-    </resources>
-    -->
   </section>
   <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="4">
     <serviceProviders>
@@ -69,9 +23,10 @@
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoRoleProvider, SanteDB.Persistence.Data.ADO, Version=0.6.0.0" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoIdentityProvider, SanteDB.Persistence.Data.ADO, Version=0.6.0.0" />
       <add type="SanteDB.Core.Security.SHA256PasswordHashingService, SanteDB.Core, Version=0.6.0.0" />
-      <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core, Version=1.10.0.31830, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core, Version=0.6.0.0" />
+      <add type="SanteDB.Core.Services.Impl.LocalRepositoryService, SanteDB.Core, Version=0.6.0.0"/>
       <add type="SanteDB.Core.Services.Impl.ThreadPoolService, SanteDB.Core, Version=0.6.0.0" />
+      <add type="SanteDB.Core.Services.Impl.LocalTagPersistenceService, SanteDB.Core, Version=1.0.0.0"/>
     </serviceProviders>
   </section>
 </SanteDBConfiguration>

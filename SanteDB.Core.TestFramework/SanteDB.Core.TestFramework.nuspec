@@ -14,6 +14,9 @@
     <releaseNotes>Initial release of assemblies</releaseNotes>
     <copyright>Copyright (C) 2018, Mohawk College of Applied Arts and Technology</copyright>
     <tags>cdr santedb server ado</tags>
+    <contentFiles>
+      <files include="TestConfig.xml" buildAction="EmbeddedResource"/>
+    </contentFiles>
     <dependencies>
       <dependency id="SanteDB.Core.Api" version="1.34.0.0" />
       <dependency id="SanteDB.Core.Model" version="1.34.0.0" />
