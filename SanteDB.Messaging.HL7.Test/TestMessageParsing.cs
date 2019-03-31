@@ -9,7 +9,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.HL7.Messages;
 using SanteDB.Messaging.HL7.TransportProtocol;
-using SanteDB.Persistence.ADO.Test.Core;
+using SanteDB.Core.TestFramework;
 using SanteDB.Persistence.Data.ADO.Test;
 using System;
 using System.Linq;

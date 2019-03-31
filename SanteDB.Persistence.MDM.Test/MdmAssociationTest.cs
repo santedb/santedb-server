@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using SanteDB.Persistence.ADO.Test.Core;
+using SanteDB.Core.TestFramework;
 
 namespace SanteDB.Persistence.MDM.Test
 {

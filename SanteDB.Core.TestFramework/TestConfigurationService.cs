@@ -6,7 +6,7 @@ using System.Configuration;
 using System.Linq;
 using System.Reflection;
 
-namespace SanteDB.Persistence.ADO.Test.Core
+namespace SanteDB.Core.TestFramework
 {
     /// <summary>
     /// Configuration service that loads from the test file

@@ -66,6 +66,10 @@
       <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
       <Name>SanteDB.Core.Model</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Core.TestFramework\SanteDB.Core.TestFramework.csproj">
+      <Project>{ad73db46-cbb3-4746-b406-40fc435ab3db}</Project>
+      <Name>SanteDB.Core.TestFramework</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{DB9BC05E-45F1-4F96-A161-F36BDECAF566}</Project>
       <Name>SanteDB.Core</Name>
@@ -73,10 +77,6 @@
     <ProjectReference Include="..\SanteDB.Messaging.HL7\SanteDB.Messaging.HL7.csproj">
       <Project>{c1f86ea3-fc84-456f-a9d9-0bf8db0d48d3}</Project>
       <Name>SanteDB.Messaging.HL7</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Persistence.ADO.Test.Core\SanteDB.Persistence.ADO.Test.Core.csproj">
-      <Project>{AD73DB46-CBB3-4746-B406-40FC435AB3DB}</Project>
-      <Name>SanteDB.Persistence.ADO.Test.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Persistence.Data.ADO.Test\SanteDB.Persistence.Data.ADO.Test.csproj">
       <Project>{11407adb-e336-4c0c-af8e-ea6b601ba69e}</Project>

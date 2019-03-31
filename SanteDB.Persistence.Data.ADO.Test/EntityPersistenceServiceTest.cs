@@ -7,7 +7,7 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
-using SanteDB.Persistence.ADO.Test.Core;
+using SanteDB.Core.TestFramework;
 using System;
 using System.Collections.Generic;
 using System.Linq;

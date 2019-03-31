@@ -11,7 +11,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.Persistence.ADO.Test.Core
+namespace SanteDB.Core.TestFramework
 {
     /// <summary>
     /// Represents the test context

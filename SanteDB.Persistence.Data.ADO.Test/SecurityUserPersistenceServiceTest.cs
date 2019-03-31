@@ -4,7 +4,7 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
-using SanteDB.Persistence.ADO.Test.Core;
+using SanteDB.Core.TestFramework;
 using System;
 using System.Linq;
 

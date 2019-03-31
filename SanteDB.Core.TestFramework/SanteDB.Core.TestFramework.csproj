@@ -7,8 +7,8 @@
     <ProjectGuid>{AD73DB46-CBB3-4746-B406-40FC435AB3DB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SanteDB.Persistence.ADO.Test.Core</RootNamespace>
-    <AssemblyName>SanteDB.Persistence.ADO.Test.Core</AssemblyName>
+    <RootNamespace>SanteDB.Core.TestFramework</RootNamespace>
+    <AssemblyName>SanteDB.Core.TestFramework</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -47,7 +47,7 @@
     <Compile Include="TestConfigurationService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="SanteDB.Persistence.ADO.Test.nuspec">
+    <None Include="SanteDB.Core.TestFramework.nuspec">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>

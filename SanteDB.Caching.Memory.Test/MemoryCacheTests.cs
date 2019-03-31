@@ -19,6 +19,7 @@
  */
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.TestFramework;
 using System;
 using System.Threading;
 
@@ -27,6 +28,17 @@ namespace SanteDB.Caching.Memory.Test
     [TestClass]
     public class MemoryCacheTests
     {
+
+        /// <summary>
+        /// Setup the test class
+        /// </summary>
+        [ClassInitialize]
+        public static void ClassInitialize(TestContext context)
+        {
+            typeof(MemoryCacheService).Equals(null);
+            TestApplicationContext.TestAssembly = typeof(MemoryCacheTests).Assembly;
+            TestApplicationContext.Initialize(context.DeploymentDirectory);
+        }
 
         /// <summary>
         /// This test will fill the cache with some data and then reduce the pressure on the cache
@@ -51,13 +63,13 @@ namespace SanteDB.Caching.Memory.Test
 
             // Now reduce pressure, should *not* reduce the size of the cache as not enough time has passed
             MemoryCache.Current.ReducePressure();
-            Thread.Sleep(3000); // Give the memory cache threads time to clean
+            Thread.Sleep(1000); // Give the memory cache threads time to clean
             Assert.AreEqual(101, MemoryCache.Current.GetSize());
 
             // Now set the min age to 2 seconds
-            MemoryCache.Current.SetMinAge(new TimeSpan(0, 0, 1));
+            MemoryCache.Current.SetMinAge(new TimeSpan(0, 0, 2));
             MemoryCache.Current.ReducePressure(); // this should reduce to 10
-            Thread.Sleep(3000); // Give the memory cache threads time to clean
+            Thread.Sleep(1000); // Give the memory cache threads time to clean
             Assert.AreEqual(10, MemoryCache.Current.GetSize());
             MemoryCache.Current.SetMinAge(new TimeSpan(0, 0, 30));
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SanteDB.Core.Model.DataTypes;
-using SanteDB.Persistence.ADO.Test.Core;
+using SanteDB.Core.TestFramework;
 using System.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Test
