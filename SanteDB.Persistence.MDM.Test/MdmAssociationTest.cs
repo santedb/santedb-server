@@ -382,7 +382,8 @@ namespace SanteDB.Persistence.MDM.Test
         }
 
         /// <summary>
-        /// Tests that when two local records are matched to a single master and a local is updated, that the master remains the only master and the information is reflected
+        /// Tests that when two local records are matched to a single master and a local is updated, 
+        /// that the master remains the only master and the information is reflected
         /// </summary>
         [TestMethod]
         public void UpdateToMatchShouldReflectWithNoNewMaster()
@@ -390,7 +391,7 @@ namespace SanteDB.Persistence.MDM.Test
             var pservice = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>();
             var patient1 = new Patient()
             {
-                DateOfBirth = DateTime.Parse("1985-06-04"),
+                DateOfBirth = DateTime.Parse("1985-07-04"),
                 Names = new List<EntityName>()
                 {
                     new EntityName(NameUseKeys.Legal, "Smith", "Testy")
@@ -404,7 +405,7 @@ namespace SanteDB.Persistence.MDM.Test
             var localPatient1 = pservice.Insert(patient1, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             var patient2 = new Patient()
             {
-                DateOfBirth = DateTime.Parse("1985-06-04"),
+                DateOfBirth = DateTime.Parse("1985-07-04"),
                 Names = new List<EntityName>()
                 {
                     new EntityName(NameUseKeys.Legal, "Smith", "Testy")
