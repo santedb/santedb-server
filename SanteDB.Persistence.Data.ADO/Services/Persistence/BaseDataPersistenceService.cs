@@ -115,6 +115,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (currentObject.CreationTime == domainObject.CreationTime) // HACK: Someone keeps passing up the same data so we have to correct here
                 domainObject.CreationTime = DateTimeOffset.Now;
 
+            if(currentObject.ObsoletedByKey.HasValue && !domainObject.ObsoletedByKey.HasValue) // We are un-deleting
+            {
+                currentObject.ObsoletedByKey = null;
+                currentObject.ObsoletionTime = null;
+                domainObject.ObsoletedByKeySpecified = domainObject.ObsoletionTimeSpecified = true;
+            }
+
             currentObject.CopyObjectData(domainObject);
             currentObject = context.Update<TDomain>(currentObject);
 

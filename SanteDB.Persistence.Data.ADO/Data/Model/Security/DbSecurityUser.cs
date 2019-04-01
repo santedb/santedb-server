@@ -44,7 +44,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
 		/// </summary>
 		/// <value>The invalid login attempts.</value>
 		[Column("fail_login")]
-		public int InvalidLoginAttempts {
+		public int? InvalidLoginAttempts {
 			get;
 			set;
 		}

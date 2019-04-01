@@ -75,7 +75,18 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 	/// </summary>
 	public class SecurityApplicationPersistenceService : BaseDataPersistenceService<Core.Model.Security.SecurityApplication, DbSecurityApplication>
 	{
-		internal override SecurityApplication Get(DataContext context, Guid key)
+
+        protected override SqlStatement AppendOrderBy(SqlStatement rawQuery, ModelSort<SecurityApplication>[] orderBy)
+        {
+            if (orderBy == null || orderBy.Length == 0)
+                orderBy = new ModelSort<SecurityApplication>[]
+                {
+                    new ModelSort<SecurityApplication>(o=>o.CreationTime, Core.Model.Map.SortOrderType.OrderByDescending)
+                };
+            return base.AppendOrderBy(rawQuery, orderBy);
+        }
+
+        internal override SecurityApplication Get(DataContext context, Guid key)
 		{
 			var application = base.Get(context, key);
 
@@ -180,7 +191,18 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 	/// </summary>
 	public class SecurityDevicePersistenceService : BaseDataPersistenceService<Core.Model.Security.SecurityDevice, DbSecurityDevice>
 	{
-		internal override SecurityDevice Get(DataContext context, Guid key)
+        protected override SqlStatement AppendOrderBy(SqlStatement rawQuery, ModelSort<SecurityDevice>[] orderBy)
+        {
+            if (orderBy == null || orderBy.Length == 0)
+                orderBy = new ModelSort<SecurityDevice>[]
+                {
+                    new ModelSort<SecurityDevice>(o=>o.UpdatedTime, Core.Model.Map.SortOrderType.OrderByDescending),
+                    new ModelSort<SecurityDevice>(o=>o.CreationTime, Core.Model.Map.SortOrderType.OrderByDescending)
+                };
+            return base.AppendOrderBy(rawQuery, orderBy);
+        }
+
+        internal override SecurityDevice Get(DataContext context, Guid key)
 		{
 			var device = base.Get(context, key);
 
@@ -282,10 +304,20 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 	/// </summary>
 	public class SecurityPolicyPersistenceService : BaseDataPersistenceService<Core.Model.Security.SecurityPolicy, DbSecurityPolicy>
 	{
-		/// <summary>
-		/// Updating policies is a security risk and not permitted... ever
-		/// </summary>
-		public override Core.Model.Security.SecurityPolicy UpdateInternal(DataContext context, Core.Model.Security.SecurityPolicy data)
+        protected override SqlStatement AppendOrderBy(SqlStatement rawQuery, ModelSort<SecurityPolicy>[] orderBy)
+        {
+            if (orderBy == null || orderBy.Length == 0)
+                orderBy = new ModelSort<SecurityPolicy>[]
+                {
+                    new ModelSort<SecurityPolicy>(o=>o.CreationTime, Core.Model.Map.SortOrderType.OrderByDescending)
+                };
+            return base.AppendOrderBy(rawQuery, orderBy);
+        }
+
+        /// <summary>
+        /// Updating policies is a security risk and not permitted... ever
+        /// </summary>
+        public override Core.Model.Security.SecurityPolicy UpdateInternal(DataContext context, Core.Model.Security.SecurityPolicy data)
 		{
 			throw new AdoFormalConstraintException(AdoFormalConstraintType.UpdatedReadonlyObject);
 		}
@@ -296,14 +328,26 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 	/// </summary>
 	public class SecurityRolePersistenceService : BaseDataPersistenceService<Core.Model.Security.SecurityRole, DbSecurityRole>
 	{
-		/// <summary>
-		/// Gets the specified context.
-		/// </summary>
-		/// <param name="context">The context.</param>
-		/// <param name="key">The key.</param>
-		/// <param name="principal">The principal.</param>
-		/// <returns>Returns a security role instance.</returns>
-		internal override SecurityRole Get(DataContext context, Guid key)
+
+        protected override SqlStatement AppendOrderBy(SqlStatement rawQuery, ModelSort<SecurityRole>[] orderBy)
+        {
+            if (orderBy == null || orderBy.Length == 0)
+                orderBy = new ModelSort<SecurityRole>[]
+                {
+                    new ModelSort<SecurityRole>(o=>o.UpdatedTime, Core.Model.Map.SortOrderType.OrderByDescending),
+                    new ModelSort<SecurityRole>(o=>o.CreationTime, Core.Model.Map.SortOrderType.OrderByDescending)
+                };
+            return base.AppendOrderBy(rawQuery, orderBy);
+        }
+
+        /// <summary>
+        /// Gets the specified context.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="principal">The principal.</param>
+        /// <returns>Returns a security role instance.</returns>
+        internal override SecurityRole Get(DataContext context, Guid key)
 		{
 			var role = base.Get(context, key);
 
@@ -412,14 +456,26 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 	/// </summary>
 	public class SecurityUserPersistenceService : BaseDataPersistenceService<Core.Model.Security.SecurityUser, DbSecurityUser>
 	{
-		/// <summary>
-		/// Insert the specified object
-		/// </summary>
-		/// <param name="context">Context.</param>
-		/// <param name="data">Data.</param>
-		/// <param name="principal">The principal.</param>
-		/// <returns>Core.Model.Security.SecurityUser.</returns>
-		public override Core.Model.Security.SecurityUser InsertInternal(DataContext context, Core.Model.Security.SecurityUser data)
+
+        protected override SqlStatement AppendOrderBy(SqlStatement rawQuery, ModelSort<SecurityUser>[] orderBy)
+        {
+            if (orderBy == null || orderBy.Length == 0)
+                orderBy = new ModelSort<SecurityUser>[]
+                {
+                    new ModelSort<SecurityUser>(o=>o.UpdatedTime, Core.Model.Map.SortOrderType.OrderByDescending),
+                    new ModelSort<SecurityUser>(o=>o.CreationTime, Core.Model.Map.SortOrderType.OrderByDescending)
+                };
+            return base.AppendOrderBy(rawQuery, orderBy);
+        }
+
+        /// <summary>
+        /// Insert the specified object
+        /// </summary>
+        /// <param name="context">Context.</param>
+        /// <param name="data">Data.</param>
+        /// <param name="principal">The principal.</param>
+        /// <returns>Core.Model.Security.SecurityUser.</returns>
+        public override Core.Model.Security.SecurityUser InsertInternal(DataContext context, Core.Model.Security.SecurityUser data)
 		{
 			var retVal = base.InsertInternal(context, data);
 

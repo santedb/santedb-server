@@ -102,7 +102,9 @@ namespace SanteDB.Core.Security
             foreach (var pol in activePolicies)
                 if (policyInstance == null)
                     policyInstance = pol;
-                else if (pol.Rule < policyInstance.Rule)
+                else if (pol.Rule < policyInstance.Rule || // More restrictive
+                    pol.Policy.Oid.Length > policyInstance.Policy.Oid.Length // More specific
+                    )
                     policyInstance = pol;
 
             if (policyInstance == null)

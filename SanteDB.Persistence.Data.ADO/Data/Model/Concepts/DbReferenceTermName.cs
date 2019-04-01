@@ -90,5 +90,15 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Concepts
         /// </summary>
         [Column("phon_alg_id"), ForeignKey(typeof(DbPhoneticAlgorithm), nameof(DbPhoneticAlgorithm.Key))]
         public Guid PhoneticAlgorithm { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether obsoleted by key is specified (for undelete)
+        /// </summary>
+        public bool ObsoletedByKeySpecified { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether obsoletion time is specified
+        /// </summary>
+        public bool ObsoletionTimeSpecified { get; set; }
     }
 }

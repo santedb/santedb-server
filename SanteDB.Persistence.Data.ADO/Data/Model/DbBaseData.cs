@@ -44,6 +44,15 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         /// Gets or sets the obsoletion time
         /// </summary>
         DateTimeOffset? ObsoletionTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the obsoleted by is specified (specifically null)
+        /// </summary>
+        bool ObsoletedByKeySpecified { get; set; }
+        /// <summary>
+        /// Gets or sets whether to obsoletion time is specified (specifically null)
+        /// </summary>
+        bool ObsoletionTimeSpecified { get; set; }
     }
 
     /// <summary>

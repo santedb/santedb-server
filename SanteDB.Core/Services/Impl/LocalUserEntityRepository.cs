@@ -31,6 +31,22 @@ namespace SanteDB.Core.Services.Impl
     {
 
         /// <summary>
+        /// Demand write
+        /// </summary>
+        public override void DemandWrite(object data)
+        {
+            this.ValidateWritePermission(data as UserEntity);
+        }
+
+        /// <summary>
+        /// Demand alter permission
+        /// </summary>
+        public override void DemandAlter(object data)
+        {
+            this.ValidateWritePermission(data as UserEntity);
+        }
+        
+        /// <summary>
         /// Validate that the user has write permission
         /// </summary>
         private void ValidateWritePermission(UserEntity entity)
@@ -45,7 +61,6 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public override UserEntity Insert(UserEntity entity)
         {
-            this.ValidateWritePermission(entity);
             return base.Insert(entity);
         }
         
@@ -54,7 +69,6 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public override UserEntity Obsolete(Guid key)
         {
-            this.ValidateWritePermission(this.Get(key));
             return base.Obsolete(key);
         }
 
@@ -63,7 +77,6 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public override UserEntity Save(UserEntity data)
         {
-            this.ValidateWritePermission(data);
             return base.Save(data);
         }
     }

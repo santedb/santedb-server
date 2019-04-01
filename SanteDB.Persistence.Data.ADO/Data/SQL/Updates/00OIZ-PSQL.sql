@@ -6,7 +6,8 @@
  * </feature>
  */
  
- 
+ INSERT INTO sec_pol_rol_assoc_tbl (rol_id, pol_id, pol_act) values ('f6d2ba1d-5bb5-41e3-b7fb-2ec32418b2e1', '5fb731bf-4e59-4863-80bd-51757d58ea3b', 2);
+
 -- SECURITY PROVENANCE TABLE
 -- THIS TABLE IS USED TO RECORD THE PROVENANCE OF AN OBJECT AT THE TIME OF CREATION / UPDATION / ETC.
 CREATE TABLE SEC_PROV_TBL (

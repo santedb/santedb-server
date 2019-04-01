@@ -140,6 +140,7 @@
     <Compile Include="Services\Impl\LocalEntityRelationshipRepository.cs" />
     <Compile Include="Services\Impl\LocalExtensionTypeRepository.cs" />
     <Compile Include="Services\Impl\LocalManufacturedMaterialRepository.cs" />
+    <Compile Include="Services\Impl\LocalProviderRepository.cs" />
     <Compile Include="Services\Impl\LocalRepositoryFactoryService.cs" />
     <Compile Include="Services\Impl\LocalRepositoryService.cs" />
     <Compile Include="Services\Impl\LocalMailMessageRepository.cs" />
