@@ -63,4 +63,5 @@ using System.Runtime.InteropServices;
 [assembly: PluginTraceSource(SanteDBConstants.MapTraceSourceName)]
 [assembly: PluginTraceSource(SanteDBConstants.SecurityTraceSourceName)]
 [assembly: PluginTraceSource(SanteDBConstants.ServiceTraceSourceName)]
+[assembly: PluginTraceSource(SanteDBConstants.ServiceTraceSourceName + ".AppletManager")]
 [assembly: PluginTraceSource(SanteDBConstants.QueueTraceSourceName)]

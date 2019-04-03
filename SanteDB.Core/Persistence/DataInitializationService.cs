@@ -212,7 +212,7 @@ namespace SanteDB.Core.Persistence
                 foreach (var de in ds.Exec.Where(o => o.InvariantName == isqlp?.InvariantName))
                 {
                     this.m_traceSource.TraceInfo("Executing post-dataset SQL instructions for {0}...", ds.Id);
-                    isqlp.Execute(de.QueryText);
+                    isqlp.ExecuteNonQuery(de.QueryText);
                 }
                 this.m_traceSource.TraceInfo("Applied {0} changes", ds.Action.Count);
 

@@ -147,6 +147,7 @@
     <Compile Include="Services\AdoPolicyInformationService.cs" />
     <Compile Include="Services\AdoRoleProvider.cs" />
     <Compile Include="Services\AdoSessionProvider.cs" />
+    <Compile Include="Services\AdoSubscriptionExecutor.cs" />
     <Compile Include="Services\Persistence\EntityIdentifierPersistenceService.cs" />
     <Compile Include="Services\IAdoPersistenceService.cs" />
     <Compile Include="Services\Persistence\ActDerivedPersistenceService.cs" />

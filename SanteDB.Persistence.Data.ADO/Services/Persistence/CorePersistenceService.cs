@@ -139,7 +139,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             if (!this.m_persistenceService.GetConfiguration().SingleThreadFetch)
             {
-                return results.AsParallel().Select(o =>
+                return results.AsParallel().AsOrdered().Select(o =>
                 {
                     var subContext = context;
                     var newSubContext = results.Count() > 1;
@@ -149,9 +149,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         if (newSubContext) subContext = subContext.OpenClonedContext();
 
                         if (o is Guid)
-                            return new { order = idx, data = this.Get(subContext, (Guid)o) };
+                            return this.Get(subContext, (Guid)o);
                         else
-                            return new { order = idx, data = this.CacheConvert(o, subContext) };
+                            return this.CacheConvert(o, subContext);
                     }
                     catch (Exception e)
                     {
@@ -163,7 +163,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         if (newSubContext)
                             subContext.Dispose();
                     }
-                }).OrderBy(o=>o.order).Select(o=>o.data);
+                });
             }
             else
                 return results.Select(o =>
@@ -230,31 +230,23 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 // Count = 0 means we're not actually fetching anything so just hit the db
                 if (count != 0)
                 {
+
                     domainQuery = this.AppendOrderBy(domainQuery, orderBy);
+                    if (count == 1)
+                        domainQuery.Limit(1);
 
                     // Only one is requested, or there is no future query coming back so no savings in querying the entire dataset
-                    if (count <= 1 || queryId == Guid.Empty)
-                    {
-                        if (includeCount)
-                            totalResults = context.Count(domainQuery);
-                        else
-                            totalResults = 0;
-                        domainQuery = domainQuery.Offset(offset).Limit(count ?? 100);
-                        return this.DomainQueryInternal<TQueryReturn>(context, domainQuery).OfType<Object>();
-                    }
+                    var retVal = this.DomainQueryInternal<TQueryReturn>(context, domainQuery).OfType<Object>();
+                    if (includeCount)
+                        totalResults = retVal.Count();
                     else
-                    {
-                        var retVal = this.DomainQueryInternal<TQueryReturn>(context, domainQuery).OfType<Object>();
-                        if (includeCount)
-                            totalResults = retVal.Count();
-                        else
-                            totalResults = 0;
+                        totalResults = 0;
 
-                        // We have a query identifier and this is the first frame, freeze the query identifiers
+                    // We have a query identifier and this is the first frame, freeze the query identifiers
+                    if(queryId != Guid.Empty)
                         this.AddQueryResults<TQueryReturn>(context, query, queryId, offset, retVal, totalResults, orderBy);
 
-                        return retVal.Skip(offset).Take(count ?? 100);
-                    }
+                    return retVal.Skip(offset).Take(count ?? 100);
                 }
                 else
                 {

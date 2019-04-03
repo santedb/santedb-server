@@ -391,7 +391,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     if(!t.IsGenericType || 
                         t.IsGenericType && (this.GetConfiguration().AllowedResources.Count == 0 ||
                         this.GetConfiguration().AllowedResources.Contains(t.GetGenericArguments()[0].GetCustomAttribute<XmlTypeAttribute>()?.TypeName)))
-	                    (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(t);
+	                    ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(t);
 
 					// Add to cache since we're here anyways
 
@@ -444,7 +444,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         else
                             pclass = typeof(GenericBasePersistenceService<,>);
                         pclass = pclass.MakeGenericType(modelClassType, domainClassType);
-                        (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(pclass);
+                        ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(pclass);
                         // Add to cache since we're here anyways
                         this.m_persistenceCache.Add(modelClassType, Activator.CreateInstance(pclass) as IAdoPersistenceService);
                     }
@@ -461,7 +461,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             pclass = typeof(GenericIdentityPersistenceService<,>);
 
                         pclass = pclass.MakeGenericType(modelClassType, domainClassType);
-                        (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(pclass);
+                        ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(pclass);
                         this.m_persistenceCache.Add(modelClassType, Activator.CreateInstance(pclass) as IAdoPersistenceService);
                     }
                     else
@@ -474,6 +474,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 this.m_tracer.TraceEvent(EventLevel.Error,  "Error initializing local persistence: {0}", e);
                 throw e;
             }
+
+            ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(typeof(AdoSubscriptionExector));
 
             // Bind some basic service stuff
             ApplicationServiceContext.Current.GetService<IDataPersistenceService<Core.Model.Security.SecurityUser>>().Inserting += (o, e) =>
@@ -512,7 +514,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// Execute the SQL provided
         /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
-        public void Execute(string sql)
+        public void ExecuteNonQuery(string sql)
         {
             using (var conn = this.GetConfiguration().Provider.GetWriteConnection())
             {

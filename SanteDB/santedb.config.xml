@@ -85,19 +85,21 @@
       <add name="SanteDB.OrmLite.FirebirdSQL" filter="Warning" />
       <add name="SanteDB.OrmLite" filter="Warning" />
       <add name="SanteDB.Auditing.ADO" filter="Warning" />
-      <add name="SanteDB.Persistence.Data.ADO.Identity" filter="Warning" />
-      <add name="SanteDB.Persistence.Data.ADO" filter="Verbose" />
+      <add name="SanteDB.Persistence.Data.ADO" filter="Warning" />
       <add name="SanteDB.Persistence.Diagnostics.Email" filter="Warning" />
       <add name="SanteDB.Persistence.Diagnostics.Jira" filter="Warning" />
       <add name="SanteDB.Persistence.MDM" filter="Warning" />
       <add name="SanteDB.Tools.DataSandbox" filter="Warning" />
       <add name="SanteDB.Warehouse.ADO" filter="Warning" />
+      <add name="SanteDB.Rest.Common.ResourceHandlerTool" filter="Error"/>
+      <add name="SanteDB.Core.DataSet" filter="Warning"/>
+      <add name="SanteDB.Core.AppletManager" filter="Informational"/>
     </sources>
     <writers>
-      <add name="main" initializationData="santedb.log" filter="Warning">
+      <add name="main" initializationData="santedb.log" filter="Informational">
         <writer>SanteDB.Core.Diagnostics.RolloverTextWriterTraceWriter, SanteDB.Core, Version=1.31.0.23444, Culture=neutral, PublicKeyToken=null</writer>
       </add>
-      <add name="console" initializationData="santedb.log" filter="Warning">
+      <add name="console" initializationData="santedb.log" filter="Informational">
         <writer>SanteDB.Core.Diagnostics.ConsoleTraceWriter, SanteDB.Core, Version=1.31.0.23444, Culture=neutral, PublicKeyToken=null</writer>
       </add>
     </writers>
@@ -450,7 +452,7 @@
            readOnlyConnectionString="SanteDBWarehouse"
            traceSql="false"
            providerType="SanteDB.OrmLite.Providers.Postgres.PostgreSQLProvider, SanteDB.OrmLite, Version=1.10.0.0" />
-  <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="4">
+  <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="32">
     <serviceProviders>
 
       <!-- Core Services -->
@@ -488,6 +490,8 @@
       <add type="SanteDB.Core.Services.Impl.LocalMailMessageRepository, SanteDB.Core, Version=1.10.0.24160, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Services.Impl.LocalStockManagementRepositoryService, SanteDB.Core, Version=1.10.0.24160, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Services.Impl.LocalTagPersistenceService, SanteDB.Core, Version=1.10.0.24160, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Core.Applets.Services.Impl.AppletSubscriptionRepository, SanteDB.Core.Applets, Version=1.30.0.0, Culture=neutral, PublicKeyToken=null"/>
+      
       <!--<add type="SanteDB.Core.Security.Audit.AuditDaemonService, SanteDB.Core, Version=1.10.0.24160, Culture=neutral, PublicKeyToken=null" />-->
 
       <!-- Data Migration & Management -->

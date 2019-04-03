@@ -65,7 +65,7 @@ namespace SanteDB.Core.Services.Impl
         private AppletConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AppletConfigurationSection>();
 
         // Tracer
-        private Tracer m_tracer = new Tracer(SanteDBConstants.ServiceTraceSourceName);
+        private Tracer m_tracer = new Tracer(SanteDBConstants.ServiceTraceSourceName + ".AppletManager");
 
         /// <summary>
         /// Indicates whether the service is running 
@@ -359,7 +359,7 @@ namespace SanteDB.Core.Services.Impl
                 else
                 {
                     this.m_tracer.TraceEvent(EventLevel.Verbose, "Scanning {0} for applets...", appletDir);
-                    foreach (var f in Directory.GetFiles(appletDir))
+                    foreach (var f in Directory.GetFiles(appletDir).OrderBy(o=>o.EndsWith(".sln.pak") ? 0 : 1))
                     {
                         // Try to open the file
                         this.m_tracer.TraceInfo("Loading {0}...", f);
@@ -381,8 +381,8 @@ namespace SanteDB.Core.Services.Impl
                             }
                             else if (this.m_fileDictionary.ContainsKey(pkg.Meta.Id))
                             {
-                                this.m_tracer.TraceEvent(EventLevel.Critical, "Duplicate package {0} is not permitted", pkg.Meta.Id);
-                                throw new DuplicateKeyException(pkg.Meta.Id);
+                                this.m_tracer.TraceEvent(EventLevel.Warning, "Skipping duplicate package {0}", pkg.Meta.Id);
+                                continue;
                             }
                             else if (this.Install(pkg, true))
                             {
@@ -463,7 +463,7 @@ namespace SanteDB.Core.Services.Impl
                 Directory.CreateDirectory(appletDir);
 
             // Install
-            var pakFile = Path.Combine(appletDir, solution.Meta.Id + ".sln.pak");
+            var pakFile = Path.Combine(appletDir, solution.Meta.Id + ".pak");
             if (this.m_solutions.Any(o => o.Meta.Id == solution.Meta.Id) && File.Exists(pakFile) && !isUpgrade)
                 throw new InvalidOperationException($"Cannot replace {solution.Meta} unless upgrade is specifically specified");
             

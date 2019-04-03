@@ -70,6 +70,9 @@
   <ItemGroup>
     <Compile Include="ConsoleParameters.cs" />
     <Compile Include="ServiceUtil.cs" />
+    <None Include="Applets\santedb.admin.sln.pak">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Applets\santedb.core.sln.pak">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

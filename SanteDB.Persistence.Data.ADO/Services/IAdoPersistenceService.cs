@@ -54,7 +54,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         Object ToModelInstance(object domainInstance, DataContext context);
         
-
     }
 
     /// <summary>

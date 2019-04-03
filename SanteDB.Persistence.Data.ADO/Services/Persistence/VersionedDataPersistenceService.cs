@@ -198,15 +198,17 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             domainQuery = this.AppendOrderBy(domainQuery, orderBy);
 
-            // Only one is requested or we're not going to move the point foward
-            if (count <= 1 || queryId == Guid.Empty)
+            // Only perform count
+            if (count == 0)
             {
                 totalResults = context.Count(domainQuery);
-                domainQuery = domainQuery.Offset(offset).Limit(count.Value);
-                return context.Query<CompositeResult<TDomain, TDomainKey>>(domainQuery);
+                return new List<CompositeResult<TDomain, TDomainKey>>();
             }
             else
             {
+                if (count == 1)
+                    domainQuery.Limit(1);
+
                 var retVal = context.Query<CompositeResult<TDomain, TDomainKey>>(domainQuery);
 
                 if (countResults)
@@ -215,7 +217,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     totalResults = 0;
 
                 // Query id just get the UUIDs in the db
-                this.AddQueryResults<CompositeResult<TDomain, TDomainKey>>(context, query, queryId, offset, retVal, totalResults, orderBy);
+                if (queryId != Guid.Empty)
+                    this.AddQueryResults<CompositeResult<TDomain, TDomainKey>>(context, query, queryId, offset, retVal, totalResults, orderBy);
                 return retVal.Skip(offset).Take(count ?? 100);
             }
 
