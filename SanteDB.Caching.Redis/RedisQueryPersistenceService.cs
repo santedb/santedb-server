@@ -15,6 +15,7 @@ namespace SanteDB.Caching.Redis
     /// <summary>
     /// Represents a REDIS based query persistence service
     /// </summary>
+    [ServiceProvider("REDIS Query Persistence Service")]
     public class RedisQueryPersistenceService : IQueryPersistenceService, IDaemonService
     {
 

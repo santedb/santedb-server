@@ -76,6 +76,7 @@ namespace SanteDB.Core.Configuration
         /// Password regex
         /// </summary>
         [XmlAttribute("passwordRegex")]
+        [DisplayName("Password Regex")]
         [Description("Identifies the password regular expression")]
         public string PasswordRegex { get; set; }
 
@@ -83,7 +84,11 @@ namespace SanteDB.Core.Configuration
         /// Policy enforcement policy
         /// </summary>
         [XmlAttribute("pepExemptionPolicy")]
-        [Description("Identifies the policy enforcement exception")]
+        [DisplayName("PEP Exemption Policy")]
+        [Description("Identifies the policy enforcement exception." +
+            "When set, certain types of security principals will not be subject to PEP rules." + 
+            "DevicePrincipalsExempt indicates that userless principals should not be subject to PEP enforcement" + 
+            "UserPrincipalsExempt indicates that user principals should be should not be subject to PEP enforcement")]
         public PolicyEnforcementExemptionPolicy PepExemptionPolicy { get; set; }
 
         /// <summary>
@@ -92,12 +97,14 @@ namespace SanteDB.Core.Configuration
         [XmlElement("signing")]
         [Description("Describes the algorithm and key for signing data originating from this server")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
+        [DisplayName("Data Signatures")]
         public SecuritySignatureConfiguration Signatures { get; set; }
 
         /// <summary>
         /// Trusted publishers
         /// </summary>
         [XmlArray("trustedCertificates"), XmlArrayItem("add")]
+        [DisplayName("Trusted Certificates")]
         [Description("Individual X.509 certificate thumbprints to trust")]
         public ObservableCollection<string> TrustedCertificates { get; set; }
     }

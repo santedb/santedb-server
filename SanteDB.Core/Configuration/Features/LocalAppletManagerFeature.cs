@@ -20,7 +20,9 @@
 using SanteDB.Core.Services.Impl;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,7 +47,10 @@ namespace SanteDB.Core.Configuration.Features
         /// </summary>
         public override IEnumerable<IConfigurationTask> CreateInstallTasks()
         {
-            var conf = this.Configuration as AppletConfigurationSection;
+            var conf = this.Configuration as AppletConfigurationSection ?? new AppletConfigurationSection()
+            {
+                AppletDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "applets")
+            };
             if (conf.TrustedPublishers.Count == 0)
                 conf.TrustedPublishers.AddRange(new String[]
                     {

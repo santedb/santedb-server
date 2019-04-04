@@ -62,6 +62,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         /// </summary>
         [XmlAttribute("staOnly")]
         [Category("Performance")]
+        [DisplayName("Single-Threaded Fetch")]
         [Description("When set, instructs ADO.NET data fetches to be on a single thread")]
         public bool SingleThreadFetch { get; set; }
 
@@ -70,6 +71,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         /// </summary>
         [XmlAttribute("maxRequests")]
         [Category("Performance")]
+        [DisplayName("Request Throttling")]
         [Description("When set, instructs the ADO.NET data provider to limit queries")]
         public int MaxRequests { get; set; }
 
@@ -78,6 +80,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         /// </summary>
         [XmlAttribute("autoUpdateExisting")]
         [Category("Behavior")]
+        [DisplayName("Auto-Update Existing Resource")]
         [Description("When set, instructs the provider to automatically update existing records when Insert() is called")]
         public bool AutoUpdateExisting { get; set; }
 
@@ -86,6 +89,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         /// </summary>
         [XmlAttribute("autoInsertChildren")]
         [Category("Behavior")]
+        [DisplayName("Auto-Insert Child Objects")]
         [Description("When set, instructs the provider to automatically insert any child objects to ensure integrity of the object")]
         public bool AutoInsertChildren { get; set; }
 
@@ -96,6 +100,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         [XmlArray("corrections"), XmlArrayItem("add")]
         [Description("Identifies the data patches to be executed")]
         [Category("Behavior")]
+        [DisplayName("Data Corrections")]
         [Editor("System.Windows.Forms.Design.StringCollectionEditor, System.Design, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", typeof(UITypeEditor))]
         public List<String> DataCorrectionKeys { get; set; }
 
@@ -103,6 +108,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         /// Allowed resources
         /// </summary>
         [XmlArray("resources"), XmlArrayItem("add")]
+        [DisplayName("Allowed Resources")]
         [Description("When set, instructs the provider to only provide access for the specified types")]
         [Editor("SanteDB.Configuration.Editors.ResourceCollectionEditor, SanteDB.Configuration, Version=1.10.0.0", "System.Drawing.Design.UITypeEditor, System.Drawing, Version=4.0.0.0")]
         [TypeConverter("SanteDB.Configuration.Converters.StringCollectionRenderConverter, SanteDB.Configuration, Version=1.10.0.0")]
@@ -113,6 +119,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         /// </summary>
         [XmlAttribute("prepareStatements")]
         [Category("Performance")]
+        [DisplayName("Prepare SQL Queries")]
         [Description("When true, instructs the provider to prepare statements")]
         public bool PrepareStatements { get; set; }
     }
