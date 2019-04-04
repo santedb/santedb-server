@@ -75,7 +75,7 @@ namespace SanteDB.Core.Services.Daemons
             {
                 ApplicationServiceContext.Current = ApplicationServiceContext.Current;
                 if (ApplicationServiceContext.Current.GetService<IDataReferenceResolver>() == null)
-                    (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(typeof(AppletDataReferenceResolver));
+                    ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(typeof(AppletDataReferenceResolver));
                 new AppletBusinessRuleLoader().LoadRules();
             };
             this.Started?.Invoke(this, EventArgs.Empty);

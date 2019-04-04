@@ -283,7 +283,7 @@ namespace SanteDB.Caching.Redis
                 //{
                 // Add
 
-                var redisDb = this.m_connection.GetDatabase();
+                var redisDb = this.m_connection.GetDatabase(RedisCacheConstants.CacheDatabaseId);
                 var existing = redisDb.KeyExists(data.Key.Value.ToString());
                 redisDb.HashSet(data.Key.Value.ToString(), this.SerializeObject(data));
 #if DEBUG
@@ -315,7 +315,7 @@ namespace SanteDB.Caching.Redis
                     return null;
 
                 // Add
-                var redisDb = this.m_connection.GetDatabase();
+                var redisDb = this.m_connection.GetDatabase(RedisCacheConstants.CacheDatabaseId);
                 return this.DeserializeObject(redisDb.HashGetAll(key.ToString()));
             }
             catch (Exception e)
@@ -347,7 +347,7 @@ namespace SanteDB.Caching.Redis
                 return;
             // Add
             var existing = this.GetCacheItem(key);
-            var redisDb = this.m_connection.GetDatabase();
+            var redisDb = this.m_connection.GetDatabase(RedisCacheConstants.CacheDatabaseId);
             redisDb.KeyDelete(key.ToString());
             this.EnsureCacheConsistency(new DataCacheEventArgs(existing), true);
 
@@ -411,8 +411,8 @@ namespace SanteDB.Caching.Redis
             catch (Exception e)
             {
                 this.m_tracer.TraceError("Error starting REDIS caching, will switch to no-caching : {0}", e);
-                (ApplicationServiceContext.Current as IServiceManager).RemoveServiceProvider(typeof(RedisCacheService));
-                (ApplicationServiceContext.Current as IServiceManager).RemoveServiceProvider(typeof(IDataCachingService));
+                ApplicationServiceContext.Current.GetService<IServiceManager>().RemoveServiceProvider(typeof(RedisCacheService));
+                ApplicationServiceContext.Current.GetService<IServiceManager>().RemoveServiceProvider(typeof(IDataCachingService));
                 return false;
             }
         }

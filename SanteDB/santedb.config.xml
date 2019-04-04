@@ -481,6 +481,7 @@
       <!-- Data Services -->
       <!--<add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />-->
       <add type="SanteDB.Caching.Redis.RedisCacheService, SanteDB.Caching.Redis, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Caching.Redis.RedisQueryPersistenceService, SanteDB.Caching.Redis, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Caching.Memory.MemoryQueryPersistenceService, SanteDB.Caching.Memory, Version=1.10.0.24160, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPersistenceService, SanteDB.Persistence.Data.ADO, Version=1.10.0.24162, Culture=neutral, PublicKeyToken=null" />
 

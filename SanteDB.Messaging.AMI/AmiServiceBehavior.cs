@@ -147,7 +147,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             var serviceOptions = new ServiceOptions
             {
                 InterfaceVersion = "1.0.0.0",
-                Endpoints = (ApplicationServiceContext.Current as IServiceManager).GetServices().OfType<IApiEndpointProvider>().Select(o =>
+                Endpoints = ApplicationServiceContext.Current.GetService<IServiceManager>().GetServices().OfType<IApiEndpointProvider>().Select(o =>
                     new ServiceEndpointOptions(o)
                     {
                         BaseUrl = o.Url.Select(url => {
@@ -215,7 +215,7 @@ namespace SanteDB.Messaging.AMI.Wcf
                 UsedMemory = GC.GetTotalMemory(false),
                 Version = Environment.Version.ToString(),
             };
-            retVal.ApplicationInfo.ServiceInfo = (ApplicationServiceContext.Current as IServiceManager).GetServices().Distinct().Select(o => new DiagnosticServiceInfo(o)).ToList();
+            retVal.ApplicationInfo.ServiceInfo = ApplicationServiceContext.Current.GetService<IServiceManager>().GetServices().Distinct().Select(o => new DiagnosticServiceInfo(o)).ToList();
             return retVal;
         }
 

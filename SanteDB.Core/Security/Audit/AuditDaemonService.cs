@@ -102,7 +102,7 @@ namespace SanteDB.Core.Security.Audit
                    
 
                     // Scan for IRepositoryServices and bind to their events as well
-                    foreach (var svc in (ApplicationServiceContext.Current as IServiceManager).GetServices().OfType<IAuditEventSource>())
+                    foreach (var svc in ApplicationServiceContext.Current.GetService<IServiceManager>().GetServices().OfType<IAuditEventSource>())
                     {
                         // Audits from the audit repository itself need to be audited however they are not audit data
                         if (svc is IAuditRepositoryService)

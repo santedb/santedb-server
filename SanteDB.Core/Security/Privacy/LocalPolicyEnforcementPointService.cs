@@ -124,7 +124,7 @@ namespace SanteDB.Core.Security.Privacy
         /// </summary>
         private void BindEvents()
         {
-            var svcManager = (ApplicationServiceContext.Current as IServiceManager);
+            var svcManager = ApplicationServiceContext.Current.GetService<IServiceManager>();
 
             this.m_tracer.TraceInfo("Starting bind to persistence services...");
 

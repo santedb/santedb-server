@@ -152,7 +152,7 @@ namespace SanteDB.Persistence.Reporting.ADO
 					try
 					{
 						this.traceSource.TraceEvent(EventLevel.Verbose, "Loading {0}...", t.AssemblyQualifiedName);
-						(ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(t);
+						ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(t);
 					}
 					catch (Exception e)
 					{

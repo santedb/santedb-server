@@ -108,7 +108,7 @@ namespace SanteDB.Core.Services.Impl
             foreach (var t in repositoryServices)
             {
                 this.m_tracer.TraceInfo("Adding repository service for {0}...", t);
-                (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(t);
+                ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(t);
             }
 
             ApplicationServiceContext.Current.Started += (o, e) =>
@@ -123,13 +123,13 @@ namespace SanteDB.Core.Services.Impl
                         {
                             this.m_tracer.TraceInfo("Adding Act repository service for {0}...", t.Name);
                             var mrst = typeof(GenericLocalActRepository<>).MakeGenericType(t);
-                            (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(mrst);
+                            ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(mrst);
                         }
                         else if (typeof(Entity).IsAssignableFrom(t))
                         {
                             this.m_tracer.TraceInfo("Adding Entity repository service for {0}...", t.Name);
                             var mrst = typeof(GenericLocalClinicalDataRepository<>).MakeGenericType(t);
-                            (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(mrst);
+                            ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(mrst);
                         }
                     }
                 }

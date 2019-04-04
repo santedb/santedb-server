@@ -108,6 +108,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             var persistenceType = typeof(IDataPersistenceService<>).MakeGenericType(subscription.ResourceType);
             var persistenceInstance = ApplicationServiceContext.Current.GetService(persistenceType) as IAdoPersistenceService;
             var queryService = ApplicationServiceContext.Current.GetService<IQueryPersistenceService>();
+            var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
 
             // Get the definition
             var definition = subscription.ServerDefinitions.FirstOrDefault(o => o.InvariantName == m_configuration.Provider.Invariant);
@@ -135,8 +136,21 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     .AsOrdered()
                     .Select(o =>
                     {
-                        using (var ctx = m_configuration.Provider.GetReadonlyConnection())
-                            return persistenceInstance.Get(ctx, o);
+                        try
+                        {
+                            using (var ctx = m_configuration.Provider.GetReadonlyConnection())
+                            {
+                                ctx.Open();
+                                var retVal = persistenceInstance.Get(ctx, o);
+                                cacheService?.Add(retVal as IdentifiedData);
+                                return retVal;
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            this.m_tracer.TraceError("Error fetching query results for {0}: {1}", queryId, e);
+                            throw new DataPersistenceException("Error fetching query results", e);
+                        }
                     }).ToList();
             }
             else {
@@ -222,7 +236,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                     try
                                     {
                                         using (var subConn = connection.OpenClonedContext())
-                                            return persistenceInstance.ToModelInstance(o, subConn);
+                                        {
+                                            var retVal = persistenceInstance.ToModelInstance(o, subConn);
+                                            cacheService?.Add(retVal as IdentifiedData);
+                                            return retVal;
+                                        }
                                     }
                                     catch (Exception e)
                                     {

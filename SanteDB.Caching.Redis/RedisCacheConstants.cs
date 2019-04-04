@@ -15,5 +15,15 @@ namespace SanteDB.Caching.Redis
         /// Trace source name
         /// </summary>
         public const string TraceSourceName = "SanteDB.Caching.Redis";
+
+        /// <summary>
+        /// Database ID for cache
+        /// </summary>
+        public const int CacheDatabaseId = 0;
+
+        /// <summary>
+        /// Database identifier
+        /// </summary>
+        public const int QueryDatabaseId = 1;
     }
 }
