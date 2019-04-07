@@ -108,7 +108,7 @@
   <section xsi:type="FileSystemQueueConfigurationSection" queueRoot=".\queue" />
   <section xsi:type="DataConfigurationSection">
     <connectionString name="FBSQL" value="initial catalog=|DataDirectory|\sdb_base.fdb;server type=Embedded;user id=sysdba" provider="Fbsql" />
-    <connectionString name="PSQL" value="server=localhost; port=5432; database=timr_upgrade; user id=postgres; password=postgres; pooling=true; MinPoolSize=10; MaxPoolSize=30; Timeout=120; Command Timeout=120" provider="Npgsql" />
+    <connectionString name="PSQL" value="server=localhost; port=5433; database=timr_upgrade; user id=postgres; password=postgres; pooling=true; MinPoolSize=10; MaxPoolSize=30; Timeout=120; Command Timeout=120" provider="Npgsql" />
     <connectionString name="AUDIT" value="server=localhost;port=5433; database=santedb; user id=postgres; password=postgres; pooling=true; MinPoolSize=10; MaxPoolSize=30; Timeout=10; " provider="Npgsql"/>
   </section>
   <section xsi:type="AppletConfigurationSection" appletDirectory=".\applets" allowUnsignedApplets="true">
