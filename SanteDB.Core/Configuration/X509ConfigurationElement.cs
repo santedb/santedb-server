@@ -39,18 +39,24 @@ namespace SanteDB.Core.Configuration
         /// The find type
         /// </summary>
         [XmlAttribute("findType")]
+        [DisplayName("Certificate Search")]
+        [Description("Identifies the algorithm to use to locate the security certificate")]
         public X509FindType FindType { get; set; }
 
         /// <summary>
         /// The store name
         /// </summary>
         [XmlAttribute("storeName")]
+        [DisplayName("X509 Store")]
+        [Description("Identifies the secure X.509 certificate store to search")]
         public StoreName StoreName { get; set; }
 
         /// <summary>
         /// The store location
         /// </summary>
         [XmlAttribute("storeLocation")]
+        [DisplayName("X509 Location")]
+        [Description("Identifies the location of the X.509 certificate store to load from")]
         public StoreLocation StoreLocation { get; set; }
 
         /// <summary>
@@ -78,6 +84,8 @@ namespace SanteDB.Core.Configuration
         /// The find value
         /// </summary>
         [XmlAttribute("findValue")]
+        [DisplayName("Certificate Identification")]
+        [Description("The certificate value to look for in the secure store")]
         [ReadOnly(true)]
         public string FindValue { get; set; }
 
@@ -86,6 +94,7 @@ namespace SanteDB.Core.Configuration
         /// </summary>
         [XmlIgnore]
         [Description("The X509 certificate to use")]
+        [DisplayName("Certificate")]
         [Editor("SanteDB.Configuration.Editors.X509Certificate2Editor, SanteDB.Configuration, Version=1.0.0.0", typeof(UITypeEditor))]
         public X509Certificate2 Certificate
         {

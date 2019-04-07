@@ -52,6 +52,7 @@ namespace SanteDB.Core.Configuration
         /// The unique name for the signer
         /// </summary>
         [XmlAttribute("name")]
+        [DisplayName("Issuer")]
         [Description("The name of the signature authority this represents")]
         public string IssuerName { get; set; }
 
@@ -59,6 +60,7 @@ namespace SanteDB.Core.Configuration
         /// Signature mode
         /// </summary>
         [XmlAttribute("alg")]
+        [DisplayName("Signing Algorithm")]
         [Description("The type of signature algorithm to use")]
         public SignatureAlgorithm Algorithm {
             get => this.m_algorithm;
@@ -80,6 +82,7 @@ namespace SanteDB.Core.Configuration
         /// When using HMAC256 signing this represents the server's secret
         /// </summary>
         [XmlAttribute("hmacKey")]
+        [DisplayName("HMAC256 Key")]
         [ReadOnly(true)]
         public byte[] Secret { get; set; }
 
@@ -88,6 +91,7 @@ namespace SanteDB.Core.Configuration
         /// </summary>
         [XmlIgnore]
         [Description("When using HS256 signing the secret to use")]
+        [DisplayName("HMAC256 Secret")]
         [PasswordPropertyText(true)]
         public string HmacSecret { get => "none"; set => this.Secret = value == null ? null : SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(value)); }
 

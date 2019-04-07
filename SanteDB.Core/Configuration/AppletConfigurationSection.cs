@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -53,18 +54,24 @@ namespace SanteDB.Core.Configuration
         /// Gets or sets the directory for applets to be loaded from
         /// </summary>
         [XmlAttribute("appletDirectory")]
+        [DisplayName("Applet Directory")]
+        [Description("Identifies the directory location where applets should be loaded")]
         public String AppletDirectory { get; set; }
 
         /// <summary>
         /// Allow unsigned applets to be installed
         /// </summary>
         [XmlAttribute("allowUnsignedApplets")]
+        [DisplayName("Allow Unsigned Code")]
+        [Description("Allows unsigned applets to be installed and executed on this server (NOT RECOMMENDED)")]
         public bool AllowUnsignedApplets { get; set; }
 
         /// <summary>
         /// Trusted publishers
         /// </summary>
         [XmlArray("trustedPublishers"), XmlArrayItem("add")]
+        [DisplayName("Trusted Publishers")]
+        [Description("Identifies the thumbprints of software publishers that are treated as TRUSTED in this environment")]
         public List<string> TrustedPublishers { get; set; }
 
     }
