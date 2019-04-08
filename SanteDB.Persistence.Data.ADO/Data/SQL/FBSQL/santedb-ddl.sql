@@ -2000,6 +2000,12 @@ INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uui
 --#!
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('fa8642cb-28e4-4e9e-bd7b-d6dc72b729b2'), '1.3.6.1.4.1.33349.3.1.5.9.2.0.10', 'Administer Data Warehouse', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 --#!
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('baa227aa-224d-4859-81b3-c1eb2750067f'), '1.3.6.1.4.1.33349.3.1.5.9.2.0.11', 'Access Audit Log', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('baa227aa-224d-4859-81b3-c1eb2750068f'), '1.3.6.1.4.1.33349.3.1.5.9.2.0.12', 'Administer Applets', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('baa227aa-224d-4859-81b3-c1eb2750069f'), '1.3.6.1.4.1.33349.3.1.5.9.2.0.13', 'Assign Policy', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('baa227aa-224d-4859-81b3-c1eb275006af'), '1.3.6.1.4.1.33349.3.1.5.9.2.2.5', 'Elevate Clinical Data', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+
+--#!
 
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('d15b96ab-646c-4c00-9a58-ea09eee67d7c'), '1.3.6.1.4.1.33349.3.1.5.9.2.1', 'Login', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 --#!

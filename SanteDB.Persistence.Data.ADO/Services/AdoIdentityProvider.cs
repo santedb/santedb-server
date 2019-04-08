@@ -203,7 +203,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public void ChangePassword(string userName, string newPassword, IPrincipal principal)
         {
-            if (!AuthenticationContext.Current.Principal.Identity.IsAuthenticated)
+            if (!principal.Identity.IsAuthenticated)
                 throw new SecurityException("Principal must be authenticated");
             // Password failed validation
             if (ApplicationServiceContext.Current.GetService<IPasswordValidatorService>()?.Validate(newPassword) == false)
@@ -228,11 +228,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             var policyDecisionService = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
                             var passwordHashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
-                            var pdpOutcome = policyDecisionService?.GetPolicyOutcome(AuthenticationContext.Current.Principal, PermissionPolicyIdentifiers.ChangePassword);
-                            if (userName != AuthenticationContext.Current.Principal.Identity.Name &&
+                            var pdpOutcome = policyDecisionService?.GetPolicyOutcome(principal, PermissionPolicyIdentifiers.ChangePassword);
+                            if (userName != principal.Identity.Name &&
                                 pdpOutcome.HasValue &&
                                 pdpOutcome != PolicyGrantType.Grant)
-                                throw new PolicyViolationException(AuthenticationContext.Current.Principal, PermissionPolicyIdentifiers.ChangePassword, pdpOutcome.Value);
+                                throw new PolicyViolationException(principal, PermissionPolicyIdentifiers.ChangePassword, pdpOutcome.Value);
 
                             user.Password = passwordHashingService.ComputeHash(newPassword);
                             user.SecurityHash = Guid.NewGuid().ToString();
@@ -284,7 +284,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             else if (String.IsNullOrEmpty(password))
                 throw new ArgumentNullException(nameof(password));
 
-            this.m_traceSource.TraceInfo("Creating identity {0} ({1})", userName, AuthenticationContext.Current.Principal);
+            this.m_traceSource.TraceInfo("Creating identity {0} ({1})", userName, principal);
 
             try
             {

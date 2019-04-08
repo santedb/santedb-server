@@ -125,7 +125,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             Assert.AreEqual("en", afterTest.ConceptNames[0].Language);
             Assert.IsTrue(afterTest.LoadCollection<ConceptName>("ConceptNames").Any(n => n.Name == "Test Code 1"));
             Assert.AreEqual("E", afterTest.ConceptNames[0].PhoneticCode);
-            Assert.IsNotNull(afterTest.LoadProperty<SecurityUser>("CreatedBy"));
+            Assert.IsNotNull(afterTest.LoadProperty<SecurityProvenance>("CreatedBy"));
 
             var originalId = afterTest.VersionKey;
 

@@ -47,7 +47,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             var principal = provider.Authenticate("admin@identitytest.com", "password");
             Assert.AreEqual("admin@identitytest.com", principal.Identity.Name);
             Assert.IsTrue(principal.Identity.IsAuthenticated);
-            Assert.AreEqual("Password", principal.Identity.AuthenticationType);
+            Assert.AreEqual("LOCAL", principal.Identity.AuthenticationType);
 
         }
 

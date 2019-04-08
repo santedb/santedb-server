@@ -322,7 +322,8 @@ namespace SanteDB.Persistence.Data.ADO.Test
 
             var afterInsert = base.DoTestInsert(p, s_authorization);
 
-            var result = base.DoTestQuery(o => o.CreationTime < DateTimeOffset.Now.AddDays(2), afterInsert.Key, s_authorization);
+            var qvalue = DateTimeOffset.Now.AddDays(2);
+            var result = base.DoTestQuery(o => o.CreationTime < qvalue, afterInsert.Key, s_authorization);
 
         }
     }

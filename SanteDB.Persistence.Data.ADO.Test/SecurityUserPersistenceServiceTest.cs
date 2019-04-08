@@ -7,6 +7,7 @@ using SanteDB.Core.Security.Services;
 using SanteDB.Core.TestFramework;
 using System;
 using System.Linq;
+using SanteDB.Core.Model;
 
 namespace SanteDB.Persistence.Data.ADO.Test
 {
@@ -77,7 +78,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             // Update
             Assert.IsNotNull(userAfterUpdate.UpdatedTime);
             Assert.IsNotNull(userAfterUpdate.PhoneNumber);
-            Assert.AreEqual(authContext.Identity.Name, userAfterUpdate.UpdatedBy.User.UserName);
+            Assert.AreEqual(authContext.Identity.Name, userAfterUpdate.LoadProperty<SecurityProvenance>("UpdatedBy").LoadProperty<SecurityUser>("User").UserName);
         }
 
         /// <summary>

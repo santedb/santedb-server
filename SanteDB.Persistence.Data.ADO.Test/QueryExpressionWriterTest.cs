@@ -121,8 +121,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
 
             Assert.IsTrue(query.SQL.Contains("SELECT * FROM pat_tbl"));
             Assert.IsTrue(query.SQL.Contains("INNER JOIN ent_vrsn_tbl"));
-            Assert.IsTrue(query.SQL.Contains("WITH"));
-            Assert.IsTrue(query.SQL.Contains("cte0"));
+            Assert.IsTrue(query.SQL.Contains("IN"));
             Assert.AreEqual(1, query.Arguments.Count());
         }
 
@@ -134,14 +133,13 @@ namespace SanteDB.Persistence.Data.ADO.Test
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            var query = m_builder.CreateQuery<Entity>(o => o.Identifiers.Any(i => i.Value == "123" && i.Authority.Oid == "1.2.3.4.6.7.8.9" || i.Value == "321" && i.Authority.Oid == "1.2.3.4.5.6.7.8") && o.ClassConceptKey == EntityClassKeys.Organization);
+            var query = m_builder.CreateQuery<Entity>(o => o.Identifiers.Any(i => i.Value == "123" && i.Authority.Oid == "1.2.3.4.6.7.8.9" || i.Value == "321" && i.Authority.Oid == "1.2.3.4.5.6.7.8") && o.ClassConceptKey == EntityClassKeys.Organization).Build();
             sw.Stop();
 
-            Assert.IsTrue(query.SQL.Contains("SELECT * FROM pat_tbl"));
-            Assert.IsTrue(query.SQL.Contains("INNER JOIN ent_vrsn_tbl"));
-            Assert.IsTrue(query.SQL.Contains("WITH"));
-            Assert.IsTrue(query.SQL.Contains("cte0"));
-            Assert.AreEqual(1, query.Arguments.Count());
+            Assert.IsTrue(query.SQL.Contains("SELECT * FROM ent_vrsn_tbl"));
+            Assert.IsTrue(query.SQL.Contains("INNER JOIN ent_tbl"));
+            Assert.IsTrue(query.SQL.Contains("IN"));
+            Assert.AreEqual(5, query.Arguments.Count());
         }
 
         /// <summary>
@@ -152,13 +150,12 @@ namespace SanteDB.Persistence.Data.ADO.Test
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            var query = m_builder.CreateQuery<Patient>(o => o.Participations.Where(guard => guard.ParticipationRole.Mnemonic == "RecordTarget").Any(sub => sub.PlayerEntity.ObsoletionTime == null));
+            var query = m_builder.CreateQuery<Patient>(o => o.Participations.Where(guard => guard.ParticipationRole.Mnemonic == "RecordTarget").Any(sub => sub.PlayerEntity.ObsoletionTime == null)).Build();
             sw.Stop();
 
             Assert.IsTrue(query.SQL.Contains("SELECT * FROM pat_tbl"));
             Assert.IsTrue(query.SQL.Contains("INNER JOIN ent_vrsn_tbl"));
-            Assert.IsTrue(query.SQL.Contains("WITH"));
-            Assert.IsTrue(query.SQL.Contains("cte0"));
+            Assert.IsTrue(query.SQL.Contains("IN"));
             Assert.AreEqual(1, query.Arguments.Count());
         }
 
@@ -176,9 +173,9 @@ namespace SanteDB.Persistence.Data.ADO.Test
 
             Assert.IsTrue(query.SQL.Contains("SELECT * FROM ent_vrsn_tbl"));
             Assert.IsTrue(query.SQL.Contains("INNER JOIN ent_tbl"));
-            Assert.IsTrue(query.SQL.Contains("WITH"));
-            Assert.IsTrue(query.SQL.Contains("cte0"));
-            Assert.AreEqual(1, query.Arguments.Count());
+            Assert.IsTrue(query.SQL.Contains("IN"));
+            Assert.IsTrue(query.SQL.Contains("mnemonic = ?"));
+            Assert.AreEqual(6, query.Arguments.Count());
         }
 
         /// <summary>
@@ -187,10 +184,10 @@ namespace SanteDB.Persistence.Data.ADO.Test
         [TestMethod]
         public void TestModelQueryShouldUseNonSerialized()
         {
-            var query = m_builder.CreateQuery<Entity>(o => o.Extensions.Any(e => e.ExtensionDisplay == "1"));
+            var query = m_builder.CreateQuery<Entity>(o => o.Extensions.Any(e => e.ExtensionDisplay == "1")).Build();
             Assert.IsTrue(query.SQL.Contains("SELECT * FROM ent_vrsn_tbl"));
             Assert.IsTrue(query.SQL.Contains("INNER JOIN ent_tbl"));
-            Assert.IsTrue(query.SQL.Contains("WITH"));
+            Assert.IsTrue(query.SQL.Contains("IN"));
             Assert.IsTrue(query.SQL.Contains("ext_disp"));
             Assert.AreEqual(1, query.Arguments.Count());
         }

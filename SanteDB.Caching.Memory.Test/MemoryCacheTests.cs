@@ -69,8 +69,8 @@ namespace SanteDB.Caching.Memory.Test
             // Now set the min age to 2 seconds
             MemoryCache.Current.SetMinAge(new TimeSpan(0, 0, 2));
             MemoryCache.Current.ReducePressure(); // this should reduce to 10
-            Thread.Sleep(1000); // Give the memory cache threads time to clean
-            Assert.AreEqual(10, MemoryCache.Current.GetSize());
+            Thread.Sleep(2000); // Give the memory cache threads time to clean
+            Assert.AreEqual(11, MemoryCache.Current.GetSize());
             MemoryCache.Current.SetMinAge(new TimeSpan(0, 0, 30));
 
         }

@@ -47,7 +47,8 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
                 valTblType = "ent_addr_cmp_val_tbl";
                 guardType = typeof(AddressComponentKeys);
                 componentType = typeof(EntityAddressComponent);
-                sqlStatement.Append($" INNER JOIN ent_addr_cmp_tbl AS {queryPrefix}ent_addr_cmp_tbl ON ({queryPrefix}ent_addr_cmp_tbl.addr_id = {queryPrefix}ent_addr_tbl.addr_id) ");
+                if (!sqlStatement.Build().SQL.Contains("INNER JOIN ent_addr_cmp_tbl"))
+                    sqlStatement.Append($" INNER JOIN ent_addr_cmp_tbl AS {queryPrefix}ent_addr_cmp_tbl ON ({queryPrefix}ent_addr_cmp_tbl.addr_id = {queryPrefix}ent_addr_tbl.addr_id) ");
             }
             else if (typeof(EntityName).IsAssignableFrom(tmodel))
             {
@@ -55,7 +56,8 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
                 valTblType = "phon_val_tbl";
                 guardType = typeof(NameComponentKeys);
                 componentType = typeof(EntityNameComponent);
-                sqlStatement.Append($" INNER JOIN ent_name_cmp_tbl AS {queryPrefix}ent_name_cmp_tbl ON ({queryPrefix}ent_name_cmp_tbl.name_id = {queryPrefix}ent_name_tbl.name_id) ");
+                if(!sqlStatement.Build().SQL.Contains("INNER JOIN ent_name_cmp_tbl"))
+                    sqlStatement.Append($" INNER JOIN ent_name_cmp_tbl AS {queryPrefix}ent_name_cmp_tbl ON ({queryPrefix}ent_name_cmp_tbl.name_id = {queryPrefix}ent_name_tbl.name_id) ");
             }
             else
                 return false;

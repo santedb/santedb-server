@@ -230,7 +230,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
         /// Private ctor
         /// </summary>
         private AdoClaimsIdentity(DbSecurityUser user, IEnumerable<DbSecurityRole> roles, bool isAuthenticated)
-            : base(user.UserName, isAuthenticated, "LOCAL")
+            : base(user.UserName, isAuthenticated, isAuthenticated ? "LOCAL" : null)
         {
             this.m_securityUser = user;
             this.m_roles = roles.ToList();
