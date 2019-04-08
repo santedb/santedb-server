@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
@@ -56,6 +57,10 @@ namespace SanteDB.Core.Services.Impl
             this.m_traceSource.TraceEvent(EventLevel.Verbose, "Creating user {0}", data);
 
             var iids = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
+
+            // Verify password meets requirements
+            if (ApplicationServiceContext.Current.GetService<IPasswordValidatorService>()?.Validate(data.Password) == false)
+                throw new DetectedIssueException(new BusinessRules.DetectedIssue(BusinessRules.DetectedIssuePriorityType.Error, "err.password", BusinessRules.DetectedIssueKeys.SecurityIssue));
 
             // Create the identity
             var id = iids.CreateIdentity(data.UserName,  data.Password, AuthenticationContext.Current.Principal);

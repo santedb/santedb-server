@@ -308,7 +308,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 UserName = userName,
                                 Password = hashingService.ComputeHash(password),
                                 SecurityHash = Guid.NewGuid().ToString(),
-                                UserClass = UserClassKeys.HumanUser
+                                UserClass = UserClassKeys.HumanUser,
+                                InvalidLoginAttempts = 0
                             };
                             newIdentityUser.CreatedByKey = dataContext.EstablishProvenance(principal, null);
 
