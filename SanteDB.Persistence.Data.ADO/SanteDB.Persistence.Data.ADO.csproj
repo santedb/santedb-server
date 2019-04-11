@@ -295,6 +295,10 @@
       <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
       <Name>SanteDB.Core.Api</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-bis\SanteDB.BI\SanteDB.BI.csproj">
+      <Project>{030666AA-FC71-449E-9DFC-270F1C23C5DA}</Project>
+      <Name>SanteDB.BI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
       <Project>{f1a82a4f-4a57-47d7-ae76-444c8a4ff54a}</Project>
       <Name>SanteDB.Core.Model</Name>

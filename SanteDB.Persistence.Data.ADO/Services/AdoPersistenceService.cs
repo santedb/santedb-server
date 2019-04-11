@@ -17,6 +17,9 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.BI;
+using SanteDB.BI.Model;
+using SanteDB.BI.Services;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
@@ -52,7 +55,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// Represents a dummy service which just adds the persistence services to the context
     /// </summary>
     [ServiceProvider("ADO.NET Data Persistence Service", Configuration = typeof(AdoPersistenceConfigurationSection))]
-    public class AdoPersistenceService : IDaemonService, ISqlDataPersistenceService
+    public class AdoPersistenceService : IDaemonService, ISqlDataPersistenceService, IBisDataSource
     {
 
         /// <summary>
@@ -356,6 +359,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public bool Start()
         {
+            // Startup on system
+            AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
             // notify startup
             this.Starting?.Invoke(this, EventArgs.Empty);
             if (this.m_running) return true;
@@ -475,7 +480,17 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 throw e;
             }
 
+            // Bind subscription execution
             ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(typeof(AdoSubscriptionExector));
+
+            // Bind BI stuff
+            ApplicationServiceContext.Current.GetService<IBisMetadataRepository>()?.Insert(new SanteDB.BI.Model.BisDataSourceDefinition()
+            {
+                Id = "org.santedb.bi.dataSource.main",
+                Name = "main",
+                ConnectionString = this.m_configuration.ReadonlyConnectionString,
+                ProviderType = this.GetType()
+            });
 
             // Bind some basic service stuff
             ApplicationServiceContext.Current.GetService<IDataPersistenceService<Core.Model.Security.SecurityUser>>().Inserting += (o, e) =>
@@ -541,6 +556,26 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     throw;
                 }
             }
+        }
+
+        /// <summary>
+        /// Executes the query
+        /// </summary>
+        public BisResultContext ExecuteQuery(BisQueryDefinition queryDefinition, Dictionary<string, object> parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Execute the specified query
+        /// </summary>
+        public BisResultContext ExecuteQuery(string queryId, Dictionary<string, object> parameters)
+        {
+            var query = ApplicationServiceContext.Current.GetService<IBisMetadataRepository>()?.Get<BisQueryDefinition>(queryId);
+            if (query == null)
+                throw new KeyNotFoundException(queryId);
+            else
+                return this.ExecuteQuery(query, parameters);
         }
     }
 }

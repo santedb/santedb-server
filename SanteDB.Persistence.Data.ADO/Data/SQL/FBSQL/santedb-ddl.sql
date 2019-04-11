@@ -2108,17 +2108,11 @@ INSERT INTO SEC_ROL_TBL (ROL_ID, ROL_NAME, DESCR, CRT_PROV_ID) VALUES (char_to_u
 --#!
 INSERT INTO SEC_USR_ROL_ASSOC_TBL (ROL_ID, USR_ID) VALUES (char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 --#!
-INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('ea73c05a-3159-48c8-bbcb-741911d91cd2'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 2); -- GRANT Access Administrative Function
+INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('da73c05a-3159-48c8-bbcb-741911d91cd2'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 2); -- GRANT UNRESTRICTED ALL
 --#!
 INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('d15b96ab-646c-4c00-9a58-ea09eee67d7c'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 0); -- DENY Login
 --#!
-INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('f6840336-4e20-4bc0-b965-baa6d7c80be3'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 2); -- GRANT Unrestricted Clinical Data
---#!
 INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('dea891aa-224d-4859-81b3-c1eb2750067e'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 0); -- DENY Override disclosure
---#!
-INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('eea891aa-224d-4859-81b3-c1eb2750067e'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 2); -- GRANT Read Metadata Administrator
---#!
-INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('0a8642cb-28e4-4e9e-bd7b-d6df72b729b2'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 2); -- GRANT Unrestricted Warehouse
 --#!
 
 -- CREATE ROLE ANONYMOUS WHICH IS DENIED ALL CLINICAL 

@@ -95,7 +95,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
             if (subscription == null || subscription.ServerDefinitions.Count == 0)
                 throw new InvalidOperationException("Subscription does not have server definition");
 
-
             var preArgs = new QueryRequestEventArgs<IdentifiedData>(o => o.Key == subscription.Key, offset, count, queryId, AuthenticationContext.Current.Principal);
             this.Executing?.Invoke(this, preArgs);
             if(preArgs.Cancel)

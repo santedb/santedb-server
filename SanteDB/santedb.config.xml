@@ -160,6 +160,17 @@
         </behaviors>
       </endpoint>
     </service>
+    <service name="BIS">
+      <behaviors>
+        <add type="SanteDB.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Core, Version=1.10.0.0"/>
+      </behaviors>
+      <endpoint address="http://0.0.0.0:8080/bis" contract="SanteDB.Rest.BIS.IBisServiceContract, SanteDB.Rest.BIS, Version=1.10.0.0">
+        <behaviors>
+          <add type="SanteDB.Core.Rest.Behavior.MessageLoggingEndpointBehavior, SanteDB.Core, Version=1.10.0.0"/>
+          <add type="SanteDB.Core.Rest.Behavior.MessageCompressionEndpointBehavior, SanteDB.Core, Version=1.10.0.0"/>
+        </behaviors>
+      </endpoint>
+    </service>
     <service name="AMI">
       <behaviors>
         <add type="SanteDB.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Core, Version=1.10.0.0"/>
@@ -523,6 +534,10 @@
       <!--<add type="SanteDB.Persistence.Reporting.ADO.ReportingPersistenceService, SanteDB.Persistence.Reporting.ADO, Version=1.10.0.24164, Culture=neutral, PublicKeyToken=null" />-->
       <add type="SanteDB.Warehouse.ADO.ADODataWarehouse, SanteDB.Warehouse.ADO, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Messaging.Metadata.MetadataMessageHandler, SanteDB.Messaging.Metadata, Version=1.0.0.0"/>
+      
+      <!-- Business Intel Service -->
+      <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS, Version=1.40.0.0"/>
+      <add type="SanteDB.BI.Services.Impl.AppletMetadataRepository, SanteDB.BI, Version=1.40.0.0"/>
     </serviceProviders>
   </section>
 </SanteDBConfiguration>

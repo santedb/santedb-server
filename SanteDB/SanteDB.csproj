@@ -235,6 +235,14 @@
       <Project>{39e61451-f4fe-493d-b754-5f06eb284aac}</Project>
       <Name>SanteDB.Core.Applets</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-bis\SanteDB.BI\SanteDB.BI.csproj">
+      <Project>{030666aa-fc71-449e-9dfc-270f1c23c5da}</Project>
+      <Name>SanteDB.BI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-bis\SanteDB.Rest.BIS\SanteDB.Rest.BIS.csproj">
+      <Project>{200ac0cb-ebbf-4fde-81d0-447cdfffa2f7}</Project>
+      <Name>SanteDB.Rest.BIS</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-bre-js\SanteDB.BusinessRules.JavaScript\SanteDB.BusinessRules.JavaScript.csproj">
       <Project>{3bfd6ee6-0267-4d82-be7d-9b48b2f6f3d4}</Project>
       <Name>SanteDB.BusinessRules.JavaScript</Name>
@@ -354,6 +362,10 @@
     <ProjectReference Include="..\SanteDB.Persistence.Diagnostics.Jira\SanteDB.Persistence.Diagnostics.Jira.csproj">
       <Project>{18a9f102-023e-4e17-8a70-a91365e1510d}</Project>
       <Name>SanteDB.Persistence.Diagnostics.Jira</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Persistence.Diagnostics.OpenProject\SanteDB.Persistence.Diagnostics.OpenProject.csproj">
+      <Project>{a789ead3-97f2-4277-8c69-9df013f56500}</Project>
+      <Name>SanteDB.Persistence.Diagnostics.OpenProject</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Persistence.MDM\SanteDB.Persistence.MDM.csproj">
       <Project>{20960967-3647-41a2-9df6-3e15e2aa7019}</Project>

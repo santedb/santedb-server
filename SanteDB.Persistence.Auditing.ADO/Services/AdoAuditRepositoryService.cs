@@ -71,6 +71,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// Fired when data is being inserted
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<AuditData>> Inserting;
+
         /// <summary>
         /// Fired when data is has been inserted
         /// </summary>
