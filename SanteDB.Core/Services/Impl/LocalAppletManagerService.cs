@@ -67,6 +67,9 @@ namespace SanteDB.Core.Services.Impl
         // Tracer
         private Tracer m_tracer = new Tracer(SanteDBConstants.ServiceTraceSourceName + ".AppletManager");
 
+        // Issuer certificate
+        private X509Certificate2 m_caIssuerCert = null;
+
         /// <summary>
         /// Indicates whether the service is running 
         /// </summary>
@@ -79,6 +82,13 @@ namespace SanteDB.Core.Services.Impl
         {
             this.m_appletCollection = new AppletCollection();
             this.m_readonlyAppletCollection = this.m_appletCollection.AsReadonly();
+            this.m_caIssuerCert = new X509Certificate2();
+            using (var str = typeof(AppletManifest).Assembly.GetManifestResourceStream("SanteDB.Core.Applets.Publisher.appca.santesuite.net.cer"))
+            {
+                var cbytes = new byte[str.Length];
+                str.Read(cbytes, 0, cbytes.Length);
+                this.m_caIssuerCert.Import(cbytes);
+            }
         }
 
         /// <summary>
@@ -268,10 +278,11 @@ namespace SanteDB.Core.Services.Impl
                     {
                         if (package.PublicKey != null)
                         {
-                            var embCert = new X509Certificate2(package.PublicKey);
-
+                            // Embedded cert and trusted CA
+                            X509Certificate2 embCert = new X509Certificate2(package.PublicKey);
+                                
                             // Not explicitly trusted to we need to build a chain
-                            if (!this.m_configuration.TrustedPublishers.Contains(embCert.Thumbprint))
+                            if (!this.m_caIssuerCert.Subject.Equals(embCert.Issuer) && !this.m_configuration.TrustedPublishers.Contains(embCert.Thumbprint))
                             {
                                 // Build the certificate chain
                                 var embChain = new X509Chain();
@@ -294,15 +305,17 @@ namespace SanteDB.Core.Services.Impl
                         else
                             throw new SecurityException($"Cannot find public key of publisher information for {package.Meta.PublicKeyToken} or the local certificate is invalid");
                     }
-
-                    if (cert[0].NotAfter < DateTime.Now || cert[0].NotBefore > DateTime.Now)
-                            throw new SecurityException($"Cannot find public key of publisher information for {package.Meta.PublicKeyToken} or the local certificate is invalid");
-
-                    
+                                     
+                    // Verify signature
                     RSACryptoServiceProvider rsa = cert[0].PublicKey.Key as RSACryptoServiceProvider;
                     var retVal =  rsa.VerifyData(package.Manifest, CryptoConfig.MapNameToOID("SHA1"), package.Meta.Signature);
 
-                    if(retVal == true)
+                    // Verify timestamp
+                    var timestamp = package.Unpack().Info.TimeStamp;
+                    if (cert[0].NotAfter < timestamp || cert[0].NotBefore > timestamp || timestamp > DateTime.Now)
+                        throw new SecurityException($"Cannot find public key of publisher information for {package.Meta.PublicKeyToken} or the local certificate is invalid");
+
+                    if (retVal == true)
                     {
                         this.m_tracer.TraceEvent(EventLevel.Informational,  "SUCCESSFULLY VALIDATED: {0} v.{1}\r\n" +
                             "\tKEY TOKEN: {2}\r\n" +
