@@ -62,42 +62,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
         // Configuration
         private AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
 
-        // Master configuration
-        private SecurityConfigurationSection m_masterConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
-
         // Session cache
         private Dictionary<Guid, DbSession> m_sessionCache = new Dictionary<Guid, DbSession>();
+
         // Session lookups
         private Int32 m_sessionLookups = 0;
-
-        /// <summary>
-        /// Create signing credentials
-        /// </summary>
-        private SigningCredentials CreateSigningCredentials()
-        {
-            SigningCredentials retVal = null;
-            // Signing credentials
-            if (this.m_masterConfig.Signatures.Algorithm == SignatureAlgorithm.RS256)
-            {
-                var cert = X509CertificateUtils.FindCertificate(this.m_masterConfig.Signatures.FindType, this.m_masterConfig.Signatures.StoreLocation, this.m_masterConfig.Signatures.StoreName, this.m_masterConfig.Signatures.FindValue);
-                if (cert == null)
-                    throw new SecurityException("Cannot find certificate to sign JWT tokens!");
-                retVal = new X509SigningCredentials(cert);
-
-            }
-            else if (this.m_masterConfig.Signatures.Algorithm == SignatureAlgorithm.HS256)
-            {
-                retVal = new SigningCredentials(
-                    new InMemorySymmetricSecurityKey(this.m_masterConfig.Signatures.Secret),
-                    "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256",
-                    "http://www.w3.org/2001/04/xmlenc#sha256",
-                    new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("keyid", "0"))
-                );
-            }
-            else
-                throw new SecurityException("Invalid signing configuration");
-            return retVal;
-        }
 
         /// <summary>
         /// Create and register a refresh token for the specified principal
@@ -157,13 +126,18 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     dbSession = context.Insert(dbSession);
 
-                    var credentials = this.CreateSigningCredentials();
-                    JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-                    var encoder = handler.SignatureProviderFactory.CreateForSigning(credentials.SigningKey, credentials.SignatureAlgorithm);
-
-                    var signedToken = dbSession.Key.ToByteArray().Concat(encoder.Sign(dbSession.Key.ToByteArray())).ToArray();
-                    var signedRefresh = refreshToken.Concat(encoder.Sign(refreshToken)).ToArray();
-                    return new AdoSecuritySession(dbSession.Key, signedToken, signedRefresh, dbSession.NotBefore, dbSession.NotAfter);
+                    var signingService = ApplicationServiceContext.Current.GetService<IDataSigningService>();
+                    if (signingService == null)
+                    {
+                        this.m_traceSource.TraceWarning("No IDataSigningService provided. Session data will be unsigned!");
+                        return new AdoSecuritySession(dbSession.Key, dbSession.Key.ToByteArray(), refreshToken, dbSession.NotBefore, dbSession.NotAfter);
+                    }
+                    else
+                    {
+                        var signedToken = dbSession.Key.ToByteArray().Concat(signingService.SignData(dbSession.Key.ToByteArray())).ToArray();
+                        var signedRefresh = refreshToken.Concat(signingService.SignData(refreshToken)).ToArray();
+                        return new AdoSecuritySession(dbSession.Key, signedToken, signedRefresh, dbSession.NotBefore, dbSession.NotAfter);
+                    }
                 }
             }
             catch (Exception e)
@@ -195,11 +169,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     tx = context.BeginTransaction();
 
-                    var credentials = this.CreateSigningCredentials();
-                    JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-                    var verification = handler.SignatureProviderFactory.CreateForVerifying(credentials.SigningKey, credentials.SignatureAlgorithm);
-
-                    if (!verification.Verify(refreshToken.Take(16).ToArray(), refreshToken.Skip(16).ToArray()))
+                    var signingService = ApplicationServiceContext.Current.GetService<IDataSigningService>();
+                    if (signingService == null)
+                    {
+                        this.m_traceSource.TraceWarning("No IDataSigningService provided. Digital signatures will not be verified");
+                    }
+                    else if (!signingService.Verify(refreshToken.Take(16).ToArray(), refreshToken.Skip(16).ToArray()))
                         throw new SecurityException("Refresh token appears to have been tampered with");
 
                     // Get the session to be extended
@@ -223,13 +198,20 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     // Save
                     context.Insert(dbSession);
 
-                    var encoder = handler.SignatureProviderFactory.CreateForSigning(credentials.SigningKey, credentials.SignatureAlgorithm);
-                    var signedToken = dbSession.Key.ToByteArray().Concat(encoder.Sign(dbSession.Key.ToByteArray())).ToArray();
-                    var signedRefresh = refreshToken.Concat(encoder.Sign(refreshToken)).ToArray();
-
                     tx.Commit();
 
-                    return new AdoSecuritySession(dbSession.Key, signedToken, signedRefresh, dbSession.NotBefore, dbSession.NotAfter);
+                    if (signingService == null)
+                    {
+                        this.m_traceSource.TraceWarning("No IDataSigningService provided. Session data will be unsigned!");
+                        return new AdoSecuritySession(dbSession.Key, dbSession.Key.ToByteArray(), refreshToken, dbSession.NotBefore, dbSession.NotAfter);
+                    }
+                    else
+                    {
+                        var signedToken = dbSession.Key.ToByteArray().Concat(signingService.SignData(dbSession.Key.ToByteArray())).ToArray();
+                        var signedRefresh = refreshToken.Concat(signingService.SignData(refreshToken)).ToArray();
+                        return new AdoSecuritySession(dbSession.Key, signedToken, signedRefresh, dbSession.NotBefore, dbSession.NotAfter);
+                    }
+
                 }
                 catch (Exception e)
                 {
@@ -257,11 +239,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 {
                     context.Open();
 
-                    var credentials = this.CreateSigningCredentials();
-                    JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-                    var verification = handler.SignatureProviderFactory.CreateForVerifying(credentials.SigningKey, credentials.SignatureAlgorithm);
-
-                    if (!verification.Verify(sessionToken.Take(16).ToArray(), sessionToken.Skip(16).ToArray()))
+                    var signingService = ApplicationServiceContext.Current.GetService<IDataSigningService>();
+                    if (signingService == null)
+                        this.m_traceSource.TraceWarning("No IDataSigingService registered. Session data will not be verified");
+                    else if(!signingService.Verify(sessionToken.Take(16).ToArray(), sessionToken.Skip(16).ToArray()))
                         throw new SecurityException("Session token appears to have been tampered with");
 
                     var sessionId = new Guid(sessionToken.Take(16).ToArray());
