@@ -68,7 +68,7 @@ namespace SanteDB.Core.Http
             if (config.Binding?.Security?.ClientCertificate != null)
             {
                 this.ClientCertificates = new X509Certificate2Collection();
-                var cert = X509CertificateUtils.FindCertificate(config.Binding.Security.ClientCertificate.FindType,
+                var cert = SecurityUtils.FindCertificate(config.Binding.Security.ClientCertificate.FindType,
                               config.Binding.Security.ClientCertificate.StoreLocation,
                               config.Binding.Security.ClientCertificate.StoreName,
                               config.Binding.Security.ClientCertificate.FindValue);

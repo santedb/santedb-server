@@ -89,7 +89,7 @@ namespace SanteDB.Tools.AdminConsole.Security
             // Attempt to get the certificate
             if (((String)headers["alg"]).StartsWith("RS"))
             {
-                var cert = X509CertificateUtils.FindCertificate(X509FindType.FindByThumbprint, StoreLocation.CurrentUser, StoreName.My, headers["x5t"].ToString());
+                var cert = SecurityUtils.FindCertificate(X509FindType.FindByThumbprint, StoreLocation.CurrentUser, StoreName.My, headers["x5t"].ToString());
                 //if (cert == null)
                 //	throw new SecurityTokenException(SecurityTokenExceptionType.KeyNotFound, String.Format ("Cannot find certificate {0}", headers ["x5t"]));
                 // TODO: Verify signature

@@ -19,7 +19,9 @@
  */
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
@@ -195,6 +197,15 @@ namespace SanteDB.Core.Services.Impl
             this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(securityUser, "Lockout=False"));
 
         }
-
+        
+        /// <summary>
+        /// Get the specified provider entity
+        /// </summary>
+        public Provider GetProviderEntity(IIdentity identity)
+        {
+            int t;
+            return ApplicationServiceContext.Current.GetService<IRepositoryService<Provider>>()
+                .Find(o => o.Relationships.Where(r => r.RelationshipType.Mnemonic == "AssignedEntity").Any(r => (r.SourceEntity as UserEntity).SecurityUser.UserName == identity.Name), 0, 1, out t).FirstOrDefault();
+        }
     }
 }

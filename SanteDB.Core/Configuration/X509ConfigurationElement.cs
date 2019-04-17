@@ -130,7 +130,7 @@ namespace SanteDB.Core.Configuration
         private X509Certificate2 GetCertificate()
         {
             if(this.m_certificate != null)
-                this.m_certificate = X509CertificateUtils.FindCertificate(this.FindType, this.StoreLocation, this.StoreName, this.FindValue);
+                this.m_certificate = SecurityUtils.FindCertificate(this.FindType, this.StoreLocation, this.StoreName, this.FindValue);
             return this.m_certificate;
         }
     }

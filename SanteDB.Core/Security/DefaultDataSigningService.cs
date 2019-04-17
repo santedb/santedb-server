@@ -24,39 +24,11 @@ namespace SanteDB.Core.Security
         private SecurityConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
 
         /// <summary>
-        /// Create signing credentials
-        /// </summary>
-        private SigningCredentials CreateSigningCredentials()
-        {
-            SigningCredentials retVal = null;
-            // Signing credentials
-            if (this.m_configuration.Signatures.Algorithm == SignatureAlgorithm.RS256)
-            {
-                var cert = X509CertificateUtils.FindCertificate(this.m_configuration.Signatures.FindType, this.m_configuration.Signatures.StoreLocation, this.m_configuration.Signatures.StoreName, this.m_configuration.Signatures.FindValue);
-                if (cert == null)
-                    throw new SecurityException("Cannot find certificate to sign data!");
-                retVal = new X509SigningCredentials(cert);
-            }
-            else if (this.m_configuration.Signatures.Algorithm == SignatureAlgorithm.HS256)
-            {
-                retVal = new SigningCredentials(
-                    new InMemorySymmetricSecurityKey(this.m_configuration.Signatures.Secret),
-                    "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256",
-                    "http://www.w3.org/2001/04/xmlenc#sha256",
-                    new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("keyid", "0"))
-                );
-            }
-            else
-                throw new SecurityException("Invalid signing configuration");
-            return retVal;
-        }
-
-        /// <summary>
         /// Sign the specfiied data
         /// </summary>
-        public byte[] SignData(byte[] data, int keyId = 0)
+        public byte[] SignData(byte[] data, string keyId = null)
         {
-            var credentials = this.CreateSigningCredentials();
+            var credentials = SecurityUtils.CreateSigningCredentials(this.m_configuration.Signatures.FirstOrDefault(o=>o.KeyName == keyId || keyId == null));
             using (var signatureProvider = new SignatureProviderFactory().CreateForSigning(credentials.SigningKey, credentials.SignatureAlgorithm))
                 return signatureProvider.Sign(data);
         }
@@ -64,9 +36,9 @@ namespace SanteDB.Core.Security
         /// <summary>
         /// Verify the signature
         /// </summary>
-        public bool Verify(byte[] data, byte[] signature, int keyId = 0)
+        public bool Verify(byte[] data, byte[] signature, string keyId = null)
         {
-            var credentials = this.CreateSigningCredentials();
+            var credentials = SecurityUtils.CreateSigningCredentials(this.m_configuration.Signatures.FirstOrDefault(o => o.KeyName == keyId || keyId == null));
             using (var signatureProvider = new SignatureProviderFactory().CreateForVerifying(credentials.SigningKey, credentials.SignatureAlgorithm))
                 return signatureProvider.Verify(data, signature);
         }

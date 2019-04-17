@@ -32,10 +32,12 @@ namespace SanteDB.Core.Configuration
     [XmlType(nameof(SignatureAlgorithm), Namespace = "http://santedb.org/configuration")]
     public enum SignatureAlgorithm
     {
-        [XmlEnum("rsa")]
+        [XmlEnum("rs256")]
         RS256,
         [XmlEnum("hmac")]
-        HS256
+        HS256,
+        [XmlEnum("rs512")]
+        RS512
     }
 
     /// <summary>
@@ -47,6 +49,14 @@ namespace SanteDB.Core.Configuration
 
         // Algorithm
         private SignatureAlgorithm m_algorithm = SignatureAlgorithm.HS256;
+
+        /// <summary>
+        /// Gets or sets the key name
+        /// </summary>
+        [XmlAttribute("id")]
+        [DisplayName("Key ID")]
+        [Description("The identifier for the signature key")]
+        public string KeyName { get; set; }
 
         /// <summary>
         /// The unique name for the signer

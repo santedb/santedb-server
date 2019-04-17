@@ -72,6 +72,10 @@ namespace SanteDB.Configurator
                     new ApplicationServiceContextConfigurationSection()
                     {
                         ThreadPoolSize = Environment.ProcessorCount
+                    },
+                    new OrmLite.Configuration.OrmConfigurationSection()
+                    {
+                        Providers = ConfigurationContext.Current.DataProviders.Select(o => new OrmLite.Configuration.ProviderRegistrationConfiguration(o.Invariant, o.DbProviderType)).ToList()
                     }
                 }
             };
@@ -98,7 +102,7 @@ namespace SanteDB.Configurator
                     if(ormConfig != null)
                     {
                         ormConfig.ReadWriteConnectionString = ormConfig.ReadonlyConnectionString = dbSelector.ConnectionString.Name;
-                        ormConfig.ProviderType = dbSelector.Provider.DbProviderType.AssemblyQualifiedName;
+                        ormConfig.ProviderType = dbSelector.Provider.Invariant;
                         ormConfig.TraceSql = false;
                     }
                     // Add configuration 

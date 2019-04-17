@@ -19,6 +19,7 @@
  */
 using SanteDB.Core.Services.Impl;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Security.Cryptography.X509Certificates;
@@ -67,7 +68,7 @@ namespace SanteDB.Core.Configuration
         /// </summary>
         public SecurityConfigurationSection()
         {
-            this.Signatures = new SecuritySignatureConfiguration();
+            this.Signatures = new List<SecuritySignatureConfiguration>();
             this.PasswordRegex = RegexPasswordValidator.DefaultPasswordPattern;
             this.TrustedCertificates = new ObservableCollection<string>();
         }
@@ -94,11 +95,10 @@ namespace SanteDB.Core.Configuration
         /// <summary>
         /// Signature configuration
         /// </summary>
-        [XmlElement("signing")]
+        [XmlArray("signingKeys"), XmlArrayItem("add")]
         [Description("Describes the algorithm and key for signing data originating from this server")]
-        [TypeConverter(typeof(ExpandableObjectConverter))]
         [DisplayName("Data Signatures")]
-        public SecuritySignatureConfiguration Signatures { get; set; }
+        public List<SecuritySignatureConfiguration> Signatures { get; set; }
 
         /// <summary>
         /// Trusted publishers

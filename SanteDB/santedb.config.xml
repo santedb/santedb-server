@@ -52,8 +52,15 @@
     <add type="SanteDB.Core.Configuration.SanteDBServerConfiguration, SanteDB.Core, Version=1.10.0.24599, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Messaging.Atna.Configuration.AtnaConfigurationSection, SanteDB.Messaging.Atna, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.FileSystemQueueConfigurationSection, SanteDB.Core, Version=1.10.0.29461, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.OrmLite.Configuration.OrmConfigurationSection, SanteDB.OrmLite, Version=1.10.0.29461, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Caching.Redis.Configuration.RedisConfigurationSection, SanteDB.Caching.Redis, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
   </sections>
+  <section xsi:type="OrmConfigurationSection">
+    <providers>
+      <add type="SanteDB.OrmLite.Providers.Postgres.PostgreSQLProvider, SanteDB.OrmLite, Version=1.41.0.27080, Culture=neutral, PublicKeyToken=null" invariant="npgsql" />
+      <add type="SanteDB.OrmLite.Providers.Firebird.FirebirdSQLProvider, SanteDB.OrmLite, Version=1.41.0.27080, Culture=neutral, PublicKeyToken=null" invariant="fbsql" />
+    </providers>
+  </section>
   <section xsi:type="RedisConfigurationSection">
     <servers>
       <add>localhost:6379</add>
@@ -107,9 +114,11 @@
   <section xsi:type="MetadataConfigurationSection"/>
   <section xsi:type="FileSystemQueueConfigurationSection" queueRoot=".\queue" />
   <section xsi:type="DataConfigurationSection">
-    <connectionString name="FBSQL" value="initial catalog=|DataDirectory|\sdb_base.fdb;server type=Embedded;user id=sysdba" provider="Fbsql" />
-    <connectionString name="PSQL" value="server=localhost; port=5433; database=timr_upgrade; user id=postgres; password=postgres; pooling=true; MinPoolSize=10; MaxPoolSize=30; Timeout=120; Command Timeout=120" provider="Npgsql" />
-    <connectionString name="AUDIT" value="server=localhost;port=5433; database=santedb; user id=postgres; password=postgres; pooling=true; MinPoolSize=10; MaxPoolSize=30; Timeout=10; " provider="Npgsql"/>
+    <connectionStrings>
+      <add name="FBSQL" value="initial catalog=|DataDirectory|\sdb_base.fdb;server type=Embedded;user id=sysdba" provider="Fbsql" />
+      <add name="PSQL" value="server=localhost; port=5433; database=timr_upgrade; user id=postgres; password=postgres; pooling=true; MinPoolSize=10; MaxPoolSize=30; Timeout=120; Command Timeout=120" provider="Npgsql" />
+      <add name="AUDIT" value="server=localhost;port=5433; database=santedb; user id=postgres; password=postgres; pooling=true; MinPoolSize=10; MaxPoolSize=30; Timeout=10; " provider="Npgsql"/>
+    </connectionStrings>
   </section>
   <section xsi:type="AppletConfigurationSection" appletDirectory=".\applets" allowUnsignedApplets="true">
     <trustedPublishers>
@@ -280,7 +289,9 @@
       <add>82C63E1E9B87578D0727E871D7613F2F0FAF683B</add>
     </trustedPublishers>
     <!-- SanteDB signs a lot of data when communicating it, this is used for configuring how this server signs data -->
-    <signing alg="hmac" hmacKey="uuNQ0pAkW+M2uxHjK1pisFZBFYjvkgveJcGtDy2E8i8="/>
+    <signingKeys>
+      <add alg="hmac" hmacKey="uuNQ0pAkW+M2uxHjK1pisFZBFYjvkgveJcGtDy2E8i8="/>
+    </signingKeys>
     <!-- To Configure X509 Signatures -->
     <!--<signing alg="rsa" findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />-->
   </section>
@@ -415,13 +426,13 @@
            readWriteConnectionString="AUDIT"
            readOnlyConnectionString="AUDIT"
            traceSql="false"
-           providerType="SanteDB.OrmLite.Providers.Postgres.PostgreSQLProvider, SanteDB.OrmLite, Version=1.10.0.0" />
+           providerType="npgsql" />
   <!-- This section controls the persistence for ADO.NET -->
   <section xsi:type="AdoPersistenceConfigurationSection"
            readWriteConnectionString="PSQL"
            readOnlyConnectionString="PSQL"
            traceSql="false"
-           providerType="SanteDB.OrmLite.Providers.Postgres.PostgreSQLProvider, SanteDB.OrmLite, Version=1.10.0.0"
+           providerType="npgsql"
            staOnly="false"
            autoUpdateExisting="true"
            autoInsertChildren="true"
@@ -456,13 +467,13 @@
            readWriteConnectionString="PSQL_RPT"
            readOnlyConnectionString="PSQL_RPT"
            traceSql="false"
-           providerType="SanteDB.OrmLite.Providers.Postgres.PostgreSQLProvider, SanteDB.OrmLite, Version=1.10.0.0" />
+           providerType="npgsql" />
   <!-- Data Warehouse Configuration -->
   <section xsi:type="AdoWarehouseConfigurationSection"
            readWriteConnectionString="SanteDBWarehouse"
            readOnlyConnectionString="SanteDBWarehouse"
            traceSql="false"
-           providerType="SanteDB.OrmLite.Providers.Postgres.PostgreSQLProvider, SanteDB.OrmLite, Version=1.10.0.0" />
+           providerType="npgsql" />
   <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="32">
     <serviceProviders>
 
@@ -484,6 +495,7 @@
       <add type="SanteDB.Persistence.Auditing.ADO.Services.AdoAuditRepositoryService, SanteDB.Persistence.Auditing.ADO, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.SimpleTfaSecretGenerator, SanteDB.Core, Version=1.10.0.31830, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.DefaultTfaRelayService, SanteDB.Core, Version=1.10.0.31437, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Core.Security.DefaultDataSigningService, SanteDB.Core, Version=1.10.0.31437, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.DefaultPasswordValidationService, SanteDB.Core, Version=1.10.0.31830, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core, Version=1.10.0.31830, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.SHA256PasswordHashingService, SanteDB.Core, Version=1.10.0.31830, Culture=neutral, PublicKeyToken=null" />

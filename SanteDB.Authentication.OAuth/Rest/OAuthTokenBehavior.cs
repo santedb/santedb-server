@@ -345,7 +345,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
 
-            SigningCredentials credentials = this.CreateSigningCredentials();
+            SigningCredentials credentials = SecurityUtils.CreateSigningCredentials(this.m_masterConfig.Signatures.FirstOrDefault());
 
             // Generate security token            
             var jwt = new JwtSecurityToken(
@@ -416,35 +416,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 };
 
             return this.CreateResponse(response);
-        }
-
-        /// <summary>
-        /// Create signing credentials
-        /// </summary>
-        private SigningCredentials CreateSigningCredentials()
-        {
-            SigningCredentials retVal = null;
-            // Signing credentials
-            if (this.m_masterConfig.Signatures.Algorithm == SignatureAlgorithm.RS256)
-            {
-                var cert = X509CertificateUtils.FindCertificate(this.m_masterConfig.Signatures.FindType, this.m_masterConfig.Signatures.StoreLocation, this.m_masterConfig.Signatures.StoreName, this.m_masterConfig.Signatures.FindValue);
-                if (cert == null)
-                    throw new SecurityException("Cannot find certificate to sign JWT tokens!");
-                retVal = new X509SigningCredentials(cert);
-
-            }
-            else if (this.m_masterConfig.Signatures.Algorithm == SignatureAlgorithm.HS256)
-            {
-                retVal = new SigningCredentials(
-                    new InMemorySymmetricSecurityKey(this.m_masterConfig.Signatures.Secret),
-                    "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256",
-                    "http://www.w3.org/2001/04/xmlenc#sha256",
-                    new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("keyid", "0"))
-                );
-            }
-            else
-                throw new SecurityException("Invalid signing configuration");
-            return retVal;
         }
 
         /// <summary>

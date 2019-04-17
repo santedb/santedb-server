@@ -17,8 +17,11 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using System;
+using System.IdentityModel.Tokens;
+using System.Security;
 using System.Security.Cryptography.X509Certificates;
 
 namespace SanteDB.Core.Security
@@ -26,21 +29,59 @@ namespace SanteDB.Core.Security
     /// <summary>
     /// Utilities for x509 certificates
     /// </summary>
-    public static class X509CertificateUtils
+    public static class SecurityUtils
 	{
 
-		private static Tracer s_tracer = Tracer.GetTracer(typeof(X509CertificateUtils));
+		private static Tracer s_tracer = Tracer.GetTracer(typeof(SecurityUtils));
 
+        /// <summary>
+        /// Create signing credentials
+        /// </summary>
+        public static SigningCredentials CreateSigningCredentials(SecuritySignatureConfiguration configuration)
+        {
+            SigningCredentials retVal = null;
+            // Signing credentials
+            switch (configuration.Algorithm)
+            {
+                case SignatureAlgorithm.RS256:
+                case SignatureAlgorithm.RS512:
+                    var cert = configuration.Certificate;
+                    if (cert == null)
+                        throw new SecurityException("Cannot find certificate to sign data!");
 
-		/// <summary>
-		/// Find a certiifcate from string values
-		/// </summary>
-		/// <returns>The certificate.</returns>
-		/// <param name="findType">Find type.</param>
-		/// <param name="storeLocation">Store location.</param>
-		/// <param name="storeName">Store name.</param>
-		/// <param name="findValue">Find value.</param>
-		public static X509Certificate2 FindCertificate(
+                    // Signature algorithm
+                    string signingAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
+                        digestAlgorithm = "http://www.w3.org/2001/04/xmlenc#sha256";
+                    if (configuration.Algorithm == SignatureAlgorithm.RS512)
+                    {
+                        signingAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512";
+                        digestAlgorithm = "http://www.w3.org/2001/04/xmlenc#sha512";
+                    }
+                    retVal = new X509SigningCredentials(cert, new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("name", configuration.KeyName ?? "0")), signingAlgorithm, digestAlgorithm);
+                    break;
+                case SignatureAlgorithm.HS256:
+                    retVal = new SigningCredentials(
+                        new InMemorySymmetricSecurityKey(configuration.Secret),
+                        "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256",
+                        "http://www.w3.org/2001/04/xmlenc#sha256",
+                        new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("name", configuration.KeyName ?? "0"))
+                    );
+                    break;
+                default:
+                    throw new SecurityException("Invalid signing configuration");
+            }
+            return retVal;
+        }
+
+        /// <summary>
+        /// Find a certiifcate from string values
+        /// </summary>
+        /// <returns>The certificate.</returns>
+        /// <param name="findType">Find type.</param>
+        /// <param name="storeLocation">Store location.</param>
+        /// <param name="storeName">Store name.</param>
+        /// <param name="findValue">Find value.</param>
+        public static X509Certificate2 FindCertificate(
 			String findType,
 			String storeLocation,
 			String storeName,
