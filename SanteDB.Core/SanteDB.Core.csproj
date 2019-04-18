@@ -192,23 +192,30 @@
   <Choose>
     <When Condition="$(SolutionName.Contains('-ext'))">
       <ItemGroup>
-    <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
-      <Project>{16EF1840-0361-439D-806C-92D0411122EB}</Project>
-      <Name>RestSrvr</Name>
+        <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
+          <Project>{16EF1840-0361-439D-806C-92D0411122EB}</Project>
+          <Name>RestSrvr</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\santedb-applets\SanteDB.Core.Applets\SanteDB.Core.Applets.csproj">
+          <Project>{39E61451-F4FE-493D-B754-5F06EB284AAC}</Project>
+          <Name>SanteDB.Core.Applets</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\santedb-bre-js\SanteDB.BusinessRules.JavaScript\SanteDB.BusinessRules.JavaScript.csproj">
+          <Project>{3bfd6ee6-0267-4d82-be7d-9b48b2f6f3d4}</Project>
+          <Name>SanteDB.BusinessRules.JavaScript</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
+          <Project>{786BD0EE-1806-4158-BA45-80249AC6DFE7}</Project>
+          <Name>SanteDB.Rest.Common</Name>
+        </ProjectReference>
+<ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
+      <Project>{f1a82a4f-4a57-47d7-ae76-444c8a4ff54a}</Project>
+      <Name>SanteDB.Core.Model</Name>
     </ProjectReference>
-    <ProjectReference Include="..\santedb-applets\SanteDB.Core.Applets\SanteDB.Core.Applets.csproj">
-      <Project>{39E61451-F4FE-493D-B754-5F06EB284AAC}</Project>
-      <Name>SanteDB.Core.Applets</Name>
+    <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
+      <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
+      <Name>SanteDB.Core.Api</Name>
     </ProjectReference>
-    <ProjectReference Include="..\santedb-bre-js\SanteDB.BusinessRules.JavaScript\SanteDB.BusinessRules.JavaScript.csproj">
-      <Project>{3bfd6ee6-0267-4d82-be7d-9b48b2f6f3d4}</Project>
-      <Name>SanteDB.BusinessRules.JavaScript</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
-      <Project>{786BD0EE-1806-4158-BA45-80249AC6DFE7}</Project>
-      <Name>SanteDB.Rest.Common</Name>
-    </ProjectReference>
-
       </ItemGroup>
     </When>
     <Otherwise>
@@ -233,14 +240,7 @@
       <Project>{ECE9B280-9647-4092-BABF-EB2E25084670}</Project>
       <Name>SanteDB.Core.Model.ViewModelSerializers</Name>
     </ProjectReference>
-    <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
-      <Project>{f1a82a4f-4a57-47d7-ae76-444c8a4ff54a}</Project>
-      <Name>SanteDB.Core.Model</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
-      <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
-      <Name>SanteDB.Core.Api</Name>
-    </ProjectReference>
+    
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\ViewModel.xml" />
