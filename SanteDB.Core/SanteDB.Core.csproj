@@ -188,7 +188,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
+
+  <Choose>
+    <When Condition="$(SolutionName.Contains('-ext'))">
+      <ItemGroup>
     <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
       <Project>{16EF1840-0361-439D-806C-92D0411122EB}</Project>
       <Name>RestSrvr</Name>
@@ -205,6 +208,23 @@
       <Project>{786BD0EE-1806-4158-BA45-80249AC6DFE7}</Project>
       <Name>SanteDB.Rest.Common</Name>
     </ProjectReference>
+
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="RestSrvr" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Core.Api" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Core.Applets" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Core.Model" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Rest.Common" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="1.42.0.0"/>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+
+
+  <ItemGroup>
     <ProjectReference Include="..\SanteDB.Configuration\SanteDB.Configuration.csproj">
       <Project>{032ABF00-6C76-47C7-9ECA-A840915A17EA}</Project>
       <Name>SanteDB.Configuration</Name>

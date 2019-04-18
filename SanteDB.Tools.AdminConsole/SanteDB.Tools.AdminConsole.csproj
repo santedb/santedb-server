@@ -88,23 +88,43 @@
     </None>
     <None Include="App.config" />
   </ItemGroup>
+  <Choose>
+    <When Condition="$(SolutionName.Contains('-ext'))">
+      <ItemGroup>
+        <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
+          <Project>{16EF1840-0361-439D-806C-92D0411122EB}</Project>
+          <Name>RestSrvr</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
+          <Project>{3A45F695-47A2-464C-ACE6-BDABBFA39FBC}</Project>
+          <Name>SanteDB.Core.Api</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\santedb-applets\SanteDB.Core.Applets\SanteDB.Core.Applets.csproj">
+          <Project>{39E61451-F4FE-493D-B754-5F06EB284AAC}</Project>
+          <Name>SanteDB.Core.Applets</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
+          <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
+          <Name>SanteDB.Core.Model</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
+          <Project>{786BD0EE-1806-4158-BA45-80249AC6DFE7}</Project>
+          <Name>SanteDB.Rest.Common</Name>
+        </ProjectReference>
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="RestSrvr" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Core.Api" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Core.Applets" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Core.Model" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Rest.Common" Version="1.42.0.0"/>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+
   <ItemGroup>
-    <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
-      <Project>{3A45F695-47A2-464C-ACE6-BDABBFA39FBC}</Project>
-      <Name>SanteDB.Core.Api</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\santedb-applets\SanteDB.Core.Applets\SanteDB.Core.Applets.csproj">
-      <Project>{39e61451-f4fe-493d-b754-5f06eb284aac}</Project>
-      <Name>SanteDB.Core.Applets</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
-      <Project>{f1a82a4f-4a57-47d7-ae76-444c8a4ff54a}</Project>
-      <Name>SanteDB.Core.Model</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
-      <Project>{786BD0EE-1806-4158-BA45-80249AC6DFE7}</Project>
-      <Name>SanteDB.Rest.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
       <Name>SanteDB.Core</Name>

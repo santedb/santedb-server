@@ -222,7 +222,11 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
+
+  <Choose>
+    <When Condition="$(SolutionName.Contains('-ext'))">
+      <ItemGroup>
+
     <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
       <Project>{16ef1840-0361-439d-806c-92d0411122eb}</Project>
       <Name>RestSrvr</Name>
@@ -283,6 +287,31 @@
       <Project>{903e2e75-7b62-4c42-a001-404dc0235a6b}</Project>
       <Name>SanteDB.Rest.HDSI</Name>
     </ProjectReference>
+
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="RestSrvr" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Core.Api" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Core.Applets" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Core.Model" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Rest.Common" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.OrmLite" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.BI" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Rest.BIS" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Cdss.Xml" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Matcher" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Core.Model.AMI" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Core.Model.RISI" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Rest.AMI" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Rest.HDSI" Version="1.42.0.0"/>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+
+  <ItemGroup>
     <ProjectReference Include="..\SanteDB.Authentication.OAuth\SanteDB.Authentication.OAuth2.csproj">
       <Project>{a3975c6f-4fdb-43be-81ab-3357b86173f1}</Project>
       <Name>SanteDB.Authentication.OAuth2</Name>

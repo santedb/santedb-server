@@ -81,16 +81,28 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceTool.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
-      <Project>{3A45F695-47A2-464C-ACE6-BDABBFA39FBC}</Project>
-      <Name>SanteDB.Core.Api</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
-      <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
-      <Name>SanteDB.Core.Model</Name>
-    </ProjectReference>
-  </ItemGroup>
+
+  <Choose>
+    <When Condition="$(SolutionName.Contains('-ext'))">
+      <ItemGroup>
+        <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
+          <Project>{3A45F695-47A2-464C-ACE6-BDABBFA39FBC}</Project>
+          <Name>SanteDB.Core.Api</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
+          <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
+          <Name>SanteDB.Core.Model</Name>
+        </ProjectReference>
+
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="SanteDB.Core.Api" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Core.Model" Version="1.42.0.0"/>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
   <ItemGroup>
     <EmbeddedResource Include="Controls\ucDatabaseSelector.resx">
       <DependentUpon>ucDatabaseSelector.cs</DependentUpon>

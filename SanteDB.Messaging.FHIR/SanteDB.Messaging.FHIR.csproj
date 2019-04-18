@@ -206,24 +206,37 @@
     <Compile Include="Rest\IFhirServiceContract.cs" />
     <Compile Include="Rest\Serialization\FhirMessageDispatchFormatter.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
-      <Project>{16EF1840-0361-439D-806C-92D0411122EB}</Project>
-      <Name>RestSrvr</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
-      <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
-      <Name>SanteDB.Core.Api</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
-      <Project>{f1a82a4f-4a57-47d7-ae76-444c8a4ff54a}</Project>
-      <Name>SanteDB.Core.Model</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
-      <Project>{786bd0ee-1806-4158-ba45-80249ac6dfe7}</Project>
-      <Name>SanteDB.Rest.Common</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <Choose>
+    <When Condition="$(SolutionName.Contains('-ext'))">
+      <ItemGroup>
+        <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
+          <Project>{16EF1840-0361-439D-806C-92D0411122EB}</Project>
+          <Name>RestSrvr</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
+          <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
+          <Name>SanteDB.Core.Api</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
+          <Project>{f1a82a4f-4a57-47d7-ae76-444c8a4ff54a}</Project>
+          <Name>SanteDB.Core.Model</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
+          <Project>{786bd0ee-1806-4158-ba45-80249ac6dfe7}</Project>
+          <Name>SanteDB.Rest.Common</Name>
+        </ProjectReference>
+
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="RestSrvr" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Core.Api" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Core.Model" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Rest.Common" Version="1.42.0.0"/>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
   <ItemGroup>
     <EmbeddedResource Include="ParameterMap.xml">
       <SubType>Designer</SubType>

@@ -63,19 +63,34 @@
     <Compile Include="Rest\IOAuthTokenContract.cs" />
     <Compile Include="Rest\OAuthTokenBehavior.cs" />
   </ItemGroup>
+  <Choose>
+    <When Condition="$(SolutionName.Contains('-ext'))">
+      <ItemGroup>
+        <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
+          <Project>{16EF1840-0361-439D-806C-92D0411122EB}</Project>
+          <Name>RestSrvr</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
+          <Project>{3A45F695-47A2-464C-ACE6-BDABBFA39FBC}</Project>
+          <Name>SanteDB.Core.Api</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
+          <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
+          <Name>SanteDB.Core.Model</Name>
+        </ProjectReference>
+
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="RestSrvr" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Core.Api" Version="1.42.0.0"/>
+        <PackageReference Include="SanteDB.Core.Model" Version="1.42.0.0"/>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+
   <ItemGroup>
-    <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
-      <Project>{16EF1840-0361-439D-806C-92D0411122EB}</Project>
-      <Name>RestSrvr</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
-      <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
-      <Name>SanteDB.Core.Model</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
-      <Project>{3A45F695-47A2-464C-ACE6-BDABBFA39FBC}</Project>
-      <Name>SanteDB.Core.Api</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
       <Name>SanteDB.Core</Name>
