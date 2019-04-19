@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using Newtonsoft.Json;
+using SanteDB.BI.Services;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model.Query;
@@ -61,23 +62,6 @@ namespace SanteDB.Warehouse.ADO
         private Tracer m_tracer = new Tracer(DataWarehouseConstants.TraceSourceName);
 
         /// <summary>
-        /// Daemon is starting
-        /// </summary>
-        public event EventHandler Starting;
-        /// <summary>
-        /// Daemon has started
-        /// </summary>
-        public event EventHandler Started;
-        /// <summary>
-        /// Daemon is stopping
-        /// </summary>
-        public event EventHandler Stopping;
-        /// <summary>
-        /// Daemon has stopped
-        /// </summary>
-        public event EventHandler Stopped;
-
-        /// <summary>
         /// Gets the name of the data provider so callers can determine how to create stored queries
         /// </summary>
         public string DataProvider
@@ -89,21 +73,24 @@ namespace SanteDB.Warehouse.ADO
         }
 
         /// <summary>
-        /// True if this is running
-        /// </summary>
-        public bool IsRunning
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        /// <summary>
         /// Constructs the SQLite data warehouse file
         /// </summary>
         public ADODataWarehouse()
         {
+            ApplicationServiceContext.Current.Started += (o, e) =>
+                ApplicationServiceContext.Current.GetService<IBiMetadataRepository>().Insert(
+                    new BI.Model.BiDataSourceDefinition()
+                    {
+                        ConnectionString = this.m_configuration.ReadonlyConnectionString,
+                        Demands = new List<string>()
+                        {
+                            PermissionPolicyIdentifiers.QueryWarehouseData
+                        },
+                        Name = "warehouse",
+                        Id = "org.santedb.bi.dataSource.warehouse",
+                        ProviderType = typeof(OrmBiDataProvider)
+                    }
+                );
         }
 
         /// <summary>

@@ -141,7 +141,6 @@
     <Compile Include="Security\AdoSecurityPolicy.cs" />
     <Compile Include="Security\AdoSecurityPolicyInstance.cs" />
     <Compile Include="Services\AdoApplicationIdentityProvider.cs" />
-    <Compile Include="Services\AdoBisDataProvider.cs" />
     <Compile Include="Services\AdoDeviceIdentityProvider.cs" />
     <Compile Include="Services\AdoIdentityProvider.cs" />
     <Compile Include="Services\AdoPersistenceService.cs" />
@@ -291,7 +290,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
-
   <Choose>
     <When Condition="$(SolutionName.Contains('-ext'))">
       <ItemGroup>
@@ -311,20 +309,17 @@
           <Project>{030666AA-FC71-449E-9DFC-270F1C23C5DA}</Project>
           <Name>SanteDB.BI</Name>
         </ProjectReference>
-
       </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="1.43.0.0"/>
-        <PackageReference Include="SanteDB.Core.Model" Version="1.43.0.0"/>
-        <PackageReference Include="SanteDB.OrmLite" Version="1.43.0.0"/>
-        <PackageReference Include="SanteDB.BI" Version="1.43.0.0"/>
+        <PackageReference Include="SanteDB.Core.Api" Version="1.43.0.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="1.43.0.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="1.43.0.0" />
+        <PackageReference Include="SanteDB.BI" Version="1.43.0.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
-
-
   <ItemGroup>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>

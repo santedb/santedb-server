@@ -490,12 +490,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
             ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(typeof(AdoSubscriptionExector));
 
             // Bind BI stuff
-            ApplicationServiceContext.Current.GetService<IBisMetadataRepository>()?.Insert(new SanteDB.BI.Model.BisDataSourceDefinition()
+            ApplicationServiceContext.Current.GetService<IBiMetadataRepository>()?.Insert(new SanteDB.BI.Model.BiDataSourceDefinition()
             {
                 Id = "org.santedb.bi.dataSource.main",
                 Name = "main",
                 ConnectionString = this.m_configuration.ReadonlyConnectionString,
-                ProviderType = typeof(AdoBisDataProvider)
+                ProviderType = typeof(OrmBiDataProvider)
             });
 
             // Bind some basic service stuff

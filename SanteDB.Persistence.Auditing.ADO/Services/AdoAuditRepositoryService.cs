@@ -40,6 +40,8 @@ using System.Linq.Expressions;
 using System.Security.Principal;
 using SanteDB.Core.Model.Query;
 using System.Diagnostics.Tracing;
+using SanteDB.BI.Services;
+using SanteDB.BI.Model;
 
 namespace SanteDB.Persistence.Auditing.ADO.Services
 {
@@ -116,6 +118,35 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         {
             try
             {
+                ApplicationServiceContext.Current.Started += (o, e) =>
+                {
+                    // Audit that Audits are now being recorded
+                    var audit = new AuditData(DateTime.Now, ActionType.Execute, OutcomeIndicator.Success, EventIdentifierType.ApplicationActivity, AuditUtil.CreateAuditActionCode(EventTypeCodes.AuditLoggingStarted));
+                    AuditUtil.AddLocalDeviceActor(audit);
+                    AuditUtil.SendAudit(audit);
+
+                    // Add audits as a BI data source
+                    ApplicationServiceContext.Current.GetService<IBiMetadataRepository>()
+                        .Insert(new BiDataSourceDefinition()
+                        {
+                            ConnectionString = this.m_configuration.ReadonlyConnectionString,
+                            Demands = new List<string>()
+                            {
+                                PermissionPolicyIdentifiers.AccessAuditLog
+                            },
+                            Id = "org.santedb.bi.dataSource.audit",
+                            Name = "audit",
+                            ProviderType = typeof(OrmBiDataProvider)
+                        });
+                };
+                ApplicationServiceContext.Current.Stopping += (o, e) =>
+                {
+                    // Audit that audits are no longer being recorded
+                    var audit = new AuditData(DateTime.Now, ActionType.Execute, OutcomeIndicator.Success, EventIdentifierType.ApplicationActivity, AuditUtil.CreateAuditActionCode(EventTypeCodes.AuditLoggingStopped));
+                    AuditUtil.AddLocalDeviceActor(audit);
+                    AuditUtil.SendAudit(audit);
+                };
+
                 this.m_mapper = new ModelMapper(typeof(AdoAuditRepositoryService).Assembly.GetManifestResourceStream("SanteDB.Persistence.Auditing.ADO.Data.Map.ModelMap.xml"));
                 this.m_builder = new QueryBuilder(this.m_mapper, this.m_configuration.Provider);
             }

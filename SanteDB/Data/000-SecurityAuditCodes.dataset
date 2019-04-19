@@ -869,6 +869,7 @@
       </name>
     </Concept>
   </update>
+  
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>19e890c1-7f1f-4022-8f75-973b6b69a3ed</id>
@@ -899,6 +900,74 @@
       <name>
         <language>en</language>
         <value>User security attribute changed</value>
+      </name>
+    </Concept>
+  </update>
+
+  <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>29e890c1-7f1f-4022-8f75-973b6b69a3ff</id>
+      <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
+      <mnemonic>110133</mnemonic>
+      <codeSystem>6c3b1b28-2e5b-40ef-a89b-0eb26477a16a</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Audit Recording Stopped</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>c25f9223-0da1-440c-8362-aec1c07bbdff</id>
+      <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
+      <version xsi:nil="true" />
+      <sequence xsi:nil="true" />
+      <isReadonly>false</isReadonly>
+      <mnemonic>SecurityAuditCode-AuditLoggingStopped</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <referenceTerm>
+        <term>29e890c1-7f1f-4022-8f75-973b6b69a3ff</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+      <name>
+        <language>en</language>
+        <value>Audit Logging Stopped</value>
+      </name>
+    </Concept>
+  </update>
+
+  <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>39e890c1-7f1f-4022-8f75-973b6b69a3ff</id>
+      <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
+      <mnemonic>110134</mnemonic>
+      <codeSystem>6c3b1b28-2e5b-40ef-a89b-0eb26477a16a</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Audit Recording Started</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>d25f9223-0da1-440c-8362-aec1c07bbdff</id>
+      <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
+      <version xsi:nil="true" />
+      <sequence xsi:nil="true" />
+      <isReadonly>false</isReadonly>
+      <mnemonic>SecurityAuditCode-AuditLoggingStarted</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <referenceTerm>
+        <term>39e890c1-7f1f-4022-8f75-973b6b69a3ff</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+      <name>
+        <language>en</language>
+        <value>Audit Logging Started</value>
       </name>
     </Concept>
   </update>
@@ -956,7 +1025,8 @@
       <concept>cea9df32-2012-4ca0-9b0d-4fc69b837c1b</concept>
       <concept>b25f9223-0da1-440c-8362-aec1c07bbdf8</concept>
       <concept>b25f9223-0fd1-440c-8362-aec1c07bbdf8</concept>
-
+      <concept>c25f9223-0da1-440c-8362-aec1c07bbdff</concept>
+      <concept>d25f9223-0da1-440c-8362-aec1c07bbdff</concept>
     </ConceptSet>
   </update>
 </dataset>
