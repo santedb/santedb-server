@@ -119,7 +119,7 @@ namespace SanteDB.Tools.DataSandbox.Wcf
 
                         RestOperationContext.Current.OutgoingResponse.StatusCode = 200; /// HttpStatusCode.OK;
                         //RestOperationContext.Current.OutgoingResponse.ContentLength = new FileInfo(contentPath).Length;
-                        RestOperationContext.Current.OutgoingResponse.ContentType = this.GetContentType(contentPath);
+                        RestOperationContext.Current.OutgoingResponse.ContentType = DefaultContentTypeMapper.GetContentType(contentPath);
 
                         return typeof(DataSandboxTool).Assembly.GetManifestResourceStream(contentPath);
                     }
