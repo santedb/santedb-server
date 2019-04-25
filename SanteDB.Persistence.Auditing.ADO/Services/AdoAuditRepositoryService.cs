@@ -130,9 +130,14 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                         .Insert(new BiDataSourceDefinition()
                         {
                             ConnectionString = this.m_configuration.ReadonlyConnectionString,
-                            Demands = new List<string>()
+                            MetaData = new BiMetadata()
                             {
-                                PermissionPolicyIdentifiers.AccessAuditLog
+                                Version = typeof(AdoAuditRepositoryService).Assembly.GetName().Version.ToString(),
+                                Status = BiDefinitionStatus.Active,
+                                Demands = new List<string>()
+                                {
+                                    PermissionPolicyIdentifiers.AccessAuditLog
+                                }
                             },
                             Id = "org.santedb.bi.dataSource.audit",
                             Name = "audit",

@@ -74,7 +74,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// Identifies the remote endpoint which established the session
         /// </summary>
         [Column("aud"), NotNull]
-        public String Audience { get; set; }
+        public String RemoteEndpoint { get; set; }
 
         /// <summary>
         /// The device key

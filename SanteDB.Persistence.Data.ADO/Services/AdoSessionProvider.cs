@@ -84,7 +84,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <param name="expiry">The expiration of the session</param>
         /// <param name="aud">The audience of the session</param>
         /// <returns>A constructed <see cref="global::ThisAssembly:AdoSession"/></returns>
-        public ISession Establish(IPrincipal principal, DateTimeOffset expiry, String aud)
+        public ISession Establish(IPrincipal principal, DateTimeOffset expiry, String remoteEp)
         {
             // Validate the parameters
             if (principal == null)
@@ -117,7 +117,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         NotBefore = DateTimeOffset.Now,
                         NotAfter = expiry,
                         RefreshExpiration = expiry.AddMinutes(10),
-                        Audience = aud,
+                        RemoteEndpoint = remoteEp,
                         RefreshToken = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(BitConverter.ToString(refreshToken).Replace("-", ""))
                     };
 

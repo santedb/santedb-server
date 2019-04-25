@@ -75,6 +75,9 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                 if (principal == null)
                     throw new AuthenticationException("Invalid client credentials");
 
+                // Client secret
+                RestOperationContext.Current.Data.Add("symm_secret", b64Data[1]);
+
                 // If the current principal is set-up then add the identity if not then don't
                 if(AuthenticationContext.Current.Principal == AuthenticationContext.AnonymousPrincipal)
                 {

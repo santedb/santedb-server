@@ -151,10 +151,10 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="1.43.0.0"/>
-        <PackageReference Include="SanteDB.Core.Applets" Version="1.43.0.0"/>
-        <PackageReference Include="SanteDB.Core.Model" Version="1.43.0.0"/>
-        <PackageReference Include="SanteDB.OrmLite" Version="1.43.0.0"/>
+        <PackageReference Include="SanteDB.Core.Api" Version="1.44.0.0"/>
+        <PackageReference Include="SanteDB.Core.Applets" Version="1.44.0.0"/>
+        <PackageReference Include="SanteDB.Core.Model" Version="1.44.0.0"/>
+        <PackageReference Include="SanteDB.OrmLite" Version="1.44.0.0"/>
       </ItemGroup>
     </Otherwise>
   </Choose>

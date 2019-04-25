@@ -82,9 +82,14 @@ namespace SanteDB.Warehouse.ADO
                     new BI.Model.BiDataSourceDefinition()
                     {
                         ConnectionString = this.m_configuration.ReadonlyConnectionString,
-                        Demands = new List<string>()
+                        MetaData= new BI.Model.BiMetadata()
                         {
-                            PermissionPolicyIdentifiers.QueryWarehouseData
+                            Version = typeof(ADODataWarehouse).Assembly.GetName().Version.ToString(),
+                            Status = BI.Model.BiDefinitionStatus.Active,
+                            Demands = new List<string>()
+                            {
+                                PermissionPolicyIdentifiers.QueryWarehouseData
+                            },
                         },
                         Name = "warehouse",
                         Id = "org.santedb.bi.dataSource.warehouse",

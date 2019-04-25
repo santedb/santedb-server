@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using RestSrvr;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using System;
@@ -60,8 +61,11 @@ namespace SanteDB.Core.Security
                     retVal = new X509SigningCredentials(cert, new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("name", configuration.KeyName ?? "0")), signingAlgorithm, digestAlgorithm);
                     break;
                 case SignatureAlgorithm.HS256:
+
+                    // If HS256 is used then the client_secret should be used as the secret
+                    object secret = RestOperationContext.Current.Data.TryGetValue("symm_secret", out secret) ? secret : configuration.Secret;
                     retVal = new SigningCredentials(
-                        new InMemorySymmetricSecurityKey(configuration.Secret),
+                        new InMemorySymmetricSecurityKey((byte[])secret),
                         "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256",
                         "http://www.w3.org/2001/04/xmlenc#sha256",
                         new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("name", configuration.KeyName ?? "0"))

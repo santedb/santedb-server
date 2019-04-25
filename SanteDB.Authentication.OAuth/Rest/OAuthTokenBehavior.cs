@@ -104,6 +104,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     if (String.IsNullOrEmpty(client_identity) || String.IsNullOrEmpty(client_secret))
                         return this.CreateErrorCondition(OAuthErrorType.invalid_client, "Missing client credentials");
 
+                    RestOperationContext.Current.Data.Add("symm_secret", Encoding.UTF8.GetBytes(client_secret));
+
                     try
                     {
                         clientPrincipal = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>().Authenticate(client_identity, client_secret);
@@ -332,6 +334,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
                    });
             }
 
+            // Add audience claim bsaed on application identity
+            claims.Add(new SanteDBClaim("aud", claimsPrincipal.Identities.OfType<Core.Security.ApplicationIdentity>().First().Name));
+
             // Name identifier
             claims.AddRange((claimsPrincipal).Claims.Where(o => o.Type == SanteDBClaimTypes.NameIdentifier));
 
@@ -374,13 +379,13 @@ namespace SanteDB.Authentication.OAuth2.Rest
             // TODO: Add configuration for expiry
             DateTime issued = DateTime.Parse((claimsPrincipal)?.FindFirst(SanteDBClaimTypes.AuthenticationInstant)?.Value ?? DateTime.Now.ToString("o")),
                 expires = DateTime.Now.Add(this.m_configuration.ValidityTime);
-            String aud =
+            String remoteIp = 
                 RestOperationContext.Current.IncomingRequest.Headers["X-Forwarded-For"] ??
                 RestOperationContext.Current.IncomingRequest.RemoteEndPoint.Address.ToString();
 
             // Establish the session
             ISessionProviderService isp = ApplicationServiceContext.Current.GetService<ISessionProviderService>();
-            var session = isp.Establish(new SanteDBClaimsPrincipal(claimsPrincipal.Identities), expires, aud);
+            var session = isp.Establish(new SanteDBClaimsPrincipal(claimsPrincipal.Identities), expires, remoteIp);
 
             string refreshToken = null, sessionId = null;
             if (session != null)
