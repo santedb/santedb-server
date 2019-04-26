@@ -51,6 +51,9 @@ using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Diagnostics.Tracing;
+using SanteDB.Core.Applets.Services;
+using System.Globalization;
+using SanteDB.Core.Http;
 
 namespace SanteDB.Authentication.OAuth2.Rest
 {
@@ -491,6 +494,56 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     Error = OAuthErrorType.invalid_request,
                     ErrorDescription = "No Such Session"
                 });
+            }
+        }
+
+        /// <summary>
+        /// Post the authorization code to the application
+        /// </summary>
+        /// <param name="authorization">Authorization post results</param>
+        public void SelfPost(NameValueCollection authorization)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Render the specified login asset
+        /// </summary>
+        /// <returns>A stream of the rendered login asset</returns>
+        public Stream RenderAsset(string content)
+        {
+            // First, does this configuraiton allow for authorization code grants?
+            if (this.m_configuration.AuthorizationFlows?.Any(o => o.Flow == OAuthAuthorizationFlowType.AuthorizationCode) != true)
+                throw new NotSupportedException("This service does not support OAUTH Authorization grant");
+
+            // Get the asset object
+            var loadedApplets = ApplicationServiceContext.Current.GetService<IAppletManagerService>().Applets;
+            var loginApplet = loadedApplets.Where(o => o.Configuration.AppSettings.Any(s => s.Name == "oauth2.login.asset")).FirstOrDefault();
+            if (loginApplet == null)
+                throw new KeyNotFoundException("No asset has been configured as oauth2.login.asset");
+
+            var loginAssetName = loginApplet.Configuration.AppSettings.FirstOrDefault(o => o.Name == "oauth2.login.asset")?.Value;
+            var loginAsset = loadedApplets.ResolveAsset(loginAssetName);
+            if (loginAsset == null)
+                throw new KeyNotFoundException($"Login asset {loginAssetName} not found");
+
+            // All "content" is relative to the path of the login asset and only in the same directory
+            var loginAssetPath = loginAsset.Name.Substring(0, loginAsset.Name.LastIndexOf("/"));
+
+            // Now time to resolve the asset
+            if (String.IsNullOrEmpty(content))
+                content = loginAsset.Name.Substring(loginAsset.Name.LastIndexOf("/") + 1);
+
+            // Render out the data
+            var assetName = $"{loginApplet.Info.Id}/{loginAssetPath}/{content}";
+            loginAsset = loadedApplets.ResolveAsset(assetName, loginAsset);
+            if (loginAsset == null)
+                throw new KeyNotFoundException($"Asset {assetName} not foud");
+            else
+            {
+                RestOperationContext.Current.OutgoingResponse.ContentType =
+                    DefaultContentTypeMapper.GetContentType(Path.GetExtension(content));
+                return new MemoryStream(loadedApplets.RenderAssetContent(loginAsset, RestOperationContext.Current.IncomingRequest.QueryString["ui_locales"] ?? CultureInfo.CurrentUICulture.TwoLetterISOLanguageName));
             }
         }
     }

@@ -128,6 +128,13 @@
   </section>
   <section xsi:type="OAuthConfigurationSection" issuerName="http://localhost:8080/auth">
     <validityTime>01:00:00</validityTime>
+    <flows>
+      <add flow="client_credentials">
+      </add>
+      <add flow="password"/>
+      <add flow="refresh_token"/>
+      <add flow="authorization_code"/>
+    </flows>
     <allowedClaims>
       <add>scope</add>
       <add>urn:santedb:org:override</add>
@@ -429,10 +436,10 @@
            providerType="npgsql" />
   <!-- This section controls the persistence for ADO.NET -->
   <section xsi:type="AdoPersistenceConfigurationSection"
-           readWriteConnectionString="PSQL"
-           readOnlyConnectionString="PSQL"
+           readWriteConnectionString="FBSQL"
+           readOnlyConnectionString="FBSQL"
            traceSql="false"
-           providerType="npgsql"
+           providerType="fbsql"
            staOnly="false"
            autoUpdateExisting="true"
            autoInsertChildren="true"
@@ -502,8 +509,8 @@
       <add type="SanteDB.Messaging.Atna.AtnaAuditService, SanteDB.Messaging.Atna, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
 
       <!-- Data Services -->
-      <!--<add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />-->
-      <add type="SanteDB.Caching.Redis.RedisCacheService, SanteDB.Caching.Redis, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />
+      <!--<add type="SanteDB.Caching.Redis.RedisCacheService, SanteDB.Caching.Redis, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />-->
       <add type="SanteDB.Caching.Redis.RedisQueryPersistenceService, SanteDB.Caching.Redis, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Caching.Memory.MemoryQueryPersistenceService, SanteDB.Caching.Memory, Version=1.10.0.24160, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPersistenceService, SanteDB.Persistence.Data.ADO, Version=1.10.0.24162, Culture=neutral, PublicKeyToken=null" />

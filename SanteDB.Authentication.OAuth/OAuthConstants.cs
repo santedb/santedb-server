@@ -32,6 +32,11 @@ namespace SanteDB.Authentication.OAuth2
 
 
         /// <summary>
+        /// Grant name for the authorization code
+        /// </summary>
+        public const string GrantNameAuthorizationCode = "authorization_code";
+
+        /// <summary>
         /// Grant name for password grant
         /// </summary>
         public const string GrantNamePassword = "password";

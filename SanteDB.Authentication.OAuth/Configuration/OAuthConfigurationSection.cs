@@ -20,6 +20,9 @@
 using SanteDB.Core.Configuration;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing.Design;
+using System.Windows.Forms.Design;
 using System.Xml.Serialization;
 
 namespace SanteDB.Authentication.OAuth2.Configuration
@@ -37,6 +40,7 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         public OAuthConfigurationSection()
         {
             this.AllowedClientClaims = new List<string>();
+            this.AuthorizationFlows = new List<OAuthAuthorizationFlowConfiguration>();
         }
 
         /// <summary>
@@ -58,6 +62,12 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         public List<String> AllowedClientClaims { get; set; }
 
         /// <summary>
+        /// Configuration for authorization flows
+        /// </summary>
+        [XmlArray("flows"), XmlArrayItem("add")]
+        public List<OAuthAuthorizationFlowConfiguration> AuthorizationFlows { get; set; }
+
+        /// <summary>
         /// Issuer name
         /// </summary>
         [XmlAttribute("issuerName"), ConfigurationRequired]
@@ -69,5 +79,11 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         [XmlElement("tokenType")]
         public string TokenType { get; set; }
 
+        /// <summary>
+        /// Login asset directory
+        /// </summary>
+        [XmlElement("inetpub"), 
+            Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
+        public String LoginAssetDir { get; set; }
     }
 }
