@@ -208,6 +208,7 @@ namespace SanteDB.Core
                             Trace.TraceWarning("Cannot find service {0}, skipping", svc.TypeXml);
                         else
                         {
+                            Trace.TraceInformation("Creating {0}...", svc.Type);
                             var instance = Activator.CreateInstance(svc.Type);
                             this.m_serviceInstances.Add(instance);
                         }
