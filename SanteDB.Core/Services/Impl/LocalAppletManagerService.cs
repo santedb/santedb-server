@@ -82,12 +82,11 @@ namespace SanteDB.Core.Services.Impl
         {
             this.m_appletCollection = new AppletCollection();
             this.m_readonlyAppletCollection = this.m_appletCollection.AsReadonly();
-            this.m_caIssuerCert = new X509Certificate2();
             using (var str = typeof(AppletManifest).Assembly.GetManifestResourceStream("SanteDB.Core.Applets.Publisher.appca.santesuite.net.cer"))
             {
                 var cbytes = new byte[str.Length];
                 str.Read(cbytes, 0, cbytes.Length);
-                this.m_caIssuerCert.Import(cbytes);
+                this.m_caIssuerCert = new X509Certificate2(cbytes); 
             }
         }
 
