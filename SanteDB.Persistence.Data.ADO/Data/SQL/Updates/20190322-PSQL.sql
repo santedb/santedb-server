@@ -28,6 +28,10 @@ CREATE INDEX IF NOT EXISTS  ENT_VRSN_CRT_UTC_IDX ON ENT_VRSN_TBL(CRT_UTC);
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE INDEX phon_val_val_gin_idx ON phon_val_tbl USING gin (val gin_trgm_ops);
 
+DROP INDEX IF EXISTS act_ptcpt_ent_id_idx;
+DROP INDEX IF EXISTS act_ptcpt_rol_cd_idx;
+DROP INDEX IF EXISTS act_tag_tag_name_idx;
+
 SELECT REG_PATCH('20190322-01');
 
 COMMIT;
