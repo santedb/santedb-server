@@ -161,7 +161,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     finally
                     {
                         if (newSubContext)
+                        {
+                            foreach (var i in subContext.CacheOnCommit)
+                                context.AddCacheCommit(i);
                             subContext.Dispose();
+                        }
                     }
                 });
             }

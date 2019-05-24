@@ -48,5 +48,21 @@ namespace SanteDB.Caching.Redis.Configuration
         /// </summary>
         [XmlAttribute("password")]
         public String Password { get; set; }
+
+        /// <summary>
+        /// Time to live for XML serialization
+        /// </summary>
+        [XmlAttribute("ttl")]
+        public string TTLXml
+        {
+            get { return this.TTL?.ToString(); }
+            set { if (!string.IsNullOrEmpty(value)) this.TTL = TimeSpan.Parse(value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the time to live
+        /// </summary>
+        [XmlIgnore]
+        public TimeSpan? TTL { get; private set; }
     }
 }
