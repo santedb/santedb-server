@@ -179,10 +179,14 @@ namespace SanteDB.Caching.Redis
                 var redisConn = this.m_connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
                 redisConn.KeyDelete($"{queryId}.{FIELD_QUERY_RESULT_IDX}");
                 redisConn.ListRightPush($"{queryId}.{FIELD_QUERY_RESULT_IDX}", results.Select(o=>(RedisValue)o.ToByteArray()).ToArray());
-
-                if(tag != null)
+                if (tag != null)
+                {
                     redisConn.StringSet($"{queryId}.{FIELD_QUERY_TAG_IDX}", tag.ToString());
+                    redisConn.KeyExpire($"{queryId}.{FIELD_QUERY_TAG_IDX}", new TimeSpan(1, 0, 0));
+                }
                 redisConn.StringSet($"{queryId}.{FIELD_QUERY_TOTAL_RESULTS}", BitConverter.GetBytes(totalResults));
+                redisConn.KeyExpire($"{queryId}.{FIELD_QUERY_RESULT_IDX}", new TimeSpan(1, 0, 0));
+                redisConn.KeyExpire($"{queryId}.{FIELD_QUERY_TOTAL_RESULTS}", new TimeSpan(1,0,0));
                 return true;
             }
             catch (Exception e)

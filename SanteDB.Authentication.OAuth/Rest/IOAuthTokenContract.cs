@@ -47,7 +47,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <summary>
         /// Post to the authorization handler
         /// </summary>
-        [Post("authz.do")]
+        [Post("/authz/authz.do")]
         void SelfPost(NameValueCollection authorization);
 
         /// <summary>

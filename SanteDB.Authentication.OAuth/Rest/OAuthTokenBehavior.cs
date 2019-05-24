@@ -531,9 +531,24 @@ namespace SanteDB.Authentication.OAuth2.Rest
             var loginAssetPath = loginAsset.Name.Substring(0, loginAsset.Name.LastIndexOf("/"));
 
             // Now time to resolve the asset
-            if (String.IsNullOrEmpty(content))
-                content = loginAsset.Name.Substring(loginAsset.Name.LastIndexOf("/") + 1);
+            if (String.IsNullOrEmpty(content) || content == "index.html")
+            {
+                // Rule: scope, response_type and client_id and redirect_uri must be provided
+                if (String.IsNullOrEmpty(RestOperationContext.Current.IncomingRequest.QueryString["redirect_uri"]) || String.IsNullOrEmpty(RestOperationContext.Current.IncomingRequest.QueryString["client_id"]))
+                    throw new InvalidOperationException("OpenID Violation: redirect_uri and client_id must be provided");
+                else
+                {
+                    var applicationId = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>().GetIdentity(RestOperationContext.Current.IncomingRequest.QueryString["client_id"]);
+                    var flowConfiguration = this.m_configuration.AuthorizationFlows.FirstOrDefault(o => o.Flow == OAuthAuthorizationFlowType.AuthorizationCode);
+                    if (flowConfiguration == null || flowConfiguration.AllowedClients.Count > 0 && !flowConfiguration.AllowedClients.Contains(applicationId.Name))
+                        throw new SecurityException("Authorization code grants not allowed for this client");
 
+                    // TODO: Get claim for application redirect URL
+                    
+
+                }
+                content = loginAsset.Name.Substring(loginAsset.Name.LastIndexOf("/") + 1);
+            }
             // Render out the data
             var assetName = $"{loginApplet.Info.Id}/{loginAssetPath}/{content}";
             loginAsset = loadedApplets.ResolveAsset(assetName, loginAsset);

@@ -238,9 +238,19 @@ namespace SanteDB.Core.Services.Impl
 
             try
             {
-                data = businessRulesService?.BeforeUpdate(data) ?? data;
-                data = persistenceService.Update(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-                businessRulesService?.AfterUpdate(data);
+                if (data.Key.HasValue && persistenceService.Get(data.Key.Value, null, true, AuthenticationContext.Current.Principal) != null)
+                {
+                    data = businessRulesService?.BeforeUpdate(data) ?? data;
+                    data = persistenceService.Update(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                    businessRulesService?.AfterUpdate(data);
+                }
+                else
+                {
+                    data = businessRulesService?.BeforeInsert(data) ?? data;
+                    data = persistenceService.Insert(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                    businessRulesService?.AfterInsert(data);
+                }
+
                 this.Saved?.Invoke(this, new RepositoryEventArgs<TEntity>(data));
                 return data;
             }
