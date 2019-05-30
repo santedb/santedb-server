@@ -2,7 +2,7 @@
  * <feature scope="SanteDB.Persistence.Data.ADO" id="00-OPENIZ" name="Upgrade from OpenIZ 1.1.0.0" applyRange="1.1.0.0-1.1.0.0" invariantName="npgsql">
  *	<summary>Upgrades an OpenIZ 1.1.0.0 database SanteDB</summary>
  *	<remarks>This update will perform the necessary steps to upgrade an existing OpenIZ database to SanteDB</remarks>
- *  <isInstalled>SELECT COUNT(*) FROM SEC_PROV_TBL;</isInstalled>
+ *  <isInstalled mustExecute="true">SELECT COUNT(*) > 0 FROM SEC_PROV_TBL;</isInstalled>
  * </feature>
  */
  
