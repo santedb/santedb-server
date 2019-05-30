@@ -102,7 +102,7 @@ namespace SanteDB.Configuration
                 {
                     this.m_features = AppDomain.CurrentDomain.GetAssemblies()
                         .Where(o => !o.IsDynamic)
-                        .SelectMany(a => a.ExportedTypes)
+                        .SelectMany(a => { try { return a.ExportedTypes; } catch { return new List<Type>(); } })
                         .Where(t => typeof(IFeature).IsAssignableFrom(t) && !t.ContainsGenericParameters && !t.IsAbstract && !t.IsInterface).Select(i => Activator.CreateInstance(i) as IFeature).ToList();
                 }
                 return this.m_features;
@@ -159,8 +159,9 @@ namespace SanteDB.Configuration
                 if (this.m_providers == null)
                     this.m_providers = AppDomain.CurrentDomain.GetAssemblies()
                         .Where(o => !o.IsDynamic)
-                        .SelectMany(a => a.ExportedTypes)
-                        .Where(t => typeof(IDataConfigurationProvider).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).Select(i => Activator.CreateInstance(i) as IDataConfigurationProvider)
+                        .SelectMany(a => { try { return a.ExportedTypes; } catch { return new List<Type>(); } })
+                        .Where(t => t != null && typeof(IDataConfigurationProvider).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface)
+                        .Select(i => Activator.CreateInstance(i) as IDataConfigurationProvider)
                         .ToArray();
                 return this.m_providers;
 
@@ -366,7 +367,7 @@ namespace SanteDB.Configuration
         {
             return AppDomain.CurrentDomain.GetAssemblies()
                 .Where(a => !a.IsDynamic)
-                .SelectMany(o => o.ExportedTypes);
+                .SelectMany(o => { try { return o.ExportedTypes; } catch { return new List<Type>(); } }); // HACK: Mono does not like all assemblies
         }
     }
 }

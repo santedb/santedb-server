@@ -148,10 +148,15 @@ namespace SanteDB.Configurator
                 var pbWidth = e.Bounds.Width - txtSize.Width - 10;
 
                 if (ProgressBarRenderer.IsSupported)
+                {
                     ProgressBarRenderer.DrawHorizontalBar(e.Graphics, new Rectangle(e.Bounds.Left + 2, e.Bounds.Top + 2, (int)pbWidth, e.Bounds.Height - 4));
-                ProgressBarRenderer.DrawHorizontalChunks(e.Graphics, new Rectangle(e.Bounds.Left + 4, e.Bounds.Top + 4, (int)((pbWidth - 4) * (float.Parse(e.SubItem.Text) / 100.0f)), e.Bounds.Height - 8));
-//                e.Graphics.FillRectangle(SystemBrushes.Highlight, new Rectangle(e.Bounds.Left + 4, e.Bounds.Top + 4, (int)((pbWidth - 4) * (float.Parse(e.SubItem.Text) / 100.0f)), e.Bounds.Height - 8));
-                //                e.Graphics.DrawRectangle(SystemPens.ControlDarkDark, e.Bounds.Left, e.Bounds.Top + 2, pbWidth, e.Bounds.Height - 3);
+                    ProgressBarRenderer.DrawHorizontalChunks(e.Graphics, new Rectangle(e.Bounds.Left + 4, e.Bounds.Top + 4, (int)((pbWidth - 4) * (float.Parse(e.SubItem.Text) / 100.0f)), e.Bounds.Height - 8));
+                }
+                else
+                {
+                    e.Graphics.FillRectangle(SystemBrushes.Highlight, new Rectangle(e.Bounds.Left + 4, e.Bounds.Top + 4, (int)((pbWidth - 4) * (float.Parse(e.SubItem.Text) / 100.0f)), e.Bounds.Height - 8));
+                    e.Graphics.DrawRectangle(SystemPens.ControlDarkDark, e.Bounds.Left, e.Bounds.Top + 2, pbWidth, e.Bounds.Height - 3);
+                }
                 e.Graphics.DrawString($"{e.SubItem.Text}%", SystemFonts.DefaultFont, SystemBrushes.ControlText, e.Bounds.Left + pbWidth + 10, e.Bounds.Top + ((e.Bounds.Height - txtSize.Height) / 2));
             }
             else

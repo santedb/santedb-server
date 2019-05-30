@@ -192,7 +192,9 @@ namespace SanteDB.Messaging.AMI
                 else
                     AmiMessageHandler.ResourceHandler = new ResourceHandlerTool(
                         typeof(SecurityUserResourceHandler).Assembly.ExportedTypes
-                        .Union(AppDomain.CurrentDomain.GetAssemblies().Where(a=>!a.IsDynamic).SelectMany(a=>a.ExportedTypes))
+                        .Union(AppDomain.CurrentDomain.GetAssemblies()
+                        .Where(a=>!a.IsDynamic)
+                        .SelectMany(a=> { try { return a.ExportedTypes; } catch { return new List<Type>(); } })) // HACK: Mono freaks out if this isn't in try/catch
                         .Where(t => !t.IsAbstract && !t.IsInterface && typeof(IApiResourceHandler).IsAssignableFrom(t))
                         .ToList(),
                         typeof(IAmiServiceContract)
