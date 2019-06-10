@@ -172,7 +172,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
             {
                 Details = issues,
                 Outcome = ResultCode.Accepted,
-                Results = hdsiResults.AsParallel().Select(o => this.MapToFhir(o, restOperationContext)).OfType<DomainResourceBase>().ToList(),
+                Results = hdsiResults.AsParallel().Select(o => this.MapToFhir(o, restOperationContext)).OfType<ResourceBase>().ToList(),
                 Query = query,
                 TotalResults = totalResults
             };

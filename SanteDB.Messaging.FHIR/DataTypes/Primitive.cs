@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
@@ -71,7 +72,12 @@ namespace SanteDB.Messaging.FHIR.DataTypes
             
             }
             set {
-                this.Value = MARC.Everest.Connectors.Util.Convert<T>(value);
+
+                // From xmlenum
+                if (typeof(T).IsEnum)
+                    this.Value = (T)typeof(T).GetFields().FirstOrDefault(o => o.GetCustomAttribute<XmlEnumAttribute>()?.Name == value || o.Name == value).GetValue(null);
+                else
+                    this.Value = MARC.Everest.Connectors.Util.Convert<T>(value);
             }
         }
 

@@ -119,9 +119,9 @@ namespace SanteDB.Messaging.FHIR.Resources
         /// <summary>
         /// Gets or sets the encounter during which the vaccination was performed
         /// </summary>
-        //[XmlElement("encounter")]
-        //[Description("Indicates the encounter in which the vaccination occurred")]
-        //public Resource<Encounter> Encounter { get; set; }
+        [XmlElement("encounter")]
+        [Description("Indicates the encounter in which the vaccination occurred")]
+        public Reference<Encounter> Encounter { get; set; }
 
         /// <summary>
         /// Gets or sets the manufacturer of the vaccine administered
@@ -133,9 +133,9 @@ namespace SanteDB.Messaging.FHIR.Resources
         /// <summary>
         /// Gets or sets the location where the immunization was performed
         /// </summary>
-        //[XmlElement("location")]
-        //[Description("Identifies the location where the immunization occurred")]
-        //public Resource<Location> Location { get; set; }
+        [XmlElement("location")]
+        [Description("Identifies the location where the immunization occurred")]
+        public Reference<Location> Location { get; set; }
 
         /// <summary>
         /// Gets or sets the lot number of the vaccination

@@ -19,6 +19,7 @@
  */
 using MARC.Everest.Connectors;
 using RestSrvr;
+using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
@@ -39,7 +40,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
     /// <summary>
     /// Resource handler for immunization classes.
     /// </summary>
-    public class ImmunizationResourceHandler : RepositoryResourceHandlerBase<Immunization, SubstanceAdministration>
+    public class ImmunizationResourceHandler : RepositoryResourceHandlerBase<Immunization, SubstanceAdministration>, IBundleResourceHandler
 	{
 		/// <summary>
 		/// Maps the substance administration to FHIR.
@@ -117,35 +118,94 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// </summary>
 		/// <param name="resource">The resource.</param>
 		/// <returns>Returns the mapped model.</returns>
-		protected override SubstanceAdministration MapToModel(Immunization resource, RestOperationContext RestOperationContext)
+		protected override SubstanceAdministration MapToModel(Immunization resource, RestOperationContext webOperationContext)
 		{
-			var substanceAdministration = new SubstanceAdministration
-			{
-				ActTime = resource.Date.DateValue.Value,
-				DoseQuantity = resource.DoseQuantity.Value.Value.Value,
-				Extensions = resource.Extension?.Select(DataTypeConverter.ToActExtension).ToList(),
-				Identifiers = resource.Identifier?.Select(DataTypeConverter.ToActIdentifier).ToList(),
-				Key = Guid.NewGuid(),
-				MoodConceptKey = DataTypeConverter.ToConcept<string>(resource.Status, "http://hl7.org/fhir/medication-admin-status")?.Key,
-				ReasonConceptKey = DataTypeConverter.ToConcept<string>(resource.Status, "http://snomed.info/sct")?.Key,
-				RouteKey = DataTypeConverter.ToConcept<string>(resource.Status, "http://hl7.org/fhir/v3/RouteOfAdministration")?.Key,
-				SiteKey = DataTypeConverter.ToConcept(resource.Site.GetPrimaryCode(), resource.Site.GetPrimaryCode().System)?.Key,
-			};
+            var substanceAdministration = new SubstanceAdministration
+            {
+                ActTime = resource.Date.DateValue.Value,
+                DoseQuantity = resource.DoseQuantity?.Value.Value ?? 0,
+                DoseUnit = resource.DoseQuantity != null ? DataTypeConverter.ToConcept<String>(resource.DoseQuantity.Units.Value, "http://hl7.org/fhir/sid/ucum") : null,
+                Extensions = resource.Extension?.Select(DataTypeConverter.ToActExtension).ToList(),
+                Identifiers = resource.Identifier?.Select(DataTypeConverter.ToActIdentifier).ToList(),
+                Key = Guid.NewGuid(),
+                MoodConceptKey = ActMoodKeys.Eventoccurrence,
+                StatusConceptKey = resource.Status == "completed" ? StatusKeys.Completed : StatusKeys.Nullified,
+                RouteKey = DataTypeConverter.ToConcept(resource.Route)?.Key,
+                SiteKey = DataTypeConverter.ToConcept(resource.Site)?.Key,
+            };
 
-			Guid key;
 
-			if (Guid.TryParse(resource.Id, out key))
-			{
-				substanceAdministration.Key = key;
-			}
+            Guid key;
+            if (Guid.TryParse(resource.Id, out key))
+            {
+                substanceAdministration.Key = key;
+            }
 
-			if (resource.WasNotGiven.Value == true)
-			{
-				substanceAdministration.IsNegated = true;
-			}
+            // Was not given
+            if (resource.WasNotGiven?.Value == true)
+            {
+                substanceAdministration.IsNegated = true;
+            }
 
-			return substanceAdministration;
-		}
+            // Patient
+            if (resource.Patient != null)
+            {
+                // Is the subject a uuid
+                if (resource.Patient.ReferenceUrl.Value.StartsWith("urn:uuid:"))
+                    substanceAdministration.Participations.Add(new ActParticipation(ActParticipationKey.RecordTarget, Guid.Parse(resource.Patient.ReferenceUrl.Value.Substring(9))));
+                else throw new NotSupportedException("Only UUID references are supported");
+            }
+
+            // Encounter
+            if (resource.Encounter != null)
+            {
+                // Is the subject a uuid
+                if (resource.Encounter.ReferenceUrl.Value.StartsWith("urn:uuid:"))
+                    substanceAdministration.Relationships.Add(new ActRelationship(ActRelationshipTypeKeys.HasComponent, substanceAdministration.Key)
+                    {
+                        SourceEntityKey = Guid.Parse(resource.Encounter.ReferenceUrl.Value.Substring(9))
+                    });
+                else throw new NotSupportedException("Only UUID references are supported");
+            }
+
+            // Find the material that was issued
+            if (resource.VaccineCode != null)
+            {
+                var concept = DataTypeConverter.ToConcept(resource.VaccineCode);
+                if (concept == null)
+                {
+                    this.traceSource.TraceWarning("Ignoring administration {0} don't have concept mapped", resource.VaccineCode);
+                    return null;
+                }
+                // Get the material 
+                int t = 0;
+                var material = ApplicationServiceContext.Current.GetService<IRepositoryService<Material>>().Find(m => m.TypeConceptKey == concept.Key, 0, 1, out t).FirstOrDefault();
+                if (material == null)
+                {
+                    this.traceSource.TraceWarning("Ignoring administration {0} don't have material registered for {1}", resource.VaccineCode, concept?.Mnemonic);
+                    return null;
+                }
+                else
+                {
+                    substanceAdministration.Participations.Add(new ActParticipation(ActParticipationKey.Product, material.Key));
+                    if (resource.LotNumber != null)
+                    {
+                        // TODO: Need to also find where the GTIN is kept
+                        var mmaterial = ApplicationServiceContext.Current.GetService<IRepositoryService<ManufacturedMaterial>>().Find(o => o.LotNumber == resource.LotNumber && o.Relationships.Any(r => r.SourceEntityKey == material.Key && r.RelationshipTypeKey == EntityRelationshipTypeKeys.Instance));
+                        substanceAdministration.Participations.Add(new ActParticipation(ActParticipationKey.Consumable, material.Key) { Quantity = 1 });
+                    }
+
+                    // Get dose units
+                    if (substanceAdministration.DoseQuantity == 0)
+                    {
+                        substanceAdministration.DoseQuantity = 1;
+                        substanceAdministration.DoseUnitKey = material.QuantityConceptKey;
+                    }
+                }
+            }
+
+            return substanceAdministration;
+        }
 
 		/// <summary>
 		/// Query for substance administrations.
@@ -194,6 +254,14 @@ namespace SanteDB.Messaging.FHIR.Handlers
                 TypeRestfulInteraction.Update,
                 TypeRestfulInteraction.Delete
             }.Select(o => new InteractionDefinition() { Type = o });
+        }
+
+        /// <summary>
+        /// Map to model
+        /// </summary>
+        public IdentifiedData MapToModel(BundleEntry bundleResource, RestOperationContext context, Bundle bundle)
+        {
+            return this.MapToModel(bundleResource.Resource.Resource as Immunization, context);
         }
     }
 }

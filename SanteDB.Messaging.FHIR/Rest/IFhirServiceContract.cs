@@ -73,43 +73,43 @@ namespace SanteDB.Messaging.FHIR.Rest
         /// Read a resource
         /// </summary>
         [Get("/{resourceType}/{id}")]
-        DomainResourceBase ReadResource(string resourceType, string id);
+        ResourceBase ReadResource(string resourceType, string id);
 
         /// <summary>
         /// Version read a resource
         /// </summary>
         [Get("/{resourceType}/{id}/_history/{vid}")]
-        DomainResourceBase VReadResource(string resourceType, string id, string vid);
+        ResourceBase VReadResource(string resourceType, string id, string vid);
 
         /// <summary>
         /// Update a resource
         /// </summary>
         [RestInvoke(UriTemplate = "/{resourceType}/{id}", Method = "PUT")]
-        DomainResourceBase UpdateResource(string resourceType, string id, DomainResourceBase target);
+        ResourceBase UpdateResource(string resourceType, string id, ResourceBase target);
 
         /// <summary>
         /// Delete a resource
         /// </summary>
         [RestInvoke(UriTemplate = "/{resourceType}/{id}", Method = "DELETE")]
-        DomainResourceBase DeleteResource(string resourceType, string id);
+        ResourceBase DeleteResource(string resourceType, string id);
 
         /// <summary>
         /// Create a resource
         /// </summary>
         [RestInvoke(UriTemplate = "/{resourceType}", Method = "POST")]
-        DomainResourceBase CreateResource(string resourceType, DomainResourceBase target);
+        ResourceBase CreateResource(string resourceType, ResourceBase target);
 
         /// <summary>
         /// Create a resource
         /// </summary>
         [RestInvoke(UriTemplate = "/{resourceType}/{id}", Method = "POST")]
-        DomainResourceBase CreateUpdateResource(string resourceType, string id, DomainResourceBase target);
+        ResourceBase CreateUpdateResource(string resourceType, string id, ResourceBase target);
 
         /// <summary>
         /// Validate a resource
         /// </summary>
         [RestInvoke(UriTemplate = "/{resourceType}/_validate/{id}", Method = "POST")]
-        OperationOutcome ValidateResource(string resourceType, string id, DomainResourceBase target);
+        OperationOutcome ValidateResource(string resourceType, string id, ResourceBase target);
 
         /// <summary>
         /// Version read a resource

@@ -284,9 +284,10 @@ namespace SanteDB.Caching.Redis
                 // Add
 
                 var redisDb = this.m_connection.GetDatabase(RedisCacheConstants.CacheDatabaseId);
+
                 var existing = redisDb.KeyExists(data.Key.Value.ToString());
-                redisDb.HashSet(data.Key.Value.ToString(), this.SerializeObject(data));
-                redisDb.KeyExpire(data.Key.Value.ToString(), this.m_configuration.TTL);
+                redisDb.HashSet(data.Key.Value.ToString(), this.SerializeObject(data), CommandFlags.FireAndForget);
+                redisDb.KeyExpire(data.Key.Value.ToString(), this.m_configuration.TTL, CommandFlags.FireAndForget);
 #if DEBUG
                 this.m_tracer.TraceVerbose("HashSet {0} (EXIST: {1}; @: {2})", data, existing, new System.Diagnostics.StackTrace(true).GetFrame(1));
 #endif 

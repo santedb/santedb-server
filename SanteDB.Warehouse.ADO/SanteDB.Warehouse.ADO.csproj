@@ -58,6 +58,7 @@
     <Content Include="Data\SQL\PSQL\santedb-dw-core.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Data\SQL\Updates\20190510-PSQL.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\SanteDB.licenseheader">
@@ -83,7 +84,6 @@
           <Project>{030666AA-FC71-449E-9DFC-270F1C23C5DA}</Project>
           <Name>SanteDB.BI</Name>
         </ProjectReference>
-        
       </ItemGroup>
     </When>
     <Otherwise>
@@ -95,9 +95,7 @@
       </ItemGroup>
     </Otherwise>
   </Choose>
-
   <ItemGroup>
-
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
       <Name>SanteDB.Core</Name>

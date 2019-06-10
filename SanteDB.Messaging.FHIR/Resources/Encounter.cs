@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Model.Entities;
 using SanteDB.Messaging.FHIR.Attributes;
 using SanteDB.Messaging.FHIR.Backbone;
 using SanteDB.Messaging.FHIR.DataTypes;
@@ -149,5 +150,11 @@ namespace SanteDB.Messaging.FHIR.Resources
         [Description("Another encounter this encounter is a part of")]
         public Reference<Encounter> PartOf { get; set; }
 
+        /// <summary>
+        /// Gets the service provider of the encounter
+        /// </summary>
+        [XmlElement("serviceProvider")]
+        [Description("Identifies the service provider for the encounter")]
+        public Reference<Organization> ServiceProvider { get; internal set; }
     }
 }

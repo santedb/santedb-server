@@ -43,7 +43,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Update a resource
         /// </summary>
-        FhirOperationResult Update(string id, DomainResourceBase target, TransactionMode mode);
+        FhirOperationResult Update(string id, ResourceBase target, TransactionMode mode);
 
         /// <summary>
         /// Delete a resource
@@ -53,7 +53,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Create a resource
         /// </summary>
-        FhirOperationResult Create(DomainResourceBase target, TransactionMode mode);
+        FhirOperationResult Create(ResourceBase target, TransactionMode mode);
 
         /// <summary>
         /// Query a FHIR resource

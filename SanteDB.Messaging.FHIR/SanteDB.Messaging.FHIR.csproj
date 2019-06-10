@@ -142,6 +142,7 @@
     <Compile Include="FhirQueryResult.cs" />
     <Compile Include="Handlers\AdverseEventResourceHandler.cs" />
     <Compile Include="Handlers\AllergyIntoleranceResourceHandler.cs" />
+    <Compile Include="Handlers\BundleResourceHandler.cs" />
     <Compile Include="Handlers\ConditionResourceHandler.cs" />
     <Compile Include="Handlers\EncounterResourceHandler.cs" />
     <Compile Include="Handlers\FhirResourceHandlerUtil.cs" />
@@ -149,6 +150,7 @@
     <Compile Include="Handlers\LocationResourceHandler.cs" />
     <Compile Include="Handlers\MedicationAdministrationResourceHandler.cs" />
     <Compile Include="Handlers\MedicationResourceHandler.cs" />
+    <Compile Include="Handlers\OrganizationResourceHandler.cs" />
     <Compile Include="Handlers\PractitionerResourceHandler.cs" />
     <Compile Include="Handlers\RepositoryResourceHandlerBase.cs" />
     <Compile Include="Handlers\ImmunizationRecommendationResourceHandler.cs" />
@@ -197,6 +199,7 @@
     <Compile Include="Rest\Behaviors\FhirMessageDispatchFormatterEndpointBehavior.cs" />
     <Compile Include="Util\ConformanceUtil.cs" />
     <Compile Include="Util\DataTypeConverter.cs" />
+    <Compile Include="Util\IBundleResourceHandler.cs" />
     <Compile Include="Util\MessageUtil.cs" />
     <Compile Include="Util\QueryRewriter.cs" />
     <Compile Include="Util\QueryParameterMap.cs" />
@@ -225,7 +228,6 @@
           <Project>{786bd0ee-1806-4158-ba45-80249ac6dfe7}</Project>
           <Name>SanteDB.Rest.Common</Name>
         </ProjectReference>
-
       </ItemGroup>
     </When>
     <Otherwise>

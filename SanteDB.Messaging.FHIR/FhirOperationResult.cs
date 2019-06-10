@@ -36,7 +36,7 @@ namespace SanteDB.Messaging.FHIR
         public FhirOperationResult()
         {
             this.Details = new List<IResultDetail>();
-            this.Results = new List<DomainResourceBase>();
+            this.Results = new List<ResourceBase>();
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace SanteDB.Messaging.FHIR
         /// <summary>
         /// Represents the results of the operation
         /// </summary>
-        public List<DomainResourceBase> Results { get; set; }
+        public List<ResourceBase> Results { get; set; }
 
         /// <summary>
         /// Gets the list of details

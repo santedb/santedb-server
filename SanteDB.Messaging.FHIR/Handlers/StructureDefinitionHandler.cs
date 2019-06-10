@@ -46,7 +46,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Create the specified definition
         /// </summary>
-        public FhirOperationResult Create(DomainResourceBase target, Core.Services.TransactionMode mode)
+        public FhirOperationResult Create(ResourceBase target, Core.Services.TransactionMode mode)
         {
             throw new NotSupportedException();
         }
@@ -118,7 +118,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Update
         /// </summary>
-        public FhirOperationResult Update(string id, DomainResourceBase target, Core.Services.TransactionMode mode)
+        public FhirOperationResult Update(string id, ResourceBase target, Core.Services.TransactionMode mode)
         {
             throw new NotSupportedException();
         }

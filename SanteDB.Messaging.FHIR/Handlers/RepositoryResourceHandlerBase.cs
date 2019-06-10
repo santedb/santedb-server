@@ -38,7 +38,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
     /// Resource handler for acts base
     /// </summary>
     public abstract class RepositoryResourceHandlerBase<TFhirResource, TModel> : ResourceHandlerBase<TFhirResource, TModel>
-		where TFhirResource : DomainResourceBase, new()
+		where TFhirResource : ResourceBase, new()
 		where TModel : IdentifiedData, new()
 	{
 		// Repository service model

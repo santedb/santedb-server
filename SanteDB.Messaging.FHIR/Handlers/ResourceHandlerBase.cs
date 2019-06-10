@@ -47,7 +47,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
     /// <typeparam name="TModel">The type of the t model.</typeparam>
     /// <seealso cref="SanteDB.Messaging.FHIR.Handlers.IFhirResourceHandler" />
     public abstract class ResourceHandlerBase<TFhirResource, TModel> : IFhirResourceHandler
-		where TFhirResource : DomainResourceBase, new()
+		where TFhirResource : ResourceBase, new()
 		where TModel : IdentifiedData, new()
 
 	{
@@ -71,7 +71,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <exception cref="System.ArgumentNullException">target</exception>
 		/// <exception cref="System.IO.InvalidDataException"></exception>
 		/// <exception cref="System.Data.SyntaxErrorException"></exception>
-		public virtual FhirOperationResult Create(DomainResourceBase target, TransactionMode mode)
+		public virtual FhirOperationResult Create(ResourceBase target, TransactionMode mode)
 		{
 			this.traceSource.TraceInfo("Creating resource {0} ({1})", this.ResourceName, target);
 
@@ -91,7 +91,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			// Return fhir operation result
 			return new FhirOperationResult()
 			{
-				Results = new List<DomainResourceBase>() { this.MapToFhir(result, RestOperationContext.Current) },
+				Results = new List<ResourceBase>() { this.MapToFhir(result, RestOperationContext.Current) },
 				Details = issues,
 				Outcome = issues.Exists(o => o.Type == MARC.Everest.Connectors.ResultDetailType.Error) ? ResultCode.Error : ResultCode.Accepted
 			};
@@ -125,7 +125,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			// Return fhir operation result
 			return new FhirOperationResult()
 			{
-				Results = new List<DomainResourceBase>() { this.MapToFhir(result, RestOperationContext.Current) },
+				Results = new List<ResourceBase>() { this.MapToFhir(result, RestOperationContext.Current) },
 				Details = details,
 				Outcome = details.Exists(o => o.Type == MARC.Everest.Connectors.ResultDetailType.Error) ? ResultCode.Error : ResultCode.Accepted
 			};
@@ -207,7 +207,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
                     {
                         AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.AnonymousPrincipal);
                     }
-                }).OfType<DomainResourceBase>().ToList(),
+                }).OfType<ResourceBase>().ToList(),
 				Query = query,
 				TotalResults = totalResults
 			};
@@ -243,7 +243,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			return new FhirOperationResult()
 			{
 				Outcome = ResultCode.Accepted,
-				Results = new List<DomainResourceBase>() { this.MapToFhir(result, RestOperationContext.Current) },
+				Results = new List<ResourceBase>() { this.MapToFhir(result, RestOperationContext.Current) },
 				Details = details
 			};
 		}
@@ -261,7 +261,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <exception cref="System.ArgumentException"></exception>
 		/// <exception cref="System.Reflection.AmbiguousMatchException"></exception>
 		/// <exception cref="System.Collections.Generic.KeyNotFoundException"></exception>
-		public FhirOperationResult Update(string id, DomainResourceBase target, TransactionMode mode)
+		public FhirOperationResult Update(string id, ResourceBase target, TransactionMode mode)
 		{
 			this.traceSource.TraceInfo("Updating resource {0}/{1} ({2})", this.ResourceName, id, target);
 
@@ -294,7 +294,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			// Return fhir operation result
 			return new FhirOperationResult
 			{
-				Results = new List<DomainResourceBase> { this.MapToFhir(result, RestOperationContext.Current) },
+				Results = new List<ResourceBase> { this.MapToFhir(result, RestOperationContext.Current) },
 				Details = issues,
 				Outcome = issues.Exists(o => o.Type == MARC.Everest.Connectors.ResultDetailType.Error) ? ResultCode.Error : ResultCode.Accepted
 			};
