@@ -174,7 +174,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <param name="bundleResource">The entry to be converted</param>
         /// <param name="context">The web context</param>
         /// <param name="bundle">The context for the bundle</param>
-        public IdentifiedData MapToModel(BundleEntry bundleResource, WebOperationContext context, Bundle bundle)
+        public IdentifiedData MapToModel(BundleEntry bundleResource, RestOperationContext context, Bundle bundle)
         {
             var patient = this.MapToModel(bundleResource.Resource.Resource as Patient, context);
 
