@@ -64,6 +64,8 @@ namespace SanteDB.Core.Security
 
                     // If HS256 is used then the client_secret should be used as the secret
                     object secret = RestOperationContext.Current.Data.TryGetValue("symm_secret", out secret) ? secret : configuration.Secret;
+                    if (((byte[])secret).Length < 16) // HACK: Requires 128 BIT key
+                        secret = configuration.Secret;
                     retVal = new SigningCredentials(
                         new InMemorySymmetricSecurityKey((byte[])secret),
                         "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256",

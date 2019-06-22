@@ -155,6 +155,6 @@ namespace SanteDB.Messaging.FHIR.Resources
         /// </summary>
         [XmlElement("serviceProvider")]
         [Description("Identifies the service provider for the encounter")]
-        public Reference<Organization> ServiceProvider { get; internal set; }
+        public Reference<Organization> ServiceProvider { get; set; }
     }
 }

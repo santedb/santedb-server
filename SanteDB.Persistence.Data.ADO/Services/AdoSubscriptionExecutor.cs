@@ -140,6 +140,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             using (var ctx = m_configuration.Provider.GetReadonlyConnection())
                             {
                                 ctx.Open();
+                                ctx.LoadState = LoadState.FullLoad;
                                 var retVal = persistenceInstance.Get(ctx, o);
                                 cacheService?.Add(retVal as IdentifiedData);
                                 return retVal;
@@ -159,6 +160,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     try
                     {
                         connection.Open();
+                        connection.LoadState = LoadState.FullLoad;
 
                         // First, build the query using the query build
                         var tableMapping = TableMapping.Get(this.m_mapper.MapModelType(subscription.ResourceType));
