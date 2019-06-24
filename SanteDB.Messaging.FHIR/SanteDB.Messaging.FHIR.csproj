@@ -232,10 +232,10 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="1.49.0.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="1.49.0.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="1.49.0.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="1.49.0.0" />
+        <PackageReference Include="RestSrvr" Version="1.52.0.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="1.52.0.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="1.52.0.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="1.52.0.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
