@@ -57,5 +57,11 @@ namespace SanteDB.Authentication.OAuth2.Rest
         [Get("authz/{*content}")]
         Stream RenderAsset(string content);
 
+        /// <summary>
+        /// Invoke a ping
+        /// </summary>
+        [RestInvoke(Method = "PING", UriTemplate = "/")]
+        void Ping();
+
     }
 }

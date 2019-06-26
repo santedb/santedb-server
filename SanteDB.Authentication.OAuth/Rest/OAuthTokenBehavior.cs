@@ -65,6 +65,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
     public class OAuthTokenBehavior : IOAuthTokenContract
     {
 
+        
         // Trace source name
         private Tracer m_traceSource = new Tracer(OAuthConstants.TraceSourceName);
 
@@ -106,8 +107,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         client_secret = tokenRequest["client_secret"];
                     if (String.IsNullOrEmpty(client_identity) || String.IsNullOrEmpty(client_secret))
                         return this.CreateErrorCondition(OAuthErrorType.invalid_client, "Missing client credentials");
-
-                    RestOperationContext.Current.Data.Add("symm_secret", Encoding.UTF8.GetBytes(client_secret));
 
                     try
                     {
@@ -561,5 +560,14 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 return new MemoryStream(loadedApplets.RenderAssetContent(loginAsset, RestOperationContext.Current.IncomingRequest.QueryString["ui_locales"] ?? CultureInfo.CurrentUICulture.TwoLetterISOLanguageName));
             }
         }
+
+        /// <summary>
+        /// Perform a ping
+        /// </summary>
+        public void Ping()
+        {
+            RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.NoContent;
+        }
+
     }
 }
