@@ -17,7 +17,6 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
-using MARC.Everest.Connectors;
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Model;
@@ -134,7 +133,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <param name="count">The count.</param>
 		/// <param name="totalResults">The total results.</param>
 		/// <returns>Returns the list of models which match the given parameters.</returns>
-		protected override IEnumerable<SubstanceAdministration> Query(Expression<Func<SubstanceAdministration, bool>> query, List<IResultDetail> issues, Guid queryId, int offset, int count, out int totalResults)
+		protected override IEnumerable<SubstanceAdministration> Query(Expression<Func<SubstanceAdministration, bool>> query, Guid queryId, int offset, int count, out int totalResults)
         {
             Guid drugTherapy = Guid.Parse("7D84A057-1FCC-4054-A51F-B77D230FC6D1");
 

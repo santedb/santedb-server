@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using Newtonsoft.Json;
 using SanteDB.Core.Configuration;
 using System;
 using System.Collections.Generic;
@@ -42,19 +43,19 @@ namespace SanteDB.Messaging.FHIR.Configuration
         /// <summary>
         /// Gets the WCF endpoint name that the FHIR service listens on
         /// </summary>
-        [XmlAttribute("restEndpoint")]
+        [XmlAttribute("restEndpoint"), JsonProperty("restEndpoint")]
         public string WcfEndpoint { get; set; }
 
         /// <summary>
         /// The landing page file
         /// </summary>
-        [XmlAttribute("index")]
+        [XmlAttribute("index"), JsonProperty("index")]
         public string LandingPage { get; set; }
 
         /// <summary>
         /// XML for resource handlers
         /// </summary>
-        [XmlArray("resourceHandlers"), XmlArrayItem("add")]
+        [XmlArray("resourceHandlers"), XmlArrayItem("add"), JsonProperty("resourceHandlers")]
         public List<TypeReferenceConfiguration> ResourceHandlers
         {
             get;set;
@@ -63,39 +64,8 @@ namespace SanteDB.Messaging.FHIR.Configuration
         /// <summary>
         /// When set, describes the base uri for all resources on this FHIR service.
         /// </summary>
-        [XmlElement("base")]
+        [XmlElement("base"), JsonProperty("base")]
         public String ResourceBaseUri { get; set; }
     }
-
-    /// <summary>
-    /// FHIR CORS configuration
-    /// </summary>
-    [XmlType(nameof(FhirCorsConfiguration), Namespace = "http://santedb.org/configuration")]
-    public class FhirCorsConfiguration
-    {
-
-        /// <summary>
-        /// Gets or sets the domain from which CORS is allowed
-        /// </summary>
-        [XmlAttribute("domain")]
-        public String Domain { get; set; }
-
-        /// <summary>
-        /// Gets or sets the rsource
-        /// </summary>
-        [XmlAttribute("resource")]
-        public String Resource { get; set; }
-
-        /// <summary>
-        /// Gets or sets the allowed operations
-        /// </summary>
-        [XmlArray("actions"), XmlArrayItem("add")]
-        public List<String> Actions { get; set; }
-
-        /// <summary>
-        /// Gets or sets the allowed headers
-        /// </summary>
-        [XmlArray("headers"), XmlArrayItem("add")]
-        public List<String> Headers { get; set; }
-    }
+    
 }

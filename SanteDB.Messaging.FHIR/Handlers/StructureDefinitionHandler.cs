@@ -46,7 +46,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Create the specified definition
         /// </summary>
-        public FhirOperationResult Create(ResourceBase target, Core.Services.TransactionMode mode)
+        public ResourceBase Create(ResourceBase target, Core.Services.TransactionMode mode)
         {
             throw new NotSupportedException();
         }
@@ -54,7 +54,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Delete
         /// </summary>
-        public FhirOperationResult Delete(string id, Core.Services.TransactionMode mode)
+        public ResourceBase Delete(string id, Core.Services.TransactionMode mode)
         {
             throw new NotSupportedException();
         }
@@ -100,25 +100,33 @@ namespace SanteDB.Messaging.FHIR.Handlers
         }
 
         /// <summary>
+        /// Not supported
+        /// </summary>
+        public FhirQueryResult History(string id)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
         /// Query for the specified search structure definition
         /// </summary>
         public FhirQueryResult Query(NameValueCollection parameters)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         /// <summary>
         /// Read the specified structure definition
         /// </summary>
-        public FhirOperationResult Read(string id, string versionId)
+        public ResourceBase Read(string id, string versionId)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         /// <summary>
         /// Update
         /// </summary>
-        public FhirOperationResult Update(string id, ResourceBase target, Core.Services.TransactionMode mode)
+        public ResourceBase Update(string id, ResourceBase target, Core.Services.TransactionMode mode)
         {
             throw new NotSupportedException();
         }

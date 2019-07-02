@@ -19,6 +19,7 @@
  */
 using SanteDB.Core.Services;
 using SanteDB.Messaging.FHIR.Resources;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 
 namespace SanteDB.Messaging.FHIR.Handlers
@@ -38,27 +39,32 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Read a specific version of a resource
         /// </summary>
-        FhirOperationResult Read(string id, string versionId);
+        ResourceBase Read(string id, string versionId);
 
         /// <summary>
         /// Update a resource
         /// </summary>
-        FhirOperationResult Update(string id, ResourceBase target, TransactionMode mode);
+        ResourceBase Update(string id, ResourceBase target, TransactionMode mode);
 
         /// <summary>
         /// Delete a resource
         /// </summary>
-        FhirOperationResult Delete(string id, TransactionMode mode);
+        ResourceBase Delete(string id, TransactionMode mode);
 
         /// <summary>
         /// Create a resource
         /// </summary>
-        FhirOperationResult Create(ResourceBase target, TransactionMode mode);
+        ResourceBase Create(ResourceBase target, TransactionMode mode);
 
         /// <summary>
         /// Query a FHIR resource
         /// </summary>
         FhirQueryResult Query(NameValueCollection parameters);
+
+        /// <summary>
+        /// Get the history of a specific FHIR object
+        /// </summary>
+        FhirQueryResult History(string id);
 
         /// <summary>
         /// Get the definition for this resource

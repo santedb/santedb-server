@@ -17,7 +17,6 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
-using MARC.Everest.Connectors;
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
@@ -71,7 +70,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <exception cref="System.ArgumentNullException">target</exception>
 		/// <exception cref="System.IO.InvalidDataException"></exception>
 		/// <exception cref="System.Data.SyntaxErrorException"></exception>
-		public virtual FhirOperationResult Create(ResourceBase target, TransactionMode mode)
+		public virtual ResourceBase Create(ResourceBase target, TransactionMode mode)
 		{
 			this.traceSource.TraceInfo("Creating resource {0} ({1})", this.ResourceName, target);
 
@@ -85,50 +84,37 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			if (modelInstance == null)
 				throw new ArgumentException("Model invalid");
 
-			List<IResultDetail> issues = new List<IResultDetail>();
-			var result = this.Create(modelInstance, issues, mode);
+			var result = this.Create(modelInstance, mode);
 
-			// Return fhir operation result
-			return new FhirOperationResult()
-			{
-				Results = new List<ResourceBase>() { this.MapToFhir(result, RestOperationContext.Current) },
-				Details = issues,
-				Outcome = issues.Exists(o => o.Type == MARC.Everest.Connectors.ResultDetailType.Error) ? ResultCode.Error : ResultCode.Accepted
-			};
+            // Return fhir operation result
+            return this.MapToFhir(result, RestOperationContext.Current);
 		}
 
-		/// <summary>
-		/// Deletes a specified resource.
-		/// </summary>
-		/// <param name="id">The identifier.</param>
-		/// <param name="mode">The mode.</param>
-		/// <returns>FhirOperationResult.</returns>
-		/// <exception cref="System.ArgumentNullException">id</exception>
-		/// <exception cref="System.ArgumentException"></exception>
-		public FhirOperationResult Delete(string id, TransactionMode mode)
-		{
-			if (String.IsNullOrEmpty(id))
-				throw new ArgumentNullException(nameof(id));
+        /// <summary>
+        /// Deletes a specified resource.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <param name="mode">The mode.</param>
+        /// <returns>FhirOperationResult.</returns>
+        /// <exception cref="System.ArgumentNullException">id</exception>
+        /// <exception cref="System.ArgumentException"></exception>
+        public ResourceBase Delete(string id, TransactionMode mode)
+        {
+            if (String.IsNullOrEmpty(id))
+                throw new ArgumentNullException(nameof(id));
 
-			this.traceSource.TraceInfo("Deleting resource {0}/{1}", this.ResourceName, id);
+            this.traceSource.TraceInfo("Deleting resource {0}/{1}", this.ResourceName, id);
 
-			// Delete
-			var guidId = Guid.Empty;
-			if (!Guid.TryParse(id, out guidId))
-				throw new ArgumentException("Invalid id");
+            // Delete
+            var guidId = Guid.Empty;
+            if (!Guid.TryParse(id, out guidId))
+                throw new ArgumentException("Invalid id");
 
-			// Do the deletion
-			List<IResultDetail> details = new List<IResultDetail>();
+            // Do the deletion
+            var result = this.Delete(guidId);
 
-			var result = this.Delete(guidId, details);
-
-			// Return fhir operation result
-			return new FhirOperationResult()
-			{
-				Results = new List<ResourceBase>() { this.MapToFhir(result, RestOperationContext.Current) },
-				Details = details,
-				Outcome = details.Exists(o => o.Type == MARC.Everest.Connectors.ResultDetailType.Error) ? ResultCode.Error : ResultCode.Accepted
-			};
+            // Return fhir operation result
+            return this.MapToFhir(result, RestOperationContext.Current);
 		}
 
         /// <summary>
@@ -186,17 +172,14 @@ namespace SanteDB.Messaging.FHIR.Handlers
 
 			// Do the query
 			int totalResults = 0;
-			List<IResultDetail> issues = new List<IResultDetail>();
 			var predicate = QueryExpressionParser.BuildLinqExpression<TModel>(hdsiQuery);
-			var hdsiResults = this.Query(predicate, issues, query.QueryId, query.Start, query.Quantity, out totalResults);
+			var hdsiResults = this.Query(predicate, query.QueryId, query.Start, query.Quantity, out totalResults);
 			var restOperationContext = RestOperationContext.Current;
 
             var auth = AuthenticationContext.Current;
 			// Return FHIR query result
 			return new FhirQueryResult()
 			{
-				Details = issues,
-				Outcome = ResultCode.Accepted,
 				Results = hdsiResults.AsParallel().Select(o => {
                     try
                     {
@@ -223,7 +206,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <exception cref="System.ArgumentException">
 		/// </exception>
 		/// <exception cref="System.Collections.Generic.KeyNotFoundException"></exception>
-		public FhirOperationResult Read(string id, string versionId)
+		public ResourceBase Read(string id, string versionId)
 		{
 			if (String.IsNullOrEmpty(id))
 				throw new ArgumentNullException(nameof(id));
@@ -234,18 +217,12 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			if (!String.IsNullOrEmpty(versionId) && !Guid.TryParse(versionId, out versionGuidId))
 				throw new ArgumentException("Invalid versionId");
 
-			List<IResultDetail> details = new List<IResultDetail>();
-			var result = this.Read(guidId, versionGuidId, details);
+			var result = this.Read(guidId, versionGuidId);
 			if (result == null)
 				throw new KeyNotFoundException();
 
-			// FHIR Operation result
-			return new FhirOperationResult()
-			{
-				Outcome = ResultCode.Accepted,
-				Results = new List<ResourceBase>() { this.MapToFhir(result, RestOperationContext.Current) },
-				Details = details
-			};
+            // FHIR Operation result
+            return this.MapToFhir(result, RestOperationContext.Current);
 		}
 
 		/// <summary>
@@ -261,7 +238,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <exception cref="System.ArgumentException"></exception>
 		/// <exception cref="System.Reflection.AmbiguousMatchException"></exception>
 		/// <exception cref="System.Collections.Generic.KeyNotFoundException"></exception>
-		public FhirOperationResult Update(string id, ResourceBase target, TransactionMode mode)
+		public ResourceBase Update(string id, ResourceBase target, TransactionMode mode)
 		{
 			this.traceSource.TraceInfo("Updating resource {0}/{1} ({2})", this.ResourceName, id, target);
 
@@ -288,16 +265,10 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			else
 				throw new KeyNotFoundException();
 
-			List<IResultDetail> issues = new List<IResultDetail>();
-			var result = this.Update(modelInstance, issues, mode);
+			var result = this.Update(modelInstance, mode);
 
-			// Return fhir operation result
-			return new FhirOperationResult
-			{
-				Results = new List<ResourceBase> { this.MapToFhir(result, RestOperationContext.Current) },
-				Details = issues,
-				Outcome = issues.Exists(o => o.Type == MARC.Everest.Connectors.ResultDetailType.Error) ? ResultCode.Error : ResultCode.Accepted
-			};
+            // Return fhir operation result
+            return this.MapToFhir(result, RestOperationContext.Current);
 		}
 
 		/// <summary>
@@ -307,7 +278,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <param name="issues">The issues.</param>
 		/// <param name="mode">The mode.</param>
 		/// <returns>Returns the created model.</returns>
-		protected abstract TModel Create(TModel modelInstance, List<IResultDetail> issues, TransactionMode mode);
+		protected abstract TModel Create(TModel modelInstance, TransactionMode mode);
 
 		/// <summary>
 		/// Deletes the specified model identifier.
@@ -315,7 +286,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <param name="modelId">The model identifier.</param>
 		/// <param name="details">The details.</param>
 		/// <returns>Returns the deleted model.</returns>
-		protected abstract TModel Delete(Guid modelId, List<IResultDetail> details);
+		protected abstract TModel Delete(Guid modelId);
 
 		/// <summary>
 		/// Maps a model instance to a FHIR instance.
@@ -340,7 +311,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <param name="count">The count.</param>
 		/// <param name="totalResults">The total results.</param>
 		/// <returns>Returns the list of models which match the given parameters.</returns>
-		protected abstract IEnumerable<TModel> Query(Expression<Func<TModel, bool>> query, List<IResultDetail> issues, Guid queryId, int offset, int count, out int totalResults);
+		protected abstract IEnumerable<TModel> Query(Expression<Func<TModel, bool>> query, Guid queryId, int offset, int count, out int totalResults);
 
 		/// <summary>
 		/// Reads the specified identifier.
@@ -348,7 +319,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <param name="id">The identifier.</param>
 		/// <param name="details">The details.</param>
 		/// <returns>Returns the model which matches the given id.</returns>
-		protected abstract TModel Read(Guid id, Guid versionId, List<IResultDetail> details);
+		protected abstract TModel Read(Guid id, Guid versionId);
 
 		/// <summary>
 		/// Updates the specified model.
@@ -357,6 +328,37 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <param name="details">The details.</param>
 		/// <param name="mode">The mode.</param>
 		/// <returns>Returns the updated model.</returns>
-		protected abstract TModel Update(TModel model, List<IResultDetail> details, TransactionMode mode);
-	}
+		protected abstract TModel Update(TModel model, TransactionMode mode);
+
+        /// <summary>
+        /// Reads the complete history of the specified identifier
+        /// </summary>
+        public FhirQueryResult History(string id)
+        {
+            if (String.IsNullOrEmpty(id))
+                throw new ArgumentNullException(nameof(id));
+
+            Guid guidId = Guid.Empty;
+            if (!Guid.TryParse(id, out guidId))
+                throw new ArgumentException("Invalid id");
+
+            var result = this.Read(guidId, Guid.Empty);
+            if (result == null)
+                throw new KeyNotFoundException();
+
+            // Results
+            List<TModel> results = new List<TModel>() { result };
+            while ((result as IVersionedEntity)?.PreviousVersionKey.HasValue == true)
+            {
+                result = this.Read(guidId, (result as IVersionedEntity).PreviousVersionKey.Value);
+                results.Add(result);
+            }
+
+            // FHIR Operation result
+            return new FhirQueryResult()
+            {
+                Results = results.Select(o => this.MapToFhir(o, RestOperationContext.Current)).OfType<ResourceBase>().ToList()
+            };
+        }
+    }
 }

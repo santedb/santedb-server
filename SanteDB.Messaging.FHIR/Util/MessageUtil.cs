@@ -17,7 +17,6 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
-using MARC.Everest.Connectors;
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Services;
@@ -71,7 +70,7 @@ namespace SanteDB.Messaging.FHIR.Util
         /// <summary>
         /// Create a feed
         /// </summary>
-        internal static Bundle CreateBundle(FhirOperationResult result)
+        internal static Bundle CreateBundle(FhirQueryResult result)
         {
 
             Bundle retVal = new Bundle();
@@ -189,44 +188,7 @@ namespace SanteDB.Messaging.FHIR.Util
         }
 
 
-
-        /// <summary>
-        /// Create an operation outcome resource
-        /// </summary>
-        public static OperationOutcome CreateOutcomeResource(FhirOperationResult result)
-        {
-            var retVal = new OperationOutcome();
-
-            Uri fhirIssue = new Uri("http://hl7.org/fhir/issue-type");
-
-            // Add issues for each of the details
-            foreach (var dtl in result.Details)
-            {
-                Issue issue = new Issue()
-                {
-                    Diagnostics = new DataTypes.FhirString(dtl.Message),
-                    Severity = (IssueSeverity)Enum.Parse(typeof(IssueSeverity), dtl.Type.ToString())
-                };
-
-                if (!String.IsNullOrEmpty(dtl.Location))
-                    issue.Location.Add(new DataTypes.FhirString(dtl.Location));
-
-                // Type
-                if (dtl.Exception is TimeoutException)
-                    issue.Code = new DataTypes.FhirCoding(fhirIssue, "timeout");
-                else if (dtl is FixedValueMisMatchedResultDetail)
-                    issue.Code = new DataTypes.FhirCoding(fhirIssue, "value");
-                else if (dtl is IOException)
-                    issue.Code = new DataTypes.FhirCoding(fhirIssue, "no-store");
-                else
-                    issue.Code = new DataTypes.FhirCoding(fhirIssue, "exception");
-
-                retVal.Issue.Add(issue);
-            }
-
-            
-            return retVal;
-        }
+        
 
     }
 }

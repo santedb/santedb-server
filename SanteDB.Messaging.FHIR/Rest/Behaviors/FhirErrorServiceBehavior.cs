@@ -27,6 +27,7 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
+using SanteDB.Messaging.FHIR.DataTypes;
 using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Rest.Serialization;
 using System;
@@ -107,6 +108,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.NotFound;
             else if (error is DbException || error is ConstraintException)
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)(System.Net.HttpStatusCode)422;
+            
             else
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
 
@@ -115,7 +117,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
             {
                 Issue = new List<Issue>()
             {
-                new Issue() { Diagnostics  = error.Message, Severity = IssueSeverity.Error }
+                new Issue() { Diagnostics  = error.Message, Severity = IssueSeverity.Error, Code = new FhirCoding(new Uri("http://hl7.org/fhir/issue-type"), "exception") }
             }
             };
 
@@ -123,7 +125,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
             var ie = error.InnerException;
             while (ie != null)
             {
-                errorResult.Issue.Add(new Issue() { Diagnostics = String.Format("Caused by {0}", error.Message), Severity = IssueSeverity.Error });
+                errorResult.Issue.Add(new Issue() { Diagnostics = String.Format("Caused by {0}", error.Message), Severity = IssueSeverity.Error, Code = new FhirCoding(new Uri("http://hl7.org/fhir/issue-type"), "exception") });
                 ie = ie.InnerException;
             }
 

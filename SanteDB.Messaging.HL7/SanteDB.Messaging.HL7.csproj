@@ -126,7 +126,6 @@
     </None>
     <None Include="SanteDB.Messaging.HL7.nuspec" />
   </ItemGroup>
-
   <Choose>
     <When Condition="$(SolutionName.Contains('-ext'))">
       <ItemGroup>
@@ -138,7 +137,6 @@
           <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
           <Name>SanteDB.Core.Model</Name>
         </ProjectReference>
-
       </ItemGroup>
     </When>
     <Otherwise>
@@ -148,12 +146,15 @@
       </ItemGroup>
     </Otherwise>
   </Choose>
-
-
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json">
       <Version>11.0.2</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="applet\controllers\config\hl7.js" />
+    <Content Include="applet\manifest.xml" />
+    <Content Include="applet\views\config\hl7\content.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

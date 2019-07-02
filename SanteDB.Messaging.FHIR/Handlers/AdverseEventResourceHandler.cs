@@ -17,7 +17,6 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
-using MARC.Everest.Connectors;
 using RestSrvr;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
@@ -112,14 +111,17 @@ namespace SanteDB.Messaging.FHIR.Handlers
             throw new NotImplementedException();
         }
 
-        protected override IEnumerable<Act> Query(Expression<Func<Act, bool>> query, List<IResultDetail> issues, Guid queryId, int offset, int count, out int totalResults)
+        /// <summary>
+        /// Query for specified adverse event 
+        /// </summary>
+        protected override IEnumerable<Act> Query(Expression<Func<Act, bool>> query, Guid queryId, int offset, int count, out int totalResults)
         {
             var typeReference = Expression.MakeBinary(ExpressionType.Equal, Expression.Convert(Expression.MakeMemberAccess(query.Parameters[0], typeof(Act).GetProperty(nameof(Act.ClassConceptKey))), typeof(Guid)), Expression.Constant(ActClassKeys.Condition));
 
             var anyRef = base.CreateConceptSetFilter(ConceptSetKeys.AdverseEventActs, query.Parameters[0]);
             query = Expression.Lambda<Func<Act, bool>>(Expression.AndAlso(Expression.AndAlso(query.Body, anyRef), typeReference), query.Parameters);
 
-            return base.Query(query, issues, queryId, offset, count, out totalResults);
+            return base.Query(query, queryId, offset, count, out totalResults);
         }
 
         /// <summary>

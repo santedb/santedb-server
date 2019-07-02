@@ -17,13 +17,21 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Messaging.FHIR.Resources;
+using System.Collections.Generic;
+
 namespace SanteDB.Messaging.FHIR
 {
     /// <summary>
     /// Query result form a FHIR query
     /// </summary>
-    public class FhirQueryResult : FhirOperationResult
+    public class FhirQueryResult
     {
+
+        /// <summary>
+        /// Gets or sets the results
+        /// </summary>
+        public List<ResourceBase> Results { get; set; }
 
         /// <summary>
         /// Gets or sets the query that initiated the action

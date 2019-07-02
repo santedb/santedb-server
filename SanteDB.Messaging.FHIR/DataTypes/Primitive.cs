@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Model.Map;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -76,8 +77,12 @@ namespace SanteDB.Messaging.FHIR.DataTypes
                 // From xmlenum
                 if (typeof(T).IsEnum)
                     this.Value = (T)typeof(T).GetFields().FirstOrDefault(o => o.GetCustomAttribute<XmlEnumAttribute>()?.Name == value || o.Name == value).GetValue(null);
-                else
-                    this.Value = MARC.Everest.Connectors.Util.Convert<T>(value);
+                else {
+                    object res = null;
+                    if (MapUtil.TryConvert(value, typeof(T), out res))
+                        this.Value = (T)res;
+                    else throw new ArgumentException($"{value} cannot be translated to {typeof(T)}", nameof(value));
+                }
             }
         }
 

@@ -17,7 +17,6 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
-using MARC.Everest.Connectors;
 using RestSrvr;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
@@ -54,7 +53,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <param name="mode">The mode.</param>
 		/// <returns>Returns the created model.</returns>
 		/// <exception cref="System.NotImplementedException"></exception>
-		protected override SubstanceAdministration Create(SubstanceAdministration modelInstance, List<IResultDetail> issues, TransactionMode mode)
+		protected override SubstanceAdministration Create(SubstanceAdministration modelInstance, TransactionMode mode)
 		{
 			throw new NotSupportedException();
 		}
@@ -66,7 +65,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <param name="details">The details.</param>
 		/// <returns>Returns the deleted model.</returns>
 		/// <exception cref="System.NotImplementedException"></exception>
-		protected override SubstanceAdministration Delete(Guid modelId, List<IResultDetail> details)
+		protected override SubstanceAdministration Delete(Guid modelId)
 		{
 			throw new NotSupportedException();
 		}
@@ -144,7 +143,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <param name="count">The count.</param>
 		/// <param name="totalResults">The total results.</param>
 		/// <returns>Returns the list of models which match the given parameters.</returns>
-		protected override IEnumerable<SubstanceAdministration> Query(Expression<Func<SubstanceAdministration, bool>> query, List<IResultDetail> issues, Guid queryId, int offset, int count, out int totalResults)
+		protected override IEnumerable<SubstanceAdministration> Query(Expression<Func<SubstanceAdministration, bool>> query, Guid queryId, int offset, int count, out int totalResults)
 		{
 			// TODO: Hook this up to the forecaster
 			var obsoletionReference = Expression.MakeBinary(ExpressionType.NotEqual, Expression.MakeMemberAccess(query.Parameters[0], typeof(SubstanceAdministration).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
@@ -161,7 +160,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <param name="details">The details.</param>
 		/// <returns>Returns the model which matches the given id.</returns>
 		/// <exception cref="System.NotImplementedException"></exception>
-		protected override SubstanceAdministration Read(Guid id, Guid versionId, List<IResultDetail> details)
+		protected override SubstanceAdministration Read(Guid id, Guid versionId)
 		{
 			throw new NotImplementedException();
 		}
@@ -174,7 +173,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <param name="mode">The mode.</param>
 		/// <returns>Returns the updated model.</returns>
 		/// <exception cref="System.NotImplementedException"></exception>
-		protected override SubstanceAdministration Update(SubstanceAdministration model, List<IResultDetail> details, TransactionMode mode)
+		protected override SubstanceAdministration Update(SubstanceAdministration model, TransactionMode mode)
 		{
 			throw new NotSupportedException();
 		}

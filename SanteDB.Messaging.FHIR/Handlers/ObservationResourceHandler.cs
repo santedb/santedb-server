@@ -17,7 +17,6 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
-using MARC.Everest.Connectors;
 using RestSrvr;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
@@ -119,7 +118,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Query
         /// </summary>
-        protected override IEnumerable<Core.Model.Acts.Observation> Query(Expression<Func<Core.Model.Acts.Observation, bool>> query, List<IResultDetail> issues, Guid queryId, int offset, int count, out int totalResults)
+        protected override IEnumerable<Core.Model.Acts.Observation> Query(Expression<Func<Core.Model.Acts.Observation, bool>> query, Guid queryId, int offset, int count, out int totalResults)
         {
             //var anyRef = Expression.OrElse(base.CreateConceptSetFilter(ConceptSetKeys.VitalSigns, query.Parameters[0]), base.CreateConceptSetFilter(ConceptSetKeys.ProblemObservations, query.Parameters[0]));
             //query = Expression.Lambda<Func<Core.Model.Acts.Observation, bool>>(Expression.AndAlso(
@@ -127,7 +126,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
             //             anyRef
             //         ), query.Parameters);
 
-            return base.Query(query, issues, queryId, offset, count, out totalResults);
+            return base.Query(query, queryId, offset, count, out totalResults);
         }
 
 
@@ -144,24 +143,23 @@ namespace SanteDB.Messaging.FHIR.Handlers
 
             // Do the query
             int totalResults = 0;
-            List<IResultDetail> issues = new List<IResultDetail>();
 
             IEnumerable<Core.Model.Acts.Observation> hdsiResults = null;
 
             if (parameters["value-concept"] != null)
             {
                 var predicate = QueryExpressionParser.BuildLinqExpression<Core.Model.Acts.CodedObservation>(hdsiQuery);
-                hdsiResults = this.QueryEx<Core.Model.Acts.CodedObservation>(predicate, issues, query.QueryId, query.Start, query.Quantity, out totalResults).OfType<Core.Model.Acts.Observation>();
+                hdsiResults = this.QueryEx<Core.Model.Acts.CodedObservation>(predicate, query.QueryId, query.Start, query.Quantity, out totalResults).OfType<Core.Model.Acts.Observation>();
             }
             else if (parameters["value-quantity"] != null)
             {
                 var predicate = QueryExpressionParser.BuildLinqExpression<Core.Model.Acts.QuantityObservation>(hdsiQuery);
-                hdsiResults = this.QueryEx<Core.Model.Acts.QuantityObservation>(predicate, issues, query.QueryId, query.Start, query.Quantity, out totalResults).OfType<Core.Model.Acts.Observation>();
+                hdsiResults = this.QueryEx<Core.Model.Acts.QuantityObservation>(predicate, query.QueryId, query.Start, query.Quantity, out totalResults).OfType<Core.Model.Acts.Observation>();
             }
             else
             {
                 var predicate = QueryExpressionParser.BuildLinqExpression<Core.Model.Acts.Observation>(hdsiQuery);
-                hdsiResults = this.Query(predicate, issues, query.QueryId, query.Start, query.Quantity, out totalResults);
+                hdsiResults = this.Query(predicate, query.QueryId, query.Start, query.Quantity, out totalResults);
             }
 
 
@@ -170,8 +168,6 @@ namespace SanteDB.Messaging.FHIR.Handlers
             // Return FHIR query result
             return new FhirQueryResult()
             {
-                Details = issues,
-                Outcome = ResultCode.Accepted,
                 Results = hdsiResults.AsParallel().Select(o => this.MapToFhir(o, restOperationContext)).OfType<ResourceBase>().ToList(),
                 Query = query,
                 TotalResults = totalResults

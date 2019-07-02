@@ -17,7 +17,6 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
-using MARC.Everest.Connectors;
 using RestSrvr;
 using RestSrvr.Attributes;
 using SanteDB.Core;
@@ -123,18 +122,18 @@ namespace SanteDB.Messaging.FHIR.Rest
         {
             this.ThrowIfNotReady();
 
-            FhirOperationResult result = null;
             try
             {
 
                 // Setup outgoing content
-                result = this.PerformRead(resourceType, id, null);
+                var result = this.PerformRead(resourceType, id, null);
                 String baseUri = RestOperationContext.Current.IncomingRequest.Url.AbsoluteUri;
-                RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Location", String.Format("{0}/_history/{1}", baseUri, result.Results[0].VersionId));
-                return result.Results[0];
+                RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Location", String.Format("{0}/_history/{1}", baseUri, result.VersionId));
+                return result;
             }
             catch (Exception e)
             {
+                this.m_tracer.TraceError("Error reading FHIR resource {0}({1}): {2}", resourceType, id, e);
                 throw;
             }
         }
@@ -147,15 +146,15 @@ namespace SanteDB.Messaging.FHIR.Rest
         {
             this.ThrowIfNotReady();
 
-            FhirOperationResult result = null;
             try
             {
                 // Setup outgoing content
-                result = this.PerformRead(resourceType, id, vid);
-                return result.Results[0];
+                var result = this.PerformRead(resourceType, id, vid);
+                return result;
             }
             catch (Exception e)
             {
+                this.m_tracer.TraceError("Error vreading FHIR resource {0}({1},{2}): {3}", resourceType, id, vid, e);
                 throw;
             }
         }
@@ -168,8 +167,6 @@ namespace SanteDB.Messaging.FHIR.Rest
         {
             this.ThrowIfNotReady();
 
-            FhirOperationResult result = null;
-
             try
             {
 
@@ -180,32 +177,22 @@ namespace SanteDB.Messaging.FHIR.Rest
                 if (handler == null)
                     throw new FileNotFoundException(); // endpoint not found!
 
-                result = handler.Update(id, target, TransactionMode.Commit);
-                if (result == null || result.Results.Count == 0) // Create
-                    throw new NotSupportedException("Update is not supported on non-existant resource");
-
-                if (result == null || result.Outcome == ResultCode.Rejected)
-                    throw new InvalidDataException("Resource structure is not valid");
-                else if (result.Outcome == ResultCode.AcceptedNonConformant)
-                    throw new ConstraintException("Resource not conformant");
-                else if (result.Outcome == ResultCode.TypeNotAvailable)
-                    throw new FileNotFoundException(String.Format("Resource {0} not found", RestOperationContext.Current.IncomingRequest.Url));
-                else if (result.Outcome != ResultCode.Accepted)
-                    throw new DataException("Update failed");
-
-                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Import, ActionType.Update, AuditableObjectLifecycle.Amendment, EventIdentifierType.Import, OutcomeIndicator.Success, id, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
+                var result = handler.Update(id, target, TransactionMode.Commit);
+               
+                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Import, ActionType.Update, AuditableObjectLifecycle.Amendment, EventIdentifierType.Import, OutcomeIndicator.Success, id, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result);
 
                 String baseUri = RestOperationContext.Current.IncomingRequest.Url.AbsoluteUri;
-                RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Location", String.Format("{0}{1}/{2}/_history/{3}", baseUri, resourceType, result.Results[0].Id, result.Results[0].VersionId));
-                RestOperationContext.Current.OutgoingResponse.SetLastModified(result.Results[0].Timestamp);
-                RestOperationContext.Current.OutgoingResponse.SetETag(result.Results[0].VersionId);
+                RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Location", String.Format("{0}{1}/{2}/_history/{3}", baseUri, resourceType, result.Id, result.VersionId));
+                RestOperationContext.Current.OutgoingResponse.SetLastModified(result.Timestamp);
+                RestOperationContext.Current.OutgoingResponse.SetETag(result.VersionId);
 
-                return result.Results[0];
+                return result;
 
             }
             catch (Exception e)
             {
-                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Import, ActionType.Update, AuditableObjectLifecycle.Amendment, EventIdentifierType.Import, OutcomeIndicator.EpicFail, id, null);
+                this.m_tracer.TraceError("Error updating FHIR resource {0}({1}): {2}", resourceType, id, e);
+                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Import, ActionType.Update, AuditableObjectLifecycle.Amendment, EventIdentifierType.Import, OutcomeIndicator.EpicFail, id, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString());
                 throw;
             }
         }
@@ -218,8 +205,6 @@ namespace SanteDB.Messaging.FHIR.Rest
         {
             this.ThrowIfNotReady();
 
-            FhirOperationResult result = null;
-
             try
             {
 
@@ -231,25 +216,16 @@ namespace SanteDB.Messaging.FHIR.Rest
                 if (handler == null)
                     throw new FileNotFoundException(); // endpoint not found!
 
-                result = handler.Delete(id, TransactionMode.Commit);
+                var result = handler.Delete(id, TransactionMode.Commit);
 
-                if (result == null || result.Outcome == ResultCode.Rejected)
-                    throw new NotSupportedException();
-                else if (result.Outcome == ResultCode.TypeNotAvailable)
-                    throw new FileNotFoundException(String.Format("Resource {0} not found", RestOperationContext.Current.IncomingRequest.Url));
-                else if (result.Outcome != ResultCode.Accepted)
-                    throw new DataException("Delete failed");
-
-                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Import, ActionType.Delete, AuditableObjectLifecycle.LogicalDeletion, EventIdentifierType.Import, OutcomeIndicator.Success, id, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
-
-
+                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Import, ActionType.Delete, AuditableObjectLifecycle.LogicalDeletion, EventIdentifierType.Import, OutcomeIndicator.Success, id, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result);
                 return null;
 
             }
             catch (Exception e)
             {
-                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Import, ActionType.Delete, AuditableObjectLifecycle.LogicalDeletion, EventIdentifierType.Import, OutcomeIndicator.EpicFail, id, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
-
+                this.m_tracer.TraceError("Error deleting FHIR resource {0}({1}): {2}", resourceType, id, e);
+                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Import, ActionType.Delete, AuditableObjectLifecycle.LogicalDeletion, EventIdentifierType.Import, OutcomeIndicator.EpicFail, id, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString());
                 throw;
             }
         }
@@ -261,9 +237,6 @@ namespace SanteDB.Messaging.FHIR.Rest
         public ResourceBase CreateResource(string resourceType, ResourceBase target)
         {
             this.ThrowIfNotReady();
-
-            FhirOperationResult result = null;
-
             try
             {
 
@@ -274,33 +247,25 @@ namespace SanteDB.Messaging.FHIR.Rest
                 if (handler == null)
                     throw new FileNotFoundException(); // endpoint not found!
 
-                result = handler.Create(target, TransactionMode.Commit);
+                var result = handler.Create(target, TransactionMode.Commit);
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.Created;
 
-                if (result == null || result.Outcome == ResultCode.Rejected)
-                    throw new InvalidDataException("Resource structure is not valid");
-                else if (result.Outcome == ResultCode.AcceptedNonConformant)
-                    throw new ConstraintException("Resource not conformant");
-                else if (result.Outcome == ResultCode.TypeNotAvailable)
-                    throw new FileNotFoundException(String.Format("Resource {0} not found", RestOperationContext.Current.IncomingRequest.Url));
-                else if (result.Outcome != ResultCode.Accepted)
-                    throw new DataException("Create failed");
 
-                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Import, ActionType.Create, AuditableObjectLifecycle.Creation, EventIdentifierType.Import, OutcomeIndicator.Success, null, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
+                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Import, ActionType.Create, AuditableObjectLifecycle.Creation, EventIdentifierType.Import, OutcomeIndicator.Success, null, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result);
 
                 String baseUri = RestOperationContext.Current.IncomingRequest.Url.AbsoluteUri;
-                RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Location", String.Format("{0}{1}/{2}/_history/{3}", baseUri, resourceType, result.Results[0].Id, result.Results[0].VersionId));
-                RestOperationContext.Current.OutgoingResponse.SetLastModified(result.Results[0].Timestamp);
-                RestOperationContext.Current.OutgoingResponse.SetETag(result.Results[0].VersionId);
+                RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Location", String.Format("{0}{1}/{2}/_history/{3}", baseUri, resourceType, result.Id, result.VersionId));
+                RestOperationContext.Current.OutgoingResponse.SetLastModified(result.Timestamp);
+                RestOperationContext.Current.OutgoingResponse.SetETag(result.VersionId);
 
 
-                return result.Results[0];
+                return result;
 
             }
             catch (Exception e)
             {
-                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Import, ActionType.Create, AuditableObjectLifecycle.Creation, EventIdentifierType.Import, OutcomeIndicator.EpicFail, null, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
-
+                this.m_tracer.TraceError("Error creating FHIR resource {0}: {1}", resourceType, e);
+                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Import, ActionType.Create, AuditableObjectLifecycle.Creation, EventIdentifierType.Import, OutcomeIndicator.EpicFail, null, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString());
                 throw;
             }
         }
@@ -312,8 +277,6 @@ namespace SanteDB.Messaging.FHIR.Rest
         public OperationOutcome ValidateResource(string resourceType, string id, ResourceBase target)
         {
             this.ThrowIfNotReady();
-
-            FhirOperationResult result = null;
             try
             {
 
@@ -324,28 +287,25 @@ namespace SanteDB.Messaging.FHIR.Rest
                 if (handler == null)
                     throw new FileNotFoundException(); // endpoint not found!
 
-                result = handler.Update(id, target, TransactionMode.Rollback);
-                if (result == null || result.Results.Count == 0) // Create
+                var result = handler.Update(id, target, TransactionMode.Rollback);
+                if (result == null) // Create
                 {
                     result = handler.Create(target, TransactionMode.Rollback);
                     RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.Created;
                 }
 
-                if (result == null || result.Outcome == ResultCode.Rejected)
-                    throw new InvalidDataException("Resource structure is not valid");
-                else if (result.Outcome == ResultCode.AcceptedNonConformant)
-                    throw new ConstraintException("Resource not conformant");
-                else if (result.Outcome == ResultCode.TypeNotAvailable)
-                    throw new FileNotFoundException(String.Format("Resource {0} not found", RestOperationContext.Current.IncomingRequest.Url));
-                else if (result.Outcome != ResultCode.Accepted)
-                    throw new DataException("Validate failed");
-
                 // Return constraint
-                return MessageUtil.CreateOutcomeResource(result);
-
+                return new OperationOutcome()
+                {
+                    Issue = new List<Issue>()
+                    {
+                        new Issue() { Severity = IssueSeverity.Information, Diagnostics = "Resource validated" }
+                    }
+                };
             }
             catch (Exception e)
             {
+                this.m_tracer.TraceError("Error validating FHIR resource: {0}", e);
                 throw;
             }
         }
@@ -359,7 +319,6 @@ namespace SanteDB.Messaging.FHIR.Rest
             this.ThrowIfNotReady();
 
             // Stuff for auditing and exception handling
-            List<IResultDetail> details = new List<IResultDetail>();
             FhirQueryResult result = null;
 
             try
@@ -378,12 +337,7 @@ namespace SanteDB.Messaging.FHIR.Rest
                 // TODO: Appropriately format response
                 // Process incoming request
                 result = resourceProcessor.Query(RestOperationContext.Current.IncomingRequest.QueryString);
-
-                if (result == null || result.Outcome == ResultCode.Rejected)
-                    throw new InvalidDataException("Message was rejected");
-                else if (result.Outcome != ResultCode.Accepted)
-                    throw new DataException("Query failed");
-
+                
                 AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Export, OutcomeIndicator.Success, RestOperationContext.Current.IncomingRequest.Url.Query, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
                 // Create the Atom feed
                 return MessageUtil.CreateBundle(result);
@@ -391,8 +345,8 @@ namespace SanteDB.Messaging.FHIR.Rest
             }
             catch (Exception e)
             {
+                this.m_tracer.TraceError("Error searching FHIR resource {0}: {1}", resourceType, e);
                 AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Export, OutcomeIndicator.EpicFail, RestOperationContext.Current.IncomingRequest.Url.Query, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
-
                 throw;
             }
 
@@ -429,17 +383,31 @@ namespace SanteDB.Messaging.FHIR.Rest
         public Bundle GetResourceInstanceHistory(string resourceType, string id)
         {
             this.ThrowIfNotReady();
-
-            FhirOperationResult readResult = null;
+            // Stuff for auditing and exception handling
             try
             {
 
-                readResult = this.PerformRead(resourceType, id, String.Empty);
-                RestOperationContext.Current.OutgoingResponse.Headers.Remove("Content-Disposition");
-                return MessageUtil.CreateBundle(readResult);
+                // Get query parameters
+                var queryParameters = RestOperationContext.Current.IncomingRequest.QueryString;
+                var resourceProcessor = FhirResourceHandlerUtil.GetResourceHandler(resourceType);
+
+                if (resourceProcessor == null) // Unsupported resource
+                    throw new FileNotFoundException("Specified resource type is not found");
+
+                // TODO: Appropriately format response
+                // Process incoming request
+                var result = resourceProcessor.History(id);
+                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Export, OutcomeIndicator.Success, $"_id={id}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
+
+                // Create the result
+                RestOperationContext.Current.OutgoingResponse.SetLastModified(result.Results[0].Timestamp);
+                return MessageUtil.CreateBundle(result);
+
             }
             catch (Exception e)
             {
+                this.m_tracer.TraceError("Error getting FHIR resource history {0}({1}): {2}", resourceType, id, e);
+                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Export, OutcomeIndicator.EpicFail, $"_id={id}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), null);
                 throw;
             }
         }
@@ -471,13 +439,11 @@ namespace SanteDB.Messaging.FHIR.Rest
         /// <summary>
         /// Perform a read against the underlying IFhirResourceHandler
         /// </summary>
-        private FhirOperationResult PerformRead(string resourceType, string id, string vid)
+        private ResourceBase PerformRead(string resourceType, string id, string vid)
         {
             this.ThrowIfNotReady();
 
             // Stuff for auditing and exception handling
-            List<IResultDetail> details = new List<IResultDetail>();
-            FhirOperationResult result = null;
 
             try
             {
@@ -491,34 +457,22 @@ namespace SanteDB.Messaging.FHIR.Rest
 
                 // TODO: Appropriately format response
                 // Process incoming request
-                result = resourceProcessor.Read(id, vid);
+                var result = resourceProcessor.Read(id, vid);
 
-                if (result.Outcome == ResultCode.Rejected)
-                    throw new InvalidDataException("Message was rejected");
-                else if (result.Outcome == (ResultCode.NotAvailable | ResultCode.Rejected))
-                    throw new FileLoadException(String.Format("Resource {0} is no longer available", RestOperationContext.Current.IncomingRequest.Url));
-                else if (result.Outcome == ResultCode.TypeNotAvailable ||
-                    result.Results == null || result.Results.Count == 0)
-                    throw new FileNotFoundException(String.Format("Resource {0} not found", RestOperationContext.Current.IncomingRequest.Url));
-                else if (result.Outcome != ResultCode.Accepted)
-                    throw new DataException("Read failed");
-
-                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Export, OutcomeIndicator.Success, $"_id={id}&_versionId={vid}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
+                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Export, OutcomeIndicator.Success, $"_id={id}&_versionId={vid}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result);
 
                 // Create the result
-                if (result.Results != null && result.Results.Count > 0 )
-                {
-                    RestOperationContext.Current.OutgoingResponse.SetLastModified(result.Results[0].Timestamp);
-                    RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Disposition", String.Format("filename=\"{0}-{1}-{2}.xml\"", resourceType, result.Results[0].Id, result.Results[0].VersionId));
-                    RestOperationContext.Current.OutgoingResponse.SetETag(result.Results[0].VersionId);
-                }
+                RestOperationContext.Current.OutgoingResponse.SetLastModified(result.Timestamp);
+                RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Disposition", String.Format("filename=\"{0}-{1}-{2}.xml\"", resourceType, result.Id, result.VersionId));
+                RestOperationContext.Current.OutgoingResponse.SetETag(result.VersionId);
+                
                 return result;
 
             }
             catch (Exception e)
             {
-                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Export, OutcomeIndicator.EpicFail, $"_id={id}&_versionId={vid}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), result.Results.ToArray());
-
+                this.m_tracer.TraceError("Error reading FHIR resource {0}({1},{2}): {3}", resourceType, id, vid, e);
+                AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Export, OutcomeIndicator.EpicFail, $"_id={id}&_versionId={vid}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString(), null);
                 throw;
             }
         }

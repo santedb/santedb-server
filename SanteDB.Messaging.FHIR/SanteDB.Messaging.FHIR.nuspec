@@ -17,7 +17,7 @@
     <dependencies>
       <dependency id="SanteDB.Core.Api" version="1.52.0.0" />
       <dependency id="SanteDB.Core.Model" version="1.52.0.0" />
-      <dependency id="Hl7.Fhr.STU3" version="0.96.0" />
+      <dependency id="Hl7.Fhir.STU3" version="0.96.0" />
       <dependency id="Newtonsoft.Json" version="11.02.0" />
       <dependency id="Restsrvr" version="1.52.0.0" />
       <dependency id="SanteDB.Rest.Common" version="1.52.0.0" />

@@ -17,7 +17,6 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
-using MARC.Everest.Connectors;
 using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
@@ -59,7 +58,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// Create the object
 		/// </summary>
-		protected override TModel Create(TModel modelInstance, List<IResultDetail> issues, TransactionMode mode)
+		protected override TModel Create(TModel modelInstance, TransactionMode mode)
 		{
 			return this.m_repository.Insert(modelInstance);
 		}
@@ -78,7 +77,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// Perform a delete operation
 		/// </summary>
-		protected override TModel Delete(Guid modelId, List<IResultDetail> details)
+		protected override TModel Delete(Guid modelId)
 		{
 			return this.m_repository.Obsolete(modelId);
 		}
@@ -92,15 +91,15 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <param name="count">The count.</param>
 		/// <param name="totalResults">The total results.</param>
 		/// <returns>Returns the list of models which match the given parameters.</returns>
-		protected override IEnumerable<TModel> Query(Expression<Func<TModel, bool>> query, List<IResultDetail> issues, Guid queryId, int offset, int count, out int totalResults)
+		protected override IEnumerable<TModel> Query(Expression<Func<TModel, bool>> query, Guid queryId, int offset, int count, out int totalResults)
         {
-            return this.QueryEx<TModel>(query, issues, queryId, offset, count, out totalResults);
+            return this.QueryEx<TModel>(query, queryId, offset, count, out totalResults);
         }
 
         /// <summary>
         /// Represents the predicate model
         /// </summary>
-        protected virtual IEnumerable<TPredicate> QueryEx<TPredicate>(Expression<Func<TPredicate, bool>> query, List<IResultDetail> issues, Guid queryId, int offset, int count, out int totalResults)
+        protected virtual IEnumerable<TPredicate> QueryEx<TPredicate>(Expression<Func<TPredicate, bool>> query, Guid queryId, int offset, int count, out int totalResults)
             where TPredicate : IdentifiedData
         {
             if (typeof(TPredicate).GetProperty(nameof(Entity.StatusConceptKey)) != null)
@@ -119,7 +118,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// Perform a read operation
 		/// </summary>
-		protected override TModel Read(Guid id, Guid versionId, List<IResultDetail> details)
+		protected override TModel Read(Guid id, Guid versionId)
 		{
 			return this.m_repository.Get(id, versionId);
 		}
@@ -127,7 +126,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// Perform an update operation
 		/// </summary>
-		protected override TModel Update(TModel model, List<IResultDetail> details, TransactionMode mode)
+		protected override TModel Update(TModel model, TransactionMode mode)
 		{
 			return this.m_repository.Save(model);
 		}

@@ -17,7 +17,6 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
-using MARC.Everest.Connectors;
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Model;
@@ -119,12 +118,12 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// Query filter
 		/// </summary>
-		protected override IEnumerable<CodedObservation> Query(Expression<Func<CodedObservation, bool>> query, List<IResultDetail> issues, Guid queryId, int offset, int count, out int totalResults)
+		protected override IEnumerable<CodedObservation> Query(Expression<Func<CodedObservation, bool>> query, Guid queryId, int offset, int count, out int totalResults)
 		{
 			var anyRef = base.CreateConceptSetFilter(ConceptSetKeys.ProblemObservations, query.Parameters[0]);
 			query = Expression.Lambda<Func<CodedObservation, bool>>(Expression.AndAlso(query.Body, anyRef), query.Parameters);
 
-			return base.Query(query, issues, queryId, offset, count, out totalResults);
+			return base.Query(query, queryId, offset, count, out totalResults);
 		}
 
         /// <summary>
