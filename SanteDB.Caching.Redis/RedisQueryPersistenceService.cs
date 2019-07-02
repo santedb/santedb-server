@@ -103,6 +103,8 @@ namespace SanteDB.Caching.Redis
             try
             {
                 var redisConn = this.m_connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
+                redisConn.KeyExpire($"{queryId}.{FIELD_QUERY_RESULT_IDX}", this.m_configuration.TTL, CommandFlags.FireAndForget);
+                redisConn.KeyExpire($"{queryId}.{FIELD_QUERY_TOTAL_RESULTS}", this.m_configuration.TTL, CommandFlags.FireAndForget);
                 if (redisConn.KeyExists($"{queryId}.{FIELD_QUERY_RESULT_IDX}"))
                     return redisConn.ListRange($"{queryId}.{FIELD_QUERY_RESULT_IDX}", offset, offset + count).Select(o => new Guid((byte[])o)).ToArray();
                 else

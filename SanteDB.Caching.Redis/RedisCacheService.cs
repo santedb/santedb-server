@@ -263,6 +263,10 @@ namespace SanteDB.Caching.Redis
         /// <summary>
         /// Add an object to the REDIS cache
         /// </summary>
+        /// <remarks>
+        /// Serlializes <paramref name="data"/> into XML and then persists the 
+        /// result in a configured REDIS cache.
+        /// </remarks>
         public void Add(IdentifiedData data)
         {
             try
