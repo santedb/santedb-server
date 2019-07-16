@@ -234,7 +234,7 @@ namespace SanteDB.Messaging.HL7.Messages
         /// <param name="request">The request message</param>
         /// <param name="error">The exception that occurred</param>
         /// <returns>NACK message</returns>
-        protected IMessage CreateNACK(Type nackType, IMessage request, Exception error, Hl7MessageReceivedEventArgs receiveData)
+        protected virtual IMessage CreateNACK(Type nackType, IMessage request, Exception error, Hl7MessageReceivedEventArgs receiveData)
         {
             // Extract TIE into real cause
             while (error is TargetInvocationException)
@@ -311,7 +311,7 @@ namespace SanteDB.Messaging.HL7.Messages
         /// <param name="ackCode">The acknowledgemode code</param>
         /// <param name="ackMessage">The message to append to the ACK</param>
         /// <returns></returns>
-        protected IMessage CreateACK(Type ackType, IMessage request, String ackCode, String ackMessage)
+        protected virtual IMessage CreateACK(Type ackType, IMessage request, String ackCode, String ackMessage)
         {
             var retVal = Activator.CreateInstance(ackType) as IMessage;
             (retVal.GetStructure("MSH") as MSH).SetDefault(request.GetStructure("MSH") as MSH);

@@ -27,6 +27,7 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.Messaging.HL7.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -334,7 +335,7 @@ namespace SanteDB.Messaging.HL7
             {
                 assigningAuthority = assigningAuthorityRepositoryService.Get(id.NamespaceID.Value);
                 if (assigningAuthority == null && throwIfNotFound)
-                    throw new KeyNotFoundException($"Cannot find assigning authority {id.NamespaceID.Value}");
+                    throw new AssigningAuthorityNotFoundException(id.NamespaceID.Value);
             }
 
             if (!string.IsNullOrEmpty(id.UniversalID.Value))
@@ -342,7 +343,7 @@ namespace SanteDB.Messaging.HL7
                 var tAssigningAuthority = assigningAuthorityRepositoryService.Get(new Uri($"urn:oid:{id.UniversalID.Value}"));
 
                 if (tAssigningAuthority == null && throwIfNotFound)
-                    throw new KeyNotFoundException($"Cannot find assigning authority {id.UniversalID.Value}");
+                    throw new AssigningAuthorityNotFoundException(id.UniversalID.Value);
                 else if (assigningAuthority != null && tAssigningAuthority?.Key != assigningAuthority.Key) // Must agree
                     throw new InvalidOperationException("When both NamespaceID and UniversalID are specified, both must agree with configured values");
                 else
