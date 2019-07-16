@@ -48,7 +48,7 @@ namespace SanteDB.Messaging.HL7.Query
         /// <summary>
         /// Append query results to the message
         /// </summary>
-        public IMessage AppendQueryResult(IEnumerable results, Expression queryDefinition, IMessage currentResponse, Hl7MessageReceivedEventArgs evt, String matchConfiguration = null, int offset = 0)
+        public virtual IMessage AppendQueryResult(IEnumerable results, Expression queryDefinition, IMessage currentResponse, Hl7MessageReceivedEventArgs evt, String matchConfiguration = null, int offset = 0)
         {
             var patients = results.OfType<Patient>();
             if (patients.Count() == 0) return currentResponse;
@@ -99,7 +99,7 @@ namespace SanteDB.Messaging.HL7.Query
         /// <summary>
         /// Rewrite a QPD query to an HDSI query
         /// </summary>
-        public NameValueCollection ParseQuery(QPD qpd, Hl7QueryParameterType map)
+        public virtual NameValueCollection ParseQuery(QPD qpd, Hl7QueryParameterType map)
         {
             NameValueCollection retVal = new NameValueCollection();
 

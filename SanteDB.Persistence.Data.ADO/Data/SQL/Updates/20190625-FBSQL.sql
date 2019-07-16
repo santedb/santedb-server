@@ -137,4 +137,7 @@ INSERT INTO REF_TERM_NAME_TBL(REF_TERM_NAME_ID, REF_TERM_ID, LANG_CS, TERM_NAME,
 INSERT INTO CD_NAME_TBL(NAME_ID, CD_ID, EFFT_VRSN_SEQ_ID, LANG_CS, VAL, PHON_ALG_ID) SELECT gen_uuid(), CD_ID, VRSN_SEQ_ID, 'en', 'Control Event', char_to_uuid('402CD339-D0E4-46CE-8FC2-12A4B0E17226') FROM CD_VRSN_TBL WHERE CD_ID = char_to_uuid('B35488CE-B7CD-4DD4-B4DE-5F83DC55AF9F') AND OBSLT_UTC IS NULL;--#!
 INSERT INTO cd_set_mem_assoc_tbl (set_id, cd_id) VALUES (char_to_uuid('62c5fde0-a3aa-45df-94e9-242f4451644a'), char_to_uuid('B35488CE-B7CD-4DD4-B4DE-5F83DC55AF9F'));--#!
 
+-- GRANT SYSTEM LOGIN AS A SERVICE
+INSERT INTO sec_rol_pol_assoc_tbl (sec_pol_inst_id, pol_id, rol_id, pol_act) VALUES (gen_uuid(), char_to_uuid('e15b96ab-646c-4c00-9a58-ea09eee67d7c'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 2);--#!
+
 SELECT REG_PATCH('20190625-01') FROM RDB$DATABASE;--#1

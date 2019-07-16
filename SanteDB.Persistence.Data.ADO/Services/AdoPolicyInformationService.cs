@@ -238,7 +238,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             .Where(o => o.SourceKey == (securable as IdentifiedData).Key);
 
                         return context.Query<CompositeResult<DbSecurityPolicy, DbSecurityRolePolicy>>(query)
-                            .Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable));
+                            .Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable)).ToList();
                     }
                     else if (securable is Core.Model.Security.SecurityApplication)
                     {
@@ -252,7 +252,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             query.Where(o => o.SourceKey == (securable as IdentifiedData).Key);
 
                         return context.Query<CompositeResult<DbSecurityPolicy, DbSecurityApplicationPolicy>>(query)
-                            .Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable));
+                            .Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable)).ToList();
                     }
                     else if (securable is IPrincipal || securable is IIdentity)
                     {
@@ -322,7 +322,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                   .Where(o => o.SourceKey == pAct.Key);
 
                         return context.Query<CompositeResult<DbSecurityPolicy, DbActSecurityPolicy>>(query)
-                            .Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable));
+                            .Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable)).ToList();
                     }
                     else if (securable is Core.Model.Entities.Entity)
                     {
@@ -332,7 +332,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                   .Where(o => o.SourceKey == pEntity.Key);
 
                         return context.Query<CompositeResult<DbSecurityPolicy, DbEntitySecurityPolicy>>(query)
-                            .Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable));
+                            .Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable)).ToList();
                     }
                     else if(securable is SecurityUser)
                     {
@@ -350,7 +350,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             .Where<DbSecurityUserRole>(o => o.UserKey == pUser.Key);
 
                         return context.Query<CompositeResult<DbSecurityPolicy, DbSecurityRolePolicy>>(query)
-                            .Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable));
+                            .Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable)).ToList();
 
                     }
                     else

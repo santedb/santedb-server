@@ -49,7 +49,6 @@ namespace SanteDB.Core.Security
                 throw new ArgumentNullException(nameof(principal));
             else if (securable == null)
                 throw new ArgumentNullException(nameof(securable));
-
             // We need to get the active policies for this
             var pip = ApplicationServiceContext.Current.GetService<IPolicyInformationService>();
             IEnumerable<IPolicyInstance> securablePolicies = pip.GetActivePolicies(securable),
@@ -87,7 +86,7 @@ namespace SanteDB.Core.Security
                 throw new ArgumentNullException(nameof(principal));
             else if (String.IsNullOrEmpty(policyId))
                 throw new ArgumentNullException(nameof(policyId));
-
+            
             // Can we make this decision based on the claims? 
             if (principal is IClaimsPrincipal && (principal as IClaimsPrincipal).HasClaim(c => c.Type == SanteDBClaimTypes.SanteDBGrantedPolicyClaim && policyId.StartsWith(c.Value)))
                 return PolicyGrantType.Grant;

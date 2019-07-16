@@ -28,8 +28,7 @@ namespace SanteDB.Messaging.HL7.Test
         /// </summary>
         public static String ToString(IMessage msg)
         {
-            
-            return MessageUtils.EncodeMessage(msg, "2.5.1");
+            return MessageUtils.EncodeMessage(msg, "2.5");
         }
     }
 }

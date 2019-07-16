@@ -181,6 +181,8 @@ namespace SanteDB.Messaging.HL7.Messages
                 var odsc = retVal.GetStructure("DSC") as DSC;
                 var oqpd = retVal.GetStructure("QPD") as QPD;
                 DeepCopy.copy(qpd, oqpd);
+                omsh.MessageType.MessageCode.Value = "RSP";
+                omsh.MessageType.MessageStructure.Value = retVal.GetType().Name;
                 omsh.MessageType.TriggerEvent.Value = map.ResponseTrigger;
                 omsh.MessageType.MessageStructure.Value = map.ResponseTypeXml;
                 qak.HitCount.Value = totalResults.ToString();

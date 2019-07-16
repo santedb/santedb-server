@@ -49,7 +49,13 @@ namespace SanteDB.Messaging.HL7.Configuration
         /// </summary>
         [XmlAttribute("security"), JsonProperty("security")]
         public SecurityMethod Security { get; set; }
-        
+
+        /// <summary>
+        /// If no security method is being used, the principal of the anonymous user
+        /// </summary>
+        [XmlAttribute("anonUser"), JsonProperty("anonUser")]
+        public String AnonymousUser { get; set; }
+
         /// <summary>
         /// The address to which to bind
         /// </summary>

@@ -53,7 +53,7 @@ namespace SanteDB.Messaging.HL7.Segments
         /// <summary>
         /// Create PD1
         /// </summary>
-        public IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, string[] exportDomains)
+        public virtual IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, string[] exportDomains)
         {
             var retVal = context.GetStructure("PD1") as PD1;
 
@@ -63,7 +63,7 @@ namespace SanteDB.Messaging.HL7.Segments
         /// <summary>
         /// Parse the PD1 segment
         /// </summary>
-        public IEnumerable<IdentifiedData> Parse(ISegment segment, IEnumerable<IdentifiedData> context)
+        public virtual IEnumerable<IdentifiedData> Parse(ISegment segment, IEnumerable<IdentifiedData> context)
         {
 
             var pd1Segment = segment as PD1;

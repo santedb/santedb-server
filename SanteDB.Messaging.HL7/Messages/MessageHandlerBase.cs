@@ -117,15 +117,14 @@ namespace SanteDB.Messaging.HL7.Messages
         /// </summary>
         private void Authenticate(Hl7MessageReceivedEventArgs e)
         {
-            IClaimsPrincipal principal = null;
+            IPrincipal principal = null;
             var msh = e.Message.GetStructure("MSH") as MSH;
             var sft = e.Message.GetStructure("SFT") as SFT;
             var sessionService = ApplicationServiceContext.Current.GetService<ISessionProviderService>();
 
-            // Authenticated args?
             if (String.IsNullOrEmpty(msh.Security.Value) && this.m_configuration.Security == SecurityMethod.Msh8)
                 throw new SecurityException("Must carry MSH-8 authorization token information");
-            if (msh.Security.Value.StartsWith("sid://")) // Session identifier
+            if (msh.Security.Value?.StartsWith("sid://") == true) // Session identifier
             {
                 var session = sessionService.Get(Enumerable.Range(5, msh.Security.Value.Length - 5)
                                     .Where(x => x % 2 == 0)
@@ -186,7 +185,17 @@ namespace SanteDB.Messaging.HL7.Messages
                     throw new UnauthorizedAccessException("Server requires authenticated application");
                 principal = new SanteDBClaimsPrincipal(new IIdentity[] { devicePrincipal.Identity, applicationPrincipal?.Identity }.OfType<IClaimsIdentity>());
             }
-
+            else 
+                switch(this.m_configuration.AnonymousUser?.ToUpper())
+                {
+                    case "SYSTEM":
+                        principal = AuthenticationContext.SystemPrincipal;
+                        break;
+                    case "ANONYMOUS":
+                    default:
+                        principal = AuthenticationContext.AnonymousPrincipal;
+                        break;
+                }
             // Pricipal
             if(principal != null)
                 AuthenticationContext.Current = new AuthenticationContext(principal);
@@ -262,6 +271,7 @@ namespace SanteDB.Messaging.HL7.Messages
             else
                 retVal = this.CreateACK(nackType, request, "AE", "General Error");
 
+           
             var msa = retVal.GetStructure("MSA") as MSA;
             msa.ErrorCondition.Identifier.Value = this.MapErrCode(error);
             msa.ErrorCondition.Text.Value = error.Message;
@@ -311,6 +321,16 @@ namespace SanteDB.Messaging.HL7.Messages
             msa.MessageControlID.Value = (request.GetStructure("MSH") as MSH).MessageControlID.Value;
             msa.AcknowledgmentCode.Value = ackCode;
             msa.TextMessage.Value = ackMessage;
+
+            // FAST ACK carry same response message type as request
+            if (retVal is ACK)
+            {
+                (retVal as ACK).MSH.MessageType.MessageStructure.Value = (retVal as ACK).MSH.MessageType.MessageCode.Value = "ACK";
+                (retVal as ACK).MSH.MessageType.TriggerEvent.Value = (request.GetStructure("MSH") as MSH).MessageType.TriggerEvent.Value;
+                
+
+            }
+
             return retVal;
         }
 

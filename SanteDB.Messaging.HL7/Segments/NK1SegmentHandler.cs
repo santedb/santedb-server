@@ -79,7 +79,7 @@ namespace SanteDB.Messaging.HL7.Segments
         /// <summary>
         /// Create next of kin relationship
         /// </summary>
-        public IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, String[] exportDomains)
+        public virtual IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, String[] exportDomains)
         {
             List<ISegment> retVal = new List<ISegment>();
             var patient = data as Patient;
@@ -97,7 +97,7 @@ namespace SanteDB.Messaging.HL7.Segments
         /// <summary>
         /// Parse the Next Of Kin Data
         /// </summary>
-        public IEnumerable<IdentifiedData> Parse(ISegment segment, IEnumerable<IdentifiedData> context)
+        public virtual IEnumerable<IdentifiedData> Parse(ISegment segment, IEnumerable<IdentifiedData> context)
         {
 
             // Cast segment

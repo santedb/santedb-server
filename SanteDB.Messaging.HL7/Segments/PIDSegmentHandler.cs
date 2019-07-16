@@ -62,7 +62,7 @@ namespace SanteDB.Messaging.HL7.Segments
         /// <param name="data">The data to be created</param>
         /// <param name="context">The message in which the segment is created</param>
         /// <returns>The segments to add to the messge</returns>
-        public IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, string[] exportDomains)
+        public virtual IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, string[] exportDomains)
         {
             var retVal = context.GetStructure("PID") as PID;
             var patient = data as Patient;
@@ -142,7 +142,7 @@ namespace SanteDB.Messaging.HL7.Segments
         /// </summary>
         /// <param name="segment">The segment to be parsed</param>
         /// <returns>The parsed patient information</returns>
-        public IEnumerable<IdentifiedData> Parse(ISegment segment, IEnumerable<IdentifiedData> context)
+        public virtual IEnumerable<IdentifiedData> Parse(ISegment segment, IEnumerable<IdentifiedData> context)
         {
             var patientService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>();
 
