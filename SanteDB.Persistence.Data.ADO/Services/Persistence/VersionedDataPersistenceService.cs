@@ -175,7 +175,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         protected override IEnumerable<Object> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TModel>[] orderBy, bool countResults = true)
         {
             // Is obsoletion time already specified?
-            if (!query.ToString().Contains("ObsoletionTime"))
+            if (!query.ToString().Contains("ObsoletionTime") && !query.ToString().Contains("VersionKey"))
             {
                 var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
                 query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);

@@ -140,9 +140,9 @@ namespace SanteDB.Persistence.Data.ADO.Test
             afterTest.Mnemonic = "TESTCODE3_A";
             afterTest = persistenceService.Update(afterTest, TransactionMode.Commit, s_authorization);
             Assert.AreEqual(3, afterTest.LoadCollection<ConceptName>("ConceptNames").Count());
+            Assert.AreEqual(originalId, afterTest.PreviousVersionKey);
             Assert.AreEqual("TESTCODE3_A", afterTest.Mnemonic);
             Assert.IsNotNull(afterTest.GetPreviousVersion());
-            Assert.AreEqual(originalId, afterTest.PreviousVersionKey);
             var updateKey = afterTest.VersionKey;
 
             // Verify 2: Remove a name
