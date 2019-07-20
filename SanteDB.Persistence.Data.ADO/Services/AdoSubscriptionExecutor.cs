@@ -208,28 +208,28 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         else
                         {
                             // Fetch
-                            var domainResults = (typeof(DataContext).GetGenericMethod(
+                            var domainResults = typeof(DataContext).GetGenericMethod(
                                 nameof(DataContext.Query),
                                 new Type[] { resultType },
-                                new Type[] { typeof(SqlStatement) }).Invoke(connection, new object[] { domainQuery }) as IEnumerable).OfType<Object>().ToList();
-
-                            // Count
-                            totalResults = domainResults.Count();
+                                new Type[] { typeof(SqlStatement) }).Invoke(connection, new object[] { domainQuery }) as IOrmResultSet;
 
                             // Register query if query id specified
                             if (queryId != Guid.Empty)
                             {
-                                if (typeof(CompositeResult).IsAssignableFrom(resultType))
-                                    ApplicationServiceContext.Current.GetService<IQueryPersistenceService>()?.RegisterQuerySet(queryId, domainResults.OfType<CompositeResult>().Select(o => (o.Values[0] as IDbIdentified).Key), null, totalResults);
-                                else
-                                    ApplicationServiceContext.Current.GetService<IQueryPersistenceService>()?.RegisterQuerySet(queryId, domainResults.OfType<IDbIdentified>().Select(o => o.Key), null, totalResults);
-
+                                var results = domainResults.Keys<Guid>().OfType<Guid>().ToArray();
+                                totalResults = results.Count();
+                                ApplicationContext.Current.GetService<IQueryPersistenceService>()?.RegisterQuerySet(queryId, results, null, totalResults);
                             }
+                            else
+                                totalResults = domainResults.Count();
+
 
                             // Return
                             return domainResults
                                 .Skip(offset)
                                 .Take(count ?? 100)
+                                .OfType<Object>()
+                                .ToList()
                                 .AsParallel()
                                 .AsOrdered()
                                 .Select(o =>

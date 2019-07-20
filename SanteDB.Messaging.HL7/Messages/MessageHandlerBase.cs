@@ -149,8 +149,9 @@ namespace SanteDB.Messaging.HL7.Messages
                 String deviceId = $"{msh.SendingApplication.NamespaceID.Value}|{msh.SendingFacility.NamespaceID.Value}",
                     deviceSecret = BitConverter.ToString(auth.AuthorizationToken).Replace("-",""),
                     applicationId = msh.SendingApplication.NamespaceID.Value,
-                    applicationSecret = this.m_configuration.Security == SecurityMethod.Sft4 ? sft.SoftwareBinaryID.Value :
-                        this.m_configuration.Security == SecurityMethod.Msh8 ? msh.Security.Value : null;
+                    applicationSecret = this.m_configuration.Security == SecurityMethod.Sft4 ? sft.SoftwareBinaryID.Value : // Authenticate app by SFT4
+                        this.m_configuration.Security == SecurityMethod.Msh8 ? msh.Security.Value : // Authenticate app by MSH-8
+                        BitConverter.ToString(auth.AuthorizationToken).Replace("-", ""); // Authenticate app using X509 certificate on the device
 
                 IPrincipal devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(deviceId, deviceSecret, AuthenticationMethod.Local),
                     applicationPrincipal = applicationSecret != null ? ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>()?.Authenticate(applicationId, applicationSecret) : null;
@@ -263,7 +264,16 @@ namespace SanteDB.Messaging.HL7.Messages
             else if (error is DetectedIssueException)
                 retVal = this.CreateACK(nackType, request, "CR", "Business Rule Violation");
             else if (error is DataPersistenceException)
-                retVal = this.CreateACK(nackType, request, "CE", "Error committing data");
+            {
+                // Data persistence failed because of D/I/E
+                if(error.InnerException is DetectedIssueException)
+                {
+                    error = error.InnerException;
+                    retVal = this.CreateACK(nackType, request, "CR", "Business Rule Violation");
+                }
+                else
+                    retVal = this.CreateACK(nackType, request, "CE", "Error committing data");
+            }
             else if (error is NotImplementedException)
                 retVal = this.CreateACK(nackType, request, "AE", "Not Implemented");
             else if (error is NotSupportedException)

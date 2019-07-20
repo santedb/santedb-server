@@ -206,19 +206,20 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
             else
             {
-                if (count == 1)
-                    domainQuery.Limit(1);
-
+            
                 var retVal = context.Query<CompositeResult<TDomain, TDomainKey>>(domainQuery);
 
-                if (countResults)
+                if (queryId != Guid.Empty)
+                {
+                    var keys = retVal.Keys<Guid>().ToArray();
+                    totalResults = keys.Count();
+                    this.AddQueryResults(context, query, queryId, offset, keys, totalResults);
+                }
+                else if (countResults)
                     totalResults = retVal.Count();
                 else
                     totalResults = 0;
 
-                // Query id just get the UUIDs in the db
-                if (queryId != Guid.Empty)
-                    this.AddQueryResults<CompositeResult<TDomain, TDomainKey>>(context, query, queryId, offset, retVal, totalResults, orderBy);
                 return retVal.Skip(offset).Take(count ?? 100);
             }
 

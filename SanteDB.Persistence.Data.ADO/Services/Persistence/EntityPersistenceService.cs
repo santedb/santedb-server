@@ -339,7 +339,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         if (provenance.ApplicationKey != auth.AssigningApplicationKey)
                         {
                             if (!data.Identifiers.Where(id => id.AuthorityKey == auth.Key).All(id => context.Any<DbEntityIdentifier>(o => o.AuthorityKey == auth.Key && o.Value == id.Value && o.SourceKey != data.Key)))
-                                throw new SecurityException($"Application {provenance.ApplicationKey} does not have permission to assign {auth.DomainName}");
+                                throw new DetectedIssueException(
+                                    new DetectedIssue(DetectedIssuePriorityType.Error, $"Application {provenance.ApplicationKey} does not have permission to assign {auth.DomainName}", DetectedIssueKeys.SecurityIssue)
+                                );
                         }
                     }
 				}

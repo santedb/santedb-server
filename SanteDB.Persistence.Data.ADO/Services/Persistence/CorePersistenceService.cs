@@ -243,21 +243,22 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 {
 
                     domainQuery = this.AppendOrderBy(domainQuery, orderBy);
-                    if (count == 1)
-                        domainQuery.Limit(1);
-
+                   
                     // Only one is requested, or there is no future query coming back so no savings in querying the entire dataset
-                    var retVal = this.DomainQueryInternal<TQueryReturn>(context, domainQuery).OfType<Object>();
-                    if (includeCount)
+                    var retVal = this.DomainQueryInternal<TQueryReturn>(context, domainQuery);
+
+                    if (queryId != Guid.Empty)
+                    {
+                        var keys = retVal.Keys<Guid>().ToArray();
+                        totalResults = keys.Count();
+                        this.AddQueryResults(context, query, queryId, offset, keys, totalResults);
+                    }
+                    else if (includeCount)
                         totalResults = retVal.Count();
                     else
                         totalResults = 0;
 
-                    // We have a query identifier and this is the first frame, freeze the query identifiers
-                    if(queryId != Guid.Empty)
-                        this.AddQueryResults<TQueryReturn>(context, query, queryId, offset, retVal, totalResults, orderBy);
-
-                    return retVal.Skip(offset).Take(count ?? 100);
+                    return retVal.Skip(offset).Take(count ?? 100).OfType<Object>();
                 }
                 else
                 {
@@ -294,67 +295,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Add query results
         /// </summary>
-        protected void AddQueryResults<TKeySearch>(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, IEnumerable<Object> initialResults, int totalResults, ModelSort<TModel>[] orderBy)
+        protected void AddQueryResults(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, IEnumerable<Guid> initialResults, int totalResults)
         {
-
-            // Get PK Column to select keys
-            ColumnMapping pkColumn = null;
-            IEnumerable<Guid> keyResults = null;
-
-            if (typeof(CompositeResult).IsAssignableFrom(typeof(TKeySearch)))
-            {
-                int keyObj = 0;
-                foreach (var p in typeof(TKeySearch).GenericTypeArguments.Select(o => this.m_persistenceService.GetMapper().MapModelType(o)))
-                {
-                    if (!typeof(DbSubTable).IsAssignableFrom(p) && !typeof(IDbVersionedData).IsAssignableFrom(p))
-                    {
-                        pkColumn = TableMapping.Get(p).Columns.SingleOrDefault(o => o.IsPrimaryKey);
-                        break;
-                    }
-                    keyObj++;
-                }
-
-                // Extract keys from composite
-                Func<CompositeResult, Guid> selector = i => (Guid)pkColumn.SourceProperty.GetValue(i.Values[keyObj], null);
-                keyResults = initialResults.OfType<CompositeResult>().Select(selector);
-                
-            }
-            else
-            {
-                pkColumn = TableMapping.Get(typeof(TKeySearch)).Columns.SingleOrDefault(o => o.IsPrimaryKey);
-                Func<IDbIdentified, Guid> selector = i => (Guid)pkColumn.SourceProperty.GetValue(i, null);
-                keyResults = initialResults.OfType<IDbIdentified>().Select(selector);
-            }
-
-            this.m_queryPersistence?.RegisterQuerySet(queryId, keyResults.ToArray(), query, totalResults);
-
-            //int step = initialResults.Count();
-
-            //// Build query for additional keys to query store if needed
-            //if (initialResults.Count() < totalResults)
-            //    ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueNonPooledWorkItem((parm) =>
-            //    {
-            //        var keyQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, orderBy, pkColumn);
-            //        keyQuery = this.AppendOrderBy(keyQuery, orderBy);
-            //        int ofs = offset == 0 ? step : 0;
-            //        //while (ofs < totalResults)
-            //        //{
-            //        this.m_tracer.TraceVerbose("Hydrating query {0} ({1}..{2})", queryId, ofs, totalResults);
-            //        var resultKeys = (parm as DataContext).Query<Guid>(keyQuery.Build().Offset(ofs));
-            //        ofs = 0;
-            //        while(ofs< totalResults) { 
-            //            this.m_tracer.TraceVerbose("Registering results {0} ({1}..{2})", queryId, ofs, ofs + step);
-            //            this.m_queryPersistence?.AddResults(queryId, resultKeys.Skip(ofs).Take(step).ToArray());
-            //            ofs += step;
-            //        }
-            //    }, context.OpenClonedContext());
-
+            this.m_queryPersistence?.RegisterQuerySet(queryId, initialResults.ToArray(), query, totalResults);
         }
 
         /// <summary>
         /// Perform a domain query
         /// </summary>
-        protected IEnumerable<TResult> DomainQueryInternal<TResult>(DataContext context, SqlStatement domainQuery)
+        protected OrmResultSet<TResult> DomainQueryInternal<TResult>(DataContext context, SqlStatement domainQuery)
         {
 
             // Build and see if the query already exists on the stack???
