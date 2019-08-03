@@ -57,6 +57,7 @@ namespace SanteDB.Messaging.HL7.Test
             app = securityAppService.Insert(app);
             metadataService.Insert(new Core.Model.DataTypes.AssigningAuthority("TEST", "TEST", "1.2.3.4.5.6.7")
             {
+                IsUnique = true,
                 AssigningApplicationKey = app.Key
             });
 
@@ -99,6 +100,32 @@ namespace SanteDB.Messaging.HL7.Test
             Assert.AreEqual(1, patient.Names.Count);
             Assert.AreEqual("JOHNSTON", patient.Names.First().Component.First(o => o.ComponentTypeKey == NameComponentKeys.Family).Value);
             Assert.AreEqual("ROBERT", patient.Names.First().Component.First(o => o.ComponentTypeKey == NameComponentKeys.Given).Value);
+        }
+
+        /// <summary>
+        /// Test that ADT message is parsed properly
+        /// </summary>
+        [TestMethod]
+        public void TestUpdateAdt()
+        {
+            AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
+            var msg = TestUtil.GetMessage("ADT_SIMPLE");
+            var message = new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
+            var messageStr = TestUtil.ToString(message);
+            Assert.AreEqual("CA", (message.GetStructure("MSA") as MSA).AcknowledgmentCode.Value);
+
+            msg = TestUtil.GetMessage("ADT_UPDATE");
+            message = new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
+            messageStr = TestUtil.ToString(message);
+            Assert.AreEqual("CA", (message.GetStructure("MSA") as MSA).AcknowledgmentCode.Value);
+
+            // Ensure that the patient actually was persisted
+            var patient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "HL7-1"), AuthenticationContext.Current.Principal).SingleOrDefault();
+            Assert.IsNotNull(patient);
+            Assert.IsTrue(messageStr.Contains(patient.Key.ToString()));
+            Assert.AreEqual(1, patient.Names.Count);
+            Assert.AreEqual("JOHNSTON", patient.Names.First().Component.First(o => o.ComponentTypeKey == NameComponentKeys.Family).Value);
+            Assert.AreEqual("ROBERTA", patient.Names.First().Component.First(o => o.ComponentTypeKey == NameComponentKeys.Given).Value);
         }
 
         /// <summary>

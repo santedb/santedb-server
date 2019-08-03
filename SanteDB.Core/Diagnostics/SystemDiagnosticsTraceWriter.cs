@@ -14,6 +14,18 @@ namespace SanteDB.Core.Diagnostics
     public class SystemDiagnosticsTraceWriter : TraceWriter
     {
 
+        // Trace source
+        private TraceSource m_traceSource = new TraceSource("SanteDB");
+
+        /// <summary>
+        /// CTOR for diagnostics
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="fileName"></param>
+        public SystemDiagnosticsTraceWriter(EventLevel filter, string fileName) : base(filter, fileName)
+        {
+        }
+
         /// <summary>
         /// Creates a new diagnostics trace writer
         /// </summary>
@@ -46,7 +58,7 @@ namespace SanteDB.Core.Diagnostics
                     break;
             }
 
-            new TraceSource(source).TraceEvent(eventLvl, 0, format, args);
+            this.m_traceSource.TraceEvent(eventLvl, 0, format, args);
         }
     }
 }

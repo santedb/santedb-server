@@ -196,7 +196,9 @@
       <Link>SanteDB.licenseheader</Link>
     </None>
     <None Include="app.config" />
-    <None Include="SanteDB.Persistence.ADO.nuspec" />
+    <None Include="SanteDB.Persistence.ADO.nuspec">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Data\SQL\PSQL\santedb-drop.sql">

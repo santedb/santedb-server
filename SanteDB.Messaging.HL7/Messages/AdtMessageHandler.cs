@@ -92,7 +92,8 @@ namespace SanteDB.Messaging.HL7.Messages
             var patient = updateBundle.Item.OfType<Patient>().FirstOrDefault(it => it.Tags.Any(t => t.TagKey == ".v2.segment" && t.Value == "PID"));
             if (patient == null)
                 throw new ArgumentNullException(nameof(updateBundle), "Message did not contain a patient");
-
+            else if (!patient.Key.HasValue)
+                throw new InvalidOperationException("Update can only be performed on existing patients. Ensure that a unique identifier exists on the update record");
             var repoService = ApplicationServiceContext.Current.GetService<IRepositoryService<Bundle>>();
             if (repoService == null)
                 throw new InvalidOperationException("Cannot find repository for Patient");

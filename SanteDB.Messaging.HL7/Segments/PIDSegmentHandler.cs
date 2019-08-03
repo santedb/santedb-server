@@ -154,7 +154,8 @@ namespace SanteDB.Messaging.HL7.Segments
             retVal.CreationAct = context.OfType<ControlAct>().FirstOrDefault();
 
             // Existing patient?
-            if(pidSegment.Message.GetStructureName().StartsWith("ADT"))
+            if (pidSegment.Message.GetStructureName().StartsWith("ADT"))
+            {
                 foreach (var id in pidSegment.GetPatientIdentifierList())
                 {
                     var idnumber = id.IDNumber.Value;
@@ -164,27 +165,25 @@ namespace SanteDB.Messaging.HL7.Segments
                     if (authority == null &&
                         id.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority?.DomainName)
                         found = patientService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.Current.Principal);
-                    else if(authority?.IsUnique == true)
+                    else if (authority?.IsUnique == true)
                         found = patientService.Query(o => o.Identifiers.Any(i => i.Value == idnumber &&
                             i.AuthorityKey == authority.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
                     if (found != null)
                     {
                         retVal = found;
-                        retVal.Names.Clear();
-                        retVal.Addresses.Clear();
-                        retVal.Telecoms.Clear();
-                        retVal.Identifiers.Clear();
-                        retVal.Extensions.Clear();
-                        retVal.Relationships.Clear();
+
                         break;
                     }
                 }
-            
+            }
+
 
             if (!pidSegment.PatientID.IsEmpty())
                 retVal.Identifiers.Add(pidSegment.PatientID.ToModel());
             if (pidSegment.PatientIdentifierListRepetitionsUsed > 0)
-                retVal.Identifiers.AddRange(pidSegment.GetPatientIdentifierList().ToModel());
+                retVal.Identifiers.AddRange(
+                    pidSegment.GetPatientIdentifierList().ToModel().Where(o=>!retVal.Identifiers.Any(i=>i.AuthorityKey == o.AuthorityKey && i.Value == o.Value)).ToArray()
+                );
 
             // Find the key for the patient 
             var keyId = pidSegment.GetPatientIdentifierList().FirstOrDefault(o => o.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority.DomainName);
@@ -195,7 +194,15 @@ namespace SanteDB.Messaging.HL7.Segments
                 throw new InvalidOperationException("Couldn't understand any patient identity");
 
             if (pidSegment.PatientNameRepetitionsUsed > 0)
-                retVal.Names.AddRange(pidSegment.GetPatientName().ToModel());
+                foreach(var itm in pidSegment.GetPatientName())
+                {
+                    var model = itm.ToModel();
+                    var existing = retVal.Names.FirstOrDefault(o => o.NameUseKey == model.NameUseKey);
+                    if (existing == null)
+                        retVal.Names.Add(model);
+                    else
+                        existing.CopyObjectData(model);
+                }
 
             // Mother's maiden name, create a relationship for mother
             if (pidSegment.MotherSMaidenNameRepetitionsUsed > 0 || pidSegment.MotherSIdentifierRepetitionsUsed > 0)
@@ -215,12 +222,20 @@ namespace SanteDB.Messaging.HL7.Segments
                     {
                         Key = Guid.NewGuid(),
                         Identifiers = pidSegment.GetMotherSIdentifier().ToModel().ToList(),
-                        Names = pidSegment.GetMotherSMaidenName().ToModel().ToList()
+                        Names = pidSegment.GetMotherSMaidenName().ToModel().ToList(),
+                        StatusConceptKey = StatusKeys.New
                     };
-
+                
                 var existingRelationship = retVal.Relationships.FirstOrDefault(r => r.SourceEntityKey == retVal.Key && r.TargetEntityKey == motherEntity.Key);
                 if (existingRelationship == null)
-                    retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Mother, motherEntity.Key));
+                {
+                    // Find by mother relationship
+                    existingRelationship = retVal.Relationships.FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother);
+                    if(existingRelationship == null) // No current mother relationship
+                        retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Mother, motherEntity.Key));
+                    else if(!existingRelationship.LoadProperty<Entity>("TargetEntity").SemanticEquals(motherEntity))
+                        existingRelationship.TargetEntityKey = motherEntity.Key;
+                }
                 else
                     existingRelationship.RelationshipTypeKey = EntityRelationshipTypeKeys.Mother;
 
@@ -246,12 +261,26 @@ namespace SanteDB.Messaging.HL7.Segments
                 ; // TODO: Implement as an extension if needed 
 
             if (pidSegment.PatientAddressRepetitionsUsed > 0)
-                retVal.Addresses.AddRange(pidSegment.GetPatientAddress().ToModel());
+                foreach(var itm in pidSegment.GetPatientAddress())
+                {
+                    var model = itm.ToModel();
+                    var existing = retVal.Addresses.FirstOrDefault(o => o.AddressUseKey == model.AddressUseKey);
+                    if (existing == null)
+                        retVal.Addresses.Add(model);
+                    else
+                        existing.CopyObjectData(model);
+                }
 
-            if (pidSegment.PhoneNumberHomeRepetitionsUsed > 0)
-                retVal.Telecoms.AddRange(pidSegment.GetPhoneNumberHome().ToModel());
-            if (pidSegment.PhoneNumberBusinessRepetitionsUsed > 0)
-                retVal.Telecoms.AddRange(pidSegment.GetPhoneNumberBusiness().ToModel());
+            var telecoms = pidSegment.GetPhoneNumberBusiness().Union(pidSegment.GetPhoneNumberHome());
+            foreach(var itm in telecoms)
+            {
+                var model = itm.ToModel();
+                var existing = retVal.Telecoms.FirstOrDefault(o => o.AddressUseKey == model.AddressUseKey);
+                if (existing == null)
+                    retVal.Telecoms.Add(model);
+                else
+                    existing.CopyObjectData(model);
+            }
 
             if (!pidSegment.PrimaryLanguage.IsEmpty())
                 retVal.LanguageCommunication = new List<PersonLanguageCommunication>()

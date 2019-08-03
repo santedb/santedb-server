@@ -36,7 +36,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
         /// Gets or sets the template
         /// </summary>
         [Column("tpl_id"), ForeignKey(typeof(DbTemplateDefinition), nameof(DbTemplateDefinition.Key))]
-        public Guid TemplateKey { get; set; }
+        public Guid? TemplateKey { get; set; }
 
         /// <summary>
         /// Gets or sets the class concept identifier.

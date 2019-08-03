@@ -57,7 +57,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestUtil.cs" />
   </ItemGroup>
-
   <Choose>
     <When Condition="$(SolutionName.Contains('-ext'))">
       <ItemGroup>
@@ -69,21 +68,18 @@
           <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
           <Name>SanteDB.Core.Model</Name>
         </ProjectReference>
-
       </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="1.64.0.0"/>
-        <PackageReference Include="SanteDB.Core.Applets" Version="1.64.0.0"/>
-        <PackageReference Include="SanteDB.Core.Model" Version="1.64.0.0"/>
-        <PackageReference Include="SanteDB.Rest.Common" Version="1.64.0.0"/>
-        <PackageReference Include="SanteDB.OrmLite" Version="1.64.0.0"/>
+        <PackageReference Include="SanteDB.Core.Api" Version="1.64.0.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="1.64.0.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="1.64.0.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="1.64.0.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="1.64.0.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
-
-
   <ItemGroup>
     <ProjectReference Include="..\SanteDB.Core.TestFramework\SanteDB.Core.TestFramework.csproj">
       <Project>{ad73db46-cbb3-4746-b406-40fc435ab3db}</Project>
@@ -139,6 +135,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\QBP_XREF_PRE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ADT_UPDATE.txt" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
