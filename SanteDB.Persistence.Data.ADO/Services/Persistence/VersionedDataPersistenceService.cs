@@ -371,7 +371,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             // Get existing
             // TODO: What happens which this is reverse?
-            var existing = context.Query<TDomainAssociation>(o => o.SourceKey == source.Key);
+            var existing = context.Query<TDomainAssociation>(o => o.SourceKey == source.Key).ToList();
 
             // Remove old
             var obsoleteRecords = existing.Where(o => !storage.Any(ecn => ecn.Key == o.Key));

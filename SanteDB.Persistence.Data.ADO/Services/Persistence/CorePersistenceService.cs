@@ -401,7 +401,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     itm.SourceEntityKey = source.Key;
 
             // Get existing
-            var existing = context.Query<TDomainAssociation>(o => o.SourceKey == source.Key);
+            var existing = context.Query<TDomainAssociation>(o => o.SourceKey == source.Key).ToList();
             // Remove old associations
             var obsoleteRecords = existing.Where(o => !storage.Any(ecn => ecn.Key == o.Key));
             foreach (var del in obsoleteRecords) // Obsolete records = delete as it is non-versioned association

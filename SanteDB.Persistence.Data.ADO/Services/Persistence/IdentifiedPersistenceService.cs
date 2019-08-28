@@ -138,7 +138,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TModel>[] orderBy, bool countResults = false)
         {
-            return this.DoQueryInternal(context, query, queryId, offset, count, out totalResults, orderBy, countResults).Select(o => o is Guid ? this.Get(context, (Guid)o) : this.CacheConvert(o, context));
+            return this.DoQueryInternal(context, query, queryId, offset, count, out totalResults, orderBy, countResults).ToList().Select(o => o is Guid ? this.Get(context, (Guid)o) : this.CacheConvert(o, context));
         }
 
         /// <summary>

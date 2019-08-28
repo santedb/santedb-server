@@ -70,9 +70,12 @@ namespace SanteDB.Messaging.HL7.Segments
                 throw new InvalidOperationException($"Cannot convert {data.GetType().Name} to PID");
 
             // Map patient to PID
-            if(exportDomains == null || exportDomains.Contains(this.m_configuration.LocalAuthority.DomainName) == true)
+            if (exportDomains?.Length == 0 || exportDomains.Contains(this.m_configuration.LocalAuthority.DomainName) == true)
+            {
                 retVal.GetPatientIdentifierList(retVal.PatientIdentifierListRepetitionsUsed).FromModel(new EntityIdentifier(this.m_configuration.LocalAuthority, patient.Key.ToString()));
+                retVal.GetPatientIdentifierList(retVal.PatientIdentifierListRepetitionsUsed - 1).IdentifierTypeCode.Value = "PI";
 
+            }
             // Map alternate identifiers
             foreach (var id in patient.LoadCollection<EntityIdentifier>("Identifiers"))
                 if (exportDomains == null || exportDomains.Contains(id.LoadProperty<AssigningAuthority>("Authority").DomainName) == true)

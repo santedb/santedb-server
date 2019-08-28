@@ -509,7 +509,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <returns>IEnumerable&lt;SecurityUser&gt;.</returns>
 		public override IEnumerable<SecurityUser> QueryInternal(DataContext context, Expression<Func<SecurityUser, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<SecurityUser>[] orderBy, bool countResults = true)
 		{
-			var results = base.QueryInternal(context, query, queryId, offset, count, out totalResults, orderBy, countResults);
+			var results = base.QueryInternal(context, query, queryId, offset, count, out totalResults, orderBy, countResults).ToList();
 
 			var users = new List<SecurityUser>();
 

@@ -78,11 +78,15 @@ namespace SanteDB.Messaging.HL7.Query
             {
                 var queryInstance = retVal.QUERY_RESPONSE;
 
-                // No match?
+                // Expose PK?
+                if (returnDomains?.Count == 0 || returnDomains.Contains(this.m_configuration.LocalAuthority.DomainName) == true)
+                {
+                    queryInstance.PID.GetPatientIdentifierList(queryInstance.PID.PatientIdentifierListRepetitionsUsed).FromModel(new EntityIdentifier(this.m_configuration.LocalAuthority, itm.Key.ToString()));
+                    queryInstance.PID.GetPatientIdentifierList(queryInstance.PID.PatientIdentifierListRepetitionsUsed - 1).IdentifierTypeCode.Value = "PI";
+                }
 
-
-                foreach(var id in itm.LoadCollection<EntityIdentifier>("Identifiers"))
-                    if (returnDomains.Count == 0 || returnDomains.Any(o=>o == id.LoadProperty<AssigningAuthority>("Authority").DomainName))
+                foreach (var id in itm.LoadCollection<EntityIdentifier>("Identifiers"))
+                    if (returnDomains.Count == 0 || returnDomains.Any(o => o == id.LoadProperty<AssigningAuthority>("Authority").DomainName))
                         queryInstance.PID.GetPatientIdentifierList(queryInstance.PID.PatientIdentifierListRepetitionsUsed).FromModel(id);
 
                 if (returnDomains.Any(rid => rid == this.m_configuration.LocalAuthority.DomainName))
@@ -147,7 +151,7 @@ namespace SanteDB.Messaging.HL7.Query
 
                 if (rid.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority.DomainName ||
                     rid.AssigningAuthority.UniversalID.Value == this.m_configuration.LocalAuthority.Oid)
-                    continue; 
+                    continue;
                 if (String.IsNullOrEmpty(rid.AssigningAuthority.NamespaceID.Value)) // lookup by AA 
                 {
                     var aa = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>().Query(o => o.Oid == rid.AssigningAuthority.UniversalID.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault();

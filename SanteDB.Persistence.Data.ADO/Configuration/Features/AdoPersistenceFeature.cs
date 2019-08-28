@@ -58,8 +58,15 @@ namespace SanteDB.Persistence.Data.ADO.Configuration.Features
             List<IConfigurationTask> retVal = new List<IConfigurationTask>(base.CreateInstallTasks());
             var conf = this.Configuration as OrmConfigurationBase;
 
-            foreach (var feature in SqlFeatureUtil.GetFeatures(conf.Provider.Invariant).OfType<SqlFeature>().Where(o => o.Scope == "SanteDB.Persistence.Data.ADO").OrderBy(o=>o.Id))
-                retVal.Add(new SqlMigrationTask(this, feature));
+            foreach (var feature in SqlFeatureUtil.GetFeatures(conf.Provider.Invariant).OfType<SqlFeature>().Where(o => o.Scope == "SanteDB.Persistence.Data.ADO").OrderBy(o => o.Id))
+                try
+                {
+                    retVal.Add(new SqlMigrationTask(this, feature));
+                }
+                catch
+                {
+                    // Not allowed to be installed
+                }
             return retVal;
         }
     }

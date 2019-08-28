@@ -289,13 +289,15 @@ namespace SanteDB.Caching.Redis
 
                 var redisDb = this.m_connection.GetDatabase(RedisCacheConstants.CacheDatabaseId);
 
+				var batch = redisDb.CreateBatch();
+				batch.HashSetAsync(data.Key.Value.ToString(), this.SerializeObject(data), CommandFlags.FireAndForget);
+                batch.KeyExpireAsync(data.Key.Value.ToString(), this.m_configuration.TTL, CommandFlags.FireAndForget);
+				batch.Execute();
                 var existing = redisDb.KeyExists(data.Key.Value.ToString());
-                redisDb.HashSet(data.Key.Value.ToString(), this.SerializeObject(data), CommandFlags.FireAndForget);
-                redisDb.KeyExpire(data.Key.Value.ToString(), this.m_configuration.TTL, CommandFlags.FireAndForget);
 #if DEBUG
                 this.m_tracer.TraceVerbose("HashSet {0} (EXIST: {1}; @: {2})", data, existing, new System.Diagnostics.StackTrace(true).GetFrame(1));
 #endif 
-
+				
                 this.EnsureCacheConsistency(new DataCacheEventArgs(data));
                 if (existing)
                     this.m_connection.GetSubscriber().Publish("oiz.events", $"PUT http://{Environment.MachineName}/cache/{data.Key.Value}");

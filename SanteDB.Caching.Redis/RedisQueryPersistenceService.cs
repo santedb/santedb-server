@@ -103,8 +103,10 @@ namespace SanteDB.Caching.Redis
             try
             {
                 var redisConn = this.m_connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
-                redisConn.KeyExpire($"{queryId}.{FIELD_QUERY_RESULT_IDX}", this.m_configuration.TTL, CommandFlags.FireAndForget);
-                redisConn.KeyExpire($"{queryId}.{FIELD_QUERY_TOTAL_RESULTS}", this.m_configuration.TTL, CommandFlags.FireAndForget);
+				var batch = redisConn.CreateBatch();
+                batch.KeyExpireAsync($"{queryId}.{FIELD_QUERY_RESULT_IDX}", this.m_configuration.TTL);
+                batch.KeyExpireAsync($"{queryId}.{FIELD_QUERY_TOTAL_RESULTS}", this.m_configuration.TTL);
+				batch.Execute();
                 if (redisConn.KeyExists($"{queryId}.{FIELD_QUERY_RESULT_IDX}"))
                     return redisConn.ListRange($"{queryId}.{FIELD_QUERY_RESULT_IDX}", offset, offset + count).Select(o => new Guid((byte[])o)).ToArray();
                 else
@@ -179,19 +181,20 @@ namespace SanteDB.Caching.Redis
             try
             {
                 var redisConn = this.m_connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
-                redisConn.KeyDelete($"{queryId}.{FIELD_QUERY_RESULT_IDX}");
-                redisConn.ListRightPush($"{queryId}.{FIELD_QUERY_RESULT_IDX}", results.Select(o => (RedisValue)o.ToByteArray()).ToArray(), CommandFlags.FireAndForget);
+				var batch = redisConn.CreateBatch();
+                batch.KeyDeleteAsync($"{queryId}.{FIELD_QUERY_RESULT_IDX}");
+                batch.ListRightPushAsync($"{queryId}.{FIELD_QUERY_RESULT_IDX}", results.Select(o => (RedisValue)o.ToByteArray()).ToArray());
 
                 if (tag != null)
                 {
-                    redisConn.StringSet($"{queryId}.{FIELD_QUERY_TAG_IDX}", tag.ToString(), flags: CommandFlags.FireAndForget);
-                    redisConn.KeyExpire($"{queryId}.{FIELD_QUERY_TAG_IDX}", this.m_configuration.TTL, CommandFlags.FireAndForget);
+                    batch.StringSetAsync($"{queryId}.{FIELD_QUERY_TAG_IDX}", tag.ToString());
+                    batch.KeyExpireAsync($"{queryId}.{FIELD_QUERY_TAG_IDX}", this.m_configuration.TTL);
                 }
 
-                redisConn.StringSet($"{queryId}.{FIELD_QUERY_TOTAL_RESULTS}", BitConverter.GetBytes(totalResults), flags: CommandFlags.FireAndForget);
-                redisConn.KeyExpire($"{queryId}.{FIELD_QUERY_RESULT_IDX}", this.m_configuration.TTL, CommandFlags.FireAndForget);
-                redisConn.KeyExpire($"{queryId}.{FIELD_QUERY_TOTAL_RESULTS}", this.m_configuration.TTL, CommandFlags.FireAndForget);
-
+                batch.StringSetAsync($"{queryId}.{FIELD_QUERY_TOTAL_RESULTS}", BitConverter.GetBytes(totalResults));
+                batch.KeyExpireAsync($"{queryId}.{FIELD_QUERY_RESULT_IDX}", this.m_configuration.TTL);
+                batch.KeyExpireAsync($"{queryId}.{FIELD_QUERY_TOTAL_RESULTS}", this.m_configuration.TTL);
+				batch.Execute();
                 return true;
             }
             catch (Exception e)

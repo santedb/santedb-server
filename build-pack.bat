@@ -22,9 +22,9 @@ echo Will use MSBUILD in %msbuild%
 
 %msbuild% santedb-server-ext.sln /t:clean /t:restore /t:build /p:configuration=debug /m
 
-FOR /R %cwd% %%G IN (*.nuspec) DO (
+FOR /R "%cwd%" %%G IN (*.nuspec) DO (
 	echo Packing %%~pG
-	pushd %%~pG
-	"%nuget%" pack -OutputDirectory %localappdata%\NugetStaging -prop Configuration=Debug -symbols
+	pushd "%%~pG"
+	%nuget% pack -OutputDirectory "%localappdata%\NugetStaging" -prop Configuration=Debug -symbols
 	popd
 )

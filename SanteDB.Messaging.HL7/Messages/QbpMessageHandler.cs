@@ -110,6 +110,8 @@ namespace SanteDB.Messaging.HL7.Messages
                 // First, process the query parameters
                 var qpd = e.Message.GetStructure("QPD") as QPD;
                 var query = map.QueryHandler.ParseQuery(qpd, map);
+                if (query.Count == 0)
+                    throw new InvalidOperationException("Query must provide at least one understood filter");
 
                 // Control?
                 var rcp = e.Message.GetStructure("RCP") as RCP;
