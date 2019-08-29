@@ -56,7 +56,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Map a user entity to a practitioner
         /// </summary>
-        protected override Practitioner MapToFhir(UserEntity model, RestOperationContext RestOperationContext)
+        protected override Practitioner MapToFhir(UserEntity model, RestOperationContext restOperationContext)
         {
             // Is there a provider that matches this user?
             var provider = model.LoadCollection<EntityRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.AssignedEntity)?.LoadProperty<Provider>("TargetEntity") ;
@@ -105,7 +105,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Map a practitioner to a user entity
         /// </summary>
-        protected override UserEntity MapToModel(Practitioner resource, RestOperationContext RestOperationContext)
+        protected override UserEntity MapToModel(Practitioner resource, RestOperationContext restOperationContext)
         {
             throw new NotImplementedException();
         }

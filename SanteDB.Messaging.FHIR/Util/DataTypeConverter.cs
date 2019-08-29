@@ -526,7 +526,8 @@ namespace SanteDB.Messaging.FHIR.Util
 		/// <summary>
 		/// Converts a <see cref="Concept"/> instance to an <see cref="FhirCodeableConcept"/> instance.
 		/// </summary>
-		/// <param name="concept">The concept.</param>
+		/// <param name="concept">The concept to be converted to a <see cref="FhirCodeableConcept"/></param>
+        /// <param name="preferredCodeSystem">The preferred code system for the codeable concept</param>
 		/// <returns>Returns a FHIR codeable concept.</returns>
 		public static FhirCodeableConcept ToFhirCodeableConcept(Concept concept, String preferredCodeSystem = null)
 		{

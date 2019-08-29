@@ -38,9 +38,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
     /// <remarks>Represents SanteDB Server implementation of the the Health Data Service Interface (HDSI) contract</remarks>
     public class HdsiServiceBehavior : HdsiServiceBehaviorBase
     {
-        // Trace source
-        private Tracer m_traceSource = new Tracer(HdsiConstants.TraceSourceName);
-
+        
         /// <summary>
         /// Creates a new HDSI service behavior
         /// </summary>

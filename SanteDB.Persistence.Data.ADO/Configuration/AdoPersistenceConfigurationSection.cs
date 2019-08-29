@@ -58,6 +58,15 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         }
 
         /// <summary>
+        /// Gets or sets whether fuzzy totals should be used
+        /// </summary>
+        [XmlAttribute("fuzzyTotal")]
+        [Category("Performance")]
+        [DisplayName("Use Approx. Totals")]
+        [Description("When set to true, the totalResults will not be an exact count, rather an indicator whether additional results are available (this does increase query performance but some clients may not be compatible with it)")]
+        public bool UseFuzzyTotals { get; set; }
+
+        /// <summary>
         /// Multi-threaded fetch
         /// </summary>
         [XmlAttribute("staOnly")]

@@ -63,12 +63,6 @@ namespace SanteDB.Messaging.HL7.Messages
         // Configuration
         private Hl7ConfigurationSection m_configuration = ApplicationServiceContext.Current?.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
 
-        // Entry ASM hash
-        private static String s_entryAsmHash = null;
-
-        // Installation date
-        private static DateTime? s_installDate = null;
-
         protected Tracer m_traceSource = new Tracer(Hl7Constants.TraceSourceName);
 
         /// <summary>

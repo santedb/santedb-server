@@ -75,7 +75,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// </summary>
 		/// <param name="model">The model.</param>
 		/// <returns>Returns the mapped FHIR resource.</returns>
-		protected override ImmunizationRecommendation MapToFhir(SubstanceAdministration model, RestOperationContext RestOperationContext)
+		protected override ImmunizationRecommendation MapToFhir(SubstanceAdministration model, RestOperationContext restOperationContext)
 		{
 			ImmunizationRecommendation retVal = new ImmunizationRecommendation();
 
@@ -129,7 +129,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <param name="resource">The resource.</param>
 		/// <returns>Returns the mapped model.</returns>
 		/// <exception cref="System.NotImplementedException"></exception>
-		protected override SubstanceAdministration MapToModel(ImmunizationRecommendation resource, RestOperationContext RestOperationContext)
+		protected override SubstanceAdministration MapToModel(ImmunizationRecommendation resource, RestOperationContext restOperationContext)
 		{
 			throw new NotImplementedException();
 		}

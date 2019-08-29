@@ -41,7 +41,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="modelInstance">The model instance to convert.</param>
 		/// <param name="context">The context.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the converted model instance.</returns>
 		public override object FromModelInstance(ReportFormat modelInstance, DataContext context)
 		{
@@ -61,7 +61,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="model">The model.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the inserted model.</returns>
 		/// <exception cref="DuplicateNameException">If the report format already exists</exception>
 		public override ReportFormat InsertInternal(DataContext context, ReportFormat model)
@@ -83,7 +83,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="model">The model.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the obsoleted data.</returns>
 		/// <exception cref="System.InvalidOperationException">Cannot obsolete report format which is currently in use</exception>
 		public override ReportFormat ObsoleteInternal(DataContext context, ReportFormat model)
@@ -105,7 +105,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="domainInstance">The domain instance to convert.</param>
 		/// <param name="context">The context.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the converted model instance.</returns>
 		public override ReportFormat ToModelInstance(object domainInstance, DataContext context)
 		{

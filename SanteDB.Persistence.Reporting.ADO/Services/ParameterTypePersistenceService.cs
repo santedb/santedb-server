@@ -40,7 +40,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="modelInstance">The model instance.</param>
 		/// <param name="context">The context.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the mapped parameter type instance.</returns>
 		public override object FromModelInstance(ParameterType modelInstance, DataContext context)
 		{
@@ -60,7 +60,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="model">The model.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the obsoleted data.</returns>
 		/// <exception cref="System.InvalidOperationException">Cannot obsolete report format which is currently in use</exception>
 		public override ParameterType ObsoleteInternal(DataContext context, ParameterType model)
@@ -82,7 +82,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="domainInstance">The domain instance.</param>
 		/// <param name="context">The context.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the mapped parameter type instance.</returns>
 		/// <exception cref="System.ArgumentException">If the domain instance is not of the correct type</exception>
 		public override ParameterType ToModelInstance(object domainInstance, DataContext context)

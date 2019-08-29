@@ -215,12 +215,21 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     totalResults = keys.Count();
                     this.AddQueryResults(context, query, queryId, offset, keys, totalResults);
                 }
-                else if (countResults)
+                else if (countResults && !m_configuration.UseFuzzyTotals)
                     totalResults = retVal.Count();
                 else
                     totalResults = 0;
 
-                return retVal.Skip(offset).Take(count ?? 100);
+                // Fuzzy totals - This will only fetch COUNT + 1 as the total results
+                if (m_configuration.UseFuzzyTotals)
+                {
+                    var fuzzResults = retVal.Skip(offset).Take((count ?? 100) + 1).OfType<Object>().ToList();
+                    totalResults = fuzzResults.Count();
+                    return fuzzResults.Take(count ?? 100);
+                }
+                else
+                    return retVal.Skip(offset).Take(count ?? 100).OfType<Object>();
+
             }
 
 

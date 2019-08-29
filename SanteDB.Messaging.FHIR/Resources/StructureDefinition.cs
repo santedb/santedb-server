@@ -35,12 +35,24 @@ namespace SanteDB.Messaging.FHIR.Resources
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/extension-context")]
     public enum ExtensionContext
     {
+        /// <summary>
+        /// The extension applies to a FHIR resource
+        /// </summary>
         [XmlEnum("resource")]
         Resource,
+        /// <summary>
+        /// The extension applies to a FHIR datatype
+        /// </summary>
         [XmlEnum("datatype")]
         Datatype,
+        /// <summary>
+        /// The extension is a mapping
+        /// </summary>
         [XmlEnum("mapping")]
         Mapping,
+        /// <summary>
+        /// The extension applies to an extension
+        /// </summary>
         [XmlEnum("extension")]
         Extension
     }
@@ -52,12 +64,24 @@ namespace SanteDB.Messaging.FHIR.Resources
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/structure-definition-kind")]
     public enum StructureDefinitionKind
     {
+        /// <summary>
+        /// The structure is a complex-type
+        /// </summary>
         [XmlEnum("complex-type")]
         Complex,
+        /// <summary>
+        /// The structure is a primitive type
+        /// </summary>
         [XmlEnum("primitive-type")]
         Datatype,
+        /// <summary>
+        /// The structure is a resource
+        /// </summary>
         [XmlEnum("resource")]
         Resource,
+        /// <summary>
+        /// The structure is a logical construct
+        /// </summary>
         [XmlEnum("logical")]
         Logical
     }
@@ -69,8 +93,14 @@ namespace SanteDB.Messaging.FHIR.Resources
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/type-derivation-rule")]
     public enum TypeDerivationRule
     {
+        /// <summary>
+        /// This type constrains the object is derives
+        /// </summary>
         [XmlEnum("constraint")]
         Constraint,
+        /// <summary>
+        /// This type is a specialization of the object type it dervies
+        /// </summary>
         [XmlEnum("specialization")]
         Specialization
     }

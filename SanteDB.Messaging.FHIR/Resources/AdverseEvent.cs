@@ -34,8 +34,14 @@ namespace SanteDB.Messaging.FHIR.Resources
     [FhirValueSet(Uri = "http://hl7.org/fhir/adverse-event-category")]
     public enum AdverseEventCategory
     {
+        /// <summary>
+        /// The adverse event is an actual adverse event
+        /// </summary>
         [XmlEnum("AE")]
         AdverseEvent,
+        /// <summary>
+        /// The adverse event is a potential / suspected adverse event
+        /// </summary>
         [XmlEnum("PAE")]
         PotentialAdverseEvent
     }
@@ -49,11 +55,14 @@ namespace SanteDB.Messaging.FHIR.Resources
     public class AdverseEvent : DomainResourceBase
     {
 
+        /// <summary>
+        /// Default CTOR for adverse event
+        /// </summary>
         public AdverseEvent()
         {
             this.Reaction = new List<Reference<Condition>>();
-
         }
+
         /// <summary>
         /// Gets or sets the business identifier for the AE
         /// </summary>

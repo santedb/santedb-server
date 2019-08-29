@@ -32,12 +32,24 @@ namespace SanteDB.Messaging.FHIR.Resources
     [XmlType("IssueSeverity", Namespace = "http://hl7.org/fhir")]
     public enum IssueSeverity
     {
+        /// <summary>
+        /// The detected issue is fatal
+        /// </summary>
         [XmlEnum("fatal")]
         Fatal,
+        /// <summary>
+        /// The detected issue is an error
+        /// </summary>
         [XmlEnum("error")]
         Error,
+        /// <summary>
+        /// The issue is a warning
+        /// </summary>
         [XmlEnum("warning")]
         Warning,
+        /// <summary>
+        /// The issue is an informational text
+        /// </summary>
         [XmlEnum("information")]
         Information
     }

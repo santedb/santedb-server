@@ -45,7 +45,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// Map to FHIR
 		/// </summary>
-		protected override Condition MapToFhir(CodedObservation model, RestOperationContext RestOperationContext)
+		protected override Condition MapToFhir(CodedObservation model, RestOperationContext restOperationContext)
 		{
 			var retVal = DataTypeConverter.CreateResource<Condition>(model);
 
@@ -90,7 +90,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
             if (recordTarget != null)
             {
                 this.traceSource.TraceInfo("RCT: {0}", recordTarget.PlayerEntityKey);
-                retVal.Subject = DataTypeConverter.CreateReference<Patient>(recordTarget.LoadProperty<Entity>("PlayerEntity"), RestOperationContext);
+                retVal.Subject = DataTypeConverter.CreateReference<Patient>(recordTarget.LoadProperty<Entity>("PlayerEntity"), restOperationContext);
             }
 			// Onset
 			if (model.StartTime.HasValue || model.StopTime.HasValue)
@@ -105,12 +105,18 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			retVal.AssertionDate = model.CreationTime.LocalDateTime;
 			var author = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Authororiginator);
 			if (author != null)
-				retVal.Asserter = DataTypeConverter.CreatePlainReference<Practitioner>(author.LoadProperty<Entity>("PlayerEntity"), RestOperationContext);
+				retVal.Asserter = DataTypeConverter.CreatePlainReference<Practitioner>(author.LoadProperty<Entity>("PlayerEntity"), restOperationContext);
 
 			return retVal;
 		}
 
-		protected override CodedObservation MapToModel(Condition resource, RestOperationContext RestOperationContext)
+        /// <summary>
+        /// Maps a FHIR condition to a model
+        /// </summary>
+        /// <param name="resource">The FHIR condition to be mapped</param>
+        /// <param name="restOperationContext">The REST operation context under which this method is called</param>
+        /// <returns>The constructed model instance</returns>
+		protected override CodedObservation MapToModel(Condition resource, RestOperationContext restOperationContext)
 		{
 			throw new NotImplementedException();
 		}

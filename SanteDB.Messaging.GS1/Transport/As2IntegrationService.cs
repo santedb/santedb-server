@@ -63,10 +63,21 @@ namespace SanteDB.Messaging.GS1.Transport.AS2
             }
         }
 
-        // Events for daemon service
+        /// <summary>
+        /// Fired when the service has completed startup
+        /// </summary>
         public event EventHandler Started;
+        /// <summary>
+        /// Fired when the service is starting up
+        /// </summary>
         public event EventHandler Starting;
+        /// <summary>
+        /// Fired when the service has successfully stopped
+        /// </summary>
         public event EventHandler Stopped;
+        /// <summary>
+        /// Fired when the service is stopping
+        /// </summary>
         public event EventHandler Stopping;
 
         /// <summary>

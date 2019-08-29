@@ -40,7 +40,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// Map the inbound place to a FHIR model
 		/// </summary>
-		protected override Location MapToFhir(Place model, RestOperationContext RestOperationContext)
+		protected override Location MapToFhir(Place model, RestOperationContext restOperationContext)
 		{
 			Location retVal = DataTypeConverter.CreateResource<Location>(model);
 			retVal.Identifier = model.LoadCollection<EntityIdentifier>("Identifiers").Select(o => DataTypeConverter.ToFhirIdentifier<Entity>(o)).ToList();
@@ -76,12 +76,18 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			// Part of?
 			var parent = model.LoadCollection<EntityRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Parent);
 			if (parent != null)
-				retVal.PartOf = DataTypeConverter.CreateReference<Location>(parent.LoadProperty<Entity>("TargetEntity"), RestOperationContext);
+				retVal.PartOf = DataTypeConverter.CreateReference<Location>(parent.LoadProperty<Entity>("TargetEntity"), restOperationContext);
 
 			return retVal;
 		}
 
-		protected override Place MapToModel(Location resource, RestOperationContext RestOperationContext)
+        /// <summary>
+        /// Map the incoming FHIR reosurce to a MODEL resource
+        /// </summary>
+        /// <param name="resource">The resource to be mapped</param>
+        /// <param name="restOperationContext">The operation context under which this method is being called</param>
+        /// <returns></returns>
+		protected override Place MapToModel(Location resource, RestOperationContext restOperationContext)
 		{
 			throw new NotImplementedException();
 		}

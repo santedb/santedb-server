@@ -31,6 +31,10 @@ namespace SanteDB.Messaging.FHIR.Resources
     [XmlType("DomainResource", Namespace = "http://hl7.org/fhir")]
     public abstract class DomainResourceBase : ResourceBase
     {
+
+        /// <summary>
+        /// Namespaces used for serialization
+        /// </summary>
         protected XmlSerializerNamespaces m_namespaces = new XmlSerializerNamespaces();
 
         /// <summary>

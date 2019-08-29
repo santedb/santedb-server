@@ -292,15 +292,17 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// Maps a model instance to a FHIR instance.
 		/// </summary>
 		/// <param name="model">The model.</param>
+        /// <param name="restOperationContext">The operation context the method is being called on</param>
 		/// <returns>Returns the mapped FHIR resource.</returns>
-		protected abstract TFhirResource MapToFhir(TModel model, RestOperationContext RestOperationContext);
+		protected abstract TFhirResource MapToFhir(TModel model, RestOperationContext restOperationContext);
 
 		/// <summary>
 		/// Maps a FHIR resource to a model instance.
 		/// </summary>
 		/// <param name="resource">The resource.</param>
+        /// <param name="restOperationContext">The operation context on which the operation is being called.</param>
 		/// <returns>Returns the mapped model.</returns>
-		protected abstract TModel MapToModel(TFhirResource resource, RestOperationContext RestOperationContext);
+		protected abstract TModel MapToModel(TFhirResource resource, RestOperationContext restOperationContext);
 
 		/// <summary>
 		/// Queries the specified query.

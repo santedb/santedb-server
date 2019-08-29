@@ -45,8 +45,9 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// Maps the substance administration to FHIR.
 		/// </summary>
 		/// <param name="model">The model.</param>
+        /// <param name="restOperationContext">The operation context in which this method is being called</param>
 		/// <returns>Returns the mapped FHIR resource.</returns>
-		protected override Immunization MapToFhir(SubstanceAdministration model, RestOperationContext RestOperationContext)
+		protected override Immunization MapToFhir(SubstanceAdministration model, RestOperationContext restOperationContext)
 		{
 			var retVal = DataTypeConverter.CreateResource<Immunization>(model);
 
@@ -79,13 +80,13 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			var rct = model.Participations.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget);
 			if (rct != null)
 			{
-				retVal.Patient = DataTypeConverter.CreateReference<Patient>(rct.LoadProperty<Entity>("PlayerEntity"), RestOperationContext);
+				retVal.Patient = DataTypeConverter.CreateReference<Patient>(rct.LoadProperty<Entity>("PlayerEntity"), restOperationContext);
 			}
 
 			// Performer
 			var prf = model.Participations.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Performer);
 			if (prf != null)
-				retVal.Performer = DataTypeConverter.CreateReference<Practitioner>(rct.LoadProperty<Entity>("PlayerEntity"), RestOperationContext);
+				retVal.Performer = DataTypeConverter.CreateReference<Practitioner>(rct.LoadProperty<Entity>("PlayerEntity"), restOperationContext);
 
 			// Protocol
 			foreach (var itm in model.Protocols)
@@ -116,8 +117,9 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// Map an immunization FHIR resource to a substance administration.
 		/// </summary>
 		/// <param name="resource">The resource.</param>
+        /// <param name="restOperationContext">The operation context in which this method is being called</param>
 		/// <returns>Returns the mapped model.</returns>
-		protected override SubstanceAdministration MapToModel(Immunization resource, RestOperationContext webOperationContext)
+		protected override SubstanceAdministration MapToModel(Immunization resource, RestOperationContext restOperationContext)
 		{
             var substanceAdministration = new SubstanceAdministration
             {
@@ -209,11 +211,11 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// Query for substance administrations.
 		/// </summary>
-		/// <param name="query">The query.</param>
-		/// <param name="issues">The issues.</param>
-		/// <param name="offset">The offset.</param>
-		/// <param name="count">The count.</param>
-		/// <param name="totalResults">The total results.</param>
+		/// <param name="query">The query to be executed</param>
+		/// <param name="offset">The offset to the first result</param>
+		/// <param name="count">The count of results in the current result set</param>
+		/// <param name="totalResults">The total results</param>
+        /// <param name="queryId">The unique query state identifier</param>
 		/// <returns>Returns the list of models which match the given parameters.</returns>
 		protected override IEnumerable<SubstanceAdministration> Query(Expression<Func<SubstanceAdministration, bool>> query, Guid queryId, int offset, int count, out int totalResults)
 		{

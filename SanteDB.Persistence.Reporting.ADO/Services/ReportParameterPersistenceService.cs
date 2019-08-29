@@ -38,7 +38,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="modelInstance">The model instance to convert.</param>
 		/// <param name="context">The context.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the converted model instance.</returns>
 		public override object FromModelInstance(ReportParameter modelInstance, DataContext context)
 		{
@@ -71,7 +71,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="correlationId">The correlation identifier.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns a report parameter for a given correlation id.</returns>
 		public ReportParameter Get(DataContext context, string correlationId)
 		{
@@ -84,7 +84,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="domainInstance">The domain instance to convert.</param>
 		/// <param name="context">The context.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the converted model instance.</returns>
 		public override ReportParameter ToModelInstance(object domainInstance, DataContext context)
 		{

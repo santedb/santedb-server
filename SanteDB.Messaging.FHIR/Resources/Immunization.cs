@@ -172,6 +172,8 @@ namespace SanteDB.Messaging.FHIR.Resources
         [Description("Identifies the quantity of substance administered")]
         public FhirQuantity DoseQuantity { get; set; }
 
+        // TODO: These elements need to be implemented and are commented out 
+
         /// <summary>
         /// Gets or sets annotations related to the vaccination
         /// </summary>

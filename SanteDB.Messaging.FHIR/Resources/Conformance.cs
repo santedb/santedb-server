@@ -28,18 +28,30 @@ using System.Xml.Serialization;
 namespace SanteDB.Messaging.FHIR.Resources
 {
     /// <summary>
-    /// Conformance resource status
+    /// Conformance resource content other than specified
     /// </summary>
     [XmlType("UnknownContentCode", Namespace = "http://hl7.org/fhir")]
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/unknown-content-code")]
     public enum UnknownContentCode
     {
+        /// <summary>
+        /// No unknown content
+        /// </summary>
         [XmlEnum("no")]
         None,
+        /// <summary>
+        /// There are unknown elements
+        /// </summary>
         [XmlEnum("elements")]
         Elements,
+        /// <summary>
+        /// There are unknown extensions
+        /// </summary>
         [XmlEnum("extensions")]
         Extensions,
+        /// <summary>
+        /// There are both unknown elements and contents
+        /// </summary>
         [XmlEnum("both")]
         Both
     }
@@ -66,10 +78,19 @@ namespace SanteDB.Messaging.FHIR.Resources
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/capability-statement-kind")]
     public enum CapabilityStatementKind
     {
+        /// <summary>
+        /// The conformance statement is a partcular instance of a conformance statement
+        /// </summary>
         [XmlEnum("instance")]
         Instance,
+        /// <summary>
+        /// The conformance statement represents a capability statement of this server
+        /// </summary>
         [XmlEnum("capability")]
         Capability,
+        /// <summary>
+        /// The conformance statement represents a requirements enumeration.
+        /// </summary>
         [XmlEnum("requirements")]
         Requirements
     }

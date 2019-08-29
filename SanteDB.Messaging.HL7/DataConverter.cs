@@ -479,7 +479,7 @@ namespace SanteDB.Messaging.HL7
                 }
                 catch(Exception e)
                 {
-                    throw new FormatException($"Date {value} was not valid according to format {flavorFormat}");
+                    throw new FormatException($"Date {value} was not valid according to format {flavorFormat}", e);
                 }
             }
         }

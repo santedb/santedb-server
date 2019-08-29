@@ -44,7 +44,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="modelInstance">The model instance to convert.</param>
 		/// <param name="context">The context.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the converted model instance.</returns>
 		public override object FromModelInstance(TModel modelInstance, DataContext context)
 		{
@@ -56,7 +56,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="model">The model.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the inserted model.</returns>
 		public override TModel InsertInternal(DataContext context, TModel model)
 		{
@@ -72,7 +72,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="model">The model.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the obsoleted data.</returns>
 		/// <exception cref="System.InvalidOperationException"></exception>
 		public override TModel ObsoleteInternal(DataContext context, TModel model)
@@ -96,7 +96,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// <param name="count">The count.</param>
 		/// <param name="totalResults">The total results.</param>
 		/// <param name="countResults">if set to <c>true</c> [count results].</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns a list of the specified model instance which match the given query expression.</returns>
 		public override IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, int offset, int? count, out int totalResults, bool countResults)
 		{
@@ -162,7 +162,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="domainInstance">The domain instance to convert.</param>
 		/// <param name="context">The context.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the converted model instance.</returns>
 		public override TModel ToModelInstance(object domainInstance, DataContext context)
 		{
@@ -174,7 +174,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="model">The model.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the updated model instance.</returns>
 		public override TModel UpdateInternal(DataContext context, TModel model)
 		{

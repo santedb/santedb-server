@@ -26,6 +26,9 @@ using System.Xml.Serialization;
 namespace SanteDB.Messaging.FHIR.Resources
 {
 
+    /// <summary>
+    /// A resource representing a photographic image
+    /// </summary>
     [XmlRoot("Picture", Namespace = "http://hl7.org/fhir")]
     [XmlType("Picture", Namespace = "http://hl7.org/fhir")]
     public class Picture : DomainResourceBase

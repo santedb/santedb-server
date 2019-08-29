@@ -27,7 +27,6 @@ using SanteDB.Tools.AdminConsole.Shell;
 using System;
 using System.Net;
 using System.Security;
-
 using System.Security.Principal;
 
 namespace SanteDB.Tools.AdminConsole.Security
@@ -51,15 +50,24 @@ namespace SanteDB.Tools.AdminConsole.Security
         /// </summary>
         public event EventHandler<AuthenticatingEventArgs> Authenticating;
         /// <summary>
-        /// Occurs when authenticated.
+        /// Occurs when a principal has authenticated.
         /// </summary>
         public event EventHandler<AuthenticatedEventArgs> Authenticated;
+        /// <summary>
+        /// Fired when security attributes of a user have changed
+        /// </summary>
         public event EventHandler<SecurityAuditDataEventArgs> SecurityAttributesChanged;
-        public event EventHandler<AuditDataEventArgs> DataCreated;
-        public event EventHandler<AuditDataEventArgs> DataUpdated;
-        public event EventHandler<AuditDataEventArgs> DataObsoleted;
+        /// <summary>
+        /// Fired when data has been disclosed
+        /// </summary>
         public event EventHandler<AuditDataDisclosureEventArgs> DataDisclosed;
+        /// <summary>
+        /// Fired when a security resource has been modified
+        /// </summary>
         public event EventHandler<SecurityAuditDataEventArgs> SecurityResourceCreated;
+        /// <summary>
+        /// Fired when a security resource has been deleted
+        /// </summary>
         public event EventHandler<SecurityAuditDataEventArgs> SecurityResourceDeleted;
 
         /// <summary>

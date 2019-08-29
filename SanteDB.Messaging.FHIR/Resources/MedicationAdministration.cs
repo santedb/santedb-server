@@ -35,14 +35,29 @@ namespace SanteDB.Messaging.FHIR.Resources
     [FhirValueSet(Uri = "http://hl7.org/fhir/medication-admin-status")]
     public enum MedicationAdministrationStatus
     {
+        /// <summary>
+        /// The administration of medication is ongoing 
+        /// </summary>
         [XmlEnum("in-progress")]
         InProgress, 
+        /// <summary>
+        /// The administration of medication has been suspended or placed on hold
+        /// </summary>
         [XmlEnum("on-hold")]
         OnHold,
+        /// <summary>
+        /// The administration of medication has been completed
+        /// </summary>
         [XmlEnum("completed")]
         Completed,
+        /// <summary>
+        /// The administration of medication record was entered in error
+        /// </summary>
         [XmlEnum("entered-in-error")]
         EnteredInError,
+        /// <summary>
+        /// The medication administration was stopped for some reason
+        /// </summary>
         [XmlEnum("stopped")]
         Stopped
     }

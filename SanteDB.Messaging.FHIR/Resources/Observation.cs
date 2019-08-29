@@ -32,20 +32,44 @@ namespace SanteDB.Messaging.FHIR.Resources
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/observationStatus")]
     public enum ObservationStatus
     {
+        /// <summary>
+        /// The observation has been registered
+        /// </summary>
         [XmlEnum("registered")]
         Registered,
+        /// <summary>
+        /// The observation is unconfirmed / preliminary
+        /// </summary>
         [XmlEnum("preliminary")]
         Preliminary,
+        /// <summary>
+        /// The observation is a final observation made
+        /// </summary>
         [XmlEnum("final")]
         Final,
+        /// <summary>
+        /// The observation has been amended
+        /// </summary>
         [XmlEnum("amended")]
         Amended,
+        /// <summary>
+        /// The observation has been corrected
+        /// </summary>
         [XmlEnum("corrected")]
         Corrected,
+        /// <summary>
+        /// The observation was cancelled
+        /// </summary>
         [XmlEnum("cancelled")]
         Cancelled,
+        /// <summary>
+        /// The observation was entered in error
+        /// </summary>
         [XmlEnum("entered-in-error")]
         EnteredInError,
+        /// <summary>
+        /// The status of the observation is unknown
+        /// </summary>
         [XmlEnum("unknown")]
         Unknown
     }

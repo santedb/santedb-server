@@ -40,6 +40,8 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
     /// <summary>
     /// Represents a dispatch message formatter which uses the JSON.NET serialization
     /// </summary>
+    /// <remarks>This serialization is used because the SanteDB FHIR resources have extra features not contained in the pure HL7 API provided by HL7 International (such as operators to/from primitiives, generation of text, etc.). This 
+    /// dispatch formatter is responsible for the serialization and de-serialization of FHIR objects to/from JSON and XML using the SanteDB classes for FHIR resources.</remarks>
     public class FhirMessageDispatchFormatter : IDispatchMessageFormatter
     {
 
@@ -58,6 +60,9 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
                 s_serializers.Add(s, new XmlSerializer(s,  s.GetCustomAttributes<XmlIncludeAttribute>().Select(o => o.Type).ToArray()));
         }
 
+        /// <summary>
+        /// Creates a new instance of the FHIR message dispatch formatter
+        /// </summary>
         public FhirMessageDispatchFormatter()
         {
 

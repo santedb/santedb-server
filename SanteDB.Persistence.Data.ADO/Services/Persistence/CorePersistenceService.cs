@@ -247,18 +247,29 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     // Only one is requested, or there is no future query coming back so no savings in querying the entire dataset
                     var retVal = this.DomainQueryInternal<TQueryReturn>(context, domainQuery);
 
+                    // Stateful query identifier = We need to add query results
                     if (queryId != Guid.Empty)
                     {
                         var keys = retVal.Keys<Guid>().ToArray();
                         totalResults = keys.Count();
                         this.AddQueryResults(context, query, queryId, offset, keys, totalResults);
                     }
-                    else if (includeCount)
+                    else if (includeCount && !m_configuration.UseFuzzyTotals) // Get an exact total
+                    {
                         totalResults = retVal.Count();
+                    }
                     else
                         totalResults = 0;
 
-                    return retVal.Skip(offset).Take(count ?? 100).OfType<Object>();
+                    // Fuzzy totals - This will only fetch COUNT + 1 as the total results
+                    if (m_configuration.UseFuzzyTotals) 
+                    {
+                        var fuzzResults = retVal.Skip(offset).Take((count ?? 100) + 1).OfType<Object>().ToList();
+                        totalResults = fuzzResults.Count();
+                        return fuzzResults.Take(count ?? 100);
+                    }
+                    else
+                        return retVal.Skip(offset).Take(count ?? 100).OfType<Object>();
                 }
                 else
                 {

@@ -35,22 +35,49 @@ namespace SanteDB.Messaging.FHIR.Resources
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/bundle-type")]
     public enum BundleType
     {
+        /// <summary>
+        /// The bundle represents a document
+        /// </summary>
         [XmlEnum("document")]
         Document,
+        /// <summary>
+        /// The bundle represnets a message between systems
+        /// </summary>
         [XmlEnum("message")]
         Message,
+        /// <summary>
+        /// The bundle represents a transaction
+        /// </summary>
         [XmlEnum("transaction")]
         Transaction,
+        /// <summary>
+        /// the bundle was sent as a response to a transaction
+        /// </summary>
         [XmlEnum("transaction-response")]
         TransactionResponse,
+        /// <summary>
+        /// The bundle represents a batch processing action
+        /// </summary>
         [XmlEnum("batch")]
         Batch,
+        /// <summary>
+        /// The bundle represents a response to a batch action
+        /// </summary>
         [XmlEnum("batch-response")]
         BatchResponse,
+        /// <summary>
+        /// The bundle represents an object history
+        /// </summary>
         [XmlEnum("history")]
         HistoryList,
+        /// <summary>
+        /// The bundle represents a search set result
+        /// </summary>
         [XmlEnum("searchset")]
         SearchResults,
+        /// <summary>
+        /// The bundle is just a collection of objects
+        /// </summary>
         [XmlEnum("collection")]
         Collection
     }

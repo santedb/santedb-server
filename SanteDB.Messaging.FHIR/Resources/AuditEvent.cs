@@ -34,14 +34,29 @@ namespace SanteDB.Messaging.FHIR.Resources
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/audit-event-action")]
     public enum AuditEventAction
     {
+        /// <summary>
+        /// The action represents a create
+        /// </summary>
         [XmlEnum("C")]
         Create,
+        /// <summary>
+        /// The action represents a read type transaction
+        /// </summary>
         [XmlEnum("R")]
         Read,
+        /// <summary>
+        /// The action represents an update type transaction
+        /// </summary>
         [XmlEnum("U")]
         Update,
+        /// <summary>
+        /// The action represents a delete type transaction
+        /// </summary>
         [XmlEnum("D")]
         Delete,
+        /// <summary>
+        /// The action represents an execute type transaction
+        /// </summary>
         [XmlEnum("E")]
         Execute
     }
@@ -53,12 +68,24 @@ namespace SanteDB.Messaging.FHIR.Resources
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/audit-event-outcome")]
     public enum AuditEventOutcome
     {
+        /// <summary>
+        /// The event was successful
+        /// </summary>
         [XmlEnum("0")]
         Success,
+        /// <summary>
+        /// The event resulted in a minor failure
+        /// </summary>
         [XmlEnum("4")]
         MinorFail,
+        /// <summary>
+        /// The event resulted in a serious failure (i.e. process had to be stopped)
+        /// </summary>
         [XmlEnum("8")]
         SeriousFail,
+        /// <summary>
+        /// The event resulted in a catastrophic failure
+        /// </summary>
         [XmlEnum("12")]
         EpicFail
     }

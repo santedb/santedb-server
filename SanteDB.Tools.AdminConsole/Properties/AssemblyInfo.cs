@@ -1,4 +1,5 @@
-﻿/*
+﻿#pragma warning disable CS0067
+/*
  * Copyright 2015-2018 Mohawk College of Applied Arts and Technology
  *
  * 

@@ -120,8 +120,8 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// Counts the specified query.
 		/// </summary>
 		/// <param name="query">The query.</param>
-		/// <param name="authContext">The authentication context.</param>
-		/// <returns>System.Int32.</returns>
+		/// <param name="overrideAuthContext">The authentication context to use instead of the default.</param>
+		/// <returns>The count of matching objects</returns>
 		/// <exception cref="System.NotImplementedException"></exception>
 		public long Count(Expression<Func<TModel, bool>> query, IPrincipal overrideAuthContext = null)
 		{
@@ -135,17 +135,16 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="modelInstance">The model instance to convert.</param>
 		/// <param name="context">The context.</param>
-		/// <param name="principal">The principal.</param>
 		/// <returns>Returns the converted model instance.</returns>
 		public abstract object FromModelInstance(TModel modelInstance, DataContext context);
 
 		/// <summary>
 		/// Gets the specified container identifier.
 		/// </summary>
-		/// <typeparam name="TIdentifier">The type of the t identifier.</typeparam>
 		/// <param name="containerId">The container identifier.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <param name="loadFast">if set to <c>true</c> [load fast].</param>
+        /// <param name="containerVersion">The version of the container to load</param>
 		/// <returns>Returns the model instance.</returns>
 		public TModel Get(Guid containerId, Guid? containerVersion, bool loadFast = false, IPrincipal overrideAuthContext = null)
 		{
@@ -187,7 +186,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="key">The key.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <param name="loadFast">if set to <c>true</c> [load fast].</param>
 		/// <returns>Returns the model instance.</returns>
 		public virtual TModel Get(DataContext context, Guid key, bool loadFast = false, IPrincipal overrideAuthContext = null)
@@ -200,7 +199,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// Inserts the specified storage data.
 		/// </summary>
 		/// <param name="storageData">The storage data.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <param name="mode">The mode.</param>
 		/// <returns>Returns the inserted model instance.</returns>
 		public TModel Insert(TModel storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
@@ -268,7 +267,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="data">The data.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the inserted model instance.</returns>
 		public TModel Insert(DataContext context, TModel data)
 		{
@@ -280,7 +279,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="model">The model.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the inserted model.</returns>
 		public abstract TModel InsertInternal(DataContext context, TModel model);
 
@@ -289,7 +288,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="model">The model.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the obsoleted data.</returns>
 		public TModel Obsolete(DataContext context, TModel model)
 		{
@@ -300,7 +299,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// Obsoletes the specified storage data.
 		/// </summary>
 		/// <param name="storageData">The storage data.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <param name="mode">The mode.</param>
 		/// <returns>TModel.</returns>
 		public TModel Obsolete(TModel storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
@@ -367,7 +366,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="model">The model.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the obsoleted data.</returns>
 		public abstract TModel ObsoleteInternal(DataContext context, TModel model);
 
@@ -407,7 +406,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// <param name="count">The count.</param>
 		/// <param name="totalResults">The total results.</param>
 		/// <param name="countResults">if set to <c>true</c> [count results].</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns a list of model instance which match the given query expression.</returns>
 		public IEnumerable<TModel> Query(DataContext context, Expression<Func<TModel, bool>> query, int offset, int count, out int totalResults, bool countResults)
 		{
@@ -423,7 +422,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// <param name="count">The count.</param>
 		/// <param name="totalResults">The total results.</param>
 		/// <param name="countResults">if set to <c>true</c> [count results].</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns a list of model instance which match the given query expression.</returns>
 		public abstract IEnumerable<TModel> QueryInternal(DataContext context, Expression<Func<TModel, bool>> query, int offset, int? count, out int totalResults, bool countResults);
 
@@ -496,7 +495,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="domainInstance">The domain instance to convert.</param>
 		/// <param name="context">The context.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the converted model instance.</returns>
 		public abstract TModel ToModelInstance(object domainInstance, DataContext context);
 
@@ -504,7 +503,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// Updates the specified storage data.
 		/// </summary>
 		/// <param name="storageData">The storage data.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <param name="mode">The mode.</param>
 		/// <returns>Returns the updated model instance.</returns>
 		public TModel Update(TModel storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
@@ -569,7 +568,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="data">The data.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the updated model instance.</returns>
 		public TModel Update(DataContext context, TModel data)
 		{
@@ -581,7 +580,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="model">The model.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the updated model instance.</returns>
 		public abstract TModel UpdateInternal(DataContext context, TModel model);
 

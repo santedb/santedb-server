@@ -41,7 +41,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// Map the substance to FHIR
 		/// </summary>
-		protected override Substance MapToFhir(Material model, RestOperationContext RestOperationContext)
+		protected override Substance MapToFhir(Material model, RestOperationContext restOperationContext)
 		{
 			var retVal = DataTypeConverter.CreateResource<Substance>(model);
 
@@ -85,8 +85,14 @@ namespace SanteDB.Messaging.FHIR.Handlers
 
 			return retVal;
 		}
-
-		protected override Material MapToModel(Substance resource, RestOperationContext RestOperationContext)
+        
+        /// <summary>
+        /// Maps a FHIR based resource to a model based resource
+        /// </summary>
+        /// <param name="resource">The resource to be mapped</param>
+        /// <param name="restOperationContext">The operation context under which this method is being called</param>
+        /// <returns>The mapped material</returns>
+		protected override Material MapToModel(Substance resource, RestOperationContext restOperationContext)
 		{
 			throw new NotImplementedException();
 		}

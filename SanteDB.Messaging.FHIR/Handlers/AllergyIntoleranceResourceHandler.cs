@@ -37,7 +37,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Map coded allergy intolerance resource to FHIR
         /// </summary>
-		protected override AllergyIntolerance MapToFhir(CodedObservation model, RestOperationContext RestOperationContext)
+		protected override AllergyIntolerance MapToFhir(CodedObservation model, RestOperationContext restOperationContext)
 		{
 			throw new NotImplementedException();
 		}
@@ -45,7 +45,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Map allergy intolerance from FHIR to a coded observation
         /// </summary>
-		protected override CodedObservation MapToModel(AllergyIntolerance resource, RestOperationContext RestOperationContext)
+		protected override CodedObservation MapToModel(AllergyIntolerance resource, RestOperationContext restOperationContext)
 		{
 			throw new NotImplementedException();
 		}

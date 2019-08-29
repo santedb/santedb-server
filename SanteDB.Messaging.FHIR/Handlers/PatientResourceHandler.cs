@@ -56,9 +56,10 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// Map a patient object to FHIR.
 		/// </summary>
-		/// <param name="model">The model.</param>
+		/// <param name="model">The patient to map to FHIR</param>
+        /// <param name="restOperationContext">The current REST operation context</param>
 		/// <returns>Returns the mapped FHIR resource.</returns>
-		protected override Patient MapToFhir(Core.Model.Roles.Patient model, RestOperationContext RestOperationContext)
+		protected override Patient MapToFhir(Core.Model.Roles.Patient model, RestOperationContext restOperationContext)
 		{
 			var retVal = DataTypeConverter.CreateResource<Patient>(model);
 			retVal.Active = model.StatusConceptKey == StatusKeys.Active;
@@ -86,7 +87,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 					relative.Identifier = rel.TargetEntity.LoadCollection<EntityIdentifier>(nameof(Entity.Identifiers)).Select(o => DataTypeConverter.ToFhirIdentifier(o)).ToList();
 					relative.Name = DataTypeConverter.ToFhirHumanName(rel.TargetEntity.LoadCollection<EntityName>(nameof(Entity.Names)).FirstOrDefault());
 					if (rel.TargetEntity is Core.Model.Roles.Patient)
-						relative.Patient = DataTypeConverter.CreateReference<Patient>(rel.TargetEntity, RestOperationContext);
+						relative.Patient = DataTypeConverter.CreateReference<Patient>(rel.TargetEntity, restOperationContext);
 					relative.Telecom = rel.TargetEntity.LoadCollection<EntityTelecomAddress>(nameof(Entity.Telecoms)).Select(o => DataTypeConverter.ToFhirTelecom(o)).ToList();
 					retVal.Contained.Add(new ContainedResource()
 					{
@@ -94,7 +95,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 					});
 				}
 				else if (rel.RelationshipTypeKey == EntityRelationshipTypeKeys.HealthcareProvider)
-					retVal.Provider = DataTypeConverter.CreateReference<Practitioner>(rel.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity)), RestOperationContext);
+					retVal.Provider = DataTypeConverter.CreateReference<Practitioner>(rel.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity)), restOperationContext);
 			}
 
 			var photo = model.LoadCollection<EntityExtension>("Extensions").FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.JpegPhotoExtension);
@@ -116,7 +117,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// </summary>
 		/// <param name="resource">The resource.</param>
 		/// <returns>Returns the mapped model.</returns>
-		protected override Core.Model.Roles.Patient MapToModel(Patient resource, RestOperationContext RestOperationContext)
+		protected override Core.Model.Roles.Patient MapToModel(Patient resource, RestOperationContext restOperationContext)
 		{
 			var patient = new Core.Model.Roles.Patient
 			{

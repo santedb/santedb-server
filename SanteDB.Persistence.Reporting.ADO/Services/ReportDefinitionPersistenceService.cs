@@ -39,7 +39,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="modelInstance">The model instance to convert.</param>
 		/// <param name="context">The context.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the converted model instance.</returns>
 		public override object FromModelInstance(ReportDefinition modelInstance, DataContext context)
 		{
@@ -59,7 +59,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
         /// </summary>
         /// <param name="context">The context.</param>
         /// <param name="key">The key.</param>
-        /// <param name="principal">The principal.</param>
+        /// <param name="overrideAuthContext">The principal to use instead of the default.</param>
         /// <param name="loadFast">if set to <c>true</c> [load fast].</param>
         /// <returns>Returns the model instance.</returns>
         public override ReportDefinition Get(DataContext context, Guid key, bool loadFast, IPrincipal overrideContext = null)
@@ -91,7 +91,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="model">The model.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the inserted model.</returns>
 		/// <exception cref="System.InvalidOperationException">Domain instance must not be null</exception>
 		public override ReportDefinition InsertInternal(DataContext context, ReportDefinition model)
@@ -124,7 +124,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="model">The model.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the obsoleted data.</returns>
 		public override ReportDefinition ObsoleteInternal(DataContext context, ReportDefinition model)
 		{
@@ -145,7 +145,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="domainInstance">The domain instance to convert.</param>
 		/// <param name="context">The context.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the converted model instance.</returns>
 		public override ReportDefinition ToModelInstance(object domainInstance, DataContext context)
 		{
@@ -170,7 +170,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="model">The model.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <returns>Returns the updated model instance.</returns>
 		/// <exception cref="System.InvalidOperationException">Domain instance must not be null</exception>
 		public override ReportDefinition UpdateInternal(DataContext context, ReportDefinition model)
@@ -222,7 +222,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 		/// Updates the report parameters.
 		/// </summary>
 		/// <param name="context">The context.</param>
-		/// <param name="principal">The principal.</param>
+		/// <param name="overrideAuthContext">The principal to use instead of the default.</param>
 		/// <param name="reportDefinition">The report definition.</param>
 		private static void UpdateReportParameters(DataContext context, ReportDefinition reportDefinition)
 		{

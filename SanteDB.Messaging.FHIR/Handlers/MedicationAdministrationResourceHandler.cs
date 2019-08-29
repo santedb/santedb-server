@@ -44,7 +44,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Maps the object to model to fhir
         /// </summary>
-        protected override MedicationAdministration MapToFhir(SubstanceAdministration model, RestOperationContext RestOperationContext)
+        protected override MedicationAdministration MapToFhir(SubstanceAdministration model, RestOperationContext restOperationContext)
         {
             var retVal = DataTypeConverter.CreateResource<MedicationAdministration>(model);
 
@@ -64,16 +64,16 @@ namespace SanteDB.Messaging.FHIR.Handlers
             var consumableRelationship = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Consumable);
             var productRelationship = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Product);
             if (consumableRelationship != null)
-                retVal.Medication = DataTypeConverter.CreateReference<Medication>(consumableRelationship.LoadProperty<ManufacturedMaterial>("PlayerEntity"), RestOperationContext);
+                retVal.Medication = DataTypeConverter.CreateReference<Medication>(consumableRelationship.LoadProperty<ManufacturedMaterial>("PlayerEntity"), restOperationContext);
             else if (productRelationship != null)
             {
-                retVal.Medication = DataTypeConverter.CreateReference<Substance>(productRelationship.LoadProperty<Material>("PlayerEntity"), RestOperationContext);
+                retVal.Medication = DataTypeConverter.CreateReference<Substance>(productRelationship.LoadProperty<Material>("PlayerEntity"), restOperationContext);
                 //retVal.Medication = DataTypeConverter.ToFhirCodeableConcept(productRelationship.LoadProperty<Material>("PlayerEntity").LoadProperty<Concept>("TypeConcept"));
             }
 
             var rct = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget);
             if (rct != null)
-                retVal.Subject = DataTypeConverter.CreateReference<Patient>(rct.LoadProperty<Entity>("PlayerEntity"), RestOperationContext);
+                retVal.Subject = DataTypeConverter.CreateReference<Patient>(rct.LoadProperty<Entity>("PlayerEntity"), restOperationContext);
 
             // Encounter
             var erService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityRelationship>>();
@@ -94,7 +94,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
                 retVal.Performer = new List<SanteDB.Messaging.FHIR.Backbone.MedicationPerformer>() {
                     new SanteDB.Messaging.FHIR.Backbone.MedicationPerformer()
                 {
-                    Actor = DataTypeConverter.CreateReference<Practitioner>(performer.LoadProperty<Entity>("PlayerEntity"), RestOperationContext)
+                    Actor = DataTypeConverter.CreateReference<Practitioner>(performer.LoadProperty<Entity>("PlayerEntity"), restOperationContext)
                 }
                 };
 
@@ -119,7 +119,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
             return retVal;
         }
 
-        protected override SubstanceAdministration MapToModel(MedicationAdministration resource, RestOperationContext RestOperationContext)
+        protected override SubstanceAdministration MapToModel(MedicationAdministration resource, RestOperationContext restOperationContext)
         {
             throw new NotImplementedException();
         }
@@ -128,10 +128,10 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// Query for substance administrations that aren't immunizations
 		/// </summary>
 		/// <param name="query">The query.</param>
-		/// <param name="issues">The issues.</param>
 		/// <param name="offset">The offset.</param>
 		/// <param name="count">The count.</param>
 		/// <param name="totalResults">The total results.</param>
+        /// <param name="queryId">The unique query state identifier</param>
 		/// <returns>Returns the list of models which match the given parameters.</returns>
 		protected override IEnumerable<SubstanceAdministration> Query(Expression<Func<SubstanceAdministration, bool>> query, Guid queryId, int offset, int count, out int totalResults)
         {

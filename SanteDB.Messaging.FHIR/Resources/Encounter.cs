@@ -34,18 +34,39 @@ namespace SanteDB.Messaging.FHIR.Resources
     [FhirValueSet(Uri = "http://hl7.org/fhir/encounter-status")]
     public enum EncounterStatus
     {
+        /// <summary>
+        /// The encounter is planned but has not yet occurred
+        /// </summary>
         [XmlEnum("planned")]
         Planned,
+        /// <summary>
+        /// The patient has arrived for the encounter
+        /// </summary>
         [XmlEnum("arrived")]
         Arrived,
+        /// <summary>
+        /// The patient has been triaged for the encounter
+        /// </summary>
         [XmlEnum("triaged")]
         Triaged,
+        /// <summary>
+        /// The encounter is currently in progress
+        /// </summary>
         [XmlEnum("in-progress")]
         InProgress,
+        /// <summary>
+        /// The encounter is on leave or suspended
+        /// </summary>
         [XmlEnum("onleave")]
         OnLeave,
+        /// <summary>
+        /// The encounter has completed
+        /// </summary>
         [XmlEnum("finished")]
         Finished,
+        /// <summary>
+        /// The encounter has been cancelled
+        /// </summary>
         [XmlEnum("cancelled")]
         Cancelled
     }
@@ -57,7 +78,9 @@ namespace SanteDB.Messaging.FHIR.Resources
     [XmlRoot("Encounter", Namespace = "http://hl7.org/fhir")]
     public class Encounter : DomainResourceBase
     {
-
+        /// <summary>
+        /// Public CTOR
+        /// </summary>
         public Encounter()
         {
             this.Identifier = new List<FhirIdentifier>();

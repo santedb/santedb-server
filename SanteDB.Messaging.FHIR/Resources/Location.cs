@@ -35,10 +35,19 @@ namespace SanteDB.Messaging.FHIR.Resources
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/locationStatus")]
     public enum LocationStatus
     {
+        /// <summary>
+        /// The location is active
+        /// </summary>
         [XmlEnum("active")]
         Active,
+        /// <summary>
+        /// The location record has been suspended
+        /// </summary>
         [XmlEnum("suspended")]
         Suspended,
+        /// <summary>
+        /// The location is currently inactive
+        /// </summary>
         [XmlEnum("inactive")]
         Inactive
     }
@@ -50,8 +59,14 @@ namespace SanteDB.Messaging.FHIR.Resources
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/locationMode")]
     public enum LocationMode
     {
+        /// <summary>
+        /// The location represents a specific location (example: Toronto General Hospital)
+        /// </summary>
         [XmlEnum("instance")]
         Instance,
+        /// <summary>
+        /// The location represents a kind of location (example: Hospital)
+        /// </summary>
         [XmlEnum("kind")]
         Kind
     }
@@ -64,7 +79,9 @@ namespace SanteDB.Messaging.FHIR.Resources
     [Description("Identifies a location where services are delivered")]
     public class Location : DomainResourceBase
     {
-
+        /// <summary>
+        /// Default ctor
+        /// </summary>
         public Location()
         {
             this.Identifier = new List<FhirIdentifier>();

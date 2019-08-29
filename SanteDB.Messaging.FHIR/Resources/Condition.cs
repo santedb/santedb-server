@@ -31,14 +31,29 @@ namespace SanteDB.Messaging.FHIR.Resources
     [XmlType("ConditionClinicalStatus", Namespace = "http://hl7.org/fhir")]
     public enum ConditionClinicalStatus
     {
+        /// <summary>
+        /// The condition is active and represents a danger to the patient
+        /// </summary>
         [XmlEnum("active")]
         Active,
+        /// <summary>
+        /// The condition is recurring
+        /// </summary>
         [XmlEnum("recurrence")]
         Recurrence,
+        /// <summary>
+        /// The condition is inactive
+        /// </summary>
         [XmlEnum("inactive")]
         Inactive,
+        /// <summary>
+        /// The condition is in remission
+        /// </summary>
         [XmlEnum("remission")]
         Remission,
+        /// <summary>
+        /// The condition has been treated
+        /// </summary>
         [XmlEnum("resolved")]
         Resolved
     }
@@ -49,16 +64,34 @@ namespace SanteDB.Messaging.FHIR.Resources
     [XmlType("ConditionVerificationStatus", Namespace = "http://hl7.org/fhir")]
     public enum ConditionVerificationStatus
     {
+        /// <summary>
+        /// The condition has been recorded but not yet confirmed
+        /// </summary>
         [XmlEnum("provisional")]
         Provisional,
+        /// <summary>
+        /// The condition is a differential report
+        /// </summary>
         [XmlEnum("differential")]
         Differential,
+        /// <summary>
+        /// The condition has been confirmed accurate
+        /// </summary>
         [XmlEnum("confirmed")]
         Confirmed,
+        /// <summary>
+        /// The condition record has been refuted
+        /// </summary>
         [XmlEnum("refuted")]
         Refuted,
+        /// <summary>
+        /// The condition was entered in error
+        /// </summary>
         [XmlEnum("entered-in-error")]
         EnteredInError,
+        /// <summary>
+        /// The verification status of the condition isunknown
+        /// </summary>
         [XmlEnum("unknown")]
         Unknown
     }

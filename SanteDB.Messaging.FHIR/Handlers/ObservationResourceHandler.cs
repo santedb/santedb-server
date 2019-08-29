@@ -42,7 +42,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Map to FHIR
         /// </summary>
-        protected override SanteDB.Messaging.FHIR.Resources.Observation MapToFhir(Core.Model.Acts.Observation model, RestOperationContext RestOperationContext)
+        protected override SanteDB.Messaging.FHIR.Resources.Observation MapToFhir(Core.Model.Acts.Observation model, RestOperationContext restOperationContext)
         {
             var retVal = DataTypeConverter.CreateResource<SanteDB.Messaging.FHIR.Resources.Observation>(model);
 
@@ -63,13 +63,13 @@ namespace SanteDB.Messaging.FHIR.Handlers
             var rct = model.Participations.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget);
             if (rct != null)
             {
-                retVal.Subject = Reference.CreateResourceReference(new Patient() { Id = rct.PlayerEntityKey.ToString() }, RestOperationContext.IncomingRequest.Url);
+                retVal.Subject = Reference.CreateResourceReference(new Patient() { Id = rct.PlayerEntityKey.ToString() }, restOperationContext.IncomingRequest.Url);
             }
 
             // Performer
             var prf = model.Participations.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Performer);
             if (prf != null)
-                retVal.Performer = Reference.CreateResourceReference(new Practitioner() { Id = rct.PlayerEntityKey.ToString() }, RestOperationContext.IncomingRequest.Url);
+                retVal.Performer = Reference.CreateResourceReference(new Practitioner() { Id = rct.PlayerEntityKey.ToString() }, restOperationContext.IncomingRequest.Url);
 
             retVal.Issued = new FhirInstant() { DateValue = model.CreationTime.DateTime };
 
@@ -110,7 +110,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Map to model
         /// </summary>
-        protected override Core.Model.Acts.Observation MapToModel(SanteDB.Messaging.FHIR.Resources.Observation resource, RestOperationContext RestOperationContext)
+        protected override Core.Model.Acts.Observation MapToModel(SanteDB.Messaging.FHIR.Resources.Observation resource, RestOperationContext restOperationContext)
         {
             throw new NotImplementedException();
         }

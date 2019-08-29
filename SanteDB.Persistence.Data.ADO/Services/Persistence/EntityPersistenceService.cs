@@ -322,7 +322,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		        {
                     if (auth == null)
                         throw new KeyNotFoundException($"Missing assigning authority from {String.Join(",", data.Identifiers.Select(o => o.AuthorityKey))}");
-                    else if (auth.IsUnique)
+                    if (auth.IsUnique)
                     {
                         var dups = data.Identifiers.Where(id => id.AuthorityKey == auth.Key).SelectMany(id => context.Query<DbEntityIdentifier>(c => c.SourceKey != data.Key && c.AuthorityKey == auth.Key && c.Value == id.Value && c.ObsoleteVersionSequenceId == null));
                         if (dups.Any(did => !data.Relationships.Any(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Replaces && o.TargetEntityKey == did.SourceKey)))
@@ -331,7 +331,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 new DetectedIssue(DetectedIssuePriorityType.Error, $"Identifiers for {String.Join(",", dups.Select(o => o.Value.ToString()))} in domain {auth.DomainName} violate unique constraint", DetectedIssueKeys.FormalConstraintIssue)
                             );
                     }
-                    else if (auth.AssigningApplicationKey.HasValue) // Must have permission
+                    if (auth.AssigningApplicationKey.HasValue) // Must have permission
                     {
                         if (provenance == null) provenance = context.FirstOrDefault<DbSecurityProvenance>(o => o.Key == context.ContextId);
 
@@ -461,17 +461,40 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Identifiers
 	        if (data.Identifiers != null)
 	        {
-				// Validate unique values for IDs
-                var uniqueIds = data.Identifiers.Where(o => o.AuthorityKey.HasValue).Where(o => (ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>() as AdoBasePersistenceService<AssigningAuthority>).Get(context, o.AuthorityKey.Value)?.IsUnique == true);
 
-                foreach (var entityIdentifier in uniqueIds)
-		        {
-			        if (context.Query<DbEntityIdentifier>(c => c.SourceKey != data.Key && c.AuthorityKey == entityIdentifier.AuthorityKey && c.Value == entityIdentifier.Value &&  c.ObsoleteVersionSequenceId == null).Any())
-			        {
-				        throw new DuplicateNameException(entityIdentifier.Value);
-			        }
-		        }
+                // Validate unique values for IDs
+                var authorities = data.Identifiers.Where(o => o.AuthorityKey.HasValue).Select(o => o.Authority ?? (ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>() as AdoBasePersistenceService<AssigningAuthority>).Get(context, o.AuthorityKey.Value));
+                DbSecurityProvenance provenance = null;
 
+                foreach (var auth in authorities)
+                {
+                    if (auth == null)
+                        throw new KeyNotFoundException($"Missing assigning authority from {String.Join(",", data.Identifiers.Select(o => o.AuthorityKey))}");
+                    if (auth.IsUnique)
+                    {
+                        var dups = data.Identifiers.Where(id => id.AuthorityKey == auth.Key).SelectMany(id => context.Query<DbEntityIdentifier>(c => c.SourceKey != data.Key && c.AuthorityKey == auth.Key && c.Value == id.Value && c.ObsoleteVersionSequenceId == null));
+                        if (dups.Any(did => !data.Relationships.Any(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Replaces && o.TargetEntityKey == did.SourceKey)))
+                            // TODO: Ensure that the duplicate is also not a RELATED to the via a MASTER
+                            throw new DetectedIssueException(
+                                new DetectedIssue(DetectedIssuePriorityType.Error, $"Identifiers for {String.Join(",", dups.Select(o => o.Value.ToString()))} in domain {auth.DomainName} violate unique constraint", DetectedIssueKeys.FormalConstraintIssue)
+                            );
+                    }
+                    if (auth.AssigningApplicationKey.HasValue) // Must have permission
+                    {
+                        if (provenance == null) provenance = context.FirstOrDefault<DbSecurityProvenance>(o => o.Key == context.ContextId);
+
+                        // If the provenance application does not have authority to assign then all the identifiers must already exist!
+                        if (provenance.ApplicationKey != auth.AssigningApplicationKey)
+                        {
+                            if (!data.Identifiers.Where(id => id.AuthorityKey == auth.Key).All(id => context.Any<DbEntityIdentifier>(o => o.AuthorityKey == auth.Key && o.Value == id.Value && o.SourceKey != data.Key)))
+                                throw new DetectedIssueException(
+                                    new DetectedIssue(DetectedIssuePriorityType.Error, $"Application {provenance.ApplicationKey} does not have permission to assign {auth.DomainName}", DetectedIssueKeys.SecurityIssue)
+                                );
+                        }
+                    }
+                }
+
+                // Validate unique values for IDs
 		        base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.EntityIdentifier, DbEntityIdentifier>(
 			        data.Identifiers.Where(o => !o.IsEmpty()),
 			        retVal,

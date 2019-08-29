@@ -32,10 +32,19 @@ namespace SanteDB.Messaging.FHIR.Resources
     [XmlType("AllergyIntoleranceClinicalStatus", Namespace = "http://hl7.org/fhir")]
     public enum AllergyIntoleranceClinicalStatus
     {
+        /// <summary>
+        /// The allergy / intolerance is active
+        /// </summary>
         [XmlEnum("active")]
         Active,
+        /// <summary>
+        /// The allergy / intolerance is no longer active
+        /// </summary>
         [XmlEnum("inactive")]
         Inactive,
+        /// <summary>
+        /// The event has been resolved
+        /// </summary>
         [XmlEnum("resolved")]
         Resolved
     }
@@ -46,12 +55,24 @@ namespace SanteDB.Messaging.FHIR.Resources
     [XmlType("AllergyIntoleranceVerificationStatus", Namespace = "http://hl7.org/fhir")]
     public enum AllergyIntoleranceVerificationStatus
     {
+        /// <summary>
+        /// The intolerance / allergy has been confirmed
+        /// </summary>
         [XmlEnum("confirmed")]
         Confirmed,
+        /// <summary>
+        /// The intolerance / allergy is suspected
+        /// </summary>
         [XmlEnum("unconfirmed")]
         UnConfirmed,
+        /// <summary>
+        /// The intolerance has been refuted (confirmed not true)
+        /// </summary>
         [XmlEnum("refuted")]
         Refuted,
+        /// <summary>
+        /// The intolerance was entered in error
+        /// </summary>
         [XmlEnum("entered-in-error")]
         EnteredInError
     }
@@ -62,8 +83,14 @@ namespace SanteDB.Messaging.FHIR.Resources
     [XmlType("AllergyIntoleranceType", Namespace = "http://hl7.org/fhir")]
     public enum AllergyIntoleranceType
     {
+        /// <summary>
+        /// The event is an allergy
+        /// </summary>
         [XmlEnum("allergy")]
         Allergy,
+        /// <summary>
+        /// The event is an intolerance
+        /// </summary>
         [XmlEnum("intolerance")]
         Intolerance
     }
@@ -74,12 +101,24 @@ namespace SanteDB.Messaging.FHIR.Resources
     [XmlType("AllergyIntoleranceCategory", Namespace = "http://hl7.org/fhir")]
     public enum AllergyIntoleranceCategory
     {
+        /// <summary>
+        /// The intolerance is to a food substance
+        /// </summary>
         [XmlEnum("food")]
         Food,
+        /// <summary>
+        /// The intolerance is to a drug substance
+        /// </summary>
         [XmlEnum("drug")]
         Drug,
+        /// <summary>
+        /// The intolerance is to an environmental substance
+        /// </summary>
         [XmlEnum("environment")]
         Environmental,
+        /// <summary>
+        /// The intolerance is to a biological substance
+        /// </summary>
         [XmlEnum("biologic")]
         Biologic
     }
@@ -90,10 +129,19 @@ namespace SanteDB.Messaging.FHIR.Resources
     [XmlType("AllergyIntoleranceCriticality", Namespace = "http://hl7.org/fhir")]
     public enum AllergyIntoleranceCriticality
     {
+        /// <summary>
+        /// The criticality of the record is low
+        /// </summary>
         [XmlEnum("low")]
         Low,
+        /// <summary>
+        /// The criticality of the record is severe
+        /// </summary>
         [XmlEnum("high")]
         High,
+        /// <summary>
+        /// The criticality was unable to be assessed
+        /// </summary>
         [XmlEnum("unable-to-assess")]
         Unknown
     }

@@ -49,7 +49,7 @@ namespace SanteDB.Messaging.FHIR.Resources
         /// <summary>
         /// Raw xml wrapper
         /// </summary>
-        /// <param name="wrapper"></param>
+        /// <param name="elements">The elemnts to wrap</param>
         /// <returns></returns>
         public static implicit operator RawXmlWrapper(XmlElement[] elements)
         {
