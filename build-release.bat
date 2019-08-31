@@ -31,30 +31,30 @@ echo Will build version %version%
 echo Will use NUGET in %nuget%
 echo Will use MSBUILD in %msbuild%
 
-if exist %nuget% (
+if exist "%nuget%" (
 	%msbuild% santedb-server-ext.sln /t:restore
 	%msbuild% santedb-server-ext.sln /t:clean /t:rebuild /p:configuration=Release /m:1
 
-	FOR /R %cwd% %%G IN (*.nuspec) DO (
+	FOR /R "%cwd%" %%G IN (*.nuspec) DO (
 		echo Packing %%~pG
-		pushd %%~pG
+		pushd "%%~pG"
 		if [%2] == [] (
-			%nuget% pack -OutputDirectory %localappdata%\NugetStaging -prop Configuration=Release 
+			%nuget% pack -OutputDirectory "%localappdata%\NugetStaging" -prop Configuration=Release 
 		) else (
 			echo Publishing NUPKG
 			%nuget% pack -prop Configuration=Release 
 			FOR /R %%F IN (*.nupkg) do (
-				%nuget% push %%F -Source https://api.nuget.org/v3/index.json -ApiKey %2
+				%nuget% push "%%F" -Source https://api.nuget.org/v3/index.json -ApiKey %2
 			)
 		) 
 		popd
 	)
 
-	FOR /R %cwd%\bin\Release %%G IN (*.exe) DO (
+	FOR /R "%cwd%\bin\Release" %%G IN (*.exe) DO (
 		echo Signing %%G
 		"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign "%%G"
 	)
-	FOR /R %cwd%\bin\Release %%G IN (*.dll) DO (
+	FOR /R "%cwd%\bin\Release" %%G IN (*.dll) DO (
 		echo Signing %%G
 		"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign "%%G"
 	)

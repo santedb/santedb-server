@@ -45,8 +45,8 @@ Compression = none
 Compression = bzip
 #endif
 AppCopyright = Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
-SignTool=default sign $f
-SignedUninstaller=yes
+; SignTool=default sign $f
+; SignedUninstaller=yes
 
 [Types]
 Name: full; Description: Complete Installation
