@@ -53,7 +53,8 @@
     <Compile Include="Configuration\Hl7EndpointConfiguration.cs" />
     <Compile Include="Configuration\Hl7X509ConfigurationElement.cs" />
     <Compile Include="DataConverter.cs" />
-    <Compile Include="Exceptions\AssigningAuthorityNotFoundException.cs" />
+    <Compile Include="Exceptions\HL7DatatypeProcessingException.cs" />
+    <Compile Include="Exceptions\HL7ProcessingException.cs" />
     <Compile Include="Hl7Constants.cs" />
     <Compile Include="HL7MessageHandler.cs" />
     <Compile Include="IHL7MessageHandler.cs" />

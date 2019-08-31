@@ -166,7 +166,7 @@ namespace SanteDB.Messaging.HL7.Messages
                     filterQuery = queryMethod.Invoke(null, new object[] { query }) as Expression;
 
                     // Now we want to query
-                    object[] parameters = { filterQuery, offset.Value, (int?)count, null, queryId, null };
+                    object[] parameters = { filterQuery, offset.Value, (int?)count ?? 100, null, queryId, null };
                     var findMethod = repoService.GetType().GetMethod("Find", new Type[] { filterQuery.GetType(), typeof(int), typeof(int?), typeof(int).MakeByRefType(), typeof(Guid), typeof(ModelSort<>).MakeGenericType(map.QueryTarget).MakeArrayType() });
                     results = findMethod.Invoke(repoService, parameters) as IEnumerable;
                     totalResults = (int)parameters[3];
@@ -177,31 +177,7 @@ namespace SanteDB.Messaging.HL7.Messages
                     ApplicationServiceContext.Current.GetService<Core.Services.IQueryPersistenceService>()?.SetQueryTag(queryId, count);
 
                 // Query basics
-                var retVal = this.CreateACK(map.ResponseType, e.Message, "AA", "Query Success");
-                var omsh = retVal.GetStructure("MSH") as MSH;
-                var qak = retVal.GetStructure("QAK") as QAK;
-                var odsc = retVal.GetStructure("DSC") as DSC;
-                var oqpd = retVal.GetStructure("QPD") as QPD;
-                DeepCopy.copy(qpd, oqpd);
-                omsh.MessageType.MessageCode.Value = "RSP";
-                omsh.MessageType.MessageStructure.Value = retVal.GetType().Name;
-                omsh.MessageType.TriggerEvent.Value = map.ResponseTrigger;
-                omsh.MessageType.MessageStructure.Value = map.ResponseTypeXml;
-                qak.HitCount.Value = totalResults.ToString();
-                qak.HitsRemaining.Value = (totalResults - offset - count > 0 ? totalResults - offset - count : 0).ToString();
-                qak.QueryResponseStatus.Value = totalResults == 0 ? "NF" : "OK";
-                qak.ThisPayload.Value = results.OfType<Object>().Count().ToString();
-
-                if (ApplicationServiceContext.Current.GetService<Core.Services.IQueryPersistenceService>() != null &&
-                    Int32.Parse(qak.HitsRemaining.Value) > 0)
-                {
-                    odsc.ContinuationPointer.Value = queryId.ToString();
-                    odsc.ContinuationStyle.Value = "RD";
-                }
-
-                // Process results
-                retVal = map.QueryHandler.AppendQueryResult(results, filterQuery, retVal, e, map.ScoreConfiguration, offset.GetValueOrDefault());
-                return retVal;
+                return this.CreateQueryResponse(e, filterQuery, map, results, queryId, offset.GetValueOrDefault(), count ?? 100, totalResults);
             }
             catch (Exception ex)
             {
@@ -212,7 +188,46 @@ namespace SanteDB.Messaging.HL7.Messages
             }
         }
 
+        /// <summary>
+        /// Create an appropriate response given the results
+        /// </summary>
+        /// <param name="results">The results that matches the query</param>
+        /// <param name="map">The HL7 query parameter mapping</param>
+        /// <param name="request">The original request message</param>
+        /// <param name="count">The number of results that the user requested</param>
+        /// <param name="offset">The offset to the first result</param>
+        /// <param name="queryId">The unique query identifier used</param>
+        /// <returns>The constructed result message</returns>
+        protected virtual IMessage CreateQueryResponse(Hl7MessageReceivedEventArgs request, Expression filter, Hl7QueryParameterType map, IEnumerable results, Guid queryId, int offset, int count, int totalResults)
+        {
+            var retVal = this.CreateACK(map.ResponseType, request.Message, "AA", "Query Success");
+            var omsh = retVal.GetStructure("MSH") as MSH;
+            var qak = retVal.GetStructure("QAK") as QAK;
+            var odsc = retVal.GetStructure("DSC") as DSC;
+            var oqpd = retVal.GetStructure("QPD") as QPD;
+            
+            DeepCopy.copy(request.Message.GetStructure("QPD") as ISegment, oqpd);
+            omsh.MessageType.MessageCode.Value = "RSP";
+            omsh.MessageType.MessageStructure.Value = retVal.GetType().Name;
+            omsh.MessageType.TriggerEvent.Value = map.ResponseTrigger;
+            omsh.MessageType.MessageStructure.Value = map.ResponseTypeXml;
+            qak.HitCount.Value = totalResults.ToString();
+            qak.HitsRemaining.Value = (totalResults - offset - count > 0 ? totalResults - offset - count : 0).ToString();
+            qak.QueryResponseStatus.Value = totalResults == 0 ? "NF" : "OK";
+            qak.ThisPayload.Value = results.OfType<Object>().Count().ToString();
 
+            if (ApplicationServiceContext.Current.GetService<Core.Services.IQueryPersistenceService>() != null &&
+                Int32.Parse(qak.HitsRemaining.Value) > 0)
+            {
+                odsc.ContinuationPointer.Value = queryId.ToString();
+                odsc.ContinuationStyle.Value = "RD";
+            }
+
+            // Process results
+            retVal = map.QueryHandler.AppendQueryResult(results, filter, retVal, request, map.ScoreConfiguration, offset);
+
+            return retVal;
+        }
 
 
         /// <summary>

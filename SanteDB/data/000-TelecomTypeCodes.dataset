@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Telecommnications Address Types">
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>c1c0a4e9-4238-4044-b89b-9c9798995b99</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>TelecomType-Telephone</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Telephone</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>c1c0a4e9-4238-4044-b89b-9c9798995b90</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>TelecomType-CellularPhone</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Cellular Telephone</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>c1c0a4e9-4238-4044-b89b-9c9798995b91</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>TelecomType-Modem</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Modem</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>c1c0a4e9-4238-4044-b89b-9c9798995b92</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>TelecomType-Fax</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Fax Machine</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>c1c0a4e9-4238-4044-b89b-9c9798995b93</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>TelecomType-Internet</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Internet Device</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <ConceptSet xmlns="http://santedb.org/model">
+      <id>0d79b02c-6444-40b5-aca4-4009fb03ad54</id>
+      
+      <name>Telecom Address Type</name>
+      <mnemonic>TelecomAddressType</mnemonic>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.13</oid>
+      <url>http://santedb.org/conceptset/telecom-type</url>
+      <concept>c1c0a4e9-4238-4044-b89b-9c9798995b99</concept>
+      <concept>c1c0a4e9-4238-4044-b89b-9c9798995b90</concept>
+      <concept>c1c0a4e9-4238-4044-b89b-9c9798995b91</concept>
+      <concept>c1c0a4e9-4238-4044-b89b-9c9798995b92</concept>
+      <concept>c1c0a4e9-4238-4044-b89b-9c9798995b93</concept>
+      <concept>788000b4-e37a-4055-a2aa-c650089ce3b1</concept>
+    </ConceptSet>
+  </update>
+</dataset>

@@ -32,6 +32,8 @@ using NHapi.Model.V25.Segment;
 using SanteDB.Core;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.HL7.Configuration;
+using SanteDB.Core.Model.DataTypes;
+using SanteDB.Messaging.HL7.Exceptions;
 
 namespace SanteDB.Messaging.HL7.Segments
 {
@@ -81,14 +83,22 @@ namespace SanteDB.Messaging.HL7.Segments
                 var sdlRepo = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>();
                 foreach (var xon in pd1Segment.GetPatientPrimaryFacility())
                 {
-                    var authority = xon.AssigningAuthority.ToModel(false);
+                    AssigningAuthority authority;
+                    try
+                    {
+                        authority = xon.AssigningAuthority.ToModel();
+                    }
+                    catch(HL7DatatypeProcessingException e)
+                    {
+                        throw new HL7ProcessingException(e.Message, "PD1", "1", 3, 5, e);
+                    }
                     var idnumber = xon.OrganizationIdentifier.Value ?? xon.IDNumber.Value;
                     // Find the org or SDL
                     Place place = null;
                     if (authority == null && xon.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority.DomainName)
                         place = sdlRepo.Get(Guid.Parse(idnumber), null, true, AuthenticationContext.SystemPrincipal);
                     else
-                        place = sdlRepo.Query(o => o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation && o.Identifiers.Any(i => i.Value == idnumber && i.AuthorityKey == authority.Key), AuthenticationContext.SystemPrincipal).SingleOrDefault();
+                        place = sdlRepo.Query(o => o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation && o.Identifiers.Any(i => i.Value == idnumber && i.Authority.Key == authority.Key), AuthenticationContext.SystemPrincipal).SingleOrDefault();
                     if (place != null)
                         retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation, place));
 

@@ -29,8 +29,8 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
     /// Represents a telecommunications address
     /// </summary>
     [Table("ent_tel_tbl")]
-	public class DbTelecomAddress : DbEntityVersionedAssociation
-	{
+    public class DbTelecomAddress : DbEntityVersionedAssociation
+    {
         /// <summary>
         /// Gets or sets the primary key
         /// </summary>
@@ -42,21 +42,33 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
         /// </summary>
         /// <value>The telecom use.</value>
         [Column("use_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-		public Guid TelecomUseKey {
-			get;
-			set;
-		}
+        public Guid TelecomUseKey
+        {
+            get;
+            set;
+        }
 
-		/// <summary>
-		/// Gets or sets the value.
-		/// </summary>
-		/// <value>The value.</value>
-		[Column("tel_val")]
-		public String Value {
-			get;
-			set;
-		}
+        /// <summary>
+        /// Gets or sets the telecom type concept
+        /// </summary>
+        [Column("typ_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        public Guid? TypeConceptKey
+        {
+            get;
+            set;
+        }
 
-	}
+        /// <summary>
+        /// Gets or sets the value.
+        /// </summary>
+        /// <value>The value.</value>
+        [Column("tel_val")]
+        public String Value
+        {
+            get;
+            set;
+        }
+
+    }
 }
 

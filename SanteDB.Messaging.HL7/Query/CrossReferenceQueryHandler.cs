@@ -39,6 +39,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using SanteDB.Core.Model;
 using SanteDB.Messaging.HL7.Configuration;
+using SanteDB.Messaging.HL7.Exceptions;
 
 namespace SanteDB.Messaging.HL7.Query
 {
@@ -134,7 +135,7 @@ namespace SanteDB.Messaging.HL7.Query
                 {
                     var aa = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>().Query(o => o.Oid == rid.AssigningAuthority.UniversalID.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault();
                     if (aa == null)
-                        throw new InvalidOperationException($"Domain {rid.AssigningAuthority.UniversalID.Value} is unknown");
+                        throw new HL7ProcessingException($"Domain {rid.AssigningAuthority.UniversalID.Value} is unknown", "QPD",  "1", 3, 4);
                     else
                         retVal.Add($"identifier[{aa.DomainName}].value", rid.IDNumber.Value);
                 }
@@ -156,7 +157,7 @@ namespace SanteDB.Messaging.HL7.Query
                 {
                     var aa = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>().Query(o => o.Oid == rid.AssigningAuthority.UniversalID.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault();
                     if (aa == null)
-                        throw new InvalidOperationException($"Domain {rid.AssigningAuthority.UniversalID.Value} is unknown");
+                        throw new HL7ProcessingException($"Domain {rid.AssigningAuthority.UniversalID.Value} is unknown", "QPD", "1", 4, 4, new KeyNotFoundException());
                     else
                         retVal.Add($"identifier[{aa.DomainName}]", "!null");
                 }

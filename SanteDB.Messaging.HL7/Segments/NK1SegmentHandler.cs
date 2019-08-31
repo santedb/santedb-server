@@ -34,6 +34,7 @@ using NHapi.Model.V25.Segment;
 using SanteDB.Core;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.HL7.Configuration;
+using SanteDB.Messaging.HL7.Exceptions;
 
 namespace SanteDB.Messaging.HL7.Segments
 {
@@ -119,7 +120,15 @@ namespace SanteDB.Messaging.HL7.Segments
             foreach (var id in nk1Segment.GetNextOfKinAssociatedPartySIdentifiers())
             {
                 var idnumber = id.IDNumber.Value;
-                var authority = id.AssigningAuthority.ToModel(id.Message.GetStructureName().StartsWith("ADT"));
+                AssigningAuthority authority = null;
+                try
+                {
+                    authority = id.AssigningAuthority.ToModel();
+                }
+                catch(HL7DatatypeProcessingException e)
+                {
+                    throw new HL7ProcessingException(e.Message, "NK1", nk1Segment.SetIDNK1.Value, 33, e.Component, e);
+                }
                 Guid idguid = Guid.Empty;
                 int tr = 0;
                 Person found = null;
@@ -128,7 +137,7 @@ namespace SanteDB.Messaging.HL7.Segments
                     found = personService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.SystemPrincipal);
                 else if (authority?.IsUnique == true)
                     found = personService.Query(o => o.Identifiers.Any(i => i.Value == idnumber &&
-                        i.AuthorityKey == authority.Key), 0, 1, out tr, AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                        i.Authority.Key == authority.Key), 0, 1, out tr, AuthenticationContext.SystemPrincipal).FirstOrDefault();
                 if (found != null)
                 {
                     retVal = found;
@@ -204,7 +213,7 @@ namespace SanteDB.Messaging.HL7.Segments
             {
                 foreach (var cit in nk1Segment.GetCitizenship())
                 {
-                    var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Identifiers.Any(i => i.Value == cit.Identifier.Value && i.AuthorityKey == AssigningAuthorityKeys.Iso3166CountryCode), AuthenticationContext.SystemPrincipal);
+                    var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Identifiers.Any(i => i.Value == cit.Identifier.Value && i.Authority.Key == AssigningAuthorityKeys.Iso3166CountryCode), AuthenticationContext.SystemPrincipal);
                     if (places.Count() == 1)
                         retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Citizen, places.First().Key));
                 }
@@ -231,8 +240,16 @@ namespace SanteDB.Messaging.HL7.Segments
 
             // Associated person identifiers
             if (nk1Segment.NextOfKinAssociatedPartySIdentifiersRepetitionsUsed > 0)
-                retVal.Identifiers = nk1Segment.GetNextOfKinAssociatedPartySIdentifiers().ToModel().ToList();
-
+            {
+                try
+                {
+                    retVal.Identifiers = nk1Segment.GetNextOfKinAssociatedPartySIdentifiers().ToModel().ToList();
+                }
+                catch(HL7ProcessingException e)
+                {
+                    throw new HL7ProcessingException(e.Message, "NK1", nk1Segment.SetIDNK1.Value, 33, e.Component);
+                }
+            }
             // Find the existing relationship on the patient
 
             patient.Relationships.RemoveAll(o => o.SourceEntityKey == retValRelation.SourceEntityKey && o.TargetEntityKey == retValRelation.TargetEntityKey);

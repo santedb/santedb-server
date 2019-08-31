@@ -47,6 +47,7 @@ namespace SanteDB.Messaging.HL7
         private const string AddressUseCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.190";
         private const string NameUseCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.200";
         private const string TelecomUseCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.201";
+        private const string TelecomTypeCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.202";
         private const string IdentifierTypeCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.203";
 
         /// <summary>
@@ -95,7 +96,7 @@ namespace SanteDB.Messaging.HL7
                 {
                     var concept = conceptService?.FindConceptsByReferenceTerm(xad.AddressType.Value, AddressUseCodeSystem).FirstOrDefault();
                     if (concept == null)
-                        throw new ArgumentException($"Address use code {xad.AddressType.Value} not known");
+                        throw new HL7DatatypeProcessingException($"Address use code {xad.AddressType.Value} not known", 6);
 
                     addressUse = concept.Key.Value;
                 }
@@ -111,7 +112,8 @@ namespace SanteDB.Messaging.HL7
                     {  nameof(XAD.OtherDesignation), AddressComponentKeys.AdditionalLocator },
                     {  nameof(XAD.StateOrProvince), AddressComponentKeys.State },
                     {  nameof(XAD.StreetAddress), AddressComponentKeys.StreetAddressLine },
-                    {  nameof(XAD.OtherGeographicDesignation), AddressComponentKeys.Precinct }
+                    {  nameof(XAD.OtherGeographicDesignation), AddressComponentKeys.Precinct },
+                    {  nameof(XAD.ZipOrPostalCode), AddressComponentKeys.PostalCode }
                 };
 
                 foreach (var kv in mappedFields)
@@ -140,6 +142,30 @@ namespace SanteDB.Messaging.HL7
             return entityAddresses.AsEnumerable();
         }
 
+
+        /// <summary>
+        /// Convert a telecom address to an XTN v2 structure
+        /// </summary>
+        public static XTN FromModel(this XTN me, EntityTelecomAddress tel)
+        {
+
+            if (tel.AddressUseKey != NullReasonKeys.NoInformation)
+            {
+                var useTerm = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(tel.AddressUseKey.GetValueOrDefault(), TelecomUseCodeSystem);
+                me.TelecommunicationUseCode.Value = useTerm.Mnemonic;
+            }
+
+            if(tel.TypeConceptKey.HasValue)
+            {
+                var typeTerm = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(tel.TypeConceptKey.GetValueOrDefault(), TelecomTypeCodeSystem);
+                me.TelecommunicationEquipmentType.Value = typeTerm.Mnemonic;
+            }
+
+            me.AnyText.Value = tel.Value;
+            return me;
+
+        }
+
         /// <summary>
         /// Convert address to XAD
         /// </summary>
@@ -160,6 +186,7 @@ namespace SanteDB.Messaging.HL7
                     {  AddressComponentKeys.StreetAddressLine , nameof(XAD.StreetAddress) },
                     {  AddressComponentKeys.Precinct, nameof(XAD.OtherGeographicDesignation) },
                     {  AddressComponentKeys.StreetName, nameof(XAD.StreetAddress) },
+                    {  AddressComponentKeys.PostalCode, nameof(XAD.ZipOrPostalCode) },
                     {  AddressComponentKeys.UnitIdentifier, nameof(XAD.StreetAddress) }
                 };
 
@@ -220,7 +247,7 @@ namespace SanteDB.Messaging.HL7
                 {
                     var concept = conceptService?.FindConceptsByReferenceTerm(xpn.NameTypeCode.Value, NameUseCodeSystem).FirstOrDefault();
                     if (concept == null)
-                        throw new ArgumentException($"Entity name use code {xpn.NameTypeCode.Value} not known");
+                        throw new HL7DatatypeProcessingException($"Entity name use code {xpn.NameTypeCode.Value} not known", 6);
 
                     nameUse = concept.Key.Value;
                 }
@@ -323,7 +350,7 @@ namespace SanteDB.Messaging.HL7
 		/// </summary>
 		/// <param name="id">The id value to be converted.</param>
 		/// <returns>Returns the converted assigning authority.</returns>
-		public static AssigningAuthority ToModel(this HD id, bool throwIfNotFound = true)
+		public static AssigningAuthority ToModel(this HD id)
         {
             var assigningAuthorityRepositoryService = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>();
             AssigningAuthority assigningAuthority = null;
@@ -334,18 +361,18 @@ namespace SanteDB.Messaging.HL7
             if (!string.IsNullOrEmpty(id.NamespaceID.Value))
             {
                 assigningAuthority = assigningAuthorityRepositoryService.Get(id.NamespaceID.Value);
-                if (assigningAuthority == null && throwIfNotFound)
-                    throw new AssigningAuthorityNotFoundException(id.NamespaceID.Value);
+                if (assigningAuthority == null)
+                    throw new HL7DatatypeProcessingException($"Authority {id.NamespaceID.Value} not found", 0);
             }
 
             if (!string.IsNullOrEmpty(id.UniversalID.Value))
             {
                 var tAssigningAuthority = assigningAuthorityRepositoryService.Get(new Uri($"urn:oid:{id.UniversalID.Value}"));
 
-                if (tAssigningAuthority == null && throwIfNotFound)
-                    throw new AssigningAuthorityNotFoundException(id.UniversalID.Value);
+                if (tAssigningAuthority == null)
+                    throw new HL7DatatypeProcessingException($"Authority {id.UniversalID.Value} not found", 1);
                 else if (assigningAuthority != null && tAssigningAuthority?.Key != assigningAuthority.Key) // Must agree
-                    throw new InvalidOperationException("When both NamespaceID and UniversalID are specified, both must agree with configured values");
+                    throw new HL7DatatypeProcessingException("When both NamespaceID and UniversalID are specified, both must agree with configured values", 0);
                 else
                     assigningAuthority = tAssigningAuthority;
             }
@@ -377,19 +404,26 @@ namespace SanteDB.Messaging.HL7
 
             foreach (var cx in identifiers)
             {
-                var assigningAuthority = cx.AssigningAuthority.ToModel(cx.Message.GetStructureName().StartsWith("ADT"));
-                if (assigningAuthority != null)
+                try
                 {
-                    var id = new EntityIdentifier(assigningAuthority, cx.IDNumber.Value);
-
-                    if (!String.IsNullOrEmpty(cx.IdentifierTypeCode.Value))
+                    var assigningAuthority = cx.AssigningAuthority.ToModel();
+                    if (assigningAuthority != null)
                     {
-                        int tr = 0;
-                        var idType = ApplicationServiceContext.Current.GetService<IDataPersistenceService<IdentifierType>>().Query(o => o.TypeConcept.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == cx.IdentifierTypeCode.Value && r.ReferenceTerm.CodeSystem.Oid == IdentifierTypeCodeSystem), 0, 1, out tr, AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                        id.IdentifierTypeKey = idType?.Key;
-                    }
+                        var id = new EntityIdentifier(assigningAuthority, cx.IDNumber.Value);
 
-                    entityIdentifiers.Add(id);
+                        if (!String.IsNullOrEmpty(cx.IdentifierTypeCode.Value))
+                        {
+                            int tr = 0;
+                            var idType = ApplicationServiceContext.Current.GetService<IDataPersistenceService<IdentifierType>>().Query(o => o.TypeConcept.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == cx.IdentifierTypeCode.Value && r.ReferenceTerm.CodeSystem.Oid == IdentifierTypeCodeSystem), 0, 1, out tr, AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                            id.IdentifierTypeKey = idType?.Key;
+                        }
+
+                        entityIdentifiers.Add(id);
+                    }
+                }
+                catch(Exception e)
+                {
+                    throw new HL7DatatypeProcessingException(e.Message, 3, e);
                 }
             }
 
@@ -439,7 +473,7 @@ namespace SanteDB.Messaging.HL7
                         string tzValue = value.Substring(sTz + 1);
                         int iTzValue = 0;
                         if (!Int32.TryParse(tzValue, out iTzValue)) // Invalid timezone can't even fix this
-                            throw new FormatException("Invalid timezone!");
+                            throw new HL7DatatypeProcessingException($"Invalid timezone {tzValue}!", 0);
                         else if (iTzValue < 24)
                             value = value.Substring(0, sTz + 1) + iTzValue.ToString("00") + "00";
                         else
@@ -479,7 +513,7 @@ namespace SanteDB.Messaging.HL7
                 }
                 catch(Exception e)
                 {
-                    throw new FormatException($"Date {value} was not valid according to format {flavorFormat}", e);
+                    throw new HL7DatatypeProcessingException($"Date {value} was not valid according to format {flavorFormat}", 0, e);
                 }
             }
         }
@@ -503,7 +537,7 @@ namespace SanteDB.Messaging.HL7
             var retVal = new EntityTelecomAddress();
 
             if (!String.IsNullOrEmpty(xtn.EmailAddress?.Value))
-                retVal.Value = $"mailto:{xtn.EmailAddress.Value}";
+                retVal.IETFValue = $"mailto:{xtn.EmailAddress.Value}";
             else if (xtn.AnyText.Value == null)
             {
                 var sb = new StringBuilder("tel:");
@@ -511,7 +545,7 @@ namespace SanteDB.Messaging.HL7
                 try
                 {
                     if (xtn.CountryCode.Value != null)
-                        sb.AppendFormat("{0}-", xtn.CountryCode);
+                        sb.AppendFormat("{0}{1}-", xtn.CountryCode.Value.Contains("+") ? "" : "+",  xtn.CountryCode);
 
                     if (!String.IsNullOrEmpty(xtn.TelephoneNumber?.Value))
                     {
@@ -520,7 +554,7 @@ namespace SanteDB.Messaging.HL7
                         sb.AppendFormat("{0}-{1}", xtn.AreaCityCode, xtn.TelephoneNumber.Value);
                     }
                     else
-                        sb.AppendFormat("{0}-{1}", xtn.AreaCityCode, xtn.LocalNumber);
+                        sb.AppendFormat("{0}-{1}", xtn.AreaCityCode, xtn.LocalNumber.Value.Contains("-") ? xtn.LocalNumber.Value : xtn.LocalNumber.Value.Replace(" ","-").Insert(3, "-"));
 
                     if (xtn.Extension.Value != null)
                         sb.AppendFormat(";ext={0}", xtn.Extension);
@@ -531,9 +565,9 @@ namespace SanteDB.Messaging.HL7
                 }
 
                 if (sb.ToString().EndsWith("tel:") || sb.ToString() == "tel:-")
-                    retVal.Value = "tel:" + xtn.AnyText.Value;
+                    retVal.IETFValue = "tel:" + xtn.AnyText.Value;
                 else
-                    retVal.Value = sb.ToString();
+                    retVal.IETFValue = sb.ToString();
             }
             else
             {
@@ -551,24 +585,34 @@ namespace SanteDB.Messaging.HL7
                     sb.AppendFormat(";ext={0}", match.Groups[5].Value);
                 }
 
-                retVal.Value = sb.ToString();
+                retVal.IETFValue = sb.ToString();
             }
 
             // Use code conversion
-            var use = Guid.Empty;
+            Guid use = NullReasonKeys.NoInformation;
 
             if (!string.IsNullOrEmpty(xtn.TelecommunicationUseCode.Value))
             {
                 var concept = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(xtn.TelecommunicationUseCode.Value, TelecomUseCodeSystem).FirstOrDefault();
 
                 if (concept == null)
-                    throw new ArgumentException($"Telecom use code {xtn.TelecommunicationUseCode.Value} not known");
+                    throw new HL7DatatypeProcessingException($"Telecom use code {xtn.TelecommunicationUseCode.Value} not known", 1);
 
                 use = concept.Key.Value;
             }
 
             retVal.AddressUseKey = use;
 
+            // Type code conversion
+            Guid? type = null;
+            if(!string.IsNullOrEmpty(xtn.TelecommunicationEquipmentType.Value))
+            {
+                var concept = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(xtn.TelecommunicationEquipmentType.Value, TelecomTypeCodeSystem).FirstOrDefault();
+                if (concept == null)
+                    throw new HL7DatatypeProcessingException($"Telecom equipment type {xtn.TelecommunicationEquipmentType.Value} not known", 2);
+                type = concept.Key.Value;
+            }
+            retVal.TypeConceptKey = type;
             return retVal;
         }
 
@@ -646,7 +690,7 @@ namespace SanteDB.Messaging.HL7
                     concept = termService.FindConceptsByReferenceTerm(code.Identifier.Value, code.NameOfCodingSystem.Value).FirstOrDefault();
 
                 if (concept == null && throwIfNotFound)
-                    throw new KeyNotFoundException($"Reference term {code.Identifier.Value} not found in {preferredDomain} or {code.NameOfCodingSystem.Value}");
+                    throw new HL7DatatypeProcessingException($"Reference term {code.Identifier.Value} not found in {preferredDomain} or {code.NameOfCodingSystem.Value}", 0);
                 retval.Add(concept);
             }
             return retval;

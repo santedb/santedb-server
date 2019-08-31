@@ -51,6 +51,7 @@ using SanteDB.Core.Security.Claims;
 using SanteDB.Messaging.HL7.Utils;
 using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
+using SanteDB.Messaging.HL7.Exceptions;
 
 namespace SanteDB.Messaging.HL7.Messages
 {
@@ -200,25 +201,32 @@ namespace SanteDB.Messaging.HL7.Messages
         /// <summary>
         /// Map detail to error code
         /// </summary>
-        private string MapErrCode(Exception e)
+        private string MapErrCode(Exception error)
         {
             string errCode = string.Empty;
+            var e = error;
 
-            if (e is ConstraintException)
-                errCode = "101";
-            else if (e is DuplicateNameException)
-                errCode = "205";
-            else if (e is DataException || e is DetectedIssueException)
-                errCode = "207";
-            else if (e is VersionNotFoundException)
-                errCode = "203";
-            else if (e is NotImplementedException)
-                errCode = "200";
-            else if (e is KeyNotFoundException || e is FileNotFoundException)
-                errCode = "204";
-            else if (e is SecurityException)
-                errCode = "901";
-            else
+            while (e != null)
+            {
+                if (e is ConstraintException)
+                    errCode = "101";
+                else if (e is DuplicateNameException)
+                    errCode = "205";
+                else if (e is DataException || e is DetectedIssueException)
+                    errCode = "207";
+                else if (e is VersionNotFoundException)
+                    errCode = "203";
+                else if (e is NotImplementedException)
+                    errCode = "200";
+                else if (e is KeyNotFoundException || e is FileNotFoundException)
+                    errCode = "204";
+                else if (e is SecurityException)
+                    errCode = "901";
+                
+                e = e.InnerException;
+            }
+
+            if(String.IsNullOrEmpty(errCode))
                 errCode = "207";
             return errCode;
         }
@@ -260,7 +268,7 @@ namespace SanteDB.Messaging.HL7.Messages
             else if (error is DataPersistenceException)
             {
                 // Data persistence failed because of D/I/E
-                if(error.InnerException is DetectedIssueException)
+                if (error.InnerException is DetectedIssueException)
                 {
                     error = error.InnerException;
                     retVal = this.CreateACK(nackType, request, "CR", "Business Rule Violation");
@@ -272,6 +280,8 @@ namespace SanteDB.Messaging.HL7.Messages
                 retVal = this.CreateACK(nackType, request, "AE", "Not Implemented");
             else if (error is NotSupportedException)
                 retVal = this.CreateACK(nackType, request, "AR", "Not Supported");
+            else if (error is HL7ProcessingException || error is HL7DatatypeProcessingException)
+                retVal = this.CreateACK(nackType, request, "AR", "Invalid Message");
             else
                 retVal = this.CreateACK(nackType, request, "AE", "General Error");
 
@@ -300,7 +310,17 @@ namespace SanteDB.Messaging.HL7.Messages
                     var err = retVal.GetStructure("ERR", erc++) as ERR;
                     err.HL7ErrorCode.Identifier.Value = this.MapErrCode(ex);
                     err.Severity.Value = "E";
-                    err.GetErrorCodeAndLocation(err.ErrorCodeAndLocationRepetitionsUsed).CodeIdentifyingError.Text.Value = ex.Message;
+                    err.GetErrorCodeAndLocation(err.ErrorCodeAndLocationRepetitionsUsed).CodeIdentifyingError.Text.Value = ex.Message; ;
+                    if (ex is HL7ProcessingException)
+                    {
+                        var hle = ex as HL7ProcessingException;
+                        var erl = err.GetErrorLocation(err.ErrorLocationRepetitionsUsed);
+                        erl.SegmentID.Value = hle.Segment;
+                        erl.SegmentSequence.Value = hle.Repetition;
+                        erl.FieldPosition.Value = hle.Field.ToString();
+                        erl.ComponentNumber.Value = hle.Component.ToString();
+                    }
+                   
                     ex = ex.InnerException;
                 }
             }

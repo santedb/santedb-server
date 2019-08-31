@@ -9,6 +9,15 @@
       <description>HL7 Version 2 Telecom types</description>
     </CodeSystem>
   </insert>
+  <insert>
+    <CodeSystem xmlns="http://santedb.org/model">
+      <id>e4547b6d-d128-48e3-8fff-7bfa828ff559</id>
+      <authority>V2TelecomEquipmentTypes</authority>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.200.202</oid>
+      <url>http://hl7.org/fhir/v2/0202</url>
+      <description>HL7 Version 2 Telecom Equipment Type</description>
+    </CodeSystem>
+  </insert>
   <insert skipIfError="false" skipIfExists="false">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>8165edde-a03b-4fe9-81bc-9fe6582a2bdd</id>
@@ -151,6 +160,128 @@
     <ConceptReferenceTerm xmlns="http://santedb.org/model">
       <source>eaa6f08e-bb8e-4457-9dc0-3a1555fadf5c</source>
       <term>7cc6630a-2fbc-48b2-89ad-9f713900533f</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+
+
+
+  <insert skipIfError="false" skipIfExists="false">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>aff6630a-2fbc-48b2-89ad-9f7139005330</id>
+      <mnemonic>PH</mnemonic>
+      <codeSystem>e4547b6d-d128-48e3-8fff-7bfa828ff559</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Telephone</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert>
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>c1c0a4e9-4238-4044-b89b-9c9798995b99</source>
+      <term>aff6630a-2fbc-48b2-89ad-9f7139005330</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  
+  <insert skipIfError="false" skipIfExists="false">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>aff6630a-2fbc-48b2-89ad-9f7139005331</id>
+      <mnemonic>FX</mnemonic>
+      <codeSystem>e4547b6d-d128-48e3-8fff-7bfa828ff559</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Fax</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert>
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>c1c0a4e9-4238-4044-b89b-9c9798995b92</source>
+      <term>aff6630a-2fbc-48b2-89ad-9f7139005331</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  
+  <insert skipIfError="false" skipIfExists="false">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>aff6630a-2fbc-48b2-89ad-9f7139005332</id>
+      <mnemonic>MD</mnemonic>
+      <codeSystem>e4547b6d-d128-48e3-8fff-7bfa828ff559</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Modem</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert>
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>c1c0a4e9-4238-4044-b89b-9c9798995b91</source>
+      <term>aff6630a-2fbc-48b2-89ad-9f7139005332</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+  
+  <insert skipIfError="false" skipIfExists="false">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>aff6630a-2fbc-48b2-89ad-9f7139005333</id>
+      <mnemonic>CP</mnemonic>
+      <codeSystem>e4547b6d-d128-48e3-8fff-7bfa828ff559</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Cellular Phone</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert>
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>c1c0a4e9-4238-4044-b89b-9c9798995b90</source>
+      <term>aff6630a-2fbc-48b2-89ad-9f7139005333</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+
+  <insert skipIfError="false" skipIfExists="false">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>aff6630a-2fbc-48b2-89ad-9f7139005334</id>
+      <mnemonic>BP</mnemonic>
+      <codeSystem>e4547b6d-d128-48e3-8fff-7bfa828ff559</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Beeper</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert>
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>788000b4-e37a-4055-a2aa-c650089ce3b1</source>
+      <term>aff6630a-2fbc-48b2-89ad-9f7139005334</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </insert>
+
+  <insert skipIfError="false" skipIfExists="false">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>aff6630a-2fbc-48b2-89ad-9f7139005335</id>
+      <mnemonic>Internet</mnemonic>
+      <codeSystem>e4547b6d-d128-48e3-8fff-7bfa828ff559</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Internet Address</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </insert>
+  <insert>
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <source>c1c0a4e9-4238-4044-b89b-9c9798995b93</source>
+      <term>aff6630a-2fbc-48b2-89ad-9f7139005335</term>
       <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
     </ConceptReferenceTerm>
   </insert>

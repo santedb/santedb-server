@@ -76,6 +76,9 @@
     <None Include="applets\santedb.core.sln.pak">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="data\000-TelecomTypeCodes.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="data\000-Countries.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

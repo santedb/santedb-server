@@ -79,41 +79,51 @@ INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err
 INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('35B13152-E43C-4BCB-8649-A9E83BEE33A2'), char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'), char_to_uuid('48b2ffb3-07db-47ba-ad73-fc8fb8502471'), 'Citizenship Patient>COUNTRY');--#!
 
 -- X CAN BE A CHILD OF X
---#1
+--#!
 INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc) SELECT CD_ID, char_to_uuid('739457d0-835a-4a9c-811c-42b5e92ed1ca'), CD_ID, 'CHILD RECORD' FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = char_to_uuid('4e6da567-0094-4f23-8555-11da499593af');
---#1
+--#!
 -- PSN or PAT CAN BE EMPLOYEE OF ORG
---#1
+--#!
 INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('7c08bd55-4d42-49cd-92f8-6388d6c4183f'), char_to_uuid('b43c9513-1c1c-4ed0-92db-55a904c122e6'), char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'), 'Organization=[Employee]=>Person'); 
---#1
+--#!
 INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('7c08bd55-4d42-49cd-92f8-6388d6c4183f'), char_to_uuid('b43c9513-1c1c-4ed0-92db-55a904c122e6'), char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'), 'Organization=[Employee]=>Patient'); 
---#1
+--#!
 
 -- MISSING POLICY IDENTIFIERS
---#1
+--#!
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('baa227aa-224d-4859-81b3-c1eb2750067f'), '1.3.6.1.4.1.33349.3.1.5.9.2.0.11', 'Access Audit Log', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
---#1
+--#!
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('baa227aa-224d-4859-81b3-c1eb2750068f'), '1.3.6.1.4.1.33349.3.1.5.9.2.0.12', 'Administer Applets', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
---#1
+--#!
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('baa227aa-224d-4859-81b3-c1eb2750069f'), '1.3.6.1.4.1.33349.3.1.5.9.2.0.13', 'Assign Policy', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
---#1
+--#!
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('baa227aa-224d-4859-81b3-c1eb275006af'), '1.3.6.1.4.1.33349.3.1.5.9.2.2.5', 'Elevate Clinical Data', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
---#1
+--#!
 
 -- Index for performance
---#1
+--#!
 CREATE INDEX ACT_VRSN_CRT_UTC_IDX ON ACT_VRSN_TBL(CRT_UTC);
---#1
+--#!
 CREATE INDEX ENT_VRSN_CRT_UTC_IDX ON ENT_VRSN_TBL(CRT_UTC);
---#1
+--#!
 
---#1
+--#!
 ALTER TABLE ENT_EXT_TBL ALTER EXT_DISP TYPE VARCHAR(4096);
---#1
+--#!
 ALTER TABLE ACT_EXT_TBL ALTER EXT_DISP TYPE VARCHAR(4096);
---#1
+--#!
 
---#1
+
+-- RULE -> PATIENTS CAN BE NEXT OF KIN TO OTHER PATIENTS
+--#!
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc)
+	SELECT cd_id, char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'), char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'), 'err_patient_nok_personOnly'
+	FROM cd_set_mem_vw
+	WHERE set_mnemonic = 'FamilyMember'
+	AND NOT EXISTS (SELECT 1 FROM ent_rel_vrfy_cdtbl WHERE src_cls_cd_id = char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d') AND trg_cls_cd_id = char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d') AND rel_typ_cd_id = cd_id);
+--#!
+
+--#!
 UPDATE ENT_REL_VRFY_CDTBL 
 	SET err_desc = (
 		SELECT SRC.MNEMONIC || ' ==[' || TYP.MNEMONIC || ']==> ' || TRG.MNEMONIC 
@@ -126,9 +136,9 @@ UPDATE ENT_REL_VRFY_CDTBL
 			VFY.ENT_REL_VRFY_ID = ENT_REL_VRFY_CDTBL.ENT_REL_VRFY_ID
 		FETCH FIRST 1 ROWS ONLY
 	);
-	--#!
+--#!
 -- FIX CACT IN CLASS
---#1
+--#!
 INSERT INTO CD_TBL VALUES(char_to_uuid('B35488CE-B7CD-4DD4-B4DE-5F83DC55AF9F'),TRUE);--#!
 INSERT INTO CD_VRSN_TBL (CD_VRSN_ID, CD_ID, STS_CD_ID, CRT_PROV_ID, MNEMONIC, CLS_ID) VALUES (gen_uuid(), char_to_uuid('B35488CE-B7CD-4DD4-B4DE-5F83DC55AF9F'), char_to_uuid('c8064cbd-fa06-4530-b430-1a52f1530c27'), char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'), 'ControlActEvent', char_to_uuid('17FD5254-8C25-4ABB-B246-083FBE9AFA15'));--#!
 INSERT INTO REF_TERM_TBL(REF_TERM_ID, CS_ID, MNEMONIC, CRT_PROV_ID)  VALUES(char_to_uuid('524e38bb-0a7a-490d-9400-b25ae094099c'), char_to_uuid('BAB1D66A-1E98-4BFD-9B4A-7C4BE88F35D1'), 'CACT', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));--#!
@@ -141,4 +151,4 @@ INSERT INTO cd_set_mem_assoc_tbl (set_id, cd_id) VALUES (char_to_uuid('62c5fde0-
 INSERT INTO sec_rol_pol_assoc_tbl (sec_pol_inst_id, pol_id, rol_id, pol_act) VALUES (gen_uuid(), char_to_uuid('e15b96ab-646c-4c00-9a58-ea09eee67d7c'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 2);--#!
 
 DROP INDEX SEC_DEV_SCRT_IDX ;--#!
-SELECT REG_PATCH('20190625-01') FROM RDB$DATABASE;--#1
+SELECT REG_PATCH('20190625-01') FROM RDB$DATABASE;--#!
