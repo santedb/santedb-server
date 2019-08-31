@@ -191,5 +191,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             Assert.IsTrue(query.SQL.Contains("ext_disp"));
             Assert.AreEqual(1, query.Arguments.Count());
         }
+
+     
     }
 }

@@ -9,6 +9,7 @@ using SanteDB.Core.Services;
 using SanteDB.Core.TestFramework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.ADO.Test
@@ -261,6 +262,75 @@ namespace SanteDB.Persistence.Data.ADO.Test
 
             var result = base.DoTestQuery(o => o.GenderConcept.Mnemonic == "Female", afterInsert.Key, s_authorization);
             
+        }
+
+        /// <summary>
+        /// Test that the SQL per
+        /// </summary>
+        [TestMethod]
+        public void TestModelQueryIdentifierClassifier()
+        {
+            Patient p = new Patient()
+            {
+                StatusConcept = new Concept()
+                {
+                    Mnemonic = "ACTIVE"
+                },
+                Names = new List<EntityName>()
+                {
+                    new EntityName() {
+                        NameUse = new Concept() { Mnemonic = "OfficialRecord" },
+                        Component = new List<EntityNameComponent>() {
+                            new EntityNameComponent() {
+                                ComponentType = new Concept() { Mnemonic = "Given" },
+                                Value = "Allison"
+                            },
+                            new EntityNameComponent() {
+                                ComponentType = new Concept() { Mnemonic = "Given" },
+                                Value = "P."
+                            },
+                            new EntityNameComponent() {
+                                ComponentType = new Concept() { Mnemonic = "Family" },
+                                Value = "Bear"
+                            }
+                        }
+                    }
+                },
+                Identifiers = new List<EntityIdentifier>()
+                {
+                    new EntityIdentifier(
+                        new AssigningAuthority() { DomainName = "OHIPCARD", Name = "OHIPCARD", Oid ="1.2.3.4.5" }, "102920")
+                },
+                Tags = new List<EntityTag>()
+                {
+                    new EntityTag("hasBirthCertificate", "false")
+                },
+                Extensions = new List<EntityExtension>() {
+                    new EntityExtension()
+                    {
+                        ExtensionType = new ExtensionType()
+                        {
+                            Name = "http://santedb.org/oiz/birthcertificate",
+                            ExtensionHandler = typeof(EntityPersistenceServiceTest)
+                        },
+                        ExtensionValueXml = BitConverter.GetBytes(true)
+                    }
+                },
+                GenderConcept = new Concept() { Mnemonic = "Female" },
+                DateOfBirth = new DateTime(1990, 03, 22),
+                MultipleBirthOrder = 2,
+                DateOfBirthPrecision = DatePrecision.Day
+            };
+
+            var afterInsert = base.DoTestInsert(p, s_authorization);
+
+            var result = base.DoTestQuery(o => o.Identifiers.Where(guard => guard.Authority.DomainName == "OHIPCARD").Any(identifier => identifier.Value == "102920"), afterInsert.Key, s_authorization);
+
+            var authKey = afterInsert.Identifiers.First().AuthorityKey;
+
+            result = base.DoTestQuery(o => o.Identifiers.Any(i => i.Authority.Key == authKey && i.Value == "102920"), afterInsert.Key, s_authorization);
+
+
         }
 
         /// <summary>

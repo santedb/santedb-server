@@ -169,7 +169,7 @@ namespace SanteDB.Messaging.HL7.Segments
                         id.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority?.DomainName)
                         found = patientService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.Current.Principal);
                     else if (authority?.IsUnique == true)
-                        found = patientService.Query(o => o.Identifiers.Where(guard=>guard.Authority.Name == authority.Name).Any(i => i.Value == idnumber), AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                        found = patientService.Query(o => o.Identifiers.Any(i => i.Authority.Key == authority.Key &&  i.Value == idnumber), AuthenticationContext.SystemPrincipal).FirstOrDefault();
                     if (found != null)
                     {
                         retVal = found;
