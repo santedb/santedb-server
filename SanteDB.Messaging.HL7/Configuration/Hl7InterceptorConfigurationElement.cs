@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using Newtonsoft.Json;
+using SanteDB.Core.Model.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
@@ -59,7 +60,7 @@ namespace SanteDB.Messaging.HL7.Configuration
         /// Gets or sets the identity domains to notify the remote target of
         /// </summary>
         [XmlArray("domains"), XmlArrayItem("add"), JsonProperty("domains")]
-        public List<String> ExportDomains { get; set; }
+        public List<AssigningAuthority> ExportDomains { get; set; }
 
         /// <summary>
         /// Sets the version

@@ -404,5 +404,15 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
 
         }
+
+        /// <summary>
+        /// Gets the specified policy instance (if applicable) for the specified object
+        /// </summary>
+        public IPolicyInstance GetPolicyInstance(object securable, string policyOid)
+        {
+            // TODO: Add caching for this
+            return this.GetActivePolicies(securable).FirstOrDefault(o => o.Policy.Oid == policyOid);
+            throw new NotImplementedException();
+        }
     }
 }

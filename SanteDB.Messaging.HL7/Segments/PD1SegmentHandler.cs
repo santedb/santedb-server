@@ -34,6 +34,7 @@ using SanteDB.Core.Services;
 using SanteDB.Messaging.HL7.Configuration;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Messaging.HL7.Exceptions;
+using SanteDB.Core.Security.Services;
 
 namespace SanteDB.Messaging.HL7.Segments
 {
@@ -55,10 +56,36 @@ namespace SanteDB.Messaging.HL7.Segments
         /// <summary>
         /// Create PD1
         /// </summary>
-        public virtual IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, string[] exportDomains)
+        public virtual IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, AssigningAuthority[] exportDomains)
         {
             var retVal = context.GetStructure("PD1") as PD1;
+            var patient = data as Patient;
+            
+            // Load the PD1 data
+            var relationships = patient.LoadCollection<EntityRelationship>(nameof(Entity.Relationships));
 
+            // Living arrangement
+            if (patient.LivingArrangementKey.HasValue)
+                retVal.LivingArrangement.FromModel(patient.LoadProperty<Concept>(nameof(Patient.LivingArrangement)), LivingArrangementCodeSystem);
+
+            // Assigned facilities
+            foreach(var itm in relationships.Where(o=>o.RelationshipTypeKey == EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation))
+            {
+                var place = itm.LoadProperty<Place>(nameof(EntityRelationship.TargetEntity));
+                var xon = retVal.GetPatientPrimaryFacility(retVal.PatientPrimaryFacilityRepetitionsUsed);
+
+                xon.AssigningAuthority.FromModel(this.m_configuration.LocalAuthority);
+                xon.IDNumber.Value = place.Key.ToString();
+                xon.OrganizationName.Value = place.LoadCollection<EntityName>(nameof(Entity.Names)).FirstOrDefault(o => o.NameUseKey == NameUseKeys.OfficialRecord)?.LoadCollection<EntityNameComponent>(nameof(EntityName.Component))?.FirstOrDefault()?.Value;
+                xon.OrganizationNameTypeCode.Value = "L"; // OFFICIAL RECORD
+                xon.IdentifierTypeCode.Value = "XX";
+            }
+
+            // Protected?
+            if (ApplicationServiceContext.Current.GetService<IPolicyInformationService>().GetPolicyInstance(patient, DataPolicyIdentifiers.RestrictedInformation) != null)
+                retVal.ProtectionIndicator.Value = "Y";
+            else
+                retVal.ProtectionIndicator.Value = "N";
             return new ISegment[] { retVal };
         }
 
@@ -101,7 +128,7 @@ namespace SanteDB.Messaging.HL7.Segments
                         var idnumber = xon.OrganizationIdentifier.Value ?? xon.IDNumber.Value;
                         // Find the org or SDL
                         Place place = null;
-                        if (authority == null && xon.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority.DomainName)
+                        if (authority.Key == this.m_configuration.LocalAuthority.Key)
                             place = sdlRepo.Get(Guid.Parse(idnumber), null, true, AuthenticationContext.SystemPrincipal);
                         else
                             place = sdlRepo.Query(o => o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation && o.Identifiers.Any(i => i.Value == idnumber && i.Authority.Key == authority.Key), AuthenticationContext.SystemPrincipal).SingleOrDefault();
@@ -118,7 +145,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 if (!pd1Segment.Handicap.IsEmpty())
                 {
                     var handicap = pd1Segment.Handicap.ToConcept(DisabilityCodeSystem).Key.Value;
-                    // TODO: Create functional limitation
+                    // TODO: Create functional limitation observations about the patient
                     throw new NotImplementedException("Handicap / Functional Limitation handler for PD1 is not completed yet");
                 }
 
@@ -128,10 +155,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 {
                     var pip = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
                     if (pd1Segment.ProtectionIndicator.Value == "Y")
-                    {
-                        var policy = pip.Query(o => o.Oid == DataPolicyIdentifiers.RestrictedInformation, AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                        retVal.Policies.Add(new SecurityPolicyInstance(policy, PolicyGrantType.Grant));
-                    }
+                        retVal.AddPolicy(DataPolicyIdentifiers.RestrictedInformation);
                     else if (pd1Segment.ProtectionIndicator.Value == "N")
                         retVal.Policies.Clear();
                     else

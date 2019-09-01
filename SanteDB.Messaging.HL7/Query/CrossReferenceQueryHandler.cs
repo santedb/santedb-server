@@ -62,12 +62,13 @@ namespace SanteDB.Messaging.HL7.Query
             var rqo = evt.Message as QBP_Q21;
 
             // Return domains
-            List<String> returnDomains = new List<String>();
+            List<AssigningAuthority> returnDomains = new List<AssigningAuthority>();
             foreach (var rt in rqo.QPD.GetField(4).OfType<Varies>())
             {
                 var rid = new CX(rqo.Message);
                 DeepCopy.copy(rt.Data as GenericComposite, rid);
-                returnDomains.Add(rid.AssigningAuthority.NamespaceID.Value);
+                var domain = rid.AssigningAuthority.ToModel();
+                returnDomains.Add(domain);
             }
 
             var matchService = ApplicationServiceContext.Current.GetService<IRecordMatchingService>();
@@ -80,17 +81,17 @@ namespace SanteDB.Messaging.HL7.Query
                 var queryInstance = retVal.QUERY_RESPONSE;
 
                 // Expose PK?
-                if (returnDomains?.Count == 0 || returnDomains.Contains(this.m_configuration.LocalAuthority.DomainName) == true)
+                if (returnDomains.Count == 0 || returnDomains.Any(d => d.Key == this.m_configuration.LocalAuthority.Key))
                 {
                     queryInstance.PID.GetPatientIdentifierList(queryInstance.PID.PatientIdentifierListRepetitionsUsed).FromModel(new EntityIdentifier(this.m_configuration.LocalAuthority, itm.Key.ToString()));
                     queryInstance.PID.GetPatientIdentifierList(queryInstance.PID.PatientIdentifierListRepetitionsUsed - 1).IdentifierTypeCode.Value = "PI";
                 }
 
                 foreach (var id in itm.LoadCollection<EntityIdentifier>("Identifiers"))
-                    if (returnDomains.Count == 0 || returnDomains.Any(o => o == id.LoadProperty<AssigningAuthority>("Authority").DomainName))
+                    if (returnDomains.Count == 0 || returnDomains.Any(o => o.Key == id.AuthorityKey))
                         queryInstance.PID.GetPatientIdentifierList(queryInstance.PID.PatientIdentifierListRepetitionsUsed).FromModel(id);
 
-                if (returnDomains.Any(rid => rid == this.m_configuration.LocalAuthority.DomainName))
+                if (returnDomains.Any(rid => rid.Key == this.m_configuration.LocalAuthority.Key))
                 {
                     int idx = queryInstance.PID.PatientIdentifierListRepetitionsUsed;
                     queryInstance.PID.GetPatientIdentifierList(idx).IDNumber.Value = itm.Key.Value.ToString();
@@ -99,6 +100,7 @@ namespace SanteDB.Messaging.HL7.Query
                     queryInstance.PID.GetPatientIdentifierList(idx).AssigningAuthority.UniversalIDType.Value = "ISO";
                 }
 
+                // No identifiers found in the response domains
                 if (queryInstance.PID.PatientIdentifierListRepetitionsUsed > 0)
                 {
                     queryInstance.PID.SetIDPID.Value = (i++).ToString();
@@ -128,41 +130,42 @@ namespace SanteDB.Messaging.HL7.Query
             // Query domains
             foreach (var rt in qpd.GetField(3).OfType<Varies>())
             {
-                var rid = new CX(qpd.Message);
-                DeepCopy.copy(rt.Data as GenericComposite, rid);
-
-                if (String.IsNullOrEmpty(rid.AssigningAuthority.NamespaceID.Value)) // lookup by AA 
+                try
                 {
-                    var aa = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>().Query(o => o.Oid == rid.AssigningAuthority.UniversalID.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                    if (aa == null)
-                        throw new HL7ProcessingException($"Domain {rid.AssigningAuthority.UniversalID.Value} is unknown", "QPD",  "1", 3, 4);
+                    var rid = new CX(qpd.Message);
+                    DeepCopy.copy(rt.Data as GenericComposite, rid);
+                    var authority = rid.AssigningAuthority.ToModel();
+
+                    if (authority.Key == m_configuration.LocalAuthority.Key)
+                        retVal.Add("_id", rid.IDNumber.Value);
                     else
-                        retVal.Add($"identifier[{aa.DomainName}].value", rid.IDNumber.Value);
+                        retVal.Add($"identifier[{authority.DomainName}].value", rid.IDNumber.Value);
                 }
-                else
-                    retVal.Add($"identifier[{rid.AssigningAuthority.NamespaceID.Value}].value", rid.IDNumber.Value);
+                catch (Exception e)
+                {
+                    throw new HL7ProcessingException("Error processing patient identity", "QPD", "1", 3, 4, e);
+                }
             }
 
 
             // Return domains
             foreach (var rt in qpd.GetField(4).OfType<Varies>())
             {
-                var rid = new CX(qpd.Message);
-                DeepCopy.copy(rt.Data as GenericComposite, rid);
-
-                if (rid.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority.DomainName ||
-                    rid.AssigningAuthority.UniversalID.Value == this.m_configuration.LocalAuthority.Oid)
-                    continue;
-                if (String.IsNullOrEmpty(rid.AssigningAuthority.NamespaceID.Value)) // lookup by AA 
+                try
                 {
-                    var aa = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>().Query(o => o.Oid == rid.AssigningAuthority.UniversalID.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                    if (aa == null)
-                        throw new HL7ProcessingException($"Domain {rid.AssigningAuthority.UniversalID.Value} is unknown", "QPD", "1", 4, 4, new KeyNotFoundException());
+                    var rid = new CX(qpd.Message);
+                    DeepCopy.copy(rt.Data as GenericComposite, rid);
+                    var authority = rid.AssigningAuthority.ToModel();
+
+                    if (authority.Key == this.m_configuration.LocalAuthority.Key)
+                        continue;
                     else
-                        retVal.Add($"identifier[{aa.DomainName}]", "!null");
+                        retVal.Add($"identifier[{rid.AssigningAuthority.NamespaceID.Value}]", "!null");
                 }
-                else
-                    retVal.Add($"identifier[{rid.AssigningAuthority.NamespaceID.Value}]", "!null");
+                catch (Exception e)
+                {
+                    throw new HL7ProcessingException("Error processing what domains returned", "QPD", "1", 4, 4, e);
+                }
             }
 
 

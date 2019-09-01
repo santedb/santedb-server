@@ -141,7 +141,7 @@ namespace SanteDB.Messaging.HL7.Interceptors
                             {
                                 var seg = patientGroup.GetStructure("MRG", patientGroup.GetAll("MRG").Length) as MRG;
 
-                                if (this.Configuration.ExportDomains.Contains(this.m_configuration.LocalAuthority.DomainName))
+                                if (this.Configuration.ExportDomains.Any(o=>o.DomainName == this.m_configuration.LocalAuthority.DomainName))
                                 {
                                     var key = seg.PriorAlternatePatientIDRepetitionsUsed;
                                     seg.GetPriorAlternatePatientID(key).IDNumber.Value = mrg.TargetEntityKey.Value.ToString();
@@ -155,7 +155,7 @@ namespace SanteDB.Messaging.HL7.Interceptors
                                 foreach(var extrn in pat.LoadCollection<EntityIdentifier>("Identifiers"))
                                 {
                                     var key = seg.PriorAlternatePatientIDRepetitionsUsed;
-                                    if (this.Configuration.ExportDomains.Contains(extrn.LoadProperty<AssigningAuthority>("Authority").DomainName))
+                                    if (this.Configuration.ExportDomains.Any(o=>o.DomainName == extrn.LoadProperty<AssigningAuthority>("Authority").DomainName))
                                     {
                                         seg.GetPriorAlternatePatientID(key).IDNumber.Value = extrn.Value;
                                         seg.GetPriorAlternatePatientID(key).IdentifierTypeCode.Value = "PT";

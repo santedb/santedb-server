@@ -27,6 +27,7 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.Messaging.HL7.Configuration;
 using SanteDB.Messaging.HL7.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -49,6 +50,10 @@ namespace SanteDB.Messaging.HL7
         private const string TelecomUseCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.201";
         private const string TelecomTypeCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.202";
         private const string IdentifierTypeCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.203";
+
+
+        // configuration 
+        private static Hl7ConfigurationSection m_configuration = ApplicationServiceContext.Current?.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
 
         /// <summary>
         /// Convert the message to v2.5
@@ -358,6 +363,11 @@ namespace SanteDB.Messaging.HL7
             if (id == null)
                 throw new ArgumentNullException(nameof(id), "Missing ID parameter");
 
+            // Internal key identifier?
+            if (id.NamespaceID.Value == m_configuration.LocalAuthority.DomainName ||
+                id.UniversalID.Value == m_configuration.LocalAuthority.Oid)
+                return m_configuration.LocalAuthority;
+
             if (!string.IsNullOrEmpty(id.NamespaceID.Value))
             {
                 assigningAuthority = assigningAuthorityRepositoryService.Get(id.NamespaceID.Value);
@@ -407,7 +417,7 @@ namespace SanteDB.Messaging.HL7
                 try
                 {
                     var assigningAuthority = cx.AssigningAuthority.ToModel();
-                    if (assigningAuthority != null)
+                    if (assigningAuthority != null && assigningAuthority.Key != m_configuration.LocalAuthority.Key)
                     {
                         var id = new EntityIdentifier(assigningAuthority, cx.IDNumber.Value);
 
@@ -703,12 +713,11 @@ namespace SanteDB.Messaging.HL7
         /// <summary>
         /// Convert entity identifier to a CX
         /// </summary>
-        public static CX FromModel(this CX me, EntityIdentifier id)
+        public static CX FromModel<TBind>(this CX me, IdentifierBase<TBind> id)
+            where TBind : VersionedEntityData<TBind>, new()
         {
             me.IDNumber.Value = id.Value;
-            me.AssigningAuthority.NamespaceID.Value = id.LoadProperty<AssigningAuthority>("Authority").DomainName;
-            me.AssigningAuthority.UniversalID.Value = id.Authority.Oid;
-            me.AssigningAuthority.UniversalIDType.Value = !String.IsNullOrEmpty(id.Authority.Oid) ? "ISO" : null;
+            me.AssigningAuthority.FromModel(id.LoadProperty<AssigningAuthority>("Authority"));
 
             // Identifier type
             if (id.IdentifierType?.TypeConceptKey.HasValue == true)
@@ -718,6 +727,30 @@ namespace SanteDB.Messaging.HL7
             }
             return me;
         }
+
+        /// <summary>
+        /// Convert assigning authortiy to v2
+        /// </summary>
+        public static HD FromModel(this HD me, AssigningAuthority authority)
+        {
+            me.NamespaceID.Value = authority.DomainName;
+            me.UniversalID.Value = authority.Oid;
+            me.UniversalIDType.Value = !String.IsNullOrEmpty(authority.Oid) ? "ISO" : null;
+            return me;
+        }
+
+        /// <summary>
+        /// Convert entity identifier to a CX
+        /// </summary>
+        public static CE FromModel(this CE me, Concept concept, String domain)
+        {
+            if (concept == null) return me;
+            var refTerm = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(concept.Key.Value, domain);
+            me.Identifier.Value = refTerm?.Mnemonic;
+            me.NameOfCodingSystem.Value = refTerm.LoadProperty<CodeSystem>(nameof(ReferenceTerm.CodeSystem))?.Name;
+            return me;
+        }
+
 
     }
 }

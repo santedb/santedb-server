@@ -28,6 +28,8 @@ using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.Messaging.HL7.Configuration;
+using SanteDB.Messaging.HL7.Exceptions;
 using SanteDB.Messaging.HL7.ParameterMap;
 using SanteDB.Messaging.HL7.Segments;
 using SanteDB.Messaging.HL7.TransportProtocol;
@@ -45,6 +47,10 @@ namespace SanteDB.Messaging.HL7.Query
     /// </summary>
     public class FindCandidatesQueryHandler : IQueryHandler
     {
+
+        // Configuration
+        private Hl7ConfigurationSection m_configuration = ApplicationServiceContext.Current?.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
+
         /// <summary>
         /// Append query results to the message
         /// </summary>
@@ -62,15 +68,13 @@ namespace SanteDB.Messaging.HL7.Query
 
             // Return domains
             var rqo = evt.Message as QBP_Q21;
-            List<String> returnDomains = new List<String>();
+            List<AssigningAuthority> returnDomains = new List<AssigningAuthority>();
             foreach (var rt in rqo.QPD.GetField(8).OfType<Varies>())
             {
                 var rid = new CX(rqo.Message);
                 DeepCopy.copy(rt.Data as GenericComposite, rid);
-
-                if(String.IsNullOrEmpty(rid.AssigningAuthority.NamespaceID.Value))
-                    rid.AssigningAuthority.NamespaceID.Value = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>().Get(new Uri("urn:oid:" + rid.AssigningAuthority.UniversalID.Value)).DomainName;
-                returnDomains.Add(rid.AssigningAuthority.NamespaceID.Value);
+                var authority = rid.AssigningAuthority.ToModel();
+                returnDomains.Add(authority);
             }
             if (returnDomains.Count == 0)
                 returnDomains = null;
@@ -115,19 +119,21 @@ namespace SanteDB.Messaging.HL7.Query
             // Return domains
             foreach (var rt in qpd.GetField(8).OfType<Varies>())
             {
-                var rid = new CX(qpd.Message);
-                DeepCopy.copy(rt.Data as GenericComposite, rid);
-
-                if (String.IsNullOrEmpty(rid.AssigningAuthority.NamespaceID.Value)) // lookup by AA 
+                try
                 {
-                    var aa = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>().Query(o => o.Oid == rid.AssigningAuthority.UniversalID.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                    if (aa == null)
-                        throw new InvalidOperationException($"Domain {rid.AssigningAuthority.UniversalID.Value} is unknown");
-                    else
-                        retVal.Add($"identifier[{aa.DomainName}]", "!null");
+                    var rid = new CX(qpd.Message);
+                    DeepCopy.copy(rt.Data as GenericComposite, rid);
+                    var authority = rid.AssigningAuthority.ToModel();
+
+                    if (authority.Key == this.m_configuration.LocalAuthority.Key)
+                        retVal.Add("_id", rid.IDNumber.Value);
+                    else 
+                        retVal.Add($"identifier[{authority.DomainName}]", "!null");
                 }
-                else
-                    retVal.Add($"identifier[{rid.AssigningAuthority.NamespaceID.Value}]", "!null");
+                catch(Exception e)
+                {
+                    throw new HL7ProcessingException("Error processing return domains", "QPD", "1", 8, 0, e);
+                }
             }
 
 

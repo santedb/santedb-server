@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using NHapi.Model.V25.Datatype;
 using NHapi.Base.Model;
 using NHapi.Model.V25.Segment;
+using SanteDB.Core.Model.DataTypes;
 
 namespace SanteDB.Messaging.HL7.Segments
 {
@@ -50,7 +51,7 @@ namespace SanteDB.Messaging.HL7.Segments
         /// <param name="data">The data to be translated into segment(s)</param>
         /// <param name="context">The message in which the segment is created</param>
         /// <returns>The necessary segments to be added to the message</returns>
-        IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, string[] exportDomains);
+        IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, AssigningAuthority[] exportDomains);
 
     }
 }

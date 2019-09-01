@@ -80,7 +80,7 @@ namespace SanteDB.Messaging.HL7.Segments
         /// <summary>
         /// Create next of kin relationship
         /// </summary>
-        public virtual IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, String[] exportDomains)
+        public virtual IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, AssigningAuthority[] exportDomains)
         {
             List<ISegment> retVal = new List<ISegment>();
             var patient = data as Patient;
@@ -88,6 +88,8 @@ namespace SanteDB.Messaging.HL7.Segments
             foreach (var itm in patient.LoadCollection<EntityRelationship>("Relationships").Where(o => NextOfKinRelationshipTypes.Contains(o.RelationshipTypeKey.Value)))
             {
                 var nk1 = context.GetStructure("NK1", context.GetAll("NK1").Length) as NK1;
+
+                // TODO: Map the NK1
 
                 retVal.Add(nk1);
             }
@@ -135,8 +137,7 @@ namespace SanteDB.Messaging.HL7.Segments
                     Guid idguid = Guid.Empty;
                     int tr = 0;
                     Person found = null;
-                    if (authority == null &&
-                        id.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority?.DomainName)
+                    if (authority.Key == this.m_configuration.LocalAuthority.Key)
                         found = personService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.SystemPrincipal);
                     else if (authority?.IsUnique == true)
                         found = personService.Query(o => o.Identifiers.Any(i => i.Value == idnumber &&
@@ -243,10 +244,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 {
                     var pip = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
                     if (nk1Segment.ProtectionIndicator.Value == "Y")
-                    {
-                        var policy = pip.Query(o => o.Oid == DataPolicyIdentifiers.RestrictedInformation, AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                        retVal.Policies.Add(new SecurityPolicyInstance(policy, PolicyGrantType.Grant));
-                    }
+                        retVal.AddPolicy(DataPolicyIdentifiers.RestrictedInformation);
                     else if (nk1Segment.ProtectionIndicator.Value == "N")
                         retVal.Policies.Clear();
                     else

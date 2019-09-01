@@ -63,7 +63,7 @@ namespace SanteDB.Messaging.HL7.Segments
         /// <param name="data">The data to be created</param>
         /// <param name="context">The message in which the segment is created</param>
         /// <returns>The segments to add to the messge</returns>
-        public virtual IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, string[] exportDomains)
+        public virtual IEnumerable<ISegment> Create(IdentifiedData data, IGroup context, AssigningAuthority[] exportDomains)
         {
             var retVal = context.GetStructure("PID") as PID;
             var patient = data as Patient;
@@ -71,15 +71,14 @@ namespace SanteDB.Messaging.HL7.Segments
                 throw new InvalidOperationException($"Cannot convert {data.GetType().Name} to PID");
 
             // Map patient to PID
-            if (exportDomains?.Length == 0 || exportDomains?.Contains(this.m_configuration.LocalAuthority.DomainName) == true)
+            if (exportDomains == null || exportDomains?.Length == 0 || exportDomains?.Any(d => d.Key == this.m_configuration.LocalAuthority.Key) == true)
             {
                 retVal.GetPatientIdentifierList(retVal.PatientIdentifierListRepetitionsUsed).FromModel(new EntityIdentifier(this.m_configuration.LocalAuthority, patient.Key.ToString()));
                 retVal.GetPatientIdentifierList(retVal.PatientIdentifierListRepetitionsUsed - 1).IdentifierTypeCode.Value = "PI";
-
             }
             // Map alternate identifiers
             foreach (var id in patient.LoadCollection<EntityIdentifier>("Identifiers"))
-                if (exportDomains == null || exportDomains.Contains(id.LoadProperty<AssigningAuthority>("Authority").DomainName) == true)
+                if (exportDomains == null || exportDomains.Any(e => e.Key == id.AuthorityKey) == true)
                     retVal.GetPatientIdentifierList(retVal.PatientIdentifierListRepetitionsUsed).FromModel(id);
 
             // Addresses
@@ -107,6 +106,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 }
             }
 
+            // Gender
             retVal.AdministrativeSex.FromModel(patient.LoadProperty<Concept>("GenderConcept"), AdministrativeGenderCodeSystem);
 
             // Deceased date
@@ -148,7 +148,44 @@ namespace SanteDB.Messaging.HL7.Segments
                 else
                     retVal.GetPhoneNumberHome(retVal.PhoneNumberHomeRepetitionsUsed).FromModel(tel);
             }
-            // TODO: Contact information
+
+            // Load relationships
+            var relationships = patient.LoadCollection<EntityRelationship>(nameof(Entity.Relationships));
+            var participations = patient.LoadCollection<ActParticipation>(nameof(Entity.Participations));
+
+            // Birthplace
+            var birthplace = relationships.FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Birthplace);
+            if (birthplace != null)
+                retVal.BirthPlace.Value = birthplace.LoadCollection<EntityName>(nameof(Entity.Names)).FirstOrDefault()?.LoadCollection<EntityNameComponent>(nameof(EntityName.Component)).FirstOrDefault()?.Value;
+
+            // Citizenships
+            var citizenships = relationships.Where(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Citizen);
+            foreach (var itm in citizenships)
+            {
+                var ce = retVal.GetCitizenship(retVal.CitizenshipRepetitionsUsed);
+                var place = itm.LoadProperty<Place>(nameof(EntityRelationship.TargetEntity));
+                ce.Identifier.Value = place.LoadCollection<EntityIdentifier>(nameof(Entity.Identifiers)).FirstOrDefault(o => o.AuthorityKey == AssigningAuthorityKeys.Iso3166CountryCode)?.Value;
+                ce.Text.Value = place.LoadCollection<EntityName>(nameof(Entity.Names)).FirstOrDefault(o => o.NameUseKey == NameUseKeys.OfficialRecord)?.LoadCollection<EntityNameComponent>(nameof(EntityName.Component)).FirstOrDefault()?.Value;
+            }
+
+            // Account number
+            var account = participations.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Holder && o.LoadProperty<Account>(nameof(ActParticipation.Act)) != null);
+            if (account != null)
+                retVal.PatientAccountNumber.FromModel(account.Act.Identifiers.FirstOrDefault() ?? new ActIdentifier(this.m_configuration.LocalAuthority, account.Key.ToString()));
+
+            // Marital status
+            if (patient.MaritalStatusKey.HasValue)
+                retVal.MaritalStatus.FromModel(patient.LoadProperty<Concept>(nameof(Patient.MaritalStatus)), MaritalStatusCodeSystem);
+
+            // Religion
+            if (patient.ReligiousAffiliationKey.HasValue)
+                retVal.Religion.FromModel(patient.LoadProperty<Concept>(nameof(Patient.ReligiousAffiliation)), ReligionCodeSystem);
+
+            // Ethnic groups
+            if (patient.EthnicGroupCodeKey.HasValue)
+                retVal.GetEthnicGroup(0).FromModel(patient.LoadProperty<Concept>(nameof(Patient.EthnicGroup)), EthnicGroupCodeSystem);
+
+
             return new ISegment[] { retVal };
         }
 
@@ -189,8 +226,7 @@ namespace SanteDB.Messaging.HL7.Segments
 
                         Guid idguid = Guid.Empty;
                         Patient found = null;
-                        if (authority == null &&
-                            id.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority?.DomainName)
+                        if (authority.Key == this.m_configuration.LocalAuthority.Key)
                             found = patientService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.Current.Principal);
                         else if (authority?.IsUnique == true)
                             found = patientService.Query(o => o.Identifiers.Any(i => i.Authority.Key == authority.Key && i.Value == idnumber), AuthenticationContext.SystemPrincipal).FirstOrDefault();
@@ -253,7 +289,9 @@ namespace SanteDB.Messaging.HL7.Segments
                             throw new HL7ProcessingException("Error processing mother's identifiers", "PID", pidSegment.SetIDPID.Value, 21, 3);
                         }
 
-                        if (authority?.IsUnique == true)
+                        if (authority.Key == this.m_configuration.LocalAuthority.Key)
+                            motherEntity = personPersistence.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.SystemPrincipal);
+                        else if (authority?.IsUnique == true)
                             motherEntity = personPersistence.Query(o => o.Identifiers.Any(i => i.Value == id.IDNumber.Value && i.Authority.Key == authority.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
                     }
 
@@ -306,6 +344,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 if (pidSegment.RaceRepetitionsUsed > 0)
                     ; // TODO: Implement as an extension if needed 
 
+                // Addresses
                 fieldNo = 11;
                 if (pidSegment.PatientAddressRepetitionsUsed > 0)
                     foreach (var itm in pidSegment.GetPatientAddress())
@@ -318,6 +357,7 @@ namespace SanteDB.Messaging.HL7.Segments
                             existing.CopyObjectData(model);
                     }
 
+                // Fields
                 fieldNo = 13;
                 var telecoms = pidSegment.GetPhoneNumberBusiness().Union(pidSegment.GetPhoneNumberHome());
                 foreach (var itm in telecoms)
@@ -330,20 +370,24 @@ namespace SanteDB.Messaging.HL7.Segments
                         existing.CopyObjectData(model);
                 }
 
+                // Language
                 if (!pidSegment.PrimaryLanguage.IsEmpty())
                     retVal.LanguageCommunication = new List<PersonLanguageCommunication>()
                 {
                     new PersonLanguageCommunication(pidSegment.PrimaryLanguage.Identifier.Value.ToLower(), true)
                 };
 
+                // Marital Status
                 fieldNo = 16;
                 if (!pidSegment.MaritalStatus.IsEmpty())
                     retVal.MaritalStatus = pidSegment.MaritalStatus.ToModel(MaritalStatusCodeSystem);
 
+                // Religion
                 fieldNo = 17;
                 if (!pidSegment.Religion.IsEmpty())
                     retVal.ReligiousAffiliation = pidSegment.Religion.ToModel(ReligionCodeSystem);
 
+                // Ethinic groups
                 fieldNo = 22;
                 if (pidSegment.EthnicGroupRepetitionsUsed > 0)
                     retVal.EthnicGroupCodeKey = pidSegment.GetEthnicGroup().First().ToModel(EthnicGroupCodeSystem).Key;
@@ -356,6 +400,24 @@ namespace SanteDB.Messaging.HL7.Segments
                     var account = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Account>>()?.Query(o => o.Identifiers.Any(i => i.Value == pidSegment.PatientAccountNumber.IDNumber.Value), AuthenticationContext.SystemPrincipal).FirstOrDefault();
                     if (account != null)
                         retVal.Participations.Add(new ActParticipation(ActParticipationKey.Holder, retVal) { SourceEntityKey = account.Key });
+                    else
+                    {
+                        retVal.Participations.Add(new ActParticipation(ActParticipationKey.Holder, retVal)
+                        {
+                            SourceEntity = new Account()
+                            {
+                                Identifiers = new List<ActIdentifier>()
+                                {
+                                    new ActIdentifier()
+                                    {
+                                        Authority = pidSegment.PatientAccountNumber.AssigningAuthority.ToModel(),
+                                        Value = pidSegment.PatientAccountNumber.IDNumber.Value
+                                    }
+                                },
+                                StatusConceptKey = StatusKeys.New
+                            }
+                        });
+                    }
                 }
 
                 // Birth place is present
@@ -411,6 +473,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 // Last update time
                 if (!pidSegment.LastUpdateDateTime.IsEmpty())
                     retVal.CreationTime = (DateTimeOffset)pidSegment.LastUpdateDateTime.ToModel();
+
                 //if(!pidSegment.LastUpdateFacility.IsEmpty())
                 //{
                 //    // Find by user ID
@@ -428,7 +491,7 @@ namespace SanteDB.Messaging.HL7.Segments
             {
                 throw;
             }
-            catch(HL7DatatypeProcessingException e)
+            catch (HL7DatatypeProcessingException e)
             {
                 throw new HL7ProcessingException("Error processing PID segment", "PID", pidSegment.SetIDPID.Value, fieldNo, e.Component, e);
             }
