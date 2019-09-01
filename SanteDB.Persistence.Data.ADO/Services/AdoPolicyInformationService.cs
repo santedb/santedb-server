@@ -412,7 +412,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
         {
             // TODO: Add caching for this
             return this.GetActivePolicies(securable).FirstOrDefault(o => o.Policy.Oid == policyOid);
-            throw new NotImplementedException();
         }
     }
 }
