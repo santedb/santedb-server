@@ -254,7 +254,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         totalResults = keys.Count();
                         this.AddQueryResults(context, query, queryId, offset, keys, totalResults);
                     }
-                    else if (includeCount && !m_configuration.UseFuzzyTotals) // Get an exact total
+                    else if (count.HasValue && includeCount && !m_configuration.UseFuzzyTotals) // Get an exact total
                     {
                         totalResults = retVal.Count();
                     }
@@ -262,14 +262,20 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         totalResults = 0;
 
                     // Fuzzy totals - This will only fetch COUNT + 1 as the total results
-                    if (m_configuration.UseFuzzyTotals) 
+                    if (count.HasValue)
                     {
-                        var fuzzResults = retVal.Skip(offset).Take((count ?? 100) + 1).OfType<Object>().ToList();
-                        totalResults = fuzzResults.Count();
-                        return fuzzResults.Take(count ?? 100);
+                        if (m_configuration.UseFuzzyTotals)
+                        {
+                            var fuzzResults = retVal.Skip(offset).Take(count.Value + 1).OfType<Object>().ToList();
+                            totalResults = fuzzResults.Count();
+                            return fuzzResults.Take(count.Value);
+                        }
+                        else
+                            return retVal.Skip(offset).Take(count.Value).OfType<Object>();
                     }
                     else
-                        return retVal.Skip(offset).Take(count ?? 100).OfType<Object>();
+                        return retVal.Skip(offset).OfType<Object>();
+
                 }
                 else
                 {

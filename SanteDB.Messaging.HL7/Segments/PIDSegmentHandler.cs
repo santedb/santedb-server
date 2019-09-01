@@ -134,7 +134,7 @@ namespace SanteDB.Messaging.HL7.Segments
             if (motherRelation != null)
             {
                 var mother = motherRelation.LoadProperty(nameof(EntityRelationship.TargetEntity)) as Person;
-                foreach (var nam in mother.LoadCollection<EntityName>(nameof(Entity.Names)))
+                foreach (var nam in mother.LoadCollection<EntityName>(nameof(Entity.Names)).Where(n=>n.NameUseKey == NameUseKeys.MaidenName))
                     retVal.GetMotherSMaidenName(retVal.MotherSMaidenNameRepetitionsUsed).FromModel(nam);
                 foreach (var id in mother.LoadCollection<EntityIdentifier>(nameof(Entity.Identifiers)))
                     retVal.GetMotherSIdentifier(retVal.MotherSIdentifierRepetitionsUsed).FromModel(id);
@@ -306,10 +306,10 @@ namespace SanteDB.Messaging.HL7.Segments
                         {
                             Key = Guid.NewGuid(),
                             Identifiers = pidSegment.GetMotherSIdentifier().ToModel().ToList(),
-                            Names = pidSegment.GetMotherSMaidenName().ToModel().ToList(),
+                            Names = pidSegment.GetMotherSMaidenName().ToModel(NameUseKeys.MaidenName).ToList(),
                             StatusConceptKey = StatusKeys.New
                         };
-
+                    
                     var existingRelationship = retVal.Relationships.FirstOrDefault(r => r.SourceEntityKey == retVal.Key && r.TargetEntityKey == motherEntity.Key);
                     if (existingRelationship == null)
                     {

@@ -36,6 +36,7 @@ using SanteDB.Core.Services;
 using SanteDB.Messaging.HL7.Configuration;
 using SanteDB.Messaging.HL7.Exceptions;
 using SanteDB.Core.Security.Services;
+using System.Collections;
 
 namespace SanteDB.Messaging.HL7.Segments
 {
@@ -143,8 +144,8 @@ namespace SanteDB.Messaging.HL7.Segments
                 if(contactExtension != null)
                 {
                     var existingValue = (contactExtension.ExtensionValue as dynamic);
-                    var contact = (existingValue.roles as List<dynamic>).FirstOrDefault(o => o.patientKey == patient.Key)?.contact;
-                    if (!String.IsNullOrEmpty(contact))
+                    var contact = Enumerable.FirstOrDefault<dynamic>(existingValue.roles as IEnumerable<dynamic>, o => o.patientKey == patient.Key)?.contact;
+                    if (!String.IsNullOrEmpty(contact?.ToString()))
                         nk1.ContactRole.Identifier.Value = contact;
                 }
 
@@ -257,7 +258,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 fieldNo = 2;
                 // Names
                 if (nk1Segment.NameRepetitionsUsed > 0)
-                    retVal.Names = nk1Segment.GetName().ToModel().ToList();
+                    retVal.Names.AddRange(nk1Segment.GetName().ToModel().ToList().Where(n=>!retVal.Names.Any(e=>e.SemanticEquals(n))));
 
                 // Address
                 fieldNo = 4;
@@ -291,6 +292,7 @@ namespace SanteDB.Messaging.HL7.Segments
                         var existingValue = (contactExtension.ExtensionValue as dynamic);
                         existingValue.roles.Add(new { patientKey = patient.Key.Value, contact = nk1Segment.ContactRole.Identifier.Value });
                     }
+                    retVal.Extensions.Add(contactExtension);
                 }
 
                 fieldNo = 16;
@@ -337,7 +339,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 fieldNo = 33;
                 if (nk1Segment.NextOfKinAssociatedPartySIdentifiersRepetitionsUsed > 0)
                 {
-                    retVal.Identifiers = nk1Segment.GetNextOfKinAssociatedPartySIdentifiers().ToModel().ToList();
+                    retVal.Identifiers.AddRange(nk1Segment.GetNextOfKinAssociatedPartySIdentifiers().ToModel().ToList().Where(i=>!retVal.Identifiers.Any(e=>e.SemanticEquals(i))));
                 }
 
                 // Find the existing relationship on the patient

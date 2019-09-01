@@ -235,7 +235,7 @@ namespace SanteDB.Messaging.HL7
         /// </summary>
         /// <param name="names">The names to be converted</param>
         /// <returns>The converted list of names</returns>
-		public static IEnumerable<EntityName> ToModel(this XPN[] names)
+		public static IEnumerable<EntityName> ToModel(this XPN[] names, Guid? nameUseKey = null )
         {
             var entityNames = new List<EntityName>();
             var conceptService = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>();
@@ -246,7 +246,7 @@ namespace SanteDB.Messaging.HL7
             foreach (var xpn in names)
             {
                 var entityName = new EntityName();
-                var nameUse = NameUseKeys.Search;
+                var nameUse = nameUseKey ?? NameUseKeys.Search;
 
                 if (!string.IsNullOrEmpty(xpn.NameTypeCode.Value))
                 {
@@ -725,6 +725,8 @@ namespace SanteDB.Messaging.HL7
                 var refTerm = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptReferenceTerm(id.IdentifierType.TypeConceptKey.Value, IdentifierTypeCodeSystem);
                 me.IdentifierTypeCode.Value = refTerm?.Mnemonic;
             }
+            else
+                me.IdentifierTypeCode.Value = "PT"; // EXTERNAL ID
             return me;
         }
 
