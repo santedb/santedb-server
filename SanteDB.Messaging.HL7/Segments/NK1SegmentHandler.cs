@@ -35,6 +35,7 @@ using SanteDB.Core;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.HL7.Configuration;
 using SanteDB.Messaging.HL7.Exceptions;
+using SanteDB.Core.Security.Services;
 
 namespace SanteDB.Messaging.HL7.Segments
 {
@@ -85,11 +86,91 @@ namespace SanteDB.Messaging.HL7.Segments
             List<ISegment> retVal = new List<ISegment>();
             var patient = data as Patient;
 
-            foreach (var itm in patient.LoadCollection<EntityRelationship>("Relationships").Where(o => NextOfKinRelationshipTypes.Contains(o.RelationshipTypeKey.Value)))
+            foreach (var rel in patient.LoadCollection<EntityRelationship>(nameof(Entity.Relationships)).Where(o => NextOfKinRelationshipTypes.Contains(o.RelationshipTypeKey.Value)))
             {
                 var nk1 = context.GetStructure("NK1", context.GetAll("NK1").Length) as NK1;
+                var person = rel.LoadProperty<Person>(nameof(EntityRelationship.TargetEntity));
+                nk1.Relationship.FromModel(rel.LoadProperty<Concept>(nameof(EntityRelationship.RelationshipType)), RelationshipCodeSystem);
 
-                // TODO: Map the NK1
+                // Map person to NK1
+                if (exportDomains == null || exportDomains?.Length == 0 || exportDomains?.Any(d => d.Key == this.m_configuration.LocalAuthority.Key) == true)
+                {
+                    nk1.GetNextOfKinAssociatedPartySIdentifiers(nk1.NextOfKinAssociatedPartySIdentifiersRepetitionsUsed).FromModel(new EntityIdentifier(this.m_configuration.LocalAuthority, person.Key.ToString()));
+                    nk1.GetNextOfKinAssociatedPartySIdentifiers(nk1.NextOfKinAssociatedPartySIdentifiersRepetitionsUsed - 1).IdentifierTypeCode.Value = "PI";
+                }
+
+                // Map alternate identifiers
+                foreach (var id in person.LoadCollection<EntityIdentifier>(nameof(Entity.Identifiers)))
+                    if (exportDomains == null || exportDomains.Any(e => e.Key == id.AuthorityKey) == true)
+                        nk1.GetNextOfKinAssociatedPartySIdentifiers(nk1.NextOfKinAssociatedPartySIdentifiersRepetitionsUsed).FromModel(id);
+
+                // Addresses
+                foreach (var addr in person.LoadCollection<EntityAddress>(nameof(Entity.Addresses)))
+                    nk1.GetAddress(nk1.AddressRepetitionsUsed).FromModel(addr);
+
+                // Names
+                foreach (var en in person.LoadCollection<EntityName>(nameof(Entity.Names)))
+                    nk1.GetName(nk1.NameRepetitionsUsed).FromModel(en);
+
+                // Date of birth
+                if (person.DateOfBirth.HasValue)
+                {
+                    switch (person.DateOfBirthPrecision ?? DatePrecision.Day)
+                    {
+                        case DatePrecision.Year:
+                            nk1.DateTimeOfBirth.Time.Set(person.DateOfBirth.Value, "yyyy");
+                            break;
+                        case DatePrecision.Month:
+                            nk1.DateTimeOfBirth.Time.Set(person.DateOfBirth.Value, "yyyyMM");
+                            break;
+                        case DatePrecision.Day:
+                            nk1.DateTimeOfBirth.Time.Set(person.DateOfBirth.Value, "yyyyMMdd");
+                            break;
+                    }
+                }
+
+                // Telecoms
+                foreach (var tel in person.LoadCollection<EntityTelecomAddress>(nameof(Entity.Telecoms)))
+                {
+                    if (tel.AddressUseKey.GetValueOrDefault() == AddressUseKeys.WorkPlace)
+                        nk1.GetBusinessPhoneNumber(nk1.BusinessPhoneNumberRepetitionsUsed).FromModel(tel);
+                    else
+                        nk1.GetPhoneNumber(nk1.PhoneNumberRepetitionsUsed).FromModel(tel);
+                }
+
+                // Contact extension
+                var contactExtension = person.LoadCollection<EntityExtension>(nameof(Entity.Extensions)).FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.ContactRolesExtension);
+                if(contactExtension != null)
+                {
+                    var existingValue = (contactExtension.ExtensionValue as dynamic);
+                    var contact = (existingValue.roles as List<dynamic>).FirstOrDefault(o => o.patientKey == patient.Key)?.contact;
+                    if (!String.IsNullOrEmpty(contact))
+                        nk1.ContactRole.Identifier.Value = contact;
+                }
+
+                // Load relationships
+                var relationships = person.LoadCollection<EntityRelationship>(nameof(Entity.Relationships));
+
+                // Citizenships
+                var citizenships = relationships.Where(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Citizen);
+                foreach (var itm in citizenships)
+                {
+                    var ce = nk1.GetCitizenship(nk1.CitizenshipRepetitionsUsed);
+                    var place = itm.LoadProperty<Place>(nameof(EntityRelationship.TargetEntity));
+                    ce.Identifier.Value = place.LoadCollection<EntityIdentifier>(nameof(Entity.Identifiers)).FirstOrDefault(o => o.AuthorityKey == AssigningAuthorityKeys.Iso3166CountryCode)?.Value;
+                    ce.Text.Value = place.LoadCollection<EntityName>(nameof(Entity.Names)).FirstOrDefault(o => o.NameUseKey == NameUseKeys.OfficialRecord)?.LoadCollection<EntityNameComponent>(nameof(EntityName.Component)).FirstOrDefault()?.Value;
+                }
+
+                // Language of communication
+                var lang = person.LoadCollection<PersonLanguageCommunication>(nameof(Person.LanguageCommunication)).FirstOrDefault(o => o.IsPreferred);
+                if (lang != null)
+                    nk1.PrimaryLanguage.Identifier.Value = lang.LanguageCode;
+
+                // Protected?
+                if (ApplicationServiceContext.Current.GetService<IPolicyInformationService>().GetPolicyInstance(person, DataPolicyIdentifiers.RestrictedInformation) != null)
+                    nk1.ProtectionIndicator.Value = "Y";
+                else
+                    nk1.ProtectionIndicator.Value = "N";
 
                 retVal.Add(nk1);
             }
@@ -199,11 +280,11 @@ namespace SanteDB.Messaging.HL7.Segments
                         {
                             roles = new[]
                             {
-                            new {
-                                patientKey = patient.Key.Value,
-                                contact = nk1Segment.ContactRole.Identifier.Value
-                            }
-                        }.ToList()
+                                new {
+                                    patientKey = patient.Key.Value,
+                                    contact = nk1Segment.ContactRole.Identifier.Value
+                                }
+                            }.ToList()
                         });
                     else
                     {

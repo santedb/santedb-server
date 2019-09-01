@@ -185,6 +185,10 @@ namespace SanteDB.Messaging.HL7.Segments
             if (patient.EthnicGroupCodeKey.HasValue)
                 retVal.GetEthnicGroup(0).FromModel(patient.LoadProperty<Concept>(nameof(Patient.EthnicGroup)), EthnicGroupCodeSystem);
 
+            // Primary language
+            var lang = patient.LoadCollection<PersonLanguageCommunication>(nameof(Patient.LanguageCommunication)).FirstOrDefault(o => o.IsPreferred);
+            if (lang != null)
+                retVal.PrimaryLanguage.Identifier.Value = lang.LanguageCode;
 
             return new ISegment[] { retVal };
         }
