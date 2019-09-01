@@ -96,7 +96,7 @@ namespace SanteDB.Messaging.HL7
                 {
                     var concept = conceptService?.FindConceptsByReferenceTerm(xad.AddressType.Value, AddressUseCodeSystem).FirstOrDefault();
                     if (concept == null)
-                        throw new HL7DatatypeProcessingException($"Address use code {xad.AddressType.Value} not known", 6);
+                        throw new HL7DatatypeProcessingException($"Error processing XAD", 6, new KeyNotFoundException($"Address use code {xad.AddressType.Value} not known"));
 
                     addressUse = concept.Key.Value;
                 }
@@ -247,7 +247,7 @@ namespace SanteDB.Messaging.HL7
                 {
                     var concept = conceptService?.FindConceptsByReferenceTerm(xpn.NameTypeCode.Value, NameUseCodeSystem).FirstOrDefault();
                     if (concept == null)
-                        throw new HL7DatatypeProcessingException($"Entity name use code {xpn.NameTypeCode.Value} not known", 6);
+                        throw new HL7DatatypeProcessingException("Error processing XPN", 6, new KeyNotFoundException($"Entity name use code {xpn.NameTypeCode.Value} not known"));
 
                     nameUse = concept.Key.Value;
                 }
@@ -362,7 +362,7 @@ namespace SanteDB.Messaging.HL7
             {
                 assigningAuthority = assigningAuthorityRepositoryService.Get(id.NamespaceID.Value);
                 if (assigningAuthority == null)
-                    throw new HL7DatatypeProcessingException($"Authority {id.NamespaceID.Value} not found", 0);
+                    throw new HL7DatatypeProcessingException("Error processing HD", 1, new KeyNotFoundException($"Authority {id.NamespaceID.Value} not found"));
             }
 
             if (!string.IsNullOrEmpty(id.UniversalID.Value))
@@ -370,9 +370,9 @@ namespace SanteDB.Messaging.HL7
                 var tAssigningAuthority = assigningAuthorityRepositoryService.Get(new Uri($"urn:oid:{id.UniversalID.Value}"));
 
                 if (tAssigningAuthority == null)
-                    throw new HL7DatatypeProcessingException($"Authority {id.UniversalID.Value} not found", 1);
+                    throw new HL7DatatypeProcessingException("Error processing HD", 2, new KeyNotFoundException($"Authority {id.UniversalID.Value} not found"));
                 else if (assigningAuthority != null && tAssigningAuthority?.Key != assigningAuthority.Key) // Must agree
-                    throw new HL7DatatypeProcessingException("When both NamespaceID and UniversalID are specified, both must agree with configured values", 0);
+                    throw new HL7DatatypeProcessingException("Error processing HD", 2, new ArgumentException("When both NamespaceID and UniversalID are specified, both must agree with configured values"));
                 else
                     assigningAuthority = tAssigningAuthority;
             }
@@ -473,7 +473,7 @@ namespace SanteDB.Messaging.HL7
                         string tzValue = value.Substring(sTz + 1);
                         int iTzValue = 0;
                         if (!Int32.TryParse(tzValue, out iTzValue)) // Invalid timezone can't even fix this
-                            throw new HL7DatatypeProcessingException($"Invalid timezone {tzValue}!", 0);
+                            throw new HL7DatatypeProcessingException("Error processing TS", 1, new ArgumentOutOfRangeException($"Invalid timezone {tzValue}!"));
                         else if (iTzValue < 24)
                             value = value.Substring(0, sTz + 1) + iTzValue.ToString("00") + "00";
                         else
@@ -513,7 +513,7 @@ namespace SanteDB.Messaging.HL7
                 }
                 catch(Exception e)
                 {
-                    throw new HL7DatatypeProcessingException($"Date {value} was not valid according to format {flavorFormat}", 0, e);
+                    throw new HL7DatatypeProcessingException("Error processing TS", 1, new FormatException($"Date {value} was not valid according to format {flavorFormat}", e));
                 }
             }
         }
@@ -596,7 +596,7 @@ namespace SanteDB.Messaging.HL7
                 var concept = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(xtn.TelecommunicationUseCode.Value, TelecomUseCodeSystem).FirstOrDefault();
 
                 if (concept == null)
-                    throw new HL7DatatypeProcessingException($"Telecom use code {xtn.TelecommunicationUseCode.Value} not known", 1);
+                    throw new HL7DatatypeProcessingException("Error processing XTN", 1, new KeyNotFoundException($"Telecom use code {xtn.TelecommunicationUseCode.Value} not known"));
 
                 use = concept.Key.Value;
             }
@@ -609,7 +609,7 @@ namespace SanteDB.Messaging.HL7
             {
                 var concept = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(xtn.TelecommunicationEquipmentType.Value, TelecomTypeCodeSystem).FirstOrDefault();
                 if (concept == null)
-                    throw new HL7DatatypeProcessingException($"Telecom equipment type {xtn.TelecommunicationEquipmentType.Value} not known", 2);
+                    throw new HL7DatatypeProcessingException("Error processing XTN", 2, new KeyNotFoundException($"Telecom equipment type {xtn.TelecommunicationEquipmentType.Value} not known"));
                 type = concept.Key.Value;
             }
             retVal.TypeConceptKey = type;
@@ -652,9 +652,13 @@ namespace SanteDB.Messaging.HL7
         /// <summary>
         /// Convert a simple string to a concept in the specified domain
         /// </summary>
-        public static Concept ToConcept(this IS me, String domain)
+        public static Concept ToConcept(this IS me, String domain, bool throwIfNotFound = true)
         {
-            return ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(me.Value, domain).FirstOrDefault();
+            var concept = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(me.Value, domain).FirstOrDefault();
+            if (concept == null && throwIfNotFound)
+                throw new KeyNotFoundException($"Concept {me.Value} is not registered in {domain}");
+            else
+                return concept;
         }
 
         /// <summary>
@@ -690,7 +694,7 @@ namespace SanteDB.Messaging.HL7
                     concept = termService.FindConceptsByReferenceTerm(code.Identifier.Value, code.NameOfCodingSystem.Value).FirstOrDefault();
 
                 if (concept == null && throwIfNotFound)
-                    throw new HL7DatatypeProcessingException($"Reference term {code.Identifier.Value} not found in {preferredDomain} or {code.NameOfCodingSystem.Value}", 0);
+                    throw new HL7DatatypeProcessingException("Error processing CE", 1, new KeyNotFoundException($"Reference term {code.Identifier.Value} not found in {preferredDomain} or {code.NameOfCodingSystem.Value}"));
                 retval.Add(concept);
             }
             return retval;

@@ -160,79 +160,71 @@ namespace SanteDB.Messaging.HL7.Segments
         public virtual IEnumerable<IdentifiedData> Parse(ISegment segment, IEnumerable<IdentifiedData> context)
         {
             var patientService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>();
-
             var pidSegment = segment as PID;
+            int fieldNo = 0;
 
-            Patient retVal = new Patient() { Key = Guid.NewGuid() };
-            Person motherEntity = null;
-
-            retVal.CreationAct = context.OfType<ControlAct>().FirstOrDefault();
-
-            // Existing patient?
-            if (pidSegment.Message.GetStructureName().StartsWith("ADT"))
+            try
             {
-                foreach (var id in pidSegment.GetPatientIdentifierList())
+
+                Patient retVal = new Patient() { Key = Guid.NewGuid() };
+                Person motherEntity = null;
+
+                retVal.CreationAct = context.OfType<ControlAct>().FirstOrDefault();
+
+                // Existing patient?
+                if (pidSegment.Message.GetStructureName().StartsWith("ADT"))
                 {
-                    var idnumber = id.IDNumber.Value;
-                    AssigningAuthority authority;
-                    try
+                    foreach (var id in pidSegment.GetPatientIdentifierList())
                     {
-                        authority = id.AssigningAuthority.ToModel();
-                    }
-                    catch (HL7DatatypeProcessingException e)
-                    {
-                        throw new HL7ProcessingException(e.Message, "PID", pidSegment.SetIDPID.Value, 3, 3);
-                    }
+                        var idnumber = id.IDNumber.Value;
+                        AssigningAuthority authority;
+                        try
+                        {
+                            authority = id.AssigningAuthority.ToModel();
+                        }
+                        catch (Exception e)
+                        {
+                            throw new HL7ProcessingException("Error processig assigning authority", "PID", pidSegment.SetIDPID.Value, 3, 3, e);
+                        }
 
-                    Guid idguid = Guid.Empty;
-                    Patient found = null;
-                    if (authority == null &&
-                        id.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority?.DomainName)
-                        found = patientService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.Current.Principal);
-                    else if (authority?.IsUnique == true)
-                        found = patientService.Query(o => o.Identifiers.Any(i => i.Authority.Key == authority.Key && i.Value == idnumber), AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                    if (found != null)
-                    {
-                        retVal = found;
+                        Guid idguid = Guid.Empty;
+                        Patient found = null;
+                        if (authority == null &&
+                            id.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority?.DomainName)
+                            found = patientService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.Current.Principal);
+                        else if (authority?.IsUnique == true)
+                            found = patientService.Query(o => o.Identifiers.Any(i => i.Authority.Key == authority.Key && i.Value == idnumber), AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                        if (found != null)
+                        {
+                            retVal = found;
 
-                        break;
+                            break;
+                        }
                     }
                 }
-            }
 
 
-            if (!pidSegment.PatientID.IsEmpty())
-                try
-                {
+                fieldNo = 2;
+                if (!pidSegment.PatientID.IsEmpty())
                     retVal.Identifiers.Add(pidSegment.PatientID.ToModel());
-                }
-                catch (HL7DatatypeProcessingException e)
-                {
-                    throw new HL7ProcessingException(e.Message, "PID", pidSegment.SetIDPID.Value, 2, e.Component, e);
-                }
-            if (pidSegment.PatientIdentifierListRepetitionsUsed > 0)
-                try
-                {
+
+
+                fieldNo = 3;
+                if (pidSegment.PatientIdentifierListRepetitionsUsed > 0)
                     retVal.Identifiers.AddRange(
                     pidSegment.GetPatientIdentifierList().ToModel().Where(o => !retVal.Identifiers.Any(i => i.Authority.Key == o.AuthorityKey && i.Value == o.Value)).ToArray()
                 );
-                }
-                catch (HL7DatatypeProcessingException e)
-                {
-                    throw new HL7ProcessingException(e.Message, "PID", pidSegment.SetIDPID.Value, 3, e.Component, e);
-                }
 
-            // Find the key for the patient 
-            var keyId = pidSegment.GetPatientIdentifierList().FirstOrDefault(o => o.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority.DomainName);
-            if (keyId != null)
-                retVal.Key = Guid.Parse(keyId.IDNumber.Value);
+                // Find the key for the patient 
+                var keyId = pidSegment.GetPatientIdentifierList().FirstOrDefault(o => o.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority.DomainName);
+                if (keyId != null)
+                    retVal.Key = Guid.Parse(keyId.IDNumber.Value);
 
-            if (retVal.Identifiers.Count == 0)
-                throw new HL7ProcessingException("Couldn't understand any patient identity", "PID", pidSegment.SetIDPID.Value, 3, 1);
+                if (retVal.Identifiers.Count == 0)
+                    throw new HL7ProcessingException("Couldn't understand any patient identity", "PID", pidSegment.SetIDPID.Value, 3, 1);
 
-            if (pidSegment.PatientNameRepetitionsUsed > 0)
-                try
-                {
+                fieldNo = 5;
+                if (pidSegment.PatientNameRepetitionsUsed > 0)
                     foreach (var itm in pidSegment.GetPatientName())
                     {
                         var model = itm.ToModel();
@@ -242,37 +234,32 @@ namespace SanteDB.Messaging.HL7.Segments
                         else
                             existing.CopyObjectData(model);
                     }
-                }
-                catch (HL7DatatypeProcessingException e)
+
+                fieldNo = 21;
+                // Mother's maiden name, create a relationship for mother
+                if (pidSegment.MotherSMaidenNameRepetitionsUsed > 0 || pidSegment.MotherSIdentifierRepetitionsUsed > 0)
                 {
-                    throw new HL7ProcessingException(e.Message, "PID", pidSegment.SetIDPID.Value, 5, e.Component, e);
-                }
+                    // Attempt to find the mother
+                    var personPersistence = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Person>>();
+                    foreach (var id in pidSegment.GetMotherSIdentifier())
+                    {
+                        AssigningAuthority authority = null;
+                        try
+                        {
+                            authority = id.AssigningAuthority.ToModel();
+                        }
+                        catch (Exception e)
+                        {
+                            throw new HL7ProcessingException("Error processing mother's identifiers", "PID", pidSegment.SetIDPID.Value, 21, 3);
+                        }
 
-            // Mother's maiden name, create a relationship for mother
-            if (pidSegment.MotherSMaidenNameRepetitionsUsed > 0 || pidSegment.MotherSIdentifierRepetitionsUsed > 0)
-            {
-                // Attempt to find the mother
-                var personPersistence = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Person>>();
-                foreach (var id in pidSegment.GetMotherSIdentifier())
-                {
-                    AssigningAuthority authority = null;
-                    try
-                    {
-                        authority = id.AssigningAuthority.ToModel();
-                    }
-                    catch (HL7DatatypeProcessingException e)
-                    {
-                        throw new HL7ProcessingException(e.Message, "PID", pidSegment.SetIDPID.Value, 21, 3);
+                        if (authority?.IsUnique == true)
+                            motherEntity = personPersistence.Query(o => o.Identifiers.Any(i => i.Value == id.IDNumber.Value && i.Authority.Key == authority.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
                     }
 
-                    if (authority?.IsUnique == true)
-                        motherEntity = personPersistence.Query(o => o.Identifiers.Any(i => i.Value == id.IDNumber.Value && i.Authority.Key == authority.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                }
-
-                // Mother doesn't exist, so add it
-                if (motherEntity == null)
-                    try
-                    {
+                    fieldNo = 6;
+                    // Mother doesn't exist, so add it
+                    if (motherEntity == null)
                         motherEntity = new Person()
                         {
                             Key = Guid.NewGuid(),
@@ -280,70 +267,47 @@ namespace SanteDB.Messaging.HL7.Segments
                             Names = pidSegment.GetMotherSMaidenName().ToModel().ToList(),
                             StatusConceptKey = StatusKeys.New
                         };
-                    }
-                    catch (HL7DatatypeProcessingException e)
+
+                    var existingRelationship = retVal.Relationships.FirstOrDefault(r => r.SourceEntityKey == retVal.Key && r.TargetEntityKey == motherEntity.Key);
+                    if (existingRelationship == null)
                     {
-                        throw new HL7ProcessingException(e.Message, "PID", pidSegment.SetIDPID.Value, 6, e.Component, e);
+                        // Find by mother relationship
+                        existingRelationship = retVal.Relationships.FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother);
+                        if (existingRelationship == null) // No current mother relationship
+                            retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Mother, motherEntity.Key));
+                        else if (!existingRelationship.LoadProperty<Entity>("TargetEntity").SemanticEquals(motherEntity))
+                            existingRelationship.TargetEntityKey = motherEntity.Key;
                     }
+                    else
+                        existingRelationship.RelationshipTypeKey = EntityRelationshipTypeKeys.Mother;
 
-                var existingRelationship = retVal.Relationships.FirstOrDefault(r => r.SourceEntityKey == retVal.Key && r.TargetEntityKey == motherEntity.Key);
-                if (existingRelationship == null)
-                {
-                    // Find by mother relationship
-                    existingRelationship = retVal.Relationships.FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother);
-                    if (existingRelationship == null) // No current mother relationship
-                        retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Mother, motherEntity.Key));
-                    else if (!existingRelationship.LoadProperty<Entity>("TargetEntity").SemanticEquals(motherEntity))
-                        existingRelationship.TargetEntityKey = motherEntity.Key;
                 }
-                else
-                    existingRelationship.RelationshipTypeKey = EntityRelationshipTypeKeys.Mother;
 
-            }
-
-            // Date/time of birth
-            if (!pidSegment.DateTimeOfBirth.IsEmpty())
-            {
-                try
+                // Date/time of birth
+                fieldNo = 7;
+                if (!pidSegment.DateTimeOfBirth.IsEmpty())
                 {
                     retVal.DateOfBirth = pidSegment.DateTimeOfBirth.ToModel();
                     retVal.DateOfBirthPrecision = pidSegment.DateTimeOfBirth.ToDatePrecision();
                 }
-                catch (HL7DatatypeProcessingException e)
-                {
-                    throw new HL7ProcessingException(e.Message, "PID", pidSegment.SetIDPID.Value, 7, e.Component, e);
-                }
-            }
 
-            // Administrative gender
-            if (!pidSegment.AdministrativeSex.IsEmpty())
-                try
-                {
+                // Administrative gender
+                fieldNo = 8;
+                if (!pidSegment.AdministrativeSex.IsEmpty())
                     retVal.GenderConcept = pidSegment.AdministrativeSex.ToConcept(AdministrativeGenderCodeSystem);
-                }
-                catch (HL7DatatypeProcessingException e)
-                {
-                    throw new HL7ProcessingException(e.Message, "PID", pidSegment.SetIDPID.Value, 8, e.Component, e);
-                }
 
-            // Patient Alias
-            if (pidSegment.PatientAliasRepetitionsUsed > 0)
-                try
-                {
+                // Patient Alias
+                fieldNo = 9;
+                if (pidSegment.PatientAliasRepetitionsUsed > 0)
                     retVal.Names.AddRange(pidSegment.GetPatientAlias().ToModel());
-                }
-                catch (HL7DatatypeProcessingException e)
-                {
-                    throw new HL7ProcessingException(e.Message, "PID", pidSegment.SetIDPID.Value, 9, e.Component, e);
-                }
 
-            // Race codes
-            if (pidSegment.RaceRepetitionsUsed > 0)
-                ; // TODO: Implement as an extension if needed 
+                // Race codes
+                fieldNo = 10;
+                if (pidSegment.RaceRepetitionsUsed > 0)
+                    ; // TODO: Implement as an extension if needed 
 
-            if (pidSegment.PatientAddressRepetitionsUsed > 0)
-                try
-                {
+                fieldNo = 11;
+                if (pidSegment.PatientAddressRepetitionsUsed > 0)
                     foreach (var itm in pidSegment.GetPatientAddress())
                     {
                         var model = itm.ToModel();
@@ -353,14 +317,8 @@ namespace SanteDB.Messaging.HL7.Segments
                         else
                             existing.CopyObjectData(model);
                     }
-                }
-                catch (HL7DatatypeProcessingException e)
-                {
-                    throw new HL7ProcessingException(e.Message, "PID", pidSegment.SetIDPID.Value, 11, e.Component, e);
-                }
 
-            try
-            {
+                fieldNo = 13;
                 var telecoms = pidSegment.GetPhoneNumberBusiness().Union(pidSegment.GetPhoneNumberHome());
                 foreach (var itm in telecoms)
                 {
@@ -371,126 +329,113 @@ namespace SanteDB.Messaging.HL7.Segments
                     else
                         existing.CopyObjectData(model);
                 }
-            }
-            catch (HL7DatatypeProcessingException e)
-            {
-                throw new HL7ProcessingException(e.Message, "PID", pidSegment.SetIDPID.Value, 13, e.Component, e);
-            }
 
-            if (!pidSegment.PrimaryLanguage.IsEmpty())
-                retVal.LanguageCommunication = new List<PersonLanguageCommunication>()
+                if (!pidSegment.PrimaryLanguage.IsEmpty())
+                    retVal.LanguageCommunication = new List<PersonLanguageCommunication>()
                 {
                     new PersonLanguageCommunication(pidSegment.PrimaryLanguage.Identifier.Value.ToLower(), true)
                 };
 
-            if (!pidSegment.MaritalStatus.IsEmpty())
-                try
-                {
+                fieldNo = 16;
+                if (!pidSegment.MaritalStatus.IsEmpty())
                     retVal.MaritalStatus = pidSegment.MaritalStatus.ToModel(MaritalStatusCodeSystem);
-                }
-                catch (HL7DatatypeProcessingException e)
-                {
-                    throw new HL7ProcessingException(e.Message, "PID", pidSegment.SetIDPID.Value, 16, e.Component, e);
-                }
 
-            if (!pidSegment.Religion.IsEmpty())
-                try
-                {
+                fieldNo = 17;
+                if (!pidSegment.Religion.IsEmpty())
                     retVal.ReligiousAffiliation = pidSegment.Religion.ToModel(ReligionCodeSystem);
-                }
-                catch (HL7DatatypeProcessingException e)
-                {
-                    throw new HL7ProcessingException(e.Message, "PID", pidSegment.SetIDPID.Value, 17, e.Component, e);
-                }
 
-            if (pidSegment.EthnicGroupRepetitionsUsed > 0)
-                try
-                {
+                fieldNo = 22;
+                if (pidSegment.EthnicGroupRepetitionsUsed > 0)
                     retVal.EthnicGroupCodeKey = pidSegment.GetEthnicGroup().First().ToModel(EthnicGroupCodeSystem).Key;
-                }
-                catch (HL7DatatypeProcessingException e)
+
+                fieldNo = 18;
+                // Patient account, locate the specified account
+                if (!pidSegment.PatientAccountNumber.IsEmpty())
                 {
-                    throw new HL7ProcessingException(e.Message, "PID", pidSegment.SetIDPID.Value, 22, e.Component, e);
+
+                    var account = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Account>>()?.Query(o => o.Identifiers.Any(i => i.Value == pidSegment.PatientAccountNumber.IDNumber.Value), AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                    if (account != null)
+                        retVal.Participations.Add(new ActParticipation(ActParticipationKey.Holder, retVal) { SourceEntityKey = account.Key });
                 }
 
-            // Patient account, locate the specified account
-            if (!pidSegment.PatientAccountNumber.IsEmpty())
-            {
-
-                var account = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Account>>()?.Query(o => o.Identifiers.Any(i => i.Value == pidSegment.PatientAccountNumber.IDNumber.Value), AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                if (account != null)
-                    retVal.Participations.Add(new ActParticipation(ActParticipationKey.Holder, retVal) { SourceEntityKey = account.Key });
-            }
-
-            // Birth place is present
-            if (!pidSegment.BirthPlace.IsEmpty()) // We need to find the birthplace relationship
-            {
-                Guid birthPlaceId = Guid.Empty;
-                if (Guid.TryParse(pidSegment.BirthPlace.Value, out birthPlaceId))
+                // Birth place is present
+                fieldNo = 23;
+                if (!pidSegment.BirthPlace.IsEmpty()) // We need to find the birthplace relationship
                 {
-                    retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Birthplace, birthPlaceId));
-                }
-                else
-                {
-                    var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Names.Any(n => n.Component.Any(c => c.Value == pidSegment.BirthPlace.Value)), AuthenticationContext.SystemPrincipal);
-                    if (places.Count() == 1)
-                        retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Birthplace, places.First().Key));
+                    Guid birthPlaceId = Guid.Empty;
+                    if (Guid.TryParse(pidSegment.BirthPlace.Value, out birthPlaceId))
+                    {
+                        retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Birthplace, birthPlaceId));
+                    }
                     else
-                        throw new HL7ProcessingException($"Cannot find unique birth place registration with name {pidSegment.BirthPlace.Value}. Try using UUID.", "PID", pidSegment.SetIDPID.Value, 23, 1);
+                    {
+                        var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Names.Any(n => n.Component.Any(c => c.Value == pidSegment.BirthPlace.Value)), AuthenticationContext.SystemPrincipal);
+                        if (places.Count() == 1)
+                            retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Birthplace, places.First().Key));
+                        else
+                            throw new KeyNotFoundException($"Cannot find unique birth place registration with name {pidSegment.BirthPlace.Value}. Try using UUID.");
+                    }
                 }
-            }
 
-            // MB indicator
-            if (!pidSegment.MultipleBirthIndicator.IsEmpty())
-                retVal.MultipleBirthOrder = pidSegment.MultipleBirthIndicator.Value == "Y" ? (int?)-1 : null;
-            if (!pidSegment.BirthOrder.IsEmpty())
-                retVal.MultipleBirthOrder = Int32.Parse(pidSegment.BirthOrder.Value);
+                // MB indicator
+                if (!pidSegment.MultipleBirthIndicator.IsEmpty())
+                    retVal.MultipleBirthOrder = pidSegment.MultipleBirthIndicator.Value == "Y" ? (int?)-1 : null;
+                if (!pidSegment.BirthOrder.IsEmpty())
+                    retVal.MultipleBirthOrder = Int32.Parse(pidSegment.BirthOrder.Value);
 
-            // Citizenship
-            if (pidSegment.CitizenshipRepetitionsUsed > 0)
-            {
-                foreach (var cit in pidSegment.GetCitizenship())
+                // Citizenship
+                fieldNo = 26;
+                if (pidSegment.CitizenshipRepetitionsUsed > 0)
                 {
-                    var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Identifiers.Any(i => i.Value == cit.Identifier.Value && i.Authority.Key == AssigningAuthorityKeys.Iso3166CountryCode), AuthenticationContext.SystemPrincipal);
-                    if (places.Count() == 1)
-                        retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Citizen, places.First().Key));
-                    else
-                        throw new HL7ProcessingException($"Cannot find country with code {cit.Identifier.Value}", "PID", pidSegment.SetIDPID.Value, 26, 1);
+                    foreach (var cit in pidSegment.GetCitizenship())
+                    {
+                        var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Identifiers.Any(i => i.Value == cit.Identifier.Value && i.Authority.Key == AssigningAuthorityKeys.Iso3166CountryCode), AuthenticationContext.SystemPrincipal);
+                        if (places.Count() == 1)
+                            retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Citizen, places.First().Key));
+                        else
+                            throw new KeyNotFoundException($"Cannot find country with code {cit.Identifier.Value}");
 
+                    }
                 }
-            }
 
-            // Death info
-            if (!pidSegment.PatientDeathIndicator.IsEmpty())
-                retVal.DeceasedDate = pidSegment.PatientDeathIndicator.Value == "Y" ? (DateTime?)DateTime.MinValue : null;
-            if (!pidSegment.PatientDeathDateAndTime.IsEmpty())
-            {
-                try
+                // Death info
+                fieldNo = 29;
+                if (!pidSegment.PatientDeathIndicator.IsEmpty())
+                    retVal.DeceasedDate = pidSegment.PatientDeathIndicator.Value == "Y" ? (DateTime?)DateTime.MinValue : null;
+                if (!pidSegment.PatientDeathDateAndTime.IsEmpty())
                 {
                     retVal.DeceasedDate = pidSegment.PatientDeathDateAndTime.ToModel();
                     retVal.DeceasedDatePrecision = pidSegment.PatientDeathDateAndTime.ToDatePrecision();
                 }
-                catch (HL7DatatypeProcessingException e)
-                {
-                    throw new HL7ProcessingException(e.Message, "PID", pidSegment.SetIDPID.Value, 29, e.Component, e);
-                }
+
+                // Last update time
+                if (!pidSegment.LastUpdateDateTime.IsEmpty())
+                    retVal.CreationTime = (DateTimeOffset)pidSegment.LastUpdateDateTime.ToModel();
+                //if(!pidSegment.LastUpdateFacility.IsEmpty())
+                //{
+                //    // Find by user ID
+                //    var user = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityUser>>().Query(u=>u.UserName == pidSegment.LastUpdateFacility.NamespaceID.Value).FirstOrDefault();
+                //    if (user != null)
+                //        retVal.CreatedBy = user;
+                //}
+
+                if (motherEntity == null)
+                    return new IdentifiedData[] { retVal };
+                else
+                    return new IdentifiedData[] { motherEntity, retVal };
             }
-
-            // Last update time
-            if (!pidSegment.LastUpdateDateTime.IsEmpty())
-                retVal.CreationTime = (DateTimeOffset)pidSegment.LastUpdateDateTime.ToModel();
-            //if(!pidSegment.LastUpdateFacility.IsEmpty())
-            //{
-            //    // Find by user ID
-            //    var user = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityUser>>().Query(u=>u.UserName == pidSegment.LastUpdateFacility.NamespaceID.Value).FirstOrDefault();
-            //    if (user != null)
-            //        retVal.CreatedBy = user;
-            //}
-
-            if (motherEntity == null)
-                return new IdentifiedData[] { retVal };
-            else
-                return new IdentifiedData[] { motherEntity, retVal };
+            catch (HL7ProcessingException) // Just re-throw
+            {
+                throw;
+            }
+            catch(HL7DatatypeProcessingException e)
+            {
+                throw new HL7ProcessingException("Error processing PID segment", "PID", pidSegment.SetIDPID.Value, fieldNo, e.Component, e);
+            }
+            catch (Exception e)
+            {
+                throw new HL7ProcessingException("Error processing PID segment", "PID", pidSegment.SetIDPID.Value, fieldNo, 1, e);
+            }
         }
     }
 }

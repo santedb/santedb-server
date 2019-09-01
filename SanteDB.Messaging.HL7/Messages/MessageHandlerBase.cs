@@ -304,21 +304,26 @@ namespace SanteDB.Messaging.HL7.Messages
             }
             else
             {
-                var ex = error.InnerException;
+                var ex = error;
                 while(ex != null)
                 {
                     var err = retVal.GetStructure("ERR", erc++) as ERR;
                     err.HL7ErrorCode.Identifier.Value = this.MapErrCode(ex);
                     err.Severity.Value = "E";
-                    err.GetErrorCodeAndLocation(err.ErrorCodeAndLocationRepetitionsUsed).CodeIdentifyingError.Text.Value = ex.Message; ;
+                    err.GetErrorCodeAndLocation(err.ErrorCodeAndLocationRepetitionsUsed).CodeIdentifyingError.Text.Value = ex.Message; 
                     if (ex is HL7ProcessingException)
                     {
                         var hle = ex as HL7ProcessingException;
                         var erl = err.GetErrorLocation(err.ErrorLocationRepetitionsUsed);
                         erl.SegmentID.Value = hle.Segment;
-                        erl.SegmentSequence.Value = hle.Repetition;
+                        erl.SegmentSequence.Value = hle.Repetition ?? "1";
                         erl.FieldPosition.Value = hle.Field.ToString();
+                        erl.FieldRepetition.Value = "1";
                         erl.ComponentNumber.Value = hle.Component.ToString();
+
+                        var ihle = (hle.InnerException as HL7DatatypeProcessingException)?.InnerException as HL7DatatypeProcessingException; // Nested DTE
+                        if (ihle != null)
+                            erl.SubComponentNumber.Value = ihle.Component.ToString();
                     }
                    
                     ex = ex.InnerException;

@@ -103,162 +103,188 @@ namespace SanteDB.Messaging.HL7.Segments
 
             // Cast segment
             var nk1Segment = segment as NK1;
-
+            var fieldNo = 0;
             // Person persistence service
             var personService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Person>>();
 
-            // Patient to which the parsing belongs
-            var patient = context.OfType<Patient>().FirstOrDefault();
-            if (patient == null)
-                throw new InvalidOperationException("NK1 Requires PID segment to be processed");
-
-            // Next of kin is a person
-            Person retVal = new Person() { Key = Guid.NewGuid() };
-            EntityRelationship retValRelation = new EntityRelationship(EntityRelationshipTypeKeys.NextOfKin, retVal.Key) { SourceEntityKey = patient.Key };
-
-            // TODO: Look for existing persons
-            foreach (var id in nk1Segment.GetNextOfKinAssociatedPartySIdentifiers())
+            try
             {
-                var idnumber = id.IDNumber.Value;
-                AssigningAuthority authority = null;
-                try
+                // Patient to which the parsing belongs
+                var patient = context.OfType<Patient>().FirstOrDefault();
+                if (patient == null)
+                    throw new InvalidOperationException("NK1 Requires PID segment to be processed");
+
+                // Next of kin is a person
+                Person retVal = new Person() { Key = Guid.NewGuid() };
+                EntityRelationship retValRelation = new EntityRelationship(EntityRelationshipTypeKeys.NextOfKin, retVal.Key) { SourceEntityKey = patient.Key };
+
+                // Look for existing person
+                fieldNo = 33;
+                foreach (var id in nk1Segment.GetNextOfKinAssociatedPartySIdentifiers())
                 {
-                    authority = id.AssigningAuthority.ToModel();
-                }
-                catch(HL7DatatypeProcessingException e)
-                {
-                    throw new HL7ProcessingException(e.Message, "NK1", nk1Segment.SetIDNK1.Value, 33, e.Component, e);
-                }
-                Guid idguid = Guid.Empty;
-                int tr = 0;
-                Person found = null;
-                if (authority == null &&
-                    id.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority?.DomainName)
-                    found = personService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.SystemPrincipal);
-                else if (authority?.IsUnique == true)
-                    found = personService.Query(o => o.Identifiers.Any(i => i.Value == idnumber &&
-                        i.Authority.Key == authority.Key), 0, 1, out tr, AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                if (found != null)
-                {
-                    retVal = found;
-                    // Existing relationship?
-                    retValRelation = ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityRelationship>>().Query(r => r.SourceEntityKey == patient.Key.Value && r.TargetEntityKey == retVal.Key.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault() ?? retValRelation;
-                    break;
-                }
-            }
-
-            // Relationship type
-            if (!nk1Segment.Relationship.IsEmpty())
-                retValRelation.RelationshipTypeKey = nk1Segment.Relationship.ToModel(RelationshipCodeSystem)?.Key;
-
-            // Do we have a mother already?
-            if (retValRelation.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother)
-            {
-                // Get the existing mother relationship
-                var existingMotherRel = patient.Relationships.FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother);
-                if (existingMotherRel != null)
-                {
-                    retValRelation = existingMotherRel;
-                    retVal = context.FirstOrDefault(o => o.Key == existingMotherRel.TargetEntityKey) as Person;
-                    // Mother isn't in context, load
-                    if (retVal == null)
-                        retVal = personService.Get(existingMotherRel.TargetEntityKey.Value, null, true, AuthenticationContext.SystemPrincipal);
-                    if (retVal == null)
-                        throw new InvalidOperationException("Cannot locate described MTH entity on patient record");
-                }
-            }
-            // Names
-            if (nk1Segment.NameRepetitionsUsed > 0)
-                retVal.Names = nk1Segment.GetName().ToModel().ToList();
-
-            // Address
-            if (nk1Segment.AddressRepetitionsUsed > 0)
-                retVal.Addresses = nk1Segment.GetAddress().ToModel().ToList();
-
-            // Phone numbers 
-            if (nk1Segment.PhoneNumberRepetitionsUsed > 0)
-                retVal.Telecoms = nk1Segment.GetPhoneNumber().ToModel().ToList();
-
-            // Context role, when the person should be contact
-            if (!nk1Segment.ContactRole.IsEmpty())
-            {
-                var contactExtension = retVal.Extensions.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.ContactRolesExtension);
-
-                if (contactExtension == null)
-                    contactExtension = new EntityExtension(ExtensionTypeKeys.ContactRolesExtension, typeof(DictionaryExtensionHandler), new
+                    var idnumber = id.IDNumber.Value;
+                    AssigningAuthority authority = null;
+                    try
                     {
-                        roles = new[]
+                        authority = id.AssigningAuthority.ToModel();
+                    }
+                    catch (Exception e)
+                    {
+                        throw new HL7ProcessingException(e.Message, "NK1", nk1Segment.SetIDNK1.Value, 33, 3, e);
+                    }
+                    Guid idguid = Guid.Empty;
+                    int tr = 0;
+                    Person found = null;
+                    if (authority == null &&
+                        id.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority?.DomainName)
+                        found = personService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.SystemPrincipal);
+                    else if (authority?.IsUnique == true)
+                        found = personService.Query(o => o.Identifiers.Any(i => i.Value == idnumber &&
+                            i.Authority.Key == authority.Key), 0, 1, out tr, AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                    if (found != null)
+                    {
+                        retVal = found;
+                        // Existing relationship?
+                        retValRelation = ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityRelationship>>().Query(r => r.SourceEntityKey == patient.Key.Value && r.TargetEntityKey == retVal.Key.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault() ?? retValRelation;
+                        break;
+                    }
+                }
+
+                // Relationship type
+                fieldNo = 3;
+                if (!nk1Segment.Relationship.IsEmpty())
+                    retValRelation.RelationshipTypeKey = nk1Segment.Relationship.ToModel(RelationshipCodeSystem)?.Key;
+
+                // Do we have a mother already?
+                if (retValRelation.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother)
+                {
+                    // Get the existing mother relationship
+                    var existingMotherRel = patient.Relationships.FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother);
+                    if (existingMotherRel != null)
+                    {
+                        retValRelation = existingMotherRel;
+                        retVal = context.FirstOrDefault(o => o.Key == existingMotherRel.TargetEntityKey) as Person;
+                        // Mother isn't in context, load
+                        if (retVal == null)
+                            retVal = personService.Get(existingMotherRel.TargetEntityKey.Value, null, true, AuthenticationContext.SystemPrincipal);
+                        if (retVal == null)
+                            throw new InvalidOperationException("Cannot locate described MTH entity on patient record");
+                    }
+                }
+
+                fieldNo = 2;
+                // Names
+                if (nk1Segment.NameRepetitionsUsed > 0)
+                    retVal.Names = nk1Segment.GetName().ToModel().ToList();
+
+                // Address
+                fieldNo = 4;
+                if (nk1Segment.AddressRepetitionsUsed > 0)
+                    retVal.Addresses = nk1Segment.GetAddress().ToModel().ToList();
+
+                // Phone numbers 
+                fieldNo = 5;
+                if (nk1Segment.PhoneNumberRepetitionsUsed > 0)
+                    retVal.Telecoms = nk1Segment.GetPhoneNumber().ToModel().ToList();
+
+                // Context role, when the person should be contact
+                fieldNo = 7;
+                if (!nk1Segment.ContactRole.IsEmpty())
+                {
+                    var contactExtension = retVal.Extensions.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.ContactRolesExtension);
+
+                    if (contactExtension == null)
+                        contactExtension = new EntityExtension(ExtensionTypeKeys.ContactRolesExtension, typeof(DictionaryExtensionHandler), new
                         {
+                            roles = new[]
+                            {
                             new {
                                 patientKey = patient.Key.Value,
                                 contact = nk1Segment.ContactRole.Identifier.Value
                             }
                         }.ToList()
-                    });
-                else
-                {
-                    var existingValue = (contactExtension.ExtensionValue as dynamic);
-                    existingValue.roles.Add(new { patientKey = patient.Key.Value, contact = nk1Segment.ContactRole.Identifier.Value });
+                        });
+                    else
+                    {
+                        var existingValue = (contactExtension.ExtensionValue as dynamic);
+                        existingValue.roles.Add(new { patientKey = patient.Key.Value, contact = nk1Segment.ContactRole.Identifier.Value });
+                    }
                 }
-            }
 
-            if (!nk1Segment.DateTimeOfBirth.IsEmpty())
-            {
-                retVal.DateOfBirth = nk1Segment.DateTimeOfBirth.ToModel();
-                retVal.DateOfBirthPrecision = nk1Segment.DateTimeOfBirth.ToDatePrecision();
-            }
-
-            // Citizenship
-            if (nk1Segment.CitizenshipRepetitionsUsed > 0)
-            {
-                foreach (var cit in nk1Segment.GetCitizenship())
+                fieldNo = 16;
+                if (!nk1Segment.DateTimeOfBirth.IsEmpty())
                 {
-                    var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Identifiers.Any(i => i.Value == cit.Identifier.Value && i.Authority.Key == AssigningAuthorityKeys.Iso3166CountryCode), AuthenticationContext.SystemPrincipal);
-                    if (places.Count() == 1)
-                        retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Citizen, places.First().Key));
+                    retVal.DateOfBirth = nk1Segment.DateTimeOfBirth.ToModel();
+                    retVal.DateOfBirthPrecision = nk1Segment.DateTimeOfBirth.ToDatePrecision();
                 }
-            }
 
-            if (!nk1Segment.PrimaryLanguage.IsEmpty())
-                retVal.LanguageCommunication = new List<PersonLanguageCommunication>()
+                // Citizenship
+                fieldNo = 19;
+                if (nk1Segment.CitizenshipRepetitionsUsed > 0)
+                {
+                    foreach (var cit in nk1Segment.GetCitizenship())
+                    {
+                        var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Identifiers.Any(i => i.Value == cit.Identifier.Value && i.Authority.Key == AssigningAuthorityKeys.Iso3166CountryCode), AuthenticationContext.SystemPrincipal);
+                        if (places.Count() == 1)
+                            retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Citizen, places.First().Key));
+                    }
+                }
+
+                fieldNo = 20;
+                if (!nk1Segment.PrimaryLanguage.IsEmpty())
+                    retVal.LanguageCommunication = new List<PersonLanguageCommunication>()
                 {
                     new PersonLanguageCommunication(nk1Segment.PrimaryLanguage.Identifier.Value.ToLower(), true)
                 };
 
-            // Privacy code
-            if (!nk1Segment.ProtectionIndicator.IsEmpty())
-            {
-                var pip = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
-                if (nk1Segment.ProtectionIndicator.Value == "Y")
+                // Privacy code
+                fieldNo = 23;
+                if (!nk1Segment.ProtectionIndicator.IsEmpty())
                 {
-                    var policy = pip.Query(o => o.Oid == DataPolicyIdentifiers.RestrictedInformation, AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                    retVal.Policies.Add(new SecurityPolicyInstance(policy, PolicyGrantType.Grant));
+                    var pip = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
+                    if (nk1Segment.ProtectionIndicator.Value == "Y")
+                    {
+                        var policy = pip.Query(o => o.Oid == DataPolicyIdentifiers.RestrictedInformation, AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                        retVal.Policies.Add(new SecurityPolicyInstance(policy, PolicyGrantType.Grant));
+                    }
+                    else if (nk1Segment.ProtectionIndicator.Value == "N")
+                        retVal.Policies.Clear();
+                    else
+                        throw new ArgumentOutOfRangeException($"Protection indicator {nk1Segment.ProtectionIndicator.Value} is invalid");
                 }
-                else
-                    retVal.Policies.Clear();
-            }
 
-            // Associated person identifiers
-            if (nk1Segment.NextOfKinAssociatedPartySIdentifiersRepetitionsUsed > 0)
-            {
-                try
+
+                // Associated person identifiers
+                fieldNo = 33;
+                if (nk1Segment.NextOfKinAssociatedPartySIdentifiersRepetitionsUsed > 0)
                 {
                     retVal.Identifiers = nk1Segment.GetNextOfKinAssociatedPartySIdentifiers().ToModel().ToList();
                 }
-                catch(HL7ProcessingException e)
-                {
-                    throw new HL7ProcessingException(e.Message, "NK1", nk1Segment.SetIDNK1.Value, 33, e.Component);
-                }
+
+                // Find the existing relationship on the patient
+
+                patient.Relationships.RemoveAll(o => o.SourceEntityKey == retValRelation.SourceEntityKey && o.TargetEntityKey == retValRelation.TargetEntityKey);
+                patient.Relationships.Add(retValRelation);
+
+                if (!context.Contains(retVal))
+                    return new IdentifiedData[] { retVal };
+                else
+                    return new IdentifiedData[0];
+
             }
-            // Find the existing relationship on the patient
-
-            patient.Relationships.RemoveAll(o => o.SourceEntityKey == retValRelation.SourceEntityKey && o.TargetEntityKey == retValRelation.TargetEntityKey);
-            patient.Relationships.Add(retValRelation);
-
-            if (!context.Contains(retVal))
-                return new IdentifiedData[] { retVal };
-            else
-                return new IdentifiedData[0];
+            catch (HL7ProcessingException) // Just re-throw
+            {
+                throw;
+            }
+            catch (HL7DatatypeProcessingException e)
+            {
+                throw new HL7ProcessingException("Error processing NK1 segment", "NK1", nk1Segment.SetIDNK1.Value, fieldNo, e.Component, e);
+            }
+            catch (Exception e)
+            {
+                throw new HL7ProcessingException("Error processing NK1 segment", "NK1", nk1Segment.SetIDNK1.Value, fieldNo, 1, e);
+            }
         }
+
     }
 }

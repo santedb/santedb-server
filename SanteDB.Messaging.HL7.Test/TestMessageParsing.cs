@@ -13,6 +13,7 @@ using SanteDB.Core.TestFramework;
 using SanteDB.Persistence.Data.ADO.Test;
 using System;
 using System.Linq;
+using NHapi.Model.V25.Message;
 
 namespace SanteDB.Messaging.HL7.Test
 {
@@ -173,6 +174,26 @@ namespace SanteDB.Messaging.HL7.Test
             Assert.AreEqual("AA", (message.GetStructure("MSA") as MSA).AcknowledgmentCode.Value);
             Assert.AreEqual("OK", (message.GetStructure("QAK") as QAK).QueryResponseStatus.Value);
             Assert.AreEqual("K22", (message.GetStructure("MSH") as MSH).MessageType.TriggerEvent.Value);
+        }
+
+        /// <summary>
+        /// Tests that the error code and location are appropriate for the type of error that is encountered
+        /// </summary>
+        [TestMethod]
+        public void TestErrorLocation()
+        {
+            AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
+            var msg = TestUtil.GetMessage("ADT_INV_GC");
+            var errmsg = new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
+            var messageStr = TestUtil.ToString(errmsg);
+
+            var ack = errmsg as ACK;
+            Assert.AreNotEqual(0, ack.ERRRepetitionsUsed);
+            Assert.AreEqual("204", ack.GetERR(0).HL7ErrorCode.Identifier.Value);
+            Assert.AreEqual("8", ack.GetERR(0).GetErrorLocation(0).FieldPosition.Value);
+            Assert.AreEqual("PID", ack.GetERR(0).GetErrorLocation(0).SegmentID.Value);
+            Assert.AreEqual("1", ack.GetERR(0).GetErrorLocation(0).SegmentSequence.Value);
+
         }
 
         /// <summary>

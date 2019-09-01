@@ -68,65 +68,90 @@ namespace SanteDB.Messaging.HL7.Segments
         public virtual IEnumerable<IdentifiedData> Parse(ISegment segment, IEnumerable<IdentifiedData> context)
         {
 
+            var fieldNo = 0;
             var pd1Segment = segment as PD1;
-            var retVal = context.OfType<Patient>().LastOrDefault();
-            if (retVal == null)
-                throw new MissingFieldException($"PD1 segment requires a PID segment to precede it");
 
-            // Living arrangement
-            if (!pd1Segment.LivingArrangement.IsEmpty())
-                retVal.LivingArrangement = pd1Segment.LivingArrangement.ToConcept(LivingArrangementCodeSystem);
-
-            // Primary facility
-            if (pd1Segment.PatientPrimaryFacilityRepetitionsUsed > 0)
+            try
             {
-                var sdlRepo = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>();
-                foreach (var xon in pd1Segment.GetPatientPrimaryFacility())
+                var retVal = context.OfType<Patient>().LastOrDefault();
+                if (retVal == null)
+                    throw new MissingFieldException($"PD1 segment requires a PID segment to precede it");
+
+                // Living arrangement
+                fieldNo = 2;
+                if (!pd1Segment.LivingArrangement.IsEmpty())
+                    retVal.LivingArrangement = pd1Segment.LivingArrangement.ToConcept(LivingArrangementCodeSystem);
+
+                // Primary facility
+                fieldNo = 3;
+                if (pd1Segment.PatientPrimaryFacilityRepetitionsUsed > 0)
                 {
-                    AssigningAuthority authority;
-                    try
+                    var sdlRepo = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>();
+                    foreach (var xon in pd1Segment.GetPatientPrimaryFacility())
                     {
-                        authority = xon.AssigningAuthority.ToModel();
+                        AssigningAuthority authority;
+                        try
+                        {
+                            authority = xon.AssigningAuthority.ToModel();
+                        }
+                        catch (Exception e)
+                        {
+                            throw new HL7ProcessingException("Error processing patient primary facility", "PD1", "1", 3, 5, e);
+                        }
+                        var idnumber = xon.OrganizationIdentifier.Value ?? xon.IDNumber.Value;
+                        // Find the org or SDL
+                        Place place = null;
+                        if (authority == null && xon.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority.DomainName)
+                            place = sdlRepo.Get(Guid.Parse(idnumber), null, true, AuthenticationContext.SystemPrincipal);
+                        else
+                            place = sdlRepo.Query(o => o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation && o.Identifiers.Any(i => i.Value == idnumber && i.Authority.Key == authority.Key), AuthenticationContext.SystemPrincipal).SingleOrDefault();
+                        if (place != null)
+                            retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation, place));
+                        else
+                            throw new KeyNotFoundException($"Facility {idnumber} could not be found");
                     }
-                    catch(HL7DatatypeProcessingException e)
+                }
+
+
+                // Disabilities - Create functional limitation template
+                fieldNo = 6;
+                if (!pd1Segment.Handicap.IsEmpty())
+                {
+                    var handicap = pd1Segment.Handicap.ToConcept(DisabilityCodeSystem).Key.Value;
+                    // TODO: Create functional limitation
+                    throw new NotImplementedException("Handicap / Functional Limitation handler for PD1 is not completed yet");
+                }
+
+                // Privacy code
+                fieldNo = 12;
+                if (!pd1Segment.ProtectionIndicator.IsEmpty())
+                {
+                    var pip = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
+                    if (pd1Segment.ProtectionIndicator.Value == "Y")
                     {
-                        throw new HL7ProcessingException(e.Message, "PD1", "1", 3, 5, e);
+                        var policy = pip.Query(o => o.Oid == DataPolicyIdentifiers.RestrictedInformation, AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                        retVal.Policies.Add(new SecurityPolicyInstance(policy, PolicyGrantType.Grant));
                     }
-                    var idnumber = xon.OrganizationIdentifier.Value ?? xon.IDNumber.Value;
-                    // Find the org or SDL
-                    Place place = null;
-                    if (authority == null && xon.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority.DomainName)
-                        place = sdlRepo.Get(Guid.Parse(idnumber), null, true, AuthenticationContext.SystemPrincipal);
+                    else if (pd1Segment.ProtectionIndicator.Value == "N")
+                        retVal.Policies.Clear();
                     else
-                        place = sdlRepo.Query(o => o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation && o.Identifiers.Any(i => i.Value == idnumber && i.Authority.Key == authority.Key), AuthenticationContext.SystemPrincipal).SingleOrDefault();
-                    if (place != null)
-                        retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation, place));
-
+                        throw new ArgumentOutOfRangeException($"Value {pd1Segment.ProtectionIndicator.Value} is not valid");
                 }
-            }
 
-            // Disabilities - Create functional limitation template
-            if (!pd1Segment.Handicap.IsEmpty())
+                return new IdentifiedData[0];
+            }
+            catch (HL7ProcessingException) // Just re-throw
             {
-                var handicap = pd1Segment.Handicap.ToConcept(DisabilityCodeSystem)?.Key.Value;
-                // TODO: Create functional limitation
-                throw new NotImplementedException("Handicap / Functional Limitation handler for PD1 is not completed yet");
+                throw;
             }
-
-            // Privacy code
-            if (!pd1Segment.ProtectionIndicator.IsEmpty())
+            catch (HL7DatatypeProcessingException e)
             {
-                var pip = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityPolicy>>();
-                if (pd1Segment.ProtectionIndicator.Value == "Y")
-                {
-                    var policy = pip.Query(o => o.Oid == DataPolicyIdentifiers.RestrictedInformation, AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                    retVal.Policies.Add(new SecurityPolicyInstance(policy, PolicyGrantType.Grant));
-                }
-                else
-                    retVal.Policies.Clear();
+                throw new HL7ProcessingException("Error processing PD1 segment", "PD1", null, fieldNo, e.Component, e);
             }
-
-            return new IdentifiedData[0];
+            catch (Exception e)
+            {
+                throw new HL7ProcessingException("Error processing PD1 segment", "PD1", null, fieldNo, 1, e);
+            }
         }
     }
 }

@@ -93,6 +93,16 @@ namespace SanteDB.Messaging.HL7.Messages
         }
 
         /// <summary>
+        /// Get the specified mapping for the specified trigger
+        /// </summary>
+        /// <param name="triggerEvent">The trigger event</param>
+        /// <remarks>Allows overides to change the IQueryHandler and query parameter mapping</remarks>
+        protected virtual Hl7QueryParameterType GetMapping(String triggerEvent)
+        {
+            return s_map.Map.First(o => o.Trigger == triggerEvent);
+        }
+
+        /// <summary>
         /// Handle message internally
         /// </summary>
         protected override IMessage HandleMessageInternal(Hl7MessageReceivedEventArgs e, Bundle parsed)
@@ -100,7 +110,7 @@ namespace SanteDB.Messaging.HL7.Messages
             // First we want to get the map
             var msh = e.Message.GetStructure("MSH") as MSH;
             var trigger = msh.MessageType.TriggerEvent.Value;
-            var map = s_map.Map.First(o => o.Trigger == trigger);
+            var map = this.GetMapping(trigger);
 
             try
             {
