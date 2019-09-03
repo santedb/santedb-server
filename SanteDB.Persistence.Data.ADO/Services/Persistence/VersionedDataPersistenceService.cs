@@ -174,7 +174,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         protected override IEnumerable<Object> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TModel>[] orderBy, bool countResults = true)
         {
-            // Is obsoletion time already specified?
+            // Is obsoletion time already specified? (this is important for versioned objects if we want to get the most current version of the object)
             if (!query.ToString().Contains("ObsoletionTime") && !query.ToString().Contains("VersionKey"))
             {
                 var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
@@ -213,7 +213,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 {
                     var keys = retVal.Keys<Guid>().ToArray();
                     totalResults = keys.Count();
-                    this.AddQueryResults(context, query, queryId, offset, keys, totalResults);
+                    this.m_queryPersistence?.RegisterQuerySet(queryId, keys, query, totalResults);
                 }
                 else if (count.HasValue && countResults && !m_configuration.UseFuzzyTotals)
                     totalResults = retVal.Count();
@@ -223,13 +223,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 // Fuzzy totals - This will only fetch COUNT + 1 as the total results
                 if (count.HasValue)
                 {
-                    if (m_configuration.UseFuzzyTotals)
+                    if (m_configuration.UseFuzzyTotals && totalResults == 0)
                     {
                         var fuzzResults = retVal.Skip(offset).Take(count.Value + 1).OfType<Object>().ToList();
                         totalResults = fuzzResults.Count();
                         return fuzzResults.Take(count.Value);
                     }
-                    else
+                    else // We already counted as part of the queryId so no need to take + 1
                         return retVal.Skip(offset).Take(count.Value).OfType<Object>();
                 }
                 else

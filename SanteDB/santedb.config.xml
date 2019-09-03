@@ -436,6 +436,7 @@
            providerType="npgsql" />
   <!-- This section controls the persistence for ADO.NET -->
   <section xsi:type="AdoPersistenceConfigurationSection"
+           fuzzyTotal="true"
            readWriteConnectionString="FBSQL"
            readOnlyConnectionString="FBSQL"
            traceSql="false"

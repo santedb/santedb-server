@@ -198,18 +198,18 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     return this.GetStoredQueryResults(queryId, offset, count, out totalResults);
 
                 // Is obsoletion time already specified?
-                if (!query.ToString().Contains("ObsoletionTime") && typeof(BaseEntityData).IsAssignableFrom(typeof(TModel)))
-                {
-                    var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
-                    //var obsoletionReference = Expression.MakeUnary(ExpressionType.Not, Expression.MakeMemberAccess(Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), typeof(Nullable<DateTimeOffset>).GetProperty("HasValue")), typeof(bool));
-                    query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
-                }
-                else if (!query.ToString().Contains("ObsoleteVersionSequenceId") && typeof(IVersionedAssociation).IsAssignableFrom(typeof(TModel)))
-                {
-                    var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedAssociation.ObsoleteVersionSequenceId))), Expression.Constant(null));
-                    //var obsoletionReference = Expression.MakeUnary(ExpressionType.Not, Expression.MakeMemberAccess(Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedAssociation.ObsoleteVersionSequenceId))), typeof(Nullable<decimal>).GetProperty("HasValue")), typeof(bool));
-                    query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
-                }
+                //if (!query.ToString().Contains("ObsoletionTime") && typeof(BaseEntityData).IsAssignableFrom(typeof(TModel)))
+                //{
+                //    var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
+                //    //var obsoletionReference = Expression.MakeUnary(ExpressionType.Not, Expression.MakeMemberAccess(Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), typeof(Nullable<DateTimeOffset>).GetProperty("HasValue")), typeof(bool));
+                //    query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
+                //}
+                //else if (!query.ToString().Contains("ObsoleteVersionSequenceId") && typeof(IVersionedAssociation).IsAssignableFrom(typeof(TModel)))
+                //{
+                //    var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedAssociation.ObsoleteVersionSequenceId))), Expression.Constant(null));
+                //    //var obsoletionReference = Expression.MakeUnary(ExpressionType.Not, Expression.MakeMemberAccess(Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedAssociation.ObsoleteVersionSequenceId))), typeof(Nullable<decimal>).GetProperty("HasValue")), typeof(bool));
+                //    query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
+                //}
 
                 // Domain query
                 Type[] selectTypes = { typeof(TQueryReturn) };
@@ -250,9 +250,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     // Stateful query identifier = We need to add query results
                     if (queryId != Guid.Empty)
                     {
+                        // Create on a separate thread the query results
                         var keys = retVal.Keys<Guid>().ToArray();
                         totalResults = keys.Count();
-                        this.AddQueryResults(context, query, queryId, offset, keys, totalResults);
+                        this.m_queryPersistence?.RegisterQuerySet(queryId, keys, query, totalResults);
+
                     }
                     else if (count.HasValue && includeCount && !m_configuration.UseFuzzyTotals) // Get an exact total
                     {
@@ -264,7 +266,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     // Fuzzy totals - This will only fetch COUNT + 1 as the total results
                     if (count.HasValue)
                     {
-                        if (m_configuration.UseFuzzyTotals)
+                        if (m_configuration.UseFuzzyTotals && totalResults == 0)
                         {
                             var fuzzResults = retVal.Skip(offset).Take(count.Value + 1).OfType<Object>().ToList();
                             totalResults = fuzzResults.Count();
@@ -309,14 +311,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             return keyResults.OfType<Object>();
         }
 
-        /// <summary>
-        /// Add query results
-        /// </summary>
-        protected void AddQueryResults(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, IEnumerable<Guid> initialResults, int totalResults)
-        {
-            this.m_queryPersistence?.RegisterQuerySet(queryId, initialResults.ToArray(), query, totalResults);
-        }
-
+      
         /// <summary>
         /// Perform a domain query
         /// </summary>

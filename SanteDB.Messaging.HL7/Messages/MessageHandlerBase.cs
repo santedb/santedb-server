@@ -296,9 +296,10 @@ namespace SanteDB.Messaging.HL7.Messages
             {
                 foreach (var itm in (error as DetectedIssueException).Issues)
                 {
+                    var err = retVal.GetStructure("ERR", erc) as ERR;
                     if (retVal.IsRepeating("ERR"))
                         erc++;
-                    var err = retVal.GetStructure("ERR", erc) as ERR;
+
                     err.HL7ErrorCode.Identifier.Value = "207";
                     err.Severity.Value = itm.Priority == Core.BusinessRules.DetectedIssuePriorityType.Error ? "E" : itm.Priority == Core.BusinessRules.DetectedIssuePriorityType.Warning ? "W" : "I";
                     err.GetErrorCodeAndLocation(err.ErrorCodeAndLocationRepetitionsUsed).CodeIdentifyingError.Text.Value = itm.Text;
@@ -309,10 +310,10 @@ namespace SanteDB.Messaging.HL7.Messages
                 var ex = error;
                 while(ex != null)
                 {
+                    var err = retVal.GetStructure("ERR", erc) as ERR;
                     if (retVal.IsRepeating("ERR"))
                         erc++;
 
-                    var err = retVal.GetStructure("ERR", erc) as ERR;
                     err.HL7ErrorCode.Identifier.Value = this.MapErrCode(ex);
                     err.Severity.Value = "E";
                     err.GetErrorCodeAndLocation(err.ErrorCodeAndLocationRepetitionsUsed).CodeIdentifyingError.Text.Value = ex.Message; 

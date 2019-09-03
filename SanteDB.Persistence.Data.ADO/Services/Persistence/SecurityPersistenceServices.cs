@@ -263,23 +263,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// </summary>
 		public override Core.Model.Security.SecurityDevice UpdateInternal(DataContext context, Core.Model.Security.SecurityDevice data)
 		{
-			var domainInstance = this.FromModelInstance(data, context);
+            var retVal = base.UpdateInternal(context, data);
 
-			var currentObject = context.FirstOrDefault<DbSecurityDevice>(d => d.Key == data.Key);
-
-			if (currentObject == null)
-			{
-				throw new KeyNotFoundException(data.Key.ToString());
-			}
-
-			currentObject.CopyObjectData(domainInstance);
-
-			currentObject.ObsoletedByKey = data.ObsoletedByKey == Guid.Empty ? null : data.ObsoletedByKey;
-			currentObject.ObsoletionTime = data.ObsoletionTime;
-
-			context.Update(currentObject);
-
-			if (data.Policies != null)
+            if (data.Policies != null)
 			{
 				context.Delete<DbSecurityDevicePolicy>(o => o.SourceKey == data.Key);
                 data.Policies.ForEach(o => o.PolicyKey = o.Policy?.EnsureExists(context)?.Key ?? o.PolicyKey);
@@ -415,24 +401,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// Update the roles to security user
 		/// </summary>
 		public override Core.Model.Security.SecurityRole UpdateInternal(DataContext context, Core.Model.Security.SecurityRole data)
-		{
-			var domainInstance = this.FromModelInstance(data, context);
+		 {
+            var retVal = base.UpdateInternal(context, data);
 
-			var currentObject = context.FirstOrDefault<DbSecurityRole>(d => d.Key == data.Key);
-
-			if (currentObject == null)
-			{
-				throw new KeyNotFoundException(data.Key.ToString());
-			}
-
-			currentObject.CopyObjectData(domainInstance);
-
-			currentObject.ObsoletedByKey = data.ObsoletedByKey == Guid.Empty ? null : data.ObsoletedByKey;
-			currentObject.ObsoletionTime = data.ObsoletionTime;
-
-			context.Update(currentObject);
-
-			if (data.Policies != null)
+            if (data.Policies != null)
 			{
 				context.Delete<DbSecurityRolePolicy>(o => o.SourceKey == data.Key);
                 data.Policies.ForEach(o => o.PolicyKey = o.Policy?.EnsureExists(context)?.Key ?? o.PolicyKey);
@@ -561,7 +533,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		{
 			var retVal = base.UpdateInternal(context, data);
 
-			if (data.Roles == null)
+			if (data.Roles == null || data.Roles.Count == 0)
 			{
 				return retVal;
 			}

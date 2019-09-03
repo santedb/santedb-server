@@ -49,7 +49,7 @@ namespace SanteDB.Core.Services.Impl
         /// <returns>Returns a list of concepts.</returns>
         public IEnumerable<Concept> FindConceptsByName(string name, string language)
 		{
-			return base.Find(o => o.ConceptNames.Any(n => n.Name == name && n.Language == language));
+			return base.Find(o => o.ConceptNames.Any(n => n.Name == name && n.Language == language && n.ObsoleteVersionSequenceId == null));
 		}
 
 		/// <summary>
@@ -66,11 +66,11 @@ namespace SanteDB.Core.Services.Impl
                 if (csOid.StartsWith("oid"))
                 {
                     csOid = codeSystem.LocalPath.Substring(4);
-                    return base.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Oid == csOid && r.ReferenceTerm.Mnemonic == code));
+                    return base.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Oid == csOid && r.ReferenceTerm.Mnemonic == code && r.ObsoleteVersionSequenceId == null));
                 }
 			}
 
-			return this.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Url == codeSystem.OriginalString && r.ReferenceTerm.Mnemonic == code));
+			return this.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Url == codeSystem.OriginalString && r.ReferenceTerm.Mnemonic == code && r.ObsoleteVersionSequenceId == null));
 		}
 
 		/// <summary>
@@ -82,11 +82,11 @@ namespace SanteDB.Core.Services.Impl
                 codeSystemDomain = codeSystemDomain.Substring(8);
             Regex oidRegex = new Regex("^(\\d+?\\.){1,}\\d+$");
             if(codeSystemDomain.StartsWith("http:") || codeSystemDomain.StartsWith("urn:"))
-                return base.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Url == codeSystemDomain && r.ReferenceTerm.Mnemonic == code));
+                return base.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Url == codeSystemDomain && r.ReferenceTerm.Mnemonic == code && r.ObsoleteVersionSequenceId == null));
             else if(oidRegex.IsMatch(codeSystemDomain))
-                return base.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Oid == codeSystemDomain && r.ReferenceTerm.Mnemonic == code));
+                return base.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Oid == codeSystemDomain && r.ReferenceTerm.Mnemonic == code && r.ObsoleteVersionSequenceId == null));
             else
-                return base.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Authority == codeSystemDomain && r.ReferenceTerm.Mnemonic == code));
+                return base.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Authority == codeSystemDomain && r.ReferenceTerm.Mnemonic == code && r.ObsoleteVersionSequenceId == null));
 		}
         
         /// <summary>
@@ -116,11 +116,11 @@ namespace SanteDB.Core.Services.Impl
             Regex oidRegex = new Regex("^(\\d+?\\.){1,}\\d+$");
             Uri uri = null;
             if (oidRegex.IsMatch(codeSystem))
-                refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Oid == codeSystem) && o.SourceEntityKey == conceptId, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
+                refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Oid == codeSystem) && o.SourceEntityKey == conceptId && o.ObsoleteVersionSequenceId == null, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
             else if (Uri.TryCreate(codeSystem, UriKind.Absolute, out uri))
-                refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Url == codeSystem) && o.SourceEntityKey == conceptId, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
+                refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Url == codeSystem) && o.SourceEntityKey == conceptId && o.ObsoleteVersionSequenceId == null, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
             else
-                refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Authority == codeSystem) && o.SourceEntityKey == conceptId, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
+                refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Authority == codeSystem) && o.SourceEntityKey == conceptId && o.ObsoleteVersionSequenceId == null, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
             return refTermEnt.LoadProperty<ReferenceTerm>("ReferenceTerm");
         }
 

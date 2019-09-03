@@ -201,7 +201,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 try
                 {
                     dataContext.Open();
-                    return dataContext.Query<DbSecurityRole>(o => o.ObsoletionTime != null).Select(o => o.Name).ToArray();
+                    return dataContext.Query<DbSecurityRole>(o => o.ObsoletionTime == null).Select(o => o.Name).ToArray();
                 }
                 catch (Exception e)
                 {
