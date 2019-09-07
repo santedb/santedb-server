@@ -37,6 +37,8 @@ using SanteDB.Rest.AMI.Resources;
 using SanteDB.Rest.AMI;
 using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
+using SanteDB.Core.Model.Serialization;
+using SanteDB.Core.Model.AMI.Auth;
 
 namespace SanteDB.Messaging.AMI
 {
@@ -186,6 +188,7 @@ namespace SanteDB.Messaging.AMI
 
                 // Start the webhost
                 this.m_webHost.Start();
+                ModelSerializationBinder.RegisterModelType(typeof(SecurityPolicyInfo));
 
                 if (this.m_configuration.ResourceHandlers.Count() > 0)
                     AmiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.configuration.ResourceHandlers, typeof(IAmiServiceContract));
