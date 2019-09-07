@@ -128,5 +128,11 @@ namespace SanteDB.Persistence.Data.PSQL.Security
             {
             }
         }
+
+        /// <summary>
+        /// Gets the key for the policy
+        /// </summary>
+        Guid IPolicy.Key => this.Key.Value;
+
     }
 }
