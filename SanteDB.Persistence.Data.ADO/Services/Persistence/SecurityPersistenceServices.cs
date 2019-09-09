@@ -167,7 +167,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
 			context.Update(currentObject);
 
-			if (data.Policies != null)
+			if (data.Policies != null && data.Policies.Count > 0)
 			{
 				context.Delete<DbSecurityApplicationPolicy>(o => o.SourceKey == data.Key);
                 data.Policies.ForEach(o => o.PolicyKey = o.Policy?.EnsureExists(context)?.Key ?? o.PolicyKey);
@@ -208,7 +208,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
 			if (device != null && context.LoadState == LoadState.FullLoad)
 			{
-				var policyQuery = context.CreateSqlStatement<DbSecurityDevicePolicy>().SelectFrom()
+				var policyQuery = context.CreateSqlStatement<DbSecurityDevicePolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityDevicePolicy))
 										.InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
 										.Where<DbSecurityDevicePolicy>(o => o.SourceKey == device.Key);
 
@@ -265,7 +265,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		{
             var retVal = base.UpdateInternal(context, data);
 
-            if (data.Policies != null)
+            if (data.Policies != null && data.Policies.Count > 0)
 			{
 				context.Delete<DbSecurityDevicePolicy>(o => o.SourceKey == data.Key);
                 data.Policies.ForEach(o => o.PolicyKey = o.Policy?.EnsureExists(context)?.Key ?? o.PolicyKey);
@@ -305,7 +305,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Core.Model.Security.SecurityPolicy UpdateInternal(DataContext context, Core.Model.Security.SecurityPolicy data)
 		{
-			throw new AdoFormalConstraintException(AdoFormalConstraintType.UpdatedReadonlyObject);
+            // Only public objects (created by the user) can be deleted
+            if(!data.IsPublic)
+			    throw new AdoFormalConstraintException(AdoFormalConstraintType.UpdatedReadonlyObject);
+            return base.UpdateInternal(context, data);
 		}
 	}
 
@@ -404,7 +407,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		 {
             var retVal = base.UpdateInternal(context, data);
 
-            if (data.Policies != null)
+            if (data.Policies != null && data.Policies.Count > 0)
 			{
 				context.Delete<DbSecurityRolePolicy>(o => o.SourceKey == data.Key);
                 data.Policies.ForEach(o => o.PolicyKey = o.Policy?.EnsureExists(context)?.Key ?? o.PolicyKey);

@@ -84,24 +84,26 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         // Add
                         if (securable is SecurityRole)
                         {
+                            var sr = securable as SecurityRole;
                             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
                             // Delete the existing role
-                            context.Delete<DbSecurityRolePolicy>(o => o.PolicyKey == policy.Key);
+                            context.Delete<DbSecurityRolePolicy>(o => o.PolicyKey == policy.Key && o.SourceKey == sr.Key);
                             context.Insert(new DbSecurityRolePolicy()
                             {
-                                SourceKey = (securable as SecurityRole).Key.Value,
+                                SourceKey = sr.Key.Value,
                                 GrantType = (int)rule,
                                 PolicyKey = policy.Key
                             });
                         }
                         else if (securable is SecurityApplication)
                         {
+                            var sa = securable as SecurityApplication;
                             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
                             // Delete the existing role
-                            context.Delete<DbSecurityApplicationPolicy>(o => o.PolicyKey == policy.Key);
+                            context.Delete<DbSecurityApplicationPolicy>(o => o.PolicyKey == policy.Key && o.SourceKey == sa.Key);
                             context.Insert(new DbSecurityApplicationPolicy()
                             {
-                                SourceKey = (securable as SecurityApplication).Key.Value,
+                                SourceKey = sa.Key.Value,
                                 GrantType = (int)rule,
                                 PolicyKey = policy.Key
                             });
@@ -109,12 +111,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         }
                         else if (securable is SecurityDevice)
                         {
+                            var sd = securable as SecurityDevice;
                             // Delete the existing role
                             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
-                            context.Delete<DbSecurityDevicePolicy>(o => o.PolicyKey == policy.Key);
+                            context.Delete<DbSecurityDevicePolicy>(o => o.PolicyKey == policy.Key && o.SourceKey == sd.Key);
                             context.Insert(new DbSecurityDevicePolicy()
                             {
-                                SourceKey = (securable as SecurityDevice).Key.Value,
+                                SourceKey = sd.Key.Value,
                                 GrantType = (int)rule,
                                 PolicyKey = policy.Key
                             });
