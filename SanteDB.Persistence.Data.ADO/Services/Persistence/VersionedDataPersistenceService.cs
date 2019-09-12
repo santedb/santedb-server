@@ -183,7 +183,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
 
             // Query has been registered?
-            if (this.m_queryPersistence?.IsRegistered(queryId) == true)
+            if (queryId != Guid.Empty && this.m_queryPersistence?.IsRegistered(queryId) == true)
                 return this.GetStoredQueryResults(queryId, offset, count, out totalResults);
 
             SqlStatement domainQuery = null;

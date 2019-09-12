@@ -32,6 +32,7 @@ using SanteDB.Core.Configuration;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Diagnostics;
 using System.Security.Principal;
+using SanteDB.Core.Security.Audit;
 
 namespace SanteDB.Core
 {
@@ -222,6 +223,9 @@ namespace SanteDB.Core
                     Trace.TraceInformation("STAGE3 START: Notify ApplicationContext has started");
                     if (this.Started != null)
                         this.Started(this, null);
+
+                    AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStart);
+
                 }
                 finally
                 {
@@ -244,19 +248,24 @@ namespace SanteDB.Core
             if (this.Stopping != null)
                 this.Stopping(this, null);
 
-            this.m_running = false;
+
             foreach (var svc in this.m_serviceInstances.OfType<IDaemonService>())
             {
                 Trace.TraceInformation("Stopping daemon service {0}...", svc.GetType().Name);
                 svc.Stop();
             }
 
-            foreach (var svc in this.m_serviceInstances.OfType<IDisposable>())
+            // Dispose services
+            foreach (var svc in this.m_serviceInstances.OfType<IDisposable>().Where(o=>o != this))
                 svc.Dispose();
+
+            this.m_running = false;
+            AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStop);
 
             if (this.Stopped != null)
                 this.Stopped(this, null);
 
+            this.Dispose();
         }
 
         /// <summary>
@@ -344,6 +353,9 @@ namespace SanteDB.Core
             foreach (var kv in this.m_serviceInstances)
                 if (kv is IDisposable)
                     (kv as IDisposable).Dispose();
+
+            Tracer.DisposeWriters();
+
         }
 
         /// <summary>

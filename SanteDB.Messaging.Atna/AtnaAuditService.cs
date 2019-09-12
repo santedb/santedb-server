@@ -157,11 +157,13 @@ namespace SanteDB.Messaging.Atna
                         UserName = adActor.UserName,
                         AlternativeUserId = adActor.AlternativeUserId
                     };
-                    foreach (var rol in adActor.ActorRoleCode)
-                        act.ActorRoleCode.Add(new CodeValue<string>(rol.Code, rol.CodeSystem)
-                            {
-                                DisplayName = rol.DisplayName
-                            });
+
+                    if(adActor.ActorRoleCode != null)
+                        foreach (var rol in adActor.ActorRoleCode)
+                            act.ActorRoleCode.Add(new CodeValue<string>(rol.Code, rol.CodeSystem)
+                                {
+                                    DisplayName = rol.DisplayName
+                                });
                     am.Actors.Add(act);
                 }
 
@@ -215,7 +217,10 @@ namespace SanteDB.Messaging.Atna
         /// </summary>
         public void SendAudit(SdbAudit.AuditData ad)
         {
-            ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(SendAuditAsync, ad);
+            if (ApplicationServiceContext.Current.IsRunning)
+                ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(SendAuditAsync, ad);
+            else
+                SendAuditAsync(ad);
         }
 
         #endregion

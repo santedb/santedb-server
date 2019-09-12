@@ -27,6 +27,7 @@ using System.Reflection;
 using System.Threading;
 using System.Configuration;
 using System.Diagnostics.Tracing;
+using System.Collections.Concurrent;
 
 namespace SanteDB.Core.Diagnostics
 {
@@ -46,10 +47,10 @@ namespace SanteDB.Core.Diagnostics
         private String m_logFile;
 
         // The log backlog
-        private Queue<String> m_logBacklog = new Queue<string>();
+        private ConcurrentQueue<String> m_logBacklog = new ConcurrentQueue<string>();
 
-        // Lock object
-        private Object s_lockObject = new object();
+        // Reset event
+        private ManualResetEvent m_resetEvent = new ManualResetEvent(false);
 
         // File name reference
         private string m_fileName;
@@ -92,15 +93,12 @@ namespace SanteDB.Core.Diagnostics
         /// </summary>
         protected override void WriteTrace(EventLevel level, string source, string format, params object[] args)
         {
-            lock (this.m_logBacklog)
-            {
-                this.m_logBacklog.Enqueue(String.Format("{0}@{1} <{2}> [{3:o}]: {4}", source, Thread.CurrentThread.Name, level, DateTime.Now, String.Format(format, args)));
-                //string dq = String.Format("{0}@{1} <{2}> [{3:o}]: {4}", source, Thread.CurrentThread.Name, level, DateTime.Now, String.Format(format, args));
-                //using (TextWriter tw = File.AppendText(this.m_logFile))
-                //    tw.WriteLine(dq); // This allows other threads to add to the write queue
+            this.m_logBacklog.Enqueue(String.Format("{0}@{1} <{2}> [{3:o}]: {4}", source, Thread.CurrentThread.Name, level, DateTime.Now, String.Format(format, args)));
+            //string dq = String.Format("{0}@{1} <{2}> [{3:o}]: {4}", source, Thread.CurrentThread.Name, level, DateTime.Now, String.Format(format, args));
+            //using (TextWriter tw = File.AppendText(this.m_logFile))
+            //    tw.WriteLine(dq); // This allows other threads to add to the write queue
 
-                Monitor.Pulse(this.m_logBacklog);
-            }
+            this.m_resetEvent.Set();
         }
 
 
@@ -122,40 +120,29 @@ namespace SanteDB.Core.Diagnostics
         {
             while (true)
             {
-                while (true)
+                try
                 {
-                    try
-                    {
-                        Monitor.Enter(this.m_logBacklog);
-                        if (this.m_disposing) return; // shutdown dispatch
-                        while (this.m_logBacklog.Count == 0)
-                            Monitor.Wait(this.m_logBacklog);
-                        if (this.m_disposing) return;
+                    if (this.m_disposing) return; // shutdown dispatch
+                    while (this.m_logBacklog.Count == 0 && !this.m_disposing)
+                        this.m_resetEvent.WaitOne();
+                    this.m_resetEvent.Reset();
+                    if (this.m_disposing) return;
 
-                        // Use file stream
-                        using (FileStream fs = File.Open(this.GenerateFilename(), FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
+                    // Use file stream
+                    using (FileStream fs = File.Open(this.GenerateFilename(), FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
+                    {
+                        fs.Seek(0, SeekOrigin.End);
+                        using (StreamWriter sw = new StreamWriter(fs))
                         {
-                            fs.Seek(0, SeekOrigin.End);
-                            using (StreamWriter sw = new StreamWriter(fs))
-                            {
-                                var dq = this.m_logBacklog.Dequeue();
-                                Monitor.Exit(this.m_logBacklog);
+                            if (this.m_logBacklog.TryDequeue(out var dq))
                                 sw.WriteLine(dq); // This allows other threads to add to the write queue
-                                Monitor.Enter(this.m_logBacklog);
-                            }
                         }
                     }
-                    catch
-                    {
-                        ;
-                    }
-                    finally
-                    {
-                        if (Monitor.IsEntered(this.m_logBacklog))
-                            Monitor.Exit(this.m_logBacklog);
-                    }
                 }
-
+                catch
+                {
+                    ;
+                }
             }
         }
 
@@ -167,9 +154,8 @@ namespace SanteDB.Core.Diagnostics
             if (this.m_dispatchThread != null)
             {
                 this.m_disposing = true;
-                lock (this.m_logBacklog)
-                    Monitor.PulseAll(this.m_logBacklog);
-                this.m_dispatchThread.Join(); // Abort thread
+                this.m_resetEvent.Set();
+               // this.m_dispatchThread.Join(); // Abort thread
                 this.m_dispatchThread = null;
             }
         }

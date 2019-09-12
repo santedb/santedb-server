@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Linq;
@@ -21,10 +22,10 @@ namespace SanteDB.Core.Diagnostics
 
 
         // The log backlog
-        private Queue<KeyValuePair<ConsoleColor, String>> m_logBacklog = new Queue<KeyValuePair<ConsoleColor, string>>(10);
+        private ConcurrentQueue<KeyValuePair<ConsoleColor, String>> m_logBacklog = new ConcurrentQueue<KeyValuePair<ConsoleColor, string>>();
 
-        // Sync object
-        private static Object s_syncObject = new object();
+        // Reset event
+        private ManualResetEvent m_resetEvent = new ManualResetEvent(false);
 
         /// <summary>
         /// Console trace writer
@@ -67,43 +68,30 @@ namespace SanteDB.Core.Diagnostics
                     break;
             }
 
-            lock (this.m_logBacklog)
-            {
-                this.m_logBacklog.Enqueue(new KeyValuePair<ConsoleColor, String>(color, String.Format("{0:yyyy/MM/dd HH:mm:ss} [{1}] : {2} {3}: 0 : {4}", DateTime.Now, String.IsNullOrEmpty(Thread.CurrentThread.Name) ? $"@{Thread.CurrentThread.ManagedThreadId}" : Thread.CurrentThread.Name, source, level, String.Format(format, args))));
-                Monitor.Pulse(this.m_logBacklog);
-            }
+            this.m_logBacklog.Enqueue(new KeyValuePair<ConsoleColor, String>(color, String.Format("{0:yyyy/MM/dd HH:mm:ss} [{1}] : {2} {3}: 0 : {4}", DateTime.Now, String.IsNullOrEmpty(Thread.CurrentThread.Name) ? $"@{Thread.CurrentThread.ManagedThreadId}" : Thread.CurrentThread.Name, source, level, String.Format(format, args))));
+            this.m_resetEvent.Set();
         }
 
         private void LogDispatcherLoop()
         {
             while (true)
             {
-                try
-                {
-                    Monitor.Enter(this.m_logBacklog);
-                    if (this.m_disposing) return; // shutdown dispatch
-                    while (this.m_logBacklog.Count == 0)
-                        Monitor.Wait(this.m_logBacklog);
-                    if (this.m_disposing) return;
 
-                    while (this.m_logBacklog.Count > 0)
+                while (this.m_logBacklog.Count == 0 && !this.m_disposing)
+                    this.m_resetEvent.WaitOne();
+                if (this.m_disposing) return;
+                this.m_resetEvent.WaitOne();
+
+                while (this.m_logBacklog.Count > 0)
+                {
+                    if (this.m_logBacklog.TryDequeue(out var dq))
                     {
-                        var dq = this.m_logBacklog.Dequeue();
-                        Monitor.Exit(this.m_logBacklog);
                         Console.ForegroundColor = dq.Key;
                         Console.WriteLine(dq.Value);
                         Console.ResetColor();
-                        Monitor.Enter(this.m_logBacklog);
                     }
                 }
-                catch
-                {
-                    ;
-                }
-                finally
-                {
-                    Monitor.Exit(this.m_logBacklog);
-                }
+
             }
         }
 
@@ -115,9 +103,7 @@ namespace SanteDB.Core.Diagnostics
             if (this.m_dispatchThread != null)
             {
                 this.m_disposing = true;
-                lock (this.m_logBacklog)
-                    Monitor.PulseAll(this.m_logBacklog);
-                this.m_dispatchThread.Join(); // Abort thread
+                this.m_resetEvent.Set();
                 this.m_dispatchThread = null;
             }
         }

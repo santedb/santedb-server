@@ -86,7 +86,6 @@ namespace SanteDB.Core.Security.Audit
             ApplicationServiceContext.Current.Stopping += (o, e) =>
             {
                 this.m_safeToStop = true;
-                AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStop);
                 this.Stop();
             };
             ApplicationServiceContext.Current.Started += (o, e) =>
@@ -99,8 +98,9 @@ namespace SanteDB.Core.Security.Audit
                     {
                         AuditUtil.AuditLogin(se.Principal, se.UserName, so as IIdentityProviderService, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), se.Success);
                     };
+                    ApplicationServiceContext.Current.GetService<ISessionProviderService>().Established += (so, se) => AuditUtil.AuditSessionStart(se.Session, se.Principal, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), se.Success);
                    
-
+                    
                     // Scan for IRepositoryServices and bind to their events as well
                     foreach (var svc in ApplicationServiceContext.Current.GetService<IServiceManager>().GetServices().OfType<IAuditEventSource>())
                     {
@@ -126,7 +126,11 @@ namespace SanteDB.Core.Security.Audit
                         }
                     }
 
-                    AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStart);
+                    // Audit that Audits are now being recorded
+                    var audit = new AuditData(DateTime.Now, ActionType.Execute, OutcomeIndicator.Success, EventIdentifierType.ApplicationActivity, AuditUtil.CreateAuditActionCode(EventTypeCodes.AuditLoggingStarted));
+                    AuditUtil.AddLocalDeviceActor(audit);
+                    AuditUtil.SendAudit(audit);
+
                 }
                 catch (Exception ex)
                 {
@@ -149,12 +153,17 @@ namespace SanteDB.Core.Security.Audit
             // Audit tool should never stop!!!!!
             if (!this.m_safeToStop)
             {
-                AuditData securityAlertData = new AuditData(DateTime.Now, ActionType.Execute, OutcomeIndicator.EpicFail, EventIdentifierType.SecurityAlert, AuditUtil.CreateAuditActionCode(EventTypeCodes.UseOfARestrictedFunction));
+                AuditData securityAlertData = new AuditData(DateTime.Now, ActionType.Execute, OutcomeIndicator.EpicFail, EventIdentifierType.SecurityAlert, AuditUtil.CreateAuditActionCode(EventTypeCodes.AuditLoggingStopped));
                 AuditUtil.AddLocalDeviceActor(securityAlertData);
                 AuditUtil.SendAudit(securityAlertData);
             }
+            else { 
+                // Audit that audits are no longer being recorded
+                var audit = new AuditData(DateTime.Now, ActionType.Execute, OutcomeIndicator.Success, EventIdentifierType.ApplicationActivity, AuditUtil.CreateAuditActionCode(EventTypeCodes.AuditLoggingStopped));
+                AuditUtil.AddLocalDeviceActor(audit);
+                AuditUtil.SendAudit(audit);
+            };
 
-            this.Stopped?.Invoke(this, EventArgs.Empty);
             return true;
         }
     }

@@ -524,7 +524,7 @@
       <add type="SanteDB.Core.Services.Impl.LocalTagPersistenceService, SanteDB.Core, Version=1.10.0.24160, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Applets.Services.Impl.AppletSubscriptionRepository, SanteDB.Core.Applets, Version=1.30.0.0, Culture=neutral, PublicKeyToken=null"/>
       
-      <!--<add type="SanteDB.Core.Security.Audit.AuditDaemonService, SanteDB.Core, Version=1.10.0.24160, Culture=neutral, PublicKeyToken=null" />-->
+      <add type="SanteDB.Core.Security.Audit.AuditDaemonService, SanteDB.Core, Version=1.10.0.24160, Culture=neutral, PublicKeyToken=null" />
 
       <!-- Data Migration & Management -->
       <add type="SanteDB.Core.Persistence.DataInitializationService, SanteDB.Core, Version=1.10.0.24160, Culture=neutral, PublicKeyToken=null" />

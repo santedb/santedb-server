@@ -68,6 +68,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
         // Session lookups
         private Int32 m_sessionLookups = 0;
 
+        public event EventHandler<SessionEstablishedEventArgs> Established;
+
+
         /// <summary>
         /// Create and register a refresh token for the specified principal
         /// </summary>
@@ -98,6 +101,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
             try
             {
+               
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open();
@@ -127,22 +131,30 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     dbSession = context.Insert(dbSession);
 
                     var signingService = ApplicationServiceContext.Current.GetService<IDataSigningService>();
+
                     if (signingService == null)
                     {
                         this.m_traceSource.TraceWarning("No IDataSigningService provided. Session data will be unsigned!");
-                        return new AdoSecuritySession(dbSession.Key, dbSession.Key.ToByteArray(), refreshToken, dbSession.NotBefore, dbSession.NotAfter);
+                        var session = new AdoSecuritySession(dbSession.Key, dbSession.Key.ToByteArray(), refreshToken, dbSession.NotBefore, dbSession.NotAfter);
+                        this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, session, true));
+                        return session;
                     }
                     else
                     {
                         var signedToken = dbSession.Key.ToByteArray().Concat(signingService.SignData(dbSession.Key.ToByteArray())).ToArray();
                         var signedRefresh = refreshToken.Concat(signingService.SignData(refreshToken)).ToArray();
-                        return new AdoSecuritySession(dbSession.Key, signedToken, signedRefresh, dbSession.NotBefore, dbSession.NotAfter);
+
+                        var session = new AdoSecuritySession(dbSession.Key, signedToken, signedRefresh, dbSession.NotBefore, dbSession.NotAfter);
+                        this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, session, true));
+                        return session;
                     }
                 }
             }
             catch (Exception e)
             {
                 this.m_traceSource.TraceError("Error establishing session: {0}", e.Message);
+                this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, null, false));
+
                 throw;
             }
         }
@@ -242,7 +254,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     var signingService = ApplicationServiceContext.Current.GetService<IDataSigningService>();
                     if (signingService == null)
                         this.m_traceSource.TraceWarning("No IDataSigingService registered. Session data will not be verified");
-                    else if(!signingService.Verify(sessionToken.Take(16).ToArray(), sessionToken.Skip(16).ToArray()))
+                    else if (!signingService.Verify(sessionToken.Take(16).ToArray(), sessionToken.Skip(16).ToArray()))
                         throw new SecurityException("Session token appears to have been tampered with");
 
                     var sessionId = new Guid(sessionToken.Take(16).ToArray());

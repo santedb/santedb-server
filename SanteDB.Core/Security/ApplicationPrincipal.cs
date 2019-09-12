@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core.Security.Claims;
+using SanteDB.Core.Security.Principal;
 using System;
 
 using System.Security.Principal;
@@ -28,7 +29,7 @@ namespace SanteDB.Core.Security
     /// <summary>
     /// Application identity
     /// </summary>
-    public class ApplicationIdentity : SanteDBClaimsIdentity
+    public class ApplicationIdentity : SanteDBClaimsIdentity, IApplicationIdentity
     {
         // Member variables
         private string m_name;
