@@ -74,7 +74,7 @@ namespace SanteDB.Core.Security.Audit
         /// The service is stopping
         /// </summary>
         public event EventHandler Stopping;
-        
+
         /// <summary>
         /// Start auditor service
         /// </summary>
@@ -99,8 +99,8 @@ namespace SanteDB.Core.Security.Audit
                         AuditUtil.AuditLogin(se.Principal, se.UserName, so as IIdentityProviderService, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), se.Success);
                     };
                     ApplicationServiceContext.Current.GetService<ISessionProviderService>().Established += (so, se) => AuditUtil.AuditSessionStart(se.Session, se.Principal, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), se.Success);
-                   
-                    
+
+
                     // Scan for IRepositoryServices and bind to their events as well
                     foreach (var svc in ApplicationServiceContext.Current.GetService<IServiceManager>().GetServices().OfType<IAuditEventSource>())
                     {
@@ -111,20 +111,23 @@ namespace SanteDB.Core.Security.Audit
                             svc.DataObsoleted += (so, se) => AuditUtil.AuditDataAction<AuditData>(EventTypeCodes.AuditLogUsed, ActionType.Delete, AuditableObjectLifecycle.Archiving, EventIdentifierType.ApplicationActivity, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, null, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), se.Objects.OfType<AuditData>().ToArray());
                             svc.DataDisclosed += (so, se) => AuditUtil.AuditDataAction<AuditData>(EventTypeCodes.AuditLogUsed, ActionType.Execute, AuditableObjectLifecycle.Access, EventIdentifierType.Query, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, se.Query, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), se.Objects.OfType<AuditData>().ToArray());
                         }
-                        else {
+                        else
+                        { // Just a regular audit source
                             svc.DataCreated += (so, se) => AuditUtil.AuditDataAction(EventTypeCodes.PatientRecord, ActionType.Create, AuditableObjectLifecycle.Creation, EventIdentifierType.PatientRecord, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, null, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), se.Objects.OfType<IdentifiedData>().ToArray());
                             svc.DataUpdated += (so, se) => AuditUtil.AuditDataAction(EventTypeCodes.PatientRecord, ActionType.Update, AuditableObjectLifecycle.Amendment, EventIdentifierType.PatientRecord, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, null, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), se.Objects.OfType<IdentifiedData>().ToArray());
                             svc.DataObsoleted += (so, se) => AuditUtil.AuditDataAction(EventTypeCodes.PatientRecord, ActionType.Delete, AuditableObjectLifecycle.LogicalDeletion, EventIdentifierType.PatientRecord, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), null, se.Objects.OfType<IdentifiedData>().ToArray());
                             svc.DataDisclosed += (so, se) => AuditUtil.AuditDataAction<IdentifiedData>(EventTypeCodes.Query, ActionType.Read, AuditableObjectLifecycle.Disclosure, EventIdentifierType.Query, se.Success ? OutcomeIndicator.Success : OutcomeIndicator.SeriousFail, se.Query, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString());
-
-                            if (svc is ISecurityAuditEventSource)
-                            {
-                                (svc as ISecurityAuditEventSource).SecurityAttributesChanged += (so, se) => AuditUtil.AuditSecurityAttributeAction(se.Objects, se.Success, se.ChangedProperties.ToArray(), RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString());
-                                (svc as ISecurityAuditEventSource).SecurityResourceCreated += (so, se) => AuditUtil.AuditSecurityCreationAction(se.Objects, se.Success, se.ChangedProperties, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString());
-                                (svc as ISecurityAuditEventSource).SecurityResourceDeleted += (so, se) => AuditUtil.AuditSecurityDeletionAction(se.Objects, se.Success, se.ChangedProperties, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString());
-                            }
                         }
                     }
+
+                    // Security audits
+                    foreach (var svc in ApplicationServiceContext.Current.GetService<IServiceManager>().GetServices().OfType<ISecurityAuditEventSource>())
+                    {
+                        svc.SecurityAttributesChanged += (so, se) => AuditUtil.AuditSecurityAttributeAction(se.Objects, se.Success, se.ChangedProperties.ToArray(), RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString());
+                        svc.SecurityResourceCreated += (so, se) => AuditUtil.AuditSecurityCreationAction(se.Objects, se.Success, se.ChangedProperties, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString());
+                        svc.SecurityResourceDeleted += (so, se) => AuditUtil.AuditSecurityDeletionAction(se.Objects, se.Success, se.ChangedProperties, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString());
+                    }
+
 
                     // Audit that Audits are now being recorded
                     var audit = new AuditData(DateTime.Now, ActionType.Execute, OutcomeIndicator.Success, EventIdentifierType.ApplicationActivity, AuditUtil.CreateAuditActionCode(EventTypeCodes.AuditLoggingStarted));
@@ -157,7 +160,8 @@ namespace SanteDB.Core.Security.Audit
                 AuditUtil.AddLocalDeviceActor(securityAlertData);
                 AuditUtil.SendAudit(securityAlertData);
             }
-            else { 
+            else
+            {
                 // Audit that audits are no longer being recorded
                 var audit = new AuditData(DateTime.Now, ActionType.Execute, OutcomeIndicator.Success, EventIdentifierType.ApplicationActivity, AuditUtil.CreateAuditActionCode(EventTypeCodes.AuditLoggingStopped));
                 AuditUtil.AddLocalDeviceActor(audit);

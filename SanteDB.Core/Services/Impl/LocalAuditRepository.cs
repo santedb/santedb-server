@@ -33,30 +33,13 @@ namespace SanteDB.Core.Services.Impl
     /// Represents an audit repository which stores and queries audit data.
     /// </summary>
     [ServiceProvider("Default Audit Repository")]
-    public class LocalAuditRepository : IAuditRepositoryService, IAuditEventSource
+    public class LocalAuditRepository : IAuditRepositoryService
     {
 
         /// <summary>
         /// Gets the service name
         /// </summary>
         public String ServiceName => "Default Audit Repository";
-
-        /// <summary>
-        /// Fired when data has been created
-        /// </summary>
-        public event EventHandler<AuditDataEventArgs> DataCreated;
-        /// <summary>
-        /// Fired when data has been disclosed
-        /// </summary>
-        public event EventHandler<AuditDataDisclosureEventArgs> DataDisclosed;
-        /// <summary>
-        /// Fired when data has been obsoleted
-        /// </summary>
-        public event EventHandler<AuditDataEventArgs> DataObsoleted;
-        /// <summary>
-        /// Fired when data has been updated
-        /// </summary>
-        public event EventHandler<AuditDataEventArgs> DataUpdated;
 
 
         /// <summary>
@@ -80,7 +63,6 @@ namespace SanteDB.Core.Services.Impl
             if (service == null)
                 throw new InvalidOperationException("Cannot find the data persistence service for audits");
             var results = service.Query(query, offset, count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
-            this.DataDisclosed?.Invoke(this, new AuditDataDisclosureEventArgs(query.ToString(), results));
             return results;
         }
 
@@ -110,7 +92,6 @@ namespace SanteDB.Core.Services.Impl
             if (service == null)
                 throw new InvalidOperationException("Cannot find the data persistence service for audits");
             var result = service.Get(key, versionKey, false, AuthenticationContext.Current.Principal);
-            this.DataDisclosed?.Invoke(this, new AuditDataDisclosureEventArgs(key.ToString(), new List<Object>() { result }));
             return result;
         }
 
@@ -123,7 +104,6 @@ namespace SanteDB.Core.Services.Impl
             if (service == null)
                 throw new InvalidOperationException("Cannot find the data persistence service for audits");
             var result = service.Insert(audit, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-            this.DataCreated?.Invoke(this, new AuditDataEventArgs(audit));
             return result;
         }
 
@@ -137,7 +117,6 @@ namespace SanteDB.Core.Services.Impl
             if (service == null)
                 throw new InvalidOperationException("Cannot find the data persistence service for audits");
             var result = service.Obsolete(new AuditData() { Key = key }, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-            this?.DataObsoleted?.Invoke(this, new AuditDataEventArgs(key));
             return result;
         }
 
@@ -155,12 +134,10 @@ namespace SanteDB.Core.Services.Impl
             if (existing == null)
             {
                 data = service.Update(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-                this.DataUpdated?.Invoke(this, new AuditDataEventArgs(data));
             }
             else
             {
                 data = service.Insert(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-                this.DataCreated?.Invoke(this, new AuditDataEventArgs(data));
             }
             return data;
         }

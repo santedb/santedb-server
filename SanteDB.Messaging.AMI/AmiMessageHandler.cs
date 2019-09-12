@@ -39,6 +39,7 @@ using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
 using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Model.AMI.Auth;
+using SanteDB.Core.Interfaces;
 
 namespace SanteDB.Messaging.AMI
 {
@@ -66,7 +67,7 @@ namespace SanteDB.Messaging.AMI
     /// AMI Message handler
     /// </summary>
     [ServiceProvider("Administrative REST Daemon")]
-    public class AmiMessageHandler : IDaemonService, IApiEndpointProvider
+    public class AmiMessageHandler : IDaemonService, IApiEndpointProvider, IAuditEventSource, ISecurityAuditEventSource
     {
         /// <summary>
         /// Gets the service name
@@ -118,6 +119,13 @@ namespace SanteDB.Messaging.AMI
         /// Fired when the service is stopping.
         /// </summary>
         public event EventHandler Stopping;
+        public event EventHandler<AuditDataEventArgs> DataCreated;
+        public event EventHandler<AuditDataEventArgs> DataUpdated;
+        public event EventHandler<AuditDataEventArgs> DataObsoleted;
+        public event EventHandler<AuditDataDisclosureEventArgs> DataDisclosed;
+        public event EventHandler<SecurityAuditDataEventArgs> SecurityAttributesChanged;
+        public event EventHandler<SecurityAuditDataEventArgs> SecurityResourceCreated;
+        public event EventHandler<SecurityAuditDataEventArgs> SecurityResourceDeleted;
 
         /// <summary>
         /// Gets the API type
@@ -196,20 +204,27 @@ namespace SanteDB.Messaging.AMI
                     AmiMessageHandler.ResourceHandler = new ResourceHandlerTool(
                         typeof(SecurityUserResourceHandler).Assembly.ExportedTypes
                         .Union(AppDomain.CurrentDomain.GetAssemblies()
-                        .Where(a=>!a.IsDynamic)
-                        .SelectMany(a=> { try { return a.ExportedTypes; } catch { return new List<Type>(); } })) // HACK: Mono freaks out if this isn't in try/catch
+                        .Where(a => !a.IsDynamic)
+                        .SelectMany(a => { try { return a.ExportedTypes; } catch { return new List<Type>(); } })) // HACK: Mono freaks out if this isn't in try/catch
                         .Where(t => !t.IsAbstract && !t.IsInterface && typeof(IApiResourceHandler).IsAssignableFrom(t))
                         .ToList(),
                         typeof(IAmiServiceContract)
                     );
-                
+
+                AmiMessageHandler.ResourceHandler.DataCreated += (o, e) => this.DataCreated?.Invoke(o, e);
+                AmiMessageHandler.ResourceHandler.DataDisclosed += (o, e) => this.DataDisclosed?.Invoke(o, e);
+                AmiMessageHandler.ResourceHandler.DataObsoleted += (o, e) => this.DataObsoleted?.Invoke(o, e);
+                AmiMessageHandler.ResourceHandler.DataUpdated += (o, e) => this.DataUpdated?.Invoke(o, e);
+                AmiMessageHandler.ResourceHandler.SecurityAttributesChanged += (o, e) => this.SecurityAttributesChanged?.Invoke(o, e);
+                AmiMessageHandler.ResourceHandler.SecurityResourceCreated += (o, e) => this.SecurityResourceCreated?.Invoke(o, e);
+                AmiMessageHandler.ResourceHandler.SecurityResourceDeleted += (o, e) => this.SecurityResourceDeleted?.Invoke(o, e);
 
                 this.Started?.Invoke(this, EventArgs.Empty);
                 return true;
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error, e.ToString());
                 return false;
             }
         }

@@ -38,8 +38,7 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Represents a security repository service that uses the direct local services
     /// </summary>
-    public class LocalSecurityRepositoryService : ISecurityRepositoryService, 
-        ISecurityAuditEventSource
+    public class LocalSecurityRepositoryService : ISecurityRepositoryService
     {
 
         /// <summary>
@@ -48,13 +47,6 @@ namespace SanteDB.Core.Services.Impl
         public string ServiceName => "Local Security Repository Service";
 
         private Tracer m_traceSource = new Tracer(SanteDBConstants.ServiceTraceSourceName);
-
-        /// <summary>
-        /// Indicates security attributes have changed
-        /// </summary>
-        public event EventHandler<SecurityAuditDataEventArgs> SecurityAttributesChanged;
-        public event EventHandler<SecurityAuditDataEventArgs> SecurityResourceCreated;
-        public event EventHandler<SecurityAuditDataEventArgs> SecurityResourceDeleted;
 
         /// <summary>
         /// Changes a user's password.
@@ -71,7 +63,6 @@ namespace SanteDB.Core.Services.Impl
 			var iids = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
 			if (iids == null) throw new InvalidOperationException("Cannot find identity provider service");
 			iids.ChangePassword(securityUser.UserName, password, AuthenticationContext.Current.Principal);
-            this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(securityUser, "Password"));
 			return securityUser;
 		}
 
@@ -81,7 +72,6 @@ namespace SanteDB.Core.Services.Impl
         public void ChangePassword(string userName, string password)
         {
             ApplicationServiceContext.Current.GetService<IIdentityProviderService>().ChangePassword(userName, password, AuthenticationContext.Current.Principal);
-            this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(userName, "Password"));
         }
         
 		/// <summary>
@@ -173,7 +163,6 @@ namespace SanteDB.Core.Services.Impl
             if (securityUser == null)
                 throw new KeyNotFoundException(userId.ToString());
 			iids.SetLockout(securityUser.UserName, true, AuthenticationContext.Current.Principal);
-            this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(securityUser, "Lockout=True"));
 		}
 
      
@@ -194,7 +183,6 @@ namespace SanteDB.Core.Services.Impl
             if (securityUser == null)
                 throw new KeyNotFoundException(userId.ToString());
 			iids.SetLockout(securityUser.UserName, false, AuthenticationContext.Current.Principal);
-            this.SecurityAttributesChanged?.Invoke(this, new SecurityAuditDataEventArgs(securityUser, "Lockout=False"));
 
         }
         
@@ -206,6 +194,21 @@ namespace SanteDB.Core.Services.Impl
             int t;
             return ApplicationServiceContext.Current.GetService<IRepositoryService<Provider>>()
                 .Find(o => o.Relationships.Where(r => r.RelationshipType.Mnemonic == "AssignedEntity").Any(r => (r.SourceEntity as UserEntity).SecurityUser.UserName == identity.Name), 0, 1, out t).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Set the user's roles to only those in the roles array
+        /// </summary>
+        public void SetUserRoles(SecurityUser user, string[] roles)
+        {
+            var irps = ApplicationServiceContext.Current.GetService<IRoleProviderService>();
+            if (irps == null)
+                throw new InvalidOperationException("Cannot find role provider service");
+
+            if (!user.Key.HasValue)
+                user = this.GetUser(user.UserName);
+            irps.RemoveUsersFromRoles(new String[] { user.UserName }, irps.GetAllRoles().Where(o => !roles.Contains(o)).ToArray(), AuthenticationContext.Current.Principal);
+            irps.AddUsersToRoles(new string[] { user.UserName }, roles, AuthenticationContext.Current.Principal);
         }
     }
 }

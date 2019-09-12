@@ -34,7 +34,7 @@ namespace SanteDB.Tools.AdminConsole.Security
     /// <summary>
     /// Represents an OAuthIdentity provider
     /// </summary>
-    public class OAuthIdentityProvider : IIdentityProviderService, ISecurityAuditEventSource
+    public class OAuthIdentityProvider : IIdentityProviderService
     {
         /// <summary>
         /// Gets the service name
@@ -53,23 +53,7 @@ namespace SanteDB.Tools.AdminConsole.Security
         /// Occurs when a principal has authenticated.
         /// </summary>
         public event EventHandler<AuthenticatedEventArgs> Authenticated;
-        /// <summary>
-        /// Fired when security attributes of a user have changed
-        /// </summary>
-        public event EventHandler<SecurityAuditDataEventArgs> SecurityAttributesChanged;
-        /// <summary>
-        /// Fired when data has been disclosed
-        /// </summary>
-        public event EventHandler<AuditDataDisclosureEventArgs> DataDisclosed;
-        /// <summary>
-        /// Fired when a security resource has been modified
-        /// </summary>
-        public event EventHandler<SecurityAuditDataEventArgs> SecurityResourceCreated;
-        /// <summary>
-        /// Fired when a security resource has been deleted
-        /// </summary>
-        public event EventHandler<SecurityAuditDataEventArgs> SecurityResourceDeleted;
-
+        
         /// <summary>
         /// Authenticate the user
         /// </summary>

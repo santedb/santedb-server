@@ -20,6 +20,7 @@
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Interfaces;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Rest;
 using SanteDB.Core.Rest.Behavior;
@@ -44,7 +45,7 @@ namespace SanteDB.Messaging.HDSI
     /// The HDSI Message Handler Daemon class
     /// </summary>
     [ServiceProvider("iCDR Message Service")]
-    public class HdsiMessageHandler : IDaemonService, IApiEndpointProvider
+    public class HdsiMessageHandler : IDaemonService, IApiEndpointProvider, IAuditEventSource, ISecurityAuditEventSource
     {
         /// <summary>
         /// Gets the service name
@@ -97,6 +98,13 @@ namespace SanteDB.Messaging.HDSI
         /// Fired when the service is stopping
         /// </summary>
         public event EventHandler Stopping;
+        public event EventHandler<SecurityAuditDataEventArgs> SecurityAttributesChanged;
+        public event EventHandler<SecurityAuditDataEventArgs> SecurityResourceCreated;
+        public event EventHandler<SecurityAuditDataEventArgs> SecurityResourceDeleted;
+        public event EventHandler<AuditDataEventArgs> DataCreated;
+        public event EventHandler<AuditDataEventArgs> DataUpdated;
+        public event EventHandler<AuditDataEventArgs> DataObsoleted;
+        public event EventHandler<AuditDataDisclosureEventArgs> DataDisclosed;
 
 
         /// <summary>
@@ -155,6 +163,14 @@ namespace SanteDB.Messaging.HDSI
                         .Where(t => !t.IsAbstract && !t.IsInterface && typeof(IApiResourceHandler).IsAssignableFrom(t))
                         .ToList(), typeof(IHdsiServiceContract)
                     );
+
+                HdsiMessageHandler.ResourceHandler.DataCreated += (o, e) => this.DataCreated?.Invoke(o, e);
+                HdsiMessageHandler.ResourceHandler.DataDisclosed += (o, e) => this.DataDisclosed?.Invoke(o, e);
+                HdsiMessageHandler.ResourceHandler.DataObsoleted += (o, e) => this.DataObsoleted?.Invoke(o, e);
+                HdsiMessageHandler.ResourceHandler.DataUpdated += (o, e) => this.DataUpdated?.Invoke(o, e);
+                HdsiMessageHandler.ResourceHandler.SecurityAttributesChanged += (o, e) => this.SecurityAttributesChanged?.Invoke(o, e);
+                HdsiMessageHandler.ResourceHandler.SecurityResourceCreated += (o, e) => this.SecurityResourceCreated?.Invoke(o, e);
+                HdsiMessageHandler.ResourceHandler.SecurityResourceDeleted += (o, e) => this.SecurityResourceDeleted?.Invoke(o, e);
 
                 this.m_webHost = ApplicationContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(HdsiServiceBehavior));
                 this.m_webHost.AddServiceBehavior(new ErrorServiceBehavior());

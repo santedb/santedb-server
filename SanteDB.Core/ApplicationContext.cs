@@ -248,7 +248,8 @@ namespace SanteDB.Core
             if (this.Stopping != null)
                 this.Stopping(this, null);
 
-
+            this.m_running = false;
+            
             foreach (var svc in this.m_serviceInstances.OfType<IDaemonService>())
             {
                 Trace.TraceInformation("Stopping daemon service {0}...", svc.GetType().Name);
@@ -259,7 +260,6 @@ namespace SanteDB.Core
             foreach (var svc in this.m_serviceInstances.OfType<IDisposable>().Where(o=>o != this))
                 svc.Dispose();
 
-            this.m_running = false;
             AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStop);
 
             if (this.Stopped != null)
