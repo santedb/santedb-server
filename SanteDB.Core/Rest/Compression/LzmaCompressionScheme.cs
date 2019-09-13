@@ -20,6 +20,8 @@
 using SharpCompress.Compressors;
 using SharpCompress.Compressors.LZMA;
 using System.IO;
+using SharpCompress.IO;
+
 
 namespace SanteDB.Core.Rest.Compression
 {
@@ -44,7 +46,7 @@ namespace SanteDB.Core.Rest.Compression
         /// </summary>
         public Stream CreateCompressionStream(Stream underlyingStream)
         {
-            return new LZipStream(underlyingStream, CompressionMode.Compress, true);
+            return new LZipStream(new NonDisposingStream(underlyingStream), CompressionMode.Compress);
 
         }
 
@@ -53,7 +55,7 @@ namespace SanteDB.Core.Rest.Compression
         /// </summary>
         public Stream CreateDecompressionStream(Stream underlyingStream)
         {
-            return new LZipStream(underlyingStream, CompressionMode.Decompress, true);
+            return new LZipStream(new NonDisposingStream(underlyingStream), CompressionMode.Decompress);
         }
     }
 }
