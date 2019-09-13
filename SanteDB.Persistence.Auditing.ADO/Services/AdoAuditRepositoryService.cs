@@ -473,7 +473,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     }
                     sql = sql.Build();
                     var itm = context.Query<CompositeResult<DbAuditData, DbAuditCode>>(sql);
-                    AuditUtil.AuditAuditLogUsed(ActionType.Read, OutcomeIndicator.Success, sql.ToString(), RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), itm.Select(o => o.Object1.Key).ToArray());
+                    AuditUtil.AuditAuditLogUsed(ActionType.Read, OutcomeIndicator.Success, sql.ToString(), itm.Select(o => o.Object1.Key).ToArray());
                     var results = itm.Select(o => this.ToModelInstance(context, o)).ToList().AsQueryable();
 
                     // Event args
@@ -485,7 +485,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             }
             catch (Exception e)
             {
-                AuditUtil.AuditAuditLogUsed(ActionType.Read, OutcomeIndicator.EpicFail, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint.ToString(), query.ToString());
+                AuditUtil.AuditAuditLogUsed(ActionType.Read, OutcomeIndicator.EpicFail, query.ToString());
                 this.m_traceSource.TraceError("Could not query audit {0}: {1}", query, e);
                 throw;
             }

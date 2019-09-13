@@ -33,6 +33,7 @@ using SanteDB.Core.Interfaces;
 using SanteDB.Core.Diagnostics;
 using System.Security.Principal;
 using SanteDB.Core.Security.Audit;
+using RestSrvr;
 
 namespace SanteDB.Core
 {
@@ -41,7 +42,7 @@ namespace SanteDB.Core
     /// </summary>
     /// <remarks>Allows components to be communicate with each other via a loosely coupled
     /// broker system.</remarks>
-    public class ApplicationContext : IServiceProvider, IServiceManager, IDisposable, IApplicationServiceContext
+    public class ApplicationContext : IServiceProvider, IServiceManager, IDisposable, IApplicationServiceContext, IRemoteEndpointResolver
     {
 
         // Lock object
@@ -113,6 +114,8 @@ namespace SanteDB.Core
         /// Gets the host type
         /// </summary>
         public SanteDBHostType HostType => SanteDBHostType.Server;
+
+        public string ServiceName => throw new NotImplementedException();
 
         /// <summary>
         /// Configuration
@@ -367,6 +370,23 @@ namespace SanteDB.Core
             return AppDomain.CurrentDomain.GetAssemblies()
                 .Where(a => !a.IsDynamic)
                 .SelectMany(a => { try { return a.ExportedTypes; } catch { return new List<Type>(); } });
+        }
+
+        /// <summary>
+        /// Gets the remote endpoint of the current request
+        /// </summary>
+        public string GetRemoteEndpoint()
+        {
+            return RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString();
+        }
+
+        /// <summary>
+        /// Gets the remote request URL
+        /// </summary>
+        /// <returns></returns>
+        public string GetRemoteRequestUrl()
+        {
+            return RestOperationContext.Current?.IncomingRequest?.Url?.ToString();
         }
 
         #endregion

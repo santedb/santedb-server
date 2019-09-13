@@ -68,7 +68,15 @@ namespace SanteDB.Persistence.Data.ADO.Services
         // Session lookups
         private Int32 m_sessionLookups = 0;
 
+        /// <summary>
+        /// Fired when the session is established
+        /// </summary>
         public event EventHandler<SessionEstablishedEventArgs> Established;
+
+        /// <summary>
+        /// Fired when a session is abandoned
+        /// </summary>
+        public event EventHandler<SessionEstablishedEventArgs> Abandoned;
 
 
         /// <summary>
@@ -101,7 +109,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
             try
             {
-               
+
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open();
@@ -296,6 +304,37 @@ namespace SanteDB.Persistence.Data.ADO.Services
             {
                 this.m_traceSource.TraceError("Error getting session: {0}", e.Message);
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// Abandon the specified session
+        /// </summary>
+        public void Abandon(ISession session)
+        {
+            try
+            {
+                using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+                {
+                    context.Open();
+                    // We want a record of the session, just set the expiration
+                    var sessionId = new Guid(session.Id);
+                    var dbSession = context.FirstOrDefault<DbSession>(o => o.Key == sessionId && o.NotAfter > DateTimeOffset.Now);
+                    if (dbSession == null)
+                        return;
+                    else
+                        dbSession.NotAfter = dbSession.RefreshExpiration = DateTimeOffset.Now;
+                    context.Update(dbSession);
+
+                }
+
+                this.Abandoned?.Invoke(this, new SessionEstablishedEventArgs(null, session, true));
+            }
+            catch (Exception e)
+            {
+                this.m_traceSource.TraceError("Cannot abandon session {0} - {1}", BitConverter.ToString(session.Id, 0), e);
+                this.Abandoned?.Invoke(this, new SessionEstablishedEventArgs(null, session, false));
+                throw new SecurityException($"Cannot abandon session {BitConverter.ToString(session.Id)}", e);
             }
         }
     }

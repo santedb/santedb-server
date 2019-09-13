@@ -109,7 +109,6 @@
     <Compile Include="Persistence\DataInitializationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\ApplicationPrincipal.cs" />
-    <Compile Include="Security\Audit\AuditDaemonService.cs" />
     <Compile Include="Security\Claims\OverrideClaimHandler.cs" />
     <Compile Include="Security\Claims\PurposeOfUseClaimHandler.cs" />
     <Compile Include="Security\Claims\IClaimTypeHandler.cs" />
@@ -174,6 +173,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Rest\Services\" />
+    <Folder Include="Security\Audit\" />
     <Folder Include="Security\Wcf\" />
   </ItemGroup>
   <ItemGroup>
