@@ -151,21 +151,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <returns>Returns the updated security application.</returns>
 		public override Core.Model.Security.SecurityApplication UpdateInternal(DataContext context, Core.Model.Security.SecurityApplication data)
 		{
-			var domainInstance = this.FromModelInstance(data, context);
-
-			var currentObject = context.FirstOrDefault<DbSecurityApplication>(d => d.Key == data.Key);
-
-			if (currentObject == null)
-			{
-				throw new KeyNotFoundException(data.Key.ToString());
-			}
-
-			currentObject.CopyObjectData(domainInstance);
-
-			currentObject.ObsoletedByKey = data.ObsoletedByKey == Guid.Empty ? null : data.ObsoletedByKey;
-			currentObject.ObsoletionTime = data.ObsoletionTime;
-
-			context.Update(currentObject);
+            var instance = base.UpdateInternal(context, data);
 
 			if (data.Policies != null && data.Policies.Count > 0)
 			{

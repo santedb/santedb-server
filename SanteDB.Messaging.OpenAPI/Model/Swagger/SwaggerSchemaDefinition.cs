@@ -53,6 +53,11 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
             this.Properties = schemaType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
                 .Where(p => p.GetCustomAttributes<XmlElementAttribute>().Any() || p.GetCustomAttribute<JsonPropertyAttribute>() != null)
                 .ToDictionary(o => o.GetSerializationName(), o => new SwaggerSchemaElement(o));
+
+            // XML info
+            var xmlType = schemaType.GetCustomAttribute<XmlTypeAttribute>();
+            if (xmlType != null)
+                this.Xml = new SwaggerXmlInfo(xmlType);
         }
 
         /// <summary>
@@ -60,6 +65,12 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
         /// </summary>
         [JsonProperty("$ref")]
         public string Reference { get; set; }
+
+        /// <summary>
+        /// Gets or sets the xml information
+        /// </summary>
+        [JsonProperty("xml")]
+        public SwaggerXmlInfo Xml { get; set; }
 
         /// <summary>
         /// Represents a property

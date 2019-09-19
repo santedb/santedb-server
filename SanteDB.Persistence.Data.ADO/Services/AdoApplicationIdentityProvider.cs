@@ -26,7 +26,9 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Configuration;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
+using SanteDB.Persistence.Data.ADO.Data;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Linq;
@@ -77,7 +79,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     dataContext.Open();
                     IPasswordHashingService hashService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
-                    var client = dataContext.FirstOrDefault<DbSecurityApplication>("auth_app", applicationId, hashService.ComputeHash(applicationSecret), 5);
+                    var client = dataContext.FirstOrDefault<DbSecurityApplication>("auth_app", applicationId, hashService.ComputeHash(applicationSecret) , 5);
                     if (client == null)
                         throw new SecurityException("Invalid application credentials");
                     else if (client.Key == Guid.Empty)
@@ -117,6 +119,65 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     throw;
                 }
 
+        }
+
+        /// <summary>
+        /// Set the lockout for the specified application
+        /// </summary>
+        public void SetLockout(string name, bool lockoutState, IPrincipal principal)
+        {
+            using (DataContext dataContext = this.m_configuration.Provider.GetWriteConnection())
+                try
+                {
+                    dataContext.Open();
+                    var provId = dataContext.EstablishProvenance(principal, null);
+
+                    var app = dataContext.FirstOrDefault<DbSecurityApplication>(o => o.PublicId == name);
+                    if (app == null)
+                        throw new KeyNotFoundException($"Application {name} not found");
+                    app.Lockout = lockoutState ? (DateTimeOffset?)DateTimeOffset.MaxValue.AddDays(-10) : null;
+                    app.LockoutSpecified = true;
+
+                    app.UpdatedByKey = provId;
+                    app.UpdatedTime = DateTimeOffset.Now;
+                    dataContext.Update(app);
+                }
+                catch (Exception e)
+                {
+                    this.m_traceSource.TraceEvent(EventLevel.Error, "Error getting identity data for {0} : {1}", name, e);
+                    throw;
+                }
+        }
+
+        /// <summary>
+        /// Changes the application secret
+        /// </summary>
+        public void ChangeSecret(string name, string secret, IPrincipal principal)
+        {
+            using (DataContext dataContext = this.m_configuration.Provider.GetWriteConnection())
+                try
+                {
+                    dataContext.Open();
+                    var provId = dataContext.EstablishProvenance(principal, null);
+
+                    var app = dataContext.FirstOrDefault<DbSecurityApplication>(o => o.PublicId == name);
+                    if (app == null)
+                        throw new KeyNotFoundException($"Application {name} not found");
+
+                    var phash = ApplicationContext.Current.GetService<IPasswordHashingService>();
+                    if (phash == null)
+                        throw new InvalidOperationException("Cannot find password hashing service");
+
+                    app.UpdatedByKey = provId;
+                    app.UpdatedTime = DateTimeOffset.Now;
+                    app.Secret = phash.ComputeHash(secret);
+                    dataContext.Update(app);
+                }
+                catch (Exception e)
+                {
+                    this.m_traceSource.TraceEvent(EventLevel.Error, "Error setting secret for {0} : {1}", name, e);
+                    throw;
+                }
         }
     }
 }

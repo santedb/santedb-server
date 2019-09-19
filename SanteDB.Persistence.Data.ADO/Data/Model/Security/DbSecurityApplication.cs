@@ -28,8 +28,8 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
     /// Security applicationDb Should only be one entry here as well
     /// </summary>
     [Table("sec_app_tbl")]
-	public class DbSecurityApplication : DbBaseData
-	{
+	public class DbSecurityApplication : DbNonVersionedBaseData
+    {
 
         /// <summary>
         /// Gets or sets the application id
@@ -64,6 +64,11 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// </summary>
         [Column("locked")]
         public DateTimeOffset? Lockout { get; set; }
+
+        /// <summary>
+        /// Sets whether the lockout was explicitly set
+        /// </summary>
+        public bool LockoutSpecified { get; set; }
 
         /// <summary>
         /// Gets or sets the lockout

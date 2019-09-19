@@ -28,7 +28,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
     /// Represents a security device. This table should only have one row (the current device)
     /// </summary>
     [Table("sec_dev_tbl")]
-	public class DbSecurityDevice : DbBaseData
+	public class DbSecurityDevice : DbNonVersionedBaseData
 	{
 		
 		/// <summary>
@@ -58,6 +58,11 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// </summary>
         [Column("locked")]
         public DateTimeOffset? Lockout { get; set; }
+
+        /// <summary>
+        /// Sets whether the lockout was explicitly set
+        /// </summary>
+        public bool LockoutSpecified { get; set; }
 
         /// <summary>
         /// Gets or sets the lockout
