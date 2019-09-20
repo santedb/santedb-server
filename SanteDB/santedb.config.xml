@@ -159,6 +159,7 @@
     </jobs>-->
   </section>
   <section xsi:type="RestConfigurationSection">
+    <baseAddress>http://foo.com</baseAddress>
     <service name="META">
       <endpoint address="http://0.0.0.0:8080/api-docs" contract="SanteDB.Messaging.Metadata.Rest.IMetadataServiceContract, SanteDB.Messaging.Metadata, Version=1.0.0.0">
         <add type="SanteDB.Core.Rest.Behavior.MessageCompressionEndpointBehavior, SanteDB.Core, Version=1.10.0.0"/>

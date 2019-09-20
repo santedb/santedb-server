@@ -196,9 +196,11 @@ namespace SanteDB.Core.Services.Impl
                 throw new SecurityException("Applet failed validation");
             else if (!this.m_appletCollection.VerifyDependencies(package.Meta))
                 throw new InvalidOperationException($"Applet {package.Meta} depends on : [{String.Join(", ", package.Meta.Dependencies.Select(o=>o.ToString()))}] which are missing or incompatible");
-           
+
             // Save the applet
-            var appletDir = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "applets");
+            var appletDir = this.m_configuration.AppletDirectory;
+            if(!Path.IsPathRooted(appletDir))
+                appletDir = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), this.m_configuration.AppletDirectory);
             if (!Directory.Exists(appletDir))
                 Directory.CreateDirectory(appletDir);
 
@@ -364,8 +366,11 @@ namespace SanteDB.Core.Services.Impl
 
 	        try
 	        {
-		        // Load packages from applets/ filesystem directory
-                var appletDir = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "applets");
+                // Load packages from applets/ filesystem directory
+                var appletDir = this.m_configuration.AppletDirectory;
+                if (!Path.IsPathRooted(appletDir))
+                    appletDir = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), this.m_configuration.AppletDirectory);
+
                 if (!Directory.Exists(appletDir))
                     this.m_tracer.TraceWarning("Applet directory {0} doesn't exist, no applets will be loaded", appletDir);
                 else
@@ -470,7 +475,10 @@ namespace SanteDB.Core.Services.Impl
                 throw new InvalidOperationException($"Applet {solution.Meta} depends on : [{String.Join(", ", solution.Meta.Dependencies.Select(o => o.ToString()))}] which are missing or incompatible");
 
             // Save the applet
-            var appletDir = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "applets");
+            var appletDir = this.m_configuration.AppletDirectory;
+            if (!Path.IsPathRooted(appletDir))
+                appletDir = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), this.m_configuration.AppletDirectory);
+
             if (!Directory.Exists(appletDir))
                 Directory.CreateDirectory(appletDir);
 
