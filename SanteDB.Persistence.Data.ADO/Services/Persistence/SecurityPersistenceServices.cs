@@ -92,7 +92,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
 			if (application != null && context.LoadState == LoadState.FullLoad)
 			{
-				var policyQuery = context.CreateSqlStatement<DbSecurityApplicationPolicy>().SelectFrom()
+				var policyQuery = context.CreateSqlStatement<DbSecurityApplicationPolicy>().SelectFrom(typeof(DbSecurityApplicationPolicy), typeof(DbSecurityPolicy))
 										.InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
 										.Where<DbSecurityApplicationPolicy>(o => o.SourceKey == application.Key);
 
