@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Services.Impl;
 using System;

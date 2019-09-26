@@ -989,6 +989,107 @@
     </Concept>
   </update>
   
+  
+  <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>4947af42-e20c-4c41-a357-4a6f9753ff00</id>
+      <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
+      <mnemonic>110145</mnemonic>
+      <codeSystem>6c3b1b28-2e5b-40ef-a89b-0eb26477a16a</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Session Start</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>388e3145-735d-4614-9bd3-61c8b577ff00</id>
+      <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
+      <version xsi:nil="true" />
+      <sequence xsi:nil="true" />
+      <isReadonly>false</isReadonly>
+      <mnemonic>SecurityAuditCode-SessionStarted</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <referenceTerm>
+        <term>4947af42-e20c-4c41-a357-4a6f9753ff00</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+      <name>
+        <language>en</language>
+        <value>Session Started</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>4947af42-e20c-4c41-a357-4a6f9753ff01</id>
+      <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
+      <mnemonic>110146</mnemonic>
+      <codeSystem>6c3b1b28-2e5b-40ef-a89b-0eb26477a16a</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Session Stopped</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>388e3145-735d-4614-9bd3-61c8b577ff01</id>
+      <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
+      <version xsi:nil="true" />
+      <sequence xsi:nil="true" />
+      <isReadonly>false</isReadonly>
+      <mnemonic>SecurityAuditCode-SessionStopped</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <referenceTerm>
+        <term>4947af42-e20c-4c41-a357-4a6f9753ff00</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+      <name>
+        <language>en</language>
+        <value>Session Stopped</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>4947af42-e20c-4c41-a357-4a6f9753ff02</id>
+      <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
+      <mnemonic>110147</mnemonic>
+      <codeSystem>6c3b1b28-2e5b-40ef-a89b-0eb26477a16a</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Access Control Decision</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>388e3145-735d-4614-9bd3-61c8b577ff02</id>
+      <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
+      <version xsi:nil="true" />
+      <sequence xsi:nil="true" />
+      <isReadonly>false</isReadonly>
+      <mnemonic>SecurityAuditCode-AccessControlDecision</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <referenceTerm>
+        <term>4947af42-e20c-4c41-a357-4a6f9753ff00</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+      <name>
+        <language>en</language>
+        <value>Access Control Decision</value>
+      </name>
+    </Concept>
+  </update>
+
   <update insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
       <id>043974d5-5032-452e-8ba9-b3a022f592eb</id>
@@ -1027,6 +1128,9 @@
       <concept>b25f9223-0fd1-440c-8362-aec1c07bbdf8</concept>
       <concept>c25f9223-0da1-440c-8362-aec1c07bbdff</concept>
       <concept>d25f9223-0da1-440c-8362-aec1c07bbdff</concept>
+      <concept>388e3145-735d-4614-9bd3-61c8b577ff00</concept>
+      <concept>388e3145-735d-4614-9bd3-61c8b577ff01</concept>
+      <concept>388e3145-735d-4614-9bd3-61c8b577ff02</concept>
     </ConceptSet>
   </update>
 </dataset>

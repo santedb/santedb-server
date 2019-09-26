@@ -84,24 +84,26 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         // Add
                         if (securable is SecurityRole)
                         {
+                            var sr = securable as SecurityRole;
                             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
                             // Delete the existing role
-                            context.Delete<DbSecurityRolePolicy>(o => o.PolicyKey == policy.Key);
+                            context.Delete<DbSecurityRolePolicy>(o => o.PolicyKey == policy.Key && o.SourceKey == sr.Key);
                             context.Insert(new DbSecurityRolePolicy()
                             {
-                                SourceKey = (securable as SecurityRole).Key.Value,
+                                SourceKey = sr.Key.Value,
                                 GrantType = (int)rule,
                                 PolicyKey = policy.Key
                             });
                         }
                         else if (securable is SecurityApplication)
                         {
+                            var sa = securable as SecurityApplication;
                             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
                             // Delete the existing role
-                            context.Delete<DbSecurityApplicationPolicy>(o => o.PolicyKey == policy.Key);
+                            context.Delete<DbSecurityApplicationPolicy>(o => o.PolicyKey == policy.Key && o.SourceKey == sa.Key);
                             context.Insert(new DbSecurityApplicationPolicy()
                             {
-                                SourceKey = (securable as SecurityApplication).Key.Value,
+                                SourceKey = sa.Key.Value,
                                 GrantType = (int)rule,
                                 PolicyKey = policy.Key
                             });
@@ -109,12 +111,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         }
                         else if (securable is SecurityDevice)
                         {
+                            var sd = securable as SecurityDevice;
                             // Delete the existing role
                             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
-                            context.Delete<DbSecurityDevicePolicy>(o => o.PolicyKey == policy.Key);
+                            context.Delete<DbSecurityDevicePolicy>(o => o.PolicyKey == policy.Key && o.SourceKey == sd.Key);
                             context.Insert(new DbSecurityDevicePolicy()
                             {
-                                SourceKey = (securable as SecurityDevice).Key.Value,
+                                SourceKey = sd.Key.Value,
                                 GrantType = (int)rule,
                                 PolicyKey = policy.Key
                             });
@@ -132,15 +135,115 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
 
                             var ent = securable as Entity;
-                            var existing = context.FirstOrDefault<DbEntitySecurityPolicy>(e => e.SourceKey == ent.Key && e.PolicyKey == policy.Key);
+                            var existing = context.FirstOrDefault<DbEntitySecurityPolicy>(e => e.SourceKey == ent.Key && e.PolicyKey == policy.Key && e.ObsoleteVersionSequenceId == null);
                             if (existing != null)
-                                context.Insert(new DbEntitySecurityPolicy()
-                                {
-                                    EffectiveVersionSequenceId = ent.VersionSequence.Value,
-                                    PolicyKey = policy.Key,
-                                    SourceKey = ent.Key.Value
-                                });
+                            {
+                                // Set obsolete to null if rule is DENY
+                                existing.ObsoleteVersionSequenceId = null;
+                                context.Update(existing);
+                            }
+                            context.Insert(new DbEntitySecurityPolicy()
+                            {
+                                EffectiveVersionSequenceId = ent.VersionSequence.Value,
+                                PolicyKey = policy.Key,
+                                SourceKey = ent.Key.Value
+                            });
+
+                        }
+                        else if (securable is Act)
+                        {
+
+                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.WriteClinicalData, principal).Demand();
+
+                            var act = securable as Act;
+                            var existing = context.FirstOrDefault<DbActSecurityPolicy>(e => e.SourceKey == act.Key && e.PolicyKey == policy.Key && e.ObsoleteVersionSequenceId == null);
+
+                            if (existing != null)
+                            {
+                                // Set obsolete to null if rule is DENY
+                                existing.ObsoleteVersionSequenceId = null;
+                                context.Update(existing);
+                            }
+                            context.Insert(new DbActSecurityPolicy()
+                            {
+                                EffectiveVersionSequenceId = act.VersionSequence.Value,
+                                PolicyKey = policy.Key,
+                                SourceKey = act.Key.Value
+                            });
+
+                        }
+                        else
+                            throw new NotSupportedException($"Policies are not supported for {securable}");
+                    }
+                    tx.Commit();
+                }
+                catch (Exception e)
+                {
+                    tx.Rollback();
+                    this.m_traceSource.TraceEvent(EventLevel.Error,  "Error adding policies to {0}: {1}", securable, e);
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// REmoves the specified policies to the specified object
+        /// </summary>
+        /// <param name="securable">The securible to which the policy is to be removed</param>
+        /// <param name="rule">The rule to apply to the securable</param>
+        /// <param name="policyOids">The policy OIDs to remove</param>
+        public void RemovePolicies(object securable, IPrincipal principal, params string[] policyOids)
+        {
+
+            using (DataContext context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                IDbTransaction tx = null;
+                try
+                {
+                    context.Open();
+                    tx = context.BeginTransaction();
+                    foreach (var oid in policyOids)
+                    {
+                        var policy = context.FirstOrDefault<DbSecurityPolicy>(p => p.Oid == oid);
+                        if (policy == null) throw new KeyNotFoundException($"Policy {oid} not found");
+
+                        // Add
+                        if (securable is SecurityRole)
+                        {
+                            var sr = securable as SecurityRole;
+                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
+                            // Delete the existing role
+                            context.Delete<DbSecurityRolePolicy>(o => o.PolicyKey == policy.Key && o.SourceKey == sr.Key);
+                        }
+                        else if (securable is SecurityApplication)
+                        {
+                            var sa = securable as SecurityApplication;
+                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
+                            // Delete the existing role
+                            context.Delete<DbSecurityApplicationPolicy>(o => o.PolicyKey == policy.Key && o.SourceKey == sa.Key);
+                        }
+                        else if (securable is SecurityDevice)
+                        {
+                            var sd = securable as SecurityDevice;
+                            // Delete the existing role
+                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
+                            context.Delete<DbSecurityDevicePolicy>(o => o.PolicyKey == policy.Key && o.SourceKey == sd.Key);
+                        }
+                        else if (securable is Entity)
+                        {
+                            // Must either have write, must be the patient or must be their dedicated provider
+                            if (securable is Patient)
+                                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.WriteClinicalData, principal).Demand();
+                            else if (securable is Material || securable is ManufacturedMaterial)
+                                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.WriteMaterials, principal).Demand();
+                            else if (securable is Place || securable is Organization || securable is Provider)
+                                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.WritePlacesAndOrgs, principal).Demand();
                             else
+                                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
+
+                            var ent = securable as Entity;
+                            var existing = context.FirstOrDefault<DbEntitySecurityPolicy>(e => e.SourceKey == ent.Key && e.PolicyKey == policy.Key && e.ObsoleteVersionSequenceId == null);
+                            if (existing != null)
                             {
                                 // Set obsolete to null if rule is DENY
                                 existing.ObsoleteVersionSequenceId = null;
@@ -153,16 +256,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.WriteClinicalData, principal).Demand();
 
                             var act = securable as Act;
-                            var existing = context.FirstOrDefault<DbActSecurityPolicy>(e => e.SourceKey == act.Key && e.PolicyKey == policy.Key);
+                            var existing = context.FirstOrDefault<DbActSecurityPolicy>(e => e.SourceKey == act.Key && e.PolicyKey == policy.Key && e.ObsoleteVersionSequenceId == null);
 
                             if (existing != null)
-                                context.Insert(new DbActSecurityPolicy()
-                                {
-                                    EffectiveVersionSequenceId = act.VersionSequence.Value,
-                                    PolicyKey = policy.Key,
-                                    SourceKey = act.Key.Value
-                                });
-                            else
                             {
                                 // Set obsolete to null if rule is DENY
                                 existing.ObsoleteVersionSequenceId = null;
@@ -178,7 +274,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 catch (Exception e)
                 {
                     tx.Rollback();
-                    this.m_traceSource.TraceEvent(EventLevel.Error,  "Error adding policies to {0}: {1}", securable, e);
+                    this.m_traceSource.TraceEvent(EventLevel.Error, "Error adding policies to {0}: {1}", securable, e);
                     throw;
                 }
             }
@@ -412,7 +508,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
         {
             // TODO: Add caching for this
             return this.GetActivePolicies(securable).FirstOrDefault(o => o.Policy.Oid == policyOid);
-            throw new NotImplementedException();
         }
     }
 }

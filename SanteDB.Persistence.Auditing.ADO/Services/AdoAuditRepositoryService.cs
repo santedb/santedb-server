@@ -120,11 +120,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             {
                 ApplicationServiceContext.Current.Started += (o, e) =>
                 {
-                    // Audit that Audits are now being recorded
-                    var audit = new AuditData(DateTime.Now, ActionType.Execute, OutcomeIndicator.Success, EventIdentifierType.ApplicationActivity, AuditUtil.CreateAuditActionCode(EventTypeCodes.AuditLoggingStarted));
-                    AuditUtil.AddLocalDeviceActor(audit);
-                    AuditUtil.SendAudit(audit);
-
+                   
                     // Add audits as a BI data source
                     ApplicationServiceContext.Current.GetService<IBiMetadataRepository>()
                         .Insert(new BiDataSourceDefinition()
@@ -144,14 +140,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             ProviderType = typeof(OrmBiDataProvider)
                         });
                 };
-                ApplicationServiceContext.Current.Stopping += (o, e) =>
-                {
-                    // Audit that audits are no longer being recorded
-                    var audit = new AuditData(DateTime.Now, ActionType.Execute, OutcomeIndicator.Success, EventIdentifierType.ApplicationActivity, AuditUtil.CreateAuditActionCode(EventTypeCodes.AuditLoggingStopped));
-                    AuditUtil.AddLocalDeviceActor(audit);
-                    AuditUtil.SendAudit(audit);
-                };
-
+                
                 this.m_mapper = new ModelMapper(typeof(AdoAuditRepositoryService).Assembly.GetManifestResourceStream("SanteDB.Persistence.Auditing.ADO.Data.Map.ModelMap.xml"));
                 this.m_builder = new QueryBuilder(this.m_mapper, this.m_configuration.Provider);
             }
@@ -484,7 +473,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     }
                     sql = sql.Build();
                     var itm = context.Query<CompositeResult<DbAuditData, DbAuditCode>>(sql);
-                    AuditUtil.AuditAuditLogUsed(ActionType.Read, OutcomeIndicator.Success, sql.ToString(), RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString(), itm.Select(o => o.Object1.Key).ToArray());
+                    AuditUtil.AuditAuditLogUsed(ActionType.Read, OutcomeIndicator.Success, sql.ToString(), itm.Select(o => o.Object1.Key).ToArray());
                     var results = itm.Select(o => this.ToModelInstance(context, o)).ToList().AsQueryable();
 
                     // Event args
@@ -496,7 +485,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             }
             catch (Exception e)
             {
-                AuditUtil.AuditAuditLogUsed(ActionType.Read, OutcomeIndicator.EpicFail, RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint.ToString(), query.ToString());
+                AuditUtil.AuditAuditLogUsed(ActionType.Read, OutcomeIndicator.EpicFail, query.ToString());
                 this.m_traceSource.TraceError("Could not query audit {0}: {1}", query, e);
                 throw;
             }

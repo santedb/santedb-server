@@ -69,6 +69,17 @@ namespace SanteDB.Persistence.Data.ADO.Services
         private Int32 m_sessionLookups = 0;
 
         /// <summary>
+        /// Fired when the session is established
+        /// </summary>
+        public event EventHandler<SessionEstablishedEventArgs> Established;
+
+        /// <summary>
+        /// Fired when a session is abandoned
+        /// </summary>
+        public event EventHandler<SessionEstablishedEventArgs> Abandoned;
+
+
+        /// <summary>
         /// Create and register a refresh token for the specified principal
         /// </summary>
         public byte[] CreateRefreshToken()
@@ -98,6 +109,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
             try
             {
+
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open();
@@ -127,22 +139,30 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     dbSession = context.Insert(dbSession);
 
                     var signingService = ApplicationServiceContext.Current.GetService<IDataSigningService>();
+
                     if (signingService == null)
                     {
                         this.m_traceSource.TraceWarning("No IDataSigningService provided. Session data will be unsigned!");
-                        return new AdoSecuritySession(dbSession.Key, dbSession.Key.ToByteArray(), refreshToken, dbSession.NotBefore, dbSession.NotAfter);
+                        var session = new AdoSecuritySession(dbSession.Key, dbSession.Key.ToByteArray(), refreshToken, dbSession.NotBefore, dbSession.NotAfter);
+                        this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, session, true));
+                        return session;
                     }
                     else
                     {
                         var signedToken = dbSession.Key.ToByteArray().Concat(signingService.SignData(dbSession.Key.ToByteArray())).ToArray();
                         var signedRefresh = refreshToken.Concat(signingService.SignData(refreshToken)).ToArray();
-                        return new AdoSecuritySession(dbSession.Key, signedToken, signedRefresh, dbSession.NotBefore, dbSession.NotAfter);
+
+                        var session = new AdoSecuritySession(dbSession.Key, signedToken, signedRefresh, dbSession.NotBefore, dbSession.NotAfter);
+                        this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, session, true));
+                        return session;
                     }
                 }
             }
             catch (Exception e)
             {
                 this.m_traceSource.TraceError("Error establishing session: {0}", e.Message);
+                this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, null, false));
+
                 throw;
             }
         }
@@ -242,7 +262,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     var signingService = ApplicationServiceContext.Current.GetService<IDataSigningService>();
                     if (signingService == null)
                         this.m_traceSource.TraceWarning("No IDataSigingService registered. Session data will not be verified");
-                    else if(!signingService.Verify(sessionToken.Take(16).ToArray(), sessionToken.Skip(16).ToArray()))
+                    else if (!signingService.Verify(sessionToken.Take(16).ToArray(), sessionToken.Skip(16).ToArray()))
                         throw new SecurityException("Session token appears to have been tampered with");
 
                     var sessionId = new Guid(sessionToken.Take(16).ToArray());
@@ -284,6 +304,37 @@ namespace SanteDB.Persistence.Data.ADO.Services
             {
                 this.m_traceSource.TraceError("Error getting session: {0}", e.Message);
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// Abandon the specified session
+        /// </summary>
+        public void Abandon(ISession session)
+        {
+            try
+            {
+                using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+                {
+                    context.Open();
+                    // We want a record of the session, just set the expiration
+                    var sessionId = new Guid(session.Id);
+                    var dbSession = context.FirstOrDefault<DbSession>(o => o.Key == sessionId && o.NotAfter > DateTimeOffset.Now);
+                    if (dbSession == null)
+                        return;
+                    else
+                        dbSession.NotAfter = dbSession.RefreshExpiration = DateTimeOffset.Now;
+                    context.Update(dbSession);
+
+                }
+
+                this.Abandoned?.Invoke(this, new SessionEstablishedEventArgs(null, session, true));
+            }
+            catch (Exception e)
+            {
+                this.m_traceSource.TraceError("Cannot abandon session {0} - {1}", BitConverter.ToString(session.Id, 0), e);
+                this.Abandoned?.Invoke(this, new SessionEstablishedEventArgs(null, session, false));
+                throw new SecurityException($"Cannot abandon session {BitConverter.ToString(session.Id)}", e);
             }
         }
     }

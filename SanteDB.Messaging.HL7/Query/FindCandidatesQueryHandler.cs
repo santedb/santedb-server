@@ -113,8 +113,15 @@ namespace SanteDB.Messaging.HL7.Query
             Double? strength = String.IsNullOrEmpty(strStrength) ? null : (double?)Double.Parse(strStrength);
 
             // Query parameters
-            foreach(var itm in MessageUtils.ParseQueryElement(qpd.GetField(3).OfType<Varies>(), map, algorithm, strength))
-                retVal.Add(itm.Key, itm.Value);
+            foreach (var itm in MessageUtils.ParseQueryElement(qpd.GetField(3).OfType<Varies>(), map, algorithm, strength))
+                try
+                {
+                    retVal.Add(itm.Key, itm.Value);
+                }
+                catch(Exception e)
+                {
+                    throw new HL7ProcessingException("Error processing query parameter", "QPD", "1", 3, 0, e);
+                }
 
             // Return domains
             foreach (var rt in qpd.GetField(8).OfType<Varies>())

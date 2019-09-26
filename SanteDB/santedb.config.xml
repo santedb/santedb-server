@@ -159,6 +159,7 @@
     </jobs>-->
   </section>
   <section xsi:type="RestConfigurationSection">
+    <baseAddress>http://foo.com</baseAddress>
     <service name="META">
       <endpoint address="http://0.0.0.0:8080/api-docs" contract="SanteDB.Messaging.Metadata.Rest.IMetadataServiceContract, SanteDB.Messaging.Metadata, Version=1.0.0.0">
         <add type="SanteDB.Core.Rest.Behavior.MessageCompressionEndpointBehavior, SanteDB.Core, Version=1.10.0.0"/>
@@ -436,6 +437,7 @@
            providerType="npgsql" />
   <!-- This section controls the persistence for ADO.NET -->
   <section xsi:type="AdoPersistenceConfigurationSection"
+           fuzzyTotal="true"
            readWriteConnectionString="FBSQL"
            readOnlyConnectionString="FBSQL"
            traceSql="false"
@@ -523,7 +525,7 @@
       <add type="SanteDB.Core.Services.Impl.LocalTagPersistenceService, SanteDB.Core, Version=1.10.0.24160, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Applets.Services.Impl.AppletSubscriptionRepository, SanteDB.Core.Applets, Version=1.30.0.0, Culture=neutral, PublicKeyToken=null"/>
       
-      <!--<add type="SanteDB.Core.Security.Audit.AuditDaemonService, SanteDB.Core, Version=1.10.0.24160, Culture=neutral, PublicKeyToken=null" />-->
+      <add type="SanteDB.Core.Security.Audit.AuditDaemonService, SanteDB.Core, Version=1.10.0.24160, Culture=neutral, PublicKeyToken=null" />
 
       <!-- Data Migration & Management -->
       <add type="SanteDB.Core.Persistence.DataInitializationService, SanteDB.Core, Version=1.10.0.24160, Culture=neutral, PublicKeyToken=null" />

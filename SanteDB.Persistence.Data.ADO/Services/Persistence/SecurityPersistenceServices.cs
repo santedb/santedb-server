@@ -92,7 +92,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
 			if (application != null && context.LoadState == LoadState.FullLoad)
 			{
-				var policyQuery = context.CreateSqlStatement<DbSecurityApplicationPolicy>().SelectFrom()
+				var policyQuery = context.CreateSqlStatement<DbSecurityApplicationPolicy>().SelectFrom(typeof(DbSecurityApplicationPolicy), typeof(DbSecurityPolicy))
 										.InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
 										.Where<DbSecurityApplicationPolicy>(o => o.SourceKey == application.Key);
 
@@ -151,23 +151,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// <returns>Returns the updated security application.</returns>
 		public override Core.Model.Security.SecurityApplication UpdateInternal(DataContext context, Core.Model.Security.SecurityApplication data)
 		{
-			var domainInstance = this.FromModelInstance(data, context);
+            var instance = base.UpdateInternal(context, data);
 
-			var currentObject = context.FirstOrDefault<DbSecurityApplication>(d => d.Key == data.Key);
-
-			if (currentObject == null)
-			{
-				throw new KeyNotFoundException(data.Key.ToString());
-			}
-
-			currentObject.CopyObjectData(domainInstance);
-
-			currentObject.ObsoletedByKey = data.ObsoletedByKey == Guid.Empty ? null : data.ObsoletedByKey;
-			currentObject.ObsoletionTime = data.ObsoletionTime;
-
-			context.Update(currentObject);
-
-			if (data.Policies != null)
+			if (data.Policies != null && data.Policies.Count > 0)
 			{
 				context.Delete<DbSecurityApplicationPolicy>(o => o.SourceKey == data.Key);
                 data.Policies.ForEach(o => o.PolicyKey = o.Policy?.EnsureExists(context)?.Key ?? o.PolicyKey);
@@ -208,7 +194,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
 			if (device != null && context.LoadState == LoadState.FullLoad)
 			{
-				var policyQuery = context.CreateSqlStatement<DbSecurityDevicePolicy>().SelectFrom()
+				var policyQuery = context.CreateSqlStatement<DbSecurityDevicePolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityDevicePolicy))
 										.InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
 										.Where<DbSecurityDevicePolicy>(o => o.SourceKey == device.Key);
 
@@ -263,23 +249,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// </summary>
 		public override Core.Model.Security.SecurityDevice UpdateInternal(DataContext context, Core.Model.Security.SecurityDevice data)
 		{
-			var domainInstance = this.FromModelInstance(data, context);
+            var retVal = base.UpdateInternal(context, data);
 
-			var currentObject = context.FirstOrDefault<DbSecurityDevice>(d => d.Key == data.Key);
-
-			if (currentObject == null)
-			{
-				throw new KeyNotFoundException(data.Key.ToString());
-			}
-
-			currentObject.CopyObjectData(domainInstance);
-
-			currentObject.ObsoletedByKey = data.ObsoletedByKey == Guid.Empty ? null : data.ObsoletedByKey;
-			currentObject.ObsoletionTime = data.ObsoletionTime;
-
-			context.Update(currentObject);
-
-			if (data.Policies != null)
+            if (data.Policies != null && data.Policies.Count > 0)
 			{
 				context.Delete<DbSecurityDevicePolicy>(o => o.SourceKey == data.Key);
                 data.Policies.ForEach(o => o.PolicyKey = o.Policy?.EnsureExists(context)?.Key ?? o.PolicyKey);
@@ -319,7 +291,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Core.Model.Security.SecurityPolicy UpdateInternal(DataContext context, Core.Model.Security.SecurityPolicy data)
 		{
-			throw new AdoFormalConstraintException(AdoFormalConstraintType.UpdatedReadonlyObject);
+            // Only public objects (created by the user) can be deleted
+            if(!data.IsPublic)
+			    throw new AdoFormalConstraintException(AdoFormalConstraintType.UpdatedReadonlyObject);
+            return base.UpdateInternal(context, data);
 		}
 	}
 
@@ -415,24 +390,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		/// Update the roles to security user
 		/// </summary>
 		public override Core.Model.Security.SecurityRole UpdateInternal(DataContext context, Core.Model.Security.SecurityRole data)
-		{
-			var domainInstance = this.FromModelInstance(data, context);
+		 {
+            var retVal = base.UpdateInternal(context, data);
 
-			var currentObject = context.FirstOrDefault<DbSecurityRole>(d => d.Key == data.Key);
-
-			if (currentObject == null)
-			{
-				throw new KeyNotFoundException(data.Key.ToString());
-			}
-
-			currentObject.CopyObjectData(domainInstance);
-
-			currentObject.ObsoletedByKey = data.ObsoletedByKey == Guid.Empty ? null : data.ObsoletedByKey;
-			currentObject.ObsoletionTime = data.ObsoletionTime;
-
-			context.Update(currentObject);
-
-			if (data.Policies != null)
+            if (data.Policies != null && data.Policies.Count > 0)
 			{
 				context.Delete<DbSecurityRolePolicy>(o => o.SourceKey == data.Key);
                 data.Policies.ForEach(o => o.PolicyKey = o.Policy?.EnsureExists(context)?.Key ?? o.PolicyKey);
@@ -561,7 +522,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		{
 			var retVal = base.UpdateInternal(context, data);
 
-			if (data.Roles == null)
+			if (data.Roles == null || data.Roles.Count == 0)
 			{
 				return retVal;
 			}

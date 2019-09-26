@@ -95,7 +95,12 @@ namespace SanteDB.Messaging.Metadata.Composer
         /// </summary>
         public static string GetElementDocumentation(PropertyInfo property, MetaDataElementType docType = MetaDataElementType.Summary)
         {
-            var docName = $"P:{property.DeclaringType.FullName}.{property.Name}";
+            var declType = property.DeclaringType.FullName;
+            if(property.DeclaringType.IsGenericType)
+            {
+                declType = declType.Substring(0, declType.IndexOf("["));
+            }
+            var docName = $"P:{declType}.{property.Name}";
             var cacheName = $"{docName}@{docType}";
             var retVal = property.GetCustomAttribute<DescriptionAttribute>()?.Description;
             if (String.IsNullOrEmpty(retVal) && !s_documentationCache.TryGetValue(cacheName, out retVal)) // Attempt to load the documentation from disk 

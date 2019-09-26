@@ -246,7 +246,7 @@ namespace SanteDB.Core.Persistence
                 // Set system principal 
                 AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
 
-                String dataDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Data");
+                String dataDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "data");
                 this.m_traceSource.TraceEvent(EventLevel.Verbose, "Scanning Directory {0} for datasets", dataDirectory);
 
                 XmlSerializer xsz = new XmlSerializer(typeof(Dataset));

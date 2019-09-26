@@ -37,6 +37,9 @@ using SanteDB.Rest.AMI.Resources;
 using SanteDB.Rest.AMI;
 using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
+using SanteDB.Core.Model.Serialization;
+using SanteDB.Core.Model.AMI.Auth;
+using SanteDB.Core.Interfaces;
 
 namespace SanteDB.Messaging.AMI
 {
@@ -116,7 +119,7 @@ namespace SanteDB.Messaging.AMI
         /// Fired when the service is stopping.
         /// </summary>
         public event EventHandler Stopping;
-
+       
         /// <summary>
         /// Gets the API type
         /// </summary>
@@ -186,27 +189,24 @@ namespace SanteDB.Messaging.AMI
 
                 // Start the webhost
                 this.m_webHost.Start();
+                ModelSerializationBinder.RegisterModelType(typeof(SecurityPolicyInfo));
 
                 if (this.m_configuration.ResourceHandlers.Count() > 0)
                     AmiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.configuration.ResourceHandlers, typeof(IAmiServiceContract));
                 else
                     AmiMessageHandler.ResourceHandler = new ResourceHandlerTool(
-                        typeof(SecurityUserResourceHandler).Assembly.ExportedTypes
-                        .Union(AppDomain.CurrentDomain.GetAssemblies()
-                        .Where(a=>!a.IsDynamic)
-                        .SelectMany(a=> { try { return a.ExportedTypes; } catch { return new List<Type>(); } })) // HACK: Mono freaks out if this isn't in try/catch
+                        ApplicationServiceContext.Current.GetService<IServiceManager>().GetAllTypes()
                         .Where(t => !t.IsAbstract && !t.IsInterface && typeof(IApiResourceHandler).IsAssignableFrom(t))
                         .ToList(),
                         typeof(IAmiServiceContract)
                     );
                 
-
                 this.Started?.Invoke(this, EventArgs.Empty);
                 return true;
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error, e.ToString());
                 return false;
             }
         }

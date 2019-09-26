@@ -26,6 +26,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
     /// Represents a user for the purpose of authentication
     /// </summary>
     [Table("sec_usr_tbl")]
+    [AssociativeTable(typeof(DbSecurityRole), typeof(DbSecurityUserRole))]
 	public class DbSecurityUser : DbNonVersionedBaseData
 	{
 

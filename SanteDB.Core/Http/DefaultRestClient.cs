@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SharpCompress.IO;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Http.Description;
@@ -213,7 +214,7 @@ namespace SanteDB.Core.Http
 #else
 
                                 requestObj.Headers.Add("Content-Encoding", "deflate");
-                                using (var df = new DeflateStream(requestStream, CompressionMode.Compress, leaveOpen: true))
+                                using (var df = new DeflateStream(new NonDisposingStream(requestStream), CompressionMode.Compress))
                                     serializer.Serialize(df, body);
 #endif
                             }
@@ -283,20 +284,20 @@ namespace SanteDB.Core.Http
                             switch (response.Headers[HttpResponseHeader.ContentEncoding])
                             {
                                 case "deflate":
-                                    using (DeflateStream df = new DeflateStream(ms, CompressionMode.Decompress, leaveOpen: true))
+                                    using (DeflateStream df = new DeflateStream(new NonDisposingStream(ms), CompressionMode.Decompress))
                                         retVal = (TResult)serializer.DeSerialize(df);
                                     break;
 
                                 case "gzip":
-                                    using (GZipStream df = new GZipStream(ms, CompressionMode.Decompress, leaveOpen: true))
+                                    using (GZipStream df = new GZipStream(new NonDisposingStream(ms), CompressionMode.Decompress))
                                         retVal = (TResult)serializer.DeSerialize(df);
                                     break;
                                 case "bzip2":
-                                    using (var bzs = new BZip2Stream(ms, CompressionMode.Decompress, leaveOpen: true))
+                                    using (var bzs = new BZip2Stream(new NonDisposingStream(ms), CompressionMode.Decompress, false))
                                         retVal = (TResult)serializer.DeSerialize(bzs);
                                     break;
                                 case "lzma":
-                                    using (var lzmas = new LZipStream(ms, CompressionMode.Decompress, leaveOpen: true))
+                                    using (var lzmas = new LZipStream(new NonDisposingStream(ms), CompressionMode.Decompress))
                                         retVal = (TResult)serializer.DeSerialize(lzmas);
 
                                     break;
@@ -342,19 +343,19 @@ namespace SanteDB.Core.Http
                                 switch (errorResponse.Headers[HttpResponseHeader.ContentEncoding])
                                 {
                                     case "deflate":
-                                        using (DeflateStream df = new DeflateStream(errorResponse.GetResponseStream(), CompressionMode.Decompress, leaveOpen: true))
+                                        using (DeflateStream df = new DeflateStream(new NonDisposingStream(errorResponse.GetResponseStream()), CompressionMode.Decompress))
                                             errorResult = serializer.DeSerialize(df);
                                         break;
                                     case "gzip":
-                                        using (GZipStream df = new GZipStream(errorResponse.GetResponseStream(), CompressionMode.Decompress, leaveOpen: true))
+                                        using (GZipStream df = new GZipStream(new NonDisposingStream(errorResponse.GetResponseStream()), CompressionMode.Decompress))
                                             errorResult = serializer.DeSerialize(df);
                                         break;
                                     case "bzip2":
-                                        using (var bzs = new BZip2Stream(errorResponse.GetResponseStream(), CompressionMode.Decompress, leaveOpen: true))
+                                        using (var bzs = new BZip2Stream(new NonDisposingStream(errorResponse.GetResponseStream()), CompressionMode.Decompress, false))
                                             errorResult = serializer.DeSerialize(bzs);
                                         break;
                                     case "lzma":
-                                        using (var lzmas = new LZipStream(errorResponse.GetResponseStream(), CompressionMode.Decompress, leaveOpen: true))
+                                        using (var lzmas = new LZipStream(new NonDisposingStream(errorResponse.GetResponseStream()), CompressionMode.Decompress))
                                             errorResult = serializer.DeSerialize(lzmas);
                                         break;
                                     default:

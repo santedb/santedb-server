@@ -145,7 +145,21 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
             else
                 this.Type = type;
 
+            // XML info
+            var xmlElement = property.GetCustomAttributes<XmlElementAttribute>().FirstOrDefault();
+            var xmlAttribute = property.GetCustomAttribute<XmlAttributeAttribute>();
+            if (xmlElement != null)
+                this.Xml = new SwaggerXmlInfo(xmlElement);
+            else if (xmlAttribute != null)
+                this.Xml = new SwaggerXmlInfo(xmlAttribute);
+
         }
+
+        /// <summary>
+        /// Gets or sets the XML information
+        /// </summary>
+        [JsonProperty("xml")]
+        public SwaggerXmlInfo Xml { get; set; }
 
         /// <summary>
         /// Gets or sets the description 

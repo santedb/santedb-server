@@ -148,7 +148,8 @@ namespace SanteDB.Messaging.HL7.Query
             }
 
 
-            // Return domains
+            //// Return domains
+            // This just verifies the return domains
             foreach (var rt in qpd.GetField(4).OfType<Varies>())
             {
                 try
@@ -156,11 +157,6 @@ namespace SanteDB.Messaging.HL7.Query
                     var rid = new CX(qpd.Message);
                     DeepCopy.copy(rt.Data as GenericComposite, rid);
                     var authority = rid.AssigningAuthority.ToModel();
-
-                    if (authority.Key == this.m_configuration.LocalAuthority.Key)
-                        continue;
-                    else
-                        retVal.Add($"identifier[{rid.AssigningAuthority.NamespaceID.Value}]", "!null");
                 }
                 catch (Exception e)
                 {

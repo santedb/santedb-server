@@ -97,7 +97,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
             var preArgs = new QueryRequestEventArgs<IdentifiedData>(o => o.Key == subscription.Key, offset, count, queryId, AuthenticationContext.Current.Principal);
             this.Executing?.Invoke(this, preArgs);
-            if(preArgs.Cancel)
+            if (preArgs.Cancel)
             {
                 this.m_tracer.TraceWarning("Pre-Event for executor failed");
                 totalResults = preArgs.TotalResults;
@@ -137,23 +137,27 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     {
                         try
                         {
-                            using (var ctx = m_configuration.Provider.GetReadonlyConnection())
-                            {
-                                ctx.Open();
-                                ctx.LoadState = LoadState.FullLoad;
-                                var retVal = persistenceInstance.Get(ctx, o);
-                                cacheService?.Add(retVal as IdentifiedData);
-                                return retVal;
-                            }
+                            var retVal = cacheService.GetCacheItem(o);
+                            if (retVal == null)
+                                using (var ctx = m_configuration.Provider.GetReadonlyConnection())
+                                {
+                                    ctx.Open();
+                                    ctx.LoadState = LoadState.FullLoad;
+                                    retVal = persistenceInstance.Get(ctx, o);
+                                    cacheService?.Add(retVal as IdentifiedData);
+                                }
+                            return retVal;
+
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             this.m_tracer.TraceError("Error fetching query results for {0}: {1}", queryId, e);
                             throw new DataPersistenceException("Error fetching query results", e);
                         }
                     }).ToList();
             }
-            else {
+            else
+            {
                 // Now grab the context and query!!!
                 using (var connection = m_configuration.Provider.GetReadonlyConnection())
                 {
@@ -213,42 +217,69 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 new Type[] { resultType },
                                 new Type[] { typeof(SqlStatement) }).Invoke(connection, new object[] { domainQuery }) as IOrmResultSet;
 
+                            IEnumerable<object> resultObjects = null;
+
                             // Register query if query id specified
                             if (queryId != Guid.Empty)
                             {
                                 var results = domainResults.Keys<Guid>().OfType<Guid>().ToArray();
                                 totalResults = results.Count();
                                 ApplicationContext.Current.GetService<IQueryPersistenceService>()?.RegisterQuerySet(queryId, results, null, totalResults);
+                                resultObjects = results.Skip(offset).Take(count ?? 100).OfType<Object>();
+                            }
+                            else if (m_configuration.UseFuzzyTotals)
+                            {
+                                resultObjects = domainResults.Skip(offset).Take((count ?? 100) + 1).OfType<Object>();
+                                totalResults = domainResults.Count();
                             }
                             else
+                            {
                                 totalResults = domainResults.Count();
-
+                                resultObjects = domainResults.Skip(offset).Take(count ?? 100).OfType<Object>();
+                            }
 
                             // Return
-                            return domainResults
-                                .Skip(offset)
+                            return resultObjects
                                 .Take(count ?? 100)
-                                .OfType<Object>()
-                                .ToList()
-                                .AsParallel()
-                                .AsOrdered()
-                                .Select(o =>
+                            .OfType<Object>()
+                            .ToList()
+                            .AsParallel()
+                            .AsOrdered()
+                            .Select(o =>
+                            {
+                                try
                                 {
-                                    try
+                                    if (o is Guid)
                                     {
-                                        using (var subConn = connection.OpenClonedContext())
-                                        {
-                                            var retVal = persistenceInstance.ToModelInstance(o, subConn);
-                                            cacheService?.Add(retVal as IdentifiedData);
-                                            return retVal;
-                                        }
+                                        var retVal = cacheService.GetCacheItem((Guid)o);
+                                        if(retVal == null)
+                                            using (var subConn = connection.OpenClonedContext())
+                                            {
+                                                retVal = persistenceInstance.Get(subConn, (Guid)o);
+                                                cacheService?.Add(retVal as IdentifiedData);
+                                            }
+                                        return retVal;
                                     }
-                                    catch (Exception e)
+                                    else
                                     {
-                                        this.m_tracer.TraceError("Error converting result: {0}", e);
-                                        throw;
+                                        var idData = (o as CompositeResult)?.Values.OfType<IDbIdentified>().FirstOrDefault() ?? o as IDbIdentified;
+                                        var retVal = cacheService.GetCacheItem(idData.Key);
+
+                                        if (retVal == null)
+                                            using (var subConn = connection.OpenClonedContext())
+                                            {
+                                                retVal = persistenceInstance.ToModelInstance(o, subConn);
+                                                cacheService?.Add(retVal as IdentifiedData);
+                                            }
+                                        return retVal;
                                     }
-                                }).ToList();
+                                }
+                                catch (Exception e)
+                                {
+                                    this.m_tracer.TraceError("Error converting result: {0}", e);
+                                    throw;
+                                }
+                            }).ToList();
 
                         }
 

@@ -301,11 +301,11 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyGrantType.Elevate).Select(o => new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, o.Policy.Oid)));
 
                         // Audit override
-                        AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(';'), true, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString());
+                        AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(';'), true);
                     }
                     catch (Exception e)
                     {
-                        AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(';'), false, RestOperationContext.Current.IncomingRequest.RemoteEndPoint.ToString());
+                        AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(';'), false);
                         throw;
                     }
                 }

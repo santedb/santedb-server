@@ -24,8 +24,10 @@ using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.ADO.Configuration;
+using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Linq;
@@ -142,5 +144,63 @@ namespace SanteDB.Persistence.Data.ADO.Services
 				}
 			}
 		}
-	}
+
+        /// <summary>
+        /// Set the lockout for the specified device
+        /// </summary>
+        public void SetLockout(string name, bool lockoutState, IPrincipal principal)
+        {
+            using (var dataContext = this.configuration.Provider.GetWriteConnection())
+                try
+                {
+                    dataContext.Open();
+                    var provId = dataContext.EstablishProvenance(principal, null);
+
+                    var dev = dataContext.FirstOrDefault<DbSecurityDevice>(o => o.PublicId == name);
+                    if (dev == null)
+                        throw new KeyNotFoundException($"Device {name} not found");
+                    dev.Lockout = lockoutState ? (DateTimeOffset?)DateTimeOffset.MaxValue.AddDays(-10) : null;
+                    dev.LockoutSpecified = true;
+                    dev.UpdatedByKey = provId;
+                    dev.UpdatedTime = DateTimeOffset.Now;
+                    dataContext.Update(dev);
+                }
+                catch (Exception e)
+                {
+                    this.traceSource.TraceEvent(EventLevel.Error, "Error getting identity data for {0} : {1}", name, e);
+                    throw;
+                }
+        }
+
+        /// <summary>
+        /// Change the device secret
+        /// </summary>
+        public void ChangeSecret(string name, string deviceSecret, IPrincipal principal)
+        {
+            using (var dataContext = this.configuration.Provider.GetWriteConnection())
+                try
+                {
+                    dataContext.Open();
+                    var provId = dataContext.EstablishProvenance(principal, null);
+
+                    var dev = dataContext.FirstOrDefault<DbSecurityDevice>(o => o.PublicId == name);
+                    if (dev == null)
+                        throw new KeyNotFoundException($"Device {name} not found");
+
+                    var phash = ApplicationContext.Current.GetService<IPasswordHashingService>();
+                    if (phash == null)
+                        throw new InvalidOperationException("Cannot find password hashing service");
+
+                    dev.UpdatedByKey = provId;
+                    dev.UpdatedTime = DateTimeOffset.Now;
+                    dev.DeviceSecret = phash.ComputeHash(deviceSecret);
+                    dataContext.Update(dev);
+                }
+                catch (Exception e)
+                {
+                    this.traceSource.TraceEvent(EventLevel.Error, "Error setting secret identity data for {0} : {1}", name, e);
+                    throw;
+                }
+        }
+    }
 }

@@ -96,8 +96,7 @@ namespace SanteDB.Tools.AdminConsole.Security
             }
             else if (((String)headers["alg"]).StartsWith("HS"))
             {
-                var keyId = headers["keyid"].Value<Int32>();
-                
+                // TODO: Verify key
             }
 
             // Parse the jwt

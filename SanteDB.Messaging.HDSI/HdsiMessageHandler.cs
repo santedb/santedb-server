@@ -20,6 +20,7 @@
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Interfaces;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Rest;
 using SanteDB.Core.Rest.Behavior;
@@ -99,6 +100,7 @@ namespace SanteDB.Messaging.HDSI
         public event EventHandler Stopping;
 
 
+
         /// <summary>
         /// Gets the API type
         /// </summary>
@@ -155,7 +157,7 @@ namespace SanteDB.Messaging.HDSI
                         .Where(t => !t.IsAbstract && !t.IsInterface && typeof(IApiResourceHandler).IsAssignableFrom(t))
                         .ToList(), typeof(IHdsiServiceContract)
                     );
-
+                
                 this.m_webHost = ApplicationContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(HdsiServiceBehavior));
                 this.m_webHost.AddServiceBehavior(new ErrorServiceBehavior());
 
