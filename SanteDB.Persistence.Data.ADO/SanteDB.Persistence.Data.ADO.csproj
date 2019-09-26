@@ -210,9 +210,6 @@
     <EmbeddedResource Include="Data\SQL\PSQL\santedb-init.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Data\SQL\Updates\20170721-PSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
     <EmbeddedResource Include="Data\SQL\Updates\20170725-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -335,6 +332,9 @@
   <ItemGroup>
     <Content Include="Data\SQL\Updates\20190522-PSQL.sql" />
     <Content Include="Data\SQL\Updates\20190625-FBSQL.sql" />
+    <Content Include="Data\SQL\Updates\20170721-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
