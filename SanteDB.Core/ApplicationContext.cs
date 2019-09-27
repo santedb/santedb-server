@@ -81,6 +81,11 @@ namespace SanteDB.Core
         public Guid ContextId { get; protected set; }
 
         /// <summary>
+        /// Gets the start time of the applicaton
+        /// </summary>
+        public DateTime StartTime { get; private set; }
+
+        /// <summary>
         /// Gets whether the domain is running
         /// </summary>
         public bool IsRunning { get { return this.m_running; } }
@@ -226,6 +231,8 @@ namespace SanteDB.Core
                     Trace.TraceInformation("STAGE3 START: Notify ApplicationContext has started");
                     if (this.Started != null)
                         this.Started(this, null);
+
+                    this.StartTime = DateTime.Now;
 
                     AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStart);
 

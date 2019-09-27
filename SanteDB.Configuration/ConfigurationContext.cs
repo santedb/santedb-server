@@ -78,6 +78,11 @@ namespace SanteDB.Configuration
         /// </summary>
         public ObservableCollection<Assembly> PluginAssemblies { get; }
 
+	/// <summary>
+	/// Gets the start time of the context
+	/// </summary>
+	public DateTime StartTime { get; private set; }
+
         /// <summary>
         /// Gets or sets the configuration handler
         /// </summary>
@@ -266,6 +271,7 @@ namespace SanteDB.Configuration
             }
 
             this.Started?.Invoke(this, EventArgs.Empty);
+	    this.StartTime = DateTime.Now;
         }
 
         /// <summary>
