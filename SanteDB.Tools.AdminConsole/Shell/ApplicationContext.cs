@@ -66,6 +66,11 @@ namespace SanteDB.Tools.AdminConsole.Shell
         public event EventHandler Stopping;
         public event EventHandler Stopped;
 
+	/// <summary>
+	/// Gets the time that the application context was started
+	/// </summary>
+	public DateTime StartTime { get; private set; }
+
         /// <summary>
         /// Initialize the application context
         /// </summary>
@@ -213,6 +218,7 @@ namespace SanteDB.Tools.AdminConsole.Shell
 
                 // Attempt to get server time from clinical interface which should challenge
                 this.GetRestClient(ServiceEndpointType.HealthDataService)?.Get("/time");
+		
                 return true;
             }
             catch (Exception ex)
@@ -224,6 +230,7 @@ namespace SanteDB.Tools.AdminConsole.Shell
 #endif
                 return false;
             }
+		this.StartTime = DateTime.Now;
         }
 
         /// <summary>
