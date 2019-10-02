@@ -91,13 +91,32 @@ namespace SanteDB.Messaging.AMI.Wcf
             var logFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), logId + ".log");
             var retVal = new AmiCollection();
             var fi = new FileInfo(logFile);
-            return new LogFileInfo()
+
+            int offset = Int32.Parse(RestOperationContext.Current.IncomingRequest.QueryString["_offset"] ?? "0"),
+                count = Int32.Parse(RestOperationContext.Current.IncomingRequest.QueryString["_count"] ?? "2048");
+
+            if (offset > fi.Length || count > fi.Length) throw new ArgumentOutOfRangeException($"Log file {logId} is {fi.Length} but offset is greater at {offset}");
+            using (var fs = File.OpenRead(logFile))
             {
-                LastWrite = fi.LastWriteTime,
-                Name = fi.Name,
-                Size = fi.Length,
-                Contents = File.ReadAllBytes(logFile)
-            };
+
+                // Is count specified 
+                byte[] buffer;
+                if (offset + count > fi.Length)
+                    buffer = new byte[fi.Length - offset];
+                else
+                    buffer = new byte[count];
+
+                fs.Seek(offset, SeekOrigin.Begin);
+                fs.Read(buffer, 0, buffer.Length);
+
+                return new LogFileInfo()
+                {
+                    Contents = buffer,
+                    LastWrite = fi.LastWriteTime,
+                    Name = fi.Name,
+                    Size = fi.Length
+                };
+            }
         }
 
         /// <summary>
