@@ -209,7 +209,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             
                 var retVal = context.Query<CompositeResult<TDomain, TDomainKey>>(domainQuery);
 
-                if (queryId != Guid.Empty)
+                if (queryId != Guid.Empty && ApplicationContext.Current.GetService<IQueryPersistenceService>() != null)
                 {
                     var keys = retVal.Keys<Guid>().ToArray();
                     totalResults = keys.Count();

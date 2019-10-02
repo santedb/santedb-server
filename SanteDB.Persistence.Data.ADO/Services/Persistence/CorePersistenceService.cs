@@ -248,11 +248,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     var retVal = this.DomainQueryInternal<TQueryReturn>(context, domainQuery);
 
                     // Stateful query identifier = We need to add query results
-                    if (queryId != Guid.Empty)
+                    if (queryId != Guid.Empty && ApplicationContext.Current.GetService<IQueryPersistenceService>() != null)
                     {
                         // Create on a separate thread the query results
                         var keys = retVal.Keys<Guid>().ToArray();
-                        totalResults = keys.Count();
+                        totalResults = keys.Length;
                         this.m_queryPersistence?.RegisterQuerySet(queryId, keys, query, totalResults);
 
                     }

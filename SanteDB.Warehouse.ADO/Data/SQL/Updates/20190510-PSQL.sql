@@ -88,3 +88,14 @@ ALTER TABLE SPLY_TBL ADD ENC_ID UUID;
 
 ALTER TABLE ent_ext_tbl ALTER ext_value TYPE TEXT;
 ALTER TABLE act_ext_tbl ALTER ext_value TYPE TEXT;
+
+CREATE TABLE fac_id_tbl
+(
+  fac_id uuid NOT NULL,
+  nsid character varying(64) NOT NULL,
+  ext_id character varying(64),
+  CONSTRAINT pk_fac_id_tbl PRIMARY KEY (fac_id, nsid),
+  CONSTRAINT fk_fac_fac_tbl FOREIGN KEY (fac_id)
+      REFERENCES public.fac_tbl (fac_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+);
