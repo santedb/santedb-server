@@ -120,7 +120,10 @@ namespace SanteDB.Core
         /// </summary>
         public SanteDBHostType HostType => SanteDBHostType.Server;
 
-        public string ServiceName => throw new NotImplementedException();
+        /// <summary>
+        /// Gets the service name
+        /// </summary>
+        public string ServiceName => "SanteDB Service Manager";
 
         /// <summary>
         /// Configuration

@@ -20,6 +20,7 @@
 using Microsoft.Diagnostics.Runtime;
 using RestSrvr;
 using SanteDB.Core;
+using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
@@ -117,6 +118,20 @@ namespace SanteDB.Messaging.AMI.Wcf
                     Size = fi.Length
                 };
             }
+        }
+
+        /// <summary>
+        /// Gets a specific log file.
+        /// </summary>
+        /// <param name="logId">The log identifier.</param>
+        /// <returns>Returns the log file information.</returns>
+        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
+        public override Stream DownloadLog(string logId)
+        {
+            var logFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), logId + ".log");
+            RestOperationContext.Current.OutgoingResponse.AddHeader("Content-Disposition", $"attachment; filename={Path.GetFileName(logFile)}");
+            RestOperationContext.Current.OutgoingResponse.ContentType = "text/plain";
+            return File.OpenRead(logFile);
         }
 
         /// <summary>
@@ -234,7 +249,8 @@ namespace SanteDB.Messaging.AMI.Wcf
                 UsedMemory = GC.GetTotalMemory(false),
                 Version = Environment.Version.ToString(),
             };
-            retVal.ApplicationInfo.ServiceInfo = ApplicationServiceContext.Current.GetService<IServiceManager>().GetServices().Distinct().Select(o => new DiagnosticServiceInfo(o)).ToList();
+            retVal.ApplicationInfo.Applets = ApplicationServiceContext.Current.GetService<IAppletManagerService>().Applets.Select(o => o.Info).ToList();
+            retVal.ApplicationInfo.ServiceInfo = ApplicationServiceContext.Current.GetService<IServiceManager>().GetAllTypes().Where(o => o.GetInterfaces().Any(i => i.FullName == typeof(IServiceImplementation).FullName) && !o.IsGenericTypeDefinition && !o.IsAbstract && !o.IsInterface).Select(o => new DiagnosticServiceInfo(o)).ToList();
             return retVal;
         }
 

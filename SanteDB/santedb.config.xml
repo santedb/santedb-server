@@ -99,7 +99,7 @@
       <add name="SanteDB.Tools.DataSandbox" filter="Warning" />
       <add name="SanteDB.Warehouse.ADO" filter="Warning" />
       <add name="SanteDB.Rest.Common.ResourceHandlerTool" filter="Error"/>
-      <add name="SanteDB.Core.DataSet" filter="Warning"/>
+      <add name="SanteDB.Core.DataSet" filter="Informational"/>
       <add name="SanteDB.Core.AppletManager" filter="Informational"/>
     </sources>
     <writers>
