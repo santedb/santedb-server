@@ -21,6 +21,7 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
@@ -31,6 +32,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Principal;
 
 namespace SanteDB.Core.Services.Impl
@@ -96,6 +98,7 @@ namespace SanteDB.Core.Services.Impl
             int tr = 0;
             return ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityPolicy>>().Find(o => o.Oid == policyOid, 0, 1, out tr).SingleOrDefault();
         }
+
 
         /// <summary>
         /// Get the security provenance 
@@ -288,6 +291,18 @@ namespace SanteDB.Core.Services.Impl
                 throw new KeyNotFoundException(key.ToString());
 
             iids.SetLockout(securityApplication.Name, false, AuthenticationContext.Current.Principal);
+        }
+
+        /// <summary>
+        /// Find provenance
+        /// </summary>
+        public IEnumerable<SecurityProvenance> FindProvenance(Expression<Func<SecurityProvenance, bool>> query, int offset, int? count, out int totalResults, Guid queryId, params ModelSort<SecurityProvenance>[] orderBy)
+        {
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityProvenance>>();
+            if (persistenceService is IStoredQueryDataPersistenceService<SecurityProvenance>)
+                return (persistenceService as IStoredQueryDataPersistenceService<SecurityProvenance>).Query(query, queryId, offset, count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
+            else
+                return persistenceService.Query(query, offset, count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
         }
     }
 }
