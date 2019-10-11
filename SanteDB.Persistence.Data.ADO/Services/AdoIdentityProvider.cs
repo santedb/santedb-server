@@ -576,5 +576,46 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 throw new InvalidOperationException("Cannot re-authenticate this principal");
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Get the specified identities from the session
+        /// </summary>
+        public IIdentity[] GetIdentities(ISession session)
+        {
+            try
+            {
+
+                using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+                {
+                    context.Open();
+                    var sessionId = new Guid(session.Id.Take(16).ToArray());
+                    var sql = context.CreateSqlStatement<DbSession>().SelectFrom(typeof(DbSession), typeof(DbSecurityApplication), typeof(DbSecurityDevice), typeof(DbSecurityUser))
+                            .Join<DbSession, DbSecurityDevice>("LEFT", o => o.DeviceKey, o => o.Key)
+                            .Join<DbSession, DbSecurityApplication>("LEFT", o => o.ApplicationKey, o => o.Key)
+                            .Join<DbSession, DbSecurityUser>("LEFT", o => o.UserKey, o => o.Key)
+                            .Where<DbSession>(o => o.Key == sessionId);
+
+                    var sessionData = context.FirstOrDefault<CompositeResult<DbSession, DbSecurityDevice, DbSecurityApplication, DbSecurityUser>>(sql);
+                    if (sessionData == null)
+                        throw new KeyNotFoundException($"Session {sessionId} not found");
+                    else
+                    {
+                        List<IIdentity> retVal = new List<IIdentity>(4);
+                        retVal.Add(new Core.Security.ApplicationIdentity(sessionData.Object1.ApplicationKey, sessionData.Object3.PublicId, false));
+                        if (sessionData.Object1.DeviceKey.HasValue)
+                            retVal.Add(new DeviceIdentity(sessionData.Object2.Key, sessionData.Object2.PublicId, false));
+                        if (sessionData.Object1.UserKey.HasValue)
+                            retVal.Add(AdoClaimsIdentity.Create(sessionData.Object4, false, session: session));
+                        return retVal.ToArray();
+                    }
+
+                }
+            }
+            catch(Exception e)
+            {
+                this.m_traceSource.TraceError("Error getting identities for session {0}", session.Id);
+                throw new DataPersistenceException($"Error getting identities for session {BitConverter.ToString(session.Id)}");
+            }
+        }
     }
 }

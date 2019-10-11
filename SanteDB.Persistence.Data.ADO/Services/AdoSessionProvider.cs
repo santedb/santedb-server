@@ -246,8 +246,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// Gets the specified session if valid from a signed session token
         /// </summary>
         /// <param name="sessionToken">The session token to retrieve the session for</param>
+        /// <param name="allowExpired">When true, instructs the method to fetch a session even if it is expired</param>
         /// <returns>The fetched session token</returns>
-        public ISession Get(byte[] sessionToken)
+        public ISession Get(byte[] sessionToken, bool allowExpired = false)
         {
             // Validate the parameters
             if (sessionToken == null)
@@ -260,18 +261,25 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     context.Open();
 
                     var signingService = ApplicationServiceContext.Current.GetService<IDataSigningService>();
+                    var sessionId = new Guid(sessionToken.Take(16).ToArray());
                     if (signingService == null)
                         this.m_traceSource.TraceWarning("No IDataSigingService registered. Session data will not be verified");
+                    else if (sessionToken.Length == 16)
+                        this.m_traceSource.TraceWarning("Will not verify signature for session {0}", sessionId);
                     else if (!signingService.Verify(sessionToken.Take(16).ToArray(), sessionToken.Skip(16).ToArray()))
                         throw new SecurityException("Session token appears to have been tampered with");
 
-                    var sessionId = new Guid(sessionToken.Take(16).ToArray());
 
                     // Check the cache
                     DbSession dbSession = null;
                     if (!this.m_sessionCache.TryGetValue(sessionId, out dbSession))
                     {
-                        dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionId && o.NotAfter > DateTimeOffset.Now);
+
+                        if (!allowExpired)
+                            dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionId && o.NotAfter > DateTimeOffset.Now);
+                        else
+                            dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionId);
+
                         if (dbSession == null)
                             throw new FileNotFoundException(BitConverter.ToString(sessionToken));
                         else lock (this.m_syncLock)

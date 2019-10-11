@@ -62,13 +62,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             throw new NotSupportedException();
         }
 
-        /// <summary>
-        /// Querying for provenance is not supported
-        /// </summary>
-        protected override IEnumerable<object> DoQueryInternal(DataContext context, Expression<Func<SecurityProvenance, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<SecurityProvenance>[] orderBy, bool incudeCount = true)
-        {
-            throw new NotSupportedException();
-        }
+       
     }
 	/// <summary>
 	/// Security user persistence

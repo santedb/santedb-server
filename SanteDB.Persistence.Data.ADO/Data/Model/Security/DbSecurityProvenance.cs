@@ -53,6 +53,12 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         public Guid? DeviceKey { get; set; }
 
         /// <summary>
+        /// Time that the session was established
+        /// </summary>
+        [Column("est_utc")]
+        public DateTimeOffset? Established { get; set; }
+
+        /// <summary>
         /// Gets or sets the session key
         /// </summary>
         [Column("ses_id")]
