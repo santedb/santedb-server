@@ -65,7 +65,6 @@ namespace SanteDB.Core.Rest.Serialization
         public bool ProvideFault(Exception error, RestResponseMessage faultMessage)
         {
 
-            this.m_traceSource.TraceError("Error on REST pipeline: {0}", error);
             var uriMatched = RestOperationContext.Current.IncomingRequest.Url;
 
             var fault = new RestServiceFault(error);
@@ -141,6 +140,24 @@ namespace SanteDB.Core.Rest.Serialization
                 faultMessage.StatusCode = (int)HttpStatusCode.MethodNotAllowed;
             else
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
+
+            switch(faultMessage.StatusCode)
+            {
+                case 409:
+                case 429:
+                case 503:
+                    this.m_traceSource.TraceInfo("Issue on REST pipeline: {0}", error);
+                    break;
+                case 401:
+                case 403:
+                case 501:
+                case 405:
+                    this.m_traceSource.TraceWarning("Warning on REST pipeline: {0}", error);
+                    break;
+                default:
+                    this.m_traceSource.TraceError("Error on REST pipeline: {0}", error);
+                    break;
+            }
 
             RestMessageDispatchFormatter.CreateFormatter(RestOperationContext.Current.ServiceEndpoint.Description.Contract.Type).SerializeResponse(faultMessage, null, fault);
             return true;
