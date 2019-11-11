@@ -12,14 +12,14 @@ namespace SanteDB.Tools.Debug.Configuration
     /// <summary>
     /// Represents debug tooling configuration
     /// </summary>
-    [XmlType(nameof(DebugToolsConfigurationSection), Namespace = "http://santedb.org")]
+    [XmlType(nameof(DebugToolsConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class DebugToolsConfigurationSection : IConfigurationSection
     {
 
         /// <summary>
         /// Metadata repository configuration
         /// </summary>
-        [XmlElement("biRepository")]
+        [XmlElement("biFileRepository")]
         public FileMetaDataRepositoryConfiguration BiMetadataRepository { get; set; }
 
     }

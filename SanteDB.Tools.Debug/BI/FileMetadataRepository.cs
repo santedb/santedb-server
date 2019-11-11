@@ -82,6 +82,10 @@ namespace SanteDB.Tools.Debug.BI
                         return (TBisDefinition)BiDefinition.Load(fs);
                     }
                 }
+                catch(InvalidCastException)
+                {
+                    return null;
+                }
                 catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error getting BIS definition {0} : {1}", id, e);
@@ -102,7 +106,7 @@ namespace SanteDB.Tools.Debug.BI
         public TBisDefinition Insert<TBisDefinition>(TBisDefinition metadata) where TBisDefinition : BiDefinition
         {
 
-            string path = this.m_configuration.BiMetadataRepository.BasePath;
+            string path = this.m_configuration.BiMetadataRepository.Paths.First();
             foreach (var s in metadata.Id.Split('.'))
                 path = Path.Combine(path, s);
             path += ".xml";
@@ -115,6 +119,9 @@ namespace SanteDB.Tools.Debug.BI
                     this.m_assetDictionary.TryRemove(metadata.Id, out path);
                 }
                 this.m_tracer.TraceInfo("Saving {0} to {1}", metadata.Id, path);
+
+                if (!Directory.Exists(Path.GetDirectoryName(path)))
+                    Directory.CreateDirectory(Path.GetDirectoryName(path));
                 using (var fs = File.Create(path))
                     metadata.Save(fs);
                 this.m_assetDictionary.TryAdd(metadata.Id, path);
@@ -144,7 +151,7 @@ namespace SanteDB.Tools.Debug.BI
                 using (var fs = File.OpenRead(f))
                 {
                     var asset = BiDefinition.Load(fs);
-                    if (asset.GetType().IsAssignableFrom(typeof(TBisDefinition)) && filterFn.Invoke((TBisDefinition)asset) && r++ > offset && r < count + offset)
+                    if (asset.GetType().IsAssignableFrom(typeof(TBisDefinition)) && filterFn.Invoke((TBisDefinition)asset) && r++ >= offset && r < count + offset)
                         yield return (TBisDefinition)asset;
                     else if (r > count + offset)
                         yield break;
@@ -186,8 +193,8 @@ namespace SanteDB.Tools.Debug.BI
 
             this.m_scanTimer = new Timer(_ =>
             {
-
-                this.LoadDefinitions(this.m_configuration.BiMetadataRepository.BasePath);
+                foreach(var path in this.m_configuration.BiMetadataRepository.Paths)
+                    this.LoadDefinitions(path);
 
             }, null, 0, this.m_configuration.BiMetadataRepository.RescanTime);
 
@@ -216,8 +223,11 @@ namespace SanteDB.Tools.Debug.BI
                     {
                         this.m_tracer.TraceInfo("Expanding package {0}", asset.Id);
                         var package = asset as BiPackage;
-                        foreach (var itm in package)
+                        foreach (var itm in new BiPackageEnumerator(package))
+                        {
+                            itm.MetaData = itm.MetaData ?? package.MetaData;
                             this.Insert(itm);
+                        }
                         File.Move(f, Path.ChangeExtension(f, "bak"));
                     }
                     else

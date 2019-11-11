@@ -54,7 +54,15 @@
     <add type="SanteDB.Core.Configuration.FileSystemQueueConfigurationSection, SanteDB.Core, Version=1.10.0.29461, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.OrmLite.Configuration.OrmConfigurationSection, SanteDB.OrmLite, Version=1.10.0.29461, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Caching.Redis.Configuration.RedisConfigurationSection, SanteDB.Caching.Redis, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Tools.Debug.Configuration.DebugToolsConfigurationSection, SanteDB.Tools.Debug, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null"/>
   </sections>
+  <section xsi:type="DebugToolsConfigurationSection">
+    <biFileRepository rescan="60000">
+      <paths>
+        <add>C:\Users\justi\source\repos\santedb\applets\bicore\bi</add>
+      </paths>
+    </biFileRepository>
+  </section>
   <section xsi:type="OrmConfigurationSection">
     <providers>
       <add type="SanteDB.OrmLite.Providers.Postgres.PostgreSQLProvider, SanteDB.OrmLite, Version=1.41.0.27080, Culture=neutral, PublicKeyToken=null" invariant="npgsql" />
@@ -557,7 +565,8 @@
       
       <!-- Business Intel Service -->
       <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS, Version=1.40.0.0"/>
-      <add type="SanteDB.BI.Services.Impl.AppletMetadataRepository, SanteDB.BI, Version=1.40.0.0"/>
+      <!--<add type="SanteDB.BI.Services.Impl.AppletMetadataRepository, SanteDB.BI, Version=1.40.0.0"/>-->
+      <add type="SanteDB.Tools.Debug.BI.FileMetadataRepository, SanteDB.Tools.Debug, Version=1.40.0.0"/>
       <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI, Version=1.40.0.0"/>
     </serviceProviders>
   </section>
