@@ -38,7 +38,9 @@ namespace SanteDB.Messaging.FHIR.DataTypes
         [NonSerialized]
         private List<Extension> m_extensions;
 
-        // XHTML
+        /// <summary>
+        /// XHTML namespace
+        /// </summary>
         public const string NS_XHTML = "http://www.w3.org/1999/xhtml";
        
         /// <summary>

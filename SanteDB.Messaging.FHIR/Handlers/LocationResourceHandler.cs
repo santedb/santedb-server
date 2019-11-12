@@ -66,11 +66,11 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			retVal.Telecom = model.LoadCollection<EntityTelecomAddress>("Telecoms").Select(o => DataTypeConverter.ToFhirTelecom(o)).ToList();
 			retVal.Address = DataTypeConverter.ToFhirAddress(model.LoadCollection<EntityAddress>("Addresses").FirstOrDefault());
 
-			if (model.Lat.HasValue && model.Lng.HasValue)
+            if(model.GeoTag != null)
 				retVal.Position = new SanteDB.Messaging.FHIR.Backbone.Position()
 				{
-					Latitude = (decimal)model.Lat.Value,
-					Longitude = (decimal)model.Lng.Value
+					Latitude = (decimal)model.GeoTag.Lat,
+					Longitude = (decimal)model.GeoTag.Lng
 				};
 
 			// Part of?

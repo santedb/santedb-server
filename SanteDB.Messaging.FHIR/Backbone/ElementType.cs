@@ -27,14 +27,26 @@ using System.Xml.Serialization;
 namespace SanteDB.Messaging.FHIR.Backbone
 {
 
+    /// <summary>
+    /// Identifies the aggregation mode of the eleemnt
+    /// </summary>
     [XmlType("AggregationMode", Namespace = "http://hl7.org/fhir")]
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/resource-aggregation-mode")]
     public enum AggregationMode
     {
+        /// <summary>
+        /// Element should be contained in containedResources
+        /// </summary>
         [XmlEnum("contained")]
         Contained,
+        /// <summary>
+        /// Element should be referenced
+        /// </summary>
         [XmlEnum("referenced")]
         Referenced,
+        /// <summary>
+        /// Element is bundled
+        /// </summary>
         [XmlEnum("bundled")]
         Bundled
     }

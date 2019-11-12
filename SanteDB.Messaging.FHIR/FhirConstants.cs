@@ -27,7 +27,9 @@ namespace SanteDB.Messaging.FHIR
     public static class FhirConstants
     {
 
-        // Address extensions
+        /// <summary>
+        /// URI of the SanteDB FHIR profile
+        /// </summary>
         public static String SanteDBProfile = "http://santedb.org/fhir/profile";
 
         /// <summary>

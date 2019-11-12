@@ -31,12 +31,24 @@ namespace SanteDB.Messaging.FHIR.Backbone
     [XmlType("BindingStrength", Namespace = "http://hl7.org/fhir")]
     public enum BindingStrength
     {
+        /// <summary>
+        /// Code system is required
+        /// </summary>
         [XmlEnum("required")]
         Required,
+        /// <summary>
+        /// Extensible code binding
+        /// </summary>
         [XmlEnum("extensible")]
         Exstensible,
+        /// <summary>
+        /// Preferred code binding
+        /// </summary>
         [XmlEnum("preferred")]
         Preferred,
+        /// <summary>
+        /// Example binding
+        /// </summary>
         [XmlEnum("example")]
         Example
     }

@@ -29,10 +29,25 @@ namespace SanteDB.Core.Services.Impl
         where TModel : IdentifiedData
     {
         
+        /// <summary>
+        /// The query policy for concepts
+        /// </summary>
         protected override string QueryPolicy => PermissionPolicyIdentifiers.ReadMetadata;
+        /// <summary>
+        /// The read policy for concepts
+        /// </summary>
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadMetadata;
+        /// <summary>
+        /// The write policy for concepts
+        /// </summary>
         protected override string WritePolicy => PermissionPolicyIdentifiers.AdministerConceptDictionary;
+        /// <summary>
+        /// The delete policy for concepts
+        /// </summary>
         protected override string DeletePolicy => PermissionPolicyIdentifiers.AdministerConceptDictionary;
+        /// <summary>
+        /// The alter policy for concepts
+        /// </summary>
         protected override string AlterPolicy => PermissionPolicyIdentifiers.AdministerConceptDictionary;
 
     }

@@ -50,10 +50,19 @@ namespace SanteDB.Messaging.FHIR.Backbone
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/conditional-delete-status")]
     public enum ConditionalDeleteStatus
     {
+        /// <summary>
+        /// Conditional delete is not supported by this server
+        /// </summary>
         [XmlEnum("not-supported")]
         NotSupported,
+        /// <summary>
+        /// Deletion is supported on single object
+        /// </summary>
         [XmlEnum("single")]
         Single, 
+        /// <summary>
+        /// Deletion is supported on multiple objects
+        /// </summary>
         [XmlEnum("multiple")]
         Multiple
     }

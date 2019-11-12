@@ -119,9 +119,25 @@ namespace SanteDB.Messaging.FHIR.DataTypes
     [XmlType("decimal", Namespace = "http://hl7.org/fhir")]
     public class FhirDecimal : Primitive<Decimal?>
     {
+        /// <summary>
+        /// Creates a new instance of the decimal wrapper
+        /// </summary>
         public FhirDecimal() : base() { }
+        /// <summary>
+        /// Creates a new wrapper of the decimal with specified value
+        /// </summary>
+        /// <param name="value">The value of the wrapper</param>
         public FhirDecimal(Decimal value) : base(value) { }
+
+        /// <summary>
+        /// Converts a decimal to a wrapped decimal
+        /// </summary>
+        /// <param name="v">The value to be converted</param>
         public static implicit operator FhirDecimal(Decimal v) { return new FhirDecimal(v); }
+
+        /// <summary>
+        /// Gets or sets the value of the decimal
+        /// </summary>
         [XmlAttribute("value")]
         public override string XmlValue
         {
@@ -146,9 +162,27 @@ namespace SanteDB.Messaging.FHIR.DataTypes
     /// </summary>
     [XmlType("boolean", Namespace = "http://hl7.org/fhir")]
     public class FhirBoolean : Primitive<Boolean?> {
+
+        /// <summary>
+        /// Construct for FHIR boolean wrapper
+        /// </summary>
         public FhirBoolean() : base() { }
+
+        /// <summary>
+        /// Creates a new boolean wrapper with specified  value
+        /// </summary>
+        /// <param name="value">The initial value</param>
         public FhirBoolean(Boolean value) : base(value) { }
+
+        /// <summary>
+        /// Converts a boolean to a wrapped boolean
+        /// </summary>
+        /// <param name="v">The value to be converted/wrapped</param>
         public static implicit operator FhirBoolean(bool v) { return new FhirBoolean(v); }
+
+        /// <summary>
+        /// Gets or sets the wire representation of the valuie
+        /// </summary>
         [XmlAttribute("value")]
         public override string XmlValue
         {
@@ -173,9 +207,23 @@ namespace SanteDB.Messaging.FHIR.DataTypes
     [XmlType("uri", Namespace = "http://hl7.org/fhir")]
     [Serializable]
     public class FhirUri : Primitive<Uri> { 
+
+        /// <summary>
+        /// Creates a new wrapped URI object
+        /// </summary>
         public FhirUri() : base() { }
+        /// <summary>
+        /// Creates a new wrapped URI object with specified <paramref name="value"/>
+        /// </summary>
+        /// <param name="value">The URI value to be wrapped</param>
         public FhirUri(Uri value) : base(value) { }
+
+        /// <summary>
+        /// Converts the specified URI to a wrapped URI
+        /// </summary>
+        /// <param name="v">The URI to be wrapped</param>
         public static implicit operator FhirUri(Uri v) { return new FhirUri(v); }
+
         /// <summary>
         /// Write as text
         /// </summary>
@@ -202,8 +250,20 @@ namespace SanteDB.Messaging.FHIR.DataTypes
     [Serializable]
     public class FhirInt : Primitive<Int32?> {
 
+        /// <summary>
+        /// Creates a new FHIR integer wrapper
+        /// </summary>
         public FhirInt() : base() { }
+        /// <summary>
+        /// Creates a new integer wrapper with specified <paramref name="value"/>
+        /// </summary>
+        /// <param name="value">The value to be wrapped</param>
         public FhirInt(Int32 value) : base(value) { }
+
+        /// <summary>
+        /// Converts the specified integer to a wrapped integer
+        /// </summary>
+        /// <param name="v">The integer value to be wrapped</param>
         public static implicit operator FhirInt(int v) { return new FhirInt(v); }
 
     }
@@ -213,8 +273,21 @@ namespace SanteDB.Messaging.FHIR.DataTypes
     [XmlType("string", Namespace = "http://hl7.org/fhir")]
     [Serializable]
     public class FhirString : Primitive<String> {
+
+        /// <summary>
+        /// Creates a new wrapped string
+        /// </summary>
         public FhirString() : base() { }
+        /// <summary>
+        /// Creates a new wrapped string
+        /// </summary>
+        /// <param name="value">The value to be wrapped</param>
         public FhirString(String value) : base(value) { }
+        
+        /// <summary>
+        /// Converts a .net string to a wrapped string
+        /// </summary>
+        /// <param name="v">The string to be wrapped</param>
         public static implicit operator FhirString(string v) { return v == null ? null : new FhirString(v); }
 
     }
@@ -226,8 +299,21 @@ namespace SanteDB.Messaging.FHIR.DataTypes
     [Serializable]
     public class FhirId : FhirString
     {
+        /// <summary>
+        /// Creates a new FHIR identifier
+        /// </summary>
         public FhirId() : base() { }
+
+        /// <summary>
+        /// Creates a new FHIR identifier with specified <paramref name="id"/>
+        /// </summary>
+        /// <param name="id">The id value to be set</param>
         public FhirId(String id) : base(id) { }
+
+        /// <summary>
+        /// Converts a string to a FHIR identifier
+        /// </summary>
+        /// <param name="v">The string representing the simple identiifer</param>
         public static implicit operator FhirId(string v) { return v == null ? null : new FhirId(v); }
 
     }
@@ -239,9 +325,25 @@ namespace SanteDB.Messaging.FHIR.DataTypes
     [Serializable]
     public class FhirBase64Binary : Primitive<byte[]>
     {
+        /// <summary>
+        /// Default ctor for base64 binary data
+        /// </summary>
         public FhirBase64Binary() : base() { }
+        /// <summary>
+        /// Constructs a base64 binary data structure from byte array
+        /// </summary>
+        /// <param name="value"></param>
         public FhirBase64Binary(byte[] value) : base(value) { }
+
+        /// <summary>
+        /// Converts a base64 binary structure to a byte array
+        /// </summary>
+        /// <param name="v">The value to be converted</param>
         public static implicit operator FhirBase64Binary(byte[] v) { return new FhirBase64Binary(v); }
+
+        /// <summary>
+        /// Gets or sets the wire representation of the value
+        /// </summary>
         [XmlAttribute("value")]
         public override string XmlValue
         {

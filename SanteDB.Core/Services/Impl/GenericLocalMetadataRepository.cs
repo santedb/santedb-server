@@ -33,10 +33,25 @@ namespace SanteDB.Core.Services.Impl
         where TMetadata : IdentifiedData
     {
 
+        /// <summary>
+        /// The query policy for metadata
+        /// </summary>
         protected override string QueryPolicy => PermissionPolicyIdentifiers.ReadMetadata;
+        /// <summary>
+        /// The read policy for metadata
+        /// </summary>
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadMetadata;
+        /// <summary>
+        /// The write policy for metadata
+        /// </summary>
         protected override string WritePolicy => PermissionPolicyIdentifiers.UnrestrictedMetadata;
+        /// <summary>
+        /// The delete policy for metadata
+        /// </summary>
         protected override string DeletePolicy => PermissionPolicyIdentifiers.UnrestrictedMetadata;
+        /// <summary>
+        /// The alter policy for metadata
+        /// </summary>
         protected override string AlterPolicy => PermissionPolicyIdentifiers.UnrestrictedMetadata;
 
         /// <summary>

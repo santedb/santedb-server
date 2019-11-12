@@ -33,10 +33,14 @@ namespace SanteDB.Messaging.FHIR.Backbone
     public class BundleLink : BackboneElement
     {
 
+        /// <summary>
+        /// Represents a bundle link
+        /// </summary>
         public BundleLink()
         {
 
         }
+
         /// <summary>
         /// Creates a new bundle link
         /// </summary>
