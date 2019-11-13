@@ -28,10 +28,25 @@ namespace SanteDB.Messaging.FHIR.DataTypes
     /// </summary>
     public enum DatePrecision
     {
+        /// <summary>
+        /// Unspecified precision
+        /// </summary>
         Unspecified = 0,
+        /// <summary>
+        /// Precise to year
+        /// </summary>
         Year = 4,
+        /// <summary>
+        /// Preice to month
+        /// </summary>
         Month = 7, 
+        /// <summary>
+        /// Precise to day
+        /// </summary>
         Day = 10,
+        /// <summary>
+        /// Full date/time precision
+        /// </summary>
         Full = 28
     }
 
@@ -107,7 +122,6 @@ namespace SanteDB.Messaging.FHIR.DataTypes
             {
                 if (value != null)
                 {
-                    string dateFormat = @"yyyy-MM-dd\THH:mm:ss.ffffzzz";
                     this.Precision = (DatePrecision)value.Length;
                     if (this.Precision > DatePrecision.Full)
                         this.Precision = DatePrecision.Full;
@@ -117,11 +131,11 @@ namespace SanteDB.Messaging.FHIR.DataTypes
                     if (this.Precision == DatePrecision.Year)
                         this.DateValue = XmlConvert.ToDateTime(value, "yyyy");
                     else
-                        this.DateValue = XmlConvert.ToDateTime(value);
+                        this.DateValue = XmlConvert.ToDateTime(value, XmlDateTimeSerializationMode.Unspecified);
 
                 }
                 else
-                    this.DateValue = XmlConvert.ToDateTime(value);
+                    this.DateValue = XmlConvert.ToDateTime(value, XmlDateTimeSerializationMode.Unspecified);
             }
         }
 

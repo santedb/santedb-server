@@ -35,10 +35,25 @@ namespace SanteDB.Core.Services.Impl
     /// </summary>
     public class LocalConceptRepository : GenericLocalNullifiedRepository<Concept>, IConceptRepositoryService
 	{
+        /// <summary>
+        /// Query policy for concepts
+        /// </summary>
         protected override string QueryPolicy => PermissionPolicyIdentifiers.ReadMetadata;
+        /// <summary>
+        /// Read policies for concepts
+        /// </summary>
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadMetadata;
+        /// <summary>
+        /// Write policy for concepts
+        /// </summary>
         protected override string WritePolicy => PermissionPolicyIdentifiers.AdministerConceptDictionary;
+        /// <summary>
+        /// Delete policy for concepts
+        /// </summary>
         protected override string DeletePolicy => PermissionPolicyIdentifiers.AdministerConceptDictionary;
+        /// <summary>
+        /// Alater policy for concepts
+        /// </summary>
         protected override string AlterPolicy => PermissionPolicyIdentifiers.AdministerConceptDictionary;
 
         /// <summary>

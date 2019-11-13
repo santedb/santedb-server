@@ -33,6 +33,9 @@ namespace SanteDB.Messaging.FHIR.Backbone
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/property-representation")]
     public enum PropertyRepresentation
     {
+        /// <summary>
+        /// Property is to be represented as an xml attribute
+        /// </summary>
         [XmlEnum("xmlAttr")]
         XmlAttribute
     }
@@ -44,6 +47,9 @@ namespace SanteDB.Messaging.FHIR.Backbone
     public class ElementDefinition : FhirElement
     {
 
+        /// <summary>
+        /// Creates a new instance of the element definition 
+        /// </summary>
         public ElementDefinition()
         {
             this.Representation = new List<FhirCode<PropertyRepresentation>>();
@@ -53,6 +59,7 @@ namespace SanteDB.Messaging.FHIR.Backbone
             this.Condition = new List<FhirId>();
             this.Type = new List<ElementType>();
         }
+
         /// <summary>
         /// Gets or sets the path of the element
         /// </summary>

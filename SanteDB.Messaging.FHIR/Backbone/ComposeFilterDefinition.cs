@@ -32,16 +32,34 @@ namespace SanteDB.Messaging.FHIR.Backbone
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/filter-operator")]
     public enum FilterOperator
     {
+        /// <summary>
+        /// A = B
+        /// </summary>
         [XmlEnum("=")]
         Eq,
+        /// <summary>
+        /// A is a B
+        /// </summary>
         [XmlEnum("is-a")]
         IsA,
+        /// <summary>
+        /// A is not a B
+        /// </summary>
         [XmlEnum("is-not-a")]
         IsNotA,
+        /// <summary>
+        /// A matches regex B
+        /// </summary>
         [XmlEnum("regex")]
         Regex,
+        /// <summary>
+        /// A appears in B
+        /// </summary>
         [XmlEnum("in")]
         In,
+        /// <summary>
+        /// A does not appear in B
+        /// </summary>
         [XmlEnum("not-in")]
         NotIn
     }

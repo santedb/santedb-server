@@ -28,10 +28,25 @@ namespace SanteDB.Core.Services.Impl
     /// </summary>
     public class GenericLocalClinicalDataRepository<TModel> : GenericLocalNullifiedRepository<TModel> where TModel : IdentifiedData, IHasState
     {
+        /// <summary>
+        /// The query policy for generic clinical data
+        /// </summary>
         protected override string QueryPolicy => PermissionPolicyIdentifiers.QueryClinicalData;
+        /// <summary>
+        /// The read policy for a single piece of clinical data
+        /// </summary>
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadClinicalData;
+        /// <summary>
+        /// The write policy for clinical data
+        /// </summary>
         protected override string WritePolicy => PermissionPolicyIdentifiers.WriteClinicalData;
+        /// <summary>
+        /// The delete policy for clinical data
+        /// </summary>
         protected override string DeletePolicy => PermissionPolicyIdentifiers.DeleteClinicalData;
+        /// <summary>
+        /// Alter policy for clinical data
+        /// </summary>
         protected override string AlterPolicy => PermissionPolicyIdentifiers.WriteClinicalData;
     }
 }

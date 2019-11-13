@@ -32,12 +32,24 @@ namespace SanteDB.Messaging.FHIR.Backbone
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/http-verb")]
     public enum HttpVerb
     {
+        /// <summary>
+        /// The GET verb is supported
+        /// </summary>
         [XmlEnum("GET")]
         Get,
+        /// <summary>
+        /// The HTTP POST verb
+        /// </summary>
         [XmlEnum("POST")]
         Post,
+        /// <summary>
+        /// The HTTP PUT verb
+        /// </summary>
         [XmlEnum("PUT")]
         Put,
+        /// <summary>
+        /// The HTTP DELETE Verb
+        /// </summary>
         [XmlEnum("DELETE")]
         Delete
     }

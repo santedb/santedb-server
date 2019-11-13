@@ -153,6 +153,9 @@ namespace SanteDB.Messaging.FHIR
 
         #endregion
 
+        /// <summary>
+        /// True if the FHIR message handler is active and running
+        /// </summary>
         public bool IsRunning
         {
             get

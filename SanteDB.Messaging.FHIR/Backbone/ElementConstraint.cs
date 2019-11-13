@@ -31,8 +31,14 @@ namespace SanteDB.Messaging.FHIR.Backbone
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/constraint-severity")]
     public enum ConstraintSeverity
     {
+        /// <summary>
+        /// Constraint violation is an error
+        /// </summary>
         [XmlEnum("error")]
         Error,
+        /// <summary>
+        /// Constraint violation is a warning
+        /// </summary>
         [XmlEnum("warning")]
         Warning
     }

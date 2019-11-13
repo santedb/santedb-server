@@ -34,14 +34,29 @@ namespace SanteDB.Messaging.FHIR.Backbone
     [FhirValueSet(Uri = "http://hl7.org/fhir/ValueSet/network-type")]
     public enum AuditEventAgentNetworkType
     {
+        /// <summary>
+        /// Audit participant is a machine name on the network
+        /// </summary>
         [XmlEnum("1")]
         MachineName,
+        /// <summary>
+        /// Audit participant is an IpAddress
+        /// </summary>
         [XmlEnum("2")]
         IpAddress,
+        /// <summary>
+        /// Audit participant is a telephone number
+        /// </summary>
         [XmlEnum("3")]
         TelephoneNumber,
+        /// <summary>
+        /// Audit participant is an e-mail address
+        /// </summary>
         [XmlEnum("4")]
         EmailAddress,
+        /// <summary>
+        /// Audit participant type is a uri
+        /// </summary>
         [XmlEnum("5")]
         Uri
     }

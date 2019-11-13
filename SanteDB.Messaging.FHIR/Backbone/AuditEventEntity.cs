@@ -39,6 +39,9 @@ namespace SanteDB.Messaging.FHIR.Backbone
         [XmlElement("type")]
         public FhirString Type { get; set; }
 
+        /// <summary>
+        /// Gets or sets the value of the audit event
+        /// </summary>
         [XmlElement("value")]
         public FhirBase64Binary Value { get; set; }
 
@@ -59,24 +62,39 @@ namespace SanteDB.Messaging.FHIR.Backbone
             this.Detail = new List<AuditEventEntityDetail>();
         }
 
+        /// <summary>
+        /// Gets or sets the identifier of the audit event object
+        /// </summary>
         [XmlElement("identifier")]
         [Description("The identifier of the object")]
         public FhirIdentifier Identifier { get; set; }
 
+        /// <summary>
+        /// Gets or sets a reference to the object
+        /// </summary>
         [XmlElement("reference")]
         [Description("A reference to the object being accessed")]
         public Reference Reference { get; set; }
 
+        /// <summary>
+        /// Gets or sets the type of object involved
+        /// </summary>
         [XmlElement("type")]
         [Description("The type of object involved")]
         [FhirElement(RemoteBinding = "http://hl7.org/fhir/ValueSet/audit-entity-type")]
         public FhirCoding Type { get; set; }
 
+        /// <summary>
+        /// Gets or sets the role that the object played
+        /// </summary>
         [XmlElement("role")]
         [Description("The role that the object played")]
         [FhirElement(RemoteBinding = "http://hl7.org/fhir/ValueSet/object-role")]
         public FhirCoding Role { get; set; }
 
+        /// <summary>
+        /// Gets or sets the lifecycle of the object
+        /// </summary>
         [XmlElement("lifecycle")]
         [Description("Where in the object's lifecycle the interaction occurred")]
         [FhirElement(RemoteBinding = "http://hl7.org/fhir/ValueSet/object-lifecycle-events")]

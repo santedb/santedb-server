@@ -28,10 +28,25 @@ namespace SanteDB.Core.Services.Impl
     /// </summary>
     public class LocalEntityRelationshipRepository : GenericLocalRepository<EntityRelationship>
     {
+        /// <summary>
+        /// Query policy for entities
+        /// </summary>
         protected override string QueryPolicy => PermissionPolicyIdentifiers.QueryClinicalData;
+        /// <summary>
+        /// Read policy for entities
+        /// </summary>
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadClinicalData;
+        /// <summary>
+        /// Write policy for entities
+        /// </summary>
         protected override string WritePolicy => PermissionPolicyIdentifiers.WriteClinicalData;
+        /// <summary>
+        /// Delete policy for entities
+        /// </summary>
         protected override string DeletePolicy => PermissionPolicyIdentifiers.DeleteClinicalData;
+        /// <summary>
+        /// Alter policy for entities
+        /// </summary>
         protected override string AlterPolicy => PermissionPolicyIdentifiers.WriteClinicalData;
 
         /// <summary>

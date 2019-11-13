@@ -48,7 +48,9 @@ namespace SanteDB.Core
         // Lock object
         private static Object s_lockObject = new object();
 
-        // Context
+        /// <summary>
+        /// Singleton context instance
+        /// </summary>
         protected static ApplicationContext s_context = null;
 
         /// <summary>

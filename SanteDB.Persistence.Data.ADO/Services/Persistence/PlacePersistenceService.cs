@@ -36,8 +36,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var retVal = m_entityPersister.ToModelInstance<Core.Model.Entities.Place>(entityVersionInstance, entityInstance, context);
             if (retVal == null) return null;
             retVal.IsMobile = placeInstance?.IsMobile == true;
-            retVal.Lat = placeInstance?.Lat;
-            retVal.Lng = placeInstance?.Lng;
+
+            if (placeInstance?.Lat != null || placeInstance?.Lng != null)
+                retVal.GeoTag = new Core.Model.DataTypes.GeoTag(placeInstance.Lat, placeInstance.Lng, false);
             return retVal;
         }
 

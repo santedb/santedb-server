@@ -31,10 +31,19 @@ namespace SanteDB.Messaging.FHIR.Backbone
     [XmlType("AllergyIntoleranceSeverity", Namespace = "http://hl7.org/fhir")]
     public enum AllergyIntoleranceSeverity
     {
+        /// <summary>
+        /// Intolerance is severe
+        /// </summary>
         [XmlEnum("severe")]
         Severe, 
+        /// <summary>
+        /// Intolerance is mild
+        /// </summary>
         [XmlEnum("mild")]
         Mild,
+        /// <summary>
+        /// Intolerance is moderate
+        /// </summary>
         [XmlEnum("moderate")]
         Moderate
     }
