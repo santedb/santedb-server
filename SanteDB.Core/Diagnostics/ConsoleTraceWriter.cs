@@ -25,7 +25,7 @@ namespace SanteDB.Core.Diagnostics
         private ConcurrentQueue<KeyValuePair<ConsoleColor, String>> m_logBacklog = new ConcurrentQueue<KeyValuePair<ConsoleColor, string>>();
 
         // Reset event
-        private ManualResetEvent m_resetEvent = new ManualResetEvent(false);
+        private ManualResetEventSlim m_resetEvent = new ManualResetEventSlim(false);
 
         /// <summary>
         /// Console trace writer
@@ -77,12 +77,14 @@ namespace SanteDB.Core.Diagnostics
             while (true)
             {
 
-                while (this.m_logBacklog.Count == 0 && !this.m_disposing)
-                    this.m_resetEvent.WaitOne();
+                while (this.m_logBacklog.IsEmpty && !this.m_disposing)
+                {
+                    this.m_resetEvent.Wait();
+                    this.m_resetEvent.Reset();
+                }
                 if (this.m_disposing) return;
-                this.m_resetEvent.WaitOne();
 
-                while (this.m_logBacklog.Count > 0)
+                while (!this.m_logBacklog.IsEmpty)
                 {
                     if (this.m_logBacklog.TryDequeue(out var dq))
                     {

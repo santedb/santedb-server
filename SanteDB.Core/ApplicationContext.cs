@@ -206,7 +206,7 @@ namespace SanteDB.Core
 
                     if (config != null)
                         foreach (var writer in config.TraceWriter)
-                            Tracer.AddWriter(writer.TraceWriter, writer.Filter);
+                            Tracer.AddWriter(Activator.CreateInstance(writer.TraceWriter, writer.Filter, writer.InitializationData) as TraceWriter, writer.Filter);
 #if DEBUG
                     else
                         Tracer.AddWriter(new SystemDiagnosticsTraceWriter(), System.Diagnostics.Tracing.EventLevel.LogAlways);
