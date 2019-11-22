@@ -63,6 +63,23 @@ namespace SanteDB.Tools.Debug.BI
         public event EventHandler Stopped;
 
         /// <summary>
+        /// Constructor for the file metadata repository
+        /// </summary>
+        public FileMetadataRepository()
+        {
+            // Validate paths
+            for (var i = this.m_configuration.BiMetadataRepository.Paths.Count - 1; i >= 0; i--)
+            {
+                var dir = this.m_configuration.BiMetadataRepository.Paths[i];
+                if (!Directory.Exists(dir))
+                {
+                    this.m_tracer.TraceWarning("Cannot find directory {0}, removing from configuration", dir);
+                    this.m_configuration.BiMetadataRepository.Paths.RemoveAt(i);
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the BI definition from the specified file
         /// </summary>
         /// <typeparam name="TBisDefinition"></typeparam>
@@ -191,6 +208,7 @@ namespace SanteDB.Tools.Debug.BI
             this.m_tracer.TraceInfo("Starting File-Based Asset Definition Repository...");
             this.Starting?.Invoke(this, EventArgs.Empty);
 
+           
             this.m_scanTimer = new Timer(_ =>
             {
                 foreach(var path in this.m_configuration.BiMetadataRepository.Paths)

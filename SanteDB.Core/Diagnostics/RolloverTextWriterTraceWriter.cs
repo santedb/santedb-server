@@ -50,7 +50,7 @@ namespace SanteDB.Core.Diagnostics
         private ConcurrentQueue<String> m_logBacklog = new ConcurrentQueue<string>();
 
         // Reset event
-        private ManualResetEvent m_resetEvent = new ManualResetEvent(false);
+        private ManualResetEventSlim m_resetEvent = new ManualResetEventSlim(false);
 
         // File name reference
         private string m_fileName;
@@ -123,9 +123,11 @@ namespace SanteDB.Core.Diagnostics
                 try
                 {
                     if (this.m_disposing) return; // shutdown dispatch
-                    while (this.m_logBacklog.Count == 0 && !this.m_disposing)
-                        this.m_resetEvent.WaitOne();
-                    this.m_resetEvent.Reset();
+                    while (this.m_logBacklog.IsEmpty && !this.m_disposing)
+                    {
+                        this.m_resetEvent.Wait();
+                        this.m_resetEvent.Reset();
+                    }
                     if (this.m_disposing) return;
 
                     // Use file stream
@@ -134,8 +136,9 @@ namespace SanteDB.Core.Diagnostics
                         fs.Seek(0, SeekOrigin.End);
                         using (StreamWriter sw = new StreamWriter(fs))
                         {
-                            if (this.m_logBacklog.TryDequeue(out var dq))
-                                sw.WriteLine(dq); // This allows other threads to add to the write queue
+                            while(!this.m_logBacklog.IsEmpty)
+                                if (this.m_logBacklog.TryDequeue(out var dq))
+                                    sw.WriteLine(dq); // This allows other threads to add to the write queue
                         }
                     }
                 }
