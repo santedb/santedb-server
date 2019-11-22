@@ -59,7 +59,7 @@
   <section xsi:type="DebugToolsConfigurationSection">
     <biFileRepository rescan="60000">
       <paths>
-        <add>C:\Users\justi\source\repos\santedb\applets\bicore\bi</add>
+        <add>..\..\..\applets\bicore\bi</add>
       </paths>
     </biFileRepository>
   </section>
