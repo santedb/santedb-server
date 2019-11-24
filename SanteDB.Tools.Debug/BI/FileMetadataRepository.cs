@@ -168,7 +168,7 @@ namespace SanteDB.Tools.Debug.BI
                 using (var fs = File.OpenRead(f))
                 {
                     var asset = BiDefinition.Load(fs);
-                    if (asset.GetType().IsAssignableFrom(typeof(TBisDefinition)) && filterFn.Invoke((TBisDefinition)asset) && r++ >= offset && r < count + offset)
+                    if (asset.GetType().IsAssignableFrom(typeof(TBisDefinition)) && filterFn.Invoke((TBisDefinition)asset) && r >= offset && r++ < count + offset)
                         yield return (TBisDefinition)asset;
                     else if (r > count + offset)
                         yield break;
