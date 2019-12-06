@@ -564,6 +564,7 @@
       <!--<add type="SanteDB.BI.Services.Impl.AppletMetadataRepository, SanteDB.BI, Version=1.40.0.0"/>-->
       <add type="SanteDB.Tools.Debug.BI.FileMetadataRepository, SanteDB.Tools.Debug, Version=1.40.0.0"/>
       <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI, Version=1.40.0.0"/>
+      <add type="SanteDB.BI.Services.Impl.LocalRenderService, SanteDB.BI, Version=1.40.0.0"/>
     </serviceProviders>
   </section>
 </SanteDBConfiguration>
