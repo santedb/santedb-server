@@ -172,7 +172,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             nameof(QueryBuilder.CreateQuery),
                             new Type[] { subscription.ResourceType },
                             new Type[] { queryExpression.GetType(), typeof(ColumnMapping).MakeArrayType() }
-                        ).Invoke(this.m_queryBuilder, new object[] { queryExpression, null }) as SqlStatement).Build();
+                        ).Invoke(this.m_queryBuilder, new object[] { queryExpression, tableMapping.Columns.ToArray() }) as SqlStatement).Build();
 
                         // Now we want to remove the portions of the built query statement after FROM and before WHERE as the definition will be the source of our selection
                         SqlStatement domainQuery = new SqlStatement(m_configuration.Provider, query.SQL.Substring(0, query.SQL.IndexOf(" FROM ")));

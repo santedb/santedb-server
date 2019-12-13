@@ -2111,7 +2111,7 @@ INSERT INTO SEC_ROL_TBL (ROL_ID, ROL_NAME, DESCR, CRT_PROV_ID) VALUES (char_to_u
 --#!
 INSERT INTO SEC_USR_ROL_ASSOC_TBL (ROL_ID, USR_ID) VALUES (char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 --#!
-INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('da73c05a-3159-48c8-bbcb-741911d91cd2'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 2); -- GRANT UNRESTRICTED ALL
+INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('DA73C05A-3159-48C8-BBCB-741911D91CD2'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 2); -- GRANT UNRESTRICTED ALL
 --#!
 INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VALUES (gen_uuid(), char_to_uuid('d15b96ab-646c-4c00-9a58-ea09eee67d7c'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 0); -- DENY Login
 --#!
