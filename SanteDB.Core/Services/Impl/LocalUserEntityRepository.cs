@@ -52,7 +52,7 @@ namespace SanteDB.Core.Services.Impl
         private void ValidateWritePermission(UserEntity entity)
         {
             var user = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>()?.GetUser(AuthenticationContext.Current.Principal.Identity);
-            if (user.Key != entity.SecurityUserKey)
+            if (user?.Key != entity.SecurityUserKey)
                 new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AlterIdentity).Demand();
         }
 

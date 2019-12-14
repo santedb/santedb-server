@@ -138,6 +138,8 @@ namespace SanteDB.Core.Rest.Serialization
                 faultMessage.StatusCode = (int)HttpStatusCode.NotImplemented;
             else if (error is NotSupportedException)
                 faultMessage.StatusCode = (int)HttpStatusCode.MethodNotAllowed;
+            else if (error is PatchException )
+                faultMessage.StatusCode = (int)HttpStatusCode.Conflict;
             else
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
 

@@ -108,7 +108,9 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.NotFound;
             else if (error is DbException || error is ConstraintException)
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)(System.Net.HttpStatusCode)422;
-            
+            else if (error is PatchException)
+                RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.Conflict;
+
             else
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
 

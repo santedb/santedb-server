@@ -248,7 +248,7 @@ namespace SanteDB.Core.Rest.Serialization
                 // Result is serializable
                 if(result == null)
                 {
-                    if (response.StatusCode != 304)
+                    if (response.StatusCode == 200)
                         response.StatusCode = 204;
                 }
                 else if (result?.GetType().GetCustomAttribute<XmlTypeAttribute>() != null ||
