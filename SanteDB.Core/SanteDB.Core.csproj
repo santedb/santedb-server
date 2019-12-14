@@ -76,6 +76,9 @@
     <Compile Include="Configuration\Features\WindowsServiceFeature.cs" />
     <Compile Include="Configuration\X509ConfigurationElement.cs" />
     <Compile Include="Diagnostics\ConsoleTraceWriter.cs" />
+    <Compile Include="Diagnostics\Performance\MachinePerformanceProbe.cs" />
+    <Compile Include="Diagnostics\Performance\WindowsPerformanceCounterProbe.cs" />
+    <Compile Include="Diagnostics\Performance\ThreadPoolPerformanceProbe.cs" />
     <Compile Include="Diagnostics\RolloverTextWriterTraceWriter.cs" />
     <Compile Include="Diagnostics\SystemDiagnosticsTraceWriter.cs" />
     <Compile Include="ExtensionMethods.cs" />

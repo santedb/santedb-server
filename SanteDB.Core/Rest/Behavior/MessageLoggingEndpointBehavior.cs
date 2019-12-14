@@ -48,21 +48,13 @@ namespace SanteDB.Core.Rest.Behavior
         {
             Guid httpCorrelator = Guid.NewGuid();
 
-            // Windows we get CPU usage
-            float usage = 0.0f;
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                using (PerformanceCounter cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total", true))
-                    usage = cpuCounter.NextValue();
-            }
-
-            this.m_traceSource.TraceEvent(EventLevel.Verbose, "HTTP RQO {0} : {1} {2} ({3}) - {4} (CPU {5}%)",
+            
+            this.m_traceSource.TraceEvent(EventLevel.Verbose, "HTTP RQO {0} : {1} {2} ({3}) - {4}",
                 RestOperationContext.Current.IncomingRequest.RemoteEndPoint,
                 request.Method,
                 request.Url,
                 RestOperationContext.Current.IncomingRequest.UserAgent,
-                httpCorrelator,
-                usage);
+                httpCorrelator);
 
             httpCorrelation = new KeyValuePair<Guid, DateTime>(httpCorrelator, DateTime.Now);
         }
@@ -82,18 +74,10 @@ namespace SanteDB.Core.Rest.Behavior
         {
             var processingTime = DateTime.Now.Subtract(httpCorrelation.Value);
 
-            float usage = 0.0f;
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                using (PerformanceCounter cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total", true))
-                    usage = cpuCounter.NextValue();
-            }
-
-            this.m_traceSource.TraceEvent(EventLevel.Verbose, "HTTP RSP {0} : {1} ({2} ms - CPU {3}%)",
+            this.m_traceSource.TraceEvent(EventLevel.Verbose, "HTTP RSP {0} : {1} ({2} ms)",
                 httpCorrelation.Key,
                 response.StatusCode,
-                processingTime.TotalMilliseconds,
-                usage);
+                processingTime.TotalMilliseconds);
         }
     }
 }

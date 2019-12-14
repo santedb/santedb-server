@@ -43,7 +43,33 @@ namespace SanteDB.Core.Services.Impl
         // Constructs a thread pool
         private WaitThreadPool m_threadPool = null;
 
+        // Trace source
         private Tracer m_traceSource = new Tracer(SanteDBConstants.ServiceTraceSourceName);
+
+        // Performance data
+        private int m_nonPooledWorkers = 0;
+        private int m_pooledWorkers = 0;
+        private int m_errorWorkers = 0;
+
+        /// <summary>
+        /// Gets the concurrency of this thread pool
+        /// </summary>
+        internal int Concurrency { get; private set; }
+
+        /// <summary>
+        /// Gets the non-pooled threads
+        /// </summary>
+        internal int NonPooledWorkers => this.m_nonPooledWorkers;
+
+        /// <summary>
+        /// Gets the pooled workers
+        /// </summary>
+        internal int PooledWorkers => this.m_pooledWorkers;
+
+        /// <summary>
+        /// Gets the number of workers that crashed
+        /// </summary>
+        internal int ErroredWorkers => this.m_errorWorkers;
 
         /// <summary>
         /// True if the service is running
@@ -90,11 +116,18 @@ namespace SanteDB.Core.Services.Impl
             Thread thd = new Thread(new ParameterizedThreadStart((o)=> {
                 try
                 {
+                    Interlocked.Increment(ref m_nonPooledWorkers);
                     action(o);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_traceSource.TraceError("THREAD DEATH: {0}", e);
+                    Interlocked.Increment(ref m_errorWorkers);
+
+                }
+                finally
+                {
+                    Interlocked.Decrement(ref m_nonPooledWorkers);
                 }
                 }));
             thd.IsBackground = true;
@@ -112,15 +145,18 @@ namespace SanteDB.Core.Services.Impl
             {
                 try
                 {
+                    Interlocked.Increment(ref m_pooledWorkers);
                     AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.AnonymousPrincipal);
                     action(o);
                 }
                 catch (Exception e)
                 {
+                    Interlocked.Increment(ref m_errorWorkers);
                     this.m_traceSource.TraceError("THREAD DEATH: {0}", e);
                 }
                 finally
                 {
+                    Interlocked.Decrement(ref m_pooledWorkers);
                     AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.AnonymousPrincipal);
                 }
             });
@@ -134,16 +170,18 @@ namespace SanteDB.Core.Services.Impl
             this.m_threadPool.QueueUserWorkItem((o) => {
                 try
                 {
+                    Interlocked.Increment(ref m_pooledWorkers);
                     AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.AnonymousPrincipal);
                     action(o);
                 }
                 catch (Exception e)
                 {
                     this.m_traceSource.TraceError("THREAD DEATH: {0}", e);
-
+                    Interlocked.Increment(ref m_errorWorkers);
                 }
                 finally
                 {
+                    Interlocked.Decrement(ref m_pooledWorkers);
                     AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.AnonymousPrincipal);
                 }
             }, parm);
@@ -180,10 +218,11 @@ namespace SanteDB.Core.Services.Impl
         {
             this.Starting?.Invoke(this, EventArgs.Empty);
 
-            int concurrency = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<ApplicationServiceContextConfigurationSection>()?.ThreadPoolSize ?? Environment.ProcessorCount;
+            this.Concurrency = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<ApplicationServiceContextConfigurationSection>()?.ThreadPoolSize ?? Environment.ProcessorCount;
+            
             if (this.m_threadPool != null)
                 this.m_threadPool.Dispose();
-            this.m_threadPool = new WaitThreadPool(concurrency);
+            this.m_threadPool = new WaitThreadPool(this.Concurrency);
 
             this.Started?.Invoke(this, EventArgs.Empty);
             return true;

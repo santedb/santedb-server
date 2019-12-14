@@ -168,7 +168,7 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                         {
 
                             // Check that this resource is supported
-                            var resourceCaps = resourceOptions?.Capabilities.FirstOrDefault(c => c.Capability == MetadataComposerUtil.VerbToCapability(v.Key));
+                            var resourceCaps = resourceOptions?.Capabilities.FirstOrDefault(c => c.Capability == MetadataComposerUtil.VerbToCapability(v.Key, v.Value.Parameters.Count));
                             if (resourceOptions != null && resourceCaps == null)
                             {
                                 unsupportedVerbs.Add(v.Key);

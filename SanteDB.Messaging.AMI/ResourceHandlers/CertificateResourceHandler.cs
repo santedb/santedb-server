@@ -29,6 +29,7 @@ using SanteDB.Core.Services;
 using SanteDB.Messaging.AMI.Configuration;
 using SanteDB.Rest.AMI;
 using SanteDB.Rest.Common;
+using SanteDB.Rest.Common.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -98,6 +99,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandlers
         /// <param name="rawId"></param>
         /// <param name="versionId"></param>
         /// <returns></returns>
+        [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public object Get(object rawId, object versionId)
         {
             var id = int.Parse(rawId.ToString());
@@ -115,7 +117,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandlers
         /// </summary>
         /// <param name="key">The key of the certificate to revoke</param>
         /// <returns>The revoked certificate</returns>
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
+        [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public object Obsolete(object key)
         {
             // Revoke reason
@@ -145,6 +147,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandlers
         /// </summary>
         /// <param name="queryParameters"></param>
         /// <returns></returns>
+        [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public IEnumerable<object> Query(NameValueCollection queryParameters)
         {
             int tr = 0;
@@ -159,6 +162,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandlers
         /// <param name="count">The number to return</param>
         /// <param name="totalCount">The total results</param>
         /// <returns>The filtered result set</returns>
+        [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public IEnumerable<object> Query(NameValueCollection queryParameters, int offset, int count, out int totalCount)
         {
             totalCount = 0;

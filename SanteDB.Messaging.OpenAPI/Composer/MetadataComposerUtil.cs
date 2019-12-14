@@ -209,12 +209,12 @@ namespace SanteDB.Messaging.Metadata.Composer
         /// <summary>
         /// Converts an HTTP verb to a capability
         /// </summary>
-        public static ResourceCapabilityType VerbToCapability(string verb)
+        public static ResourceCapabilityType VerbToCapability(string verb, int argl)
         {
             switch(verb.ToLower())
             {
                 case "get":
-                    return ResourceCapabilityType.Get;
+                    return argl == 0 ? ResourceCapabilityType.Search : ResourceCapabilityType.Get;
                 case "post":
                     return ResourceCapabilityType.Create;
                 case "put":

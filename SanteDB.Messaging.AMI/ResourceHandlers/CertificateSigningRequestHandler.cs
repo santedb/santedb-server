@@ -28,6 +28,7 @@ using SanteDB.Core.Services;
 using SanteDB.Messaging.AMI.Configuration;
 using SanteDB.Rest.AMI;
 using SanteDB.Rest.Common;
+using SanteDB.Rest.Common.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,6 +85,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandlers
         /// <param name="data">The certificate signing request request</param>
         /// <param name="updateIfExists">Not supported on this interface</param>
         /// <returns>The created CSR</returns>
+        [Demand(PermissionPolicyIdentifiers.Login)]
         public object Create(object data, bool updateIfExists)
         {
             var s = data as SubmissionRequest;
@@ -99,6 +101,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandlers
         /// <summary>
         /// Gets the specified CSR object
         /// </summary>
+        [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public object Get(object id, object versionId)
         {
             int cid = Int32.Parse((string)id);
@@ -113,7 +116,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandlers
         /// </summary>
         /// <param name="key">Deletes a CSR</param>
         /// <returns></returns>
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
+        [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public object Obsolete(object key)
         {
             int id = Int32.Parse(key.ToString());
@@ -128,6 +131,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandlers
         /// <summary>
         /// Query for CSRs
         /// </summary>
+        [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public IEnumerable<object> Query(NameValueCollection queryParameters)
         {
             int tr = 0;
@@ -137,6 +141,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandlers
         /// <summary>
         /// Query for specific CSRs
         /// </summary>
+        [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public IEnumerable<object> Query(NameValueCollection queryParameters, int offset, int count, out int totalCount)
         {
             List<SubmissionInfo> collection = new List<SubmissionInfo>();
@@ -158,7 +163,7 @@ namespace SanteDB.Messaging.AMI.ResourceHandlers
         /// </summary>
         /// <param name="data">The CSR to be update</param>
         /// <returns>The accepted certificate</returns>
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
+        [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public object Update(object data)
         {
             // Data
