@@ -87,6 +87,7 @@ namespace SanteDB.Core.Services.Impl
                 typeof(GenericLocalMetadataRepository<TemplateDefinition>),
                 typeof(LocalBatchRepository),
                 typeof(LocalMaterialRepository),
+                typeof(LocalAuditRepository),
                 typeof(LocalManufacturedMaterialRepository),
                 typeof(LocalOrganizationRepository),
                 typeof(LocalPlaceRepository),

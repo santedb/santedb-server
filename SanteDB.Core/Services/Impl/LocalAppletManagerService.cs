@@ -195,7 +195,9 @@ namespace SanteDB.Core.Services.Impl
             if (!this.VerifyPackage(package))
                 throw new SecurityException("Applet failed validation");
             else if (!this.m_appletCollection.VerifyDependencies(package.Meta))
-                throw new InvalidOperationException($"Applet {package.Meta} depends on : [{String.Join(", ", package.Meta.Dependencies.Select(o=>o.ToString()))}] which are missing or incompatible");
+            {
+                this.m_tracer.TraceWarning($"Applet {package.Meta} depends on : [{String.Join(", ", package.Meta.Dependencies.Select(o => o.ToString()))}] which are missing or incompatible");
+            }
 
             // Save the applet
             var appletDir = this.m_configuration.AppletDirectory;

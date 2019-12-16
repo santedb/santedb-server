@@ -126,6 +126,7 @@
       <add name="FBSQL" value="initial catalog=|DataDirectory|\sdb_base.fdb;server type=Embedded;user id=sysdba" provider="Fbsql" />
       <add name="PSQL" value="server=localhost; port=5433; database=timr_upgrade; user id=postgres; password=postgres; pooling=true; MinPoolSize=10; MaxPoolSize=30; Timeout=120; Command Timeout=120" provider="Npgsql" />
       <add name="AUDIT" value="server=localhost;port=5433; database=santedb; user id=postgres; password=postgres; pooling=true; MinPoolSize=10; MaxPoolSize=30; Timeout=10; " provider="Npgsql"/>
+      <add name="AUDIT_FBSQL" value="initial catalog=|DataDirectory|\sdb_audit.fdb;server type=Embedded;user id=sysdba" provider="Fbsql"/>
     </connectionStrings>
   </section>
   <section xsi:type="AppletConfigurationSection" appletDirectory=".\applets" allowUnsignedApplets="true">
@@ -435,10 +436,10 @@
   </section>
   <!-- This section controls the audit repository for ADO.NET -->
   <section xsi:type="AdoAuditConfigurationSection"
-           readWriteConnectionString="AUDIT"
-           readOnlyConnectionString="AUDIT"
+           readWriteConnectionString="AUDIT_FBSQL"
+           readOnlyConnectionString="AUDIT_FBSQL"
            traceSql="false"
-           providerType="npgsql" />
+           providerType="fbsql" />
   <!-- This section controls the persistence for ADO.NET -->
   <section xsi:type="AdoPersistenceConfigurationSection"
            fuzzyTotal="true"
@@ -564,7 +565,7 @@
       <!--<add type="SanteDB.BI.Services.Impl.AppletMetadataRepository, SanteDB.BI, Version=1.40.0.0"/>-->
       <add type="SanteDB.Tools.Debug.BI.FileMetadataRepository, SanteDB.Tools.Debug, Version=1.40.0.0"/>
       <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI, Version=1.40.0.0"/>
-      <add type="SanteDB.BI.Services.Impl.LocalRenderService, SanteDB.BI, Version=1.40.0.0"/>
+      <add type="SanteDB.BI.Services.Impl.LocalBiRenderService, SanteDB.BI, Version=1.40.0.0"/>
     </serviceProviders>
   </section>
 </SanteDBConfiguration>

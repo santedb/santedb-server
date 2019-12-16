@@ -20,6 +20,7 @@
 using AtnaApi.Model;
 using AtnaApi.Transport;
 using SanteDB.Core;
+using SanteDB.Core.Model;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
@@ -33,6 +34,9 @@ using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using SdbAudit = SanteDB.Core.Auditing;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Auditing;
+using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Diagnostics;
 
 namespace SanteDB.Messaging.Atna
 {
@@ -43,6 +47,9 @@ namespace SanteDB.Messaging.Atna
     [ServiceProvider("IHE ATNA Audit Dispatcher")]
     public class AtnaAuditService : IAuditDispatchService
     {
+
+        // Tracer
+        private Tracer m_tracer = Tracer.GetTracer(typeof(AtnaAuditService));
 
         /// <summary>
         /// Gets the service name
@@ -119,11 +126,28 @@ namespace SanteDB.Messaging.Atna
             {
                 var ad = state as SdbAudit.AuditData;
 
+                // Translate codes to DICOM
+                if (ad.EventTypeCode != null)
+                {
+                    IConceptRepositoryService icpcr = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>();
+                    var concept = icpcr.GetConcept(ad.EventTypeCode.Code);
+                    if (concept != null)
+                    {
+                        var refTerm = icpcr.GetConceptReferenceTerm(concept.Key.Value, "DCM");
+                        if (refTerm != null)
+                            ad.EventTypeCode = new AuditCode(refTerm.Mnemonic, "DCM") { DisplayName = refTerm.LoadCollection<ReferenceTermName>("DisplayNames")?.FirstOrDefault()?.Name };
+                        else
+                            ad.EventTypeCode.DisplayName = concept.LoadCollection<ConceptName>("ConceptNames").FirstOrDefault()?.Name;
+                    }
+                    this.m_tracer.TraceVerbose("Mapped Audit Type Code - {0}-{1}-{2}", ad.EventTypeCode.CodeSystem, ad.EventTypeCode.Code, ad.EventTypeCode.DisplayName);
+
+                }
+
                 // Create the audit basic
                 AuditMessage am = new AuditMessage(
-                    ad.Timestamp, (ActionType)Enum.Parse(typeof(ActionType), ad.ActionCode.ToString()),
-                    (OutcomeIndicator)Enum.Parse(typeof(OutcomeIndicator), ad.Outcome.ToString()),
-                    (EventIdentifierType)Enum.Parse(typeof(EventIdentifierType), ad.EventIdentifier.ToString()),
+                    ad.Timestamp, (AtnaApi.Model.ActionType)Enum.Parse(typeof(AtnaApi.Model.ActionType), ad.ActionCode.ToString()),
+                    (AtnaApi.Model.OutcomeIndicator)Enum.Parse(typeof(AtnaApi.Model.OutcomeIndicator), ad.Outcome.ToString()),
+                    (AtnaApi.Model.EventIdentifierType)Enum.Parse(typeof(AtnaApi.Model.EventIdentifierType), ad.EventIdentifier.ToString()),
                     null
                 );
                 if (ad.EventTypeCode != null)
@@ -133,10 +157,10 @@ namespace SanteDB.Messaging.Atna
                 {
                     AuditEnterpriseSiteID = ad.Metadata.FirstOrDefault(o=>o.Key == SdbAudit.AuditMetadataKey.EnterpriseSiteID)?.Value ?? this.m_configuration.EnterpriseSiteId,
                     AuditSourceID = ad.Metadata.FirstOrDefault(o => o.Key == SdbAudit.AuditMetadataKey.AuditSourceID)?.Value ?? Dns.GetHostName(),
-                    AuditSourceTypeCode = new List<CodeValue<AuditSourceType>>()
+                    AuditSourceTypeCode = new List<CodeValue<AtnaApi.Model.AuditSourceType>>()
                     {
-                        new CodeValue<AuditSourceType>(
-                            (AuditSourceType)Enum.Parse(typeof(AuditSourceType), ad.Metadata.FirstOrDefault(o=>o.Key == SdbAudit.AuditMetadataKey.AuditSourceType)?.Value ?? "ApplicationServerProcess"))
+                        new CodeValue<AtnaApi.Model.AuditSourceType>(
+                            (AtnaApi.Model.AuditSourceType)Enum.Parse(typeof(AtnaApi.Model.AuditSourceType), ad.Metadata.FirstOrDefault(o=>o.Key == SdbAudit.AuditMetadataKey.AuditSourceType)?.Value ?? "ApplicationServerProcess"))
                     }
                 });
                 
@@ -147,10 +171,10 @@ namespace SanteDB.Messaging.Atna
                 {
                     thisFound |= (adActor.NetworkAccessPointId == Environment.MachineName || adActor.NetworkAccessPointId == dnsName) &&
                         adActor.NetworkAccessPointType == SdbAudit.NetworkAccessPointType.MachineName;
-                    var act = new AuditActorData()
+                    var act = new AtnaApi.Model.AuditActorData()
                     {
                         NetworkAccessPointId = adActor.NetworkAccessPointId,
-                        NetworkAccessPointType = (NetworkAccessPointType)Enum.Parse(typeof(NetworkAccessPointType), adActor.NetworkAccessPointType.ToString()),
+                        NetworkAccessPointType = (AtnaApi.Model.NetworkAccessPointType)Enum.Parse(typeof(AtnaApi.Model.NetworkAccessPointType), adActor.NetworkAccessPointType.ToString()),
                         NetworkAccessPointTypeSpecified = adActor.NetworkAccessPointType != 0,
                         UserIdentifier = adActor.UserIdentifier,
                         UserIsRequestor = adActor.UserIsRequestor,
@@ -170,25 +194,25 @@ namespace SanteDB.Messaging.Atna
                 
                 foreach (var aoPtctpt in ad.AuditableObjects)
                 {
-                    var atnaAo = new AuditableObject()
+                    var atnaAo = new AtnaApi.Model.AuditableObject()
                     {
                         IDTypeCode = aoPtctpt.IDTypeCode.HasValue ?
                             aoPtctpt.IDTypeCode.Value != SdbAudit.AuditableObjectIdType.Custom ?
-                                new CodeValue<AuditableObjectIdType>((AuditableObjectIdType)Enum.Parse(typeof(AuditableObjectIdType), aoPtctpt?.IDTypeCode?.ToString())) :
+                                new CodeValue<AtnaApi.Model.AuditableObjectIdType>((AtnaApi.Model.AuditableObjectIdType)Enum.Parse(typeof(AtnaApi.Model.AuditableObjectIdType), aoPtctpt?.IDTypeCode?.ToString())) :
                                 (aoPtctpt.CustomIdTypeCode != null ?
-                                  new CodeValue<AuditableObjectIdType>()
+                                  new CodeValue<AtnaApi.Model.AuditableObjectIdType>()
                                   {
                                       Code = aoPtctpt.CustomIdTypeCode?.Code,
                                       CodeSystem = aoPtctpt.CustomIdTypeCode?.CodeSystem,
                                       DisplayName = aoPtctpt.CustomIdTypeCode?.DisplayName
                                   } : null) :
                             null,
-                        LifecycleType = aoPtctpt.LifecycleType.HasValue ? (AuditableObjectLifecycle)Enum.Parse(typeof(AuditableObjectLifecycle), aoPtctpt.LifecycleType.ToString()) : 0,
+                        LifecycleType = aoPtctpt.LifecycleType.HasValue ? (AtnaApi.Model.AuditableObjectLifecycle)Enum.Parse(typeof(AtnaApi.Model.AuditableObjectLifecycle), aoPtctpt.LifecycleType.ToString()) : 0,
                         LifecycleTypeSpecified = aoPtctpt.LifecycleType.HasValue,
                         ObjectId = aoPtctpt.ObjectId,
-                        Role = aoPtctpt.Role.HasValue ? (AuditableObjectRole)Enum.Parse(typeof(AuditableObjectRole), aoPtctpt.Role.ToString()) : 0,
+                        Role = aoPtctpt.Role.HasValue ? (AtnaApi.Model.AuditableObjectRole)Enum.Parse(typeof(AtnaApi.Model.AuditableObjectRole), aoPtctpt.Role.ToString()) : 0,
                         RoleSpecified = aoPtctpt.Role != 0,
-                        Type = (AuditableObjectType)Enum.Parse(typeof(AuditableObjectType), aoPtctpt.Type.ToString()),
+                        Type = (AtnaApi.Model.AuditableObjectType)Enum.Parse(typeof(AtnaApi.Model.AuditableObjectType), aoPtctpt.Type.ToString()),
                         TypeSpecified = aoPtctpt.Type != 0,
                         ObjectSpec = aoPtctpt.QueryData ?? aoPtctpt.NameData,
                         ObjectSpecChoice = aoPtctpt.QueryData == null ? ObjectDataChoiceType.ParticipantObjectName : ObjectDataChoiceType.ParticipantObjectQuery
@@ -202,13 +226,14 @@ namespace SanteDB.Messaging.Atna
                             });
                     am.AuditableObjects.Add(atnaAo);
                 }
-                
+
                 // Send the message
+                this.m_tracer.TraceVerbose("Dispatching audit {0} via SYSLOG", ad.Key);
                 this.m_transporter.SendMessage(am);
             }
             catch (Exception e)
             {
-                Trace.TraceError(e.ToString());
+                this.m_tracer.TraceError(e.ToString());
             }
         }
 

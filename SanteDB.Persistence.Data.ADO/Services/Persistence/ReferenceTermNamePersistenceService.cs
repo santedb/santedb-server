@@ -24,6 +24,8 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
 using System;
+using System.Collections;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -31,8 +33,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// Represents a reference term name persistence service.
     /// </summary>
     /// <seealso cref="DbReferenceTermName" />
-    public class ReferenceTermNamePersistenceService : BaseDataPersistenceService<ReferenceTermName, DbReferenceTermName>
-	{
+    public class ReferenceTermNamePersistenceService : BaseDataPersistenceService<ReferenceTermName, DbReferenceTermName>, IAdoAssociativePersistenceService
+    {
 		/// <summary>
 		/// Converts a domain instance into a model instance.
 		/// </summary>
@@ -52,14 +54,23 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 			return domainInstance;
 		}
 
-		/// <summary>
-		/// Performs the actual insert.
-		/// </summary>
-		/// <param name="context">Context.</param>
-		/// <param name="data">Data.</param>
-		/// <param name="principal">The principal.</param>
-		/// <returns>Returns the inserted reference term name.</returns>
-		public override ReferenceTermName InsertInternal(DataContext context, ReferenceTermName data)
+        /// <summary>
+        /// Get names from source
+        /// </summary>
+        public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId)
+        {
+            return this.QueryInternal(context, base.BuildSourceQuery<ReferenceTermName>(id), Guid.Empty, 0, null, out int tr, null, false).ToList();
+
+        }
+
+        /// <summary>
+        /// Performs the actual insert.
+        /// </summary>
+        /// <param name="context">Context.</param>
+        /// <param name="data">Data.</param>
+        /// <param name="principal">The principal.</param>
+        /// <returns>Returns the inserted reference term name.</returns>
+        public override ReferenceTermName InsertInternal(DataContext context, ReferenceTermName data)
 		{
 			// set the key if we don't have one
 			if (!data.Key.HasValue || data.Key == Guid.Empty)

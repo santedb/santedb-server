@@ -113,7 +113,8 @@
     <None Include="data\demo\991-demo.facilities.dataset" />
     <None Include="data\demo\992-demo.places.dataset" />
     <None Include="data\demo\994-demo.manufactured-materials.dataset" />
-    <None Include="data\demo\sdb_sample.fdb" />
+    <None Include="data\SDB_AUDIT.FDB" />
+    <None Include="data\SDB_BASE.FDB" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\SanteDB.licenseheader">
@@ -293,21 +294,21 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.BI" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.Rest.BIS" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.Cdss.Xml" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.Matcher" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.Core.Model.AMI" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.Core.Model.RISI" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.Rest.AMI" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.Rest.HDSI" Version="1.81.0.0" />
+        <PackageReference Include="RestSrvr" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.BI" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.Rest.BIS" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.Cdss.Xml" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.Matcher" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.Core.Model.AMI" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.Core.Model.RISI" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.Rest.AMI" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.Rest.HDSI" Version="1.83.0.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

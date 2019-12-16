@@ -149,6 +149,7 @@ INSERT INTO cd_set_mem_assoc_tbl (set_id, cd_id) VALUES (char_to_uuid('62c5fde0-
 
 -- GRANT SYSTEM LOGIN AS A SERVICE
 INSERT INTO sec_rol_pol_assoc_tbl (sec_pol_inst_id, pol_id, rol_id, pol_act) VALUES (gen_uuid(), char_to_uuid('e15b96ab-646c-4c00-9a58-ea09eee67d7c'), char_to_uuid('c3ae21d2-fc23-4133-ba42-b0e0a3b817d7'), 2);--#!
-
+--#!
+ALTER TABLE PSN_LNG_TBL ALTER COLUMN LNG_CS TYPE CHAR(5);--#!
 DROP INDEX SEC_DEV_SCRT_IDX ;--#!
 SELECT REG_PATCH('20190625-01') FROM RDB$DATABASE;--#!

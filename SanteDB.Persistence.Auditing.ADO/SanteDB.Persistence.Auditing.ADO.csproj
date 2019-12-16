@@ -57,7 +57,8 @@
     <EmbeddedResource Include="Data\Map\ModelMap.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Data\SQL\audit_repo.sql" />
+    <Content Include="Data\SQL\FBSQL\audit_repo.sql" />
+    <Content Include="Data\SQL\PSQL\audit_repo.sql" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Jobs\" />
@@ -97,17 +98,16 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="1.81.0.0" />
-        <PackageReference Include="SanteDB.BI" Version="1.81.0.0" />
+        <PackageReference Include="RestSrvr" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="1.83.0.0" />
+        <PackageReference Include="SanteDB.BI" Version="1.83.0.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
-
   <ItemGroup>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>

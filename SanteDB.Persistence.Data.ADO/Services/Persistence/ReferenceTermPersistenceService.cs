@@ -17,9 +17,12 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -28,14 +31,16 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class ReferenceTermPersistenceService : BaseDataPersistenceService<ReferenceTerm, DbReferenceTerm>
 	{
-		/// <summary>
-		/// Inserts a reference term.
-		/// </summary>
-		/// <param name="context">Context.</param>
-		/// <param name="data">Data.</param>
-		/// <param name="principal">The principal.</param>
-		/// <returns>Returns the inserted reference term.</returns>
-		public override ReferenceTerm InsertInternal(DataContext context, ReferenceTerm data)
+
+
+        /// <summary>
+        /// Inserts a reference term.
+        /// </summary>
+        /// <param name="context">Context.</param>
+        /// <param name="data">Data.</param>
+        /// <param name="principal">The principal.</param>
+        /// <returns>Returns the inserted reference term.</returns>
+        public override ReferenceTerm InsertInternal(DataContext context, ReferenceTerm data)
 		{
 			var referenceTerm = base.InsertInternal(context, data);
 
