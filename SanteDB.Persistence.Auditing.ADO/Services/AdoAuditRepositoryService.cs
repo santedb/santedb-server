@@ -42,6 +42,7 @@ using SanteDB.Core.Model.Query;
 using System.Diagnostics.Tracing;
 using SanteDB.BI.Services;
 using SanteDB.BI.Model;
+using SanteDB.Core.Model.DataTypes;
 
 namespace SanteDB.Persistence.Auditing.ADO.Services
 {
@@ -49,7 +50,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
     /// Represents a service which is responsible for the storage of audits
     /// </summary>
     [ServiceProvider("ADO.NET Audit Repository")]
-    #pragma warning disable CS0067
+#pragma warning disable CS0067
     public class AdoAuditRepositoryService : IDataPersistenceService<AuditData>
     {
         /// <summary>
@@ -120,7 +121,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             {
                 ApplicationServiceContext.Current.Started += (o, e) =>
                 {
-                   
+
                     // Add audits as a BI data source
                     ApplicationServiceContext.Current.GetService<IBiMetadataRepository>()
                         .Insert(new BiDataSourceDefinition()
@@ -140,17 +141,40 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             ProviderType = typeof(OrmBiDataProvider)
                         });
                 };
-                
+
                 this.m_mapper = new ModelMapper(typeof(AdoAuditRepositoryService).Assembly.GetManifestResourceStream("SanteDB.Persistence.Auditing.ADO.Data.Map.ModelMap.xml"));
                 this.m_builder = new QueryBuilder(this.m_mapper, this.m_configuration.Provider);
             }
-            catch(ModelMapValidationException e)
+            catch (ModelMapValidationException e)
             {
                 this.m_traceSource.TraceError("Error validing map: {0}", e.Message);
                 foreach (var i in e.ValidationDetails)
                     this.m_traceSource.TraceError("{0}:{1} @ {2}", i.Level, i.Message, i.Location);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Resolve code
+        /// </summary>
+        private AuditCode ResolveCode(Guid key, String code, String codeSystem)
+        {
+            if (key == Guid.Empty) return null;
+            var cache = ApplicationServiceContext.Current.GetService<IDataCachingService>();
+
+            var cacheItem = cache.GetCacheItem<Concept>(key);
+            if (cacheItem == null)
+            {
+                cacheItem = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(code, codeSystem).FirstOrDefault();
+                if (cacheItem == null)
+                    cacheItem = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConcept(code);
+                if (cacheItem != null)
+                    cache.Add(cacheItem);
+            }
+            return new AuditCode(code, codeSystem)
+            {
+                DisplayName = cacheItem?.ConceptNames?.FirstOrDefault()?.Name
+            };
         }
 
         /// <summary>
@@ -168,20 +192,14 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             };
 
             if (res.Object1.EventTypeCode != null)
-            {
-                var concept = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConcept(res.Object2.Code);
-                retVal.EventTypeCode = new AuditCode(res.Object2.Code, res.Object2.CodeSystem)
-                {
-                    DisplayName = concept?.ConceptNames.First()?.Name ?? res.Object2.Code
-                };
-            }
+                retVal.EventTypeCode = this.ResolveCode(res.Object1.EventTypeCode, res.Object2.Code, res.Object2.CodeSystem);
 
             // Get actors and objects
             if (!summary)
             {
 
                 // Actors
-                var sql = context.CreateSqlStatement<DbAuditActorAssociation>().SelectFrom()
+                var sql = context.CreateSqlStatement<DbAuditActorAssociation>().SelectFrom(typeof(DbAuditActorAssociation), typeof(DbAuditActor), typeof(DbAuditCode))
                         .InnerJoin<DbAuditActorAssociation, DbAuditActor>(o => o.TargetKey, o => o.Key)
                         .Join<DbAuditActor, DbAuditCode>("LEFT", o => o.ActorRoleCode, o => o.Key)
                         .Where<DbAuditActorAssociation>(o => o.SourceKey == res.Object1.Key)
@@ -193,10 +211,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                         UserName = itm.Object1.UserName,
                         UserIsRequestor = itm.Object1.UserIsRequestor,
                         UserIdentifier = itm.Object1.UserIdentifier,
-                        ActorRoleCode = new List<AuditCode>()
-                        {
-                            new AuditCode(itm.Object2.Code, itm.Object2.CodeSystem)
-                        }
+                        ActorRoleCode = new List<AuditCode>() { this.ResolveCode(itm.Object1.ActorRoleCode, itm.Object2.Code, itm.Object2.CodeSystem) }.OfType<AuditCode>().ToList()
                     });
 
                 // Objects
@@ -218,7 +233,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             {
                 // Actors
                 // Actors
-                var sql = context.CreateSqlStatement<DbAuditActorAssociation>().SelectFrom()
+                var sql = context.CreateSqlStatement<DbAuditActorAssociation>().SelectFrom(typeof(DbAuditActorAssociation), typeof(DbAuditActor), typeof(DbAuditCode))
                         .InnerJoin<DbAuditActorAssociation, DbAuditActor>(o => o.TargetKey, o => o.Key)
                         .Join<DbAuditActor, DbAuditCode>("LEFT", o => o.ActorRoleCode, o => o.Key)
                         .Where<DbAuditActorAssociation>(o => o.SourceKey == res.Object1.Key).And<DbAuditActor>(p => p.UserIsRequestor == true)
@@ -230,10 +245,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                         UserName = itm.Object1.UserName,
                         UserIsRequestor = itm.Object1.UserIsRequestor,
                         UserIdentifier = itm.Object1.UserIdentifier,
-                        ActorRoleCode = new List<AuditCode>()
-                        {
-                            new AuditCode(itm.Object2.Code, itm.Object2.CodeSystem)
-                        }
+                        ActorRoleCode = new List<AuditCode>() { this.ResolveCode(itm.Object1.ActorRoleCode, itm.Object2.Code, itm.Object2.CodeSystem) }.OfType<AuditCode>().ToList()
                     });
             }
 
@@ -261,7 +273,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 IDbTransaction tx = null;
                 try
                 {
-                    context.Open();                    
+                    context.Open();
                     tx = context.BeginTransaction();
 
                     // Insert core
@@ -295,7 +307,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             {
                                 dbAct = this.m_mapper.MapModelInstance<AuditActorData, DbAuditActor>(act);
                                 dbAct.Key = Guid.NewGuid();
-                                context.Insert(dbAct);
                                 var roleCode = act.ActorRoleCode?.FirstOrDefault();
                                 if (roleCode != null)
                                 {
@@ -308,6 +319,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                                     else
                                         dbAct.ActorRoleCode = existing.Key;
                                 }
+                                context.Insert(dbAct);
 
                             }
                             context.Insert(new DbAuditActorAssociation()
@@ -376,7 +388,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
             var preEvtData = new DataRetrievingEventArgs<AuditData>(containerId, versionId, overrideAuthContext);
             this.Retrieving?.Invoke(this, preEvtData);
-            if(preEvtData.Cancel)
+            if (preEvtData.Cancel)
             {
                 this.m_traceSource.TraceWarning("Pre-retrieval event indicates cancel {0}", containerId);
                 return null;
@@ -392,8 +404,8 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 {
                     context.Open();
 
-                    var sql = this.m_builder.CreateQuery<AuditData>(o => o.Key == pk).Limit(1).Build();
-                    var res = context.FirstOrDefault(typeof(CompositeResult<DbAuditData, DbAuditCode>), sql);
+                    var sql = this.m_builder.CreateQuery<AuditData>(o => o.Key == pk).Build();
+                    var res = context.FirstOrDefault<CompositeResult<DbAuditData, DbAuditCode>>(sql);
                     var result = this.ToModelInstance(context, res as CompositeResult<DbAuditData, DbAuditCode>, false);
 
                     var postEvtData = new DataRetrievedEventArgs<AuditData>(result, overrideAuthContext);
@@ -437,7 +449,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
             var preEvtData = new QueryRequestEventArgs<AuditData>(query, offset: offset, count: count, queryId: null, principal: overrideAuthContext);
             this.Querying?.Invoke(this, preEvtData);
-            if(preEvtData.Cancel)
+            if (preEvtData.Cancel)
             {
                 this.m_traceSource.TraceWarning("Pre-event handler for query indicates cancel : {0}", query);
                 totalCount = 0;
@@ -462,17 +474,12 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     totalCount = context.Count(sql);
 
                     // Query control
-                    if (count.HasValue)
-                        sql.Limit(count.Value);
-                    if (offset > 0)
-                    {
-                        if (count == 0)
-                            sql.Limit(100).Offset(offset);
-                        else
-                            sql.Offset(offset);
-                    }
+                    if (count.GetValueOrDefault() == 0)
+                        sql.Offset(offset).Limit(100);
+                    else
+                        sql.Offset(offset).Limit(count.Value);
                     sql = sql.Build();
-                    var itm = context.Query<CompositeResult<DbAuditData, DbAuditCode>>(sql);
+                    var itm = context.Query<CompositeResult<DbAuditData, DbAuditCode>>(sql).ToList();
                     AuditUtil.AuditAuditLogUsed(ActionType.Read, OutcomeIndicator.Success, sql.ToString(), itm.Select(o => o.Object1.Key).ToArray());
                     var results = itm.Select(o => this.ToModelInstance(context, o)).ToList().AsQueryable();
 
@@ -491,6 +498,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             }
         }
     }
-    #pragma warning restore CS0067
+#pragma warning restore CS0067
 
 }

@@ -56,7 +56,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Data.Model
         /// <summary>
         /// Role code identifier
         /// </summary>
-        [Column("rol_cd_id"), ForeignKey(typeof(DbAuditCode), nameof(DbAuditCode.Key)), AlwaysJoin]
+        [Column("rol_cd_id"), ForeignKey(typeof(DbAuditCode), nameof(DbAuditCode.Key))]
         public Guid ActorRoleCode { get; set; }
 
     }

@@ -124,6 +124,7 @@ namespace SanteDB.Messaging.Atna
 
             try
             {
+                AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
                 var ad = state as SdbAudit.AuditData;
 
                 // Translate codes to DICOM
