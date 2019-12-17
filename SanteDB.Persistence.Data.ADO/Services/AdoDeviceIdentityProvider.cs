@@ -97,7 +97,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
 					IPrincipal devicePrincipal = new DevicePrincipal(new DeviceIdentity(client.Key, client.PublicId, true));
 
-					new PolicyPermission(System.Security.Permissions.PermissionState.None, PermissionPolicyIdentifiers.LoginAsService, devicePrincipal).Demand();
+					new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService, devicePrincipal).Demand();
 
 					return devicePrincipal;
 				}

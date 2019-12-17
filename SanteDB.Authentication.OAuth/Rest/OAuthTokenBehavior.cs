@@ -65,7 +65,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
     public class OAuthTokenBehavior : IOAuthTokenContract
     {
 
-        
+
         // Trace source name
         private Tracer m_traceSource = new Tracer(OAuthConstants.TraceSourceName);
 
@@ -89,7 +89,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             if (tokenRequest["grant_type"] != OAuthConstants.GrantNamePassword &&
                 tokenRequest["grant_type"] != OAuthConstants.GrantNameRefresh &&
                 tokenRequest["grant_type"] != OAuthConstants.GrantNameClientCredentials)
-                return this.CreateErrorCondition(OAuthErrorType.unsupported_grant_type, "Only 'password', 'client_credentials' or 'refresh_token' grants allowed");
+                return this.CreateErrorCondition(OAuthErrorType.unsupported_grant_type, "Only 'password', 'client_credentials' or 'refresh_token' grants supported");
 
             // Password grant needs well formed scope which defaults to * or all permissions
             if (tokenRequest["scope"] == null)
@@ -148,6 +148,10 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 switch (tokenRequest["grant_type"])
                 {
                     case OAuthConstants.GrantNameClientCredentials:
+                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthClientCredentialFlowPolicy, clientPrincipal).Demand();
+                        if (devicePrincipal != null)
+                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal).Demand();
+
                         if (devicePrincipal == null)
                             throw new SecurityException("client_credentials grant requires device authentication either using X509 or X-Device-Authorization");
                         principal = clientPrincipal;
@@ -155,6 +159,11 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService, devicePrincipal).Demand();
                         break;
                     case OAuthConstants.GrantNamePassword:
+
+                        // Password grants allowed for this application?
+                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, clientPrincipal).Demand();
+                        if(devicePrincipal != null)
+                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal).Demand();
 
                         // Validate 
                         if (String.IsNullOrWhiteSpace(tokenRequest["username"]) && String.IsNullOrWhiteSpace(tokenRequest["refresh_token"]))
@@ -164,6 +173,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                             principal = identityProvider.Authenticate(tokenRequest["username"], tokenRequest["password"], RestOperationContext.Current.IncomingRequest.Headers[OAuthConstants.TfaHeaderName]);
                         else
                             principal = identityProvider.Authenticate(tokenRequest["username"], tokenRequest["password"]);
+
 
                         break;
                     case OAuthConstants.GrantNameRefresh:
@@ -181,24 +191,22 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 if (principal == null)
                     return this.CreateErrorCondition(OAuthErrorType.invalid_grant, "Invalid username or password");
                 else
-                {
                     return this.EstablishSession(principal, clientPrincipal, devicePrincipal, tokenRequest["scope"], this.ValidateClaims(principal));
-                }
             }
             catch (AuthenticationException e)
             {
 
-                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error generating token: {0}", e);
+                this.m_traceSource.TraceEvent(EventLevel.Error, "Error generating token: {0}", e);
                 return this.CreateErrorCondition(OAuthErrorType.invalid_grant, e.Message);
             }
             catch (SecurityException e)
             {
-                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error generating token: {0}", e);
+                this.m_traceSource.TraceEvent(EventLevel.Error, "Error generating token: {0}", e);
                 return this.CreateErrorCondition(OAuthErrorType.invalid_grant, e.Message);
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error generating token: {0}", e);
+                this.m_traceSource.TraceEvent(EventLevel.Error, "Error generating token: {0}", e);
                 return this.CreateErrorCondition(OAuthErrorType.invalid_request, e.Message);
             }
         }
@@ -241,7 +249,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         private JwtSecurityToken HydrateToken(IClaimsPrincipal claimsPrincipal, String scope, IEnumerable<IClaim> additionalClaims, DateTime issued, DateTime expires)
         {
             this.m_traceSource.TraceInfo("Will create new ClaimsPrincipal based on existing principal");
-            
+
             IRoleProviderService roleProvider = ApplicationServiceContext.Current.GetService<IRoleProviderService>();
             IPolicyInformationService pip = ApplicationServiceContext.Current.GetService<IPolicyInformationService>();
 
@@ -357,7 +365,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             // Generate security token            
             var jwt = new JwtSecurityToken(
                 signingCredentials: credentials,
-                claims: claims.Select(o=>new System.Security.Claims.Claim(o.Type, o.Value)),
+                claims: claims.Select(o => new System.Security.Claims.Claim(o.Type, o.Value)),
                 issuer: this.m_configuration.IssuerName,
                 notBefore: issued,
                 expires: expires
@@ -381,7 +389,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             // TODO: Add configuration for expiry
             DateTime issued = DateTime.Parse((claimsPrincipal)?.FindFirst(SanteDBClaimTypes.AuthenticationInstant)?.Value ?? DateTime.Now.ToString("o")),
                 expires = DateTime.Now.Add(this.m_configuration.ValidityTime);
-            String remoteIp = 
+            String remoteIp =
                 RestOperationContext.Current.IncomingRequest.Headers["X-Forwarded-For"] ??
                 RestOperationContext.Current.IncomingRequest.RemoteEndPoint.Address.ToString();
 
@@ -511,10 +519,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <returns>A stream of the rendered login asset</returns>
         public Stream RenderAsset(string content)
         {
-            // First, does this configuraiton allow for authorization code grants?
-            if (this.m_configuration.AuthorizationFlows?.Any(o => o.Flow == OAuthAuthorizationFlowType.AuthorizationCode) != true)
-                throw new NotSupportedException("This service does not support OAUTH Authorization grant");
-
             // Get the asset object
             var loadedApplets = ApplicationServiceContext.Current.GetService<IAppletManagerService>().Applets;
             var loginApplet = loadedApplets.Where(o => o.Configuration.AppSettings.Any(s => s.Name == "oauth2.login.asset")).FirstOrDefault();
@@ -538,13 +542,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 else
                 {
                     var applicationId = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>().GetIdentity(RestOperationContext.Current.IncomingRequest.QueryString["client_id"]);
-                    var flowConfiguration = this.m_configuration.AuthorizationFlows.FirstOrDefault(o => o.Flow == OAuthAuthorizationFlowType.AuthorizationCode);
-                    if (flowConfiguration == null || flowConfiguration.AllowedClients.Count > 0 && !flowConfiguration.AllowedClients.Contains(applicationId.Name))
-                        throw new SecurityException("Authorization code grants not allowed for this client");
-
+                    new PolicyPermission(System.Security.Permissions.PermissionState.None, OAuth2.OAuthConstants.OAuthCodeFlowPolicy, new GenericPrincipal(applicationId, null)).Demand();
                     // TODO: Get claim for application redirect URL
-                    
-
                 }
                 content = loginAsset.Name.Substring(loginAsset.Name.LastIndexOf("/") + 1);
             }

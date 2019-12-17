@@ -40,7 +40,6 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         public OAuthConfigurationSection()
         {
             this.AllowedClientClaims = new List<string>();
-            this.AuthorizationFlows = new List<OAuthAuthorizationFlowConfiguration>();
         }
 
         /// <summary>
@@ -60,13 +59,7 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         /// </summary>
         [XmlArray("allowedClaims"), XmlArrayItem("add")]
         public List<String> AllowedClientClaims { get; set; }
-
-        /// <summary>
-        /// Configuration for authorization flows
-        /// </summary>
-        [XmlArray("flows"), XmlArrayItem("add")]
-        public List<OAuthAuthorizationFlowConfiguration> AuthorizationFlows { get; set; }
-
+        
         /// <summary>
         /// Issuer name
         /// </summary>

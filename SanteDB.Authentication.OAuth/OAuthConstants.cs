@@ -17,6 +17,8 @@
  * User: justin
  * Date: 2018-6-22
  */
+using SanteDB.Core.Security;
+
 namespace SanteDB.Authentication.OAuth2
 {
     /// <summary>
@@ -71,5 +73,24 @@ namespace SanteDB.Authentication.OAuth2
         /// </summary>
         public const string TfaHeaderName = "X-SanteDB-TfaSecret";
 
+        /// <summary>
+        /// Gets the client credential policy
+        /// </summary>
+        public const string OAuthLoginPolicy = PermissionPolicyIdentifiers.LoginAsService + ".0";
+
+        /// <summary>
+        /// Client credentials policy
+        /// </summary>
+        public const string OAuthClientCredentialFlowPolicy = OAuthLoginPolicy + ".1";
+
+        /// <summary>
+        /// Password credentials policy
+        /// </summary>
+        public const string OAuthPasswordFlowPolicy = OAuthLoginPolicy + ".2";
+
+        /// <summary>
+        /// Code token policy
+        /// </summary>
+        public const string OAuthCodeFlowPolicy = OAuthLoginPolicy + ".3";
     }
 }

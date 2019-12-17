@@ -64,13 +64,7 @@ namespace SanteDB.Core.Security.Attribute
         /// </summary>
         public override IPermission CreatePermission()
         {
-
-            // TODO: Configure this 
-            if (ApplicationServiceContext.Current.GetService(typeof(IPolicyDecisionService)) == null)
-                return new PolicyPermission(PermissionState.None, this.PolicyId);
-            else
-                return new PolicyPermission(PermissionState.Unrestricted, this.PolicyId);
-
+            return new PolicyPermission(PermissionState.Unrestricted, this.PolicyId);
         }
     }
 
@@ -128,7 +122,8 @@ namespace SanteDB.Core.Security.Attribute
 
             // Non system principals must be authenticated
             if(!principal.Identity.IsAuthenticated &&
-                principal != AuthenticationContext.SystemPrincipal)
+                principal != AuthenticationContext.SystemPrincipal &&
+                this.m_isUnrestricted == true)
                 throw new PolicyViolationException(principal, this.m_policyId, PolicyGrantType.Deny);
 
             PolicyGrantType action = PolicyGrantType.Deny;
