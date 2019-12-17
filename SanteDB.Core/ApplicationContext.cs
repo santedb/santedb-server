@@ -389,6 +389,8 @@ namespace SanteDB.Core
         /// </summary>
         public string GetRemoteEndpoint()
         {
+            if (RestOperationContext.Current?.IncomingRequest?.Headers["X-Forwarded-For"] != null)
+                return RestOperationContext.Current?.IncomingRequest?.Headers["X-Forwarded-For"];
             return RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString();
         }
 

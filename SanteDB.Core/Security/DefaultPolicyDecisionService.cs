@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
@@ -74,6 +75,7 @@ namespace SanteDB.Core.Security
                 details.Add(new PolicyDecisionDetail(pol.Policy.Oid, rule));
             }
 
+            AuditUtil.AuditAccessControlDecision(principal, retVal);
             return retVal;
         }
 
@@ -86,10 +88,13 @@ namespace SanteDB.Core.Security
                 throw new ArgumentNullException(nameof(principal));
             else if (String.IsNullOrEmpty(policyId))
                 throw new ArgumentNullException(nameof(policyId));
-            
+
             // Can we make this decision based on the claims? 
             if (principal is IClaimsPrincipal && (principal as IClaimsPrincipal).HasClaim(c => c.Type == SanteDBClaimTypes.SanteDBGrantedPolicyClaim && policyId.StartsWith(c.Value)))
+            {
+                AuditUtil.AuditAccessControlDecision(principal, policyId, PolicyGrantType.Grant);
                 return PolicyGrantType.Grant;
+            }
 
             // Get the user object from the principal
             var pip = ApplicationServiceContext.Current.GetService<IPolicyInformationService>();
@@ -106,24 +111,26 @@ namespace SanteDB.Core.Security
                     )
                     policyInstance = pol;
 
+            var retVal = PolicyGrantType.Deny;
+
             if (policyInstance == null)
-            {
-                // TODO: Configure OptIn or OptOut
-                return PolicyGrantType.Deny;
-            }
+                retVal = PolicyGrantType.Deny;
             else if (!policyInstance.Policy.CanOverride && policyInstance.Rule == PolicyGrantType.Elevate)
-                return PolicyGrantType.Deny;
+                retVal =  PolicyGrantType.Deny;
             else if (!policyInstance.Policy.IsActive)
-                return PolicyGrantType.Grant;
+                retVal = PolicyGrantType.Grant;
             else if ((policyInstance.Policy as ILocalPolicy)?.Handler != null)
             {
                 var policy = policyInstance.Policy as ILocalPolicy;
                 if (policy != null)
-                    return policy.Handler.GetPolicyDecision(principal, policy, null).Outcome;
+                    retVal = policy.Handler.GetPolicyDecision(principal, policy, null).Outcome;
 
             }
-            return policyInstance.Rule;
+            else 
+                retVal = policyInstance.Rule;
 
+            AuditUtil.AuditAccessControlDecision(principal, policyId, retVal);
+            return retVal;
         }
     }
 }

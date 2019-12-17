@@ -54,6 +54,8 @@ using System.Diagnostics.Tracing;
 using SanteDB.Core.Applets.Services;
 using System.Globalization;
 using SanteDB.Core.Http;
+using SanteDB.Core.Auditing;
+using System.Net;
 
 namespace SanteDB.Authentication.OAuth2.Rest
 {
@@ -88,6 +90,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             // Only password grants
             if (tokenRequest["grant_type"] != OAuthConstants.GrantNamePassword &&
                 tokenRequest["grant_type"] != OAuthConstants.GrantNameRefresh &&
+                tokenRequest["grant_type"] != OAuthConstants.GrantNameAuthorizationCode &&
                 tokenRequest["grant_type"] != OAuthConstants.GrantNameClientCredentials)
                 return this.CreateErrorCondition(OAuthErrorType.unsupported_grant_type, "Only 'password', 'client_credentials' or 'refresh_token' grants supported");
 
@@ -162,7 +165,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
                         // Password grants allowed for this application?
                         new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, clientPrincipal).Demand();
-                        if(devicePrincipal != null)
+                        if (devicePrincipal != null)
                             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal).Demand();
 
                         // Validate 
@@ -173,8 +176,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
                             principal = identityProvider.Authenticate(tokenRequest["username"], tokenRequest["password"], RestOperationContext.Current.IncomingRequest.Headers[OAuthConstants.TfaHeaderName]);
                         else
                             principal = identityProvider.Authenticate(tokenRequest["username"], tokenRequest["password"]);
-
-
                         break;
                     case OAuthConstants.GrantNameRefresh:
                         var refreshToken = tokenRequest["refresh_token"];
@@ -183,6 +184,32 @@ namespace SanteDB.Authentication.OAuth2.Rest
                                     .Select(x => Convert.ToByte(refreshToken.Substring(x, 2), 16))
                                     .ToArray();
                         principal = (identityProvider as ISessionIdentityProviderService).Authenticate(ApplicationServiceContext.Current.GetService<ISessionProviderService>().Extend(secret));
+                        break;
+                    case OAuthConstants.GrantNameAuthorizationCode:
+
+                        // We want to decode the token and verify ..
+                        var token = Convert.FromBase64String(tokenRequest["code"].Replace(" ", "+"));
+
+                        // First we extract the token information
+                        var sid = new Guid(Enumerable.Range(0, 32).Where(x => x % 2 == 0).Select(o => token[o]).ToArray());
+                        var aid = new Guid(Enumerable.Range(32, 32).Where(x => x % 2 == 0).Select(o => token[o]).ToArray());
+                        var scopeLength = BitConverter.ToInt32(token, 64);
+                        var scopeData = Enumerable.Range(68, scopeLength * 2).Where(x => x % 2 == 0).Select(o => token[o]).ToArray();
+                        var claimLength = BitConverter.ToInt32(token, 68 + scopeLength * 2);
+                        var claimData = Enumerable.Range(72 + scopeLength * 2, claimLength * 2).Where(x => x % 2 == 0).Select(o => token[o]).ToArray();
+                        var dsig = token.Skip(72 + 2 * (scopeLength + claimLength)).Take(32).ToArray();
+                        var expiry = new DateTime(BitConverter.ToInt64(token, 104 + 2* (scopeLength + claimLength)));
+
+                        // Verify 
+                        if (!ApplicationServiceContext.Current.GetService<IDataSigningService>().Verify(token.Take(token.Length - 40).ToArray(), dsig))
+                            throw new SecurityTokenValidationException("Authorization code failed signature verification");
+                        
+                        // Expiry?
+                        if (expiry < DateTime.Now)
+                            throw new SecurityTokenExpiredException("Authorization code is expired");
+
+                        // Get the claims
+
                         break;
                     default:
                         throw new InvalidOperationException("Invalid grant type");
@@ -510,7 +537,83 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <param name="authorization">Authorization post results</param>
         public void SelfPost(NameValueCollection authorization)
         {
-            throw new NotImplementedException();
+            // Generate an authorization code for this user and redirect to their redirect URL
+            var redirectUrl = RestOperationContext.Current.IncomingRequest.QueryString["redirect_uri"] ?? authorization["redirect_uri"];
+            var client_id = RestOperationContext.Current.IncomingRequest.QueryString["client_id"] ?? authorization["client_id"];
+            var scope = RestOperationContext.Current.IncomingRequest.QueryString.GetValues("scope") ?? authorization.GetValues("scope")?.SelectMany(o=>o.Split(';'));
+            var claims = RestOperationContext.Current.IncomingRequest.QueryString.GetValues("claim") ?? authorization.GetValues("claim")?.SelectMany(o=>o.Split(';'));
+            var state = RestOperationContext.Current.IncomingRequest.QueryString["state"] ?? authorization["state"];
+            var signature = RestOperationContext.Current.IncomingRequest.QueryString["dsig"]  ?? authorization["dsig"];
+
+            AuditData audit = new AuditData(DateTime.Now, ActionType.Execute, OutcomeIndicator.Success, EventIdentifierType.SecurityAlert, AuditUtil.CreateAuditActionCode(EventTypeCodes.UserAuthentication));
+            AuditUtil.AddLocalDeviceActor(audit);
+            AuditUtil.AddRemoteDeviceActor(audit);
+
+            try
+            {
+                if (signature == null)
+                    throw new ArgumentException("Must provide the dsig parameter");
+                if(client_id == null)
+                    throw new ArgumentException("Must provide the client_id parameter");
+                if (redirectUrl == null)
+                    throw new ArgumentException("Must provide redirect_uri parameter");
+                if (scope == null)
+                    throw new ArgumentException("Must provide at least openid scope");
+
+                // Verify signature
+                var signing = ApplicationServiceContext.Current.GetService<IDataSigningService>();
+                if (!signing.Verify(Encoding.UTF8.GetBytes(client_id + redirectUrl), signature.Split('-').Select(o => Convert.ToByte(o, 16)).ToArray()))
+                    throw new SecurityTokenValidationException("Signature mismatch - client_id or redirect_uri has been tampered with");
+
+                // Authenticate the user and client
+                var idp = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
+                var iadp = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
+                var clientIdentity = iadp.GetIdentity(client_id) as IClaimsIdentity;
+                var principal = idp.Authenticate(authorization["username"], authorization["password"]) as IClaimsPrincipal;
+                var sid = Guid.Parse(principal.FindFirst(SanteDBClaimTypes.Sid).Value);
+                var aid = Guid.Parse(clientIdentity.FindFirst(SanteDBClaimTypes.Sid).Value);
+                var scopeData = scope.Where(o => o != "openid").SelectMany(o => Encoding.UTF8.GetBytes(o).Concat(new byte[] { 0 })).ToArray();
+                var claimData = claims?.SelectMany(o => Encoding.UTF8.GetBytes(o).Union(new byte[] { 0 })).ToArray() ?? new byte[0];
+                // Generate the appropriate authorization code
+                byte[] salt = Guid.NewGuid().ToByteArray();
+
+                // Generate the token 
+                // Token format is :
+                // SID w/SALT . AID w/SALT . SIG
+                byte[] authCode = new byte[112 + scopeData.Length * 2 + claimData.Length * 2];
+                var i = 0;
+                foreach (var b in sid.ToByteArray()) { authCode[i++] = b; authCode[i++] = salt[i % salt.Length]; }
+                foreach (var b in aid.ToByteArray()) { authCode[i++] = b; authCode[i++] = salt[i % salt.Length]; }
+                Array.Copy(BitConverter.GetBytes(scopeData.Length), 0, authCode, i, 4);
+                i += 4; // 2 byte portion
+                foreach (var b in scopeData) { authCode[i++] = b; authCode[i++] = salt[i % salt.Length]; }
+                Array.Copy(BitConverter.GetBytes(claimData.Length), 0, authCode, i, 4);
+                i += 4; // 2 byte portion
+                foreach (var b in claimData) { authCode[i++] = b; authCode[i++] = salt[i % salt.Length]; }
+
+                // Sign the data
+                var dsig = signing.SignData(authCode.Take(authCode.Length - 40).ToArray());
+                Array.Copy(dsig, 0, authCode, i, dsig.Length);
+                i += 32;
+                Array.Copy(BitConverter.GetBytes(DateTime.Now.AddMinutes(1).Ticks), 0, authCode, i, 8);
+                // Encode
+                var tokenString = Convert.ToBase64String(authCode);
+
+                // Redirect
+                RestOperationContext.Current.OutgoingResponse.Redirect($"{redirectUrl}?code={tokenString}&state={state}");
+                return;
+            }
+            catch (Exception e)
+            {
+                audit.Outcome = OutcomeIndicator.SeriousFail;
+                this.m_traceSource.TraceError("Could not create authentication token: {0}", e.Message);
+                RestOperationContext.Current.OutgoingResponse.Redirect($"{redirectUrl}?error=invalid_request&error_description={e.Message}&state={state}");
+            }
+            finally
+            {
+                AuditUtil.SendAudit(audit);
+            }
+
         }
 
         /// <summary>
@@ -521,43 +624,56 @@ namespace SanteDB.Authentication.OAuth2.Rest
         {
             // Get the asset object
             var loadedApplets = ApplicationServiceContext.Current.GetService<IAppletManagerService>().Applets;
-            var loginApplet = loadedApplets.Where(o => o.Configuration.AppSettings.Any(s => s.Name == "oauth2.login.asset")).FirstOrDefault();
+
+
+            var lander = RestOperationContext.Current.IncomingRequest.QueryString["lander"];
+            var client = RestOperationContext.Current.IncomingRequest.QueryString["client_id"];
+            var redirectUri = RestOperationContext.Current.IncomingRequest.QueryString["redirect_uri"];
+
+            var loginApplet = loadedApplets.Where(o => o.Configuration?.AppSettings.Any(s => s.Name == "oauth2.login") == true && (lander == o.Info.Id || String.IsNullOrEmpty(lander))).FirstOrDefault();
             if (loginApplet == null)
                 throw new KeyNotFoundException("No asset has been configured as oauth2.login.asset");
 
-            var loginAssetName = loginApplet.Configuration.AppSettings.FirstOrDefault(o => o.Name == "oauth2.login.asset")?.Value;
-            var loginAsset = loadedApplets.ResolveAsset(loginAssetName);
-            if (loginAsset == null)
-                throw new KeyNotFoundException($"Login asset {loginAssetName} not found");
+            var loginAssetPath = loginApplet.Configuration.AppSettings.FirstOrDefault(o => o.Name == "oauth2.login")?.Value;
 
-            // All "content" is relative to the path of the login asset and only in the same directory
-            var loginAssetPath = loginAsset.Name.Substring(0, loginAsset.Name.LastIndexOf("/"));
+            if (String.IsNullOrEmpty(content))
+                content = "index.html";
+
+            var assetName = loginAssetPath + content;
+
+            var asset = loadedApplets.ResolveAsset(assetName);
+            if (asset == null)
+                throw new KeyNotFoundException($"{assetName} not found");
 
             // Now time to resolve the asset
+            var bindingParms = RestOperationContext.Current.IncomingRequest.QueryString.AllKeys.ToDictionary(o => o, o => String.Join(";", RestOperationContext.Current.IncomingRequest.QueryString.GetValues(o)));
             if (String.IsNullOrEmpty(content) || content == "index.html")
             {
+
                 // Rule: scope, response_type and client_id and redirect_uri must be provided
-                if (String.IsNullOrEmpty(RestOperationContext.Current.IncomingRequest.QueryString["redirect_uri"]) || String.IsNullOrEmpty(RestOperationContext.Current.IncomingRequest.QueryString["client_id"]))
+                if (String.IsNullOrEmpty(redirectUri) || 
+                    String.IsNullOrEmpty(client) ||
+                    RestOperationContext.Current.IncomingRequest.QueryString.GetValues("scope")?.Contains("openid") != true ||
+                    RestOperationContext.Current.IncomingRequest.QueryString["response_type"] != "code")
                     throw new InvalidOperationException("OpenID Violation: redirect_uri and client_id must be provided");
                 else
                 {
-                    var applicationId = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>().GetIdentity(RestOperationContext.Current.IncomingRequest.QueryString["client_id"]);
-                    new PolicyPermission(System.Security.Permissions.PermissionState.None, OAuth2.OAuthConstants.OAuthCodeFlowPolicy, new GenericPrincipal(applicationId, null)).Demand();
+                    var applicationId = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>().GetIdentity(client);
+                    if (applicationId == null)
+                        throw new SecurityException($"Client {client} is not registered with this provider");
+                    var pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
+                    if(pdp.GetPolicyOutcome(new SanteDBClaimsPrincipal(applicationId as IClaimsIdentity), OAuthConstants.OAuthCodeFlowPolicy) != PolicyGrantType.Grant)
+                        throw new SecurityException($"Client {client} is not permitted to execute this authorization grant flow");
                     // TODO: Get claim for application redirect URL
+
+                    var signature = ApplicationServiceContext.Current.GetService<IDataSigningService>().SignData(Encoding.UTF8.GetBytes(client + redirectUri));
+                    bindingParms.Add("dsig", BitConverter.ToString(signature));
+
                 }
-                content = loginAsset.Name.Substring(loginAsset.Name.LastIndexOf("/") + 1);
             }
-            // Render out the data
-            var assetName = $"{loginApplet.Info.Id}/{loginAssetPath}/{content}";
-            loginAsset = loadedApplets.ResolveAsset(assetName, loginAsset);
-            if (loginAsset == null)
-                throw new KeyNotFoundException($"Asset {assetName} not foud");
-            else
-            {
-                RestOperationContext.Current.OutgoingResponse.ContentType =
-                    DefaultContentTypeMapper.GetContentType(Path.GetExtension(content));
-                return new MemoryStream(loadedApplets.RenderAssetContent(loginAsset, RestOperationContext.Current.IncomingRequest.QueryString["ui_locales"] ?? CultureInfo.CurrentUICulture.TwoLetterISOLanguageName));
-            }
+
+            RestOperationContext.Current.OutgoingResponse.ContentType = DefaultContentTypeMapper.GetContentType(Path.GetExtension(content));
+            return new MemoryStream(loadedApplets.RenderAssetContent(asset, RestOperationContext.Current.IncomingRequest.QueryString["ui_locale"] ?? CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, bindingParameters: bindingParms));
         }
 
         /// <summary>

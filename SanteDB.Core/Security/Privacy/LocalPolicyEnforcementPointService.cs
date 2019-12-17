@@ -25,6 +25,7 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
@@ -198,9 +199,12 @@ namespace SanteDB.Core.Security.Privacy
             return decisions
                 // We want to mask ELEVATE
                 .Where(o => o.Decision.Outcome == PolicyGrantType.Elevate && o.Securable is Act).Select(
-                    o => new Act() {
-                        ReasonConceptKey = NullReasonKeys.Masked,
-                        Key = (o.Securable as IdentifiedData).Key
+                    o => {
+                        AuditUtil.AuditMasking(o.Securable as Act);
+                        return new Act() {
+                            ReasonConceptKey = NullReasonKeys.Masked,
+                            Key = (o.Securable as IdentifiedData).Key
+                        };
                     }
                 )
                 // We want to include all grant

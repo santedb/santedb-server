@@ -20,6 +20,7 @@
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Services;
 using System;
 using System.Diagnostics;
@@ -121,7 +122,7 @@ namespace SanteDB.Core.Security.Attribute
             var principal = this.m_principal ?? AuthenticationContext.Current.Principal;
 
             // Non system principals must be authenticated
-            if(!principal.Identity.IsAuthenticated &&
+            if (!principal.Identity.IsAuthenticated &&
                 principal != AuthenticationContext.SystemPrincipal &&
                 this.m_isUnrestricted == true)
                 throw new PolicyViolationException(principal, this.m_policyId, PolicyGrantType.Deny);
