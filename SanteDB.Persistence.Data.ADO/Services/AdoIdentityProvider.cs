@@ -112,6 +112,29 @@ namespace SanteDB.Persistence.Data.ADO.Services
         }
 
         /// <summary>
+        /// Gets an un-authenticated identity
+        /// </summary>
+        public IIdentity GetIdentity(Guid sid)
+        {
+            try
+            {
+                using (var dataContext = this.m_configuration.Provider.GetReadonlyConnection())
+                {
+                    dataContext.Open();
+                    var name = dataContext.FirstOrDefault<DbSecurityUser>(o => o.Key == sid)?.UserName;
+                    if (name == null)
+                        return null;
+                    else
+                        return AdoClaimsIdentity.Create(name);
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Authenticate the user using a TwoFactorAuthentication secret
         /// </summary>
         public IPrincipal Authenticate(string userName, string password, string tfaSecret)

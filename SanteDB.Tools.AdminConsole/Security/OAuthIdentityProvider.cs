@@ -175,6 +175,15 @@ namespace SanteDB.Tools.AdminConsole.Security
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Gets the specified identity
+        /// </summary>
+        public System.Security.Principal.IIdentity GetIdentity(Guid userName)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Authenticates the specified user
         /// </summary>

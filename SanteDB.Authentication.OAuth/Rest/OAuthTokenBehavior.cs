@@ -147,6 +147,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
                 IPrincipal principal = null;
 
+                var clientClaims = SanteDBClaimsUtil.ExtractClaims(RestOperationContext.Current.IncomingRequest.Headers);
+
                 // perform auth
                 switch (tokenRequest["grant_type"])
                 {
@@ -187,6 +189,11 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         break;
                     case OAuthConstants.GrantNameAuthorizationCode:
 
+                        // First, ensure the authenticated application has permission to use this grant
+                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuthConstants.OAuthCodeFlowPolicy, clientPrincipal).Demand();
+                        if (devicePrincipal != null)
+                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal).Demand();
+
                         // We want to decode the token and verify ..
                         var token = Convert.FromBase64String(tokenRequest["code"].Replace(" ", "+"));
 
@@ -208,17 +215,36 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         if (expiry < DateTime.Now)
                             throw new SecurityTokenExpiredException("Authorization code is expired");
 
-                        // Get the claims
+                        // Verify the application is the same purported by the client
+                        if (aid.ToString() != (clientPrincipal.Identity as IClaimsIdentity).FindFirst(SanteDBClaimTypes.Sid).Value)
+                            throw new SecurityTokenValidationException("Authorization code was not issued to this client");
+
+                        // Fetch the principal information
+                        principal = new SanteDBClaimsPrincipal(identityProvider.GetIdentity(sid));
+
+                        // Add scopes
+                        int li = 0, idx;
+                        string scopes = "";
+                        do
+                        {
+                            idx = Array.IndexOf(scopeData, (byte)0, li);
+                            if(idx > 0) scopes += Encoding.UTF8.GetString(scopeData, li, idx - li) + ";";
+                            li += idx + 1;
+                        } while (idx > -1);
+                        tokenRequest["scope"] = scopes.Substring(0, scopes.Length - 1);
+
+                        // TODO: Claims
 
                         break;
                     default:
                         throw new InvalidOperationException("Invalid grant type");
                 }
 
+               
                 if (principal == null)
                     return this.CreateErrorCondition(OAuthErrorType.invalid_grant, "Invalid username or password");
                 else
-                    return this.EstablishSession(principal, clientPrincipal, devicePrincipal, tokenRequest["scope"], this.ValidateClaims(principal));
+                    return this.EstablishSession(principal, clientPrincipal, devicePrincipal, tokenRequest["scope"], this.ValidateClaims(principal, clientClaims.ToArray()));
             }
             catch (AuthenticationException e)
             {
@@ -241,7 +267,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <summary>
         /// Validate claims made by the requestor
         /// </summary>
-        private IEnumerable<IClaim> ValidateClaims(IPrincipal userPrincipal)
+        private IEnumerable<IClaim> ValidateClaims(IPrincipal userPrincipal, params IClaim[] claims)
         {
             IPolicyDecisionService pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
 
@@ -249,7 +275,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             // HACK: Find a better way to make claims
             // Claims are stored as X-SanteDBACS-Claim headers
-            foreach (var itm in SanteDBClaimsUtil.ExtractClaims(RestOperationContext.Current.IncomingRequest.Headers))
+            foreach (var itm in claims)
             {
 
                 // Claim allowed

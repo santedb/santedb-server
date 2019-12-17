@@ -125,6 +125,16 @@ namespace SanteDB.Tools.AdminConsole.Security
         }
 
         /// <summary>
+        /// Get identity details without authenticating
+        /// </summary>
+        /// <param name="sid">The security identifier</param>
+        /// <returns>The constructed identity</returns>
+        public IIdentity GetIdentity(Guid sid)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Re-authenticates (extends) a session
         /// </summary>
         public IPrincipal ReAuthenticate(IPrincipal principal)

@@ -46,5 +46,18 @@ namespace SanteDB.Persistence.Auditing.ADO.Data.Model
         [Column("act_id"), NotNull, ForeignKey(typeof(DbAuditActor), nameof(DbAuditActor.Key))]
         public Guid TargetKey { get; set; }
 
+        /// <summary>
+        /// True if user is requestor
+        /// </summary>
+        [Column("is_rqo")]
+        public bool UserIsRequestor { get; set; }
+
+        /// <summary>
+        /// True if user is requestor
+        /// </summary>
+        [Column("ap")]
+        public String AccessPoint { get; set; }
+
+
     }
 }
