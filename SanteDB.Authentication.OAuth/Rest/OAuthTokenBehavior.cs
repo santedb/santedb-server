@@ -573,7 +573,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             AuditData audit = new AuditData(DateTime.Now, ActionType.Execute, OutcomeIndicator.Success, EventIdentifierType.SecurityAlert, AuditUtil.CreateAuditActionCode(EventTypeCodes.UserAuthentication));
             AuditUtil.AddLocalDeviceActor(audit);
-            AuditUtil.AddRemoteDeviceActor(audit);
 
             try
             {
@@ -603,6 +602,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 // Generate the appropriate authorization code
                 byte[] salt = Guid.NewGuid().ToByteArray();
 
+                AuditUtil.AddUserActor(audit, principal);
+
                 // Generate the token 
                 // Token format is :
                 // SID w/SALT . AID w/SALT . SIG
@@ -631,6 +632,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             }
             catch (Exception e)
             {
+                AuditUtil.AddUserActor(audit);
                 audit.Outcome = OutcomeIndicator.SeriousFail;
                 this.m_traceSource.TraceError("Could not create authentication token: {0}", e.Message);
                 RestOperationContext.Current.OutgoingResponse.Redirect($"{redirectUrl}?error=invalid_request&error_description={e.Message}&state={state}");

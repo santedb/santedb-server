@@ -143,6 +143,22 @@
       </name>
     </Concept>
   </update>
+   <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>5eceb3da-b5cd-fd3d-b045-8ce07635ac99</id>
+      <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
+      <version xsi:nil="true" />
+      <sequence xsi:nil="true" />
+      <isReadonly>false</isReadonly>
+      <mnemonic>SecurityAuditCode-SecondaryUseQuery</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Secondary Use Query (BI)</value>
+      </name>
+    </Concept>
+  </update>
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>6f41e616-7fac-49a9-a7b5-0cee6d15df81</id>
