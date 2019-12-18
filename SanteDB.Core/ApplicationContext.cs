@@ -213,7 +213,7 @@ namespace SanteDB.Core
 #endif
                         // Add this
                         this.m_serviceInstances.Add(this);
-
+                    this.m_serviceInstances.Add(new AuditMetadataProvider());
                     Trace.TraceInformation("STAGE1 START: Loading services");
 
                     foreach (var svc in this.m_configuration.ServiceProviders)

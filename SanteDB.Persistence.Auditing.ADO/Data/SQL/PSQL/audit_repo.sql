@@ -70,3 +70,15 @@ CREATE TABLE aud_act_assoc_tbl (
 );
 
 CREATE INDEX aud_act_assoc_aud_id_idx ON aud_act_assoc_tbl(aud_id);
+
+-- METADATA TABLE
+CREATE TABLE aud_meta_tbl (
+	id UUID NOT NULL DEFAULT uuid_generate_v4(),
+	aud_id UUID NOT NULL,
+	attr INT NOT NULL,
+	val TEXT NOT NULL,
+	CONSTRAINT pk_aud_meta_tbl PRIMARY KEY (id),
+	CONSTRAINT fk_aud_meta_aud_id FOREIGN KEY (aud_id) REFERENCES aud_tbl(id)
+);
+
+CREATE INDEX aud_meta_aud_id_idx ON aud_meta_tbl(aud_id);

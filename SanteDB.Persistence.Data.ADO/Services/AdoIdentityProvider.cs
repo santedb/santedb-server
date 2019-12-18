@@ -259,8 +259,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                             user.Password = passwordHashingService.ComputeHash(newPassword);
                             user.SecurityHash = Guid.NewGuid().ToString();
-                            user.UpdatedByKey = dataContext.EstablishProvenance(principal, null); 
-
+                            user.UpdatedByKey = dataContext.EstablishProvenance(principal, null);
+                            user.UpdatedTime = DateTimeOffset.Now;
                             dataContext.Update(user);
                             tx.Commit();
                         }
@@ -563,6 +563,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         identities.Add(new DeviceIdentity(auth.Object4.Key, auth.Object4.PublicId, true));
                     identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, session.NotBefore.ToString("o")));
                     identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, session.NotAfter.ToString("o")));
+                    identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, auth.Object1.Key.ToString()));
                     var principal = auth.Object1.UserKey.GetValueOrDefault() == Guid.Empty ?
                         new SanteDBClaimsPrincipal(identities) : AdoClaimsIdentity.Create(auth.Object3, true, "SESSION", session).CreateClaimsPrincipal(identities);
                     

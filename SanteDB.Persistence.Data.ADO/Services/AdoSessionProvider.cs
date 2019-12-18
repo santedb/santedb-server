@@ -345,5 +345,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 throw new SecurityException($"Cannot abandon session {BitConverter.ToString(session.Id)}", e);
             }
         }
+
     }
 }

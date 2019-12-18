@@ -33,5 +33,9 @@ domainClass="SanteDB.Persistence.Auditing.ADO.Data.Model.DbAuditObject, SanteDB.
   <class modelClass="SanteDB.Core.Auditing.AuditCode, SanteDB.Core.Model, Version=1.1.0.0"
 domainClass="SanteDB.Persistence.Auditing.ADO.Data.Model.DbAuditCode, SanteDB.Persistence.Auditing.ADO, Version=0.5.0.0">
   </class>
-  
+
+  <class modelClass="SanteDB.Core.Auditing.AuditMetadata, SanteDB.Core.Model, Version=1.1.0.0"
+domainClass="SanteDB.Persistence.Auditing.ADO.Data.Model.DbAuditMetadata, SanteDB.Persistence.Auditing.ADO, Version=0.5.0.0">
+    <property modelName="Key" domainName="MetadataKey"/>
+  </class>
 </modelMap>

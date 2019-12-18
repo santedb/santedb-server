@@ -48,6 +48,7 @@
     <Compile Include="Data\Model\DbAuditActorAssociation.cs" />
     <Compile Include="Data\Model\DbAuditCode.cs" />
     <Compile Include="Data\Model\DbAuditData.cs" />
+    <Compile Include="Data\Model\DbAuditMetadata.cs" />
     <Compile Include="Data\Model\DbAuditObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AdoAuditRepositoryService.cs" />
