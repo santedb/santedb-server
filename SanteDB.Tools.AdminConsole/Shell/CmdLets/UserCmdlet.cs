@@ -92,7 +92,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// </summary>
         [AdminCommand("user.add", "Adds a user to the SanteDB instance")]
         [Description("This command add the specified user to the SanteDB IMS instance")]
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateIdentity)]
+        // // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateIdentity)]
         internal static void Useradd(UseraddParms parms)
         {
 
@@ -144,7 +144,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// </summary>
         [AdminCommand("user.del", "De-activates a user to the SanteDB instance")]
         [Description("This command change the obsoletion time of the user effectively de-activating it")]
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
+        // // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
         internal static void Userdel(GenericUserParms parms)
         {
             if (parms.UserName == null)
@@ -166,7 +166,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// </summary>
         [AdminCommand("user.undel", "Re-activates a user to the SanteDB instance")]
         [Description("This command will undo a de-activation and will reset the user's obsoletion time")]
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
+        // // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
         internal static void Userudel(GenericUserParms parms)
         {
             if (parms.UserName == null)
@@ -190,7 +190,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// Useradd parameters
         /// </summary>
         [AdminCommand("user.lock", "Engages or disengages the user lock")]
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
+        // // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
         [Description("This command will change lock status of the user, either setting it or un-setting it")]
         internal static void Userlock(UserLockParms parms)
         {
@@ -301,7 +301,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// Gets or sets roles
         /// </summary>
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
+        // // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
         [AdminCommand("user.roles", "Change roles for a user")]
         [Description("This command is used to assign roles for the specified user to the specified roles. Note that the role list provided replaces the current role list of the user")]
         internal static void ChangeRoles(ChangeRoleParms parms)
@@ -345,7 +345,6 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// </summary>
         [AdminCommand("user.password", "Changes a users password")]
         [Description("This command will change the specified user's password the specified password. The server will reject this command if the password does not meet complixity requirements")]
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ChangePassword)]
         internal static void SetPassword(UserPasswordParms parms)
         {
             if (parms.UserName == null)
@@ -384,7 +383,6 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// User information
         /// </summary>
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterIdentity)]
         [AdminCommand("user.info", "Displays detailed information about the user")]
         [Description("This command will display detailed information about the specified security user account. It will show groups, status, and effective policies")]
         internal static void UserInfo(GenericUserParms parms)

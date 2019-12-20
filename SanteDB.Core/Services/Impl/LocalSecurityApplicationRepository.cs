@@ -39,6 +39,8 @@ namespace SanteDB.Core.Services.Impl
         {
             if (!String.IsNullOrEmpty(data.ApplicationSecret))
                 data.ApplicationSecret = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(data.ApplicationSecret);
+
+           
             return base.Insert(data);
         }
 

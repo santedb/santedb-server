@@ -364,8 +364,8 @@ namespace SanteDB.Messaging.HL7
                 throw new ArgumentNullException(nameof(id), "Missing ID parameter");
 
             // Internal key identifier?
-            if (id.NamespaceID.Value == m_configuration.LocalAuthority.DomainName ||
-                id.UniversalID.Value == m_configuration.LocalAuthority.Oid)
+            if (!String.IsNullOrEmpty(id.NamespaceID.Value) && id.NamespaceID.Value == m_configuration.LocalAuthority.DomainName ||
+                !String.IsNullOrEmpty(id.UniversalID.Value) && id.UniversalID.Value == m_configuration.LocalAuthority.Oid)
                 return m_configuration.LocalAuthority;
 
             if (!string.IsNullOrEmpty(id.NamespaceID.Value))

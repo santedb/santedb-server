@@ -389,8 +389,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 catch (Exception ex)
                 {
                     tx?.Rollback();
-                    this.m_traceSource.TraceError("Error inserting audit: {0}", ex);
-                    throw;
+                    throw new Exception($"Error inserting audit {storageData.Key}", ex);
                 }
             }
         }

@@ -118,7 +118,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <param name="parms"></param>
         [AdminCommand("authority.add", "Add Assigning Authority application")]
         [Description("This command will create a new assigning authority which can be used to identify external authorities")]
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedMetadata)]
+        // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedMetadata)]
         public static void AddAssigningAuthority(AddAssigningAuthorityParams parms)
         {
 

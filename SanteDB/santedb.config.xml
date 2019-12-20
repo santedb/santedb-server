@@ -488,7 +488,7 @@
            readOnlyConnectionString="SanteDBWarehouse"
            traceSql="false"
            providerType="npgsql" />
-  <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="32">
+  <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="8">
     <serviceProviders>
 
       <!-- Core Services -->
@@ -562,7 +562,7 @@
       
       <!-- Business Intel Service -->
       <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS, Version=1.40.0.0"/>
-      <!--<add type="SanteDB.BI.Services.Impl.AppletMetadataRepository, SanteDB.BI, Version=1.40.0.0"/>-->
+      <!--<add type="SanteDB.BI.Services.Impl.AppletBiRepository, SanteDB.BI, Version=1.40.0.0"/>-->
       <add type="SanteDB.Tools.Debug.BI.FileMetadataRepository, SanteDB.Tools.Debug, Version=1.40.0.0"/>
       <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI, Version=1.40.0.0"/>
       <add type="SanteDB.BI.Services.Impl.LocalBiRenderService, SanteDB.BI, Version=1.40.0.0"/>

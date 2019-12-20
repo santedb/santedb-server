@@ -91,7 +91,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
 
         [AdminCommand("device.add", "Add security device")]
         [Description("This command will create a new security device which can be used to access the SanteDB instance")]
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateDevice)]
+        // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateDevice)]
         internal static void AddDevice(AddDeviceParms parms)
         {
             var policies = new List<SecurityPolicyInfo>();
@@ -127,7 +127,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
 
         [AdminCommand("device.alter", "Alter security device")]
         [Description("This command will alter an existing security device which can be used to access the SanteDB instance")]
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateDevice)]
+        // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateDevice)]
         internal static void AlterDevice(AddDeviceParms parms)
         {
 
@@ -194,7 +194,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
 
         [AdminCommand("device.list", "List Security Devices")]
         [Description("This command will list all security devices in the SanteDB instance")]
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
+        // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         internal static void ListDevices(DeviceListParams parms)
         {
             AmiCollection list = null;
@@ -221,7 +221,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// User information
         /// </summary>
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateDevice)]
+        // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateDevice)]
         [AdminCommand("device.info", "Displays detailed information about the device")]
         [Description("This command will display detailed information about the specified security device account. It will status, and effective policies")]
         internal static void DeviceInfo(GenericDeviceParms parms)

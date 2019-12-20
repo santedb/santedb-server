@@ -94,7 +94,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// Add a role
         /// </summary>
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateRoles)]
+        // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateRoles)]
         [AdminCommand("role.add", "Adds a role to the current SanteDB instance")]
         internal static void AddRole(AddRoleParms parms)
         {
@@ -139,7 +139,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
 
         [AdminCommand("role.list", "List Security Roles")]
         [Description("This command will list all security roles in the SanteDB instance")]
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
+        // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         internal static void ListRoles(RoleListParams parms)
         {
             AmiCollection list = null;
@@ -161,7 +161,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// User information
         /// </summary>
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterRoles)]
+        // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterRoles)]
         [AdminCommand("role.info", "Displays detailed information about the role")]
         [Description("This command will display detailed information about the specified security role")]
         internal static void RoleInfo(GenericRoleParms parms)

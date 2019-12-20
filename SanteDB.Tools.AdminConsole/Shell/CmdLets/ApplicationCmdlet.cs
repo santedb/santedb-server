@@ -97,7 +97,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
 
         [AdminCommand("application.add", "Add security application")]
         [Description("This command will create a new security application which can be used to access the SanteDB instance")]
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateApplication)]
+        // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateApplication)]
         internal static void AddApplication(AddApplicationParms parms)
         {
             var policies = new List<SecurityPolicyInfo>();
@@ -157,7 +157,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
 
         [AdminCommand("application.list", "List Security Applications")]
         [Description("This command will list all security applications in the SanteDB instance")]
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
+        // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         internal static void ListRoles(ApplicationListParams parms)
         {
             AmiCollection list = null;
@@ -183,7 +183,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
         /// <summary>
         /// Detail security information
         /// </summary>
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateApplication)]
+        // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateApplication)]
         [AdminCommand("application.info", "Displays detailed information about the application")]
         [Description("This command will display detailed information about the specified security application account. It will status, and effective policies")]
         internal static void ApplicationInfo(GenericApplicationParms parms)
