@@ -1,8 +1,8 @@
 ﻿extensions: designer.cs generated.cs
 extensions: .cs .cpp .h .js
 /*
- * Copyright 2015-%CurrentYear% Mohawk College of Applied Arts and Technology
- *
+ * Portions Copyright 2015-2019 Mohawk College of Applied Arts and Technology
+ * Portions Copyright 2019-%CurrentYear% SanteSuite Contributors (See NOTICE)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you 
  * may not use this file except in compliance with the License. You may 
@@ -22,7 +22,8 @@ extensions: .cs .cpp .h .js
 extensions: .aspx .ascx
 extensions:  .xml .config .xsd .xslt
 <!--
- - Copyright 2015-%CurrentYear% Mohawk College of Applied Arts and Technology
+ - Portions Copyright 2015-2019 Mohawk College of Applied Arts and Technology
+ - Portions Copyright 2019-%CurrentYear% SanteSuite Contributors (See NOTICE)
  - 
  - 
  - Licensed under the Apache License, Version 2.0 (the "License"); you 
