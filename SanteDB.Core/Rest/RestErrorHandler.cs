@@ -81,14 +81,12 @@ namespace SanteDB.Rest.Common.Serialization
                     // Ask the user to elevate themselves
                     faultMessage.StatusCode = 401;
                     var authHeader = $"{(RestOperationContext.Current.AppliedPolicies.OfType<BasicAuthorizationAccessBehavior>().Any() ? "Basic" : "Bearer")} realm=\"{RestOperationContext.Current.IncomingRequest.Url.Host}\" error=\"insufficient_scope\" scope=\"{pve.PolicyId}\"  error_description=\"{error.Message}\"";
-                    AuditUtil.AuditRestrictedFunction(error as PolicyViolationException, uriMatched, authHeader);
                     RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", authHeader);
 
                 }
                 else
                 {
                     faultMessage.StatusCode = 403;
-                    AuditUtil.AuditRestrictedFunction(error, uriMatched, "HTTP-403");
                 }
             }
             else if (error is SecurityException)
@@ -100,7 +98,6 @@ namespace SanteDB.Rest.Common.Serialization
                 // TODO: Audit this
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
                 var authHeader = $"Bearer realm=\"{RestOperationContext.Current.IncomingRequest.Url.Host}\" error=\"invalid_token\" error_description=\"{error.Message}\"";
-                AuditUtil.AuditRestrictedFunction(error as SecurityTokenException, uriMatched, authHeader);
                 RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", authHeader );
             }
             else if (error is LimitExceededException)
@@ -113,13 +110,11 @@ namespace SanteDB.Rest.Common.Serialization
             else if (error is AuthenticationException)
             {
                 var authHeader = $"{(RestOperationContext.Current.AppliedPolicies.OfType<BasicAuthorizationAccessBehavior>().Any() ? "Basic" : "Bearer")} realm=\"{RestOperationContext.Current.IncomingRequest.Url.Host}\" error=\"invalid_token\" error_description=\"{error.Message}\"";
-                AuditUtil.AuditRestrictedFunction(error as AuthenticationException, uriMatched, authHeader);
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
                 RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", authHeader);
             }
             else if (error is UnauthorizedAccessException)
             {
-                AuditUtil.AuditRestrictedFunction(error, uriMatched, "HTTP-403");
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
             }
             else if (error is FaultException)
@@ -161,6 +156,8 @@ namespace SanteDB.Rest.Common.Serialization
                     this.m_traceSource.TraceError("Error on REST pipeline: {0}", error);
                     break;
             }
+
+            AuditUtil.AuditNetworkRequestFailure(error as AuthenticationException, uriMatched, RestOperationContext.Current.IncomingRequest.Headers.AllKeys.ToDictionary(o=>o, o=> RestOperationContext.Current.IncomingRequest.Headers[o]), RestOperationContext.Current.OutgoingResponse.Headers.AllKeys.ToDictionary(o => o, o => RestOperationContext.Current.OutgoingResponse.Headers[o]));
 
             RestMessageDispatchFormatter.CreateFormatter(RestOperationContext.Current.ServiceEndpoint.Description.Contract.Type).SerializeResponse(faultMessage, null, fault);
             return true;

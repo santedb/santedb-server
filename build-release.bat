@@ -27,8 +27,12 @@ if exist "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild
 if exist "c:\Program Files (x86)\Inno Setup 6\ISCC.exe" (
 	set inno="c:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 ) else (
-	echo Can't Find INNO Setup Tools
-	goto :eof
+	if exist "c:\Program Files (x86)\Inno Setup 5\ISCC.exe" (
+		set inno="c:\Program Files (x86)\Inno Setup 5\ISCC.exe"
+	) else (
+		echo Can't Find INNO Setup Tools
+		goto :eof
+	)
 )
 
 set cwd=%cd%

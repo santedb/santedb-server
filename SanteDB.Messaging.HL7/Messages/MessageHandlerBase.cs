@@ -249,12 +249,10 @@ namespace SanteDB.Messaging.HL7.Messages
             else if (error is PolicyViolationException || error is SecurityException)
             {
                 retVal = this.CreateACK(nackType, request, "AR", "Security Error");
-                AuditUtil.AuditRestrictedFunction(error, receiveData.ReceiveEndpoint, receiveData.SolicitorEndpoint.ToString());
             }
             else if (error is AuthenticationException || error is UnauthorizedAccessException)
             {
                 retVal = this.CreateACK(nackType, request, "AR", "Unauthorized");
-                AuditUtil.AuditRestrictedFunction(error as AuthenticationException, receiveData.ReceiveEndpoint, receiveData.SolicitorEndpoint.ToString());
             }
             else if (error is Newtonsoft.Json.JsonException ||
                 error is System.Xml.XmlException)
@@ -335,6 +333,11 @@ namespace SanteDB.Messaging.HL7.Messages
                     ex = ex.InnerException;
                 }
             }
+
+            var imsh = request.GetStructure("MSH") as MSH;
+            AuditUtil.AuditNetworkRequestFailure(error, receiveData.ReceiveEndpoint,
+                Enumerable.Range(0, imsh.NumFields()).ToDictionary(o => $"MSH-{o}", o => imsh.GetField(o).ToString()),
+                Enumerable.Range(0, msa.NumFields()).ToDictionary(o => $"MSA-{o}", o => msa.GetField(o).ToString()));
 
             return retVal;
         }
