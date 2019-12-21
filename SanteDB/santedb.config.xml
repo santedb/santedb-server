@@ -170,7 +170,7 @@
   <section xsi:type="RestConfigurationSection">
     <service name="META">
       <endpoint address="http://0.0.0.0:8080/api-docs" contract="SanteDB.Messaging.Metadata.Rest.IMetadataServiceContract, SanteDB.Messaging.Metadata, Version=1.0.0.0">
-        <add type="SanteDB.Core.Rest.Behavior.MessageCompressionEndpointBehavior, SanteDB.Core, Version=1.10.0.0"/>
+        <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
       </endpoint>
     </service>
     <service name="HDSI">
@@ -179,9 +179,9 @@
       </behaviors>
       <endpoint address="http://0.0.0.0:8080/hdsi" contract="SanteDB.Rest.HDSI.IHdsiServiceContract, SanteDB.Rest.HDSI, Version=1.10.0.0">
         <behaviors>
-          <add type="SanteDB.Core.Rest.Behavior.MessageLoggingEndpointBehavior, SanteDB.Core, Version=1.10.0.0"/>
-          <add type="SanteDB.Core.Rest.Behavior.MessageCompressionEndpointBehavior, SanteDB.Core, Version=1.10.0.0"/>
-          <add type="SanteDB.Core.Rest.Behavior.MessageDispatchFormatterBehavior, SanteDB.Core, Version=1.10.0.0"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageDispatchFormatterBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
         </behaviors>
       </endpoint>
     </service>
@@ -191,8 +191,8 @@
       </behaviors>
       <endpoint address="http://0.0.0.0:8080/bis" contract="SanteDB.Rest.BIS.IBisServiceContract, SanteDB.Rest.BIS, Version=1.10.0.0">
         <behaviors>
-          <add type="SanteDB.Core.Rest.Behavior.MessageLoggingEndpointBehavior, SanteDB.Core, Version=1.10.0.0"/>
-          <add type="SanteDB.Core.Rest.Behavior.MessageCompressionEndpointBehavior, SanteDB.Core, Version=1.10.0.0"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
         </behaviors>
       </endpoint>
     </service>
@@ -202,9 +202,9 @@
       </behaviors>
       <endpoint address="http://0.0.0.0:8080/ami" contract="SanteDB.Rest.AMI.IAmiServiceContract, SanteDB.Rest.AMI, Version=1.10.0.0">
         <behaviors>
-          <add type="SanteDB.Core.Rest.Behavior.MessageLoggingEndpointBehavior, SanteDB.Core, Version=1.10.0.0"/>
-          <add type="SanteDB.Core.Rest.Behavior.MessageCompressionEndpointBehavior, SanteDB.Core, Version=1.10.0.0"/>
-          <add type="SanteDB.Core.Rest.Behavior.MessageDispatchFormatterBehavior, SanteDB.Core, Version=1.10.0.0"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageDispatchFormatterBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
         </behaviors>
       </endpoint>
     </service>
@@ -214,9 +214,9 @@
       </behaviors>
       <endpoint address="http://0.0.0.0:8080/risi" contract="SanteDB.Rest.RISI.IRisiServiceContract, SanteDB.Rest.Common, Version=1.10.0.0">
         <behaviors>
-          <add type="SanteDB.Core.Rest.Behavior.MessageLoggingEndpointBehavior, SanteDB.Core, Version=1.10.0.0"/>
-          <add type="SanteDB.Core.Rest.Behavior.MessageCompressionEndpointBehavior, SanteDB.Core, Version=1.10.0.0"/>
-          <add type="SanteDB.Core.Rest.Behavior.MessageDispatchFormatterBehavior, SanteDB.Core, Version=1.10.0.0"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageDispatchFormatterBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
         </behaviors>
       </endpoint>
     </service>
@@ -225,7 +225,7 @@
         <add type="SanteDB.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Core, Version=1.10.0.0"/>
       </behaviors>
       <endpoint address="http://0.0.0.0:8080/gs1" contract="SanteDB.Messaging.GS1.Rest.IStockService, SanteDB.Messaging.GS1, Version=1.10.0.0">
-        <add type="SanteDB.Core.Rest.Behavior.MessageLoggingEndpointBehavior, SanteDB.Core, Version=1.10.0.0"/>
+        <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
       </endpoint>
     </service>
     <service name="FHIR">
@@ -234,9 +234,9 @@
       </behaviors>
       <endpoint address="http://0.0.0.0:8080/fhir" contract="SanteDB.Messaging.FHIR.Rest.IFhirServiceContract, SanteDB.Messaging.FHIR, Version=1.10.0.0">
         <behaviors>
-          <add type="SanteDB.Core.Rest.Behavior.MessageLoggingEndpointBehavior, SanteDB.Core, Version=1.10.0.0"/>
-          <add type="SanteDB.Core.Rest.Behavior.MessageCompressionEndpointBehavior, SanteDB.Core, Version=1.10.0.0"/>
-          <add type="SanteDB.Core.Rest.Behavior.CorsEndpointBehavior, SanteDB.Core, Version=1.10.0.0">
+          <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
+          <add type="SanteDB.Rest.Common.Behavior.CorsEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0">
             <configuration>
               <CorsEndpointBehaviorConfiguration>
                 <resource name="*" domain="*">
@@ -562,8 +562,8 @@
       
       <!-- Business Intel Service -->
       <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS, Version=1.40.0.0"/>
-      <!--<add type="SanteDB.BI.Services.Impl.AppletBiRepository, SanteDB.BI, Version=1.40.0.0"/>-->
-      <add type="SanteDB.Tools.Debug.BI.FileMetadataRepository, SanteDB.Tools.Debug, Version=1.40.0.0"/>
+      <add type="SanteDB.BI.Services.Impl.AppletBiRepository, SanteDB.BI, Version=1.40.0.0"/>
+      <!--<add type="SanteDB.Tools.Debug.BI.FileMetadataRepository, SanteDB.Tools.Debug, Version=1.40.0.0"/>-->
       <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI, Version=1.40.0.0"/>
       <add type="SanteDB.BI.Services.Impl.LocalBiRenderService, SanteDB.BI, Version=1.40.0.0"/>
     </serviceProviders>

@@ -21,10 +21,13 @@ using RestSrvr;
 using RestSrvr.Attributes;
 using RestSrvr.Bindings;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Rest.Behavior;
 using SanteDB.Core.Rest.Security;
 using SanteDB.Core.Services;
+using SanteDB.Rest.Common.Behavior;
+using SanteDB.Rest.Common.Security;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -62,35 +65,42 @@ namespace SanteDB.Core.Rest
         /// </summary>
         public RestService CreateService(Type serviceType)
         {
-            // Get the configuration
-            var configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RestConfigurationSection>();
-            var sname = serviceType.GetCustomAttribute<ServiceBehaviorAttribute>()?.Name ?? serviceType.FullName;
-            var config = configuration.Services.FirstOrDefault(o => o.Name == sname);
-            if (config == null)
-                throw new InvalidOperationException($"Cannot find configuration for {sname}");
-            var retVal = new RestService(serviceType);
-            foreach (var bhvr in config.Behaviors)
-                retVal.AddServiceBehavior(
-                    bhvr.Configuration == null ?
-                    Activator.CreateInstance(bhvr.Type) as IServiceBehavior :
-                    Activator.CreateInstance(bhvr.Type, bhvr.Configuration) as IServiceBehavior);
-
-            var demandPolicy = new OperationDemandPolicyBehavior(serviceType);
-
-            foreach (var ep in config.Endpoints)
+            try
             {
-                var se = retVal.AddServiceEndpoint(new Uri(ep.Address), ep.Contract, new RestHttpBinding());
-                foreach (var bhvr in ep.Behaviors)
-                {
-                    se.AddEndpointBehavior(
+                // Get the configuration
+                var configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RestConfigurationSection>();
+                var sname = serviceType.GetCustomAttribute<ServiceBehaviorAttribute>()?.Name ?? serviceType.FullName;
+                var config = configuration.Services.FirstOrDefault(o => o.Name == sname);
+                if (config == null)
+                    throw new InvalidOperationException($"Cannot find configuration for {sname}");
+                var retVal = new RestService(serviceType);
+                foreach (var bhvr in config.Behaviors)
+                    retVal.AddServiceBehavior(
                         bhvr.Configuration == null ?
-                        Activator.CreateInstance(bhvr.Type) as IEndpointBehavior :
-                        Activator.CreateInstance(bhvr.Type, bhvr.Configuration) as IEndpointBehavior);
-                    se.AddEndpointBehavior(demandPolicy);
-                }
-            }
-            return retVal;
+                        Activator.CreateInstance(bhvr.Type) as IServiceBehavior :
+                        Activator.CreateInstance(bhvr.Type, bhvr.Configuration) as IServiceBehavior);
 
+                var demandPolicy = new OperationDemandPolicyBehavior(serviceType);
+
+                foreach (var ep in config.Endpoints)
+                {
+                    var se = retVal.AddServiceEndpoint(new Uri(ep.Address), ep.Contract, new RestHttpBinding());
+                    foreach (var bhvr in ep.Behaviors)
+                    {
+                        se.AddEndpointBehavior(
+                            bhvr.Configuration == null ?
+                            Activator.CreateInstance(bhvr.Type) as IEndpointBehavior :
+                            Activator.CreateInstance(bhvr.Type, bhvr.Configuration) as IEndpointBehavior);
+                        se.AddEndpointBehavior(demandPolicy);
+                    }
+                }
+                return retVal;
+            }
+            catch(Exception e)
+            {
+                Tracer.GetTracer(typeof(RestServiceFactory)).TraceError("Could not start {0} : {1}", serviceType.FullName, e);
+                throw new Exception($"Could not start {serviceType.FullName}", e);
+            }
 
         }
     }

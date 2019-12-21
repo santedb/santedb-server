@@ -164,8 +164,8 @@ namespace SanteDB.Core.Configuration.Features
                 configuration.AddSection(config.Values["Configuration"] as SecurityConfigurationSection);
 
                 // Now add the services
-                appServices.RemoveAll(t => t.Type == typeof(LocalPolicyEnforcementPointService));
-                appServices.Add(new TypeReferenceConfiguration(typeof(LocalPolicyEnforcementPointService)));
+                appServices.RemoveAll(t => t.Type == typeof(LocalDataPolicyFilterService));
+                appServices.Add(new TypeReferenceConfiguration(typeof(LocalDataPolicyFilterService)));
                 appServices.Add(new TypeReferenceConfiguration(config.Values["PasswordHasher"] as Type));
                 appServices.Add(new TypeReferenceConfiguration(config.Values["PasswordValidator"] as Type));
                 appServices.Add(new TypeReferenceConfiguration(config.Values["PolicyDecisionProvider"] as Type));

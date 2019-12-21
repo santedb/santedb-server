@@ -23,7 +23,6 @@ using SanteDB.Core;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Rest;
 using SanteDB.Core.Rest.Behavior;
-using SanteDB.Core.Rest.Security;
 using SanteDB.Messaging.AMI.Configuration;
 using SanteDB.Messaging.AMI.Wcf;
 using SanteDB.Rest.Common;

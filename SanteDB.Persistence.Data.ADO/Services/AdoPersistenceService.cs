@@ -492,6 +492,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             // Bind BI stuff
             ApplicationServiceContext.Current.GetService<IBiMetadataRepository>()?.Insert(new SanteDB.BI.Model.BiDataSourceDefinition()
             {
+                IsSystemObject = true,
                 MetaData = new BiMetadata()
                 {
                     Version = typeof(AdoPersistenceService).Assembly.GetName().Version.ToString(),

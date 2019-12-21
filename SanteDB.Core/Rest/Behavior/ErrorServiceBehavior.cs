@@ -18,7 +18,7 @@
  * Date: 2019-1-22
  */
 using RestSrvr;
-using SanteDB.Core.Rest.Serialization;
+using SanteDB.Rest.Common.Serialization;
 
 namespace SanteDB.Core.Rest.Behavior
 {

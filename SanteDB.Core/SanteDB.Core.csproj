@@ -82,32 +82,16 @@
     <Compile Include="Diagnostics\RolloverTextWriterTraceWriter.cs" />
     <Compile Include="Diagnostics\SystemDiagnosticsTraceWriter.cs" />
     <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="Configuration\BasicAuthorizationConfigurationSection.cs" />
     <Compile Include="Configuration\ClaimsAuthorizationConfigurationSection.cs" />
     <Compile Include="Configuration\SecurityConfigurationSection.cs" />
     <Compile Include="Http\DefaultRestClient.cs" />
     <Compile Include="Http\ServiceClientDescription.cs" />
     <Compile Include="Jobs\JobStateType.cs" />
     <Compile Include="Model\ModelExtensions.cs" />
-    <Compile Include="Rest\Behavior\CorsEndpointBehavior.cs" />
-    <Compile Include="Rest\Behavior\MessageCompressionEndpointBehavior.cs" />
     <Compile Include="Rest\Behavior\ErrorServiceBehavior.cs" />
-    <Compile Include="Rest\Behavior\MessageDispatchFormatterBehavior.cs" />
-    <Compile Include="Rest\Behavior\MessageLoggingEndpointBehavior.cs" />
-    <Compile Include="Rest\Compression\BZip2CompressionScheme.cs" />
-    <Compile Include="Rest\Compression\CompressionUtil.cs" />
-    <Compile Include="Rest\Compression\DeflateCompressionScheme.cs" />
-    <Compile Include="Rest\Compression\GzipCompressionScheme.cs" />
-    <Compile Include="Rest\Compression\ICompressionScheme.cs" />
-    <Compile Include="Rest\Compression\LzmaCompressionScheme.cs" />
+    <Compile Include="Rest\RestErrorHandler.cs" />
     <Compile Include="Rest\RestServiceFactory.cs" />
-    <Compile Include="Rest\Security\BasicAuthorizationAccessBehavior.cs" />
-    <Compile Include="Rest\Security\OperationDemandPolicyBehavior.cs" />
     <Compile Include="Rest\Security\TokenAuthorizationAccessBehavior.cs" />
-    <Compile Include="Rest\Serialization\CorsMessageInspector.cs" />
-    <Compile Include="Rest\Serialization\RestErrorHandler.cs" />
-    <Compile Include="Rest\Serialization\RestCompressionMessageInspector.cs" />
-    <Compile Include="Rest\Serialization\RestMessageDispatchFormatter.cs" />
     <Compile Include="SanteDBConstants.cs" />
     <Compile Include="Persistence\DataInitializationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -115,8 +99,6 @@
     <Compile Include="Security\Audit\AuditMetadataProvider.cs" />
     <Compile Include="Security\Claims\OverrideClaimHandler.cs" />
     <Compile Include="Security\Claims\PurposeOfUseClaimHandler.cs" />
-    <Compile Include="Security\Claims\IClaimTypeHandler.cs" />
-    <Compile Include="Security\Claims\SanteDBClaimsUtil.cs" />
     <Compile Include="Security\DefaultDataSigningService.cs" />
     <Compile Include="Security\DefaultTfaRelayService.cs" />
     <Compile Include="Security\DeviceIdentity.cs" />
@@ -126,7 +108,7 @@
     <Compile Include="Security\ILocalPolicy.cs" />
     <Compile Include="Security\IPolicyHandler.cs" />
     <Compile Include="Security\DefaultPolicyDecisionService.cs" />
-    <Compile Include="Security\Privacy\LocalPolicyEnforcementPointService.cs" />
+    <Compile Include="Security\Privacy\LocalDataPolicyFilterService.cs" />
     <Compile Include="Security\PasswordHashingServices.cs" />
     <Compile Include="Security\TwoFactorSecretGenerators.cs" />
     <Compile Include="Security\SecurityUtils.cs" />
@@ -176,7 +158,6 @@
     <Compile Include="Jobs\IJob.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Rest\Services\" />
     <Folder Include="Security\Wcf\" />
   </ItemGroup>
   <ItemGroup>
@@ -222,12 +203,12 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="1.87.0.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="1.87.0.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="1.87.0.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="1.87.0.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="1.87.0.0" />
-        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="1.87.0.0" />
+        <PackageReference Include="RestSrvr" Version="1.88.0.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="1.88.0.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="1.88.0.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="1.88.0.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="1.88.0.0" />
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="1.88.0.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -236,13 +217,6 @@
       <Project>{032ABF00-6C76-47C7-9ECA-A840915A17EA}</Project>
       <Name>SanteDB.Configuration</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Core.Model.ViewModelSerializers\SanteDB.Core.Model.ViewModelSerializers.csproj">
-      <Project>{ECE9B280-9647-4092-BABF-EB2E25084670}</Project>
-      <Name>SanteDB.Core.Model.ViewModelSerializers</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\ViewModel.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

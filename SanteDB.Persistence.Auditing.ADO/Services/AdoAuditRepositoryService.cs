@@ -126,6 +126,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     ApplicationServiceContext.Current.GetService<IBiMetadataRepository>()
                         .Insert(new BiDataSourceDefinition()
                         {
+                            IsSystemObject = true,
                             ConnectionString = this.m_configuration.ReadonlyConnectionString,
                             MetaData = new BiMetadata()
                             {

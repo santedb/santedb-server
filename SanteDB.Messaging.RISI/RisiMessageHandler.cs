@@ -22,7 +22,6 @@ using RestSrvr;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Rest;
 using SanteDB.Core.Rest.Behavior;
-using SanteDB.Core.Rest.Security;
 using SanteDB.Messaging.RISI.Rest;
 using System;
 using System.ComponentModel;

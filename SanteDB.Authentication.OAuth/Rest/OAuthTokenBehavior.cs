@@ -30,12 +30,10 @@ using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Security;
-using SanteDB.Core.Rest.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Claims;
-using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -56,6 +54,9 @@ using System.Globalization;
 using SanteDB.Core.Http;
 using SanteDB.Core.Auditing;
 using System.Net;
+using SanteDB.Rest.Common;
+using SanteDB.Core.Rest.Behavior;
+using SanteDB.Core.Rest.Security;
 
 namespace SanteDB.Authentication.OAuth2.Rest
 {
@@ -269,7 +270,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         private IEnumerable<IClaim> ValidateClaims(IPrincipal userPrincipal, params IClaim[] claims)
         {
-            IPolicyDecisionService pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
 
             List<IClaim> retVal = new List<IClaim>();
 
@@ -689,11 +689,10 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     var applicationId = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>().GetIdentity(client);
                     if (applicationId == null)
                         throw new SecurityException($"Client {client} is not registered with this provider");
-                    var pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
-                    if(pdp.GetPolicyOutcome(new SanteDBClaimsPrincipal(applicationId as IClaimsIdentity), OAuthConstants.OAuthCodeFlowPolicy) != PolicyGrantType.Grant)
-                        throw new SecurityException($"Client {client} is not permitted to execute this authorization grant flow");
-                    // TODO: Get claim for application redirect URL
 
+                    ApplicationServiceContext.Current.GetService<IPolicyEnforcementService>().Demand(OAuthConstants.OAuthCodeFlowPolicy);
+                    
+                    // TODO: Get claim for application redirect URL
                     var signature = ApplicationServiceContext.Current.GetService<IDataSigningService>().SignData(Encoding.UTF8.GetBytes(client + redirectUri));
                     bindingParms.Add("dsig", BitConverter.ToString(signature));
 

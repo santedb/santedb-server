@@ -75,7 +75,6 @@ namespace SanteDB.Core.Security
                 details.Add(new PolicyDecisionDetail(pol.Policy.Oid, rule));
             }
 
-            AuditUtil.AuditAccessControlDecision(principal, retVal);
             return retVal;
         }
 
@@ -91,10 +90,7 @@ namespace SanteDB.Core.Security
 
             // Can we make this decision based on the claims? 
             if (principal is IClaimsPrincipal && (principal as IClaimsPrincipal).HasClaim(c => c.Type == SanteDBClaimTypes.SanteDBGrantedPolicyClaim && policyId.StartsWith(c.Value)))
-            {
-                AuditUtil.AuditAccessControlDecision(principal, policyId, PolicyGrantType.Grant);
                 return PolicyGrantType.Grant;
-            }
 
             // Get the user object from the principal
             var pip = ApplicationServiceContext.Current.GetService<IPolicyInformationService>();
@@ -129,7 +125,6 @@ namespace SanteDB.Core.Security
             else 
                 retVal = policyInstance.Rule;
 
-            AuditUtil.AuditAccessControlDecision(principal, policyId, retVal);
             return retVal;
         }
     }

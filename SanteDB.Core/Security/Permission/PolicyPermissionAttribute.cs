@@ -54,7 +54,7 @@ namespace SanteDB.Core.Security.Attribute
         {
             this.PolicyId = policyId;
         }
-        
+
         /// <summary>
         /// The claim type which the user must 
         /// </summary>
@@ -118,23 +118,26 @@ namespace SanteDB.Core.Security.Attribute
         public void Demand()
         {
             var pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
-
             var principal = this.m_principal ?? AuthenticationContext.Current.Principal;
+            var action = PolicyGrantType.Deny;
 
             // Non system principals must be authenticated
             if (!principal.Identity.IsAuthenticated &&
                 principal != AuthenticationContext.SystemPrincipal &&
                 this.m_isUnrestricted == true)
                 throw new PolicyViolationException(principal, this.m_policyId, PolicyGrantType.Deny);
+            else
+            {
+                if (pdp == null) // No way to verify 
+                    action = PolicyGrantType.Deny;
+                else if (pdp != null)
+                    action = pdp.GetPolicyOutcome(principal, this.m_policyId);
+            }
 
-            PolicyGrantType action = PolicyGrantType.Deny;
-            if (pdp == null) // No way to verify 
-                action = PolicyGrantType.Deny;
-            else if (pdp != null)
-                action = pdp.GetPolicyOutcome(principal, this.m_policyId);
 
             this.m_traceSource.TraceInfo("Policy Enforce: {0}({1}) = {2}", principal?.Identity?.Name, this.m_policyId, action);
 
+            AuditUtil.AuditAccessControlDecision(principal, m_policyId, action);
             if (action != PolicyGrantType.Grant)
                 throw new PolicyViolationException(principal, this.m_policyId, action);
         }
@@ -151,7 +154,7 @@ namespace SanteDB.Core.Security.Attribute
             if (element != null)
                 this.m_policyId = element;
             element = elem.Attribute("principal");
-            if(element != null)
+            if (element != null)
                 this.m_principal = new GenericPrincipal(ApplicationServiceContext.Current.GetService<IIdentityProviderService>().GetIdentity(element), null);
             else
                 throw new InvalidOperationException("Must have policyid");

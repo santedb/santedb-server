@@ -24,22 +24,23 @@ using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Security;
-using SanteDB.Core.Rest.Security;
+using SanteDB.Rest.Common.Security;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Services;
 using SanteDB.Rest.Common.Fault;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Linq;
-using System.IdentityModel.Tokens;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security;
 using System.Security.Authentication;
+using SanteDB.Core;
+using System.IdentityModel.Tokens;
+using System.Data.Linq;
 
-namespace SanteDB.Core.Rest.Serialization
+namespace SanteDB.Rest.Common.Serialization
 {
     /// <summary>
     /// Error handler
@@ -92,7 +93,7 @@ namespace SanteDB.Core.Rest.Serialization
             }
             else if (error is SecurityException)
             {
-                faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+                faultMessage.StatusCode = (int)HttpStatusCode.Forbidden;
             }
             else if (error is SecurityTokenException)
             {

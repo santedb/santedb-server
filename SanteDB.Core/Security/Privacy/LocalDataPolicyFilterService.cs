@@ -24,7 +24,10 @@ using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
@@ -35,6 +38,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Security.Principal;
 
 namespace SanteDB.Core.Security.Privacy
 {
@@ -42,7 +46,7 @@ namespace SanteDB.Core.Security.Privacy
     /// Local policy enforcement point service
     /// </summary>
     [ServiceProvider("Default Policy Enforcement Service")]
-    public class LocalPolicyEnforcementPointService : IDaemonService
+    public class LocalDataPolicyFilterService : IDaemonService
     {
         /// <summary>
         /// Gets the service name
@@ -147,7 +151,7 @@ namespace SanteDB.Core.Security.Privacy
                     var eventParm = Expression.Parameter(pqeArgType, "e");
                     var delegateData = Expression.Convert(Expression.MakeMemberAccess(eventParm, pqeArgType.GetRuntimeProperty("Results")), typeof(IEnumerable));
                     var ofTypeMethod = typeof(Enumerable).GetGenericMethod(nameof(Enumerable.OfType), new Type[] { t }, new Type[] { typeof(IEnumerable) }) as MethodInfo;
-                    var queriedInstanceDelegate = Expression.Lambda(qevtHdlrType, Expression.Assign(delegateData.Operand, Expression.Convert(Expression.Call(ofTypeMethod, Expression.Call(Expression.Constant(this), typeof(LocalPolicyEnforcementPointService).GetRuntimeMethod(nameof(HandlePostQueryEvent), new Type[] { typeof(IEnumerable) }), delegateData)), delegateData.Operand.Type)), senderParm, eventParm).Compile();
+                    var queriedInstanceDelegate = Expression.Lambda(qevtHdlrType, Expression.Assign(delegateData.Operand, Expression.Convert(Expression.Call(ofTypeMethod, Expression.Call(Expression.Constant(this), typeof(LocalDataPolicyFilterService).GetRuntimeMethod(nameof(HandlePostQueryEvent), new Type[] { typeof(IEnumerable) }), delegateData)), delegateData.Operand.Type)), senderParm, eventParm).Compile();
 
                     // Bind to events
                     svcType.GetRuntimeEvent("Queried").AddEventHandler(svcInstance, queriedInstanceDelegate);
@@ -158,7 +162,7 @@ namespace SanteDB.Core.Security.Privacy
                     senderParm = Expression.Parameter(typeof(Object), "o");
                     eventParm = Expression.Parameter(pqeArgType, "e");
                     delegateData = Expression.Convert(Expression.MakeMemberAccess(eventParm, pqeArgType.GetRuntimeProperty("Data")), t);
-                    var retrievedInstanceDelegate = Expression.Lambda(qevtHdlrType, Expression.Assign(delegateData.Operand, Expression.Convert(Expression.Call(Expression.Constant(this), typeof(LocalPolicyEnforcementPointService).GetRuntimeMethod(nameof(HandlePostRetrieveEvent), new Type[] { t }), delegateData), t)), senderParm, eventParm).Compile();
+                    var retrievedInstanceDelegate = Expression.Lambda(qevtHdlrType, Expression.Assign(delegateData.Operand, Expression.Convert(Expression.Call(Expression.Constant(this), typeof(LocalDataPolicyFilterService).GetRuntimeMethod(nameof(HandlePostRetrieveEvent), new Type[] { t }), delegateData), t)), senderParm, eventParm).Compile();
 
                     // Bind to events
                     svcType.GetRuntimeEvent("Retrieved").AddEventHandler(svcInstance, retrievedInstanceDelegate);
@@ -198,17 +202,26 @@ namespace SanteDB.Core.Security.Privacy
             
             return decisions
                 // We want to mask ELEVATE
-                .Where(o => o.Decision.Outcome == PolicyGrantType.Elevate && o.Securable is Act).Select(
+                .Where(o => o.Decision.Outcome == PolicyGrantType.Elevate && o.Securable is IdentifiedData).Select<dynamic, IdentifiedData>(
                     o => {
-                        AuditUtil.AuditMasking(o.Securable as Act);
-                        return new Act() {
-                            ReasonConceptKey = NullReasonKeys.Masked,
-                            Key = (o.Securable as IdentifiedData).Key
-                        };
+                        AuditUtil.AuditMasking(o.Securable as IdentifiedData, false);
+
+                        if (o.Securable is Act)
+                        {
+                            return new Act()
+                            {
+                                ReasonConceptKey = NullReasonKeys.Masked,
+                                Key = (o.Securable as IdentifiedData).Key
+                            };
+                        }
+                        else if (o.Securable is Entity)
+                            return new Entity() { Key = (o.Securable as IdentifiedData).Key };
+                        else
+                            return null;
                     }
                 )
                 // We want to include all grant
-                .Union(
+                .Concat(
                     decisions.Where(o => o.Decision.Outcome == PolicyGrantType.Grant).Select(o => o.Securable)
                 )
                 .ToList();
@@ -234,5 +247,6 @@ namespace SanteDB.Core.Security.Privacy
                 i.Key.GetType().GetRuntimeEvent("Retrieved").RemoveEventHandler(i.Key, i.Value.Value);
             }
         }
+
     }
 }

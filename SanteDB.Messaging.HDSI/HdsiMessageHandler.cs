@@ -24,7 +24,6 @@ using SanteDB.Core.Interfaces;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Rest;
 using SanteDB.Core.Rest.Behavior;
-using SanteDB.Core.Rest.Security;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.HDSI.Configuration;
 using SanteDB.Messaging.HDSI.Wcf;

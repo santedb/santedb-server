@@ -22,7 +22,6 @@ using RestSrvr;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Rest;
 using SanteDB.Core.Rest.Behavior;
-using SanteDB.Core.Rest.Security;
 using SanteDB.Messaging.GS1.Rest;
 using System;
 using System.ComponentModel;
@@ -32,6 +31,7 @@ using System.Reflection;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
+using SanteDB.Rest.Common.Behavior;
 
 namespace SanteDB.Messaging.GS1
 {

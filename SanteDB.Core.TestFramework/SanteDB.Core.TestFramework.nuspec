@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>SanteDB.Server.TestFramework</id>
-    <version>1.87.0.0</version>
+    <version>1.88.0.0</version>
     <title>SanteDB Server Plugin Unit Test Data Tests Core</title>
     <authors>SanteDB Community</authors>
     <owners>santedb.org</owners>
@@ -18,11 +18,11 @@
       <files include="TestConfig.xml" buildAction="EmbeddedResource"/>
     </contentFiles>
     <dependencies>
-      <dependency id="SanteDB.Core.Api" version="1.87.0.0" />
-      <dependency id="SanteDB.Core.Model" version="1.87.0.0" />
-      <dependency id="SanteDB.OrmLite" version="1.87.0.0"/>
-      <dependency id="SanteDB.Server.Plugin" version="1.87.0.0"/>
-      <dependency id="SanteDB.Server.Plugin.Data" version="1.87.0.0"/>
+      <dependency id="SanteDB.Core.Api" version="1.88.0.0" />
+      <dependency id="SanteDB.Core.Model" version="1.88.0.0" />
+      <dependency id="SanteDB.OrmLite" version="1.88.0.0"/>
+      <dependency id="SanteDB.Server.Plugin" version="1.88.0.0"/>
+      <dependency id="SanteDB.Server.Plugin.Data" version="1.88.0.0"/>
       <dependency id="FirebirdSql.Data.FirebirdClient" version="5.12.1"/>
     </dependencies>
   </metadata>

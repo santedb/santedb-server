@@ -81,6 +81,7 @@ namespace SanteDB.Warehouse.ADO
                 ApplicationServiceContext.Current.GetService<IBiMetadataRepository>().Insert(
                     new BI.Model.BiDataSourceDefinition()
                     {
+                        IsSystemObject = true,
                         ConnectionString = this.m_configuration.ReadonlyConnectionString,
                         MetaData= new BI.Model.BiMetadata()
                         {

@@ -182,13 +182,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
             return base.ResourceOptions(resourceType);
         }
 
-        /// <summary>
-        /// Demand permission
-        /// </summary>
-        protected override void Demand(string policyId)
-        {
-            new PolicyPermission(PermissionState.Unrestricted, policyId).Demand();
-        }
+        
     }
 
 }

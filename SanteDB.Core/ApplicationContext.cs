@@ -34,6 +34,9 @@ using SanteDB.Core.Diagnostics;
 using System.Security.Principal;
 using SanteDB.Core.Security.Audit;
 using RestSrvr;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Security.Services;
 
 namespace SanteDB.Core
 {
@@ -42,7 +45,7 @@ namespace SanteDB.Core
     /// </summary>
     /// <remarks>Allows components to be communicate with each other via a loosely coupled
     /// broker system.</remarks>
-    public class ApplicationContext : IServiceProvider, IServiceManager, IDisposable, IApplicationServiceContext, IRemoteEndpointResolver
+    public class ApplicationContext : IServiceProvider, IServiceManager, IDisposable, IApplicationServiceContext, IRemoteEndpointResolver, IPolicyEnforcementService
     {
 
         // Lock object
@@ -231,7 +234,7 @@ namespace SanteDB.Core
                     Trace.TraceInformation("STAGE2 START: Starting Daemons");
                     foreach (var dc in this.m_serviceInstances.OfType<IDaemonService>().ToArray())
                         if (!dc.Start())
-                            throw new Exception($"Could not start {dc} successfully");
+                            throw new Exception($"Service {dc} reported unsuccessful start");
 
                     Trace.TraceInformation("STAGE3 START: Notify ApplicationContext has started");
                     if (this.Started != null)
@@ -345,6 +348,7 @@ namespace SanteDB.Core
         /// </summary>
         public void RemoveServiceProvider(Type serviceType)
         {
+            if (serviceType == typeof(ApplicationContext) || serviceType.IsAssignableFrom(typeof(ApplicationContext))) throw new InvalidOperationException("Cannot remove core application context service"); // Don't allow service to remove itself
             if (this.m_cachedServices.ContainsKey(serviceType))
                 this.m_cachedServices.Remove(serviceType);
             this.m_serviceInstances.RemoveAll(o => serviceType.IsAssignableFrom(o.GetType()));
@@ -401,6 +405,23 @@ namespace SanteDB.Core
         public string GetRemoteRequestUrl()
         {
             return RestOperationContext.Current?.IncomingRequest?.Url?.ToString();
+        }
+
+
+        /// <summary>
+        /// Demand the policy
+        /// </summary>
+        public void Demand(string policyId)
+        {
+            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, policyId).Demand();
+        }
+
+        /// <summary>
+        /// Demand policy enforcement
+        /// </summary>
+        public void Demand(string policyId, IPrincipal principal)
+        {
+            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, policyId, principal).Demand();
         }
 
         #endregion

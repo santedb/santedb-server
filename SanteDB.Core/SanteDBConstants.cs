@@ -41,13 +41,6 @@ namespace SanteDB.Core
         /// </summary>
         internal const string DatasetInstallSourceName = "SanteDB.Core.DataSet";
 
-        // Client claim header
-        internal const string BasicHttpClientClaimHeaderName = "X-SanteDBClient-Claim";
-        // Client auth header
-        internal const string BasicHttpClientCredentialHeaderName = "X-SanteDBClient-Authorization";
-
-        // Device authorization
-        internal const string HttpDeviceCredentialHeaderName = "X-Device-Authorization";
 
         // WCF trace source
         internal const string WcfTraceSourceName = "SanteDB.Core.HttpRest";

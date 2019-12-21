@@ -123,6 +123,7 @@ namespace SanteDB.Tools.Debug.BI
         public TBisDefinition Insert<TBisDefinition>(TBisDefinition metadata) where TBisDefinition : BiDefinition
         {
 
+
             string path = this.m_configuration.BiMetadataRepository.Paths.First();
             foreach (var s in metadata.Id.Split('.'))
                 path = Path.Combine(path, s);
