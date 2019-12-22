@@ -334,10 +334,12 @@ namespace SanteDB.Messaging.HL7.Messages
                 }
             }
 
-            var imsh = request.GetStructure("MSH") as MSH;
+            var icomps = PipeParser.Encode(request.GetStructure("MSH") as MSH, new EncodingCharacters('|', "^~\\&")).Split('|');
+            var ocomps = PipeParser.Encode(retVal.GetStructure("MSH") as MSH, new EncodingCharacters('|', "^~\\&")).Split('|');
+
             AuditUtil.AuditNetworkRequestFailure(error, receiveData.ReceiveEndpoint,
-                Enumerable.Range(0, imsh.NumFields()).ToDictionary(o => $"MSH-{o}", o => imsh.GetField(o).ToString()),
-                Enumerable.Range(0, msa.NumFields()).ToDictionary(o => $"MSA-{o}", o => msa.GetField(o).ToString()));
+                Enumerable.Range(0, icomps.Length).ToDictionary(o => $"MSH-{o}", o => icomps[o]),
+                Enumerable.Range(0, ocomps.Length).ToDictionary(o => $"MSA-{o}", o => ocomps[o]));
 
             return retVal;
         }

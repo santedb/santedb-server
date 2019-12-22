@@ -84,6 +84,8 @@ namespace SanteDB.Core.Services.Impl
         {
             this.m_appletCollection.Add(String.Empty, new AppletCollection()); // Default applet
             this.m_readonlyAppletCollection.Add(String.Empty, this.m_appletCollection[String.Empty].AsReadonly());
+            this.m_readonlyAppletCollection.First().Value.CollectionChanged += (o, e) => this.Changed?.Invoke(o, e);
+
             using (var str = typeof(AppletManifest).Assembly.GetManifestResourceStream("SanteDB.Core.Applets.Publisher.appca.santesuite.net.cer"))
             {
                 var cbytes = new byte[str.Length];
@@ -124,6 +126,10 @@ namespace SanteDB.Core.Services.Impl
         /// The daemon is stopping
         /// </summary>
         public event EventHandler Stopping;
+        /// <summary>
+        /// Applet has changed
+        /// </summary>
+        public event EventHandler Changed;
 
         /// <summary>
         /// Get the specified applet
@@ -201,6 +207,7 @@ namespace SanteDB.Core.Services.Impl
         {
             return this.Install(package, isUpgrade, null);
         }
+
         /// <summary>
         /// Performs an installation 
         /// </summary>
@@ -513,6 +520,7 @@ namespace SanteDB.Core.Services.Impl
 
             this.m_appletCollection.Add(solution.Meta.Id, new AppletCollection());
             this.m_readonlyAppletCollection.Add(solution.Meta.Id, this.m_appletCollection[solution.Meta.Id].AsReadonly());
+            this.m_readonlyAppletCollection[solution.Meta.Id].CollectionChanged += (o, e) => this.Changed?.Invoke(o, e);
 
             // Save the applet
             var appletDir = this.m_configuration.AppletDirectory;
@@ -537,19 +545,13 @@ namespace SanteDB.Core.Services.Impl
                     this.m_tracer.TraceInfo("Installing Solution applet {0} v{1}...", itm.Meta.Id, itm.Meta.Version);
                     this.Install(itm, true, solution);
                 }
-                itm.Manifest = null;
             }
 
             // Register the pakfile
             lock (this.m_fileDictionary)
                 if (!this.m_fileDictionary.ContainsKey(solution.Meta.Id + ".sln"))
                     this.m_fileDictionary.Add(solution.Meta.Id + ".sln", pakFile);
-
-            using (var fs = File.Create(pakFile))
-            {
-                solution.Save(fs);
-            }
-
+            
             this.m_solutions.Add(solution);
 
             return true;
