@@ -68,12 +68,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Fired when the query is executed
         /// </summary>
-        public event EventHandler<QueryResultEventArgs<IdentifiedData>> Executed;
+        public event EventHandler<QueryResultEventArgs<SubscriptionDefinition>> Executed;
 
         /// <summary>
         /// Fired when the query is about to execute
         /// </summary>
-        public event EventHandler<QueryRequestEventArgs<IdentifiedData>> Executing;
+        public event EventHandler<QueryRequestEventArgs<SubscriptionDefinition>> Executing;
 
         /// <summary>
         /// Exectue the specified subscription
@@ -95,7 +95,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             if (subscription == null || subscription.ServerDefinitions.Count == 0)
                 throw new InvalidOperationException("Subscription does not have server definition");
 
-            var preArgs = new QueryRequestEventArgs<IdentifiedData>(o => o.Key == subscription.Key, offset, count, queryId, AuthenticationContext.Current.Principal);
+            var preArgs = new QueryRequestEventArgs<SubscriptionDefinition>(o => o.Key == subscription.Key, offset, count, queryId, AuthenticationContext.Current.Principal, parameters);
             this.Executing?.Invoke(this, preArgs);
             if (preArgs.Cancel)
             {

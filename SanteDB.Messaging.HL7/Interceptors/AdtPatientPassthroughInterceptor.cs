@@ -49,6 +49,8 @@ using SanteDB.Core.Model.Query;
 using NHapi.Base.Util;
 using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
+using SanteDB.Core.Model.Subscription;
+using SanteDB.Messaging.HL7.Exceptions;
 
 namespace SanteDB.Messaging.HL7.Interceptors
 {
@@ -127,8 +129,44 @@ namespace SanteDB.Messaging.HL7.Interceptors
                 ApplicationServiceContext.Current.GetService<IDataPersistenceService<Bundle>>().Inserting += AdtPatientRegistrationInterceptor_Bundle;
                 ApplicationServiceContext.Current.GetService<IDataPersistenceService<Bundle>>().Updating += AdtPatientRegistrationInterceptor_Bundle;
                 ApplicationServiceContext.Current.GetService<IDataPersistenceService<Bundle>>().Obsoleting += AdtPatientRegistrationInterceptor_Bundle;
+
+                // Bind for subscription
+                ApplicationServiceContext.Current.GetService<ISubscriptionExecutor>().Executing += AdtPatientPassthroughInterceptor_Executing;
             };
         }
+
+        /// <summary>
+        /// Subscription is executing
+        /// </summary>
+        private void AdtPatientPassthroughInterceptor_Executing(object sender, QueryRequestEventArgs<IdentifiedData> e)
+        {
+            e.Cancel = true;
+
+            // Now we want to load the subscription
+            var subscriptionDefinitionQuery = QueryExpressionParser.BuildLinqExpression<SubscriptionDefinition>(new NameValueCollection(QueryExpressionBuilder.BuildQuery(e.Query).ToArray()));
+            var subscriptionDefinition = ApplicationServiceContext.Current.GetService<IRepositoryService<SubscriptionDefinition>>().Find(subscriptionDefinitionQuery, 0, 1, out int tr, null).FirstOrDefault();
+            // Get the HL7 definition
+            var hl7Def = subscriptionDefinition.ServerDefinitions.FirstOrDefault(o => o.InvariantName == "hl7");
+            if (hl7Def == null)
+                throw new InvalidOperationException("Subscription does not contian a definition for 'hl7' query");
+
+            // Get the parameters from the rest operation context
+            NameValueCollection filter = e.QueryTag, subscription = NameValueCollection.ParseQueryString(hl7Def.Definition), queryFilter = new NameValueCollection();
+            
+            foreach(var itm in subscription)
+                queryFilter.Add(itm.Key, itm.Value.Select(o =>
+                {
+                    if (o.StartsWith("$") && o.EndsWith("$"))
+                        return filter[o.Substring(1, o.Length - 2)][0];
+                    else
+                        return o;
+                }).ToList());
+
+            e.Results = this.SendQuery(queryFilter, e.Count ?? 25, out tr);
+            e.TotalResults = tr;
+
+        }
+
 
         /// <summary>
         /// Interceptor for querying
@@ -138,20 +176,36 @@ namespace SanteDB.Messaging.HL7.Interceptors
             e.Cancel = true;
             var parmMap = s_map.Map.FirstOrDefault(o => o.Trigger == "Q22");
             var nvc = QueryExpressionBuilder.BuildQuery(e.Query);
+           
+            e.Results = this.SendQuery(new NameValueCollection(nvc.ToArray()), e.Count ?? 25, out int tr);
+            e.TotalResults = tr;
+
+        }
+
+        /// <summary>
+        /// Send query to master target
+        /// </summary>
+        private List<Patient> SendQuery(NameValueCollection originalQuery, int count, out int totalResults) {
 
             // Map reverse
+            var parmMap = s_map.Map.FirstOrDefault(o => o.Trigger == "Q22");
             List<KeyValuePair<Hl7QueryParameterMapProperty, object>> parameters = new List<KeyValuePair<Hl7QueryParameterMapProperty, object>>();
-            foreach(var kv in nvc)
+            foreach (var kv in originalQuery)
             {
                 var rmap = parmMap.Parameters.Find(o => o.ModelName == kv.Key);
                 if (rmap == null)
+                {
+                    // Is the value a UUID? If so, it may be an identifier we can use
+                    
                     continue;
+                }
                 else
                     parameters.Add(new KeyValuePair<Hl7QueryParameterMapProperty, object>(rmap, kv.Value));
             }
 
             if (parameters.Count == 0)
-                parameters.Add(new KeyValuePair<Hl7QueryParameterMapProperty, object>(parmMap.Parameters.FirstOrDefault(o=>o.Hl7Name=="@PID.33"), DateTime.MinValue));
+                parameters.Add(new KeyValuePair<Hl7QueryParameterMapProperty, object>(parmMap.Parameters.FirstOrDefault(o => o.Hl7Name == "@PID.33"), DateTime.MinValue));
+
 
             // Construct the basic QBP_Q22
             QBP_Q21 queryRequest = new QBP_Q21();
@@ -163,7 +217,7 @@ namespace SanteDB.Messaging.HL7.Interceptors
 
             queryRequest.GetSFT(0).SetDefault();
             queryRequest.RCP.QuantityLimitedRequest.Units.Identifier.Value = "RD";
-            queryRequest.RCP.QuantityLimitedRequest.Quantity.Value = (e.Count ?? 100).ToString();
+            queryRequest.RCP.QuantityLimitedRequest.Quantity.Value = (count).ToString();
             queryRequest.QPD.MessageQueryName.Identifier.Value = "Q22";
             queryRequest.QPD.MessageQueryName.Text.Value = "Find Candidates";
             queryRequest.QPD.MessageQueryName.NameOfCodingSystem.Value = "HL7";
@@ -215,7 +269,7 @@ namespace SanteDB.Messaging.HL7.Interceptors
             {
                 RSP_K21 response = endpoint.GetSender().SendAndReceive(queryRequest) as RSP_K21;
                 // Iterate and create responses
-                e.TotalResults = Int32.Parse(response.QAK.HitCount.Value ?? response.QUERY_RESPONSERepetitionsUsed.ToString());
+                totalResults = Int32.Parse(response.QAK.HitCount.Value ?? response.QUERY_RESPONSERepetitionsUsed.ToString());
                 List<Patient> overr = new List<Patient>();
                 // Query response
                 for(int i = 0; i < response.QUERY_RESPONSERepetitionsUsed; i++)
@@ -231,11 +285,13 @@ namespace SanteDB.Messaging.HL7.Interceptors
                     overr.Add(pat);
 
                 }
-                e.Results = overr;
+                return overr;
             }
             catch (Exception ex)
             {
+                totalResults = 0;
                 this.m_tracer.TraceEvent(EventLevel.Error,  "Error dispatching HL7 query {0}", ex);
+                throw new HL7ProcessingException("Error dispatching HL7 query", null, null, 0, 0, ex);
             }
         }
 
