@@ -23,6 +23,8 @@ using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Security;
+using SanteDB.Rest.Common.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Data.Linq;
@@ -53,10 +55,10 @@ namespace SanteDB.Core.Services.Impl
         private List<AppletSolution> m_solutions = new List<AppletSolution>();
 
         // Applet collection
-        private AppletCollection m_appletCollection = new AppletCollection();
+        private Dictionary<String, AppletCollection> m_appletCollection = new Dictionary<string, AppletCollection>();
 
         // RO applet collection
-        private ReadonlyAppletCollection m_readonlyAppletCollection;
+        private Dictionary<String, ReadonlyAppletCollection> m_readonlyAppletCollection = new Dictionary<string, ReadonlyAppletCollection>();
 
         // Map of package id to file
         private Dictionary<String, String> m_fileDictionary = new Dictionary<string, string>();
@@ -80,8 +82,8 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public LocalAppletManagerService()
         {
-            this.m_appletCollection = new AppletCollection();
-            this.m_readonlyAppletCollection = this.m_appletCollection.AsReadonly();
+            this.m_appletCollection.Add(String.Empty, new AppletCollection()); // Default applet
+            this.m_readonlyAppletCollection.Add(String.Empty, this.m_appletCollection[String.Empty].AsReadonly());
             using (var str = typeof(AppletManifest).Assembly.GetManifestResourceStream("SanteDB.Core.Applets.Publisher.appca.santesuite.net.cer"))
             {
                 var cbytes = new byte[str.Length];
@@ -97,10 +99,10 @@ namespace SanteDB.Core.Services.Impl
         {
             get
             {
-                return this.m_readonlyAppletCollection;
+                return this.m_readonlyAppletCollection[String.Empty];
             }
         }
-
+        
         /// <summary>
         /// Get the solutions
         /// </summary>
@@ -124,20 +126,28 @@ namespace SanteDB.Core.Services.Impl
         public event EventHandler Stopping;
 
         /// <summary>
-        /// Get the specified package data
+        /// Get the specified applet
         /// </summary>
         public byte[] GetPackage(String appletId)
+        {
+            return this.GetPackage(String.Empty, appletId);
+        }
+
+        /// <summary>
+        /// Get the specified package data
+        /// </summary>
+        public byte[] GetPackage(String solutionId, String appletId)
         {
             this.m_tracer.TraceInfo("Retrieving package {0}", appletId);
 
             // Save the applet
-            var appletDir = this.m_configuration.AppletDirectory;
+            var appletDir = Path.Combine(this.m_configuration.AppletDirectory, solutionId);
             if (!Directory.Exists(appletDir))
                 Directory.CreateDirectory(appletDir);
 
             // Install
             String pakFile = null;
-            if(this.m_fileDictionary.TryGetValue(appletId, out pakFile) && File.Exists(pakFile))
+            if(this.m_fileDictionary.TryGetValue($"{solutionId}{appletId}", out pakFile) && File.Exists(pakFile))
                 return File.ReadAllBytes(pakFile);
             else
                 throw new FileNotFoundException($"Applet {appletId} not found");
@@ -151,7 +161,7 @@ namespace SanteDB.Core.Services.Impl
 
             this.m_tracer.TraceInfo("Un-installing {0}", packageId);
             // Applet check
-            var applet = this.m_appletCollection.FirstOrDefault(o => o.Info.Id == packageId);
+            var applet = this.m_appletCollection[String.Empty].FirstOrDefault(o => o.Info.Id == packageId);
             if (applet == null) // Might be solution
             {
                 var soln = this.m_solutions.FirstOrDefault(o => o.Meta.Id == packageId);
@@ -168,12 +178,12 @@ namespace SanteDB.Core.Services.Impl
             else
             {
                 // Dependency check
-                var dependencies = this.m_appletCollection.Where(o => o.Info.Dependencies.Any(d => d.Id == packageId));
+                var dependencies = this.m_appletCollection[String.Empty].Where(o => o.Info.Dependencies.Any(d => d.Id == packageId));
                 if (dependencies.Any())
                     throw new InvalidOperationException($"Uninstalling {packageId} would break : {String.Join(", ", dependencies.Select(o => o.Info))}");
 
                 // We're good to go!
-                this.m_appletCollection.Remove(applet);
+                this.m_appletCollection[String.Empty].Remove(applet);
 
                 lock (this.m_fileDictionary)
                     if (this.m_fileDictionary.ContainsKey(packageId))
@@ -185,16 +195,25 @@ namespace SanteDB.Core.Services.Impl
         }
 
         /// <summary>
-        /// Performs an installation 
+        /// Install package 
         /// </summary>
         public bool Install(AppletPackage package, bool isUpgrade = false)
         {
+            return this.Install(package, isUpgrade, null);
+        }
+        /// <summary>
+        /// Performs an installation 
+        /// </summary>
+        public bool Install(AppletPackage package, bool isUpgrade, AppletSolution owner)
+        {
             this.m_tracer.TraceInfo("Installing {0}", package.Meta);
 
+        
+            var appletScope = owner?.Meta.Id ?? String.Empty;
             // TODO: Verify package hash / signature
             if (!this.VerifyPackage(package))
                 throw new SecurityException("Applet failed validation");
-            else if (!this.m_appletCollection.VerifyDependencies(package.Meta))
+            else if (!this.m_appletCollection[appletScope].VerifyDependencies(package.Meta))
             {
                 this.m_tracer.TraceWarning($"Applet {package.Meta} depends on : [{String.Join(", ", package.Meta.Dependencies.Select(o => o.ToString()))}] which are missing or incompatible");
             }
@@ -203,12 +222,14 @@ namespace SanteDB.Core.Services.Impl
             var appletDir = this.m_configuration.AppletDirectory;
             if(!Path.IsPathRooted(appletDir))
                 appletDir = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), this.m_configuration.AppletDirectory);
+            if (owner != null)
+                appletDir = Path.Combine(appletDir, owner.Meta.Id);
             if (!Directory.Exists(appletDir))
                 Directory.CreateDirectory(appletDir);
 
             // Install
             var pakFile = Path.Combine(appletDir, package.Meta.Id + ".pak");
-            if (this.m_appletCollection.Any(o=>o.Info.Id == package.Meta.Id) && File.Exists(pakFile) && !isUpgrade)
+            if (this.m_appletCollection[appletScope].Any(o=>o.Info.Id == package.Meta.Id) && File.Exists(pakFile) && !isUpgrade)
                 throw new InvalidOperationException($"Cannot replace {package.Meta} unless upgrade is specifically specified");
 
 	        using (var fs = File.Create(pakFile))
@@ -217,18 +238,18 @@ namespace SanteDB.Core.Services.Impl
 			}
 
 	        lock (this.m_fileDictionary)
-		        if (!this.m_fileDictionary.ContainsKey(package.Meta.Id))
-			        this.m_fileDictionary.Add(package.Meta.Id, pakFile);
+		        if (!this.m_fileDictionary.ContainsKey($"{appletScope}{package.Meta.Id}"))
+			        this.m_fileDictionary.Add($"{appletScope}{package.Meta.Id}", pakFile);
 
             var pkg = package.Unpack();
 
 			// remove the package from the collection if this is an upgrade
 	        if (isUpgrade)
 	        {
-		        this.m_appletCollection.Remove(pkg);
+		        this.m_appletCollection[appletScope].Remove(pkg);
 	        }
 
-            this.m_appletCollection.Add(pkg);
+            this.m_appletCollection[appletScope].Add(pkg);
 
             // We want to install the templates & protocols into the DB
             this.m_tracer.TraceInfo("Installing templates...");
@@ -448,7 +469,23 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public AppletManifest GetApplet(string appletId)
         {
-            return this.m_appletCollection.FirstOrDefault(o => o.Info.Id == appletId);
+            return this.GetApplet(String.Empty, appletId);
+        }
+
+        /// <summary>
+        /// Gets the specified applet manifest
+        /// </summary>
+        public AppletManifest GetApplet(string solutionId, string appletId)
+        {
+            return this.m_appletCollection[solutionId].FirstOrDefault(o => o.Info.Id == appletId);
+        }
+
+        /// <summary>
+        /// Gets the specified applet manifest
+        /// </summary>
+        public ReadonlyAppletCollection GetApplets(string solutionId)
+        {
+            return this.m_readonlyAppletCollection[solutionId];
         }
 
         /// <summary>
@@ -473,8 +510,9 @@ namespace SanteDB.Core.Services.Impl
             // TODO: Verify package hash / signature
             if (!this.VerifyPackage(solution))
                 throw new SecurityException("Applet failed validation");
-            else if (!this.m_appletCollection.VerifyDependencies(solution.Meta))
-                throw new InvalidOperationException($"Applet {solution.Meta} depends on : [{String.Join(", ", solution.Meta.Dependencies.Select(o => o.ToString()))}] which are missing or incompatible");
+
+            this.m_appletCollection.Add(solution.Meta.Id, new AppletCollection());
+            this.m_readonlyAppletCollection.Add(solution.Meta.Id, this.m_appletCollection[solution.Meta.Id].AsReadonly());
 
             // Save the applet
             var appletDir = this.m_configuration.AppletDirectory;
@@ -492,12 +530,12 @@ namespace SanteDB.Core.Services.Impl
             // Unpack items from the solution package and install if needed
             foreach(var itm in solution.Include.Where(o=>o.Manifest != null))
             {
-                var installedApplet = this.GetApplet(itm.Meta.Id);
+                var installedApplet = this.GetApplet(solution.Meta.Id, itm.Meta.Id);
                 if (installedApplet == null ||
                     new Version(installedApplet.Info.Version) < new Version(itm.Meta.Version)) // Installed version is there but is older or is not installed, so we install it
                 {
                     this.m_tracer.TraceInfo("Installing Solution applet {0} v{1}...", itm.Meta.Id, itm.Meta.Version);
-                    this.Install(itm, true);
+                    this.Install(itm, true, solution);
                 }
                 itm.Manifest = null;
             }

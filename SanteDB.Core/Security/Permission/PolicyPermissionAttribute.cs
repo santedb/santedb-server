@@ -137,7 +137,9 @@ namespace SanteDB.Core.Security.Attribute
 
             this.m_traceSource.TraceInfo("Policy Enforce: {0}({1}) = {2}", principal?.Identity?.Name, this.m_policyId, action);
 
-            AuditUtil.AuditAccessControlDecision(principal, m_policyId, action);
+            if(principal != AuthenticationContext.SystemPrincipal && 
+                principal != AuthenticationContext.AnonymousPrincipal)
+                AuditUtil.AuditAccessControlDecision(principal, m_policyId, action);
             if (action != PolicyGrantType.Grant)
                 throw new PolicyViolationException(principal, this.m_policyId, action);
         }

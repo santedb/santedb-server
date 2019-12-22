@@ -157,9 +157,9 @@ namespace SanteDB.Rest.Common.Serialization
                     break;
             }
 
-            AuditUtil.AuditNetworkRequestFailure(error as AuthenticationException, uriMatched, RestOperationContext.Current.IncomingRequest.Headers.AllKeys.ToDictionary(o=>o, o=> RestOperationContext.Current.IncomingRequest.Headers[o]), RestOperationContext.Current.OutgoingResponse.Headers.AllKeys.ToDictionary(o => o, o => RestOperationContext.Current.OutgoingResponse.Headers[o]));
 
             RestMessageDispatchFormatter.CreateFormatter(RestOperationContext.Current.ServiceEndpoint.Description.Contract.Type).SerializeResponse(faultMessage, null, fault);
+            AuditUtil.AuditNetworkRequestFailure(error, uriMatched, RestOperationContext.Current.IncomingRequest.Headers.AllKeys.ToDictionary(o => o, o => RestOperationContext.Current.IncomingRequest.Headers[o]), RestOperationContext.Current.OutgoingResponse.Headers.AllKeys.ToDictionary(o => o, o => RestOperationContext.Current.OutgoingResponse.Headers[o]));
             return true;
             
         }
