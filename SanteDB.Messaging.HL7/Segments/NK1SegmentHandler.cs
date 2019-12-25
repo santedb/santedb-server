@@ -91,6 +91,10 @@ namespace SanteDB.Messaging.HL7.Segments
             {
                 var nk1 = context.GetStructure("NK1", context.GetAll("NK1").Length) as NK1;
                 var person = rel.LoadProperty<Person>(nameof(EntityRelationship.TargetEntity));
+
+                // HACK: This needs to be fixed on sync
+                if (person == null) continue;
+
                 nk1.Relationship.FromModel(rel.LoadProperty<Concept>(nameof(EntityRelationship.RelationshipType)), RelationshipCodeSystem);
 
                 // Map person to NK1

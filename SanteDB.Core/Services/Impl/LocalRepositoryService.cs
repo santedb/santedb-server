@@ -25,6 +25,7 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -76,7 +77,7 @@ namespace SanteDB.Core.Services.Impl
             this.Starting?.Invoke(this, EventArgs.Empty);
 
             // Add repository services
-            Type[] repositoryServices = {
+            List<Type> repositoryServices = new List<Type>() {
                 typeof(LocalConceptRepository),
                 typeof(GenericLocalMetadataRepository<IdentifierType>),
                 typeof(GenericLocalConceptRepository<ReferenceTerm>),
@@ -87,7 +88,6 @@ namespace SanteDB.Core.Services.Impl
                 typeof(GenericLocalMetadataRepository<TemplateDefinition>),
                 typeof(LocalBatchRepository),
                 typeof(LocalMaterialRepository),
-                typeof(LocalAuditRepository),
                 typeof(LocalManufacturedMaterialRepository),
                 typeof(LocalOrganizationRepository),
                 typeof(LocalPlaceRepository),
@@ -105,6 +105,10 @@ namespace SanteDB.Core.Services.Impl
                 typeof(GenericLocalMetadataRepository<ApplicationEntity>),
                 typeof(LocalSecurityRepositoryService)
             };
+
+            // Non-test environments need auditing
+            if (ApplicationServiceContext.Current.HostType != SanteDBHostType.Test)
+                repositoryServices.Add(typeof(LocalAuditRepository));
 
             foreach (var t in repositoryServices)
             {

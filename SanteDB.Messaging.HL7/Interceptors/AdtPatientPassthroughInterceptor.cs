@@ -51,6 +51,7 @@ using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
 using SanteDB.Core.Model.Subscription;
 using SanteDB.Messaging.HL7.Exceptions;
+using SanteDB.Core.Model.Attributes;
 
 namespace SanteDB.Messaging.HL7.Interceptors
 {
@@ -157,7 +158,7 @@ namespace SanteDB.Messaging.HL7.Interceptors
                 queryFilter.Add(itm.Key, itm.Value.Select(o =>
                 {
                     if (o.StartsWith("$") && o.EndsWith("$"))
-                        return filter[o.Substring(1, o.Length - 2)][0];
+                        return filter["_" + o.Substring(1, o.Length - 2)][0];
                     else
                         return o;
                 }).ToList());
@@ -196,15 +197,38 @@ namespace SanteDB.Messaging.HL7.Interceptors
                 if (rmap == null)
                 {
                     // Is the value a UUID? If so, it may be an identifier we can use
-                    
-                    continue;
+                    if(Guid.TryParse(kv.Value.First(), out Guid uuid))
+                    {
+                        // What is the type of this property
+                        var property = QueryExpressionParser.BuildPropertySelector<Patient>(kv.Key);
+                        if (property == null) throw new InvalidOperationException($"{kv.Key} is not valid on Patient");
+                        // Is there a classifier? We need it for querying a guaranteed unique property
+                        var preferred = property.Body.Type.GetCustomAttribute<ClassifierAttribute>()?.ClassifierProperty;
+                        if (String.IsNullOrEmpty(preferred)) throw new InvalidOperationException($"{property.Body.Type} does not have a ClassifierAttribute");
+                        var idp = typeof(IDataPersistenceService<>).MakeGenericType(property.Body.Type);
+                        var ids = ApplicationServiceContext.Current.GetService(idp) as IDataPersistenceService;
+                        if (ids == null)
+                            throw new InvalidOperationException($"{idp} not found");
+                        var value = ids.Get(uuid);
+                        var match = property.Body.Type.GetProperty(preferred).GetValue(value);
+                        preferred = property.Body.Type.GetProperty(preferred).GetSerializationName();
+
+                        // Get the parmaeter map for this classifier 
+                        rmap = parmMap.Parameters.Find(o => o.ModelName == $"{kv.Key}.{preferred}");
+                        if (rmap != null)
+                            parameters.Add(new KeyValuePair<Hl7QueryParameterMapProperty, object>(rmap, match));
+                        else
+                            continue;
+                    }
+                    else 
+                        continue;
                 }
                 else
                     parameters.Add(new KeyValuePair<Hl7QueryParameterMapProperty, object>(rmap, kv.Value));
             }
 
             if (parameters.Count == 0)
-                parameters.Add(new KeyValuePair<Hl7QueryParameterMapProperty, object>(parmMap.Parameters.FirstOrDefault(o => o.Hl7Name == "@PID.33"), DateTime.MinValue));
+                parameters.Add(new KeyValuePair<Hl7QueryParameterMapProperty, object>(parmMap.Parameters.FirstOrDefault(o => o.Hl7Name == "@PID.33"), DateTime.MinValue.AddDays(10)));
 
 
             // Construct the basic QBP_Q22

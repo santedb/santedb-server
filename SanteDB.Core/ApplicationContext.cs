@@ -123,7 +123,7 @@ namespace SanteDB.Core
         /// <summary>
         /// Gets the host type
         /// </summary>
-        public SanteDBHostType HostType => SanteDBHostType.Server;
+        public virtual SanteDBHostType HostType => SanteDBHostType.Server;
 
         /// <summary>
         /// Gets the service name

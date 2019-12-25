@@ -115,18 +115,20 @@ namespace SanteDB.Messaging.HL7.Test
             var messageStr = TestUtil.ToString(message);
             Assert.AreEqual("CA", (message.GetStructure("MSA") as MSA).AcknowledgmentCode.Value);
 
+            var patientOriginal = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "HL7-1"), AuthenticationContext.Current.Principal).SingleOrDefault();
+
             msg = TestUtil.GetMessage("ADT_UPDATE");
             message = new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
             messageStr = TestUtil.ToString(message);
             Assert.AreEqual("CA", (message.GetStructure("MSA") as MSA).AcknowledgmentCode.Value);
 
             // Ensure that the patient actually was persisted
-            var patient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "HL7-1"), AuthenticationContext.Current.Principal).SingleOrDefault();
-            Assert.IsNotNull(patient);
-            Assert.IsTrue(messageStr.Contains(patient.Key.ToString()));
-            Assert.AreEqual(1, patient.Names.Count);
-            Assert.AreEqual("JOHNSTON", patient.Names.First().Component.First(o => o.ComponentTypeKey == NameComponentKeys.Family).Value);
-            Assert.AreEqual("ROBERTA", patient.Names.First().Component.First(o => o.ComponentTypeKey == NameComponentKeys.Given).Value);
+            var patientNew = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "HL7-1"), AuthenticationContext.Current.Principal).SingleOrDefault();
+            Assert.IsNotNull(patientNew);
+            Assert.IsTrue(messageStr.Contains(patientNew.Key.ToString()));
+            Assert.AreEqual(1, patientNew.Names.Count);
+            Assert.AreEqual("JOHNSTON", patientNew.Names.First().Component.First(o => o.ComponentTypeKey == NameComponentKeys.Family).Value);
+            Assert.AreEqual("ROBERTA", patientNew.Names.First().Component.First(o => o.ComponentTypeKey == NameComponentKeys.Given).Value);
         }
 
         /// <summary>

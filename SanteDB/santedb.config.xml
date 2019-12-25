@@ -61,6 +61,8 @@
       <paths>
         <add>C:\Users\justin fyfe\source\repos\santedb\applets\bicore\bi</add>
         <add>C:\Users\fyfej\source\repos\santedb\applets\bicore\bi</add>
+        <add>C:\Users\fyfej\source\repos\santedb\santempi\applet\bi</add>
+        <add>C:\Users\justin fyfe\source\repos\santedb\santempi\applet\bi</add>
       </paths>
     </biFileRepository>
   </section>
@@ -516,8 +518,8 @@
       <add type="SanteDB.Messaging.Atna.AtnaAuditService, SanteDB.Messaging.Atna, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
 
       <!-- Data Services -->
-      <add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />
-      <!--<add type="SanteDB.Caching.Redis.RedisCacheService, SanteDB.Caching.Redis, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />-->
+      <!--<add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />-->
+      <add type="SanteDB.Caching.Redis.RedisCacheService, SanteDB.Caching.Redis, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Caching.Redis.RedisQueryPersistenceService, SanteDB.Caching.Redis, Version=1.10.0.24163, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Caching.Memory.MemoryQueryPersistenceService, SanteDB.Caching.Memory, Version=1.10.0.24160, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPersistenceService, SanteDB.Persistence.Data.ADO, Version=1.10.0.24162, Culture=neutral, PublicKeyToken=null" />
@@ -562,8 +564,8 @@
       
       <!-- Business Intel Service -->
       <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS, Version=1.40.0.0"/>
-      <add type="SanteDB.BI.Services.Impl.AppletBiRepository, SanteDB.BI, Version=1.40.0.0"/>
-      <!--<add type="SanteDB.Tools.Debug.BI.FileMetadataRepository, SanteDB.Tools.Debug, Version=1.40.0.0"/>-->
+      <!--<add type="SanteDB.BI.Services.Impl.AppletBiRepository, SanteDB.BI, Version=1.40.0.0"/>-->
+      <add type="SanteDB.Tools.Debug.BI.FileMetadataRepository, SanteDB.Tools.Debug, Version=1.40.0.0"/>
       <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI, Version=1.40.0.0"/>
       <add type="SanteDB.BI.Services.Impl.LocalBiRenderService, SanteDB.BI, Version=1.40.0.0"/>
     </serviceProviders>

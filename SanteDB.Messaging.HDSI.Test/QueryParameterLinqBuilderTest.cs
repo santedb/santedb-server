@@ -193,7 +193,9 @@ namespace SanteDB.Messaging.HDSI.Test
 		public void TestNullableCondition()
 		{
 			var dtString = new DateTime(1999, 01, 01);
-			String expected = "o => ((o.StartTime != null) AndAlso (o.StartTime.Value > 1/1/1999 12:00:00 AM -05:00))";
+            var tzo = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
+
+            String expected = String.Format("o => ((o.StartTime != null) AndAlso (o.StartTime.Value > 1/1/1999 12:00:00 AM {0}{1:00}:{2:00}))", tzo.Hours < 0 ? "-" : "+", tzo.Hours, tzo.Minutes);
 			NameValueCollection httpQueryParameters = new NameValueCollection();
 			httpQueryParameters.Add("startTime", ">" + dtString);
 			var expr = QueryExpressionParser.BuildLinqExpression<Act>(httpQueryParameters);

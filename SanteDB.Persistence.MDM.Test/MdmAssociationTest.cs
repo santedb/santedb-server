@@ -39,6 +39,8 @@ namespace SanteDB.Persistence.MDM.Test
             typeof(MemoryCacheService).Equals(null);
             TestApplicationContext.TestAssembly = typeof(MdmAssociationTest).Assembly;
             TestApplicationContext.Initialize(context.DeploymentDirectory);
+
+
         }
 
         /// <summary>
@@ -56,7 +58,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 Identifiers = new List<EntityIdentifier>()
                 {
-                    new EntityIdentifier(new AssigningAuthority("TEST", "TEST", "1.2.3.4.5"), "TC-1")
+                    new EntityIdentifier(new AssigningAuthority("TEST-MDM", "TEST-MDM", "1.2.3.4.9999"), "TC-1")
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
@@ -109,7 +111,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 Identifiers = new List<EntityIdentifier>()
                 {
-                    new EntityIdentifier(new AssigningAuthority("TEST", "TEST", "1.2.3.4.5"), "TC-2")
+                    new EntityIdentifier(new AssigningAuthority("TEST-MDM", "TEST-MDM", "1.2.3.4.999"), "TC-2")
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198"),
                 MultipleBirthOrder = 0
@@ -136,7 +138,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 Identifiers = new List<EntityIdentifier>()
                 {
-                    new EntityIdentifier(new AssigningAuthority("TEST2", "TEST2", "1.2.3.4.5.2"), "TC-2B")
+                    new EntityIdentifier(new AssigningAuthority("TEST2", "TEST2", "1.2.3.4.999"), "TC-2B")
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198"),
                 MultipleBirthOrder = 0
@@ -175,7 +177,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 Identifiers = new List<EntityIdentifier>()
                 {
-                    new EntityIdentifier(new AssigningAuthority("TEST", "TEST", "1.2.3.4.5"), "TC-3")
+                    new EntityIdentifier(new AssigningAuthority("TEST-MDM", "TEST-MDM", "1.2.3.4.999"), "TC-3")
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
@@ -220,7 +222,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 Identifiers = new List<EntityIdentifier>()
                 {
-                    new EntityIdentifier(new AssigningAuthority("TEST", "TEST", "1.2.3.4.5"), "TC-4A")
+                    new EntityIdentifier(new AssigningAuthority("TEST-MDM", "TEST-MDM", "1.2.3.4.999"), "TC-4A")
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198"),
                 MultipleBirthOrder = 1
@@ -235,7 +237,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 Identifiers = new List<EntityIdentifier>()
                 {
-                    new EntityIdentifier(new AssigningAuthority("TEST", "TEST", "1.2.3.4.5"), "TC-4B")
+                    new EntityIdentifier(new AssigningAuthority("TEST-MDM", "TEST-MDM", "1.2.3.4.999"), "TC-4B")
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198"),
                 MultipleBirthOrder = 2
@@ -257,7 +259,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 Identifiers = new List<EntityIdentifier>()
                 {
-                    new EntityIdentifier(new AssigningAuthority("TEST", "TEST", "1.2.3.4.5"), "TC-4C")
+                    new EntityIdentifier(new AssigningAuthority("TEST-MDM", "TEST-MDM", "1.2.3.4.999"), "TC-4C")
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198"),
                 MultipleBirthOrder = null
@@ -293,7 +295,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 Identifiers = new List<EntityIdentifier>()
                 {
-                    new EntityIdentifier(new AssigningAuthority("TEST", "TEST", "1.2.3.4.5.5"), "TC-5A")
+                    new EntityIdentifier(new AssigningAuthority("TEST-MDM", "TEST-MDM", "1.2.3.4.5.5"), "TC-5A")
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
@@ -307,7 +309,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 Identifiers = new List<EntityIdentifier>()
                 {
-                    new EntityIdentifier(new AssigningAuthority("TEST", "TEST", "1.2.3.4.5.6"), "TC-5B")
+                    new EntityIdentifier(new AssigningAuthority("TEST-MDM", "TEST-MDM", "1.2.3.4.5.6"), "TC-5B")
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
@@ -346,7 +348,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 Identifiers = new List<EntityIdentifier>()
                 {
-                    new EntityIdentifier(new AssigningAuthority("TEST", "TEST", "1.2.3.4.5.5"), "TC-6A")
+                    new EntityIdentifier(new AssigningAuthority("TEST-MDM", "TEST-MDM", "1.2.3.4.5.5"), "TC-6A")
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
@@ -360,7 +362,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 Identifiers = new List<EntityIdentifier>()
                 {
-                    new EntityIdentifier(new AssigningAuthority("TEST", "TEST", "1.2.3.4.5.6"), "TC-6B")
+                    new EntityIdentifier(new AssigningAuthority("TEST-MDM", "TEST-MDM", "1.2.3.4.5.6"), "TC-6B")
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
@@ -398,7 +400,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 Identifiers = new List<EntityIdentifier>()
                 {
-                    new EntityIdentifier(new AssigningAuthority("TEST", "TEST", "1.2.3.4.5.5"), "TC-7A")
+                    new EntityIdentifier(new AssigningAuthority("TEST-MDM", "TEST-MDM", "1.2.3.4.5.5"), "TC-7A")
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
@@ -456,7 +458,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 Identifiers = new List<EntityIdentifier>()
                 {
-                    new EntityIdentifier(new AssigningAuthority("TEST", "TEST", "1.2.3.4.5.5"), "TC-8A")
+                    new EntityIdentifier(new AssigningAuthority("TEST-MDM", "TEST-MDM", "1.2.3.4.5.5"), "TC-8A")
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
@@ -516,7 +518,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 Identifiers = new List<EntityIdentifier>()
                 {
-                    new EntityIdentifier(new AssigningAuthority("TEST", "TEST", "1.2.3.4.5.5"), "TC-9A")
+                    new EntityIdentifier(new AssigningAuthority("TEST-MDM", "TEST-MDM", "1.2.3.4.5.5"), "TC-9A")
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };
@@ -577,7 +579,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 Identifiers = new List<EntityIdentifier>()
                 {
-                    new EntityIdentifier(new AssigningAuthority("TEST", "TEST", "1.2.3.4.5"), "TC-10")
+                    new EntityIdentifier(new AssigningAuthority("TEST-MDM", "TEST-MDM", "1.2.3.4.999"), "TC-10")
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198")
             };

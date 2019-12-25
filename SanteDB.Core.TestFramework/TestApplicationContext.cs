@@ -20,6 +20,11 @@ namespace SanteDB.Core.TestFramework
     {
 
         /// <summary>
+        /// Gets the host type
+        /// </summary>
+        public override SanteDBHostType HostType => SanteDBHostType.Test;
+
+        /// <summary>
         /// Gets or set sthe test assembly
         /// </summary>
         public static Assembly TestAssembly { get; set; }

@@ -89,6 +89,31 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Roles
 			set;
 		}
 
-	}
+        /// <summary>
+        /// Gets or sets the marital status code
+        /// </summary>
+        [Column("mrtl_sts_cd_id")]
+        public Guid? MaritalStatusKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the education level key
+        /// </summary>
+        [Column("edu_lvl_cd_id")]
+        public Guid? EducationLevelKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the living arrangement key
+        /// </summary>
+        [Column("lvn_arg_cd_id")]
+        public Guid? LivingArrangementKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ethnic group code id
+        /// </summary>
+        [Column("eth_grp_cd_id")]
+        public Guid? EthnicGroupCodeKey { get; set; }
+
+      
+    }
 }
 

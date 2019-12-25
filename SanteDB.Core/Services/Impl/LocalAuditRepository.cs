@@ -102,7 +102,7 @@ namespace SanteDB.Core.Services.Impl
         {
             var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditData>>();
             if (service == null)
-                throw new InvalidOperationException("Cannot find the data persistence service for audits");
+                    throw new InvalidOperationException("Cannot find the data persistence service for audits");
             var result = service.Insert(audit, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             return result;
         }

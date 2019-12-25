@@ -387,7 +387,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		 {
             var retVal = base.UpdateInternal(context, data);
 
-            if (data.Policies != null && data.Policies.Count > 0)
+            if (data.Policies != null)
 			{
 				context.Delete<DbSecurityRolePolicy>(o => o.SourceKey == data.Key);
                 data.Policies.ForEach(o => o.PolicyKey = o.Policy?.EnsureExists(context)?.Key ?? o.PolicyKey);
