@@ -55,6 +55,7 @@
     <add type="SanteDB.OrmLite.Configuration.OrmConfigurationSection, SanteDB.OrmLite, Version=1.10.0.29461, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Caching.Redis.Configuration.RedisConfigurationSection, SanteDB.Caching.Redis, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Tools.Debug.Configuration.DebugToolsConfigurationSection, SanteDB.Tools.Debug, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null"/>
+    <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api, Version=1.10.0.0"/>
   </sections>
   <section xsi:type="DebugToolsConfigurationSection">
     <biFileRepository rescan="60000">

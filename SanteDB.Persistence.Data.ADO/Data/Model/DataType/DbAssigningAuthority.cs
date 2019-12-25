@@ -27,7 +27,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.DataType
     /// <summary>
     /// Represents an assigning authority
     /// </summary>
-    [Table("asgn_aut_tbl")]
+    [Table("asgn_aut_tbl"), AssociativeTable(typeof(DbConceptVersion), typeof(DbAuthorityScope))]
     public class DbAssigningAuthority : DbBaseData
     {
 
@@ -102,7 +102,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.DataType
         /// <summary>
         /// Gets or sets the scope of the auhority
         /// </summary>
-        [Column("cd_id"), PrimaryKey, ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("cd_id"), PrimaryKey, ForeignKey(typeof(DbConceptVersion), nameof(DbConceptVersion.Key))]
         public Guid ScopeConceptKey { get; set; }
 
     }

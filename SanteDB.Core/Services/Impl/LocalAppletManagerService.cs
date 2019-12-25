@@ -289,9 +289,14 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         private bool VerifyPackage(AppletPackage package)
         {
-
+            byte[] verifyBytes = package.Manifest;
             // First check: Hash - Make sure the HASH is ok
-            if (Convert.ToBase64String(SHA256.Create().ComputeHash(package.Manifest)) != Convert.ToBase64String(package.Meta.Hash))
+            if (package is AppletSolution) {
+                verifyBytes = (package as AppletSolution).Include.SelectMany(o => o.Manifest).ToArray();
+                if (BitConverter.ToString(SHA256.Create().ComputeHash(verifyBytes)) != BitConverter.ToString(package.Meta.Hash))
+                    throw new InvalidOperationException($"Package contents of {package.Meta.Id} appear to be corrupt!");
+            }
+            else if(BitConverter.ToString(SHA256.Create().ComputeHash(package.Manifest)) != BitConverter.ToString(package.Meta.Hash))
                 throw new InvalidOperationException($"Package contents of {package.Meta.Id} appear to be corrupt!");
 
             if (package.Meta.Signature != null)
@@ -339,7 +344,8 @@ namespace SanteDB.Core.Services.Impl
                                      
                     // Verify signature
                     RSACryptoServiceProvider rsa = cert[0].PublicKey.Key as RSACryptoServiceProvider;
-                    var retVal =  rsa.VerifyData(package.Manifest, CryptoConfig.MapNameToOID("SHA1"), package.Meta.Signature);
+
+                    var retVal =  rsa.VerifyData(verifyBytes, CryptoConfig.MapNameToOID("SHA1"), package.Meta.Signature);
 
                     // Verify timestamp
                     var timestamp = package.Unpack().Info.TimeStamp;

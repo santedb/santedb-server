@@ -57,6 +57,8 @@ using System.Net;
 using SanteDB.Rest.Common;
 using SanteDB.Core.Rest.Behavior;
 using SanteDB.Core.Rest.Security;
+using SanteDB.Core.Applets.Model;
+using SanteDB.Core.Applets;
 
 namespace SanteDB.Authentication.OAuth2.Rest
 {
@@ -196,8 +198,11 @@ namespace SanteDB.Authentication.OAuth2.Rest
                             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal).Demand();
 
                         // We want to decode the token and verify ..
-                        var token = Convert.FromBase64String(tokenRequest["code"].Replace(" ", "+"));
-
+                        var token = Enumerable.Range(0, tokenRequest["code"].Length)
+                                    .Where(x => x % 2 == 0)
+                                    .Select(x => Convert.ToByte(tokenRequest["code"].Substring(x, 2), 16))
+                                    .ToArray();
+                        
                         // First we extract the token information
                         var sid = new Guid(Enumerable.Range(0, 32).Where(x => x % 2 == 0).Select(o => token[o]).ToArray());
                         var aid = new Guid(Enumerable.Range(32, 32).Where(x => x % 2 == 0).Select(o => token[o]).ToArray());
@@ -561,7 +566,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// Post the authorization code to the application
         /// </summary>
         /// <param name="authorization">Authorization post results</param>
-        public void SelfPost(NameValueCollection authorization)
+        public Stream SelfPost(String content, NameValueCollection authorization)
         {
             // Generate an authorization code for this user and redirect to their redirect URL
             var redirectUrl = RestOperationContext.Current.IncomingRequest.QueryString["redirect_uri"] ?? authorization["redirect_uri"];
@@ -624,18 +629,24 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 i += 32;
                 Array.Copy(BitConverter.GetBytes(DateTime.Now.AddMinutes(1).Ticks), 0, authCode, i, 8);
                 // Encode
-                var tokenString = Convert.ToBase64String(authCode);
+                var tokenString = BitConverter.ToString(authCode).Replace("-","");
 
                 // Redirect
                 RestOperationContext.Current.OutgoingResponse.Redirect($"{redirectUrl}?code={tokenString}&state={state}");
-                return;
+                return null;
             }
             catch (Exception e)
             {
                 AuditUtil.AddUserActor(audit);
                 audit.Outcome = OutcomeIndicator.SeriousFail;
                 this.m_traceSource.TraceError("Could not create authentication token: {0}", e.Message);
-                RestOperationContext.Current.OutgoingResponse.Redirect($"{redirectUrl}?error=invalid_request&error_description={e.Message}&state={state}");
+
+                var bindingParms = RestOperationContext.Current.IncomingRequest.QueryString.AllKeys.ToDictionary(o => o, o => String.Join(";", RestOperationContext.Current.IncomingRequest.QueryString.GetValues(o)));
+                foreach (var itm in authorization.AllKeys)
+                    if (itm != "password" && !bindingParms.ContainsKey(itm))
+                        bindingParms.Add(itm, authorization[itm]);
+                bindingParms.Add("auth_error", e.Message);
+                return this.RenderInternal(content, bindingParms);
             }
             finally
             {
@@ -650,36 +661,17 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <returns>A stream of the rendered login asset</returns>
         public Stream RenderAsset(string content)
         {
-            // Get the asset object
-            var loadedApplets = ApplicationServiceContext.Current.GetService<IAppletManagerService>().Applets;
 
-
-            var lander = RestOperationContext.Current.IncomingRequest.QueryString["lander"];
             var client = RestOperationContext.Current.IncomingRequest.QueryString["client_id"];
             var redirectUri = RestOperationContext.Current.IncomingRequest.QueryString["redirect_uri"];
 
-            var loginApplet = loadedApplets.Where(o => o.Configuration?.AppSettings.Any(s => s.Name == "oauth2.login") == true && (lander == o.Info.Id || String.IsNullOrEmpty(lander))).FirstOrDefault();
-            if (loginApplet == null)
-                throw new KeyNotFoundException("No asset has been configured as oauth2.login.asset");
-
-            var loginAssetPath = loginApplet.Configuration.AppSettings.FirstOrDefault(o => o.Name == "oauth2.login")?.Value;
-
-            if (String.IsNullOrEmpty(content))
-                content = "index.html";
-
-            var assetName = loginAssetPath + content;
-
-            var asset = loadedApplets.ResolveAsset(assetName);
-            if (asset == null)
-                throw new KeyNotFoundException($"{assetName} not found");
-
-            // Now time to resolve the asset
             var bindingParms = RestOperationContext.Current.IncomingRequest.QueryString.AllKeys.ToDictionary(o => o, o => String.Join(";", RestOperationContext.Current.IncomingRequest.QueryString.GetValues(o)));
+            // Now time to resolve the asset
             if (String.IsNullOrEmpty(content) || content == "index.html")
             {
 
                 // Rule: scope, response_type and client_id and redirect_uri must be provided
-                if (String.IsNullOrEmpty(redirectUri) || 
+                if (String.IsNullOrEmpty(redirectUri) ||
                     String.IsNullOrEmpty(client) ||
                     RestOperationContext.Current.IncomingRequest.QueryString.GetValues("scope")?.Contains("openid") != true ||
                     RestOperationContext.Current.IncomingRequest.QueryString["response_type"] != "code")
@@ -690,17 +682,53 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     if (applicationId == null)
                         throw new SecurityException($"Client {client} is not registered with this provider");
 
-                    ApplicationServiceContext.Current.GetService<IPolicyEnforcementService>().Demand(OAuthConstants.OAuthCodeFlowPolicy);
-                    
+                    if (ApplicationServiceContext.Current.GetService<IPolicyDecisionService>().GetPolicyOutcome(new SanteDBClaimsPrincipal(applicationId), OAuthConstants.OAuthCodeFlowPolicy) != PolicyGrantType.Grant)
+                        throw new SecurityException($"Client {client} is not allowed to execute this grant type");
+
                     // TODO: Get claim for application redirect URL
                     var signature = ApplicationServiceContext.Current.GetService<IDataSigningService>().SignData(Encoding.UTF8.GetBytes(client + redirectUri));
                     bindingParms.Add("dsig", BitConverter.ToString(signature));
 
                 }
             }
+            bindingParms.Add("auth_error", "&nbsp;");
+            return this.RenderInternal(content, bindingParms);
+        }
 
-            RestOperationContext.Current.OutgoingResponse.ContentType = DefaultContentTypeMapper.GetContentType(Path.GetExtension(content));
-            return new MemoryStream(loadedApplets.RenderAssetContent(asset, RestOperationContext.Current.IncomingRequest.QueryString["ui_locale"] ?? CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, bindingParameters: bindingParms));
+        private Stream RenderInternal (String assetPath, IDictionary<String, String> bindingParms)
+        { 
+            // Get the asset object
+            var lander = RestOperationContext.Current.IncomingRequest.QueryString["lander"];
+
+            AppletManifest loginApplet = null;
+            ReadonlyAppletCollection loginAppletAssets = null;
+            var solutions = ApplicationServiceContext.Current.GetService<IAppletSolutionManagerService>().Solutions.Select(o => o.Meta.Id).ToList();
+            solutions.Add(String.Empty);
+            foreach(var sln in solutions)
+            {
+                loginApplet = ApplicationServiceContext.Current.GetService<IAppletSolutionManagerService>().GetApplets(sln).Where(o => o.Configuration?.AppSettings.Any(s => s.Name == "oauth2.login") == true && (lander == o.Info.Id || String.IsNullOrEmpty(lander))).FirstOrDefault();
+                if (loginApplet != null)
+                {
+                    loginAppletAssets = ApplicationServiceContext.Current.GetService<IAppletSolutionManagerService>().GetApplets(sln);
+                    break;
+                }
+            }
+            if (loginApplet == null)
+                throw new KeyNotFoundException("No asset has been configured as oauth2.login.asset");
+            
+            var loginAssetPath = loginApplet.Configuration.AppSettings.FirstOrDefault(o => o.Name == "oauth2.login")?.Value;
+
+            if (String.IsNullOrEmpty(assetPath))
+                assetPath = "index.html";
+
+            var assetName = loginAssetPath + assetPath;
+
+            var asset = loginAppletAssets.ResolveAsset(assetName);
+            if (asset == null)
+                throw new KeyNotFoundException($"{assetName} not found");
+            
+            RestOperationContext.Current.OutgoingResponse.ContentType = DefaultContentTypeMapper.GetContentType(Path.GetExtension(assetPath));
+            return new MemoryStream(loginAppletAssets.RenderAssetContent(asset, RestOperationContext.Current.IncomingRequest.QueryString["ui_locale"] ?? CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, allowCache: false, bindingParameters: bindingParms));
         }
 
         /// <summary>
