@@ -61,7 +61,7 @@ namespace SanteDB.Caching.Memory
         /// <summary>
         /// Timer has elapsed
         /// </summary>
-        public void Run(object sender, ElapsedEventArgs e, object[] parameters)
+        public void Run(object sender, EventArgs e, object[] parameters)
         {
             try
             {

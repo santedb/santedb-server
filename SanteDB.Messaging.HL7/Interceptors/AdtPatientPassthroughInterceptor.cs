@@ -163,6 +163,9 @@ namespace SanteDB.Messaging.HL7.Interceptors
                         return o;
                 }).ToList());
 
+            // Original has modified on?
+            if (filter.ContainsKey("modifiedOn"))
+                queryFilter.Add("modifiedOn", filter["modifiedOn"]);
             e.Results = this.SendQuery(queryFilter, e.Count ?? 25, out tr);
             e.TotalResults = tr;
 

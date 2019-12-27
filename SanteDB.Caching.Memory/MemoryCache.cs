@@ -43,12 +43,7 @@ namespace SanteDB.Caching.Memory
     /// <summary>
     /// Memory cache functions
     /// </summary>
-    #if DEBUG
-    public
-#else
-        internal
-#endif
-        sealed class MemoryCache : IDisposable
+    public sealed class MemoryCache : IDisposable
     {
 
         // Entry table for the cache

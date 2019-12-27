@@ -20,6 +20,12 @@ using SanteDB.Persistence.Data.ADO.Data.Model;
 using System.Collections;
 using SanteDB.Core.Event;
 using SanteDB.Core.Security;
+using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Acts;
+using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
+using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
+using SanteDB.Core.Model.DataTypes;
+using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -167,7 +173,16 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         connection.LoadState = LoadState.FullLoad;
 
                         // First, build the query using the query build
-                        var tableMapping = TableMapping.Get(this.m_mapper.MapModelType(subscription.ResourceType));
+                        TableMapping tableMapping = null;
+                        if (typeof(Entity).IsAssignableFrom(subscription.ResourceType))
+                            tableMapping = TableMapping.Get(typeof(DbEntityVersion));
+                        else if (typeof(Act).IsAssignableFrom(subscription.ResourceType))
+                            tableMapping = TableMapping.Get(typeof(DbActVersion));
+                        else if (typeof(Concept).IsAssignableFrom(subscription.ResourceType))
+                            tableMapping = TableMapping.Get(typeof(DbConceptVersion));
+                        else
+                            throw new InvalidOperationException("ADO Subscriptions only support Entities and Acts (or sub-types)");
+
                         var query = (typeof(QueryBuilder).GetGenericMethod(
                             nameof(QueryBuilder.CreateQuery),
                             new Type[] { subscription.ResourceType },
@@ -182,13 +197,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         List<Object> values = new List<object>();
                         definitionQuery = this.m_parmRegex.Replace(definitionQuery, (o) =>
                         {
-                            var strValue = parameters["_" + o.Groups[2].Value.Substring(1, o.Groups[2].Value.Length - 2)].First();
+                            var qValue = parameters["_" + o.Groups[2].Value.Substring(1, o.Groups[2].Value.Length - 2)];
                             Guid uuid = Guid.Empty;
-                            if (Guid.TryParse(strValue, out uuid))
-                                values.Add(uuid);
+                            if (Guid.TryParse(qValue.First(), out uuid))
+                                values.AddRange(qValue.Select(v=>Guid.Parse(v)).OfType<Object>());
                             else
-                                values.Add(strValue);
-                            return o.Groups[1].Value + "?";
+                                values.AddRange(qValue);
+                            return o.Groups[1].Value + String.Join(",", qValue.Select(v=>"?"));
+                            
                         });
 
                         // Now we want to append 

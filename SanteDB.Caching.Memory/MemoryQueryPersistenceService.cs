@@ -279,7 +279,7 @@ namespace SanteDB.Caching.Memory
         /// <summary>
         /// Timer has elapsed
         /// </summary>
-        public void Run(object sender, ElapsedEventArgs e, object[] parameters)
+        public void Run(object sender, EventArgs e, object[] parameters)
         {
 #if DEBUG
             this.m_tracer.TraceInfo("Cleaning stale queries from memory...");
