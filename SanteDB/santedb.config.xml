@@ -56,7 +56,13 @@
     <add type="SanteDB.Caching.Redis.Configuration.RedisConfigurationSection, SanteDB.Caching.Redis, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Tools.Debug.Configuration.DebugToolsConfigurationSection, SanteDB.Tools.Debug, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null"/>
     <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api, Version=1.10.0.0"/>
+    <add type="SanteDB.Matcher.Configuration.File.FileMatchConfigurationSection, SanteDB.Matcher, Version=1.0.0.0"/>
   </sections>
+  <section xsi:type="FileMatchConfigurationSection">
+    <basePath>
+      <add>..\..\..\santempi\applet\matching</add>
+    </basePath>
+  </section>
   <section xsi:type="DebugToolsConfigurationSection">
     <biFileRepository rescan="60000">
       <paths>
@@ -569,6 +575,9 @@
       <add type="SanteDB.Tools.Debug.BI.FileMetadataRepository, SanteDB.Tools.Debug, Version=1.40.0.0"/>
       <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI, Version=1.40.0.0"/>
       <add type="SanteDB.BI.Services.Impl.LocalBiRenderService, SanteDB.BI, Version=1.40.0.0"/>
+      
+      <!-- Matching -->
+      <add type="SanteDB.Matcher.Services.StreamMatchConfigurationProvider, SanteDB.Matcher, Version=1.40.0.0"/>
     </serviceProviders>
   </section>
 </SanteDBConfiguration>

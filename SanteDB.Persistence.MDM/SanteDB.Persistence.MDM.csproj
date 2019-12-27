@@ -41,8 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\MdmConfigurationSection.cs" />
-    <Compile Include="Configuration\MdmResourceConfiguration.cs" />
     <Compile Include="MdmConstants.cs" />
     <Compile Include="MdmPermissionPolicyIdentifiers.cs" />
     <Compile Include="Model\ActMaster.cs" />
@@ -50,7 +48,7 @@
     <Compile Include="Model\IMdmMaster.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\BundleResourceListener.cs" />
-    <Compile Include="Services\MdmDaemonService.cs" />
+    <Compile Include="Services\MdmDataManagementService.cs" />
     <Compile Include="Services\MdmResourceListener.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -88,7 +86,6 @@
       </ItemGroup>
     </Otherwise>
   </Choose>
-
   <ItemGroup>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{DB9BC05E-45F1-4F96-A161-F36BDECAF566}</Project>

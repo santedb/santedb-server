@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Event;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Collection;
@@ -39,7 +40,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <summary>
         /// Bundle resource listener
         /// </summary>
-        public BundleResourceListener(IEnumerable<MdmResourceListener> listeners) : base(new Configuration.MdmResourceConfiguration(typeof(Bundle), "default", false))
+        public BundleResourceListener(IEnumerable<MdmResourceListener> listeners) : base(new ResourceMergeConfiguration(typeof(Bundle), "default", false))
         {
             this.m_listeners = listeners;
         }

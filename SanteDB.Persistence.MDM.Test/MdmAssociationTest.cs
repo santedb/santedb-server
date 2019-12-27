@@ -35,7 +35,7 @@ namespace SanteDB.Persistence.MDM.Test
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            typeof(MdmDaemonService).Equals(null); // Trick - Force test context to load
+            typeof(MdmDataManagementService).Equals(null); // Trick - Force test context to load
             typeof(MemoryCacheService).Equals(null);
             TestApplicationContext.TestAssembly = typeof(MdmAssociationTest).Assembly;
             TestApplicationContext.Initialize(context.DeploymentDirectory);
@@ -274,8 +274,8 @@ namespace SanteDB.Persistence.MDM.Test
             Assert.IsNotNull(patient3Master);
 
             // There should be 2 probables
-            Assert.AreEqual(2, patient3Master.Relationships.Count(r => r.RelationshipTypeKey == MdmConstants.DuplicateRecordRelationship));
-            Assert.AreEqual(2, patient3Master.Relationships.Count(r => r.RelationshipTypeKey == MdmConstants.DuplicateRecordRelationship && masters.Any(m => m.Key == r.TargetEntityKey)));
+            Assert.AreEqual(2, patient3Master.Relationships.Count(r => r.RelationshipTypeKey == MdmConstants.CandidateLocalRelationship));
+            Assert.AreEqual(2, patient3Master.Relationships.Count(r => r.RelationshipTypeKey == MdmConstants.CandidateLocalRelationship && masters.Any(m => m.Key == r.TargetEntityKey)));
 
         }
 

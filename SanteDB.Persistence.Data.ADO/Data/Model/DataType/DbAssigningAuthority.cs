@@ -84,6 +84,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.DataType
         /// </summary>
         [Column("is_unq")]
         public bool IsUnique { get; set; }
+
     }
 
 

@@ -86,7 +86,6 @@
     <Compile Include="Configuration\SecurityConfigurationSection.cs" />
     <Compile Include="Http\DefaultRestClient.cs" />
     <Compile Include="Http\ServiceClientDescription.cs" />
-    <Compile Include="Jobs\JobStateType.cs" />
     <Compile Include="Model\ModelExtensions.cs" />
     <Compile Include="Rest\Behavior\ErrorServiceBehavior.cs" />
     <Compile Include="Rest\RestErrorHandler.cs" />
@@ -155,7 +154,6 @@
     <Compile Include="Services\ITfaRelayService.cs" />
     <Compile Include="Services\Impl\LocalConceptRepository.cs" />
     <Compile Include="Services\Impl\LocalSecurityRepositoryService.cs" />
-    <Compile Include="Jobs\IJob.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Security\Wcf\" />

@@ -148,6 +148,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dx", "Dx", "{86A42CDB-A7A4-
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MDM", "MDM", "{12BB9926-8A67-44D5-BE68-7E27E3AE6DE9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Matcher.Configuration.File", "santedb-match\SanteDB.Matcher.Configuration.File\SanteDB.Matcher.Configuration.File.csproj", "{34C6A8FA-D3DD-4AB9-9D0D-24F355690CEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -362,6 +364,10 @@ Global
 		{ECE9B280-9647-4092-BABF-EB2E25084670}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECE9B280-9647-4092-BABF-EB2E25084670}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ECE9B280-9647-4092-BABF-EB2E25084670}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34C6A8FA-D3DD-4AB9-9D0D-24F355690CEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34C6A8FA-D3DD-4AB9-9D0D-24F355690CEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34C6A8FA-D3DD-4AB9-9D0D-24F355690CEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34C6A8FA-D3DD-4AB9-9D0D-24F355690CEC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -426,6 +432,7 @@ Global
 		{C6921DBD-1FCB-43A7-98A6-AF24C3C6652A} = {66328BE7-81CC-4820-99E9-8C5C534B4A2B}
 		{86A42CDB-A7A4-4548-AEF7-ECCB242F5A48} = {66328BE7-81CC-4820-99E9-8C5C534B4A2B}
 		{12BB9926-8A67-44D5-BE68-7E27E3AE6DE9} = {66328BE7-81CC-4820-99E9-8C5C534B4A2B}
+		{34C6A8FA-D3DD-4AB9-9D0D-24F355690CEC} = {75D6A9C9-C580-4684-88D4-A2291A302861}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E73A1AED-8AB7-492C-A4F0-C71FCC5C393C}

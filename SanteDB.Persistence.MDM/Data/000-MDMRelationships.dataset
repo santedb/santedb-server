@@ -47,7 +47,7 @@
       <conceptClass>92cdea39-b9a3-4a5b-bc88-a6646c74240d</conceptClass>
       <name>
         <language>en</language>
-        <value>Duplicate Record</value>
+        <value>Candidate Local Record</value>
       </name>
       <conceptSet>eba4783b-f7a3-4f7b-ac74-bb3beef8d15e</conceptSet>
       <conceptSet>ee16a667-2085-440a-b1e7-4032d10b9f40</conceptSet>
@@ -66,7 +66,7 @@ INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err
 -- FOR PROBABLE RELATIONSHIP TYPE
 INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
 	SELECT 
-		'56cfb115-8207-4f89-b52e-d20dbad8f8cc', CD_ID, '49328452-7e30-4dcd-94cd-fd532d111578', 'MDM MASTER POINTER'
+		'56cfb115-8207-4f89-b52e-d20dbad8f8cc', CD_ID, '49328452-7e30-4dcd-94cd-fd532d111578', 'CANDIDATE LOCAL MATCH'
 	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = '4e6da567-0094-4f23-8555-11da499593af';
 
 SELECT REG_PATCH('MDM-RELATIONSHIP');
@@ -83,7 +83,7 @@ INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err
 -- FOR PROBABLE RELATIONSHIP TYPE
 INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
 	SELECT 
-		char_to_uuid('56cfb115-8207-4f89-b52e-d20dbad8f8cc'), CD_ID, char_to_uuid('49328452-7e30-4dcd-94cd-fd532d111578'), 'MDM MASTER POINTER'
+		char_to_uuid('56cfb115-8207-4f89-b52e-d20dbad8f8cc'), CD_ID, char_to_uuid('49328452-7e30-4dcd-94cd-fd532d111578'), 'CANDIDATE LOCAL MATCH'
 	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = char_to_uuid('4e6da567-0094-4f23-8555-11da499593af');
 
 SELECT REG_PATCH('MDM-RELATIONSHIP') FROM rdb$database;

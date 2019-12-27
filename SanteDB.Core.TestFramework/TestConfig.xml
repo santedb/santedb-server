@@ -4,6 +4,7 @@
     <add type="SanteDB.Core.Configuration.ApplicationServiceContextConfigurationSection, SanteDB.Core.Api, Version=1.11.0.29460, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.DiagnosticsConfigurationSection, SanteDB.Core.Api, Version=1.30.0.23443, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Persistence.Data.ADO.Configuration.AdoPersistenceConfigurationSection, SanteDB.Persistence.Data.ADO, Version=1.10.0.24600, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api, Version=1.10.0.0"/>
     <add type="SanteDB.OrmLite.Configuration.OrmConfigurationSection, SanteDB.OrmLite, Version=1.10.0.29461, Culture=neutral, PublicKeyToken=null" />
   </sections>
   <!-- This section controls the persistence for ADO.NET -->

@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="MDM Relationship Codes">
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>2BBF068B-9121-4081-BF3C-AB62C01362EE</id>
+      <mnemonic>Detected-Duplicate-Record</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>92cdea39-b9a3-4a5b-bc88-a6646c74240d</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Detected Duplicate Record</value>
+      </name>
+      <conceptSet>ee16a667-2085-440a-b1e7-4032d10b9f40</conceptSet>
+      <conceptSet>cf686a21-86e5-41e7-af07-0016a054227a</conceptSet>
+    </Concept>
+  </update>
+  <sql>
+    <exec invariant="npgsql">
+      <![CDATA[
+-- FOR PROBABLE RELATIONSHIP TYPE
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+	SELECT 
+		'2BBF068B-9121-4081-BF3C-AB62C01362EE', CD_ID, CD_ID, 'PROBABLE DUPLICATE / DUPLICATE'
+	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = '4e6da567-0094-4f23-8555-11da499593af';
+
+SELECT REG_PATCH('MDM-RELATIONSHIP');
+      ]]>
+    </exec>
+    <exec invariant="fbsql">
+      <![CDATA[
+-- FOR PROBABLE RELATIONSHIP TYPE
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+	SELECT 
+		char_to_uuid('2BBF068B-9121-4081-BF3C-AB62C01362EE'), CD_ID, CD_ID, 'PROBABLE DUPLICATE / DUPLICATE'
+	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = char_to_uuid('4e6da567-0094-4f23-8555-11da499593af');
+
+SELECT REG_PATCH('MDM-RELATIONSHIP') FROM rdb$database;
+      ]]>
+    </exec>
+  </sql>
+</dataset>

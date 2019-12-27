@@ -18,9 +18,10 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core;
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Services;
-using SanteDB.Persistence.MDM.Configuration;
+using SanteDB.Core.Services.Impl;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,7 +33,7 @@ namespace SanteDB.Persistence.MDM.Services
     /// and linking/creating master records whenever a record of that type is created.
     /// </summary>
     [ServiceProvider("MDM Data Repository")]
-    public class MdmDaemonService : IDaemonService, IDisposable
+    public class MdmDataManagementService : IDaemonService, IDisposable
     {
 
         /// <summary>
@@ -44,7 +45,7 @@ namespace SanteDB.Persistence.MDM.Services
         private Tracer m_traceSource = new Tracer(MdmConstants.TraceSourceName);
 
         // Configuration
-        private MdmConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<MdmConfigurationSection>();
+        private ResourceMergeConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<ResourceMergeConfigurationSection>();
 
         // Listeners
         private List<MdmResourceListener> m_listeners = new List<MdmResourceListener>();
@@ -91,6 +92,8 @@ namespace SanteDB.Persistence.MDM.Services
             {
                 if (ApplicationServiceContext.Current.GetService<IRecordMatchingService>() == null)
                     throw new InvalidOperationException("MDM requires a matching service to be configured");
+                else if (ApplicationContext.Current.GetService<SimResourceMergeService>() != null)
+                    throw new System.Configuration.ConfigurationException("Cannot use MDM and SIM merging strategies at the same time. Please disable one or the other");
 
                 foreach(var itm in this.m_configuration.ResourceTypes)
                 {

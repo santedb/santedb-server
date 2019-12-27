@@ -37,7 +37,7 @@ namespace SanteDB.Persistence.MDM
         /// <summary>
         /// Relationship used to represent that a local record has a high probability of being a duplicate with a master record
         /// </summary>
-        public static readonly Guid DuplicateRecordRelationship = Guid.Parse("56cfb115-8207-4f89-b52e-d20dbad8f8cc");
+        public static readonly Guid CandidateLocalRelationship = Guid.Parse("56cfb115-8207-4f89-b52e-d20dbad8f8cc");
 
         /// <summary>
         /// Represents a record of truth, this is a record which is promoted on the master record such that it is the "true" version of the record

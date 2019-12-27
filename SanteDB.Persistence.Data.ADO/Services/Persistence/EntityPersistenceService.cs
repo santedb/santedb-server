@@ -44,6 +44,7 @@ using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Security;
+using System.Text.RegularExpressions;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -344,6 +345,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 );
                         }
                     }
+                    if(!String.IsNullOrEmpty(auth.ValidationRegex)) // must be valid
+                    {
+                        var nonMatch = data.Identifiers
+                            .Where(id => id.AuthorityKey == auth.Key && !new Regex(auth.ValidationRegex).IsMatch(id.Value));
+                        if(nonMatch.Any())
+                            throw new DetectedIssueException(
+                                new DetectedIssue(DetectedIssuePriorityType.Error, $"Identifier for {String.Join(",", nonMatch.Select(o => o.Value.ToString()))} in domain {auth.DomainName} failed format validation", DetectedIssueKeys.FormalConstraintIssue)
+                            );
+                    }
 				}
 
                 // Assert 
@@ -443,6 +453,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public Core.Model.Entities.Entity UpdateCoreProperties(DataContext context, Core.Model.Entities.Entity data)
         {
+
             // Esnure exists
             if (data.ClassConcept != null) data.ClassConcept = data.ClassConcept?.EnsureExists(context) as Concept;
             if (data.DeterminerConcept != null) data.DeterminerConcept = data.DeterminerConcept?.EnsureExists(context) as Concept;
