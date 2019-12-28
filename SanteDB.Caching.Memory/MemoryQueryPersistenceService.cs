@@ -151,6 +151,16 @@ namespace SanteDB.Caching.Memory
         public IDictionary<string, Type> Parameters => null;
 
         /// <summary>
+        /// Gets the time this job last started
+        /// </summary>
+        public DateTime? LastStarted { get; private set; }
+
+        /// <summary>
+        /// Gets the time this job last finished
+        /// </summary>
+        public DateTime? LastFinished { get; private set; }
+
+        /// <summary>
         /// Clear
         /// </summary>
         public void Clear()
@@ -287,6 +297,7 @@ namespace SanteDB.Caching.Memory
 
             try
             {
+                this.LastStarted = DateTime.Now;
                 lock (this.m_syncObject)
                 {
                     DateTime now = DateTime.Now;
@@ -298,6 +309,10 @@ namespace SanteDB.Caching.Memory
             catch (Exception ex)
             {
                 this.m_tracer.TraceError(ex.ToString());
+            }
+            finally
+            {
+                this.LastFinished = DateTime.Now;
             }
         }
 

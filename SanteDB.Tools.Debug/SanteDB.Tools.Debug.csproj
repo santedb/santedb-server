@@ -45,6 +45,7 @@
     <Compile Include="BI\FileMetadataRepository.cs" />
     <Compile Include="Configuration\DebugToolsConfigurationSection.cs" />
     <Compile Include="Configuration\FileMetaDataRepositoryConfiguration.cs" />
+    <Compile Include="DevHacks\AlwaysThrowConflictHack.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

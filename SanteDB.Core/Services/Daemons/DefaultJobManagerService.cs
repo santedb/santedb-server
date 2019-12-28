@@ -228,6 +228,39 @@ namespace SanteDB.Core.Services
                 return this.m_log.Keys;
             }
         }
+
+        /// <summary>
+        /// Get the last time the job was run
+        /// </summary>
+        public DateTime? GetLastRuntime(IJob job)
+        {
+            if (!this.m_log.TryGetValue(job, out DateTime retVal))
+                return null;
+            return retVal;
+        }
+
+        /// <summary>
+        /// Start a job right now
+        /// </summary>
+        public void StartJob(IJob job, object[] parameters)
+        {
+            // Log that the timer fired
+            if (this.m_log.ContainsKey(job))
+                this.m_log[job] = DateTime.Now;
+            else
+                lock (this.m_log)
+                    this.m_log.Add(job, DateTime.Now);
+
+            ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem((o)=> job.Run(this, EventArgs.Empty, parameters));
+        }
+
+        /// <summary>
+        /// Get the specified job instance
+        /// </summary>
+        public IJob GetJobInstance(String jobTypeName)
+        {
+            return this.m_log.Keys.First(o => o.GetType().FullName == jobTypeName);
+        }
         #endregion
     }
 }

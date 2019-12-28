@@ -51,6 +51,16 @@ namespace SanteDB.Caching.Memory
         public IDictionary<string, Type> Parameters => null;
 
         /// <summary>
+        /// Gets the time that this job last started
+        /// </summary>
+        public DateTime? LastStarted { get; private set; }
+
+        /// <summary>
+        /// gets the time that this job last finished
+        /// </summary>
+        public DateTime? LastFinished { get; private set; }
+
+        /// <summary>
         /// Cancel
         /// </summary>
         public void Cancel()
@@ -65,6 +75,7 @@ namespace SanteDB.Caching.Memory
         {
             try
             {
+                this.LastStarted = DateTime.Now;
                 this.CurrentState = JobStateType.Running;
                 MemoryCache.Current.ReducePressure();
                 this.CurrentState = JobStateType.Completed;
@@ -72,6 +83,10 @@ namespace SanteDB.Caching.Memory
             catch
             {
                 this.CurrentState = JobStateType.Aborted;
+            }
+            finally
+            {
+                this.LastFinished = DateTime.Now;
             }
         }
     }

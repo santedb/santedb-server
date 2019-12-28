@@ -112,7 +112,6 @@
     <Compile Include="Security\TwoFactorSecretGenerators.cs" />
     <Compile Include="Security\SecurityUtils.cs" />
     <Compile Include="Services\Daemons\AppletBusinessRulesDaemon.cs" />
-    <Compile Include="Services\IJobManagerService.cs" />
     <Compile Include="Services\Impl\DefaultNetworkInformationService.cs" />
     <Compile Include="Services\Impl\FileSystemQueueService.cs" />
     <Compile Include="Services\Impl\GenericLocalActRepository.cs" />
