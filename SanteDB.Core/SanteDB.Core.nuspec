@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>SanteDB.Server.Plugin</id>
-    <version>1.107.0.0</version>
+    <version>1.109.0.0</version>
     <title>SanteDB Server Plugin Support</title>
     <authors>SanteDB Community</authors>
     <owners>santedb.org</owners>
@@ -16,10 +16,10 @@
     <tags>cdr santedb server</tags>
     <dependencies>
       <dependency id="AtnaApi" version="1.1.0.0" />
-      <dependency id="SanteDB.Core.Api" version="1.107.0.0" />
-      <dependency id="SanteDB.Core.Model" version="1.107.0.0" />
-      <dependency id="SanteDB.OrmLite" version="1.107.0.0"/>
-      <dependency id="SanteDB.Rest.Common" version="1.107.0.0"/>
+      <dependency id="SanteDB.Core.Api" version="1.109.0.0" />
+      <dependency id="SanteDB.Core.Model" version="1.109.0.0" />
+      <dependency id="SanteDB.OrmLite" version="1.109.0.0"/>
+      <dependency id="SanteDB.Rest.Common" version="1.109.0.0"/>
     </dependencies>
     <references>
       <group targetFramework="net45">

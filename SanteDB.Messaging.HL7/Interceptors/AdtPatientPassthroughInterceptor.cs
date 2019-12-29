@@ -71,6 +71,9 @@ namespace SanteDB.Messaging.HL7.Interceptors
         // Loaded query parameter map
         private static Hl7QueryParameterMap s_map;
 
+        // Retrieve hacks
+        private Dictionary<Guid, IEnumerable<EntityIdentifier>> m_retrieveHacks = new Dictionary<Guid, IEnumerable<EntityIdentifier>>();
+
         /// <summary>
         /// Open the mapping
         /// </summary>
@@ -306,6 +309,16 @@ namespace SanteDB.Messaging.HL7.Interceptors
                     Bundle patientData = MessageUtils.Parse(ar);
                     patientData.Reconstitute();
 
+                    // Does this patient "really" exist? 
+                    if(!ar.PID.GetPatientIdentifierList().Any(o=>o.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority.DomainName) &&
+                        !this.m_retrieveHacks.ContainsKey(patientData.Item.OfType<Patient>().First().Key.Value))
+                    {
+                        var key = this.m_retrieveHacks.FirstOrDefault(o => o.Value.Any(x => x.Value == ar.PID.GetPatientIdentifierList()[0].IDNumber.Value));
+                        if (key.Key != Guid.Empty)
+                            patientData.Item.OfType<Patient>().First().Key = key.Key;
+                        else 
+                            this.m_retrieveHacks.Add(patientData.Item.OfType<Patient>().First().Key.Value, (patientData.Item[0] as Patient).Identifiers);
+                    }
                     // Now we extract the patient
                     var pat = patientData.Item.OfType<Patient>().First();
                     pat.VersionKey = pat.Key;
@@ -328,9 +341,19 @@ namespace SanteDB.Messaging.HL7.Interceptors
         private void AdtPatientPassthroughInterceptor_Retrieving(object sender, DataRetrievingEventArgs<Patient> e)
         {
             e.Cancel = true;
-            var qryParms = new QueryRequestEventArgs<Patient>(o => o.Key == e.Id.Value, 0, 1, Guid.NewGuid(), e.Principal);
-            AdtPatientPassthroughInterceptor_Querying(sender, qryParms);
-            e.Result = qryParms.Results.FirstOrDefault();
+            if (this.m_retrieveHacks.TryGetValue(e.Id.Value, out IEnumerable<EntityIdentifier> ids))
+            {
+                var id = ids.Last();
+                var qryParms = new QueryRequestEventArgs<Patient>(o => o.Identifiers.Any(i=>i.Value == id.Value && i.Authority.DomainName == id.Authority.DomainName), 0, 1, Guid.NewGuid(), e.Principal);
+                AdtPatientPassthroughInterceptor_Querying(sender, qryParms);
+                e.Result = qryParms.Results.FirstOrDefault();
+            }
+            else
+            {
+                var qryParms = new QueryRequestEventArgs<Patient>(o => o.Key == e.Id.Value, 0, 1, Guid.NewGuid(), e.Principal);
+                AdtPatientPassthroughInterceptor_Querying(sender, qryParms);
+                e.Result = qryParms.Results.FirstOrDefault();
+            }
         }
 
         /// <summary>
