@@ -319,6 +319,7 @@ namespace SanteDB.Messaging.HL7.Interceptors
                         else 
                             this.m_retrieveHacks.Add(patientData.Item.OfType<Patient>().First().Key.Value, (patientData.Item[0] as Patient).Identifiers);
                     }
+                    
                     // Now we extract the patient
                     var pat = patientData.Item.OfType<Patient>().First();
                     pat.VersionKey = pat.Key;
