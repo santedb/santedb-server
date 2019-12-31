@@ -195,7 +195,7 @@ namespace SanteDB.Messaging.HL7.Messages
             catch (Exception ex)
             {
                 this.m_traceSource.TraceEvent(EventLevel.Error,  "Error executing query: {0}", ex);
-                AuditUtil.AuditQuery(Core.Auditing.OutcomeIndicator.MinorFail, PipeParser.Encode(qpd, new EncodingCharacters('|', "^~\\&")));
+                AuditUtil.AuditQuery<IdentifiedData>(Core.Auditing.OutcomeIndicator.MinorFail, PipeParser.Encode(qpd, new EncodingCharacters('|', "^~\\&")));
 
                 // Now we construct the response
                 return this.CreateNACK(map.ResponseType, e.Message, ex, e);
