@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using NHapi.Base.Model;
+using NHapi.Base.Parser;
 using NHapi.Base.Util;
 using NHapi.Model.V25.Datatype;
 using NHapi.Model.V25.Segment;
@@ -27,6 +28,7 @@ using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.HL7.ParameterMap;
 using SanteDB.Messaging.HL7.TransportProtocol;
@@ -111,14 +113,13 @@ namespace SanteDB.Messaging.HL7.Messages
             var msh = e.Message.GetStructure("MSH") as MSH;
             var trigger = msh.MessageType.TriggerEvent.Value;
             var map = this.GetMapping(trigger);
-
+                var qpd = e.Message.GetStructure("QPD") as QPD;
             try
             {
                 if (map.ResponseType == null)
                     throw new NotSupportedException($"Response type not found");
 
                 // First, process the query parameters
-                var qpd = e.Message.GetStructure("QPD") as QPD;
                 var query = map.QueryHandler.ParseQuery(qpd, map);
                 if (query.Count == 0)
                     throw new InvalidOperationException("Query must provide at least one understood filter");
@@ -186,12 +187,15 @@ namespace SanteDB.Messaging.HL7.Messages
                     offset.Value + count.GetValueOrDefault() < totalResults)
                     ApplicationServiceContext.Current.GetService<Core.Services.IQueryPersistenceService>()?.SetQueryTag(queryId, count);
 
+                AuditUtil.AuditQuery(Core.Auditing.OutcomeIndicator.Success, PipeParser.Encode(qpd, new EncodingCharacters('|', "^~\\&")), results.OfType<IdentifiedData>().ToArray());
+
                 // Query basics
                 return this.CreateQueryResponse(e, filterQuery, map, results, queryId, offset.GetValueOrDefault(), count ?? 100, totalResults);
             }
             catch (Exception ex)
             {
                 this.m_traceSource.TraceEvent(EventLevel.Error,  "Error executing query: {0}", ex);
+                AuditUtil.AuditQuery(Core.Auditing.OutcomeIndicator.MinorFail, PipeParser.Encode(qpd, new EncodingCharacters('|', "^~\\&")));
 
                 // Now we construct the response
                 return this.CreateNACK(map.ResponseType, e.Message, ex, e);

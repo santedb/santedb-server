@@ -23,6 +23,7 @@ using NHapi.Model.V25.Segment;
 using SanteDB.Core;
 using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.Roles;
+using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.HL7.TransportProtocol;
 using System;
@@ -70,38 +71,56 @@ namespace SanteDB.Messaging.HL7.Messages
         /// </summary>
         protected virtual IMessage PerformAdmit(Hl7MessageReceivedEventArgs e, Bundle insertBundle)
         {
-            var patient = insertBundle.Item.OfType<Patient>().FirstOrDefault(it => it.Tags.Any(t => t.TagKey == ".v2.segment" && t.Value == "PID"));
-            if (patient == null)
-                throw new ArgumentNullException(nameof(insertBundle), "Message did not contain a patient");
+            try
+            {
+                var patient = insertBundle.Item.OfType<Patient>().FirstOrDefault(it => it.Tags.Any(t => t.TagKey == ".v2.segment" && t.Value == "PID"));
+                if (patient == null)
+                    throw new ArgumentNullException(nameof(insertBundle), "Message did not contain a patient");
 
-            var repoService = ApplicationServiceContext.Current.GetService<IRepositoryService<Bundle>>();
-            if (repoService == null)
-                throw new InvalidOperationException("Cannot find repository for Patient");
+                var repoService = ApplicationServiceContext.Current.GetService<IRepositoryService<Bundle>>();
+                if (repoService == null)
+                    throw new InvalidOperationException("Cannot find repository for Patient");
 
-            insertBundle = repoService.Insert(insertBundle);
+                insertBundle = repoService.Insert(insertBundle);
 
-            // Create response message
-            return this.CreateACK(typeof(ACK), e.Message, "CA", $"{patient.Key} created");
-        }
+                AuditUtil.AuditCreate(Core.Auditing.OutcomeIndicator.Success, null, insertBundle.Item.ToArray());
+                // Create response message
+                return this.CreateACK(typeof(ACK), e.Message, "CA", $"{patient.Key} created");
+            }
+            catch
+            {
+                AuditUtil.AuditUpdate(Core.Auditing.OutcomeIndicator.MinorFail, null, insertBundle.Item.ToArray());
+                throw;
+            }
+}
 
         /// <summary>
         /// Perform an update of the specified patient
         /// </summary>
         protected virtual IMessage PerformUpdate(Hl7MessageReceivedEventArgs e, Bundle updateBundle)
         {
-            var patient = updateBundle.Item.OfType<Patient>().FirstOrDefault(it => it.Tags.Any(t => t.TagKey == ".v2.segment" && t.Value == "PID"));
-            if (patient == null)
-                throw new ArgumentNullException(nameof(updateBundle), "Message did not contain a patient");
-            else if (!patient.Key.HasValue)
-                throw new InvalidOperationException("Update can only be performed on existing patients. Ensure that a unique identifier exists on the update record");
-            var repoService = ApplicationServiceContext.Current.GetService<IRepositoryService<Bundle>>();
-            if (repoService == null)
-                throw new InvalidOperationException("Cannot find repository for Patient");
+            try
+            {
+                var patient = updateBundle.Item.OfType<Patient>().FirstOrDefault(it => it.Tags.Any(t => t.TagKey == ".v2.segment" && t.Value == "PID"));
+                if (patient == null)
+                    throw new ArgumentNullException(nameof(updateBundle), "Message did not contain a patient");
+                else if (!patient.Key.HasValue)
+                    throw new InvalidOperationException("Update can only be performed on existing patients. Ensure that a unique identifier exists on the update record");
+                var repoService = ApplicationServiceContext.Current.GetService<IRepositoryService<Bundle>>();
+                if (repoService == null)
+                    throw new InvalidOperationException("Cannot find repository for Patient");
 
-            updateBundle = repoService.Save(updateBundle);
+                updateBundle = repoService.Save(updateBundle);
+                AuditUtil.AuditUpdate(Core.Auditing.OutcomeIndicator.Success, null, updateBundle.Item.ToArray());
 
-            // Create response message
-            return this.CreateACK(typeof(ACK), e.Message, "CA", $"{patient.Key} updated");
+                // Create response message
+                return this.CreateACK(typeof(ACK), e.Message, "CA", $"{patient.Key} updated");
+            }
+            catch
+            {
+                AuditUtil.AuditUpdate(Core.Auditing.OutcomeIndicator.MinorFail, null, updateBundle.Item.ToArray());
+                throw;
+            }
 
         }
 

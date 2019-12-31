@@ -68,7 +68,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         private QueryBuilder m_builder;
 
         // Trace source name
-        private Tracer m_traceSource = new Tracer(AuditConstants.TraceSourceName);
+        private Tracer m_traceSource = new Tracer(typeof(AdoAuditRepositoryService));
 
         /// <summary>
         /// Fired when data is being inserted

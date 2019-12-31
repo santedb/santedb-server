@@ -314,10 +314,14 @@ namespace SanteDB.Messaging.HL7.Interceptors
                         !this.m_retrieveHacks.ContainsKey(patientData.Item.OfType<Patient>().First().Key.Value))
                     {
                         var key = this.m_retrieveHacks.FirstOrDefault(o => o.Value.Any(x => x.Value == ar.PID.GetPatientIdentifierList()[0].IDNumber.Value));
+                        var patient = patientData.Item.OfType<Patient>().First();
+
                         if (key.Key != Guid.Empty)
-                            patientData.Item.OfType<Patient>().First().Key = key.Key;
-                        else 
-                            this.m_retrieveHacks.Add(patientData.Item.OfType<Patient>().First().Key.Value, (patientData.Item[0] as Patient).Identifiers);
+                            patient.Key = key.Key;
+                        else
+                        {
+                            this.m_retrieveHacks.Add(patient.Key.Value, patient.Identifiers);
+                        }
                     }
                     
                     // Now we extract the patient
