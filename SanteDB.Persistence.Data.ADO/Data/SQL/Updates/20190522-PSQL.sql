@@ -17,10 +17,10 @@ DROP INDEX SEC_DEV_SCRT_IDX ;--#!
 
 INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc)
 	SELECT cd_id, 'bacd9c6f-3fa9-481e-9636-37457962804d', 'bacd9c6f-3fa9-481e-9636-37457962804d', 'err_patient_nok_personOnly'
-	FROM cd_set_mem_vw
-	WHERE set_mnemonic = 'FamilyMember'
+	FROM cd_set_mem_assoc_tbl
+	
+	WHERE set_id = 'd3692f40-1033-48ea-94cb-31fc0f352a4e'
 	AND NOT EXISTS (SELECT 1 FROM ent_rel_vrfy_cdtbl WHERE src_cls_cd_id = 'bacd9c6f-3fa9-481e-9636-37457962804d' AND trg_cls_cd_id = 'bacd9c6f-3fa9-481e-9636-37457962804d' AND rel_typ_cd_id = cd_id);
-
 
 UPDATE ENT_REL_VRFY_CDTBL 
 	SET err_desc = (

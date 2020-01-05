@@ -198,13 +198,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     return this.GetStoredQueryResults(queryId, offset, count, out totalResults);
 
                 // Is obsoletion time already specified? If so and the entity is an iversioned entity we don't want obsolete data coming back
-                if (!query.ToString().Contains("ObsoletionTime") && typeof(IVersionedEntity).IsAssignableFrom(typeof(TModel)))
+                var queryString = query.ToString();
+                if (!queryString.Contains("ObsoletionTime") && typeof(IVersionedEntity).IsAssignableFrom(typeof(TModel)) && !queryString.Contains("VersionKey"))
                 {
                     var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
                     //var obsoletionReference = Expression.MakeUnary(ExpressionType.Not, Expression.MakeMemberAccess(Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), typeof(Nullable<DateTimeOffset>).GetProperty("HasValue")), typeof(bool));
                     query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
                 }
-                else if (!query.ToString().Contains("ObsoleteVersionSequenceId") && typeof(IVersionedAssociation).IsAssignableFrom(typeof(TModel)))
+                else if (!queryString.Contains("ObsoleteVersionSequenceId") && typeof(IVersionedAssociation).IsAssignableFrom(typeof(TModel)))
                 {
                     var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedAssociation.ObsoleteVersionSequenceId))), Expression.Constant(null));
                     //var obsoletionReference = Expression.MakeUnary(ExpressionType.Not, Expression.MakeMemberAccess(Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedAssociation.ObsoleteVersionSequenceId))), typeof(Nullable<decimal>).GetProperty("HasValue")), typeof(bool));

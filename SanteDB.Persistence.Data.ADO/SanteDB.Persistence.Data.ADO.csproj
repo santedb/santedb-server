@@ -343,6 +343,8 @@
     <Content Include="Data\SQL\Updates\20170721-PSQL.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Data\SQL\Updates\20200105-FBSQL.sql" />
+    <EmbeddedResource Include="Data\SQL\Updates\20200105-PSQL.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

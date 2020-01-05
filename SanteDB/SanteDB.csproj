@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SanteDB</RootNamespace>
     <AssemblyName>SanteDB</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -290,6 +290,10 @@
           <Project>{903e2e75-7b62-4c42-a001-404dc0235a6b}</Project>
           <Name>SanteDB.Rest.HDSI</Name>
         </ProjectReference>
+        <ProjectReference Include="..\santedb-match\SanteDB.Matcher.Configuration.File\SanteDB.Matcher.Configuration.File.csproj">
+          <Project>{34c6a8fa-d3dd-4ab9-9d0d-24f355690cec}</Project>
+          <Name>SanteDB.Matcher.Configuration.File</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
@@ -305,6 +309,7 @@
         <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="1.112.0.0" />
         <PackageReference Include="SanteDB.Cdss.Xml" Version="1.112.0.0" />
         <PackageReference Include="SanteDB.Matcher" Version="1.112.0.0" />
+        <PackageReference Include="SanteDB.Configuration.File" Version="1.112.0.0" />
         <PackageReference Include="SanteDB.Core.Model.AMI" Version="1.112.0.0" />
         <PackageReference Include="SanteDB.Core.Model.RISI" Version="1.112.0.0" />
         <PackageReference Include="SanteDB.Rest.AMI" Version="1.112.0.0" />

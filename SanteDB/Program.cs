@@ -56,6 +56,7 @@ namespace SanteDB
         /// </summary>
         static void Main(String[] args)
         {
+
             // Trace copyright information
             Assembly entryAsm = Assembly.GetEntryAssembly();
             
@@ -161,6 +162,7 @@ namespace SanteDB
                         Console.WriteLine("Service started (CTRL+C to stop)...");
                         quitEvent.WaitOne();
                     }
+                    
                 }
                 else
                 {

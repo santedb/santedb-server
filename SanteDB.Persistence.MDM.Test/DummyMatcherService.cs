@@ -68,6 +68,7 @@ namespace SanteDB.Persistence.MDM.Test
     /// Represent a dummy match result
     /// </summary>
     public class DummyMatchResult<T> : IRecordMatchResult<T>
+        where T: IdentifiedData
     {
         // The record
         private T m_record;
@@ -86,6 +87,11 @@ namespace SanteDB.Persistence.MDM.Test
         /// Match classification
         /// </summary>
         public RecordMatchClassification Classification { get; private set; }
+
+        /// <summary>
+        /// Return the record
+        /// </summary>
+        IdentifiedData IRecordMatchResult.Record => this.m_record;
 
         /// <summary>
         /// Create a dummy match

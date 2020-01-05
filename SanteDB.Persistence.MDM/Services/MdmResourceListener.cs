@@ -36,6 +36,7 @@ using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.MDM.Model;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -68,7 +69,7 @@ namespace SanteDB.Persistence.MDM.Services
         /// <summary>
         /// Gets the service name
         /// </summary>
-        public string ServiceName => $"MDM Data Listener for {typeof(T).FullName}";
+        public string ServiceName => $"MIDM Data Handler Listener for {typeof(T).FullName}";
 
         // Configuration
         private ResourceMergeConfiguration m_resourceConfiguration;
@@ -395,8 +396,14 @@ namespace SanteDB.Persistence.MDM.Services
             var taggable = (ITaggable)state;
             var relationshipType = identified is Entity ? typeof(EntityRelationship) : typeof(ActRelationship);
             var relationshipService = ApplicationServiceContext.Current.GetService(typeof(IDataPersistenceService<>).MakeGenericType(relationshipType)) as IDataPersistenceService;
-            var matchingRecords = matchService.Match(identified, this.m_resourceConfiguration.MatchConfiguration);
 
+            // Create generic method for call with proper arguments
+            var matchMethod = typeof(IRecordMatchingService).GetGenericMethod(nameof(IRecordMatchingService.Match), new Type[] { identified.GetType() }, new Type[] { identified.GetType(), typeof(String) });
+            if (matchMethod == null)
+                throw new InvalidOperationException("State is invalid - Could not find matching service method - Does it implement IRecordMatchingService properly?");
+
+            var rawMatches = matchMethod.Invoke(matchService, new object[] { identified, this.m_resourceConfiguration.MatchConfiguration }) as IEnumerable;
+            var matchingRecords = rawMatches.OfType<IRecordMatchResult>();
             // Matching records can only match with MASTER records
             matchingRecords = matchingRecords.Where(o => (o.Record as ITaggable)?.Tags.Any(t => t.TagKey == "mdm.type" && t.Value == "M") == true);
             var matchGroups = matchingRecords

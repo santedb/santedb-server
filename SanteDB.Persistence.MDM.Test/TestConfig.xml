@@ -31,6 +31,7 @@
     <add type="SanteDB.Core.Configuration.SanteDBServerConfiguration, SanteDB.Core, Version=1.10.0.24599, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Messaging.Atna.Configuration.AtnaConfigurationSection, SanteDB.Messaging.Atna, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.OrmLite.Configuration.OrmConfigurationSection, SanteDB.OrmLite, Version=1.10.0.29461, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Core.Configuration.ResourceMergeConfigurationSection, SanteDB.Core.Api, Version=1.10.0.29461"/>
   </sections>
   <section xsi:type="MemoryCacheConfigurationSection" autoSubscribe="true" maxSize="10000" maxAge="3600" />
   <section xsi:type="OrmConfigurationSection">
@@ -61,7 +62,7 @@
            prepareStatements="true">
   </section>
   <!-- Master Data Management Configuration -->
-  <section xsi:type="MdmConfigurationSection">
+  <section xsi:type="ResourceMergeConfigurationSection">
     <resources>
       <add type="Patient" matchConfiguration="default" autoMerge="true" />
     </resources>
@@ -78,7 +79,7 @@
       <add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory, Version=0.6.0.0" />
       <add type="SanteDB.Core.Services.Impl.ThreadPoolService, SanteDB.Core, Version=0.6.0.0" />
       <add type="SanteDB.Persistence.MDM.Test.DummyMatcherService, SanteDB.Persistence.MDM.Test, Version=1.0.0.0"/>
-      <add type="SanteDB.Persistence.MDM.Services.MdmDaemonService, SanteDB.Persistence.MDM, Version=1.0.0.0"/>
+      <add type="SanteDB.Persistence.MDM.Services.MdmDataManagementService, SanteDB.Persistence.MDM, Version=1.0.0.0"/>
       <add type="SanteDB.Core.Services.Impl.LocalTagPersistenceService, SanteDB.Core, Version=1.0.0.0"/>
     </serviceProviders>
   </section>
