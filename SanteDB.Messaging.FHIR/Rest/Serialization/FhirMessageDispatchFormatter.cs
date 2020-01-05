@@ -179,6 +179,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
                             String fhirContent = sr.ReadToEnd();
                             var parser = new FhirXmlParser();
                             parser.Settings.AllowUnrecognizedEnums = true;
+                            parser.Settings.AcceptUnknownMembers = true;
                             parser.Settings.DisallowXsiAttributesOnRoot = false;
                             fhirObject = parser.Parse<Resource>(fhirContent);
                         }
