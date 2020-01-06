@@ -78,7 +78,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if(data.TargetEntity != null && !data.InversionIndicator) data.TargetEntity = data.TargetEntity.EnsureExists(context) as Entity;
             data.TargetEntityKey = data.TargetEntity?.Key ?? data.TargetEntityKey;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
-            
+            data.EffectiveVersionSequenceId = data.EffectiveVersionSequenceId ?? data.SourceEntity?.VersionSequence;
             return base.InsertInternal(context, data);
         }
 

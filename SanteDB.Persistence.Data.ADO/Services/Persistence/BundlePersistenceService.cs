@@ -172,6 +172,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 {
                     if (svc == null)
                         throw new InvalidOperationException($"Cannot find persister for {itm.GetType()}");
+                    
                     if (itm.TryGetExisting(context, true) != null)
                     {
                         this.m_tracer.TraceInfo("Will update {0} object from bundle...", itm);

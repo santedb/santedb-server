@@ -31,6 +31,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using System.Xml.Serialization;
+using SanteDB.Core.Model;
+using SanteDB.Core.Model.Roles;
 
 namespace SanteDB.Persistence.MDM.Model
 {
@@ -73,14 +75,16 @@ namespace SanteDB.Persistence.MDM.Model
         public T GetMaster(IPrincipal principal)
         {
             var master = new T();
-            master.CopyObjectData<IdentifiedData>(this.m_masterRecord);
+            master.CopyObjectData<IdentifiedData>(this.m_masterRecord, overwritePopulatedWithNull: false, ignoreTypeMismatch: true);
 
             // Is there a relationship which is the record of truth
             var rot = this.LoadCollection<EntityRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == MdmConstants.MasterRecordOfTruthRelationship);
             var pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
             var locals = this.LocalRecords.Where(o => {
                 if (pdp.GetPolicyDecision(principal, o).Outcome == PolicyGrantType.Grant)
+                {
                     return true;
+                }
                 else
                 {
                     AuditUtil.AuditMasking(o, true);
@@ -116,7 +120,26 @@ namespace SanteDB.Persistence.MDM.Model
             get
             {
                 if (this.m_localRecords == null)
+                {
                     this.m_localRecords = EntitySource.Current.Provider.Query<EntityRelationship>(o => o.TargetEntityKey == this.Key && o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship).Select(o => o.LoadProperty<T>("SourceEntity")).OfType<T>().ToList();
+                    this.m_localRecords.OfType<Entity>().ToList().ForEach(o =>
+                    {
+                        o.LoadCollection<EntityRelationship>(nameof(Entity.Relationships));
+                        o.LoadCollection<EntityAddress>(nameof(Entity.Addresses));
+                        o.LoadCollection<EntityTag>(nameof(Entity.Tag));
+                        o.LoadCollection<EntityTelecomAddress>(nameof(Entity.Telecoms));
+                        o.LoadCollection<EntityIdentifier>(nameof(Entity.Identifiers));
+                        o.LoadCollection<EntityName>(nameof(Entity.Names));
+                        o.LoadCollection<EntityNote>(nameof(Entity.Notes));
+                        o.LoadCollection<SecurityPolicyInstance>(nameof(Entity.Policies));
+                        o.LoadCollection<EntityExtension>(nameof(Entity.Extensions));
+
+                        if(o is Person)
+                            (o as Person).LoadCollection<PersonLanguageCommunication>(nameof(Person.LanguageCommunication));
+                        if (o is Place)
+                            (o as Place).LoadCollection<PlaceService>(nameof(Place.Services));
+                    });
+                }
                 return this.m_localRecords;
             }
         }

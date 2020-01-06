@@ -211,8 +211,11 @@
     <None Include="data\000-PlaceTypeConceptSet.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Content Include="santedb.config.xml">
+    <Content Include="santedb.config.dev.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="santedb.config.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>

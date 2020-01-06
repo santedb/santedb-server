@@ -11,6 +11,7 @@
     <add type="SanteDB.Core.Configuration.BasicAuthorizationConfigurationSection, SanteDB.Core, Version=1.10.0.24599, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.ClaimsAuthorizationConfigurationSection, SanteDB.Core, Version=1.10.0.24599, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.SecurityConfigurationSection, SanteDB.Core, Version=1.10.0.24599, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api, Version=1.10.0.0"/>
     <add type="SanteDB.Core.Security.Tfa.Email.Configuration.TfaEmailMechanismConfigurationSection, SanteDB.Core.Security.Tfa.Email, Version=1.10.0.24602, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Security.Tfa.Twilio.Configuration.TwilioTfaMechanismConfigurationSection, SanteDB.Core.Security.Tfa.Twilio, Version=1.10.0.24602, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Messaging.AMI.Configuration.AmiConfigurationSection, SanteDB.Messaging.AMI, Version=1.10.0.24603, Culture=neutral, PublicKeyToken=null" />

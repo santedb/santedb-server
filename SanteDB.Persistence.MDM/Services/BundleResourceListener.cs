@@ -56,17 +56,17 @@ namespace SanteDB.Persistence.MDM.Services
         /// <summary>
         /// Chain invoke a bundle on inserted
         /// </summary>
-        protected override void OnInserted(object sender, DataPersistedEventArgs<Bundle> e)
+        protected override void OnInserting(object sender, DataPersistingEventArgs<Bundle> e)
         {
-            this.ChainInvoke(sender, e, e.Data, nameof(OnInserted), typeof(DataPersistedEventArgs<>));
+            this.ChainInvoke(sender, e, e.Data, nameof(OnInserting), typeof(DataPersistingEventArgs<>));
         }
 
         /// <summary>
         /// Chain invoke a bundle
         /// </summary>
-        protected override void OnUpdated(object sender, DataPersistedEventArgs<Bundle> e)
+        protected override void OnSaving(object sender, DataPersistingEventArgs<Bundle> e)
         {
-            this.ChainInvoke(sender, e, e.Data, nameof(OnUpdated), typeof(DataPersistedEventArgs<>));
+            this.ChainInvoke(sender, e, e.Data, nameof(OnSaving), typeof(DataPersistedEventArgs<>));
         }
 
         /// <summary>

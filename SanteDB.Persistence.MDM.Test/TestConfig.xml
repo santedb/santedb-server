@@ -6,6 +6,7 @@
     <add type="SanteDB.Core.Configuration.DiagnosticsConfigurationSection, SanteDB.Core.Api, Version=1.30.0.23443, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Authentication.OAuth2.Configuration.OAuthConfigurationSection, SanteDB.Authentication.OAuth2, Version=1.10.0.24602, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Caching.Memory.Configuration.MemoryCacheConfigurationSection, SanteDB.Caching.Memory, Version=1.10.0.24600, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api, Version=1.10.0.0"/>
     <add type="SanteDB.Caching.Redis.Configuration.RedisConfigurationSection, SanteDB.Caching.Redis, Version=1.10.0.24601, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.JobConfigurationSection, SanteDB.Core, Version=1.10.0.24599, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.RestConfigurationSection, SanteDB.Core, Version=1.10.0.24599, Culture=neutral, PublicKeyToken=null" />

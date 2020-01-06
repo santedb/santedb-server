@@ -19,6 +19,7 @@
  */
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Collection;
@@ -58,21 +59,45 @@ namespace SanteDB.Core.Services.Impl
         protected Tracer m_traceSource = new Tracer(SanteDBConstants.DataTraceSourceName);
 
         /// <summary>
-        /// Fired after data is inserted
+        /// Fired prior to inserting the record
         /// </summary>
-        public event EventHandler<RepositoryEventArgs<TEntity>> Inserted;
+        public event EventHandler<DataPersistingEventArgs<TEntity>> Inserting;
         /// <summary>
-        /// Fired after data is saved
+        /// Fired after the record has been inserted
         /// </summary>
-        public event EventHandler<RepositoryEventArgs<TEntity>> Saved;
+        public event EventHandler<DataPersistedEventArgs<TEntity>> Inserted;
         /// <summary>
-        /// Fired after data was retrieved
+        /// Fired before the record is saved
         /// </summary>
-        public event EventHandler<RepositoryEventArgs<TEntity>> Retrieved;
+        public event EventHandler<DataPersistingEventArgs<TEntity>> Saving;
         /// <summary>
-        /// Fired after data was queried
+        /// Fired after the record has been persisted
         /// </summary>
-        public event EventHandler<RepositoryEventArgs<IEnumerable<TEntity>>> Queried;
+        public event EventHandler<DataPersistedEventArgs<TEntity>> Saved;
+        /// <summary>
+        /// Fired prior to the record being retrieved
+        /// </summary>
+        public event EventHandler<DataRetrievingEventArgs<TEntity>> Retrieving;
+        /// <summary>
+        /// Fired after the record has been retrieved
+        /// </summary>
+        public event EventHandler<DataRetrievedEventArgs<TEntity>> Retrieved;
+        /// <summary>
+        /// Fired before a query is executed
+        /// </summary>
+        public event EventHandler<QueryRequestEventArgs<TEntity>> Querying;
+        /// <summary>
+        /// Fired after query results have been executed
+        /// </summary>
+        public event EventHandler<QueryResultEventArgs<TEntity>> Queried;
+        /// <summary>
+        /// Data is obsoleting
+        /// </summary>
+        public event EventHandler<DataPersistingEventArgs<TEntity>> Obsoleting;
+        /// <summary>
+        /// Data has obsoleted
+        /// </summary>
+        public event EventHandler<DataPersistedEventArgs<TEntity>> Obsoleted;
 
         /// <summary>
         /// Gets the policy required for querying
@@ -113,14 +138,23 @@ namespace SanteDB.Core.Services.Impl
 
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
+            // Notify query 
+            var preQueryEventArgs = new QueryRequestEventArgs<TEntity>(query, offset, count, queryId, AuthenticationContext.Current.Principal);
+            this.Querying?.Invoke(this, preQueryEventArgs);
+            if (preQueryEventArgs.Cancel) /// Cancel the request
+            {
+                totalResults = preQueryEventArgs.TotalResults;
+                return preQueryEventArgs.Results;
+            }
+
             IEnumerable<TEntity> results = null;
             if (queryId != Guid.Empty && persistenceService is IStoredQueryDataPersistenceService<TEntity>)
-                results = (persistenceService as IStoredQueryDataPersistenceService<TEntity>).Query(query, queryId, offset, count,  out totalResults, AuthenticationContext.Current.Principal, orderBy);
+                results = (persistenceService as IStoredQueryDataPersistenceService<TEntity>).Query(preQueryEventArgs.Query, preQueryEventArgs.QueryId.GetValueOrDefault(), preQueryEventArgs.Offset, preQueryEventArgs.Count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
             else
-                results = persistenceService.Query(query, offset, count,  out totalResults, AuthenticationContext.Current.Principal, orderBy);
+                results = persistenceService.Query(preQueryEventArgs.Query, preQueryEventArgs.Offset, preQueryEventArgs.Count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
 
             var retVal = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
-            this.Queried?.Invoke(this, new RepositoryEventArgs<IEnumerable<TEntity>>(retVal));
+            this.Queried?.Invoke(this, new QueryResultEventArgs<TEntity>(query, retVal, offset, count, totalResults, queryId, AuthenticationContext.Current.Principal));
             return retVal;
         }
 
@@ -132,31 +166,32 @@ namespace SanteDB.Core.Services.Impl
             // Demand permission
             this.DemandWrite(data);
 
-            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TEntity>>();
-
-            if (persistenceService == null)
-            {
-                throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<TEntity>)}");
-            }
-
+            // Validate the resource
             data = this.Validate(data);
 
+            // Fire pre-persistence triggers
+            var prePersistence = new DataPersistingEventArgs<TEntity>(data, AuthenticationContext.Current.Principal);
+            this.Inserting?.Invoke(this, prePersistence);
+            if (prePersistence.Cancel)
+            {
+                this.m_traceSource.TraceWarning("Pre-persistence event signal cancel: {0}", data);
+                return prePersistence.Data;
+            }
+            // Did the pre-persistence service change the type to a batch
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
-
-            data = businessRulesService?.BeforeInsert(data) ?? data;
-
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TEntity>>();
+            data = businessRulesService?.BeforeInsert(data) ?? prePersistence.Data;
             data = persistenceService.Insert(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-
             businessRulesService?.AfterInsert(data);
+            this.Inserted?.Invoke(this, new DataPersistedEventArgs<TEntity>(data, AuthenticationContext.Current.Principal));
 
-            this.Inserted?.Invoke(this, new RepositoryEventArgs<TEntity>(data));
             return data;
         }
 
         /// <summary>
         /// Obsolete the specified data
         /// </summary>
-        public virtual TEntity Obsolete(Guid key) 
+        public virtual TEntity Obsolete(Guid key)
         {
             // Demand permission
             this.DemandDelete(key);
@@ -168,11 +203,18 @@ namespace SanteDB.Core.Services.Impl
                 throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<TEntity>)}");
             }
 
-            var entity = persistenceService.Get(key, null,  true, AuthenticationContext.Current.Principal);
+            var entity = persistenceService.Get(key, null, true, AuthenticationContext.Current.Principal);
 
             if (entity == null)
-            {
                 throw new KeyNotFoundException($"Entity {key} not found");
+
+            // Fire pre-persistence triggers
+            var prePersistence = new DataPersistingEventArgs<TEntity>(entity, AuthenticationContext.Current.Principal);
+            this.Obsoleting?.Invoke(this, prePersistence);
+            if (prePersistence.Cancel)
+            {
+                this.m_traceSource.TraceWarning("Pre-persistence event signal cancel obsolete: {0}", key);
+                return prePersistence.Data;
             }
 
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
@@ -181,7 +223,7 @@ namespace SanteDB.Core.Services.Impl
             entity = persistenceService.Obsolete(entity, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             entity = businessRulesService?.AfterObsolete(entity) ?? entity;
 
-            this.Inserted?.Invoke(this, new RepositoryEventArgs<TEntity>(entity));
+            this.Obsoleted?.Invoke(this, new DataPersistedEventArgs<TEntity>(entity, AuthenticationContext.Current.Principal));
 
             return entity;
         }
@@ -197,7 +239,7 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Get specified data from persistence
         /// </summary>
-        public virtual TEntity Get(Guid key, Guid versionKey) 
+        public virtual TEntity Get(Guid key, Guid versionKey)
         {
             // Demand permission
             this.DemandRead(key);
@@ -210,10 +252,17 @@ namespace SanteDB.Core.Services.Impl
 
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
-            var result = persistenceService.Get(key, versionKey,  true, AuthenticationContext.Current.Principal);
-
+            var preRetrieve = new DataRetrievingEventArgs<TEntity>(key, versionKey, AuthenticationContext.Current.Principal);
+            this.Retrieving?.Invoke(this, preRetrieve);
+            if(preRetrieve.Cancel)
+            {
+                this.m_traceSource.TraceWarning("Pre-retrieve trigger signals cancel: {0}", key);
+                return preRetrieve.Result;
+            }
+            
+            var result = persistenceService.Get(key, versionKey, true, AuthenticationContext.Current.Principal);
             var retVal = businessRulesService?.AfterRetrieve(result) ?? result;
-            this.Retrieved?.Invoke(this, new RepositoryEventArgs<TEntity>(retVal));
+            this.Retrieved?.Invoke(this, new DataRetrievedEventArgs<TEntity>(retVal, AuthenticationContext.Current.Principal));
             return retVal;
         }
 
@@ -232,14 +281,23 @@ namespace SanteDB.Core.Services.Impl
                 throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<TEntity>)}");
             }
 
-            data=this.Validate(data);
+            data = this.Validate(data);
 
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
             try
             {
+                var preSave = new DataPersistingEventArgs<TEntity>(data, AuthenticationContext.Current.Principal);
+                this.Saving?.Invoke(this, preSave);
+                if(preSave.Cancel)
+                {
+                    this.m_traceSource.TraceWarning("Persistence layer indicates pre-save cancel: {0}", data);
+                    return preSave.Data;
+                }
+
                 if (data.Key.HasValue && persistenceService.Get(data.Key.Value, null, true, AuthenticationContext.Current.Principal) != null)
                 {
+                    
                     data = businessRulesService?.BeforeUpdate(data) ?? data;
                     data = persistenceService.Update(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                     businessRulesService?.AfterUpdate(data);
@@ -251,23 +309,19 @@ namespace SanteDB.Core.Services.Impl
                     businessRulesService?.AfterInsert(data);
                 }
 
-                this.Saved?.Invoke(this, new RepositoryEventArgs<TEntity>(data));
+                this.Saved?.Invoke(this, new DataPersistedEventArgs<TEntity>(data, AuthenticationContext.Current.Principal));
                 return data;
             }
             catch (KeyNotFoundException)
             {
-                data = businessRulesService?.BeforeInsert(data) ?? data;
-                data = persistenceService.Insert(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-                businessRulesService?.AfterInsert(data);
-                this.Saved?.Invoke(this, new RepositoryEventArgs<TEntity>(data));
-                return data;
+                return this.Insert(data);
             }
         }
 
         /// <summary>
         /// Validate a patient before saving
         /// </summary>
-        public virtual TEntity Validate(TEntity p) 
+        public virtual TEntity Validate(TEntity p)
         {
             p = (TEntity)p.Clean(); // clean up messy data
 
@@ -289,7 +343,7 @@ namespace SanteDB.Core.Services.Impl
                     var itm = bundle.Item[i];
                     var vrst = typeof(IValidatingRepositoryService<>).MakeGenericType(itm.GetType());
                     var vrsi = ApplicationServiceContext.Current.GetService(vrst);
-                    
+
                     if (vrsi != null)
                         bundle.Item[i] = vrsi.GetType().GetMethod(nameof(Validate)).Invoke(vrsi, new object[] { itm }) as IdentifiedData;
                 }
@@ -300,7 +354,7 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Perform a faster version of the query for an object
         /// </summary>
-        public virtual IEnumerable<TEntity> FindFast(Expression<Func<TEntity, bool>> query, int offset, int? count, out int totalResults, Guid queryId) 
+        public virtual IEnumerable<TEntity> FindFast(Expression<Func<TEntity, bool>> query, int offset, int? count, out int totalResults, Guid queryId)
         {
             // Demand permission
             this.DemandQuery();
@@ -314,11 +368,20 @@ namespace SanteDB.Core.Services.Impl
 
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
+            // Notify query 
+            var preQueryEventArgs = new QueryRequestEventArgs<TEntity>(query, offset, count, queryId, AuthenticationContext.Current.Principal);
+            this.Querying?.Invoke(this, preQueryEventArgs);
+            if (preQueryEventArgs.Cancel) /// Cancel the request
+            {
+                totalResults = preQueryEventArgs.TotalResults;
+                return preQueryEventArgs.Results;
+            }
+
             IEnumerable<TEntity> results = null;
             results = persistenceService.QueryFast(query, queryId, offset, count, out totalResults);
 
             results = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
-            this.Queried?.Invoke(this, new RepositoryEventArgs<IEnumerable<TEntity>>(results));
+            this.Queried?.Invoke(this, new QueryResultEventArgs<TEntity>(query, results, offset, count, totalResults, queryId, AuthenticationContext.Current.Principal));
             return results;
         }
 
