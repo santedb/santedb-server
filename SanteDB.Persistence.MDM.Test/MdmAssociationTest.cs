@@ -138,7 +138,7 @@ namespace SanteDB.Persistence.MDM.Test
                 },
                 Identifiers = new List<EntityIdentifier>()
                 {
-                    new EntityIdentifier(new AssigningAuthority("TEST2", "TEST2", "1.2.3.4.999"), "TC-2B")
+                    new EntityIdentifier(new AssigningAuthority("TEST2", "TEST2", "1.2.3.4.999.5"), "TC-2B")
                 },
                 GenderConceptKey = Guid.Parse("F4E3A6BB-612E-46B2-9F77-FF844D971198"),
                 MultipleBirthOrder = 0

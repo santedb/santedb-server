@@ -183,13 +183,7 @@ namespace SanteDB.Caching.Memory
                     this.Remove(rel.SourceEntityKey.GetValueOrDefault());
                     this.Remove(rel.TargetEntityKey.GetValueOrDefault());
                 }
-                else if (e.Object is Act) // We need to remove RCT 
-                {
-                    var act = e.Object as Act;
-                    var rct = act.Participations.FirstOrDefault(x => x.ParticipationRoleKey == ActParticipationKey.RecordTarget || x.ParticipationRole?.Mnemonic == "RecordTarget");
-                    if (rct != null)
-                        MemoryCache.Current.RemoveObject(rct.PlayerEntityKey);
-                }
+                
             }
         }
 

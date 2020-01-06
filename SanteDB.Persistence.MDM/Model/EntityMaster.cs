@@ -31,7 +31,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using System.Xml.Serialization;
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.Roles;
 
 namespace SanteDB.Persistence.MDM.Model
@@ -42,6 +41,11 @@ namespace SanteDB.Persistence.MDM.Model
     public class EntityMaster<T> : Entity, IMdmMaster<T>
         where T : IdentifiedData, new()
     {
+
+        /// <summary>
+        /// Get the type name
+        /// </summary>
+        public override string Type { get => $"{typeof(T).Name}Master"; set { } }
 
         // The master record
         private Entity m_masterRecord;

@@ -40,6 +40,10 @@ namespace SanteDB.Persistence.MDM.Model
     public class ActMaster<T> : Act, IMdmMaster<T>
         where T : IdentifiedData, new()
     {
+        /// <summary>
+        /// Get the type name
+        /// </summary>
+        public override string Type { get => $"{typeof(T).Name}Master"; set { } }
 
         // The master record
         private Act m_masterRecord;

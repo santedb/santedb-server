@@ -90,6 +90,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Ensure we haven't already persisted this
             data.TargetEntityKey = data.TargetEntity?.Key ?? data.TargetEntityKey;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
+
+            if(data.ObsoleteVersionSequenceId == Int32.MaxValue)
+                data.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence ?? data.ObsoleteVersionSequenceId;
+
             return base.UpdateInternal(context, data);
         }
 

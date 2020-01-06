@@ -160,102 +160,26 @@ namespace SanteDB.Caching.Redis
         /// </summary>
         private void EnsureCacheConsistency(DataCacheEventArgs e, bool remove = false)
         {
-            //// Relationships should always be clean of source/target so the source/target will load the new relationship
+            // If someone inserts a relationship directly, we need to unload both the source and target so they are re-loaded 
             if (e.Object is ActParticipation)
             {
                 var ptcpt = (e.Object as ActParticipation);
-                var sourceEntity = this.GetCacheItem(ptcpt.SourceEntityKey.Value) as Act;
-                var targetEntity = this.GetCacheItem(ptcpt.PlayerEntityKey.Value) as Entity;
 
-                if (sourceEntity != null) // search and replace
-                {
-                    var idx = sourceEntity.Participations.FirstOrDefault(o => o.ParticipationRoleKey == ptcpt.ParticipationRoleKey &&
-                        o.ActKey == ptcpt.ActKey && o.PlayerEntityKey == ptcpt.PlayerEntityKey);
-                    if (idx != null)
-                        sourceEntity.Participations.Remove(idx);
-
-                    if (!remove && !ptcpt.ObsoleteVersionSequenceId.HasValue)
-                        sourceEntity.Participations.Add(ptcpt);
-                    this.Add(sourceEntity);
-                }
-                if (targetEntity != null)
-                {
-                    var idx = targetEntity.Participations.FirstOrDefault(o => o.ParticipationRoleKey == ptcpt.ParticipationRoleKey &&
-                        o.ActKey == ptcpt.ActKey && o.PlayerEntityKey == ptcpt.PlayerEntityKey);
-                    if (idx != null)
-                    {
-                        targetEntity.Participations.Remove(idx);
-                        if (!remove && !ptcpt.ObsoleteVersionSequenceId.HasValue)
-                            targetEntity.Participations.Add(ptcpt);
-                    }
-                    this.Add(targetEntity);
-                }
+                this.Remove(ptcpt.SourceEntityKey.GetValueOrDefault());
+                this.Remove(ptcpt.PlayerEntityKey.GetValueOrDefault());
                 //MemoryCache.Current.RemoveObject(ptcpt.PlayerEntity?.GetType() ?? typeof(Entity), ptcpt.PlayerEntityKey);
             }
             else if (e.Object is ActRelationship)
             {
                 var rel = (e.Object as ActRelationship);
-                var sourceEntity = this.GetCacheItem(rel.SourceEntityKey.Value) as Act;
-                var targetEntity = this.GetCacheItem(rel.TargetActKey.Value) as Act;
-
-                if (sourceEntity != null) // search and replace
-                {
-                    var idx = sourceEntity.Relationships.FirstOrDefault(o => o.RelationshipTypeKey == rel.RelationshipTypeKey &&
-                        o.SourceEntityKey == rel.SourceEntityKey && o.TargetActKey == rel.TargetActKey);
-                    if (idx != null)
-                        sourceEntity.Relationships.Remove(idx);
-                    if (!remove && !rel.ObsoleteVersionSequenceId.HasValue)
-                        sourceEntity.Relationships.Add(rel);
-                    this.Add(sourceEntity);
-
-                }
-                if (targetEntity != null)
-                {
-                    var idx = targetEntity.Relationships.FirstOrDefault(o => o.RelationshipTypeKey == rel.RelationshipTypeKey &&
-                        o.SourceEntityKey == rel.SourceEntityKey && o.TargetActKey == rel.TargetActKey);
-                    if (idx != null)
-                        targetEntity.Relationships.Remove(idx);
-                    if (!remove && !rel.ObsoleteVersionSequenceId.HasValue)
-                        targetEntity.Relationships.Add(rel);
-                    this.Add(targetEntity);
-
-                }
+                this.Remove(rel.SourceEntityKey.GetValueOrDefault());
+                this.Remove(rel.TargetActKey.GetValueOrDefault());
             }
             else if (e.Object is EntityRelationship)
             {
                 var rel = (e.Object as EntityRelationship);
-                var sourceEntity = this.GetCacheItem(rel.SourceEntityKey.Value) as Entity;
-                var targetEntity = this.GetCacheItem(rel.TargetEntityKey.Value) as Entity;
-
-                if (sourceEntity != null) // search and replace
-                {
-                    var idx = sourceEntity.Relationships.FirstOrDefault(o => o.RelationshipTypeKey == rel.RelationshipTypeKey &&
-                        o.SourceEntityKey == rel.SourceEntityKey && o.TargetEntityKey == rel.TargetEntityKey);
-                    if (idx != null)
-                        sourceEntity.Relationships.Remove(idx);
-                    if (!remove && !rel.ObsoleteVersionSequenceId.HasValue)
-                        sourceEntity.Relationships.Add(rel);
-                    this.Add(sourceEntity);
-
-                }
-                if (targetEntity != null)
-                {
-                    var idx = targetEntity.Relationships.FirstOrDefault(o => o.RelationshipTypeKey == rel.RelationshipTypeKey &&
-                        o.SourceEntityKey == rel.SourceEntityKey && o.TargetEntityKey == rel.TargetEntityKey);
-                    if (idx != null)
-                        targetEntity.Relationships.Remove(idx);
-                    if (!remove && !rel.ObsoleteVersionSequenceId.HasValue)
-                        targetEntity.Relationships.Add(rel);
-                    this.Add(targetEntity);
-
-                }
-            }
-            else if (e.Object is Act) // We need to remove RCT 
-            {
-                var act = e.Object as Act;
-                var rct = act.Participations.FirstOrDefault(x => x.ParticipationRoleKey == ActParticipationKey.RecordTarget || x.ParticipationRole?.Mnemonic == "RecordTarget");
-                if (rct != null)
-                    this.Remove(rct.PlayerEntityKey.Value);
+                this.Remove(rel.SourceEntityKey.GetValueOrDefault());
+                this.Remove(rel.TargetEntityKey.GetValueOrDefault());
             }
 
         }
