@@ -26,15 +26,7 @@ DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 LicenseFile=..\License.rtf
 OutputDir=..\bin\release\dist\
-#ifdef BUNDLED
-#ifdef x64
-OutputBaseFilename = santedb-setup-bundled-x64-{#MyAppVersion}
-#else
-OutputBaseFilename = santedb-setup-bundled-{#MyAppVersion}
-#endif
-#else
-OutputBaseFilename = santedb-setup-standalone-{#MyAppVersion}
-#endif
+OutputBaseFilename = santedb-server-{#MyAppVersion}
 SolidCompression=yes
 Uninstallable=true
 WizardSmallImageFile=.\install-small.bmp
@@ -42,9 +34,11 @@ WizardImageFile=.\install.bmp
 #ifdef DEBUG
 Compression = none
 #else
-Compression = bzip
+Compression = lzma
 #endif
-AppCopyright = Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+AppCopyright = Copyright (C) 2015-2019 SanteSuite Community Partners
+ArchitecturesInstallIn64BitMode = x64
+ArchitecturesAllowed =  x64
 ; SignTool=default sign $f
 ; SignedUninstaller=yes
 
@@ -90,13 +84,6 @@ Name: tools; Description: Management Tooling; Types: full demo
 Name: demo; Description: Sample Data; Types: demo
 
 [Files]
-#ifdef BUNDLED
-#ifdef x64
-Source: .\postgresql-9.4.15-2-windows-x64.exe; DestDir: {tmp}; Flags:dontcopy
-#else
-Source: .\postgresql-9.4.15-2-windows.exe; DestDir: {tmp}; Flags:dontcopy
-#endif
-#endif
 
 ; Microsoft .NET Framework 4.5 Installation
 Source: .\dotNetFx45_Full_setup.exe; DestDir: {tmp} ; Flags: dontcopy
@@ -245,26 +232,24 @@ Source: ..\bin\release\SanteDB.Persistence.MDM.dll; DestDir: {app}; Components: 
 
 ; Matcher
 Source: ..\bin\release\SanteDB.Matcher.dll; DestDir: {app}; Components: match
+Source: ..\bin\release\SanteDB.Matcher.Configuration.File.dll; DestDir: {app}; Components: match
 Source: ..\bin\release\Phonix.dll; DestDir: {app}; Components: match
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Run]
-Filename: "{app}\SanteDB.exe"; Parameters:"--console --test-start"; Flags: runhidden runascurrentuser waituntilterminated; StatusMsg: "Initializing Sample Data Environment"; Components: demo
+Filename: "{app}\ConfigTool.exe";  Description: "Configure SanteDB Server"; Flags: postinstall ; 
 Filename: "{app}\SanteDB.exe"; Parameters:"--install"; Flags: runhidden runascurrentuser; StatusMsg: "Registering SanteDB Service"
-Filename: "net.exe"; Parameters: "start santedb"; Flags: postinstall nowait runascurrentuser; Description: "Start SanteDB Service With Demo Data"; Components: demo
 
 [UninstallRun]
-#ifdef BUNDLED
-Filename: "{app}\postgresql\uninstall-postgresql.exe"; Parameters: "--mode unattended"; StatusMsg: "Un-registering PostgreSQL 9.4"; Flags:runhidden;
-#endif
-Filename: "net.exe"; Parameters: "stop santedb"; StatusMsg: "Stopping SanteDB"; Flags: waituntilterminated runascurrentuser;
 Filename: "{app}\SanteDB.exe"; Parameters: "--uninstall"; StatusMsg: "Un-registering SanteDB"; Flags:runhidden runascurrentuser;
 
 
 [Icons]
-Name: "{commonprograms}\SanteDB\SanteDB Administration Console"; Filename: "{app}\sdbac.exe"
+Name: "{commonprograms}\SanteDB\SanteDB Server Console"; Filename: "{app}\sdbac.exe"
+Name: "{commonprograms}\SanteDB\SanteDB Server Configuration"; Filename: "{app}\configtool.exe"
+Filename: "http://help.santesuite.org"; Name: "{group}\SanteDB\SanteDB Help"; IconFilename: "{app}\santedb.exe"
 
 ; Components
 [Code]
@@ -322,25 +307,6 @@ begin
     ExtractTemporaryFile('vcredist_x86.exe');
     Exec(ExpandConstant('{tmp}\vcredist_x86.exe'), '/install /passive', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
 
-  #ifdef BUNDLED
-    if (chkInstallPSQL.Checked) then begin
-	#ifdef x64
-      ExtractTemporaryFile('postgresql-9.4.15-2-windows-x64.exe');
-      if Exec(ExpandConstant('{tmp}\postgresql-9.4.15-2-windows-x64.exe'), '--mode unattended --superaccount ' + txtPostgresSU.Text + ' --superpassword ' + txtPostgresSUPass.Text + ' --servicename psql_openiz --install_runtimes 1 --prefix "' + ExpandConstant('{app}\postgresql') + '" --datadir "' + ExpandConstant('{app}\postgresql\data') + '"', '', SW_SHOW, ewWaitUntilTerminated, ResultCode) then begin
-	#else
-      ExtractTemporaryFile('postgresql-9.4.15-2-windows.exe');
-      if Exec(ExpandConstant('{tmp}\postgresql-9.4.15-2-windows.exe'), '--mode unattended --superaccount ' + txtPostgresSU.Text + ' --superpassword ' + txtPostgresSUPass.Text + ' --servicename  psql_openiz --install_runtimes 1 --prefix "' + ExpandConstant('{app}\postgresql') + '" --datadir "' + ExpandConstant('{app}\postgresql\data') + '"', '', SW_SHOW, ewWaitUntilTerminated, ResultCode) then begin
-	#endif
-          // handle success if necessary; ResultCode contains the exit code
-          if not (ResultCode = 0) then begin
-            Result := 'PostgreSQL Install Failed';
-          end;
-        end else begin
-          // handle failure if necessary; ResultCode contains the error code
-            Result := 'PostgreSQL Install Failed';
-        end;
-      end;
-    #endif
     if (Result = '') and (dotNetNeeded = true) then begin
       ExtractTemporaryFile('dotNetFx45_Full_setup.exe');
       if Exec(ExpandConstant(dotnetRedistURL), '/passive /norestart', '', SW_SHOW, ewWaitUntilTerminated, ResultCode) then begin
@@ -366,100 +332,5 @@ begin
   s := s + MemoDirInfo + NewLine;
 
   Result := s
-end;
-
-
-function PSQL_CreatePage(PreviousPageId : Integer) : Integer  ;
-var
-  Page : TWizardPage;
-  lblSU, lblSUPwd, lblDescription : TLabel;
-  
-begin
-  Page := CreateCustomPage( PreviousPageId, ExpandConstant('Install PostgreSQL'), ExpandConstant('Setup can install PostgreSQL 9.4'));
-  
-  // Select mode
-  lblDescription := TLabel.Create(Page);
-	with lblDescription do begin
-		Parent := Page.Surface;
-		Caption := ExpandConstant('Setup can install Enterprise DB''s Windows version of PostgreSQL 9.4.15 on this computer. You do not need to do this if you have another computer running PostgreSQL 9.4 or higher.');
-    WordWrap := true;
-		Left := ScaleX(5);
-		Top := ScaleY(8);
-		Width := ScaleX(410);
-		Height := ScaleY(100);
-	end;
-	
-	// Check to install PSQL
-	chkInstallPSQL := TCheckBox.Create(Page);
-	with chkInstallPSQL do begin
-		Parent := Page.Surface;
-		Caption := ExpandConstant('Install PostgreSQL 9.4.15');
-		Left := ScaleX(5);
-		Top := ScaleY(60);
-		Width := ScaleX(348);
-		Height := ScaleY(32);
-		Checked := true;
-	end;
-	
-  // Username
-  lblSU := TLabel.Create(Page);
-  with lblSU do begin
-    Parent := Page.Surface;
-    Caption := 'Superuser Account:';
-		Left := ScaleX(5);
-		Top := ScaleY(90);
-		Width := ScaleX(128);
-		Height := ScaleY(32);
-  end; 
-  txtPostgresSU := TEdit.Create(Page);
-  with txtPostgresSU do begin
-    Parent := Page.Surface;
-		Left := ScaleX(128);
-		Top := ScaleY(90);
-		Width := ScaleX(128);
-		Height := ScaleY(32);
-  end;
-
-  // Pass
-  lblSUPwd := TLabel.Create(Page);
-  with lblSUPwd do begin
-    Parent := Page.Surface;
-    Caption := 'Password:';
-		Left := ScaleX(5);
-		Top := ScaleY(112);
-		Width := ScaleX(128);
-		Height := ScaleY(32);
-  end; 
-  txtPostgresSUPass := TEdit.Create(Page);
-  with txtPostgresSUPass do begin
-    Parent := Page.Surface;
-		Left := ScaleX(128);
-		Top := ScaleY(112);
-		Width := ScaleX(128);
-    PasswordChar := '*';
-		Height := ScaleY(32);
-  end;
-
-  // Check 
-	Result := Page.ID;
-end;
-
-function NextButtonClick(CurPageID: Integer): Boolean;
-begin
-  if(CurPageID = psqlPageId) then begin
-    if(chkInstallPSQL.Checked = true and ((txtPostgresSU.Text = '') or (txtPostgresSUPass.Text = ''))) then begin
-      MsgBox('When installing PostgreSQL you must supply a superuser name and password', mbInformation, MB_OK);
-      Result := false;
-    end else
-      Result := true;
-  end else
-    Result := true;
-end;
-
-procedure InitializeWizard();
-begin
-#ifdef BUNDLED
-  	psqlPageId := PSQL_CreatePage(wpWelcome);
-#endif
 end;
 

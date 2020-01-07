@@ -384,6 +384,11 @@
       <oid xmlns="http://santedb.org/model">1.3.6.1.4.1.52820.5.1.1.1.999</oid>
       <url xmlns="http://santedb.org/model">http://mpi.mohs.go.mm/identity/mohs/nhid/mpi/internal</url>
     </localAuthority>
+    <ssnAuthority>
+      <domainName xmlns="http://santedb.org/model">MOIP_NRC</domainName>
+      <oid xmlns="http://santedb.org/model">1.3.6.1.4.1.52820.5.1.1.1.7</oid>
+      <url xmlns="http://santedb.org/model">http://mpi.mohs.gov.mm/identity/moip/nrc</url>
+    </ssnAuthority>
     <services>
       <add address="llp://0.0.0.0:2100" name="LLP" receiveTimeout="20000">
         <!-- If you want to enable security Encryption

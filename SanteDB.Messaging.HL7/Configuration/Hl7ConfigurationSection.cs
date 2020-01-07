@@ -74,6 +74,12 @@ namespace SanteDB.Messaging.HL7.Configuration
         /// </summary>
         [XmlArray("interceptors"), XmlArrayItem("add"), JsonProperty("interceptors")]
         public List<Hl7InterceptorConfigurationElement> Interceptors { get; set; }
+
+        /// <summary>
+        /// Gets or sets the authority for SSN
+        /// </summary>
+        [XmlElement("ssnAuthority"), JsonProperty("ssnAuthority")]
+        public AssigningAuthority SsnAuthority { get; set; }
     }
 
     /// <summary>

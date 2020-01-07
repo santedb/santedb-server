@@ -540,9 +540,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Execute the SQL provided
         /// </summary>
-        [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public void ExecuteNonQuery(string sql)
         {
+
+            if (AuthenticationContext.Current.Principal != AuthenticationContext.SystemPrincipal)
+                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.UnrestrictedAdministration).Demand();
+
             using (var conn = this.GetConfiguration().Provider.GetWriteConnection())
             {
                 IDbTransaction tx = null;

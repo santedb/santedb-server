@@ -21,6 +21,7 @@ using Newtonsoft.Json;
 using RestSrvr.Attributes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
 using System.Xml.Serialization;
 
@@ -68,7 +69,7 @@ namespace SanteDB.Core.Configuration
         /// <summary>
         /// Service ignore
         /// </summary>
-        [XmlIgnore, JsonIgnore]
+        [XmlIgnore, JsonIgnore, Browsable(false)]
         public Type ServiceType { get => Type.GetType(this.ServiceTypeXml); set => this.ServiceTypeXml = value.AssemblyQualifiedName; }
 
         /// <summary>

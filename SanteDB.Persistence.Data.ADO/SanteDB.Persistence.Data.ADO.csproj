@@ -312,10 +312,10 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="1.112.0.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="1.112.0.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="1.112.0.0" />
-        <PackageReference Include="SanteDB.BI" Version="1.112.0.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="1.115.0.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="1.115.0.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="1.115.0.0" />
+        <PackageReference Include="SanteDB.BI" Version="1.115.0.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -340,9 +340,9 @@
     <Content Include="Data\SQL\Updates\20190625-FBSQL.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\SQL\Updates\20170721-PSQL.sql">
+    <EmbeddedResource Include="Data\SQL\Updates\20170721-PSQL.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </EmbeddedResource>
     <Content Include="Data\SQL\Updates\20200105-FBSQL.sql" />
     <EmbeddedResource Include="Data\SQL\Updates\20200105-PSQL.sql" />
   </ItemGroup>

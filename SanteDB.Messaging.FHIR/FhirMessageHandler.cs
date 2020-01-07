@@ -38,7 +38,7 @@ namespace SanteDB.Messaging.FHIR
     /// <summary>
     /// Message handler for FHIR
     /// </summary>
-    [ServiceProvider("HL7 FHIR R3 API Endpoint")]
+    [ApiServiceProvider("HL7 FHIR R3 API Endpoint", typeof(IFhirServiceContract), configurationType: typeof(FhirServiceConfigurationSection))]
     public class FhirMessageHandler : IDaemonService, IApiEndpointProvider
     {
 

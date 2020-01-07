@@ -22,6 +22,7 @@ using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Data;
 using SanteDB.Core.Configuration.Features;
 using SanteDB.Core.Interfaces;
+using SanteDB.Core.Interop;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -57,7 +58,7 @@ namespace SanteDB.Configuration
         // Providers
         private IEnumerable<IDataConfigurationProvider> m_providers;
         // Features
-        private IEnumerable<IFeature> m_features;
+        private IList<IFeature> m_features;
 
         /// <summary>
         /// Gets the configuration file name
@@ -99,7 +100,7 @@ namespace SanteDB.Configuration
         /// <summary>
         /// Gets the features available in the current version of the object
         /// </summary>
-        public IEnumerable<IFeature> Features
+        public IList<IFeature> Features
         {
             get
             {
@@ -108,7 +109,9 @@ namespace SanteDB.Configuration
                     this.m_features = AppDomain.CurrentDomain.GetAssemblies()
                         .Where(o => !o.IsDynamic)
                         .SelectMany(a => { try { return a.ExportedTypes; } catch { return new List<Type>(); } })
-                        .Where(t => typeof(IFeature).IsAssignableFrom(t) && !t.ContainsGenericParameters && !t.IsAbstract && !t.IsInterface).Select(i => Activator.CreateInstance(i) as IFeature).ToList();
+                        .Where(t => typeof(IFeature).IsAssignableFrom(t) && !t.ContainsGenericParameters && !t.IsAbstract && !t.IsInterface)
+                        .Select(i => Activator.CreateInstance(i) as IFeature)
+                        .ToList();
                 }
                 return this.m_features;
             }
@@ -269,6 +272,8 @@ namespace SanteDB.Configuration
                 Application.DoEvents();
                 svc.Start();
             }
+
+            this.Features.Count();
 
             this.Started?.Invoke(this, EventArgs.Empty);
 	    this.StartTime = DateTime.Now;

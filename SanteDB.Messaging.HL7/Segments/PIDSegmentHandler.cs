@@ -78,8 +78,15 @@ namespace SanteDB.Messaging.HL7.Segments
             }
             // Map alternate identifiers
             foreach (var id in patient.LoadCollection<EntityIdentifier>("Identifiers"))
+            {
                 if (exportDomains == null || exportDomains.Any(e => e.Key == id.AuthorityKey) == true)
+                {
                     retVal.GetPatientIdentifierList(retVal.PatientIdentifierListRepetitionsUsed).FromModel(id);
+                    if (id.Authority.DomainName == this.m_configuration.SsnAuthority.DomainName ||
+                        id.Authority.Oid == this.m_configuration.SsnAuthority.Oid)
+                        retVal.SSNNumberPatient.Value = id.Value;
+                }
+            }
 
             // Addresses
             foreach (var addr in patient.LoadCollection<EntityAddress>("Addresses"))
@@ -426,8 +433,19 @@ namespace SanteDB.Messaging.HL7.Segments
                     }
                 }
 
-                // Birth place is present
-                fieldNo = 23;
+                // SSN
+                fieldNo = 19;
+
+                // Patient account, locate the specified account
+                if (!String.IsNullOrEmpty(pidSegment.SSNNumberPatient.Value))
+                {
+                    var ssn = pidSegment.SSNNumberPatient.Value;
+                    // Lookup identity domain which is designated as SSN
+                    retVal.Identifiers.Add(new EntityIdentifier(this.m_configuration.SsnAuthority, ssn));
+                }
+
+                    // Birth place is present
+                    fieldNo = 23;
                 if (!pidSegment.BirthPlace.IsEmpty()) // We need to find the birthplace relationship
                 {
                     Guid birthPlaceId = Guid.Empty;
