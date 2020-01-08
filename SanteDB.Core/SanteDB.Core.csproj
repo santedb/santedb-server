@@ -64,13 +64,6 @@
     <Compile Include="Configuration\Features\FileSystemQueueFeature.cs" />
     <Compile Include="Configuration\Features\JobManagerFeature.cs" />
     <Compile Include="Configuration\Features\LocalAppletManagerFeature.cs" />
-    <Compile Include="Configuration\Features\Rest\ActivateApiService.cs" />
-    <Compile Include="Configuration\Features\Rest\ConfigureRestEndpointTask.cs" />
-    <Compile Include="Configuration\Features\Rest\ConfigureServiceSectionTask.cs" />
-    <Compile Include="Configuration\Features\Rest\DeactivateApiService.cs" />
-    <Compile Include="Configuration\Features\Rest\RemoveRestEndpointTask.cs" />
-    <Compile Include="Configuration\Features\Rest\RemoveServiceSectionTask.cs" />
-    <Compile Include="Configuration\Features\Rest\RestServiceFeatureBase.cs" />
     <Compile Include="Configuration\Features\ServerSecurityFeature.cs" />
     <Compile Include="Configuration\FileSystemQueueConfigurationSection.cs" />
     <Compile Include="Configuration\JobConfigurationSection.cs" />

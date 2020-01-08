@@ -20,6 +20,7 @@
 using Newtonsoft.Json;
 using SanteDB.Core.Configuration;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Xml.Serialization;
 
 namespace SanteDB.Core.Configuration
@@ -49,7 +50,7 @@ namespace SanteDB.Core.Configuration
         /// <summary>
         /// Gets or sets the service configuration
         /// </summary>
-        [XmlElement("service"), JsonProperty("service")]
+        [XmlElement("service"), JsonProperty("service"), Browsable(false)]
         public List<RestServiceConfiguration> Services { get; set; }
     }
 }

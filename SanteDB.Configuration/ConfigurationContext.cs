@@ -118,6 +118,16 @@ namespace SanteDB.Configuration
         }
 
         /// <summary>
+        /// Initial configuration startup
+        /// </summary>
+        public void InitialStart()
+        {
+            this.Features.Count();
+
+            this.Started?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
         /// Get the configuration tasks
         /// </summary>
         public ObservableCollection<IConfigurationTask> ConfigurationTasks

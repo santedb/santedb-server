@@ -40,7 +40,7 @@ using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Security;
-
+using System.Security.Authentication;
 using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.ADO.Services
@@ -551,12 +551,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         .InnerJoin<DbSecurityApplication>(o => o.ApplicationKey, o => o.Key)
                         .Join<DbSession, DbSecurityUser>("LEFT", o => o.UserKey, o => o.Key)
                         .Join<DbSession, DbSecurityDevice>("LEFT", o=>o.DeviceKey, o=>o.Key)
-                        .Where<DbSession>(s => s.Key == sessionId && s.NotAfter > DateTimeOffset.Now);
+                        .Where<DbSession>(s => s.Key == sessionId);
 
                     var auth = context.FirstOrDefault<CompositeResult<DbSession, DbSecurityApplication, DbSecurityUser, DbSecurityDevice>>(sql);
 
                     // Identities
                     List<IClaimsIdentity> identities = new List<IClaimsIdentity>(3);
+                    if (auth.Object1.NotAfter < DateTime.Now)
+                        throw new AuthenticationException("Session is expired");
                     if (auth.Object2?.Key != null)
                         identities.Add(new Core.Security.ApplicationIdentity(auth.Object2.Key, auth.Object2.PublicId, true));
                     if (auth.Object1.DeviceKey.HasValue)

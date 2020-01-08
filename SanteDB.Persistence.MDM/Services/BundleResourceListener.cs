@@ -17,10 +17,13 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Event;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Collection;
+using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -139,7 +142,7 @@ namespace SanteDB.Persistence.MDM.Services
                 foreach (var hdlr in this.m_listeners.Where(o => o.GetType() == mdmHandler))
                 {
                     var exeMethod = mdmHandler.GetRuntimeMethods().Single(m => m.Name == methodName && m.GetParameters().Select(p => p.ParameterType).SequenceEqual(new Type[] { typeof(Object), evtArgType }));
-                    exeMethod.Invoke(hdlr, new Object[] { sender, evtArgs });
+                    exeMethod.Invoke(hdlr, new Object[] { bundle, evtArgs });
 
                     // Cancel?
                     bundle.Item[i] = evtArgType.GetRuntimeProperty("Data").GetValue(evtArgs) as IdentifiedData;
@@ -149,6 +152,23 @@ namespace SanteDB.Persistence.MDM.Services
 
                 }
             }
+
+            // Now that bundle is processed , process it
+            if ((eventArgs as DataPersistingEventArgs<Bundle>)?.Cancel == true && (methodName == "OnInserting" || methodName == "OnSaving"))
+            {
+                var businessRulesSerice = ApplicationServiceContext.Current.GetBusinessRulesService<Bundle>();
+                bundle = businessRulesSerice?.BeforeInsert(bundle) ?? bundle;
+                // Business rules shouldn't be used for relationships, we need to delay load the sources
+                bundle.Item.OfType<EntityRelationship>().ToList().ForEach((i) =>
+                {
+                    if (i.SourceEntity == null)
+                        i.SourceEntity = bundle.Item.Find(o => o.Key == i.SourceEntityKey) as Entity;
+                });
+                bundle = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Bundle>>().Insert(bundle, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                bundle = businessRulesSerice?.AfterInsert(bundle) ?? bundle;
+
+            }
+
         }
     }
 }

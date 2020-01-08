@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<RestServiceConfiguration xmlns="http://santedb.org/configuration" name="FHIR">
+  <behaviors>
+    <add type="SanteDB.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Core, Version=1.10.0.0"/>
+  </behaviors>
+  <endpoint address="http://0.0.0.0:8080/fhir" contract="SanteDB.Messaging.FHIR.Rest.IFhirServiceContract, SanteDB.Messaging.FHIR, Version=1.10.0.0">
+    <behaviors>
+      <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
+      <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
+      <add type="SanteDB.Rest.Common.Behavior.CorsEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
+    </behaviors>
+  </endpoint>
+</RestServiceConfiguration>

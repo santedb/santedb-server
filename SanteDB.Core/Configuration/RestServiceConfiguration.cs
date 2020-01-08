@@ -22,6 +22,7 @@ using RestSrvr.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Reflection;
 using System.Xml.Serialization;
 
@@ -32,9 +33,12 @@ namespace SanteDB.Core.Configuration
     /// Represents configuration of a single AGS service
     /// </summary>
     [XmlType(nameof(RestServiceConfiguration), Namespace = "http://santedb.org/configuration")]
+    [XmlRoot(nameof(RestServiceConfiguration), Namespace = "http://santedb.org/configuration")]
     [JsonObject]
     public class RestServiceConfiguration
     {
+        // Configuration
+        private static XmlSerializer s_serializer;
 
         /// <summary>
         /// AGS Service Configuration
@@ -70,7 +74,7 @@ namespace SanteDB.Core.Configuration
         /// Service ignore
         /// </summary>
         [XmlIgnore, JsonIgnore, Browsable(false)]
-        public Type ServiceType { get => Type.GetType(this.ServiceTypeXml); set => this.ServiceTypeXml = value.AssemblyQualifiedName; }
+        public Type ServiceType { get => this.ServiceTypeXml != null ? Type.GetType(this.ServiceTypeXml) : null; set => this.ServiceTypeXml = value?.AssemblyQualifiedName; }
 
         /// <summary>
         /// Gets or sets the behavior of the AGS endpoint
@@ -84,5 +88,16 @@ namespace SanteDB.Core.Configuration
         [XmlElement("endpoint"), JsonProperty("endpoint")]
         public List<RestEndpointConfiguration> Endpoints { get; set; }
 
+        /// <summary>
+        /// Load from the specified stream
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        internal static RestServiceConfiguration Load(Stream stream)
+        {
+            if (s_serializer == null)
+                s_serializer = new XmlSerializer(typeof(RestServiceConfiguration));
+            return s_serializer.Deserialize(stream) as RestServiceConfiguration;
+        }
     }
 }

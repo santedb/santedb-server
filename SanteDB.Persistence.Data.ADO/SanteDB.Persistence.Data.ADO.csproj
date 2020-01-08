@@ -334,16 +334,16 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Data\SQL\Updates\20190522-PSQL.sql">
+    <EmbeddedResource Include="Data\SQL\Updates\20190522-PSQL.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\SQL\Updates\20190625-FBSQL.sql">
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\Updates\20190625-FBSQL.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </EmbeddedResource>
     <EmbeddedResource Include="Data\SQL\Updates\20170721-PSQL.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <Content Include="Data\SQL\Updates\20200105-FBSQL.sql" />
+    <EmbeddedResource Include="Data\SQL\Updates\20200105-FBSQL.sql" />
     <EmbeddedResource Include="Data\SQL\Updates\20200105-PSQL.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

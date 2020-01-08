@@ -343,18 +343,26 @@ namespace SanteDB.Persistence.MDM.Services
                 var bundle = this.PerformMdmMatch(e.Data);
                 e.Cancel = true;
 
-                // Manually fire the business rules trigger for Bundle
-                var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<Bundle>();
-                bundle = businessRulesService?.BeforeUpdate(bundle) ?? bundle;
-                // Business rules shouldn't be used for relationships, we need to delay load the sources
-                bundle.Item.OfType<EntityRelationship>().ToList().ForEach((i) =>
+                // Is the caller the bundle MDM? if so just add 
+                if (sender is Bundle)
                 {
-                    if (i.SourceEntity == null)
-                        i.SourceEntity = bundle.Item.Find(o => o.Key == i.SourceEntityKey) as Entity;
-                });
-                bundle = this.m_persistence.Update(bundle, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-                bundle = businessRulesService?.AfterUpdate(bundle) ?? bundle;
-                
+                    (sender as Bundle).Item.Remove(e.Data);
+                    (sender as Bundle).Item.AddRange(bundle.Item);
+                }
+                else
+                {
+                    // Manually fire the business rules trigger for Bundle
+                    var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<Bundle>();
+                    bundle = businessRulesService?.BeforeUpdate(bundle) ?? bundle;
+                    // Business rules shouldn't be used for relationships, we need to delay load the sources
+                    bundle.Item.OfType<EntityRelationship>().ToList().ForEach((i) =>
+                    {
+                        if (i.SourceEntity == null)
+                            i.SourceEntity = bundle.Item.Find(o => o.Key == i.SourceEntityKey) as Entity;
+                    });
+                    bundle = this.m_persistence.Update(bundle, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                    bundle = businessRulesService?.AfterUpdate(bundle) ?? bundle;
+                }
                 //ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(this.PerformMdmMatch, identified);
             }
 
@@ -397,16 +405,26 @@ namespace SanteDB.Persistence.MDM.Services
             {
                 e.Cancel = true;
                 var bundle = this.PerformMdmMatch(e.Data);
-                var businessRulesSerice = ApplicationServiceContext.Current.GetBusinessRulesService<Bundle>();
-                bundle = businessRulesSerice?.BeforeInsert(bundle) ?? bundle;
-                // Business rules shouldn't be used for relationships, we need to delay load the sources
-                bundle.Item.OfType<EntityRelationship>().ToList().ForEach((i) =>
+
+                // Is the caller the bundle MDM? if so just add 
+                if (sender is Bundle)
                 {
-                    if (i.SourceEntity == null)
-                        i.SourceEntity = bundle.Item.Find(o => o.Key == i.SourceEntityKey) as Entity;
-                });
-                bundle = this.m_persistence.Insert(bundle, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-                bundle = businessRulesSerice?.AfterInsert(bundle) ?? bundle;
+                    //(sender as Bundle).Item.Remove(e.Data);
+                    (sender as Bundle).Item.AddRange(bundle.Item.Where(o=> o != e.Data));
+                }
+                else
+                {
+                    var businessRulesSerice = ApplicationServiceContext.Current.GetBusinessRulesService<Bundle>();
+                    bundle = businessRulesSerice?.BeforeInsert(bundle) ?? bundle;
+                    // Business rules shouldn't be used for relationships, we need to delay load the sources
+                    bundle.Item.OfType<EntityRelationship>().ToList().ForEach((i) =>
+                    {
+                        if (i.SourceEntity == null)
+                            i.SourceEntity = bundle.Item.Find(o => o.Key == i.SourceEntityKey) as Entity;
+                    });
+                    bundle = this.m_persistence.Insert(bundle, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                    bundle = businessRulesSerice?.AfterInsert(bundle) ?? bundle;
+                }
                 //ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(this.PerformMdmMatch, identified);
             }
 
@@ -434,9 +452,11 @@ namespace SanteDB.Persistence.MDM.Services
             var matchingRecords = rawMatches.OfType<IRecordMatchResult>();
             // Matching records can only match with those that have MASTER records
             var matchGroups = matchingRecords
-                .Select(o => new { Match = o, Master = this.GetMaster(o.Record) })
-                .GroupBy(o => o.Match.Classification)
-                .ToDictionary(o => o.Key, o => o.Select(g=>g.Master));
+                .Select(o => new MasterMatch(this.GetMaster(o.Record).Value, o))
+                .Distinct(new MasterMatchEqualityComparer())
+                .GroupBy(o => o.MatchResult.Classification)
+                .ToDictionary(o => o.Key, o => o.Select(g => g.Master).Distinct());
+                
             if (!matchGroups.ContainsKey(RecordMatchClassification.Match))
                 matchGroups.Add(RecordMatchClassification.Match, null);
             if (!matchGroups.ContainsKey(RecordMatchClassification.Probable))
@@ -578,7 +598,7 @@ namespace SanteDB.Persistence.MDM.Services
                 // Now we persist
                 if (matchGroups[RecordMatchClassification.Match] != null)
                     insertData.AddRange(matchGroups[RecordMatchClassification.Match]
-                        .Where(m => !ignoreList.Contains(m.Value.ToString())) // ignore list
+                        .Where(m => !ignoreList.Contains(m.ToString())) // ignore list
                         .Where(m => !rels.OfType<EntityRelationship>().Any(er => er.TargetEntityKey == m)) // existing relationships
                         .Where(m => !rels.OfType<ActRelationship>().Any(er => er.TargetActKey == m)) // existing relationships
                         .Select(m => this.CreateRelationship(relationshipType, MdmConstants.CandidateLocalRelationship, entity, m)));
@@ -587,7 +607,7 @@ namespace SanteDB.Persistence.MDM.Services
             // Add probable records
             if (matchGroups[RecordMatchClassification.Probable] != null)
                 insertData.AddRange(matchGroups[RecordMatchClassification.Probable]
-                    .Where(m => !ignoreList.Contains(m.Value.ToString())) // ignore list
+                    .Where(m => !ignoreList.Contains(m.ToString())) // ignore list
                     .Select(m => this.CreateRelationship(relationshipType, MdmConstants.CandidateLocalRelationship, entity, m)));
 
             
@@ -601,24 +621,58 @@ namespace SanteDB.Persistence.MDM.Services
         {
             // Is the object already a master?
             var mdmType = match.LoadCollection<ITag>(nameof(ITaggable.Tags)).FirstOrDefault(o=>o.TagKey == "mdm.type")?.Value;
+            Guid? retVal = null;
             switch(mdmType)
             {
                 case "M": // master
-                    return match.Key;
+                    retVal = match.Key;
+                    break;
                 case "T": // Record of truth , reverse find
                     if (match is Entity)
-                        return ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityRelationship>>().Query(o => o.TargetEntityKey == match.Key && o.RelationshipTypeKey == MdmConstants.MasterRecordOfTruthRelationship, 0, 1, out int t, AuthenticationContext.SystemPrincipal).SingleOrDefault().SourceEntityKey;
+                        retVal = ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityRelationship>>().Query(o => o.TargetEntityKey == match.Key && o.RelationshipTypeKey == MdmConstants.MasterRecordOfTruthRelationship, 0, 1, out int t, AuthenticationContext.SystemPrincipal).SingleOrDefault().SourceEntityKey;
                     else
-                        return ApplicationServiceContext.Current.GetService<IDataPersistenceService<ActRelationship>>().Query(o => o.TargetActKey == match.Key && o.RelationshipTypeKey == MdmConstants.MasterRecordOfTruthRelationship, 0, 1, out int t, AuthenticationContext.SystemPrincipal).SingleOrDefault().SourceEntityKey;
+                        retVal = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ActRelationship>>().Query(o => o.TargetActKey == match.Key && o.RelationshipTypeKey == MdmConstants.MasterRecordOfTruthRelationship, 0, 1, out int t, AuthenticationContext.SystemPrincipal).SingleOrDefault().SourceEntityKey;
+                    break;
                 case "L": // local
                     if (match is Entity)
-                        return ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityRelationship>>().Query(o => o.SourceEntityKey == match.Key && o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship, 0, 1, out int t, AuthenticationContext.SystemPrincipal).SingleOrDefault().TargetEntityKey;
+                        retVal = ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityRelationship>>().Query(o => o.SourceEntityKey == match.Key && o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship, 0, 1, out int t, AuthenticationContext.SystemPrincipal).SingleOrDefault().TargetEntityKey;
                     else
-                        return ApplicationServiceContext.Current.GetService<IDataPersistenceService<ActRelationship>>().Query(o => o.SourceEntityKey == match.Key && o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship, 0, 1, out int t, AuthenticationContext.SystemPrincipal).SingleOrDefault().TargetActKey;
+                        retVal = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ActRelationship>>().Query(o => o.SourceEntityKey == match.Key && o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship, 0, 1, out int t, AuthenticationContext.SystemPrincipal).SingleOrDefault().TargetActKey;
+                    break;
                 default:
-                    throw new InvalidOperationException("Cannot determine master relationship");
+                    this.m_traceSource.TraceWarning("Record {0} is an orphan and has not master, will create one");
+                    if (match is Entity) {
+                        var master = this.CreateMasterRecord() as IdentifiedData;
+                        var bundle = new Bundle()
+                        {
+                            Item = new List<IdentifiedData>()
+                            {
+                                master,
+                                this.CreateRelationship(typeof(EntityRelationship), MdmConstants.MasterRecordRelationship, (T)match, master.Key)
+                            }
+                        };
+                        this.m_persistence.Insert(bundle, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+                        retVal = master.Key;
+                    }
+                    else
+                    {
+                        var master = this.CreateMasterRecord() as IdentifiedData;
+                        var bundle = new Bundle()
+                        {
+                            Item = new List<IdentifiedData>()
+                            {
+                                master,
+                                this.CreateRelationship(typeof(ActRelationship), MdmConstants.MasterRecordRelationship, (T)match, master.Key)
+                            }
+                        };
+                        this.m_persistence.Insert(bundle, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+                        retVal = master.Key;
+                    }
+                    
+                    break;
             }
-           
+            return retVal;
+
         }
 
         /// <summary>

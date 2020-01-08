@@ -65,7 +65,7 @@ namespace SanteDB.Messaging.AMI
     /// <summary>
     /// AMI Message handler
     /// </summary>
-    [ServiceProvider("Administrative REST Daemon")]
+    [ApiServiceProvider("Administrative REST Daemon", typeof(IAmiServiceContract), configurationType: typeof(AmiConfigurationSection), required: true)]
     public class AmiMessageHandler : IDaemonService, IApiEndpointProvider
     {
         /// <summary>

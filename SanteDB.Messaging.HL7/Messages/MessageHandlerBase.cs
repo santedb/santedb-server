@@ -174,6 +174,11 @@ namespace SanteDB.Messaging.HL7.Messages
                    applicationSecret = this.m_configuration.Security == SecurityMethod.Sft4 ? sft.SoftwareBinaryID.Value :
                                             this.m_configuration.Security == SecurityMethod.Msh8 ? msh.Security.Value : null;
 
+                if(applicationSecret == deviceSecret && applicationSecret.Contains("+")) // Both device and app are using same auth key? Odd, perhaps there is the delimeter
+                {
+                    var secrets = applicationSecret.Split('+');
+                    applicationSecret = secrets[1]; deviceSecret = secrets[0];
+                }
                 IPrincipal devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(deviceId, deviceSecret, AuthenticationMethod.Local),
                     applicationPrincipal = applicationSecret != null ? ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>()?.Authenticate(applicationId, applicationSecret) : null;
 

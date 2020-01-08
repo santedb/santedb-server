@@ -17,6 +17,7 @@ namespace SanteDB.Messaging.Metadata
     /// <summary>
     /// Represents the daemon service that starts/stops the OpenApi information file
     /// </summary>
+    [ApiServiceProvider("OpenAPI Metadata Exchange", typeof(IMetadataServiceContract), configurationType: typeof(MetadataConfigurationSection))]
     public class MetadataMessageHandler : IDaemonService, IApiEndpointProvider
     {
 

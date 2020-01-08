@@ -67,7 +67,6 @@
     <Compile Include="ResourceHandlers\CertificateSigningRequestHandler.cs" />
     <Compile Include="AmiServiceBehavior.cs" />
   </ItemGroup>
-
   <Choose>
     <When Condition="$(SolutionName.Contains('-ext'))">
       <ItemGroup>
@@ -108,10 +107,7 @@
       </ItemGroup>
     </Otherwise>
   </Choose>
-
-
   <ItemGroup>
-
     <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.AMI\SanteDB.Rest.AMI.csproj">
       <Project>{F14023E2-F8DF-4EBC-B2C4-34A825E3790E}</Project>
       <Name>SanteDB.Rest.AMI</Name>
@@ -130,6 +126,9 @@
     <PackageReference Include="Microsoft.Diagnostics.Runtime">
       <Version>1.0.0</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration\Default.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

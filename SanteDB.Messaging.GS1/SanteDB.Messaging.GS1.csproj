@@ -46,7 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\Gs1Configuration.cs" />
+    <Compile Include="Configuration\Gs1ConfigurationSection.cs" />
     <Compile Include="Configuration\As2ServiceElement.cs" />
     <Compile Include="Gs1ModelExtensions.cs" />
     <Compile Include="Model\eComModel.cs" />
@@ -66,6 +66,7 @@
     <None Include="Data\100-Gs1ReferenceTerms.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <EmbeddedResource Include="Configuration\Default.xml" />
     <Content Include="Sample\SampleInventoryReportRequest.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -91,10 +92,10 @@
           <Project>{f1a82a4f-4a57-47d7-ae76-444c8a4ff54a}</Project>
           <Name>SanteDB.Core.Model</Name>
         </ProjectReference>
-		 <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
-      <Project>{786BD0EE-1806-4158-BA45-80249AC6DFE7}</Project>
-      <Name>SanteDB.Rest.Common</Name>
-    </ProjectReference>
+        <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
+          <Project>{786BD0EE-1806-4158-BA45-80249AC6DFE7}</Project>
+          <Name>SanteDB.Rest.Common</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
@@ -107,7 +108,6 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-   
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
       <Name>SanteDB.Core</Name>

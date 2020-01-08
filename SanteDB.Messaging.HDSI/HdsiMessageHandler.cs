@@ -43,7 +43,7 @@ namespace SanteDB.Messaging.HDSI
     /// <summary>
     /// The HDSI Message Handler Daemon class
     /// </summary>
-    [ServiceProvider("iCDR Message Service")]
+    [ApiServiceProvider("iCDR Message Service", typeof(IHdsiServiceContract), configurationType: typeof(HdsiConfigurationSection), required: true)]
     public class HdsiMessageHandler : IDaemonService, IApiEndpointProvider
     {
         /// <summary>

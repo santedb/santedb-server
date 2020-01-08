@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<RestServiceConfiguration xmlns="http://santedb.org/configuration" name="GS1">
+  <behaviors>
+    <add type="SanteDB.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Core, Version=1.10.0.0"/>
+  </behaviors>
+  <endpoint address="http://0.0.0.0:8080/gs1" contract="SanteDB.Messaging.GS1.Rest.IStockService, SanteDB.Messaging.GS1, Version=1.10.0.0">
+    <behaviors>
+      <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
+      <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
+      <add type="SanteDB.Rest.Common.Behavior.CorsEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
+    </behaviors>
+  </endpoint>
+</RestServiceConfiguration>

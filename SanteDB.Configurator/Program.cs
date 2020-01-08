@@ -103,8 +103,10 @@ namespace SanteDB.Configurator
                 splash.NotifyStatus("Loading Configuration....", 0.6f);
                 if (!File.Exists(ConfigurationContext.Current.ConfigurationFile))
                 {
-                    splash.NotifyStatus("Preparing initial configuration...", 1f); // TOOD: Launch initial configuration
+                    splash.NotifyStatus("Preparing initial configuration...", 1f); // TODO: Launch initial configuration
                     splash.Close();
+                    ConfigurationContext.Current.InitialStart();
+
 
                     var init = new frmInitialConfig();
                     if (init.ShowDialog() == DialogResult.Cancel)

@@ -270,6 +270,7 @@
     <Content Include="applet\controllers\config\fhir.js" />
     <Content Include="applet\manifest.xml" />
     <Content Include="applet\views\config\fhir\content.html" />
+    <EmbeddedResource Include="Configuration\Default.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

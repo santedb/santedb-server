@@ -59,11 +59,14 @@ namespace SanteDB.Core.Configuration
         {
             get
             {
-                return Type.GetType(this.XmlType);
+                if (this.XmlType != null)
+                    return Type.GetType(this.XmlType);
+                else
+                    return null;
             }
             set
             {
-                this.XmlType = value.AssemblyQualifiedName;
+                this.XmlType = value?.AssemblyQualifiedName;
             }
         }
 

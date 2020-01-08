@@ -32,13 +32,14 @@ using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
 using SanteDB.Rest.Common.Behavior;
+using SanteDB.Messaging.GS1.Configuration;
 
 namespace SanteDB.Messaging.GS1
 {
     /// <summary>
     /// Stock service message handler
     /// </summary>
-    [ServiceProvider("GS1 BMS XML3.3 API Endpoint")]
+    [ApiServiceProvider("GS1 BMS XML3.3 API Endpoint", typeof(IStockService), configurationType: typeof(Gs1ConfigurationSection))]
 	public class StockServiceMessageHandler : IDaemonService, IApiEndpointProvider
 	{
         /// <summary>

@@ -52,8 +52,8 @@ namespace SanteDB.Core.Configuration
         [XmlIgnore, JsonIgnore]
         public Type Contract
         {
-            get => Type.GetType(this.ContractXml);
-            set => this.ContractXml = value.AssemblyQualifiedName;
+            get => this.ContractXml != null ? Type.GetType(this.ContractXml) : null;
+            set => this.ContractXml = value?.AssemblyQualifiedName;
         }
 
         /// <summary>
