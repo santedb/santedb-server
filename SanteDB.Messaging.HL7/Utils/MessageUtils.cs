@@ -264,6 +264,15 @@ namespace SanteDB.Messaging.HL7.Utils
                         }
                         retVal.Add(parm.ModelName, transform.Split(',').Select(tx => String.Format(tx, qvalue)).ToList());
                         break;
+                    case "date":
+
+                        if (qvalue.Length == 4) // partial date
+                            retVal.Add(parm.ModelName, $"~{qvalue}");
+                        else if (qvalue.Length == 6) // partial to month
+                            retVal.Add(parm.ModelName, $"~{qvalue.Insert(4, "-")}");
+                        else
+                            retVal.Add(parm.ModelName, qvalue);
+                        break;
                     default:
                         var txv = parm.ValueTransform ?? "{0}";
                         retVal.Add(parm.ModelName, txv.Split(',').Select(tx => String.Format(tx, qvalue)).ToList());

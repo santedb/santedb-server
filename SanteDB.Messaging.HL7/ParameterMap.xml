@@ -35,6 +35,10 @@
     <parameter hl7="@PID.3.1.1" model="id" />
     <parameter hl7="@PID.11.4.1" model="address.component[State].value"/>
     <parameter hl7="@PID.33" model="modifiedOn" type="date"/>
+    <parameter hl7="@PID.23" model="relationship[Birthplace].target.name.component.value" type="string"/>
+    <parameter hl7="@NK1.2.2.1" model="relationship[Mother|Father|Guardian].target.name.component[Given].value" type="string" />
+    <parameter hl7="@NK1.2.1.1" model="relationship[Mother|Father|Guardian].target.name.component[Family].value" type="string" />
+
   </messageType>
   <messageType trigger="Q23" name="Cross Reference Identifiers" response="RSP_K23" responseTrigger="K23" queryTarget="Patient"
                queryHandler="SanteDB.Messaging.HL7.Query.CrossReferenceQueryHandler, SanteDB.Messaging.HL7, Version=1.0.0.0"

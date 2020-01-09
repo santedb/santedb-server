@@ -179,6 +179,62 @@ namespace SanteDB.Messaging.HL7.Test
         }
 
         /// <summary>
+        /// Tests that a query actually occurs
+        /// </summary>
+        [TestMethod]
+        public void TestParseComplexQBPMessage()
+        {
+            AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
+            var msg = TestUtil.GetMessage("QBP_COMPLEX_PRE");
+            new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
+            var patient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "HL7-9"), AuthenticationContext.Current.Principal).SingleOrDefault();
+            Assert.IsNotNull(patient);
+            msg = TestUtil.GetMessage("QBP_COMPLEX");
+            var message = new QbpMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
+            var messageStr = TestUtil.ToString(message);
+            Assert.AreEqual("SMITH", ((message.GetStructure("QUERY_RESPONSE") as AbstractGroup).GetStructure("PID") as PID).GetMotherSMaidenName(0).FamilyName.Surname.Value);
+            Assert.AreEqual("AA", (message.GetStructure("MSA") as MSA).AcknowledgmentCode.Value);
+            Assert.AreEqual("OK", (message.GetStructure("QAK") as QAK).QueryResponseStatus.Value);
+            Assert.AreEqual("K22", (message.GetStructure("MSH") as MSH).MessageType.TriggerEvent.Value);
+        }
+
+
+        /// <summary>
+        /// Tests that a query actually occurs
+        /// </summary>
+        [TestMethod]
+        public void TestParseAndQBPMessage()
+        {
+            AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
+            var msg = TestUtil.GetMessage("QBP_COMPLEX_PRE");
+            new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
+            var patient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "HL7-9"), AuthenticationContext.Current.Principal).SingleOrDefault();
+            Assert.IsNotNull(patient);
+            msg = TestUtil.GetMessage("QBP_AND_PRE");
+            new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
+            patient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "HL7-10"), AuthenticationContext.Current.Principal).SingleOrDefault();
+            Assert.IsNotNull(patient);
+
+            msg = TestUtil.GetMessage("QBP_COMPLEX");
+            var message = new QbpMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
+            var messageStr = TestUtil.ToString(message);
+            Assert.AreEqual("1", (message.GetStructure("QAK") as QAK).HitCount.Value);
+            Assert.AreEqual("SMITH", ((message.GetStructure("QUERY_RESPONSE") as AbstractGroup).GetStructure("PID") as PID).GetMotherSMaidenName(0).FamilyName.Surname.Value);
+            Assert.AreNotEqual("JENNY", ((message.GetStructure("QUERY_RESPONSE") as AbstractGroup).GetStructure("PID") as PID).GetPatientName(0).GivenName.Value);
+            Assert.AreEqual("AA", (message.GetStructure("MSA") as MSA).AcknowledgmentCode.Value);
+            Assert.AreEqual("OK", (message.GetStructure("QAK") as QAK).QueryResponseStatus.Value);
+            Assert.AreEqual("K22", (message.GetStructure("MSH") as MSH).MessageType.TriggerEvent.Value);
+
+            // OR MESSAGE SHOULD CATCH TWO PATIENTS
+            msg = TestUtil.GetMessage("QBP_OR");
+            message = new QbpMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
+            messageStr = TestUtil.ToString(message);
+            Assert.AreEqual("2", (message.GetStructure("QAK") as QAK).HitCount.Value);
+            Assert.AreEqual("AA", (message.GetStructure("MSA") as MSA).AcknowledgmentCode.Value);
+            Assert.AreEqual("OK", (message.GetStructure("QAK") as QAK).QueryResponseStatus.Value);
+            Assert.AreEqual("K22", (message.GetStructure("MSH") as MSH).MessageType.TriggerEvent.Value);
+        }
+        /// <summary>
         /// Tests that the error code and location are appropriate for the type of error that is encountered
         /// </summary>
         [TestMethod]

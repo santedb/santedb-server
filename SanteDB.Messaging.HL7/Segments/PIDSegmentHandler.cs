@@ -82,8 +82,8 @@ namespace SanteDB.Messaging.HL7.Segments
                 if (exportDomains == null || exportDomains.Any(e => e.Key == id.AuthorityKey) == true)
                 {
                     retVal.GetPatientIdentifierList(retVal.PatientIdentifierListRepetitionsUsed).FromModel(id);
-                    if (id.Authority.DomainName == this.m_configuration.SsnAuthority.DomainName ||
-                        id.Authority.Oid == this.m_configuration.SsnAuthority.Oid)
+                    if (id.Authority.DomainName == this.m_configuration.SsnAuthority?.DomainName ||
+                        id.Authority.Oid == this.m_configuration.SsnAuthority?.Oid)
                         retVal.SSNNumberPatient.Value = id.Value;
                 }
             }
