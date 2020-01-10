@@ -240,7 +240,7 @@
       <codeSystem>56058493-266b-4d87-8b48-54c866a7218c</codeSystem>
       <name>
         <language>en</language>
-        <value>MAsked</value>
+        <value>Masked</value>
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>

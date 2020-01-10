@@ -148,9 +148,13 @@ namespace SanteDB.Messaging.HL7.Segments
                 if(contactExtension != null)
                 {
                     var existingValue = (contactExtension.ExtensionValue as dynamic);
-                    var contact = Enumerable.FirstOrDefault<dynamic>(existingValue.roles as IEnumerable<dynamic>, o => o.patientKey == patient.Key)?.contact;
-                    if (!String.IsNullOrEmpty(contact?.ToString()))
-                        nk1.ContactRole.Identifier.Value = contact;
+                    var roles = existingValue.roles as IEnumerable<dynamic>;
+                    if (roles != null)
+                    {
+                        var contact = Enumerable.FirstOrDefault<dynamic>(roles, o => o.patientKey == patient.Key)?.contact;
+                        if (!String.IsNullOrEmpty(contact?.ToString()))
+                            nk1.ContactRole.Identifier.Value = contact;
+                    }
                 }
 
                 // Load relationships
