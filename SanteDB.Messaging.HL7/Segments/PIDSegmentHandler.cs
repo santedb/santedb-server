@@ -446,8 +446,12 @@ namespace SanteDB.Messaging.HL7.Segments
                 if (!String.IsNullOrEmpty(pidSegment.SSNNumberPatient.Value))
                 {
                     var ssn = pidSegment.SSNNumberPatient.Value;
-                    // Lookup identity domain which is designated as SSN
-                    retVal.Identifiers.Add(new EntityIdentifier(this.m_configuration.SsnAuthority, ssn));
+                    // Lookup identity domain which is designated as SSN , if they already have one update it, if not, add it
+                    var existing = retVal.Identifiers.FirstOrDefault(o => o.Authority.DomainName == this.m_configuration.SsnAuthority.DomainName);
+                    if (existing == null)
+                        retVal.Identifiers.Add(new EntityIdentifier(this.m_configuration.SsnAuthority, ssn));
+                    else
+                        existing.Value = ssn;
                 }
 
                     // Birth place is present
