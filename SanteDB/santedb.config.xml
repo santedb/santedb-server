@@ -113,7 +113,7 @@
     <tokenType>bearer</tokenType>
   </section>
   <section xsi:type="MemoryCacheConfigurationSection" autoSubscribe="true" maxSize="10000" maxAge="3600" />
-  <section xsi:type="RedisConfigurationSection">
+  <section xsi:type="RedisConfigurationSection" ttl="0:5:0.0000">
     <servers>
       <add>localhost:6379</add>
     </servers>
@@ -491,7 +491,8 @@
       <!-- Data Services -->
       <!--<add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory, Version=1.9.0.24163, Culture=neutral, PublicKeyToken=null" />-->
       <add type="SanteDB.Caching.Redis.RedisCacheService, SanteDB.Caching.Redis, Version=1.9.0.24163, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Core.Query.MemoryQueryPersistenceService, SanteDB.Core, Version=1.9.0.24160, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Caching.Redis.RedisQueryPersistenceService, SanteDB.Caching.Redis, Version=1.9.0.24163, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Caching.Redis.RedisAdhocCache, SanteDB.Caching.Redis, Version=1.9.0.24163, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPersistenceService, SanteDB.Persistence.Data.ADO, Version=1.9.0.24162, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Auditing.ADO.Services.AdoAuditRepositoryService, SanteDB.Persistence.Auditing.ADO, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
 

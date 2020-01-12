@@ -75,7 +75,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
             else if (!String.IsNullOrEmpty(parms.Oid))
                 policies = m_client.GetPolicies(o => o.Oid.Contains(parms.Oid)).CollectionItem.OfType<SecurityPolicy>();
             else
-                policies = m_client.GetPolicies(o => o.Name != null).CollectionItem.OfType<SecurityPolicy>();
+                policies = m_client.GetPolicies(o => true).CollectionItem.OfType<SecurityPolicy>();
 
             // Now output
             DisplayUtil.TablePrint(policies,

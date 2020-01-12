@@ -452,6 +452,7 @@ namespace SanteDB.Persistence.MDM.Services
             var matchingRecords = rawMatches.OfType<IRecordMatchResult>();
             // Matching records can only match with those that have MASTER records
             var matchGroups = matchingRecords
+                .Where(o=>o.Record.Key != entity.Key)
                 .Select(o => new MasterMatch(this.GetMaster(o.Record).Value, o))
                 .Distinct(new MasterMatchEqualityComparer())
                 .GroupBy(o => o.MatchResult.Classification)

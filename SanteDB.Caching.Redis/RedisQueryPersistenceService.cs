@@ -248,7 +248,7 @@ namespace SanteDB.Caching.Redis
             catch (Exception e)
             {
                 this.m_tracer.TraceError("Error starting REDIS query persistence, will switch to query persister : {0}", e);
-                ApplicationServiceContext.Current.GetService<IServiceManager>().RemoveServiceProvider(typeof(RedisCacheService));
+                ApplicationServiceContext.Current.GetService<IServiceManager>().RemoveServiceProvider(typeof(RedisQueryPersistenceService));
                 ApplicationServiceContext.Current.GetService<IServiceManager>().RemoveServiceProvider(typeof(IDataCachingService));
                 return false;
             }

@@ -20,8 +20,12 @@
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl;
+using SanteDB.Persistence.MDM.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -87,6 +91,17 @@ namespace SanteDB.Persistence.MDM.Services
         {
             this.Starting?.Invoke(this, EventArgs.Empty);
 
+            // Pre-register types for serialization
+            foreach(var itm in this.m_configuration.ResourceTypes)
+            {
+                var rt = itm.ResourceType;
+                string typeName = $"{rt.Name}Master";
+                if (typeof(Entity).IsAssignableFrom(rt))
+                    rt = typeof(EntityMaster<>).MakeGenericType(rt);
+                else if (typeof(Act).IsAssignableFrom(rt))
+                    rt = typeof(ActMaster<>).MakeGenericType(rt);
+                ModelSerializationBinder.RegisterModelType(typeName, rt);
+            }
             // Wait until application context is started
             ApplicationServiceContext.Current.Started += (o, e) =>
             {

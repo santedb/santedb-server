@@ -24,6 +24,7 @@ using SanteDB.Core.Interop;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
+using SanteDB.Core.Services.Impl;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Tools.AdminConsole.Security;
 using SanteDB.Tools.AdminConsole.Util;
@@ -66,10 +67,10 @@ namespace SanteDB.Tools.AdminConsole.Shell
         public event EventHandler Stopping;
         public event EventHandler Stopped;
 
-	/// <summary>
-	/// Gets the time that the application context was started
-	/// </summary>
-	public DateTime StartTime { get; private set; }
+	    /// <summary>
+	    /// Gets the time that the application context was started
+	    /// </summary>
+	    public DateTime StartTime { get; private set; }
 
         /// <summary>
         /// Initialize the application context
@@ -95,6 +96,7 @@ namespace SanteDB.Tools.AdminConsole.Shell
             this.ApplicationName = configuration.AppId ?? "org.santedb.sdbac";
             this.ApplicationSecret = configuration.AppSecret ?? "sdbac-default-secret";
             this.m_configuration = configuration;
+            this.m_services.Add(new FileConfigurationService());
         }
 
         /// <summary>
@@ -137,12 +139,13 @@ namespace SanteDB.Tools.AdminConsole.Shell
         /// </summary>
         public bool Start()
         {
+
+            ApplicationServiceContext.Current = this;
             this.m_tracer.TraceInfo("Starting mini-context");
 
             String scheme = this.m_configuration.UseTls ? "https" : "http",
                 host = $"{scheme}://{this.m_configuration.RealmId}:{this.m_configuration.Port}/";
-
-            ApplicationServiceContext.Current = this;
+            
             this.m_tracer.TraceInfo("Contacting {0}", host);
             try
             {

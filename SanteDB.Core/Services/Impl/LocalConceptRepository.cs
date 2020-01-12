@@ -34,7 +34,8 @@ namespace SanteDB.Core.Services.Impl
     /// maintenance of concepts.
     /// </summary>
     public class LocalConceptRepository : GenericLocalNullifiedRepository<Concept>, IConceptRepositoryService
-	{
+    {
+
         /// <summary>
         /// Query policy for concepts
         /// </summary>
@@ -63,62 +64,97 @@ namespace SanteDB.Core.Services.Impl
         /// <param name="language">The language of the concept.</param>
         /// <returns>Returns a list of concepts.</returns>
         public IEnumerable<Concept> FindConceptsByName(string name, string language)
-		{
-			return base.Find(o => o.ConceptNames.Any(n => n.Name == name && n.Language == language && n.ObsoleteVersionSequenceId == null));
-		}
+        {
+            return base.Find(o => o.ConceptNames.Any(n => n.Name == name && n.Language == language && n.ObsoleteVersionSequenceId == null));
+        }
 
-		/// <summary>
-		/// Finds a concept by reference term.
-		/// </summary>
-		/// <param name="code">The code of the reference term.</param>
-		/// <param name="codeSystem">The code system OID of the reference term.</param>
-		/// <returns>Returns a list of concepts.</returns>
+        /// <summary>
+        /// Finds a concept by reference term.
+        /// </summary>
+        /// <param name="code">The code of the reference term.</param>
+        /// <param name="codeSystem">The code system OID of the reference term.</param>
+        /// <returns>Returns a list of concepts.</returns>
         public IEnumerable<Concept> FindConceptsByReferenceTerm(string code, Uri codeSystem)
-		{
-			if ((codeSystem.Scheme == "urn" || codeSystem.Scheme == "oid"))
-			{
-				var csOid = codeSystem.LocalPath;
+        {
+            var adhocCache = ApplicationServiceContext.Current.GetService<IAdhocCacheService>();
+            var retVal = adhocCache?.Get<IEnumerable<Concept>>($"{code}.{codeSystem}");
+            if (retVal != null)
+                return retVal;
+            else if ((codeSystem.Scheme == "urn" || codeSystem.Scheme == "oid"))
+            {
+                var csOid = codeSystem.LocalPath;
                 if (csOid.StartsWith("oid"))
                 {
                     csOid = codeSystem.LocalPath.Substring(4);
-                    return base.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Oid == csOid && r.ReferenceTerm.Mnemonic == code && r.ObsoleteVersionSequenceId == null));
+                    retVal = base.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Oid == csOid && r.ReferenceTerm.Mnemonic == code && r.ObsoleteVersionSequenceId == null));
                 }
-			}
+            }
+            else
+                retVal = this.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Url == codeSystem.OriginalString && r.ReferenceTerm.Mnemonic == code && r.ObsoleteVersionSequenceId == null));
 
-			return this.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Url == codeSystem.OriginalString && r.ReferenceTerm.Mnemonic == code && r.ObsoleteVersionSequenceId == null));
-		}
+            adhocCache?.Add($"{code}.{codeSystem}", retVal, new TimeSpan(0, 0, 30));
+            return retVal;
+        }
 
-		/// <summary>
-		/// Find concepts by reference terms
-		/// </summary>
+        /// <summary>
+        /// Find concepts by reference terms
+        /// </summary>
         public IEnumerable<Concept> FindConceptsByReferenceTerm(string code, string codeSystemDomain)
-		{
+        {
+            
             if (codeSystemDomain.StartsWith("urn:oid:"))
                 codeSystemDomain = codeSystemDomain.Substring(8);
+
             Regex oidRegex = new Regex("^(\\d+?\\.){1,}\\d+$");
-            if(codeSystemDomain.StartsWith("http:") || codeSystemDomain.StartsWith("urn:"))
-                return base.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Url == codeSystemDomain && r.ReferenceTerm.Mnemonic == code && r.ObsoleteVersionSequenceId == null));
-            else if(oidRegex.IsMatch(codeSystemDomain))
-                return base.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Oid == codeSystemDomain && r.ReferenceTerm.Mnemonic == code && r.ObsoleteVersionSequenceId == null));
+            var adhocCache = ApplicationServiceContext.Current.GetService<IAdhocCacheService>();
+            var retVal = adhocCache?.Get<IEnumerable<Concept>>($"{code}.{codeSystemDomain}");
+
+            if (retVal != null)
+                return retVal;
+            if (codeSystemDomain.StartsWith("http:") || codeSystemDomain.StartsWith("urn:"))
+                retVal = base.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Url == codeSystemDomain && r.ReferenceTerm.Mnemonic == code && r.ObsoleteVersionSequenceId == null));
+            else if (oidRegex.IsMatch(codeSystemDomain))
+                retVal = base.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Oid == codeSystemDomain && r.ReferenceTerm.Mnemonic == code && r.ObsoleteVersionSequenceId == null));
             else
-                return base.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Authority == codeSystemDomain && r.ReferenceTerm.Mnemonic == code && r.ObsoleteVersionSequenceId == null));
-		}
-        
+                retVal = base.Find(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.CodeSystem.Authority == codeSystemDomain && r.ReferenceTerm.Mnemonic == code && r.ObsoleteVersionSequenceId == null));
+
+            adhocCache?.Add($"{code}.{codeSystemDomain}", retVal, new TimeSpan(0, 0, 30));
+            return retVal;
+        }
+
         /// <summary>
         /// Get a concept by its mnemonic
         /// </summary>
         /// <param name="mnemonic">The concept mnemonic to get.</param>
         /// <returns>Returns the concept.</returns>
-		public Concept GetConcept(string mnemonic)
-		{
-			return base.Find(o => o.Mnemonic == mnemonic).FirstOrDefault();
-		}
+        public Concept GetConcept(string mnemonic)
+        {
+            var adhocCache = ApplicationServiceContext.Current.GetService<IAdhocCacheService>();
+            var retVal = adhocCache?.Get<Guid>($"concept.{mnemonic}");
+
+            if (retVal != null)
+                return this.Get(retVal.Value);
+            else
+            {
+                var obj = base.Find(o => o.Mnemonic == mnemonic).FirstOrDefault();
+                if(obj != null)
+                    adhocCache?.Add($"concept.{mnemonic}", obj.Key.Value, new TimeSpan(1, 0, 0));
+                return obj;
+            }
+        }
 
         /// <summary>
         /// Get the specified reference term for the specified code system
         /// </summary>
         public ReferenceTerm GetConceptReferenceTerm(Guid conceptId, string codeSystem)
         {
+
+            var adhocCache = ApplicationServiceContext.Current.GetService<IAdhocCacheService>();
+            var retVal = adhocCache?.Get<ReferenceTerm>($"refTerm.{conceptId}.{codeSystem}");
+
+            if (retVal != null)
+                return retVal;
+            
             // Concept is loaded
             var refTermService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ConceptReferenceTerm>>();
 
@@ -136,7 +172,11 @@ namespace SanteDB.Core.Services.Impl
                 refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Url == codeSystem) && o.SourceEntityKey == conceptId && o.ObsoleteVersionSequenceId == null, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
             else
                 refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Authority == codeSystem) && o.SourceEntityKey == conceptId && o.ObsoleteVersionSequenceId == null, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
-            return refTermEnt.LoadProperty<ReferenceTerm>("ReferenceTerm");
+            retVal = refTermEnt.LoadProperty<ReferenceTerm>("ReferenceTerm");
+
+            adhocCache?.Add($"refTerm.{conceptId}.{codeSystem}", retVal, new TimeSpan(0,0,30));
+
+            return retVal;
         }
 
         /// <summary>
@@ -152,11 +192,11 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         public bool Implies(Concept a, Concept b)
-		{
-			throw new NotImplementedException();
-		}
+        {
+            throw new NotImplementedException();
+        }
 
-      
+
         /// <summary>
         /// Determine if the concept set contains the specified concept
         /// </summary>
@@ -165,17 +205,17 @@ namespace SanteDB.Core.Services.Impl
         /// <returns><c>true</c> if the specified set is member; otherwise, <c>false</c>.</returns>
         /// <exception cref="System.InvalidOperationException">ConceptSet persistence service not found.</exception>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
-		public bool IsMember(ConceptSet set, Concept concept)
-		{
-			var persistence = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ConceptSet>>();
+        public bool IsMember(ConceptSet set, Concept concept)
+        {
+            var persistence = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ConceptSet>>();
 
-			if (persistence == null)
-			{
-				throw new InvalidOperationException($"{nameof(IDataPersistenceService<ConceptSet>)} not found");
-			}
+            if (persistence == null)
+            {
+                throw new InvalidOperationException($"{nameof(IDataPersistenceService<ConceptSet>)} not found");
+            }
 
-			return persistence.Count(o => o.Key == set.Key &&  o.ConceptsXml.Any(c => c == concept.Key)) > 0;
-		}
+            return persistence.Count(o => o.Key == set.Key && o.ConceptsXml.Any(c => c == concept.Key)) > 0;
+        }
 
         /// <summary>
 		/// Determine if the concept set contains the specified concept
@@ -194,7 +234,7 @@ namespace SanteDB.Core.Services.Impl
                 throw new InvalidOperationException($"{nameof(IDataPersistenceService<ConceptSet>)} not found");
             }
 
-            return persistence.Count(o => o.Key == set &&  o.ConceptsXml.Any(c => c == concept)) > 0;
+            return persistence.Count(o => o.Key == set && o.ConceptsXml.Any(c => c == concept)) > 0;
         }
 
 

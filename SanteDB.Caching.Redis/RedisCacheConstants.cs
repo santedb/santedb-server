@@ -25,5 +25,10 @@ namespace SanteDB.Caching.Redis
         /// Database identifier
         /// </summary>
         public const int QueryDatabaseId = 1;
+
+        /// <summary>
+        /// Adhoc cache database id
+        /// </summary>
+        public const int AdhocCacheDatabaseId = 2;
     }
 }

@@ -63,6 +63,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
                 Console.Write("{0:%}", e.Progress);
             };
         }
+
         /// <summary>
         /// List applets
         /// </summary>
