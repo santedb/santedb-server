@@ -13,8 +13,14 @@ INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err
 --#!
 INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('1373ff04-a6ef-420a-b1d0-4a07465fe8e8'), char_to_uuid('77b7a04b-c065-4faf-8ec0-2cdad4ae372b'), char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'), 'Device=[AssignedEntity]=>Person'); 
 --#!
-
-
+ALTER TABLE ASGN_AUT_TBL ADD POL_ID UUID;
+--#!
+ALTER TABLE ASGN_AUT_TBL ADD UPD_UTC TIMESTAMP;
+--#!
+ALTER TABLE ASGN_AUT_TBL ADD UPD_PROV_ID UUID;
+--#!
+ALTER TABLE ASGN_AUT_TBL ADD CONSTRAINT CK_ASGN_AUT_UPD CHECK (UPD_UTC IS NULL OR UPD_UTC IS NOT NULL AND UPD_PROV_ID IS NOT NULL);
+--#!
 SELECT REG_PATCH('20200105-01') FROM RDB$DATABASE;
 --#!
 COMMIT;

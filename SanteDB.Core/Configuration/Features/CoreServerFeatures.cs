@@ -48,7 +48,7 @@ namespace SanteDB.Core.Configuration.Features
             typeof(RestServiceFactory),
             typeof(LocalRepositoryFactoryService),
             typeof(LocalRepositoryService),
-            typeof(LocalDataPolicyFilterService),
+            typeof(ExemptablePolicyFilterService),
             typeof(LocalMailMessageRepository),
             typeof(LocalStockManagementRepositoryService),
             typeof(LocalTagPersistenceService),

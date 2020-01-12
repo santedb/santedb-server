@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\TypeSelectorBindAttribute.cs" />
     <Compile Include="ConfigurationContext.cs" />
     <Compile Include="Controls\DynamicPropertyValue.cs" />
     <Compile Include="Controls\PropertyGridEx.cs">
@@ -59,7 +60,9 @@
     <Compile Include="Converters\ServiceProviderTypeConverter.cs" />
     <Compile Include="Converters\StringCollectionRenderConverter.cs" />
     <Compile Include="Converters\DataProviderConverter.cs" />
+    <Compile Include="Converters\TypeDisplayConverter.cs" />
     <Compile Include="Editors\ConnectionStringEditor.cs" />
+    <Compile Include="Editors\TypeSelectorEditor.cs" />
     <Compile Include="Editors\X509Certificate2Editor.cs" />
     <Compile Include="Editors\DatabaseNameEditor.cs" />
     <Compile Include="Editors\DataProviderEditor.cs" />

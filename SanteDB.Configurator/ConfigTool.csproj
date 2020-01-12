@@ -26,10 +26,13 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -126,7 +129,6 @@
   <ItemGroup>
     <EmbeddedResource Include="icon.png" />
   </ItemGroup>
-
   <Choose>
     <When Condition="$(SolutionName.Contains('-ext'))">
       <ItemGroup>
@@ -146,7 +148,6 @@
           <Project>{407C87E6-A1F3-45E6-B883-A8176B350817}</Project>
           <Name>SanteDB.OrmLite</Name>
         </ProjectReference>
-
       </ItemGroup>
     </When>
     <Otherwise>
@@ -158,8 +159,6 @@
       </ItemGroup>
     </Otherwise>
   </Choose>
-
-
   <ItemGroup>
     <ProjectReference Include="..\SanteDB.Configuration\SanteDB.Configuration.csproj">
       <Project>{032ABF00-6C76-47C7-9ECA-A840915A17EA}</Project>
@@ -172,6 +171,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Util\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

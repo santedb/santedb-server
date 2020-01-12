@@ -19,9 +19,12 @@
  */
 using Newtonsoft.Json;
 using RestSrvr.Attributes;
+using SanteDB.Configuration.Converters;
+using SanteDB.Configuration.Editors;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing.Design;
 using System.IO;
 using System.Reflection;
 using System.Xml.Serialization;
@@ -45,7 +48,7 @@ namespace SanteDB.Core.Configuration
         /// </summary>
         public RestServiceConfiguration()
         {
-            this.Behaviors = new List<RestBehaviorConfiguration>();
+            this.Behaviors = new List<RestServiceBehaviorConfiguration>();
             this.Endpoints = new List<RestEndpointConfiguration>();
         }
 
@@ -62,30 +65,36 @@ namespace SanteDB.Core.Configuration
         /// Gets or sets the name of the service
         /// </summary>
         [XmlAttribute("name"), JsonProperty("name")]
+        [DisplayName("Info Name"), Description("Sets the informative name for this service")]
         public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the behavior
         /// </summary>
         [XmlAttribute("serviceBehavior"), JsonProperty("serviceBehavior")]
+        [Browsable(false)]
         public String ServiceTypeXml { get; set; }
 
         /// <summary>
         /// Service ignore
         /// </summary>
-        [XmlIgnore, JsonIgnore, Browsable(false)]
+        [XmlIgnore, JsonIgnore]
+        [DisplayName("Behavior"), Description("Sets the implementation behavior of this service")]
+        [ReadOnly(true)]
         public Type ServiceType { get => this.ServiceTypeXml != null ? Type.GetType(this.ServiceTypeXml) : null; set => this.ServiceTypeXml = value?.AssemblyQualifiedName; }
 
         /// <summary>
         /// Gets or sets the behavior of the AGS endpoint
         /// </summary>
         [XmlArray("behaviors"), XmlArrayItem("add"), JsonProperty("behaviors")]
-        public List<RestBehaviorConfiguration> Behaviors { get; set; }
+        [DisplayName("Service Behaviors"), Description("Sets the overall behaviors on the service layer")]
+        public List<RestServiceBehaviorConfiguration> Behaviors { get; set; }
 
         /// <summary>
         /// Gets or sets the endpoints 
         /// </summary>
         [XmlElement("endpoint"), JsonProperty("endpoint")]
+        [DisplayName("Endpoints"), Description("One or more service endpoints where this service can be reached")]
         public List<RestEndpointConfiguration> Endpoints { get; set; }
 
         /// <summary>

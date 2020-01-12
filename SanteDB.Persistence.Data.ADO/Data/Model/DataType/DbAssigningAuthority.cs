@@ -28,7 +28,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.DataType
     /// Represents an assigning authority
     /// </summary>
     [Table("asgn_aut_tbl"), AssociativeTable(typeof(DbConceptVersion), typeof(DbAuthorityScope))]
-    public class DbAssigningAuthority : DbBaseData
+    public class DbAssigningAuthority : DbNonVersionedBaseData
     {
 
         /// <summary>
@@ -66,6 +66,12 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.DataType
         /// </summary>
         [Column("app_id"), ForeignKey(typeof(DbSecurityApplication), nameof(DbSecurityApplication.Key))]
         public Guid? AssigningApplicationKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the assigning authority policy key (that policy which devices must have to be disclosed this identity)
+        /// </summary>
+        [Column("pol_id"), ForeignKey(typeof(DbSecurityPolicy), nameof(DbSecurityPolicy.Key))]
+        public Guid? PolicyKey { get; set; }
 
         /// <summary>
         /// Validation regular expression

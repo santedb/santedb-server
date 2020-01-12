@@ -4,7 +4,7 @@
 #define MyAppName "SanteDB Server"
 #define MyAppPublisher "Mohawk College mHealth & eHealth Development and Innovation Centre"
 #define MyAppURL "http://santesuite.org"
-
+#define MyAppVersion "1.117.0"
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -17,11 +17,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-#ifdef x64
 DefaultDirName={pf64}\SanteSuite\SanteDB\Server
-#else
-DefaultDirName={pf32}\SanteSuite\SanteDB\Server
-#endif
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 LicenseFile=..\License.rtf
@@ -47,13 +43,13 @@ Name: full; Description: Complete Installation
 Name: imsi; Description: HDSI Only (Cluster Install)
 Name: ami; Description: AMI Only (Cluster Install)
 Name: auth; Description: ACS Only (Cluster Install)
-Name: risi; Description: RISI Only (Cluster Install)
-Name: demo; Description: Demonstration Installation
+Name: bis; Description: BIS Only (Cluster Install)
+Name: demo; Description: Demo Installation
 Name: tools; Description: Tooling Only              
 Name: custom; Description: Custom Installation; Flags: iscustom
 
 [Components]
-Name: core; Description: SanteDB Core; Types: full imsi ami auth risi demo
+Name: core; Description: SanteDB Core; Types: full imsi ami auth bis demo
 Name: core\bre; Description: JInt Business Rules Engine; Types: full demo
 Name: core\protocol; Description: XML Clinical Support Decision Engine; Types: full demo
 Name: server; Description: SanteDB Service Host; Types: full demo
@@ -67,9 +63,11 @@ Name: interop\hl7; Description: HL7v2 Messaging; Types: full demo
 Name: interop\gs1; Description: GS1 BMS Messaging; Types: full demo
 Name: interop\jira; Description: JIRA Integration; Types: full
 Name: interop\atna; Description: ATNA & DICOM Auditing; Types: full
+Name: interop\openapi; Description: OpenAPI; Types: full demo
 Name: reporting; Description: Reporting Services; Types: full
-Name: reporting\risi; Description: Report Integration Service; Types: full risi
-Name: reporting\jasper; Description: Jasper Reports Server Integration; Types: full
+Name: reporting\bis; Description: Business Intelligence Services; Types: full bis
+Name: reporting\risi; Description: Report Integration Service (Legacy); Types: full 
+Name: reporting\jasper; Description: Jasper Reports Server Integration (Legacy); Types: full
 Name: tfa; Description: Two Factor Authentication; Types: full
 Name: tfa\twilio; Description: Twilio SMS TFA Adapter; Types: full
 Name: tfa\email; Description: Email TFA Adapter; Types: full
@@ -81,7 +79,7 @@ Name: db\psql; Description: PostgreSQL Persistence Services; Types: full
 Name: cache; Description: Memory Caching Services; Types: full demo
 Name: cache\redis; Description: REDIS Shared Memory Caching; Types: full
 Name: tools; Description: Management Tooling; Types: full demo
-Name: demo; Description: Sample Data; Types: demo
+Name: demo; Description: Elbonia Quickstart; Types: demo
 
 [Files]
 
@@ -89,7 +87,7 @@ Name: demo; Description: Sample Data; Types: demo
 Source: .\dotNetFx45_Full_setup.exe; DestDir: {tmp} ; Flags: dontcopy
 
 ; VC Redist for FBSQL
-Source: .\vcredist_x86.exe; DestDir: {tmp} ; Flags: dontcopy
+Source: .\vc2010.exe; DestDir: {tmp} ; Flags: dontcopy
 
 ; ADO.NET 
 Source: ..\bin\release\Npgsql.dll; DestDir: {app}; Components: db\psql
@@ -106,7 +104,8 @@ Source: ..\bin\release\IDPLicense.txt; DestDir: {app}\NOTICES; Components: db\fb
 Source: ..\bin\release\IPLicense.txt; DestDir: {app}\NOTICES; Components: db\fbsql demo
 Source: ..\bin\release\plugins\engine12.dll; DestDir: {app}\plugins; Components: db\fbsql demo
 Source: ..\bin\release\FirebirdSQL.Data.FirebirdClient.dll; DestDir: {app}; Components: db\fbsql demo
-Source: ..\SanteDB\Data\SDB_BASE.FDB; DestDir: {app}; Components: db\fbsql
+Source: ..\SanteDB\Data\SDB_BASE.FDB; DestDir: {app}; Components: demo
+Source: ..\SanteDB\Data\SDB_AUDIT.FDB; DestDir: {app}; Components: demo
 
 ; XClinical Protocol 
 Source: ..\bin\release\Antlr3.Runtime.dll; DestDir: {app}; Components: core\protocol
@@ -235,12 +234,30 @@ Source: ..\bin\release\SanteDB.Matcher.dll; DestDir: {app}; Components: match
 Source: ..\bin\release\SanteDB.Matcher.Configuration.File.dll; DestDir: {app}; Components: match
 Source: ..\bin\release\Phonix.dll; DestDir: {app}; Components: match
 
+; Configuration
+Source: ..\bin\release\ConfigTool.exe; DestDir: {app}; 
+Source: ..\bin\release\SanteDB.Configuration.dll; DestDir: {app};
+
+; Demo
+Source: ..\SanteDB\Data\Demo\*.dataset; DestDir: {app}\data; Components: demo
+Source: ..\SanteDB\santedb.config.dev.xml; DestDir: {app}; DestName: santedb.config.xml; Components: demo
+
+; BIS
+Source: ..\bin\release\SanteDB.BI.dll; DestDir: {app}; Components: reporting\bis demo
+Source: ..\bin\release\SanteDB.Rest.BIS.dll; DestDir: {app}; Components: reporting\bis demo
+
+; Metadata
+Source: ..\bin\release\SanteDB.Messaging.Metadata.dll; DestDir: {app}; Components: interop\openapi demo
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Run]
-Filename: "{app}\ConfigTool.exe";  Description: "Configure SanteDB Server"; Flags: postinstall ; 
+;Filename: "{app}\ConfigTool.exe";  Description: "Configure SanteDB Server"; Flags: postinstall ; 
 Filename: "{app}\SanteDB.exe"; Parameters:"--install"; Flags: runhidden runascurrentuser; StatusMsg: "Registering SanteDB Service"
+Filename: "c:\windows\system32\netsh.exe"; Parameters: "advfirewall firewall add rule name=""SanteDB REST Ports"" dir=in protocol=TCP localport=8080 action=allow"; StatusMsg: "Configuring Firewall"; Flags: runhidden; Components: demo
+Filename: "c:\windows\system32\netsh.exe"; Parameters: "advfirewall firewall add rule name=""SanteDB HL7 Ports"" dir=in protocol=TCP localport=2100 action=allow"; StatusMsg: "Configuring Firewall"; Flags: runhidden; Components: demo
+Filename: "net.exe";StatusMsg: "Starting Services..."; Parameters: "start santedb"; Flags: runhidden; Components: demo
+
 
 [UninstallRun]
 Filename: "{app}\SanteDB.exe"; Parameters: "--uninstall"; StatusMsg: "Un-registering SanteDB"; Flags:runhidden runascurrentuser;
@@ -304,8 +321,8 @@ begin
     
     EnableFsRedirection(true);
 
-    ExtractTemporaryFile('vcredist_x86.exe');
-    Exec(ExpandConstant('{tmp}\vcredist_x86.exe'), '/install /passive', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
+    ExtractTemporaryFile('vc2010.exe');
+    Exec(ExpandConstant('{tmp}\vc2010.exe'), '/install /passive', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
 
     if (Result = '') and (dotNetNeeded = true) then begin
       ExtractTemporaryFile('dotNetFx45_Full_setup.exe');

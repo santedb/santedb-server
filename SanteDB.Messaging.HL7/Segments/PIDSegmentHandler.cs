@@ -208,6 +208,7 @@ namespace SanteDB.Messaging.HL7.Segments
         public virtual IEnumerable<IdentifiedData> Parse(ISegment segment, IEnumerable<IdentifiedData> context)
         {
             var patientService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>();
+            var personService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Person>>();
             var pidSegment = segment as PID;
             int fieldNo = 0;
 
@@ -216,6 +217,7 @@ namespace SanteDB.Messaging.HL7.Segments
 
                 Patient retVal = new Patient() { Key = Guid.NewGuid() };
                 Person motherEntity = null;
+                List<IdentifiedData> retCollection = new List<IdentifiedData>();
 
                 retVal.CreationAct = context.OfType<ControlAct>().FirstOrDefault();
 
@@ -238,15 +240,20 @@ namespace SanteDB.Messaging.HL7.Segments
                         if (authority == null)
                             throw new HL7ProcessingException($"No authority configured for {id.AssigningAuthority.NamespaceID.Value}", "PID", pidSegment.SetIDPID.Value, 3, 4);
                         Guid idguid = Guid.Empty;
-                        Patient found = null;
+                        Person found = null;
                         if (authority.Key == this.m_configuration.LocalAuthority.Key)
-                            found = patientService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.Current.Principal);
+                            found = personService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.Current.Principal);
                         else if (authority?.IsUnique == true)
-                            found = patientService.Query(o => o.Identifiers.Any(i => i.Authority.Key == authority.Key && i.Value == idnumber), AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                            found = personService.Query(o => o.Identifiers.Any(i => i.Authority.Key == authority.Key && i.Value == idnumber), AuthenticationContext.SystemPrincipal).FirstOrDefault();
                         if (found != null)
                         {
-                            retVal = found;
-
+                            if (found is Patient)
+                                retVal = (Patient)found;
+                            else // We need to upgrade this person
+                            {
+                                retVal.CopyObjectData(found, false, true);
+                                retVal.Tags.Add(new EntityTag("$sys.reclass", "true"));
+                            }
                             break;
                         }
                     }
@@ -289,7 +296,6 @@ namespace SanteDB.Messaging.HL7.Segments
                 if (pidSegment.MotherSMaidenNameRepetitionsUsed > 0 || pidSegment.MotherSIdentifierRepetitionsUsed > 0)
                 {
                     // Attempt to find the mother
-                    var personPersistence = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Person>>();
                     foreach (var id in pidSegment.GetMotherSIdentifier())
                     {
                         AssigningAuthority authority = null;
@@ -303,9 +309,9 @@ namespace SanteDB.Messaging.HL7.Segments
                         }
 
                         if (authority.Key == this.m_configuration.LocalAuthority.Key)
-                            motherEntity = personPersistence.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.SystemPrincipal);
+                            motherEntity = personService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.SystemPrincipal);
                         else if (authority?.IsUnique == true)
-                            motherEntity = personPersistence.Query(o => o.Identifiers.Any(i => i.Value == id.IDNumber.Value && i.Authority.Key == authority.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                            motherEntity = personService.Query(o => o.Identifiers.Any(i => i.Value == id.IDNumber.Value && i.Authority.Key == authority.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
                     }
 
                     fieldNo = 6;
@@ -506,12 +512,12 @@ namespace SanteDB.Messaging.HL7.Segments
                 //        retVal.CreatedBy = user;
                 //}
 
-                if (motherEntity == null)
-                    return new IdentifiedData[] { retVal };
-                else
-                    return new IdentifiedData[] { motherEntity, retVal };
+                if (motherEntity != null)
+                    retCollection.Add(motherEntity);
+                retCollection.Add(retVal);
+                return retCollection;
             }
-            catch (HL7ProcessingException) // Just re-throw
+            catch (HL7ProcessingException e) // Just re-throw
             {
                 throw;
             }

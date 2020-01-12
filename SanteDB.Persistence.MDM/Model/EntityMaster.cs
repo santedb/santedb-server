@@ -32,6 +32,9 @@ using System.Linq;
 using System.Security.Principal;
 using System.Xml.Serialization;
 using SanteDB.Core.Model.Roles;
+using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Security;
+using SanteDB.Core.Model.Constants;
 
 namespace SanteDB.Persistence.MDM.Model
 {
@@ -49,9 +52,11 @@ namespace SanteDB.Persistence.MDM.Model
 
         // The master record
         private Entity m_masterRecord;
+
         // Local records
         private List<T> m_localRecords;
 
+     
         /// <summary>
         /// Create entity master
         /// </summary>
@@ -79,6 +84,7 @@ namespace SanteDB.Persistence.MDM.Model
         public T GetMaster(IPrincipal principal)
         {
             var master = new T();
+            var entityMaster = master as Entity;
             master.CopyObjectData<IdentifiedData>(this.m_masterRecord, overwritePopulatedWithNull: false, ignoreTypeMismatch: true);
 
             // Is there a relationship which is the record of truth
@@ -107,11 +113,13 @@ namespace SanteDB.Persistence.MDM.Model
                 master.SemanticCopy(rot.LoadProperty<T>("TargetEntity"));
                 master.SemanticCopyNullFields(locals);
             }
-            
-            (master as Entity).Policies = this.LocalRecords.SelectMany(o => (o as Entity).Policies).Select(o => new SecurityPolicyInstance(o.Policy, (PolicyGrantType)(int)pdp.GetPolicyOutcome(principal, o.Policy.Oid))).Where(o => o.GrantType == PolicyGrantType.Grant || o.Policy.CanOverride).ToList();
-            (master as Entity).Tags.RemoveAll(o => o.TagKey == "mdm.type");
-            (master as Entity).Tags.Add(new EntityTag("mdm.type", "M"));
 
+            entityMaster.Policies = this.LocalRecords.SelectMany(o => (o as Entity).Policies).Select(o => new SecurityPolicyInstance(o.Policy, (PolicyGrantType)(int)pdp.GetPolicyOutcome(principal, o.Policy.Oid))).Where(o => o.GrantType == PolicyGrantType.Grant || o.Policy.CanOverride).ToList();
+            entityMaster.Tags.RemoveAll(o => o.TagKey == "mdm.type");
+            entityMaster.Tags.Add(new EntityTag("mdm.type", "M"));
+            entityMaster.Tags.Add(new EntityTag("$mdm.resource", typeof(T).Name));
+            entityMaster.Tags.Add(new EntityTag("$alt.keys", String.Join(";", this.m_localRecords.Select(o => o.Key.ToString()))));
+           
             return master;
         }
 
@@ -138,10 +146,23 @@ namespace SanteDB.Persistence.MDM.Model
                         o.LoadCollection<SecurityPolicyInstance>(nameof(Entity.Policies));
                         o.LoadCollection<EntityExtension>(nameof(Entity.Extensions));
 
-                        if(o is Person)
+                        if (o is Person)
+                        {
                             (o as Person).LoadCollection<PersonLanguageCommunication>(nameof(Person.LanguageCommunication));
+                            var family = EntitySource.Current.Provider.Query<EntityRelationship>(r => r.TargetEntityKey == o.Key && o.TypeConcept.ConceptSets.Where(cs => cs.Mnemonic == "FamilyMember").Any()).ToList();
+                            o.Relationships.AddRange(family);
+                        }
                         if (o is Place)
                             (o as Place).LoadCollection<PlaceService>(nameof(Place.Services));
+
+                        // Correct to master
+                        o.Relationships.ForEach(r =>
+                        {
+                            if (r.SourceEntityKey == o.Key)
+                                r.SourceEntityKey = this.m_masterRecord.Key;
+                            else if (r.TargetEntityKey == o.Key)
+                                r.TargetEntityKey = this.m_masterRecord.Key;
+                        });
                     });
                 }
                 return this.m_localRecords;

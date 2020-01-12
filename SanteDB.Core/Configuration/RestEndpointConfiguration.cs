@@ -20,6 +20,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Xml.Serialization;
 
 namespace SanteDB.Core.Configuration
@@ -37,19 +38,21 @@ namespace SanteDB.Core.Configuration
         /// </summary>
         public RestEndpointConfiguration()
         {
-            this.Behaviors = new List<RestBehaviorConfiguration>();
+            this.Behaviors = new List<RestEndpointBehaviorConfiguration>();
         }
 
         /// <summary>
         /// Gets or sets the contract type
         /// </summary>
-        [XmlAttribute("contract"), JsonProperty("contract")]
+        [XmlAttribute("contract"), JsonProperty("contract"), Browsable(false)]
         public String ContractXml { get; set; }
 
         /// <summary>
         /// Gets or sets the Contract type
         /// </summary>
         [XmlIgnore, JsonIgnore]
+        [DisplayName("Service Contract"), Description("The service contract this endpoint implements")]
+        [ReadOnly(true)]
         public Type Contract
         {
             get => this.ContractXml != null ? Type.GetType(this.ContractXml) : null;
@@ -60,13 +63,15 @@ namespace SanteDB.Core.Configuration
         /// Gets or sets the address
         /// </summary>
         [XmlAttribute("address"), JsonProperty("address")]
+        [DisplayName("Address"), Description("The address where the endpoint should accept messages")]
         public String Address { get; set; }
 
         /// <summary>
         /// Gets the bindings 
         /// </summary>
         [XmlArray("behaviors"), XmlArrayItem("add"), JsonProperty("behaviors")]
-        public List<RestBehaviorConfiguration> Behaviors { get; set; }
+        [DisplayName("Endpoint Behaviors"), Description("The behaviors to attach to the endpoint")]
+        public List<RestEndpointBehaviorConfiguration> Behaviors { get; set; }
 
     }
 }

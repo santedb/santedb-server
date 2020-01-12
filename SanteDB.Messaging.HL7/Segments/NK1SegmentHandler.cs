@@ -37,6 +37,7 @@ using SanteDB.Messaging.HL7.Configuration;
 using SanteDB.Messaging.HL7.Exceptions;
 using SanteDB.Core.Security.Services;
 using System.Collections;
+using SanteDB.Core.Model.Interfaces;
 
 namespace SanteDB.Messaging.HL7.Segments
 {
@@ -154,6 +155,13 @@ namespace SanteDB.Messaging.HL7.Segments
                         var contact = Enumerable.FirstOrDefault<dynamic>(roles, o => o.patientKey == patient.Key)?.contact;
                         if (!String.IsNullOrEmpty(contact?.ToString()))
                             nk1.ContactRole.Identifier.Value = contact;
+                        else if (patient.Tags.Any(o=>o.TagKey == "$alt.keys")) // might be a composite
+                        {
+                            var altKeys = patient.Tags.FirstOrDefault(o=>o.TagKey == "$alt.keys")?.Value.Split(';').Select(o=>Guid.Parse(o));
+                            contact = Enumerable.FirstOrDefault<dynamic>(roles, o => altKeys.Contains((Guid)o.patientKey))?.contact;
+                            if (!String.IsNullOrEmpty(contact?.ToString()))
+                                nk1.ContactRole.Identifier.Value = contact;
+                        }
                     }
                 }
 

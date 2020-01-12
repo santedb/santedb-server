@@ -48,6 +48,8 @@ namespace SanteDB.Configurator
 {
     public partial class frmMain : Form
     {
+        public IFeature CurrentFeature { get; private set; }
+
         public frmMain()
         {
             InitializeComponent();
@@ -174,6 +176,7 @@ namespace SanteDB.Configurator
                     pgConfiguration.Visible = false;
 
                 lblDescription.Text = $"     {feature.Description}";
+                this.CurrentFeature = feature;
                 // Now detect the necessary bars
                 switch (state)
                 {
@@ -205,7 +208,7 @@ namespace SanteDB.Configurator
         private void btnApply_Click(object sender, EventArgs e)
         {
 
-            // If there is no tasks then we must save
+            // If there are no tasks then we must save
             if (ConfigurationContext.Current.ConfigurationTasks.Count == 0)
             {
                 foreach(var tsk in ConfigurationContext.Current.Features.Where(o => 
@@ -216,6 +219,44 @@ namespace SanteDB.Configurator
                 ConfigurationContext.Current.ConfigurationTasks.Add(new SaveConfigurationTask());
             }
             ConfigurationContext.Current.Apply();
+        }
+
+        /// <summary>
+        /// Enable the feature
+        /// </summary>
+        private void btnEnable_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            // Set the view
+            tcSettings.Enabled = btnDisable.Visible = lblEnabled.Visible = true;
+            lblDisabled.Visible = btnEnable.Visible = false;
+
+            // Remove any uninstall tasks related to this feature
+            foreach (var itm in ConfigurationContext.Current.ConfigurationTasks.Where(o => o.Feature == this.CurrentFeature).ToArray())
+                ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
+
+            // Create install tasks
+            if(this.CurrentFeature.QueryState(ConfigurationContext.Current.Configuration) != FeatureInstallState.Installed)
+                foreach (var tsk in this.CurrentFeature.CreateInstallTasks())
+                    ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
+
+        }
+
+        /// <summary>
+        /// Disable the feature
+        /// </summary>
+        private void btnDisable_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            tcSettings.Enabled = btnDisable.Visible = lblEnabled.Visible = false;
+            lblDisabled.Visible = btnEnable.Visible = true;
+            var feature = (sender as Control).Tag as IFeature;
+            // Remove any tasks related to this feature
+            foreach (var itm in ConfigurationContext.Current.ConfigurationTasks.Where(o => o.Feature == this.CurrentFeature).ToArray())
+                ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
+
+            // Create removal tasks
+            if(this.CurrentFeature.QueryState(ConfigurationContext.Current.Configuration) == FeatureInstallState.Installed)
+                foreach (var tsk in this.CurrentFeature.CreateUninstallTasks())
+                    ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
         }
     }
 }

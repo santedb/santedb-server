@@ -31,6 +31,7 @@ namespace SanteDB.Configurator
         private void InitializeComponent()
         {
             SanteDB.Core.Configuration.Data.ConnectionString connectionString1 = new SanteDB.Core.Configuration.Data.ConnectionString();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmInitialConfig));
             this.pnlLogo = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.lblText = new System.Windows.Forms.Label();
@@ -38,13 +39,13 @@ namespace SanteDB.Configurator
             this.rdoEasy = new System.Windows.Forms.RadioButton();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.txtInstance = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.dbSelector = new SanteDB.Configuration.Controls.ucDatabaseSelector();
             this.btnContinue = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.rdoAdvanced = new System.Windows.Forms.RadioButton();
-            this.label4 = new System.Windows.Forms.Label();
-            this.txtInstance = new System.Windows.Forms.TextBox();
             this.pnlLogo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -128,6 +129,23 @@ namespace SanteDB.Configurator
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Database Parameters";
             // 
+            // txtInstance
+            // 
+            this.txtInstance.Location = new System.Drawing.Point(114, 230);
+            this.txtInstance.Name = "txtInstance";
+            this.txtInstance.Size = new System.Drawing.Size(364, 20);
+            this.txtInstance.TabIndex = 3;
+            this.txtInstance.Text = "SanteDB";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(18, 233);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(79, 13);
+            this.label4.TabIndex = 2;
+            this.label4.Text = "Instance Name";
+            // 
             // dbSelector
             // 
             this.dbSelector.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -187,23 +205,6 @@ namespace SanteDB.Configurator
             this.rdoAdvanced.Text = "Advanced Configuration";
             this.rdoAdvanced.UseVisualStyleBackColor = true;
             // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(18, 233);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(79, 13);
-            this.label4.TabIndex = 2;
-            this.label4.Text = "Instance Name";
-            // 
-            // txtInstance
-            // 
-            this.txtInstance.Location = new System.Drawing.Point(114, 230);
-            this.txtInstance.Name = "txtInstance";
-            this.txtInstance.Size = new System.Drawing.Size(364, 20);
-            this.txtInstance.TabIndex = 3;
-            this.txtInstance.Text = "SanteDB";
-            // 
             // frmInitialConfig
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -218,6 +219,7 @@ namespace SanteDB.Configurator
             this.Controls.Add(this.rdoEasy);
             this.Controls.Add(this.pnlLogo);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "frmInitialConfig";

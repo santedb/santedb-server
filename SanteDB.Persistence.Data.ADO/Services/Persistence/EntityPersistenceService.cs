@@ -323,14 +323,18 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		        {
                     if (auth == null)
                         throw new KeyNotFoundException($"Missing assigning authority from {String.Join(",", data.Identifiers.Select(o => o.AuthorityKey))}");
-                    if (auth.IsUnique)
+                    if (auth.IsUnique && this.m_persistenceService.GetConfiguration().Validation.IdentifierUniqueness)
                     {
                         var dups = data.Identifiers.Where(id => id.AuthorityKey == auth.Key).SelectMany(id => context.Query<DbEntityIdentifier>(c => c.SourceKey != data.Key && c.AuthorityKey == auth.Key && c.Value == id.Value && c.ObsoleteVersionSequenceId == null));
                         if (dups.Any(did => !data.Relationships.Any(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Replaces && o.TargetEntityKey == did.SourceKey)))
-                            // TODO: Ensure that the duplicate is also not a RELATED to the via a MASTER
-                            throw new DetectedIssueException(
-                                new DetectedIssue(DetectedIssuePriorityType.Error, $"Identifiers for {String.Join(",", dups.Select(o => o.Value.ToString()))} in domain {auth.DomainName} violate unique constraint", DetectedIssueKeys.FormalConstraintIssue)
-                            );
+                        {
+                            if (!this.m_persistenceService.GetConfiguration().Validation.SoftValidation)
+                                throw new DetectedIssueException(
+                                        new DetectedIssue(DetectedIssuePriorityType.Error, $"Identifiers for {String.Join(",", dups.Select(o => o.Value.ToString()))} in domain {auth.DomainName} violate unique constraint", DetectedIssueKeys.FormalConstraintIssue)
+                                    );
+                            else
+                                data.Tags.Add(new EntityTag("dq.err.id.uq", String.Join(",", dups.Select(o => o.Value.ToString()))));
+                        }
                     }
                     if (auth.AssigningApplicationKey.HasValue) // Must have permission
                     {
@@ -345,14 +349,19 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 );
                         }
                     }
-                    if(!String.IsNullOrEmpty(auth.ValidationRegex)) // must be valid
+                    if(!String.IsNullOrEmpty(auth.ValidationRegex) && this.m_persistenceService.GetConfiguration().Validation.IdentifierFormat) // must be valid
                     {
                         var nonMatch = data.Identifiers
                             .Where(id => id.AuthorityKey == auth.Key && !new Regex(auth.ValidationRegex).IsMatch(id.Value));
-                        if(nonMatch.Any())
-                            throw new DetectedIssueException(
-                                new DetectedIssue(DetectedIssuePriorityType.Error, $"Identifier for {String.Join(",", nonMatch.Select(o => o.Value.ToString()))} in domain {auth.DomainName} failed format validation", DetectedIssueKeys.FormalConstraintIssue)
-                            );
+                        if (nonMatch.Any())
+                        {
+                            if (!this.m_persistenceService.GetConfiguration().Validation.SoftValidation)
+                                throw new DetectedIssueException(
+                                    new DetectedIssue(DetectedIssuePriorityType.Error, $"Identifier for {String.Join(",", nonMatch.Select(o => o.Value.ToString()))} in domain {auth.DomainName} failed format validation", DetectedIssueKeys.FormalConstraintIssue)
+                                );
+                            else
+                                data.Tags.Add(new EntityTag("dq.err.id.format", String.Join(",", nonMatch.Select(o => o.Value.ToString()))));
+                        }
                     }
 				}
 
@@ -408,7 +417,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Tags
             if (data.Tags != null)
                 base.UpdateAssociatedItems<Core.Model.DataTypes.EntityTag, DbEntityTag>(
-                   data.Tags.Where(o => o != null && !o.IsEmpty()),
+                   data.Tags.Where(o => o != null && !o.IsEmpty() && !o.TagKey.StartsWith("$")),
                     retVal,
                     context);
 
@@ -557,7 +566,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Tags
             if (data.Tags != null)
                 base.UpdateAssociatedItems<Core.Model.DataTypes.EntityTag, DbEntityTag>(
-                   data.Tags.Where(o => o != null && !o.IsEmpty()),
+                   data.Tags.Where(o => o != null && !o.IsEmpty() && !o.TagKey.StartsWith("$")),
                     retVal,
                     context);
 

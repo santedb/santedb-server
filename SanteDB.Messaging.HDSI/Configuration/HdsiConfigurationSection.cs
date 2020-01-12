@@ -21,6 +21,7 @@ using SanteDB.Core.Configuration;
 using SanteDB.Core.Model.Serialization;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Xml.Serialization;
 
@@ -32,29 +33,31 @@ namespace SanteDB.Messaging.HDSI.Configuration
     [XmlType(nameof(HdsiConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class HdsiConfigurationSection : IConfigurationSection
     {
-
+        /// <summary>
+        /// HDSI Configuration
+        /// </summary>
         public HdsiConfigurationSection()
         {
-
+            
         }
 
         /// <summary>
         /// Resources on the AMI that are forbidden
         /// </summary>
-        [XmlIgnore]
+        [XmlIgnore, Browsable(false)]
         public IEnumerable<Type> ResourceHandlers
         {
             get
             {
                 var msb = new ModelSerializationBinder();
-                return this.ResourceHandlerXml.Select(o => msb.BindToType(null, o));
+                return this.ResourceHandlerXml?.Select(o => msb.BindToType(null, o));
             }
         }
 
         /// <summary>
         /// Gets or sets the resource in xml format
         /// </summary>
-        [XmlArray("resources"), XmlArrayItem("add")]
+        [XmlArray("resources"), XmlArrayItem("add"), ReadOnly(true)]
         public List<String> ResourceHandlerXml { get; set; }
 
        

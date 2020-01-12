@@ -103,6 +103,10 @@ namespace SanteDB.Persistence.Data.ADO.Data
             // Is there a classifier?
             var serviceInstance = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
             var idpInstance = serviceInstance.GetPersister(me.GetType()) as IAdoPersistenceService;
+
+            if ((me as ITaggable)?.Tags.Any(o => o.TagKey == "$sys.reclass") == true) // The entity is being re-classified, so it needs to be saved
+                idpInstance = serviceInstance.GetPersister(me.GetType().BaseType) as IAdoPersistenceService;
+
             var cacheService = new AdoPersistenceCache(context);
 
             IIdentifiedEntity existing = null;

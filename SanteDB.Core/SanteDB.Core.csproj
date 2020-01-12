@@ -64,6 +64,7 @@
     <Compile Include="Configuration\Features\FileSystemQueueFeature.cs" />
     <Compile Include="Configuration\Features\JobManagerFeature.cs" />
     <Compile Include="Configuration\Features\LocalAppletManagerFeature.cs" />
+    <Compile Include="Configuration\Features\RestServiceFeature.cs" />
     <Compile Include="Configuration\Features\ServerSecurityFeature.cs" />
     <Compile Include="Configuration\FileSystemQueueConfigurationSection.cs" />
     <Compile Include="Configuration\JobConfigurationSection.cs" />
@@ -107,8 +108,8 @@
     <Compile Include="Security\ILocalPolicy.cs" />
     <Compile Include="Security\IPolicyHandler.cs" />
     <Compile Include="Security\DefaultPolicyDecisionService.cs" />
-    <Compile Include="Security\Privacy\LocalDataPolicyFilterService.cs" />
     <Compile Include="Security\PasswordHashingServices.cs" />
+    <Compile Include="Security\Privacy\ExemptablePolicyFilterService.cs" />
     <Compile Include="Security\TwoFactorSecretGenerators.cs" />
     <Compile Include="Security\SecurityUtils.cs" />
     <Compile Include="Services\Daemons\AppletBusinessRulesDaemon.cs" />
@@ -155,6 +156,7 @@
     <Compile Include="Services\Impl\LocalSecurityRepositoryService.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Configuration\Editors\" />
     <Folder Include="Security\Wcf\" />
   </ItemGroup>
   <ItemGroup>

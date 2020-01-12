@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="AdoDataConstants.cs" />
     <Compile Include="Configuration\AdoPersistenceConfigurationSection.cs" />
+    <Compile Include="Configuration\EntityValidationFlags.cs" />
     <Compile Include="Data\Extensions\DataModelExtensions.cs" />
     <Compile Include="Data\Hax\ConceptQueryHack.cs" />
     <Compile Include="Data\Hax\CreationTimeQueryHack.cs" />

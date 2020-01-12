@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using System.ComponentModel;
 using System.Xml.Serialization;
 
 namespace SanteDB.Messaging.AMI.Configuration
@@ -31,18 +32,21 @@ namespace SanteDB.Messaging.AMI.Configuration
 		/// When true, automatically approve CA
 		/// </summary>
         [XmlAttribute("autoApprove")]
+        [DisplayName("Auto Approve CSR"), Description("Automatically approve any CSR which is sent to the AMI")]
 		public bool AutoApprove { get; set; }
 
 		/// <summary>
 		/// Gets or sets the name of the certification authority
 		/// </summary>
         [XmlAttribute("name")]
+        [DisplayName("CA Name"), Description("The name of the Microsoft Certificate Services CA")]
 		public string Name { get; set; }
 
 		/// <summary>
 		/// Gets or sets the name of the machine
 		/// </summary>
         [XmlAttribute("server")]
+        [DisplayName("CA Server"), Description("The server address of the Microsoft Certificate Services CA")]
 		public string ServerName { get; set; }
 	}
 }

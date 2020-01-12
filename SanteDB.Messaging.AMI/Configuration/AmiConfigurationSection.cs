@@ -22,6 +22,7 @@ using SanteDB.Core.Interop;
 using SanteDB.Core.Model.Serialization;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Xml.Serialization;
 
@@ -38,38 +39,41 @@ namespace SanteDB.Messaging.AMI.Configuration
         /// </summary>
         public AmiConfigurationSection()
         {
-
+            this.Endpoints = new List<ServiceEndpointOptions>();
+            this.CaConfiguration = new CertificationAuthorityConfiguration();
         }
 
         /// <summary>
         /// Resources on the AMI that are forbidden
         /// </summary>
-        [XmlIgnore]
+        [XmlIgnore, Browsable(false)]
         public IEnumerable<Type> ResourceHandlers
         {
             get
             {
                 var msb = new ModelSerializationBinder();
-                return this.ResourceHandlerXml.Select(o => msb.BindToType(null, o));
+                return this.ResourceHandlerXml?.Select(o => msb.BindToType(null, o));
             }
         }
 
         /// <summary>
         /// Gets or sets the resource in xml format
         /// </summary>
-        [XmlArray("resources"), XmlArrayItem("add")]
+        [XmlArray("resources"), XmlArrayItem("add"), Browsable(false)]
         public List<String> ResourceHandlerXml { get; set; }
 
         /// <summary>
         /// Certification authority configuration
         /// </summary>
-        [XmlElement("msftCertAuth")]
+        [XmlElement("msftCertAuth"), TypeConverter(typeof(ExpandableObjectConverter))]
+        [DisplayName("CA Configuration"), Description("Certificate authority configuration. Note: SanteDB only works with Microsoft Certificate Authority Services in a non-domain enrolment configuration")]
         public CertificationAuthorityConfiguration CaConfiguration { get; set; }
 
 		/// <summary>
 		/// Extra endpoints
 		/// </summary>
         [XmlArray("endpoints"), XmlArrayItem("add")]
+        [DisplayName("API Endpoints"), Description("The API endpoints which can't be auto-detected by the default AMI (if you're running in a distributed deployment)")]
 		public List<ServiceEndpointOptions> Endpoints { get; set; }
 	}
 }

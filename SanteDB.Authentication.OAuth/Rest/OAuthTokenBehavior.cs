@@ -321,7 +321,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             try
             {
-                claims.AddRange(roleProvider.GetAllRoles(claimsPrincipal.Identity.Name).Select(r => new SanteDBClaim(SanteDBClaimTypes.DefaultRoleClaimType, r)));
+                if(!(claimsPrincipal is ApplicationPrincipal))
+                    claims.AddRange(roleProvider.GetAllRoles(claimsPrincipal.Identity.Name).Select(r => new SanteDBClaim(SanteDBClaimTypes.DefaultRoleClaimType, r)));
             }
             catch { }
 

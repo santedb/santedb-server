@@ -55,6 +55,12 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         {
             this.DataCorrectionKeys = new List<string>();
             this.AllowedResources = new List<string>();
+            this.Validation = new EntityValidationFlags()
+            {
+                IdentifierFormat = true,
+                IdentifierUniqueness = true,
+                SoftValidation = false
+            };
         }
 
         /// <summary>
@@ -131,5 +137,12 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         [DisplayName("Prepare SQL Queries")]
         [Description("When true, instructs the provider to prepare statements")]
         public bool PrepareStatements { get; set; }
+
+        /// <summary>
+        /// Validation flags
+        /// </summary>
+        [XmlElement("validation"), Category("Data Quality"), DisplayName("Validation"), Description("When set, enables data validation parameters")]
+        public EntityValidationFlags Validation { get; set; }
+
     }
 }

@@ -18,7 +18,13 @@
  * Date: 2019-1-22
  */
 using Newtonsoft.Json;
+using RestSrvr;
+using SanteDB.Configuration.Attributes;
+using SanteDB.Configuration.Converters;
+using SanteDB.Configuration.Editors;
 using System;
+using System.ComponentModel;
+using System.Drawing.Design;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
@@ -31,7 +37,9 @@ namespace SanteDB.Core.Configuration
     [JsonObject]
     public class RestBehaviorConfiguration
     {
-
+        /// <summary>
+        /// Creates a new rest behavior configuration
+        /// </summary>
         public RestBehaviorConfiguration()
         {
 
@@ -48,14 +56,14 @@ namespace SanteDB.Core.Configuration
         /// <summary>
         /// Gets or sets the name
         /// </summary>
-        [XmlAttribute("type"), JsonProperty("type")]
+        [XmlAttribute("type"), JsonProperty("type"), Browsable(false)]
         public string XmlType { get; set; }
 
         /// <summary>
         /// Gets the type of the binding
         /// </summary>
         [XmlIgnore, JsonIgnore]
-        public Type Type
+        public virtual Type Type
         {
             get
             {
@@ -74,6 +82,36 @@ namespace SanteDB.Core.Configuration
         /// Gets or sets the special configuration for the binding
         /// </summary>
         [XmlElement("configuration"), JsonProperty("configuration")]
+        [DisplayName("Behavior Configuration"), Description("XML Configuration for the Behavior")]
         public XElement Configuration { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a single behavior configuration element with validation that the type is a IServiceBehavior
+    /// </summary>
+    [XmlType(nameof(RestServiceBehaviorConfiguration), Namespace = "http://santedb.org/configuration")]
+    [JsonObject]
+    public class RestServiceBehaviorConfiguration : RestBehaviorConfiguration {
+
+        /// <summary>
+        /// Gets the type
+        /// </summary>
+        [Editor(typeof(TypeSelectorEditor), typeof(UITypeEditor)), TypeConverter(typeof(TypeDisplayConverter)), TypeSelectorBind(typeof(IServiceBehavior))]
+        public override Type Type { get => base.Type; set => base.Type = value; }
+    }
+
+    /// <summary>
+    /// Represents a single behavior configuration element with validation that the type is a IServiceBehavior
+    /// </summary>
+    [XmlType(nameof(RestEndpointBehaviorConfiguration), Namespace = "http://santedb.org/configuration")]
+    [JsonObject]
+    public class RestEndpointBehaviorConfiguration : RestBehaviorConfiguration
+    {
+
+        /// <summary>
+        /// Gets the type
+        /// </summary>
+        [Editor(typeof(TypeSelectorEditor), typeof(UITypeEditor)), TypeConverter(typeof(TypeDisplayConverter)), TypeSelectorBind(typeof(IEndpointBehavior))]
+        public override Type Type { get => base.Type; set => base.Type = value; }
     }
 }

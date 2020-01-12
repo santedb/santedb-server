@@ -110,7 +110,18 @@ namespace SanteDB.Configuration
                         .Where(o => !o.IsDynamic)
                         .SelectMany(a => { try { return a.ExportedTypes; } catch { return new List<Type>(); } })
                         .Where(t => typeof(IFeature).IsAssignableFrom(t) && !t.ContainsGenericParameters && !t.IsAbstract && !t.IsInterface)
-                        .Select(i => Activator.CreateInstance(i) as IFeature)
+                        .Select(i =>
+                        {
+                            try
+                            {
+                                return Activator.CreateInstance(i) as IFeature;
+                            }
+                            catch (Exception e)
+                            {
+                                return null;
+                            }
+                        })
+                        .OfType<IFeature>()
                         .ToList();
                 }
                 return this.m_features;

@@ -47,7 +47,7 @@ namespace SanteDB.Core.Services.Impl
             var cache = ApplicationServiceContext.Current.GetService<IDataCachingService>();
 
             // Don't persist empty tags
-            if ((tag as IdentifiedData)?.IsEmpty() == true) return;
+            if ((tag as IdentifiedData)?.IsEmpty() == true || tag.TagKey.StartsWith("$")) return;
 
             if (tag is EntityTag)
             {

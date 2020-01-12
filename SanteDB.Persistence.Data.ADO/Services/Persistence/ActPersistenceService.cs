@@ -256,7 +256,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             if (data.Tags != null && data.Tags.Any())
                 base.UpdateAssociatedItems<Core.Model.DataTypes.ActTag, DbActTag>(
-                   data.Tags.Where(o => o != null && !o.IsEmpty()),
+                   data.Tags.Where(o => o != null && !o.IsEmpty() && !o.TagKey.StartsWith("$")),
                     retVal,
                     context);
 
@@ -391,7 +391,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             if (data.Tags != null)
                 base.UpdateAssociatedItems<Core.Model.DataTypes.ActTag, DbActTag>(
-                   data.Tags.Where(o => o != null && !o.IsEmpty()),
+                   data.Tags.Where(o => o != null && !o.IsEmpty() && !o.TagKey.StartsWith("$")),
                     retVal,
                     context);
 

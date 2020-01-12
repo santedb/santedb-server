@@ -20,6 +20,7 @@
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Http;
 using System;
+using System.ComponentModel;
 using System.Configuration;
 using System.Xml.Serialization;
 
@@ -45,6 +46,7 @@ namespace SanteDB.Messaging.GS1.Configuration
         /// Use AS2 standard mime based encoding
         /// </summary>
         [XmlAttribute("useAs2MimeEncoding")]
+        [DisplayName("Use AS.2 MIME"), Description("When true, instructs the service to use AS.2 mime encoded messages instead of REST messages")]
         public bool UseAS2MimeEncoding {
             get;set;
         }
@@ -53,6 +55,7 @@ namespace SanteDB.Messaging.GS1.Configuration
         /// Gets or sets the username
         /// </summary>
         [XmlAttribute("userName")]
+        [DisplayName("User Name"), Description("The user name to use when connecting to the GS1 broker")]
         public String UserName {
             get;set;
         }
@@ -61,6 +64,7 @@ namespace SanteDB.Messaging.GS1.Configuration
         /// Gets or sets the password
         /// </summary>
         [XmlAttribute("password")]
+        [PasswordPropertyTextAttribute, DisplayName("Password"), Description("The password to use when connecting to the GS1 broker")]
         public String Password {
             get;set;
         }
@@ -69,6 +73,7 @@ namespace SanteDB.Messaging.GS1.Configuration
         /// Configuration property for trusted cert
         /// </summary>
         [XmlElement("clientCertificate")]
+        [TypeConverter(typeof(ExpandableObjectConverter)), DisplayName("Client Cert"), Description("If using client certificates to communicate with GS1 broker, the client certificate configuration")]
         public X509ConfigurationElement ClientCertificate {
             get;set;
         }

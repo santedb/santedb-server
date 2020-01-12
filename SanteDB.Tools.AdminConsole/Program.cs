@@ -36,7 +36,7 @@ namespace SanteDB.Tools.AdminConsole
         {
 
             Console.WriteLine("SanteDB Administration & Security Console v{0} ({1})", typeof(Program).Assembly.GetName().Version, typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
-            Console.WriteLine("Copyright (C) 2015 - 2018, Mohawk College of Applied Arts and Technology");
+            Console.WriteLine("Copyright (C) 2015 - 2019, SanteSuite Community Partners (see NOTICES)");
 
             var pp = new ParameterParser<ConsoleParameters>();
             var options = pp.Parse(args);

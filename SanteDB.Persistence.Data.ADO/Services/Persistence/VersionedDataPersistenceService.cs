@@ -122,6 +122,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 (nonVersionedObect as IDbReadonly)?.IsReadonly == true)
                 throw new AdoFormalConstraintException(AdoFormalConstraintType.UpdatedReadonlyObject);
 
+            // Are we re-classing this object?
+            nonVersionedObect.CopyObjectData((object)data, false, true);
+
             // Map existing
             var storageInstance = this.FromModelInstance(data, context);
 
