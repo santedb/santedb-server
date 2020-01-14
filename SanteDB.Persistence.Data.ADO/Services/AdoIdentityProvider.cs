@@ -170,20 +170,16 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             if (user == null)
                                 throw new KeyNotFoundException(userName);
 
-                            var claims = dataContext.Query<DbUserClaim>(o => o.SourceKey == user.Key && (o.ClaimType == SanteDBClaimTypes.SanteDBTfaSecretClaim || o.ClaimType == SanteDBClaimTypes.SanteDBTfaSecretExpiry || o.ClaimType == SanteDBClaimTypes.SanteDBPasswordlessAuth));
-                            DbUserClaim tfaClaim = claims.FirstOrDefault(o => o.ClaimType == SanteDBClaimTypes.SanteDBTfaSecretClaim),
-                                tfaExpiry = claims.FirstOrDefault(o => o.ClaimType == SanteDBClaimTypes.SanteDBTfaSecretExpiry),
-                                noPassword = claims.FirstOrDefault(o => o.ClaimType == SanteDBClaimTypes.SanteDBPasswordlessAuth);
+                            var claims = dataContext.Query<DbUserClaim>(o => o.SourceKey == user.Key && (o.ClaimType == SanteDBClaimTypes.SanteDBOTAuthCode || o.ClaimType == SanteDBClaimTypes.SanteDBCodeAuth) && (!o.ClaimExpiry.HasValue || o.ClaimExpiry > DateTime.Now));
+                            DbUserClaim tfaClaim = claims.FirstOrDefault(o => o.ClaimType == SanteDBClaimTypes.SanteDBOTAuthCode),
+                                noPassword = claims.FirstOrDefault(o => o.ClaimType == SanteDBClaimTypes.SanteDBCodeAuth);
 
-                            if (tfaClaim == null || tfaExpiry == null)
+                            if (tfaClaim == null)
                                 throw new InvalidOperationException("Cannot find appropriate claims for TFA");
 
                             // Expiry check
                             IClaimsPrincipal retVal = null;
-                            DateTime expiryDate = DateTime.Parse(tfaExpiry.ClaimValue);
-                            if (expiryDate < DateTime.Now)
-                                throw new SecurityException("TFA secret expired");
-                            else if (String.IsNullOrEmpty(password) &&
+                            if (String.IsNullOrEmpty(password) &&
                                 Boolean.Parse(noPassword?.ClaimValue ?? "false") &&
                                 tfaSecret == tfaClaim.ClaimValue) // Last known password hash sent as password, this is a password reset token - It will be set to expire ASAP
                             {
@@ -287,10 +283,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             // This is a simple TFA generator
             var secret = ApplicationServiceContext.Current.GetService<ITwoFactorSecretGenerator>().GenerateTfaSecret();
             var hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
-
-            this.AddClaim(userName, new SanteDBClaim(SanteDBClaimTypes.SanteDBTfaSecretClaim, hashingService.ComputeHash(secret)), AuthenticationContext.SystemPrincipal);
-            this.AddClaim(userName, new SanteDBClaim(SanteDBClaimTypes.SanteDBTfaSecretExpiry, DateTime.Now.AddMinutes(5).ToString("o")), AuthenticationContext.SystemPrincipal);
-
+            this.AddClaim(userName, new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, hashingService.ComputeHash(secret)), AuthenticationContext.SystemPrincipal, new TimeSpan(0, 5, 0));
             return secret;
         }
 
@@ -451,7 +444,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Add a claim to the specified user
         /// </summary>
-        public void AddClaim(string userName, IClaim claim, IPrincipal principal)
+        public void AddClaim(string userName, IClaim claim, IPrincipal principal, TimeSpan? expire = null)
         {
             if (userName == null)
                 throw new ArgumentNullException(nameof(userName));
@@ -483,11 +476,15 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 ClaimValue = claim.Value,
                                 SourceKey = user.Key
                             };
+                            if (expire.HasValue)
+                                existingClaim.ClaimExpiry = DateTime.Now.Add(expire.Value);
                             dataContext.Insert(existingClaim);
                         }
                         else
                         {
                             existingClaim.ClaimValue = claim.Value;
+                            if (expire.HasValue)
+                                existingClaim.ClaimExpiry = DateTime.Now.Add(expire.Value);
                             dataContext.Update(existingClaim);
                         }
 

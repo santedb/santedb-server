@@ -301,7 +301,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             if (resetInfo.Purpose == "PasswordReset")
             {
                 new PolicyPermission(PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService);
-                identityProvider.AddClaim(securityUser.UserName, new SanteDBClaim(SanteDBClaimTypes.SanteDBPasswordlessAuth, "true"), AuthenticationContext.SystemPrincipal);
+                identityProvider.AddClaim(securityUser.UserName, new SanteDBClaim(SanteDBClaimTypes.SanteDBCodeAuth, "true"), AuthenticationContext.SystemPrincipal, new TimeSpan(0, 5, 0));
             }
 
             var tfaRelay = ApplicationServiceContext.Current.GetService<ITfaRelayService>();

@@ -205,6 +205,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         
                         // First we extract the token information
                         var sid = new Guid(Enumerable.Range(0, 32).Where(x => x % 2 == 0).Select(o => token[o]).ToArray());
+                        var sec = new Guid(token.Take(16).ToArray());
                         var aid = new Guid(Enumerable.Range(32, 32).Where(x => x % 2 == 0).Select(o => token[o]).ToArray());
                         var scopeLength = BitConverter.ToInt32(token, 64);
                         var scopeData = Enumerable.Range(68, scopeLength * 2).Where(x => x % 2 == 0).Select(o => token[o]).ToArray();
@@ -226,19 +227,21 @@ namespace SanteDB.Authentication.OAuth2.Rest
                             throw new SecurityTokenValidationException("Authorization code was not issued to this client");
 
                         // Fetch the principal information
-                        principal = new SanteDBClaimsPrincipal(identityProvider.GetIdentity(sid));
+                        principal = identityProvider.Authenticate(identityProvider.GetIdentity(sid).Name, null, sec.ToString());
 
                         // Add scopes
                         int li = 0, idx;
                         string scopes = "";
-                        do
+                        if (scopeData.Length > 0)
                         {
-                            idx = Array.IndexOf(scopeData, (byte)0, li);
-                            if(idx > 0) scopes += Encoding.UTF8.GetString(scopeData, li, idx - li) + ";";
-                            li += idx + 1;
-                        } while (idx > -1);
-                        tokenRequest["scope"] = scopes.Substring(0, scopes.Length - 1);
-
+                            do
+                            {
+                                idx = Array.IndexOf(scopeData, (byte)0, li);
+                                if (idx > 0) scopes += Encoding.UTF8.GetString(scopeData, li, idx - li) + ";";
+                                li += idx + 1;
+                            } while (idx > -1);
+                            tokenRequest["scope"] = scopes.Substring(0, scopes.Length - 1);
+                        }
                         // TODO: Claims
 
                         break;
@@ -417,6 +420,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 claims.Add(new SanteDBClaim("sub", nameId.Value));
             }
 
+            // Add JTI
+            claims.Add(new SanteDBClaim("jti", claimsPrincipal.FindFirst("jti")?.Value));
             claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
 
             SigningCredentials credentials = SecurityUtils.CreateSigningCredentials(this.m_masterConfig.Signatures.FirstOrDefault());
@@ -606,8 +611,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 var scopeData = scope.Where(o => o != "openid").SelectMany(o => Encoding.UTF8.GetBytes(o).Concat(new byte[] { 0 })).ToArray();
                 var claimData = claims?.SelectMany(o => Encoding.UTF8.GetBytes(o).Union(new byte[] { 0 })).ToArray() ?? new byte[0];
                 // Generate the appropriate authorization code
-                byte[] salt = Guid.NewGuid().ToByteArray();
-
+                var sec = Guid.NewGuid();
+                byte[] salt = sec.ToByteArray();
+                
                 AuditUtil.AddUserActor(audit, principal);
 
                 // Generate the token 
@@ -617,6 +623,11 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 var i = 0;
                 foreach (var b in sid.ToByteArray()) { authCode[i++] = b; authCode[i++] = salt[i % salt.Length]; }
                 foreach (var b in aid.ToByteArray()) { authCode[i++] = b; authCode[i++] = salt[i % salt.Length]; }
+                
+                // Now register the auth code
+                idp.AddClaim(authorization["username"], new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(new Guid(authCode.Take(16).ToArray()).ToString())), Core.Security.AuthenticationContext.SystemPrincipal, new TimeSpan(0, 1, 0));
+                idp.AddClaim(authorization["username"], new SanteDBClaim(SanteDBClaimTypes.SanteDBCodeAuth, "true"), Core.Security.AuthenticationContext.SystemPrincipal, new TimeSpan(0, 1, 0));
+
                 Array.Copy(BitConverter.GetBytes(scopeData.Length), 0, authCode, i, 4);
                 i += 4; // 2 byte portion
                 foreach (var b in scopeData) { authCode[i++] = b; authCode[i++] = salt[i % salt.Length]; }

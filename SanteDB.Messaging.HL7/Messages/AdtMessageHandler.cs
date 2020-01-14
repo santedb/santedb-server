@@ -92,7 +92,7 @@ namespace SanteDB.Messaging.HL7.Messages
                 AuditUtil.AuditUpdate(Core.Auditing.OutcomeIndicator.MinorFail, null, insertBundle.Item.ToArray());
                 throw;
             }
-}
+        }
 
         /// <summary>
         /// Perform an update of the specified patient

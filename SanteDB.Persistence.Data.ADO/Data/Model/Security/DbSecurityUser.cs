@@ -228,6 +228,12 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         [Column("clm_val")]
         public String ClaimValue { get; set; }
 
+        /// <summary>
+        /// The time the claim expires
+        /// </summary>
+        [Column("exp_utc")]
+        public DateTime? ClaimExpiry { get; set; }
+
     }
 }
 
