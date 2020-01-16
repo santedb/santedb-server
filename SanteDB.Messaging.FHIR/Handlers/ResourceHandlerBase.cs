@@ -147,8 +147,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// </summary>
         public virtual StructureDefinition GetStructureDefinition()
         {
-			// TODO: implement
-			return null;
+            return StructureDefinitionUtil.GetStructureDefinition(typeof(TFhirResource), false);
         }
 
         /// <summary>

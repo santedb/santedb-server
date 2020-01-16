@@ -26,7 +26,8 @@ set nuget="%cwd%\.nuget\nuget.exe"
 echo Will use NUGET in %nuget%
 echo Will use MSBUILD in %msbuild%
 
-%msbuild%\msbuild santedb-server-ext.sln /t:clean /t:restore /t:build /p:configuration=debug /m
+%msbuild%\msbuild santedb-server-ext.sln /t:clean /t:restore 
+%msbuild%\msbuild santedb-server-ext.sln /t:build /p:configuration=debug /m
 
 FOR /R "%cwd%" %%G IN (*.nuspec) DO (
 	echo Packing %%~pG

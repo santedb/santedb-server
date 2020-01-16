@@ -40,7 +40,7 @@ namespace SanteDB.Messaging.FHIR.Rest
     [ServiceKnownResource(typeof(Bundle))]
     [ServiceKnownResource(typeof(Immunization))]
     [ServiceKnownResource(typeof(ImmunizationRecommendation))]
-    [ServiceKnownResource(typeof(Conformance))]
+    [ServiceKnownResource(typeof(CapabilityStatement))]
     [ServiceKnownResource(typeof(RelatedPerson))]
     [ServiceKnownResource(typeof(Encounter))]
     [ServiceKnownResource(typeof(Condition))]
@@ -68,6 +68,13 @@ namespace SanteDB.Messaging.FHIR.Rest
         /// <returns></returns>
         [Get("/time")]
         DateTime Time();
+
+
+        /// <summary>
+        /// Options for this service
+        /// </summary>
+        [RestInvoke(UriTemplate = "/metadata", Method = "GET")]
+        CapabilityStatement GetMetaData();
 
         /// <summary>
         /// Read a resource
@@ -128,13 +135,8 @@ namespace SanteDB.Messaging.FHIR.Rest
         /// Options for this service
         /// </summary>
         [RestInvoke(UriTemplate = "/", Method = "OPTIONS")]
-        Conformance GetOptions();
+        CapabilityStatement GetOptions();
 
-        /// <summary>
-        /// Options for this service
-        /// </summary>
-        [RestInvoke(UriTemplate = "/metadata", Method = "GET")]
-        Conformance GetMetaData();
 
         /// <summary>
         /// Post a transaction

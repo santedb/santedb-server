@@ -138,7 +138,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             {
                 this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).GetTypeInfo().Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName));
 
-                List<IQueryBuilderHack> hax = new List<IQueryBuilderHack>() { new RelationshipQueryHack(), new CreationTimeQueryHack(this.m_mapper), new EntityAddressNameQueryHack() };
+                List<IQueryBuilderHack> hax = new List<IQueryBuilderHack>() { new RelationshipGuardQueryHack(), new CreationTimeQueryHack(this.m_mapper), new EntityAddressNameQueryHack() };
                 if (this.GetConfiguration().DataCorrectionKeys.Any(k => k == "ConceptQueryHack"))
                     hax.Add(new ConceptQueryHack(this.m_mapper));
 

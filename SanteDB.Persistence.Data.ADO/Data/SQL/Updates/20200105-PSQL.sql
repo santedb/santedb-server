@@ -2,7 +2,7 @@
  * <feature scope="SanteDB.Persistence.Data.ADO" id="20200105-01" name="Update:20200105-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
  *	<summary>Update: Add relationship for devices</summary>
  *	<remarks>This allows devices to be tracked to facilities and users</remarks>
- *	<check>select ck_patch('20200105-01')</check>
+ *	<isInstalled>select ck_patch('20200105-01')</isInstalled>
  * </feature>
  */
 
@@ -14,7 +14,7 @@ INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err
 ALTER TABLE ASGN_AUT_TBL ADD POL_ID UUID;
 ALTER TABLE ASGN_AUT_TBL ADD UPD_UTC TIMESTAMPTZ;
 ALTER TABLE ASGN_AUT_TBL ADD UPD_PROV_ID UUID;
-ALTER TABLE ASGNT_AUT_TBL ADD CONSTRAINT CK_ASGN_AUT_UPD CHECK (UPD_UTC IS NULL OR UPD_UTC IS NOT NULL AND UPD_PROV_ID IS NOT NULL);
+ALTER TABLE ASGN_AUT_TBL ADD CONSTRAINT CK_ASGN_AUT_UPD CHECK (UPD_UTC IS NULL OR UPD_UTC IS NOT NULL AND UPD_PROV_ID IS NOT NULL);
 ALTER TABLE SEC_USR_CLM_TBL ADD EXP_UTC TIMESTAMPTZ;
 SELECT REG_PATCH('20200105-01');
 COMMIT;

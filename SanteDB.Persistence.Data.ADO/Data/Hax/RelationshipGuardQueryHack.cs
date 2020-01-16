@@ -34,7 +34,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
     /// <summary>
     /// Represents a query hack for participations / relationships where the guard is being queried 
     /// </summary>
-    public class RelationshipQueryHack : IQueryBuilderHack
+    public class RelationshipGuardQueryHack : IQueryBuilderHack
     {
 
         /// <summary>
@@ -89,6 +89,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
 
                 // Now add to query
                 whereClause.And($"{columnName} IN ({String.Join(",", qValues.Select(o=>$"'{o}'").ToArray())})");
+
                 // Remove the inner join 
                 var remStack = new Stack<SqlStatement>();
                 SqlStatement last;

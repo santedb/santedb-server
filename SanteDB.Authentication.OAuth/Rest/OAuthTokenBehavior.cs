@@ -59,6 +59,7 @@ using SanteDB.Core.Rest.Behavior;
 using SanteDB.Core.Rest.Security;
 using SanteDB.Core.Applets.Model;
 using SanteDB.Core.Applets;
+using SanteDB.Core.Security.Principal;
 
 namespace SanteDB.Authentication.OAuth2.Rest
 {
@@ -107,7 +108,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 // Client principal
                 IPrincipal clientPrincipal = Core.Security.AuthenticationContext.Current.Principal;
                 // Client is not present so look in body
-                if (clientPrincipal == null || clientPrincipal == Core.Security.AuthenticationContext.AnonymousPrincipal)
+                if (clientPrincipal == null || clientPrincipal == Core.Security.AuthenticationContext.AnonymousPrincipal ||
+                    !(clientPrincipal.Identity is IApplicationIdentity))
                 {
                     String client_identity = tokenRequest["client_id"],
                         client_secret = tokenRequest["client_secret"];
@@ -129,24 +131,28 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
                 // Device principal?
                 IPrincipal devicePrincipal = null;
-                var authHead = RestOperationContext.Current.IncomingRequest.Headers["X-Device-Authorization"];
-
-                // TODO: X509 Authentication 
-                //if (RestOperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets != null)
-                //{
-                //    var claimSet = OperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets.OfType<System.IdentityModel.Claims.X509CertificateClaimSet>().FirstOrDefault();
-                //    if (claimSet != null) // device authenticated with X509 PKI Cert
-                //        devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(claimSet.X509Certificate);
-                //}
-                if (devicePrincipal == null && !String.IsNullOrEmpty(authHead)) // Device is authenticated using basic auth
+                if (Core.Security.AuthenticationContext.Current.Principal.Identity is IDeviceIdentity)
+                    devicePrincipal = Core.Security.AuthenticationContext.Current.Principal;
+                else
                 {
-                    if (!authHead.ToLower().StartsWith("basic "))
-                        throw new InvalidCastException("X-Device-Authorization must be BASIC scheme");
+                    var authHead = RestOperationContext.Current.IncomingRequest.Headers["X-Device-Authorization"];
 
-                    var authParts = Encoding.UTF8.GetString(Convert.FromBase64String(authHead.Substring(6).Trim())).Split(':');
-                    devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(authParts[0], authParts[1]);
+                    // TODO: X509 Authentication 
+                    //if (RestOperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets != null)
+                    //{
+                    //    var claimSet = OperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets.OfType<System.IdentityModel.Claims.X509CertificateClaimSet>().FirstOrDefault();
+                    //    if (claimSet != null) // device authenticated with X509 PKI Cert
+                    //        devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(claimSet.X509Certificate);
+                    //}
+                    if (devicePrincipal == null && !String.IsNullOrEmpty(authHead)) // Device is authenticated using basic auth
+                    {
+                        if (!authHead.ToLower().StartsWith("basic "))
+                            throw new InvalidCastException("X-Device-Authorization must be BASIC scheme");
+
+                        var authParts = Encoding.UTF8.GetString(Convert.FromBase64String(authHead.Substring(6).Trim())).Split(':');
+                        devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(authParts[0], authParts[1]);
+                    }
                 }
-
 
                 IPrincipal principal = null;
 
@@ -161,7 +167,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal).Demand();
 
                         if (devicePrincipal == null)
-                            throw new SecurityException("client_credentials grant requires device authentication either using X509 or X-Device-Authorization");
+                            throw new SecurityException("client_credentials grant requires device authentication either using X509 or X-Device-Authorization or enabling the DeviceAuthorizationAccessBehavior");
                         principal = clientPrincipal;
                         // Demand "Login As Service" permission
                         new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService, devicePrincipal).Demand();

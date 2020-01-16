@@ -54,7 +54,7 @@ namespace SanteDB.Tools.AdminConsole.Security
         /// <param name="claim">The claim</param>
         /// <param name="principal">The princiapl asserting the claim</param>
         /// <remarks>Not implemented</remarks>
-        public void AddClaim(string userName, IClaim claim, IPrincipal principal)
+        public void AddClaim(string userName, IClaim claim, IPrincipal principal,TimeSpan? expiry = null)
         {
             throw new NotImplementedException();
         }

@@ -98,6 +98,19 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         }
 
         /// <summary>
+        /// Obsolete the data
+        /// </summary>
+        public override EntityRelationship ObsoleteInternal(DataContext context, EntityRelationship data)
+        {
+            var obsoletionSequence = data.SourceEntity?.VersionSequence;
+            if (obsoletionSequence == null)
+                obsoletionSequence = context.FirstOrDefault<DbEntityVersion>(o => o.Key == data.SourceEntityKey && o.ObsoletionTime == null)?.VersionSequenceId;
+
+            data.ObsoleteVersionSequenceId = obsoletionSequence;
+            return base.UpdateInternal(context, data);
+        }
+
+        /// <summary>
         /// Comparer for entity relationships
         /// </summary>
         internal class Comparer : IEqualityComparer<EntityRelationship>

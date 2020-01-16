@@ -184,7 +184,7 @@ namespace SanteDB.Messaging.FHIR.Rest
                 String baseUri = RestOperationContext.Current.IncomingRequest.Url.AbsoluteUri;
                 RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Location", String.Format("{0}{1}/{2}/_history/{3}", baseUri, resourceType, result.Id, result.VersionId));
                 RestOperationContext.Current.OutgoingResponse.SetLastModified(result.Timestamp);
-                RestOperationContext.Current.OutgoingResponse.SetETag(result.VersionId);
+                RestOperationContext.Current.OutgoingResponse.SetETag($"W/\"{result.VersionId}\"");
 
                 return result;
 
@@ -256,7 +256,7 @@ namespace SanteDB.Messaging.FHIR.Rest
                 String baseUri = RestOperationContext.Current.IncomingRequest.Url.AbsoluteUri;
                 RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Location", String.Format("{0}{1}/{2}/_history/{3}", baseUri, resourceType, result.Id, result.VersionId));
                 RestOperationContext.Current.OutgoingResponse.SetLastModified(result.Timestamp);
-                RestOperationContext.Current.OutgoingResponse.SetETag(result.VersionId);
+                RestOperationContext.Current.OutgoingResponse.SetETag($"W/\"{result.VersionId}\"");
 
 
                 return result;
@@ -355,15 +355,12 @@ namespace SanteDB.Messaging.FHIR.Rest
         /// <summary>
         /// Get conformance
         /// </summary>
-        public Conformance GetOptions()
+        public CapabilityStatement GetOptions()
         {
             this.ThrowIfNotReady();
-
             var retVal = ConformanceUtil.GetConformanceStatement();
-            RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Location", String.Format("{0}Conformance/{1}/_history/{2}", RestOperationContext.Current.IncomingRequest.Url, retVal.Id, retVal.VersionId));
+            RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Location", String.Format("{0}metadata", RestOperationContext.Current.IncomingRequest.Url));
             RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.OK;
-            RestOperationContext.Current.OutgoingResponse.Headers.Remove("Content-Disposition");
-            RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Disposition", "filename=\"conformance.xml\"");
             return retVal;
         }
 
@@ -464,7 +461,7 @@ namespace SanteDB.Messaging.FHIR.Rest
                 // Create the result
                 RestOperationContext.Current.OutgoingResponse.SetLastModified(result.Timestamp);
                 RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Disposition", String.Format("filename=\"{0}-{1}-{2}.xml\"", resourceType, result.Id, result.VersionId));
-                RestOperationContext.Current.OutgoingResponse.SetETag(result.VersionId);
+                RestOperationContext.Current.OutgoingResponse.SetETag($"W/\"{result.VersionId}\"");
                 
                 return result;
 
@@ -480,7 +477,7 @@ namespace SanteDB.Messaging.FHIR.Rest
         /// <summary>
         /// Get meta-data
         /// </summary>
-        public Conformance GetMetaData()
+        public CapabilityStatement GetMetaData()
         {
             return this.GetOptions();
         }

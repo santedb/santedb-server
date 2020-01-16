@@ -24,6 +24,7 @@ using RestSrvr;
 using RestSrvr.Attributes;
 using RestSrvr.Message;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Model.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -48,16 +49,16 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
         // Trace source
         private Tracer m_traceSource = new Tracer(FhirConstants.TraceSourceName);
         // Known types
-        private static Type[] s_knownTypes = typeof(IFhirServiceContract).GetCustomAttributes<ServiceKnownResourceAttribute>().Select(o=>o.Type).ToArray();
+        private static Type[] s_knownTypes = typeof(IFhirServiceContract).GetCustomAttributes<ServiceKnownResourceAttribute>().Select(o => o.Type).ToArray();
 
         // Serializers
-        private static Dictionary<Type, XmlSerializer> s_serializers = new Dictionary<Type, XmlSerializer>();
+        private static Dictionary<String, XmlSerializer> s_serializers = new Dictionary<String, XmlSerializer>();
 
         // Static ctor
         static FhirMessageDispatchFormatter()
         {
             foreach (var s in s_knownTypes)
-                s_serializers.Add(s, new XmlSerializer(s,  s.GetCustomAttributes<XmlIncludeAttribute>().Select(o => o.Type).ToArray()));
+                s_serializers.Add(s.Name, new XmlSerializer(s, s.GetCustomAttributes<XmlIncludeAttribute>().Select(o => o.Type).ToArray()));
         }
 
         /// <summary>
@@ -67,7 +68,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
         {
 
         }
-        
+
         /// <summary>
         /// Deserialize the request
         /// </summary>
@@ -97,12 +98,12 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
 
                             Type eType = s_knownTypes.FirstOrDefault(o => o.GetCustomAttribute<XmlRootAttribute>()?.ElementName == bodyReader.LocalName &&
                                 o.GetCustomAttribute<XmlRootAttribute>()?.Namespace == bodyReader.NamespaceURI);
-                            if (!s_serializers.TryGetValue(eType, out serializer))
+                            if (!s_serializers.TryGetValue(eType.Name, out serializer))
                             {
                                 serializer = new XmlSerializer(eType);
                                 lock (s_serializers)
-                                    if (!s_serializers.ContainsKey(eType))
-                                        s_serializers.Add(eType, serializer);
+                                    if (!s_serializers.ContainsKey(eType.Name))
+                                        s_serializers.Add(eType.Name, serializer);
                             }
                             parameters[pNumber] = serializer.Deserialize(request.Body);
                         }
@@ -117,13 +118,24 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
                         using (StreamReader sr = new StreamReader(request.Body))
                         {
                             string fhirContent = sr.ReadToEnd();
-                            fhirObject = FhirParser.ParseFromJson(fhirContent);
+                            fhirObject = new FhirJsonParser().Parse(fhirContent);
                         }
 
                         // Now we want to serialize the FHIR MODEL object and re-parse as our own API bundle object
-                        MemoryStream ms = new MemoryStream(FhirSerializer.SerializeResourceToXmlBytes(fhirObject as Hl7.Fhir.Model.Resource));
-                        XmlSerializer xsz = s_serializers[fhirObject?.GetType()];
-                        parameters[0] = xsz.Deserialize(ms);
+                        if (fhirObject != null)
+                        {
+                            MemoryStream ms = new MemoryStream(new FhirXmlSerializer().SerializeToBytes(fhirObject as Hl7.Fhir.Model.Resource));
+                            if (!s_serializers.TryGetValue(fhirObject.GetType().Name, out XmlSerializer xsz))
+                            {
+                                xsz = new XmlSerializer(new ModelSerializationBinder().BindToType(typeof(Patient).AssemblyQualifiedName, fhirObject.GetType().Name));
+                                lock (s_serializers)
+                                    if (!s_serializers.ContainsKey(fhirObject.GetType().Name))
+                                        s_serializers.Add(fhirObject.GetType().Name, xsz);
+                            }
+                            parameters[pNumber] = xsz.Deserialize(ms);
+                        }
+                        else
+                            parameters[pNumber] = null;
                     }
                     else if (contentType != null)// TODO: Binaries
                         throw new InvalidOperationException("Invalid request format");
@@ -131,7 +143,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error, e.ToString());
                 throw;
             }
 
@@ -155,12 +167,12 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
                     result?.GetType().GetCustomAttribute<JsonObjectAttribute>() != null)
                 {
                     XmlSerializer xsz = null;
-                    if (!s_serializers.TryGetValue(result.GetType(), out xsz))
+                    if (!s_serializers.TryGetValue(result.GetType().Name, out xsz))
                     {
                         xsz = new XmlSerializer(result.GetType());
                         lock (s_serializers)
-                            if (!s_serializers.ContainsKey(result.GetType()))
-                                s_serializers.Add(result.GetType(), xsz);
+                            if (!s_serializers.ContainsKey(result.GetType().Name))
+                                s_serializers.Add(result.GetType().Name, xsz);
                     }
                     MemoryStream ms = new MemoryStream();
                     xsz.Serialize(ms, result);
@@ -185,7 +197,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
                         }
 
                         // Now we serialize to JSON
-                        byte[] body = FhirSerializer.SerializeResourceToJsonBytes(fhirObject as Hl7.Fhir.Model.Resource);
+                        byte[] body = new FhirJsonSerializer().SerializeToBytes(fhirObject as Hl7.Fhir.Model.Resource);
                         ms.Dispose();
                         ms = new MemoryStream(body);
                         // Prepare reply for the WCF pipeline
@@ -206,14 +218,14 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
                     responseMessage.Body = result as Stream;
                 }
 
-                
+
                 RestOperationContext.Current.OutgoingResponse.ContentType = contentType;
                 RestOperationContext.Current.OutgoingResponse.AppendHeader("X-PoweredBy", String.Format("{0} v{1} ({2})", Assembly.GetEntryAssembly().GetName().Name, Assembly.GetEntryAssembly().GetName().Version, Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion));
                 RestOperationContext.Current.OutgoingResponse.AppendHeader("X-GeneratedOn", DateTime.Now.ToString("o"));
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error, e.ToString());
                 throw;
             }
         }

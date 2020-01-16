@@ -42,7 +42,7 @@
   <insert>
     <ConceptReferenceTerm xmlns="http://santedb.org/model">
       <source>1ec9583a-b019-4baa-b856-b99caf368656</source>
-      <term>3E79D2AF-34E3-4B3B-9E57-587D32C46E0A</term>
+      <term>22668261-525D-430E-8478-06A513981ADF</term>
       <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
     </ConceptReferenceTerm>
   </insert>

@@ -87,10 +87,10 @@
           <Project>{39E61451-F4FE-493D-B754-5F06EB284AAC}</Project>
           <Name>SanteDB.Core.Applets</Name>
         </ProjectReference>
-		<ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
-      <Project>{786BD0EE-1806-4158-BA45-80249AC6DFE7}</Project>
-      <Name>SanteDB.Rest.Common</Name>
-    </ProjectReference>
+        <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
+          <Project>{786BD0EE-1806-4158-BA45-80249AC6DFE7}</Project>
+          <Name>SanteDB.Rest.Common</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
@@ -104,7 +104,6 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
       <Name>SanteDB.Core</Name>

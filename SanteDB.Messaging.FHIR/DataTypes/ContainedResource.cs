@@ -47,7 +47,7 @@ namespace SanteDB.Messaging.FHIR.DataTypes
         [XmlElement(ElementName = "OperationOutcome", Type = typeof(OperationOutcome))]
         [XmlElement(ElementName = "ValueSet", Type = typeof(ValueSet))]
         [XmlElement(ElementName = "Profile", Type = typeof(StructureDefinition))]
-        [XmlElement(ElementName = "Conformance", Type = typeof(Conformance))]
+        [XmlElement(ElementName = "Conformance", Type = typeof(CapabilityStatement))]
         [XmlElement(ElementName = "RelatedPerson", Type = typeof(RelatedPerson))]
         public DomainResourceBase Item { get; set; }
 

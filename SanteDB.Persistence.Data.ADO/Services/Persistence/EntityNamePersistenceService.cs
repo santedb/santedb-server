@@ -71,7 +71,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         LoadState = Core.Model.LoadState.PartialLoad,
                         ObsoleteVersionSequenceId = o.FirstOrDefault().Object2.ObsoleteVersionSequenceId,
                         SourceEntityKey = o.FirstOrDefault().Object2.SourceKey,
-                        Component = o.Select(c => new EntityNameComponent()
+                        Component = o.OrderBy(c=>c.Object1.Sequence).Select(c => new EntityNameComponent()
                         {
                             ComponentTypeKey = c.Object1.ComponentTypeKey,
                             Key = c.Object1.Key,

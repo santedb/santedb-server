@@ -167,7 +167,7 @@ namespace SanteDB.Messaging.FHIR.Resources
         /// <summary>
         /// Provider of the patient resource
         /// </summary>
-        [XmlElement("careProvider")]
+        [XmlElement("generalPractitioner")]
         [Description("Provider managing this patient")]
         public Reference Provider { get; set; }
 
@@ -184,7 +184,6 @@ namespace SanteDB.Messaging.FHIR.Resources
         [XmlElement("link")]
         [Description("Other patient resources linked to this patient resource")]
         public List<PatientLink> Link { get; set; }
-
       
         /// <summary>
         /// Generate the narrative

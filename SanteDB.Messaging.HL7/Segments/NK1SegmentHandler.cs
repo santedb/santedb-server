@@ -146,7 +146,7 @@ namespace SanteDB.Messaging.HL7.Segments
 
                 // Contact extension
                 var contactExtension = person.LoadCollection<EntityExtension>(nameof(Entity.Extensions)).FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.ContactRolesExtension);
-                if(contactExtension != null)
+                if (contactExtension != null)
                 {
                     var existingValue = (contactExtension.ExtensionValue as dynamic);
                     var roles = existingValue.roles as IEnumerable<dynamic>;
@@ -155,9 +155,9 @@ namespace SanteDB.Messaging.HL7.Segments
                         var contact = Enumerable.FirstOrDefault<dynamic>(roles, o => o.patientKey == patient.Key)?.contact;
                         if (!String.IsNullOrEmpty(contact?.ToString()))
                             nk1.ContactRole.Identifier.Value = contact;
-                        else if (patient.Tags.Any(o=>o.TagKey == "$alt.keys")) // might be a composite
+                        else if (patient.Tags.Any(o => o.TagKey == "$alt.keys")) // might be a composite
                         {
-                            var altKeys = patient.Tags.FirstOrDefault(o=>o.TagKey == "$alt.keys")?.Value.Split(';').Select(o=>Guid.Parse(o));
+                            var altKeys = patient.Tags.FirstOrDefault(o => o.TagKey == "$alt.keys")?.Value.Split(';').Select(o => Guid.Parse(o));
                             contact = Enumerable.FirstOrDefault<dynamic>(roles, o => altKeys.Contains((Guid)o.patientKey))?.contact;
                             if (!String.IsNullOrEmpty(contact?.ToString()))
                                 nk1.ContactRole.Identifier.Value = contact;
@@ -217,6 +217,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 // Next of kin is a person
                 Person retVal = new Person() { Key = Guid.NewGuid() };
                 EntityRelationship retValRelation = new EntityRelationship(EntityRelationshipTypeKeys.NextOfKin, retVal.Key) { SourceEntityKey = patient.Key };
+                bool foundByKey = false;
 
                 // Look for existing person
                 fieldNo = 33;
@@ -243,6 +244,7 @@ namespace SanteDB.Messaging.HL7.Segments
                     if (found != null)
                     {
                         retVal = found;
+                        foundByKey = true;
                         // Existing relationship?
                         retValRelation = ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityRelationship>>().Query(r => r.SourceEntityKey == patient.Key.Value && r.TargetEntityKey == retVal.Key.Value, AuthenticationContext.SystemPrincipal).FirstOrDefault() ?? retValRelation;
                         break;
@@ -254,27 +256,34 @@ namespace SanteDB.Messaging.HL7.Segments
                 if (!nk1Segment.Relationship.IsEmpty())
                     retValRelation.RelationshipTypeKey = nk1Segment.Relationship.ToModel(RelationshipCodeSystem)?.Key;
 
-                // Do we have a mother already?
-                if (retValRelation.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother)
+                // Some relationships only allow one person, we should update them 
+                if (patient.VersionKey.HasValue)
                 {
-                    // Get the existing mother relationship
-                    var existingMotherRel = patient.Relationships.FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother);
-                    if (existingMotherRel != null)
+                    // We will try to fetch the information by key
+                    var existingNokRel = patient.LoadCollection<EntityRelationship>(nameof(Entity.Relationships)).FirstOrDefault(o => o.RelationshipTypeKey == retValRelation.RelationshipTypeKey);
+                    if (existingNokRel != null)
                     {
-                        retValRelation = existingMotherRel;
-                        retVal = context.FirstOrDefault(o => o.Key == existingMotherRel.TargetEntityKey) as Person;
-                        // Mother isn't in context, load
-                        if (retVal == null)
-                            retVal = personService.Get(existingMotherRel.TargetEntityKey.Value, null, true, AuthenticationContext.SystemPrincipal);
-                        if (retVal == null)
-                            throw new InvalidOperationException("Cannot locate described MTH entity on patient record");
+                        retValRelation = existingNokRel;
+                        if (!foundByKey) // We didn't actually resolve anyone by current key so we should try to find them in the DB
+                        {
+                            retVal = context.FirstOrDefault(o => o.Key == existingNokRel.TargetEntityKey) as Person;
+                            // Mother isn't in context, load
+                            if (retVal == null)
+                                retVal = personService.Get(existingNokRel.TargetEntityKey.Value, null, true, AuthenticationContext.SystemPrincipal);
+                            if (retVal == null)
+                                throw new InvalidOperationException("Cannot locate described NOK entity on patient record");
+
+                            // IF the person is a PATIENT and not a PERSON we will not update them - too dangerous - ignore the NOK entry
+                            if (retVal is Patient && !foundByKey)
+                                return new IdentifiedData[0];
+                        }
                     }
                 }
 
                 fieldNo = 2;
                 // Names
                 if (nk1Segment.NameRepetitionsUsed > 0)
-                    retVal.Names.AddRange(nk1Segment.GetName().ToModel().ToList().Where(n=>!retVal.Names.Any(e=>e.SemanticEquals(n))));
+                    retVal.Names.AddRange(nk1Segment.GetName().ToModel().ToList().Where(n => !retVal.Names.Any(e => e.SemanticEquals(n))));
 
                 // Address
                 fieldNo = 4;
@@ -355,7 +364,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 fieldNo = 33;
                 if (nk1Segment.NextOfKinAssociatedPartySIdentifiersRepetitionsUsed > 0)
                 {
-                    retVal.Identifiers.AddRange(nk1Segment.GetNextOfKinAssociatedPartySIdentifiers().ToModel().ToList().Where(i=>!retVal.Identifiers.Any(e=>e.SemanticEquals(i))));
+                    retVal.Identifiers.AddRange(nk1Segment.GetNextOfKinAssociatedPartySIdentifiers().ToModel().ToList().Where(i => !retVal.Identifiers.Any(e => e.SemanticEquals(i))));
                 }
 
                 // Find the existing relationship on the patient

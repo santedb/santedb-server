@@ -23,6 +23,7 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.FHIR.Backbone;
 using SanteDB.Messaging.FHIR.DataTypes;
@@ -124,12 +125,12 @@ namespace SanteDB.Messaging.FHIR.Handlers
 				Addresses = resource.Address.Select(DataTypeConverter.ToEntityAddress).ToList(),
 				CreationTime = DateTimeOffset.Now,
 				DateOfBirth = resource.BirthDate?.DateValue,
+                DateOfBirthPrecision = resource.BirthDate.Precision == DataTypes.DatePrecision.Day ? DatePrecision.Day : DatePrecision.Year,
                 // TODO: Extensions
                 Extensions = resource.Extension.Select(DataTypeConverter.ToEntityExtension).OfType<EntityExtension>().ToList(),
                 GenderConceptKey = DataTypeConverter.ToConcept(new FhirCoding(new Uri("http://hl7.org/fhir/administrative-gender"), resource.Gender?.Value))?.Key,
 				Identifiers = resource.Identifier.Select(DataTypeConverter.ToEntityIdentifier).ToList(),
 				LanguageCommunication = resource.Communication.Select(DataTypeConverter.ToPersonLanguageCommunication).ToList(),
-				Key = Guid.NewGuid(),
 				Names = resource.Name.Select(DataTypeConverter.ToEntityName).ToList(),
 				Relationships = resource.Contact.Select(DataTypeConverter.ToEntityRelationship).ToList(),
 				StatusConceptKey = resource.Active?.Value == true ? StatusKeys.Active : StatusKeys.Obsolete,
@@ -137,12 +138,17 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			};
 
 			Guid key;
-
 			if (!Guid.TryParse(resource.Id, out key))
-			{
-				key = Guid.NewGuid();
-			}
-
+            {
+                foreach(var id in patient.Identifiers) // try to lookup based on reliable id for the record to update
+                {
+                    if(id.Authority.IsUnique)
+                    {
+                        var match = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Core.Model.Roles.Patient>>().Query(o => o.Identifiers.Any(i => i.Authority.DomainName == id.Authority.DomainName && i.Value == id.Value), 0, 1, out int tr, AuthenticationContext.SystemPrincipal);
+                        key = match.FirstOrDefault()?.Key ?? Guid.NewGuid();
+                    }   
+                }
+            }
 			patient.Key = key;
 
 			if (resource.Deceased is FhirDateTime)

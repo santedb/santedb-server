@@ -100,13 +100,13 @@ namespace SanteDB.Messaging.FHIR.Resources
     /// </summary>
     [XmlType("CapabilityStatement", Namespace = "http://hl7.org/fhir")]
     [XmlRoot("CapabilityStatement", Namespace = "http://hl7.org/fhir")]
-    public class Conformance : DomainResourceBase
+    public class CapabilityStatement : DomainResourceBase
     {
 
         /// <summary>
         /// Creates a new instance of the conformance class
         /// </summary>
-        public Conformance()
+        public CapabilityStatement()
         {
             this.Rest = new List<RestDefinition>();
             this.Format = new List<FhirCode<string>>();

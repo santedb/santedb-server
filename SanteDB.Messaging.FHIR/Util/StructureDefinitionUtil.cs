@@ -61,7 +61,7 @@ namespace SanteDB.Messaging.FHIR.Util
                 },
                 Name = me.GetCustomAttribute<DescriptionAttribute>()?.Description ?? me.Name,
                 Description = me.GetCustomAttribute<DescriptionAttribute>()?.Description ?? me.Name,
-                FhirVersion = "3.0.1",
+                FhirVersion = "4.0.0",
                 Date = DateTime.Now,
                 Kind = StructureDefinitionKind.Resource,
                 Type = me.GetCustomAttribute<XmlTypeAttribute>()?.TypeName ?? me.Name,
