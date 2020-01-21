@@ -67,8 +67,9 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			retVal.Address = model.LoadCollection<EntityAddress>("Addresses").Select(o => DataTypeConverter.ToFhirAddress(o)).ToList();
 			retVal.BirthDate = model.DateOfBirth;
 			retVal.Deceased = model.DeceasedDate == DateTime.MinValue ? (object)new FhirBoolean(true) : model.DeceasedDate != null ? new FhirDate(model.DeceasedDate.Value) : null;
-			retVal.Gender = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("GenderConcept"))?.GetPrimaryCode()?.Code;
-			retVal.Identifier = model.Identifiers?.Select(o => DataTypeConverter.ToFhirIdentifier(o)).ToList();
+			retVal.Gender = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("GenderConcept"), "http://hl7.org/fhir/administrative-gender")?.GetPrimaryCode()?.Code;
+
+            retVal.Identifier = model.Identifiers?.Select(o => DataTypeConverter.ToFhirIdentifier(o)).ToList();
 			retVal.MultipleBirth = model.MultipleBirthOrder == 0 ? (FhirElement)new FhirBoolean(true) : model.MultipleBirthOrder.HasValue ? new FhirInt(model.MultipleBirthOrder.Value) : null;
 			retVal.Name = model.LoadCollection<EntityName>("Names").Select(o => DataTypeConverter.ToFhirHumanName(o)).ToList();
 			retVal.Timestamp = model.ModifiedOn.DateTime;
