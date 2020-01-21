@@ -242,10 +242,12 @@ namespace SanteDB.Messaging.FHIR.Util
 
                 List<String> value = new List<string>(fhirQuery.GetValues(kv).Length);
 
+                var parmComponents = kv.Split(':');
+
                 // Is the name extension?
-                var parmMap = map?.Map.FirstOrDefault(o => o.FhirName == kv);
+                var parmMap = map?.Map.FirstOrDefault(o => o.FhirName == parmComponents[0]);
                 if (parmMap == null)
-                    parmMap = s_default.Map.FirstOrDefault(o => o.FhirName == kv);
+                    parmMap = s_default.Map.FirstOrDefault(o => o.FhirName == parmComponents[0]);
                 if (parmMap == null && kv == "extension")
                     parmMap = new QueryParameterMapProperty()
                     {
@@ -256,6 +258,7 @@ namespace SanteDB.Messaging.FHIR.Util
                 else if (parmMap == null)
                     continue;
 
+                // Valuse
                 foreach (var v in fhirQuery.GetValues(kv))
                 {
                     if (String.IsNullOrEmpty(v)) continue;
@@ -263,6 +266,7 @@ namespace SanteDB.Messaging.FHIR.Util
                     // Operands
                     bool chop = false;
                     string opValue = String.Empty;
+                    string filterValue = v;
                     if (v.Length > 2)
                         switch (v.Substring(0, 2))
                         {
@@ -296,8 +300,22 @@ namespace SanteDB.Messaging.FHIR.Util
                             default:
                                 break;
                         }
-                    retVal.ActualParameters.Add(kv, v);
-                    value.Add(opValue + v.Substring(chop ? 2 : 0));
+
+                    if(parmComponents.Length > 1)
+                        switch(parmComponents[1])
+                        {
+                            case "contains":
+                                opValue = "~";
+                                filterValue = $"*{filterValue}*";
+                                break;
+                            case "missing":
+                                filterValue = "null";
+                                chop = false;
+                                break;
+                        }
+
+                    retVal.ActualParameters.Add(kv, filterValue);
+                    value.Add(opValue + filterValue.Substring(chop ? 2 : 0));
                 }
 
                 if (value.Count(o => !String.IsNullOrEmpty(o)) == 0)
@@ -312,7 +330,15 @@ namespace SanteDB.Messaging.FHIR.Util
                             if (itm.Contains("|"))
                             {
                                 var segs = itm.Split('|');
-                                hdsiQuery.Add(String.Format("{0}[{1}].value", parmMap.ModelName, segs[0]), segs[1]);
+                                // Might be a URL
+                                if (Uri.TryCreate(segs[0], UriKind.Absolute, out Uri data))
+                                {
+                                    var aa = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>().Get(data);
+                                    hdsiQuery.Add(String.Format("{0}[{1}].value", parmMap.ModelName, aa.DomainName), segs[1]);
+                                }
+                                else
+                                    hdsiQuery.Add(String.Format("{0}[{1}].value", parmMap.ModelName, segs[0]), segs[1]);
+
                             }
                             else
                                 hdsiQuery.Add(parmMap.ModelName + ".value", itm);

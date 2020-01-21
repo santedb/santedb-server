@@ -637,7 +637,7 @@ namespace SanteDB.Messaging.FHIR.Util
 
 			return new FhirTelecom()
 			{
-				Use = DataTypeConverter.ToFhirCodeableConcept(telecomAddress.AddressUse)?.GetPrimaryCode()?.Code,
+				Use = telecomAddress.AddressUseKey == NullReasonKeys.NoInformation ? null : DataTypeConverter.ToFhirCodeableConcept(telecomAddress.AddressUse)?.GetPrimaryCode()?.Code,
 				Value = telecomAddress.IETFValue
 			};
 		}
