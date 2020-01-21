@@ -704,6 +704,7 @@ namespace SanteDB.Persistence.MDM.Services
             var retVal = Activator.CreateInstance(mtype.MakeGenericType(typeof(T))) as IMdmMaster<T>;
             retVal.Key = Guid.NewGuid();
             retVal.VersionKey = null;
+            (retVal as BaseEntityData).CreatedByKey = Guid.Parse(AuthenticationContext.SystemApplicationSid);
             return retVal;
         }
 

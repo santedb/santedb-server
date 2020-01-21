@@ -224,7 +224,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Perform the cache convert
         /// </summary>
-        internal Entity DoCacheConvert(object dataInstance, DataContext context) { 
+        internal Entity DoCacheConvert(object dataInstance, DataContext context)
+        {
             if (dataInstance == null)
                 return null;
             // Alright first, which type am I mapping to?
@@ -296,6 +297,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public Core.Model.Entities.Entity InsertCoreProperties(DataContext context, Core.Model.Entities.Entity data)
         {
 
+            // The creator asserted from the persistence call
+            Guid? assertedCreator = data.CreatedByKey;
+
             // Ensure FK exists
             if (data.ClassConcept != null) data.ClassConcept = data.ClassConcept?.EnsureExists(context) as Concept;
             if (data.DeterminerConcept != null) data.DeterminerConcept = data.DeterminerConcept?.EnsureExists(context) as Concept;
@@ -313,67 +317,18 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var retVal = base.InsertInternal(context, data);
 
             // Identifiers
-	        if (data.Identifiers != null)
-	        {
-		        // Validate unique values for IDs
-		        var authorities = data.Identifiers.Where(o => o.AuthorityKey.HasValue).Select(o => o.Authority ?? (ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>() as AdoBasePersistenceService<AssigningAuthority>).Get(context, o.AuthorityKey.Value));
-                DbSecurityProvenance provenance = null;
-
-		        foreach (var auth in authorities)
-		        {
-                    if (auth == null)
-                        throw new KeyNotFoundException($"Missing assigning authority from {String.Join(",", data.Identifiers.Select(o => o.AuthorityKey))}");
-                    if (auth.IsUnique && this.m_persistenceService.GetConfiguration().Validation.IdentifierUniqueness)
-                    {
-                        var dups = data.Identifiers.Where(id => id.AuthorityKey == auth.Key).SelectMany(id => context.Query<DbEntityIdentifier>(c => c.SourceKey != data.Key && c.AuthorityKey == auth.Key && c.Value == id.Value && c.ObsoleteVersionSequenceId == null));
-                        if (dups.Any(did => !data.Relationships.Any(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Replaces && o.TargetEntityKey == did.SourceKey)))
-                        {
-                            if (!this.m_persistenceService.GetConfiguration().Validation.SoftValidation)
-                                throw new DetectedIssueException(
-                                        new DetectedIssue(DetectedIssuePriorityType.Error, $"Identifiers for {String.Join(",", dups.Select(o => o.Value.ToString()))} in domain {auth.DomainName} violate unique constraint", DetectedIssueKeys.FormalConstraintIssue)
-                                    );
-                            else
-                                data.Tags.Add(new EntityTag("dq.err.id.uq", String.Join(",", dups.Select(o => o.Value.ToString()))));
-                        }
-                    }
-                    if (auth.AssigningApplicationKey.HasValue) // Must have permission
-                    {
-                        if (provenance == null) provenance = context.FirstOrDefault<DbSecurityProvenance>(o => o.Key == context.ContextId);
-
-                        // If the provenance application does not have authority to assign then all the identifiers must already exist!
-                        if (provenance.ApplicationKey != auth.AssigningApplicationKey)
-                        {
-                            if (!data.Identifiers.Where(id => id.AuthorityKey == auth.Key).All(id => context.Any<DbEntityIdentifier>(o => o.AuthorityKey == auth.Key && o.Value == id.Value && o.SourceKey != data.Key)))
-                                throw new DetectedIssueException(
-                                    new DetectedIssue(DetectedIssuePriorityType.Error, $"Application {provenance.ApplicationKey} does not have permission to assign {auth.DomainName}", DetectedIssueKeys.SecurityIssue)
-                                );
-                        }
-                    }
-                    if(!String.IsNullOrEmpty(auth.ValidationRegex) && this.m_persistenceService.GetConfiguration().Validation.IdentifierFormat) // must be valid
-                    {
-                        var nonMatch = data.Identifiers
-                            .Where(id => id.AuthorityKey == auth.Key && !new Regex(auth.ValidationRegex).IsMatch(id.Value));
-                        if (nonMatch.Any())
-                        {
-                            if (!this.m_persistenceService.GetConfiguration().Validation.SoftValidation)
-                                throw new DetectedIssueException(
-                                    new DetectedIssue(DetectedIssuePriorityType.Error, $"Identifier for {String.Join(",", nonMatch.Select(o => o.Value.ToString()))} in domain {auth.DomainName} failed format validation", DetectedIssueKeys.FormalConstraintIssue)
-                                );
-                            else
-                                data.Tags.Add(new EntityTag("dq.err.id.format", String.Join(",", nonMatch.Select(o => o.Value.ToString()))));
-                        }
-                    }
-				}
-
+            if (data.Identifiers != null)
+            {
+                this.VerifyIdentities(context, data, assertedCreator);
                 // Assert 
-				base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.EntityIdentifier, DbEntityIdentifier>(
-					data.Identifiers.Where(o => o != null && !o.IsEmpty()),
-					retVal,
-					context);
-			}
+                base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.EntityIdentifier, DbEntityIdentifier>(
+                    data.Identifiers.Where(o => o != null && !o.IsEmpty()),
+                    retVal,
+                    context);
+            }
 
             // Relationships
-            if (data.Relationships != null) 
+            if (data.Relationships != null)
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityRelationship, DbEntityRelationship>(
                    data.Relationships.Where(o => o != null && !o.InversionIndicator && !o.IsEmpty()).ToList(),
                     retVal,
@@ -458,10 +413,83 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         }
 
         /// <summary>
+        /// Verify the identities are appropriately designed
+        /// </summary>
+        private void VerifyIdentities(DataContext context, Entity data, Guid? assertedCreator)
+        {
+            // Validate unique values for IDs
+            var authorities = data.Identifiers.Where(o => o.AuthorityKey.HasValue).Select(o => o.Authority ?? (ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>() as AdoBasePersistenceService<AssigningAuthority>).Get(context, o.AuthorityKey.Value));
+            DbSecurityProvenance provenance = null;
+
+            foreach (var auth in authorities)
+            {
+                var dbAuth = context.FirstOrDefault<DbAssigningAuthority>(o => o.Key == auth.Key);
+
+                if (dbAuth == null)
+                    throw new KeyNotFoundException($"Missing assigning authority from {String.Join(",", data.Identifiers.Select(o => o.AuthorityKey))}");
+
+                var alreadyKnown = data.Identifiers.Where(id => id.AuthorityKey == dbAuth.Key).All(id => context.Any<DbEntityIdentifier>(o => o.AuthorityKey == dbAuth.Key && o.Value == id.Value && o.SourceKey != data.Key));
+
+                if (dbAuth.IsUnique && this.m_persistenceService.GetConfiguration().Validation.IdentifierUniqueness)
+                {
+                    var dups = data.Identifiers.Where(id => id.AuthorityKey == dbAuth.Key).SelectMany(id => context.Query<DbEntityIdentifier>(c => c.SourceKey != data.Key && c.AuthorityKey == dbAuth.Key && c.Value == id.Value && c.ObsoleteVersionSequenceId == null));
+                    if (dups.Any(did => !data.Relationships.Any(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Replaces && o.TargetEntityKey == did.SourceKey)))
+                    {
+                        if (!this.m_persistenceService.GetConfiguration().Validation.SoftValidation)
+                            throw new DetectedIssueException(
+                                    new DetectedIssue(DetectedIssuePriorityType.Error, $"Identifiers for {String.Join(",", dups.Select(o => o.Value.ToString()))} in domain {dbAuth.DomainName} violate unique constraint", DetectedIssueKeys.FormalConstraintIssue)
+                                );
+                        else
+                            data.Tags.Add(new EntityTag("dq.err.id.uq", String.Join(",", dups.Select(o => o.Value.ToString()))));
+                    }
+                }
+                if (dbAuth.AssigningApplicationKey.HasValue) // Must have permission
+                {
+                    if (provenance == null) provenance = context.FirstOrDefault<DbSecurityProvenance>(o => o.Key == data.CreatedByKey);
+
+                    // If the provenance application does not have authority to assign then all the identifiers must already exist!
+                    if (provenance.ApplicationKey != dbAuth.AssigningApplicationKey && assertedCreator != dbAuth.AssigningApplicationKey && !alreadyKnown)
+                        throw new DetectedIssueException(
+                            new DetectedIssue(DetectedIssuePriorityType.Error, $"Application {provenance.ApplicationKey} does not have permission to assign {dbAuth.DomainName}", DetectedIssueKeys.SecurityIssue)
+                        );
+                }
+                if (!String.IsNullOrEmpty(dbAuth.ValidationRegex) && this.m_persistenceService.GetConfiguration().Validation.IdentifierFormat) // must be valid
+                {
+                    var nonMatch = data.Identifiers
+                        .Where(id => id.AuthorityKey == dbAuth.Key && !new Regex(dbAuth.ValidationRegex).IsMatch(id.Value));
+                    if (nonMatch.Any())
+                    {
+                        if (!this.m_persistenceService.GetConfiguration().Validation.SoftValidation)
+                            throw new DetectedIssueException(
+                                new DetectedIssue(DetectedIssuePriorityType.Error, $"Identifier for {String.Join(",", nonMatch.Select(o => o.Value.ToString()))} in domain {dbAuth.DomainName} failed format validation", DetectedIssueKeys.FormalConstraintIssue)
+                            );
+                        else
+                            data.Tags.Add(new EntityTag("dq.err.id.format", String.Join(",", nonMatch.Select(o => o.Value.ToString()))));
+                    }
+                }
+
+                // Verify scope
+                var scopes = context.Query<DbAuthorityScope>(o => o.AssigningAuthorityKey == dbAuth.Key);
+                if (scopes.Any() && !scopes.Any(s => s.ScopeConceptKey == data.ClassConceptKey))
+                {
+                    // Only valid if the identifier has already been assigned (we're just getting a link)
+                    if (!alreadyKnown)
+                        throw new DetectedIssueException(
+                            new DetectedIssue(DetectedIssuePriorityType.Error, $"Identifier of type {dbAuth.DomainName} cannot be assigned to object of type {data.ClassConceptKey}", DetectedIssueKeys.BusinessRuleViolationIssue)
+                        );
+                }
+            }
+
+        }
+
+        /// <summary>
         /// Update the specified entity
         /// </summary>
         public Core.Model.Entities.Entity UpdateCoreProperties(DataContext context, Core.Model.Entities.Entity data)
         {
+
+            // Asserted creator of this version
+            Guid? assertedCreator = data.CreatedByKey;
 
             // Esnure exists
             if (data.ClassConcept != null) data.ClassConcept = data.ClassConcept?.EnsureExists(context) as Concept;
@@ -479,47 +507,16 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
 
             // Identifiers
-	        if (data.Identifiers != null)
-	        {
+            if (data.Identifiers != null)
+            {
+                this.VerifyIdentities(context, data, assertedCreator);
 
                 // Validate unique values for IDs
-                var authorities = data.Identifiers.Where(o => o.AuthorityKey.HasValue).Select(o => o.Authority ?? (ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>() as AdoBasePersistenceService<AssigningAuthority>).Get(context, o.AuthorityKey.Value));
-                DbSecurityProvenance provenance = null;
-
-                foreach (var auth in authorities)
-                {
-                    if (auth == null)
-                        throw new KeyNotFoundException($"Missing assigning authority from {String.Join(",", data.Identifiers.Select(o => o.AuthorityKey))}");
-                    if (auth.IsUnique)
-                    {
-                        var dups = data.Identifiers.Where(id => id.AuthorityKey == auth.Key).SelectMany(id => context.Query<DbEntityIdentifier>(c => c.SourceKey != data.Key && c.AuthorityKey == auth.Key && c.Value == id.Value && c.ObsoleteVersionSequenceId == null));
-                        if (dups.Any(did => !data.Relationships.Any(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Replaces && o.TargetEntityKey == did.SourceKey)))
-                            // TODO: Ensure that the duplicate is also not a RELATED to the via a MASTER
-                            throw new DetectedIssueException(
-                                new DetectedIssue(DetectedIssuePriorityType.Error, $"Identifiers for {String.Join(",", dups.Select(o => o.Value.ToString()))} in domain {auth.DomainName} violate unique constraint", DetectedIssueKeys.FormalConstraintIssue)
-                            );
-                    }
-                    if (auth.AssigningApplicationKey.HasValue) // Must have permission
-                    {
-                        if (provenance == null) provenance = context.FirstOrDefault<DbSecurityProvenance>(o => o.Key == context.ContextId);
-
-                        // If the provenance application does not have authority to assign then all the identifiers must already exist!
-                        if (provenance.ApplicationKey != auth.AssigningApplicationKey)
-                        {
-                            if (!data.Identifiers.Where(id => id.AuthorityKey == auth.Key).All(id => context.Any<DbEntityIdentifier>(o => o.AuthorityKey == auth.Key && o.Value == id.Value && o.SourceKey != data.Key)))
-                                throw new DetectedIssueException(
-                                    new DetectedIssue(DetectedIssuePriorityType.Error, $"Application {provenance.ApplicationKey} does not have permission to assign {auth.DomainName}", DetectedIssueKeys.SecurityIssue)
-                                );
-                        }
-                    }
-                }
-
-                // Validate unique values for IDs
-		        base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.EntityIdentifier, DbEntityIdentifier>(
-			        data.Identifiers.Where(o => !o.IsEmpty()),
-			        retVal,
-			        context);
-			}
+                base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.EntityIdentifier, DbEntityIdentifier>(
+                    data.Identifiers.Where(o => !o.IsEmpty()),
+                    retVal,
+                    context);
+            }
 
             // Relationships
             if (data.Relationships != null)
@@ -570,7 +567,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     retVal,
                     context);
 
-           
+
             return retVal;
         }
 
@@ -654,6 +651,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             }
         }
-        
+
     }
 }

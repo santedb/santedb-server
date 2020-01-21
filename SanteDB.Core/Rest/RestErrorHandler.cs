@@ -68,6 +68,9 @@ namespace SanteDB.Rest.Common.Serialization
 
             var uriMatched = RestOperationContext.Current.IncomingRequest.Url;
 
+            while (error.InnerException != null)
+                error = error.InnerException;
+
             var fault = new RestServiceFault(error);
 
             // Formulate appropriate response

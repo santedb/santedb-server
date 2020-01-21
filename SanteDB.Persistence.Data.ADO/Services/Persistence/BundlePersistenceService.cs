@@ -37,6 +37,7 @@ using System.Reflection;
 using System.Security.Principal;
 using SanteDB.Core.Model.Query;
 using System.Diagnostics.Tracing;
+using System.Data.Common;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -195,6 +196,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     foreach (var iss in e.Issues)
                         this.m_tracer.TraceError("\t{0}: {1}", iss.Priority, iss.Text);
                     throw new DetectedIssueException(e.Issues, $"Could not insert bundle due to sub-object persistence (at item {i})", e);
+                }
+                catch(DbException e)
+                {
+                    this.TranslateDbException(e);
                 }
                 catch (Exception e)
                 {

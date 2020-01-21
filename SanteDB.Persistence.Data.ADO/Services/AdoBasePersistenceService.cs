@@ -382,7 +382,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Translates a DB exception to an appropriate SanteDB exception
         /// </summary>
-        private void TranslateDbException(DbException e)
+        protected void TranslateDbException(DbException e)
         {
             if (e.Data["SqlState"] != null)
             {
