@@ -455,7 +455,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 catch (Exception e)
                 {
                     this.m_traceSource.TraceEvent(EventLevel.Error,  "Error getting active policies for {0} : {1}", securable, e);
-                    throw;
+                    throw new Exception($"Error getting active policies for {securable}", e);
                 }
         }
 

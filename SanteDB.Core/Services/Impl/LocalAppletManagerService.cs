@@ -349,7 +349,9 @@ namespace SanteDB.Core.Services.Impl
 
                     // Verify timestamp
                     var timestamp = package.Unpack().Info.TimeStamp;
-                    if (cert[0].NotAfter < timestamp || cert[0].NotBefore > timestamp || timestamp > DateTime.Now)
+                    if (timestamp > DateTime.Now)
+                        throw new SecurityException($"Package {package.Meta.Id} was published in the future! Something's fishy, refusing to load");
+                    else if (cert[0].NotAfter < timestamp || cert[0].NotBefore > timestamp)
                         throw new SecurityException($"Cannot find public key of publisher information for {package.Meta.PublicKeyToken} or the local certificate is invalid");
 
                     if (retVal == true)

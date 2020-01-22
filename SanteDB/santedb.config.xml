@@ -51,7 +51,7 @@
   </section>
   <section xsi:type="FileMatchConfigurationSection">
     <basePath>
-      <add readonly="false">C:\Users\Justin Fyfe\source\repos\santedb\santempi\applet\matching</add>
+      <add readonly="false">C:\Users\fyfej\source\repos\santedb\sante-mpi\applet\matching</add>
     </basePath>
   </section>
   <section xsi:type="MetadataConfigurationSection"/>
@@ -59,8 +59,8 @@
   <section xsi:type="FileSystemQueueConfigurationSection" queueRoot=".\queue" />
   <section xsi:type="DataConfigurationSection">
     <connectionStrings>
-      <add name="PSQL" value="server=192.168.199.200;port=5432; database=santedb; user id=postgres; password=postgres; pooling=true; MinPoolSize=10; MaxPoolSize=30; Timeout=60; " provider="Npgsql"/>
-      <add name="AUDIT" value="server=192.168.199.200;port=5432; database=audit; user id=postgres; password=postgres; pooling=true; MinPoolSize=10; MaxPoolSize=30; Timeout=60; " provider="Npgsql"/>
+      <add name="PSQL" value="server=fs-dev-psql10;port=5432; database=santempi; user id=postgres; password=postgres; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql"/>
+      <add name="AUDIT" value="server=fs-dev-psql10;port=5432; database=santempi_audit; user id=postgres; password=postgres; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql"/>
     </connectionStrings>
   </section>
   <section xsi:type="OrmConfigurationSection">

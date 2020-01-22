@@ -54,7 +54,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
         /// <summary>
         /// Query hack for creation time
         /// </summary>
-        public bool HackQuery(QueryBuilder builder, SqlStatement sqlStatement, SqlStatement whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, object values, IEnumerable<TableMapping> scopedTables)
+        public bool HackQuery(QueryBuilder builder, SqlStatement sqlStatement, SqlStatement whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, object values, IEnumerable<TableMapping> scopedTables, params KeyValuePair<String, object>[] queryFilter)
         {
             if(property.Name == nameof(IBaseEntityData.CreationTime) && typeof(IVersionedEntity).IsAssignableFrom(tmodel)) // filter by first creation time
             {
