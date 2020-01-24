@@ -136,28 +136,26 @@ namespace SanteDB.Persistence.MDM.Services
         {
             var query = new NameValueCollection(QueryExpressionBuilder.BuildQuery<T>(e.Query).ToArray());
 
-            // The query is already querying for master records
-            if (query.ContainsKey("classConcept") && query["classConcept"].Contains(MdmConstants.MasterRecordClassification.ToString()))
-                return;
             // The query doesn't contain a query for master records, so...
             // If the user is not in the role "SYSTEM" OR they didn't ask specifically for LOCAL records we have to rewrite the query to use MASTER
             if (!e.Principal.IsInRole("SYSTEM") || !query.ContainsKey("tag[mdm.type].value"))
             {
                 // Did the person ask specifically for a local record? if so we need to demand permission
-                if (query.ContainsKey("tag[mdm.type].value") && query["tag[mdm.type].value"].Contains("L"))
+                if (query.TryGetValue("tag[mdm.type].value", out List<String> mdmFilters) && mdmFilters.Contains("L"))
                     new PolicyPermission(PermissionState.Unrestricted, MdmPermissionPolicyIdentifiers.ReadMdmLocals).Demand();
                 else // We want to modify the query to only include masters and rewrite the query
                 {
-                    query = new NameValueCollection(query.ToDictionary(o => $"relationship[MDM-Master].source@{typeof(T).Name}.{o.Key}", o => o.Value));
+                    var localQuery = new NameValueCollection(query.ToDictionary(o => $"relationship[MDM-Master].source@{typeof(T).Name}.{o.Key}", o => o.Value));
+                    localQuery.Add("classConcept", MdmConstants.MasterRecordClassification.ToString());
                     query.Add("classConcept", MdmConstants.MasterRecordClassification.ToString());
                     e.Cancel = true; // We want to cancel the other's query
 
                     // We are wrapping an entity, so we query entity masters
                     int tr = 0;
                     if (typeof(Entity).IsAssignableFrom(typeof(T)))
-                        e.Results = this.MasterQuery<Entity>(query, e.QueryId.GetValueOrDefault(), e.Offset, e.Count, e.Principal, out tr);
+                        e.Results = this.MasterQuery<Entity>(query, localQuery, e.QueryId.GetValueOrDefault(), e.Offset, e.Count, e.Principal, out tr);
                     else
-                        e.Results = this.MasterQuery<Act>(query, e.QueryId.GetValueOrDefault(), e.Offset, e.Count, e.Principal, out tr);
+                        e.Results = this.MasterQuery<Act>(query, localQuery, e.QueryId.GetValueOrDefault(), e.Offset, e.Count, e.Principal, out tr);
                     e.TotalResults = tr;
                 }
             }
@@ -166,12 +164,39 @@ namespace SanteDB.Persistence.MDM.Services
         /// <summary>
         /// Perform a master query 
         /// </summary>
-        private IEnumerable<T> MasterQuery<TMasterType>(NameValueCollection query, Guid queryId, int offset, int? count, IPrincipal principal, out int totalResults)
+        /// <param name="count">The number of results to return</param>
+        /// <param name="localQuery">The query for local records affixed to the MDM tree</param>
+        /// <param name="masterQuery">The query for master records</param>
+        /// <param name="offset">The offset of the first result</param>
+        /// <param name="principal">The user executing the query</param>
+        /// <param name="queryId">The unique query identifier</param>
+        ///<param name="totalResults">The number of matching results</param>
+        private IEnumerable<T> MasterQuery<TMasterType>(NameValueCollection masterQuery, NameValueCollection localQuery, Guid queryId, int offset, int? count, IPrincipal principal, out int totalResults)
             where TMasterType : IdentifiedData
         {
-            var masterQuery = QueryExpressionParser.BuildLinqExpression<TMasterType>(query, null, false);
-            return ApplicationServiceContext.Current.GetService<IStoredQueryDataPersistenceService<TMasterType>>().Query(masterQuery, queryId, offset, count, out totalResults, principal)
-                .AsParallel().AsOrdered().Select(o => o is Entity ? new EntityMaster<T>((Entity)(object)o).GetMaster(principal) : new ActMaster<T>((Act)(Object)o).GetMaster(principal)).OfType<T>().ToList();
+            var qpi = ApplicationServiceContext.Current.GetService<IStoredQueryDataPersistenceService<TMasterType>>();
+            IEnumerable<TMasterType> results = null;
+            if (qpi is IUnionQueryDataPersistenceService<TMasterType> iqps)
+            {
+                // Try to do a linked query (unless the query is on a special local filter value)
+                try
+                {
+                    var masterLinq = QueryExpressionParser.BuildLinqExpression<TMasterType>(masterQuery, null, false);
+                    var localLinq = QueryExpressionParser.BuildLinqExpression<TMasterType>(localQuery, null, false);
+                    results = iqps.Union(new Expression<Func<TMasterType, bool>>[] { masterLinq, localLinq }, queryId, offset, count, out totalResults, principal);
+                }
+                catch
+                {
+                    var localLinq = QueryExpressionParser.BuildLinqExpression<TMasterType>(localQuery, null, false);
+                    results = qpi.Query(localLinq, queryId, offset, count, out totalResults, principal);
+                }
+            }
+            else
+            { // Not capable of doing intersect results at query level
+                var masterLinq = QueryExpressionParser.BuildLinqExpression<TMasterType>(localQuery, null, false);
+                results = qpi.Query(masterLinq, queryId, offset, count, out totalResults, principal);
+            }
+            return results.AsParallel().AsOrdered().Select(o => o is Entity ? new EntityMaster<T>((Entity)(object)o).GetMaster(principal) : new ActMaster<T>((Act)(Object)o).GetMaster(principal)).OfType<T>().ToList();
         }
 
         /// <summary>
@@ -199,7 +224,7 @@ namespace SanteDB.Persistence.MDM.Services
         protected virtual void OnRetrieving(object sender, DataRetrievingEventArgs<T> e)
         {
             // There aren't actually any data in the database which is of this type
-            (sender as IRepositoryService<T>).Find(o => o.Key == e.Id, 0, 0, out int records);
+            ApplicationServiceContext.Current.GetService<IDataPersistenceService<T>>().Query(o => o.Key == e.Id, 0, 0, out int records, AuthenticationContext.SystemPrincipal);
             if (records == 0) //
             {
                 e.Cancel = true;

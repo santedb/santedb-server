@@ -182,71 +182,87 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Perform the query 
         /// </summary>
-        protected virtual IEnumerable<Object> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TModel>[] orderBy, bool includeCount = true)
+        protected virtual IEnumerable<Object> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> primaryQuery, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TModel>[] orderBy, bool includeCount = true)
         {
 #if DEBUG
             Stopwatch sw = new Stopwatch();
             sw.Start();
 #endif
 
-            SqlStatement domainQuery = null;
+            OrmResultSet<TQueryReturn> retVal = null;
+            Expression<Func<TModel, bool>>[] queries = new Expression<Func<TModel, bool>>[] { primaryQuery };
+            // Are we intersecting?
+            if(context.Data.TryGetValue("UNION", out object others) &&
+                others is Expression<Func<TModel, bool>>[])
+            {
+                context.Data.Remove("UNION");
+                queries = queries.Concat((Expression<Func<TModel, bool>>[])others).ToArray();
+            }
+
             try
             {
-
-                // Query has been registered?
-                if (queryId != Guid.Empty && this.m_queryPersistence?.IsRegistered(queryId) == true)
-                    return this.GetStoredQueryResults(queryId, offset, count, out totalResults);
-
-                // Is obsoletion time already specified? If so and the entity is an iversioned entity we don't want obsolete data coming back
-                var queryString = query.ToString();
-                if (!queryString.Contains("ObsoletionTime") && typeof(IVersionedEntity).IsAssignableFrom(typeof(TModel)) && !queryString.Contains("VersionKey"))
+                // Fetch queries
+                foreach (var q in queries)
                 {
-                    var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
-                    //var obsoletionReference = Expression.MakeUnary(ExpressionType.Not, Expression.MakeMemberAccess(Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), typeof(Nullable<DateTimeOffset>).GetProperty("HasValue")), typeof(bool));
-                    query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
-                }
-                else if (!queryString.Contains("ObsoleteVersionSequenceId") && typeof(IVersionedAssociation).IsAssignableFrom(typeof(TModel)))
-                {
-                    var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedAssociation.ObsoleteVersionSequenceId))), Expression.Constant(null));
-                    //var obsoletionReference = Expression.MakeUnary(ExpressionType.Not, Expression.MakeMemberAccess(Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedAssociation.ObsoleteVersionSequenceId))), typeof(Nullable<decimal>).GetProperty("HasValue")), typeof(bool));
-                    query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
-                }
+                    var query = q;
+                    SqlStatement domainQuery = null;
+                    // Query has been registered?
+                    if (queryId != Guid.Empty && this.m_queryPersistence?.IsRegistered(queryId) == true)
+                        return this.GetStoredQueryResults(queryId, offset, count, out totalResults);
 
-                // Domain query
-                Type[] selectTypes = { typeof(TQueryReturn) };
-                if (selectTypes[0].IsConstructedGenericType)
-                    selectTypes = selectTypes[0].GenericTypeArguments;
+                    // Is obsoletion time already specified? If so and the entity is an iversioned entity we don't want obsolete data coming back
+                    var queryString = query.ToString();
+                    if (!queryString.Contains("ObsoletionTime") && typeof(IVersionedEntity).IsAssignableFrom(typeof(TModel)) && !queryString.Contains("VersionKey"))
+                    {
+                        var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
+                        //var obsoletionReference = Expression.MakeUnary(ExpressionType.Not, Expression.MakeMemberAccess(Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), typeof(Nullable<DateTimeOffset>).GetProperty("HasValue")), typeof(bool));
+                        query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
+                    }
+                    else if (!queryString.Contains("ObsoleteVersionSequenceId") && typeof(IVersionedAssociation).IsAssignableFrom(typeof(TModel)))
+                    {
+                        var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedAssociation.ObsoleteVersionSequenceId))), Expression.Constant(null));
+                        //var obsoletionReference = Expression.MakeUnary(ExpressionType.Not, Expression.MakeMemberAccess(Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedAssociation.ObsoleteVersionSequenceId))), typeof(Nullable<decimal>).GetProperty("HasValue")), typeof(bool));
+                        query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
+                    }
 
-                domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(selectTypes);
-                var expression = m_mapper.MapModelExpression<TModel, TDomain, bool>(query, false);
-                if (expression != null)
-                {
-                    Type lastJoined = typeof(TDomain);
-                    if (typeof(CompositeResult).IsAssignableFrom(typeof(TQueryReturn)))
-                        foreach (var p in typeof(TQueryReturn).GenericTypeArguments.Select(o => this.m_persistenceService.GetMapper().MapModelType(o)))
-                            if (p != typeof(TDomain))
-                            {
-                                // Find the FK to join
-                                domainQuery.InnerJoin(lastJoined, p);
-                                lastJoined = p;
-                            }
+                    // Domain query
+                    Type[] selectTypes = { typeof(TQueryReturn) };
+                    if (selectTypes[0].IsConstructedGenericType)
+                        selectTypes = selectTypes[0].GenericTypeArguments;
 
-                    domainQuery.Where<TDomain>(expression);
-                }
-                else
-                {
-                    m_tracer.TraceEvent(EventLevel.Verbose, "Will use slow query construction due to complex mapped fields");
-                    domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, orderBy);
+                    domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(selectTypes);
+                    var expression = m_mapper.MapModelExpression<TModel, TDomain, bool>(query, false);
+                    if (expression != null)
+                    {
+                        Type lastJoined = typeof(TDomain);
+                        if (typeof(CompositeResult).IsAssignableFrom(typeof(TQueryReturn)))
+                            foreach (var p in typeof(TQueryReturn).GenericTypeArguments.Select(o => this.m_persistenceService.GetMapper().MapModelType(o)))
+                                if (p != typeof(TDomain))
+                                {
+                                    // Find the FK to join
+                                    domainQuery.InnerJoin(lastJoined, p);
+                                    lastJoined = p;
+                                }
+
+                        domainQuery.Where<TDomain>(expression);
+                    }
+                    else
+                    {
+                        m_tracer.TraceEvent(EventLevel.Verbose, "Will use slow query construction due to complex mapped fields");
+                        domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, orderBy);
+                    }
+
+                    domainQuery = this.AppendOrderBy(domainQuery, orderBy);
+
+                    if (retVal == null)
+                        retVal = this.DomainQueryInternal<TQueryReturn>(context, domainQuery);
+                    else
+                        retVal = retVal.Union(this.DomainQueryInternal<TQueryReturn>(context, domainQuery));
                 }
 
                 // Count = 0 means we're not actually fetching anything so just hit the db
                 if (count != 0)
                 {
-
-                    domainQuery = this.AppendOrderBy(domainQuery, orderBy);
-                   
-                    // Only one is requested, or there is no future query coming back so no savings in querying the entire dataset
-                    var retVal = this.DomainQueryInternal<TQueryReturn>(context, domainQuery);
 
                     // Stateful query identifier = We need to add query results
                     if (queryId != Guid.Empty && ApplicationContext.Current.GetService<IQueryPersistenceService>() != null)
@@ -254,7 +270,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         // Create on a separate thread the query results
                         var keys = retVal.Keys<Guid>().ToArray();
                         totalResults = keys.Length;
-                        this.m_queryPersistence?.RegisterQuerySet(queryId, keys, query, totalResults);
+                        this.m_queryPersistence?.RegisterQuerySet(queryId, keys, queries, totalResults);
 
                     }
                     else if (count.HasValue && includeCount && !m_configuration.UseFuzzyTotals) // Get an exact total
@@ -282,14 +298,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
                 else
                 {
-                    totalResults = context.Count(domainQuery);
+                    totalResults = retVal.Count();
                     return new List<Object>();
                 }
             }
             catch (Exception ex)
             {
-                if (domainQuery != null)
-                    this.m_tracer.TraceEvent(EventLevel.Error, context.GetQueryLiteral(domainQuery.Build()));
+                if (retVal != null)
+                    this.m_tracer.TraceEvent(EventLevel.Error, context.GetQueryLiteral(retVal.ToSqlStatement()));
                 context.Dispose(); // No longer important
 
                 throw;

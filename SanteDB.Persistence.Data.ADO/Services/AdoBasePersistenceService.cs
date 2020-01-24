@@ -53,7 +53,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// Represents a data persistence service which stores data in the local SQLite data store
     /// </summary>
     [ServiceProvider("ADO.NET Generic Persistence Provider")]
-    public abstract class AdoBasePersistenceService<TData> : IDataPersistenceService<TData>, IStoredQueryDataPersistenceService<TData>, IFastQueryDataPersistenceService<TData>, IAdoPersistenceService where TData : IdentifiedData
+    public abstract class AdoBasePersistenceService<TData> : 
+        IDataPersistenceService<TData>, 
+        IStoredQueryDataPersistenceService<TData>, 
+        IFastQueryDataPersistenceService<TData>,
+        IUnionQueryDataPersistenceService<TData>,
+        IAdoPersistenceService
+    where TData : IdentifiedData
     {
 
         /// <summary>
@@ -599,7 +605,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         public virtual IEnumerable<TData> Query(Expression<Func<TData, bool>> query, IPrincipal overrideAuthContext)
         {
             var tr = 0;
-            return this.QueryInternal(query, Guid.Empty, 0, null, out tr, true, overrideAuthContext, null);
+            return this.QueryInternal(query, Guid.Empty, 0, null, out tr, true, overrideAuthContext, null, null);
 
         }
 
@@ -608,13 +614,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public virtual IEnumerable<TData> Query(Expression<Func<TData, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext, params ModelSort<TData>[] orderBy)
         {
-            return this.QueryInternal(query, Guid.Empty, offset, count, out totalCount, false, overrideAuthContext, orderBy);
+            return this.QueryInternal(query, Guid.Empty, offset, count, out totalCount, false, overrideAuthContext, orderBy, null);
         }
 
         /// <summary>
         /// Instructs the service 
         /// </summary>
-        protected virtual IEnumerable<TData> QueryInternal(Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalCount, bool fastQuery, IPrincipal overrideAuthContext, ModelSort<TData>[] orderBy)
+        protected virtual IEnumerable<TData> QueryInternal(Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalCount, bool fastQuery, IPrincipal overrideAuthContext, ModelSort<TData>[] orderBy, Expression<Func<TData, bool>>[] unionWith)
         {
             if (query == null)
                 throw new ArgumentNullException(nameof(query));
@@ -652,6 +658,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     }
                     else
                         connection.LoadState = LoadState.FullLoad;
+
+                    // Other results we want to intersect with?
+                    if (unionWith != null)
+                        connection.AddData("UNION", unionWith);
 
                     var results = this.Query(connection, preArgs.Query, queryId, preArgs.Offset, preArgs.Count ?? 1000, out totalCount, orderBy, true);
                     var postData = new QueryResultEventArgs<TData>(query, results.AsQueryable(), offset, count, totalCount, queryId, overrideAuthContext);
@@ -855,7 +865,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public IEnumerable<TData> Query(Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext, params ModelSort<TData>[] orderBy)
         {
-            return this.QueryInternal(query, queryId, offset, count, out totalCount, false, overrideAuthContext, orderBy);
+            return this.QueryInternal(query, queryId, offset, count, out totalCount, false, overrideAuthContext, orderBy, null);
 
         }
 
@@ -864,8 +874,17 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public IEnumerable<TData> QueryFast(Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext)
         {
-            return this.QueryInternal(query, queryId, offset, count, out totalCount, true, overrideAuthContext, null);
+            return this.QueryInternal(query, queryId, offset, count, out totalCount, true, overrideAuthContext, null, null);
         }
+
+        /// <summary>
+        /// Intersect the specified queries together
+        /// </summary>
+        public IEnumerable<TData> Union(Expression<Func<TData, bool>>[] queries, Guid queryId, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext, params ModelSort<TData>[] orderBy)
+        {
+            return this.QueryInternal(queries.First(), queryId, offset, count, out totalCount, false, overrideAuthContext, orderBy, queries.Skip(1).ToArray());
+        }
+
 
         #endregion
 

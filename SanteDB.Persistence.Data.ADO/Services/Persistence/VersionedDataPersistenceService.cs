@@ -85,7 +85,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             nonVersionedPortion = context.Insert(nonVersionedPortion);
 
             // Ensure created by exists
-            data.CreatedByKey = domainObject.CreatedByKey = context.ContextId ;
+            data.CreatedByKey = domainObject.CreatedByKey = context.ContextId;
 
             if (data.CreationTime == DateTimeOffset.MinValue || data.CreationTime.Year < 100)
                 data.CreationTime = DateTimeOffset.Now;
@@ -175,70 +175,112 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Query internal for versioned data elements
         /// </summary>
-        protected override IEnumerable<Object> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TModel>[] orderBy, bool countResults = true)
+        protected override IEnumerable<Object> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> primaryQuery, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TModel>[] orderBy, bool countResults = true)
         {
-            // Is obsoletion time already specified? (this is important for versioned objects if we want to get the most current version of the object)
-            if (!query.ToString().Contains("ObsoletionTime") && !query.ToString().Contains("VersionKey"))
+
+#if DEBUG
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+#endif
+
+            // Queries to be performed
+            OrmResultSet<CompositeResult<TDomain, TDomainKey>> retVal = null;
+            Expression<Func<TModel, bool>>[] queries = new Expression<Func<TModel, bool>>[] { primaryQuery };
+            // Are we intersecting?
+            if (context.Data.TryGetValue("UNION", out object others) &&
+                others is Expression<Func<TModel, bool>>[])
             {
-                var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
-                query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
+                context.Data.Remove("UNION");
+                queries = queries.Concat((Expression<Func<TModel, bool>>[])others).ToArray();
             }
 
-
-            // Query has been registered?
-            if (queryId != Guid.Empty && this.m_queryPersistence?.IsRegistered(queryId) == true)
-                return this.GetStoredQueryResults(queryId, offset, count, out totalResults);
-
-            SqlStatement domainQuery = null;
-            var expr = m_mapper.MapModelExpression<TModel, TDomain, bool>(query, false);
-            if (expr != null)
-                domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(typeof(TDomain), typeof(TDomainKey))
-                    .InnerJoin<TDomain, TDomainKey>(o => o.Key, o => o.Key)
-                    .Where<TDomain>(expr).Build();
-            else
-                domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query).Build();
-
-
-            domainQuery = this.AppendOrderBy(domainQuery, orderBy);
-
-            // Only perform count
-            if (count == 0)
+            try
             {
-                totalResults = context.Count(domainQuery);
-                return new List<CompositeResult<TDomain, TDomainKey>>();
-            }
-            else
-            {
-            
-                var retVal = context.Query<CompositeResult<TDomain, TDomainKey>>(domainQuery);
-
-                if (queryId != Guid.Empty && ApplicationContext.Current.GetService<IQueryPersistenceService>() != null)
+                // Execute queries
+                foreach (var q in queries)
                 {
-                    var keys = retVal.Keys<Guid>().ToArray();
-                    totalResults = keys.Count();
-                    this.m_queryPersistence?.RegisterQuerySet(queryId, keys, query, totalResults);
-                }
-                else if (count.HasValue && countResults && !m_configuration.UseFuzzyTotals)
-                    totalResults = retVal.Count();
-                else
-                    totalResults = 0;
-
-                // Fuzzy totals - This will only fetch COUNT + 1 as the total results
-                if (count.HasValue)
-                {
-                    if (m_configuration.UseFuzzyTotals && totalResults == 0)
+                    var query = q;
+                    // Is obsoletion time already specified? (this is important for versioned objects if we want to get the most current version of the object)
+                    if (!query.ToString().Contains("ObsoletionTime") && !query.ToString().Contains("VersionKey"))
                     {
-                        var fuzzResults = retVal.Skip(offset).Take(count.Value + 1).OfType<Object>().ToList();
-                        totalResults = fuzzResults.Count();
-                        return fuzzResults.Take(count.Value);
+                        var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
+                        query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
                     }
-                    else // We already counted as part of the queryId so no need to take + 1
-                        return retVal.Skip(offset).Take(count.Value).OfType<Object>();
+
+
+                    // Query has been registered?
+                    if (queryId != Guid.Empty && this.m_queryPersistence?.IsRegistered(queryId) == true)
+                        return this.GetStoredQueryResults(queryId, offset, count, out totalResults);
+
+                    SqlStatement domainQuery = null;
+                    var expr = m_mapper.MapModelExpression<TModel, TDomain, bool>(query, false);
+                    if (expr != null)
+                        domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(typeof(TDomain), typeof(TDomainKey))
+                            .InnerJoin<TDomain, TDomainKey>(o => o.Key, o => o.Key)
+                            .Where<TDomain>(expr).Build();
+                    else
+                        domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query).Build();
+
+
+                    domainQuery = this.AppendOrderBy(domainQuery, orderBy);
+
+                    // Create or extend queries
+                    if (retVal == null)
+                        retVal = this.DomainQueryInternal<CompositeResult<TDomain, TDomainKey>>(context, domainQuery);
+                    else
+                        retVal = retVal.Union(this.DomainQueryInternal<CompositeResult<TDomain, TDomainKey>>(context, domainQuery));
+                }
+
+                // Only perform count
+                if (count == 0)
+                {
+                    totalResults = retVal.Count();
+                    return new List<CompositeResult<TDomain, TDomainKey>>();
                 }
                 else
-                    return retVal.Skip(offset).OfType<Object>();
-            }
+                {
 
+                    if (queryId != Guid.Empty && ApplicationContext.Current.GetService<IQueryPersistenceService>() != null)
+                    {
+                        var keys = retVal.Keys<Guid>().ToArray();
+                        totalResults = keys.Count();
+                        this.m_queryPersistence?.RegisterQuerySet(queryId, keys, queries, totalResults);
+                    }
+                    else if (count.HasValue && countResults && !m_configuration.UseFuzzyTotals)
+                        totalResults = retVal.Count();
+                    else
+                        totalResults = 0;
+
+                    // Fuzzy totals - This will only fetch COUNT + 1 as the total results
+                    if (count.HasValue)
+                    {
+                        if (m_configuration.UseFuzzyTotals && totalResults == 0)
+                        {
+                            var fuzzResults = retVal.Skip(offset).Take(count.Value + 1).OfType<Object>().ToList();
+                            totalResults = fuzzResults.Count();
+                            return fuzzResults.Take(count.Value);
+                        }
+                        else // We already counted as part of the queryId so no need to take + 1
+                            return retVal.Skip(offset).Take(count.Value).OfType<Object>();
+                    }
+                    else
+                        return retVal.Skip(offset).OfType<Object>();
+                }
+            }
+            catch (Exception ex)
+            {
+                if (retVal != null)
+                    this.m_tracer.TraceEvent(EventLevel.Error, context.GetQueryLiteral(retVal.ToSqlStatement()));
+                context.Dispose(); // No longer important
+
+                throw new DataPersistenceException("Error executing query" , ex);
+            }
+#if DEBUG
+            finally
+            {
+                sw.Stop();
+            }
+#endif
 
         }
 
@@ -322,7 +364,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error : {0}", e);
+                    this.m_tracer.TraceEvent(EventLevel.Error, "Error : {0}", e);
                     throw;
                 }
                 finally
@@ -345,7 +387,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TAssociation>>() as AdoBasePersistenceService<TAssociation>;
             if (persistenceService == null)
             {
-                this.m_tracer.TraceEvent(EventLevel.Informational,  "Missing persister for type {0}", typeof(TAssociation).Name);
+                this.m_tracer.TraceEvent(EventLevel.Informational, "Missing persister for type {0}", typeof(TAssociation).Name);
                 return;
             }
 
