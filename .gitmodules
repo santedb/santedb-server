@@ -33,3 +33,6 @@
 [submodule "santedb-bis"]
 	path = santedb-bis
 	url = https://github.com/santedb/santedb-bis
+[submodule "santedb-mdm"]
+	path = santedb-mdm
+	url = https://github.com/santedb/santedb-mdm.git

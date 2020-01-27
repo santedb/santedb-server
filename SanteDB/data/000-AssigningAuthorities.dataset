@@ -25,6 +25,7 @@
       <oid>1.0.3166.1.2.3</oid>
       <url>urn:iso:std:iso:3166:1</url>
       <scope>21ab7873-8ef3-4d78-9c19-4582b3c40631</scope>
+      <scope>48b2ffb3-07db-47ba-ad73-fc8fb8502471</scope>
       <validation>^[A-Z]{2}$</validation>
       <isUnique>true</isUnique>
     </AssigningAuthority>
