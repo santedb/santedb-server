@@ -405,10 +405,6 @@
       <Project>{a789ead3-97f2-4277-8c69-9df013f56500}</Project>
       <Name>SanteDB.Persistence.Diagnostics.OpenProject</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Persistence.MDM\SanteDB.Persistence.MDM.csproj">
-      <Project>{20960967-3647-41a2-9df6-3e15e2aa7019}</Project>
-      <Name>SanteDB.Persistence.MDM</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Persistence.Reporting.ADO\SanteDB.Persistence.Reporting.ADO.csproj">
       <Project>{aa364bac-ba47-4548-bd4b-31c0a73277b7}</Project>
       <Name>SanteDB.Persistence.Reporting.ADO</Name>
