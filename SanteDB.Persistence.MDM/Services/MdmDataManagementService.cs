@@ -22,6 +22,7 @@ using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl;
@@ -29,6 +30,9 @@ using SanteDB.Persistence.MDM.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Linq.Expressions;
+using SanteDB.Core.Model;
 
 namespace SanteDB.Persistence.MDM.Services
 {
@@ -117,11 +121,51 @@ namespace SanteDB.Persistence.MDM.Services
                     this.m_listeners.Add(Activator.CreateInstance(idt, itm) as MdmResourceListener);
                 }
 
+                // Add an MDM listener for subscriptions
+                var subscService = ApplicationServiceContext.Current.GetService<ISubscriptionExecutor>();
+                if(subscService != null)
+                    subscService.Executed += MdmSubscriptionExecuted;
+
                 this.m_listeners.Add(new BundleResourceListener(this.m_listeners));
             };
 
             this.Started?.Invoke(this, EventArgs.Empty);
             return true;
+        }
+
+        /// <summary>
+        /// Fired when the MDM Subscription has been executed
+        /// </summary>
+        private void MdmSubscriptionExecuted(object sender, Core.Event.QueryResultEventArgs<Core.Model.IdentifiedData> e)
+        {
+            var lresults = e.Results.ToList();
+
+            foreach(var itm in this.m_configuration.ResourceTypes)
+            {
+                var exprFunc = typeof(Func<,>).MakeGenericType(itm.ResourceType, typeof(Boolean));
+                exprFunc = typeof(Expression<>).MakeGenericType(exprFunc);
+                if (!exprFunc.IsAssignableFrom(e.Query.GetType())) continue;
+
+                // We have a resource type that matches
+                foreach(var res in e.Results)
+                {
+                    // Result is taggable and a tag exists for MDM
+                    if(res is Entity entity && entity.Tags.Any(o=>o.TagKey == "mdm.type" && o.Value != "M"))
+                    {
+                        // Attempt to load the master and add to the results
+                        var master = entity.LoadCollection<EntityRelationship>(nameof(Entity.Relationships)).FirstOrDefault(o => o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship);
+                        lresults.Add(master.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity)));
+                    }
+                    else if(res is Act act && act.Tags.Any(o=>o.TagKey == "mdm.type" && o.Value != "M"))
+                    {
+                        // Attempt to load the master and add to the results
+                        var master = act.LoadCollection<ActRelationship>(nameof(Act.Relationships)).FirstOrDefault(o => o.RelationshipTypeKey == MdmConstants.MasterRecordRelationship);
+                        lresults.Add(master.LoadProperty<Act>(nameof(ActRelationship.TargetAct)));
+                    }
+                }
+            }
+
+            e.Results = lresults;
         }
 
         /// <summary>
