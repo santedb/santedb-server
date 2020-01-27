@@ -78,5 +78,13 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         [XmlElement("inetpub"), 
             Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
         public String LoginAssetDir { get; set; }
+
+
+        /// <summary>
+        /// When true, allows login using client_credentials without any node authentication
+        /// </summary>
+        [XmlElement("allowNodelessClientAuth"), 
+            Description("When enabled, allows clients to authenticate with client_credentials grant with no node authentication")]
+        public bool AllowClientOnlyGrant { get; set; }
     }
 }

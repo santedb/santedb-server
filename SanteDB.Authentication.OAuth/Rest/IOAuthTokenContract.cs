@@ -18,6 +18,7 @@
  * Date: 2018-11-23
  */
 using RestSrvr.Attributes;
+using SanteDB.Authentication.OAuth2.Model;
 using System.Collections.Specialized;
 using System.IO;
 
@@ -33,16 +34,32 @@ namespace SanteDB.Authentication.OAuth2.Rest
     {
 
         /// <summary>
+        /// Get discovery exchange 
+        /// </summary>
+        [Get("/.well-known/openid-configuration")]
+        [return: MessageFormat(MessageFormatType.Json)]
+        OpenIdConfiguration GetDiscovery();
+
+        /// <summary>
         /// Token request
         /// </summary>
         [RestInvoke(UriTemplate = "oauth2_token", Method = "POST")]
-        Stream Token(NameValueCollection tokenRequest);
+        [return: MessageFormat(MessageFormatType.Json)]
+        object Token(NameValueCollection tokenRequest);
 
         /// <summary>
         /// Get the session from the authenticated bearer or JWT token
         /// </summary>
         [Get("session")]
-        Stream Session();
+        [return: MessageFormat(MessageFormatType.Json)]
+        object Session();
+
+        /// <summary>
+        /// Gets the user information related to the current session (very similar to the session parameter only this is not an OAUTH response format)
+        /// </summary>
+        [Get("userinfo")]
+
+        Stream UserInfo();
 
         /// <summary>
         /// Post to the authorization handler

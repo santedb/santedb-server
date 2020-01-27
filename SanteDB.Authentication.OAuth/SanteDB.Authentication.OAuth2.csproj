@@ -60,6 +60,7 @@
     <Compile Include="Model\OAuthError.cs" />
     <Compile Include="Model\OAuthTokenRequest.cs" />
     <Compile Include="Model\OAuthTokenResponse.cs" />
+    <Compile Include="Model\OpenIdConfiguration.cs" />
     <Compile Include="OAuthConstants.cs" />
     <Compile Include="OAuthErrorBehavior.cs" />
     <Compile Include="OAuthMessageHandler.cs" />

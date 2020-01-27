@@ -60,6 +60,9 @@ using SanteDB.Core.Rest.Security;
 using SanteDB.Core.Applets.Model;
 using SanteDB.Core.Applets;
 using SanteDB.Core.Security.Principal;
+using SanteDB.Core.Interop;
+using System.Xml;
+using SanteDB.Core.Exceptions;
 
 namespace SanteDB.Authentication.OAuth2.Rest
 {
@@ -80,11 +83,13 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
         // Master configuration
         private SecurityConfigurationSection m_masterConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
+        // XHTML
+        private const string XS_HTML = "http://www.w3.org/1999/xhtml";
 
         /// <summary>
         /// OAuth token request
         /// </summary>
-        public Stream Token(NameValueCollection tokenRequest)
+        public object Token(NameValueCollection tokenRequest)
         {
 
             // Get the client application 
@@ -166,11 +171,15 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         if (devicePrincipal != null)
                             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal).Demand();
 
-                        if (devicePrincipal == null)
+                        if (devicePrincipal == null && !this.m_configuration.AllowClientOnlyGrant)
                             throw new SecurityException("client_credentials grant requires device authentication either using X509 or X-Device-Authorization or enabling the DeviceAuthorizationAccessBehavior");
+                        else if (devicePrincipal == null)
+                            this.m_traceSource.TraceWarning("No device credential could be established, configuration allows for client only grant. Recommend disabling this in production environment");
+                        else
+                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService, devicePrincipal).Demand();
+
                         principal = clientPrincipal;
                         // Demand "Login As Service" permission
-                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService, devicePrincipal).Demand();
                         break;
                     case OAuthConstants.GrantNamePassword:
 
@@ -208,7 +217,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                                     .Where(x => x % 2 == 0)
                                     .Select(x => Convert.ToByte(tokenRequest["code"].Substring(x, 2), 16))
                                     .ToArray();
-                        
+
                         // First we extract the token information
                         var sid = new Guid(Enumerable.Range(0, 32).Where(x => x % 2 == 0).Select(o => token[o]).ToArray());
                         var sec = new Guid(token.Take(16).ToArray());
@@ -218,12 +227,12 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         var claimLength = BitConverter.ToInt32(token, 68 + scopeLength * 2);
                         var claimData = Enumerable.Range(72 + scopeLength * 2, claimLength * 2).Where(x => x % 2 == 0).Select(o => token[o]).ToArray();
                         var dsig = token.Skip(72 + 2 * (scopeLength + claimLength)).Take(32).ToArray();
-                        var expiry = new DateTime(BitConverter.ToInt64(token, 104 + 2* (scopeLength + claimLength)));
+                        var expiry = new DateTime(BitConverter.ToInt64(token, 104 + 2 * (scopeLength + claimLength)));
 
                         // Verify 
                         if (!ApplicationServiceContext.Current.GetService<IDataSigningService>().Verify(token.Take(token.Length - 40).ToArray(), dsig))
                             throw new SecurityTokenValidationException("Authorization code failed signature verification");
-                        
+
                         // Expiry?
                         if (expiry < DateTime.Now)
                             throw new SecurityTokenExpiredException("Authorization code is expired");
@@ -243,7 +252,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                             do
                             {
                                 idx = Array.IndexOf(scopeData, (byte)0, li);
-                                if (idx > 0) scopes += Encoding.UTF8.GetString(scopeData, li, idx - li) + ";";
+                                if (idx > 0) scopes += Encoding.UTF8.GetString(scopeData, li, idx - li) + " ";
                                 li += idx + 1;
                             } while (idx > -1);
                             tokenRequest["scope"] = scopes.Substring(0, scopes.Length - 1);
@@ -255,7 +264,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         throw new InvalidOperationException("Invalid grant type");
                 }
 
-               
+
                 if (principal == null)
                     return this.CreateErrorCondition(OAuthErrorType.invalid_grant, "Invalid username or password");
                 else
@@ -330,7 +339,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             try
             {
-                if(!(claimsPrincipal is ApplicationPrincipal))
+                if (!(claimsPrincipal is ApplicationPrincipal))
                     claims.AddRange(roleProvider.GetAllRoles(claimsPrincipal.Identity.Name).Select(r => new SanteDBClaim(SanteDBClaimTypes.DefaultRoleClaimType, r)));
             }
             catch { }
@@ -377,11 +386,11 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyGrantType.Elevate).Select(o => new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, o.Policy.Oid)));
 
                         // Audit override
-                        AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(';'), true);
+                        AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(' '), true);
                     }
                     catch (Exception e)
                     {
-                        AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(';'), false);
+                        AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(' '), false);
                         throw;
                     }
                 }
@@ -389,9 +398,20 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 // Now restrict down to claimed scope
                 if (scope != "*")
                 {
-                    var scopes = scope.Split(';');
+                    var scopes = scope.Split(' ');
                     foreach (var s in scopes)
-                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, s, claimsPrincipal).Demand(); // Ensure that scope is granted
+                    {
+                        var policy = pip.GetPolicy(s);
+                        if (policy != null)
+                            try
+                            {
+                                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, s, claimsPrincipal).Demand(); // Ensure that scope is granted
+                            }
+                            catch (PolicyViolationException e)
+                            {
+                                throw new PolicyViolationException(claimsPrincipal, policy, e.PolicyDecision, e.Detail);
+                            }
+                    }
                     claims.RemoveAll(o => o.Type == SanteDBClaimTypes.SanteDBScopeClaim && !scopes.Contains(o.Value));
                 }
 
@@ -428,6 +448,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             // Add JTI
             claims.Add(new SanteDBClaim("jti", claimsPrincipal.FindFirst("jti")?.Value));
+            claims.Add(new SanteDBClaim("iat", (issued - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds.ToString()));
             claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
 
             SigningCredentials credentials = SecurityUtils.CreateSigningCredentials(this.m_masterConfig.Signatures.FirstOrDefault());
@@ -448,7 +469,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <summary>
         /// Create a token response
         /// </summary>
-        private Stream EstablishSession(IPrincipal oizPrincipal, IPrincipal clientPrincipal, IPrincipal devicePrincipal, String scope, IEnumerable<IClaim> additionalClaims)
+        private OAuthTokenResponse EstablishSession(IPrincipal oizPrincipal, IPrincipal clientPrincipal, IPrincipal devicePrincipal, String scope, IEnumerable<IClaim> additionalClaims)
         {
             var claimsPrincipal = oizPrincipal as IClaimsPrincipal;
             if (clientPrincipal is IClaimsPrincipal && !claimsPrincipal.Identities.OfType<Core.Security.ApplicationIdentity>().Any(o => o.Name == clientPrincipal.Identity.Name))
@@ -500,44 +521,27 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     RefreshToken = refreshToken // TODO: Need to write a SessionProvider for this so we can keep track of refresh tokens 
                 };
 
-            return this.CreateResponse(response);
+            return response;
         }
 
         /// <summary>
         /// Create error condition
         /// </summary>
-        private Stream CreateErrorCondition(OAuthErrorType errorType, String message)
+        private OAuthError CreateErrorCondition(OAuthErrorType errorType, String message)
         {
             this.m_traceSource.TraceEvent(EventLevel.Error, message);
             RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
-            OAuthError err = new OAuthError()
+            return new OAuthError()
             {
                 Error = errorType,
                 ErrorDescription = message
             };
-            return this.CreateResponse(err);
-        }
-
-        /// <summary>
-        /// Create response
-        /// </summary>
-        private Stream CreateResponse(Object response)
-        {
-            var settings = new JsonSerializerSettings()
-            {
-                NullValueHandling = NullValueHandling.Ignore
-            };
-            settings.Converters.Add(new StringEnumConverter());
-            String result = JsonConvert.SerializeObject(response, Newtonsoft.Json.Formatting.Indented, settings);
-            MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(result));
-            RestOperationContext.Current.OutgoingResponse.ContentType = "application/json";
-            return ms;
         }
 
         /// <summary>
         /// Get the specified session information
         /// </summary>
-        public Stream Session()
+        public object Session()
         {
             new TokenAuthorizationAccessBehavior().Apply(new RestRequestMessage(RestOperationContext.Current.IncomingRequest)); ;
             var principal = Core.Security.AuthenticationContext.Current.Principal as IClaimsPrincipal;
@@ -546,31 +550,31 @@ namespace SanteDB.Authentication.OAuth2.Rest
             {
 
                 if (principal.Identity.Name == Core.Security.AuthenticationContext.AnonymousPrincipal.Identity.Name)
-                    return this.CreateResponse(new OAuthError()
+                    return new OAuthError()
                     {
                         Error = OAuthErrorType.invalid_request,
                         ErrorDescription = "No Such Session"
-                    });
+                    };
                 else
                 {
                     DateTime notBefore = DateTime.Parse(principal.FindFirst(SanteDBClaimTypes.AuthenticationInstant).Value), notAfter = DateTime.Parse(principal.FindFirst(SanteDBClaimTypes.Expiration).Value);
                     var jwt = this.HydrateToken(principal, principal.FindFirst(SanteDBClaimTypes.SanteDBScopeClaim)?.Value ?? "*", null, notBefore, notAfter);
-                    return this.CreateResponse(new OAuthTokenResponse()
+                    return new OAuthTokenResponse()
                     {
                         AccessToken = RestOperationContext.Current.IncomingRequest.Headers["Authorization"].Split(' ')[1],
                         IdentityToken = new JwtSecurityTokenHandler().WriteToken(jwt),
                         ExpiresIn = (int)(notAfter).Subtract(DateTime.Now).TotalMilliseconds,
                         TokenType = this.m_configuration.TokenType
-                    });
+                    };
                 }
             }
             else
             {
-                return this.CreateResponse(new OAuthError()
+                return new OAuthError()
                 {
                     Error = OAuthErrorType.invalid_request,
                     ErrorDescription = "No Such Session"
-                });
+                };
             }
         }
 
@@ -583,10 +587,13 @@ namespace SanteDB.Authentication.OAuth2.Rest
             // Generate an authorization code for this user and redirect to their redirect URL
             var redirectUrl = RestOperationContext.Current.IncomingRequest.QueryString["redirect_uri"] ?? authorization["redirect_uri"];
             var client_id = RestOperationContext.Current.IncomingRequest.QueryString["client_id"] ?? authorization["client_id"];
-            var scope = RestOperationContext.Current.IncomingRequest.QueryString.GetValues("scope") ?? authorization.GetValues("scope")?.SelectMany(o=>o.Split(';'));
-            var claims = RestOperationContext.Current.IncomingRequest.QueryString.GetValues("claim") ?? authorization.GetValues("claim")?.SelectMany(o=>o.Split(';'));
+            var scope = RestOperationContext.Current.IncomingRequest.QueryString.GetValues("scope") ?? authorization.GetValues("scope")?.SelectMany(o => o.Split(' '));
+            var claims = RestOperationContext.Current.IncomingRequest.QueryString.GetValues("claim") ?? authorization.GetValues("claim")?.SelectMany(o => o.Split(' '));
             var state = RestOperationContext.Current.IncomingRequest.QueryString["state"] ?? authorization["state"];
-            var signature = RestOperationContext.Current.IncomingRequest.QueryString["dsig"]  ?? authorization["dsig"];
+            var signature = RestOperationContext.Current.IncomingRequest.QueryString["dsig"] ?? authorization["dsig"];
+            var responseType = RestOperationContext.Current.IncomingRequest.QueryString["response_type"] ?? authorization["response_type"] ?? "code";
+            var responseMode = RestOperationContext.Current.IncomingRequest.QueryString["response_mode"] ?? authorization["response_mode"] ?? "query";
+            var nonce = RestOperationContext.Current.IncomingRequest.QueryString["nonce"] ?? authorization["nonce"];
 
             AuditData audit = new AuditData(DateTime.Now, ActionType.Execute, OutcomeIndicator.Success, EventIdentifierType.SecurityAlert, AuditUtil.CreateAuditActionCode(EventTypeCodes.UserAuthentication));
             AuditUtil.AddLocalDeviceActor(audit);
@@ -595,7 +602,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             {
                 if (signature == null)
                     throw new ArgumentException("Must provide the dsig parameter");
-                if(client_id == null)
+                if (client_id == null)
                     throw new ArgumentException("Must provide the client_id parameter");
                 if (redirectUrl == null)
                     throw new ArgumentException("Must provide redirect_uri parameter");
@@ -614,43 +621,73 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 var principal = idp.Authenticate(authorization["username"], authorization["password"]) as IClaimsPrincipal;
                 var sid = Guid.Parse(principal.FindFirst(SanteDBClaimTypes.Sid).Value);
                 var aid = Guid.Parse(clientIdentity.FindFirst(SanteDBClaimTypes.Sid).Value);
-                var scopeData = scope.Where(o => o != "openid").SelectMany(o => Encoding.UTF8.GetBytes(o).Concat(new byte[] { 0 })).ToArray();
-                var claimData = claims?.SelectMany(o => Encoding.UTF8.GetBytes(o).Union(new byte[] { 0 })).ToArray() ?? new byte[0];
-                // Generate the appropriate authorization code
-                var sec = Guid.NewGuid();
-                byte[] salt = sec.ToByteArray();
-                
-                AuditUtil.AddUserActor(audit, principal);
 
-                // Generate the token 
-                // Token format is :
-                // SID w/SALT . AID w/SALT . SIG
-                byte[] authCode = new byte[112 + scopeData.Length * 2 + claimData.Length * 2];
-                var i = 0;
-                foreach (var b in sid.ToByteArray()) { authCode[i++] = b; authCode[i++] = salt[i % salt.Length]; }
-                foreach (var b in aid.ToByteArray()) { authCode[i++] = b; authCode[i++] = salt[i % salt.Length]; }
-                
-                // Now register the auth code
-                idp.AddClaim(authorization["username"], new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(new Guid(authCode.Take(16).ToArray()).ToString())), Core.Security.AuthenticationContext.SystemPrincipal, new TimeSpan(0, 1, 0));
-                idp.AddClaim(authorization["username"], new SanteDBClaim(SanteDBClaimTypes.SanteDBCodeAuth, "true"), Core.Security.AuthenticationContext.SystemPrincipal, new TimeSpan(0, 1, 0));
+                // Are we executing a code flow?
+                if (responseType.Contains("code"))
+                {
+                    var scopeData = scope.Where(o => o != "openid").SelectMany(o => Encoding.UTF8.GetBytes(o).Concat(new byte[] { 0 })).ToArray();
+                    var claimData = claims?.SelectMany(o => Encoding.UTF8.GetBytes(o).Union(new byte[] { 0 })).ToArray() ?? new byte[0];
+                    // Generate the appropriate authorization code
+                    var sec = Guid.NewGuid();
+                    byte[] salt = sec.ToByteArray();
 
-                Array.Copy(BitConverter.GetBytes(scopeData.Length), 0, authCode, i, 4);
-                i += 4; // 2 byte portion
-                foreach (var b in scopeData) { authCode[i++] = b; authCode[i++] = salt[i % salt.Length]; }
-                Array.Copy(BitConverter.GetBytes(claimData.Length), 0, authCode, i, 4);
-                i += 4; // 2 byte portion
-                foreach (var b in claimData) { authCode[i++] = b; authCode[i++] = salt[i % salt.Length]; }
+                    AuditUtil.AddUserActor(audit, principal);
 
-                // Sign the data
-                var dsig = signing.SignData(authCode.Take(authCode.Length - 40).ToArray());
-                Array.Copy(dsig, 0, authCode, i, dsig.Length);
-                i += 32;
-                Array.Copy(BitConverter.GetBytes(DateTime.Now.AddMinutes(1).Ticks), 0, authCode, i, 8);
-                // Encode
-                var tokenString = BitConverter.ToString(authCode).Replace("-","");
+                    // Generate the token 
+                    // Token format is :
+                    // SID w/SALT . AID w/SALT . SIG
+                    byte[] authCode = new byte[112 + scopeData.Length * 2 + claimData.Length * 2];
+                    var i = 0;
+                    foreach (var b in sid.ToByteArray()) { authCode[i++] = b; authCode[i++] = salt[i % salt.Length]; }
+                    foreach (var b in aid.ToByteArray()) { authCode[i++] = b; authCode[i++] = salt[i % salt.Length]; }
 
-                // Redirect
-                RestOperationContext.Current.OutgoingResponse.Redirect($"{redirectUrl}?code={tokenString}&state={state}");
+                    // Now register the auth code
+                    idp.AddClaim(authorization["username"], new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(new Guid(authCode.Take(16).ToArray()).ToString())), Core.Security.AuthenticationContext.SystemPrincipal, new TimeSpan(0, 1, 0));
+                    idp.AddClaim(authorization["username"], new SanteDBClaim(SanteDBClaimTypes.SanteDBCodeAuth, "true"), Core.Security.AuthenticationContext.SystemPrincipal, new TimeSpan(0, 1, 0));
+
+                    Array.Copy(BitConverter.GetBytes(scopeData.Length), 0, authCode, i, 4);
+                    i += 4; // 2 byte portion
+                    foreach (var b in scopeData) { authCode[i++] = b; authCode[i++] = salt[i % salt.Length]; }
+                    Array.Copy(BitConverter.GetBytes(claimData.Length), 0, authCode, i, 4);
+                    i += 4; // 2 byte portion
+                    foreach (var b in claimData) { authCode[i++] = b; authCode[i++] = salt[i % salt.Length]; }
+
+                    // Sign the data
+                    var dsig = signing.SignData(authCode.Take(authCode.Length - 40).ToArray());
+                    Array.Copy(dsig, 0, authCode, i, dsig.Length);
+                    i += 32;
+                    Array.Copy(BitConverter.GetBytes(DateTime.Now.AddMinutes(1).Ticks), 0, authCode, i, 8);
+                    // Encode
+                    var tokenString = BitConverter.ToString(authCode).Replace("-", "");
+
+                    // Redirect or post?
+                    if (responseMode == "form_post")
+                        return this.RenderOAuthAutoPost(redirectUrl, "code={tokenString}&state={state}");
+                    else
+                        RestOperationContext.Current.OutgoingResponse.Redirect($"{redirectUrl}?code={tokenString}&state={state}");
+                }
+                else if (responseType.Contains("token"))
+                {
+                    // Establish session
+                    var claimList = claims?.Select(o => new SanteDBClaim(o.Split('=')[0], o.Split('=')[1])).ToList() ?? new List<SanteDBClaim>() ;
+                    if (!String.IsNullOrEmpty(nonce)) // append nonce
+                        claimList.Add(new SanteDBClaim("nonce", nonce));
+                    var response = this.EstablishSession(principal, new SanteDBClaimsPrincipal(clientIdentity), null, String.Join(" ", scope), claimList);
+                    // Return id token?
+                    String redirectString = "";
+                    if (responseType.Split(' ').Contains("token"))
+                        redirectString += $"access_token={response.AccessToken}&";
+                    if (responseType.Split(' ').Contains("id_token"))
+                        redirectString += $"id_token={response.IdentityToken}&";
+                    redirectString += $"state={state}";
+                  
+
+                    if (responseMode == "form_post")
+                        return this.RenderOAuthAutoPost(redirectUrl, redirectString);
+                    else
+                        RestOperationContext.Current.OutgoingResponse.Redirect($"{redirectUrl}?{redirectString}");
+
+                }
                 return null;
             }
             catch (Exception e)
@@ -659,11 +696,11 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 audit.Outcome = OutcomeIndicator.SeriousFail;
                 this.m_traceSource.TraceError("Could not create authentication token: {0}", e.Message);
 
-                var bindingParms = RestOperationContext.Current.IncomingRequest.QueryString.AllKeys.ToDictionary(o => o, o => String.Join(";", RestOperationContext.Current.IncomingRequest.QueryString.GetValues(o)));
+                var bindingParms = RestOperationContext.Current.IncomingRequest.QueryString.AllKeys.ToDictionary(o => o, o => String.Join(" ", RestOperationContext.Current.IncomingRequest.QueryString.GetValues(o)));
                 foreach (var itm in authorization.AllKeys)
                     if (itm != "password" && !bindingParms.ContainsKey(itm))
                         bindingParms.Add(itm, authorization[itm]);
-                bindingParms.Add("auth_error", e.Message);
+                bindingParms.Add("auth_error", e.Message.Replace("\n","").Replace("\r",""));
                 return this.RenderInternal(content, bindingParms);
             }
             finally
@@ -671,6 +708,52 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 AuditUtil.SendAudit(audit);
             }
 
+        }
+
+        /// <summary>
+        /// Render a redirect oauth post
+        /// </summary>
+        private Stream RenderOAuthAutoPost(string redirectUri, string formData)
+        {
+            var ms = new MemoryStream();
+            RestOperationContext.Current.OutgoingResponse.ContentType = "text/html";
+            using(var xw = XmlWriter.Create(ms, new XmlWriterSettings() {  CloseOutput = false, OmitXmlDeclaration = true }))
+            {
+                xw.WriteDocType("html", "-//W3C//DTD XHTML 1.0 Transitional//EN", "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd", null);
+                xw.WriteStartElement("html", XS_HTML);
+
+                xw.WriteStartElement("body", XS_HTML);
+                xw.WriteAttributeString("onload", "javascript:document.forms[0].submit()");
+
+                xw.WriteStartElement("form", XS_HTML);
+                xw.WriteAttributeString("method", "POST");
+                xw.WriteAttributeString("action", redirectUri);
+
+                // Emit data
+                foreach (var itm in formData.Split('&'))
+                {
+                    var data = itm.Split('=');
+                    xw.WriteStartElement("input");
+                    xw.WriteAttributeString("type", "hidden");
+                    xw.WriteAttributeString("name", data[0]);
+
+                    if (data.Length > 2)
+                        data[1] = String.Join("=", data.Skip(1).ToArray());
+                    xw.WriteAttributeString("value", data[1]);
+                    xw.WriteEndElement(); // input
+                }
+                xw.WriteStartElement("button", XS_HTML);
+                xw.WriteAttributeString("type", "submit");
+                xw.WriteString("Complete Authentication");
+                xw.WriteEndElement();
+                xw.WriteEndElement(); // form
+
+                xw.WriteEndElement(); // body
+                xw.WriteEndElement(); // html
+            }
+
+            ms.Seek(0, SeekOrigin.Begin);
+            return ms;
         }
 
         /// <summary>
@@ -682,8 +765,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             var client = RestOperationContext.Current.IncomingRequest.QueryString["client_id"];
             var redirectUri = RestOperationContext.Current.IncomingRequest.QueryString["redirect_uri"];
-
-            var bindingParms = RestOperationContext.Current.IncomingRequest.QueryString.AllKeys.ToDictionary(o => o, o => String.Join(";", RestOperationContext.Current.IncomingRequest.QueryString.GetValues(o)));
+            var responseType = RestOperationContext.Current.IncomingRequest.QueryString["response_type"];
+            var responseMode = RestOperationContext.Current.IncomingRequest.QueryString["response_mode"];
+            var bindingParms = RestOperationContext.Current.IncomingRequest.QueryString.AllKeys.ToDictionary(o => o, o => String.Join(" ", RestOperationContext.Current.IncomingRequest.QueryString.GetValues(o)));
             // Now time to resolve the asset
             if (String.IsNullOrEmpty(content) || content == "index.html")
             {
@@ -691,8 +775,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 // Rule: scope, response_type and client_id and redirect_uri must be provided
                 if (String.IsNullOrEmpty(redirectUri) ||
                     String.IsNullOrEmpty(client) ||
-                    RestOperationContext.Current.IncomingRequest.QueryString.GetValues("scope")?.Contains("openid") != true ||
-                    RestOperationContext.Current.IncomingRequest.QueryString["response_type"] != "code")
+                    RestOperationContext.Current.IncomingRequest.QueryString.GetValues("scope")?.SelectMany(s => s.Split(' ')).Contains("openid") != true)
                     throw new InvalidOperationException("OpenID Violation: redirect_uri and client_id must be provided");
                 else
                 {
@@ -713,8 +796,14 @@ namespace SanteDB.Authentication.OAuth2.Rest
             return this.RenderInternal(content, bindingParms);
         }
 
-        private Stream RenderInternal (String assetPath, IDictionary<String, String> bindingParms)
-        { 
+        /// <summary>
+        /// Render the specified asset
+        /// </summary>
+        /// <param name="assetPath"></param>
+        /// <param name="bindingParms"></param>
+        /// <returns></returns>
+        private Stream RenderInternal(String assetPath, IDictionary<String, String> bindingParms)
+        {
             // Get the asset object
             var lander = RestOperationContext.Current.IncomingRequest.QueryString["lander"];
 
@@ -722,7 +811,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             ReadonlyAppletCollection loginAppletAssets = null;
             var solutions = ApplicationServiceContext.Current.GetService<IAppletSolutionManagerService>().Solutions.Select(o => o.Meta.Id).ToList();
             solutions.Add(String.Empty);
-            foreach(var sln in solutions)
+            foreach (var sln in solutions)
             {
                 loginApplet = ApplicationServiceContext.Current.GetService<IAppletSolutionManagerService>().GetApplets(sln).Where(o => o.Configuration?.AppSettings.Any(s => s.Name == "oauth2.login") == true && (lander == o.Info.Id || String.IsNullOrEmpty(lander))).FirstOrDefault();
                 if (loginApplet != null)
@@ -733,7 +822,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             }
             if (loginApplet == null)
                 throw new KeyNotFoundException("No asset has been configured as oauth2.login.asset");
-            
+
             var loginAssetPath = loginApplet.Configuration.AppSettings.FirstOrDefault(o => o.Name == "oauth2.login")?.Value;
 
             if (String.IsNullOrEmpty(assetPath))
@@ -744,7 +833,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             var asset = loginAppletAssets.ResolveAsset(assetName);
             if (asset == null)
                 throw new KeyNotFoundException($"{assetName} not found");
-            
+
             RestOperationContext.Current.OutgoingResponse.ContentType = DefaultContentTypeMapper.GetContentType(Path.GetExtension(assetPath));
             return new MemoryStream(loginAppletAssets.RenderAssetContent(asset, RestOperationContext.Current.IncomingRequest.QueryString["ui_locale"] ?? CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, allowCache: false, bindingParameters: bindingParms));
         }
@@ -757,5 +846,71 @@ namespace SanteDB.Authentication.OAuth2.Rest
             RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.NoContent;
         }
 
+        /// <summary>
+        /// Gets the discovery object
+        /// </summary>
+        public OpenIdConfiguration GetDiscovery()
+        {
+            try
+            {
+                RestOperationContext.Current.OutgoingResponse.ContentType = "application/json";
+                var authDiscovery = ApplicationServiceContext.Current.GetService<OAuthMessageHandler>() as IApiEndpointProvider;
+                var securityConfiguration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
+                var retVal = new OpenIdConfiguration();
+
+                // mex configuration
+                var mexConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RestConfigurationSection>();
+                String boundHostPort = $"{RestOperationContext.Current.IncomingRequest.Url.Scheme}://{RestOperationContext.Current.IncomingRequest.Url.Host}:{RestOperationContext.Current.IncomingRequest.Url.Port}";
+                if (!String.IsNullOrEmpty(mexConfig.ExternalHostPort))
+                {
+                    var tUrl = new Uri(mexConfig.ExternalHostPort);
+                    boundHostPort = $"{tUrl.Scheme}://{tUrl.Host}:{tUrl.Port}";
+                }
+                boundHostPort = $"{boundHostPort}{new Uri(authDiscovery.Url.First()).AbsolutePath}";
+
+                // Now get the settings
+                retVal.Issuer = this.m_configuration.IssuerName;
+                retVal.TokenEndpoint = $"{boundHostPort}/oauth2_token";
+                retVal.AuthorizationEndpoint = $"{boundHostPort}/ui/";
+                retVal.UserInfoEndpoint = $"{boundHostPort}/userinfo";
+                retVal.GrantTypesSupported = new List<string>() { "client_credentials", "password", "authorization_code" };
+                retVal.IdTokenSigning = securityConfiguration.Signatures.Select(o => o.Algorithm).Distinct().Select(o => o.ToString()).ToList();
+                retVal.ResponseTypesSupported = new List<string>() { "code" };
+                retVal.ScopesSupported = ApplicationServiceContext.Current.GetService<IPolicyInformationService>().GetPolicies().Select(o => o.Oid).ToList();
+                retVal.SigningKeyEndpoint = $"{boundHostPort}/jwks";
+                retVal.SubjectTypesSupported = new List<string>() { "public" };
+                return retVal;
+            }
+            catch (Exception e)
+            {
+                this.m_traceSource.TraceError("Error generating OpenID Metadata: {0}", e);
+                throw new Exception("Error generating OpenID Metadata", e);
+            }
+        }
+
+
+        /// <summary>
+        /// Get the specified session information
+        /// </summary>
+        public Stream UserInfo()
+        {
+            new TokenAuthorizationAccessBehavior().Apply(new RestRequestMessage(RestOperationContext.Current.IncomingRequest)); ;
+            var principal = Core.Security.AuthenticationContext.Current.Principal as IClaimsPrincipal;
+
+            if (principal != null)
+            {
+                if (principal.Identity.Name == Core.Security.AuthenticationContext.AnonymousPrincipal.Identity.Name)
+                    throw new SecurityException("No Such Session");
+                else
+                {
+                    DateTime notBefore = DateTime.Parse(principal.FindFirst(SanteDBClaimTypes.AuthenticationInstant).Value), notAfter = DateTime.Parse(principal.FindFirst(SanteDBClaimTypes.Expiration).Value);
+                    var jwt = this.HydrateToken(principal, principal.FindFirst(SanteDBClaimTypes.SanteDBScopeClaim)?.Value ?? "*", null, notBefore, notAfter);
+                    return new MemoryStream(Encoding.UTF8.GetBytes(jwt.Payload.SerializeToJson()));
+                }
+            }
+            else
+                throw new SecurityException("No Such Session");
+        }
     }
+
 }
