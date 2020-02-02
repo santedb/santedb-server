@@ -4,7 +4,7 @@
 #define MyAppName "SanteDB Server"
 #define MyAppPublisher "Mohawk College mHealth & eHealth Development and Innovation Centre"
 #define MyAppURL "http://santesuite.org"
-#define MyAppVersion "1.117.0"
+
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -115,6 +115,7 @@ Source: ..\bin\Release\SanteDB.Cdss.Xml.dll; DestDir: {app}; Components: core\pr
 ; JINT BRE
 Source: ..\bin\release\SanteDB.BusinessRules.JavaScript.dll; DestDir: {app}; Components: core\bre
 Source: ..\bin\Release\jint.dll; DestDir: {app}; Components: core\bre
+Source: ..\bin\Release\esprima.dll; DestDir: {app}; Components: core\bre
 
 ; Caching
 Source: ..\bin\release\SanteDB.Caching.Memory.dll; DestDir: {app}; Components: cache
@@ -175,9 +176,12 @@ Source: ..\bin\release\AtnaApi.dll; DestDir: {app}; Components: interop\atna
 
 ; FHIR
 Source: ..\bin\release\SanteDB.Messaging.FHIR.dll; DestDir: {app}; Components: interop\fhir
-Source: ..\bin\release\Hl7.Fhir.STU3.Core.dll; DestDir: {app}; Components: interop\fhir
+Source: ..\bin\release\Hl7.Fhir.R4.Core.dll; DestDir: {app}; Components: interop\fhir
 Source: ..\bin\release\Hl7.Fhir.Support.dll; DestDir: {app}; Components: interop\fhir
 Source: ..\bin\release\Hl7.FhirPath.dll; DestDir: {app}; Components: interop\fhir
+Source: ..\bin\release\Hl7.Fhir.Support.Poco.dll; DestDir: {app}; Components: interop\fhir
+Source: ..\bin\release\Hl7.Fhir.Serialization.dll; DestDir: {app}; Components: interop\fhir
+Source: ..\bin\release\Hl7.Fhir.ElementModel.dll; DestDir: {app}; Components: interop\fhir
 
 ; GS1
 Source: ..\bin\release\SanteDB.Messaging.GS1.dll; DestDir: {app}; Components: interop\gs1
