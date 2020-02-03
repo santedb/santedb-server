@@ -110,7 +110,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 {
                     dataContext.Open();
                     var client = dataContext.FirstOrDefault<DbSecurityApplication>(o => o.PublicId == name);
-                    return new SanteDB.Core.Security.ApplicationIdentity(client.Key, client.PublicId, false);
+                    if (client == null)
+                        return null;
+                    else 
+                        return new SanteDB.Core.Security.ApplicationIdentity(client.Key, client.PublicId, false);
 
                 }
                 catch (Exception e)

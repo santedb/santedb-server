@@ -246,7 +246,8 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			else if (!(target is TFhirResource))
 				throw new InvalidDataException();
 
-			// We want to map from TFhirResource to TModel
+            // We want to map from TFhirResource to TModel
+            target.Id = id;
 			var modelInstance = this.MapToModel(target as TFhirResource, RestOperationContext.Current);
 			if (modelInstance == null)
 				throw new ArgumentException("Invalid Request");
@@ -261,8 +262,6 @@ namespace SanteDB.Messaging.FHIR.Handlers
 				throw new InvalidCastException("Target's key does not equal key on path");
 			else if (modelInstance.Key == Guid.Empty)
 				modelInstance.Key = guidId;
-			else
-				throw new KeyNotFoundException();
 
 			var result = this.Update(modelInstance, mode);
 

@@ -325,6 +325,10 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <ProjectReference Include="..\santedb-mdm\SanteDB.Persistence.MDM\SanteDB.Persistence.MDM.csproj">
+      <Project>{20960967-3647-41a2-9df6-3e15e2aa7019}</Project>
+      <Name>SanteDB.Persistence.MDM</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Authentication.OAuth\SanteDB.Authentication.OAuth2.csproj">
       <Project>{a3975c6f-4fdb-43be-81ab-3357b86173f1}</Project>
       <Name>SanteDB.Authentication.OAuth2</Name>

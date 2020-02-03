@@ -275,13 +275,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     if (!this.m_sessionCache.TryGetValue(sessionId, out dbSession))
                     {
 
-                        if (!allowExpired)
-                            dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionId && o.NotAfter > DateTimeOffset.Now);
-                        else
-                            dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionId);
+                        dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionId);
 
                         if (dbSession == null)
-                            throw new FileNotFoundException(BitConverter.ToString(sessionToken));
+                            throw new KeyNotFoundException($"Session {BitConverter.ToString(sessionToken)} not found");
+                        else if (dbSession.NotAfter < DateTime.Now)
+                            throw new SecurityTokenExpiredException($"Session {BitConverter.ToString(sessionToken)} is expired");
                         else lock (this.m_syncLock)
                             {
                                 if (!this.m_sessionCache.ContainsKey(sessionId))
@@ -311,7 +310,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             catch (Exception e)
             {
                 this.m_traceSource.TraceError("Error getting session: {0}", e.Message);
-                throw;
+                throw new SecurityTokenException($"Could not get session token {BitConverter.ToString(sessionToken)}", e);
             }
         }
 
