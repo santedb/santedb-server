@@ -221,14 +221,22 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     else
                         domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query).Build();
 
-
-                    domainQuery = this.AppendOrderBy(domainQuery, orderBy);
-
                     // Create or extend queries
                     if (retVal == null)
                         retVal = this.DomainQueryInternal<CompositeResult<TDomain, TDomainKey>>(context, domainQuery);
                     else
                         retVal = retVal.Union(this.DomainQueryInternal<CompositeResult<TDomain, TDomainKey>>(context, domainQuery));
+                }
+
+                // HACK: More than one query which indicates union was used, we need to wrap in a select statement to be adherent to SQL standard on Firebird and PSQL
+                if (queries.Count() > 1)
+                {
+                    var query = this.AppendOrderBy(context.CreateSqlStatement("SELECT * FROM (").Append(retVal.ToSqlStatement()).Append(") AS domain_query "), orderBy);
+                    retVal = this.DomainQueryInternal<CompositeResult<TDomain, TDomainKey>>(context, query);
+                }
+                else
+                {
+                    this.AppendOrderBy(retVal.Statement, orderBy);
                 }
 
                 // Only perform count
@@ -242,7 +250,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                     if (queryId != Guid.Empty && ApplicationContext.Current.GetService<IQueryPersistenceService>() != null)
                     {
-                        var keys = retVal.Keys<Guid>().ToArray();
+                        var keys = retVal.Keys<Guid>(false).ToArray();
                         totalResults = keys.Count();
                         this.m_queryPersistence?.RegisterQuerySet(queryId, keys, queries, totalResults);
                     }

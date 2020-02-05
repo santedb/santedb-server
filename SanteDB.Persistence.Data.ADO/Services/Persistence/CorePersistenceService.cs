@@ -31,7 +31,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using SanteDB.Core.Model.Query;
 using System.Diagnostics.Tracing;
 using System.Threading;
 
@@ -252,13 +251,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, orderBy);
                     }
 
-                    domainQuery = this.AppendOrderBy(domainQuery, orderBy);
+                    
 
                     if (retVal == null)
                         retVal = this.DomainQueryInternal<TQueryReturn>(context, domainQuery);
                     else
                         retVal = retVal.Union(this.DomainQueryInternal<TQueryReturn>(context, domainQuery));
                 }
+
+                this.AppendOrderBy(retVal.Statement, orderBy);
 
                 // Count = 0 means we're not actually fetching anything so just hit the db
                 if (count != 0)

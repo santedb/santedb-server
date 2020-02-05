@@ -350,7 +350,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             tx?.Rollback();
 
                             this.TranslateDbException(e);
-                            throw;
+                            throw new DataPersistenceException($"Error updating {data}", e);
                         }
                         catch (Exception e)
                         {
@@ -366,11 +366,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             // so that a potential insert can take place
                             if (e is KeyNotFoundException)
                             {
-                                throw new KeyNotFoundException(e.Message, e);
+                                throw new KeyNotFoundException($"Record {data} was not found for update", e);
                             }
 
                             // if the exception is anything else, we want to throw a data persistence exception
-                            throw new DataPersistenceException(e.Message, e);
+                            throw new DataPersistenceException($"Error updating {data}", e);
 
                         }
                         finally

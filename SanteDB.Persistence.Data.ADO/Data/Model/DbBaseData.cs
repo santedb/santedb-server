@@ -31,10 +31,12 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         /// <summary>
         /// Gets or sets the entity id which created this
         /// </summary>
+        [ForeignKey(typeof(DbSecurityProvenance), nameof(DbSecurityProvenance.Key))]
         Guid CreatedByKey { get; set; }
         /// <summary>
         /// Gets or sets the id which obsoleted this
         /// </summary>
+        [ForeignKey(typeof(DbSecurityProvenance), nameof(DbSecurityProvenance.Key))]
         Guid? ObsoletedByKey { get; set; }
         /// <summary>
         /// Gets or sets the creation time
@@ -63,6 +65,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         /// <summary>
         /// Gets or sets the updated user
         /// </summary>
+        [ForeignKey(typeof(DbSecurityProvenance), nameof(DbSecurityProvenance.Key))]
         Guid? UpdatedByKey { get; set; }
 
         /// <summary>

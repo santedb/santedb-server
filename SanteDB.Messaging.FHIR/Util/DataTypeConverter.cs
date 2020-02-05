@@ -100,7 +100,7 @@ namespace SanteDB.Messaging.FHIR.Util
             };
             retVal.Meta.Tags = (resource as ITaggable)?.Tags.Select(o => DataTypeConverter.ToFhirTag(o)).ToList();
             // TODO: Configure this namespace / coding scheme
-            retVal.Meta.Security = (resource as ISecurable)?.Policies.Where(o => o.GrantType == Core.Model.Security.PolicyGrantType.Grant).Select(o => new FhirCoding(new Uri("http://santedb.org/security/policy"), o.Policy.Oid)).ToList() ?? new List<FhirCoding>();
+            retVal.Meta.Security = (resource as ISecurable)?.Policies?.Where(o => o.GrantType == Core.Model.Security.PolicyGrantType.Grant).Select(o => new FhirCoding(new Uri("http://santedb.org/security/policy"), o.Policy.Oid)).ToList() ?? new List<FhirCoding>();
             retVal.Meta.Security.Add(new FhirCoding(new Uri("http://santedb.org/security/policy"), PermissionPolicyIdentifiers.ReadClinicalData));
             retVal.Extension = (resource as IExtendable)?.Extensions.Where(o=>o.ExtensionTypeKey != ExtensionTypeKeys.JpegPhotoExtension).Select(o => DataTypeConverter.ToExtension(o)).ToList();
             return retVal;
@@ -441,7 +441,7 @@ namespace SanteDB.Messaging.FHIR.Util
 
 			var name = new EntityName
 			{
-				NameUseKey = ToConcept(fhirHumanName.Use, "http://hl7.org/fhir/name-use")?.Key
+				NameUseKey = ToConcept(fhirHumanName.Use ?? "official", "http://hl7.org/fhir/name-use")?.Key
 			};
 
 			name.Component.AddRange(fhirHumanName.Family.Select(f => new EntityNameComponent(NameComponentKeys.Family, f.Value)));
@@ -474,7 +474,7 @@ namespace SanteDB.Messaging.FHIR.Util
 			return new EntityTelecomAddress
 			{
 				Value = fhirTelecom.Value.Value,
-				AddressUseKey = ToConcept(fhirTelecom.Use, "http://hl7.org/fhir/contact-point-use")?.Key
+				AddressUseKey = ToConcept(fhirTelecom.Use ?? "temp", "http://hl7.org/fhir/contact-point-use")?.Key
 			};
 		}
 

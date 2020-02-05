@@ -44,7 +44,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         /// <summary>
         /// When set don't reject registrations, but flag them
         /// </summary>
-        [XmlAttribute("softValidation"), Description("When set, accept invalid data, but flag it as invalid"), DisplayName("Soft Validation")]
-        public bool SoftValidation { get; set; }
+        [XmlAttribute("hardValidation"), Description("When set, invalid data will cause persistence to fail"), DisplayName("Hard Validation")]
+        public bool HardValidation { get; set; }
     }
 }

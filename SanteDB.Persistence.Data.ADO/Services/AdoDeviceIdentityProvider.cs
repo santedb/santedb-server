@@ -134,7 +134,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
 					var client = dataContext.FirstOrDefault<DbSecurityDevice>(o => o.PublicId == name);
 
-					return new DeviceIdentity(client.Key, client.PublicId, false);
+                    if (client == null)
+                        return null;
+                    else
+					    return new DeviceIdentity(client.Key, client.PublicId, false);
 
 				}
 				catch (Exception e)

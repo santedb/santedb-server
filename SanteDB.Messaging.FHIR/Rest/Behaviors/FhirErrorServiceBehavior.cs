@@ -74,6 +74,11 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
         public bool ProvideFault(Exception error, RestResponseMessage response)
         {
             this.m_tracer.TraceEvent(EventLevel.Error, "Error on WCF FHIR Pipeline: {0}", error);
+
+            // Get to the root of the error
+            while (error.InnerException != null)
+                error = error.InnerException;
+
             // Formulate appropriate response
             if (error is DomainStateException)
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.ServiceUnavailable;
@@ -122,14 +127,6 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
                 new Issue() { Diagnostics  = error.Message, Severity = IssueSeverity.Error, Code = new FhirCoding(new Uri("http://hl7.org/fhir/issue-type"), "exception") }
             }
             };
-
-            // Cascade inner exceptions
-            var ie = error.InnerException;
-            while (ie != null)
-            {
-                errorResult.Issue.Add(new Issue() { Diagnostics = String.Format("Caused by {0}", error.Message), Severity = IssueSeverity.Error, Code = new FhirCoding(new Uri("http://hl7.org/fhir/issue-type"), "exception") });
-                ie = ie.InnerException;
-            }
 
             if (error is DetectedIssueException)
                 foreach (var iss in (error as DetectedIssueException).Issues)
