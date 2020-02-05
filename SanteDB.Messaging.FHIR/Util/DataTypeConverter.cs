@@ -528,8 +528,9 @@ namespace SanteDB.Messaging.FHIR.Util
 		/// </summary>
 		/// <param name="concept">The concept to be converted to a <see cref="FhirCodeableConcept"/></param>
         /// <param name="preferredCodeSystem">The preferred code system for the codeable concept</param>
+        /// <param name="nullIfNoPreferred">When true, instructs the system to return only code in preferred code system or nothing</param>
 		/// <returns>Returns a FHIR codeable concept.</returns>
-		public static FhirCodeableConcept ToFhirCodeableConcept(Concept concept, String preferredCodeSystem = null)
+		public static FhirCodeableConcept ToFhirCodeableConcept(Concept concept, String preferredCodeSystem = null, bool nullIfNoPreferred = false)
 		{
 			traceSource.TraceEvent(EventLevel.Verbose, "Mapping concept");
 
@@ -547,7 +548,9 @@ namespace SanteDB.Messaging.FHIR.Util
             else {
                 var codeSystemService = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>();
                 var refTerm = codeSystemService.GetConceptReferenceTerm(concept.Key.Value, preferredCodeSystem);
-                if (refTerm == null) // No code in the preferred system, ergo, we will instead use our own
+                if (refTerm == null && nullIfNoPreferred)
+                    return null; // No code in the preferred system, ergo, we will instead use our own
+                else if(refTerm == null)
                     return new FhirCodeableConcept
                     {
                         Coding = concept.LoadCollection<ConceptReferenceTerm>(nameof(Concept.ReferenceTerms)).Select(o => DataTypeConverter.ToCoding(o.LoadProperty<ReferenceTerm>(nameof(ConceptReferenceTerm.ReferenceTerm)))).ToList(),
@@ -637,8 +640,9 @@ namespace SanteDB.Messaging.FHIR.Util
 
 			return new FhirTelecom()
 			{
-				Use = telecomAddress.AddressUseKey == NullReasonKeys.NoInformation ? null : DataTypeConverter.ToFhirCodeableConcept(telecomAddress.AddressUse)?.GetPrimaryCode()?.Code,
-				Value = telecomAddress.IETFValue
+				Use = telecomAddress.AddressUseKey == NullReasonKeys.NoInformation ? null : DataTypeConverter.ToFhirCodeableConcept(telecomAddress.AddressUse, "http://hl7.org/fhir/contact-point-use", true)?.GetPrimaryCode()?.Code,
+
+                Value = telecomAddress.IETFValue
 			};
 		}
 

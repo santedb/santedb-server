@@ -426,7 +426,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 var dbAuth = context.FirstOrDefault<DbAssigningAuthority>(o => o.Key == auth.Key);
 
                 if (dbAuth == null)
-                    throw new KeyNotFoundException($"Missing assigning authority from {String.Join(",", data.Identifiers.Select(o => o.AuthorityKey))}");
+                {
+                    if (!this.m_persistenceService.GetConfiguration().Validation.SoftValidation)
+                        throw new KeyNotFoundException($"Missing assigning authority with ID {String.Join(",", data.Identifiers.Select(o => o.AuthorityKey))}");
+                    else
+                        continue; // can't verify
+                }
 
                 var alreadyKnown = data.Identifiers.Where(id => id.AuthorityKey == dbAuth.Key).All(id => context.Any<DbEntityIdentifier>(o => o.AuthorityKey == dbAuth.Key && o.Value == id.Value && o.SourceKey != data.Key));
 

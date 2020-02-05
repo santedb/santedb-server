@@ -115,7 +115,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
             for (char s = 'a'; s < localChar; s++)
                 whereClause.Append($" {queryPrefix}{valTblType}_{s}.val_seq_id IS NOT NULL ").Append("OR");
             whereClause.RemoveLast();
-            whereClause.Append($") GROUP BY {keyName} HAVING COUNT(DISTINCT {queryPrefix}{cmpTblType}.typ_cd_id) = {vCount})");
+            whereClause.Append($") GROUP BY {keyName} HAVING COUNT(DISTINCT {queryPrefix}{cmpTblType}.cmp_id) >= {vCount})");
 
             return true;
         }

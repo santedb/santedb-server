@@ -54,6 +54,11 @@
       <domainName xmlns="http://santedb.org/model">KEY</domainName>
       <oid xmlns="http://santedb.org/model">1.2.3.4.5.6.7</oid>
     </localAuthority>
+    <ssnAuthority>
+      <domainName xmlns="http://santedb.org/model">SSN</domainName>
+      <name xmlns="http://santedb.org/model">Social Security Administration</name>
+      <oid xmlns="http://santedb.org/model">1.2.3.4.5.6.99999</oid>
+    </ssnAuthority>
   </section>
   <!-- This section controls the persistence for ADO.NET -->
   <section xsi:type="AdoPersistenceConfigurationSection"

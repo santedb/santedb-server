@@ -76,6 +76,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 retVal.GetPatientIdentifierList(retVal.PatientIdentifierListRepetitionsUsed).FromModel(new EntityIdentifier(this.m_configuration.LocalAuthority, patient.Key.ToString()));
                 retVal.GetPatientIdentifierList(retVal.PatientIdentifierListRepetitionsUsed - 1).IdentifierTypeCode.Value = "PI";
             }
+
             // Map alternate identifiers
             foreach (var id in patient.LoadCollection<EntityIdentifier>("Identifiers"))
             {
@@ -245,6 +246,7 @@ namespace SanteDB.Messaging.HL7.Segments
                             found = personService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.Current.Principal);
                         else if (authority?.IsUnique == true)
                             found = personService.Query(o => o.Identifiers.Any(i => i.Authority.Key == authority.Key && i.Value == idnumber), AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                        
                         if (found != null)
                         {
                             if (found is Patient)
@@ -447,7 +449,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 {
                     var ssn = pidSegment.SSNNumberPatient.Value;
                     // Lookup identity domain which is designated as SSN , if they already have one update it, if not, add it
-                    var existing = retVal.Identifiers.FirstOrDefault(o => o.Authority.DomainName == this.m_configuration.SsnAuthority.DomainName);
+                    var existing = retVal.Identifiers.FirstOrDefault(o => o.Authority.DomainName == this.m_configuration.SsnAuthority?.DomainName);
                     if (existing == null)
                         retVal.Identifiers.Add(new EntityIdentifier(this.m_configuration.SsnAuthority, ssn));
                     else

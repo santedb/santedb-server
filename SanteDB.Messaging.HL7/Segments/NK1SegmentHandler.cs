@@ -257,26 +257,22 @@ namespace SanteDB.Messaging.HL7.Segments
                     retValRelation.RelationshipTypeKey = nk1Segment.Relationship.ToModel(RelationshipCodeSystem)?.Key;
 
                 // Some relationships only allow one person, we should update them 
-                if (patient.VersionKey.HasValue)
+                var existingNokRel = patient.LoadCollection<EntityRelationship>(nameof(Entity.Relationships)).FirstOrDefault(o => o.RelationshipTypeKey == retValRelation.RelationshipTypeKey);
+                if (existingNokRel != null)
                 {
-                    // We will try to fetch the information by key
-                    var existingNokRel = patient.LoadCollection<EntityRelationship>(nameof(Entity.Relationships)).FirstOrDefault(o => o.RelationshipTypeKey == retValRelation.RelationshipTypeKey);
-                    if (existingNokRel != null)
+                    retValRelation = existingNokRel;
+                    if (!foundByKey) // We didn't actually resolve anyone by current key so we should try to find them in the DB
                     {
-                        retValRelation = existingNokRel;
-                        if (!foundByKey) // We didn't actually resolve anyone by current key so we should try to find them in the DB
-                        {
-                            retVal = context.FirstOrDefault(o => o.Key == existingNokRel.TargetEntityKey) as Person;
-                            // Mother isn't in context, load
-                            if (retVal == null)
-                                retVal = personService.Get(existingNokRel.TargetEntityKey.Value, null, true, AuthenticationContext.SystemPrincipal);
-                            if (retVal == null)
-                                throw new InvalidOperationException("Cannot locate described NOK entity on patient record");
+                        retVal = context.FirstOrDefault(o => o.Key == existingNokRel.TargetEntityKey) as Person;
+                        // Mother isn't in context, load
+                        if (retVal == null)
+                            retVal = personService.Get(existingNokRel.TargetEntityKey.Value, null, true, AuthenticationContext.SystemPrincipal);
+                        if (retVal == null)
+                            throw new InvalidOperationException("Cannot locate described NOK entity on patient record");
 
-                            // IF the person is a PATIENT and not a PERSON we will not update them - too dangerous - ignore the NOK entry
-                            if (retVal is Patient && !foundByKey)
-                                return new IdentifiedData[0];
-                        }
+                        // IF the person is a PATIENT and not a PERSON we will not update them - too dangerous - ignore the NOK entry
+                        if (retVal is Patient && !foundByKey)
+                            return new IdentifiedData[0];
                     }
                 }
 
