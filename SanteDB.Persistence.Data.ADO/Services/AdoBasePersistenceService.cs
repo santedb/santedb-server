@@ -211,6 +211,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 if (m_configuration.AutoUpdateExisting)
                                 {
                                     this.m_tracer.TraceEvent(EventLevel.Warning, "INSERT WOULD RESULT IN DUPLICATE CLASSIFIER: UPDATING INSTEAD {0}", data);
+                                    data.Key = existing.Key;
                                     data = this.Update(connection, data);
                                 }
                                 else

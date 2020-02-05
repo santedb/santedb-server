@@ -427,7 +427,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                 if (dbAuth == null)
                 {
-                    if (!this.m_persistenceService.GetConfiguration().Validation.SoftValidation)
+                    if (this.m_persistenceService.GetConfiguration().Validation.HardValidation)
                         throw new KeyNotFoundException($"Missing assigning authority with ID {String.Join(",", data.Identifiers.Select(o => o.AuthorityKey))}");
                     else
                         continue; // can't verify

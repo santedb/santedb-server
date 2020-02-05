@@ -118,7 +118,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             String securityHash = Guid.NewGuid().ToString();
             SecurityUser userUnderTest = new SecurityUser()
             {
-                Email = "query@test.com",
+                Email = "delay@test.com",
                 EmailConfirmed = false,
                 Password = hashingService.ComputeHash("password"),
                 SecurityHash = securityHash,
