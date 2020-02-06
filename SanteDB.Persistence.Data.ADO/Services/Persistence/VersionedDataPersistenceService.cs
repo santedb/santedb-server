@@ -363,6 +363,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     var postData = new DataRetrievedEventArgs<TModel>(retVal, principal);
                     this.FireRetrieved(postData);
 
+                    // Add to cache
+                    foreach (var d in connection.CacheOnCommit)
+                        ApplicationServiceContext.Current.GetService<IDataCachingService>().Add(d);
                     return retVal;
 
                 }
