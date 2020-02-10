@@ -92,6 +92,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 if (oldDomainObject == null)
                     throw new KeyNotFoundException(data.Key.ToString());
 
+                // Is this an un-delete?
+                if (oldDomainObject is IDbVersionedAssociation dba && dba.ObsoleteVersionSequenceId.HasValue &&
+                    newDomainObject is IDbVersionedAssociation dbb && !dbb.ObsoleteVersionSequenceId.HasValue)
+                {
+                    dba.ObsoleteVersionSequenceId = dbb.ObsoleteVersionSequenceId;
+                    dba.ObsoleteVersionSequenceIdSpecified = true;
+                }
+
                 oldDomainObject.CopyObjectData(newDomainObject);
                 context.Update<TDomain>(oldDomainObject);
                 return data;

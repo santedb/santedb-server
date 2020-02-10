@@ -78,6 +78,12 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// </summary>
         [Column("obslt_vrsn_seq_id")]
         public Int32? ObsoleteVersionSequenceId { get; set; }
+
+        /// <summary>
+        /// Gets whether the obsoletion id is specified
+        /// </summary>
+        public bool ObsoleteVersionSequenceIdSpecified { get; set; }
+
     }
 
     /// <summary>
@@ -108,6 +114,11 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// </summary>
         [Column("obslt_vrsn_seq_id")]
         public Int32? ObsoleteVersionSequenceId { get; set; }
+
+        /// <summary>
+        /// Gets whether the obsoletion id is specified
+        /// </summary>
+        public bool ObsoleteVersionSequenceIdSpecified { get; set; }
     }
 
     /// <summary>
