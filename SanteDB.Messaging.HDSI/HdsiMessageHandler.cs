@@ -162,12 +162,10 @@ namespace SanteDB.Messaging.HDSI
 
                 // Add service behaviors
                 foreach (ServiceEndpoint endpoint in this.m_webHost.Endpoints)
-                {
                     this.m_traceSource.TraceInfo("Starting HDSI on {0}...", endpoint.Description.ListenUri);
-                }
 
                 // Start the webhost
-                this.m_webHost.Start();
+                ApplicationServiceContext.Current.Started += (o,e) => this.m_webHost.Start();
 
                 this.Started?.Invoke(this, EventArgs.Empty);
                 return true;

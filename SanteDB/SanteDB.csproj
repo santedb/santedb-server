@@ -77,6 +77,10 @@
     <None Include="applets\santedb.core.sln.pak">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="data\000-NamePrefixSuffix.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </None>
     <None Include="data\000-PlaceClassTypes.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -301,35 +305,34 @@
           <Project>{34c6a8fa-d3dd-4ab9-9d0d-24f355690cec}</Project>
           <Name>SanteDB.Matcher.Configuration.File</Name>
         </ProjectReference>
-		 <ProjectReference Include="..\santedb-mdm\SanteDB.Persistence.MDM\SanteDB.Persistence.MDM.csproj">
-      <Project>{20960967-3647-41a2-9df6-3e15e2aa7019}</Project>
-      <Name>SanteDB.Persistence.MDM</Name>
-    </ProjectReference>
+        <ProjectReference Include="..\santedb-mdm\SanteDB.Persistence.MDM\SanteDB.Persistence.MDM.csproj">
+          <Project>{20960967-3647-41a2-9df6-3e15e2aa7019}</Project>
+          <Name>SanteDB.Persistence.MDM</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="1.121.0.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="1.121.0.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="1.121.0.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="1.121.0.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="1.121.0.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="1.121.0.0" />
-        <PackageReference Include="SanteDB.BI" Version="1.121.0.0" />
-        <PackageReference Include="SanteDB.Rest.BIS" Version="1.121.0.0" />
-        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="1.121.0.0" />
-        <PackageReference Include="SanteDB.Cdss.Xml" Version="1.121.0.0" />
-        <PackageReference Include="SanteDB.Matcher" Version="1.121.0.0" />
-        <PackageReference Include="SanteDB.Matcher.Configuration.File" Version="1.121.0.0" />
-        <PackageReference Include="SanteDB.Core.Model.AMI" Version="1.121.0.0" />
-        <PackageReference Include="SanteDB.Core.Model.RISI" Version="1.121.0.0" />
-        <PackageReference Include="SanteDB.Rest.AMI" Version="1.121.0.0" />
-        <PackageReference Include="SanteDB.Rest.HDSI" Version="1.121.0.0" />
+        <PackageReference Include="RestSrvr" Version="1.122.0.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="1.122.0.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="1.122.0.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="1.122.0.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="1.122.0.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="1.122.0.0" />
+        <PackageReference Include="SanteDB.BI" Version="1.122.0.0" />
+        <PackageReference Include="SanteDB.Rest.BIS" Version="1.122.0.0" />
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="1.122.0.0" />
+        <PackageReference Include="SanteDB.Cdss.Xml" Version="1.122.0.0" />
+        <PackageReference Include="SanteDB.Matcher" Version="1.122.0.0" />
+        <PackageReference Include="SanteDB.Matcher.Configuration.File" Version="1.122.0.0" />
+        <PackageReference Include="SanteDB.Core.Model.AMI" Version="1.122.0.0" />
+        <PackageReference Include="SanteDB.Core.Model.RISI" Version="1.122.0.0" />
+        <PackageReference Include="SanteDB.Rest.AMI" Version="1.122.0.0" />
+        <PackageReference Include="SanteDB.Rest.HDSI" Version="1.122.0.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
   <ItemGroup>
-
     <ProjectReference Include="..\SanteDB.Authentication.OAuth\SanteDB.Authentication.OAuth2.csproj">
       <Project>{a3975c6f-4fdb-43be-81ab-3357b86173f1}</Project>
       <Name>SanteDB.Authentication.OAuth2</Name>
