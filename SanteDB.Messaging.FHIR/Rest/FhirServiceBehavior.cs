@@ -181,8 +181,8 @@ namespace SanteDB.Messaging.FHIR.Rest
                
                 AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Import, ActionType.Update, AuditableObjectLifecycle.Amendment, EventIdentifierType.Import, OutcomeIndicator.Success, id, result);
 
-                String baseUri = RestOperationContext.Current.IncomingRequest.Url.AbsoluteUri;
-                RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Location", String.Format("{0}{1}/{2}/_history/{3}", baseUri, resourceType, result.Id, result.VersionId));
+                String baseUri = MessageUtil.GetBaseUri();
+                RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Location", String.Format("{0}/{1}/_history/{2}", baseUri, result.Id, result.VersionId));
                 RestOperationContext.Current.OutgoingResponse.SetLastModified(result.Timestamp);
                 RestOperationContext.Current.OutgoingResponse.SetETag($"W/\"{result.VersionId}\"");
 
@@ -253,8 +253,8 @@ namespace SanteDB.Messaging.FHIR.Rest
 
                 AuditUtil.AuditDataAction<ResourceBase>(EventTypeCodes.Import, ActionType.Create, AuditableObjectLifecycle.Creation, EventIdentifierType.Import, OutcomeIndicator.Success, null, result);
 
-                String baseUri = RestOperationContext.Current.IncomingRequest.Url.AbsoluteUri;
-                RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Location", String.Format("{0}{1}/{2}/_history/{3}", baseUri, resourceType, result.Id, result.VersionId));
+                String baseUri = MessageUtil.GetBaseUri();
+                RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Location", String.Format("{0}/{1}/{2}/_history/{3}", baseUri, resourceType, result.Id, result.VersionId));
                 RestOperationContext.Current.OutgoingResponse.SetLastModified(result.Timestamp);
                 RestOperationContext.Current.OutgoingResponse.SetETag($"W/\"{result.VersionId}\"");
 
@@ -460,7 +460,6 @@ namespace SanteDB.Messaging.FHIR.Rest
 
                 // Create the result
                 RestOperationContext.Current.OutgoingResponse.SetLastModified(result.Timestamp);
-                RestOperationContext.Current.OutgoingResponse.Headers.Add("Content-Disposition", String.Format("filename=\"{0}-{1}-{2}.xml\"", resourceType, result.Id, result.VersionId));
                 RestOperationContext.Current.OutgoingResponse.SetETag($"W/\"{result.VersionId}\"");
                 
                 return result;

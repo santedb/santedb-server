@@ -84,11 +84,9 @@ namespace SanteDB.Messaging.FHIR.Util
             retVal.Id = String.Format("urn:uuid:{0}", Guid.NewGuid());
 
             // Make the Self uri
-            String baseUri = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<FhirServiceConfigurationSection>()?.ResourceBaseUri ?? RestOperationContext.Current.IncomingRequest.Url.AbsoluteUri;
-            if (baseUri.Contains("?"))
-                baseUri = baseUri.Substring(0, baseUri.IndexOf("?") + 1);
-            else
-                baseUri += "?";
+            String baseUri = MessageUtil.GetBaseUri();
+
+            var queryUri = baseUri + "?";
 
             // Self uri
             if (queryResult != null)
@@ -102,12 +100,12 @@ namespace SanteDB.Messaging.FHIR.Util
                             case "_count":
                                 break;
                             default:
-                                baseUri += string.Format("{0}={1}&", queryResult.Query.ActualParameters.GetKey(i), itm);
+                                queryUri += string.Format("{0}={1}&", queryResult.Query.ActualParameters.GetKey(i), itm);
                                 break;
                         }
 
                 if(!baseUri.Contains("_stateid=") && queryResult.Query.QueryId != Guid.Empty)
-                    baseUri += String.Format("_stateid={0}&", queryResult.Query.QueryId);
+                    queryUri += String.Format("_stateid={0}&", queryResult.Query.QueryId);
             }
 
             // Format
@@ -119,26 +117,26 @@ namespace SanteDB.Messaging.FHIR.Util
             else if (format == "application/fhir+json")
                 format = "json";
 
-            if (!baseUri.Contains("_format"))
-                baseUri += String.Format("_format={0}&", format);
+            if (!queryUri.Contains("_format"))
+                queryUri += String.Format("_format={0}&", format);
 
             // Self URI
             if (queryResult != null && queryResult.TotalResults > queryResult.Results.Count)
             {
-                retVal.Link.Add(new BundleLink(new Uri(String.Format("{0}_page={1}&_count={2}", baseUri, pageNo, queryResult?.Query.Quantity ?? 100)), "self"));
+                retVal.Link.Add(new BundleLink(new Uri(String.Format("{0}_page={1}&_count={2}", queryUri, pageNo, queryResult?.Query.Quantity ?? 100)), "self"));
                 if (pageNo > 0)
                 {
-                    retVal.Link.Add(new BundleLink(new Uri(String.Format("{0}_page=0&_count={1}", baseUri, queryResult?.Query.Quantity ?? 100)), "first"));
-                    retVal.Link.Add(new BundleLink(new Uri(String.Format("{0}_page={1}&_count={2}", baseUri, pageNo - 1, queryResult?.Query.Quantity ?? 100)), "previous"));
+                    retVal.Link.Add(new BundleLink(new Uri(String.Format("{0}_page=0&_count={1}", queryUri, queryResult?.Query.Quantity ?? 100)), "first"));
+                    retVal.Link.Add(new BundleLink(new Uri(String.Format("{0}_page={1}&_count={2}", queryUri, pageNo - 1, queryResult?.Query.Quantity ?? 100)), "previous"));
                 }
                 if (pageNo <= nPages)
                 {
-                    retVal.Link.Add(new BundleLink(new Uri(String.Format("{0}_page={1}&_count={2}", baseUri, pageNo + 1, queryResult?.Query.Quantity ?? 100)), "next"));
-                    retVal.Link.Add(new BundleLink(new Uri(String.Format("{0}_page={1}&_count={2}", baseUri, nPages + 1, queryResult?.Query.Quantity ?? 100)), "last"));
+                    retVal.Link.Add(new BundleLink(new Uri(String.Format("{0}_page={1}&_count={2}", queryUri, pageNo + 1, queryResult?.Query.Quantity ?? 100)), "next"));
+                    retVal.Link.Add(new BundleLink(new Uri(String.Format("{0}_page={1}&_count={2}", queryUri, nPages + 1, queryResult?.Query.Quantity ?? 100)), "last"));
                 }
             }
             else
-                retVal.Link.Add(new BundleLink(new Uri(baseUri), "self"));
+                retVal.Link.Add(new BundleLink(new Uri(queryUri), "self"));
 
             // Updated
             retVal.Timestamp = DateTime.Now;
@@ -155,11 +153,11 @@ namespace SanteDB.Messaging.FHIR.Util
                 var feedItems = new List<BundleEntry>();
                 foreach (DomainResourceBase itm in result.Results)
                 {
-                    Uri resourceUrl = new Uri(String.Format("{0}/{1}?_format={2}", RestOperationContext.Current.IncomingRequest.Url, String.Format("{0}/{1}/_history/{2}", itm.GetType().Name, itm.Id, itm.VersionId), format));
+                    Uri resourceUrl = new Uri(String.Format("{0}/{1}?_format={2}", baseUri, String.Format("{0}/{1}/_history/{2}", itm.GetType().Name, itm.Id, itm.VersionId), format));
                     BundleEntry feedResult = new BundleEntry(); //new Bundleentry(String.Format("{0} id {1} version {2}", itm.GetType().Name, itm.Id, itm.VersionId), null ,resourceUrl);
 
-                    feedResult.FullUrl = resourceUrl;
-
+                    feedResult.Link = new List<BundleLink>() { new BundleLink(resourceUrl, "_self") };
+                    feedResult.FullUrl = new Uri($"urn:uuid:{itm.Id}");
                     string summary = "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + itm.Text.ToString() + "</div>";
 
                     // Add confidence if the attribute permits
@@ -187,8 +185,18 @@ namespace SanteDB.Messaging.FHIR.Util
 
         }
 
-
-        
-
+        /// <summary>
+        /// Get BASE URI
+        /// </summary>
+        internal static string GetBaseUri()
+        {
+            String baseUri = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<FhirServiceConfigurationSection>()?.ResourceBaseUri;
+            if (String.IsNullOrEmpty(baseUri))
+            {
+                var inUri = RestOperationContext.Current.IncomingRequest.Url;
+                baseUri = $"{inUri.Scheme}://{inUri.Host}:{inUri.Port}/{inUri.LocalPath}";
+            }
+            return baseUri;
+        }
     }
 }

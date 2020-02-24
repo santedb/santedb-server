@@ -43,7 +43,7 @@ namespace SanteDB.Messaging.FHIR.Resources
         /// <summary>
         /// Gets or sets the internal identifier for the resource
         /// </summary>
-        [XmlIgnore]
+        [XmlElement("id")]
         public string Id { get; set; }
 
         /// <summary>

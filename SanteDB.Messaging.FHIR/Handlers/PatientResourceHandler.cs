@@ -78,27 +78,54 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			// TODO: Relationships
 			foreach (var rel in model.LoadCollection<EntityRelationship>("Relationships").Where(o => !o.InversionIndicator))
 			{
-				// Family member
-				if (rel.LoadProperty<Concept>(nameof(EntityRelationship.RelationshipType)).ConceptSetsXml.Contains(ConceptSetKeys.FamilyMember))
-				{
-					// Create the relative object
-					var relative = DataTypeConverter.CreateResource<RelatedPerson>(rel.LoadProperty<Person>(nameof(EntityRelationship.TargetEntity)));
-					relative.Relationship = DataTypeConverter.ToFhirCodeableConcept(rel.LoadProperty<Concept>(nameof(EntityRelationship.RelationshipType)));
-					relative.Address = DataTypeConverter.ToFhirAddress(rel.TargetEntity.Addresses.FirstOrDefault());
-					relative.Gender = DataTypeConverter.ToFhirCodeableConcept((rel.TargetEntity as Core.Model.Roles.Patient)?.LoadProperty<Concept>(nameof(Core.Model.Roles.Patient.GenderConcept)));
-					relative.Identifier = rel.TargetEntity.LoadCollection<EntityIdentifier>(nameof(Entity.Identifiers)).Select(o => DataTypeConverter.ToFhirIdentifier(o)).ToList();
-					relative.Name = DataTypeConverter.ToFhirHumanName(rel.TargetEntity.LoadCollection<EntityName>(nameof(Entity.Names)).FirstOrDefault());
-					if (rel.TargetEntity is Core.Model.Roles.Patient)
-						relative.Patient = DataTypeConverter.CreateReference<Patient>(rel.TargetEntity, restOperationContext);
-					relative.Telecom = rel.TargetEntity.LoadCollection<EntityTelecomAddress>(nameof(Entity.Telecoms)).Select(o => DataTypeConverter.ToFhirTelecom(o)).ToList();
-					retVal.Contained.Add(new ContainedResource()
-					{
-						Item = relative
-					});
-				}
-				else if (rel.RelationshipTypeKey == EntityRelationshipTypeKeys.HealthcareProvider)
-					retVal.Provider = DataTypeConverter.CreateReference<Practitioner>(rel.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity)), restOperationContext);
-			}
+                // Family member
+                if (rel.LoadProperty<Concept>(nameof(EntityRelationship.RelationshipType)).ConceptSetsXml.Contains(ConceptSetKeys.FamilyMember))
+                {
+                    // Create the relative object
+                    var relative = DataTypeConverter.CreateResource<RelatedPerson>(rel.LoadProperty<Person>(nameof(EntityRelationship.TargetEntity)));
+                    relative.Relationship = DataTypeConverter.ToFhirCodeableConcept(rel.LoadProperty<Concept>(nameof(EntityRelationship.RelationshipType)));
+                    relative.Address = DataTypeConverter.ToFhirAddress(rel.TargetEntity.Addresses.FirstOrDefault());
+                    relative.Gender = DataTypeConverter.ToFhirCodeableConcept((rel.TargetEntity as Core.Model.Roles.Patient)?.LoadProperty<Concept>(nameof(Core.Model.Roles.Patient.GenderConcept)));
+                    relative.Identifier = rel.TargetEntity.LoadCollection<EntityIdentifier>(nameof(Entity.Identifiers)).Select(o => DataTypeConverter.ToFhirIdentifier(o)).ToList();
+                    relative.Name = DataTypeConverter.ToFhirHumanName(rel.TargetEntity.LoadCollection<EntityName>(nameof(Entity.Names)).FirstOrDefault());
+                    if (rel.TargetEntity is Core.Model.Roles.Patient)
+                        relative.Patient = DataTypeConverter.CreateReference<Patient>(rel.TargetEntity, restOperationContext);
+                    relative.Telecom = rel.TargetEntity.LoadCollection<EntityTelecomAddress>(nameof(Entity.Telecoms)).Select(o => DataTypeConverter.ToFhirTelecom(o)).ToList();
+                    retVal.Contained.Add(new ContainedResource()
+                    {
+                        Item = relative
+                    });
+                }
+                else if (rel.RelationshipTypeKey == EntityRelationshipTypeKeys.HealthcareProvider)
+                    retVal.Provider = DataTypeConverter.CreateReference<Practitioner>(rel.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity)), restOperationContext);
+                else if (rel.RelationshipTypeKey == EntityRelationshipTypeKeys.Replaces)
+                    retVal.Link.Add(new PatientLink()
+                    {
+                        Type = PatientLinkType.Replace,
+                        Other = Reference.CreateLocalResourceReference(rel.LoadProperty<Patient>(nameof(EntityRelationship.TargetEntity)))
+                    });
+                else if (rel.RelationshipTypeKey == EntityRelationshipTypeKeys.Duplicate)
+                    retVal.Link.Add(new PatientLink()
+                    {
+                        Type = PatientLinkType.SeeAlso,
+                        Other = Reference.CreateLocalResourceReference(rel.LoadProperty<Patient>(nameof(EntityRelationship.TargetEntity)))
+                    });
+                else if (rel.RelationshipTypeKey?.ToString() == "97730a52-7e30-4dcd-94cd-fd532d111578") // MDM Master Record
+                {
+                    if(rel.SourceEntityKey != model.Key)
+                        retVal.Link.Add(new PatientLink() // Is a master
+                        {
+                            Type = PatientLinkType.SeeAlso,
+                            Other = Reference.CreateLocalResourceReference(rel.LoadProperty<Patient>(nameof(EntityRelationship.SourceEntity)))
+                        });
+                    else // Is a local
+                        retVal.Link.Add(new PatientLink()
+                        {
+                            Type = PatientLinkType.Refer,
+                            Other = Reference.CreateLocalResourceReference(rel.LoadProperty<Patient>(nameof(EntityRelationship.TargetEntity)))
+                        });
+                }
+            }
 
 			var photo = model.LoadCollection<EntityExtension>("Extensions").FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.JpegPhotoExtension);
 			if (photo != null)
