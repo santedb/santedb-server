@@ -142,6 +142,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     result = queryService.GetQueryResults(queryId, offset, count ?? 100)
                         .AsParallel()
                         .AsOrdered()
+                        .WithDegreeOfParallelism(2)
                         .Select(o =>
                         {
                             try
@@ -264,6 +265,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 .ToList()
                                 .AsParallel()
                                 .AsOrdered()
+                                .WithDegreeOfParallelism(2)
                                 .Select(o =>
                                 {
                                     try

@@ -476,7 +476,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 
 					this.Queried?.Invoke(this, postData);
 
-					var retVal = postData.Results.AsParallel().ToList();
+					var retVal = postData.Results.AsParallel().WithDegreeOfParallelism(2).ToList();
 
 					this.traceSource.TraceEvent(EventLevel.Verbose, $"Returning {offset}..{offset + (count ?? 1000)} or {totalCount} results");
 

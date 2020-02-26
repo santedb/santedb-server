@@ -138,7 +138,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             if (!this.m_persistenceService.GetConfiguration().SingleThreadFetch)
             {
-                return results.AsParallel().AsOrdered().Select(o =>
+                return results.AsParallel().AsOrdered().WithDegreeOfParallelism(2).Select(o =>
                 {
                     var subContext = context;
                     var newSubContext = results.Count() > 1;

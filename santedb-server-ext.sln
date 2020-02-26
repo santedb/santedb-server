@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.757
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29509.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB", "SanteDB\SanteDB.csproj", "{649B7C70-EC21-4AC4-B918-C34C84753126}"
 EndProject
@@ -149,6 +149,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Persistence.MDM", "santedb-mdm\SanteDB.Persistence.MDM\SanteDB.Persistence.MDM.csproj", "{20960967-3647-41A2-9DF6-3E15E2AA7019}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Persistence.MDM.Test", "santedb-mdm\SanteDB.Persistence.MDM.Test\SanteDB.Persistence.MDM.Test.csproj", "{16BE3000-C76A-41FC-99DB-C5C90DD521E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Core.Api.Test", "..\santedb-api\SanteDB.Core.Api.Test\SanteDB.Core.Api.Test.csproj", "{59B5E3BE-790E-451F-BACA-631369CF535C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -368,6 +370,10 @@ Global
 		{16BE3000-C76A-41FC-99DB-C5C90DD521E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16BE3000-C76A-41FC-99DB-C5C90DD521E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16BE3000-C76A-41FC-99DB-C5C90DD521E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59B5E3BE-790E-451F-BACA-631369CF535C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59B5E3BE-790E-451F-BACA-631369CF535C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59B5E3BE-790E-451F-BACA-631369CF535C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59B5E3BE-790E-451F-BACA-631369CF535C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -433,6 +439,7 @@ Global
 		{34C6A8FA-D3DD-4AB9-9D0D-24F355690CEC} = {75D6A9C9-C580-4684-88D4-A2291A302861}
 		{20960967-3647-41A2-9DF6-3E15E2AA7019} = {12BB9926-8A67-44D5-BE68-7E27E3AE6DE9}
 		{16BE3000-C76A-41FC-99DB-C5C90DD521E8} = {12BB9926-8A67-44D5-BE68-7E27E3AE6DE9}
+		{59B5E3BE-790E-451F-BACA-631369CF535C} = {58D303FA-0113-4888-AA67-A9436DDEBFAD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E73A1AED-8AB7-492C-A4F0-C71FCC5C393C}
