@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Model.Serialization;
 using SanteDB.Messaging.FHIR.DataTypes;
 using System;
 using System.Diagnostics;
@@ -129,7 +130,7 @@ namespace SanteDB.Messaging.FHIR.Resources
                     if (response.StatusCode != HttpStatusCode.Accepted)
                         throw new WebException(String.Format("Server responded with {0}", response.StatusCode));
 
-                    XmlSerializer xsz = new XmlSerializer(resourceType);
+                    XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(resourceType);
                     return xsz.Deserialize(response.GetResponseStream()) as DomainResourceBase;
                 }
             }

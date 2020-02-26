@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Model.Serialization;
 using System;
 using System.IO;
 using System.Xml.Serialization;
@@ -55,7 +56,7 @@ namespace SanteDB.Core.Security.Tfa.Email.Template
 		{
 			using (var fs = File.OpenRead(fileName))
 			{
-				XmlSerializer xsz = new XmlSerializer(typeof(EmailTemplate));
+				XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(typeof(EmailTemplate));
 				return xsz.Deserialize(fs) as EmailTemplate;
 			}
 		}

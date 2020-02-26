@@ -52,6 +52,7 @@ using System.Diagnostics.Tracing;
 using SanteDB.Core.Model.Subscription;
 using SanteDB.Messaging.HL7.Exceptions;
 using SanteDB.Core.Model.Attributes;
+using SanteDB.Core.Model.Serialization;
 
 namespace SanteDB.Messaging.HL7.Interceptors
 {
@@ -96,7 +97,7 @@ namespace SanteDB.Messaging.HL7.Interceptors
         /// </summary>
         private static void OpenMapping(Stream stream)
         {
-            XmlSerializer xsz = new XmlSerializer(typeof(Hl7QueryParameterMap));
+            XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(typeof(Hl7QueryParameterMap));
 
             if (s_map == null)
                 s_map = xsz.Deserialize(stream) as Hl7QueryParameterMap;

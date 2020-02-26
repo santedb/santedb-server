@@ -51,16 +51,6 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
         // Known types
         private static Type[] s_knownTypes = typeof(IFhirServiceContract).GetCustomAttributes<ServiceKnownResourceAttribute>().Select(o => o.Type).ToArray();
 
-        // Serializers
-        private static Dictionary<String, XmlSerializer> s_serializers = new Dictionary<String, XmlSerializer>();
-
-        // Static ctor
-        static FhirMessageDispatchFormatter()
-        {
-            foreach (var s in s_knownTypes)
-                s_serializers.Add(s.Name, new XmlSerializer(s, s.GetCustomAttributes<XmlIncludeAttribute>().Select(o => o.Type).ToArray()));
-        }
-
         /// <summary>
         /// Creates a new instance of the FHIR message dispatch formatter
         /// </summary>
@@ -90,7 +80,6 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
                     // Use XML Serializer
                     if (contentType?.StartsWith("application/fhir+xml") == true)
                     {
-                        XmlSerializer serializer = null;
                         using (XmlReader bodyReader = XmlReader.Create(request.Body))
                         {
                             while (bodyReader.NodeType != XmlNodeType.Element)
@@ -98,13 +87,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
 
                             Type eType = s_knownTypes.FirstOrDefault(o => o.GetCustomAttribute<XmlRootAttribute>()?.ElementName == bodyReader.LocalName &&
                                 o.GetCustomAttribute<XmlRootAttribute>()?.Namespace == bodyReader.NamespaceURI);
-                            if (!s_serializers.TryGetValue(eType.Name, out serializer))
-                            {
-                                serializer = new XmlSerializer(eType);
-                                lock (s_serializers)
-                                    if (!s_serializers.ContainsKey(eType.Name))
-                                        s_serializers.Add(eType.Name, serializer);
-                            }
+                            var serializer = XmlModelSerializerFactory.Current.CreateSerializer(eType);
                             parameters[pNumber] = serializer.Deserialize(request.Body);
                         }
 
@@ -125,13 +108,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
                         if (fhirObject != null)
                         {
                             MemoryStream ms = new MemoryStream(new FhirXmlSerializer().SerializeToBytes(fhirObject as Hl7.Fhir.Model.Resource));
-                            if (!s_serializers.TryGetValue(fhirObject.GetType().Name, out XmlSerializer xsz))
-                            {
-                                xsz = new XmlSerializer(new ModelSerializationBinder().BindToType(typeof(Patient).AssemblyQualifiedName, fhirObject.GetType().Name));
-                                lock (s_serializers)
-                                    if (!s_serializers.ContainsKey(fhirObject.GetType().Name))
-                                        s_serializers.Add(fhirObject.GetType().Name, xsz);
-                            }
+                            var xsz = XmlModelSerializerFactory.Current.CreateSerializer(fhirObject.GetType());
                             parameters[pNumber] = xsz.Deserialize(ms);
                         }
                         else
@@ -166,14 +143,7 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
                 if (result?.GetType().GetCustomAttribute<XmlTypeAttribute>() != null ||
                     result?.GetType().GetCustomAttribute<JsonObjectAttribute>() != null)
                 {
-                    XmlSerializer xsz = null;
-                    if (!s_serializers.TryGetValue(result.GetType().Name, out xsz))
-                    {
-                        xsz = new XmlSerializer(result.GetType());
-                        lock (s_serializers)
-                            if (!s_serializers.ContainsKey(result.GetType().Name))
-                                s_serializers.Add(result.GetType().Name, xsz);
-                    }
+                    XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(result.GetType());
                     MemoryStream ms = new MemoryStream();
                     xsz.Serialize(ms, result);
                     contentType = "application/fhir+xml";

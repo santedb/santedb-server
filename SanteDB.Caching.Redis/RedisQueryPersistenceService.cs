@@ -186,14 +186,10 @@ namespace SanteDB.Caching.Redis
                 batch.ListRightPushAsync($"{queryId}.{FIELD_QUERY_RESULT_IDX}", results.Select(o => (RedisValue)o.ToByteArray()).ToArray());
 
                 if (tag != null)
-                {
-                    batch.StringSetAsync($"{queryId}.{FIELD_QUERY_TAG_IDX}", tag.ToString());
-                    batch.KeyExpireAsync($"{queryId}.{FIELD_QUERY_TAG_IDX}", this.m_configuration.TTL);
-                }
+                    batch.StringSetAsync($"{queryId}.{FIELD_QUERY_TAG_IDX}", tag.ToString(), expiry: this.m_configuration.TTL);
 
-                batch.StringSetAsync($"{queryId}.{FIELD_QUERY_TOTAL_RESULTS}", BitConverter.GetBytes(totalResults));
+                batch.StringSetAsync($"{queryId}.{FIELD_QUERY_TOTAL_RESULTS}", BitConverter.GetBytes(totalResults), expiry: this.m_configuration.TTL);
                 batch.KeyExpireAsync($"{queryId}.{FIELD_QUERY_RESULT_IDX}", this.m_configuration.TTL);
-                batch.KeyExpireAsync($"{queryId}.{FIELD_QUERY_TOTAL_RESULTS}", this.m_configuration.TTL);
 				batch.Execute();
                 return true;
             }
@@ -213,7 +209,7 @@ namespace SanteDB.Caching.Redis
             {
                 var redisConn = this.m_connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
                 if (redisConn.KeyExists($"{queryId}.{FIELD_QUERY_RESULT_IDX}"))
-                    redisConn.StringSet($"{queryId}.{FIELD_QUERY_TAG_IDX}", value?.ToString(), flags: CommandFlags.FireAndForget);
+                    redisConn.StringSet($"{queryId}.{FIELD_QUERY_TAG_IDX}", value?.ToString(), flags: CommandFlags.FireAndForget, expiry: this.m_configuration.TTL);
             }
             catch (Exception e)
             {

@@ -46,6 +46,7 @@ using System.Xml.Serialization;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
+using SanteDB.Core.Model.Serialization;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -441,7 +442,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             if (data is Bundle)
                 extraTypes = extraTypes.Union((data as Bundle).Item.Select(o => o.GetType()));
 
-            XmlSerializer xsz = new XmlSerializer(data.GetType(), extraTypes.ToArray());
+            XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(data.GetType(), extraTypes.ToArray());
             using (MemoryStream ms = new MemoryStream())
             {
                 xsz.Serialize(ms, data);

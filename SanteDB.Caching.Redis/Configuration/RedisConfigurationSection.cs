@@ -64,5 +64,12 @@ namespace SanteDB.Caching.Redis.Configuration
         /// </summary>
         [XmlIgnore]
         public TimeSpan? TTL { get; private set; }
+
+        /// <summary>
+        /// When true notify other systems of the changes
+        /// </summary>
+        [XmlAttribute("publish")]
+        public bool PublishChanges { get; set; }
+
     }
 }

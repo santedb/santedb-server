@@ -27,6 +27,7 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Query;
+using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Services;
@@ -81,7 +82,7 @@ namespace SanteDB.Messaging.HL7.Messages
         /// </summary>
         private static void OpenMapping(Stream stream)
         {
-            XmlSerializer xsz = new XmlSerializer(typeof(Hl7QueryParameterMap));
+            XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(typeof(Hl7QueryParameterMap));
 
             if (s_map == null)
                 s_map = xsz.Deserialize(stream) as Hl7QueryParameterMap;

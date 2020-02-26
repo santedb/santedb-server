@@ -178,7 +178,7 @@ namespace SanteDB.Messaging.FHIR.Util
             //if (result.Details.Count > 0 || result.Issues != null && result.Issues.Count > 0)
             //{
             //    var outcome = CreateOutcomeResource(result);
-            //    retVal.ElementExtensions.Add(outcome, new XmlSerializer(typeof(OperationOutcome)));
+            //    retVal.ElementExtensions.Add(outcome, XmlModelSerializerFactory.Current.CreateSerializer(typeof(OperationOutcome)));
             //    retVal.Description = new TextSyndicationContent(outcome.Text.ToString(), TextSyndicationContentKind.Html);
             //}
             return retVal;

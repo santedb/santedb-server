@@ -19,6 +19,7 @@
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Model.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -71,7 +72,7 @@ namespace SanteDB.Core.Services.Impl
             /// </summary>
             public static QueueEntry Create(Object data)
             {
-                XmlSerializer xsz = new XmlSerializer(data.GetType());
+                XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(data.GetType());
                 using (var ms = new MemoryStream())
                 {
                     xsz.Serialize(ms, data);
@@ -89,7 +90,7 @@ namespace SanteDB.Core.Services.Impl
             /// </summary>
             public object ToObject()
             {
-                XmlSerializer xsz = new XmlSerializer(System.Type.GetType(this.Type));
+                XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(System.Type.GetType(this.Type));
                 using (var ms = new MemoryStream(this.XmlData))
                 {
                     return xsz.Deserialize(ms);
@@ -101,7 +102,7 @@ namespace SanteDB.Core.Services.Impl
             /// </summary>
             public static QueueEntry Load(Stream str)
             {
-                var xsz = new XmlSerializer(typeof(QueueEntry));
+                var xsz = XmlModelSerializerFactory.Current.CreateSerializer(typeof(QueueEntry));
                 return xsz.Deserialize(str) as QueueEntry;
             }
 
@@ -110,7 +111,7 @@ namespace SanteDB.Core.Services.Impl
             /// </summary>
             public void Save(Stream str)
             {
-                var xsz = new XmlSerializer(typeof(QueueEntry));
+                var xsz = XmlModelSerializerFactory.Current.CreateSerializer(typeof(QueueEntry));
                 xsz.Serialize(str, this);
             }
         }

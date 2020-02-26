@@ -25,6 +25,7 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.RISI;
 using SanteDB.Core.Model.RISI.Constants;
+using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Services;
@@ -572,7 +573,7 @@ namespace SanteDB.Reporting.Jasper
 
             using (var stream = response.Content.ReadAsStreamAsync().Result)
             {
-                var serializer = new XmlSerializer(typeof(Resources));
+                var serializer = XmlModelSerializerFactory.Current.CreateSerializer(typeof(Resources));
 
                 resources = (Resources)serializer.Deserialize(stream);
             }
@@ -1069,7 +1070,7 @@ namespace SanteDB.Reporting.Jasper
 
             using (var stream = referenceResponse.Content.ReadAsStreamAsync().Result)
             {
-                var serializer = new XmlSerializer(typeof(T));
+                var serializer = XmlModelSerializerFactory.Current.CreateSerializer(typeof(T));
 
                 reference = (T)serializer.Deserialize(stream);
             }
@@ -1117,7 +1118,7 @@ namespace SanteDB.Reporting.Jasper
 
             using (var stream = resourceResponse.Content.ReadAsStreamAsync().Result)
             {
-                var serializer = new XmlSerializer(typeof(T));
+                var serializer = XmlModelSerializerFactory.Current.CreateSerializer(typeof(T));
 
                 resource = (T)serializer.Deserialize(stream);
             }

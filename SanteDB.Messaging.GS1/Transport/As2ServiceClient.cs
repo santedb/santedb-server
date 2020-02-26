@@ -20,6 +20,7 @@
 using SanteDB.Core;
 using SanteDB.Core.Http;
 using SanteDB.Core.Interop.Clients;
+using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.GS1.Configuration;
 using SanteDB.Messaging.GS1.Model;
@@ -91,7 +92,7 @@ namespace SanteDB.Messaging.GS1.Transport.AS2
         /// </summary>
         private MultipartAttachment CreateAttachment(object content)
         {
-            XmlSerializer xsz = new XmlSerializer(content.GetType());
+            XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(content.GetType());
             using (var ms = new MemoryStream())
             {
                 xsz.Serialize(ms, content);

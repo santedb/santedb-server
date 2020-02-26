@@ -24,6 +24,7 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Http;
 using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.Export;
+using SanteDB.Core.Model.Serialization;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
@@ -60,7 +61,7 @@ namespace SanteDB.Tools.DataSandbox.Wcf
             RestOperationContext.Current.OutgoingResponse.Headers["Content-Disposition"] = "attachment; filename=codesystem.dataset";
 
             MemoryStream ms = new MemoryStream();
-            new XmlSerializer(typeof(Dataset)).Serialize(ms, output);
+            XmlModelSerializerFactory.Current.CreateSerializer(typeof(Dataset)).Serialize(ms, output);
             ms.Seek(0, SeekOrigin.Begin);
             return ms;
 

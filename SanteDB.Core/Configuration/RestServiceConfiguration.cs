@@ -21,6 +21,7 @@ using Newtonsoft.Json;
 using RestSrvr.Attributes;
 using SanteDB.Configuration.Converters;
 using SanteDB.Configuration.Editors;
+using SanteDB.Core.Model.Serialization;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -105,7 +106,7 @@ namespace SanteDB.Core.Configuration
         internal static RestServiceConfiguration Load(Stream stream)
         {
             if (s_serializer == null)
-                s_serializer = new XmlSerializer(typeof(RestServiceConfiguration));
+                s_serializer = XmlModelSerializerFactory.Current.CreateSerializer(typeof(RestServiceConfiguration));
             return s_serializer.Deserialize(stream) as RestServiceConfiguration;
         }
     }

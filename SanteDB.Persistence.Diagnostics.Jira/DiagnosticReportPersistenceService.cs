@@ -40,6 +40,7 @@ using System.Xml.Serialization;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
+using SanteDB.Core.Model.Serialization;
 
 namespace SanteDB.Persistence.Diagnostics.Jira
 {
@@ -182,7 +183,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira
                 // Attach the application information
                 using(var ms = new MemoryStream())
                 {
-                    XmlSerializer xsz = new XmlSerializer(typeof(DiagnosticApplicationInfo));
+                    XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(typeof(DiagnosticApplicationInfo));
                     xsz.Serialize(ms, storageData.ApplicationInfo);
                     attachments.Add(new MultipartAttachment(ms.ToArray(), "text/xml", "appinfo.xml", true));
                 }

@@ -22,6 +22,7 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.Export;
 using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using System;
@@ -249,7 +250,7 @@ namespace SanteDB.Core.Persistence
                 String dataDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "data");
                 this.m_traceSource.TraceEvent(EventLevel.Verbose, "Scanning Directory {0} for datasets", dataDirectory);
 
-                XmlSerializer xsz = new XmlSerializer(typeof(Dataset));
+                XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(typeof(Dataset));
                 var datasetFiles = Directory.GetFiles(dataDirectory, "*.dataset");
                 Array.Sort(datasetFiles);
                 int i = 0;

@@ -22,6 +22,7 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Query;
+using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.FHIR.DataTypes;
 using SanteDB.Messaging.FHIR.Resources;
@@ -89,7 +90,7 @@ namespace SanteDB.Messaging.FHIR.Util
         /// </summary>
         private static void OpenMapping(Stream stream)
         {
-            XmlSerializer xsz = new XmlSerializer(typeof(QueryParameterMap));
+            XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(typeof(QueryParameterMap));
 
             if (s_map == null)
                 s_map = xsz.Deserialize(stream) as QueryParameterMap;

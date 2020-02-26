@@ -55,9 +55,6 @@ namespace SanteDB.Caching.Redis
         // Redis trace source
         private Tracer m_tracer = new Tracer(RedisCacheConstants.TraceSourceName);
 
-        // Serializer
-        private Dictionary<Type, XmlSerializer> m_serializerCache = new Dictionary<Type, XmlSerializer>();
-
         // Connection
         private ConnectionMultiplexer m_connection;
 
@@ -105,15 +102,7 @@ namespace SanteDB.Caching.Redis
         /// </summary>
         private HashEntry[] SerializeObject(IdentifiedData data)
         {
-            XmlSerializer xsz = null;
-            if (!this.m_serializerCache.TryGetValue(data.GetType(), out xsz))
-            {
-                xsz = new XmlSerializer(data.GetType());
-                lock (this.m_serializerCache)
-                    if (!this.m_serializerCache.ContainsKey(data.GetType()))
-                        this.m_serializerCache.Add(data.GetType(), xsz);
-            }
-
+            XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(data.GetType());
             HashEntry[] retVal = new HashEntry[3];
             retVal[0] = new HashEntry("type", data.GetType().AssemblyQualifiedName);
             retVal[1] = new HashEntry("loadState", (int)data.LoadState);
@@ -138,14 +127,7 @@ namespace SanteDB.Caching.Redis
             String value = data.FirstOrDefault(o => o.Name == "value").Value;
 
             // Find serializer
-            XmlSerializer xsz = null;
-            if (!this.m_serializerCache.TryGetValue(type, out xsz))
-            {
-                xsz = new XmlSerializer(type);
-                lock (this.m_serializerCache)
-                    if (!this.m_serializerCache.ContainsKey(type))
-                        this.m_serializerCache.Add(type, xsz);
-            }
+            XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(type);
             using (var sr = new StringReader(value))
             {
                 var retVal = xsz.Deserialize(sr) as IdentifiedData;
@@ -212,22 +194,23 @@ namespace SanteDB.Caching.Redis
                 // Add
 
                 var redisDb = this.m_connection.GetDatabase(RedisCacheConstants.CacheDatabaseId);
+                redisDb.HashSet(data.Key.Value.ToString(), this.SerializeObject(data));
+                redisDb.KeyExpire(data.Key.Value.ToString(), this.m_configuration.TTL);
 
-				var batch = redisDb.CreateBatch();
-				batch.HashSetAsync(data.Key.Value.ToString(), this.SerializeObject(data), CommandFlags.FireAndForget);
-                batch.KeyExpireAsync(data.Key.Value.ToString(), this.m_configuration.TTL, CommandFlags.FireAndForget);
-				batch.Execute();
-                var existing = redisDb.KeyExists(data.Key.Value.ToString());
-#if DEBUG
-                this.m_tracer.TraceVerbose("HashSet {0} (EXIST: {1}; @: {2})", data, existing, new System.Diagnostics.StackTrace(true).GetFrame(1));
-#endif 
-				
                 this.EnsureCacheConsistency(new DataCacheEventArgs(data));
-                if (existing)
-                    this.m_connection.GetSubscriber().Publish("oiz.events", $"PUT http://{Environment.MachineName}/cache/{data.Key.Value}");
-                else
-                    this.m_connection.GetSubscriber().Publish("oiz.events", $"POST http://{Environment.MachineName}/cache/{data.Key.Value}");
-                //}
+                if (this.m_configuration.PublishChanges)
+                {
+                    var existing = redisDb.KeyExists(data.Key.Value.ToString());
+#if DEBUG
+                    this.m_tracer.TraceVerbose("HashSet {0} (EXIST: {1}; @: {2})", data, existing, new System.Diagnostics.StackTrace(true).GetFrame(1));
+#endif
+
+                    if (existing)
+                        this.m_connection.GetSubscriber().Publish("oiz.events", $"PUT http://{Environment.MachineName}/cache/{data.Key.Value}");
+                    else
+                        this.m_connection.GetSubscriber().Publish("oiz.events", $"POST http://{Environment.MachineName}/cache/{data.Key.Value}");
+                    //}
+                }
             }
             catch (Exception e)
             {
@@ -248,7 +231,7 @@ namespace SanteDB.Caching.Redis
 
                 // Add
                 var redisDb = this.m_connection.GetDatabase(RedisCacheConstants.CacheDatabaseId);
-                redisDb.KeyExpire(key.ToString(), this.m_configuration.TTL);
+                redisDb.KeyExpire(key.ToString(), this.m_configuration.TTL, CommandFlags.FireAndForget);
                 return this.DeserializeObject(redisDb.HashGetAll(key.ToString()));
             }
             catch (Exception e)
@@ -281,7 +264,7 @@ namespace SanteDB.Caching.Redis
             // Add
             var existing = this.GetCacheItem(key);
             var redisDb = this.m_connection.GetDatabase(RedisCacheConstants.CacheDatabaseId);
-            redisDb.KeyDelete(key.ToString());
+            redisDb.KeyDelete(key.ToString(), CommandFlags.FireAndForget);
             this.EnsureCacheConsistency(new DataCacheEventArgs(existing), true);
 
             this.m_connection.GetSubscriber().Publish("oiz.events", $"DELETE http://{Environment.MachineName}/cache/{key}");
@@ -312,31 +295,32 @@ namespace SanteDB.Caching.Redis
                     this.m_nonCached.Add(itm);
 
                 // Subscribe to SanteDB events
-                m_subscriber.Subscribe("oiz.events", (channel, message) =>
-                {
-
-                    this.m_tracer.TraceVerbose("Received event {0} on {1}", message, channel);
-
-                    var messageParts = ((string)message).Split(' ');
-                    var verb = messageParts[0];
-                    var uri = new Uri(messageParts[1]);
-
-                    string resource = uri.AbsolutePath.Replace("hdsi/", ""),
-                        id = uri.AbsolutePath.Substring(uri.AbsolutePath.LastIndexOf("/") + 1);
-
-                    switch (verb.ToLower())
+                if(this.m_configuration.PublishChanges)
+                    m_subscriber.Subscribe("oiz.events", (channel, message) =>
                     {
-                        case "post":
-                            this.Added?.Invoke(this, new DataCacheEventArgs(this.GetCacheItem(Guid.Parse(id))));
-                            break;
-                        case "put":
-                            this.Updated?.Invoke(this, new DataCacheEventArgs(this.GetCacheItem(Guid.Parse(id))));
-                            break;
-                        case "delete":
-                            this.Removed?.Invoke(this, new DataCacheEventArgs(id));
-                            break;
-                    }
-                });
+
+                        this.m_tracer.TraceVerbose("Received event {0} on {1}", message, channel);
+
+                        var messageParts = ((string)message).Split(' ');
+                        var verb = messageParts[0];
+                        var uri = new Uri(messageParts[1]);
+
+                        string resource = uri.AbsolutePath.Replace("hdsi/", ""),
+                            id = uri.AbsolutePath.Substring(uri.AbsolutePath.LastIndexOf("/") + 1);
+
+                        switch (verb.ToLower())
+                        {
+                            case "post":
+                                this.Added?.Invoke(this, new DataCacheEventArgs(this.GetCacheItem(Guid.Parse(id))));
+                                break;
+                            case "put":
+                                this.Updated?.Invoke(this, new DataCacheEventArgs(this.GetCacheItem(Guid.Parse(id))));
+                                break;
+                            case "delete":
+                                this.Removed?.Invoke(this, new DataCacheEventArgs(id));
+                                break;
+                        }
+                    });
 
                 this.Started?.Invoke(this, EventArgs.Empty);
                 return true;

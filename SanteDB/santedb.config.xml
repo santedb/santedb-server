@@ -60,8 +60,8 @@
   <section xsi:type="FileSystemQueueConfigurationSection" queueRoot=".\queue" />
   <section xsi:type="DataConfigurationSection">
     <connectionStrings>
-      <add name="PSQL" value="server=fs-dev-psql10;port=5432; database=santedb; user id=postgres; password=postgres; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql"/>
-      <add name="AUDIT" value="server=fs-dev-psql10;port=5432; database=audit; user id=postgres; password=postgres; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql"/>
+      <add name="PSQL" value="server=fs-dev-psql10;port=5432; database=santempi; user id=postgres; password=postgres; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql"/>
+      <add name="AUDIT" value="server=fs-dev-psql10;port=5432; database=santempi_audit; user id=postgres; password=postgres; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql"/>
     </connectionStrings>
   </section>
   <section xsi:type="OrmConfigurationSection">

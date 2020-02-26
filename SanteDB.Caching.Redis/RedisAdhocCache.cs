@@ -66,7 +66,7 @@ namespace SanteDB.Caching.Redis
             try
             {
                 var db = this.m_connection.GetDatabase(RedisCacheConstants.AdhocCacheDatabaseId);
-                db.StringSet(key, JsonConvert.SerializeObject(value), expiry: timeout);
+                db.StringSet(key, JsonConvert.SerializeObject(value), expiry: timeout, flags: CommandFlags.FireAndForget);
             }
             catch (Exception e)
             {

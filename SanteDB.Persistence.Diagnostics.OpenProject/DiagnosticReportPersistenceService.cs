@@ -24,6 +24,7 @@ using SanteDB.Core.Http;
 using SanteDB.Core.Model.AMI.Diagnostics;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Query;
+using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Services;
@@ -154,7 +155,7 @@ namespace SanteDB.Persistence.Diagnostics.OpenProject
                 // Attach the application information
                 using (var ms = new MemoryStream())
                 {
-                    XmlSerializer xsz = new XmlSerializer(typeof(DiagnosticApplicationInfo));
+                    XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(typeof(DiagnosticApplicationInfo));
                     xsz.Serialize(ms, storageData.ApplicationInfo);
                     attachments.Add(new MultipartAttachment(ms.ToArray(), "text/xml", "appinfo.xml", true));
                 }
