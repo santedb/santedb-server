@@ -226,7 +226,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 throw new SecurityException("Principal must be authenticated");
             // Password failed validation
             if (ApplicationServiceContext.Current.GetService<IPasswordValidatorService>()?.Validate(newPassword) == false)
-                throw new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, "err.password", DetectedIssueKeys.SecurityIssue));
+                throw new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, "err.password", "Password does not meet complexity requirements", DetectedIssueKeys.SecurityIssue));
 
             try
             {

@@ -59,7 +59,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
             {
                 IdentifierFormat = true,
                 IdentifierUniqueness = true,
-                HardValidation = false
+                ValidationLevel = Core.BusinessRules.DetectedIssuePriorityType.Warning
             };
         }
 

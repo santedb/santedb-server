@@ -41,6 +41,7 @@
     <add type="SanteGuard.Configuration.SanteGuardConfiguration, SanteGuard.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteGuard.Persistence.Ado.Configuration.SanteGuardAdoConfiguration, SanteGuard.Persistence.Ado, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.ResourceMergeConfigurationSection, SanteDB.Core.Api, Version=1.10.0.29461"/>
+    <add type="SanteDB.Core.Data.Quality.Configuration.DataQualityConfigurationSection, SanteDB.Core.Api, Version=1.10.0.29461"/>
   </sections>
   <section xsi:type="AuditAccountabilityConfigurationSection" completeAuditTrail="false">
     <filters>
@@ -412,6 +413,42 @@
       </add>
     </services>
   </section>
+  <section xsi:type="DataQualityConfigurationSection">
+    <ruleSet enabled="true" id="mempi" name="Myanmar National MPI">
+      <resources>
+        <add resource="Patient">
+          <assert id="dob.required" name="Date of Birth Required" priority="Warning">
+            <expression>dateOfBirth=!null</expression>
+          </assert>
+          <assert id="dob.future" name="Date of Birth in Future" priority="Warning">
+            <expression>dateOfBirth=&lt;$now</expression>
+          </assert>
+          <assert id="address.required" name="Address Required" priority="Warning">
+            <expression>address.component.value=!null</expression>
+          </assert>
+          <assert id="name.required" name="Name Required" priority="Warning">
+            <expression>name.component.value=!null</expression>
+          </assert>
+          <assert id="identifier.national" name="Identifier Required" evaluation="any" priority="Warning">
+            <expression>identifier[MOIP_NRC].value=!null</expression>
+            <expression>identifier[MOHS_GEN_NHID].value=!null</expression>
+            <expression>identifier[DLN].value=!null</expression>
+            <expression>identifier[MOHS_DC_TB_MDRTB_CASE].value=!null</expression>
+            <expression>identifier[MOHS_DC_HIV_NAP].value=!null</expression>
+          </assert>
+          <assert id="gender.required" name="Gender Required" priority="Warning">
+            <expression>genderConcept=!null</expression>
+          </assert>
+          <assert id="nok.required" name="Next of Kin Required" priority="Warning">
+            <expression>relationship[Mother|Father|NextOfKin]=!null</expression>
+          </assert>
+          <assert id="birthplace.required" name="Birthpplace Required" priority="Warning">
+            <expression>relationship[Birthplace]=!null</expression>
+          </assert>
+        </add>
+      </resources>
+    </ruleSet>
+  </section>
   <!-- ATNA Audit -->
   <section xsi:type="AtnaConfigurationSection" endpoint="127.0.0.1:11515" enterpriseSiteID="SanteDB^^^&amp;1.2.3.4.5.6.7" format="DICOM" transport="udp">
     <!--<clientCertificate findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />-->
@@ -421,12 +458,13 @@
            readWriteConnectionString="PSQL"
            readOnlyConnectionString="PSQL"
            traceSql="false"
-			providerType="npgsql"
+			     providerType="npgsql"
            staOnly="false"
-		   fuzzyTotal="false"
+		       fuzzyTotal="false"
            autoUpdateExisting="true"
            autoInsertChildren="true"
-           prepareStatements="true">
+           prepareStatements="true"
+      validationLevel="Warning">
     <!-- Any corrective handlers should be added here 
     <corrections>
       <add>value</add>
@@ -436,6 +474,7 @@
       <add>value</add>
     </resources>
     -->
+
   </section>
   <!-- Diagnostic e-mail (bug) report configuration -->
   <section xsi:type="DiagnosticEmailServiceConfigurationSection">
@@ -553,6 +592,8 @@
       <add type="SanteDB.Persistence.MDM.Services.MdmDataManagementService, SanteDB.Persistence.MDM, Version=1.0.0.0"/>
       <add type="SanteDB.Matcher.Matchers.ProbabalisticRecordMatchingService, SanteDB.Matcher, Version=1.0.0.0"/>
       <add type="SanteDB.Matcher.Configuration.File.FileMatchConfigurationProvider, SanteDB.Matcher.Configuration.File, Version=1.0.0.0"/>
+    
+      <add type="SanteDB.Core.Data.Quality.DataQualityService, SanteDB.Core.Api, Version=1.0.0.0"/>
     </serviceProviders>
   </section>
 </SanteDBConfiguration>

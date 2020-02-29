@@ -60,7 +60,7 @@ namespace SanteDB.Core.Services.Impl
 
             // Verify password meets requirements
             if (ApplicationServiceContext.Current.GetService<IPasswordValidatorService>()?.Validate(data.Password) == false)
-                throw new DetectedIssueException(new BusinessRules.DetectedIssue(BusinessRules.DetectedIssuePriorityType.Error, "err.password", BusinessRules.DetectedIssueKeys.SecurityIssue));
+                throw new DetectedIssueException(new BusinessRules.DetectedIssue(BusinessRules.DetectedIssuePriorityType.Error, "err.password", "Password failed validation", BusinessRules.DetectedIssueKeys.SecurityIssue));
 
             // Create the identity
             var id = iids.CreateIdentity(data.UserName,  data.Password, AuthenticationContext.Current.Principal);

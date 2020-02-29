@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.BusinessRules;
 using System.ComponentModel;
 using System.Xml.Serialization;
 
@@ -44,7 +45,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         /// <summary>
         /// When set don't reject registrations, but flag them
         /// </summary>
-        [XmlAttribute("hardValidation"), Description("When set, invalid data will cause persistence to fail"), DisplayName("Hard Validation")]
-        public bool HardValidation { get; set; }
+        [XmlAttribute("validationLevel"), Description("The default validation level"), DisplayName("Hard Validation")]
+        public DetectedIssuePriorityType ValidationLevel { get; set; }
     }
 }

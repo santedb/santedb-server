@@ -21,4 +21,11 @@
       <name>http://santedb.org/extensions/core/contactRole</name>
     </ExtensionType>
   </update>
+  <update insertIfNotExists="true">
+    <ExtensionType xmlns="http://santedb.org/model">
+      <id>6DE54C16-8D1C-48E4-B750-7A2F4552E86D</id>
+      <handlerClass>SanteDB.Core.Extensions.DictionaryExtensionHandler, SanteDB.Core.Model, Version=1.1.0.0</handlerClass>
+      <name>http://santedb.org/extensions/core/detectedIssue</name>
+    </ExtensionType>
+  </update>
 </dataset>
