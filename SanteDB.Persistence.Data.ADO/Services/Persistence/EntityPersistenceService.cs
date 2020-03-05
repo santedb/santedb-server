@@ -455,7 +455,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 // Verify scope
                 var scopes = context.Query<DbAuthorityScope>(o => o.AssigningAuthorityKey == dbAuth.Key);
                 if (scopes.Any() && !scopes.Any(s => s.ScopeConceptKey == data.ClassConceptKey) // This type of identifier is not allowed to be assigned to this type of object
-                    && !ownedByOthers.Any()) // Unless it was already associated to another type of object related to me
+                    && !ownedByOthers.Any()
+                    && !ownedByMe.Any()) // Unless it was already associated to another type of object related to me
                     issues.Add(new DetectedIssue(DetectedIssuePriorityType.Error, "id.target", $"Identifier of type {dbAuth.DomainName} cannot be assigned to object of type {data.ClassConceptKey}", DetectedIssueKeys.BusinessRuleViolationIssue));
 
                 // If the identity domain is unique, and we've been asked to raid identifier uq issues
