@@ -268,7 +268,7 @@ namespace SanteDB.Core
 
             this.m_running = false;
             
-            foreach (var svc in this.m_serviceInstances.OfType<IDaemonService>())
+            foreach (var svc in this.m_serviceInstances.OfType<IDaemonService>().ToArray())
             {
                 Trace.TraceInformation("Stopping daemon service {0}...", svc.GetType().Name);
                 svc.Stop();

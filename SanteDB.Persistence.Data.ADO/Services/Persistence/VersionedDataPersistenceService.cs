@@ -365,7 +365,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                     // Add to cache
                     foreach (var d in connection.CacheOnCommit)
-                        ApplicationServiceContext.Current.GetService<IDataCachingService>().Add(d);
+                        ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(d);
                     return retVal;
 
                 }
@@ -376,7 +376,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 catch (Exception e)
                 {
                     this.m_tracer.TraceEvent(EventLevel.Error, "Error : {0}", e);
-                    throw;
+                    throw new DataPersistenceException($"Cannot retrieve object {containerId}", e);
                 }
                 finally
                 {

@@ -27,8 +27,6 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
@@ -108,7 +106,13 @@ namespace SanteDB.Core.Persistence
                     {
                         Item = ds.Action.Select(o => o.Element).ToList()
                     };
+
+                    var progress = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Bundle>>() as IReportProgressChanged;
+                    if (progress != null)
+                        progress.ProgressChanged += this.ProgressChanged;
                     ApplicationServiceContext.Current.GetService<IDataPersistenceService<Bundle>>().Insert(bundle, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+                    if (progress != null)
+                        progress.ProgressChanged -= this.ProgressChanged;
                 }
                 else 
                     foreach (var itm in ds.Action.Where(o=>o.Element != null))
@@ -202,7 +206,7 @@ namespace SanteDB.Core.Persistence
                         }
                         catch(Exception e)
                         {
-                            this.m_traceSource.TraceEvent(EventLevel.Verbose, "There was an issue in the dataset file {0} : {1} ", ds.Id, e);
+                            this.m_traceSource.TraceEvent(EventLevel.Verbose, "There was an issue in the dataset file {0} : {1} @ {2} ", ds.Id, e, itm.Element);
                             if (!itm.IgnoreErrors)
                                 throw;
                         }

@@ -80,6 +80,8 @@ namespace SanteDB.Core.Security.Privacy
         /// </summary>
         public override Object HandlePostRetrieveEvent(Object result)
         {
+            if (result == null) // no result
+                return null;
             // If the current authentication context is a device (not a user) then we should allow the data to flow to the device
             switch (this.m_configuration.PepExemptionPolicy)
             {
