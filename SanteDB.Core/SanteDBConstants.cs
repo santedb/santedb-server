@@ -24,8 +24,9 @@ namespace SanteDB.Core
     /// <summary>
     /// SanteDB constants
     /// </summary>
-    internal static class SanteDBConstants
+    public static class SanteDBConstants
     {
+
 
         // Configuration name
         internal const string SanteDBConfigurationName = "santedb.core";
@@ -103,5 +104,11 @@ namespace SanteDB.Core
         /// Gets the thread pooling performance counter
         /// </summary>
         public static readonly Guid MemoryUseCounter = new Guid("9E77D692-1F71-4442-BDA1-056D3DB1A487");
+
+
+        /// <summary>
+        /// Gets the session property name
+        /// </summary>
+        public const string RestPropertyNameSession = "Session";
     }
 }

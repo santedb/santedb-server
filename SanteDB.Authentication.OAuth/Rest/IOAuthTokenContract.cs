@@ -46,7 +46,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         [RestInvoke(UriTemplate = "oauth2_token", Method = "POST")]
         [return: MessageFormat(MessageFormatType.Json)]
         object Token(NameValueCollection tokenRequest);
-
+        
         /// <summary>
         /// Get the session from the authenticated bearer or JWT token
         /// </summary>

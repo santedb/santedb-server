@@ -16,7 +16,9 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Http;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Interop;
+using SanteDB.Core.Services;
 using SanteDB.Messaging.Metadata.Composer;
+using SanteDB.Messaging.Metadata.Configuration;
 using SanteDB.Messaging.Metadata.Model.Swagger;
 using SanteDB.Rest.Common.Fault;
 
@@ -51,15 +53,15 @@ namespace SanteDB.Messaging.Metadata.Rest
                 throw e;
             }
         }
-
+         
         /// <summary>
         /// Get the YAML documentation
         /// </summary>
         public Stream GetOpenApiDefinitions()
         {
             RestOperationContext.Current.OutgoingResponse.ContentType = "application/json";
-            IEnumerable<ServiceEndpointOptions> services = ApplicationServiceContext.Current.GetService<MetadataMessageHandler>().Configuration.Services;
-            if (services.Count() == 0)
+            IEnumerable<ServiceEndpointOptions> services = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<MetadataConfigurationSection>().Services;
+            if (services == null || services.Count() == 0)
                 services = ApplicationServiceContext.Current.GetService<IServiceManager>().GetServices().OfType<IApiEndpointProvider>().Select(o => new ServiceEndpointOptions(o));
 
             // Output YAML

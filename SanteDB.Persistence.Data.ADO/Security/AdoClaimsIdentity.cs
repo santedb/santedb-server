@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core;
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Constants;
@@ -72,6 +73,9 @@ namespace SanteDB.Persistence.Data.ADO.Security
         // Configuration
         private static AdoPersistenceConfigurationSection s_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
 
+        // Security configuration section
+        private static SecurityConfigurationSection s_securityConfiguration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
+
         /// <summary>
         /// Gets the internal session id
         /// </summary>
@@ -120,7 +124,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
                     var hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
                     var passwordHash = hashingService.ComputeHash(password);
-                    var fnResult = dataContext.FirstOrDefault<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr", userName, passwordHash, 5);
+                    var fnResult = dataContext.FirstOrDefault<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr", userName, passwordHash, s_securityConfiguration.MaxInvalidLogins ?? 5);
 
 	                var user = fnResult.Object1;
 
@@ -130,9 +134,10 @@ namespace SanteDB.Persistence.Data.ADO.Security
 		                {
 							UpdateCache(user, dataContext);
 						}
-
+                        
 						throw new AuthenticationException(fnResult.Object2.ErrorCode);
 					}
+
 
                     var roles = dataContext.Query<DbSecurityRole>(dataContext.CreateSqlStatement< DbSecurityRole>().SelectFrom()
                         .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
@@ -234,6 +239,9 @@ namespace SanteDB.Persistence.Data.ADO.Security
         {
             this.m_securityUser = user;
             this.m_roles = roles.ToList();
+
+            if (!this.Claims.Any(o => o.Type == SanteDBClaimTypes.DefaultRoleClaimType))
+                this.m_roles.ForEach(r => this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.DefaultRoleClaimType, r.Name)));
         }
         
         /// <summary>
@@ -246,6 +254,11 @@ namespace SanteDB.Persistence.Data.ADO.Security
                 return this.m_securityUser;
             }
         }
+
+        /// <summary>
+        /// Get claims
+        /// </summary>
+        IClaim[] ISession.Claims => this.Claims.ToArray();
 
         /// <summary>
         /// Create an authorization context
@@ -261,18 +274,26 @@ namespace SanteDB.Persistence.Data.ADO.Security
 
                 // System claims
                 List<IClaim> claims = new List<IClaim>(
-                    this.m_roles.Select(r => new SanteDBClaim(SanteDBClaimTypes.DefaultRoleClaimType, r.Name))
+                    
                 )
                 {
                     new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, this.NotBefore.ToString("o")), // TODO: Fix this
                     new SanteDBClaim(SanteDBClaimTypes.AuthenticationMethod, this.m_authenticationType ?? "LOCAL"),
                     new SanteDBClaim(SanteDBClaimTypes.Expiration, this.NotAfter.ToString("o")), // TODO: Move this to configuration
-                    new SanteDBClaim(SanteDBClaimTypes.Name, this.m_securityUser.UserName),
                     new SanteDBClaim(SanteDBClaimTypes.Sid, this.m_securityUser.Key.ToString()),
                     new SanteDBClaim(SanteDBClaimTypes.NameIdentifier, this.m_securityUser.Key.ToString()),
                     new SanteDBClaim(SanteDBClaimTypes.Actor, this.m_securityUser.UserClass.ToString()),
                 };
 
+                if (!this.Claims.Any(o => o.Type == SanteDBClaimTypes.Name))
+                    claims.Add(new SanteDBClaim(SanteDBClaimTypes.Name, this.m_securityUser.UserName));
+                if (!this.Claims.Any(o => o.Type == SanteDBClaimTypes.DefaultRoleClaimType))
+                    claims.AddRange(this.m_roles.Select(r => new SanteDBClaim(SanteDBClaimTypes.DefaultRoleClaimType, r.Name)));
+                if (this.m_securityUser.PasswordExpiry.HasValue && this.m_securityUser.PasswordExpiry < DateTime.Now)
+                {
+                    claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
+                    claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
+                }
                 if (this.m_securityUser.Email != null)
                     claims.Add(new SanteDBClaim(SanteDBClaimTypes.Email, this.m_securityUser.Email));
                 if (this.m_securityUser.PhoneNumber != null)

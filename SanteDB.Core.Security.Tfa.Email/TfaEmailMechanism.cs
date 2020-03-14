@@ -48,7 +48,7 @@ namespace SanteDB.Core.Security.Tfa.Email
 		/// <summary>
 		/// Gets the challenge text
 		/// </summary>
-		public string Challenge
+		public string Description
 		{
 			get
 			{

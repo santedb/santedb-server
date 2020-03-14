@@ -45,7 +45,7 @@ namespace SanteDB.Core.Security.Tfa.Twilio
 		/// <summary>
 		/// Challenge string
 		/// </summary>
-		public string Challenge
+		public string Description
 		{
 			get
 			{

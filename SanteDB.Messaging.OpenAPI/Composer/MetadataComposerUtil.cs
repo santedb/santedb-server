@@ -16,6 +16,8 @@ using System.Xml.Serialization;
 using SanteDB.Core.Model;
 using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
+using SanteDB.Core.Services;
+using SanteDB.Messaging.Metadata.Configuration;
 
 namespace SanteDB.Messaging.Metadata.Composer
 {
@@ -234,8 +236,8 @@ namespace SanteDB.Messaging.Metadata.Composer
         public static ServiceEndpointOptions ResolveService(String serviceName)
         {
             // Look for external services?
-            IEnumerable<ServiceEndpointOptions> services = ApplicationServiceContext.Current.GetService<MetadataMessageHandler>().Configuration.Services;
-            if (services.Count() == 0)
+            IEnumerable<ServiceEndpointOptions> services = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<MetadataConfigurationSection>().Services;
+            if (services == null || services.Count() == 0)
                 services = ApplicationServiceContext.Current.GetService<IServiceManager>().GetServices().OfType<IApiEndpointProvider>().Select(o => new ServiceEndpointOptions(o));
 
             var serviceEndpoint = typeof(ServiceEndpointType).GetFields().FirstOrDefault(o => o.GetCustomAttribute<XmlEnumAttribute>()?.Name == serviceName)?.Name;

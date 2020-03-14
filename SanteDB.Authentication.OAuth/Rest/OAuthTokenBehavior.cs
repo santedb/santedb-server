@@ -100,7 +100,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
             if (tokenRequest["grant_type"] != OAuthConstants.GrantNamePassword &&
                 tokenRequest["grant_type"] != OAuthConstants.GrantNameRefresh &&
                 tokenRequest["grant_type"] != OAuthConstants.GrantNameAuthorizationCode &&
-                tokenRequest["grant_type"] != OAuthConstants.GrantNameClientCredentials)
+                tokenRequest["grant_type"] != OAuthConstants.GrantNameClientCredentials &&
+                tokenRequest["grant_type"] != OAuthConstants.GrantNameReset)
                 return this.CreateErrorCondition(OAuthErrorType.unsupported_grant_type, "Only 'password', 'client_credentials' or 'refresh_token' grants supported");
 
             // Password grant needs well formed scope which defaults to * or all permissions
@@ -166,6 +167,22 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 // perform auth
                 switch (tokenRequest["grant_type"])
                 {
+                    case OAuthConstants.GrantNameReset: // password reset grant (special token which only allows a session to reset their password)
+
+                        tokenRequest["scope"] = PermissionPolicyIdentifiers.LoginPasswordOnly;
+
+                        // Password grants allowed for this application? Becuase this grant is only for password grants
+                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthResetFlowPolicy, clientPrincipal).Demand();
+                        if (devicePrincipal != null)
+                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthResetFlowPolicy, devicePrincipal).Demand();
+
+                        // Validate 
+                        if (String.IsNullOrWhiteSpace(tokenRequest["username"]) || String.IsNullOrWhiteSpace(tokenRequest["challenge"]) || String.IsNullOrWhiteSpace(tokenRequest["response"]))
+                            return this.CreateErrorCondition(OAuthErrorType.invalid_request, "Invalid client grant message");
+
+                        // Authenticate the user
+                        principal = ApplicationServiceContext.Current.GetService<ISecurityChallengeService>().Authenticate(tokenRequest["username"], Guid.Parse(tokenRequest["challenge"]), tokenRequest["response"]);
+                        break;
                     case OAuthConstants.GrantNameClientCredentials:
                         new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthClientCredentialFlowPolicy, clientPrincipal).Demand();
                         if (devicePrincipal != null)
@@ -272,7 +289,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
             }
             catch (AuthenticationException e)
             {
-
                 this.m_traceSource.TraceEvent(EventLevel.Error, "Error generating token: {0}", e);
                 return this.CreateErrorCondition(OAuthErrorType.invalid_grant, e.Message);
             }
@@ -322,135 +338,20 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <summary>
         /// Hydrate the JWT token
         /// </summary>
-        private JwtSecurityToken HydrateToken(IClaimsPrincipal claimsPrincipal, String scope, IEnumerable<IClaim> additionalClaims, DateTime issued, DateTime expires)
+        private JwtSecurityToken HydrateToken(ISession session)
         {
             this.m_traceSource.TraceInfo("Will create new ClaimsPrincipal based on existing principal");
 
-            IRoleProviderService roleProvider = ApplicationServiceContext.Current.GetService<IRoleProviderService>();
-            IPolicyInformationService pip = ApplicationServiceContext.Current.GetService<IPolicyInformationService>();
 
             // System claims
-            List<IClaim> claims = new List<IClaim>()
-            {
-                new SanteDBClaim("iss", this.m_configuration.IssuerName),
-                new SanteDBClaim(SanteDBClaimTypes.Name, claimsPrincipal.Identity.Name),
-                new SanteDBClaim("typ", claimsPrincipal.GetType().Name)
-            };
-
-            try
-            {
-                if (!(claimsPrincipal is ApplicationPrincipal))
-                    claims.AddRange(roleProvider.GetAllRoles(claimsPrincipal.Identity.Name).Select(r => new SanteDBClaim(SanteDBClaimTypes.DefaultRoleClaimType, r)));
-            }
-            catch { }
-
-            // Additional claims
-            claims.AddRange(additionalClaims ?? new List<IClaim>());
-
-            // Get policies
-            List<IPolicyInstance> oizPrincipalPolicies = new List<IPolicyInstance>();
-            foreach (var pol in pip.GetActivePolicies(claimsPrincipal).GroupBy(o => o.Policy.Oid))
-                oizPrincipalPolicies.Add(pol.FirstOrDefault(o => (int)o.Rule == pol.Min(r => (int)r.Rule)));
-
-            // Scopes user is allowed to access
-            claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyGrantType.Grant).Select(o => new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, o.Policy.Oid)));
-
-            // Add grant if not exists
-            if ((claimsPrincipal)?.FindFirst(SanteDBClaimTypes.Actor)?.Value == UserClassKeys.HumanUser.ToString())
-            {
-                claims.AddRange(new IClaim[]
-                    {
-                    //new SanteDBClaim(ClaimTypes.AuthenticationInstant, issued.ToString("o")), 
-                    new SanteDBClaim(SanteDBClaimTypes.AuthenticationMethod, "OAuth2"),
-                    new SanteDBClaim(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim, claimsPrincipal?.Identities.OfType<Core.Security.ApplicationIdentity>().FirstOrDefault()?.FindFirst(SanteDBClaimTypes.Sid)?.Value)
-                    });
-
-                if (claimsPrincipal.Identities.OfType<DeviceIdentity>().Any())
-                    claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim, claimsPrincipal.Identities.OfType<DeviceIdentity>().FirstOrDefault().FindFirst(SanteDBClaimTypes.Sid)?.Value));
-
-
-                // Is the user elevated? If so, add claims for those policies in scope
-                if (claims.FirstOrDefault(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim)?.Value?.ToLower() == "true")
-                {
-                    try
-                    {
-                        // 1. SCOPE must exist 
-                        if (String.IsNullOrEmpty(scope))
-                            throw new InvalidOperationException("Override requires scope");
-                        // 2. POU must exist
-                        if (!claims.Exists(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim))
-                            throw new InvalidOperationException("Override required purpose of use");
-                        // 3. Person must have override permission
-                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.OverridePolicyPermission, claimsPrincipal).Demand();
-                        // Add elevation objects as GRANT to this session
-                        claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyGrantType.Elevate).Select(o => new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, o.Policy.Oid)));
-
-                        // Audit override
-                        AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(' '), true);
-                    }
-                    catch (Exception e)
-                    {
-                        AuditUtil.AuditOverride(claimsPrincipal, claims.Where(c => c.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim).FirstOrDefault().Value, scope.Split(' '), false);
-                        throw;
-                    }
-                }
-
-                // Now restrict down to claimed scope
-                if (scope != "*")
-                {
-                    var scopes = scope.Split(' ');
-                    foreach (var s in scopes)
-                    {
-                        var policy = pip.GetPolicy(s);
-                        if (policy != null)
-                            try
-                            {
-                                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, s, claimsPrincipal).Demand(); // Ensure that scope is granted
-                            }
-                            catch (PolicyViolationException e)
-                            {
-                                throw new PolicyViolationException(claimsPrincipal, policy, e.PolicyDecision, e.Detail);
-                            }
-                    }
-                    claims.RemoveAll(o => o.Type == SanteDBClaimTypes.SanteDBScopeClaim && !scopes.Contains(o.Value));
-                }
-
-                // Add Email address from idp
-                claims.AddRange(claimsPrincipal.Claims.Where(o => o.Type == SanteDBClaimTypes.Email));
-                var tel = claimsPrincipal.Claims.FirstOrDefault(o => o.Type == SanteDBClaimTypes.Telephone)?.Value;
-                if (!String.IsNullOrEmpty(tel))
-                    claims.Add(new SanteDBClaim("tel", tel));
-            }
-            else
-            {
-                claims.AddRange(new IClaim[]
-                   {
-                    //new SanteDBClaim(ClaimTypes.AuthenticationInstant, issued.ToString("o")), 
-                    new SanteDBClaim(SanteDBClaimTypes.AuthenticationMethod, "OAuth2"),
-                    new SanteDBClaim(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim, claimsPrincipal.Identities.OfType<Core.Security.ApplicationIdentity>().FirstOrDefault()?.FindFirst(SanteDBClaimTypes.Sid).Value),
-                    new SanteDBClaim(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim, claimsPrincipal.Identities.OfType<Core.Security.DeviceIdentity>().FirstOrDefault()?.FindFirst(SanteDBClaimTypes.Sid)?.Value)
-                   });
-            }
-
-            // Add audience claim bsaed on application identity
-            claims.Add(new SanteDBClaim("aud", claimsPrincipal.Identities.OfType<Core.Security.ApplicationIdentity>().First().Name));
-
-            // Name identifier
-            claims.AddRange((claimsPrincipal).Claims.Where(o => o.Type == SanteDBClaimTypes.NameIdentifier));
-
-            // Find the nameid
-            var nameId = claims.Find(o => o.Type == SanteDBClaimTypes.NameIdentifier);
-            if (nameId != null)
-            {
-                claims.Remove(nameId);
-                claims.Add(new SanteDBClaim("sub", nameId.Value));
-            }
-
+            List<IClaim> claims = session.Claims.ToList() ;
+            
             // Add JTI
-            claims.Add(new SanteDBClaim("jti", claimsPrincipal.FindFirst("jti")?.Value));
-            claims.Add(new SanteDBClaim("iat", (issued - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds.ToString()));
+            claims.Add(new SanteDBClaim("jti", BitConverter.ToString(session.Id).Replace("-","")));
+            claims.Add(new SanteDBClaim("iat", (session.NotBefore - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds.ToString()));
             claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
-
+            claims.Add(new SanteDBClaim("exp", (session.NotAfter - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds.ToString()));
+            claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
             SigningCredentials credentials = SecurityUtils.CreateSigningCredentials(this.m_masterConfig.Signatures.FirstOrDefault());
 
             // Generate security token            
@@ -458,8 +359,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 signingCredentials: credentials,
                 claims: claims.Select(o => new System.Security.Claims.Claim(o.Type, o.Value)),
                 issuer: this.m_configuration.IssuerName,
-                notBefore: issued,
-                expires: expires
+                notBefore: session.NotBefore.DateTime,
+                expires: session.NotAfter.DateTime
             );
 
             return jwt;
@@ -484,9 +385,12 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 RestOperationContext.Current.IncomingRequest.Headers["X-Forwarded-For"] ??
                 RestOperationContext.Current.IncomingRequest.RemoteEndPoint.Address.ToString();
 
+            // HACK: Is the session for login password only? If so, this session is only valid for 2 mins
+            if (scope == PermissionPolicyIdentifiers.LoginPasswordOnly)
+                expires = DateTime.Now.Add(new TimeSpan(0, 2, 0));
             // Establish the session
             ISessionProviderService isp = ApplicationServiceContext.Current.GetService<ISessionProviderService>();
-            var session = isp.Establish(new SanteDBClaimsPrincipal(claimsPrincipal.Identities), expires, remoteIp);
+            var session = isp.Establish(new SanteDBClaimsPrincipal(claimsPrincipal.Identities), expires, remoteIp, additionalClaims.FirstOrDefault(o=>o.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim)?.Value, scope == "*" ? null : scope.Split(' '));
 
             string refreshToken = null, sessionId = null;
             if (session != null)
@@ -495,8 +399,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 (claimsPrincipal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim("jti", sessionId));
                 refreshToken = BitConverter.ToString(session.RefreshToken).Replace("-", "");
             }
-
-            var jwt = this.HydrateToken(claimsPrincipal, scope, additionalClaims, issued, expires);
+            if (scope == PermissionPolicyIdentifiers.LoginPasswordOnly)
+                refreshToken = String.Empty;
+            var jwt = this.HydrateToken(session);
 
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
             RestOperationContext.Current.OutgoingResponse.ContentType = "application/json";
@@ -558,7 +463,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 else
                 {
                     DateTime notBefore = DateTime.Parse(principal.FindFirst(SanteDBClaimTypes.AuthenticationInstant).Value), notAfter = DateTime.Parse(principal.FindFirst(SanteDBClaimTypes.Expiration).Value);
-                    var jwt = this.HydrateToken(principal, principal.FindFirst(SanteDBClaimTypes.SanteDBScopeClaim)?.Value ?? "*", null, notBefore, notAfter);
+
+                    var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDBConstants.RestPropertyNameSession] as ISession);
                     return new OAuthTokenResponse()
                     {
                         AccessToken = RestOperationContext.Current.IncomingRequest.Headers["Authorization"].Split(' ')[1],
@@ -669,7 +575,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 else if (responseType.Contains("token"))
                 {
                     // Establish session
-                    var claimList = claims?.Select(o => new SanteDBClaim(o.Split('=')[0], o.Split('=')[1])).ToList() ?? new List<SanteDBClaim>() ;
+                    var claimList = claims?.Select(o => new SanteDBClaim(o.Split('=')[0], o.Split('=')[1])).ToList() ?? new List<SanteDBClaim>();
                     if (!String.IsNullOrEmpty(nonce)) // append nonce
                         claimList.Add(new SanteDBClaim("nonce", nonce));
                     var response = this.EstablishSession(principal, new SanteDBClaimsPrincipal(clientIdentity), null, String.Join(" ", scope), claimList);
@@ -680,7 +586,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     if (responseType.Split(' ').Contains("id_token"))
                         redirectString += $"id_token={response.IdentityToken}&";
                     redirectString += $"state={state}";
-                  
+
 
                     if (responseMode == "form_post")
                         return this.RenderOAuthAutoPost(redirectUrl, redirectString);
@@ -700,7 +606,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 foreach (var itm in authorization.AllKeys)
                     if (itm != "password" && !bindingParms.ContainsKey(itm))
                         bindingParms.Add(itm, authorization[itm]);
-                bindingParms.Add("auth_error", e.Message.Replace("\n","").Replace("\r",""));
+                bindingParms.Add("auth_error", e.Message.Replace("\n", "").Replace("\r", ""));
                 return this.RenderInternal(content, bindingParms);
             }
             finally
@@ -717,7 +623,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         {
             var ms = new MemoryStream();
             RestOperationContext.Current.OutgoingResponse.ContentType = "text/html";
-            using(var xw = XmlWriter.Create(ms, new XmlWriterSettings() {  CloseOutput = false, OmitXmlDeclaration = true }))
+            using (var xw = XmlWriter.Create(ms, new XmlWriterSettings() { CloseOutput = false, OmitXmlDeclaration = true }))
             {
                 xw.WriteDocType("html", "-//W3C//DTD XHTML 1.0 Transitional//EN", "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd", null);
                 xw.WriteStartElement("html", XS_HTML);
@@ -903,14 +809,15 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     throw new SecurityException("No Such Session");
                 else
                 {
-                    DateTime notBefore = DateTime.Parse(principal.FindFirst(SanteDBClaimTypes.AuthenticationInstant).Value), notAfter = DateTime.Parse(principal.FindFirst(SanteDBClaimTypes.Expiration).Value);
-                    var jwt = this.HydrateToken(principal, principal.FindFirst(SanteDBClaimTypes.SanteDBScopeClaim)?.Value ?? "*", null, notBefore, notAfter);
+                    var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDBConstants.RestPropertyNameSession] as ISession);
                     return new MemoryStream(Encoding.UTF8.GetBytes(jwt.Payload.SerializeToJson()));
                 }
             }
             else
                 throw new SecurityException("No Such Session");
         }
+
+
     }
 
 }

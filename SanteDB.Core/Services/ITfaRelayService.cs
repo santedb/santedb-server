@@ -23,6 +23,7 @@ using System.Collections.Generic;
 
 namespace SanteDB.Core.Services
 {
+
     /// <summary>
     /// Represents the TFA mechanism
     /// </summary>
@@ -40,12 +41,12 @@ namespace SanteDB.Core.Services
         String Name { get; }
 
         /// <summary>
-        /// The challenge text this mechanism uses
+        /// The description of this challenge mechanism
         /// </summary>
-        String Challenge { get; }
-
+        String Description { get; }
+        
         /// <summary>
-        /// Send the specified two factor authentication via the mechanism
+        /// Send the specified two factor authentication via the mechanism 
         /// </summary>
         void Send(SecurityUser user, String challengeResponse, String tfaSecret);
 

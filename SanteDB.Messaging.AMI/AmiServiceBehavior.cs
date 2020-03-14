@@ -70,6 +70,26 @@ namespace SanteDB.Messaging.AMI.Wcf
         }
 
         /// <summary>
+        /// Get a list of TFA mechanisms
+        /// </summary>
+        /// <returns>Returns a list of TFA mechanisms.</returns>
+        public override AmiCollection GetTfaMechanisms()
+        {
+            var tfaRelay = ApplicationServiceContext.Current.GetService<ITfaRelayService>();
+            if (tfaRelay == null)
+                throw new InvalidOperationException("TFA Relay missing");
+            return new AmiCollection()
+            {
+                CollectionItem = tfaRelay.Mechanisms.Select(o => new TfaMechanismInfo()
+                {
+                    Id = o.Id,
+                    Name = o.Name,
+                    Description = o.Description
+                }).OfType<Object>().ToList()
+            };
+        }
+
+        /// <summary>
         /// Create a diagnostic report
         /// </summary>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.Login)]
@@ -254,64 +274,6 @@ namespace SanteDB.Messaging.AMI.Wcf
             return retVal;
         }
 
-        /// <summary>
-        /// Get a list of TFA mechanisms
-        /// </summary>
-        /// <returns>Returns a list of TFA mechanisms.</returns>
-        public override AmiCollection GetTfaMechanisms()
-        {
-            var tfaRelay = ApplicationServiceContext.Current.GetService<ITfaRelayService>();
-            if (tfaRelay == null)
-                throw new InvalidOperationException("TFA Relay missing");
-            return new AmiCollection()
-            {
-                CollectionItem = tfaRelay.Mechanisms.Select(o => new TfaMechanismInfo()
-                {
-                    Id = o.Id,
-                    Name = o.Name,
-                    ChallengeText = o.Challenge
-                }).OfType<Object>().ToList()
-            };
-        }
-
-        /// <summary>
-        /// Creates security reset information
-        /// </summary>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.LoginAsService)]
-        public override void SendTfaSecret(TfaRequestInfo resetInfo)
-        {
-            var securityRepository = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>();
-
-            var securityUser = securityRepository.GetUser(resetInfo.UserName);
-
-            // don't throw an error if the user is not found, just act as if we sent it.
-            // this is to make sure that people cannot guess users
-            if (securityUser == null)
-            {
-                this.m_traceSource.TraceEvent(EventLevel.Warning, "Attempt to get TFA reset code for {0} which is not a valid user", resetInfo.UserName);
-                RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.NoContent;
-                return;
-            }
-
-            // Identity provider
-            var identityProvider = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
-            var tfaSecret = identityProvider.GenerateTfaSecret(securityUser.UserName);
-
-            // Add a claim
-            if (resetInfo.Purpose == "PasswordReset")
-            {
-                new PolicyPermission(PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService);
-                identityProvider.AddClaim(securityUser.UserName, new SanteDBClaim(SanteDBClaimTypes.SanteDBCodeAuth, "true"), AuthenticationContext.SystemPrincipal, new TimeSpan(0, 5, 0));
-            }
-
-            var tfaRelay = ApplicationServiceContext.Current.GetService<ITfaRelayService>();
-            if (tfaRelay == null)
-                throw new InvalidOperationException("TFA relay not specified");
-
-            // Now issue the TFA secret
-            tfaRelay.SendSecret(resetInfo.ResetMechanism, securityUser, resetInfo.Verification, tfaSecret);
-            RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.NoContent;
-        }
 
         /// <summary>
         /// Creates the specified resource for the AMI service 

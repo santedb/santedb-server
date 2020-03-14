@@ -502,6 +502,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 				.Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key);
 
 			retVal.Roles = context.Query<DbSecurityRole>(rolesQuery).Select(o => m_mapper.MapDomainInstance<DbSecurityRole, Core.Model.Security.SecurityRole>(o)).ToList();
+
 			return retVal;
 		}
 

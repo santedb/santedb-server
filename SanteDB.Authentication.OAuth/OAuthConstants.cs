@@ -36,6 +36,11 @@ namespace SanteDB.Authentication.OAuth2
         /// <summary>
         /// Grant name for the authorization code
         /// </summary>
+        public const string GrantNameReset = "x_reset";
+
+        /// <summary>
+        /// Grant name for the authorization code
+        /// </summary>
         public const string GrantNameAuthorizationCode = "authorization_code";
 
         /// <summary>
@@ -92,5 +97,10 @@ namespace SanteDB.Authentication.OAuth2
         /// Code token policy
         /// </summary>
         public const string OAuthCodeFlowPolicy = OAuthLoginPolicy + ".3";
+
+        /// <summary>
+        /// Code token policy
+        /// </summary>
+        public const string OAuthResetFlowPolicy = OAuthLoginPolicy + ".4";
     }
 }

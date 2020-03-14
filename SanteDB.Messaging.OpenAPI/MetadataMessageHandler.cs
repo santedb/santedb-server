@@ -34,9 +34,6 @@ namespace SanteDB.Messaging.Metadata
         /// </summary>
         public bool IsRunning => this.m_webHost?.IsRunning == true;
 
-        // Configuration section
-        public MetadataConfigurationSection Configuration { get; }
-
         /// <summary>
         /// Get the name of this service
         /// </summary>
@@ -67,7 +64,6 @@ namespace SanteDB.Messaging.Metadata
         /// </summary>
         public MetadataMessageHandler()
         {
-            this.Configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<MetadataConfigurationSection>();
         }
 
         /// <summary>

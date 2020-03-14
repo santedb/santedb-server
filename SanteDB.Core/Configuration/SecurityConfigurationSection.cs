@@ -107,5 +107,21 @@ namespace SanteDB.Core.Configuration
         [DisplayName("Trusted Certificates")]
         [Description("Individual X.509 certificate thumbprints to trust")]
         public ObservableCollection<string> TrustedCertificates { get; set; }
+
+        /// <summary>
+        /// Maximum invalid logins
+        /// </summary>
+        [XmlElement("maxInvalidLogins")]
+        [DisplayName("Maximum Invalid Logins")]
+        [Description("The maximum invalid logins before an account is locked")]
+        public int? MaxInvalidLogins { get; set; }
+
+        /// <summary>
+        /// Maximum invalid logins
+        /// </summary>
+        [XmlElement("passwordAging")]
+        [DisplayName("Password Age")]
+        [Description("The maximum password age")]
+        public TimeSpan? MaxPasswordAge { get; set; }
     }
 }

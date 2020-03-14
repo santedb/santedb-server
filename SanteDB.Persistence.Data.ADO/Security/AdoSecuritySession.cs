@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Claims;
 using System;
 
 namespace SanteDB.Persistence.Data.ADO.Security
@@ -36,7 +37,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
         /// <summary>
         /// Creates a new ADO Session
         /// </summary>
-        internal AdoSecuritySession(Guid key, byte[] id, byte[] refreshToken, DateTimeOffset notBefore, DateTimeOffset notAfter) : base(id, refreshToken, notBefore, notAfter)
+        internal AdoSecuritySession(Guid key, byte[] id, byte[] refreshToken, DateTimeOffset notBefore, DateTimeOffset notAfter, IClaim[] claims) : base(id, refreshToken, notBefore, notAfter, claims)
         {
             this.Key = key;
         }

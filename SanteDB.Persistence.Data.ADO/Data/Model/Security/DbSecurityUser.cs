@@ -150,6 +150,23 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         public override Guid Key { get; set; }
 
         
+        /// <summary>
+        /// Password expiration
+        /// </summary>
+        [Column("tfa_mech")]
+        public Guid? TwoFactorMechnaismKey { get; set; }
+
+        /// <summary>
+        /// Password expiration
+        /// </summary>
+        [Column("pwd_exp_utc")]
+        public DateTime? PasswordExpiry { get; set; }
+
+        /// <summary>
+        /// True if password expiry was specified
+        /// </summary>
+        public bool PasswordExpirySpecified { get; set; }
+
     }
 
 	/// <summary>

@@ -65,6 +65,7 @@ namespace SanteDB.Core.Rest.Security
             if (principal == null)
                 throw new SecurityTokenException("Invalid bearer token") ;
 
+            RestOperationContext.Current.Data.Add(SanteDBConstants.RestPropertyNameSession, session);
             Core.Security.AuthenticationContext.Current = new Core.Security.AuthenticationContext(principal);
 
             this.m_traceSource.TraceInfo("User {0} authenticated via SESSION BEARER", principal.Identity.Name);

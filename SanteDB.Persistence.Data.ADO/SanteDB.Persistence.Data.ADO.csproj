@@ -75,6 +75,7 @@
     <Compile Include="Data\Model\Acts\DbSubstanceAdministration.cs" />
     <Compile Include="Data\Model\Mail\DbMailMessage.cs" />
     <Compile Include="Data\Model\Mail\DbMailMessageRcptTo.cs" />
+    <Compile Include="Data\Model\Security\DbSecurityChallenge.cs" />
     <Compile Include="Data\Model\Security\DbSecurityProvenance.cs" />
     <Compile Include="Data\Model\Security\DbSession.cs" />
     <Compile Include="Data\Model\Security\DbSessionClaim.cs" />
@@ -147,6 +148,7 @@
     <Compile Include="Services\AdoPersistenceService.cs" />
     <Compile Include="Services\AdoPolicyInformationService.cs" />
     <Compile Include="Services\AdoRoleProvider.cs" />
+    <Compile Include="Services\AdoSecurityChallengeProvider.cs" />
     <Compile Include="Services\AdoSessionProvider.cs" />
     <Compile Include="Services\AdoSubscriptionExecutor.cs" />
     <Compile Include="Services\Persistence\EntityIdentifierPersistenceService.cs" />

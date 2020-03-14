@@ -118,5 +118,10 @@
     <EmbeddedResource Include="Docs\swagger-ui.css.map" />
     <EmbeddedResource Include="Docs\swagger-ui.js.map" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="SanteDB.Messaging.Metadata.nuspec">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

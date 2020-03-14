@@ -19,6 +19,7 @@
  */
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Constants;
@@ -58,12 +59,15 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
         // Sync lock
         private Object m_syncLock = new object();
-
+        
         // Trace source
         private Tracer m_traceSource = new Tracer(AdoDataConstants.IdentityTraceSourceName);
 
         // Configuration
         private AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
+
+        // Security configuration
+        private SecurityConfigurationSection m_securityConfiguration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
 
         /// <summary>
         /// Fired prior to an authentication request being made
@@ -89,7 +93,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             try
             {
                 var principal = AdoClaimsIdentity.Create(userName, password).CreateClaimsPrincipal();
-
+                
                 this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, principal, true));
                 return principal;
             }
@@ -184,13 +188,18 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 tfaSecret == tfaClaim.ClaimValue) // Last known password hash sent as password, this is a password reset token - It will be set to expire ASAP
                             {
                                 retVal = AdoClaimsIdentity.Create(user, true, "Tfa+LastPasswordHash").CreateClaimsPrincipal();
-                                (retVal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBGrantedPolicyClaim, PermissionPolicyIdentifiers.ChangePassword));
+                                (retVal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
+                                (retVal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
                                 (retVal.Identity as IClaimsIdentity).RemoveClaim(retVal.FindFirst(SanteDBClaimTypes.Expiration));
-                                // TODO: Add to configuration
                                 (retVal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, DateTime.Now.AddMinutes(5).ToString("o")));
                             }
                             else if (!String.IsNullOrEmpty(password))
-                                retVal = this.Authenticate(userName, password) as IClaimsPrincipal;
+                            {
+                                if (!user.TwoFactorEnabled || tfaSecret == tfaClaim.ClaimValue)
+                                    retVal = this.Authenticate(userName, password) as IClaimsPrincipal;
+                                else
+                                    throw new AuthenticationException("TFA_MISMATCH");
+                            }
                             else
                                 throw new PolicyViolationException(new GenericPrincipal(new GenericIdentity(userName), new string[0]), PermissionPolicyIdentifiers.Login, PolicyGrantType.Deny);
 
@@ -248,7 +257,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             var passwordHashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
                             var pdpOutcome = policyDecisionService?.GetPolicyOutcome(principal, PermissionPolicyIdentifiers.ChangePassword);
-                            if (userName != principal.Identity.Name &&
+                            if (!userName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase) &&
                                 pdpOutcome.HasValue &&
                                 pdpOutcome != PolicyGrantType.Grant)
                                 throw new PolicyViolationException(principal, PermissionPolicyIdentifiers.ChangePassword, pdpOutcome.Value);
@@ -257,6 +266,15 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             user.SecurityHash = Guid.NewGuid().ToString();
                             user.UpdatedByKey = dataContext.EstablishProvenance(principal, null);
                             user.UpdatedTime = DateTimeOffset.Now;
+
+                            // Set expiration
+                            if (this.m_securityConfiguration.MaxPasswordAge.HasValue)
+                                user.PasswordExpiry = DateTime.Now.Add(this.m_securityConfiguration.MaxPasswordAge.Value);
+                            else
+                            {
+                                user.PasswordExpiry = null;
+                                user.PasswordExpirySpecified = true;
+                            }
                             dataContext.Update(user);
                             tx.Commit();
                         }
@@ -565,7 +583,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, auth.Object1.Key.ToString()));
                     var principal = auth.Object1.UserKey.GetValueOrDefault() == Guid.Empty ?
                         new SanteDBClaimsPrincipal(identities) : AdoClaimsIdentity.Create(auth.Object3, true, "SESSION", session).CreateClaimsPrincipal(identities);
-                    
+
+                    // Add claims from session
+                    foreach (var clm in session.Claims)
+                        identities.First().AddClaim(clm);
                     // TODO: Load additional claims made about the user on the session
                     return principal;
                 }

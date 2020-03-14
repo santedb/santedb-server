@@ -9,6 +9,7 @@ using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.Metadata.Composer;
+using SanteDB.Messaging.Metadata.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +49,7 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
         {
             var listen = new Uri(service.BaseUrl.First());
             this.BasePath = listen.AbsolutePath;
-            listen = new Uri(ApplicationServiceContext.Current.GetService<MetadataMessageHandler>().Configuration.ApiHost ?? listen.ToString());
+            listen = new Uri(ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<MetadataConfigurationSection>().ApiHost ?? listen.ToString());
             this.Info = new SwaggerServiceInfo()
             {
                 Title = MetadataComposerUtil.GetElementDocumentation(service.Behavior.Type, MetaDataElementType.Summary) ?? service.Behavior.Type.GetCustomAttribute<ServiceBehaviorAttribute>()?.Name,
@@ -64,14 +65,13 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
             };
 
             // Construct the paths
-            var operations = service.Contracts.SelectMany(c=>c.Type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                    .Select(o => new { Rest = o.GetCustomAttribute<RestInvokeAttribute>(), ContractMethod = o, BehaviorMethod = service.Behavior.Type.GetMethod(o.Name, o.GetParameters().Select(p=>p.ParameterType).ToArray())  }))
+            var operations = service.Contracts.SelectMany(c => c.Type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                    .Select(o => new { Rest = o.GetCustomAttribute<RestInvokeAttribute>(), ContractMethod = o, BehaviorMethod = service.Behavior.Type.GetMethod(o.Name, o.GetParameters().Select(p => p.ParameterType).ToArray()) }))
                     .Where(o => o.Rest != null);
 
             // What this option produces
-            this.Produces.AddRange(service.Contracts.SelectMany(c=>c.Type.GetCustomAttributes<ServiceProducesAttribute>().Select(o => o.MimeType)));
+            this.Produces.AddRange(service.Contracts.SelectMany(c => c.Type.GetCustomAttributes<ServiceProducesAttribute>().Select(o => o.MimeType)));
             this.Consumes.AddRange(service.Contracts.SelectMany(c => c.Type.GetCustomAttributes<ServiceConsumesAttribute>().Select(o => o.MimeType)));
-
 
             // Security requires us to peek into the runtime environment ... 
             var serviceCaps = MetadataComposerUtil.GetServiceCapabilities(service.ServiceType);
@@ -79,7 +79,7 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
             {
                 var bauth = AuthenticationContext.Current;
                 var tokenUrl = new Uri(MetadataComposerUtil.ResolveService("acs").BaseUrl.FirstOrDefault());
-                if(tokenUrl.Host == "0.0.0.0") // Host is vanialla
+                if (tokenUrl.Host == "0.0.0.0") // Host is vanialla
                     tokenUrl = new Uri($"{listen.Scheme}://{listen.Host}:{listen.Port}{tokenUrl.AbsolutePath}");
 
                 AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
@@ -95,7 +95,7 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                     }
                 };
                 AuthenticationContext.Current = bauth;
-                
+
             }
 
             // Is there an options() method that can be called?
@@ -127,7 +127,7 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                 var path = new SwaggerPath();
                 foreach (var val in operation)
                 {
-                    
+
                     // Process operations
                     var pathDefinition = new SwaggerPathDefinition(val.BehaviorMethod, val.ContractMethod);
                     path.Add(val.Rest.Method.ToLower(), pathDefinition);
@@ -136,8 +136,10 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                     if (pathDefinition.Produces.Count == 0)
                         pathDefinition.Produces.AddRange(this.Produces);
 
+
+
                     // Any faults?
-                    foreach (var flt in service.Contracts.SelectMany(t=>t.Type.GetCustomAttributes<ServiceFaultAttribute>()))
+                    foreach (var flt in service.Contracts.SelectMany(t => t.Type.GetCustomAttributes<ServiceFaultAttribute>()))
                         pathDefinition.Responses.Add(flt.StatusCode, new SwaggerSchemaElement()
                         {
                             Description = flt.Condition,
@@ -180,7 +182,7 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                             v.Value.Parameters.RemoveAll(o => o.Name == "resourceType");
 
                             // Security? 
-                            if(this.SecurityDefinitions.Count > 0 && resourceCaps?.Demand.Length > 0)
+                            if (this.SecurityDefinitions.Count > 0 && resourceCaps?.Demand.Length > 0)
                             {
                                 v.Value.Security = new List<SwaggerPathSecurity>()
                                 {
@@ -278,7 +280,7 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                     }
                 else
                 {
-                   this.Paths.Add(operation.Key, path);
+                    this.Paths.Add(operation.Key, path);
                 }
             }
 
@@ -287,8 +289,8 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
             var missingDefns = this.Paths.AsParallel().SelectMany(
                     o => o.Value.SelectMany(p => p.Value?.Parameters.Select(r => r.Schema))
                         .Union(o.Value.SelectMany(p => p.Value?.Responses?.Values?.Select(r => r.Schema))))
-                .Union(this.Definitions.AsParallel().Where(o=>o.Value.Properties != null).SelectMany(o => o.Value.Properties.Select(p => p.Value.Items ?? p.Value.Schema)))
-                .Union(this.Definitions.AsParallel().Where(o=>o.Value.AllOf != null).SelectMany(o => o.Value.AllOf))
+                .Union(this.Definitions.AsParallel().Where(o => o.Value.Properties != null).SelectMany(o => o.Value.Properties.Select(p => p.Value.Items ?? p.Value.Schema)))
+                .Union(this.Definitions.AsParallel().Where(o => o.Value.AllOf != null).SelectMany(o => o.Value.AllOf))
                 .Select(s => s?.NetType)
                 .Where(o => o != null && !this.Definitions.ContainsKey(MetadataComposerUtil.CreateSchemaReference(o)))
                 .Distinct();
@@ -296,12 +298,12 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                 foreach (var def in missingDefns.AsParallel().ToList())
                 {
                     var name = MetadataComposerUtil.CreateSchemaReference(def);
-                    if(!this.Definitions.ContainsKey(name))
+                    if (!this.Definitions.ContainsKey(name))
                         this.Definitions.Add(name, new SwaggerSchemaDefinition(def));
                 }
 
             // Create the definitions
-            
+
         }
 
         /// <summary>

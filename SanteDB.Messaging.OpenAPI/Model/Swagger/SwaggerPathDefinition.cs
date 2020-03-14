@@ -56,6 +56,10 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
             this.Produces.AddRange(contractMethod.GetCustomAttributes<ServiceProducesAttribute>().Select(o => o.MimeType));
             this.Consumes.AddRange(contractMethod.GetCustomAttributes<ServiceConsumesAttribute>().Select(o => o.MimeType));
 
+            // Obsolete?
+            this.Obsolete = (behaviorMethod?.GetCustomAttribute<ObsoleteAttribute>() != null || contractMethod?.GetCustomAttribute<ObsoleteAttribute>() != null ||
+                behaviorMethod.DeclaringType.GetCustomAttribute<ObsoleteAttribute>() != null || contractMethod.DeclaringType.GetCustomAttribute<ObsoleteAttribute>() != null);
+
             var parms = behaviorMethod.GetParameters();
             if (parms.Length > 0)
                 this.Parameters = parms.Select(o => new SwaggerParameter(behaviorMethod, o, operationAtt)).ToList();
@@ -163,6 +167,12 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
         /// </summary>
         [JsonProperty("security")]
         public List<SwaggerPathSecurity> Security { get; set; }
+
+        /// <summary>
+        /// True if the method is deprecated
+        /// </summary>
+        [JsonProperty("deprecated")]
+        public bool Obsolete { get; set; }
 
     }
 }
