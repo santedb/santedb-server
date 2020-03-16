@@ -36,7 +36,7 @@ namespace SanteDB.Authentication.OAuth2
         /// <summary>
         /// Grant name for the authorization code
         /// </summary>
-        public const string GrantNameReset = "x_reset";
+        public const string GrantNameReset = "x_challenge";
 
         /// <summary>
         /// Grant name for the authorization code
