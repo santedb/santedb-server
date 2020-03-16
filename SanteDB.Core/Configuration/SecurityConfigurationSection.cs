@@ -71,6 +71,7 @@ namespace SanteDB.Core.Configuration
             this.Signatures = new List<SecuritySignatureConfiguration>();
             this.PasswordRegex = RegexPasswordValidator.DefaultPasswordPattern;
             this.TrustedCertificates = new ObservableCollection<string>();
+            this.SecurityPolicy = new List<SecurityPolicyConfiguration>();
         }
 
         /// <summary>
@@ -109,19 +110,24 @@ namespace SanteDB.Core.Configuration
         public ObservableCollection<string> TrustedCertificates { get; set; }
 
         /// <summary>
-        /// Maximum invalid logins
+        /// Gets or sets the security policy configuration
         /// </summary>
-        [XmlElement("maxInvalidLogins")]
-        [DisplayName("Maximum Invalid Logins")]
-        [Description("The maximum invalid logins before an account is locked")]
-        public int? MaxInvalidLogins { get; set; }
+        [XmlArray("securityPolicy"), XmlArrayItem("add")]
+        [DisplayName("Security policy configuration")]
+        [Description("Policy configuration")]
+        public List<SecurityPolicyConfiguration> SecurityPolicy { get; set; }
 
         /// <summary>
-        /// Maximum invalid logins
+        /// Gets the enabled security policy
         /// </summary>
-        [XmlElement("passwordAging")]
-        [DisplayName("Password Age")]
-        [Description("The maximum password age")]
-        public TimeSpan? MaxPasswordAge { get; set; }
+        /// <param name="id">The identifier of the policy</param>
+        /// <param name="defaultValue">The default value of the policy</param>
+        /// <returns>The policy configuration</returns>
+        public T GetSecurityPolicy<T>(SecurityPolicyIdentification id, T defaultValue = default(T))
+        {
+            var pol = this.SecurityPolicy?.Find(o => o.Enabled && o.PolicyId == id);
+            if (pol == null) return defaultValue;
+            else return (T)(object)pol.PolicyValue;
+        }
     }
 }

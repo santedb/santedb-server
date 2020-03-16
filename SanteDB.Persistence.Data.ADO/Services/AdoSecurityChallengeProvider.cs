@@ -25,7 +25,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// <summary>
     /// Represents a callenge service which uses the ADO.NET tables
     /// </summary>
-    public class AdoSecurityChallengeProvider : ISecurityChallengeService
+    public class AdoSecurityChallengeProvider : ISecurityChallengeService, ISecurityChallengeIdentityService
     {
 
         // Tracer
@@ -37,6 +37,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
         // Security Configuration section
         private SecurityConfigurationSection m_securityConfiguration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
 
+        // The randomizer
+        private Random m_random = new Random();
 
         /// <summary>
         /// Gets the service name
@@ -74,7 +76,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     context.Open();
                     var query = context.CreateSqlStatement<DbSecurityUser>().SelectFrom(typeof(DbSecurityUser), typeof(DbSecurityUserChallengeAssoc))
                         .InnerJoin<DbSecurityUserChallengeAssoc>(o => o.Key, o => o.UserKey)
-                        .Where(o => o.UserName.ToLower() == userName.ToLower() && o.ObsoletionTime == null);
+                        .Where(o => o.UserName.ToLower() == userName.ToLower() && o.ObsoletionTime == null)
+                        .And<DbSecurityUserChallengeAssoc>(o => o.ExpiryTime > DateTime.Now);
                     var dbUser = context.FirstOrDefault<CompositeResult<DbSecurityUser, DbSecurityUserChallengeAssoc>>(query);
 
                     // User found?
@@ -85,7 +88,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     else if (dbUser.Object2.ChallengeResponse != responseHash || dbUser.Object1.Lockout.GetValueOrDefault() > DateTime.Now) // Increment invalid
                     {
                         dbUser.Object1.InvalidLoginAttempts++;
-                        if (dbUser.Object1.InvalidLoginAttempts > this.m_securityConfiguration.MaxInvalidLogins) 
+                        if (dbUser.Object1.InvalidLoginAttempts > this.m_securityConfiguration.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxInvalidLogins,5)) 
                             dbUser.Object1.Lockout = DateTime.Now.Add(new TimeSpan(0, 0, dbUser.Object1.InvalidLoginAttempts.Value * 30));
                         dbUser.Object1.UpdatedByKey = Guid.Parse(AuthenticationContext.SystemUserSid);
                         dbUser.Object1.UpdatedTime = DateTimeOffset.Now;
@@ -112,24 +115,141 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
             catch (Exception e)
             {
+                this.m_tracer.TraceError("Challenge authentication failed: {0}", e);
                 this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, null, false));
                 throw new AuthenticationException($"Challenge authentication failed");
             }
         }
 
-        public IEnumerable<SecurityChallenge> Get(Guid userKey)
+        /// <summary>
+        /// Get the security challenges for the specified user key
+        /// </summary>
+        public IEnumerable<SecurityChallenge> Get(String userName, IPrincipal principal)
         {
-            throw new NotImplementedException();
+            try
+            {
+                
+                using (var context = this.m_configuration.Provider.GetWriteConnection())
+                {
+
+                    context.Open();
+
+                    userName = userName.ToLower();
+                    var sqlQuery = context.CreateSqlStatement<DbSecurityChallenge>().SelectFrom(typeof(DbSecurityChallenge), typeof(DbSecurityUserChallengeAssoc))
+                            .InnerJoin<DbSecurityUserChallengeAssoc>(o => o.Key, o => o.ChallengeKey)
+                            .InnerJoin<DbSecurityUserChallengeAssoc, DbSecurityUser>(o=>o.UserKey, o=>o.Key)
+                            .Where<DbSecurityUser>(o => o.UserName.ToLower() == userName);
+
+                    var retVal = context.Query< CompositeResult<DbSecurityChallenge, DbSecurityUserChallengeAssoc>>(sqlQuery).Select(o => new SecurityChallenge()
+                    {
+                        ChallengeText = o.Object1.ChallengeText,
+                        Key = o.Object1.Key,
+                        ObsoletionTime = o.Object2.ExpiryTime
+                    }).ToList();
+
+                    // Only the current user can fetch their own security challenge questions 
+                    if (!userName.Equals(principal.Identity.Name)
+                        || !principal.Identity.IsAuthenticated)
+                        return retVal;
+                    else // Only a random option can be returned  
+                        return retVal.Skip(this.m_random.Next(0, retVal.Count)).Take(1);
+
+                }
+            }
+            catch (Exception e)
+            {
+                this.m_tracer.TraceError("Failed to fetch security challenges for user {0}: {1}", userName, e);
+                throw new Exception($"Failed to fetch security challenges for {userName}", e);
+            }
         }
 
-        public void Remove(Guid userKey, Guid challengeKey)
+        /// <summary>
+        /// Remove the specified challenge for this particular key
+        /// </summary>
+        public void Remove(String userName, Guid challengeKey, IPrincipal principal)
         {
-            throw new NotImplementedException();
+            if (!userName.Equals(principal.Identity.Name)
+                || !principal.Identity.IsAuthenticated)
+                throw new SecurityException($"Users may only modify their own security challenges");
+
+            // Ensure that the user has been explicitly granted the special security policy
+            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AlterSecurityChallenge).Demand();
+
+            try
+            {
+                using (var context = this.m_configuration.Provider.GetWriteConnection())
+                {
+                    context.Open();
+                    userName = userName.ToLower();
+                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName == userName);
+                    if (dbUser == null)
+                        throw new KeyNotFoundException($"User {userName} not found");
+                    context.Delete<DbSecurityUserChallengeAssoc>(o => o.ChallengeKey == challengeKey && o.UserKey == dbUser.Key);
+                }
+            }
+            catch (Exception e)
+            {
+
+                this.m_tracer.TraceError("Failed to removing security challenge {0} for user {1}: {2}", challengeKey, userName, e);
+                throw new Exception($"Failed to remove security challenge {challengeKey} for {userName}", e);
+            }
         }
 
-        public void Set(Guid userKey, Guid challengeKey, string response)
+        /// <summary>
+        /// Set the specified challenge response
+        /// </summary>
+        public void Set(String userName, Guid challengeKey, string response, IPrincipal principal)
         {
-            throw new NotImplementedException();
+            if (!userName.Equals(principal.Identity.Name)
+                || !principal.Identity.IsAuthenticated)
+                throw new SecurityException($"Users may only modify their own security challenges");
+            else if (String.IsNullOrEmpty(response))
+                throw new ArgumentNullException(nameof(response), "Response to challenge must be provided");
+
+            // Ensure that the user has been explicitly granted the special security policy
+            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AlterSecurityChallenge).Demand();
+
+            try
+            {
+                using (var context = this.m_configuration.Provider.GetWriteConnection())
+                {
+                    context.Open();
+                    userName = userName.ToLower();
+                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLower() == userName);
+                    if (dbUser == null)
+                        throw new KeyNotFoundException($"User {userName} not found");
+
+                    var challengeResponse = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(response);
+
+                    // Existing?
+                    var challengeRec = context.FirstOrDefault<DbSecurityUserChallengeAssoc>(o => o.UserKey == dbUser.Key && o.ChallengeKey == challengeKey);
+                    if (challengeRec == null)
+                    {
+                        context.Insert(new DbSecurityUserChallengeAssoc()
+                        {
+                            ChallengeKey = challengeKey,
+                            UserKey = dbUser.Key,
+                            ChallengeResponse = challengeResponse,
+                            ExpiryTime = DateTime.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.MaxChallengeAge, new TimeSpan(3650, 0, 0, 0)))
+                        });
+                    }
+                    else if (!this.m_securityConfiguration.GetSecurityPolicy<Boolean>(SecurityPolicyIdentification.ChallengeHistory, false) ||
+                        !context.Any<DbSecurityUserChallengeAssoc>(o=>o.ChallengeKey == challengeRec.ChallengeKey && o.UserKey == challengeRec.UserKey && o.ChallengeResponse == challengeResponse))
+                    {
+                        challengeRec.ExpiryTime = DateTime.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.MaxChallengeAge, new TimeSpan(3650, 0, 0, 0)));
+                        challengeRec.ChallengeResponse = challengeResponse;
+                        context.Update(challengeRec);
+                    }
+                    else
+                        throw new InvalidOperationException("Challenge response cannot be the same as previous");
+                }
+            }
+            catch (Exception e)
+            {
+
+                this.m_tracer.TraceError("Failed to removing security challenge {0} for user {1}: {2}", challengeKey, userName, e);
+                throw new Exception($"Failed to remove security challenge {challengeKey} for {userName}", e);
+            }
         }
     }
 }

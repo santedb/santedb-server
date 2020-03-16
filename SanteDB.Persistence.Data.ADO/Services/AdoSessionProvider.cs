@@ -65,6 +65,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
         // Configuration
         private AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
 
+        // Security configuration
+        private SecurityConfigurationSection m_securityConfiguration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
+
         // Session cache
         private Dictionary<Guid, KeyValuePair<DbSession, DbSessionClaim[]>> m_sessionCache = new Dictionary<Guid, KeyValuePair<DbSession, DbSessionClaim[]>>();
 
@@ -101,7 +104,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <param name="policyDemands">The policies which are being demanded for this session</param>
         /// <param name="purposeOfUse">The purpose of this session</param>
         /// <returns>A constructed <see cref="global::ThisAssembly:AdoSession"/></returns>
-        public ISession Establish(IPrincipal principal, DateTimeOffset expiry, String remoteEp, String purpose, String[] policyDemands)
+        public ISession Establish(IPrincipal principal, String remoteEp, bool isOverride, String purpose, String[] policyDemands)
         {
             // Validate the parameters
             if (principal == null)
@@ -110,9 +113,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 throw new InvalidOperationException("Cannot create a session for a non-authenticated principal");
             else if (!(principal is IClaimsPrincipal))
                 throw new ArgumentException("Principal must be ClaimsPrincipal", nameof(principal));
+            else if (isOverride && (String.IsNullOrEmpty(purpose) || policyDemands == null || policyDemands.Length == 0))
+                throw new InvalidOperationException("Override requests require policy demands and a purpose of use");
 
             var cprincipal = principal as IClaimsPrincipal;
-
             try
             {
 
@@ -135,8 +139,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             ApplicationKey = Guid.Parse(applicationKey),
                             UserKey = userKey != null && userKey != deviceKey ? (Guid?)Guid.Parse(userKey) : null,
                             NotBefore = DateTimeOffset.Now,
-                            NotAfter = expiry,
-                            RefreshExpiration = expiry.AddMinutes(10),
+                            NotAfter = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.SessionLength, new TimeSpan(0,5,0))),
+                            RefreshExpiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.RefreshLength, new TimeSpan(0, 10, 0))),
                             RemoteEndpoint = remoteEp,
                             RefreshToken = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(BitConverter.ToString(refreshToken).Replace("-", ""))
                         };
@@ -157,12 +161,20 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         else if (policyDemands?.Length > 0)
                         {
 
+                            if (isOverride)
+                                claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBOverrideClaim, "true"));
+                            if (!String.IsNullOrEmpty(purpose))
+                                claims.Add(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, purpose));
+
                             var pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
                             foreach (var pol in policyDemands)
                             {
                                 // Get grant
                                 var grant = pdp.GetPolicyOutcome(cprincipal, pol);
-                                if (grant == PolicyGrantType.Elevate && !String.IsNullOrEmpty(purpose) && pdp.GetPolicyOutcome(cprincipal, PermissionPolicyIdentifiers.OverridePolicyPermission) == PolicyGrantType.Grant) // We are attempting to override
+                                if (isOverride && grant == PolicyGrantType.Elevate && 
+                                    (pol.StartsWith(PermissionPolicyIdentifiers.SecurityElevations) || // Special security elevations don't require override permission
+                                    pdp.GetPolicyOutcome(cprincipal, PermissionPolicyIdentifiers.OverridePolicyPermission) == PolicyGrantType.Grant
+                                    )) // We are attempting to override
                                     claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, pol));
                                 else if (grant == PolicyGrantType.Grant)
                                     claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, pol));
@@ -170,8 +182,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                     throw new PolicyViolationException(cprincipal, pol, grant);
                             }
 
-                            if (!String.IsNullOrEmpty(purpose))
-                                claims.Add(new SanteDBClaim(SanteDBClaimTypes.XspaPurposeOfUseClaim, purpose));
                         }
                         else
                         {
@@ -194,12 +204,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         tx.Commit();
 
                         var signingService = ApplicationServiceContext.Current.GetService<IDataSigningService>();
-
+                        
                         if (signingService == null)
                         {
                             this.m_traceSource.TraceWarning("No IDataSigningService provided. Session data will be unsigned!");
                             var session = new AdoSecuritySession(dbSession.Key, dbSession.Key.ToByteArray(), refreshToken, dbSession.NotBefore, dbSession.NotAfter, claims.ToArray());
-                            this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, session, true));
+                            this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, session, true, isOverride, purpose, policyDemands));
                             return session;
                         }
                         else
@@ -208,7 +218,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             var signedRefresh = refreshToken.Concat(signingService.SignData(refreshToken)).ToArray();
 
                             var session = new AdoSecuritySession(dbSession.Key, signedToken, signedRefresh, dbSession.NotBefore, dbSession.NotAfter, claims.ToArray());
-                            this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, session, true));
+                            this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, session, true, isOverride, purpose, policyDemands));
                             return session;
                         }
                     }
@@ -217,7 +227,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             catch (Exception e)
             {
                 this.m_traceSource.TraceError("Error establishing session: {0}", e.Message);
-                this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, null, false));
+                this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, null, false, isOverride, purpose, policyDemands));
 
                 throw;
             }
@@ -405,12 +415,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                 }
 
-                this.Abandoned?.Invoke(this, new SessionEstablishedEventArgs(null, session, true));
+                this.Abandoned?.Invoke(this, new SessionEstablishedEventArgs(null, session, true, false, null, null));
             }
             catch (Exception e)
             {
                 this.m_traceSource.TraceError("Cannot abandon session {0} - {1}", BitConverter.ToString(session.Id, 0), e);
-                this.Abandoned?.Invoke(this, new SessionEstablishedEventArgs(null, session, false));
+                this.Abandoned?.Invoke(this, new SessionEstablishedEventArgs(null, session, false, false, null, null));
                 throw new SecurityException($"Cannot abandon session {BitConverter.ToString(session.Id)}", e);
             }
         }

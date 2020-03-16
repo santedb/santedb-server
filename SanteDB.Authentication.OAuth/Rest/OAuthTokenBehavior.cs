@@ -181,7 +181,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                             return this.CreateErrorCondition(OAuthErrorType.invalid_request, "Invalid client grant message");
 
                         // Authenticate the user
-                        principal = ApplicationServiceContext.Current.GetService<ISecurityChallengeService>().Authenticate(tokenRequest["username"], Guid.Parse(tokenRequest["challenge"]), tokenRequest["response"]);
+                        principal = ApplicationServiceContext.Current.GetService<ISecurityChallengeIdentityService>().Authenticate(tokenRequest["username"], Guid.Parse(tokenRequest["challenge"]), tokenRequest["response"]);
                         break;
                     case OAuthConstants.GrantNameClientCredentials:
                         new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthClientCredentialFlowPolicy, clientPrincipal).Demand();
@@ -320,7 +320,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 // Claim allowed
                 if (this.m_configuration.AllowedClientClaims == null ||
                     !this.m_configuration.AllowedClientClaims.Contains(itm.Type))
-                    throw new SecurityException("Claim is not permitted");
+                    throw new SecurityException($"Claim {itm.Type} is not permitted");
                 else
                 {
                     // Validate the claim
@@ -390,8 +390,12 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 expires = DateTime.Now.Add(new TimeSpan(0, 2, 0));
             // Establish the session
             ISessionProviderService isp = ApplicationServiceContext.Current.GetService<ISessionProviderService>();
-            var session = isp.Establish(new SanteDBClaimsPrincipal(claimsPrincipal.Identities), expires, remoteIp, additionalClaims.FirstOrDefault(o=>o.Type == SanteDBClaimTypes.XspaPurposeOfUseClaim)?.Value, scope == "*" ? null : scope.Split(' '));
+            var scopeList = scope == "*" ? null : scope.Split(' ');
+            string purposeOfUse = additionalClaims?.FirstOrDefault(o => o.Type == SanteDBClaimTypes.PurposeOfUse)?.Value;
+            bool isOverride = additionalClaims?.Any(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim) == true || scopeList?.Any(o=>o == PermissionPolicyIdentifiers.OverridePolicyPermission) == true;
 
+            var session = isp.Establish(new SanteDBClaimsPrincipal(claimsPrincipal.Identities), remoteIp, isOverride, purposeOfUse, scopeList);
+            
             string refreshToken = null, sessionId = null;
             if (session != null)
             {

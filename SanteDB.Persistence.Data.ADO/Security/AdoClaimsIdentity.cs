@@ -124,7 +124,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
                     var hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
                     var passwordHash = hashingService.ComputeHash(password);
-                    var fnResult = dataContext.FirstOrDefault<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr", userName, passwordHash, s_securityConfiguration.MaxInvalidLogins ?? 5);
+                    var fnResult = dataContext.FirstOrDefault<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr", userName, passwordHash, s_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.MaxInvalidLogins, 5));
 
 	                var user = fnResult.Object1;
 

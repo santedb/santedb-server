@@ -105,12 +105,11 @@
     <validityTime>02:00:00</validityTime>
     <allowedClaims>
       <add>scope</add>
-      <add>urn:santedb:org:override</add>
-      <add>urn:oasis:names:tc:xacml:2.0:resource:resource-id</add>
-      <add>urn:oasis:names:tc:xacml:2.0:action:purpose</add>
-      <add>urn:oasis:names:tc:xspa:1.0:subject:facility</add>
-      <add>urn:oasis:names:tc:xspa:1.0:subject:organization-id</add>
-      <add>urn:oasis:names:tc:xacml:1.0:subject:subject-id</add>
+      <add>PolicyOverride</add>
+      <add>ResourceId</add>
+      <add>PurposeOfUse</add>
+      <add>FacilityId</add>
+      <add>OrganizationId</add>
     </allowedClaims>
     <tokenType>bearer</tokenType>
     <allowNodelessClientAuth>true</allowNodelessClientAuth>
@@ -257,12 +256,11 @@
     <!-- X-SanteDB-ClientClaim allowed claims -->
     <claims>
       <add>scope</add>
-      <add>urn:santedb:org:override</add>
-      <add>urn:oasis:names:tc:xacml:2.0:resource:resource-id</add>
-      <add>urn:oasis:names:tc:xacml:2.0:action:purpose</add>
-      <add>urn:oasis:names:tc:xspa:1.0:subject:facility</add>
-      <add>urn:oasis:names:tc:xspa:1.0:subject:organization-id</add>
-      <add>urn:oasis:names:tc:xacml:1.0:subject:subject-id</add>
+      <add>PolicyOverride</add>
+      <add>ResourceId</add>
+      <add>PurposeOfUse</add>
+      <add>FacilityId</add>
+      <add>OrganizationId</add>
     </claims>
   </section>
   <!-- Used for authorizing clients using a claims token -->

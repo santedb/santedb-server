@@ -78,6 +78,7 @@ CREATE PROCEDURE AUTH_USR (
     UPD_UTC TIMESTAMP,
     UPD_PROV_ID UUID, 
 	PWD_EXP_UTC DATE,
+	TFA_MECH UUID,
     ERR_CODE VARCHAR(128)
 ) AS
 	DECLARE VARIABLE VAR_USR_ID UUID;
@@ -138,7 +139,7 @@ BEGIN
 	FOR SELECT USR_ID, CLS_ID, USR_NAME, EMAIL, EMAIL_CNF, PHN_NUM, 
 				PHN_CNF, TFA_ENABLED, LOCKED, PASSWD, SEC_STMP, FAIL_LOGIN, 
 				LAST_LOGIN_UTC, CRT_UTC, CRT_PROV_ID, OBSLT_UTC, OBSLT_PROV_ID,
-				UPD_UTC, UPD_PROV_ID, PWD_EXP_UTC, :VAR_USR_ERR
+				UPD_UTC, UPD_PROV_ID, PWD_EXP_UTC, TFA_MECH, :VAR_USR_ERR
 			FROM SEC_USR_TBL
 			WHERE
 				USR_ID = :VAR_USR_ID
@@ -146,7 +147,7 @@ BEGIN
 				:USR_ID, :CLS_ID, :USR_NAME, :EMAIL, :EMAIL_CNF, :PHN_NUM, 
 				:PHN_CNF, :TFA_ENABLED, :LOCKED, :PASSWD, :SEC_STMP, :FAIL_LOGIN, 
 				:LAST_LOGIN_UTC, :CRT_UTC, :CRT_PROV_ID, :OBSLT_UTC, :OBSLT_PROV_ID,
-				:UPD_UTC, :UPD_PROV_ID, :PWD_EXP_UTC, :ERR_CODE
+				:UPD_UTC, :UPD_PROV_ID, :PWD_EXP_UTC, :TFA_MECH, :ERR_CODE
 	DO BEGIN
 		SUSPEND;
 	END
@@ -163,5 +164,11 @@ INSERT INTO sec_chl_tbl (chl_txt, crt_prov_id) VALUES ('security.challenge.text1
 INSERT INTO sec_chl_tbl (chl_txt, crt_prov_id) VALUES ('security.challenge.text2', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 --#!
 INSERT INTO sec_chl_tbl (chl_txt, crt_prov_id) VALUES ('security.challenge.text3', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+--#!
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('e15b96ab-646c-4c00-9a58-ea09eee67dad', '1.3.6.1.4.1.33349.3.1.5.9.2.1.0.1', 'Login for Password Reassignment', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+--#!
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('e15b96ab-646c-4c00-9a58-ea09eee67dae', '1.3.6.1.4.1.33349.3.1.5.9.2.600', 'Special Security Elevation', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+--#!
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID, IS_ELEV) VALUES ('e15b96ab-646c-4c00-9a58-ea09eee67daf', '1.3.6.1.4.1.33349.3.1.5.9.2.600.1', 'Change Security Challenge Question', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'), TRUE);
 --#!
 COMMIT;

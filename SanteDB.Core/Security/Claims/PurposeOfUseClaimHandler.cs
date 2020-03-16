@@ -41,7 +41,7 @@ namespace SanteDB.Core.Security.Claims
         {
             get
             {
-                return SanteDBClaimTypes.XspaPurposeOfUseClaim;
+                return SanteDBClaimTypes.PurposeOfUse;
             }
         }
 

@@ -88,19 +88,26 @@ namespace SanteDB.Core.Security
             else if (String.IsNullOrEmpty(policyId))
                 throw new ArgumentNullException(nameof(policyId));
 
+            // Get the user object from the principal
+            var pip = ApplicationServiceContext.Current.GetService<IPolicyInformationService>();
+
             // Can we make this decision based on the claims? 
-            if (principal is IClaimsPrincipal claimsPrincipal && claimsPrincipal.HasClaim(c => c.Type == SanteDBClaimTypes.SanteDBGrantedPolicyClaim)) // must adhere tothe token
+            if (principal is IClaimsPrincipal claimsPrincipal && claimsPrincipal.HasClaim(c => c.Type == SanteDBClaimTypes.SanteDBGrantedPolicyClaim)) // must adhere to the token
             {
                 if (claimsPrincipal.HasClaim(c => c.Type == SanteDBClaimTypes.SanteDBGrantedPolicyClaim && policyId.StartsWith(c.Value)))
                     return PolicyGrantType.Grant;
                 else
-                    return PolicyGrantType.Deny;
+                {
+                    // Can override?
+                    var polInfo = pip.GetPolicy(policyId);
+                    if (polInfo.CanOverride)
+                        return PolicyGrantType.Elevate;
+                    else return PolicyGrantType.Deny;
+                }
             }
             else
             {
-                // Get the user object from the principal
-                var pip = ApplicationServiceContext.Current.GetService<IPolicyInformationService>();
-
+                
                 // Policies
                 var activePolicies = pip.GetActivePolicies(principal).Where(o => policyId.StartsWith(o.Policy.Oid));
                 // Most restrictive

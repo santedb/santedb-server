@@ -262,19 +262,19 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 pdpOutcome != PolicyGrantType.Grant)
                                 throw new PolicyViolationException(principal, PermissionPolicyIdentifiers.ChangePassword, pdpOutcome.Value);
 
-                            user.Password = passwordHashingService.ComputeHash(newPassword);
+                            var newPasswordHash = passwordHashingService.ComputeHash(newPassword);
+                            if (!this.m_securityConfiguration.GetSecurityPolicy<Boolean>(SecurityPolicyIdentification.PasswordHistory, false) ||
+                                !dataContext.Any<DbSecurityUser>(o=>o.Key == user.Key && o.Password == newPasswordHash))
+                                user.Password = newPasswordHash;
+                            else
+                                throw new InvalidOperationException("Password must be different than current password");
+
                             user.SecurityHash = Guid.NewGuid().ToString();
                             user.UpdatedByKey = dataContext.EstablishProvenance(principal, null);
                             user.UpdatedTime = DateTimeOffset.Now;
 
                             // Set expiration
-                            if (this.m_securityConfiguration.MaxPasswordAge.HasValue)
-                                user.PasswordExpiry = DateTime.Now.Add(this.m_securityConfiguration.MaxPasswordAge.Value);
-                            else
-                            {
-                                user.PasswordExpiry = null;
-                                user.PasswordExpirySpecified = true;
-                            }
+                            user.PasswordExpiry = DateTime.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.MaxPasswordAge, new TimeSpan(3650,0,0,0)));
                             dataContext.Update(user);
                             tx.Commit();
                         }
