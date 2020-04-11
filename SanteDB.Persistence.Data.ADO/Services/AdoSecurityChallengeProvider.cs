@@ -58,7 +58,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Authenticate a user using their challenge response
         /// </summary>
-        public IPrincipal Authenticate(string userName, Guid challengeKey, string response)
+        public IPrincipal Authenticate(string userName, Guid challengeKey, string response, String tfa)
         {
             try
             {
@@ -83,7 +83,20 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     // User found?
                     if (dbUser == null)
                         throw new SecurityException("AUTH_INV");
-                    else if (dbUser.Object1.Lockout > DateTime.Now)
+
+                    // TFA? 
+                    if(!String.IsNullOrEmpty(tfa))
+                    {
+                        var tfaSecret = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(tfa);
+
+                        var claims = context.Query<DbUserClaim>(o => o.SourceKey == dbUser.Object1.Key && (!o.ClaimExpiry.HasValue || o.ClaimExpiry > DateTime.Now)).ToList();
+                        DbUserClaim tfaClaim = claims.FirstOrDefault(o => o.ClaimType == SanteDBClaimTypes.SanteDBOTAuthCode);
+                        if (tfaClaim == null || !tfaSecret.Equals(tfaClaim.ClaimValue, StringComparison.OrdinalIgnoreCase))
+                            throw new SecurityException("TFA_MISMATCH");
+
+                    }
+
+                    if (dbUser.Object1.Lockout > DateTime.Now)
                         throw new SecurityException("AUTH_LCK");
                     else if (dbUser.Object2.ChallengeResponse != responseHash || dbUser.Object1.Lockout.GetValueOrDefault() > DateTime.Now) // Increment invalid
                     {
@@ -150,9 +163,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     // Only the current user can fetch their own security challenge questions 
                     if (!userName.Equals(principal.Identity.Name)
                         || !principal.Identity.IsAuthenticated)
-                        return retVal;
-                    else // Only a random option can be returned  
                         return retVal.Skip(this.m_random.Next(0, retVal.Count)).Take(1);
+                    else // Only a random option can be returned  
+                        return retVal;
 
                 }
             }

@@ -181,7 +181,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
                             return this.CreateErrorCondition(OAuthErrorType.invalid_request, "Invalid client grant message");
 
                         // Authenticate the user
-                        principal = ApplicationServiceContext.Current.GetService<ISecurityChallengeIdentityService>().Authenticate(tokenRequest["username"], Guid.Parse(tokenRequest["challenge"]), tokenRequest["response"]);
+                        var tfa = RestOperationContext.Current.IncomingRequest.Headers[OAuthConstants.TfaHeaderName];
+                        principal = ApplicationServiceContext.Current.GetService<ISecurityChallengeIdentityService>().Authenticate(tokenRequest["username"], Guid.Parse(tokenRequest["challenge"]), tokenRequest["response"], tfa);
                         break;
                     case OAuthConstants.GrantNameClientCredentials:
                         new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthClientCredentialFlowPolicy, clientPrincipal).Demand();
