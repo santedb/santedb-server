@@ -150,8 +150,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Persistence.MDM", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Persistence.MDM.Test", "santedb-mdm\SanteDB.Persistence.MDM.Test\SanteDB.Persistence.MDM.Test.csproj", "{16BE3000-C76A-41FC-99DB-C5C90DD521E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Core.Api.Test", "..\santedb-api\SanteDB.Core.Api.Test\SanteDB.Core.Api.Test.csproj", "{59B5E3BE-790E-451F-BACA-631369CF535C}"
-EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Core.Api.Test", ".\santedb-api\SanteDB.Core.Api.Test\SanteDB.Core.Api.Test.csproj", "{59B5E3BE-790E-451F-BACA-631369CF535C}"
+EndProject 
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
