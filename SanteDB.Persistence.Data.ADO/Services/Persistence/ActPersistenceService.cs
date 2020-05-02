@@ -250,7 +250,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             if (data.Relationships != null && data.Relationships.Any())
                 base.UpdateVersionedAssociatedItems<Core.Model.Acts.ActRelationship, DbActRelationship>(
-                   data.Relationships.Where(o => o != null && !o.IsEmpty()),
+                   data.Relationships.Distinct(new ActRelationshipPersistenceService.Comparer()).Where(o => o != null && !o.IsEmpty()),
                     retVal,
                     context);
 
@@ -385,7 +385,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             if (data.Relationships != null)
                 base.UpdateVersionedAssociatedItems<Core.Model.Acts.ActRelationship, DbActRelationship>(
-                   data.Relationships.Where(o => o != null && !o.IsEmpty() && (o.SourceEntityKey == data.Key || !o.SourceEntityKey.HasValue)),
+                   data.Relationships.Distinct(new ActRelationshipPersistenceService.Comparer()).Where(o => o != null && !o.IsEmpty() && (o.SourceEntityKey == data.Key || !o.SourceEntityKey.HasValue)),
                     retVal,
                     context);
 

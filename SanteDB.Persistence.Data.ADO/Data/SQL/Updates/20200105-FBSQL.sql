@@ -13,6 +13,22 @@ INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err
 --#!
 INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('1373ff04-a6ef-420a-b1d0-4a07465fe8e8'), char_to_uuid('77b7a04b-c065-4faf-8ec0-2cdad4ae372b'), char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'), 'Device=[AssignedEntity]=>Person'); 
 --#!
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'),char_to_uuid('79DD4F75-68E8-4722-A7F5-8BC2E08F5CD6'), 'Person ==[Birthplace]==> CityOrTown');
+--#!
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'),char_to_uuid('48B2FFB3-07DB-47BA-AD73-FC8FB8502471'), 'Person ==[Birthplace]==> Country');
+--#!
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'),char_to_uuid('D9489D56-DDAC-4596-B5C6-8F41D73D8DC5'), 'Person ==[Birthplace]==> CountyOrParish');
+--#!
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'),char_to_uuid('8CF4B0B0-84E5-4122-85FE-6AFA8240C218'), 'Person ==[Birthplace]==> State');
+--#!
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'),char_to_uuid('79DD4F75-68E8-4722-A7F5-8BC2E08F5CD6'), 'Patient ==[Birthplace]==> CityOrTown');
+--#!
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'),char_to_uuid('48B2FFB3-07DB-47BA-AD73-FC8FB8502471'), 'Patient ==[Birthplace]==> Country');
+--#!
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'),char_to_uuid('D9489D56-DDAC-4596-B5C6-8F41D73D8DC5'), 'Patient ==[Birthplace]==> CountyOrParish');
+--#!
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'),char_to_uuid('8CF4B0B0-84E5-4122-85FE-6AFA8240C218'), 'Patient ==[Birthplace]==> State');
+--#!
 ALTER TABLE ASGN_AUT_TBL ADD POL_ID UUID;
 --#!
 ALTER TABLE ASGN_AUT_TBL ADD UPD_UTC TIMESTAMP;
@@ -49,6 +65,10 @@ CREATE TABLE SEC_USR_CHL_ASSOC_TBL (
 	CONSTRAINT FK_SEC_USR_CHL_USR_TBL FOREIGN KEY (USR_ID) REFERENCES SEC_USR_TBL(USR_ID),
 	CONSTRAINT FK_SEC_USR_CHL_CHL_TBL FOREIGN KEY (CHL_ID) REFERENCES SEC_CHL_TBL(CHL_ID)
 );
+--#!
+ALTER TABLE SEC_USR_TBL ADD PWD_EXP_UTC DATE;
+--#!
+ALTER TABLE SEC_USR_TBL ADD TFA_MECH UUID;
 --#!
 DROP PROCEDURE AUTH_USR;
 --#!
@@ -153,22 +173,18 @@ BEGIN
 	END
 END;
 --#!
-ALTER TABLE SEC_USR_TBL ADD PWD_EXP_UTC DATE;
+INSERT INTO sec_chl_tbl (chl_id, chl_txt, crt_prov_id) VALUES (gen_uuid(), 'security.challenge.text1', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 --#!
-ALTER TABLE SEC_USR_TBL ADD TFA_MECH UUID;
+INSERT INTO sec_chl_tbl (chl_id, chl_txt, crt_prov_id) VALUES (gen_uuid(), 'security.challenge.text2', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+--#!
+INSERT INTO sec_chl_tbl (chl_id, chl_txt, crt_prov_id) VALUES (gen_uuid(), 'security.challenge.text3', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+--#!
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('e15b96ab-646c-4c00-9a58-ea09eee67dad'), '1.3.6.1.4.1.33349.3.1.5.9.2.1.0.1', 'Login for Password Reassignment', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+--#!
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('e15b96ab-646c-4c00-9a58-ea09eee67dae'), '1.3.6.1.4.1.33349.3.1.5.9.2.600', 'Special Security Elevation', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+--#!
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID, IS_ELEV) VALUES (char_to_uuid('e15b96ab-646c-4c00-9a58-ea09eee67daf'), '1.3.6.1.4.1.33349.3.1.5.9.2.600.1', 'Change Security Challenge Question', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'), TRUE);
 --#!
 SELECT REG_PATCH('20200105-01') FROM RDB$DATABASE;
---#!
-INSERT INTO sec_chl_tbl (chl_txt, crt_prov_id) VALUES ('security.challenge.text1', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
---#!
-INSERT INTO sec_chl_tbl (chl_txt, crt_prov_id) VALUES ('security.challenge.text2', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
---#!
-INSERT INTO sec_chl_tbl (chl_txt, crt_prov_id) VALUES ('security.challenge.text3', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
---#!
-INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('e15b96ab-646c-4c00-9a58-ea09eee67dad', '1.3.6.1.4.1.33349.3.1.5.9.2.1.0.1', 'Login for Password Reassignment', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
---#!
-INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('e15b96ab-646c-4c00-9a58-ea09eee67dae', '1.3.6.1.4.1.33349.3.1.5.9.2.600', 'Special Security Elevation', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
---#!
-INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID, IS_ELEV) VALUES ('e15b96ab-646c-4c00-9a58-ea09eee67daf', '1.3.6.1.4.1.33349.3.1.5.9.2.600.1', 'Change Security Challenge Question', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'), TRUE);
 --#!
 COMMIT;

@@ -331,7 +331,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Relationships
             if (data.Relationships != null)
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityRelationship, DbEntityRelationship>(
-                   data.Relationships.Where(o => o != null && !o.InversionIndicator && !o.IsEmpty()).ToList(),
+                   data.Relationships.Distinct(new EntityRelationshipPersistenceService.Comparer()).Where(o => o != null && !o.InversionIndicator && !o.IsEmpty()).ToList(),
                     retVal,
                     context);
 
@@ -430,7 +430,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 if (dbAuth == null)
                 {
                     dbAuth = context.FirstOrDefault<DbAssigningAuthority>(o => o.DomainName == id.Authority.DomainName);
-                    id.AuthorityKey = dbAuth.Key;
+                    if(dbAuth != null)
+                        id.AuthorityKey = dbAuth.Key;
                 }
                 if (dbAuth == null)
                 {
@@ -539,7 +540,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Relationships
             if (data.Relationships != null)
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityRelationship, DbEntityRelationship>(
-                   data.Relationships.Where(o => o != null && !o.InversionIndicator && !o.IsEmpty() && (o.SourceEntityKey == data.Key || !o.SourceEntityKey.HasValue)).ToList(),
+                   data.Relationships.Distinct(new EntityRelationshipPersistenceService.Comparer()).Where(o => o != null && !o.InversionIndicator && !o.IsEmpty() && (o.SourceEntityKey == data.Key || !o.SourceEntityKey.HasValue)).ToList(),
                     retVal,
                     context);
 

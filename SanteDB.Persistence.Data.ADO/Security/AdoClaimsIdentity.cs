@@ -50,7 +50,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
     /// <summary>
     /// Represents a user prinicpal based on a SecurityUser domain model 
     /// </summary>
-    public class AdoClaimsIdentity : SanteDBClaimsIdentity, IIdentity, ISession, IClaimsIdentity
+    public class AdoClaimsIdentity : SanteDBClaimsIdentity, IIdentity, IClaimsIdentity
     {
         // Trace source
         private static Tracer s_traceSource = new Tracer(AdoDataConstants.IdentityTraceSourceName);
@@ -62,11 +62,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
         private DbSecurityUser m_securityUser;
         // The authentication type
         private String m_authenticationType;
-        private ISession m_session;
-        // Issued on
-        private DateTimeOffset m_issuedOn = DateTimeOffset.Now;
-        // Expiration time
-        private DateTimeOffset? m_expires = null;
+        
         // Roles
         private List<DbSecurityRole> m_roles = null;
 
@@ -75,31 +71,6 @@ namespace SanteDB.Persistence.Data.ADO.Security
 
         // Security configuration section
         private static SecurityConfigurationSection s_securityConfiguration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
-
-        /// <summary>
-        /// Gets the internal session id
-        /// </summary>
-        internal byte[] SessionToken { get { return this.m_session?.Id; } }
-        
-        /// <summary>
-        /// Gets the identifier of the session
-        /// </summary>
-        byte[] ISession.Id { get { return this.SessionToken; } }
-
-        /// <summary>
-        /// Gets the 
-        /// </summary>
-        public byte[] RefreshToken { get { return this.m_session?.RefreshToken; } }
-
-        /// <summary>
-        /// Gets the time of issuance
-        /// </summary>
-        public DateTimeOffset NotBefore { get { return this.m_issuedOn; } }
-
-        /// <summary>
-        /// Gets the time of issuance
-        /// </summary>
-        public DateTimeOffset NotAfter { get { return this.m_expires ?? this.m_issuedOn.AddMinutes(30); } }
 
         /// <summary>
         /// Creates a principal based on username and password
@@ -124,7 +95,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
                     var hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
                     var passwordHash = hashingService.ComputeHash(password);
-                    var fnResult = dataContext.FirstOrDefault<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr", userName, passwordHash, s_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.MaxInvalidLogins, 5));
+                    var fnResult = dataContext.FirstOrDefault<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr", userName, passwordHash, s_securityConfiguration?.GetSecurityPolicy(SecurityPolicyIdentification.MaxInvalidLogins, 5) ?? 5);
 
 	                var user = fnResult.Object1;
 
@@ -185,7 +156,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
         /// <summary>
         /// Create a claims identity from a data context user
         /// </summary>
-        internal static AdoClaimsIdentity Create(DbSecurityUser user, bool isAuthenticated = false, String authenticationMethod = null, ISession session = null)
+        internal static AdoClaimsIdentity Create(DbSecurityUser user, bool isAuthenticated = false, String authenticationMethod = null)
         {
 
             var roles = user.Context.Query<DbSecurityRole>(user.Context.CreateSqlStatement<DbSecurityRole>().SelectFrom()
@@ -194,10 +165,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
             
             return new AdoClaimsIdentity(user, roles, isAuthenticated)
             {
-                m_authenticationType = authenticationMethod,
-                m_issuedOn = session?.NotBefore ?? DateTimeOffset.Now,
-                m_expires = session?.NotAfter ?? DateTimeOffset.Now.AddMinutes(10),
-                m_session = session
+                m_authenticationType = authenticationMethod
             };
 
 
@@ -256,11 +224,6 @@ namespace SanteDB.Persistence.Data.ADO.Security
         }
 
         /// <summary>
-        /// Get claims
-        /// </summary>
-        IClaim[] ISession.Claims => this.Claims.ToArray();
-
-        /// <summary>
         /// Create an authorization context
         /// </summary>
         public IClaimsPrincipal CreateClaimsPrincipal(IEnumerable<IClaimsIdentity> otherIdentities = null)
@@ -277,9 +240,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
                     
                 )
                 {
-                    new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, this.NotBefore.ToString("o")), // TODO: Fix this
                     new SanteDBClaim(SanteDBClaimTypes.AuthenticationMethod, this.m_authenticationType ?? "LOCAL"),
-                    new SanteDBClaim(SanteDBClaimTypes.Expiration, this.NotAfter.ToString("o")), // TODO: Move this to configuration
                     new SanteDBClaim(SanteDBClaimTypes.Sid, this.m_securityUser.Key.ToString()),
                     new SanteDBClaim(SanteDBClaimTypes.NameIdentifier, this.m_securityUser.Key.ToString()),
                     new SanteDBClaim(SanteDBClaimTypes.Actor, this.m_securityUser.UserClass.ToString()),
@@ -299,11 +260,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
                 if (this.m_securityUser.PhoneNumber != null)
                     claims.Add(new SanteDBClaim(SanteDBClaimTypes.Telephone, this.m_securityUser.PhoneNumber));
 
-                if (this.SessionToken != null) {
-                    claims.Add(new SanteDBClaim(SanteDBClaimTypes.IsPersistent, "true"));
-                    claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, (this.m_session as AdoSecuritySession)?.Key.ToString() ?? BitConverter.ToString(this.SessionToken).Replace("-","")));
-                }
-
+              
                 this.AddClaims(claims);
 
                 var identities = new IClaimsIdentity[] { this };

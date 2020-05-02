@@ -20,8 +20,10 @@
 using RestSrvr;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Services;
 using System;
 using System.IdentityModel.Tokens;
+using System.Linq;
 using System.Security;
 using System.Security.Cryptography.X509Certificates;
 
@@ -38,9 +40,17 @@ namespace SanteDB.Core.Security
         /// <summary>
         /// Create signing credentials
         /// </summary>
-        public static SigningCredentials CreateSigningCredentials(SecuritySignatureConfiguration configuration)
+        /// <param name="keyName">The name of the key to use in the configuration, or null to use a default key</param>
+        public static SigningCredentials CreateSigningCredentials(string keyName)
         {
+            var configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>().Signatures.FirstOrDefault(o => o.KeyName == keyName);
+            // No configuration found for this key
+            if (configuration == null)
+                return null;
+
+            // No specific configuration for the key name is found?
             SigningCredentials retVal = null;
+
             // Signing credentials
             switch (configuration.Algorithm)
             {
@@ -61,13 +71,11 @@ namespace SanteDB.Core.Security
                     retVal = new X509SigningCredentials(cert, new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("name", configuration.KeyName ?? "0")), signingAlgorithm, digestAlgorithm);
                     break;
                 case SignatureAlgorithm.HS256:
-
-                    // If HS256 is used then the client_secret should be used as the secret
-                    object secret = configuration.Secret;
-                    if (((byte[])secret).Length < 16) // HACK: Requires 128 BIT key
-                        secret = configuration.Secret;
+                    byte[] secret = configuration.Secret.ToArray();
+                    while (secret.Length < 16)
+                        secret = secret.Concat(secret).ToArray();
                     retVal = new SigningCredentials(
-                        new InMemorySymmetricSecurityKey((byte[])secret),
+                        new InMemorySymmetricSecurityKey(secret),
                         "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256",
                         "http://www.w3.org/2001/04/xmlenc#sha256",
                         new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("name", configuration.KeyName ?? "0"))

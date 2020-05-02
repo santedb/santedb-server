@@ -28,7 +28,7 @@ namespace SanteDB.Core.Security
         /// </summary>
         public byte[] SignData(byte[] data, string keyId = null)
         {
-            var credentials = SecurityUtils.CreateSigningCredentials(this.m_configuration.Signatures.FirstOrDefault(o=>o.KeyName == keyId || keyId == null));
+            var credentials = SecurityUtils.CreateSigningCredentials(keyId);
             using (var signatureProvider = new SignatureProviderFactory().CreateForSigning(credentials.SigningKey, credentials.SignatureAlgorithm))
                 return signatureProvider.Sign(data);
         }
@@ -38,9 +38,17 @@ namespace SanteDB.Core.Security
         /// </summary>
         public bool Verify(byte[] data, byte[] signature, string keyId = null)
         {
-            var credentials = SecurityUtils.CreateSigningCredentials(this.m_configuration.Signatures.FirstOrDefault(o => o.KeyName == keyId || keyId == null));
+            var credentials = SecurityUtils.CreateSigningCredentials(keyId);
             using (var signatureProvider = new SignatureProviderFactory().CreateForVerifying(credentials.SigningKey, credentials.SignatureAlgorithm))
                 return signatureProvider.Verify(data, signature);
+        }
+
+        /// <summary>
+        /// Get the specified signature algorithm
+        /// </summary>
+        public string GetSignatureAlgorithm(string keyId = null)
+        {
+            return SecurityUtils.CreateSigningCredentials(keyId)?.SignatureAlgorithm;
         }
     }
 }

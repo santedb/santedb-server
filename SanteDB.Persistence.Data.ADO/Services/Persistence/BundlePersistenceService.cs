@@ -188,7 +188,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 catch (TargetInvocationException e)
                 {
                     this.m_tracer.TraceEvent(EventLevel.Error,  "Error inserting bundle: {0}", e);
-                    throw e.InnerException;
+                    throw new Exception($"Error inserting bundle at item #{i}", e.InnerException);
                 }
                 catch(DetectedIssueException e)
                 {

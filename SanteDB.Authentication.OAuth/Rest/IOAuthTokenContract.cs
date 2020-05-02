@@ -64,14 +64,14 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <summary>
         /// Post to the authorization handler
         /// </summary>
-        [Post("/ui/{*content}")]
+        [Post("/authorize/{*content}")]
         Stream SelfPost(string content, NameValueCollection authorization);
 
         /// <summary>
         /// Gets the 
         /// </summary>
         /// <returns></returns>
-        [Get("/ui/{*content}")]
+        [Get("/authorize/{*content}")]
         Stream RenderAsset(string content);
 
         /// <summary>

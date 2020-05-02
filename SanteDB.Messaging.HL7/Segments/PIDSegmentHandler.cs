@@ -460,16 +460,26 @@ namespace SanteDB.Messaging.HL7.Segments
                     fieldNo = 23;
                 if (!pidSegment.BirthPlace.IsEmpty()) // We need to find the birthplace relationship
                 {
+                    var existing = retVal.Relationships.FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Birthplace);
+
                     Guid birthPlaceId = Guid.Empty;
                     if (Guid.TryParse(pidSegment.BirthPlace.Value, out birthPlaceId))
                     {
-                        retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Birthplace, birthPlaceId));
+                        if (existing == null)
+                            retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Birthplace, birthPlaceId));
+                        else
+                            existing.TargetEntityKey = birthPlaceId;
                     }
                     else
                     {
                         var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Names.Any(n => n.Component.Any(c => c.Value == pidSegment.BirthPlace.Value)), AuthenticationContext.SystemPrincipal);
                         if (places.Count() == 1)
-                            retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Birthplace, places.First().Key));
+                        {
+                            if (existing == null)
+                                retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Birthplace, places.First().Key));
+                            else
+                                existing.TargetEntityKey = places.First().Key;
+                        }
                         else
                             throw new KeyNotFoundException($"Cannot find unique birth place registration with name {pidSegment.BirthPlace.Value}. Try using UUID.");
                     }

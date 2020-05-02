@@ -11,6 +11,16 @@ BEGIN TRANSACTION ;
 -- ASSIGNED ENTITY
 INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc) VALUES ('1373ff04-a6ef-420a-b1d0-4a07465fe8e8', '455f1772-f580-47e8-86bd-b5ce25d351f9', 'FF34DFA7-C6D3-4F8B-BC9F-14BCDC13BA6C', 'Device=[DedicatedServiceDeliveryLocation]=>ServiceDeliveryLocation'); 
 INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc) VALUES ('1373ff04-a6ef-420a-b1d0-4a07465fe8e8', '77b7a04b-c065-4faf-8ec0-2cdad4ae372b', '9de2a846-ddf2-4ebc-902e-84508c5089ea', 'Device=[AssignedEntity]=>Person'); 
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','9de2a846-ddf2-4ebc-902e-84508c5089ea','79DD4F75-68E8-4722-A7F5-8BC2E08F5CD6', 'Person ==[Birthplace]==> CityOrTown');
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','9de2a846-ddf2-4ebc-902e-84508c5089ea','48B2FFB3-07DB-47BA-AD73-FC8FB8502471', 'Person ==[Birthplace]==> Country');
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','9de2a846-ddf2-4ebc-902e-84508c5089ea','D9489D56-DDAC-4596-B5C6-8F41D73D8DC5', 'Person ==[Birthplace]==> CountyOrParish');
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','9de2a846-ddf2-4ebc-902e-84508c5089ea','8CF4B0B0-84E5-4122-85FE-6AFA8240C218', 'Person ==[Birthplace]==> State');
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','bacd9c6f-3fa9-481e-9636-37457962804d','79DD4F75-68E8-4722-A7F5-8BC2E08F5CD6', 'Patient ==[Birthplace]==> CityOrTown');
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','bacd9c6f-3fa9-481e-9636-37457962804d','48B2FFB3-07DB-47BA-AD73-FC8FB8502471', 'Patient ==[Birthplace]==> Country');
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','bacd9c6f-3fa9-481e-9636-37457962804d','D9489D56-DDAC-4596-B5C6-8F41D73D8DC5', 'Patient ==[Birthplace]==> CountyOrParish');
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','bacd9c6f-3fa9-481e-9636-37457962804d','8CF4B0B0-84E5-4122-85FE-6AFA8240C218', 'Patient ==[Birthplace]==> State');
+
+
 ALTER TABLE ASGN_AUT_TBL ADD POL_ID UUID;
 ALTER TABLE ASGN_AUT_TBL ADD UPD_UTC TIMESTAMPTZ;
 ALTER TABLE ASGN_AUT_TBL ADD UPD_PROV_ID UUID;

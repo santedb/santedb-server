@@ -125,6 +125,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     try
                     {
                         clientPrincipal = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>().Authenticate(client_identity, client_secret);
+                        RestOperationContext.Current.Data.Add("symm_secret", client_secret);
                     }
                     catch (Exception e)
                     {
@@ -345,19 +346,42 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
 
             // System claims
-            List<IClaim> claims = session.Claims.ToList() ;
-            
+            List<IClaim> claims = session.Claims.ToList();
+
             // Add JTI
-            claims.Add(new SanteDBClaim("jti", BitConverter.ToString(session.Id).Replace("-","")));
+            claims.Add(new SanteDBClaim("jti", BitConverter.ToString(session.Id).Replace("-", "")));
             claims.Add(new SanteDBClaim("iat", (session.NotBefore - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds.ToString()));
             claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
             claims.Add(new SanteDBClaim("exp", (session.NotAfter - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds.ToString()));
             claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
-            SigningCredentials credentials = SecurityUtils.CreateSigningCredentials(this.m_masterConfig.Signatures.FirstOrDefault());
+
+            // Creates signing credentials for the specified application key
+            var appid = claims.Find(o => o.Type == SanteDBClaimTypes.SanteDBApplicationIdentifierClaim).Value;
+            var signingCredentials = SecurityUtils.CreateSigningCredentials(appid);
+
+            // Was there a signing credentials provided for this application? If so, then create for default
+            if(signingCredentials == null)
+                signingCredentials = SecurityUtils.CreateSigningCredentials(null); // attempt to get default
+
+            // Is the default an HMAC256 key? 
+            if ((signingCredentials == null ||
+                signingCredentials.SignatureAlgorithm == "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256") &&
+                RestOperationContext.Current.Data.TryGetValue("symm_secret", out object clientSecret)) // OPENID States we should use the application client secret to sign the result , we can only do this if we actually have a symm_secret set
+            {
+                var secret = Encoding.UTF8.GetBytes(clientSecret.ToString());
+                while (secret.Length < 16)
+                    secret = secret.Concat(secret).ToArray();
+                signingCredentials = new SigningCredentials(
+                        new InMemorySymmetricSecurityKey((byte[])secret),
+                        "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256",
+                        "http://www.w3.org/2001/04/xmlenc#sha256",
+                        new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("name", appid))
+                    );
+            }
 
             // Generate security token            
             var jwt = new JwtSecurityToken(
-                signingCredentials: credentials,
+                signingCredentials: signingCredentials,
                 claims: claims.Select(o => new System.Security.Claims.Claim(o.Type, o.Value)),
                 issuer: this.m_configuration.IssuerName,
                 notBefore: session.NotBefore.DateTime,
@@ -393,10 +417,10 @@ namespace SanteDB.Authentication.OAuth2.Rest
             ISessionProviderService isp = ApplicationServiceContext.Current.GetService<ISessionProviderService>();
             var scopeList = scope == "*" ? null : scope.Split(' ');
             string purposeOfUse = additionalClaims?.FirstOrDefault(o => o.Type == SanteDBClaimTypes.PurposeOfUse)?.Value;
-            bool isOverride = additionalClaims?.Any(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim) == true || scopeList?.Any(o=>o == PermissionPolicyIdentifiers.OverridePolicyPermission) == true;
+            bool isOverride = additionalClaims?.Any(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim) == true || scopeList?.Any(o => o == PermissionPolicyIdentifiers.OverridePolicyPermission) == true;
 
             var session = isp.Establish(new SanteDBClaimsPrincipal(claimsPrincipal.Identities), remoteIp, isOverride, purposeOfUse, scopeList);
-            
+
             string refreshToken = null, sessionId = null;
             if (session != null)
             {
@@ -782,7 +806,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 // Now get the settings
                 retVal.Issuer = this.m_configuration.IssuerName;
                 retVal.TokenEndpoint = $"{boundHostPort}/oauth2_token";
-                retVal.AuthorizationEndpoint = $"{boundHostPort}/ui/";
+                retVal.AuthorizationEndpoint = $"{boundHostPort}/authorize/";
                 retVal.UserInfoEndpoint = $"{boundHostPort}/userinfo";
                 retVal.GrantTypesSupported = new List<string>() { "client_credentials", "password", "authorization_code" };
                 retVal.IdTokenSigning = securityConfiguration.Signatures.Select(o => o.Algorithm).Distinct().Select(o => o.ToString()).ToList();

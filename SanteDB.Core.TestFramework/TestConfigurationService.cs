@@ -67,10 +67,23 @@ namespace SanteDB.Core.TestFramework
         /// </summary>
         public ConnectionString GetConnectionString(string key)
         {
-            var cs = ConfigurationManager.ConnectionStrings[key];
-            if (cs != null)
-                return new ConnectionString(cs.ProviderName, cs.ConnectionString);
-            return null;
+            // Use configuration setting 
+            ConnectionString retVal = null;
+            try
+            {
+                retVal = this.Configuration.GetSection<DataConfigurationSection>()?.ConnectionString.Find(o => o.Name == key);
+            }
+            catch { }
+
+            if (retVal == null)
+            {
+                var cs = this.m_configuration.ConnectionStrings.ConnectionStrings[key];
+                if (cs != null)
+                {
+                    return new ConnectionString(cs.ProviderName, cs.ConnectionString);
+                }
+            }
+            return retVal;
         }
 
         /// <summary>

@@ -56,6 +56,27 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public string ServiceName => "ADO.NET Session Storage Provider";
 
+        private String[] m_nonSessionClaims = {
+            SanteDBClaimTypes.Actor,
+            SanteDBClaimTypes.AuthenticationInstant,
+            SanteDBClaimTypes.AuthenticationMethod,
+            SanteDBClaimTypes.AuthenticationType,
+            SanteDBClaimTypes.DefaultNameClaimType,
+            SanteDBClaimTypes.DefaultRoleClaimType,
+            SanteDBClaimTypes.Email,
+            SanteDBClaimTypes.Expiration,
+            SanteDBClaimTypes.IsPersistent,
+            SanteDBClaimTypes.Name,
+            SanteDBClaimTypes.NameIdentifier,
+            SanteDBClaimTypes.SanteDBApplicationIdentifierClaim,
+            SanteDBClaimTypes.SanteDBDeviceIdentifierClaim,
+            SanteDBClaimTypes.SanteDBOTAuthCode,
+            SanteDBClaimTypes.SanteDBSessionIdClaim,
+            SanteDBClaimTypes.Sid,
+            SanteDBClaimTypes.SubjectId,
+            SanteDBClaimTypes.Telephone
+        };
+
         // Sync lock
         private Object m_syncLock = new object();
 
@@ -123,7 +144,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open();
-                    using (var tx = context.Connection.BeginTransaction())
+                    using (var tx = context.BeginTransaction())
                     {
                         var refreshToken = this.CreateRefreshToken();
 
@@ -193,7 +214,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         }
 
                         // Claims?
-                        foreach (var clm in claims)
+                        foreach (var clm in claims.Where(o=>!m_nonSessionClaims.Contains(o.Type)))
                             context.Insert(new DbSessionClaim()
                             {
                                 SessionKey = dbSession.Key,

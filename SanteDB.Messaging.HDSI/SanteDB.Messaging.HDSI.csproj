@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SanteDB.Messaging.HDSI</RootNamespace>
     <AssemblyName>SanteDB.Messaging.HDSI</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -96,12 +96,12 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="1.128.0.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="1.128.0.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="1.128.0.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="1.128.0.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="1.128.0.0" />
-        <PackageReference Include="SanteDB.Rest.HDSI" Version="1.128.0.0" />
+        <PackageReference Include="RestSrvr" Version="2.0.0.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.0.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.0.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.0.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.0.0" />
+        <PackageReference Include="SanteDB.Rest.HDSI" Version="2.0.0.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
