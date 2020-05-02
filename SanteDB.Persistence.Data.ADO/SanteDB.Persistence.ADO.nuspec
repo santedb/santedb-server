@@ -3,7 +3,7 @@
   <metadata>
     <id>SanteDB.Server.Plugin.Data</id>
     <version>2.0.0.0</version>
-    <title>SanteDB Server Plugin Database Support</title>
+    <title>SanteDB Server Database Support</title>
     <authors>SanteDB Community</authors>
     <owners>santedb.org</owners>
     <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
@@ -12,7 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>SanteDB Server assemblies for plugin development using base ADO persistence services. These are particularly useful if you need to store new types of information</description>
     <releaseNotes>Initial release of assemblies</releaseNotes>
-    <copyright>Copyright (C) 2018, Mohawk College of Applied Arts and Technology</copyright>
+    <copyright>Copyright (C) 2015-2020 SanteSuite Contributors (See: NOTICES)</copyright>
     <tags>cdr santedb server ado</tags>
     <dependencies>
       <dependency id="SanteDB.Server.Plugin" version="2.0.0.0" />

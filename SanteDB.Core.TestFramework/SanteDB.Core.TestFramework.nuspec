@@ -3,16 +3,16 @@
   <metadata>
     <id>SanteDB.Server.TestFramework</id>
     <version>2.0.0.0</version>
-    <title>SanteDB Server Plugin Unit Test Data Tests Core</title>
+    <title>SanteDB Server Plugin Unit Test Tooling</title>
     <authors>SanteDB Community</authors>
     <owners>santedb.org</owners>
     <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <projectUrl>http://santedb.org</projectUrl>
     <iconUrl>http://santedb.org/img/logo.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>SanteDB Server assemblies for plugin which need to unit test with ADO persistence services</description>
+    <description>Provides a fake server environment which can be used within Visual Studio unit tests</description>
     <releaseNotes>Initial release of assemblies</releaseNotes>
-    <copyright>Copyright (C) 2018, Mohawk College of Applied Arts and Technology</copyright>
+    <copyright>Copyright (C) 2015-2020 SanteSuite Contributors (See: NOTICES)</copyright>
     <tags>cdr santedb server ado</tags>
     <contentFiles>
       <files include="TestConfig.xml" buildAction="EmbeddedResource"/>

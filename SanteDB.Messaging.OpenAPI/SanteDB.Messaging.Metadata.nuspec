@@ -10,9 +10,9 @@
     <projectUrl>http://santedb.org</projectUrl>
     <iconUrl>http://santedb.org/img/logo.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>SanteDB OpenAPI / Swagger 2.0 metadata generation assemblies</description>
+    <description>Exposes all interfaces registered with the SanteDB Execution service via Swagger 2.0</description>
     <releaseNotes>Initial release of assemblies</releaseNotes>
-    <copyright>Copyright (C) 2019 - 2020, Fyfe Software Inc.</copyright>
+    <copyright>Copyright (C) 2019-2020 SanteSuite Contributors (See: NOTICES)</copyright>
     <tags>cdr santedb openapi</tags>
     <dependencies>
       <dependency id="SanteDB.Core.Api" version="2.0.0.0" />

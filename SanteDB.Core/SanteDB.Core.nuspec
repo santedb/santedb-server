@@ -10,12 +10,12 @@
     <projectUrl>http://santedb.org</projectUrl>
     <iconUrl>http://santedb.org/img/logo.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>SanteDB Server Core assemblies used for plugin development</description>
+    <description>Allows developers to write plugins in .NET for the SanteDB Server infrastructure (not on Disconnected Client infrastructure). This is useful whenever a developer wishes to extend the default functionality of the SanteDB server</description>
     <releaseNotes></releaseNotes>
-    <copyright>Copyright (C) 2018, Mohawk College of Applied Arts and Technology</copyright>
+    <copyright>Copyright (C) 2015-2020 SanteSuite Contributors (See: NOTICES)</copyright>
     <tags>cdr santedb server</tags>
     <dependencies>
-      <dependency id="AtnaApi" version="1.1.1.0" />
+      <dependency id="AtnaApi" version="1.1.4.0" />
       <dependency id="SanteDB.Core.Api" version="2.0.0.0" />
       <dependency id="SanteDB.Core.Model" version="2.0.0.0" />
       <dependency id="SanteDB.OrmLite" version="2.0.0.0"/>

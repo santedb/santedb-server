@@ -10,9 +10,8 @@
     <projectUrl>http://santedb.org</projectUrl>
     <iconUrl>http://santedb.org/img/logo.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>SanteDB assemblies for HL7 v2.5</description>
-    <releaseNotes>Initial release of assemblies</releaseNotes>
-    <copyright>Copyright (C) 2018, Mohawk College of Applied Arts and Technology</copyright>
+    <description>Allows SanteDB to communicate with third party systems using HL7v2.3.1 and HL7v2.5</description>
+    <copyright>Copyright (C) 2015-2020 SanteSuite Contributors (See: NOTICES)</copyright>
     <tags>cdr santedb hl7</tags>
     <dependencies>
       <dependency id="SanteDB.Core.Api" version="2.0.0.0" />

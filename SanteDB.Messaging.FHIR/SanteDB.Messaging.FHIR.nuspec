@@ -10,14 +10,14 @@
     <projectUrl>http://santedb.org</projectUrl>
     <iconUrl>http://santedb.org/img/logo.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>SanteDB assemblies for HL7 FHIR</description>
+    <description>Allows SanteDB to communicate with external services using the HL7 FHIR R4 REST services.</description>
     <releaseNotes>Initial release of assemblies</releaseNotes>
-    <copyright>Copyright (C) 2018, Mohawk College of Applied Arts and Technology</copyright>
+    <copyright>Copyright (C) 2015-2020 SanteSuite Contributors (See: NOTICES)</copyright>
     <tags>cdr santedb fhir</tags>
     <dependencies>
       <dependency id="SanteDB.Core.Api" version="2.0.0.0" />
       <dependency id="SanteDB.Core.Model" version="2.0.0.0" />
-      <dependency id="Hl7.Fhir.STU3" version="0.96.0" />
+      <dependency id="Hl7.Fhir.R4" version="1.4.0" />
       <dependency id="Newtonsoft.Json" version="11.02.0" />
       <dependency id="Restsrvr" version="2.0.0.0" />
       <dependency id="SanteDB.Rest.Common" version="2.0.0.0" />
