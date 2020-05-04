@@ -188,8 +188,10 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 						var message = MessageUtils.ParseMessage(messageString, out originalVersion);
 						messageArgs = new Hl7MessageReceivedEventArgs(message, localEndpoint, remoteEndpoint, DateTime.Now);
 
-						// Call any bound event handlers that there is a message available
-						OnMessageReceived(messageArgs);
+                        HL7OperationContext.Current = new HL7OperationContext(messageArgs);
+
+                        // Call any bound event handlers that there is a message available
+                        OnMessageReceived(messageArgs);
 					}
 					finally
 					{
@@ -226,8 +228,10 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 			{
 				stream.Close();
 				tcpClient.Close();
-			}
-		}
+                HL7OperationContext.Current = null;
+
+            }
+        }
 
 		/// <summary>
 		/// Message received

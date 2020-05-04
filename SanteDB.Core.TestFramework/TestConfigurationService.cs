@@ -31,19 +31,18 @@ namespace SanteDB.Core.TestFramework
         /// </summary>
         public TestConfigurationService()
         {
-            try
+            var asm = TestApplicationContext.TestAssembly;
+            var asmRsn = asm?.GetManifestResourceNames().FirstOrDefault(o => o.EndsWith("TestConfig.xml"));
+            if (String.IsNullOrEmpty(asmRsn))
             {
-                var asm = TestApplicationContext.TestAssembly;
-                var asmRsn = asm.GetManifestResourceNames().FirstOrDefault(o => o.EndsWith("TestConfig.xml"));
-                if (String.IsNullOrEmpty(asmRsn))
-                {
-                    asm = typeof(TestConfigurationService).Assembly;
-                    asmRsn = asm.GetManifestResourceNames().FirstOrDefault(o => o.EndsWith("TestConfig.xml"));
-                }
-                using (var s = asm.GetManifestResourceStream(asmRsn))
-                    this.Configuration = SanteDBConfiguration.Load(s);
+                asm = typeof(TestConfigurationService).Assembly;
+                asmRsn = asm.GetManifestResourceNames().FirstOrDefault(o => o.EndsWith("TestConfig.xml"));
             }
-            catch { }
+            using (var s = asm.GetManifestResourceStream(asmRsn))
+                this.Configuration = SanteDBConfiguration.Load(s);
+
+            if (this.Configuration == null)
+                throw new InvalidOperationException("Could not load test configuration. Ensure that TestConfig.xml is in your project and set as an EmbeddedResource");
         }
 
         /// <summary>

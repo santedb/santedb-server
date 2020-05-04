@@ -45,7 +45,7 @@ namespace SanteDB.Core
     /// </summary>
     /// <remarks>Allows components to be communicate with each other via a loosely coupled
     /// broker system.</remarks>
-    public class ApplicationContext : IServiceProvider, IServiceManager, IDisposable, IApplicationServiceContext, IRemoteEndpointResolver, IPolicyEnforcementService
+    public class ApplicationContext : IServiceProvider, IServiceManager, IDisposable, IApplicationServiceContext, IPolicyEnforcementService
     {
 
         // Lock object
@@ -216,7 +216,6 @@ namespace SanteDB.Core
 #endif
                         // Add this
                         this.m_serviceInstances.Add(this);
-                    this.m_serviceInstances.Add(new AuditMetadataProvider());
                     Trace.TraceInformation("STAGE1 START: Loading services");
 
                     foreach (var svc in this.m_configuration.ServiceProviders)
@@ -388,26 +387,7 @@ namespace SanteDB.Core
                 .SelectMany(a => { try { return a.ExportedTypes; } catch { return new List<Type>(); } });
         }
 
-        /// <summary>
-        /// Gets the remote endpoint of the current request
-        /// </summary>
-        public string GetRemoteEndpoint()
-        {
-            if (RestOperationContext.Current?.IncomingRequest?.Headers["X-Forwarded-For"] != null)
-                return RestOperationContext.Current?.IncomingRequest?.Headers["X-Forwarded-For"];
-            return RestOperationContext.Current?.IncomingRequest?.RemoteEndPoint?.ToString();
-        }
-
-        /// <summary>
-        /// Gets the remote request URL
-        /// </summary>
-        /// <returns></returns>
-        public string GetRemoteRequestUrl()
-        {
-            return RestOperationContext.Current?.IncomingRequest?.Url?.ToString();
-        }
-
-
+      
         /// <summary>
         /// Demand the policy
         /// </summary>

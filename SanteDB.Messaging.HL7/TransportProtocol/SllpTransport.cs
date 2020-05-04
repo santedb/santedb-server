@@ -261,10 +261,13 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 
 						messageArgs = new AuthenticatedHl7MessageReceivedEventArgs(message, localEndpoint, remoteEndpoint, DateTime.Now, stream.RemoteCertificate.GetPublicKey());
 
+                        HL7OperationContext.Current = new HL7OperationContext(messageArgs);
+
 						// Call any bound event handlers that there is a message available
 						OnMessageReceived(messageArgs);
-					}
-					finally
+
+                    }
+                    finally
 					{
 						// Send the response back
 						using (MemoryStream memoryWriter = new MemoryStream())
@@ -289,7 +292,8 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 						}
 
 						lastReceive = DateTime.Now; // Update the last receive time so the timeout function works
-					}
+
+                    }
 				}
 			}
 			catch (AuthenticationException e)
@@ -340,8 +344,10 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 			{
 				stream.Close();
 				tcpClient.Close();
-			}
-		}
+                HL7OperationContext.Current = null;
+
+            }
+        }
         
 	}
 }

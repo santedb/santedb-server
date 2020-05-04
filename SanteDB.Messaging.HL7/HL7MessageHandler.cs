@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using SanteDB.Core;
+using SanteDB.Core.Api.Security;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Model.Entities;
@@ -65,6 +66,25 @@ namespace SanteDB.Messaging.HL7
 
         // Interceptors
         private List<InterceptorBase> m_interceptors = new List<InterceptorBase>();
+
+
+        /// <summary>
+        /// Retrieve the remote endpoint information
+        /// </summary>
+        /// <returns></returns>
+        public RemoteEndpointInfo GetRemoteEndpointInfo()
+        {
+            if (HL7OperationContext.Current == null) return null;
+            else
+            {
+                return new RemoteEndpointInfo()
+                {
+                    OriginalRequestUrl = HL7OperationContext.Current.LocalEndpoint.ToString(),
+                    RemoteAddress = HL7OperationContext.Current?.RemoteEndpoint.ToString(),
+                    CorrelationToken = HL7OperationContext.Current?.Uuid.ToString()
+                };
+            }
+        }
 
         /// <summary>
         /// Start the v2 message handler

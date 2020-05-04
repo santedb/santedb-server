@@ -23,7 +23,7 @@
             <label for="hl7Facility" class="col-md-2 col-xs-12 control-label">{{ 'ui.config.hl7.place.label' | i18n }}</label>
             <div class="col-md-10 col-xs-12">
 
-                <entity-search type="Place" style="height:3em;" class="form-control" name="hl7Facility" ng-model="hl7Config.facility" filter='{ "statusConcept.mnemonic" : "ACTIVE", "classConcept.mnemonic" : "ServiceDeliveryLocation" }'
+                <entity-search type="'Place'" style="height:3em;" class="form-control" name="hl7Facility" ng-model="hl7Config.facility" filter='{ "statusConcept.mnemonic" : "ACTIVE", "classConcept.mnemonic" : "ServiceDeliveryLocation" }'
                 />
                 <div class="form-text text-muted">
                     {{ 'ui.config.hl7.place.help' | i18n }}

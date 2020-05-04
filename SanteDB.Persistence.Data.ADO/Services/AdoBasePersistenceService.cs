@@ -859,7 +859,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         protected void FireRetrieved(DataRetrievedEventArgs<TData> e)
         {
-            this.Retrieved?.Invoke(this, e);
+            if(e.Data != null)
+                this.Retrieved?.Invoke(this, e);
         }
 
         /// <summary>

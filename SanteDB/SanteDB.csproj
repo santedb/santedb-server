@@ -61,6 +61,9 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.7.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -309,33 +312,43 @@
           <Project>{20960967-3647-41a2-9df6-3e15e2aa7019}</Project>
           <Name>SanteDB.Persistence.MDM</Name>
         </ProjectReference>
+		<ProjectReference Include="..\santedb-restsvc\SanteDB.Core.Model.ViewModelSerializers\SanteDB.Core.Model.ViewModelSerializers.csproj">
+		  <Project>{ece9b280-9647-4092-babf-eb2e25084670}</Project>
+		  <Name>SanteDB.Core.Model.ViewModelSerializers</Name>
+		</ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.BI" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.Rest.BIS" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.Cdss.Xml" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.Matcher" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.Matcher.Configuration.File" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.Core.Model.AMI" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.Core.Model.RISI" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.Rest.AMI" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.Rest.HDSI" Version="2.0.0.0" />
+        <PackageReference Include="RestSrvr" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.BI" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.Rest.BIS" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.Cdss.Xml" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.Matcher" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.Matcher.Configuration.File" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.Core.Model.AMI" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.Core.Model.RISI" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.Rest.AMI" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.Rest.HDSI" Version="2.0.1.0" />
+		<PackageReference Include="SanteDB.Core.Model.ViewModelSerializers" Version="2.0.1.0"/>
       </ItemGroup>
     </Otherwise>
   </Choose>
   <ItemGroup>
+	<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1"/>
     <ProjectReference Include="..\SanteDB.Authentication.OAuth\SanteDB.Authentication.OAuth2.csproj">
       <Project>{a3975c6f-4fdb-43be-81ab-3357b86173f1}</Project>
       <Name>SanteDB.Authentication.OAuth2</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Caching.Memory.Test\SanteDB.Caching.Memory.Test.csproj">
+      <Project>{b09a6d4c-862c-4b5b-9c05-4160ed7cca4a}</Project>
+      <Name>SanteDB.Caching.Memory.Test</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Caching.Memory\SanteDB.Caching.Memory.csproj">
       <Project>{8553abc7-abfa-4a21-b0e8-68b7de76129d}</Project>
@@ -356,6 +369,10 @@
     <ProjectReference Include="..\SanteDB.Core.Security.Tfa.Twilio\SanteDB.Core.Security.Tfa.Twilio.csproj">
       <Project>{5a60d6e2-72dd-478a-91a6-e928208ca1ba}</Project>
       <Name>SanteDB.Core.Security.Tfa.Twilio</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Core.TestFramework\SanteDB.Core.TestFramework.csproj">
+      <Project>{ad73db46-cbb3-4746-b406-40fc435ab3db}</Project>
+      <Name>SanteDB.Core.TestFramework</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
@@ -425,9 +442,17 @@
       <Project>{5e587d57-fbb9-4064-9444-47b40c4bad8f}</Project>
       <Name>SanteDB.Reporting.Jasper</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Tools.AdminConsole\SanteDB.Tools.AdminConsole.csproj">
+      <Project>{98c8b04a-82de-4eef-a0a0-bf098be53ee4}</Project>
+      <Name>SanteDB.Tools.AdminConsole</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Tools.DataQueryService\SanteDB.Tools.DataSandbox.csproj">
       <Project>{5660297c-6db6-45fe-bf1d-de254e35a5b3}</Project>
       <Name>SanteDB.Tools.DataSandbox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Tools.Debug\SanteDB.Tools.Debug.csproj">
+      <Project>{223d4d87-6819-4f38-ae69-a82e249e1879}</Project>
+      <Name>SanteDB.Tools.Debug</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Warehouse.ADO\SanteDB.Warehouse.ADO.csproj">
       <Project>{bfc58f38-9023-4700-b35c-aa933a608e43}</Project>

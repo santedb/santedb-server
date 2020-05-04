@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>SanteDB.Server.TestFramework</id>
-    <version>2.0.0.0</version>
+    <version>2.0.1.0</version>
     <title>SanteDB Server Plugin Unit Test Tooling</title>
     <authors>SanteDB Community</authors>
     <owners>santedb.org</owners>
@@ -18,26 +18,26 @@
       <files include="TestConfig.xml" buildAction="EmbeddedResource"/>
     </contentFiles>
     <dependencies>
-      <dependency id="SanteDB.Core.Api" version="2.0.0.0" />
-      <dependency id="SanteDB.Core.Model" version="2.0.0.0" />
-      <dependency id="SanteDB.OrmLite" version="2.0.0.0"/>
-      <dependency id="SanteDB.Server.Plugin" version="2.0.0.0"/>
-      <dependency id="SanteDB.Server.Plugin.Data" version="2.0.0.0"/>
-      <dependency id="FirebirdSql.Data.FirebirdClient" version="5.12.1"/>
+      <dependency id="SanteDB.Core.Api" version="2.0.1.0" />
+      <dependency id="SanteDB.Core.Model" version="2.0.1.0" />
+      <dependency id="SanteDB.OrmLite" version="2.0.1.0"/>
+      <dependency id="SanteDB.Server.Plugin" version="2.0.1.0"/>
+      <dependency id="SanteDB.Server.Plugin.Data" version="2.0.1.0"/>
+      <dependency id="FirebirdSql.Data.FirebirdClient" version="7.5.0"/>
     </dependencies>
   </metadata>
   <files>
-    <file src="..\Solution Items\santedb_test.fdb" target="build\net45"/>
-    <file src="SanteDB.Server.TestFramework.targets" target="build\net45"/>
-    <file src="..\bin\$configuration$\fbclient.dll" target="build\net45"/>
-    <file src="..\bin\$configuration$\firebird.conf" target="build\net45"/>
-    <file src="..\bin\$configuration$\firebird.msg" target="build\net45"/>
-    <file src="..\bin\$configuration$\ib_util.dll" target="build\net45"/>
-    <file src="..\bin\$configuration$\icudt52.dll" target="build\net45"/>
-    <file src="..\bin\$configuration$\icudt52l.dat" target="build\net45"/>
-    <file src="..\bin\$configuration$\icuin52.dll" target="build\net45"/>
-    <file src="..\bin\$configuration$\icuuc52.dll" target="build\net45"/>
-    <file src="..\bin\$configuration$\plugins\engine12.dll" target="build\net45\plugins"/>
+    <file src="..\Solution Items\santedb_test.fdb" target="build\net47"/>
+    <file src="SanteDB.Server.TestFramework.targets" target="build\net47"/>
+    <file src="..\bin\$configuration$\fbclient.dll" target="build\net47"/>
+    <file src="..\bin\$configuration$\firebird.conf" target="build\net47"/>
+    <file src="..\bin\$configuration$\firebird.msg" target="build\net47"/>
+    <file src="..\bin\$configuration$\ib_util.dll" target="build\net47"/>
+    <file src="..\bin\$configuration$\icudt52.dll" target="build\net47"/>
+    <file src="..\bin\$configuration$\icudt52l.dat" target="build\net47"/>
+    <file src="..\bin\$configuration$\icuin52.dll" target="build\net47"/>
+    <file src="..\bin\$configuration$\icuuc52.dll" target="build\net47"/>
+    <file src="..\bin\$configuration$\plugins\engine12.dll" target="build\net47\plugins"/>
   </files>
   <!-- TODO: Include FDB, FDB DLLS and App.Config -->
 </package>

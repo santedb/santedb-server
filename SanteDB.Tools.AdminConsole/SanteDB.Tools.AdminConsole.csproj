@@ -99,10 +99,6 @@
           <Project>{3A45F695-47A2-464C-ACE6-BDABBFA39FBC}</Project>
           <Name>SanteDB.Core.Api</Name>
         </ProjectReference>
-        <ProjectReference Include="..\santedb-applets\SanteDB.Core.Applets\SanteDB.Core.Applets.csproj">
-          <Project>{39E61451-F4FE-493D-B754-5F06EB284AAC}</Project>
-          <Name>SanteDB.Core.Applets</Name>
-        </ProjectReference>
         <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
           <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
           <Name>SanteDB.Core.Model</Name>
@@ -115,16 +111,19 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.0.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.0.0" />
+        <PackageReference Include="RestSrvr" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.1.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.1.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
-
   <ItemGroup>
+    <ProjectReference Include="..\santedb-applets\SanteDB.Core.Applets\SanteDB.Core.Applets.csproj">
+      <Project>{39e61451-f4fe-493d-b754-5f06eb284aac}</Project>
+      <Name>SanteDB.Core.Applets</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
       <Name>SanteDB.Core</Name>
@@ -132,10 +131,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="SanteDB.Messaging.AMI.Client">
-      <Version>2.0.0</Version>
+      <Version>2.0.1</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.Messaging.HDSI.Client">
-      <Version>2.0.0</Version>
+      <Version>2.0.1</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

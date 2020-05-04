@@ -20,6 +20,7 @@
 using RestSrvr;
 using RestSrvr.Attributes;
 using RestSrvr.Bindings;
+using SanteDB.Core.Api.Security;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interop;
@@ -39,6 +40,34 @@ namespace SanteDB.Core.Rest
     /// </summary>
     public class RestServiceFactory : IRestServiceFactory
     {
+        /// <summary>
+        /// Rest service factory
+        /// </summary>
+        public RestServiceFactory()
+        {
+            // Register a remote endpoint util that uses the RestOperationContext
+            RemoteEndpointUtil.Current.AddEndpointProvider(this.GetRemoteEndpointInfo);
+        }
+
+        /// <summary>
+        /// Retrieve the remote endpoint information
+        /// </summary>
+        /// <returns></returns>
+        public RemoteEndpointInfo GetRemoteEndpointInfo()
+        {
+            if (RestOperationContext.Current == null) return null;
+            else
+            {
+                var fwdHeader = RestOperationContext.Current?.IncomingRequest.Headers["X-Forwarded-For"];
+                return new RemoteEndpointInfo()
+                {
+                    OriginalRequestUrl = RestOperationContext.Current?.IncomingRequest.Url.ToString(),
+                    RemoteAddress = fwdHeader ?? RestOperationContext.Current?.IncomingRequest.RemoteEndPoint.Address.ToString(),
+                    CorrelationToken = RestOperationContext.Current?.Data["uuid"]?.ToString()
+                };
+            }
+        }
+
         /// <summary>
         /// Get capabilities
         /// </summary>

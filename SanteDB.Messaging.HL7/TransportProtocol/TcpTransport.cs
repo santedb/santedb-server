@@ -164,8 +164,9 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 				Uri localEndpoint = new Uri(String.Format("tcp://{0}:{1}", localEp.Address, localEp.Port));
 				Uri remoteEndpoint = new Uri(String.Format("tcp://{0}:{1}", remoteEp.Address, remoteEp.Port));
 				var messageArgs = new Hl7MessageReceivedEventArgs(message, localEndpoint, remoteEndpoint, DateTime.Now);
+                HL7OperationContext.Current = new HL7OperationContext(messageArgs);
 
-				this.MessageReceived(this, messageArgs);
+                this.MessageReceived(this, messageArgs);
 
 				// Send the response back
 				StreamWriter writer = new StreamWriter(stream);
@@ -183,8 +184,10 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 			finally
 			{
 				stream.Close();
-			}
-		}
+                HL7OperationContext.Current = null;
+
+            }
+        }
 
 		#endregion ITransportProtocol Members
 
