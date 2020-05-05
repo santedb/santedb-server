@@ -40,6 +40,7 @@ namespace SanteDB.Core.Security
             base(name, isAuthenticated, "SYSTEM")
 		{
 			this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Sid, sid.ToString()));
+			this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim, sid.ToString()));
 		}
 
 	

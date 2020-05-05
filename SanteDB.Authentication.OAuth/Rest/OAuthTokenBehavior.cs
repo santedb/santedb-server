@@ -197,7 +197,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         else
                             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService, devicePrincipal).Demand();
 
-                        principal = clientPrincipal;
+                        principal = devicePrincipal;
                         // Demand "Login As Service" permission
                         break;
                     case OAuthConstants.GrantNamePassword:
@@ -354,7 +354,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
             claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
             claims.Add(new SanteDBClaim("exp", (session.NotAfter - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds.ToString()));
             claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
-
+            claims.Add(new SanteDBClaim("sub", session.Claims.First(o => o.Type == SanteDBClaimTypes.Sid).Value)); // Subject is the first security identifier
+            claims.RemoveAll(o => o.Type == SanteDBClaimTypes.Sid);
             // Creates signing credentials for the specified application key
             var appid = claims.Find(o => o.Type == SanteDBClaimTypes.SanteDBApplicationIdentifierClaim).Value;
             var signingCredentials = SecurityUtils.CreateSigningCredentials(appid);
@@ -386,7 +387,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 issuer: this.m_configuration.IssuerName,
                 notBefore: session.NotBefore.DateTime,
                 expires: session.NotAfter.DateTime
-            );
+           );
 
             return jwt;
 
