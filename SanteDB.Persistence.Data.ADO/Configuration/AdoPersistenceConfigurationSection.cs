@@ -135,7 +135,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         [XmlAttribute("prepareStatements")]
         [Category("Performance")]
         [DisplayName("Prepare SQL Queries")]
-        [Description("When true, instructs the provider to prepare statements")]
+        [Description("When true, instructs the provider to prepare statements and reuse them during a transaction")]
         public bool PrepareStatements { get; set; }
 
         /// <summary>
