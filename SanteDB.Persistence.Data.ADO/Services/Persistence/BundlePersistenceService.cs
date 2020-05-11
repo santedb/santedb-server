@@ -202,7 +202,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     {
                         this.TranslateDbException(e);
                     }
-                    catch(Exception e2)
+                    catch (DetectedIssueException e2)
+                    {
+                        throw new DetectedIssueException(e2.Issues, $"Could not insert bundle due to sub-object persistence (at item {i})", e2);
+                    }
+                    catch (Exception e2)
                     {
                         throw new Exception($"Could not insert bundle due to sub-object persistence (bundle item {i})", e2);
                     }

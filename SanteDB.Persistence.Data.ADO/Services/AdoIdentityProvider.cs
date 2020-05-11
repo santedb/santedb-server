@@ -188,6 +188,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 tfaSecret == tfaClaim.ClaimValue) // TFA password hash sent as password, this is a password reset token - It will be set to expire ASAP
                             {
                                 retVal = AdoClaimsIdentity.Create(user, true, "Tfa+LastPasswordHash").CreateClaimsPrincipal();
+                                (retVal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, PurposeOfUseKeys.SecurityAdmin.ToString()));
                                 (retVal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
                                 (retVal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
                                 (retVal.Identity as IClaimsIdentity).RemoveClaim(retVal.FindFirst(SanteDBClaimTypes.Expiration));
@@ -235,7 +236,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 throw new SecurityException("Principal must be authenticated");
             // Password failed validation
             if (ApplicationServiceContext.Current.GetService<IPasswordValidatorService>()?.Validate(newPassword) == false)
-                throw new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, "err.password", "Password does not meet complexity requirements", DetectedIssueKeys.SecurityIssue));
+                throw new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, "err.password.complexity", "Password does not meet complexity requirements", DetectedIssueKeys.SecurityIssue));
 
             try
             {
@@ -268,14 +269,15 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 !dataContext.Any<DbSecurityUser>(o=>o.Key == user.Key && o.Password == newPasswordHash))
                                 user.Password = newPasswordHash;
                             else
-                                throw new InvalidOperationException("Password must be different than current password");
+                                throw new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, "err.password.history", "Password does not meet complexity requirements", DetectedIssueKeys.SecurityIssue));
+
 
                             user.SecurityHash = Guid.NewGuid().ToString();
                             user.UpdatedByKey = dataContext.EstablishProvenance(principal, null);
                             user.UpdatedTime = DateTimeOffset.Now;
 
                             // Set expiration
-                            user.PasswordExpiry = DateTime.Now.Add(this.m_securityConfiguration?.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.MaxPasswordAge, new TimeSpan(3650,0,0,0)) ?? new TimeSpan(3650, 0, 0, 0));
+                            user.PasswordExpiration = DateTime.Now.AddDays((double)this.m_securityConfiguration?.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxPasswordAge, 3650));
                             dataContext.Update(user);
                             tx.Commit();
                         }

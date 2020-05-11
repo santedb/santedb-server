@@ -305,6 +305,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
             catch (Exception ex)
             {
+                this.m_tracer.TraceError("Error performing underlying query: {0}", ex);
                 if (retVal != null)
                     this.m_tracer.TraceEvent(EventLevel.Error, context.GetQueryLiteral(retVal.ToSqlStatement()));
                 context.Dispose(); // No longer important

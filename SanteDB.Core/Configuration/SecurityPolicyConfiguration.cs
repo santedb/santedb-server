@@ -19,6 +19,8 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Xml;
+using System.Xml.Schema;
 using System.Xml.Serialization;
 
 namespace SanteDB.Core.Configuration
@@ -68,6 +70,38 @@ namespace SanteDB.Core.Configuration
     }
 
     /// <summary>
+    /// Gets the policy value as a timespan
+    /// </summary>
+    public class PolicyValueTimeSpan
+    {
+
+        /// <summary>
+        /// Time to live for XML serialization
+        /// </summary>
+        [XmlText]
+        public string ValueXml
+        {
+            get { return XmlConvert.ToString(this.Value); }
+            set { if (!string.IsNullOrEmpty(value)) this.Value = XmlConvert.ToTimeSpan(value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the value of the timespan
+        /// </summary>
+        [XmlIgnore]
+        public TimeSpan Value { get; set; }
+
+        /// <summary>
+        /// Convert this wrapper to timespan
+        /// </summary>
+        public static explicit operator TimeSpan(PolicyValueTimeSpan instance) {
+            return instance.Value;
+        }
+
+     
+    }
+
+    /// <summary>
     /// Security policies
     /// </summary>
     [XmlType(nameof(SecurityPolicyConfiguration), Namespace = "http://santedb.org/configuration")]
@@ -90,7 +124,7 @@ namespace SanteDB.Core.Configuration
         /// The policy value
         /// </summary>
         [XmlElement("int", typeof(Int32))]
-        [XmlElement("timespan", typeof(TimeSpan))]
+        [XmlElement("timespan", typeof(PolicyValueTimeSpan))]
         [XmlElement("date", typeof(DateTime))]
         [XmlElement("list", typeof(List<String>))]
         [XmlElement("string", typeof(String))]

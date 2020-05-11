@@ -462,8 +462,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 {
                     var existing = retVal.Relationships.FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Birthplace);
 
-                    Guid birthPlaceId = Guid.Empty;
-                    if (Guid.TryParse(pidSegment.BirthPlace.Value, out birthPlaceId))
+                    if (Guid.TryParse(pidSegment.BirthPlace.Value, out Guid birthPlaceId))
                     {
                         if (existing == null)
                             retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Birthplace, birthPlaceId));
@@ -472,7 +471,7 @@ namespace SanteDB.Messaging.HL7.Segments
                     }
                     else
                     {
-                        var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Names.Any(n => n.Component.Any(c => c.Value == pidSegment.BirthPlace.Value)), AuthenticationContext.SystemPrincipal);
+                        var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Names.Any(n => n.Component.Any(c => c.Value == pidSegment.BirthPlace.Value)), AuthenticationContext.SystemPrincipal).Where(o => this.m_configuration.BirthplaceClassKeys.Contains(o.ClassConceptKey.Value));
                         if (places.Count() == 1)
                         {
                             if (existing == null)

@@ -39,6 +39,7 @@ using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.AMI.Configuration;
 using SanteDB.Rest.Common;
+using SanteDB.Rest.Common.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -73,6 +74,8 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// Get a list of TFA mechanisms
         /// </summary>
         /// <returns>Returns a list of TFA mechanisms.</returns>
+        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.Login)]
+        [Demand(PermissionPolicyIdentifiers.Login)]
         public override AmiCollection GetTfaMechanisms()
         {
             var tfaRelay = ApplicationServiceContext.Current.GetService<ITfaRelayService>();
@@ -93,6 +96,7 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// Create a diagnostic report
         /// </summary>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.Login)]
+        [Demand(PermissionPolicyIdentifiers.Login)]
         public override DiagnosticReport CreateDiagnosticReport(DiagnosticReport report)
         {
             var persister = ApplicationServiceContext.Current.GetService<IDataPersistenceService<DiagnosticReport>>();
@@ -107,6 +111,7 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <param name="logId">The log identifier.</param>
         /// <returns>Returns the log file information.</returns>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
+        [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public override LogFileInfo GetLog(string logId)
         {
             var logFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), logId + ".log");
@@ -146,6 +151,7 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <param name="logId">The log identifier.</param>
         /// <returns>Returns the log file information.</returns>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
+        [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public override Stream DownloadLog(string logId)
         {
             var logFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), logId + ".log");
@@ -159,6 +165,7 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// </summary>
         /// <returns>Returns a collection of log files.</returns>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
+        [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public override AmiCollection GetLogs()
         {
             var logDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);

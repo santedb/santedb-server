@@ -95,8 +95,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             data.TargetEntityKey = data.TargetEntity?.Key ?? data.TargetEntityKey;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
 
-            if(data.ObsoleteVersionSequenceId == Int32.MaxValue)
-                data.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence ?? data.ObsoleteVersionSequenceId;
+            if (data.ObsoleteVersionSequenceId == Int32.MaxValue)
+                data.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence ?? context.FirstOrDefault<DbEntityVersion>(o=>o.Key == data.SourceEntityKey && o.ObsoletionTime == null)?.VersionSequenceId;
 
             return base.UpdateInternal(context, data);
         }

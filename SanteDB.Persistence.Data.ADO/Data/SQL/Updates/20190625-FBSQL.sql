@@ -84,9 +84,9 @@ INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err
 --#!
 -- PSN or PAT CAN BE EMPLOYEE OF ORG
 --#!
-INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('7c08bd55-4d42-49cd-92f8-6388d6c4183f'), char_to_uuid('b43c9513-1c1c-4ed0-92db-55a904c122e6'), char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'), 'Organization=[Employee]=>Person'); 
+INSERT INTO ENT_REL_VRFY_CDTBL (trg_cls_cd_id, rel_typ_cd_id, src_cls_cd_id, err_desc) VALUES (char_to_uuid('7c08bd55-4d42-49cd-92f8-6388d6c4183f'), char_to_uuid('b43c9513-1c1c-4ed0-92db-55a904c122e6'), char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'), 'Person=[Employee]=>Organization'); 
 --#!
-INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('7c08bd55-4d42-49cd-92f8-6388d6c4183f'), char_to_uuid('b43c9513-1c1c-4ed0-92db-55a904c122e6'), char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'), 'Organization=[Employee]=>Patient'); 
+INSERT INTO ENT_REL_VRFY_CDTBL (trg_cls_cd_id, rel_typ_cd_id, src_cls_cd_id, err_desc) VALUES (char_to_uuid('7c08bd55-4d42-49cd-92f8-6388d6c4183f'), char_to_uuid('b43c9513-1c1c-4ed0-92db-55a904c122e6'), char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'), 'Person=[Employee]=>Organization'); 
 --#!
 
 -- MISSING POLICY IDENTIFIERS

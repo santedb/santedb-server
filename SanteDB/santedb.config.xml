@@ -107,7 +107,6 @@
 	perpareStatements="false" />
 
   <section xsi:type="OAuthConfigurationSection" issuerName="http://localhost:8080/auth">
-    <validityTime>02:00:00</validityTime>
     <allowedClaims>
       <add>scope</add>
       <add>PolicyOverride</add>
@@ -120,7 +119,7 @@
     <allowNodelessClientAuth>true</allowNodelessClientAuth>
   </section>
   <section xsi:type="MemoryCacheConfigurationSection" autoSubscribe="true" maxSize="10000" maxAge="3600" />
-  <section xsi:type="RedisConfigurationSection" ttl="0:5:0.0000">
+  <section xsi:type="RedisConfigurationSection" ttl="PT5H">
     <servers>
       <add>localhost:6379</add>
     </servers>
@@ -288,6 +287,24 @@
            passwordRegex="^(?=.*\d){1,}(?=.*[a-z]){1,}(?=.*[A-Z]){1,}(?=.*[^\w\d]){1,}.{6,}$"
            allowUnsignedApplets="true"
            pepExemptionPolicy="devices">
+    <!-- Sets policies for the system -->
+    <securityPolicy>
+      <add enabled="true" policy="auth.pwd.maxAge">
+        <int>120</int>
+      </add>
+      <add enabled="true" policy="auth.pwd.history">
+        <bool>true</bool>
+      </add>
+      <add enabled="true" policy="auth.failLogin">
+        <int>5</int>
+      </add>
+      <add enabled="true" policy="auth.session.length">
+        <timespan>PT30M</timespan>
+      </add>
+      <add enabled="true" policy="auth.session.refresh">
+        <timespan>PT35M</timespan>
+      </add>
+    </securityPolicy>
     <!-- Sets the thumbprints of publishers that should be trusted to run code-->
     <trustedPublishers>
       <add>84BD51F0584A1F708D604CF0B8074A68D3BEB973</add>
@@ -383,6 +400,13 @@
   </section>
   <!-- Controls the HL7 v2 LLP Handler -->
   <section xsi:type="Hl7ConfigurationSection" security="Msh8">
+    <birthplaceClasses>
+      <add>79DD4F75-68E8-4722-A7F5-8BC2E08F5CD6</add>
+      <add>48B2FFB3-07DB-47BA-AD73-FC8FB8502471</add>
+      <add>D9489D56-DDAC-4596-B5C6-8F41D73D8DC5</add>
+      <add>FF34DFA7-C6D3-4F8B-BC9F-14BCDC13BA6C</add>
+      <add>8CF4B0B0-84E5-4122-85FE-6AFA8240C218</add>
+    </birthplaceClasses>
     <localAuthority>
       <domainName xmlns="http://santedb.org/model">MOHS_GEN_NHID_MPI_INT</domainName>
       <oid xmlns="http://santedb.org/model">1.3.6.1.4.1.52820.5.1.1.1.999</oid>
@@ -458,10 +482,10 @@
   </section>
   <!-- This section controls the persistence for ADO.NET -->
   <section xsi:type="AdoPersistenceConfigurationSection"
-           readWriteConnectionString="FBSQL"
-           readOnlyConnectionString="FBSQL"
+           readWriteConnectionString="PSQL"
+           readOnlyConnectionString="PSQL"
            traceSql="false"
-			     providerType="fbsql"
+			     providerType="npgsql"
            staOnly="false"
 		       fuzzyTotal="false"
            autoUpdateExisting="true"

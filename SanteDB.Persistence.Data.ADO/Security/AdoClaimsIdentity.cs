@@ -250,8 +250,9 @@ namespace SanteDB.Persistence.Data.ADO.Security
                     claims.Add(new SanteDBClaim(SanteDBClaimTypes.Name, this.m_securityUser.UserName));
                 if (!this.Claims.Any(o => o.Type == SanteDBClaimTypes.DefaultRoleClaimType))
                     claims.AddRange(this.m_roles.Select(r => new SanteDBClaim(SanteDBClaimTypes.DefaultRoleClaimType, r.Name)));
-                if (this.m_securityUser.PasswordExpiry.HasValue && this.m_securityUser.PasswordExpiry < DateTime.Now)
+                if (this.m_securityUser.PasswordExpiration.HasValue && this.m_securityUser.PasswordExpiration < DateTime.Now)
                 {
+                    claims.Add(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, PurposeOfUseKeys.SecurityAdmin.ToString()));
                     claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
                     claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
                 }

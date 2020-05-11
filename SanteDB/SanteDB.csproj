@@ -87,6 +87,9 @@
     <None Include="data\000-PlaceClassTypes.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="data\000-PurposeOfUse.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="data\000-TelecomTypeCodes.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -312,10 +315,10 @@
           <Project>{20960967-3647-41a2-9df6-3e15e2aa7019}</Project>
           <Name>SanteDB.Persistence.MDM</Name>
         </ProjectReference>
-		<ProjectReference Include="..\santedb-restsvc\SanteDB.Core.Model.ViewModelSerializers\SanteDB.Core.Model.ViewModelSerializers.csproj">
-		  <Project>{ece9b280-9647-4092-babf-eb2e25084670}</Project>
-		  <Name>SanteDB.Core.Model.ViewModelSerializers</Name>
-		</ProjectReference>
+        <ProjectReference Include="..\santedb-restsvc\SanteDB.Core.Model.ViewModelSerializers\SanteDB.Core.Model.ViewModelSerializers.csproj">
+          <Project>{ece9b280-9647-4092-babf-eb2e25084670}</Project>
+          <Name>SanteDB.Core.Model.ViewModelSerializers</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
@@ -336,12 +339,12 @@
         <PackageReference Include="SanteDB.Core.Model.RISI" Version="2.0.6.0" />
         <PackageReference Include="SanteDB.Rest.AMI" Version="2.0.6.0" />
         <PackageReference Include="SanteDB.Rest.HDSI" Version="2.0.6.0" />
-		<PackageReference Include="SanteDB.Core.Model.ViewModelSerializers" Version="2.0.6.0"/>
+        <PackageReference Include="SanteDB.Core.Model.ViewModelSerializers" Version="2.0.6.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
   <ItemGroup>
-	<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1"/>
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />
     <ProjectReference Include="..\SanteDB.Authentication.OAuth\SanteDB.Authentication.OAuth2.csproj">
       <Project>{a3975c6f-4fdb-43be-81ab-3357b86173f1}</Project>
       <Name>SanteDB.Authentication.OAuth2</Name>

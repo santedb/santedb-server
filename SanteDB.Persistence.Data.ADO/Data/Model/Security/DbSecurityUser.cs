@@ -160,7 +160,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// Password expiration
         /// </summary>
         [Column("pwd_exp_utc")]
-        public DateTime? PasswordExpiry { get; set; }
+        public DateTime? PasswordExpiration { get; set; }
 
         /// <summary>
         /// True if password expiry was specified

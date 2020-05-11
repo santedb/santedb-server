@@ -404,16 +404,11 @@ namespace SanteDB.Authentication.OAuth2.Rest
             if (devicePrincipal is IClaimsPrincipal && !claimsPrincipal.Identities.OfType<DeviceIdentity>().Any(o => o.Name == devicePrincipal.Identity.Name))
                 claimsPrincipal.AddIdentity(devicePrincipal.Identity as IClaimsIdentity);
 
-            // TODO: Add configuration for expiry
-            DateTime issued = DateTime.Parse((claimsPrincipal)?.FindFirst(SanteDBClaimTypes.AuthenticationInstant)?.Value ?? DateTime.Now.ToString("o")),
-                expires = DateTime.Now.Add(this.m_configuration.ValidityTime);
             String remoteIp =
                 RestOperationContext.Current.IncomingRequest.Headers["X-Forwarded-For"] ??
                 RestOperationContext.Current.IncomingRequest.RemoteEndPoint.Address.ToString();
 
-            // HACK: Is the session for login password only? If so, this session is only valid for 2 mins
-            if (scope == PermissionPolicyIdentifiers.LoginPasswordOnly)
-                expires = DateTime.Now.Add(new TimeSpan(0, 2, 0));
+          
             // Establish the session
             ISessionProviderService isp = ApplicationServiceContext.Current.GetService<ISessionProviderService>();
             var scopeList = scope == "*" ? null : scope.Split(' ');
@@ -421,7 +416,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             bool isOverride = additionalClaims?.Any(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim) == true || scopeList?.Any(o => o == PermissionPolicyIdentifiers.OverridePolicyPermission) == true;
 
             var session = isp.Establish(new SanteDBClaimsPrincipal(claimsPrincipal.Identities), remoteIp, isOverride, purposeOfUse, scopeList);
-
+            
             string refreshToken = null, sessionId = null;
             if (session != null)
             {
@@ -444,7 +439,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     TokenType = OAuthConstants.BearerTokenType,
                     AccessToken = sessionId,
                     IdentityToken = handler.WriteToken(jwt),
-                    ExpiresIn = (int)(expires.Subtract(DateTime.Now)).TotalMilliseconds,
+                    ExpiresIn = (int)(session.NotAfter.Subtract(DateTime.Now)).TotalMilliseconds,
                     RefreshToken = refreshToken // TODO: Need to write a SessionProvider for this so we can keep track of refresh tokens 
                 };
             else
@@ -452,7 +447,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 {
                     TokenType = OAuthConstants.JwtTokenType,
                     AccessToken = handler.WriteToken(jwt),
-                    ExpiresIn = (int)(expires.Subtract(DateTime.Now)).TotalMilliseconds,
+                    ExpiresIn = (int)(session.NotAfter.Subtract(DateTime.Now)).TotalMilliseconds,
                     RefreshToken = refreshToken // TODO: Need to write a SessionProvider for this so we can keep track of refresh tokens 
                 };
 

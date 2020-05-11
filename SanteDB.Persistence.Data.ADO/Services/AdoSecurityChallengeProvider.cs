@@ -1,6 +1,7 @@
 ﻿using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
@@ -64,14 +65,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
             {
                 var authArgs = new AuthenticatingEventArgs(userName);
                 this.Authenticating?.Invoke(this, authArgs);
-                if(authArgs.Cancel)
+                if (authArgs.Cancel)
                     throw new SecurityException("Authentication cancelled");
 
                 var hashService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
                 var responseHash = hashService.ComputeHash(response);
-                
+
                 // Connection to perform auth
-                using(var context = this.m_configuration.Provider.GetWriteConnection())
+                using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open();
                     var query = context.CreateSqlStatement<DbSecurityUser>().SelectFrom(typeof(DbSecurityUser), typeof(DbSecurityUserChallengeAssoc))
@@ -85,7 +86,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         throw new SecurityException("AUTH_INV");
 
                     // TFA? 
-                    if(!String.IsNullOrEmpty(tfa))
+                    if (!String.IsNullOrEmpty(tfa))
                     {
                         var tfaSecret = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(tfa);
 
@@ -101,7 +102,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     else if (dbUser.Object2.ChallengeResponse != responseHash || dbUser.Object1.Lockout.GetValueOrDefault() > DateTime.Now) // Increment invalid
                     {
                         dbUser.Object1.InvalidLoginAttempts++;
-                        if (dbUser.Object1.InvalidLoginAttempts > this.m_securityConfiguration.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxInvalidLogins,5)) 
+                        if (dbUser.Object1.InvalidLoginAttempts > this.m_securityConfiguration.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxInvalidLogins, 5))
                             dbUser.Object1.Lockout = DateTime.Now.Add(new TimeSpan(0, 0, dbUser.Object1.InvalidLoginAttempts.Value * 30));
                         dbUser.Object1.UpdatedByKey = Guid.Parse(AuthenticationContext.SystemUserSid);
                         dbUser.Object1.UpdatedTime = DateTimeOffset.Now;
@@ -118,6 +119,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                         new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.Login, principal).Demand(); // must still be allowed to login
 
+                        (principal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, PurposeOfUseKeys.SecurityAdmin.ToString()));
                         (principal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
                         (principal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
 
@@ -141,7 +143,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         {
             try
             {
-                
+
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
 
@@ -150,10 +152,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     userName = userName.ToLower();
                     var sqlQuery = context.CreateSqlStatement<DbSecurityChallenge>().SelectFrom(typeof(DbSecurityChallenge), typeof(DbSecurityUserChallengeAssoc))
                             .InnerJoin<DbSecurityUserChallengeAssoc>(o => o.Key, o => o.ChallengeKey)
-                            .InnerJoin<DbSecurityUserChallengeAssoc, DbSecurityUser>(o=>o.UserKey, o=>o.Key)
+                            .InnerJoin<DbSecurityUserChallengeAssoc, DbSecurityUser>(o => o.UserKey, o => o.Key)
                             .Where<DbSecurityUser>(o => o.UserName.ToLower() == userName);
 
-                    var retVal = context.Query< CompositeResult<DbSecurityChallenge, DbSecurityUserChallengeAssoc>>(sqlQuery).Select(o => new SecurityChallenge()
+                    var retVal = context.Query<CompositeResult<DbSecurityChallenge, DbSecurityUserChallengeAssoc>>(sqlQuery).Select(o => new SecurityChallenge()
                     {
                         ChallengeText = o.Object1.ChallengeText,
                         Key = o.Object1.Key,
@@ -247,7 +249,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         });
                     }
                     else if (!this.m_securityConfiguration.GetSecurityPolicy<Boolean>(SecurityPolicyIdentification.ChallengeHistory, false) ||
-                        !context.Any<DbSecurityUserChallengeAssoc>(o=>o.ChallengeKey == challengeRec.ChallengeKey && o.UserKey == challengeRec.UserKey && o.ChallengeResponse == challengeResponse))
+                        !context.Any<DbSecurityUserChallengeAssoc>(o => o.ChallengeKey == challengeRec.ChallengeKey && o.UserKey == challengeRec.UserKey && o.ChallengeResponse == challengeResponse))
                     {
                         challengeRec.ExpiryTime = DateTime.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.MaxChallengeAge, new TimeSpan(3650, 0, 0, 0)));
                         challengeRec.ChallengeResponse = challengeResponse;

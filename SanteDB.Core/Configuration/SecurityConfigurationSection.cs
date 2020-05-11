@@ -17,6 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
+using SanteDB.Core.Model.Map;
 using SanteDB.Core.Services.Impl;
 using System;
 using System.Collections.Generic;
@@ -127,7 +128,10 @@ namespace SanteDB.Core.Configuration
         {
             var pol = this.SecurityPolicy?.Find(o => o.Enabled && o.PolicyId == id);
             if (pol == null) return defaultValue;
-            else return (T)(object)pol.PolicyValue;
+            else if (MapUtil.TryConvert(pol.PolicyValue, typeof(T), out object retVal))
+                return (T)retVal;
+            else
+                return defaultValue;
         }
     }
 }

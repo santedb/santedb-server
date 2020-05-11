@@ -151,6 +151,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         var applicationKey = cprincipal.FindFirst(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim)?.Value;
                         var deviceKey = cprincipal.FindFirst(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim)?.Value;
                         var userKey = cprincipal.FindFirst(SanteDBClaimTypes.Sid).Value;
+                        var expiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.SessionLength, new TimeSpan(0, 5, 0)));
+                        if ((purpose == PurposeOfUseKeys.SecurityAdmin.ToString() ||
+                            cprincipal.Claims.Any(o=>o.Type == SanteDBClaimTypes.PurposeOfUse && o.Value == PurposeOfUseKeys.SecurityAdmin.ToString()))
+                            && policyDemands.Contains(PermissionPolicyIdentifiers.LoginPasswordOnly)) // TODO: Make purpose of use menmonic check instead
+                            expiration = DateTime.Now.Add(new TimeSpan(0, 2, 0));
 
                         var dbSession = new DbSession()
                         {
@@ -158,7 +163,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             ApplicationKey = Guid.Parse(applicationKey),
                             UserKey = userKey != null && userKey != deviceKey ? (Guid?)Guid.Parse(userKey) : null,
                             NotBefore = DateTimeOffset.Now,
-                            NotAfter = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.SessionLength, new TimeSpan(0,5,0))),
+                            NotAfter = expiration,
                             RefreshExpiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.RefreshLength, new TimeSpan(0, 10, 0))),
                             RemoteEndpoint = remoteEp,
                             RefreshToken = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(BitConverter.ToString(refreshToken).Replace("-", ""))

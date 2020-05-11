@@ -20,6 +20,7 @@
 using SanteDB.Core.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace SanteDB.Caching.Redis.Configuration
@@ -55,8 +56,8 @@ namespace SanteDB.Caching.Redis.Configuration
         [XmlAttribute("ttl")]
         public string TTLXml
         {
-            get { return this.TTL?.ToString(); }
-            set { if (!string.IsNullOrEmpty(value)) this.TTL = TimeSpan.Parse(value); }
+            get { return this.TTL.HasValue ? XmlConvert.ToString(this.TTL.Value) : null; }
+            set { if (!string.IsNullOrEmpty(value)) this.TTL = XmlConvert.ToTimeSpan(value); }
         }
 
         /// <summary>

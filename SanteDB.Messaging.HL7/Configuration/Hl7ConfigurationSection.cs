@@ -80,6 +80,12 @@ namespace SanteDB.Messaging.HL7.Configuration
         /// </summary>
         [XmlElement("ssnAuthority"), JsonProperty("ssnAuthority")]
         public AssigningAuthority SsnAuthority { get; set; }
+
+        /// <summary>
+        /// Birthplace class keys
+        /// </summary>
+        [XmlArray("birthplaceClasses"), XmlArrayItem("add")]
+        public List<Guid> BirthplaceClassKeys { get; set; }
     }
 
     /// <summary>

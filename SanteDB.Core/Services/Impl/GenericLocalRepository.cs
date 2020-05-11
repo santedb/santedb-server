@@ -289,11 +289,13 @@ namespace SanteDB.Core.Services.Impl
             {
                 var preSave = new DataPersistingEventArgs<TEntity>(data, AuthenticationContext.Current.Principal);
                 this.Saving?.Invoke(this, preSave);
-                if(preSave.Cancel)
+                if (preSave.Cancel)
                 {
                     this.m_traceSource.TraceWarning("Persistence layer indicates pre-save cancel: {0}", data);
                     return preSave.Data;
                 }
+                else
+                    data = preSave.Data; // Data may have been updated
 
                 if (data.Key.HasValue && persistenceService.Get(data.Key.Value, null, true, AuthenticationContext.Current.Principal) != null)
                 {
