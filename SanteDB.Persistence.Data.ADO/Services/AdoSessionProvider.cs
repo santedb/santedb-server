@@ -125,7 +125,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <param name="policyDemands">The policies which are being demanded for this session</param>
         /// <param name="purposeOfUse">The purpose of this session</param>
         /// <returns>A constructed <see cref="global::ThisAssembly:AdoSession"/></returns>
-        public ISession Establish(IPrincipal principal, String remoteEp, bool isOverride, String purpose, String[] policyDemands)
+        public ISession Establish(IPrincipal principal, String remoteEp, bool isOverride, String purpose, String[] policyDemands, string lang)
         {
             // Validate the parameters
             if (principal == null)
@@ -215,6 +215,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             // Scopes user is allowed to access
                             claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyGrantType.Grant).Select(o => new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, o.Policy.Oid)));
                         }
+
+                        if (!String.IsNullOrEmpty(lang)) // set language
+                            claims.Add(new SanteDBClaim(SanteDBClaimTypes.Language, lang));
 
                         // Claims?
                         foreach (var clm in claims.Where(o=>!m_nonSessionClaims.Contains(o.Type)))

@@ -164,6 +164,10 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 IPrincipal principal = null;
 
                 var clientClaims = SanteDBClaimsUtil.ExtractClaims(RestOperationContext.Current.IncomingRequest.Headers);
+                // Set the language claim?
+                if (!String.IsNullOrEmpty(tokenRequest["ui_locales"]) &&
+                    !clientClaims.Any(o => o.Type == SanteDBClaimTypes.Language))
+                    clientClaims.Add(new SanteDBClaim(SanteDBClaimTypes.Language, tokenRequest["ui_locales"]));
 
                 // perform auth
                 switch (tokenRequest["grant_type"])
@@ -415,7 +419,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             string purposeOfUse = additionalClaims?.FirstOrDefault(o => o.Type == SanteDBClaimTypes.PurposeOfUse)?.Value;
             bool isOverride = additionalClaims?.Any(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim) == true || scopeList?.Any(o => o == PermissionPolicyIdentifiers.OverridePolicyPermission) == true;
 
-            var session = isp.Establish(new SanteDBClaimsPrincipal(claimsPrincipal.Identities), remoteIp, isOverride, purposeOfUse, scopeList);
+            var session = isp.Establish(new SanteDBClaimsPrincipal(claimsPrincipal.Identities), remoteIp, isOverride, purposeOfUse, scopeList, additionalClaims.FirstOrDefault(o=>o.Type == SanteDBClaimTypes.Language)?.Value);
             
             string refreshToken = null, sessionId = null;
             if (session != null)
