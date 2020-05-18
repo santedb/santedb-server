@@ -1,6 +1,6 @@
 ﻿/** 
  * <feature scope="SanteDB.Persistence.Data.ADO" id="20200105-01" name="Update:20200105-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="fbsql">
- *	<summary>Update: Add relationship for devices</summary>
+ *	<summary>Update: Add relationship allowing devices to be assigned a delegate user, and adds support for security challenges</summary>
  *	<remarks>This allows devices to be tracked to facilities and users</remarks>
  *	<isInstalled>select ck_patch('20200105-01')</isInstalled>
  * </feature>

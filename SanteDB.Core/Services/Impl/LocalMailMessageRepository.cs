@@ -22,6 +22,7 @@ using SanteDB.Core.Exceptions;
 using SanteDB.Core.Mail;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -80,8 +81,28 @@ namespace SanteDB.Core.Services.Impl
         /// <param name="message">The alert message to be broadcast.</param>
         public void Broadcast(MailMessage message)
 		{
-			this.Committed?.Invoke(this, new MailMessageEventArgs(message));
-		}
+            try
+            {
+                this.traceSource.TraceVerbose("Broadcasting alert {0}", message);
+
+                // Broadcast alert
+                // TODO: Fix this, this is bad
+                var args = new MailMessageEventArgs(message);
+                this.Received?.Invoke(this, args);
+                if (args.Ignore)
+                    return;
+
+                if (message.Flags != MailMessageFlags.Transient)
+                    this.Insert(message);
+
+                // Committed
+                this.Committed?.BeginInvoke(this, args, null, null);
+            }
+            catch (Exception e)
+            {
+                this.traceSource.TraceError("Error broadcasting alert: {0}", e);
+            }
+        }
 
 		/// <summary>
 		/// Searches for alerts.
@@ -136,8 +157,12 @@ namespace SanteDB.Core.Services.Impl
 		public MailMessage Insert(MailMessage message)
 		{
 			var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<MailMessage>>();
+            var securityService = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>();
+            var roleService = ApplicationServiceContext.Current.GetService<IRoleProviderService>();
 
-			if (persistenceService == null)
+            if (String.IsNullOrEmpty(message.To) || string.IsNullOrEmpty(message.From))
+                throw new InvalidOperationException("Mail messages must of TO and FROM fields");
+            if (persistenceService == null)
 			{
 				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<MailMessage>)));
 			}
@@ -146,6 +171,24 @@ namespace SanteDB.Core.Services.Impl
 
 			try
 			{
+                // Clear the RCPT TO and set via TO
+                message.RcptTo.Clear();
+                foreach(var rcp in message.To.Split(';').Select(o=>o.ToLower()).Distinct())
+                {
+                    var usr = securityService.GetUser(rcp);
+                    if (usr == null) // Group?
+                    {
+                        var rol = roleService.FindUsersInRole(rcp);
+                        foreach (var mem in rol)
+                        {
+                            usr = securityService.GetUser(mem);
+                            if (usr != null) message.RcptTo.Add(usr);
+                        }
+                    }
+                    else
+                        message.RcptTo.Add(usr);
+                }
+
 				alert = persistenceService.Insert(message, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 				this.Received?.Invoke(this, new MailMessageEventArgs(alert));
                 this.Inserted?.Invoke(this, new RepositoryEventArgs<MailMessage>(alert));

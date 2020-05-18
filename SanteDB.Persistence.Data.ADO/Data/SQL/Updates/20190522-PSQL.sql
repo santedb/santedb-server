@@ -1,6 +1,6 @@
 ﻿/** 
- * <update id="20190522-01" applyRange="1.0.0.0-1.2.0.0"  invariantName="npgsql">
- *	<summary>Add relationship "replaces" between all entities of the same class</summary>
+ * <update id="20190522-01" applyRange="1.0.0.0-1.9.0.0"  invariantName="npgsql">
+ *	<summary>Add relationship "next of kin" between all persons of the same class</summary>
  *	<remarks>Any entity is technically allowed to replace itself :)</remarks>
  *	<isInstalled>select ck_patch('20190522-01')</isInstalled>
  * </update>
