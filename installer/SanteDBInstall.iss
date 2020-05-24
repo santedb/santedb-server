@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "SanteDB Server"
-#define MyAppPublisher "Mohawk College mHealth & eHealth Development and Innovation Centre"
+#define MyAppPublisher "SanteDB Community"
 #define MyAppURL "http://santesuite.org"
 
 [Setup]
@@ -32,9 +32,11 @@ Compression = none
 #else
 Compression = lzma
 #endif
-AppCopyright = Copyright (C) 2015-2019 SanteSuite Community Partners
+AppCopyright = Copyright (C) 2015-2020 SanteSuite Contributors
 ArchitecturesInstallIn64BitMode = x64
 ArchitecturesAllowed =  x64
+WizardStyle=modern
+
 ; SignTool=default sign $f
 ; SignedUninstaller=yes
 

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
- - Copyright 2015-2019 Mohawk College of Applied Arts and Technology
+ - Portions Copyright 2015-2019 Mohawk College of Applied Arts and Technology
+ - Portions Copyright 2019-2020 SanteSuite Contributors (See NOTICE)
  - 
  - 
  - Licensed under the Apache License, Version 2.0 (the "License"); you 
@@ -15,8 +16,8 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  - 
- - User: JustinFyfe
- - Date: 2019-1-22
+ - User: fyfej (Justin Fyfe)
+ - Date: 2020-1-8
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.10.0.23074" xmlns="http://santedb.org/configuration">
   <sections>

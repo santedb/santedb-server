@@ -1,6 +1,6 @@
 ﻿/*
- * Copyright 2015-2019 Mohawk College of Applied Arts and Technology
- *
+ * Based on OpenIZ - Copyright 2015-2019 Mohawk College of Applied Arts and Technology
+ * Portions Copyright 2019-2020, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you 
  * may not use this file except in compliance with the License. You may 
@@ -14,8 +14,8 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: JustinFyfe
- * Date: 2019-2-28
+ * User: fyfej (Justin Fyfe)
+ * Date: 2019-11-27
  */
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -51,6 +51,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.28.*")]
-[assembly: AssemblyVersion("2.0.11.0")]
-[assembly: AssemblyInformationalVersion("2.0.11")]
-[assembly: AssemblyFileVersion("2.0.11.0")]
+[assembly: AssemblyVersion("2.0.12.0")]
+[assembly: AssemblyInformationalVersion("2.0.12")]
+[assembly: AssemblyFileVersion("2.0.12.0")]
