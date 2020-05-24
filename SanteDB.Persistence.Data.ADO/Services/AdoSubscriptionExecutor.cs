@@ -247,7 +247,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                     ApplicationContext.Current.GetService<IQueryPersistenceService>()?.RegisterQuerySet(queryId, results, null, totalResults);
                                     resultObjects = results.Skip(offset).Take(count ?? 100).OfType<Object>();
                                 }
-                                else if (m_configuration.UseFuzzyTotals)
+                                else if (m_configuration.UseFuzzyTotals || preArgs.UseFuzzyTotals)
                                 {
                                     resultObjects = domainResults.Skip(offset).Take((count ?? 100) + 1).OfType<Object>();
                                     totalResults = domainResults.Count();

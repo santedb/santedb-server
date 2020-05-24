@@ -175,7 +175,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Query internal for versioned data elements
         /// </summary>
-        protected override IEnumerable<Object> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> primaryQuery, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TModel>[] orderBy, bool countResults = true)
+        protected override IEnumerable<Object> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> primaryQuery, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TModel>[] orderBy, bool countResults = true, bool overrideFuzzyTotalSetting = false)
         {
 
 #if DEBUG
@@ -262,7 +262,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     // Fuzzy totals - This will only fetch COUNT + 1 as the total results
                     if (count.HasValue)
                     {
-                        if (m_configuration.UseFuzzyTotals && totalResults == 0)
+                        if ((overrideFuzzyTotalSetting || m_configuration.UseFuzzyTotals) && totalResults == 0)
                         {
                             var fuzzResults = retVal.Skip(offset).Take(count.Value + 1).OfType<Object>().ToList();
                             totalResults = fuzzResults.Count();

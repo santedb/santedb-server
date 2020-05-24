@@ -221,7 +221,7 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
                                     {
                                         Name = "_lean",
                                         Type = SwaggerSchemaElementType.boolean,
-                                        Description = "When true, only return minimal data",
+                                        Description = "When true, the server will only return minimal data by removing duplicates from the bundle's resource[] property. NOTE: This means that the .count parameter may not match the number of items in resource[], however you should continue to use the .count parameter to increase your offset",
                                         Location = SwaggerParameterLocation.query
                                     },
                                     new SwaggerParameter()

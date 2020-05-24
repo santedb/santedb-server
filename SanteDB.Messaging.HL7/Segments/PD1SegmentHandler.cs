@@ -75,7 +75,7 @@ namespace SanteDB.Messaging.HL7.Segments
                 var xon = retVal.GetPatientPrimaryFacility(retVal.PatientPrimaryFacilityRepetitionsUsed);
 
                 xon.AssigningAuthority.FromModel(this.m_configuration.LocalAuthority);
-                xon.IDNumber.Value = place.Key.ToString();
+                xon.OrganizationIdentifier.Value = place.Key.ToString();
                 xon.OrganizationName.Value = place.LoadCollection<EntityName>(nameof(Entity.Names)).FirstOrDefault(o => o.NameUseKey == NameUseKeys.OfficialRecord)?.LoadCollection<EntityNameComponent>(nameof(EntityName.Component))?.FirstOrDefault()?.Value;
                 xon.OrganizationNameTypeCode.Value = "L"; // OFFICIAL RECORD
                 xon.IdentifierTypeCode.Value = "XX";
