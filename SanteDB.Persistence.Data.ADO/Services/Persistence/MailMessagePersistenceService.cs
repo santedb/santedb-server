@@ -18,8 +18,11 @@
  * Date: 2019-11-27
  */
 using SanteDB.Core.Mail;
+using SanteDB.Core.Model.Security;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data.Model.Mail;
+using SanteDB.Persistence.Data.ADO.Data.Model.Security;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -55,9 +58,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 		{
 			var alert = base.InsertInternal(context, data);
 
-			foreach (var securityUser in alert.RcptTo)
+			foreach (var securityUser in alert.RcptToXml)
 			{
-				context.Insert(new DbMailMessageRcptTo(data.Key.Value, securityUser.Key.Value));
+				context.Insert(new DbMailMessageRcptTo(data.Key.Value, securityUser));
 			}
 
 			return alert;
@@ -76,7 +79,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
 			modelInstance.Flags = (MailMessageFlags)(dataInstance as DbMailMessage).Flags;
 
-			return base.ToModelInstance(dataInstance, context);
+            SqlStatement rcptStatement = context.CreateSqlStatement()
+                .SelectFrom(typeof(DbSecurityUser))
+                .InnerJoin<DbSecurityUser, DbMailMessageRcptTo> (o=>o.Key, o=>o.SourceKey)
+                .Where<DbMailMessageRcptTo>(o=>o.Key == modelInstance.Key).Build();
+
+            modelInstance.RcptToXml = context.Query<DbSecurityUser>(rcptStatement).Select(o => o.Key).ToList();
+			return modelInstance;
 		}
 	}
 }
