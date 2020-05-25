@@ -189,6 +189,9 @@ namespace SanteDB.Core.Services.Impl
                         message.RcptTo.Add(usr);
                 }
 
+                if (message.TimeStamp == default(DateTimeOffset))
+                    message.TimeStamp = DateTimeOffset.Now;
+
 				alert = persistenceService.Insert(message, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 				this.Received?.Invoke(this, new MailMessageEventArgs(alert));
                 this.Inserted?.Invoke(this, new RepositoryEventArgs<MailMessage>(alert));

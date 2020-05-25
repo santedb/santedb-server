@@ -438,11 +438,11 @@ begin
   dotNetNeeded := Framework45IsNotInstalled();
   
   if (not IsAdminLoggedOn()) then begin
-    MsgBox('OpenIZ needs the Microsoft .NET Framework 4.5.1 to be installed by an Administrator', mbInformation, MB_OK);
+    MsgBox('SanteDB needs the Microsoft .NET Framework 4.8 to be installed by an Administrator', mbInformation, MB_OK);
     Result := false;
   end 
   else if(dotNetNeeded) then begin
-    memoDependenciesNeeded := memoDependenciesNeeded + '      .NET Framework 4.5.2' #13;
+    memoDependenciesNeeded := memoDependenciesNeeded + '      .NET Framework 4.8' #13;
   end;
 
 end;
