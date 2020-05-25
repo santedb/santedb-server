@@ -84,7 +84,7 @@ namespace SanteDB.Messaging.HL7.Configuration
         /// <summary>
         /// Birthplace class keys
         /// </summary>
-        [XmlArray("birthplaceClasses"), XmlArrayItem("add")]
+        [XmlArray("birthplaceClasses"), XmlArrayItem("add"), JsonProperty("birthplaceClasses")]
         public List<Guid> BirthplaceClassKeys { get; set; }
     }
 

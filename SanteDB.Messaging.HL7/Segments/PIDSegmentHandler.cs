@@ -480,7 +480,7 @@ namespace SanteDB.Messaging.HL7.Segments
                                 existing.TargetEntityKey = places.First().Key;
                         }
                         else
-                            throw new KeyNotFoundException($"Cannot find unique birth place registration with name {pidSegment.BirthPlace.Value}. Try using UUID.");
+                            throw new KeyNotFoundException($"Cannot find unique birth place registration with name {pidSegment.BirthPlace.Value} ({places.Count()} results found). Try using UUID.");
                     }
                 }
 
