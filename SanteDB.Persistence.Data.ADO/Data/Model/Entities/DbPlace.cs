@@ -63,13 +63,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
         /// Identifies the known latitude of the place
         /// </summary>
         [Column("lat")]
-        public float Lat { get; set; }
+        public double Lat { get; set; }
 
         /// <summary>
         /// Identifies the known longitude of the place
         /// </summary>
         [Column("lng")]
-        public float Lng { get; set; }
+        public double Lng { get; set; }
 
     }
 }

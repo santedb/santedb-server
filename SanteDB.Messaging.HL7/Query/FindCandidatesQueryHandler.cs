@@ -143,6 +143,7 @@ namespace SanteDB.Messaging.HL7.Query
                 }
             }
 
+            retVal.Add("obsoletionTime", "null");
 
             return retVal;
         }
