@@ -279,17 +279,41 @@ namespace SanteDB.Messaging.HL7.Segments
                 fieldNo = 2;
                 // Names
                 if (nk1Segment.NameRepetitionsUsed > 0)
-                    retVal.Names.AddRange(nk1Segment.GetName().ToModel().ToList().Where(n => !retVal.Names.Any(e => e.SemanticEquals(n))));
+                    foreach (var itm in nk1Segment.GetName())
+                    {
+                        var model = itm.ToModel();
+                        var existing = retVal.Names.FirstOrDefault(o => o.NameUseKey == model.NameUseKey);
+                        if (existing == null)
+                            retVal.Names.Add(model);
+                        else
+                            existing.CopyObjectData(model);
+                    }
 
                 // Address
                 fieldNo = 4;
                 if (nk1Segment.AddressRepetitionsUsed > 0)
-                    retVal.Addresses = nk1Segment.GetAddress().ToModel().ToList();
+                    foreach (var itm in nk1Segment.GetAddress())
+                    {
+                        var model = itm.ToModel();
+                        var existing = retVal.Addresses.FirstOrDefault(o => o.AddressUseKey == model.AddressUseKey);
+                        if (existing == null)
+                            retVal.Addresses.Add(model);
+                        else
+                            existing.CopyObjectData(model);
+                    }
 
                 // Phone numbers 
                 fieldNo = 5;
-                if (nk1Segment.PhoneNumberRepetitionsUsed > 0)
-                    retVal.Telecoms = nk1Segment.GetPhoneNumber().ToModel().ToList();
+                var telecoms = nk1Segment.GetBusinessPhoneNumber().Union(nk1Segment.GetPhoneNumber());
+                foreach (var itm in telecoms)
+                {
+                    var model = itm.ToModel();
+                    var existing = retVal.Telecoms.FirstOrDefault(o => o.AddressUseKey == model.AddressUseKey);
+                    if (existing == null)
+                        retVal.Telecoms.Add(model);
+                    else
+                        existing.CopyObjectData(model);
+                }
 
                 // Context role, when the person should be contact
                 fieldNo = 7;
