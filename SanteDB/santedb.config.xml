@@ -19,7 +19,7 @@
  - User: fyfej (Justin Fyfe)
  - Date: 2019-11-27
  -->
-<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.9.1.23074" xmlns:santeguard="http://santedb.org/configuration/santeguard" xmlns="http://santedb.org/configuration">
+<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.9.1.23074" xmlns:santempi="http://santedb.org/configuration/santempi" xmlns:santeguard="http://santedb.org/configuration/santeguard" xmlns="http://santedb.org/configuration">
   <sections>
     <add type="SanteDB.Core.Configuration.DiagnosticsConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Messaging.Metadata.Configuration.MetadataConfigurationSection, SanteDB.Messaging.Metadata, Version=1.0.0.0"/>
@@ -62,6 +62,7 @@
     <add type="SanteGuard.Persistence.Ado.Configuration.SanteGuardAdoConfiguration, SanteGuard.Persistence.Ado, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.ResourceMergeConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0"/>
     <add type="SanteDB.Core.Data.Quality.Configuration.DataQualityConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0"/>
+    <add type="SanteMPI.Persistence.ADO.Configuration.AdoConfigurationSection, SanteMPI.Persistence.Ado, Version=2.0.0.0"/>
   </sections>
   <section xsi:type="AuditAccountabilityConfigurationSection" completeAuditTrail="false">
     <filters>
@@ -113,6 +114,13 @@
     </santeguard:endpoints>
     <santeguard:defaultEnterpriseSite>value</santeguard:defaultEnterpriseSite>
   </section>
+  <section xsi:type="santempi:AdoConfigurationSection"
+      readWriteConnectionString="PSQL"
+	    readOnlyConnectionString="PSQL"
+	    traceSql="false"
+	    providerType="npgsql"
+	    perpareStatements="false"
+    />
   <section xsi:type="AppletConfigurationSection" appletDirectory=".\applets" allowUnsignedApplets="true">
     <trustedPublishers>
       <add>82C63E1E9B87578D0727E871D7613F2F0FAF683B</add>
@@ -638,10 +646,11 @@
       <add type="SanteDB.BI.Services.Impl.LocalBiRenderService, SanteDB.BI, Version=1.40.0.0"/>
 
       <add type="SanteDB.Persistence.MDM.Services.MdmDataManagementService, SanteDB.Persistence.MDM, Version=1.0.0.0"/>
-      <add type="SanteDB.Matcher.Matchers.ProbabalisticRecordMatchingService, SanteDB.Matcher, Version=1.0.0.0"/>
+      <add type="SanteDB.Matcher.Matchers.WeightedRecordMatchingService, SanteDB.Matcher, Version=1.0.0.0"/>
       <add type="SanteDB.Matcher.Configuration.File.FileMatchConfigurationProvider, SanteDB.Matcher.Configuration.File, Version=1.0.0.0"/>
     
       <add type="SanteDB.Core.Data.Quality.DataQualityService, SanteDB.Core.Api, Version=1.0.0.0"/>
+      <add type="SanteMPI.Persistence.ADO.Services.AdoNameAliasService, SanteMPI.Persistence.ADO, Version=2.0.0.0"/>
     </serviceProviders>
   </section>
 </SanteDBConfiguration>

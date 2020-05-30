@@ -150,6 +150,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Persistence.MDM.Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Core.Api.Test", "santedb-api\SanteDB.Core.Api.Test\SanteDB.Core.Api.Test.csproj", "{59B5E3BE-790E-451F-BACA-631369CF535C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Matcher.Test", "santedb-match\SanteDB.Matcher.Test\SanteDB.Matcher.Test.csproj", "{E210AD94-8006-4F32-A86D-198CB2D8A9CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -368,6 +370,10 @@ Global
 		{59B5E3BE-790E-451F-BACA-631369CF535C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59B5E3BE-790E-451F-BACA-631369CF535C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59B5E3BE-790E-451F-BACA-631369CF535C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E210AD94-8006-4F32-A86D-198CB2D8A9CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E210AD94-8006-4F32-A86D-198CB2D8A9CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E210AD94-8006-4F32-A86D-198CB2D8A9CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E210AD94-8006-4F32-A86D-198CB2D8A9CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -433,6 +439,7 @@ Global
 		{20960967-3647-41A2-9DF6-3E15E2AA7019} = {12BB9926-8A67-44D5-BE68-7E27E3AE6DE9}
 		{16BE3000-C76A-41FC-99DB-C5C90DD521E8} = {12BB9926-8A67-44D5-BE68-7E27E3AE6DE9}
 		{59B5E3BE-790E-451F-BACA-631369CF535C} = {58D303FA-0113-4888-AA67-A9436DDEBFAD}
+		{E210AD94-8006-4F32-A86D-198CB2D8A9CE} = {75D6A9C9-C580-4684-88D4-A2291A302861}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E73A1AED-8AB7-492C-A4F0-C71FCC5C393C}
