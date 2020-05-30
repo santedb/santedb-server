@@ -4,7 +4,7 @@
 #define MyAppName "SanteDB Server"
 #define MyAppPublisher "SanteDB Community"
 #define MyAppURL "http://santesuite.org"
-#define MyAppVersion "2.0.13"
+#define MyAppVersion "2.0.17"
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -30,7 +30,7 @@ WizardImageFile=.\install.bmp
 #ifdef DEBUG
 Compression = none
 #else
-Compression = lzma
+Compression = zip
 #endif
 AppCopyright = Copyright (C) 2015-2020 SanteSuite Contributors
 ArchitecturesInstallIn64BitMode = x64
@@ -48,40 +48,44 @@ Name: auth; Description: ACS Only (Cluster Install)
 Name: bis; Description: BIS Only (Cluster Install)
 Name: demo; Description: Demo Installation
 Name: tools; Description: Tooling Only              
+Name: mpi; Description: SanteMPI Only
+Name: guard; Description: SanteGuard Only
 Name: custom; Description: Custom Installation; Flags: iscustom
 
 [Components]
-Name: core; Description: SanteDB Core; Types: full imsi ami auth bis demo
-Name: core\bre; Description: JInt Business Rules Engine; Types: full demo
+Name: core; Description: SanteDB Core; Types: full imsi ami auth bis demo guard mpi
+Name: core\bre; Description: JInt Business Rules Engine; Types: full demo guard mpi
 Name: core\protocol; Description: XML Clinical Support Decision Engine; Types: full demo
-Name: server; Description: SanteDB Service Host; Types: full demo
-Name: msg; Description: Core Messaging Interfaces; Types: full demo
-Name: msg\hdsi; Description: Health Administration Interface; Types: full imsi demo
-Name: msg\ami; Description: Administration Management Interface; Types: full ami demo
-Name: msg\auth; Description: OAuth2.0 Authentication Server; Types: full auth demo
-Name: bi; Description: Business Intelligence Services; Types: full auth demo
-Name: interop; Description: Integration Interfaces; Types: full demo
-Name: interop\fhir; Description: HL7 Fast Health Integration Resources; Types: full demo
-Name: interop\hl7; Description: HL7v2 Messaging; Types: full demo
+Name: server; Description: SanteDB Service Host; Types: full demo guard mpi
+Name: msg; Description: Core Messaging Interfaces; Types: full demo guard mpi
+Name: msg\hdsi; Description: Health Administration Interface; Types: full imsi demo guard mpi
+Name: msg\ami; Description: Administration Management Interface; Types: full ami demo guard mpi
+Name: msg\auth; Description: OAuth2.0 Authentication Server; Types: full auth demo guard mpi
+Name: bi; Description: Business Intelligence Services; Types: full auth demo guard mpi
+Name: interop; Description: Integration Interfaces; Types: full demo guard mpi
+Name: interop\fhir; Description: HL7 Fast Health Integration Resources; Types: full demo guard mpi
+Name: interop\hl7; Description: HL7v2 Messaging; Types: full demo mpi
 Name: interop\gs1; Description: GS1 BMS Messaging; Types: full demo
 Name: interop\jira; Description: JIRA Integration; Types: full
 Name: interop\atna; Description: ATNA & DICOM Auditing; Types: full
 Name: interop\openapi; Description: OpenAPI; Types: full demo
 Name: reporting; Description: Reporting Services; Types: full
-Name: reporting\bis; Description: Business Intelligence Services; Types: full bis
+Name: reporting\bis; Description: Business Intelligence Services; Types: full bis guard mpi
 Name: reporting\risi; Description: Report Integration Service (Legacy); Types: full 
 Name: reporting\jasper; Description: Jasper Reports Server Integration (Legacy); Types: full
 Name: tfa; Description: Two Factor Authentication; Types: full
 Name: tfa\twilio; Description: Twilio SMS TFA Adapter; Types: full
 Name: tfa\email; Description: Email TFA Adapter; Types: full
-Name: mdm; Description: Master Data Management (MDM); Types: full
-Name: match; Description: Record Matcher (SanteMatch); Types: full
-Name: db; Description: Data Persistence; Types: full demo
-Name: db\fbsql; Description: FirebirdSQL Persistence Services; Types: full demo
-Name: db\psql; Description: PostgreSQL Persistence Services; Types: full
-Name: cache; Description: Memory Caching Services; Types: full demo
-Name: cache\redis; Description: REDIS Shared Memory Caching; Types: full
+Name: mdm; Description: Master Data Management (MDM); Types: full mpi
+Name: match; Description: Record Matcher (SanteMatch); Types: full mpi
+Name: db; Description: Data Persistence; Types: full demo guard mpi
+Name: db\fbsql; Description: FirebirdSQL Persistence Services; Types: full demo guard mpi
+Name: db\psql; Description: PostgreSQL Persistence Services; Types: full guard mpi
+Name: cache; Description: Memory Caching Services; Types: full demo guard mpi
+Name: cache\redis; Description: REDIS Shared Memory Caching; Types: full guard mpi
 Name: tools; Description: Management Tooling; Types: full demo
+Name: mpi; Description: SanteMPI Plugins; Types: full demo mpi
+Name: guard; Description: SanteGuard Plugins; Types: full demo guard
 Name: demo; Description: Elbonia Quickstart; Types: demo
 
 [Files]
@@ -381,7 +385,15 @@ Source: ..\bin\Release\System.Xml.XmlSerializer.dll; DestDir: {app};
 Source: ..\bin\Release\System.Xml.XPath.dll; DestDir: {app}; 
 Source: ..\bin\Release\System.Xml.XPath.XDocument.dll; DestDir: {app}; 
 
+; SanteMPI DLLS
+Source: ..\..\sante-mpi\bin\Release\SanteMPI.Persistence.Ado.dll; DestDir: {app}; Components: mpi
+Source: ..\..\sante-mpi\bin\Release\SanteMPI.Messaging.PixPdqV2.dll; DestDir: {app}; Components: mpi
 
+; SanteGuard
+Source: ..\..\sante-guard\bin\Release\SanteGuard.Core.dll; DestDir: {app}; Components: guard
+Source: ..\..\sante-guard\bin\Release\SanteGuard.Messaging.Ami.dll; DestDir: {app}; Components: guard
+Source: ..\..\sante-guard\bin\Release\SanteGuard.Messaging.Syslog.dll; DestDir: {app}; Components: guard
+Source: ..\..\sante-guard\bin\Release\SanteGuard.Persistence.Ado.dll; DestDir: {app}; Components: guard
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -389,8 +401,9 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Run]
 ;Filename: "{app}\ConfigTool.exe";  Description: "Configure SanteDB Server"; Flags: postinstall ; 
 Filename: "{app}\SanteDB.exe"; Parameters:"--install"; Flags: runhidden runascurrentuser; StatusMsg: "Registering SanteDB Service"
-Filename: "c:\windows\system32\netsh.exe"; Parameters: "advfirewall firewall add rule name=""SanteDB REST Ports"" dir=in protocol=TCP localport=8080 action=allow"; StatusMsg: "Configuring Firewall"; Flags: runhidden; Components: demo
-Filename: "c:\windows\system32\netsh.exe"; Parameters: "advfirewall firewall add rule name=""SanteDB HL7 Ports"" dir=in protocol=TCP localport=2100 action=allow"; StatusMsg: "Configuring Firewall"; Flags: runhidden; Components: demo
+Filename: "c:\windows\system32\netsh.exe"; Parameters: "advfirewall firewall add rule name=""SanteDB REST Ports"" dir=in protocol=TCP localport=8080 action=allow"; StatusMsg: "Configuring Firewall"; Flags: runhidden; 
+Filename: "c:\windows\system32\netsh.exe"; Parameters: "advfirewall firewall add rule name=""SanteDB HL7 Ports"" dir=in protocol=TCP localport=2100 action=allow"; StatusMsg: "Configuring Firewall"; Flags: runhidden; 
+Filename: "c:\windows\system32\netsh.exe"; Parameters: "advfirewall firewall add rule name=""SanteDB UDP Ports"" dir=in protocol=UDP localport=514 action=allow"; StatusMsg: "Configuring Firewall"; Flags: runhidden; Components: guard
 Filename: "net.exe";StatusMsg: "Starting Services..."; Parameters: "start santedb"; Flags: runhidden; Components: demo
 
 

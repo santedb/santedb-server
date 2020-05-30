@@ -74,6 +74,7 @@ namespace SanteDB
             AppDomain.CurrentDomain.UnhandledException += (o, e) =>
             {
                 Trace.TraceError("++++++ FATAL APPLICATION ERROR ++++++++\r\n{0}", e.ExceptionObject);
+                EventLog.WriteEntry("SanteDB Host Process", $"++++++ FATAL APPLICATION ERROR ++++++++\r\n{e.ExceptionObject}", EventLogEntryType.Error, 999);
                 Environment.Exit(999);
             };
 
@@ -177,9 +178,13 @@ namespace SanteDB
                 Trace.TraceError("011 899 981 199 911 9725 3!!! {0}", e.ToString());
                 if (hasConsole)
                     Console.WriteLine("011 899 981 199 911 9725 3!!! {0}", e.ToString());
+
+                EventLog.WriteEntry("SanteDB Host Process", $"011 899 981 199 911 9725 3!!! {e}", EventLogEntryType.Error, 911);
+
 #else
                 Trace.TraceError("Error encountered: {0}. Will terminate", e.Message);
 #endif
+
                 Environment.Exit(911);
 
             }

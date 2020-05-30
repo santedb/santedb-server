@@ -63,11 +63,13 @@ namespace SanteDB
                 if (ApplicationContext.Current.Start())
                 {
                     Trace.TraceInformation("Service Started Successfully");
+                    EventLog.WriteEntry("SanteDB Host Process", $"SanteDB is ready to accept connections", EventLogEntryType.Information, 777);
                     return 0;
                 }
                 else
                 {
                     Trace.TraceError("No message handler service started. Terminating program");
+                    EventLog.WriteEntry("SanteDB Host Process", $"Please configure a  message handler to run this service", EventLogEntryType.Error, 1911);
                     Stop();
                     return 1911;
                 }
@@ -75,6 +77,7 @@ namespace SanteDB
             catch (Exception e)
             {
                 Trace.TraceError("Fatal exception occurred: {0}", e.ToString());
+                EventLog.WriteEntry("SanteDB Host Process", $"Exception occurred starting up: {e}", EventLogEntryType.Error, 1064);
                 Stop();
                 return 1064;
             }
@@ -88,7 +91,9 @@ namespace SanteDB
         /// </summary>
         public static void Stop()
         {
+            EventLog.WriteEntry("SanteDB Host Process", $"The SanteDB service is shutting down services", EventLogEntryType.Information, 666);
             ApplicationContext.Current.Stop();
+
         }
 
         /// <summary>
