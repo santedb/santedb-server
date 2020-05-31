@@ -92,16 +92,22 @@ namespace SanteDB
                 // What to do?
                 if (parameters.ShowHelp)
                     parser.WriteHelp(Console.Out);
-                else if (parameters.Install && !ServiceTools.ServiceInstaller.ServiceIsInstalled("SanteDB"))
+                else if (parameters.Install)
                 {
-                    Console.WriteLine("Installing Service...");
-                    ServiceTools.ServiceInstaller.Install("SanteDB", "SanteDB Host Process", Assembly.GetEntryAssembly().Location, null, null, ServiceTools.ServiceBootFlag.AutoStart);
+                    if (!ServiceTools.ServiceInstaller.ServiceIsInstalled("SanteDB"))
+                    {
+                        Console.WriteLine("Installing Service...");
+                        ServiceTools.ServiceInstaller.Install("SanteDB", "SanteDB Host Process", Assembly.GetEntryAssembly().Location, null, null, ServiceTools.ServiceBootFlag.AutoStart);
+                    }
                 }
-                else if (parameters.UnInstall && ServiceTools.ServiceInstaller.ServiceIsInstalled("SanteDB"))
+                else if (parameters.UnInstall)
                 {
-                    Console.WriteLine("Un-Installing Service...");
-                    ServiceTools.ServiceInstaller.StopService("SanteDB");
-                    ServiceTools.ServiceInstaller.Uninstall("SanteDB");
+                    if (ServiceTools.ServiceInstaller.ServiceIsInstalled("SanteDB"))
+                    {
+                        Console.WriteLine("Un-Installing Service...");
+                        ServiceTools.ServiceInstaller.StopService("SanteDB");
+                        ServiceTools.ServiceInstaller.Uninstall("SanteDB");
+                    }
                 }
                 else if (parameters.GenConfig)
                 {

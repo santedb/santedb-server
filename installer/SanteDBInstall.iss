@@ -4,7 +4,7 @@
 #define MyAppName "SanteDB Server"
 #define MyAppPublisher "SanteDB Community"
 #define MyAppURL "http://santesuite.org"
-#define MyAppVersion "2.0.17"
+#define MyAppVersion "2.0.18"
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -30,7 +30,7 @@ WizardImageFile=.\install.bmp
 #ifdef DEBUG
 Compression = none
 #else
-Compression = zip
+Compression = lzma
 #endif
 AppCopyright = Copyright (C) 2015-2020 SanteSuite Contributors
 ArchitecturesInstallIn64BitMode = x64
@@ -127,11 +127,11 @@ Source: ..\bin\release\data\*.dataset; DestDir: {app}\data; Components: server
 Source: ..\bin\release\applets\*.pak; DestDir: {app}\applets; Components: server
 
 ; ADO Stuff
-Source: ..\SanteDB.Persistence.Data.ADO\Data\SQL\FBSQL\*.sql; DestDir: {app}\sql\fbsql; Components: db\fbsql
-Source: ..\SanteDB.Persistence.Data.ADO\Data\SQL\Updates\*-FBSQL.sql; DestDir: {app}\sql\updates; Components: db\fbsql
-Source: ..\SanteDB.Persistence.Data.ADO\Data\SQL\PSQL\*.sql; DestDir: {app}\sql\psql; Components: db\psql
-Source: ..\SanteDB.Persistence.Data.ADO\Data\SQL\Updates\*-PSQL.sql; DestDir: {app}\sql\updates; Components: db\psql
-Source: ..\SanteDB.Warehouse.ADO\Data\SQL\PSQL\*.sql; DestDir: {app}\sql; Components: db\psql
+Source: ..\bin\release\DATA\SQL\FBSQL\*.sql; DestDir: {app}\sql\fbsql; Components: db\fbsql
+Source: ..\bin\release\DATA\SQL\Updates\*-FBSQL.sql; DestDir: {app}\sql\updates; Components: db\fbsql
+Source: ..\bin\release\DATA\SQL\PSQL\*.sql; DestDir: {app}\sql\psql; Components: db\psql
+Source: ..\bin\release\DATA\SQL\Updates\*-PSQL.sql; DestDir: {app}\sql\updates; Components: db\psql
+Source: ..\bin\release\DATA\SQL\PSQL\*.sql; DestDir: {app}\sql; Components: db\psql
 
 ; Tools
 Source: ..\bin\release\sdbac.exe; DestDir: {app}; Components: tools
@@ -418,84 +418,18 @@ Filename: "http://help.santesuite.org"; Name: "{group}\SanteDB\SanteDB Help"; Ic
 
 ; Components
 [Code]
-var
-  dotNetNeeded: boolean;
-  memoDependenciesNeeded: string;
-  psqlPageId : integer;
-  chkInstallPSQL : TCheckBox;
-  txtPostgresSU, txtPostgresSUPass : TEdit;
-
-const
-  dotnetRedistURL = '{tmp}\dotNetFx45_Full_setup.exe';
-  // local system for testing...
-  // dotnetRedistURL = 'http://192.168.1.1/dotnetfx.exe';
-
-
-function Framework45IsNotInstalled(): Boolean;
-var
-  bSuccess: Boolean;
-  regVersion: Cardinal;
-begin
-  Result := True;
-  bSuccess := RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v4\Full', 'Release', regVersion);
-  if (True = bSuccess) and (regVersion >= 378675) then begin
-    Result := False;
-  end;
-end; 
-
-function InitializeSetup(): Boolean;
-
-begin
- 
-  Result := true;
-  dotNetNeeded := Framework45IsNotInstalled();
-  
-  if (not IsAdminLoggedOn()) then begin
-    MsgBox('SanteDB needs the Microsoft .NET Framework 4.8 to be installed by an Administrator', mbInformation, MB_OK);
-    Result := false;
-  end 
-  else if(dotNetNeeded) then begin
-    memoDependenciesNeeded := memoDependenciesNeeded + '      .NET Framework 4.8' #13;
-  end;
-
-end;
-
 function PrepareToInstall(var needsRestart:Boolean): String;
 var
   hWnd: Integer;
   ResultCode : integer;
   uninstallString : string;
 begin
-    
     EnableFsRedirection(true);
-
+    WizardForm.PreparingLabel.Visible := True;
+    WizardForm.PreparingLabel.Caption := 'Installing Visual C++ Redistributable';
     ExtractTemporaryFile('vc2010.exe');
-    Exec(ExpandConstant('{tmp}\vc2010.exe'), '/install /passive', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
-
-    if (Result = '') and (dotNetNeeded = true) then begin
-      ExtractTemporaryFile('netfx.exe');
-      if Exec(ExpandConstant(dotnetRedistURL), '/passive /norestart', '', SW_SHOW, ewWaitUntilTerminated, ResultCode) then begin
-          // handle success if necessary; ResultCode contains the exit code
-          if not (ResultCode <> 0) then begin
-            Result := '.NET Framework 4.8 is Required';
-          end;
-        end else begin
-          // handle failure if necessary; ResultCode contains the error code
-            Result := '.NET Framework 4.8 is Required';
-        end;
-    end;
-
+    Exec(ExpandConstant('{tmp}\vcredist_x86.exe'), '/install /passive', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
+    WizardForm.PreparingLabel.Caption := 'Installing Microsoft .NET Framework 4.8';
+     ExtractTemporaryFile('netfx.exe');
+    Exec(ExpandConstant('{tmp}\netfx.exe'), '/q', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
 end;
-
-function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
-var
-  s: string;
-
-begin
-  if memoDependenciesNeeded <> '' then s := s + 'Dependencies that will be automatically downloaded And installed:' + NewLine + memoDependenciesNeeded + NewLine;
-
-  s := s + MemoDirInfo + NewLine;
-
-  Result := s
-end;
-

@@ -82,8 +82,8 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.16.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.16.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.18.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.18.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

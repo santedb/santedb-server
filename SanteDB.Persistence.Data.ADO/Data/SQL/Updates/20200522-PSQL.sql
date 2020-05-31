@@ -67,11 +67,7 @@ BEGIN
 	END IF;
 END	
 $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100
-  ROWS 1000;
-ALTER FUNCTION public.auth_usr(text, text, integer)
-  OWNER TO postgres;
+  LANGUAGE plpgsql ;
 
 SELECT REG_PATCH('20200522-01');
 COMMIT;
