@@ -59,16 +59,11 @@ namespace SanteDB.Messaging.AMI.Wcf
     public class AmiServiceBehavior : AmiServiceBehaviorBase
     {
 
-        // The trace source for logging
-        private Tracer m_traceSource = new Tracer(AmiConstants.TraceSourceName);
-
         /// <summary>
-        /// Create a new ami service behavior
+        /// Get resource handler
         /// </summary>
-        public AmiServiceBehavior() : base(AmiMessageHandler.ResourceHandler)
-        {
+        protected override ResourceHandlerTool GetResourceHandler() => AmiMessageHandler.ResourceHandler;
 
-        }
 
         /// <summary>
         /// Get a list of TFA mechanisms
@@ -226,7 +221,7 @@ namespace SanteDB.Messaging.AMI.Wcf
                 serviceOptions.Endpoints.AddRange(config.Endpoints);
 
             // Get the resources which are supported
-            foreach (var itm in this.m_resourceHandler.Handlers)
+            foreach (var itm in this.GetResourceHandler().Handlers)
             {
                 var svc = this.ResourceOptions(itm.ResourceName);
                 serviceOptions.Resources.Add(svc);

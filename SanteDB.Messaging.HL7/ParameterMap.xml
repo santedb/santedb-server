@@ -35,6 +35,13 @@
     <parameter hl7="@PID.3.4.2" model="identifier.authority.oid"/>
     <parameter hl7="@PID.3.1.1" model="id" />
     <parameter hl7="@PID.11.4.1" model="address.component[State].value"/>
+    <parameter hl7="@PID.11.3.1" model="address.component[City].value"/>
+    <parameter hl7="@PID.11.1.1" model="address.component[AddressLine].value"/>
+    <parameter hl7="@PID.11.5.1" model="address.component[PostalCode].value"/>
+    <parameter hl7="@PID.11.6.1" model="address.component[Country].value"/>
+    <parameter hl7="@PID.11.8.1" model="address.component[AdditionalLocator].value"/>
+    <parameter hl7="@PID.11.9.1" model="address.component[County].value"/>
+    <parameter hl7="@PID.11.10.1" model="address.component[CensusTract].value"/>
     <parameter hl7="@PID.33" model="modifiedOn" type="date"/>
     <parameter hl7="@PID.23" model="relationship[Birthplace].target.name.component.value" type="string"/>
     <parameter hl7="@NK1.2.2.1" model="relationship[Mother|Father|Guardian].target.name.component[Given].value" type="string" />

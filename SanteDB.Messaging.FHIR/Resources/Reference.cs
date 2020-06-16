@@ -34,6 +34,8 @@ namespace SanteDB.Messaging.FHIR.Resources
     public class Reference : FhirElement
     {
 
+        // Base uri
+        internal static Uri BaseUri { get; set; }
 
         /// <summary>
         /// Gets or sets the reference
@@ -59,6 +61,24 @@ namespace SanteDB.Messaging.FHIR.Resources
                 ReferenceUrl = String.IsNullOrEmpty(instance.VersionId) ?
                     baseUri.ToString() + String.Format("/{0}/{1}", instance.GetType().Name, instance.Id) :
                     baseUri.ToString() + String.Format("/{0}/{1}/_history/{2}", instance.GetType().Name, instance.Id, instance.VersionId)
+            };
+        }
+
+        /// <summary>
+        /// Create resource refernece (friendly method)
+        /// </summary>
+        public static Reference CreateResourceReference(DomainResourceBase instance)
+        {
+            var builder = new UriBuilder(BaseUri);
+            builder.Path += String.IsNullOrEmpty(instance.VersionId) ?
+                    String.Format("/{0}/{1}", instance.GetType().Name, instance.Id) :
+                    String.Format("/{0}/{1}/_history/{2}", instance.GetType().Name, instance.Id, instance.VersionId);
+
+            return new Reference()
+            {
+                Display = instance.ToString(),
+                //Type = new PrimitiveCode<string>(instance.GetType().GetCustomAttribute<XmlRootAttribute>() != null ? instance.GetType().GetCustomAttribute<XmlRootAttribute>().ElementName : instance.GetType().Name),
+                ReferenceUrl = builder.Uri.ToString()
             };
         }
 
@@ -155,6 +175,25 @@ namespace SanteDB.Messaging.FHIR.Resources
                     baseUri.ToString() + String.Format("/{0}/{1}/_history/{2}", instance.GetType().Name, instance.Id, instance.VersionId)
             };
         }
+
+        /// <summary>
+        /// Create resource refernece (friendly method)
+        /// </summary>
+        public static Reference<TResource> CreateResourceReference<TResource>(DomainResourceBase instance) where TResource : DomainResourceBase
+        {
+            var builder = new UriBuilder(BaseUri);
+            builder.Path += String.IsNullOrEmpty(instance.VersionId) ?
+                    String.Format("/{0}/{1}", instance.GetType().Name, instance.Id) :
+                    String.Format("/{0}/{1}/_history/{2}", instance.GetType().Name, instance.Id, instance.VersionId);
+
+            return new Reference<TResource>()
+            {
+                Display = instance.ToString(),
+                //Type = new PrimitiveCode<string>(instance.GetType().GetCustomAttribute<XmlRootAttribute>() != null ? instance.GetType().GetCustomAttribute<XmlRootAttribute>().ElementName : instance.GetType().Name),
+                ReferenceUrl = builder.Uri.ToString()
+            };
+        }
+
 
         /// <summary>
         /// Create a reasource reference to the specified resource

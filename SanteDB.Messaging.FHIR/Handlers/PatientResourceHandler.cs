@@ -66,6 +66,18 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			retVal.Active = model.StatusConceptKey == StatusKeys.Active;
 			retVal.Address = model.LoadCollection<EntityAddress>("Addresses").Select(o => DataTypeConverter.ToFhirAddress(o)).ToList();
 			retVal.BirthDate = model.DateOfBirth;
+            switch(model.DateOfBirthPrecision.GetValueOrDefault())
+            {
+                case DatePrecision.Day:
+                    retVal.BirthDate.Precision = DataTypes.DatePrecision.Day;
+                    break;
+                case DatePrecision.Month:
+                    retVal.BirthDate.Precision = DataTypes.DatePrecision.Month;
+                    break;
+                case DatePrecision.Year:
+                    retVal.BirthDate.Precision = DataTypes.DatePrecision.Year;
+                    break;
+            }
 			retVal.Deceased = model.DeceasedDate == DateTime.MinValue ? (object)new FhirBoolean(true) : model.DeceasedDate != null ? new FhirDate(model.DeceasedDate.Value) : null;
 			retVal.Gender = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("GenderConcept"), "http://hl7.org/fhir/administrative-gender")?.GetPrimaryCode()?.Code;
 
@@ -102,13 +114,13 @@ namespace SanteDB.Messaging.FHIR.Handlers
                     retVal.Link.Add(new PatientLink()
                     {
                         Type = PatientLinkType.Replace,
-                        Other = Reference.CreateLocalResourceReference(rel.LoadProperty<Patient>(nameof(EntityRelationship.TargetEntity)))
+                        Other = Reference.CreateResourceReference<Patient>(DataTypeConverter.CreateResource<Patient>(rel.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity))))
                     });
                 else if (rel.RelationshipTypeKey == EntityRelationshipTypeKeys.Duplicate)
                     retVal.Link.Add(new PatientLink()
                     {
                         Type = PatientLinkType.SeeAlso,
-                        Other = Reference.CreateLocalResourceReference(rel.LoadProperty<Patient>(nameof(EntityRelationship.TargetEntity)))
+                        Other = Reference.CreateResourceReference<Patient>(DataTypeConverter.CreateResource<Patient>(rel.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity))))
                     });
                 else if (rel.RelationshipTypeKey?.ToString() == "97730a52-7e30-4dcd-94cd-fd532d111578") // MDM Master Record
                 {
@@ -116,13 +128,13 @@ namespace SanteDB.Messaging.FHIR.Handlers
                         retVal.Link.Add(new PatientLink() // Is a master
                         {
                             Type = PatientLinkType.SeeAlso,
-                            Other = Reference.CreateLocalResourceReference(rel.LoadProperty<Patient>(nameof(EntityRelationship.SourceEntity)))
+                            Other = Reference.CreateResourceReference<Patient>(DataTypeConverter.CreateResource<Patient>(rel.LoadProperty<Entity>(nameof(EntityRelationship.SourceEntity))))
                         });
                     else // Is a local
                         retVal.Link.Add(new PatientLink()
                         {
                             Type = PatientLinkType.Refer,
-                            Other = Reference.CreateLocalResourceReference(rel.LoadProperty<Patient>(nameof(EntityRelationship.TargetEntity)))
+                            Other = Reference.CreateResourceReference<Patient>(DataTypeConverter.CreateResource<Patient>(rel.LoadProperty<Entity>(nameof(EntityRelationship.SourceEntity))))
                         });
                 }
             }
