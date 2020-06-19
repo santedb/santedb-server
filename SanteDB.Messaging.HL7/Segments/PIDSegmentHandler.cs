@@ -164,7 +164,7 @@ namespace SanteDB.Messaging.HL7.Segments
             // Birthplace
             var birthplace = relationships.FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Birthplace);
             if (birthplace != null)
-                retVal.BirthPlace.Value = birthplace.LoadCollection<EntityName>(nameof(Entity.Names)).FirstOrDefault()?.LoadCollection<EntityNameComponent>(nameof(EntityName.Component)).FirstOrDefault()?.Value;
+                retVal.BirthPlace.Value = birthplace.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity)).LoadCollection<EntityName>(nameof(Entity.Names)).FirstOrDefault()?.LoadCollection<EntityNameComponent>(nameof(EntityName.Component)).FirstOrDefault()?.Value;
 
             // Citizenships
             var citizenships = relationships.Where(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Citizen);

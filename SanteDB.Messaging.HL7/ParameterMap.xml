@@ -44,6 +44,9 @@
     <parameter hl7="@PID.11.10.1" model="address.component[CensusTract].value"/>
     <parameter hl7="@PID.33" model="modifiedOn" type="date"/>
     <parameter hl7="@PID.23" model="relationship[Birthplace].target.name.component.value" type="string"/>
+    <parameter hl7="@PID.21.1" model="relationship[Mother].target.identifier.value" />
+    <parameter hl7="@PID.21.4.1" model="relationship[Mother].target.identifier.authority.domainName"/>
+    <parameter hl7="@PID.21.4.2" model="relationship[Mother].target.identifier.authority.oid"/>
     <parameter hl7="@NK1.2.2.1" model="relationship[Mother|Father|Guardian].target.name.component[Given].value" type="string" />
     <parameter hl7="@NK1.2.1.1" model="relationship[Mother|Father|Guardian].target.name.component[Family].value" type="string" />
 

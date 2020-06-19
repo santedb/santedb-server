@@ -103,6 +103,8 @@ namespace SanteDB.Messaging.HL7.Query
                 // No identifiers found in the response domains
                 if (queryInstance.PID.PatientIdentifierListRepetitionsUsed > 0)
                 {
+                    (currentResponse.GetStructure("QAK") as QAK).QueryResponseStatus.Value = "OK";
+                    (currentResponse.GetStructure("QAK") as QAK).ThisPayload.Value = "1";
                     queryInstance.PID.SetIDPID.Value = (i++).ToString();
                     queryInstance.PID.GetPatientName(0).NameTypeCode.Value = "S";
                 }
