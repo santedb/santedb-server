@@ -82,3 +82,5 @@ CREATE TABLE aud_meta_tbl (
 );
 
 CREATE INDEX aud_meta_aud_id_idx ON aud_meta_tbl(aud_id);
+
+ALTER TABLE aud_obj_tbl ALTER COLUMN obj_id TYPE VARCHAR(512);

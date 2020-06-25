@@ -121,11 +121,10 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 			while (m_run) // run the service
 			{
 				var client = this.m_listener.AcceptTcpClient();
-				Thread clientThread = new Thread(OnReceiveMessage);
-				clientThread.IsBackground = true;
-				clientThread.Start(client);
-			}
-		}
+                HL7ThreadPool.Current.QueueUserWorkItem(OnReceiveMessage, client);
+
+            }
+        }
 
 		/// <summary>
 		/// Validation for certificates
@@ -294,6 +293,8 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 						lastReceive = DateTime.Now; // Update the last receive time so the timeout function works
 
                     }
+
+
 				}
 			}
 			catch (AuthenticationException e)

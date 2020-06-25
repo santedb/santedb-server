@@ -202,12 +202,12 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.22.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.22.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.22.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.22.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.22.0" />
-        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.22.0" />
+        <PackageReference Include="RestSrvr" Version="2.0.23.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.23.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.23.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.23.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.23.0" />
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.23.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

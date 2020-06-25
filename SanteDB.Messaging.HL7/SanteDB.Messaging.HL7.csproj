@@ -58,6 +58,7 @@
     <Compile Include="Hl7Constants.cs" />
     <Compile Include="HL7MessageHandler.cs" />
     <Compile Include="HL7OperationContext.cs" />
+    <Compile Include="Hl7ThreadPool.cs" />
     <Compile Include="IHL7MessageHandler.cs" />
     <Compile Include="Interceptors\AdtPatientPassthroughInterceptor.cs" />
     <Compile Include="Interceptors\AdtPatientRegistrationInterceptor.cs" />
@@ -146,8 +147,8 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.22.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.22.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.23.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.23.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

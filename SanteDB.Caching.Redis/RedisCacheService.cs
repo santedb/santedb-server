@@ -194,8 +194,8 @@ namespace SanteDB.Caching.Redis
                 // Add
 
                 var redisDb = this.m_connection.GetDatabase(RedisCacheConstants.CacheDatabaseId);
-                redisDb.HashSet(data.Key.Value.ToString(), this.SerializeObject(data));
-                redisDb.KeyExpire(data.Key.Value.ToString(), this.m_configuration.TTL);
+                redisDb.HashSet(data.Key.Value.ToString(), this.SerializeObject(data), CommandFlags.FireAndForget);
+                redisDb.KeyExpire(data.Key.Value.ToString(), this.m_configuration.TTL, CommandFlags.FireAndForget);
 
                 this.EnsureCacheConsistency(new DataCacheEventArgs(data));
                 if (this.m_configuration.PublishChanges)
