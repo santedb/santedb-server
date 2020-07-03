@@ -46,7 +46,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// <summary>
     /// Versioned domain data
     /// </summary>
-    public abstract class VersionedDataPersistenceService<TModel, TDomain, TDomainKey> : BaseDataPersistenceService<TModel, TDomain, CompositeResult<TDomain, TDomainKey>>
+    public abstract class VersionedDataPersistenceService<TModel, TDomain, TDomainKey> : BaseDataPersistenceService<TModel, TDomain, CompositeResult<TDomain, TDomainKey>>, IDataPersistenceServiceEx<TModel>
         where TDomain : class, IDbVersionedData, new()
         where TModel : VersionedEntityData<TModel>, new()
         where TDomainKey : IDbIdentified, new()
@@ -478,6 +478,59 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                 persistenceService.InsertInternal(context, ins);
             }
+        }
+
+
+        /// <summary>
+        /// Touch the specified versioned object (update time without creating new version
+        /// </summary>
+        public void Touch(Guid key, TransactionMode mode, IPrincipal principal)
+        {
+#if DEBUG
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+#endif
+
+
+            // Query object
+            using (var connection = m_configuration.Provider.GetWriteConnection())
+                try
+                {
+                    connection.Open();
+                    this.m_tracer.TraceEvent(EventLevel.Verbose, "TOUCH {0}", key);
+
+                    TModel retVal = null;
+                    connection.LoadState = LoadState.FullLoad;
+                    // Update the specified object
+                    var currentData = connection.FirstOrDefault<TDomain>(o => !o.ObsoletionTime.HasValue && o.Key == key);
+                    if (currentData != null)
+                    {
+                        var provenance = connection.EstablishProvenance(principal, null);
+                        currentData.CreationTime = DateTimeOffset.Now;
+                        currentData.CreatedByKey = provenance;
+                        connection.Update(currentData);
+                    }
+
+                }
+                catch (NotSupportedException e)
+                {
+                    throw new DataPersistenceException("Cannot perform LINQ query", e);
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceEvent(EventLevel.Error, "Error : {0}", e);
+                    throw;
+                }
+                finally
+                {
+#if DEBUG
+                    sw.Stop();
+                    this.m_tracer.TraceEvent(EventLevel.Verbose, "Retrieve took {0} ms", sw.ElapsedMilliseconds);
+#endif
+                }
+
+
+
         }
     }
 }

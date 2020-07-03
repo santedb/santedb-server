@@ -34,10 +34,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <Reference Include="MARC.Everest, Version=1.5.0.0, Culture=neutral, PublicKeyToken=ba5b2480018546af, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Solution Items\MARC.Everest.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -96,12 +92,12 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.23.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.23.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.23.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.23.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.23.0" />
-        <PackageReference Include="SanteDB.Rest.HDSI" Version="2.0.23.0" />
+        <PackageReference Include="RestSrvr" Version="2.0.25.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.25.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.25.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.25.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.25.0" />
+        <PackageReference Include="SanteDB.Rest.HDSI" Version="2.0.25.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

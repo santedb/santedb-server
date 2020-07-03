@@ -33,7 +33,7 @@ namespace SanteDB.Core.Services.Impl
     /// Represents a service which is responsible for the
     /// maintenance of concepts.
     /// </summary>
-    public class LocalConceptRepository : GenericLocalNullifiedRepository<Concept>, IConceptRepositoryService
+    public class LocalConceptRepository : GenericLocalRepositoryEx<Concept>, IConceptRepositoryService
     {
 
         /// <summary>

@@ -179,8 +179,9 @@ namespace SanteDB.Core.Services
         /// </summary>
         public void AddJob(IJob jobObject, TimeSpan elapseTime, JobStartType startType = JobStartType.Immediate)
         {
-            if (!(jobObject is IJob))
-                throw new ArgumentOutOfRangeException(nameof(jobObject));
+
+            if (this.IsJobRegistered(jobObject.GetType()))
+                return; // Job is already added
 
             lock (this.m_log)
                 this.m_log.Add(jobObject, DateTime.MinValue);

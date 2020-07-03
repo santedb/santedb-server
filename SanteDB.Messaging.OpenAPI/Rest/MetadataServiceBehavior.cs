@@ -83,13 +83,14 @@ namespace SanteDB.Messaging.Metadata.Rest
             if (services == null || services.Count() == 0)
                 services = ApplicationServiceContext.Current.GetService<IServiceManager>().GetServices().OfType<IApiEndpointProvider>().Select(o => new ServiceEndpointOptions(o));
 
+            var localPath = RestOperationContext.Current.IncomingRequest.Url.Segments[1];
             // Output YAML
             var sw = new StringBuilder();
             sw.Append("{ urls: [");
             foreach (var api in services.Where(o=>o.Behavior != null))
             {
                 var serviceName = typeof(ServiceEndpointType).GetField(api.ServiceType.ToString()).GetCustomAttribute<XmlEnumAttribute>()?.Name ?? api.ServiceType.ToString();
-                sw.AppendFormat("{{ \"url\": \"{0}\", ", $"./{serviceName}/swagger.json");
+                sw.AppendFormat("{{ \"url\": \"{0}\", ", $"/{localPath}{serviceName}/swagger.json");
                 sw.AppendFormat("\"name\": \"{0}\" }} ,", MetadataComposerUtil.GetElementDocumentation(api.Behavior.Type) ?? api.ServiceType.ToString());
             }
             sw.Remove(sw.Length - 2, 2);

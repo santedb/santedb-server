@@ -25,7 +25,7 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Place repository that uses local persistence
     /// </summary>
-    public class LocalPlaceRepository : GenericLocalNullifiedRepository<Place>
+    public class LocalPlaceRepository : GenericLocalRepositoryEx<Place>
 	{
         protected override string QueryPolicy => PermissionPolicyIdentifiers.ReadPlacesAndOrgs;
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadPlacesAndOrgs;

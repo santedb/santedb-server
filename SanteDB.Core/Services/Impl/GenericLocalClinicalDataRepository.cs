@@ -26,7 +26,7 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Represents generic local clinical data repository
     /// </summary>
-    public class GenericLocalClinicalDataRepository<TModel> : GenericLocalNullifiedRepository<TModel> where TModel : IdentifiedData, IHasState
+    public class GenericLocalClinicalDataRepository<TModel> : GenericLocalRepositoryEx<TModel> where TModel : IdentifiedData, IHasState
     {
         /// <summary>
         /// The query policy for generic clinical data

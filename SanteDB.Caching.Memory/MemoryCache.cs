@@ -17,11 +17,11 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
-using MARC.Everest.Threading;
 using SanteDB.Caching.Memory.Configuration;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
+using SanteDB.Core.Jobs;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Model.Collection;
@@ -73,9 +73,6 @@ namespace SanteDB.Caching.Memory
         // Lockbox for singleton creation
         private static object s_lock = new object();
 
-        // Thread pool for cleanup tasks
-        private WaitThreadPool m_taskPool = new WaitThreadPool(2);
-
         // Minimum age of a cache item (helps when large queries are returned)
         private long m_minAgeTicks = new TimeSpan(0, 0, 30).Ticks;
 
@@ -99,6 +96,11 @@ namespace SanteDB.Caching.Memory
                 // TODO: Initialize the cache
                 ApplicationServiceContext.Current.Started += (o, e) =>
                 {
+                    var jobManager = ApplicationServiceContext.Current.GetService<IJobManagerService>();
+                    if(!jobManager.IsJobRegistered(typeof(CacheRegulatorTimerJob)))
+                        jobManager.AddJob(new CacheRegulatorTimerJob(), new TimeSpan(0, 30, 0), JobStartType.Immediate);
+                    if(!jobManager.IsJobRegistered(typeof(CacheCleanupTimerJob)))
+                        jobManager.AddJob(new CacheCleanupTimerJob(), new TimeSpan(0, 30, 0), JobStartType.Immediate);
                     ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(x =>
                     {
                         var xt = (x as TypeCacheConfigurationInfo);
@@ -182,17 +184,17 @@ namespace SanteDB.Caching.Memory
                     else
                         this.m_entryTable[idData.Key.Value] = new CacheEntry(DateTime.Now, data as IdentifiedData);
                 }
-		}
+        }
 
         /// <summary>
         /// Try to get an entry from the cache returning null if not found
         /// </summary>
-        public object TryGetEntry( Guid? key)
+        public object TryGetEntry(Guid? key)
         {
             this.ThrowIfDisposed();
 
             if (!key.HasValue) return null;
-           
+
 
             CacheEntry candidate = null;
             if (this.m_entryTable.TryGetValue(key.Value, out candidate) && candidate != null)
@@ -215,6 +217,8 @@ namespace SanteDB.Caching.Memory
             this.m_minAgeTicks = age.Ticks;
         }
 
+
+
         /// <summary>
         /// If a cache is reaching its maximum entry level clean some space 
         /// </summary>
@@ -236,18 +240,12 @@ namespace SanteDB.Caching.Memory
                     if (garbageBin.Count() > 0)
                     {
                         this.m_tracer.TraceInfo("Cache overcommitted by {0} will remove entries older than min age..", garbageBin.Count());
-
-                        this.m_taskPool.QueueUserWorkItem((o) =>
+                        try
                         {
-                            try
-                            {
-                                IEnumerable<Guid> gc = o as IEnumerable<Guid>;
-                                foreach (var g in gc)
-                                    lock (this.m_lock)
-                                        this.m_entryTable.Remove(g);
-                            }
-                            catch { }
-                        }, garbageBin);
+                            foreach (var g in garbageBin)
+                                this.m_entryTable.Remove(g);
+                        }
+                        catch { }
                     }
                 }
                 finally
@@ -264,7 +262,7 @@ namespace SanteDB.Caching.Memory
             this.ThrowIfDisposed();
 
             if (!key.HasValue) return;
-            
+
 
             CacheEntry candidate = null;
             if (this.m_entryTable.TryGetValue(key.Value, out candidate))
@@ -304,13 +302,8 @@ namespace SanteDB.Caching.Memory
                     if (garbageBin.Count() > 0)
                     {
                         this.m_tracer.TraceInfo("Will clean {0} stale entries from cache..", garbageBin.Count());
-                        this.m_taskPool.QueueUserWorkItem((o) =>
-                        {
-                            IEnumerable<Guid> gc = o as IEnumerable<Guid>;
-                            foreach (var g in gc.ToArray())
-                                lock (this.m_lock)
-                                    this.m_entryTable.Remove(g);
-                        }, garbageBin);
+                        foreach (var g in garbageBin)
+                            this.m_entryTable.Remove(g);
                     }
 
                 }
@@ -348,7 +341,7 @@ namespace SanteDB.Caching.Memory
                 var eventData = Expression.MakeMemberAccess(eventParm, ppeArgType.GetRuntimeProperty("Data"));
                 var eventMode = Expression.MakeMemberAccess(eventParm, ppeArgType.GetRuntimeProperty("Mode"));
                 var insertInstanceDelegate = Expression.Lambda(evtHdlrType, Expression.Call(Expression.Constant(this), typeof(MemoryCache).GetRuntimeMethod(nameof(HandlePostPersistenceEvent), new Type[] { typeof(TransactionMode), typeof(Object) }), eventMode, eventData), senderParm, eventParm).Compile();
-                var updateInstanceDelegate = Expression.Lambda(evtHdlrType, Expression.Call(Expression.Constant(this), typeof(MemoryCache).GetRuntimeMethod(nameof(HandlePostPersistenceEvent), new Type[] { typeof(TransactionMode), typeof(Object) }), eventMode, eventData),  senderParm, eventParm).Compile();
+                var updateInstanceDelegate = Expression.Lambda(evtHdlrType, Expression.Call(Expression.Constant(this), typeof(MemoryCache).GetRuntimeMethod(nameof(HandlePostPersistenceEvent), new Type[] { typeof(TransactionMode), typeof(Object) }), eventMode, eventData), senderParm, eventParm).Compile();
                 var obsoleteInstanceDelegate = Expression.Lambda(evtHdlrType, Expression.Call(Expression.Constant(this), typeof(MemoryCache).GetRuntimeMethod(nameof(HandlePostPersistenceEvent), new Type[] { typeof(TransactionMode), typeof(Object) }), eventMode, eventData), senderParm, eventParm).Compile();
 
                 eventParm = Expression.Parameter(pqeArgType, "e");
@@ -362,22 +355,16 @@ namespace SanteDB.Caching.Memory
                 idpType.GetRuntimeEvent("Queried").AddEventHandler(svcInstance, queryInstanceDelegate);
             }
 
-
-
-            // Load initial data
-            this.m_taskPool.QueueUserWorkItem((o) =>
+            lock (s_lock)
             {
-                lock (s_lock)
+                var conf = this.m_configuration.Types.ToArray().FirstOrDefault(c => c.Type == t);
+                if (conf == null) return;
+                foreach (var sd in conf.SeedQueries)
                 {
-                    var conf = this.m_configuration.Types.ToArray().FirstOrDefault(c => c.Type == t);
-                    if (conf == null) return;
-                    foreach (var sd in conf.SeedQueries)
-                    {
-                        this.m_tracer.TraceInfo("Seeding cache with {0}", sd);
-                        // TODO: Seed cache initial data
-                    }
+                    this.m_tracer.TraceInfo("Seeding cache with {0}", sd);
+                    // TODO: Seed cache initial data
                 }
-            });
+            }
 
         }
 
@@ -441,8 +428,6 @@ namespace SanteDB.Caching.Memory
         /// </summary>
         public void Dispose()
         {
-
-            this.m_taskPool.Dispose();
             this.m_disposed = true;
         }
     }

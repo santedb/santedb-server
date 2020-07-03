@@ -30,7 +30,7 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// Provides operations for managing organizations.
     /// </summary>
-    public class LocalProviderRepository : GenericLocalNullifiedRepository<Provider>
+    public class LocalProviderRepository : GenericLocalRepositoryEx<Provider>
     {
         protected override string QueryPolicy => PermissionPolicyIdentifiers.ReadMetadata;
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadMetadata;
