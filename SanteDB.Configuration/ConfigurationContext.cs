@@ -377,6 +377,14 @@ namespace SanteDB.Configuration
         }
 
         /// <summary>
+        /// Add a service provider to this context
+        /// </summary>
+        public void AddServiceProvider(Object serviceInstance)
+        {
+            this.m_services.Add(serviceInstance);
+        }
+
+        /// <summary>
         /// Get all services
         /// </summary>
         public IEnumerable<object> GetServices()

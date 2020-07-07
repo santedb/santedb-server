@@ -343,6 +343,15 @@ namespace SanteDB.Core
         }
 
         /// <summary>
+        /// Add service provider instance
+        /// </summary>
+        public void AddServiceProvider(Object serviceInstance)
+        {
+            lock (this.m_serviceInstances)
+                this.m_serviceInstances.Add(serviceInstance);
+        }
+
+        /// <summary>
         /// Remove service provider
         /// </summary>
         public void RemoveServiceProvider(Type serviceType)
