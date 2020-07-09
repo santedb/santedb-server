@@ -24,6 +24,9 @@ WHERE MNEMONIC = 'FamilyMember'
 AND NOT EXISTS (SELECT 1 FROM ENT_REL_VRFY_CDTBL WHERE src_cls_cD_id = 'bacd9c6f-3fa9-481e-9636-37457962804d' and rel_typ_cd_id = CD_SET_MEM_ASSOC_TBL.CD_ID and trg_cls_cd_id = 'bacd9c6f-3fa9-481e-9636-37457962804d');
 
 
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('8ff9d9a5-a206-4566-82cd-67b770d7ce8a', 'bacd9c6f-3fa9-481e-9636-37457962804d','7c08bd55-4d42-49cd-92f8-6388d6c4183f', 'COVERAGE SPONSOR');
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('0c157566-d1e9-4976-8542-473caa9ba2a4', 'bacd9c6f-3fa9-481e-9636-37457962804d','7c08bd55-4d42-49cd-92f8-6388d6c4183f', 'STUDENT');
+
 
 CREATE OR REPLACE FUNCTION public.auth_usr(
     IN usr_name_in text,
@@ -66,6 +69,19 @@ BEGIN
 		END IF;
 	END IF;
 END	
+$BODY$
+  LANGUAGE plpgsql ;
+
+
+  
+CREATE OR REPLACE FUNCTION is_ent_cls(
+    ent_id_in uuid,
+    cls_mnemonic_in character varying)
+  RETURNS boolean AS
+$BODY$
+BEGIN
+RETURN EXISTS (SELECT 1 FROM ENT_TBL INNER JOIN CD_VRSN_TBL ON (ENT_TBL.CLS_CD_ID = CD_VRSN_TBL.CD_ID) WHERE ENT_ID = ENT_ID_IN AND CD_VRSN_TBL.MNEMONIC = CLS_MNEMONIC_IN AND CD_VRSN_TBL.OBSLT_UTC IS NULL);
+END
 $BODY$
   LANGUAGE plpgsql ;
 

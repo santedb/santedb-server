@@ -208,8 +208,8 @@ namespace SanteDB.Messaging.HL7.Segments
         /// <returns>The parsed patient information</returns>
         public virtual IEnumerable<IdentifiedData> Parse(ISegment segment, IEnumerable<IdentifiedData> context)
         {
-            var patientService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>();
-            var personService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Person>>();
+            var patientService = ApplicationServiceContext.Current.GetService<IRepositoryService<Patient>>();
+            var personService = ApplicationServiceContext.Current.GetService<IRepositoryService<Person>>();
             var pidSegment = segment as PID;
             int fieldNo = 0;
 
@@ -243,10 +243,19 @@ namespace SanteDB.Messaging.HL7.Segments
                         Guid idguid = Guid.Empty;
                         Person found = null;
                         if (authority.Key == this.m_configuration.LocalAuthority.Key)
-                            found = personService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.Current.Principal);
+                        {
+                            found = patientService.Get(Guid.Parse(id.IDNumber.Value), Guid.Empty);
+                            if (found == null)
+                                found = personService.Get(Guid.Parse(id.IDNumber.Value), Guid.Empty);
+                        }
                         else if (authority?.IsUnique == true)
-                            found = personService.Query(o => o.Identifiers.Any(i => i.Authority.Key == authority.Key && i.Value == idnumber), AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                        
+                        {
+                            found = patientService.Find(o => o.Identifiers.Any(i => i.Authority.Key == authority.Key && i.Value == idnumber)).FirstOrDefault();
+                            if(found == null)
+                                found = personService.Find(o => o.Identifiers.Any(i => i.Authority.Key == authority.Key && i.Value == idnumber)).FirstOrDefault();
+
+                        }
+
                         if (found != null)
                         {
                             if (found is Patient)
@@ -311,9 +320,9 @@ namespace SanteDB.Messaging.HL7.Segments
                         }
 
                         if (authority.Key == this.m_configuration.LocalAuthority.Key)
-                            motherEntity = personService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.SystemPrincipal);
+                            motherEntity = personService.Get(Guid.Parse(id.IDNumber.Value), Guid.Empty);
                         else if (authority?.IsUnique == true)
-                            motherEntity = personService.Query(o => o.Identifiers.Any(i => i.Value == id.IDNumber.Value && i.Authority.Key == authority.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                            motherEntity = personService.Find(o => o.Identifiers.Any(i => i.Value == id.IDNumber.Value && i.Authority.Key == authority.Key)).FirstOrDefault();
                     }
 
                     fieldNo = 6;

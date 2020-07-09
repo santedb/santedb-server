@@ -141,18 +141,20 @@ namespace SanteDB.Core.Services.Impl
             // Notify query 
             var preQueryEventArgs = new QueryRequestEventArgs<TEntity>(query, offset, count, queryId, AuthenticationContext.Current.Principal);
             this.Querying?.Invoke(this, preQueryEventArgs);
+            IEnumerable<TEntity> results = null; 
             if (preQueryEventArgs.Cancel) /// Cancel the request
             {
                 totalResults = preQueryEventArgs.TotalResults;
-                return preQueryEventArgs.Results;
+                results = preQueryEventArgs.Results;
             }
-
-            IEnumerable<TEntity> results = null;
-            if (queryId != Guid.Empty && persistenceService is IStoredQueryDataPersistenceService<TEntity>)
-                results = (persistenceService as IStoredQueryDataPersistenceService<TEntity>).Query(preQueryEventArgs.Query, preQueryEventArgs.QueryId.GetValueOrDefault(), preQueryEventArgs.Offset, preQueryEventArgs.Count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
             else
-                results = persistenceService.Query(preQueryEventArgs.Query, preQueryEventArgs.Offset, preQueryEventArgs.Count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
+            {
 
+                if (queryId != Guid.Empty && persistenceService is IStoredQueryDataPersistenceService<TEntity>)
+                    results = (persistenceService as IStoredQueryDataPersistenceService<TEntity>).Query(preQueryEventArgs.Query, preQueryEventArgs.QueryId.GetValueOrDefault(), preQueryEventArgs.Offset, preQueryEventArgs.Count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
+                else
+                    results = persistenceService.Query(preQueryEventArgs.Query, preQueryEventArgs.Offset, preQueryEventArgs.Count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
+            }
             var retVal = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
             this.Queried?.Invoke(this, new QueryResultEventArgs<TEntity>(query, retVal, offset, count, totalResults, queryId, AuthenticationContext.Current.Principal));
             return retVal;
