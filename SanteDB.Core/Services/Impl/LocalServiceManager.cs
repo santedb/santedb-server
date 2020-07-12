@@ -39,6 +39,14 @@ namespace SanteDB.Core.Services.Impl
         }
 
         /// <summary>
+        /// Add the specified service provider
+        /// </summary>
+        public void AddServiceProvider(object serviceInstance)
+        {
+            ApplicationContext.Current.AddServiceProvider(serviceInstance);
+        }
+
+        /// <summary>
         /// Get all services
         /// </summary>
         public IEnumerable<object> GetServices()

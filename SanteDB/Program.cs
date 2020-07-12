@@ -146,7 +146,7 @@ namespace SanteDB
                     Console.WriteLine("SanteDB (SanteDB) {0} ({1})", entryAsm.GetName().Version, entryAsm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
                     Console.WriteLine("{0}", entryAsm.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright);
                     Console.WriteLine("Complete Copyright information available at http://SanteDB.codeplex.com/wikipage?title=Contributions");
-                    ServiceUtil.Start(typeof(Program).GUID);
+                    ServiceUtil.Start(typeof(Program).GUID, parameters.ConfigFile);
                     if (!parameters.StartupTest)
                     {
 

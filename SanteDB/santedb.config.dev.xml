@@ -19,7 +19,7 @@
  - User: fyfej (Justin Fyfe)
  - Date: 2019-11-27
  -->
-<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.9.1.23074" xmlns:santeguard="http://santedb.org/configuration/santeguard" xmlns="http://santedb.org/configuration">
+<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.9.1.23074" xmlns:santempi="http://santedb.org/configuration/santempi" xmlns:santeguard="http://santedb.org/configuration/santeguard" xmlns="http://santedb.org/configuration">
   <sections>
     <add type="SanteDB.Core.Configuration.DiagnosticsConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Messaging.Metadata.Configuration.MetadataConfigurationSection, SanteDB.Messaging.Metadata, Version=1.0.0.0"/>
@@ -58,8 +58,11 @@
     <add type="SanteDB.Tools.Debug.Configuration.DebugToolsConfigurationSection, SanteDB.Tools.Debug, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null"/>
     <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api, Version=1.10.0.0"/>
     <add type="SanteDB.Matcher.Configuration.File.FileMatchConfigurationSection, SanteDB.Matcher.Configuration.File, Version=1.0.0.0"/>
+    <add type="SanteGuard.Configuration.SanteGuardConfiguration, SanteGuard.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteGuard.Persistence.Ado.Configuration.SanteGuardAdoConfiguration, SanteGuard.Persistence.Ado, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.ResourceMergeConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0"/>
     <add type="SanteDB.Core.Data.Quality.Configuration.DataQualityConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0"/>
+    <add type="SanteMPI.Persistence.ADO.Configuration.AdoConfigurationSection, SanteMPI.Persistence.Ado, Version=2.0.0.0"/>
   </sections>
   <section xsi:type="AuditAccountabilityConfigurationSection" completeAuditTrail="false">
     <filters>
@@ -70,16 +73,18 @@
   </section>
   <section xsi:type="FileMatchConfigurationSection">
     <basePath>
-      <add readonly="false">.\match-config</add>
+      <add readonly="false">C:\Users\fyfej\source\repos\santedb\sante-mpi\applet\matching</add>
+      <add readonly="false">C:\Users\fyfej\source\repos\santedb\santempi\applet\matching</add>
     </basePath>
   </section>
   <section xsi:type="MetadataConfigurationSection"/>
+
   <section xsi:type="FileSystemQueueConfigurationSection" queueRoot=".\queue" />
   <section xsi:type="DataConfigurationSection">
-    <connectionStrings>
-      <add name="FBSQL" value="initial catalog=|DataDirectory|\sdb_base.fdb;server type=Embedded;user id=sysdba" provider="Fbsql" />
-      <add name="AUDIT_FBSQL" value="initial catalog=|DataDirectory|\sdb_audit.fdb;server type=Embedded;user id=sysdba" provider="Fbsql"/>
-    </connectionStrings>
+      <connectionStrings>
+        <add name="FBSQL" value="initial catalog=|DataDirectory|\sdb_base.fdb;server type=Embedded;user id=sysdba" provider="Fbsql" />
+        <add name="AUDIT_FBSQL" value="initial catalog=|DataDirectory|\sdb_audit.fdb;server type=Embedded;user id=sysdba" provider="Fbsql"/>
+      </connectionStrings>
   </section>
   <section xsi:type="OrmConfigurationSection">
     <providers>
@@ -96,6 +101,14 @@
 		   readOnlyConnectionString="AUDIT_FBSQL"
 		   traceSql="false"
 		   providerType="fbsql" />
+  
+  <section xsi:type="santempi:AdoConfigurationSection"
+      readWriteConnectionString="FBSQL"
+	    readOnlyConnectionString="FBSQL"
+	    traceSql="false"
+	    providerType="fbsql"
+	    perpareStatements="false"
+    />
   <section xsi:type="AppletConfigurationSection" appletDirectory=".\applets" allowUnsignedApplets="true">
     <trustedPublishers>
       <add>82C63E1E9B87578D0727E871D7613F2F0FAF683B</add>
@@ -404,14 +417,14 @@
       <add>8CF4B0B0-84E5-4122-85FE-6AFA8240C218</add>
     </birthplaceClasses>
     <localAuthority>
-      <domainName xmlns="http://santedb.org/model">MOHS_GEN_ELB</domainName>
-      <oid xmlns="http://santedb.org/model">2.25.329083298</oid>
-      <url xmlns="http://santedb.org/model">http://gov.elb/identity/mohs</url>
+      <domainName xmlns="http://santedb.org/model">MOHS_GEN_NHID_MPI_INT</domainName>
+      <oid xmlns="http://santedb.org/model">1.3.6.1.4.1.52820.5.1.1.1.999</oid>
+      <url xmlns="http://santedb.org/model">http://mpi.mohs.go.mm/identity/mohs/nhid/mpi/internal</url>
     </localAuthority>
     <ssnAuthority>
-      <domainName xmlns="http://santedb.org/model">SSN</domainName>
-      <oid xmlns="http://santedb.org/model">2.16.840.1.113883.4.5</oid>
-      <url xmlns="http://santedb.org/model">http://hl7.org/fhir/sid/us-ssn</url>
+      <domainName xmlns="http://santedb.org/model">MOIP_NRC</domainName>
+      <oid xmlns="http://santedb.org/model">1.3.6.1.4.1.52820.5.1.1.1.7</oid>
+      <url xmlns="http://santedb.org/model">http://mpi.mohs.gov.mm/identity/moip/nrc</url>
     </ssnAuthority>
     <services>
       <add address="llp://0.0.0.0:2100" name="LLP" receiveTimeout="20000">
@@ -437,8 +450,7 @@
     </services>
   </section>
   <section xsi:type="DataQualityConfigurationSection">
-    <!-- Note: This will be moved to a file based configuration later in SanteDB lifecycle -->
-    <ruleSet enabled="true" id="mempi" name="Elbonia Data Quality Rules">
+    <ruleSet enabled="true" id="mempi" name="Myanmar National MPI">
       <resources>
         <add resource="Patient">
           <assert id="dob.required" name="Date of Birth Required" priority="Warning">
@@ -601,6 +613,13 @@
       <!--<add type="SanteDB.Persistence.Reporting.ADO.ReportingPersistenceService, SanteDB.Persistence.Reporting.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />-->
       <add type="SanteDB.Warehouse.ADO.ADODataWarehouse, SanteDB.Warehouse.ADO, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
 
+      <!-- SG Services -->
+      <!--<add type="SanteGuard.Services.LocalAuditTermLookupService, SanteGuard.Core, Version=1.0.0.0"/>
+	  <add type="SanteGuard.Services.Repositories.SanteGuardDataRepository, SanteGuard.Core, Version=1.0.0.0"/>-->
+      <add type="SanteGuard.Messaging.Syslog.SyslogMessageHandler, SanteGuard.Messaging.Syslog, Version=1.0.0.0"/>
+      <!--  <add type="SanteGuard.Persistence.Ado.Services.AdoAuditPersistenceService, SanteGuard.Persistence.Ado, Version=1.0.0.0"/>-->
+      <!--<add type="SanteGuard.Services.Repositories.SanteGuardAuditRepository, SanteGuard.Core, Version=1.0.0.0"/>-->
+
       <!-- BI Services -->
       <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS, Version=1.40.0.0"/>
       <add type="SanteDB.BI.Services.Impl.AppletBiRepository, SanteDB.BI, Version=1.40.0.0"/>
@@ -608,10 +627,11 @@
       <add type="SanteDB.BI.Services.Impl.LocalBiRenderService, SanteDB.BI, Version=1.40.0.0"/>
 
       <add type="SanteDB.Persistence.MDM.Services.MdmDataManagementService, SanteDB.Persistence.MDM, Version=1.0.0.0"/>
-      <add type="SanteDB.Matcher.Matchers.ProbabalisticRecordMatchingService, SanteDB.Matcher, Version=1.0.0.0"/>
+      <add type="SanteDB.Matcher.Matchers.WeightedRecordMatchingService, SanteDB.Matcher, Version=1.0.0.0"/>
       <add type="SanteDB.Matcher.Configuration.File.FileMatchConfigurationProvider, SanteDB.Matcher.Configuration.File, Version=1.0.0.0"/>
 
       <add type="SanteDB.Core.Data.Quality.DataQualityService, SanteDB.Core.Api, Version=1.0.0.0"/>
+      <add type="SanteMPI.Persistence.ADO.Services.AdoNameAliasService, SanteMPI.Persistence.ADO, Version=2.0.0.0"/>
     </serviceProviders>
   </section>
 </SanteDBConfiguration>

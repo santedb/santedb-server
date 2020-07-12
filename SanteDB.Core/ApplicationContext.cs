@@ -155,7 +155,6 @@ namespace SanteDB.Core
         protected ApplicationContext()
         {
             ContextId = Guid.NewGuid();
-            this.m_serviceInstances.Add(new FileConfigurationService());
         }
 
         #region IServiceProvider Members
@@ -222,7 +221,7 @@ namespace SanteDB.Core
                     {
                         if (svc.Type == null)
                             Trace.TraceWarning("Cannot find service {0}, skipping", svc.TypeXml);
-                        else
+                        else if(!this.m_serviceInstances.Any(s=>s.GetType() == svc.Type))
                         {
                             Trace.TraceInformation("Creating {0}...", svc.Type);
                             var instance = Activator.CreateInstance(svc.Type);
@@ -402,6 +401,15 @@ namespace SanteDB.Core
         public void Demand(string policyId, IPrincipal principal)
         {
             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, policyId, principal).Demand();
+        }
+
+        /// <summary>
+        /// Add the specified service provider
+        /// </summary>
+        public void AddServiceProvider(object serviceInstance)
+        {
+            lock (this.m_serviceInstances)
+                this.m_serviceInstances.Add(serviceInstance);
         }
 
         #endregion

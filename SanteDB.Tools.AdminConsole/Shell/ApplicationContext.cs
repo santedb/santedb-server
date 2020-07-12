@@ -96,7 +96,7 @@ namespace SanteDB.Tools.AdminConsole.Shell
             this.ApplicationName = configuration.AppId ?? "org.santedb.sdbac";
             this.ApplicationSecret = configuration.AppSecret ?? "sdbac-default-secret";
             this.m_configuration = configuration;
-            this.m_services.Add(new FileConfigurationService());
+            this.m_services.Add(new FileConfigurationService(String.Empty));
         }
 
         /// <summary>

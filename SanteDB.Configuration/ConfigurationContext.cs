@@ -401,5 +401,15 @@ namespace SanteDB.Configuration
                 .Where(a => !a.IsDynamic)
                 .SelectMany(o => { try { return o.ExportedTypes; } catch { return new List<Type>(); } }); // HACK: Mono does not like all assemblies
         }
+
+        /// <summary>
+        /// Add the specified service provider
+        /// </summary>
+        public void AddServiceProvider(object serviceInstance)
+        {
+            lock (this.m_services)
+                this.m_services.Add(serviceInstance);
+        }
+
     }
 }
