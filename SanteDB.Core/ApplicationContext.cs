@@ -341,6 +341,7 @@ namespace SanteDB.Core
                 this.m_serviceInstances.Add(Activator.CreateInstance(serviceType));
         }
 
+
         /// <summary>
         /// Remove service provider
         /// </summary>

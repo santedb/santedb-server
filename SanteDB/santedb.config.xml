@@ -193,7 +193,7 @@
       <add name="main" initializationData="santedb.log" filter="Warning">
         <writer>SanteDB.Core.Diagnostics.RolloverTextWriterTraceWriter, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</writer>
       </add>
-      <add name="console" initializationData="santedb.log" filter="Warning">
+      <add name="console" initializationData="santedb.log" filter="Informational">
         <writer>SanteDB.Core.Diagnostics.ConsoleTraceWriter, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</writer>
       </add>
     </writers>
@@ -564,7 +564,8 @@
       <!-- Core Services -->
       <add type="SanteDB.Core.Services.Impl.FileConfigurationService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Services.DefaultJobManagerService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Core.Services.Impl.ThreadPoolService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      
+      <add type="SanteDB.Core.Services.Impl.DefaultThreadPoolService, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Services.Impl.FileSystemQueueService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Rest.RestServiceFactory, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null"/>
       <add type="SanteDB.Core.Services.Impl.DefaultNetworkInformationService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null"/>

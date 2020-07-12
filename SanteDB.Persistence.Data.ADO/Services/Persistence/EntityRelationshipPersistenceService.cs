@@ -83,7 +83,18 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (!data.EffectiveVersionSequenceId.HasValue)
                 data.EffectiveVersionSequenceId = context.FirstOrDefault<DbEntityVersion>(o => o.Key == data.SourceEntityKey)?.VersionSequenceId;
 
-            return base.InsertInternal(context, data);
+            // Duplicate check 
+            var existing = context.FirstOrDefault<DbEntityRelationship>(r => r.SourceKey == data.SourceEntityKey && r.TargetKey == data.TargetEntityKey && r.RelationshipTypeKey == data.RelationshipTypeKey && !r.ObsoleteVersionSequenceId.HasValue) ;
+            if (existing == null)
+                return base.InsertInternal(context, data);
+            else if (existing.Quantity != data.Quantity)
+            {
+                data.Key = existing.Key;
+                return base.UpdateInternal(context, data);
+            }
+            else
+                return this.ToModelInstance(existing, context);
+
         }
 
         /// <summary>
