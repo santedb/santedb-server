@@ -298,8 +298,8 @@ namespace SanteDB.Caching.Memory
                     // Entry table clean
 
                     // Clean old data
-                    var garbageBin = this.m_entryTable.Where(o => nowTicks - o.Value.LastUpdateTime > this.m_configuration.MaxCacheAge).Select(o => o.Key);
-                    if (garbageBin.Count() > 0)
+                    var garbageBin = this.m_entryTable.Where(o => nowTicks - o.Value.LastUpdateTime > this.m_configuration.MaxCacheAge).Select(o => o.Key).ToArray();
+                    if (garbageBin.Any())
                     {
                         this.m_tracer.TraceInfo("Will clean {0} stale entries from cache..", garbageBin.Count());
                         foreach (var g in garbageBin)

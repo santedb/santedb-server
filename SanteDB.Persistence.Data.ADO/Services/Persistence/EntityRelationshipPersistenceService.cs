@@ -26,6 +26,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using SanteDB.Core.Model;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -73,8 +74,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override EntityRelationship InsertInternal(DataContext context, EntityRelationship data)
         {
-            
+
             // Ensure we haven't already persisted this
+            if (data.InversionIndicator) 
+                return data; // don't persist inverted
             if(data.TargetEntity != null && !data.InversionIndicator) data.TargetEntity = data.TargetEntity.EnsureExists(context) as Entity;
             data.TargetEntityKey = data.TargetEntity?.Key ?? data.TargetEntityKey;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
@@ -93,8 +96,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 return base.UpdateInternal(context, data);
             }
             else
+            {
+                data.Key = existing.Key;
+                data.EffectiveVersionSequenceId = existing.EffectiveVersionSequenceId;
+                data.ObsoleteVersionSequenceId = existing.ObsoleteVersionSequenceId;
                 return this.ToModelInstance(existing, context);
-
+            }
         }
 
         /// <summary>
@@ -103,6 +110,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override EntityRelationship UpdateInternal(DataContext context, EntityRelationship data)
         {
             // Ensure we haven't already persisted this
+            if (data.InversionIndicator) 
+                return data; // don't persist inverted
             data.TargetEntityKey = data.TargetEntity?.Key ?? data.TargetEntityKey;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
 

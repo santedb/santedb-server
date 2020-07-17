@@ -134,7 +134,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     }
                     else
                     {
-                        var principal = AdoClaimsIdentity.Create(dbUser.Object1, true, "Secret=" + challengeKey.ToString()).CreateClaimsPrincipal();
+                        var principal = AdoClaimsIdentity.Create(context, dbUser.Object1, true, "Secret=" + challengeKey.ToString()).CreateClaimsPrincipal();
 
                         new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.Login, principal).Demand(); // must still be allowed to login
 

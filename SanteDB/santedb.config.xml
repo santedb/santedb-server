@@ -469,7 +469,7 @@
     </services>
   </section>
   <section xsi:type="DataQualityConfigurationSection">
-    <ruleSet enabled="true" id="mempi" name="Myanmar National MPI">
+    <ruleSet enabled="true" id="mempi" name="Elbonia National MPI">
       <resources>
         <add resource="Patient">
           <assert id="dob.required" name="Date of Birth Required" priority="Warning">

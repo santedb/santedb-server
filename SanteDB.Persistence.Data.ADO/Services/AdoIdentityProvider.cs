@@ -187,7 +187,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 Boolean.Parse(noPassword?.ClaimValue ?? "false") &&
                                 tfaSecret == tfaClaim.ClaimValue) // TFA password hash sent as password, this is a password reset token - It will be set to expire ASAP
                             {
-                                retVal = AdoClaimsIdentity.Create(user, true, "Tfa+LastPasswordHash").CreateClaimsPrincipal();
+                                retVal = AdoClaimsIdentity.Create(dataContext, user, true, "Tfa+LastPasswordHash").CreateClaimsPrincipal();
                                 (retVal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, PurposeOfUseKeys.SecurityAdmin.ToString()));
                                 (retVal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
                                 (retVal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
@@ -277,14 +277,16 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             user.UpdatedTime = DateTimeOffset.Now;
 
                             // Set expiration
-                            user.PasswordExpiration = DateTime.Now.AddDays((double)this.m_securityConfiguration?.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxPasswordAge, 3650));
+                            var passwordAge = this.m_securityConfiguration?.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxPasswordAge, 3650);
+                            if(passwordAge.HasValue)
+                                user.PasswordExpiration = DateTime.Now.AddDays(passwordAge.Value);
                             dataContext.Update(user);
                             tx.Commit();
                         }
-                        catch
+                        catch(Exception e)
                         {
                             tx.Rollback();
-                            throw;
+                            throw new DataPersistenceException("Error updating data store", e);
                         }
 
                 }
@@ -351,7 +353,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             newIdentityUser.CreatedByKey = dataContext.EstablishProvenance(principal, null);
 
                             dataContext.Insert(newIdentityUser);
-                            var retVal = AdoClaimsIdentity.Create(newIdentityUser);
+                            var retVal = AdoClaimsIdentity.Create(dataContext, newIdentityUser);
                             tx.Commit();
                             return retVal;
                         }
@@ -583,7 +585,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         identities.Add(new DeviceIdentity(auth.Object4.Key, auth.Object4.PublicId, true));
                     
                     var principal = auth.Object1.UserKey.GetValueOrDefault() == Guid.Empty ?
-                        new SanteDBClaimsPrincipal(identities) : AdoClaimsIdentity.Create(auth.Object3, true, "SESSION").CreateClaimsPrincipal(identities);
+                        new SanteDBClaimsPrincipal(identities) : AdoClaimsIdentity.Create(context, auth.Object3, true, "SESSION").CreateClaimsPrincipal(identities);
                     
                     identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, session.NotBefore.ToString("o")));
                     identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, session.NotAfter.ToString("o")));
@@ -655,7 +657,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         if (sessionData.Object1.DeviceKey.HasValue)
                             retVal.Add(new DeviceIdentity(sessionData.Object2.Key, sessionData.Object2.PublicId, false));
                         if (sessionData.Object1.UserKey.HasValue)
-                            retVal.Add(AdoClaimsIdentity.Create(sessionData.Object4, false));
+                            retVal.Add(AdoClaimsIdentity.Create(context, sessionData.Object4, false));
                         return retVal.ToArray();
                     }
 

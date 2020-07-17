@@ -475,8 +475,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 if (!sourceVersionMaps.TryGetValue(ins.SourceEntityKey.Value, out eftVersion))
                     eftVersion = source.VersionSequence.GetValueOrDefault();
                 ins.EffectiveVersionSequenceId = eftVersion;
-
                 persistenceService.InsertInternal(context, ins);
+            }
+
+            // Remove any duplicated relationships
+            if (storage is IList<TAssociation> listStore)
+            {
+                for(int i = listStore.Count - 1; i >= 0; i--) // Remove dups
+                    if(listStore.Count(o=> o.Key == listStore[i].Key) > 1)
+                        listStore.RemoveAt(i);
             }
         }
 

@@ -156,11 +156,10 @@ namespace SanteDB.Persistence.Data.ADO.Security
         /// <summary>
         /// Create a claims identity from a data context user
         /// </summary>
-        internal static AdoClaimsIdentity Create(DbSecurityUser user, bool isAuthenticated = false, String authenticationMethod = null)
+        internal static AdoClaimsIdentity Create(DataContext context, DbSecurityUser user, bool isAuthenticated = false, String authenticationMethod = null)
         {
 
-
-            var roles = user.Context.Query<DbSecurityRole>(user.Context.CreateSqlStatement<DbSecurityRole>().SelectFrom()
+            var roles = context.Query<DbSecurityRole>(context.CreateSqlStatement<DbSecurityRole>().SelectFrom()
                         .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
                         .Where<DbSecurityUserRole>(o => o.UserKey == user.Key));
             

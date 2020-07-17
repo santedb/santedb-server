@@ -42,9 +42,6 @@ namespace SanteDB.Core.TestFramework
         /// </summary>
         public SanteDBConfiguration Configuration { get; set; }
 
-        // Configuration
-        private System.Configuration.Configuration m_configuration = null;
-
         /// <summary>
         /// Get configuration service
         /// </summary>
@@ -95,7 +92,7 @@ namespace SanteDB.Core.TestFramework
 
             if (retVal == null)
             {
-                var cs = this.m_configuration.ConnectionStrings.ConnectionStrings[key];
+                var cs = ConfigurationManager.ConnectionStrings[key];
                 if (cs != null)
                 {
                     return new ConnectionString(cs.ProviderName, cs.ConnectionString);

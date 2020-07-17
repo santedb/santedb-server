@@ -259,7 +259,7 @@ namespace SanteDB.Messaging.HL7.Segments
                         if (found != null)
                         {
                             if (found is Patient)
-                                retVal = (Patient)found;
+                                retVal = (Patient)found.Clone();
                             else // We need to upgrade this person
                             {
                                 retVal.CopyObjectData(found, false, true);
@@ -327,13 +327,15 @@ namespace SanteDB.Messaging.HL7.Segments
 
                     fieldNo = 6;
                     // Mother doesn't exist, so add it
-                    if (motherEntity == null)
+                    var foundById = motherEntity != null;
+                    if (!foundById)
                         motherEntity = new Person()
                         {
                             Key = Guid.NewGuid(),
                             Identifiers = pidSegment.GetMotherSIdentifier().ToModel().ToList(),
                             Names = pidSegment.GetMotherSMaidenName().ToModel(NameUseKeys.MaidenName).ToList(),
-                            StatusConceptKey = StatusKeys.New
+                            StatusConceptKey = StatusKeys.New,
+                            
                         };
                     
                     var existingRelationship = retVal.Relationships.FirstOrDefault(r => r.SourceEntityKey == retVal.Key && r.TargetEntityKey == motherEntity.Key);
@@ -343,8 +345,24 @@ namespace SanteDB.Messaging.HL7.Segments
                         existingRelationship = retVal.Relationships.FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother);
                         if (existingRelationship == null) // No current mother relationship
                             retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Mother, motherEntity.Key));
-                        else if (!existingRelationship.LoadProperty<Entity>("TargetEntity").SemanticEquals(motherEntity))
-                            existingRelationship.TargetEntityKey = motherEntity.Key;
+                        else
+                        {
+                            var mother = existingRelationship.LoadProperty<Entity>("TargetEntity");
+
+                            // Was the data found by ID? If so point at it
+                            if (foundById)
+                                existingRelationship.TargetEntityKey = motherEntity.Key;
+                            else
+                            {
+                                // was not found by ID so only update the name of existing mother entity - Check for validity
+                                var newMaidenName = pidSegment.GetMotherSMaidenName().ToModel(NameUseKeys.MaidenName).FirstOrDefault();
+                                if (!mother.LoadCollection<EntityName>(nameof(Entity.Names)).Any(e => e.SemanticEquals(newMaidenName)))
+                                {
+                                    mother.Names.Add((newMaidenName)); // Add it
+                                    motherEntity = mother as Person;
+                                }
+                            }
+                        }
                     }
                     else
                         existingRelationship.RelationshipTypeKey = EntityRelationshipTypeKeys.Mother;
@@ -480,7 +498,11 @@ namespace SanteDB.Messaging.HL7.Segments
                     }
                     else
                     {
-                        var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Names.Any(n => n.Component.Any(c => c.Value == pidSegment.BirthPlace.Value)), AuthenticationContext.SystemPrincipal).Where(o => this.m_configuration.BirthplaceClassKeys.Contains(o.ClassConceptKey.Value));
+                        var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Names.Any(n => n.Component.Any(c => c.Value == pidSegment.BirthPlace.Value)), AuthenticationContext.SystemPrincipal);
+                        if (this.m_configuration.BirthplaceClassKeys.Any())
+                            places = places.Where(o =>
+                                this.m_configuration.BirthplaceClassKeys.Contains(o.ClassConceptKey.Value));
+
                         if (places.Count() == 1)
                         {
                             if (existing == null)
