@@ -53,6 +53,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     {
 
         /// <summary>
+        /// Return true if the specified object exists
+        /// </summary>
+        public override bool Exists(DataContext context, Guid key)
+        {
+            return context.Any<TDomainKey>(o => o.Key == key);
+        }
+
+        /// <summary>
         /// Insert the data
         /// </summary>
         public override TModel InsertInternal(DataContext context, TModel data)
@@ -110,7 +118,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             // This is technically an insert and not an update
             SqlStatement currentVersionQuery = context.CreateSqlStatement<TDomain>().SelectFrom()
-                .Where(o => o.Key == data.Key && !o.ObsoletionTime.HasValue)
+                .Where(o => o.Key == data.Key)
                 .OrderBy<TDomain>(o => o.VersionSequenceId, Core.Model.Map.SortOrderType.OrderByDescending);
 
             var existingObject = context.FirstOrDefault<TDomain>(currentVersionQuery); // Get the last version (current)
@@ -121,9 +129,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             else if ((existingObject as IDbReadonly)?.IsReadonly == true ||
                 (nonVersionedObect as IDbReadonly)?.IsReadonly == true)
                 throw new AdoFormalConstraintException(AdoFormalConstraintType.UpdatedReadonlyObject);
+            else if (existingObject.ObsoletionTime.HasValue)
+                this.m_tracer.TraceWarning("Current object {0} had no active versions - Will un-delete it", data);
 
-            // Are we re-classing this object?
-            nonVersionedObect.CopyObjectData((object)data, false, true);
+                // Are we re-classing this object?
+                nonVersionedObect.CopyObjectData((object)data, false, true);
 
             // Map existing
             var storageInstance = this.FromModelInstance(data, context);
@@ -149,8 +159,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             context.Update(existingObject);
 
+            // Ensure that the new version does not have the obsoletion time specified at all
+            newEntityVersion.ObsoletedByKey = null;
+            newEntityVersion.ObsoletedByKeySpecified = true;
+            newEntityVersion.ObsoletionTime = null;
+            newEntityVersion.ObsoletionTimeSpecified = true;
             newEntityVersion = context.Insert<TDomain>(newEntityVersion);
             nonVersionedObect = context.Update<TDomainKey>(nonVersionedObect);
+
 
             // Pull database generated fields
             data.VersionSequence = newEntityVersion.VersionSequenceId;
@@ -306,9 +322,22 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
                 var domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(typeof(TDomain), typeof(TDomainKey))
                     .InnerJoin<TDomain, TDomainKey>(o => o.Key, o => o.Key)
-                    .Where<TDomain>(o => o.Key == key && o.ObsoletionTime == null)
+                    .Where<TDomain>(o => o.Key == key)
                     .OrderBy<TDomain>(o => o.VersionSequenceId, Core.Model.Map.SortOrderType.OrderByDescending);
-                return this.CacheConvert(context.FirstOrDefault<CompositeResult<TDomain, TDomainKey>>(domainQuery), context);
+
+                // Is the most recent version obsolete? If so, un-obsolete it
+                var recentVersion = context.FirstOrDefault<CompositeResult<TDomain, TDomainKey>>(domainQuery);
+                if (recentVersion?.Object1.ObsoletionTime != null && !context.IsReadonly)
+                {
+                    this.m_tracer.TraceWarning("Object {0} # {1} has no active versions - Possible BUG - Restoring previous version", recentVersion.GetType().FullName, recentVersion.Object2?.Key);
+                    recentVersion.Object1.ObsoletionTime = null;
+                    recentVersion.Object1.ObsoletionTimeSpecified = true;
+                    recentVersion.Object1.ObsoletedByKey = null;
+                    recentVersion.Object1.ObsoletedByKeySpecified = true;
+                    recentVersion = context.Update(recentVersion);
+                }
+
+                return this.CacheConvert(recentVersion, context);
             }
         }
 

@@ -62,6 +62,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             return rawQuery;
         }
 
+       
+
         /// <summary>
         /// Maps the data to a model instance
         /// </summary>

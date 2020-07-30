@@ -53,7 +53,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// Map to model instance
         /// </summary>
         Object ToModelInstance(object domainInstance, DataContext context);
-        
+
+        /// <summary>
+        /// Returns true if the specified object exists
+        /// </summary>
+        bool Exists(DataContext context, Guid id);
     }
 
     /// <summary>

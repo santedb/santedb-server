@@ -40,12 +40,6 @@ namespace SanteDB.Persistence.Reporting.ADO.Model
 		}
 
 		/// <summary>
-		/// Gets the data context
-		/// </summary>
-		/// <value>The context.</value>
-		public DataContext Context { get; set; }
-
-		/// <summary>
 		/// Gets or sets the key.
 		/// </summary>
 		/// <value>The key.</value>

@@ -149,6 +149,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
         public abstract IEnumerable<TData> QueryInternal(DataContext context, Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TData>[] orderBy, bool countResults = true);
 
         /// <summary>
+        /// Returns true if the object exists
+        /// </summary>
+        public abstract bool Exists(DataContext context, Guid key);
+
+        /// <summary>
         /// Get the specified key.
         /// </summary>
         /// <param name="key">Key.</param>

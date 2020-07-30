@@ -92,7 +92,7 @@ namespace SanteDB.Core.Services.Impl
                 typeof(LocalOrganizationRepository),
                 typeof(LocalPlaceRepository),
                 typeof(LocalEntityRelationshipRepository),
-                typeof(LocalPatientRepository),
+                typeof( GenericLocalRepositoryEx<Patient>),
                 typeof(LocalExtensionTypeRepository),
                 typeof(LocalSecurityApplicationRepository),
                 typeof(LocalSecurityDeviceRepository),

@@ -50,6 +50,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
 
         /// <summary>
+        /// Bundles don't really exist
+        /// </summary>
+        public override bool Exists(DataContext context, Guid key)
+        {
+            return false;
+        }
+
+        /// <summary>
         /// From model instance
         /// </summary>
         public override object FromModelInstance(Bundle modelInstance, DataContext context)
@@ -173,7 +181,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     if (svc == null)
                         throw new InvalidOperationException($"Cannot find persister for {itm.GetType()}");
                     
-                    if (itm.TryGetExisting(context, true) != null)
+                    if (itm.CheckExists(context))
                     {
                         this.m_tracer.TraceInfo("Will update {0} object from bundle...", itm);
                         data.Item[i] = svc.Update(context, itm) as IdentifiedData;

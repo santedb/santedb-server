@@ -35,7 +35,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// <seealso cref="DbReferenceTermName" />
     public class ReferenceTermNamePersistenceService : BaseDataPersistenceService<ReferenceTermName, DbReferenceTermName>, IAdoAssociativePersistenceService
     {
-		/// <summary>
+        /// <summary>
 		/// Converts a domain instance into a model instance.
 		/// </summary>
 		/// <param name="modelInstance">Model instance.</param>

@@ -104,6 +104,7 @@ CREATE TABLE ent_rel_part_fam_tbl PARTITION OF ent_rel_part_tbl FOR VALUES IN ('
 CREATE TABLE ent_rel_part_own_tbl PARTITION OF ent_rel_part_tbl FOR VALUES IN ('117da15c-0864-4f00-a987-9b9854cba44e');
 CREATE TABLE ent_rel_part_stock_tbl PARTITION OF ent_rel_part_tbl FOR VALUES IN ('08fff7d9-bac7-417b-b026-c9bee52f4a37','639b4b8f-afd3-4963-9e79-ef0d3928796a','6780df3b-afbd-44a3-8627-cbb3dc2f02f6');
 CREATE TABLE ent_rel_part_inf_tbl PARTITION OF ent_rel_part_tbl FOR VALUES IN ('ac45a740-b0c7-4425-84d8-b3f8a41fef9f', 'd1578637-e1cb-415e-b319-4011da033813', '77b7a04b-c065-4faf-8ec0-2cdad4ae372b');
+CREATE TABLE ent_rel_part_bp_cit_tbl PARTITION OF ent_rel_part_tbl FOR VALUES IN ('F3EF7E48-D8B7-4030-B431-AFF7E0E1CB76', '35B13152-E43C-4BCB-8649-A9E83BEE33A2');
 
 --#!
 INSERT INTO ENT_REL_PART_TBL SELECT * FROM ENT_REL_TBL;
@@ -115,6 +116,7 @@ ALTER TABLE ent_rel_part_fam_tbl ADD CONSTRAINT pk_ent_rel_part_fam_tbl PRIMARY 
 ALTER TABLE ent_rel_part_own_tbl ADD CONSTRAINT pk_ent_rel_part_own_tbl PRIMARY KEY (ent_rel_id);
 ALTER TABLE ent_rel_part_stock_tbl ADD CONSTRAINT pk_ent_rel_part_stock_tbl PRIMARY KEY (ent_rel_id);
 ALTER TABLE ent_rel_part_inf_tbl ADD CONSTRAINT pk_ent_rel_part_inf_tbl PRIMARY KEY (ent_rel_id);
+ALTER TABLE ent_rel_part_bp_cit_tbl ADD CONSTRAINT pk_ent_rel_part_bp_cit_tbl PRIMARY KEY (ent_rel_id); 
 --#!
 
 -- ADD FKS
@@ -133,6 +135,8 @@ ALTER TABLE ent_rel_part_fam_tbl ADD CONSTRAINT fk_ent_rel_part_fam_trg_ent_id F
 ALTER TABLE ent_rel_part_own_tbl ADD CONSTRAINT fk_ent_rel_part_own_trg_ent_id FOREIGN KEY (trg_ent_id) REFERENCES ent_tbl (ent_id); 
 ALTER TABLE ent_rel_part_stock_tbl ADD CONSTRAINT fk_ent_rel_part_stock_trg_ent_id FOREIGN KEY (trg_ent_id) REFERENCES ent_tbl (ent_id);
 ALTER TABLE ent_rel_part_inf_tbl ADD CONSTRAINT fk_ent_rel_part_inf_trg_ent_id FOREIGN KEY (trg_ent_id) REFERENCES ent_tbl (ent_id); 
+ALTER TABLE ent_rel_part_bp_cit_tbl ADD CONSTRAINT fk_ent_rel_part_bp_cit_trg_ent_id FOREIGN KEY (trg_ent_id) REFERENCES ent_tbl (ent_id); 
+
 --#!
 
 -- INDEX OF SRC_ENT_ID
