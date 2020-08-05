@@ -22,8 +22,8 @@
   <messageType trigger="Q22" name="Find Candidates Query" response="RSP_K21" responseTrigger="K22" queryTarget="Patient"
                queryHandler="SanteDB.Messaging.HL7.Query.FindCandidatesQueryHandler, SanteDB.Messaging.HL7, Version=1.0.0.0"
                matchConfiguration="default">
-    <parameter hl7="@PID.5.1.1" model="name.component[Family].value" type="string"/>
-    <parameter hl7="@PID.5.2.1" model="name.component[Given].value"  type="string"/>
+    <parameter hl7="@PID.5.1.1" model="name.component[Family].value" type="string" />
+    <parameter hl7="@PID.5.2.1" model="name.component[Given].value"  type="string" />
     <parameter hl7="@PID.6.1.1" model="relationship[Mother].target.name.component[Family].value"  type="string"/>
     <parameter hl7="@PID.6.2.1" model="relationship[Mother].target.name.component[Given].value"  type="string"/>
     <parameter hl7="@PID.7.1.1" model="dateOfBirth" type="date"/>

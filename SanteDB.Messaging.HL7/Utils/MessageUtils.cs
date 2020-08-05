@@ -229,8 +229,11 @@ namespace SanteDB.Messaging.HL7.Utils
                         break;
                     case "string": // Enables phonetic matching
                         String transform = null;
-                        switch ((matchAlgorithm ?? "pattern").ToLower())
+                        switch ((matchAlgorithm ?? "approx").ToLower())
                         {
+                            case "approx":
+                                transform = ":(approx|{0})";
+                                break;
                             case "exact":
                                 transform = "{0}";
                                 break;
@@ -259,7 +262,10 @@ namespace SanteDB.Messaging.HL7.Utils
                                 transform = $":(alias|{{0}})>={matchStrength ?? 3}";
                                 break;
                             default:
-                                transform = $":(phonetic_diff|{{0}})<={matchStrength * qvalue.Length},:(alias|{{0}})>={matchStrength ?? 3}";
+                                if(matchStrength.HasValue)
+                                    transform = $":(phonetic_diff|{{0}})<={matchStrength * qvalue.Length},:(alias|{{0}})>={matchStrength ?? 3}";
+                                else 
+                                    transform = ":(approx|{0})";
                                 break;
                         }
                         retVal.Add(parm.ModelName, transform.Split(',').Select(tx => String.Format(tx, qvalue)).ToList());

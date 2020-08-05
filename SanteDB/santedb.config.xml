@@ -57,7 +57,7 @@
     <add type="SanteDB.Caching.Redis.Configuration.RedisConfigurationSection, SanteDB.Caching.Redis, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Tools.Debug.Configuration.DebugToolsConfigurationSection, SanteDB.Tools.Debug, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null"/>
     <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api, Version=1.10.0.0"/>
-    <add type="SanteDB.Matcher.Configuration.File.FileMatchConfigurationSection, SanteDB.Matcher.Configuration.File, Version=1.0.0.0"/>
+    <add type="SanteDB.Matcher.Configuration.FileMatchConfigurationSection, SanteDB.Matcher, Version=1.0.0.0"/>
     <add type="SanteGuard.Configuration.SanteGuardConfiguration, SanteGuard.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteGuard.Persistence.Ado.Configuration.SanteGuardAdoConfiguration, SanteGuard.Persistence.Ado, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.ResourceMergeConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0"/>
@@ -648,7 +648,7 @@
 
       <add type="SanteDB.Persistence.MDM.Services.MdmDataManagementService, SanteDB.Persistence.MDM, Version=1.0.0.0"/>
       <add type="SanteDB.Matcher.Matchers.WeightedRecordMatchingService, SanteDB.Matcher, Version=1.0.0.0"/>
-      <add type="SanteDB.Matcher.Configuration.File.FileMatchConfigurationProvider, SanteDB.Matcher.Configuration.File, Version=1.0.0.0"/>
+      <add type="SanteDB.Matcher.Services.FileMatchConfigurationProvider, SanteDB.Matcher, Version=1.0.0.0"/>
     
       <add type="SanteDB.Core.Data.Quality.DataQualityService, SanteDB.Core.Api, Version=1.0.0.0"/>
       <add type="SanteMPI.Persistence.ADO.Services.AdoNameAliasService, SanteMPI.Persistence.ADO, Version=2.0.0.0"/>

@@ -41,18 +41,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
     /// </summary>
     public class PatientResourceHandler : RepositoryResourceHandlerBase<Patient, Core.Model.Roles.Patient>, IBundleResourceHandler
 	{
-		/// <summary>
-		/// The repository.
-		/// </summary>
-		private IPatientRepositoryService repository;
-
-		/// <summary>
-		/// Resource handler subscription
-		/// </summary>
-		public PatientResourceHandler()
-		{
-			ApplicationServiceContext.Current.Started += (o, e) => this.repository = ApplicationServiceContext.Current.GetService<IPatientRepositoryService>();
-		}
+		
 
 		/// <summary>
 		/// Map a patient object to FHIR.

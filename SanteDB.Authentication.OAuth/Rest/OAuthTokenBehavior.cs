@@ -415,7 +415,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
           
             // Establish the session
             ISessionProviderService isp = ApplicationServiceContext.Current.GetService<ISessionProviderService>();
-            var scopeList = scope == "*" ? null : scope.Split(' ');
+            var scopeList = scope == "*" || String.IsNullOrEmpty(scope) ? null : scope.Split(' ');
             string purposeOfUse = additionalClaims?.FirstOrDefault(o => o.Type == SanteDBClaimTypes.PurposeOfUse)?.Value;
             bool isOverride = additionalClaims?.Any(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim) == true || scopeList?.Any(o => o == PermissionPolicyIdentifiers.OverridePolicyPermission) == true;
 
@@ -593,11 +593,11 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     i += 32;
                     Array.Copy(BitConverter.GetBytes(DateTime.Now.AddMinutes(1).Ticks), 0, authCode, i, 8);
                     // Encode
-                    var tokenString = BitConverter.ToString(authCode).Replace("-", "");
+                    var tokenString = Base64UrlEncoder.Encode(authCode);
 
                     // Redirect or post?
                     if (responseMode == "form_post")
-                        return this.RenderOAuthAutoPost(redirectUrl, "code={tokenString}&state={state}");
+                        return this.RenderOAuthAutoPost(redirectUrl, $"code={tokenString}&state={state}");
                     else
                         RestOperationContext.Current.OutgoingResponse.Redirect($"{redirectUrl}?code={tokenString}&state={state}");
                 }
@@ -607,7 +607,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     var claimList = claims?.Select(o => new SanteDBClaim(o.Split('=')[0], o.Split('=')[1])).ToList() ?? new List<SanteDBClaim>();
                     if (!String.IsNullOrEmpty(nonce)) // append nonce
                         claimList.Add(new SanteDBClaim("nonce", nonce));
-                    var response = this.EstablishSession(principal, new SanteDBClaimsPrincipal(clientIdentity), null, String.Join(" ", scope), claimList);
+                    var response = this.EstablishSession(principal, new SanteDBClaimsPrincipal(clientIdentity), null, String.Join(" ", scope.Where(o=>!o.Equals("openid"))), claimList);
                     // Return id token?
                     String redirectString = "";
                     if (responseType.Split(' ').Contains("token"))

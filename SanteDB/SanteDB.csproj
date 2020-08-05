@@ -307,10 +307,6 @@
           <Project>{903e2e75-7b62-4c42-a001-404dc0235a6b}</Project>
           <Name>SanteDB.Rest.HDSI</Name>
         </ProjectReference>
-        <ProjectReference Include="..\santedb-match\SanteDB.Matcher.Configuration.File\SanteDB.Matcher.Configuration.File.csproj">
-          <Project>{34c6a8fa-d3dd-4ab9-9d0d-24f355690cec}</Project>
-          <Name>SanteDB.Matcher.Configuration.File</Name>
-        </ProjectReference>
         <ProjectReference Include="..\santedb-mdm\SanteDB.Persistence.MDM\SanteDB.Persistence.MDM.csproj">
           <Project>{20960967-3647-41a2-9df6-3e15e2aa7019}</Project>
           <Name>SanteDB.Persistence.MDM</Name>
