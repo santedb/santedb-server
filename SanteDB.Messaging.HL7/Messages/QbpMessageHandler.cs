@@ -239,7 +239,7 @@ namespace SanteDB.Messaging.HL7.Messages
             }
 
             // Process results
-            retVal = map.QueryHandler.AppendQueryResult(results, filter, retVal, request, map.ScoreConfiguration, offset);
+            retVal = map.QueryHandler.AppendQueryResult(results, filter, retVal, request, offset);
 
             return retVal;
         }

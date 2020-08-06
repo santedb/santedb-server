@@ -163,14 +163,14 @@ namespace SanteDB.Messaging.HL7.Utils
             }
             return retVal;
 
-    }
+        }
 
-    /// <summary>
-    /// Update the MSH on the specified MSH segment
-    /// </summary>
-    /// <param name="msh">The message header to be updated</param>
-    /// <param name="inbound">The inbound message</param>
-    public static void SetDefault(this MSH msh, MSH inbound)
+        /// <summary>
+        /// Update the MSH on the specified MSH segment
+        /// </summary>
+        /// <param name="msh">The message header to be updated</param>
+        /// <param name="inbound">The inbound message</param>
+        public static void SetDefault(this MSH msh, MSH inbound)
         {
             var config = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
             msh.MessageControlID.Value = Guid.NewGuid().ToString();
@@ -203,7 +203,7 @@ namespace SanteDB.Messaging.HL7.Utils
         /// <summary>
         /// Rewrite a QPD query to an HDSI query
         /// </summary>
-        public static NameValueCollection ParseQueryElement(IEnumerable<Varies> varies, Hl7QueryParameterType map, String matchAlgorithm = "pattern", double? matchStrength = null )
+        public static NameValueCollection ParseQueryElement(IEnumerable<Varies> varies, Hl7QueryParameterType map, String matchAlgorithm, double? matchStrength = null)
         {
             NameValueCollection retVal = new NameValueCollection();
             var config = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
@@ -262,10 +262,7 @@ namespace SanteDB.Messaging.HL7.Utils
                                 transform = $":(alias|{{0}})>={matchStrength ?? 3}";
                                 break;
                             default:
-                                if(matchStrength.HasValue)
-                                    transform = $":(phonetic_diff|{{0}})<={matchStrength * qvalue.Length},:(alias|{{0}})>={matchStrength ?? 3}";
-                                else 
-                                    transform = ":(approx|{0})";
+                                transform = ":(approx|{0})";
                                 break;
                         }
                         retVal.Add(parm.ModelName, transform.Split(',').Select(tx => String.Format(tx, qvalue)).ToList());
@@ -289,8 +286,9 @@ namespace SanteDB.Messaging.HL7.Utils
 
             // HACK: Are they asking for the @PID.3.4.1 of our local auth?
             List<String> localId = null;
-            if(retVal.TryGetValue("identifier.authority.domainName", out localId) &&
-                localId.Contains(config.LocalAuthority.DomainName)) { 
+            if (retVal.TryGetValue("identifier.authority.domainName", out localId) &&
+                localId.Contains(config.LocalAuthority.DomainName))
+            {
                 retVal.Remove("identifier.authority.domainName");
                 localId = retVal["identifier.value"];
                 retVal.Remove("identifier.value");

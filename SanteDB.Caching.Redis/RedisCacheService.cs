@@ -143,25 +143,21 @@ namespace SanteDB.Caching.Redis
         private void EnsureCacheConsistency(DataCacheEventArgs e, bool remove = false)
         {
             // If someone inserts a relationship directly, we need to unload both the source and target so they are re-loaded 
-            if (e.Object is ActParticipation)
+            if (e.Object is ActParticipation ptcpt)
             {
-                var ptcpt = (e.Object as ActParticipation);
-
                 this.Remove(ptcpt.SourceEntityKey.GetValueOrDefault());
                 this.Remove(ptcpt.PlayerEntityKey.GetValueOrDefault());
                 //MemoryCache.Current.RemoveObject(ptcpt.PlayerEntity?.GetType() ?? typeof(Entity), ptcpt.PlayerEntityKey);
             }
-            else if (e.Object is ActRelationship)
+            else if (e.Object is ActRelationship actrel)
             {
-                var rel = (e.Object as ActRelationship);
-                this.Remove(rel.SourceEntityKey.GetValueOrDefault());
-                this.Remove(rel.TargetActKey.GetValueOrDefault());
+                this.Remove(actrel.SourceEntityKey.GetValueOrDefault());
+                this.Remove(actrel.TargetActKey.GetValueOrDefault());
             }
-            else if (e.Object is EntityRelationship)
+            else if (e.Object is EntityRelationship entrel)
             {
-                var rel = (e.Object as EntityRelationship);
-                this.Remove(rel.SourceEntityKey.GetValueOrDefault());
-                this.Remove(rel.TargetEntityKey.GetValueOrDefault());
+                this.Remove(entrel.SourceEntityKey.GetValueOrDefault());
+                this.Remove(entrel.TargetEntityKey.GetValueOrDefault());
             }
 
         }
