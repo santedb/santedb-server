@@ -44,7 +44,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// </summary>
         protected override AdverseEvent MapToFhir(Act model, RestOperationContext restOperationContext)
         {
-            var retVal = DataTypeConverter.CreateResource<AdverseEvent>(model);
+            var retVal = DataTypeConverter.CreateResource<AdverseEvent>(model, restOperationContext);
 
             retVal.Identifier = DataTypeConverter.ToFhirIdentifier<Act>(model.Identifiers.FirstOrDefault());
             retVal.Category = AdverseEventCategory.AdverseEvent;

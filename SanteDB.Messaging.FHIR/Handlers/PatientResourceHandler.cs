@@ -51,7 +51,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <returns>Returns the mapped FHIR resource.</returns>
 		protected override Patient MapToFhir(Core.Model.Roles.Patient model, RestOperationContext restOperationContext)
 		{
-			var retVal = DataTypeConverter.CreateResource<Patient>(model);
+			var retVal = DataTypeConverter.CreateResource<Patient>(model, restOperationContext);
 			retVal.Active = model.StatusConceptKey == StatusKeys.Active;
 			retVal.Address = model.LoadCollection<EntityAddress>("Addresses").Select(o => DataTypeConverter.ToFhirAddress(o)).ToList();
 			retVal.BirthDate = model.DateOfBirth;
@@ -83,7 +83,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
                 if (rel.LoadProperty<Concept>(nameof(EntityRelationship.RelationshipType)).ConceptSetsXml.Contains(ConceptSetKeys.FamilyMember))
                 {
                     // Create the relative object
-                    var relative = DataTypeConverter.CreateResource<RelatedPerson>(rel.LoadProperty<Person>(nameof(EntityRelationship.TargetEntity)));
+                    var relative = DataTypeConverter.CreateResource<RelatedPerson>(rel.LoadProperty<Person>(nameof(EntityRelationship.TargetEntity)), restOperationContext);
                     relative.Relationship = DataTypeConverter.ToFhirCodeableConcept(rel.LoadProperty<Concept>(nameof(EntityRelationship.RelationshipType)));
                     relative.Address = DataTypeConverter.ToFhirAddress(rel.TargetEntity.Addresses.FirstOrDefault());
                     relative.Gender = DataTypeConverter.ToFhirCodeableConcept((rel.TargetEntity as Core.Model.Roles.Patient)?.LoadProperty<Concept>(nameof(Core.Model.Roles.Patient.GenderConcept)));
@@ -103,13 +103,13 @@ namespace SanteDB.Messaging.FHIR.Handlers
                     retVal.Link.Add(new PatientLink()
                     {
                         Type = PatientLinkType.Replace,
-                        Other = Reference.CreateResourceReference<Patient>(DataTypeConverter.CreateResource<Patient>(rel.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity))))
+                        Other = Reference.CreateResourceReference<Patient>(DataTypeConverter.CreateResource<Patient>(rel.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity)), restOperationContext))
                     });
                 else if (rel.RelationshipTypeKey == EntityRelationshipTypeKeys.Duplicate)
                     retVal.Link.Add(new PatientLink()
                     {
                         Type = PatientLinkType.SeeAlso,
-                        Other = Reference.CreateResourceReference<Patient>(DataTypeConverter.CreateResource<Patient>(rel.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity))))
+                        Other = Reference.CreateResourceReference<Patient>(DataTypeConverter.CreateResource<Patient>(rel.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity)), restOperationContext))
                     });
                 else if (rel.RelationshipTypeKey?.ToString() == "97730a52-7e30-4dcd-94cd-fd532d111578") // MDM Master Record
                 {
@@ -117,13 +117,13 @@ namespace SanteDB.Messaging.FHIR.Handlers
                         retVal.Link.Add(new PatientLink() // Is a master
                         {
                             Type = PatientLinkType.SeeAlso,
-                            Other = Reference.CreateResourceReference<Patient>(DataTypeConverter.CreateResource<Patient>(rel.LoadProperty<Entity>(nameof(EntityRelationship.SourceEntity))))
+                            Other = Reference.CreateResourceReference<Patient>(DataTypeConverter.CreateResource<Patient>(rel.LoadProperty<Entity>(nameof(EntityRelationship.SourceEntity)), restOperationContext))
                         });
                     else // Is a local
                         retVal.Link.Add(new PatientLink()
                         {
                             Type = PatientLinkType.Refer,
-                            Other = Reference.CreateResourceReference<Patient>(DataTypeConverter.CreateResource<Patient>(rel.LoadProperty<Entity>(nameof(EntityRelationship.SourceEntity))))
+                            Other = Reference.CreateResourceReference<Patient>(DataTypeConverter.CreateResource<Patient>(rel.LoadProperty<Entity>(nameof(EntityRelationship.SourceEntity)), restOperationContext))
                         });
                 }
             }

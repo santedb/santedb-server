@@ -55,13 +55,15 @@ namespace SanteDB.Messaging.FHIR.Util
 		/// <typeparam name="TResource">The type of the t resource.</typeparam>
 		/// <param name="targetEntity">The target entity.</param>
 		/// <returns>Returns a reference instance.</returns>
-		public static Reference<TResource> CreateReference<TResource>(IVersionedEntity targetEntity, RestOperationContext context) where TResource : DomainResourceBase, new()
+		public static Reference<TResource> CreateReference<TResource>(IVersionedEntity targetEntity, RestOperationContext context) 
+            where TResource : DomainResourceBase, new()
 		{
             if (targetEntity == null)
                 throw new ArgumentNullException(nameof(targetEntity));
             else if (context == null)
                 throw new ArgumentNullException(nameof(context));
-			var refer =  Reference.CreateResourceReference(DataTypeConverter.CreateResource<TResource>(targetEntity), context.IncomingRequest.Url);
+
+			var refer =  Reference.CreateResourceReference(DataTypeConverter.CreateResource<TResource>(targetEntity, context), context.IncomingRequest.Url);
             refer.Display = (targetEntity as Entity)?.Names?.FirstOrDefault()?.ToString();
             return refer;
 		}
@@ -74,7 +76,7 @@ namespace SanteDB.Messaging.FHIR.Util
         /// <returns>Returns a reference instance.</returns>
         public static Reference CreatePlainReference<TResource>(IVersionedEntity targetEntity, RestOperationContext context) where TResource : DomainResourceBase, new()
         {
-            var refer = Reference.CreateResourceReference((DomainResourceBase)DataTypeConverter.CreateResource<TResource>(targetEntity), context.IncomingRequest.Url);
+            var refer = Reference.CreateResourceReference((DomainResourceBase)DataTypeConverter.CreateResource<TResource>(targetEntity, context), context.IncomingRequest.Url);
             refer.Display = (targetEntity as Entity)?.Names?.FirstOrDefault()?.ToString();
             return refer;
 
@@ -85,7 +87,7 @@ namespace SanteDB.Messaging.FHIR.Util
         /// <typeparam name="TResource">The type of the t resource.</typeparam>
         /// <param name="resource">The resource.</param>
         /// <returns>TResource.</returns>
-        public static TResource CreateResource<TResource>(IVersionedEntity resource) where TResource : ResourceBase, new()
+        public static TResource CreateResource<TResource>(IVersionedEntity resource, RestOperationContext context) where TResource : ResourceBase, new()
 		{
 			var retVal = new TResource();
 			retVal.Id = resource.Key.ToString();
@@ -102,7 +104,7 @@ namespace SanteDB.Messaging.FHIR.Util
             // TODO: Configure this namespace / coding scheme
             retVal.Meta.Security = (resource as ISecurable)?.Policies?.Where(o => o.GrantType == Core.Model.Security.PolicyGrantType.Grant).Select(o => new FhirCoding(new Uri("http://santedb.org/security/policy"), o.Policy.Oid)).ToList() ?? new List<FhirCoding>();
             retVal.Meta.Security.Add(new FhirCoding(new Uri("http://santedb.org/security/policy"), PermissionPolicyIdentifiers.ReadClinicalData));
-            retVal.Extension = (resource as IExtendable)?.Extensions.Where(o=>o.ExtensionTypeKey != ExtensionTypeKeys.JpegPhotoExtension).Select(o => DataTypeConverter.ToExtension(o)).ToList();
+            retVal.Extension = (resource as IExtendable)?.Extensions.Where(o=>o.ExtensionTypeKey != ExtensionTypeKeys.JpegPhotoExtension).Select(o => DataTypeConverter.ToExtension(o, context)).ToList();
             return retVal;
 		}
 
@@ -262,7 +264,7 @@ namespace SanteDB.Messaging.FHIR.Util
         /// <summary>
         /// Act Extension to Fhir Extension
         /// </summary>
-        public static Extension ToExtension(IModelExtension ext)
+        public static Extension ToExtension(IModelExtension ext, RestOperationContext context)
         {
 
             var extensionTypeService = ApplicationServiceContext.Current.GetService<IExtensionTypeRepository>();
@@ -279,6 +281,10 @@ namespace SanteDB.Messaging.FHIR.Util
                 retVal.Value = new FhirString((String)(ext.Value ?? new StringExtensionHandler().DeSerialize(ext.Data)));
             else if (ext.Value is Boolean || eType.ExtensionHandler == typeof(BooleanExtensionHandler))
                 retVal.Value = new FhirBoolean((bool)(ext.Value ?? new BooleanExtensionHandler().DeSerialize(ext.Data)));
+            else if (ext.Value is Concept concept)
+                retVal.Value = ToFhirCodeableConcept(concept);
+            else if (ext.Value is SanteDB.Core.Model.Roles.Patient patient)
+                retVal.Value = DataTypeConverter.CreateReference<Patient>(patient, context);
             else
                 retVal.Value = new FhirBase64Binary(ext.Data);
             return retVal;
@@ -540,11 +546,20 @@ namespace SanteDB.Messaging.FHIR.Util
 			}
 
             if (String.IsNullOrEmpty(preferredCodeSystem))
-                return new FhirCodeableConcept
-                {
-                    Coding = concept.LoadCollection<ConceptReferenceTerm>(nameof(Concept.ReferenceTerms)).Select(o => DataTypeConverter.ToCoding(o.LoadProperty<ReferenceTerm>(nameof(ConceptReferenceTerm.ReferenceTerm)))).ToList(),
-                    Text = concept.LoadCollection<ConceptName>(nameof(Concept.ConceptNames)).FirstOrDefault()?.Name
-                };
+            {
+                var refTerms = concept.LoadCollection<ConceptReferenceTerm>(nameof(Concept.ReferenceTerms));
+                if (refTerms.Any())
+                    return new FhirCodeableConcept
+                    {
+                        Coding = refTerms.Select(o => DataTypeConverter.ToCoding(o.LoadProperty<ReferenceTerm>(nameof(ConceptReferenceTerm.ReferenceTerm)))).ToList(),
+                        Text = concept.LoadCollection<ConceptName>(nameof(Concept.ConceptNames)).FirstOrDefault()?.Name
+                    };
+                else
+                    return new FhirCodeableConcept(new Uri("http://openiz.org/concept"), concept.Mnemonic)
+                    {
+                        Text = concept.LoadCollection<ConceptName>(nameof(Concept.ConceptNames)).FirstOrDefault()?.Name
+                    };
+            }
             else {
                 var codeSystemService = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>();
                 var refTerm = codeSystemService.GetConceptReferenceTerm(concept.Key.Value, preferredCodeSystem);

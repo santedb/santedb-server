@@ -65,7 +65,6 @@
     <Compile Include="PatientPersistenceServiceTest.cs" />
     <Compile Include="PersistenceTest.cs" />
     <Compile Include="PersonPersistenceServiceTest.cs" />
-    <Compile Include="PhoneticAlgorithmPersistenceServiceTest.cs" />
     <Compile Include="QueryExpressionWriterTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AdoPolicyProviderTest.cs" />

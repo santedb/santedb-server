@@ -80,18 +80,6 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Concepts
         public String Value { get; set; }
 
         /// <summary>
-        /// Gets or sets the phonetic code
-        /// </summary>
-        [Column("phon_cs")]
-        public String PhoneticCode { get; set; }
-
-        /// <summary>
-        /// Gets or sets the algorithm id
-        /// </summary>
-        [Column("phon_alg_id"), ForeignKey(typeof(DbPhoneticAlgorithm), nameof(DbPhoneticAlgorithm.Key))]
-        public Guid PhoneticAlgorithm { get; set; }
-
-        /// <summary>
         /// Gets or sets whether obsoleted by key is specified (for undelete)
         /// </summary>
         public bool ObsoletedByKeySpecified { get; set; }

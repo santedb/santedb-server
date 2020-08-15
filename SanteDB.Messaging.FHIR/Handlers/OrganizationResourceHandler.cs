@@ -60,7 +60,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// </summary>
         protected override SanteDB.Messaging.FHIR.Resources.Organization MapToFhir(Core.Model.Entities.Organization model, RestOperationContext webOperationContext)
         {
-            return DataTypeConverter.CreateResource<SanteDB.Messaging.FHIR.Resources.Organization>(model);
+            return DataTypeConverter.CreateResource<SanteDB.Messaging.FHIR.Resources.Organization>(model, webOperationContext);
         }
 
         /// <summary>

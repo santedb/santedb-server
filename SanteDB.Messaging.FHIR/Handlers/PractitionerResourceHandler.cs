@@ -60,7 +60,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         {
             // Is there a provider that matches this user?
             var provider = model.LoadCollection<EntityRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.AssignedEntity)?.LoadProperty<Provider>("TargetEntity") ;
-            var retVal = DataTypeConverter.CreateResource<Practitioner>(model);
+            var retVal = DataTypeConverter.CreateResource<Practitioner>(model, restOperationContext);
 
             // Identifiers
             retVal.Identifier = (provider?.Identifiers ?? model.Identifiers)?.Select(o => DataTypeConverter.ToFhirIdentifier(o)).ToList();

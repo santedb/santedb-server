@@ -43,7 +43,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// </summary>
 		protected override Substance MapToFhir(Material model, RestOperationContext restOperationContext)
 		{
-			var retVal = DataTypeConverter.CreateResource<Substance>(model);
+			var retVal = DataTypeConverter.CreateResource<Substance>(model, restOperationContext);
 
 			// Identifiers
 			retVal.Identifier = model.Identifiers.Select(o => DataTypeConverter.ToFhirIdentifier<Entity>(o)).ToList();

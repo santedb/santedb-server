@@ -49,7 +49,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <returns>Returns the mapped FHIR resource.</returns>
 		protected override Immunization MapToFhir(SubstanceAdministration model, RestOperationContext restOperationContext)
 		{
-			var retVal = DataTypeConverter.CreateResource<Immunization>(model);
+			var retVal = DataTypeConverter.CreateResource<Immunization>(model, restOperationContext);
 
 			retVal.DoseQuantity = new FhirQuantity()
 			{

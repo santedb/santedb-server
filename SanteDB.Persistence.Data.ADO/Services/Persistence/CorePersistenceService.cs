@@ -253,8 +253,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, orderBy);
                     }
 
-                    
-
                     if (retVal == null)
                         retVal = this.DomainQueryInternal<TQueryReturn>(context, domainQuery);
                     else

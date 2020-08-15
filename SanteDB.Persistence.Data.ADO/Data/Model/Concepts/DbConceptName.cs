@@ -51,26 +51,6 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Concepts
 			set;
 		}
 
-		/// <summary>
-		/// Gets or sets the phonetic code.
-		/// </summary>
-		/// <value>The phonetic code.</value>
-		[Column("phon_cs")]
-		public String PhoneticCode {
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// Gets or sets the phonetic algorithm identifier.
-		/// </summary>
-		/// <value>The phonetic algorithm identifier.</value>
-		[Column("phon_alg_id")]
-		public Guid PhoneticAlgorithmKey {
-			get;
-			set;
-		}
-        
         /// <summary>
         /// Gets or sets the id of the name
         /// </summary>

@@ -68,7 +68,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// </summary>
         protected override Encounter MapToFhir(PatientEncounter model, RestOperationContext restOperationContext)
         {
-            var retVal = DataTypeConverter.CreateResource<Encounter>(model);
+            var retVal = DataTypeConverter.CreateResource<Encounter>(model, restOperationContext);
 
             // Map the identifier
             retVal.Identifier = model.LoadCollection<ActIdentifier>("Identifiers").Select(o => DataTypeConverter.ToFhirIdentifier<Act>(o)).ToList();

@@ -46,7 +46,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// </summary>
         protected override MedicationAdministration MapToFhir(SubstanceAdministration model, RestOperationContext restOperationContext)
         {
-            var retVal = DataTypeConverter.CreateResource<MedicationAdministration>(model);
+            var retVal = DataTypeConverter.CreateResource<MedicationAdministration>(model, restOperationContext);
 
             retVal.Identifier = model.LoadCollection<ActIdentifier>("Identifiers").Select(o => DataTypeConverter.ToFhirIdentifier(o)).ToList();
 

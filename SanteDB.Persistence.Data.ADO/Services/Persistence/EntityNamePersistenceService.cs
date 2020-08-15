@@ -77,9 +77,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                             Key = c.Object1.Key,
                             LoadState = Core.Model.LoadState.FullLoad,
                             SourceEntityKey = c.Object2.Key,
-                            Value = c.Object3.Value,
-                            PhoneticAlgorithmKey = c.Object3.PhoneticAlgorithmKey,
-                            PhoneticCode = c.Object3.PhoneticCode
+                            Value = c.Object3.Value
                         }).ToList()
                     });
 
@@ -159,12 +157,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 retVal.ValueSequenceId = existing.SequenceId.Value;
             else if (existing == null)
             {
-                var phoneticCoder = ApplicationServiceContext.Current.GetService<IPhoneticAlgorithmHandler>();
                 var value = context.Insert(new DbPhoneticValue()
                 {
-                    Value = modelInstance.Value,
-                    PhoneticAlgorithmKey = phoneticCoder?.AlgorithmId ?? PhoneticAlgorithmKeys.None,
-                    PhoneticCode = phoneticCoder?.GenerateCode(modelInstance.Value)
+                    Value = modelInstance.Value
                 });
                 retVal.ValueSequenceId = value.SequenceId.Value;
             }
@@ -187,8 +182,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             return new EntityNameComponent()
             {
                 ComponentTypeKey = nameComp.ComponentTypeKey,
-                PhoneticAlgorithmKey = nameValue.PhoneticAlgorithmKey,
-                PhoneticCode = nameValue.PhoneticCode,
                 Value = nameValue.Value,
                 Key = nameComp.Key,
                 SourceEntityKey = nameComp.SourceKey

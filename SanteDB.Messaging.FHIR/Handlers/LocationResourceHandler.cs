@@ -42,7 +42,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// </summary>
 		protected override Location MapToFhir(Place model, RestOperationContext restOperationContext)
 		{
-			Location retVal = DataTypeConverter.CreateResource<Location>(model);
+			Location retVal = DataTypeConverter.CreateResource<Location>(model, restOperationContext);
 			retVal.Identifier = model.LoadCollection<EntityIdentifier>("Identifiers").Select(o => DataTypeConverter.ToFhirIdentifier<Entity>(o)).ToList();
 
 			// Map status

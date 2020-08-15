@@ -179,17 +179,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class ConceptNamePersistenceService : IdentifiedPersistenceService<Core.Model.DataTypes.ConceptName, DbConceptName>, IAdoAssociativePersistenceService
     {
-        /// <summary>
-        /// Concept name service
-        /// </summary>
-        public override object FromModelInstance(Core.Model.DataTypes.ConceptName modelInstance, DataContext context)
-        {
-            var retVal = base.FromModelInstance(modelInstance, context) as DbConceptName;
-            var phoneticCoder = ApplicationServiceContext.Current.GetService<IPhoneticAlgorithmHandler>();
-            retVal.PhoneticAlgorithmKey = phoneticCoder?.AlgorithmId ?? PhoneticAlgorithmKeys.None;
-            retVal.PhoneticCode = phoneticCoder?.GenerateCode(modelInstance.Name);
-            return retVal;
-        }
 
         /// <summary>
         /// Get names from source
