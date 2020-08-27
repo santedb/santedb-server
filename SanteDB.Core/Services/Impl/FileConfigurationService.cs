@@ -68,6 +68,7 @@ namespace SanteDB.Core.Services.Impl
             }
             catch (Exception e) {
                 Trace.TraceError("Error loading configuration: {0}", e);
+                throw;
             }
         }
         

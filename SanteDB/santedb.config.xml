@@ -102,7 +102,7 @@
 		   readOnlyConnectionString="AUDIT"
 		   traceSql="false"
 		   providerType="npgsql" />
-  <section xsi:type="santeguard:SanteGuardConfiguration">
+  <!--<section xsi:type="santeguard:SanteGuardConfiguration">
     <santeguard:endpoints>
       <santeguard:add name="UDP Audit Transport" timeout="00:00:10" readTimeout="00:00:10" maxMessageSize="655340" address="udp://0.0.0.0:514">
         <santeguard:actions>
@@ -113,26 +113,26 @@
       </santeguard:add>h
     </santeguard:endpoints>
     <santeguard:defaultEnterpriseSite>value</santeguard:defaultEnterpriseSite>
-  </section>
-  <section xsi:type="santempi:AdoConfigurationSection"
+  </section>-->
+  <!--<section xsi:type="santempi:AdoConfigurationSection"
       readWriteConnectionString="PSQL"
 	    readOnlyConnectionString="PSQL"
 	    traceSql="false"
 	    providerType="npgsql"
 	    perpareStatements="false"
-    />
+    />-->
   <section xsi:type="AppletConfigurationSection" appletDirectory=".\applets" allowUnsignedApplets="true">
     <trustedPublishers>
       <add>82C63E1E9B87578D0727E871D7613F2F0FAF683B</add>
       <add>4326A4421216AC254DA93DC61B93160B08925BB1</add>
     </trustedPublishers>
   </section>
-  <section xsi:type="santeguard:SanteGuardAdoConfiguration"
+  <!--<section xsi:type="santeguard:SanteGuardAdoConfiguration"
 	readWriteConnectionString="PSQL"
 	readOnlyConnectionString="PSQL"
 	traceSql="false"
 	providerType="npgsql"
-	perpareStatements="false" />
+	perpareStatements="false" />-->
 
   <section xsi:type="OAuthConfigurationSection" issuerName="http://localhost:8080/auth">
     <allowedClaims>
@@ -284,8 +284,8 @@
     </service>
   </section>
   <!-- Basic Authorization Configuration -->
-  <section xsi:type="BasicAuthorizationConfigurationSection" requireClientAuth="true" realm="127.0.0.1">
-    <!-- X-SanteDB-ClientClaim allowed claims -->
+  <!--<section xsi:type="BasicAuthorizationConfigurationSection" requireClientAuth="true" realm="127.0.0.1">
+    --><!-- X-SanteDB-ClientClaim allowed claims --><!--
     <claims>
       <add>scope</add>
       <add>PolicyOverride</add>
@@ -294,7 +294,7 @@
       <add>FacilityId</add>
       <add>OrganizationId</add>
     </claims>
-  </section>
+  </section>-->
   <!-- Used for authorizing clients using a claims token -->
   <section xsi:type="ClaimsAuthorizationConfigurationSection" realm="127.0.0.1">
     <issuer>

@@ -25,6 +25,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Services;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.IdentityModel.Configuration;
@@ -145,8 +146,12 @@ namespace SanteDB.Core.Rest.Security
             catch (UnauthorizedAccessException e)
             {
                 this.m_traceSource.TraceEvent(EventLevel.Error,  "Token Error (From: {0}) : {1}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint, e);
-
                 throw;
+            }
+            catch(KeyNotFoundException e)
+            {
+                this.m_traceSource.TraceEvent(EventLevel.Error, "Token Error (From: {0}) : {1}", RestOperationContext.Current.IncomingRequest.RemoteEndPoint, e);
+                throw new SecurityTokenException(e.Message);
             }
             catch (Exception e)
             {

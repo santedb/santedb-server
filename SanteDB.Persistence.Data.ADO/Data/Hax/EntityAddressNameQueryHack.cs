@@ -70,7 +70,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
                 !String.IsNullOrEmpty(whereClause.SQL))
                 return false;
 
-            whereClause.And($" {keyName} IN (SELECT {keyName} FROM  {cmpTblType} AS {queryPrefix}{cmpTblType} ");
+            whereClause.And($" EXISTS (SELECT 1 FROM  {cmpTblType} AS {queryPrefix}{cmpTblType}  ");
             // Filter through other name or address components which may be in the query at this query level
             List <String> componentTypeGuard = new List<String>();
             var localChar = 'a';
@@ -115,6 +115,8 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
             for (char s = 'a'; s < localChar; s++)
                 whereClause.Append($" {queryPrefix}{valTblType}_{s}.val_seq_id IS NOT NULL ").Append("OR");
             whereClause.RemoveLast();
+            whereClause.And($"{queryPrefix}{scopedTables.First().TableName}.{keyName} = {queryPrefix}{cmpTblType}.{keyName}");
+
             whereClause.Append($") GROUP BY {keyName} HAVING COUNT(DISTINCT {queryPrefix}{cmpTblType}.cmp_id) >= {vCount})");
 
             return true;

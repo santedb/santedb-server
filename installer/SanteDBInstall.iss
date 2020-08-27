@@ -4,7 +4,7 @@
 #define MyAppName "SanteDB Server"
 #define MyAppPublisher "SanteDB Community"
 #define MyAppURL "http://santesuite.org"
-#define MyAppVersion "2.0.29"
+#define MyAppVersion "2.0.30"
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -36,6 +36,8 @@ AppCopyright = Copyright (C) 2015-2020 SanteSuite Contributors
 ArchitecturesInstallIn64BitMode = x64
 ArchitecturesAllowed =  x64
 WizardStyle=modern
+SignedUninstaller=yes
+SignTool=default sign /a /n $qFyfe Software$q /tr http://tsa.starfieldtech.com /d $qSanteDB iCDR Server$q $f
 
 ; SignTool=default sign $f
 ; SignedUninstaller=yes
@@ -223,7 +225,6 @@ Source: ..\bin\Release\Npgsql.dll; DestDir: {app}; Components: db\psql
 ; Matching Infrastructure
 Source: ..\bin\Release\Phonix.dll; DestDir: {app}; Components: match
 Source: ..\bin\Release\SanteDB.Matcher.dll; DestDir: {app}; Components: match
-Source: ..\bin\Release\SanteDB.Matcher.Orm.dll; DestDir: {app}; Components: match
 
 ; OAUTH
 Source: ..\bin\Release\SanteDB.Authentication.OAuth2.dll; DestDir: {app}; Components: msg\auth

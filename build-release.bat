@@ -52,11 +52,11 @@ if exist "%nuget%" (
 
 	FOR /R "%cwd%\bin\Release" %%G IN (*.exe) DO (
 		echo Signing %%G
-		"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign "%%G"
+		"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /d "SanteDB iCDR" /tr http://tsa.starfieldtech.com santedb-dcg.exe "%%G"
 	)
-	FOR /R "%cwd%\bin\Release" %%G IN (*.dll) DO (
+	FOR /R "%cwd%\bin\Release" %%G IN (SanteDB*.dll) DO (
 		echo Signing %%G
-		"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign "%%G"
+		"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /d "SanteDB iCDR" /tr http://tsa.starfieldtech.com santedb-dcg.exe "%%G"
 	)
 	
 	%inno% "/o.\bin\dist" ".\installer\SanteDBInstall.iss" /d"MyAppVersion=%version%" /d"x64" /d"BUNDLED"

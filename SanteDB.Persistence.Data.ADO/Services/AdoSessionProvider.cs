@@ -295,7 +295,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     qToken = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(qToken);
                     var dbSession = context.SingleOrDefault<DbSession>(o => o.RefreshToken == qToken && o.RefreshExpiration > DateTimeOffset.Now);
                     if (dbSession == null)
-                        throw new FileNotFoundException(BitConverter.ToString(refreshToken));
+                        throw new SecurityTokenValidationException(BitConverter.ToString(refreshToken));
 
                     var claims = context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Key).ToArray();
 
@@ -381,7 +381,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         var dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionId);
 
                         if (dbSession == null)
-                            throw new KeyNotFoundException($"Session {BitConverter.ToString(sessionToken)} not found");
+                            throw new SecurityTokenException($"Session {BitConverter.ToString(sessionToken)} not found");
                         else if (dbSession.NotAfter < DateTime.Now)
                             throw new SecurityTokenExpiredException($"Session {BitConverter.ToString(sessionToken)} is expired");
                         else
