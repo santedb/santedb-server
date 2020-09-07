@@ -250,7 +250,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     else
                     {
                         m_tracer.TraceEvent(EventLevel.Verbose, "Will use slow query construction due to complex mapped fields");
-                        domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, orderBy);
+                        if(q == queries.Last())
+                            domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, orderBy);
+                        else
+                            domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query);
                     }
 
                     if (retVal == null)

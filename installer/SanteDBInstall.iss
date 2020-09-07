@@ -4,7 +4,7 @@
 #define MyAppName "SanteDB Server"
 #define MyAppPublisher "SanteDB Community"
 #define MyAppURL "http://santesuite.org"
-#define MyAppVersion "2.0.30"
+#define MyAppVersion "2.0.32"
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -37,7 +37,7 @@ ArchitecturesInstallIn64BitMode = x64
 ArchitecturesAllowed =  x64
 WizardStyle=modern
 SignedUninstaller=yes
-SignTool=default sign /a /n $qFyfe Software$q /tr http://tsa.starfieldtech.com /d $qSanteDB iCDR Server$q $f
+SignTool=default sign /a /n $qFyfe Software$q /d $qSanteDB iCDR Server$q $f
 
 ; SignTool=default sign $f
 ; SignedUninstaller=yes

@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Hax
 {
@@ -70,10 +71,8 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
                 !String.IsNullOrEmpty(whereClause.SQL))
                 return false;
 
-            whereClause.And($" EXISTS (SELECT 1 FROM  {cmpTblType} AS {queryPrefix}{cmpTblType}  ");
+            whereClause.And($"EXISTS (SELECT 1 FROM {valTblType} AS {queryPrefix}{valTblType} INNER JOIN  {cmpTblType} AS {queryPrefix}{cmpTblType} ON ({queryPrefix}{valTblType}.val_seq_id = {queryPrefix}{cmpTblType}.val_seq_id) WHERE (");
             // Filter through other name or address components which may be in the query at this query level
-            List <String> componentTypeGuard = new List<String>();
-            var localChar = 'a';
             int vCount = 0;
             foreach (var itm in queryFilter)
             {
@@ -90,8 +89,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
                     if (guards.Any(o => o == null)) return false;
 
                     // Add to where clause
-                   componentTypeGuard.AddRange(guards);
-                    guardFilter = $"AND {queryPrefix}{cmpTblType}.typ_cd_id IN ({String.Join(",", guards.Select(o => $"'{o}'"))})";
+                   guardFilter = $"AND {queryPrefix}{cmpTblType}.typ_cd_id IN ({String.Join(",", guards.Select(o => $"'{o}'"))})";
                 }
 
                 // Filter on the component value
@@ -101,23 +99,20 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
                 var qValues = value as List<Object>;
                 vCount++;
 
-
-                whereClause.Append($"LEFT JOIN (SELECT val_seq_id FROM {valTblType} AS {queryPrefix}{valTblType} WHERE ");
-                whereClause.Append(builder.CreateSqlPredicate($"{queryPrefix}{valTblType}", "val", componentType.GetProperty("Value"), qValues));
-                whereClause.Append($") AS {queryPrefix}{valTblType}_{localChar} ON ({queryPrefix}{valTblType}_{localChar++}.val_seq_id = {queryPrefix}{cmpTblType}.val_seq_id {guardFilter})");
+                // Filter based on type and prefix :)
+                whereClause.Append("(")
+                        .Append(builder.CreateSqlPredicate($"{queryPrefix}{valTblType}", "val", componentType.GetProperty("Value"), qValues))
+                        .Append(guardFilter)
+                        .Append(")")
+                        .Append(" OR ");
             }
 
-            whereClause.Append($" WHERE ");
-            if(componentTypeGuard.Count > 0 )
-                whereClause.Append($"{queryPrefix}{cmpTblType}.typ_cd_id IN ({String.Join(",", componentTypeGuard.Select(o => $"'{o}'"))}) AND ");
-            whereClause.Append("(");
-            // Ensure that the left joined objects exist
-            for (char s = 'a'; s < localChar; s++)
-                whereClause.Append($" {queryPrefix}{valTblType}_{s}.val_seq_id IS NOT NULL ").Append("OR");
             whereClause.RemoveLast();
-            whereClause.And($"{queryPrefix}{scopedTables.First().TableName}.{keyName} = {queryPrefix}{cmpTblType}.{keyName}");
+            whereClause.Append(")");
+            // Ensure that the left joined objects exist
+            whereClause.And($"({queryPrefix}{scopedTables.First().TableName}.{keyName} = {queryPrefix}{cmpTblType}.{keyName})");
 
-            whereClause.Append($") GROUP BY {keyName} HAVING COUNT(DISTINCT {queryPrefix}{cmpTblType}.cmp_id) >= {vCount})");
+            whereClause.Append($" GROUP BY {keyName} HAVING COUNT(DISTINCT {queryPrefix}{cmpTblType}.cmp_id) >= {vCount})");
 
             return true;
         }

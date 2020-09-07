@@ -142,7 +142,7 @@ namespace SanteDB.Core
         private bool m_running = false;
 
         /// <summary>
-        /// Cached services
+        /// Cached services dictionary for singleton services
         /// </summary>
         private Dictionary<Type, object> m_cachedServices = new Dictionary<Type, object>();
 
@@ -213,19 +213,24 @@ namespace SanteDB.Core
                     else
                         Tracer.AddWriter(new SystemDiagnosticsTraceWriter(), System.Diagnostics.Tracing.EventLevel.LogAlways);
 #endif
-                        // Add this
-                        this.m_serviceInstances.Add(this);
+                    // Add this
+                    this.m_serviceInstances.Add(this);
                     Trace.TraceInformation("STAGE1 START: Loading services");
 
                     foreach (var svc in this.m_configuration.ServiceProviders)
                     {
                         if (svc.Type == null)
                             Trace.TraceWarning("Cannot find service {0}, skipping", svc.TypeXml);
-                        else if(!this.m_serviceInstances.Any(s=>s.GetType() == svc.Type))
-                        {
-                            Trace.TraceInformation("Creating {0}...", svc.Type);
-                            var instance = Activator.CreateInstance(svc.Type);
-                            this.m_serviceInstances.Add(instance);
+                        else {
+                            var spa = svc.Type.GetCustomAttribute<ServiceProviderAttribute>();
+                            if (spa?.Type == ServiceInstantiationType.PerCall)
+                                this.m_serviceInstances.Add(spa?.Type);
+                            else if (!this.m_serviceInstances.Any(s => s.GetType() == svc.Type))
+                            {
+                                Trace.TraceInformation("Creating {0}...", svc.Type);
+                                var instance = Activator.CreateInstance(svc.Type);
+                                this.m_serviceInstances.Add(instance);
+                            }
                         }
                     }
 
@@ -302,8 +307,10 @@ namespace SanteDB.Core
             Object candidateService = null;
             if (!this.m_cachedServices.TryGetValue(serviceType, out candidateService))
             {
-                candidateService = this.m_serviceInstances.Find(o => serviceType.GetTypeInfo().IsAssignableFrom(o.GetType().GetTypeInfo()));
-                if (candidateService != null)
+                candidateService = this.m_serviceInstances.Find(o => serviceType.Equals(o) || serviceType.GetTypeInfo().IsAssignableFrom(o.GetType().GetTypeInfo()));
+                if (candidateService is Type type) // The type was registered = this is a per-call 
+                    return Activator.CreateInstance(type);
+                else if (candidateService != null)
                     lock (this.m_cachedServices)
                         if (!this.m_cachedServices.ContainsKey(serviceType))
                         {

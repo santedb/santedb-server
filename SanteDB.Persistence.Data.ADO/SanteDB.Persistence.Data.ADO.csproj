@@ -145,6 +145,7 @@
     <Compile Include="Security\AdoSecurityPolicyInstance.cs" />
     <Compile Include="Services\AdoApplicationIdentityProvider.cs" />
     <Compile Include="Services\AdoDeviceIdentityProvider.cs" />
+    <Compile Include="Services\AdoFreetextSearchService.cs" />
     <Compile Include="Services\AdoIdentityProvider.cs" />
     <Compile Include="Services\AdoPersistenceService.cs" />
     <Compile Include="Services\AdoPolicyInformationService.cs" />
@@ -316,10 +317,10 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.30.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.30.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.0.30.0" />
-        <PackageReference Include="SanteDB.BI" Version="2.0.30.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.32.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.32.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="2.0.32.0" />
+        <PackageReference Include="SanteDB.BI" Version="2.0.32.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

@@ -420,12 +420,22 @@ namespace SanteDB.Messaging.HL7
                     if (assigningAuthority != null && assigningAuthority.Key != m_configuration.LocalAuthority.Key)
                     {
                         var id = new EntityIdentifier(assigningAuthority, cx.IDNumber.Value);
-
+                       
                         if (!String.IsNullOrEmpty(cx.IdentifierTypeCode.Value))
                         {
                             int tr = 0;
                             var idType = ApplicationServiceContext.Current.GetService<IDataPersistenceService<IdentifierType>>().Query(o => o.TypeConcept.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == cx.IdentifierTypeCode.Value && r.ReferenceTerm.CodeSystem.Oid == IdentifierTypeCodeSystem), 0, 1, out tr, AuthenticationContext.SystemPrincipal).FirstOrDefault();
                             id.IdentifierTypeKey = idType?.Key;
+                        }
+
+                        if(!String.IsNullOrEmpty(cx.ExpirationDate.Value) && 
+                            new DateTime(cx.ExpirationDate.Year, cx.ExpirationDate.Month, cx.ExpirationDate.Day) <= DateTime.Now.Date) // Value is expired - indicate this
+                            id.ObsoleteVersionSequenceId = Int32.MaxValue;
+                        if (!String.IsNullOrEmpty(cx.EffectiveDate.Value)) {
+                            if (new DateTime(cx.EffectiveDate.Year, cx.EffectiveDate.Month, cx.EffectiveDate.Day) <= DateTime.Now.Date) // Value is being actively changed - indicate this
+                                id.EffectiveVersionSequenceId = Int32.MaxValue;
+                            else
+                                continue; // value is not effective yet so don't change
                         }
 
                         entityIdentifiers.Add(id);

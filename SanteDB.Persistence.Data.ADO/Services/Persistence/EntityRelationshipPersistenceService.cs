@@ -118,6 +118,21 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (data.ObsoleteVersionSequenceId == Int32.MaxValue)
                 data.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence ?? context.FirstOrDefault<DbEntityVersion>(o=>o.Key == data.SourceEntityKey && o.ObsoletionTime == null)?.VersionSequenceId;
 
+            // Duplicate check 
+            var existing = context.FirstOrDefault<DbEntityRelationship>(r => r.SourceKey == data.SourceEntityKey && r.TargetKey == data.TargetEntityKey && r.RelationshipTypeKey == data.RelationshipTypeKey && !r.ObsoleteVersionSequenceId.HasValue);
+            if (existing != null && existing.Key != data.Key) // There is an existing relationship which isn't this one, obsolete it 
+            {
+                existing.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence;
+                if (existing.ObsoleteVersionSequenceId.HasValue)
+                    context.Update(existing);
+                else
+                {
+                    this.m_tracer.TraceWarning("EntityRelationship {0} would conflict with existing {1} -> {2} (role {3}, quantity = {4}) already exists and this update would violate unique constraint.", data, existing.SourceKey, existing.TargetKey, existing.RelationshipTypeKey, existing.Quantity);
+                    existing.ObsoleteVersionSequenceId = 1;
+                    context.Update(existing);
+                }
+            }
+
             return base.UpdateInternal(context, data);
         }
 

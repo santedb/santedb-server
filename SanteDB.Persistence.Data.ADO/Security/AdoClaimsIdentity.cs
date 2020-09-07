@@ -252,6 +252,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
                     claims.AddRange(this.m_roles.Select(r => new SanteDBClaim(SanteDBClaimTypes.DefaultRoleClaimType, r.Name)));
                 if (this.m_securityUser.PasswordExpiration.HasValue && this.m_securityUser.PasswordExpiration < DateTime.Now)
                 {
+                    s_traceSource.TraceWarning("User {0} password expired on {1}", this.m_securityUser.UserName, this.m_securityUser.PasswordExpiration);
                     claims.Add(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, PurposeOfUseKeys.SecurityAdmin.ToString()));
                     claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
                     claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));

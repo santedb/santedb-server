@@ -86,11 +86,43 @@ namespace SanteDB.Messaging.HL7.Configuration
         /// </summary>
         [XmlArray("birthplaceClasses"), XmlArrayItem("add"), JsonProperty("birthplaceClasses")]
         public List<Guid> BirthplaceClassKeys { get; set; }
+
+        /// <summary>
+        /// Identifier expiration behavior
+        /// </summary>
+        [XmlAttribute("idReplacement")]
+        public IdentifierReplacementMode IdentifierReplacementBehavior { get; set; }
+
+        /// <summary>
+        /// When true, indicates strict birthplace matching
+        /// </summary>
+        [XmlAttribute("strictMetadata")]
+        public bool StrictMetadataMatch { get; set; }
     }
 
     /// <summary>
-	/// Handler definition
-	/// </summary>
+    /// Identifier expiration behavior mode
+    /// </summary>
+    [XmlType(nameof(IdentifierReplacementMode), Namespace = "http://santedb.org/configuration")]
+    public enum IdentifierReplacementMode
+    {
+        /// <summary>
+        /// When an identifier is marked as "expired" it shall replace any active identifier in the identity domain
+        /// </summary>
+        /// <remarks>When this setting mode is enabled the processor will void (remove) any existing identifier in any identity domain where the submitted message
+        /// contains an identifier in that identity domain with an effective time on "today's date". Any identifiers with an expiration date must match value for value.</remarks>
+        [XmlEnum("any-in-domain")]
+        AnyInDomain = 0,
+        /// <summary>
+        /// When an identifier is marked as "expired" it will only replace an active identity with the same value
+        /// </summary>
+        [XmlEnum("specific")]
+        Specific = 1
+    }
+
+    /// <summary>
+    /// Handler definition
+    /// </summary>
     [XmlType(nameof(HandlerDefinition), Namespace = "http://santedb.org/configuration")]
     public class HandlerDefinition
     {

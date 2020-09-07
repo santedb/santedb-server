@@ -59,7 +59,7 @@ namespace SanteDB.Reporting.Jasper
     /// <summary>
     /// Represents a Jasper server report executor.
     /// </summary>
-    [ServiceProvider("TIBCO JasperSoft Server Report Executor", false, ServiceInstantiationType.Instance)]
+    [ServiceProvider("TIBCO JasperSoft Server Report Executor", false, ServiceInstantiationType.PerCall)]
     public class JasperReportExecutor : IReportExecutor, ISupportBasicAuthentication
     {
         /// <summary>
