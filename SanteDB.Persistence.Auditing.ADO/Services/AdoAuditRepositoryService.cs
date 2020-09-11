@@ -273,6 +273,22 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         }
 
         /// <summary>
+        /// Get or create audit code
+        /// </summary>
+        private DbAuditCode GetOrCreateAuditCode(DataContext context, AuditCode messageCode)
+        {
+            if (messageCode == null) return null;
+            var existing = context.FirstOrDefault<DbAuditCode>(o => o.Code == messageCode.Code && o.CodeSystem == messageCode.CodeSystem);
+            if (existing == null)
+            {
+                Guid codeId = Guid.NewGuid();
+                return context.Insert(new DbAuditCode() { Code = messageCode.Code, CodeSystem = messageCode.CodeSystem, Key = codeId });
+            }
+            else
+                return existing;
+        }
+
+        /// <summary>
         /// Insert the specified audit into the database
         /// </summary>
         public AuditData Insert(AuditData storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
@@ -301,17 +317,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
                     var eventId = storageData.EventTypeCode;
                     if (eventId != null)
-                    {
-                        var existing = context.FirstOrDefault<DbAuditCode>(o => o.Code == eventId.Code && o.CodeSystem == eventId.CodeSystem);
-                        if (existing == null)
-                        {
-                            Guid codeId = Guid.NewGuid();
-                            dbAudit.EventTypeCode = codeId;
-                            context.Insert(new DbAuditCode() { Code = eventId.Code, CodeSystem = eventId.CodeSystem, Key = codeId });
-                        }
-                        else
-                            dbAudit.EventTypeCode = existing.Key;
-                    }
+                        dbAudit.EventTypeCode = this.GetOrCreateAuditCode(context, eventId).Key;
 
                     dbAudit.CreationTime = DateTime.Now;
                     storageData.Key = Guid.NewGuid();
@@ -322,25 +328,21 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     if (storageData.Actors != null)
                         foreach (var act in storageData.Actors)
                         {
-                            var dbAct = context.FirstOrDefault<DbAuditActor>(o => o.UserName == act.UserName);
+
+                            var roleCode = this.GetOrCreateAuditCode(context, act.ActorRoleCode.FirstOrDefault());
+                            
+                            DbAuditActor dbAct = null;
+                            if (roleCode != null)
+                                dbAct = context.FirstOrDefault<DbAuditActor>(o => o.UserName == act.UserName && o.ActorRoleCode == roleCode.Key);
+                            else
+                                dbAct = context.FirstOrDefault<DbAuditActor>(o => o.UserName == act.UserName && o.ActorRoleCode == Guid.Empty);
+
                             if (dbAct == null)
                             {
                                 dbAct = this.m_mapper.MapModelInstance<AuditActorData, DbAuditActor>(act);
                                 dbAct.Key = Guid.NewGuid();
-                                var roleCode = act.ActorRoleCode?.FirstOrDefault();
-                                if (roleCode != null)
-                                {
-                                    var existing = context.FirstOrDefault<DbAuditCode>(o => o.Code == roleCode.Code && o.CodeSystem == roleCode.CodeSystem);
-                                    if (existing == null)
-                                    {
-                                        dbAct.ActorRoleCode = Guid.NewGuid();
-                                        context.Insert(new DbAuditCode() { Code = roleCode.Code, CodeSystem = roleCode.CodeSystem, Key = dbAct.ActorRoleCode });
-                                    }
-                                    else
-                                        dbAct.ActorRoleCode = existing.Key;
-                                }
+                                dbAct.ActorRoleCode = roleCode?.Key ?? Guid.Empty;
                                 context.Insert(dbAct);
-
                             }
                             context.Insert(new DbAuditActorAssociation()
                             {

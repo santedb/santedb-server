@@ -39,6 +39,11 @@ namespace SanteDB.Core.Security
         /// </summary>
         public string ServiceName => "Digital Signature Service";
 
+        /// <summary>
+        /// This is not symmetric
+        /// </summary>
+        public bool IsSymmetric => false;
+
         // Master configuration
         private SecurityConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
 
@@ -68,6 +73,14 @@ namespace SanteDB.Core.Security
         public string GetSignatureAlgorithm(string keyId = null)
         {
             return SecurityUtils.CreateSigningCredentials(keyId)?.SignatureAlgorithm;
+        }
+
+        /// <summary>
+        /// Get all available keys
+        /// </summary>
+        public IEnumerable<string> GetKeys()
+        {
+            return SecurityUtils.GetKeyIdentifiers();
         }
     }
 }

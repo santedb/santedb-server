@@ -182,9 +182,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
                             try
                             {
                                 if (messagePart == "\r") continue;
-#if DEBUG
                                 this.m_traceSource.TraceInfo("Received message from llp://{0}:{1} : {2}", remoteEp.Address, remoteEp.Port, messagePart);
-#endif
                                 // HACK: nHAPI doesn't like URLs ... Will fix this later
                                 string messageString = messagePart.Replace("|URL|", "|ST|");
 
@@ -207,9 +205,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
                                         if (messageArgs != null && messageArgs.Response != null)
                                         {
                                             var strMessage = MessageUtils.EncodeMessage(messageArgs.Response, originalVersion);
-#if DEBUG
                                             this.m_traceSource.TraceInfo("Sending message to llp://{0} : {1}", tcpClient.Client.RemoteEndPoint, strMessage);
-#endif
                                             // Since nHAPI only emits a string we just send that along the stream
                                             streamWriter.Write(strMessage);
                                             streamWriter.Flush();

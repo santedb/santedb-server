@@ -22,6 +22,7 @@ using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Services;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens;
 using System.Linq;
 using System.Security;
@@ -85,6 +86,18 @@ namespace SanteDB.Core.Security
                     throw new SecurityException("Invalid signing configuration");
             }
             return retVal;
+        }
+
+        /// <summary>
+        /// Get key idetnifiers from configuration
+        /// </summary>
+        public static IEnumerable<string> GetKeyIdentifiers()
+        {
+            var configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>().Signatures;
+            // No configuration found for this key
+            if (configuration == null)
+                return null;
+            return configuration.Select(o => o.KeyName);
         }
 
         /// <summary>

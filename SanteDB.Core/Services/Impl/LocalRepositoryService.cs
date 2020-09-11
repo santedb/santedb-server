@@ -103,7 +103,8 @@ namespace SanteDB.Core.Services.Impl
                 typeof(LocalAssigningAuthorityRepository),
                 typeof(GenericLocalMetadataRepository<DeviceEntity>),
                 typeof(GenericLocalMetadataRepository<ApplicationEntity>),
-                typeof(LocalSecurityRepositoryService)
+                typeof(LocalSecurityRepositoryService),
+                typeof(LocalTemplateDefinitionRepositoryService)
             };
 
             // Non-test environments need auditing
