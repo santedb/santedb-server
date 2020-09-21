@@ -100,8 +100,8 @@ INSERT INTO SEC_APP_POL_ASSOC_TBL(SEC_POL_INST_ID, APP_ID, POL_ID, POL_ACT)
 --#!
 	
 
-INSERT INTO SEC_APP_TBL (APP_PUB_ID, APP_SCRT, CRT_PROV_ID)
-	VALUES ('org.santedb.disconnected_client.android', ('ec1e5ef79b95cc1e8a5dec7492b9eb7e2b413ad7a45c5637d16c11bb68fcd53c'), 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO SEC_APP_TBL (APP_ID,  APP_PUB_ID, APP_SCRT, CRT_PROV_ID)
+	VALUES ('a0fdceb2-a2d3-11ea-ae5e-00155d4f0905', 'org.santedb.disconnected_client.android', ('ec1e5ef79b95cc1e8a5dec7492b9eb7e2b413ad7a45c5637d16c11bb68fcd53c'), 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
 
 INSERT INTO SEC_APP_POL_ASSOC_TBL(APP_ID, POL_ID, POL_ACT)
 	SELECT APP_ID, POL_ID, 2 FROM

@@ -34,15 +34,12 @@ namespace SanteDB.Core.Security
     /// </summary>
     public class DefaultDataSigningService : IDataSigningService
     {
+
+        
         /// <summary>
         /// Gets the name of the service
         /// </summary>
         public string ServiceName => "Digital Signature Service";
-
-        /// <summary>
-        /// This is not symmetric
-        /// </summary>
-        public bool IsSymmetric => false;
 
         // Master configuration
         private SecurityConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
@@ -53,6 +50,8 @@ namespace SanteDB.Core.Security
         public byte[] SignData(byte[] data, string keyId = null)
         {
             var credentials = SecurityUtils.CreateSigningCredentials(keyId);
+            if (credentials == null)
+                throw new InvalidOperationException($"Couldn't create signature for key {keyId}");
             using (var signatureProvider = new SignatureProviderFactory().CreateForSigning(credentials.SigningKey, credentials.SignatureAlgorithm))
                 return signatureProvider.Sign(data);
         }
@@ -81,6 +80,17 @@ namespace SanteDB.Core.Security
         public IEnumerable<string> GetKeys()
         {
             return SecurityUtils.GetKeyIdentifiers();
+        }
+
+        /// <summary>
+        /// Add signing key to the service
+        /// </summary>
+        /// <param name="keyId"></param>
+        /// <param name="keyData"></param>
+        /// <param name="signatureAlgorithm"></param>
+        public void AddSigningKey(string keyId, byte[] keyData, string signatureAlgorithm)
+        {
+            SecurityUtils.AddSigningCredentials(keyId, keyData, signatureAlgorithm);
         }
     }
 }

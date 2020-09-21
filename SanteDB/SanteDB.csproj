@@ -322,23 +322,23 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.36.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.36.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.36.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.36.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.36.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.0.36.0" />
-        <PackageReference Include="SanteDB.BI" Version="2.0.36.0" />
-        <PackageReference Include="SanteDB.Rest.BIS" Version="2.0.36.0" />
-        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.36.0" />
-        <PackageReference Include="SanteDB.Cdss.Xml" Version="2.0.36.0" />
-        <PackageReference Include="SanteDB.Matcher" Version="2.0.36.0" />
-        <PackageReference Include="SanteDB.Matcher.Configuration.File" Version="2.0.36.0" />
-        <PackageReference Include="SanteDB.Core.Model.AMI" Version="2.0.36.0" />
-        <PackageReference Include="SanteDB.Core.Model.RISI" Version="2.0.36.0" />
-        <PackageReference Include="SanteDB.Rest.AMI" Version="2.0.36.0" />
-        <PackageReference Include="SanteDB.Rest.HDSI" Version="2.0.36.0" />
-        <PackageReference Include="SanteDB.Core.Model.ViewModelSerializers" Version="2.0.36.0" />
+        <PackageReference Include="RestSrvr" Version="2.0.38.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.38.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.38.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.38.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.38.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="2.0.38.0" />
+        <PackageReference Include="SanteDB.BI" Version="2.0.38.0" />
+        <PackageReference Include="SanteDB.Rest.BIS" Version="2.0.38.0" />
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.38.0" />
+        <PackageReference Include="SanteDB.Cdss.Xml" Version="2.0.38.0" />
+        <PackageReference Include="SanteDB.Matcher" Version="2.0.38.0" />
+        <PackageReference Include="SanteDB.Matcher.Configuration.File" Version="2.0.38.0" />
+        <PackageReference Include="SanteDB.Core.Model.AMI" Version="2.0.38.0" />
+        <PackageReference Include="SanteDB.Core.Model.RISI" Version="2.0.38.0" />
+        <PackageReference Include="SanteDB.Rest.AMI" Version="2.0.38.0" />
+        <PackageReference Include="SanteDB.Rest.HDSI" Version="2.0.38.0" />
+        <PackageReference Include="SanteDB.Core.Model.ViewModelSerializers" Version="2.0.38.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

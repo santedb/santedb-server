@@ -362,7 +362,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
             claims.RemoveAll(o => o.Type == SanteDBClaimTypes.Sid);
             // Creates signing credentials for the specified application key
             var appid = claims.Find(o => o.Type == SanteDBClaimTypes.SanteDBApplicationIdentifierClaim).Value;
-            var signingCredentials = SecurityUtils.CreateSigningCredentials(appid);
+
+            // Signing credentials for the application
+            var signingCredentials = SecurityUtils.CreateSigningCredentials($"SA.{appid}");
 
             // Was there a signing credentials provided for this application? If so, then create for default
             if(signingCredentials == null)
@@ -373,6 +375,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 signingCredentials.SignatureAlgorithm == "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256") &&
                 RestOperationContext.Current.Data.TryGetValue("symm_secret", out object clientSecret)) // OPENID States we should use the application client secret to sign the result , we can only do this if we actually have a symm_secret set
             {
+
                 var secret = Encoding.UTF8.GetBytes(clientSecret.ToString());
                 while (secret.Length < 16)
                     secret = secret.Concat(secret).ToArray();

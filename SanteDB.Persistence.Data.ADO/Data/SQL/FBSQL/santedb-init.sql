@@ -55,7 +55,7 @@ INSERT INTO SEC_APP_POL_ASSOC_TBL(SEC_POL_INST_ID, APP_ID, POL_ID, POL_ACT)
 		SEC_APP_TBL.APP_PUB_ID = 'org.santedb.disconnected_client';
 --#!
 INSERT INTO SEC_APP_TBL (APP_ID, APP_PUB_ID, APP_SCRT, CRT_UTC, CRT_PROV_ID) 
-		VALUES (char_to_uuid('4C5A581C-A6EE-4267-9231-B0D3D50CC08F'), 'org.santedb.debug', 'cba830db9a6f5a4b638ff95ef70e98aa82d414ac35b351389024ecb6be40ebf0', CURRENT_TIMESTAMP, char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+		VALUES (char_to_uuid('4C5A581C-A6EE-4267-9231-B0D3D50CC08B'), 'org.santedb.debug', 'cba830db9a6f5a4b638ff95ef70e98aa82d414ac35b351389024ecb6be40ebf0', CURRENT_TIMESTAMP, char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 --#!
 
 INSERT INTO SEC_APP_POL_ASSOC_TBL(SEC_POL_INST_ID, APP_ID, POL_ID, POL_ACT)
@@ -94,7 +94,7 @@ INSERT INTO SEC_APP_POL_ASSOC_TBL(SEC_POL_INST_ID, APP_ID, POL_ID, POL_ACT)
 		SEC_APP_TBL.APP_PUB_ID = 'org.santedb.disconnected_client.gateway';
 --#!
 INSERT INTO SEC_APP_TBL (APP_ID, APP_PUB_ID, APP_SCRT, CRT_PROV_ID)
-	VALUES (char_to_uuid('acd81e9f-cc50-4448-b938-e884d591a42f'), 'org.santedb.disconnected_client.android', ('ec1e5ef79b95cc1e8a5dec7492b9eb7e2b413ad7a45c5637d16c11bb68fcd53c'), char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+	VALUES (char_to_uuid('a0fdceb2-a2d3-11ea-ae5e-00155d4f0905'), 'org.santedb.disconnected_client.android', ('ec1e5ef79b95cc1e8a5dec7492b9eb7e2b413ad7a45c5637d16c11bb68fcd53c'), char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 --#!
 INSERT INTO SEC_APP_POL_ASSOC_TBL(SEC_POL_INST_ID, APP_ID, POL_ID, POL_ACT)
 	SELECT GEN_UUID(), APP_ID, POL_ID, 2 FROM

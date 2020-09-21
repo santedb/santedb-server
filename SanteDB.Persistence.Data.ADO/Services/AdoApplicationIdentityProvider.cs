@@ -27,6 +27,7 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Configuration;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using SanteDB.Persistence.Data.ADO.Data;
+using SanteDB.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -35,6 +36,8 @@ using System.Linq;
 using System.Security;
 using System.Security.Authentication;
 using System.Security.Principal;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -175,6 +178,32 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     app.UpdatedTime = DateTimeOffset.Now;
                     app.Secret = phash.ComputeHash(secret);
                     dataContext.Update(app);
+                }
+                catch (Exception e)
+                {
+                    this.m_traceSource.TraceEvent(EventLevel.Error, "Error setting secret for {0} : {1}", name, e);
+                    throw;
+                }
+        }
+
+        /// <summary>
+        /// Get secure key for the unknown application name
+        /// </summary>
+        public byte[] GetSecureKey(string name)
+        {
+            using (DataContext dataContext = this.m_configuration.Provider.GetWriteConnection())
+                try
+                {
+                    dataContext.Open();
+
+                    var dbType = TableMapping.Get(typeof(DbSecurityApplication));
+                    var stmt = dataContext.CreateSqlStatement().SelectFrom(dbType.OrmType, dbType.Columns.First(o => o.SourceProperty.Name == nameof(DbSecurityApplication.Secret)))
+                        .Where<DbSecurityApplication>(o => o.PublicId == name);
+
+                    var secret = dataContext.FirstOrDefault<String>(stmt.Build());
+
+                    // Secret is the key
+                    return secret.ParseHexString();
                 }
                 catch (Exception e)
                 {
