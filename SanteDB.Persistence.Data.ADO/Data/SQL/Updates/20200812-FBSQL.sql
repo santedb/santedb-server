@@ -18,5 +18,5 @@ ALTER TABLE ref_term_name_tbl DROP phon_alg_id;
 ALTER TABLE phon_val_tbl DROP phon_cs;
 ALTER TABLE phon_val_tbl DROP alg_id;
 
-SELECT REG_PATCH('20200812-01');
+SELECT REG_PATCH('20200812-01') FROM RDB$DATABASE;;
 COMMIT;
