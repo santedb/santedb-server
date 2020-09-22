@@ -431,6 +431,11 @@ namespace SanteDB.Messaging.FHIR.Util
                 throw new InvalidOperationException("Identifier must carry a coding system");
 			}
 
+            if (fhirId.Period != null)
+            {
+                retVal.IssueDate = fhirId.Period.Start;
+                retVal.ExpiryDate = fhirId.Period.Stop;
+            }
 			// TODO: Fill in use
 			return retVal;
 		}
@@ -636,12 +641,22 @@ namespace SanteDB.Messaging.FHIR.Util
 
             var imetaService = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>();
             var authority = imetaService.Get(identifier.AuthorityKey.Value);
-			return new FhirIdentifier
+			var retVal = new FhirIdentifier
 			{
 				System = new FhirUri(new Uri(authority?.Url ?? $"urn:oid:{authority?.Oid}")),
 				Type = ToFhirCodeableConcept(identifier.LoadProperty<IdentifierType>(nameof(EntityIdentifier.IdentifierType))?.TypeConcept),
 				Value = identifier.Value
 			};
+
+            if (identifier.ExpiryDate.HasValue || identifier.IssueDate.HasValue)
+                retVal.Period = new FhirPeriod()
+                {
+                    Start = identifier.IssueDate,
+                    Stop = identifier.ExpiryDate
+                };
+
+            return retVal;
+
 		}
 
 		/// <summary>
