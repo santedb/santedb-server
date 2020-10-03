@@ -62,6 +62,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             return rawQuery;
         }
 
+       
+
         /// <summary>
         /// Maps the data to a model instance
         /// </summary>
@@ -248,10 +250,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     else
                     {
                         m_tracer.TraceEvent(EventLevel.Verbose, "Will use slow query construction due to complex mapped fields");
-                        domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, orderBy);
+                        if(q == queries.Last())
+                            domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, orderBy);
+                        else
+                            domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query);
                     }
-
-                    
 
                     if (retVal == null)
                         retVal = this.DomainQueryInternal<TQueryReturn>(context, domainQuery);

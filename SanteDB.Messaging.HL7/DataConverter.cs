@@ -428,6 +428,21 @@ namespace SanteDB.Messaging.HL7
                             id.IdentifierTypeKey = idType?.Key;
                         }
 
+                        if (!String.IsNullOrEmpty(cx.ExpirationDate.Value)) {
+
+                            id.ExpiryDate = new DateTime(cx.ExpirationDate.Year, cx.ExpirationDate.Month, cx.ExpirationDate.Day);
+                            // Is the value already expired? If so we can obsolete the identifier 
+                            if (id.ExpiryDate <= DateTime.Now.Date) // Value is expired - indicate this
+                                id.ObsoleteVersionSequenceId = Int32.MaxValue;
+                        }
+                        if (!String.IsNullOrEmpty(cx.EffectiveDate.Value)) {
+
+                            id.IssueDate = new DateTime(cx.EffectiveDate.Year, cx.EffectiveDate.Month, cx.EffectiveDate.Day);
+
+                            if (id.IssueDate <= DateTime.Now.Date) // Value is being actively changed - indicate this
+                                id.EffectiveVersionSequenceId = Int32.MaxValue;
+                        }
+
                         entityIdentifiers.Add(id);
                     }
                 }
@@ -719,6 +734,14 @@ namespace SanteDB.Messaging.HL7
             me.IDNumber.Value = id.Value;
             me.AssigningAuthority.FromModel(id.LoadProperty<AssigningAuthority>("Authority"));
 
+            if (id.ExpiryDate.HasValue)
+                me.ExpirationDate.setYearMonthDayPrecision(id.ExpiryDate.Value.Year, id.ExpiryDate.Value.Month, id.ExpiryDate.Value.Day);
+            if(id.IssueDate.HasValue)
+                me.EffectiveDate.setYearMonthDayPrecision(id.IssueDate.Value.Year, id.IssueDate.Value.Month, id.IssueDate.Value.Day);
+
+            me.CheckDigit.Value = id.CheckDigit;
+            me.CheckDigitScheme.Value = id.LoadProperty<AssigningAuthority>("Authority").GetCustomValidator()?.Name;
+
             // Identifier type
             if (id.IdentifierType?.TypeConceptKey.HasValue == true)
             {
@@ -727,6 +750,7 @@ namespace SanteDB.Messaging.HL7
             }
             else
                 me.IdentifierTypeCode.Value = "PT"; // EXTERNAL ID
+
             return me;
         }
 

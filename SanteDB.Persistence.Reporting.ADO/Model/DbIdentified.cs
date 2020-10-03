@@ -28,7 +28,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Model
     /// </summary>
     /// <seealso cref="SanteDB.OrmLite.IAdoLoadedData" />
     /// <seealso cref="IDbIdentified" />
-    public abstract class DbIdentified : IAdoLoadedData, IDbIdentified
+    public abstract class DbIdentified : IDbIdentified
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DbIdentified"/> class.
@@ -38,12 +38,6 @@ namespace SanteDB.Persistence.Reporting.ADO.Model
 		{
 			this.Key = key;
 		}
-
-		/// <summary>
-		/// Gets the data context
-		/// </summary>
-		/// <value>The context.</value>
-		public DataContext Context { get; set; }
 
 		/// <summary>
 		/// Gets or sets the key.

@@ -107,7 +107,7 @@ namespace SanteDB.Messaging.Atna
                     };
                     break;
                 default:
-                    throw new ConfigurationException($"Invalid transport type {this.m_configuration.Transport}");
+                    throw new InvalidOperationException($"Invalid transport type {this.m_configuration.Transport}");
             }
 
 

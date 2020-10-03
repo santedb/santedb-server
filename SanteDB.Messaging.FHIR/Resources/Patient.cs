@@ -102,7 +102,7 @@ namespace SanteDB.Messaging.FHIR.Resources
         /// </summary>
         [XmlElement("birthDate")]
         [Description("The date and time of birth for the individual")]
-        public FhirDateTime BirthDate { get; set; }
+        public FhirDate BirthDate { get; set; }
 
         /// <summary>
         /// True if the individual is deceased

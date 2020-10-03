@@ -54,7 +54,7 @@ namespace SanteDB.Messaging.HL7.Query
         /// <summary>
         /// Append query results to the message
         /// </summary>
-        public virtual IMessage AppendQueryResult(IEnumerable results, Expression queryDefinition, IMessage currentResponse, Hl7MessageReceivedEventArgs evt, String matchConfiguration = null, int offset = 0)
+        public virtual IMessage AppendQueryResult(IEnumerable results, Expression queryDefinition, IMessage currentResponse, Hl7MessageReceivedEventArgs evt, int offset = 0)
         {
             var patients = results.OfType<Patient>();
             if (patients.Count() == 0) return currentResponse;
@@ -89,11 +89,20 @@ namespace SanteDB.Messaging.HL7.Query
                 nokHandler.Create(itm, queryInstance, null);
                 queryInstance.PID.SetIDPID.Value = (i++).ToString();
                 // QRI?
-                if(matchService != null && !String.IsNullOrEmpty(matchConfiguration))
+                if(matchService != null)
                 {
-                    var score = matchService.Score<Patient>(itm, queryDefinition as Expression<Func<Patient, bool>>, matchConfiguration);
-                    queryInstance.QRI.CandidateConfidence.Value = score.Score.ToString();
-                    queryInstance.QRI.AlgorithmDescriptor.Identifier.Value = matchConfiguration;
+                    var ttag = itm.Tags.FirstOrDefault(o => o.TagKey == "$match.confidence");
+                    if(ttag != null)
+                        queryInstance.QRI.CandidateConfidence.Value = ttag?.Value;
+                    
+                    ttag = itm.Tags.FirstOrDefault(o => o.TagKey == "$match.reason");
+                    if (ttag != null)
+                        foreach(var t in ttag.Value.Split(';'))
+                            queryInstance.QRI.GetMatchReasonCode(queryInstance.QRI.MatchReasonCodeRepetitionsUsed).Value = t;
+
+                    ttag = itm.Tags.FirstOrDefault(o => o.TagKey == "$match.method");
+                    if(ttag != null)
+                        queryInstance.QRI.AlgorithmDescriptor.Identifier.Value = ttag?.Value;
                 }   
             }
 

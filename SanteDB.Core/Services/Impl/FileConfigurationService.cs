@@ -51,11 +51,15 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Get configuration service
         /// </summary>
-        public FileConfigurationService()
+        public FileConfigurationService(string configFile)
         {
             try
             {
-                var configFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.config.xml");
+                if(String.IsNullOrEmpty(configFile))
+                    configFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.config.xml");
+                else if(!Path.IsPathRooted(configFile))
+                    configFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), configFile);
+
                 using (var s = File.OpenRead(configFile))
                     this.Configuration = SanteDBConfiguration.Load(s);
                 ExeConfigurationFileMap fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "SanteDB.exe.config") }; //Path to your config file
@@ -64,6 +68,7 @@ namespace SanteDB.Core.Services.Impl
             }
             catch (Exception e) {
                 Trace.TraceError("Error loading configuration: {0}", e);
+                throw;
             }
         }
         

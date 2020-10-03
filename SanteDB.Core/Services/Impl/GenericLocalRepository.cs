@@ -27,6 +27,7 @@ using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -39,6 +40,7 @@ namespace SanteDB.Core.Services.Impl
     /// </summary>
     [ServiceProvider("Local Repository Service", Dependencies = new Type[] { typeof(IDataPersistenceService) })]
     public class GenericLocalRepository<TEntity> :
+        IRepositoryService,
         IValidatingRepositoryService<TEntity>,
         IRepositoryService<TEntity>,
         IPersistableQueryRepositoryService<TEntity>,
@@ -141,18 +143,20 @@ namespace SanteDB.Core.Services.Impl
             // Notify query 
             var preQueryEventArgs = new QueryRequestEventArgs<TEntity>(query, offset, count, queryId, AuthenticationContext.Current.Principal);
             this.Querying?.Invoke(this, preQueryEventArgs);
+            IEnumerable<TEntity> results = null; 
             if (preQueryEventArgs.Cancel) /// Cancel the request
             {
                 totalResults = preQueryEventArgs.TotalResults;
-                return preQueryEventArgs.Results;
+                results = preQueryEventArgs.Results;
             }
-
-            IEnumerable<TEntity> results = null;
-            if (queryId != Guid.Empty && persistenceService is IStoredQueryDataPersistenceService<TEntity>)
-                results = (persistenceService as IStoredQueryDataPersistenceService<TEntity>).Query(preQueryEventArgs.Query, preQueryEventArgs.QueryId.GetValueOrDefault(), preQueryEventArgs.Offset, preQueryEventArgs.Count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
             else
-                results = persistenceService.Query(preQueryEventArgs.Query, preQueryEventArgs.Offset, preQueryEventArgs.Count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
+            {
 
+                if (queryId != Guid.Empty && persistenceService is IStoredQueryDataPersistenceService<TEntity>)
+                    results = (persistenceService as IStoredQueryDataPersistenceService<TEntity>).Query(preQueryEventArgs.Query, preQueryEventArgs.QueryId.GetValueOrDefault(), preQueryEventArgs.Offset, preQueryEventArgs.Count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
+                else
+                    results = persistenceService.Query(preQueryEventArgs.Query, preQueryEventArgs.Offset, preQueryEventArgs.Count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
+            }
             var retVal = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
             this.Queried?.Invoke(this, new QueryResultEventArgs<TEntity>(query, retVal, offset, count, totalResults, queryId, AuthenticationContext.Current.Principal));
             return retVal;
@@ -443,6 +447,54 @@ namespace SanteDB.Core.Services.Impl
         public virtual void DemandQuery()
         {
             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, this.QueryPolicy).Demand();
+        }
+
+        /// <summary>
+        /// Get the specified data
+        /// </summary>
+        IdentifiedData IRepositoryService.Get(Guid key)
+        {
+            return this.Get(key);
+        }
+
+        /// <summary>
+        /// Find specified data
+        /// </summary>
+        IEnumerable<IdentifiedData> IRepositoryService.Find(Expression query)
+        {
+            return this.Find((Expression<Func<TEntity, bool>>)query).OfType<IdentifiedData>();
+        }
+
+        /// <summary>
+        /// Find specified data
+        /// </summary>
+        IEnumerable<IdentifiedData> IRepositoryService.Find(Expression query, int offset, int? count, out int totalResults)
+        {
+            return this.Find((Expression<Func<TEntity, bool>>)query, offset, count, out totalResults).OfType<IdentifiedData>();
+        }
+
+        /// <summary>
+        /// Insert the specified data
+        /// </summary>
+        IdentifiedData IRepositoryService.Insert(object data)
+        {
+            return this.Insert((TEntity)data);
+        }
+
+        /// <summary>
+        /// Save specified data
+        /// </summary>
+        IdentifiedData IRepositoryService.Save(object data)
+        {
+            return this.Save((TEntity)data);
+        }
+
+        /// <summary>
+        /// Obsolete
+        /// </summary>
+        IdentifiedData IRepositoryService.Obsolete(Guid key)
+        {
+            return this.Obsolete(key);
         }
     }
 }

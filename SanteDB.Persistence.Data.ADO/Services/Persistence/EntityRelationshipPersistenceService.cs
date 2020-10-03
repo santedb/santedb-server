@@ -26,6 +26,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using SanteDB.Core.Model;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -73,8 +74,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override EntityRelationship InsertInternal(DataContext context, EntityRelationship data)
         {
-            
+
             // Ensure we haven't already persisted this
+            if (data.InversionIndicator) 
+                return data; // don't persist inverted
             if(data.TargetEntity != null && !data.InversionIndicator) data.TargetEntity = data.TargetEntity.EnsureExists(context) as Entity;
             data.TargetEntityKey = data.TargetEntity?.Key ?? data.TargetEntityKey;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
@@ -83,7 +86,22 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (!data.EffectiveVersionSequenceId.HasValue)
                 data.EffectiveVersionSequenceId = context.FirstOrDefault<DbEntityVersion>(o => o.Key == data.SourceEntityKey)?.VersionSequenceId;
 
-            return base.InsertInternal(context, data);
+            // Duplicate check 
+            var existing = context.FirstOrDefault<DbEntityRelationship>(r => r.SourceKey == data.SourceEntityKey && r.TargetKey == data.TargetEntityKey && r.RelationshipTypeKey == data.RelationshipTypeKey && !r.ObsoleteVersionSequenceId.HasValue) ;
+            if (existing == null)
+                return base.InsertInternal(context, data);
+            else if (existing.Quantity != data.Quantity)
+            {
+                data.Key = existing.Key;
+                return base.UpdateInternal(context, data);
+            }
+            else
+            {
+                data.Key = existing.Key;
+                data.EffectiveVersionSequenceId = existing.EffectiveVersionSequenceId;
+                data.ObsoleteVersionSequenceId = existing.ObsoleteVersionSequenceId;
+                return this.ToModelInstance(existing, context);
+            }
         }
 
         /// <summary>
@@ -92,11 +110,28 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override EntityRelationship UpdateInternal(DataContext context, EntityRelationship data)
         {
             // Ensure we haven't already persisted this
+            if (data.InversionIndicator) 
+                return data; // don't persist inverted
             data.TargetEntityKey = data.TargetEntity?.Key ?? data.TargetEntityKey;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
 
             if (data.ObsoleteVersionSequenceId == Int32.MaxValue)
                 data.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence ?? context.FirstOrDefault<DbEntityVersion>(o=>o.Key == data.SourceEntityKey && o.ObsoletionTime == null)?.VersionSequenceId;
+
+            // Duplicate check 
+            var existing = context.FirstOrDefault<DbEntityRelationship>(r => r.SourceKey == data.SourceEntityKey && r.TargetKey == data.TargetEntityKey && r.RelationshipTypeKey == data.RelationshipTypeKey && !r.ObsoleteVersionSequenceId.HasValue);
+            if (existing != null && existing.Key != data.Key) // There is an existing relationship which isn't this one, obsolete it 
+            {
+                existing.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence;
+                if (existing.ObsoleteVersionSequenceId.HasValue)
+                    context.Update(existing);
+                else
+                {
+                    this.m_tracer.TraceWarning("EntityRelationship {0} would conflict with existing {1} -> {2} (role {3}, quantity = {4}) already exists and this update would violate unique constraint.", data, existing.SourceKey, existing.TargetKey, existing.RelationshipTypeKey, existing.Quantity);
+                    existing.ObsoleteVersionSequenceId = 1;
+                    context.Update(existing);
+                }
+            }
 
             return base.UpdateInternal(context, data);
         }

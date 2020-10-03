@@ -37,6 +37,7 @@ using SanteDB.Messaging.HL7.Configuration;
 using SanteDB.Messaging.HL7.Exceptions;
 using SanteDB.Core.Security.Services;
 using System.Collections;
+using Newtonsoft.Json.Linq;
 using SanteDB.Core.Model.Interfaces;
 
 namespace SanteDB.Messaging.HL7.Segments
@@ -322,6 +323,7 @@ namespace SanteDB.Messaging.HL7.Segments
                     var contactExtension = retVal.Extensions.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.ContactRolesExtension);
 
                     if (contactExtension == null)
+                    {
                         contactExtension = new EntityExtension(ExtensionTypeKeys.ContactRolesExtension, typeof(DictionaryExtensionHandler), new
                         {
                             roles = new[]
@@ -332,12 +334,31 @@ namespace SanteDB.Messaging.HL7.Segments
                                 }
                             }.ToList()
                         });
+                        retVal.Extensions.Add(contactExtension);
+                    }
                     else
                     {
                         var existingValue = (contactExtension.ExtensionValue as dynamic);
-                        existingValue.roles.Add(new { patientKey = patient.Key.Value, contact = nk1Segment.ContactRole.Identifier.Value });
+                        var roles = existingValue.roles as IEnumerable<dynamic>;
+                        if (roles != null)
+                        {
+                            var contact = Enumerable.FirstOrDefault<dynamic>(roles, o => o.patientKey == patient.Key);
+                            if (contact != null)
+                                contact.contact = nk1Segment.ContactRole.Identifier.Value;
+                            else
+                            {
+                                var data = new
+                                {
+                                    patientKey = patient.Key.Value,
+                                    contact = nk1Segment.ContactRole.Identifier.Value
+                                };
+                                existingValue.roles.Add(data);
+                            }
+                        }
+                        contactExtension.ExtensionValue = existingValue;
+
                     }
-                    retVal.Extensions.Add(contactExtension);
+
                 }
 
                 fieldNo = 16;

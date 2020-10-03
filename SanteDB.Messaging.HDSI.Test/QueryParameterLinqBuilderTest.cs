@@ -344,7 +344,7 @@ namespace SanteDB.Messaging.HDSI.Test
         [TestMethod]
         public void TestExtendedQueryFilterWithParameterVariableComplexPathParse()
         {
-            var expected = "((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => (((__xinstance.Relationships.Where(guard => ((guard.LoadProperty(\"RelationshipType\") ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).TargetEntity As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__20_0())) ?? default(DateTime))) > 730.12:00:00))";
+            var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => (((__xinstance.Relationships.Where(guard => ((guard.LoadProperty(\"RelationshipType\") ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).TargetEntity As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__20_0())) ?? default(DateTime))) > 730.12:00:00))";
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add("dateOfBirth", ":(testEx|$input.relationship[Mother].target@Patient.dateOfBirth)>2y");

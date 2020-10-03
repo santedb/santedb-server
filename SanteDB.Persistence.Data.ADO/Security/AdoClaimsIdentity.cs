@@ -156,10 +156,10 @@ namespace SanteDB.Persistence.Data.ADO.Security
         /// <summary>
         /// Create a claims identity from a data context user
         /// </summary>
-        internal static AdoClaimsIdentity Create(DbSecurityUser user, bool isAuthenticated = false, String authenticationMethod = null)
+        internal static AdoClaimsIdentity Create(DataContext context, DbSecurityUser user, bool isAuthenticated = false, String authenticationMethod = null)
         {
 
-            var roles = user.Context.Query<DbSecurityRole>(user.Context.CreateSqlStatement<DbSecurityRole>().SelectFrom()
+            var roles = context.Query<DbSecurityRole>(context.CreateSqlStatement<DbSecurityRole>().SelectFrom()
                         .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
                         .Where<DbSecurityUserRole>(o => o.UserKey == user.Key));
             
@@ -252,6 +252,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
                     claims.AddRange(this.m_roles.Select(r => new SanteDBClaim(SanteDBClaimTypes.DefaultRoleClaimType, r.Name)));
                 if (this.m_securityUser.PasswordExpiration.HasValue && this.m_securityUser.PasswordExpiration < DateTime.Now)
                 {
+                    s_traceSource.TraceWarning("User {0} password expired on {1}", this.m_securityUser.UserName, this.m_securityUser.PasswordExpiration);
                     claims.Add(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, PurposeOfUseKeys.SecurityAdmin.ToString()));
                     claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
                     claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));

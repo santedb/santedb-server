@@ -70,7 +70,6 @@ namespace SanteDB.Persistence.Data.ADO.Test
             {
                 Name = "Test Code",
                 Language = "en",
-                PhoneticAlgorithm = PhoneticAlgorithm.EmptyAlgorithm
             });
 
             // Insert
@@ -102,16 +101,12 @@ namespace SanteDB.Persistence.Data.ADO.Test
             namedConcept.ConceptNames.Add(new ConceptName()
             {
                 Name = "Test Code 1",
-                Language = "en",
-                PhoneticAlgorithm = PhoneticAlgorithm.EmptyAlgorithm,
-                PhoneticCode = "E"
+                Language = "en"
             });
             namedConcept.ConceptNames.Add(new ConceptName()
             {
                 Name = "Test Code 2",
-                Language = "en",
-                PhoneticAlgorithm = PhoneticAlgorithm.EmptyAlgorithm,
-                PhoneticCode = "E"
+                Language = "en"
             });
 
             // Insert
@@ -124,7 +119,6 @@ namespace SanteDB.Persistence.Data.ADO.Test
             Assert.AreEqual(2, afterTest.LoadCollection<ConceptName>("ConceptNames").Count());
             Assert.AreEqual("en", afterTest.ConceptNames[0].Language);
             Assert.IsTrue(afterTest.LoadCollection<ConceptName>("ConceptNames").Any(n => n.Name == "Test Code 1"));
-            Assert.AreEqual("E", afterTest.ConceptNames[0].PhoneticCode);
             Assert.IsNotNull(afterTest.LoadProperty<SecurityProvenance>("CreatedBy"));
 
             var originalId = afterTest.VersionKey;
@@ -133,9 +127,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             afterTest.ConceptNames.Add(new ConceptName()
             {
                 Name = "Test Code 3",
-                Language = "en",
-                PhoneticAlgorithm = PhoneticAlgorithm.EmptyAlgorithm,
-                PhoneticCode = "E"
+                Language = "en"
             });
             afterTest.Mnemonic = "TESTCODE3_A";
             afterTest = persistenceService.Update(afterTest, TransactionMode.Commit, s_authorization);
@@ -223,9 +215,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             refTermConcept.ConceptNames.Add(new ConceptName()
             {
                 Name = "Test Code",
-                Language = "en",
-                PhoneticAlgorithm = PhoneticAlgorithm.EmptyAlgorithm,
-                PhoneticCode = "E"
+                Language = "en"
             });
 
             // Reference term
@@ -254,7 +244,6 @@ namespace SanteDB.Persistence.Data.ADO.Test
             Assert.IsNotNull(afterTest.ReferenceTerms[0].LoadProperty<ReferenceTerm>("ReferenceTerm"));
             Assert.AreEqual(CodeSystemKeys.LOINC, afterTest.ReferenceTerms[0].ReferenceTerm.LoadProperty<CodeSystem>("CodeSystem").Key);
             Assert.AreEqual("Test Code", afterTest.ConceptNames[0].Name);
-            Assert.AreEqual("E", afterTest.ConceptNames[0].PhoneticCode);
 
             // Update
             afterTest.ReferenceTerms.Add(new ConceptReferenceTerm()

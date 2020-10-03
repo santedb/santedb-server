@@ -43,7 +43,7 @@ namespace SanteDB
 		/// <param name="args">Data passed by the start command.</param>
 		protected override void OnStart(string[] args)
 		{
-			ExitCode = ServiceUtil.Start(typeof(Program).GUID);
+			ExitCode = ServiceUtil.Start(typeof(Program).GUID, string.Empty);
 			if (ExitCode != 0)
 				Stop();
 		}

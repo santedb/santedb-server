@@ -33,9 +33,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <Reference Include="MARC.Everest">
-      <HintPath>..\Solution Items\MARC.Everest.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Configuration" />
@@ -74,13 +71,10 @@
     <Compile Include="Configuration\RestEndpointConfiguration.cs" />
     <Compile Include="Configuration\RestServiceConfiguration.cs" />
     <Compile Include="Configuration\SecurityPolicyConfiguration.cs" />
-    <Compile Include="Configuration\SecuritySignatureConfiguration.cs" />
     <Compile Include="Configuration\Features\WindowsServiceFeature.cs" />
-    <Compile Include="Configuration\X509ConfigurationElement.cs" />
     <Compile Include="Diagnostics\ConsoleTraceWriter.cs" />
     <Compile Include="Diagnostics\Performance\MachinePerformanceProbe.cs" />
     <Compile Include="Diagnostics\Performance\WindowsPerformanceCounterProbe.cs" />
-    <Compile Include="Diagnostics\Performance\ThreadPoolPerformanceProbe.cs" />
     <Compile Include="Diagnostics\RolloverTextWriterTraceWriter.cs" />
     <Compile Include="Diagnostics\SystemDiagnosticsTraceWriter.cs" />
     <Compile Include="ExtensionMethods.cs" />
@@ -118,7 +112,7 @@
     <Compile Include="Services\Impl\GenericLocalActRepository.cs" />
     <Compile Include="Services\Impl\GenericLocalClinicalDataRepository.cs" />
     <Compile Include="Services\Impl\GenericLocalConceptRepository.cs" />
-    <Compile Include="Services\Impl\GenericLocalNullifiedRepository.cs" />
+    <Compile Include="Services\Impl\GenericLocalRepositoryEx.cs" />
     <Compile Include="Services\Impl\GenericLocalSecurityRepository.cs" />
     <Compile Include="Services\Impl\LocalEntityRelationshipRepository.cs" />
     <Compile Include="Services\Impl\LocalExtensionTypeRepository.cs" />
@@ -141,14 +135,12 @@
     <Compile Include="Services\Impl\LocalSecurityUserRepositoryService.cs" />
     <Compile Include="Services\Impl\LocalTemplateDefinitionRepositoryService.cs" />
     <Compile Include="Services\Impl\LocalOrganizationRepository.cs" />
-    <Compile Include="Services\Impl\LocalPatientRepository.cs" />
     <Compile Include="Services\Impl\LocalPlaceRepository.cs" />
     <Compile Include="Services\Impl\LocalServiceManager.cs" />
     <Compile Include="Services\Impl\LocalStockManagementRepositoryService.cs" />
     <Compile Include="Services\Impl\LocalTagPersistenceService.cs" />
     <Compile Include="Services\Impl\FileConfigurationService.cs" />
     <Compile Include="Services\Impl\LocalUserEntityRepository.cs" />
-    <Compile Include="Services\Impl\ThreadPoolService.cs" />
     <Compile Include="Services\Daemons\DefaultJobManagerService.cs" />
     <Compile Include="Services\IPersistentQueueService.cs" />
     <Compile Include="Services\ITfaRelayService.cs" />
@@ -202,12 +194,12 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.19.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.19.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.19.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.19.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.19.0" />
-        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.19.0" />
+        <PackageReference Include="RestSrvr" Version="2.0.40.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.40.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.40.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.40.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.40.0" />
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.40.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

@@ -47,7 +47,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// </summary>
 		protected override Condition MapToFhir(CodedObservation model, RestOperationContext restOperationContext)
 		{
-			var retVal = DataTypeConverter.CreateResource<Condition>(model);
+			var retVal = DataTypeConverter.CreateResource<Condition>(model, restOperationContext);
 
 			retVal.Identifier = model.LoadCollection<ActIdentifier>("Identifiers").Select(o => DataTypeConverter.ToFhirIdentifier<Act>(o)).ToList();
 

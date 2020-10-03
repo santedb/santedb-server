@@ -41,7 +41,7 @@ namespace SanteDB
         /// <summary>
         /// Helper function to start the services
         /// </summary>
-        public static int Start(Guid activityId)
+        public static int Start(Guid activityId, String configFile)
         {
             Trace.CorrelationManager.ActivityId = activityId;
             Trace.TraceInformation("Starting host context on Console Presentation System at {0}", DateTime.Now);
@@ -49,6 +49,8 @@ namespace SanteDB
             // Detect platform
             if (System.Environment.OSVersion.Platform != PlatformID.Win32NT)
                 Trace.TraceWarning("Not running on WindowsNT, some features may not function correctly");
+            else if (!EventLog.SourceExists("SanteDB Host Process"))
+                EventLog.CreateEventSource("SanteDB Host Process", "santedb");
 
             // Do this because loading stuff is tricky ;)
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
@@ -57,7 +59,7 @@ namespace SanteDB
             {
                 // Initialize 
                 ApplicationServiceContext.Current = ApplicationContext.Current;
-                (ApplicationServiceContext.Current as IServiceManager).AddServiceProvider(typeof(FileConfigurationService));
+                ApplicationContext.Current.AddServiceProvider(new FileConfigurationService(configFile));
 
                 Trace.TraceInformation("Getting default message handler service.");
                 if (ApplicationContext.Current.Start())

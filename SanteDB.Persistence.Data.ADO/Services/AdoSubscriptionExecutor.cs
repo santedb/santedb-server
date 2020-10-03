@@ -262,21 +262,25 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 if (queryId != Guid.Empty)
                                 {
                                     var results = domainResults.Keys<Guid>().OfType<Guid>().ToArray();
+                                    this.m_tracer.TraceVerbose("Query for Keys: {0}", connection.GetQueryLiteral(domainResults.Keys<Guid>().ToSqlStatement()));
                                     totalResults = results.Count();
                                     ApplicationContext.Current.GetService<IQueryPersistenceService>()?.RegisterQuerySet(queryId, results, null, totalResults);
                                     resultObjects = results.Skip(offset).Take(count ?? 100).OfType<Object>();
                                 }
                                 else if (m_configuration.UseFuzzyTotals || preArgs.UseFuzzyTotals)
                                 {
+                                    this.m_tracer.TraceVerbose("Query for Objects: {0}", connection.GetQueryLiteral(domainResults.ToSqlStatement()));
                                     resultObjects = domainResults.Skip(offset).Take((count ?? 100) + 1).OfType<Object>();
                                     totalResults = domainResults.Count();
                                 }
                                 else
                                 {
+                                    this.m_tracer.TraceVerbose("Query for Objects: {0}", connection.GetQueryLiteral(domainResults.ToSqlStatement()));
+
                                     totalResults = domainResults.Count();
                                     resultObjects = domainResults.Skip(offset).Take(count ?? 100).OfType<Object>();
                                 }
-
+                                this.m_tracer.TraceVerbose("If i show up in the log, the log is ???????? WHY?????");
                                 // Return
                                 result = resultObjects
                                     .Take(count ?? 100)

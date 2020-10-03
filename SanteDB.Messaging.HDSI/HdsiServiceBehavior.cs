@@ -25,6 +25,7 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Model.Patch;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
+using SanteDB.Rest.Common;
 using SanteDB.Rest.HDSI;
 using System;
 using System.Diagnostics;
@@ -38,13 +39,11 @@ namespace SanteDB.Messaging.HDSI.Wcf
     /// <remarks>Represents SanteDB Server implementation of the the Health Data Service Interface (HDSI) contract</remarks>
     public class HdsiServiceBehavior : HdsiServiceBehaviorBase
     {
-        
+
         /// <summary>
-        /// Creates a new HDSI service behavior
+        /// Get resource handler
         /// </summary>
-        public HdsiServiceBehavior() : base(HdsiMessageHandler.ResourceHandler)
-        {
-        }
+        protected override ResourceHandlerTool GetResourceHandler() => HdsiMessageHandler.ResourceHandler;
 
         /// <summary>
         /// Create the specified resource

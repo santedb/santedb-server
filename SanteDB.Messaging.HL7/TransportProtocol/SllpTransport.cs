@@ -121,11 +121,10 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 			while (m_run) // run the service
 			{
 				var client = this.m_listener.AcceptTcpClient();
-				Thread clientThread = new Thread(OnReceiveMessage);
-				clientThread.IsBackground = true;
-				clientThread.Start(client);
-			}
-		}
+                HL7ThreadPool.Current.QueueUserWorkItem(OnReceiveMessage, client);
+
+            }
+        }
 
 		/// <summary>
 		/// Validation for certificates
@@ -255,9 +254,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 					{
 						var message = parser.Parse(messageData.ToString());
 
-#if DEBUG
 						this.m_traceSource.TraceInfo("Received message from sllp://{0} : {1}", tcpClient.Client.RemoteEndPoint, messageData.ToString());
-#endif
 
 						messageArgs = new AuthenticatedHl7MessageReceivedEventArgs(message, localEndpoint, remoteEndpoint, DateTime.Now, stream.RemoteCertificate.GetPublicKey());
 
@@ -278,9 +275,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 								if (messageArgs != null && messageArgs.Response != null)
 								{
 									var strMessage = parser.Encode(messageArgs.Response);
-#if DEBUG
 									this.m_traceSource.TraceInfo("Sending message to sllp://{0} : {1}", tcpClient.Client.RemoteEndPoint, strMessage);
-#endif
 									// Since nHAPI only emits a string we just send that along the stream
 									streamWriter.Write(strMessage);
 									streamWriter.Flush();
@@ -294,6 +289,8 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 						lastReceive = DateTime.Now; // Update the last receive time so the timeout function works
 
                     }
+
+
 				}
 			}
 			catch (AuthenticationException e)

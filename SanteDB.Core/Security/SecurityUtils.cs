@@ -20,8 +20,11 @@
 using RestSrvr;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Services;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens;
 using System.Linq;
 using System.Security;
@@ -35,7 +38,19 @@ namespace SanteDB.Core.Security
     public static class SecurityUtils
 	{
 
+        // Security utils
 		private static Tracer s_tracer = Tracer.GetTracer(typeof(SecurityUtils));
+
+        // Signatoreu configuration
+        private static ConcurrentDictionary<String, SecuritySignatureConfiguration> m_signatureConfiguration;
+
+        /// <summary>
+        /// Load from config
+        /// </summary>
+        static SecurityUtils ()
+        {
+            m_signatureConfiguration = new ConcurrentDictionary<string, SecuritySignatureConfiguration>(ApplicationContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>().Signatures.ToDictionary(o => o.KeyName ?? "default", o => o));
+        }
 
         /// <summary>
         /// Create signing credentials
@@ -43,9 +58,8 @@ namespace SanteDB.Core.Security
         /// <param name="keyName">The name of the key to use in the configuration, or null to use a default key</param>
         public static SigningCredentials CreateSigningCredentials(string keyName)
         {
-            var configuration = ApplicationContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>().Signatures.FirstOrDefault(o => o.KeyName == keyName);
-            // No configuration found for this key
-            if (configuration == null)
+
+            if(!m_signatureConfiguration.TryGetValue(keyName ?? "default", out SecuritySignatureConfiguration configuration))
                 return null;
 
             // No specific configuration for the key name is found?
@@ -85,6 +99,58 @@ namespace SanteDB.Core.Security
                     throw new SecurityException("Invalid signing configuration");
             }
             return retVal;
+        }
+
+        /// <summary>
+        /// Add signature credentials
+        /// </summary>
+        internal static void AddSigningCredentials(string keyId, byte[] keyData, string signatureAlgorithm)
+        {
+            keyId = keyId ?? "default";
+            SecuritySignatureConfiguration configuration = null;
+            switch(signatureAlgorithm)
+            {
+                case "HS256":
+                    configuration = new SecuritySignatureConfiguration()
+                    {
+                        Algorithm = SignatureAlgorithm.HS256,
+                        KeyName = keyId,
+                        Secret = keyData
+                    };
+                    break;
+                case "RS256":
+                case "RS512":
+                    var certificate = SecurityUtils.FindCertificate(X509FindType.FindByThumbprint, StoreLocation.LocalMachine, StoreName.My, BitConverter.ToString(keyData).Replace("-", ""));
+                    if (certificate == null)
+                        throw new KeyNotFoundException($"Cannot find specified X509 Certificate - Please ensure it is installed in the certificiate repository");
+                    configuration = new SecuritySignatureConfiguration()
+                    {
+                        Algorithm = (SignatureAlgorithm)Enum.Parse(typeof(SignatureAlgorithm), signatureAlgorithm),
+                        KeyName = keyId,
+                        Certificate = certificate,
+                        StoreName = StoreName.My,
+                        StoreLocation = StoreLocation.LocalMachine,
+                        FindType = X509FindType.FindByThumbprint,
+                        StoreLocationSpecified = true,
+                        StoreNameSpecified = true,
+                        FindTypeSpecified = true
+                    };
+                    break;
+            }
+
+            // Now add them
+            if (m_signatureConfiguration.TryGetValue(keyId, out SecuritySignatureConfiguration existing))
+                throw new SecurityException($"Cannot register {keyId} again as it is already configured");
+            else if (!m_signatureConfiguration.TryAdd(keyId, configuration))
+                throw new InvalidOperationException($"Adding {keyId} failed");
+        }
+
+        /// <summary>
+        /// Get key idetnifiers from configuration
+        /// </summary>
+        public static IEnumerable<string> GetKeyIdentifiers()
+        {
+            return m_signatureConfiguration.Keys;
         }
 
         /// <summary>

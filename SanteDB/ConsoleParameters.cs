@@ -45,6 +45,12 @@ namespace SanteDB
         public bool ConsoleMode { get; set; }
 
         /// <summary>
+        /// Gets or sets the configuration file to use
+        /// </summary>
+        [Description("Load an alternate configuration file")]
+        [Parameter("config")]
+        public string ConfigFile { get; set; }
+        /// <summary>
         /// Start test
         /// </summary>
         [Description("Instructs the host process to perform startup functions and then shut down immediately")]

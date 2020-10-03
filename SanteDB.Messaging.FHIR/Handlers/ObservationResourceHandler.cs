@@ -44,7 +44,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// </summary>
         protected override SanteDB.Messaging.FHIR.Resources.Observation MapToFhir(Core.Model.Acts.Observation model, RestOperationContext restOperationContext)
         {
-            var retVal = DataTypeConverter.CreateResource<SanteDB.Messaging.FHIR.Resources.Observation>(model);
+            var retVal = DataTypeConverter.CreateResource<SanteDB.Messaging.FHIR.Resources.Observation>(model, restOperationContext);
 
             retVal.EffectiveDateTime = (FhirDate)model.ActTime.DateTime;
 

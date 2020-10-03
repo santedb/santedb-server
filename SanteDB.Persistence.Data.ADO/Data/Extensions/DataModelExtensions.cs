@@ -51,10 +51,10 @@ namespace SanteDB.Persistence.Data.ADO.Data
     /// </summary>
     public static class DataModelExtensions
     {
-        
+
         // Trace source
         private static Tracer s_traceSource = new Tracer(AdoDataConstants.TraceSourceName);
-        
+
         // Field cache
         private static Dictionary<Type, FieldInfo[]> s_fieldCache = new Dictionary<Type, FieldInfo[]>();
 
@@ -94,6 +94,23 @@ namespace SanteDB.Persistence.Data.ADO.Data
             return retVal;
         }
 
+
+        /// <summary>
+        /// Try get by classifier
+        /// </summary>
+        public static bool CheckExists(this IIdentifiedEntity me, DataContext context)
+        {
+
+            // Is there a classifier?
+            var serviceInstance = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
+            var idpInstance = serviceInstance.GetPersister(me.GetType()) as IAdoPersistenceService;
+
+            if (me.Key.HasValue && me.Key != Guid.Empty)
+                return idpInstance.Exists(context, me.Key.GetValueOrDefault());
+            else
+                return false;
+        }
+
         /// <summary>
         /// Try get by classifier
         /// </summary>
@@ -115,14 +132,14 @@ namespace SanteDB.Persistence.Data.ADO.Data
             if (forceDatabase && me.Key.HasValue)
                 // HACK: This should really hit the database instead of just clearing the cache
                 ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(me.Key.Value);
-                //var tableType = AdoPersistenceService.GetMapper().MapModelType(me.GetType());
-                //if (me.GetType() != tableType)
-                //{
-                //    var tableMap = TableMapping.Get(tableType);
-                //    var dbExisting = context.FirstOrDefault(tableType, context.CreateSqlStatement().SelectFrom(tableType).Where($"{tableMap.Columns.FirstOrDefault(o=>o.IsPrimaryKey).Name}=?", me.Key.Value));
-                //    if (dbExisting != null)
-                //        existing = idpInstance.ToModelInstance(dbExisting, context, principal) as IIdentifiedEntity;
-                //}
+            //var tableType = AdoPersistenceService.GetMapper().MapModelType(me.GetType());
+            //if (me.GetType() != tableType)
+            //{
+            //    var tableMap = TableMapping.Get(tableType);
+            //    var dbExisting = context.FirstOrDefault(tableType, context.CreateSqlStatement().SelectFrom(tableType).Where($"{tableMap.Columns.FirstOrDefault(o=>o.IsPrimaryKey).Name}=?", me.Key.Value));
+            //    if (dbExisting != null)
+            //        existing = idpInstance.ToModelInstance(dbExisting, context, principal) as IIdentifiedEntity;
+            //}
             if (me.Key != Guid.Empty && me.Key != null)
                 existing = idpInstance.Get(context, me.Key.Value) as IIdentifiedEntity;
 
@@ -285,13 +302,14 @@ namespace SanteDB.Persistence.Data.ADO.Data
             Guid retVal = Guid.Empty;
             IDbIdentified loaded = null;
             if (me is DeviceIdentity && !m_deviceIdCache.TryGetValue(me.Name.ToLower(), out retVal))
-                loaded = dataContext.SingleOrDefault<DbSecurityDevice>(o=>o.PublicId.ToLower() == me.Name.ToLower() && !o.ObsoletionTime.HasValue);
+                loaded = dataContext.SingleOrDefault<DbSecurityDevice>(o => o.PublicId.ToLower() == me.Name.ToLower() && !o.ObsoletionTime.HasValue);
             else if (me is Core.Security.ApplicationIdentity && !m_applicationIdCache.TryGetValue(me.Name.ToLower(), out retVal))
                 loaded = dataContext.SingleOrDefault<DbSecurityApplication>(o => o.PublicId.ToLower() == me.Name.ToLower() && !o.ObsoletionTime.HasValue);
             else if (!m_userIdCache.TryGetValue(me.Name.ToLower(), out retVal))
                 loaded = dataContext.SingleOrDefault<DbSecurityUser>(o => o.UserName.ToLower() == me.Name.ToLower() && !o.ObsoletionTime.HasValue);
 
-            if(retVal == Guid.Empty) { 
+            if (retVal == Guid.Empty)
+            {
                 retVal = loaded.Key;
                 // TODO: Enable auto-creation of users via configuration
                 if (loaded == null)
@@ -409,7 +427,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
                     decimal? versionSequence = (me as IBaseEntityData)?.ObsoletionTime.HasValue == true ? (me as IVersionedEntity)?.VersionSequence : null;
                     var assoc = assocPersister.GetFromSource(context, me.Key.Value, versionSequence);
                     ConstructorInfo ci = null;
-                    if(!m_constructors.TryGetValue(pi.PropertyType, out ci))
+                    if (!m_constructors.TryGetValue(pi.PropertyType, out ci))
                     {
                         var type = pi.PropertyType.StripGeneric();
                         while (type != typeof(Object) && ci == null)
@@ -478,8 +496,8 @@ namespace SanteDB.Persistence.Data.ADO.Data
                 Key = me.ContextId,
                 ApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid),
                 ExternalSecurityObjectRefKey = externalRef,
-                ExternalSecurityObjectRefType = externalRef != null ?  
-                    (me.Count<DbSecurityUser>(o=>o.Key == externalRef) > 0 ? "U" : "P") : null
+                ExternalSecurityObjectRefType = externalRef != null ?
+                    (me.Count<DbSecurityUser>(o => o.Key == externalRef) > 0 ? "U" : "P") : null
             };
 
             // Identities
@@ -516,7 +534,8 @@ namespace SanteDB.Persistence.Data.ADO.Data
                     retVal = me.Insert(retVal);
 
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 s_traceSource.TraceWarning("Error creating context: {0}", e);
                 throw;
             }

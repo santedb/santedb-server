@@ -143,25 +143,21 @@ namespace SanteDB.Caching.Redis
         private void EnsureCacheConsistency(DataCacheEventArgs e, bool remove = false)
         {
             // If someone inserts a relationship directly, we need to unload both the source and target so they are re-loaded 
-            if (e.Object is ActParticipation)
+            if (e.Object is ActParticipation ptcpt)
             {
-                var ptcpt = (e.Object as ActParticipation);
-
                 this.Remove(ptcpt.SourceEntityKey.GetValueOrDefault());
                 this.Remove(ptcpt.PlayerEntityKey.GetValueOrDefault());
                 //MemoryCache.Current.RemoveObject(ptcpt.PlayerEntity?.GetType() ?? typeof(Entity), ptcpt.PlayerEntityKey);
             }
-            else if (e.Object is ActRelationship)
+            else if (e.Object is ActRelationship actrel)
             {
-                var rel = (e.Object as ActRelationship);
-                this.Remove(rel.SourceEntityKey.GetValueOrDefault());
-                this.Remove(rel.TargetActKey.GetValueOrDefault());
+                this.Remove(actrel.SourceEntityKey.GetValueOrDefault());
+                this.Remove(actrel.TargetActKey.GetValueOrDefault());
             }
-            else if (e.Object is EntityRelationship)
+            else if (e.Object is EntityRelationship entrel)
             {
-                var rel = (e.Object as EntityRelationship);
-                this.Remove(rel.SourceEntityKey.GetValueOrDefault());
-                this.Remove(rel.TargetEntityKey.GetValueOrDefault());
+                this.Remove(entrel.SourceEntityKey.GetValueOrDefault());
+                this.Remove(entrel.TargetEntityKey.GetValueOrDefault());
             }
 
         }
@@ -194,8 +190,8 @@ namespace SanteDB.Caching.Redis
                 // Add
 
                 var redisDb = this.m_connection.GetDatabase(RedisCacheConstants.CacheDatabaseId);
-                redisDb.HashSet(data.Key.Value.ToString(), this.SerializeObject(data));
-                redisDb.KeyExpire(data.Key.Value.ToString(), this.m_configuration.TTL);
+                redisDb.HashSet(data.Key.Value.ToString(), this.SerializeObject(data), CommandFlags.FireAndForget);
+                redisDb.KeyExpire(data.Key.Value.ToString(), this.m_configuration.TTL, CommandFlags.FireAndForget);
 
                 this.EnsureCacheConsistency(new DataCacheEventArgs(data));
                 if (this.m_configuration.PublishChanges)

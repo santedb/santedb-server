@@ -14,6 +14,8 @@ using SanteDB.Persistence.Data.ADO.Test;
 using System;
 using System.Linq;
 using NHapi.Model.V25.Message;
+using SanteDB.Core.Model;
+using SanteDB.Core.Model.Entities;
 
 namespace SanteDB.Messaging.HL7.Test
 {
@@ -189,10 +191,12 @@ namespace SanteDB.Messaging.HL7.Test
             new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
             var patient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "HL7-9"), AuthenticationContext.Current.Principal).SingleOrDefault();
             Assert.IsNotNull(patient);
+            Assert.AreEqual(6, patient.LoadCollection<EntityRelationship>(nameof(Entity.Relationships)).Count());
+            Assert.IsNotNull(patient.LoadCollection<EntityRelationship>(nameof(Entity.Relationships)).FirstOrDefault(o=>o.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother));
             msg = TestUtil.GetMessage("QBP_COMPLEX");
             var message = new QbpMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
             var messageStr = TestUtil.ToString(message);
-            Assert.AreEqual("SMITH", ((message.GetStructure("QUERY_RESPONSE") as AbstractGroup).GetStructure("PID") as PID).GetMotherSMaidenName(0).FamilyName.Surname.Value);
+            Assert.AreEqual("SMITH", ((message.GetStructure("QUERY_RESPONSE") as AbstractGroup).GetStructure("PID") as PID).GetMotherSMaidenName(0).FamilyName.Surname.Value, $"Mothers name doesn't match {messageStr}");
             Assert.AreEqual("AA", (message.GetStructure("MSA") as MSA).AcknowledgmentCode.Value);
             Assert.AreEqual("OK", (message.GetStructure("QAK") as QAK).QueryResponseStatus.Value);
             Assert.AreEqual("K22", (message.GetStructure("MSH") as MSH).MessageType.TriggerEvent.Value);
@@ -207,7 +211,7 @@ namespace SanteDB.Messaging.HL7.Test
         {
             AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
             var msg = TestUtil.GetMessage("QBP_COMPLEX_PRE");
-            new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
+            var response = new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
             var patient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "HL7-9"), AuthenticationContext.Current.Principal).SingleOrDefault();
             Assert.IsNotNull(patient);
             msg = TestUtil.GetMessage("QBP_AND_PRE");

@@ -4,7 +4,7 @@
 #define MyAppName "SanteDB Server"
 #define MyAppPublisher "SanteDB Community"
 #define MyAppURL "http://santesuite.org"
-#define MyAppVersion "2.0.18"
+
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -36,6 +36,8 @@ AppCopyright = Copyright (C) 2015-2020 SanteSuite Contributors
 ArchitecturesInstallIn64BitMode = x64
 ArchitecturesAllowed =  x64
 WizardStyle=modern
+SignedUninstaller=yes
+SignTool=default sign /a /n $qFyfe Software$q /d $qSanteDB iCDR Server$q $f
 
 ; SignTool=default sign $f
 ; SignedUninstaller=yes
@@ -116,8 +118,6 @@ Source: ..\SanteDB\Data\Demo\*.dataset; DestDir: {app}\data; Components: demo
 Source: ..\SanteDB\santedb.config.dev.xml; DestDir: {app}; DestName: santedb.config.xml; Components: demo
 
 ; Security AMI stuff
-Source: ..\solution items\CERTADMINLIB.dll; DestDir: {app}; Components: msg\ami
-Source: ..\bin\Release\MARC.Util.CertificateTools.dll; DestDir: {app}; Components: msg\ami
 Source: ..\bin\Release\SanteDB.Core.Model.AMI.dll; DestDir: {app}; Components: msg\ami
 Source: ..\bin\Release\SanteDB.Messaging.AMI.dll; DestDir: {app}; Components: msg\ami
 Source: ..\bin\Release\SanteDB.Rest.AMI.dll; DestDir: {app}; Components: msg\ami
@@ -190,7 +190,6 @@ Source: ..\bin\Release\SanteDB.Persistence.Diagnostics.Email.dll; DestDir: {app}
 Source: ..\bin\Release\Antlr3.Runtime.dll; DestDir: {app}; Components: core\bre core\protocol core
 Source: ..\bin\Release\ExpressionEvaluator.dll; DestDir: {app}; Components: core\bre core\protocol                              
 Source: ..\bin\Release\Jint.dll; DestDir: {app}; Components: core\bre
-Source: ..\bin\Release\MARC.Everest.dll; DestDir: {app}; Components: core server
 Source: ..\bin\Release\SanteDB.BusinessRules.JavaScript.dll; DestDir: {app}; Components: core\bre
 Source: ..\bin\Release\SanteDB.Cdss.Xml.dll; DestDir: {app}; Components: core\protocol
 
@@ -225,7 +224,6 @@ Source: ..\bin\Release\Npgsql.dll; DestDir: {app}; Components: db\psql
 
 ; Matching Infrastructure
 Source: ..\bin\Release\Phonix.dll; DestDir: {app}; Components: match
-Source: ..\bin\Release\SanteDB.Matcher.Configuration.File.dll; DestDir: {app}; Components: match
 Source: ..\bin\Release\SanteDB.Matcher.dll; DestDir: {app}; Components: match
 
 ; OAUTH

@@ -35,24 +35,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// <seealso cref="DbReferenceTermName" />
     public class ReferenceTermNamePersistenceService : BaseDataPersistenceService<ReferenceTermName, DbReferenceTermName>, IAdoAssociativePersistenceService
     {
-		/// <summary>
-		/// Converts a domain instance into a model instance.
-		/// </summary>
-		/// <param name="modelInstance">Model instance.</param>
-		/// <param name="context">Context.</param>
-		/// <param name="principal">The principal.</param>
-		/// <returns>The model instance.</returns>
-		public override object FromModelInstance(ReferenceTermName modelInstance, DataContext context)
-		{
-			var domainInstance = base.FromModelInstance(modelInstance, context) as DbReferenceTermName;
-
-			var phoneticCoder = ApplicationServiceContext.Current.GetService<IPhoneticAlgorithmHandler>();
-
-			domainInstance.PhoneticAlgorithm = phoneticCoder?.AlgorithmId ?? PhoneticAlgorithmKeys.None;
-			domainInstance.PhoneticCode = phoneticCoder?.GenerateCode(modelInstance.Name);
-
-			return domainInstance;
-		}
 
         /// <summary>
         /// Get names from source

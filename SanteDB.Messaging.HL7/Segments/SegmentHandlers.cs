@@ -39,7 +39,17 @@ namespace SanteDB.Messaging.HL7.Segments
         /// </summary>
         static SegmentHandlers()
         {
-            foreach (var t in AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic).SelectMany(a => a.ExportedTypes.Where(t => typeof(ISegmentHandler).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface)))
+            foreach (var t in AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic).SelectMany(a =>
+            {
+                try
+                {
+                    return a.ExportedTypes;
+                }
+                catch
+                {
+                    return Type.EmptyTypes;
+                }
+            }).Where(t => typeof(ISegmentHandler).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface))
             {
                 var instance = Activator.CreateInstance(t) as ISegmentHandler;
                 s_segmentHandlers.Add(instance.Name, instance);

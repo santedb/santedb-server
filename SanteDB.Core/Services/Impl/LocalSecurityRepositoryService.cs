@@ -26,6 +26,7 @@ using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using System;
 using System.Collections.Generic;
@@ -303,6 +304,34 @@ namespace SanteDB.Core.Services.Impl
                 return (persistenceService as IStoredQueryDataPersistenceService<SecurityProvenance>).Query(query, queryId, offset, count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
             else
                 return persistenceService.Query(query, offset, count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
+        }
+
+        /// <summary>
+        /// Get the security entity from the specified principal
+        /// </summary>
+        /// <param name="principal">The principal to be fetched</param>
+        public SecurityEntity GetSecurityEntity(IPrincipal principal)
+        {
+            if (principal.Identity is DeviceIdentity deviceIdentity) // Device credential 
+            {
+                var sid = deviceIdentity.FindFirst(SanteDBClaimTypes.Sid)?.Value;
+                if (!String.IsNullOrEmpty(sid))
+                    return ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityDevice>>().Get(Guid.Parse(sid));
+                else
+                    return null;
+            }
+            else if (principal.Identity is Security.ApplicationIdentity applicationIdentity) //
+            {
+                var sid = applicationIdentity.FindFirst(SanteDBClaimTypes.Sid)?.Value;
+                if (!String.IsNullOrEmpty(sid))
+                    return ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityApplication>>().Get(Guid.Parse(sid));
+                else
+                    return null;
+            }
+            else
+            {
+                return this.GetUser(principal.Identity);
+            }
         }
     }
 }

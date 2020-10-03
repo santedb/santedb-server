@@ -49,8 +49,16 @@ namespace SanteDB.Messaging.HL7.Segments
         private const string ReligionCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.6";
         private const string EthnicGroupCodeSystem = "1.3.6.1.4.1.33349.3.1.5.9.3.200.189";
 
-        private Hl7ConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
+        private readonly Guid[] AddressHierarchy = {
+            EntityClassKeys.ServiceDeliveryLocation,
+            EntityClassKeys.CityOrTown,
+            EntityClassKeys.CountyOrParish,
+            EntityClassKeys.State,
+            EntityClassKeys.Country,
+            EntityClassKeys.Place
+        };
 
+        private Hl7ConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<Hl7ConfigurationSection>();
 
         /// <summary>
         /// Gets the name of the segment
@@ -142,7 +150,7 @@ namespace SanteDB.Messaging.HL7.Segments
             if (motherRelation != null)
             {
                 var mother = motherRelation.LoadProperty(nameof(EntityRelationship.TargetEntity)) as Person;
-                foreach (var nam in mother.LoadCollection<EntityName>(nameof(Entity.Names)).Where(n=>n.NameUseKey == NameUseKeys.MaidenName))
+                foreach (var nam in mother.LoadCollection<EntityName>(nameof(Entity.Names)).Where(n => n.NameUseKey == NameUseKeys.MaidenName))
                     retVal.GetMotherSMaidenName(retVal.MotherSMaidenNameRepetitionsUsed).FromModel(nam);
                 foreach (var id in mother.LoadCollection<EntityIdentifier>(nameof(Entity.Identifiers)))
                     retVal.GetMotherSIdentifier(retVal.MotherSIdentifierRepetitionsUsed).FromModel(id);
@@ -164,7 +172,7 @@ namespace SanteDB.Messaging.HL7.Segments
             // Birthplace
             var birthplace = relationships.FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Birthplace);
             if (birthplace != null)
-                retVal.BirthPlace.Value = birthplace.LoadCollection<EntityName>(nameof(Entity.Names)).FirstOrDefault()?.LoadCollection<EntityNameComponent>(nameof(EntityName.Component)).FirstOrDefault()?.Value;
+                retVal.BirthPlace.Value = birthplace.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity)).LoadCollection<EntityName>(nameof(Entity.Names)).FirstOrDefault()?.LoadCollection<EntityNameComponent>(nameof(EntityName.Component)).FirstOrDefault()?.Value;
 
             // Citizenships
             var citizenships = relationships.Where(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Citizen);
@@ -208,8 +216,8 @@ namespace SanteDB.Messaging.HL7.Segments
         /// <returns>The parsed patient information</returns>
         public virtual IEnumerable<IdentifiedData> Parse(ISegment segment, IEnumerable<IdentifiedData> context)
         {
-            var patientService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>();
-            var personService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Person>>();
+            var patientService = ApplicationServiceContext.Current.GetService<IRepositoryService<Patient>>();
+            var personService = ApplicationServiceContext.Current.GetService<IRepositoryService<Person>>();
             var pidSegment = segment as PID;
             int fieldNo = 0;
 
@@ -243,14 +251,23 @@ namespace SanteDB.Messaging.HL7.Segments
                         Guid idguid = Guid.Empty;
                         Person found = null;
                         if (authority.Key == this.m_configuration.LocalAuthority.Key)
-                            found = personService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.Current.Principal);
+                        {
+                            found = patientService.Get(Guid.Parse(id.IDNumber.Value), Guid.Empty);
+                            if (found == null)
+                                found = personService.Get(Guid.Parse(id.IDNumber.Value), Guid.Empty);
+                        }
                         else if (authority?.IsUnique == true)
-                            found = personService.Query(o => o.Identifiers.Any(i => i.Authority.Key == authority.Key && i.Value == idnumber), AuthenticationContext.SystemPrincipal).FirstOrDefault();
-                        
+                        {
+                            found = patientService.Find(o => o.Identifiers.Any(i => i.Authority.Key == authority.Key && i.Value == idnumber)).FirstOrDefault();
+                            if (found == null)
+                                found = personService.Find(o => o.Identifiers.Any(i => i.Authority.Key == authority.Key && i.Value == idnumber)).FirstOrDefault();
+
+                        }
+
                         if (found != null)
                         {
                             if (found is Patient)
-                                retVal = (Patient)found;
+                                retVal = (Patient)found.Clone();
                             else // We need to upgrade this person
                             {
                                 retVal.CopyObjectData(found, false, true);
@@ -269,9 +286,18 @@ namespace SanteDB.Messaging.HL7.Segments
 
                 fieldNo = 3;
                 if (pidSegment.PatientIdentifierListRepetitionsUsed > 0)
-                    retVal.Identifiers.AddRange(
-                    pidSegment.GetPatientIdentifierList().ToModel().Where(o => !retVal.Identifiers.Any(i => i.Authority.Key == o.AuthorityKey && i.Value == o.Value)).ToArray()
-                );
+                {
+                    var messageIdentifiers = pidSegment.GetPatientIdentifierList().ToModel();
+
+                    if (this.m_configuration.IdentifierReplacementBehavior == IdentifierReplacementMode.AnyInDomain)
+                        retVal.Identifiers.RemoveAll(o => messageIdentifiers.Any(i => i.EffectiveVersionSequenceId.HasValue && i.AuthorityKey == o.AuthorityKey));
+
+                    // Remove any identifiers matching the value explicitly 
+                    retVal.Identifiers.RemoveAll(o => messageIdentifiers.Any(i => i.ObsoleteVersionSequenceId.HasValue && i.AuthorityKey == o.AuthorityKey && i.Value == o.Value));
+
+                    // Add any identifiers which we don't have any other identifier domain for
+                    retVal.Identifiers.AddRange(messageIdentifiers.Where(o => !o.ObsoleteVersionSequenceId.HasValue && !retVal.Identifiers.Any(i => i.Authority.Key == o.AuthorityKey && i.Value == o.Value)));
+                }
 
                 // Find the key for the patient 
                 var keyId = pidSegment.GetPatientIdentifierList().FirstOrDefault(o => o.AssigningAuthority.NamespaceID.Value == this.m_configuration.LocalAuthority.DomainName);
@@ -311,22 +337,24 @@ namespace SanteDB.Messaging.HL7.Segments
                         }
 
                         if (authority.Key == this.m_configuration.LocalAuthority.Key)
-                            motherEntity = personService.Get(Guid.Parse(id.IDNumber.Value), null, true, AuthenticationContext.SystemPrincipal);
+                            motherEntity = personService.Get(Guid.Parse(id.IDNumber.Value), Guid.Empty);
                         else if (authority?.IsUnique == true)
-                            motherEntity = personService.Query(o => o.Identifiers.Any(i => i.Value == id.IDNumber.Value && i.Authority.Key == authority.Key), AuthenticationContext.SystemPrincipal).FirstOrDefault();
+                            motherEntity = personService.Find(o => o.Identifiers.Any(i => i.Value == id.IDNumber.Value && i.Authority.Key == authority.Key)).FirstOrDefault();
                     }
 
                     fieldNo = 6;
                     // Mother doesn't exist, so add it
-                    if (motherEntity == null)
+                    var foundById = motherEntity != null;
+                    if (!foundById)
                         motherEntity = new Person()
                         {
                             Key = Guid.NewGuid(),
                             Identifiers = pidSegment.GetMotherSIdentifier().ToModel().ToList(),
                             Names = pidSegment.GetMotherSMaidenName().ToModel(NameUseKeys.MaidenName).ToList(),
-                            StatusConceptKey = StatusKeys.New
+                            StatusConceptKey = StatusKeys.New,
+
                         };
-                    
+
                     var existingRelationship = retVal.Relationships.FirstOrDefault(r => r.SourceEntityKey == retVal.Key && r.TargetEntityKey == motherEntity.Key);
                     if (existingRelationship == null)
                     {
@@ -334,8 +362,24 @@ namespace SanteDB.Messaging.HL7.Segments
                         existingRelationship = retVal.Relationships.FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother);
                         if (existingRelationship == null) // No current mother relationship
                             retVal.Relationships.Add(new EntityRelationship(EntityRelationshipTypeKeys.Mother, motherEntity.Key));
-                        else if (!existingRelationship.LoadProperty<Entity>("TargetEntity").SemanticEquals(motherEntity))
-                            existingRelationship.TargetEntityKey = motherEntity.Key;
+                        else
+                        {
+                            var mother = existingRelationship.LoadProperty<Entity>("TargetEntity");
+
+                            // Was the data found by ID? If so point at it
+                            if (foundById)
+                                existingRelationship.TargetEntityKey = motherEntity.Key;
+                            else
+                            {
+                                // was not found by ID so only update the name of existing mother entity - Check for validity
+                                var newMaidenName = pidSegment.GetMotherSMaidenName().ToModel(NameUseKeys.MaidenName).FirstOrDefault();
+                                if (!mother.LoadCollection<EntityName>(nameof(Entity.Names)).Any(e => e.SemanticEquals(newMaidenName)))
+                                {
+                                    mother.Names.Add((newMaidenName)); // Add it
+                                    motherEntity = mother as Person;
+                                }
+                            }
+                        }
                     }
                     else
                         existingRelationship.RelationshipTypeKey = EntityRelationshipTypeKeys.Mother;
@@ -456,8 +500,8 @@ namespace SanteDB.Messaging.HL7.Segments
                         existing.Value = ssn;
                 }
 
-                    // Birth place is present
-                    fieldNo = 23;
+                // Birth place is present
+                fieldNo = 23;
                 if (!pidSegment.BirthPlace.IsEmpty()) // We need to find the birthplace relationship
                 {
                     var existing = retVal.Relationships.FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Birthplace);
@@ -471,7 +515,22 @@ namespace SanteDB.Messaging.HL7.Segments
                     }
                     else
                     {
-                        var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Names.Any(n => n.Component.Any(c => c.Value == pidSegment.BirthPlace.Value)), AuthenticationContext.SystemPrincipal).Where(o => this.m_configuration.BirthplaceClassKeys.Contains(o.ClassConceptKey.Value));
+                        var places = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>()?.Query(o => o.Names.Any(n => n.Component.Any(c => c.Value == pidSegment.BirthPlace.Value)), AuthenticationContext.SystemPrincipal);
+                        if (this.m_configuration.BirthplaceClassKeys.Any())
+                            places = places.Where(o =>
+                                this.m_configuration.BirthplaceClassKeys.Contains(o.ClassConceptKey.Value));
+
+                        // Still conflicts? Check for same region as address
+                        if (places.Count() > 1 && !this.m_configuration.StrictMetadataMatch)
+                        {
+                            var placeClasses = places.GroupBy(o=>o.ClassConceptKey).OrderBy(o => Array.IndexOf(AddressHierarchy, o.Key.Value));
+                            // Take the first wrung of the address hierarchy
+                            places = placeClasses.First();
+                            if(places.Count() > 1) // Still more than one type of place
+                                places = places.Where(p => p.LoadCollection<EntityAddress>(nameof(Entity.Addresses)).Any(a => a.Component.All(a2 => retVal.LoadCollection<EntityAddress>(nameof(Entity.Addresses)).Any(pa => pa.Component.Any(pc => pc.Value == a2.Value && pc.ComponentTypeKey == a2.ComponentTypeKey)))));
+                        }
+
+                        // Assign if only one place
                         if (places.Count() == 1)
                         {
                             if (existing == null)

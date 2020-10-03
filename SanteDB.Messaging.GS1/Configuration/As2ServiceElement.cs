@@ -19,6 +19,7 @@
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Http;
+using SanteDB.Core.Security.Configuration;
 using System;
 using System.ComponentModel;
 using System.Configuration;

@@ -64,6 +64,23 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.DataType
             set;
         }
 
+        /// <summary>
+        /// Gets or sets the time of issue
+        /// </summary>
+        [Column("iss_dt")]
+        public DateTime? IssueDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the expiration time
+        /// </summary>
+        [Column("exp_dt")]
+        public DateTime? ExpiryDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the check digit
+        /// </summary>
+        [Column("chk_dgt")]
+        public String CheckDigit { get; set; }
     }
 
     /// <summary>

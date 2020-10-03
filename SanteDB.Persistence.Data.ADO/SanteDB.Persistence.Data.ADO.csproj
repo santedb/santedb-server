@@ -62,6 +62,7 @@
     <Compile Include="Data\Hax\CreationTimeQueryHack.cs" />
     <Compile Include="Data\Hax\EntityAddressNameQueryHack.cs" />
     <Compile Include="Data\Hax\RelationshipGuardQueryHack.cs" />
+    <Compile Include="Data\Hax\SecurityUserEntityQueryHack.cs" />
     <Compile Include="Data\Model\Acts\DbActProtocol.cs" />
     <Compile Include="Data\Model\Acts\DbActVersion.cs" />
     <Compile Include="Data\Model\Acts\DbAct.cs" />
@@ -144,6 +145,7 @@
     <Compile Include="Security\AdoSecurityPolicyInstance.cs" />
     <Compile Include="Services\AdoApplicationIdentityProvider.cs" />
     <Compile Include="Services\AdoDeviceIdentityProvider.cs" />
+    <Compile Include="Services\AdoFreetextSearchService.cs" />
     <Compile Include="Services\AdoIdentityProvider.cs" />
     <Compile Include="Services\AdoPersistenceService.cs" />
     <Compile Include="Services\AdoPolicyInformationService.cs" />
@@ -315,10 +317,10 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.19.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.19.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.0.19.0" />
-        <PackageReference Include="SanteDB.BI" Version="2.0.19.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.40.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.40.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="2.0.40.0" />
+        <PackageReference Include="SanteDB.BI" Version="2.0.40.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -355,6 +357,26 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Data\SQL\Updates\20200522-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Data\SQL\Updates\20200812-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Data\SQL\Updates\20200812-FBSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Data\SQL\Updates\20200912-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Data\SQL\Updates\20200912-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

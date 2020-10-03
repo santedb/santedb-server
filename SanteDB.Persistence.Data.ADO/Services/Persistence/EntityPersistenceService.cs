@@ -72,7 +72,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var policySql = context.CreateSqlStatement<DbEntitySecurityPolicy>()
                 .SelectFrom(typeof(DbEntitySecurityPolicy), typeof(DbSecurityPolicy))
                 .InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
-                .Where(o => o.SourceKey == retVal.Key && o.EffectiveVersionSequenceId <= retVal.VersionSequence && (!o.ObsoleteVersionSequenceId.HasValue || o.ObsoleteVersionSequenceId > retVal.VersionSequence));
+                .Where(o => o.SourceKey == retVal.Key  && (!o.ObsoleteVersionSequenceId.HasValue || o.ObsoleteVersionSequenceId > retVal.VersionSequence));
             retVal.Policies = context.Query<CompositeResult<DbEntitySecurityPolicy, DbSecurityPolicy>>(policySql).Select(o => new SecurityPolicyInstance(new SecurityPolicy()
             {
                 CanOverride = o.Object2.CanOverride,
@@ -210,6 +210,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             sw.Stop();
             this.m_tracer.TraceEvent(EventLevel.Verbose, "Basic conversion took: {0}", sw.ElapsedMilliseconds);
 #endif 
+
             retVal.LoadAssociations(context);
             return retVal;
         }
@@ -540,7 +541,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Relationships
             if (data.Relationships != null)
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityRelationship, DbEntityRelationship>(
-                   data.Relationships.Distinct(new EntityRelationshipPersistenceService.Comparer()).Where(o => o != null && !o.InversionIndicator && !o.IsEmpty() && (o.SourceEntityKey == data.Key || !o.SourceEntityKey.HasValue)).ToList(),
+                   data.Relationships,
                     retVal,
                     context);
 
@@ -586,6 +587,48 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     retVal,
                     context);
 
+            // Persist policies
+            if (data.Policies != null && data.Policies.Any())
+            {
+                // Delete / obsolete any old policies
+                foreach(var pol in context.Query<DbEntitySecurityPolicy>(o=>o.SourceKey == data.Key))
+                    if (!data.Policies.Any(o => o.PolicyKey == pol.PolicyKey))
+                    {
+                        pol.ObsoleteVersionSequenceId = retVal.VersionSequence;
+                        context.Update(pol);
+                    }
+
+                // Now update any policies that don't exist
+                foreach (var p in data.Policies)
+                {
+                    var pol = p.Policy?.EnsureExists(context);
+                    if (pol == null) // maybe we can retrieve it from the PIP?
+                    {
+                        var pipInfo = ApplicationServiceContext.Current.GetService<IPolicyInformationService>().GetPolicy(p.PolicyKey.ToString());
+                        if (pipInfo != null)
+                        {
+                            p.Policy = new Core.Model.Security.SecurityPolicy()
+                            {
+                                Oid = pipInfo.Oid,
+                                Name = pipInfo.Name,
+                                CanOverride = pipInfo.CanOverride
+                            };
+                            pol = p.Policy.EnsureExists(context);
+                        }
+                        else throw new InvalidOperationException("Cannot find policy information");
+                    }
+
+                    // Insert
+                    if(!context.Any<DbEntitySecurityPolicy>(o=>o.SourceKey == retVal.Key && o.ObsoleteVersionSequenceId == null && o.PolicyKey == pol.Key))
+                        context.Insert(new DbEntitySecurityPolicy()
+                        {
+                            Key = Guid.NewGuid(),
+                            PolicyKey = pol.Key.Value,
+                            SourceKey = retVal.Key.Value,
+                            EffectiveVersionSequenceId = retVal.VersionSequence.Value
+                        });
+                }
+            }
 
             return retVal;
         }

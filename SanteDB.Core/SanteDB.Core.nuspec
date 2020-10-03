@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>SanteDB.Server.Plugin</id>
-    <version>2.0.19.0</version>
+    <version>2.0.40.0</version>
     <title>SanteDB Server Plugin Support</title>
     <authors>SanteDB Community</authors>
     <owners>santedb.org</owners>
@@ -16,21 +16,19 @@
     <tags>cdr santedb server</tags>
     <dependencies>
       <dependency id="AtnaApi" version="1.1.4.0" />
-      <dependency id="SanteDB.Core.Api" version="2.0.19.0" />
-      <dependency id="SanteDB.Core.Model" version="2.0.19.0" />
-      <dependency id="SanteDB.OrmLite" version="2.0.19.0"/>
-      <dependency id="SanteDB.Rest.Common" version="2.0.19.0"/>
+      <dependency id="SanteDB.Core.Api" version="2.0.40.0" />
+      <dependency id="SanteDB.Core.Model" version="2.0.40.0" />
+      <dependency id="SanteDB.OrmLite" version="2.0.40.0"/>
+      <dependency id="SanteDB.Rest.Common" version="2.0.40.0"/>
     </dependencies>
     <references>
       <group targetFramework="net47">
         <reference file="SanteDB.Core.dll"/>
-        <reference file="MARC.Everest.dll"/>
         <reference file="SanteDB.Configuration.dll"/>
       </group>
     </references>
   </metadata>
   <files>
-    <file src="..\Solution Items\MARC.Everest.dll" target="lib\net47"/>
     <file src="..\bin\$configuration$\SanteDB.Configuration.dll" target="lib\net47"/>
   </files>
 </package>

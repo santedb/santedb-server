@@ -17,6 +17,8 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+
+using System;
 using SanteDB.Core.Model.Acts;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data.Model;
@@ -42,6 +44,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         // act persister
         protected ActPersistenceService m_actPersister = new ActPersistenceService();
 
+        /// <summary>
+        /// If the linked act exists
+        /// </summary>
+        public override bool Exists(DataContext context, Guid key)
+        {
+            return this.m_actPersister.Exists(context, key);
+        }
 
         /// <summary>
         /// From model instance

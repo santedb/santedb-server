@@ -57,7 +57,7 @@
     <add type="SanteDB.Caching.Redis.Configuration.RedisConfigurationSection, SanteDB.Caching.Redis, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Tools.Debug.Configuration.DebugToolsConfigurationSection, SanteDB.Tools.Debug, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null"/>
     <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api, Version=1.10.0.0"/>
-    <add type="SanteDB.Matcher.Configuration.File.FileMatchConfigurationSection, SanteDB.Matcher.Configuration.File, Version=1.0.0.0"/>
+    <add type="SanteDB.Matcher.Configuration.FileMatchConfigurationSection, SanteDB.Matcher, Version=1.0.0.0"/>
     <add type="SanteGuard.Configuration.SanteGuardConfiguration, SanteGuard.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteGuard.Persistence.Ado.Configuration.SanteGuardAdoConfiguration, SanteGuard.Persistence.Ado, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.ResourceMergeConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0"/>
@@ -102,7 +102,7 @@
 		   readOnlyConnectionString="AUDIT"
 		   traceSql="false"
 		   providerType="npgsql" />
-  <section xsi:type="santeguard:SanteGuardConfiguration">
+  <!--<section xsi:type="santeguard:SanteGuardConfiguration">
     <santeguard:endpoints>
       <santeguard:add name="UDP Audit Transport" timeout="00:00:10" readTimeout="00:00:10" maxMessageSize="655340" address="udp://0.0.0.0:514">
         <santeguard:actions>
@@ -113,26 +113,26 @@
       </santeguard:add>h
     </santeguard:endpoints>
     <santeguard:defaultEnterpriseSite>value</santeguard:defaultEnterpriseSite>
-  </section>
-  <section xsi:type="santempi:AdoConfigurationSection"
+  </section>-->
+  <!--<section xsi:type="santempi:AdoConfigurationSection"
       readWriteConnectionString="PSQL"
 	    readOnlyConnectionString="PSQL"
 	    traceSql="false"
 	    providerType="npgsql"
 	    perpareStatements="false"
-    />
+    />-->
   <section xsi:type="AppletConfigurationSection" appletDirectory=".\applets" allowUnsignedApplets="true">
     <trustedPublishers>
       <add>82C63E1E9B87578D0727E871D7613F2F0FAF683B</add>
       <add>4326A4421216AC254DA93DC61B93160B08925BB1</add>
     </trustedPublishers>
   </section>
-  <section xsi:type="santeguard:SanteGuardAdoConfiguration"
+  <!--<section xsi:type="santeguard:SanteGuardAdoConfiguration"
 	readWriteConnectionString="PSQL"
 	readOnlyConnectionString="PSQL"
 	traceSql="false"
 	providerType="npgsql"
-	perpareStatements="false" />
+	perpareStatements="false" />-->
 
   <section xsi:type="OAuthConfigurationSection" issuerName="http://localhost:8080/auth">
     <allowedClaims>
@@ -193,7 +193,7 @@
       <add name="main" initializationData="santedb.log" filter="Warning">
         <writer>SanteDB.Core.Diagnostics.RolloverTextWriterTraceWriter, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</writer>
       </add>
-      <add name="console" initializationData="santedb.log" filter="Warning">
+      <add name="console" initializationData="santedb.log" filter="Informational">
         <writer>SanteDB.Core.Diagnostics.ConsoleTraceWriter, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</writer>
       </add>
     </writers>
@@ -284,8 +284,8 @@
     </service>
   </section>
   <!-- Basic Authorization Configuration -->
-  <section xsi:type="BasicAuthorizationConfigurationSection" requireClientAuth="true" realm="127.0.0.1">
-    <!-- X-SanteDB-ClientClaim allowed claims -->
+  <!--<section xsi:type="BasicAuthorizationConfigurationSection" requireClientAuth="true" realm="127.0.0.1">
+    --><!-- X-SanteDB-ClientClaim allowed claims --><!--
     <claims>
       <add>scope</add>
       <add>PolicyOverride</add>
@@ -294,7 +294,7 @@
       <add>FacilityId</add>
       <add>OrganizationId</add>
     </claims>
-  </section>
+  </section>-->
   <!-- Used for authorizing clients using a claims token -->
   <section xsi:type="ClaimsAuthorizationConfigurationSection" realm="127.0.0.1">
     <issuer>
@@ -469,7 +469,7 @@
     </services>
   </section>
   <section xsi:type="DataQualityConfigurationSection">
-    <ruleSet enabled="true" id="mempi" name="Myanmar National MPI">
+    <ruleSet enabled="true" id="mempi" name="Elbonia National MPI">
       <resources>
         <add resource="Patient">
           <assert id="dob.required" name="Date of Birth Required" priority="Warning">
@@ -564,7 +564,8 @@
       <!-- Core Services -->
       <add type="SanteDB.Core.Services.Impl.FileConfigurationService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Services.DefaultJobManagerService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Core.Services.Impl.ThreadPoolService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      
+      <add type="SanteDB.Core.Services.Impl.DefaultThreadPoolService, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Services.Impl.FileSystemQueueService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Rest.RestServiceFactory, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null"/>
       <add type="SanteDB.Core.Services.Impl.DefaultNetworkInformationService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null"/>
@@ -647,10 +648,12 @@
 
       <add type="SanteDB.Persistence.MDM.Services.MdmDataManagementService, SanteDB.Persistence.MDM, Version=1.0.0.0"/>
       <add type="SanteDB.Matcher.Matchers.WeightedRecordMatchingService, SanteDB.Matcher, Version=1.0.0.0"/>
-      <add type="SanteDB.Matcher.Configuration.File.FileMatchConfigurationProvider, SanteDB.Matcher.Configuration.File, Version=1.0.0.0"/>
+      <add type="SanteDB.Matcher.Services.FileMatchConfigurationProvider, SanteDB.Matcher, Version=1.0.0.0"/>
     
       <add type="SanteDB.Core.Data.Quality.DataQualityService, SanteDB.Core.Api, Version=1.0.0.0"/>
       <add type="SanteMPI.Persistence.ADO.Services.AdoNameAliasService, SanteMPI.Persistence.ADO, Version=2.0.0.0"/>
+    
+      <add type="SanteDB.Core.Services.Impl.JwsResourcePointerService, SanteDB.Core.Api, Version=2.0.0.0"/>
     </serviceProviders>
   </section>
 </SanteDBConfiguration>

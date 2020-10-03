@@ -50,6 +50,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         protected EntityPersistenceService m_entityPersister = new EntityPersistenceService();
 
         /// <summary>
+        /// If the linked act exists
+        /// </summary>
+        public override bool Exists(DataContext context, Guid key)
+        {
+            return this.m_entityPersister.Exists(context, key);
+        }
+
+        /// <summary>
         /// From model instance
         /// </summary>
         public override object FromModelInstance(TModel modelInstance, DataContext context)
@@ -149,5 +157,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             return base.InsertInternal(context, data);
         }
 
+     
     }
 }

@@ -18,6 +18,7 @@
  * Date: 2019-11-27
  */
 using SanteDB.OrmLite.Attributes;
+using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
 using System;
 
 namespace SanteDB.Persistence.Data.ADO.Data.Model.Security

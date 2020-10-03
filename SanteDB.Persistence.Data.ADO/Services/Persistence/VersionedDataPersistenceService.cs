@@ -46,11 +46,19 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// <summary>
     /// Versioned domain data
     /// </summary>
-    public abstract class VersionedDataPersistenceService<TModel, TDomain, TDomainKey> : BaseDataPersistenceService<TModel, TDomain, CompositeResult<TDomain, TDomainKey>>
+    public abstract class VersionedDataPersistenceService<TModel, TDomain, TDomainKey> : BaseDataPersistenceService<TModel, TDomain, CompositeResult<TDomain, TDomainKey>>, IDataPersistenceServiceEx<TModel>
         where TDomain : class, IDbVersionedData, new()
         where TModel : VersionedEntityData<TModel>, new()
         where TDomainKey : IDbIdentified, new()
     {
+
+        /// <summary>
+        /// Return true if the specified object exists
+        /// </summary>
+        public override bool Exists(DataContext context, Guid key)
+        {
+            return context.Any<TDomainKey>(o => o.Key == key);
+        }
 
         /// <summary>
         /// Insert the data
@@ -110,7 +118,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             // This is technically an insert and not an update
             SqlStatement currentVersionQuery = context.CreateSqlStatement<TDomain>().SelectFrom()
-                .Where(o => o.Key == data.Key && !o.ObsoletionTime.HasValue)
+                .Where(o => o.Key == data.Key)
                 .OrderBy<TDomain>(o => o.VersionSequenceId, Core.Model.Map.SortOrderType.OrderByDescending);
 
             var existingObject = context.FirstOrDefault<TDomain>(currentVersionQuery); // Get the last version (current)
@@ -121,9 +129,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             else if ((existingObject as IDbReadonly)?.IsReadonly == true ||
                 (nonVersionedObect as IDbReadonly)?.IsReadonly == true)
                 throw new AdoFormalConstraintException(AdoFormalConstraintType.UpdatedReadonlyObject);
+            else if (existingObject.ObsoletionTime.HasValue)
+                this.m_tracer.TraceWarning("Current object {0} had no active versions - Will un-delete it", data);
 
-            // Are we re-classing this object?
-            nonVersionedObect.CopyObjectData((object)data, false, true);
+                // Are we re-classing this object?
+                nonVersionedObect.CopyObjectData((object)data, false, true);
 
             // Map existing
             var storageInstance = this.FromModelInstance(data, context);
@@ -149,8 +159,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             context.Update(existingObject);
 
+            // Ensure that the new version does not have the obsoletion time specified at all
+            newEntityVersion.ObsoletedByKey = null;
+            newEntityVersion.ObsoletedByKeySpecified = true;
+            newEntityVersion.ObsoletionTime = null;
+            newEntityVersion.ObsoletionTimeSpecified = true;
             newEntityVersion = context.Insert<TDomain>(newEntityVersion);
             nonVersionedObect = context.Update<TDomainKey>(nonVersionedObect);
+
 
             // Pull database generated fields
             data.VersionSequence = newEntityVersion.VersionSequenceId;
@@ -306,9 +322,22 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
                 var domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(typeof(TDomain), typeof(TDomainKey))
                     .InnerJoin<TDomain, TDomainKey>(o => o.Key, o => o.Key)
-                    .Where<TDomain>(o => o.Key == key && o.ObsoletionTime == null)
+                    .Where<TDomain>(o => o.Key == key)
                     .OrderBy<TDomain>(o => o.VersionSequenceId, Core.Model.Map.SortOrderType.OrderByDescending);
-                return this.CacheConvert(context.FirstOrDefault<CompositeResult<TDomain, TDomainKey>>(domainQuery), context);
+
+                // Is the most recent version obsolete? If so, un-obsolete it
+                var recentVersion = context.FirstOrDefault<CompositeResult<TDomain, TDomainKey>>(domainQuery);
+                if (recentVersion?.Object1.ObsoletionTime != null && !context.IsReadonly)
+                {
+                    this.m_tracer.TraceWarning("Object {0} # {1} has no active versions - Possible BUG - Restoring previous version", recentVersion.GetType().FullName, recentVersion.Object2?.Key);
+                    recentVersion.Object1.ObsoletionTime = null;
+                    recentVersion.Object1.ObsoletionTimeSpecified = true;
+                    recentVersion.Object1.ObsoletedByKey = null;
+                    recentVersion.Object1.ObsoletedByKeySpecified = true;
+                    recentVersion = context.Update(recentVersion);
+                }
+
+                return this.CacheConvert(recentVersion, context);
             }
         }
 
@@ -475,9 +504,69 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 if (!sourceVersionMaps.TryGetValue(ins.SourceEntityKey.Value, out eftVersion))
                     eftVersion = source.VersionSequence.GetValueOrDefault();
                 ins.EffectiveVersionSequenceId = eftVersion;
-
                 persistenceService.InsertInternal(context, ins);
             }
+
+            // Remove any duplicated relationships
+            if (storage is IList<TAssociation> listStore)
+            {
+                for(int i = listStore.Count - 1; i >= 0; i--) // Remove dups
+                    if(listStore.Count(o=> o.Key == listStore[i].Key) > 1)
+                        listStore.RemoveAt(i);
+            }
+        }
+
+
+        /// <summary>
+        /// Touch the specified versioned object (update time without creating new version
+        /// </summary>
+        public void Touch(Guid key, TransactionMode mode, IPrincipal principal)
+        {
+#if DEBUG
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+#endif
+
+
+            // Query object
+            using (var connection = m_configuration.Provider.GetWriteConnection())
+                try
+                {
+                    connection.Open();
+                    this.m_tracer.TraceEvent(EventLevel.Verbose, "TOUCH {0}", key);
+
+                    TModel retVal = null;
+                    connection.LoadState = LoadState.FullLoad;
+                    // Update the specified object
+                    var currentData = connection.FirstOrDefault<TDomain>(o => !o.ObsoletionTime.HasValue && o.Key == key);
+                    if (currentData != null)
+                    {
+                        var provenance = connection.EstablishProvenance(principal, null);
+                        currentData.CreationTime = DateTimeOffset.Now;
+                        currentData.CreatedByKey = provenance;
+                        connection.Update(currentData);
+                    }
+
+                }
+                catch (NotSupportedException e)
+                {
+                    throw new DataPersistenceException("Cannot perform LINQ query", e);
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceEvent(EventLevel.Error, "Error : {0}", e);
+                    throw;
+                }
+                finally
+                {
+#if DEBUG
+                    sw.Stop();
+                    this.m_tracer.TraceEvent(EventLevel.Verbose, "Retrieve took {0} ms", sw.ElapsedMilliseconds);
+#endif
+                }
+
+
+
         }
     }
 }

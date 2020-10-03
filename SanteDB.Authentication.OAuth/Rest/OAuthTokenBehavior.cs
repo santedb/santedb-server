@@ -362,7 +362,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
             claims.RemoveAll(o => o.Type == SanteDBClaimTypes.Sid);
             // Creates signing credentials for the specified application key
             var appid = claims.Find(o => o.Type == SanteDBClaimTypes.SanteDBApplicationIdentifierClaim).Value;
-            var signingCredentials = SecurityUtils.CreateSigningCredentials(appid);
+
+            // Signing credentials for the application
+            var signingCredentials = SecurityUtils.CreateSigningCredentials($"SA.{appid}");
 
             // Was there a signing credentials provided for this application? If so, then create for default
             if(signingCredentials == null)
@@ -373,6 +375,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 signingCredentials.SignatureAlgorithm == "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256") &&
                 RestOperationContext.Current.Data.TryGetValue("symm_secret", out object clientSecret)) // OPENID States we should use the application client secret to sign the result , we can only do this if we actually have a symm_secret set
             {
+
                 var secret = Encoding.UTF8.GetBytes(clientSecret.ToString());
                 while (secret.Length < 16)
                     secret = secret.Concat(secret).ToArray();
@@ -415,7 +418,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
           
             // Establish the session
             ISessionProviderService isp = ApplicationServiceContext.Current.GetService<ISessionProviderService>();
-            var scopeList = scope == "*" ? null : scope.Split(' ');
+            var scopeList = scope == "*" || String.IsNullOrEmpty(scope) ? null : scope.Split(' ');
             string purposeOfUse = additionalClaims?.FirstOrDefault(o => o.Type == SanteDBClaimTypes.PurposeOfUse)?.Value;
             bool isOverride = additionalClaims?.Any(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim) == true || scopeList?.Any(o => o == PermissionPolicyIdentifiers.OverridePolicyPermission) == true;
 
@@ -593,11 +596,11 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     i += 32;
                     Array.Copy(BitConverter.GetBytes(DateTime.Now.AddMinutes(1).Ticks), 0, authCode, i, 8);
                     // Encode
-                    var tokenString = BitConverter.ToString(authCode).Replace("-", "");
+                    var tokenString = Base64UrlEncoder.Encode(authCode);
 
                     // Redirect or post?
                     if (responseMode == "form_post")
-                        return this.RenderOAuthAutoPost(redirectUrl, "code={tokenString}&state={state}");
+                        return this.RenderOAuthAutoPost(redirectUrl, $"code={tokenString}&state={state}");
                     else
                         RestOperationContext.Current.OutgoingResponse.Redirect($"{redirectUrl}?code={tokenString}&state={state}");
                 }
@@ -607,7 +610,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     var claimList = claims?.Select(o => new SanteDBClaim(o.Split('=')[0], o.Split('=')[1])).ToList() ?? new List<SanteDBClaim>();
                     if (!String.IsNullOrEmpty(nonce)) // append nonce
                         claimList.Add(new SanteDBClaim("nonce", nonce));
-                    var response = this.EstablishSession(principal, new SanteDBClaimsPrincipal(clientIdentity), null, String.Join(" ", scope), claimList);
+                    var response = this.EstablishSession(principal, new SanteDBClaimsPrincipal(clientIdentity), null, String.Join(" ", scope.Where(o=>!o.Equals("openid"))), claimList);
                     // Return id token?
                     String redirectString = "";
                     if (responseType.Split(' ').Contains("token"))

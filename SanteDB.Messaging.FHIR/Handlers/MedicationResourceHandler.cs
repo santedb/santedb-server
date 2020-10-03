@@ -41,7 +41,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// </summary>
 		protected override Medication MapToFhir(ManufacturedMaterial model, RestOperationContext restOperationContext)
 		{
-			var retVal = DataTypeConverter.CreateResource<Medication>(model);
+			var retVal = DataTypeConverter.CreateResource<Medication>(model, restOperationContext);
 
 			// Code of medication code
 			retVal.Code = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("TypeConcept"));

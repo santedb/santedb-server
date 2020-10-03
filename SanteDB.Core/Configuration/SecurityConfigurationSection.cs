@@ -18,6 +18,7 @@
  * Date: 2019-11-27
  */
 using SanteDB.Core.Model.Map;
+using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Services.Impl;
 using System;
 using System.Collections.Generic;
