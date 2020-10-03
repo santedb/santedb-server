@@ -19,6 +19,7 @@
  */
 using AtnaApi.Transport;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Security.Configuration;
 using System;
 using System.Net;
 using System.Xml.Serialization;

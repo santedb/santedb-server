@@ -18,6 +18,7 @@
  * Date: 2019-11-27
  */
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

@@ -20,6 +20,7 @@
 using RestSrvr;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Concurrent;
