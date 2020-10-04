@@ -77,7 +77,7 @@ namespace SanteDB.Core.Configuration
                     this.m_keys = this.IssuerKeysXml.ToDictionary(
                         o => o.IssuerName,
                         o => o.Algorithm == SignatureAlgorithm.HS256 ?
-                            (SecurityKey)new InMemorySymmetricSecurityKey(o.Secret) :
+                            (SecurityKey)new InMemorySymmetricSecurityKey(o.GetSecret()) :
                             new X509AsymmetricSecurityKey(o.Certificate)
                         );
                 return this.m_keys;

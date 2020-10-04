@@ -340,7 +340,8 @@
     </trustedPublishers>
     <!-- SanteDB signs a lot of data when communicating it, this is used for configuring how this server signs data -->
     <signingKeys>
-      <add alg="hmac" hmacKey="uuNQ0pAkW+M2uxHjK1pisFZBFYjvkgveJcGtDy2E8i8="/>
+      <add id="jwsdefault" alg="hmac" hmacSecret="@SanteDBDefault$$$409" />
+      <add id="default" alg="hmac" hmacSecret="@SanteDBDefault$$$409"/>
     </signingKeys>
     <!-- To Configure X509 Signatures -->
     <!--<signing alg="rsa" findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />-->
@@ -654,6 +655,7 @@
       <add type="SanteMPI.Persistence.ADO.Services.AdoNameAliasService, SanteMPI.Persistence.ADO, Version=2.0.0.0"/>
     
       <add type="SanteDB.Core.Services.Impl.JwsResourcePointerService, SanteDB.Core.Api, Version=2.0.0.0"/>
+      <add type="SanteDB.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Core, Version=2.0.0.0" />
     </serviceProviders>
   </section>
 </SanteDBConfiguration>
