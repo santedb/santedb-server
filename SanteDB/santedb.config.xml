@@ -75,6 +75,7 @@
     <basePath>
       <add readonly="false">C:\Users\fyfej\source\repos\santedb\sante-mpi\applet\matching</add>
       <add readonly="false">C:\Users\justin fyfe\source\repos\santedb\santempi\applet\matching</add>
+      <add readonly="false">C:\Users\fyfej\source\repos\santedb\santempi\applet\matching</add>
     </basePath>
   </section>
   <section xsi:type="MetadataConfigurationSection"/>
@@ -85,6 +86,7 @@
       <add name="PSQL" value="server=fs-dev-psql10;port=5432; database=santempi_2; user id=postgres; password=postgres; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql"/>
       <add name="FBSQL" value="initial catalog=|DataDirectory|\sdb_base.fdb;server type=Embedded;user id=sysdba" provider="Fbsql" />
       <add name="AUDIT" value="server=fs-dev-psql10;port=5432; database=santempi_audit; user id=postgres; password=postgres; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql"/>
+      <add name="AUDIT_FBSQL" value="initial catalog=|DataDirectory|\sdb_audit.fdb;server type=Embedded;user id=sysdba" provider="Fbsql" />
     </connectionStrings>
   </section>
   <section xsi:type="OrmConfigurationSection">
@@ -98,10 +100,10 @@
     </dbProviderFactories>
   </section>
   <section xsi:type="AdoAuditConfigurationSection"
-		   readWriteConnectionString="AUDIT"
-		   readOnlyConnectionString="AUDIT"
+		   readWriteConnectionString="AUDIT_FBSQL"
+		   readOnlyConnectionString="AUDIT_FBSQL"
 		   traceSql="false"
-		   providerType="npgsql" />
+		   providerType="fbsql" />
   <!--<section xsi:type="santeguard:SanteGuardConfiguration">
     <santeguard:endpoints>
       <santeguard:add name="UDP Audit Transport" timeout="00:00:10" readTimeout="00:00:10" maxMessageSize="655340" address="udp://0.0.0.0:514">
@@ -511,10 +513,10 @@
   </section>
   <!-- This section controls the persistence for ADO.NET -->
   <section xsi:type="AdoPersistenceConfigurationSection"
-           readWriteConnectionString="PSQL"
-           readOnlyConnectionString="PSQL"
+           readWriteConnectionString="FBSQL"
+           readOnlyConnectionString="FBSQL"
            traceSql="false"
-			     providerType="npgsql"
+			     providerType="fbsql"
            staOnly="false"
 		       fuzzyTotal="false"
            autoUpdateExisting="true"
@@ -549,16 +551,16 @@
   </section>
   <!-- Reporting configuration -->
   <section xsi:type="ReportingConfiguration"
-           readWriteConnectionString="PSQL"
-           readOnlyConnectionString="PSQL"
+           readWriteConnectionString="FBSQL"
+           readOnlyConnectionString="FBSQL"
            traceSql="false"
-           	providerType="npgsql" />
+           	providerType="fbsql" />
   <!-- Data Warehouse Configuration -->
   <section xsi:type="AdoWarehouseConfigurationSection"
-           readWriteConnectionString="PSQL"
-           readOnlyConnectionString="PSQL"
+           readWriteConnectionString="FBSQL"
+           readOnlyConnectionString="FBSQL"
            traceSql="false"
-           	providerType="npgsql"  />
+           	providerType="fbsql"  />
   <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="8">
     <serviceProviders>
 
