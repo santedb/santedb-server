@@ -81,7 +81,7 @@ namespace SanteDB.Core.Configuration
         /// </summary>
         [XmlIgnore, JsonIgnore]
         [DisplayName("Behavior"), Description("Sets the implementation behavior of this service")]
-        [ReadOnly(true)]
+        [Browsable(false)]
         public Type ServiceType { get => this.ServiceTypeXml != null ? Type.GetType(this.ServiceTypeXml) : null; set => this.ServiceTypeXml = value?.AssemblyQualifiedName; }
 
         /// <summary>

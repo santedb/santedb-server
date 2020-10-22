@@ -24,10 +24,13 @@ using SanteDB.Core.Configuration.Features;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Services;
+using SanteDB.OrmLite.Configuration;
+using SanteDB.OrmLite.Providers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -134,7 +137,15 @@ namespace SanteDB.Configuration
         public void InitialStart()
         {
             this.Features.Count();
-
+            
+            // Default configuration
+            this.Configuration = new SanteDBConfiguration();
+            // Initial settings for initial 
+            this.Configuration.AddSection(new OrmConfigurationSection()
+            {
+                AdoProvider = this.GetAllTypes().Where(t => typeof(DbProviderFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface ).Select(t => new ProviderRegistrationConfiguration(t.Namespace.StartsWith("System") ? t.Name : t.Namespace.Split('.')[0], t)).ToList(),
+                Providers = this.GetAllTypes().Where(t => typeof(IDbProvider).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).Select(t => new ProviderRegistrationConfiguration((Activator.CreateInstance(t) as IDbProvider).Invariant, t)).ToList()
+            });
             this.Started?.Invoke(this, EventArgs.Empty);
         }
 
@@ -283,15 +294,24 @@ namespace SanteDB.Configuration
 
             foreach (var itm in this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders)
             {
+                if (typeof(IConfigurationManager).IsAssignableFrom(itm.Type)) continue;
                 this.GetService(itm.Type);
                 Application.DoEvents();
             }
 
             foreach (var itm in this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.Where(s => typeof(IDaemonService).IsAssignableFrom(s.Type)))
             {
-                var svc = this.GetService(itm.Type) as IDaemonService;
-                Application.DoEvents();
-                svc.Start();
+                try
+                {
+                    var svc = this.GetService(itm.Type) as IDaemonService;
+                    Application.DoEvents();
+                    svc.Start();
+                }
+                catch(Exception e)
+                {
+                    Trace.TraceError("Could not restart daemon: {0} - {1}", itm.Type, e.Message);
+                    MessageBox.Show($"Error Loading Configuration - Service {itm.Type.Name} failed to initialize because of {e.Message}");
+                }
             }
 
             this.Features.Count();
@@ -305,20 +325,28 @@ namespace SanteDB.Configuration
         /// </summary>
         public object GetService(Type serviceType)
         {
-            if (serviceType.IsAssignableFrom(typeof(ConfigurationContext)))
-                return this;
-            else
+            try
             {
-                var candidate = this.m_services.FirstOrDefault(o => serviceType.IsAssignableFrom(o.GetType()));
-                if (candidate == null)
+                if (serviceType.IsAssignableFrom(typeof(ConfigurationContext)))
+                    return this;
+                else
                 {
-                    var dt = this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.FirstOrDefault(o => serviceType.IsAssignableFrom(o.Type))?.Type;
-                    if (dt != null)
-                        candidate = Activator.CreateInstance(dt);
-                    if (candidate != null)
-                        this.m_services.Add(candidate);
+                    var candidate = this.m_services.FirstOrDefault(o => serviceType.IsAssignableFrom(o.GetType()));
+                    if (candidate == null)
+                    {
+                        var dt = this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.FirstOrDefault(o => serviceType.IsAssignableFrom(o.Type))?.Type;
+                        if (dt != null)
+                            candidate = Activator.CreateInstance(dt);
+                        if (candidate != null)
+                            this.m_services.Add(candidate);
+                    }
+                    return candidate;
                 }
-                return candidate;
+            }
+            catch(Exception e)
+            {
+                Trace.TraceError("Error getting service {0} - {1}", serviceType, e.Message);
+                throw new InvalidOperationException($"Error getting service {serviceType}", e);
             }
         }
 

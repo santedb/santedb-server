@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data.ADO" id="0-003" name="Core Functions" invariantName="fbsql">
+ * <feature scope="SanteDB.Persistence.Data.ADO" id="0-003" name="Core Functions" invariantName="FirebirdSQL">
  *	<summary>Install Database Functions</summary>
  *	<remarks>Install the core database functions required for SanteDB operation</remarks>
  *  <isInstalled>SELECT IS_USR_LOCK('SYSTEM') IS NULL FROM RDB$DATABASE;</isInstalled>

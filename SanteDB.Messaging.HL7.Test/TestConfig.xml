@@ -35,16 +35,16 @@
   </sections>
   <section xsi:type="DataConfigurationSection">
     <connectionStrings>
-      <add name="TEST_CONNECTION" value="initial catalog=|DataDirectory|\santedb_test.fdb;server type=Embedded;user id=sysdba" provider="Fbsql"/>
+      <add name="TEST_CONNECTION" value="initial catalog=|DataDirectory|\santedb_test.fdb;server type=Embedded;user id=sysdba" provider="FirebirdSQL"/>
     </connectionStrings>
   </section>
   <section xsi:type="OrmConfigurationSection">
     <providers>
-      <add type="SanteDB.OrmLite.Providers.Firebird.FirebirdSQLProvider, SanteDB.OrmLite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" invariant="fbsql" />
+      <add type="SanteDB.OrmLite.Providers.Firebird.FirebirdSQLProvider, SanteDB.OrmLite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" invariant="FirebirdSQL" />
     </providers>
     <dbProviderFactories>
       <add name="PostgreSQL Data Provider" invariant="Npgsql" description=".Net Framework Data Provider for PostgreSQL" type="Npgsql.NpgsqlFactory, Npgsql, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7"/>
-      <add name="Firebird Data Provider" invariant="Fbsql" description="Firebird" type="FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient, Culture=neutral, PublicKeyToken=3750abcc3150b00c" />
+      <add name="Firebird Data Provider" invariant="FirebirdSQL" description="Firebird" type="FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient, Culture=neutral, PublicKeyToken=3750abcc3150b00c" />
     </dbProviderFactories>
   </section>
   <section xsi:type="MemoryCacheConfigurationSection" autoSubscribe="true" maxSize="10000" maxAge="36000000" />
@@ -76,7 +76,7 @@
            readWriteConnectionString="TEST_CONNECTION"
            readOnlyConnectionString="TEST_CONNECTION"
            traceSql="false"
-           providerType="fbsql"
+           providerType="FirebirdSQL"
            staOnly="false"
            autoUpdateExisting="true"
            autoInsertChildren="true"

@@ -21,10 +21,12 @@ using SanteDB.Configuration;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Data;
 using SanteDB.Core.Configuration.Tasks;
+using SanteDB.OrmLite.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Common;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -75,7 +77,8 @@ namespace SanteDB.Configurator
                     },
                     new OrmLite.Configuration.OrmConfigurationSection()
                     {
-                        Providers = ConfigurationContext.Current.DataProviders.Select(o => new OrmLite.Configuration.ProviderRegistrationConfiguration(o.Invariant, o.DbProviderType)).ToList()
+                        Providers = ConfigurationContext.Current.DataProviders.Select(o => new OrmLite.Configuration.ProviderRegistrationConfiguration(o.Invariant, o.DbProviderType)).ToList(),
+                        AdoProvider = ConfigurationContext.Current.GetAllTypes().Where(t => typeof(DbProviderFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface ).Select(t => new ProviderRegistrationConfiguration(t.Namespace.StartsWith("System") ? t.Name : t.Namespace.Split('.')[0], t)).ToList(),
                     }
                 }
             };

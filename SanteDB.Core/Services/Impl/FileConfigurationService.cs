@@ -49,6 +49,14 @@ namespace SanteDB.Core.Services.Impl
         private System.Configuration.Configuration m_configuration = null;
 
         /// <summary>
+        /// Create new file confiugration service.
+        /// </summary>
+        public FileConfigurationService() : this(String.Empty)
+        {
+
+        }
+
+        /// <summary>
         /// Get configuration service
         /// </summary>
         public FileConfigurationService(string configFile)
