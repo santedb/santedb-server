@@ -181,7 +181,14 @@ namespace SanteDB.Messaging.HDSI.Wcf
             return base.ResourceOptions(resourceType);
         }
 
-        
+        /// <summary>
+        /// Copy a resource from upstream
+        /// </summary>
+        public override IdentifiedData Copy(string reosurceType, string id)
+        {
+            throw new NotSupportedException();
+        }
+
     }
 
 }
