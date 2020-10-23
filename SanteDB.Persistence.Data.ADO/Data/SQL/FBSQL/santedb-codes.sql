@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data.ADO" id="0-002" name="Core Codes" invariantName="fbsql">
+ * <feature scope="SanteDB.Persistence.Data.ADO" id="0-002" name="Core Codes" invariantName="FirebirdSQL">
  *	<summary>Install Core Codes</summary>
  *	<remarks>Installs the baseline concept dictionary for SanteDB to operate</remarks>
  *	<isInstalled>SELECT COUNT(1) > 0 FROM CD_TBL WHERE CD_ID = char_to_uuid('a87a6d21-2ca6-4aea-88f3-6135cceb58d1')</isInstalled>

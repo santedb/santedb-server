@@ -120,5 +120,11 @@
       <Link>SanteDB.licenseheader</Link>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\santedb-orm\SanteDB.OrmLite\SanteDB.OrmLite.csproj">
+      <Project>{407C87E6-A1F3-45E6-B883-A8176B350817}</Project>
+      <Name>SanteDB.OrmLite</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

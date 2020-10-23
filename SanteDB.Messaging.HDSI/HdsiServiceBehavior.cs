@@ -182,11 +182,11 @@ namespace SanteDB.Messaging.HDSI.Wcf
         }
 
         /// <summary>
-        /// Copy a resource from upstream
+        /// Copy operation (not supported)
         /// </summary>
         public override IdentifiedData Copy(string reosurceType, string id)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException("Copy from upstream not supported on iCDR");
         }
 
     }

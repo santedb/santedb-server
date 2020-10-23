@@ -30,7 +30,7 @@
   <section xsi:type="MemoryCacheConfigurationSection" autoSubscribe="true" maxSize="10" maxAge="50000000" />
   <section xsi:type="OrmConfigurationSection">
     <providers>
-      <add type="SanteDB.OrmLite.Providers.Firebird.FirebirdSQLProvider, SanteDB.OrmLite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" invariant="fbsql" />
+      <add type="SanteDB.OrmLite.Providers.Firebird.FirebirdSQLProvider, SanteDB.OrmLite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" invariant="FirebirdSQL" />
     </providers>
   </section>
   <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="4">
