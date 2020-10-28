@@ -86,7 +86,7 @@ namespace SanteDB.Messaging.HL7.Segments
             }
 
             // Map alternate identifiers
-            foreach (var id in patient.LoadCollection<EntityIdentifier>("Identifiers"))
+            foreach (var id in patient.GetIdentifiers())
             {
                 if (exportDomains == null || exportDomains.Any(e => e.Key == id.AuthorityKey) == true)
                 {
@@ -98,11 +98,11 @@ namespace SanteDB.Messaging.HL7.Segments
             }
 
             // Addresses
-            foreach (var addr in patient.LoadCollection<EntityAddress>("Addresses"))
+            foreach (var addr in patient.GetAddresses())
                 retVal.GetPatientAddress(retVal.PatientAddressRepetitionsUsed).FromModel(addr);
 
             // Names
-            foreach (var en in patient.LoadCollection<EntityName>("Names"))
+            foreach (var en in patient.GetNames())
                 retVal.GetPatientName(retVal.PatientNameRepetitionsUsed).FromModel(en);
 
             // Date of birth
@@ -146,18 +146,18 @@ namespace SanteDB.Messaging.HL7.Segments
             }
 
             // Mother's info
-            var motherRelation = patient.LoadCollection<EntityRelationship>(nameof(Entity.Relationships)).FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother);
+            var motherRelation = patient.GetRelationships().FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother);
             if (motherRelation != null)
             {
                 var mother = motherRelation.LoadProperty(nameof(EntityRelationship.TargetEntity)) as Person;
-                foreach (var nam in mother.LoadCollection<EntityName>(nameof(Entity.Names)).Where(n => n.NameUseKey == NameUseKeys.MaidenName))
+                foreach (var nam in mother.GetNames().Where(n => n.NameUseKey == NameUseKeys.MaidenName))
                     retVal.GetMotherSMaidenName(retVal.MotherSMaidenNameRepetitionsUsed).FromModel(nam);
-                foreach (var id in mother.LoadCollection<EntityIdentifier>(nameof(Entity.Identifiers)))
+                foreach (var id in mother.GetIdentifiers())
                     retVal.GetMotherSIdentifier(retVal.MotherSIdentifierRepetitionsUsed).FromModel(id);
             }
 
             // Telecoms
-            foreach (var tel in patient.LoadCollection<EntityTelecomAddress>(nameof(Entity.Telecoms)))
+            foreach (var tel in patient.GetTelecoms())
             {
                 if (tel.AddressUseKey.GetValueOrDefault() == AddressUseKeys.WorkPlace)
                     retVal.GetPhoneNumberBusiness(retVal.PhoneNumberBusinessRepetitionsUsed).FromModel(tel);
@@ -166,13 +166,13 @@ namespace SanteDB.Messaging.HL7.Segments
             }
 
             // Load relationships
-            var relationships = patient.LoadCollection<EntityRelationship>(nameof(Entity.Relationships));
+            var relationships = patient.GetRelationships();
             var participations = patient.LoadCollection<ActParticipation>(nameof(Entity.Participations));
 
             // Birthplace
             var birthplace = relationships.FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Birthplace);
             if (birthplace != null)
-                retVal.BirthPlace.Value = birthplace.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity)).LoadCollection<EntityName>(nameof(Entity.Names)).FirstOrDefault()?.LoadCollection<EntityNameComponent>(nameof(EntityName.Component)).FirstOrDefault()?.Value;
+                retVal.BirthPlace.Value = birthplace.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity)).GetNames().FirstOrDefault()?.LoadCollection<EntityNameComponent>(nameof(EntityName.Component)).FirstOrDefault()?.Value;
 
             // Citizenships
             var citizenships = relationships.Where(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Citizen);
@@ -180,8 +180,8 @@ namespace SanteDB.Messaging.HL7.Segments
             {
                 var ce = retVal.GetCitizenship(retVal.CitizenshipRepetitionsUsed);
                 var place = itm.LoadProperty<Place>(nameof(EntityRelationship.TargetEntity));
-                ce.Identifier.Value = place.LoadCollection<EntityIdentifier>(nameof(Entity.Identifiers)).FirstOrDefault(o => o.AuthorityKey == AssigningAuthorityKeys.Iso3166CountryCode)?.Value;
-                ce.Text.Value = place.LoadCollection<EntityName>(nameof(Entity.Names)).FirstOrDefault(o => o.NameUseKey == NameUseKeys.OfficialRecord)?.LoadCollection<EntityNameComponent>(nameof(EntityName.Component)).FirstOrDefault()?.Value;
+                ce.Identifier.Value = place.GetIdentifiers().FirstOrDefault(o => o.AuthorityKey == AssigningAuthorityKeys.Iso3166CountryCode)?.Value;
+                ce.Text.Value = place.GetNames().FirstOrDefault(o => o.NameUseKey == NameUseKeys.OfficialRecord)?.LoadCollection<EntityNameComponent>(nameof(EntityName.Component)).FirstOrDefault()?.Value;
             }
 
             // Account number
@@ -373,7 +373,7 @@ namespace SanteDB.Messaging.HL7.Segments
                             {
                                 // was not found by ID so only update the name of existing mother entity - Check for validity
                                 var newMaidenName = pidSegment.GetMotherSMaidenName().ToModel(NameUseKeys.MaidenName).FirstOrDefault();
-                                if (!mother.LoadCollection<EntityName>(nameof(Entity.Names)).Any(e => e.SemanticEquals(newMaidenName)))
+                                if (!mother.GetNames().Any(e => e.SemanticEquals(newMaidenName)))
                                 {
                                     mother.Names.Add((newMaidenName)); // Add it
                                     motherEntity = mother as Person;

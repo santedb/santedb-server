@@ -3,7 +3,6 @@
   <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>f7a5cbd8-5425-415e-8308-d14b94f56917</id>
-
       <name>ICD10</name>
       <oid>2.16.840.1.113883.6.3</oid>
       <authority>I10</authority>
@@ -12,11 +11,9 @@
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>55b9ff1b-3692-475c-b482-051e91ab5f76</id>
-
       <mnemonic>B05</mnemonic>
       <codeSystem>f7a5cbd8-5425-415e-8308-d14b94f56917</codeSystem>
       <name>
-
 
         <language>en</language>
         <value>Measles</value>
