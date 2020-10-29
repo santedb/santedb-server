@@ -27,6 +27,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using SanteDB.Core.Model;
+using System.Data;
+using System.Data.Common;
+using SanteDB.Core.Exceptions;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -78,8 +81,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Ensure we haven't already persisted this
             if (data.InversionIndicator) 
                 return data; // don't persist inverted
-            if(data.TargetEntity != null && !data.InversionIndicator) data.TargetEntity = data.TargetEntity.EnsureExists(context) as Entity;
             data.TargetEntityKey = data.TargetEntity?.Key ?? data.TargetEntityKey;
+            if (data.RelationshipType != null) data.RelationshipType = data.RelationshipType.EnsureExists(context, false) as Concept;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
             data.EffectiveVersionSequenceId = data.EffectiveVersionSequenceId ?? data.SourceEntity?.VersionSequence;
             // Lookup the original 
@@ -112,7 +115,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Ensure we haven't already persisted this
             if (data.InversionIndicator) 
                 return data; // don't persist inverted
+
             data.TargetEntityKey = data.TargetEntity?.Key ?? data.TargetEntityKey;
+            if (data.RelationshipType != null) data.RelationshipType = data.RelationshipType.EnsureExists(context, false) as Concept;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
 
             if (data.ObsoleteVersionSequenceId == Int32.MaxValue)

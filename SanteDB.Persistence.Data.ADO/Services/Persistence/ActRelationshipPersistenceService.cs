@@ -18,6 +18,7 @@
  * Date: 2019-11-27
  */
 using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
@@ -49,8 +50,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override ActRelationship InsertInternal(DataContext context, ActRelationship data)
         {
             // Ensure we haven't already persisted this
-            if (data.TargetAct != null) data.TargetAct = data.TargetAct.EnsureExists(context) as Act;
             data.TargetActKey = data.TargetAct?.Key ?? data.TargetActKey;
+            if (data.RelationshipType != null) data.RelationshipType = data.RelationshipType.EnsureExists(context, false) as Concept;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
 
             byte[] target = data.TargetActKey.Value.ToByteArray(),
@@ -96,6 +97,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override ActRelationship UpdateInternal(DataContext context, ActRelationship data)
         {
             data.TargetActKey = data.TargetAct?.Key ?? data.TargetActKey;
+            if (data.RelationshipType != null) data.RelationshipType = data.RelationshipType.EnsureExists(context, false) as Concept;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
 
             return base.UpdateInternal(context, data);

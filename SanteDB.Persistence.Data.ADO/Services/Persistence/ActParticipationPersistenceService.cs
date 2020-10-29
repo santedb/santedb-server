@@ -93,10 +93,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override ActParticipation InsertInternal(DataContext context, ActParticipation data)
         {
             // Ensure we haven't already persisted this
-            if (data.PlayerEntity != null) data.PlayerEntity = data.PlayerEntity.EnsureExists(context) as Entity;
             data.PlayerEntityKey = data.PlayerEntity?.Key ?? data.PlayerEntityKey;
+            if (data.ParticipationRole != null) data.ParticipationRole = data.ParticipationRole.EnsureExists(context, false) as Concept;
             data.ParticipationRoleKey = data.ParticipationRole?.Key ?? data.ParticipationRoleKey;
-            if (data.Act != null) data.Act = data.Act.EnsureExists(context) as Act;
             data.ActKey = data.Act?.Key ?? data.ActKey;
 
             byte[] target = data.PlayerEntityKey.Value.ToByteArray(),
@@ -142,6 +141,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override ActParticipation UpdateInternal(DataContext context, ActParticipation data)
         {
             data.PlayerEntityKey = data.PlayerEntity?.Key ?? data.PlayerEntityKey;
+            if (data.ParticipationRole != null) data.ParticipationRole = data.ParticipationRole.EnsureExists(context, false) as Concept;
             data.ParticipationRoleKey = data.ParticipationRole?.Key ?? data.ParticipationRoleKey;
             data.ActKey = data.Act?.Key ?? data.ActKey;
 

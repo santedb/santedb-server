@@ -217,7 +217,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
         /// <summary>
         /// Ensures a model has been persisted
         /// </summary>
-        public static IIdentifiedEntity EnsureExists(this IIdentifiedEntity me, DataContext context)
+        public static IIdentifiedEntity EnsureExists(this IIdentifiedEntity me, DataContext context, bool createIfNotExists = true)
         {
 
             if (me == null) return null;
@@ -231,7 +231,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
             var idpInstance = serviceInstance.GetPersister(me.GetType());
 
             // Don't touch the child just return reference
-            if (!serviceInstance.GetConfiguration().AutoInsertChildren)
+            if (!serviceInstance.GetConfiguration().AutoInsertChildren || !createIfNotExists)
             {
                 if (existing != null)
                 {
