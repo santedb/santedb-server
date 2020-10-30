@@ -38,6 +38,7 @@ using System.Net;
 using System.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using System.Net.Security;
 
 namespace SanteDB.Core.Http
 {
@@ -107,7 +108,7 @@ namespace SanteDB.Core.Http
             if (this.Description?.Binding?.Security?.CertificateValidator != null)
                 retVal.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) =>
                 {
-                    return this.Description.Binding.Security.CertificateValidator.ValidateCertificate(certificate, chain);
+                    return sslPolicyErrors == SslPolicyErrors.None || this.Description.Binding.Security.CertificateValidator.ValidateCertificate(certificate, chain);
                 };
             else
                 retVal.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) =>

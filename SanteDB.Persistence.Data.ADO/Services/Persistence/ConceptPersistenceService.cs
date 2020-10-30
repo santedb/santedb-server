@@ -62,7 +62,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 retVal.LoadState = Core.Model.LoadState.PartialLoad;
                 retVal.ConceptNames = context.Query<DbConceptName>(o => o.SourceKey == retVal.Key).Select(o => new ConceptName(o.Language, o.Name)).ToList();
                 retVal.ReferenceTerms = context.Query<DbConceptReferenceTerm>(o => o.SourceKey == retVal.Key).Select(o => new ConceptReferenceTerm(o.TargetKey, o.RelationshipTypeKey)).ToList();
-
+                
             }
             return retVal;
         }
