@@ -51,10 +51,10 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("2.0.43.*")][assembly: AssemblyInformationalVersion("Langley")]
-[assembly: AssemblyVersion("2.0.43.*")]
+// [assembly: AssemblyVersion("2.0.45.*")][assembly: AssemblyInformationalVersion("Langley")]
+[assembly: AssemblyVersion("2.0.45.*")]
 [assembly: AssemblyInformationalVersion("Langley")]
-[assembly: AssemblyFileVersion("2.0.43.0")]
+[assembly: AssemblyFileVersion("2.0.45.0")]
 
 [assembly: Plugin(Group = FeatureGroup.Performance, Environment = PluginEnvironment.Server, EnableByDefault = true)]
 [assembly: PluginDependency("SanteDB.Core, Version=1.10.0.0")]

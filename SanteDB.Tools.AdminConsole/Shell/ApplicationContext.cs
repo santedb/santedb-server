@@ -214,13 +214,14 @@ namespace SanteDB.Tools.AdminConsole.Shell
                     config.Endpoint.AddRange(itm.BaseUrl.Select(o => new AdminClientEndpointDescription(o.Replace("0.0.0.0", this.m_configuration.RealmId))));
 
                     // Add client
-                    this.m_restClients.Add(itm.ServiceType, new RestClient(
-                        config
-                    ));
+                    if(!this.m_restClients.ContainsKey(itm.ServiceType))
+                        this.m_restClients.Add(itm.ServiceType, new RestClient(
+                            config
+                        ));
                 }
 
                 // Attempt to get server time from clinical interface which should challenge
-                this.GetRestClient(ServiceEndpointType.HealthDataService)?.Get("/time");
+                var data = this.GetRestClient(ServiceEndpointType.HealthDataService)?.Get("/time");
 		
                 return true;
             }
@@ -233,7 +234,6 @@ namespace SanteDB.Tools.AdminConsole.Shell
 #endif
                 return false;
             }
-		this.StartTime = DateTime.Now;
         }
 
         /// <summary>

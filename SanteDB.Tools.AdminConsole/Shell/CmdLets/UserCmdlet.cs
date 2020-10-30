@@ -265,7 +265,7 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
             else if (!String.IsNullOrEmpty(un))
                 users = m_client.GetUsers(o => o.UserName.Contains(un));
             else
-                users = m_client.GetUsers(o => o.UserName != null);
+                users = m_client.GetUsers(o => o.ObsoletionTime == null);
 
             if (parms.Active)
                 users.CollectionItem = users.CollectionItem.OfType<SecurityUserInfo>().Where(o => o.Entity.ObsoletionTime.HasValue).OfType<object>().ToList();

@@ -126,6 +126,7 @@ namespace SanteDB.Core.Http
 
             if (this.Description.Binding.Optimize)
                 retVal.Headers[HttpRequestHeader.AcceptEncoding] = "gzip, deflate";
+
             return retVal;
         }
 

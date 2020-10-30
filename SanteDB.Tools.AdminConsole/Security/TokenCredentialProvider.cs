@@ -42,7 +42,15 @@ namespace SanteDB.Tools.AdminConsole.Security
 		/// <param name="context">Context.</param>
 		public Credentials GetCredentials (IRestClient context)
 		{
-            return this.GetCredentials(AuthenticationContext.Current.Principal);
+            if(!AuthenticationContext.Current.Principal.Identity.IsAuthenticated ||
+                AuthenticationContext.Current.Principal == AuthenticationContext.AnonymousPrincipal)
+            {
+                var credentials = this.Authenticate(context);
+                AuthenticationContext.Current = new AuthenticationContext(credentials.Principal);
+                return credentials;
+            }
+            else
+                return this.GetCredentials(AuthenticationContext.Current.Principal);
 		}
 
 		/// <summary>
