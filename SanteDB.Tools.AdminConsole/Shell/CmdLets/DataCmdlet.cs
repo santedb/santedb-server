@@ -137,7 +137,8 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
             var queryMethod = m_client.GetType().GetGenericMethod(nameof(HdsiServiceClient.Query), new Type[] { type }, new Type[] { linqExpression.GetType(), typeof(int), typeof(int?), typeof(String[]), typeof(Guid?), typeof(ModelSort<>).MakeGenericType(type).MakeArrayType() });
             var result = queryMethod.Invoke(m_client, new object[] { linqExpression, offset, count, parms.Expand?.OfType<String>().ToArray(), null, null }) as Bundle;
 
-            if(!parms.AsDataSet)
+
+            if (!parms.AsDataSet)
             {
                 Console.WriteLine("Result: {0} .. {1} of {2}", result.Offset, result.Item.Count, result.TotalResults);
                 var displayCols = parms.Display.OfType<String>().Select(o =>
@@ -150,13 +151,18 @@ namespace SanteDB.Tools.AdminConsole.Shell.CmdLets
             else
             {
                 Dataset ds = new Dataset($"sdbac Dataset for {type} filter {nvc}");
+
+                Delegate displaySelector = null;
+                if (parms.Display.Count > 0)
+                    displaySelector = QueryExpressionParser.BuildPropertySelector(type, parms.Display.OfType<String>().FirstOrDefault(), true).Compile();
+
                 foreach (var itm in result.Item)
                     ds.Action.Add(new DataUpdate()
                     {
                         InsertIfNotExists = true,
                         IgnoreErrors = true,
-                        Element = itm
-                    });
+                        Element = (IdentifiedData)(displaySelector != null ? displaySelector.DynamicInvoke(itm) : itm)
+                    }) ;
 
                 m_xsz.Serialize(Console.Out, ds);
                 

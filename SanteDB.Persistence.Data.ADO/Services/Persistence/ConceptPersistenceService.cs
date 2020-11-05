@@ -60,7 +60,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             else
             {
                 retVal.LoadState = Core.Model.LoadState.PartialLoad;
-                retVal.ConceptNames = context.Query<DbConceptName>(o => o.SourceKey == retVal.Key).Select(o => new ConceptName(o.Language, o.Name)).ToList();
+                retVal.ConceptNames = context.Query<DbConceptName>(o => o.SourceKey == retVal.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => new ConceptName(o.Language, o.Name)).ToList();
                 retVal.ReferenceTerms = context.Query<DbConceptReferenceTerm>(o => o.SourceKey == retVal.Key).Select(o => new ConceptReferenceTerm(o.TargetKey, o.RelationshipTypeKey)).ToList();
                 
             }
@@ -192,6 +192,24 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             int tr = 0;
             return this.QueryInternal(context, this.BuildSourceQuery<ConceptName>(id, versionSequenceId), Guid.Empty, 0, null, out tr, null, false).ToList();
+        }
+
+        /// <summary>
+        /// Insert the specified data
+        /// </summary>
+        public override ConceptName InsertInternal(DataContext context, ConceptName data)
+        {
+            // Does this inbound not have an ID, and if so, does the concept already have the same name language pair?
+            if (!data.Key.HasValue)
+            {
+                var existing = context.FirstOrDefault<DbConceptName>(o => o.Language == data.Language && o.SourceKey == data.SourceEntityKey && !o.ObsoleteVersionSequenceId.HasValue);
+                if (existing != null) // Obsolete the existing 
+                {
+                    existing.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence ?? context.FirstOrDefault<DbConceptVersion>(o => o.Key == data.SourceEntityKey && o.ObsoletionTime == null)?.VersionSequenceId;
+                    context.Update(existing);
+                }
+            }
+            return base.InsertInternal(context, data);
         }
     }
 }
