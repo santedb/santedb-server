@@ -22,6 +22,7 @@
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.9.1.23074" xmlns:santempi="http://santedb.org/configuration/santempi" xmlns:santeguard="http://santedb.org/configuration/santeguard" xmlns="http://santedb.org/configuration">
   <sections>
     <add type="SanteDB.Core.Configuration.DiagnosticsConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Core.Configuration.EmailNotificationConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Messaging.Metadata.Configuration.MetadataConfigurationSection, SanteDB.Messaging.Metadata, Version=1.0.0.0"/>
     <add type="SanteDB.Core.Configuration.AppletConfigurationSection, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.ApplicationServiceContextConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
@@ -64,6 +65,18 @@
     <add type="SanteDB.Core.Data.Quality.Configuration.DataQualityConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0"/>
     <add type="SanteMPI.Persistence.ADO.Configuration.AdoConfigurationSection, SanteMPI.Persistence.Ado, Version=2.0.0.0"/>
   </sections>
+  <section xsi:type="EmailNotificationConfigurationSection">
+    <smtp>
+      <server>smtp://smtp.sendgrid.net:587</server>
+      <username>apikey</username>
+      <password>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</password>
+      <useTls>true</useTls>
+      <from>no-reply@fyfesoftware.ca</from>
+    </smtp>
+    <adminContacts>
+      <add>justin@fyfesoftware.ca</add>
+    </adminContacts>
+  </section>
   <section xsi:type="AuditAccountabilityConfigurationSection" completeAuditTrail="false">
     <filters>
       <add outcome="fail.minor fail.major fail.epic" insert="true" ship="true" />
@@ -83,9 +96,9 @@
   <section xsi:type="FileSystemQueueConfigurationSection" queueRoot=".\queue" />
   <section xsi:type="DataConfigurationSection">
     <connectionStrings>
-      <add name="PSQL" value="server=fs-dev-psql10;port=5432; database=santempi_2; user id=postgres; password=postgres; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql"/>
+      <add name="PSQL" value="server=mpi-test.local;port=5432; database=mpidb; user id=postgres; password=postgres; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql"/>
       <add name="FirebirdSQL" value="initial catalog=|DataDirectory|\sdb_base.fdb;server type=Embedded;user id=sysdba" provider="FirebirdSQL" />
-      <add name="AUDIT" value="server=fs-dev-psql10;port=5432; database=santempi_audit; user id=postgres; password=postgres; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql"/>
+      <add name="AUDIT" value="server=mpi-test.local;port=5432; database=auditdb; user id=postgres; password=postgres; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql"/>
       <add name="AUDIT_FirebirdSQL" value="initial catalog=|DataDirectory|\sdb_audit.fdb;server type=Embedded;user id=sysdba" provider="FirebirdSQL" />
     </connectionStrings>
   </section>
@@ -100,10 +113,10 @@
     </dbProviderFactories>
   </section>
   <section xsi:type="AdoAuditConfigurationSection"
-		   readWriteConnectionString="AUDIT_FirebirdSQL"
-		   readOnlyConnectionString="AUDIT_FirebirdSQL"
+		   readWriteConnectionString="AUDIT"
+		   readOnlyConnectionString="AUDIT"
 		   traceSql="false"
-		   providerType="FirebirdSQL" />
+		   providerType="Npgsql" />
   <!--<section xsi:type="santeguard:SanteGuardConfiguration">
     <santeguard:endpoints>
       <santeguard:add name="UDP Audit Transport" timeout="00:00:10" readTimeout="00:00:10" maxMessageSize="655340" address="udp://0.0.0.0:514">
@@ -513,10 +526,10 @@
   </section>
   <!-- This section controls the persistence for ADO.NET -->
   <section xsi:type="AdoPersistenceConfigurationSection"
-           readWriteConnectionString="FirebirdSQL"
-           readOnlyConnectionString="FirebirdSQL"
+           readWriteConnectionString="PSQL"
+           readOnlyConnectionString="PSQL"
            traceSql="false"
-			     providerType="FirebirdSQL"
+			     providerType="Npgsql"
            staOnly="false"
 		       fuzzyTotal="false"
            autoUpdateExisting="true"
@@ -536,9 +549,8 @@
   </section>
   <!-- Diagnostic e-mail (bug) report configuration -->
   <section xsi:type="DiagnosticEmailServiceConfigurationSection">
-    <smtp from="value" password="value" server="value" ssl="false" username="value" />
     <recipients>
-      <add>value</add>
+      <add>justin@fyfesoftware.ca</add>
     </recipients>
   </section>
   <!-- Diagnostics via JIRA configuration-->
@@ -551,16 +563,16 @@
   </section>
   <!-- Reporting configuration -->
   <section xsi:type="ReportingConfiguration"
-           readWriteConnectionString="FirebirdSQL"
-           readOnlyConnectionString="FirebirdSQL"
+           readWriteConnectionString="PSQL"
+           readOnlyConnectionString="PSQL"
            traceSql="false"
-           	providerType="FirebirdSQL" />
+           	providerType="Npgsql" />
   <!-- Data Warehouse Configuration -->
   <section xsi:type="AdoWarehouseConfigurationSection"
-           readWriteConnectionString="FirebirdSQL"
-           readOnlyConnectionString="FirebirdSQL"
+           readWriteConnectionString="PSQL"
+           readOnlyConnectionString="PSQL"
            traceSql="false"
-           	providerType="FirebirdSQL"  />
+           	providerType="Npgsql"  />
   <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="8">
     <serviceProviders>
 
@@ -658,6 +670,9 @@
     
       <add type="SanteDB.Core.Services.Impl.JwsResourcePointerService, SanteDB.Core.Api, Version=2.0.0.0"/>
       <add type="SanteDB.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Core, Version=2.0.0.0" />
+
+      <add type="SanteDB.Core.Notifications.DefaultNotificationService, SanteDB.Core.Api, Version=1.9.1.24156, Culture=neutral, PublicKeyToken=null" />
+
     </serviceProviders>
   </section>
 </SanteDBConfiguration>

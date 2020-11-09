@@ -38,6 +38,7 @@ using System.Security.Principal;
 using SanteDB.Core.Model.Query;
 using System.Diagnostics.Tracing;
 using System.Data.Common;
+using SanteDB.Core.Model.DataTypes;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -134,6 +135,37 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                     }
                 }
+                else if (itm is Concept concept) {
+                    foreach (var rel in concept.ReferenceTerms)
+                    {
+                        this.m_tracer.TraceInfo("Processing {0} / referenceTerm / {1} ..", itm.Key, rel.ReferenceTermKey);
+                        var bitm = bundle.Item?.FirstOrDefault(o => o.Key == rel?.ReferenceTermKey);
+                        if (bitm == null) continue;
+
+                        if (retVal.Item.Any(o => o.Key == rel.ReferenceTermKey))
+                            continue;
+                        this.m_tracer.TraceInfo("Bumping (due to relationship): {0}", bitm);
+                        if (idx > -1)
+                            retVal.Item.Insert(idx, bitm); // make sure it gets inserted first
+                        else
+                            retVal.Item.Add(bitm);
+                    }
+
+                    foreach (var rel in concept.Relationship)
+                    {
+                        this.m_tracer.TraceInfo("Processing {0} / relationship / {1} ..", itm.Key, rel.TargetConceptKey);
+                        var bitm = bundle.Item?.FirstOrDefault(o => o.Key == rel?.TargetConceptKey);
+                        if (bitm == null) continue;
+
+                        if (retVal.Item.Any(o => o.Key == rel.TargetConceptKey))
+                            continue;
+                        this.m_tracer.TraceInfo("Bumping (due to relationship): {0}", bitm);
+                        if (idx > -1)
+                            retVal.Item.Insert(idx, bitm); // make sure it gets inserted first
+                        else
+                            retVal.Item.Add(bitm);
+                    }
+                }
                 else if (itm is EntityRelationship entRel)
                 {
                     var bitm = bundle.Item.FirstOrDefault(o => o.Key == entRel.TargetEntityKey);
@@ -222,25 +254,25 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
 
             this.m_tracer.TraceInfo("Bundle has {0} objects...", data.Item.Count);
-            data = this.ReorganizeForInsert(data);
-            this.m_tracer.TraceInfo("After reorganization has {0} objects...", data.Item.Count);
+            var reorganized = this.ReorganizeForInsert(data);
+            this.m_tracer.TraceInfo("After reorganization has {0} objects...", reorganized.Item.Count);
 
             context.PrepareStatements = this.m_persistenceService.GetConfiguration().PrepareStatements;
 
             // Ensure that provenance objects match
-            var operationalItems = data.Item.Where(o => !data.ExpansionKeys.Any(k => o.Key == k)).ToArray();
+            var operationalItems = reorganized.Item.Where(o => !reorganized.ExpansionKeys.Any(k => o.Key == k)).ToArray();
             var provenance = operationalItems.OfType<NonVersionedEntityData>().Select(o => o.UpdatedByKey.GetValueOrDefault()).Union(operationalItems.OfType<BaseEntityData>().Select(o => o.CreatedByKey.GetValueOrDefault())).Where(o => o != Guid.Empty);
             if (provenance.Distinct().Count() > 1)
                 this.m_tracer.TraceError("PROVENANCE OF OBJECTS DO NOT MATCH. WHEN A BUNDLE IS PERSISTED PROVENANCE DATA MUST BE NULL OR MUST MATCH. {0}", String.Join(",", provenance.Distinct().Select(o => o.ToString())));
 
-            for (int i = 0; i < data.Item.Count; i++)
+            for (int i = 0; i < reorganized.Item.Count; i++)
             {
-                var itm = data.Item[i];
+                var itm = reorganized.Item[i];
                 var svc = this.m_persistenceService.GetPersister(itm.GetType());
 
-                if (data.ExpansionKeys.Any(k => itm.Key == k)) continue; // skip refs
+                if (reorganized.ExpansionKeys.Any(k => itm.Key == k)) continue; // skip refs
 
-                this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)(i + 1) / data.Item.Count, itm));
+                this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)(i + 1) / reorganized.Item.Count, itm));
                 try
                 {
                     if (svc == null)
@@ -249,12 +281,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     if (itm.CheckExists(context))
                     {
                         this.m_tracer.TraceInfo("Will update {0} object from bundle...", itm);
-                        data.Item[i] = svc.Update(context, itm) as IdentifiedData;
+                        reorganized.Item[i] = svc.Update(context, itm) as IdentifiedData;
                     }
                     else
                     {
                         this.m_tracer.TraceInfo("Will insert {0} object from bundle...", itm);
-                        data.Item[i] = svc.Insert(context, itm) as IdentifiedData;
+                        reorganized.Item[i] = svc.Insert(context, itm) as IdentifiedData;
                     }
                 }
                 catch (TargetInvocationException e)
@@ -264,14 +296,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
                 catch (DetectedIssueException e)
                 {
-                    this.m_tracer.TraceError("### Error Inserting Bundle[{0}]:", i);
+                    this.m_tracer.TraceError("### Error Inserting Bundle[{0} / {1}]:", i, data.Item.FindIndex(o=>o.Key == itm.Key));
                     foreach (var iss in e.Issues)
                         this.m_tracer.TraceError("\t{0}: {1}", iss.Priority, iss.Text);
                     throw new DetectedIssueException(e.Issues, $"Could not insert bundle due to sub-object persistence (at item {i})", e);
                 }
                 catch (DbException e)
                 {
-                    throw new DataPersistenceException($"Cannot insert bundle object {itm} @ {i}", this.TranslateDbException(e));
+                    throw new DataPersistenceException($"Cannot insert bundle object {itm} @ {i} - {e.Message}", this.TranslateDbException(e));
                 }
                 catch (Exception e)
                 {

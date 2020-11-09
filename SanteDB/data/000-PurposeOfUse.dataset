@@ -111,7 +111,7 @@
 
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>6af98494-9169-11ea-bb37-0242ac130002</id>
+      <id>6af988fd-9169-11ea-bb37-0242ac130002</id>
       <mnemonic>HOPERAT</mnemonic>
       <codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
       <name>
@@ -129,7 +129,7 @@
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
       <referenceTerm>
-        <term>6af98494-9169-11ea-bb37-0242ac130002</term>
+        <term>6af988fd-9169-11ea-bb37-0242ac130002</term>
         <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
       </referenceTerm>
       <name>
