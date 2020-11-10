@@ -21,6 +21,7 @@ using SanteDB.Core;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
@@ -208,8 +209,31 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     existing.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence ?? context.FirstOrDefault<DbConceptVersion>(o => o.Key == data.SourceEntityKey && o.ObsoletionTime == null)?.VersionSequenceId;
                     context.Update(existing);
                 }
+
             }
+
+            // Remove concept from cache and create a new version
+            ApplicationContext.Current.GetService<IDataCachingService>().Remove(data.SourceEntityKey.Value);
+            var conceptVersion = context.FirstOrDefault<DbConceptVersion>(o => o.Key == data.SourceEntityKey.Value && o.ObsoletionTime == null);
+            var newVersion = new DbConceptVersion();
+            conceptVersion.ObsoletedByKey = context.ContextId;
+            conceptVersion.ObsoletionTime = DateTimeOffset.Now;
+            context.Update(conceptVersion);
+            
+            // Insert new version
+            conceptVersion.VersionSequenceId = null;
+            conceptVersion.ReplacesVersionKey = conceptVersion.VersionKey;
+
+            conceptVersion.VersionKey = Guid.Empty;
+            conceptVersion.ObsoletionTime = null;
+            conceptVersion.ObsoletedByKey = null;
+            conceptVersion.CreatedByKey = context.ContextId;
+            conceptVersion.CreationTime = DateTime.MinValue;
+            conceptVersion= context.Insert(conceptVersion);
+
+            data.EffectiveVersionSequenceId = conceptVersion.VersionSequenceId;
             return base.InsertInternal(context, data);
+
         }
     }
 }

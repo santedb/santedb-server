@@ -138,18 +138,18 @@ namespace SanteDB.Persistence.Diagnostics.Email
 
             try
             {
-                var issueId = Guid.NewGuid().ToString().Substring(0, 4);
+                var issueId = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
 
-                var subject = $"ISSUE #{issueId}";
-                var body = $"{storageData.Note} - Username - {storageData.LoadProperty<SecurityUser>("CreatedBy")?.UserName ?? storageData?.Submitter?.LoadProperty<SecurityUser>("SecurityUser")?.UserName}";
+                var subject = $"SANTEDB ISSUE MAILER #{issueId}";
+                var body = $"<html><body><p>{storageData.LoadProperty<SecurityUser>("CreatedBy")?.UserName ?? storageData?.Submitter?.LoadProperty<SecurityUser>("SecurityUser")?.UserName} has reported a bug</p><pre>{storageData.Note}</pre><p>You can reply directly to the reporter by pressing the Reply button in your mail client</p></body></html>";
                 var attachments = storageData.Attachments.Select(a =>
                 {
                     if (a is DiagnosticBinaryAttachment bin)
-                        return new NotificationAttachment(a.FileDescription ?? a.FileName, "application/x-gzip", bin.Content);
+                        return new NotificationAttachment(a.FileName ?? a.FileDescription, a.ContentType ?? "application/x-gzip", bin.Content);
                     else if (a is DiagnosticTextAttachment txt)
-                        return new NotificationAttachment(a.FileDescription ?? a.FileName, "text/plain", txt.Content);
+                        return new NotificationAttachment(a.FileName ?? a.FileDescription, a.ContentType ?? "text/plain", txt.Content);
                     else
-                        return new NotificationAttachment(a.FileDescription ?? a.FileName, "text/plain", $"Unknown attachment - {a}");
+                        return new NotificationAttachment(a.FileName ?? a.FileDescription, a.ContentType ?? "text/plain", $"Unknown attachment - {a}");
                 }).ToList();
 
                 // Attach the application information

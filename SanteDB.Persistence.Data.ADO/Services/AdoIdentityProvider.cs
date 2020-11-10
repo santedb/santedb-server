@@ -188,11 +188,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 tfaSecret == tfaClaim.ClaimValue) // TFA password hash sent as password, this is a password reset token - It will be set to expire ASAP
                             {
                                 retVal = AdoClaimsIdentity.Create(dataContext, user, true, "Tfa+LastPasswordHash").CreateClaimsPrincipal();
-                                (retVal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, PurposeOfUseKeys.SecurityAdmin.ToString()));
-                                (retVal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
-                                (retVal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
-                                (retVal.Identity as IClaimsIdentity).RemoveClaim(retVal.FindFirst(SanteDBClaimTypes.Expiration));
-                                (retVal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, DateTime.Now.AddMinutes(5).ToString("o"))); // Special case, passwoird
+                                if (retVal.Identity is IClaimsIdentity ici)
+                                {
+                                    ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, PurposeOfUseKeys.SecurityAdmin.ToString()));
+                                    ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
+                                    ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
+                                    ici.RemoveClaim(retVal.FindFirst(SanteDBClaimTypes.Expiration));
+                                    ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, DateTime.Now.AddMinutes(5).ToString("o"))); // Special case, passwoird
+                                }
                             }
                             else if (!String.IsNullOrEmpty(password))
                             {

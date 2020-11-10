@@ -88,6 +88,9 @@
     <None Include="data\000-FamilyMembers.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="data\000-GenderConcept.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="data\000-NamePrefixSuffix.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
