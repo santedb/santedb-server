@@ -161,7 +161,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
                 }
 
                 var notificationService = ApplicationServiceContext.Current.GetService<INotificationService>();
-                var recipients = this.m_configuration.Recipients.Select(o => o.StartsWith("mailto:") ? o : $"mailto:{o}").ToArray();
+                var recipients = this.m_configuration?.Recipients.Select(o => o.StartsWith("mailto:") ? o : $"mailto:{o}").ToArray();
                 notificationService?.Send(recipients, subject, body, null, attachments.ToArray());
 
                 // Invoke

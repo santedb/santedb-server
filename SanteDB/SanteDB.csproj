@@ -337,23 +337,23 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.45.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.45.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.45.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.45.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.45.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.0.45.0" />
-        <PackageReference Include="SanteDB.BI" Version="2.0.45.0" />
-        <PackageReference Include="SanteDB.Rest.BIS" Version="2.0.45.0" />
-        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.45.0" />
-        <PackageReference Include="SanteDB.Cdss.Xml" Version="2.0.45.0" />
-        <PackageReference Include="SanteDB.Matcher" Version="2.0.45.0" />
-        <PackageReference Include="SanteDB.Matcher.Configuration.File" Version="2.0.45.0" />
-        <PackageReference Include="SanteDB.Core.Model.AMI" Version="2.0.45.0" />
-        <PackageReference Include="SanteDB.Core.Model.RISI" Version="2.0.45.0" />
-        <PackageReference Include="SanteDB.Rest.AMI" Version="2.0.45.0" />
-        <PackageReference Include="SanteDB.Rest.HDSI" Version="2.0.45.0" />
-        <PackageReference Include="SanteDB.Core.Model.ViewModelSerializers" Version="2.0.45.0" />
+        <PackageReference Include="RestSrvr" Version="2.0.47.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.47.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.47.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.47.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.47.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="2.0.47.0" />
+        <PackageReference Include="SanteDB.BI" Version="2.0.47.0" />
+        <PackageReference Include="SanteDB.Rest.BIS" Version="2.0.47.0" />
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.47.0" />
+        <PackageReference Include="SanteDB.Cdss.Xml" Version="2.0.47.0" />
+        <PackageReference Include="SanteDB.Matcher" Version="2.0.47.0" />
+        <PackageReference Include="SanteDB.Matcher.Configuration.File" Version="2.0.47.0" />
+        <PackageReference Include="SanteDB.Core.Model.AMI" Version="2.0.47.0" />
+        <PackageReference Include="SanteDB.Core.Model.RISI" Version="2.0.47.0" />
+        <PackageReference Include="SanteDB.Rest.AMI" Version="2.0.47.0" />
+        <PackageReference Include="SanteDB.Rest.HDSI" Version="2.0.47.0" />
+        <PackageReference Include="SanteDB.Core.Model.ViewModelSerializers" Version="2.0.47.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -362,10 +362,6 @@
     <ProjectReference Include="..\SanteDB.Authentication.OAuth\SanteDB.Authentication.OAuth2.csproj">
       <Project>{a3975c6f-4fdb-43be-81ab-3357b86173f1}</Project>
       <Name>SanteDB.Authentication.OAuth2</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Caching.Memory.Test\SanteDB.Caching.Memory.Test.csproj">
-      <Project>{b09a6d4c-862c-4b5b-9c05-4160ed7cca4a}</Project>
-      <Name>SanteDB.Caching.Memory.Test</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Caching.Memory\SanteDB.Caching.Memory.csproj">
       <Project>{8553abc7-abfa-4a21-b0e8-68b7de76129d}</Project>
