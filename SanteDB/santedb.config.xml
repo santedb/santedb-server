@@ -69,7 +69,7 @@
     <smtp>
       <server>smtp://smtp.sendgrid.net:587</server>
       <username>apikey</username>
-      <password>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</password>
+      <password></password>
       <useTls>true</useTls>
       <from>no-reply@fyfesoftware.ca</from>
     </smtp>
