@@ -54,41 +54,16 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (data.RelationshipType != null) data.RelationshipType = data.RelationshipType.EnsureExists(context, false) as Concept;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
 
-            byte[] target = data.TargetActKey.Value.ToByteArray(),
-                source = data.SourceEntityKey.Value.ToByteArray(),
-                typeKey = data.RelationshipTypeKey.Value.ToByteArray();
+            // Lookup the original 
+            if (!data.EffectiveVersionSequenceId.HasValue)
+                data.EffectiveVersionSequenceId = context.FirstOrDefault<DbActVersion>(o => o.Key == data.SourceEntityKey)?.VersionSequenceId;
 
-            //SqlStatement sql = new SqlStatement<DbActRelationship>().SelectFrom()
-            //    .Where<DbActRelationship>(o => o.SourceUuid == source)
-            //    .Limit(1).Build();
-
-            //IEnumerable<DbActRelationship> dbrelationships = context.TryGetData($"EX:{sql.ToString()}") as IEnumerable<DbActRelationship>;
-            //if (dbrelationships == null)
-            //{
-            //    dbrelationships = context.Connection.Query<DbActRelationship>(sql.SQL, sql.Arguments.ToArray()).ToList();
-            //    context.AddData($"EX{sql.ToString()}", dbrelationships);
-            //}
-            //var existing = dbrelationships.FirstOrDefault(
-            //        o => o.RelationshipTypeUuid == typeKey &&
-            //        o.TargetUuid == target);
-
-            //if (existing == null)
-            //{
-            return base.InsertInternal(context, data);
-            //    (dbrelationships as List<DbActRelationship>).Add(new DbActRelationship()
-            //    {
-            //        Uuid = retVal.Key.Value.ToByteArray(),
-            //        RelationshipTypeUuid = typeKey,
-            //        SourceUuid = source,
-            //        TargetUuid = target
-            //    });
-            //    return retVal;
-            //}
-            //else
-            //{
-            //    data.Key = new Guid(existing.Uuid);
-            //    return data;
-            //}
+            // Duplicate check 
+            var existing = context.FirstOrDefault<DbActRelationship>(r => r.SourceKey == data.SourceEntityKey && r.TargetKey == data.TargetActKey && r.RelationshipTypeKey == data.RelationshipTypeKey && !r.ObsoleteVersionSequenceId.HasValue);
+            if (existing == null)
+                return base.InsertInternal(context, data);
+            else
+                return this.ToModelInstance(existing, context);
         }
 
         /// <summary>
@@ -99,6 +74,21 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             data.TargetActKey = data.TargetAct?.Key ?? data.TargetActKey;
             if (data.RelationshipType != null) data.RelationshipType = data.RelationshipType.EnsureExists(context, false) as Concept;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
+
+            // Duplicate check 
+            var existing = context.FirstOrDefault<DbActRelationship>(r => r.SourceKey == data.SourceEntityKey && r.TargetKey == data.TargetActKey && r.RelationshipTypeKey == data.RelationshipTypeKey && !r.ObsoleteVersionSequenceId.HasValue);
+            if (existing != null && existing.Key != data.Key) // There is an existing relationship which isn't this one, obsolete it 
+            {
+                existing.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence;
+                if (existing.ObsoleteVersionSequenceId.HasValue)
+                    context.Update(existing);
+                else
+                {
+                    this.m_tracer.TraceWarning("ActRelationship {0} would conflict with existing {1} -> {2} (role {3}) already exists and this update would violate unique constraint.", data, existing.SourceKey, existing.TargetKey, existing.RelationshipTypeKey);
+                    existing.ObsoleteVersionSequenceId = 1;
+                    context.Update(existing);
+                }
+            }
 
             return base.UpdateInternal(context, data);
         }

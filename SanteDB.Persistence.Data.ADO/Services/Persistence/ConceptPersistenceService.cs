@@ -228,7 +228,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             conceptVersion.ObsoletionTime = null;
             conceptVersion.ObsoletedByKey = null;
             conceptVersion.CreatedByKey = context.ContextId;
-            conceptVersion.CreationTime = DateTime.MinValue;
+            conceptVersion.CreationTime = default(DateTimeOffset);
             conceptVersion= context.Insert(conceptVersion);
 
             data.EffectiveVersionSequenceId = conceptVersion.VersionSequenceId;
