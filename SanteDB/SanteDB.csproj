@@ -375,10 +375,6 @@
       <Project>{032abf00-6c76-47c7-9eca-a840915a17ea}</Project>
       <Name>SanteDB.Configuration</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Core.Security.Tfa.Email\SanteDB.Core.Security.Tfa.Email.csproj">
-      <Project>{23699f04-da75-4889-aa00-7f6f4b5fcfbb}</Project>
-      <Name>SanteDB.Core.Security.Tfa.Email</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core.Security.Tfa.Twilio\SanteDB.Core.Security.Tfa.Twilio.csproj">
       <Project>{5a60d6e2-72dd-478a-91a6-e928208ca1ba}</Project>
       <Name>SanteDB.Core.Security.Tfa.Twilio</Name>
