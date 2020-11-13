@@ -17,36 +17,29 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
-using SanteDB.Core.Configuration;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace SanteDB.Core.Security.Tfa.Email.Configuration
+namespace SanteDB.Core.Configuration
 {
     /// <summary>
-    /// Represents the configuration for the TFA mecahnism
+    /// Represents a configuration section for file system queueing
     /// </summary>
-    [XmlType(nameof(TfaEmailMechanismConfigurationSection), Namespace = "http://santedb.org/configuration")]
-    public class TfaEmailMechanismConfigurationSection : IConfigurationSection
-	{
-		/// <summary>
-		/// Creates a new template mechanism configuration
-		/// </summary>
-		public TfaEmailMechanismConfigurationSection()
-		{
-			this.Templates = new List<TemplateConfiguration>();
-		}
+    [XmlType(nameof(FileSystemNotificationConfigurationSection), Namespace = "http://santedb.org/configuration")]
+    public class FileSystemNotificationConfigurationSection : IConfigurationSection
+    {
 
-		/// <summary>
-		/// SMTP configuration
-		/// </summary>
-        [XmlElement("smtp")]
-		public TfaSmtpConfiguration Smtp { get; set; }
+        /// <summary>
+        /// Gets or sets the path to the queue location
+        /// </summary>
+        [XmlAttribute("repositoryRoot")]
+        [Description("Identifies where file based repository exists")]
+        public String RepositoryRoot { get; set; }
 
-		/// <summary>
-		/// Template configuration
-		/// </summary>
-        [XmlArray("templates"), XmlArrayItem("add")]
-		public List<TemplateConfiguration> Templates { get; set; }
-	}
+    }
 }

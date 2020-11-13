@@ -194,15 +194,19 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                     ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
                                     ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
                                     ici.RemoveClaim(retVal.FindFirst(SanteDBClaimTypes.Expiration));
-                                    ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, DateTime.Now.AddMinutes(5).ToString("o"))); // Special case, passwoird
+                                    ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, DateTime.Now.AddMinutes(5).ToString("o"))); // Special case, password
                                 }
                             }
                             else if (!String.IsNullOrEmpty(password))
                             {
                                 if (!user.TwoFactorEnabled || tfaSecret == tfaClaim.ClaimValue)
                                     retVal = this.Authenticate(userName, password) as IClaimsPrincipal;
-                                else
-                                    throw new AuthenticationException("TFA_MISMATCH");
+                                else if(user.TwoFactorEnabled && user.TwoFactorMechnaismKey.HasValue)
+                                {
+                                    var suser = ApplicationServiceContext.Current.GetService<AdoPersistenceService>().GetMapper().MapDomainInstance<DbSecurityUser, SecurityUser>(user, true);
+                                    var secretResponse = ApplicationServiceContext.Current.GetService<ITfaRelayService>()?.SendSecret(user.TwoFactorMechnaismKey.Value, suser);
+                                    throw new AuthenticationException($"TFA_MISMATCH:{secretResponse}");
+                                }
                             }
                             else
                                 throw new PolicyViolationException(new GenericPrincipal(new GenericIdentity(userName), new string[0]), PermissionPolicyIdentifiers.Login, PolicyGrantType.Deny);
@@ -299,18 +303,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 throw new DataPersistenceException("Error changing password", e);
             }
-        }
-
-        /// <summary>
-        /// Generate and store the TFA secret
-        /// </summary>
-        public string GenerateTfaSecret(string userName)
-        {
-            // This is a simple TFA generator
-            var secret = ApplicationServiceContext.Current.GetService<ITwoFactorSecretGenerator>().GenerateTfaSecret();
-            var hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
-            this.AddClaim(userName, new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, hashingService.ComputeHash(secret)), AuthenticationContext.SystemPrincipal, new TimeSpan(0, 5, 0));
-            return secret;
         }
 
         /// <summary>
@@ -493,13 +485,17 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     {
                         var existingClaim = dataContext.FirstOrDefault<DbUserClaim>(o => o.ClaimType == claim.Type && o.SourceKey == user.Key);
 
+                        var claimValue = claim.Value;
+                        if (claim.Type == SanteDBClaimTypes.SanteDBOTAuthCode)
+                            claimValue = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(claim.Value); // OT Password claim is secret
+
                         // Set the secret
                         if (existingClaim == null)
                         {
                             existingClaim = new DbUserClaim()
                             {
                                 ClaimType = claim.Type,
-                                ClaimValue = claim.Value,
+                                ClaimValue = claimValue,
                                 SourceKey = user.Key
                             };
                             if (expire.HasValue)
@@ -508,7 +504,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         }
                         else
                         {
-                            existingClaim.ClaimValue = claim.Value;
+                            existingClaim.ClaimValue = claimValue;
                             if (expire.HasValue)
                                 existingClaim.ClaimExpiry = DateTime.Now.Add(expire.Value);
                             dataContext.Update(existingClaim);
