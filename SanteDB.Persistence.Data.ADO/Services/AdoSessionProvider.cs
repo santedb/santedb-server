@@ -207,14 +207,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             }
 
                         }
-                        else
-                        {
-                            List<IPolicyInstance> oizPrincipalPolicies = new List<IPolicyInstance>();
-                            foreach (var pol in pip.GetActivePolicies(cprincipal).GroupBy(o => o.Policy.Oid))
-                                oizPrincipalPolicies.Add(pol.FirstOrDefault(o => (int)o.Rule == pol.Min(r => (int)r.Rule)));
-                            // Scopes user is allowed to access
-                            claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyGrantType.Grant).Select(o => new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, o.Policy.Oid)));
-                        }
+
+                        // Add default policies
+                        List<IPolicyInstance> oizPrincipalPolicies = new List<IPolicyInstance>();
+                        foreach (var pol in pip.GetActivePolicies(cprincipal).GroupBy(o => o.Policy.Oid))
+                            oizPrincipalPolicies.Add(pol.FirstOrDefault(o => (int)o.Rule == pol.Min(r => (int)r.Rule)));
+                        // Scopes user is allowed to access
+                        claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyGrantType.Grant).Select(o => new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, o.Policy.Oid)));
 
                         if (!String.IsNullOrEmpty(lang)) // set language
                             claims.Add(new SanteDBClaim(SanteDBClaimTypes.Language, lang));

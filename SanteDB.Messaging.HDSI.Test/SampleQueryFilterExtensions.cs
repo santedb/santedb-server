@@ -151,15 +151,5 @@ namespace SanteDB.Messaging.HDSI.Test
                 }), valueExpression);
 
         }
-
-        public KeyValuePair<string, object> DeCompose(BinaryExpression expression)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Detect(BinaryExpression expression)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

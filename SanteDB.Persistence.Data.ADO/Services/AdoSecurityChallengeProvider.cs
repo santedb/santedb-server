@@ -182,7 +182,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     }).ToList();
 
                     // Only the current user can fetch their own security challenge questions 
-                    if (!userName.Equals(principal.Identity.Name)
+                    if (!userName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase)
                         || !principal.Identity.IsAuthenticated)
                         return retVal.Skip(this.m_random.Next(0, retVal.Count)).Take(1);
                     else // Only a random option can be returned  
@@ -198,11 +198,52 @@ namespace SanteDB.Persistence.Data.ADO.Services
         }
 
         /// <summary>
+        /// Get the specified challenges
+        /// </summary>
+        public IEnumerable<SecurityChallenge> Get(Guid userKey, IPrincipal principal)
+        {
+            try
+            {
+
+                using (var context = this.m_configuration.Provider.GetWriteConnection())
+                {
+
+                    context.Open();
+
+                    var sqlQuery = context.CreateSqlStatement<DbSecurityChallenge>().SelectFrom(typeof(DbSecurityChallenge), typeof(DbSecurityUserChallengeAssoc))
+                            .InnerJoin<DbSecurityUserChallengeAssoc>(o => o.Key, o => o.ChallengeKey)
+                            .Where<DbSecurityUserChallengeAssoc>(o => o.UserKey == userKey);
+
+                    var retVal = context.Query<CompositeResult<DbSecurityChallenge, DbSecurityUserChallengeAssoc>>(sqlQuery).Select(o => new SecurityChallenge()
+                    {
+                        ChallengeText = o.Object1.ChallengeText,
+                        Key = o.Object1.Key,
+                        ObsoletionTime = o.Object2.ExpiryTime
+                    }).ToList();
+
+                    var userInfo = context.FirstOrDefault<DbSecurityUser>(o => o.Key == userKey);
+                    // Only the current user can fetch their own security challenge questions 
+                    if (!userInfo.UserName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase)
+                        || !principal.Identity.IsAuthenticated)
+                        return retVal.Skip(this.m_random.Next(0, retVal.Count)).Take(1);
+                    else // Only a random option can be returned  
+                        return retVal;
+
+                }
+            }
+            catch (Exception e)
+            {
+                this.m_tracer.TraceError("Failed to fetch security challenges for user {0}: {1}", userKey, e);
+                throw new Exception($"Failed to fetch security challenges for {userKey}", e);
+            }
+        }
+
+        /// <summary>
         /// Remove the specified challenge for this particular key
         /// </summary>
         public void Remove(String userName, Guid challengeKey, IPrincipal principal)
         {
-            if (!userName.Equals(principal.Identity.Name)
+            if (!userName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase)
                 || !principal.Identity.IsAuthenticated)
                 throw new SecurityException($"Users may only modify their own security challenges");
 
@@ -215,7 +256,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 {
                     context.Open();
                     userName = userName.ToLower();
-                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName == userName);
+                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLower() == userName);
                     if (dbUser == null)
                         throw new KeyNotFoundException($"User {userName} not found");
                     context.Delete<DbSecurityUserChallengeAssoc>(o => o.ChallengeKey == challengeKey && o.UserKey == dbUser.Key);
@@ -234,7 +275,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public void Set(String userName, Guid challengeKey, string response, IPrincipal principal)
         {
-            if (!userName.Equals(principal.Identity.Name)
+            if (!userName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase)
                 || !principal.Identity.IsAuthenticated)
                 throw new SecurityException($"Users may only modify their own security challenges");
             else if (String.IsNullOrEmpty(response))
