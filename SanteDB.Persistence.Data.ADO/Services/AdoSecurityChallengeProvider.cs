@@ -198,7 +198,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         }
 
         /// <summary>
-        /// Get the security challenges for the specified user key
+        /// Get the specified challenges
         /// </summary>
         public IEnumerable<SecurityChallenge> Get(Guid userKey, IPrincipal principal)
         {
@@ -221,9 +221,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         ObsoletionTime = o.Object2.ExpiryTime
                     }).ToList();
 
-                    var uname = context.FirstOrDefault<DbSecurityUser>(o => o.Key == userKey);
+                    var userInfo = context.FirstOrDefault<DbSecurityUser>(o => o.Key == userKey);
                     // Only the current user can fetch their own security challenge questions 
-                    if (!uname.UserName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase)
+                    if (!userInfo.UserName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase)
                         || !principal.Identity.IsAuthenticated)
                         return retVal.Skip(this.m_random.Next(0, retVal.Count)).Take(1);
                     else // Only a random option can be returned  
@@ -237,12 +237,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 throw new Exception($"Failed to fetch security challenges for {userKey}", e);
             }
         }
+
         /// <summary>
         /// Remove the specified challenge for this particular key
         /// </summary>
         public void Remove(String userName, Guid challengeKey, IPrincipal principal)
         {
-            if (!userName.Equals(principal.Identity.Name)
+            if (!userName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase)
                 || !principal.Identity.IsAuthenticated)
                 throw new SecurityException($"Users may only modify their own security challenges");
 
@@ -255,7 +256,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 {
                     context.Open();
                     userName = userName.ToLower();
-                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName == userName);
+                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLower() == userName);
                     if (dbUser == null)
                         throw new KeyNotFoundException($"User {userName} not found");
                     context.Delete<DbSecurityUserChallengeAssoc>(o => o.ChallengeKey == challengeKey && o.UserKey == dbUser.Key);
@@ -274,7 +275,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public void Set(String userName, Guid challengeKey, string response, IPrincipal principal)
         {
-            if (!userName.Equals(principal.Identity.Name)
+            if (!userName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase)
                 || !principal.Identity.IsAuthenticated)
                 throw new SecurityException($"Users may only modify their own security challenges");
             else if (String.IsNullOrEmpty(response))
