@@ -182,7 +182,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     }).ToList();
 
                     // Only the current user can fetch their own security challenge questions 
-                    if (!userName.Equals(principal.Identity.Name)
+                    if (!userName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase)
                         || !principal.Identity.IsAuthenticated)
                         return retVal.Skip(this.m_random.Next(0, retVal.Count)).Take(1);
                     else // Only a random option can be returned  
@@ -197,6 +197,46 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
         }
 
+        /// <summary>
+        /// Get the security challenges for the specified user key
+        /// </summary>
+        public IEnumerable<SecurityChallenge> Get(Guid userKey, IPrincipal principal)
+        {
+            try
+            {
+
+                using (var context = this.m_configuration.Provider.GetWriteConnection())
+                {
+
+                    context.Open();
+
+                    var sqlQuery = context.CreateSqlStatement<DbSecurityChallenge>().SelectFrom(typeof(DbSecurityChallenge), typeof(DbSecurityUserChallengeAssoc))
+                            .InnerJoin<DbSecurityUserChallengeAssoc>(o => o.Key, o => o.ChallengeKey)
+                            .Where<DbSecurityUserChallengeAssoc>(o => o.UserKey == userKey);
+
+                    var retVal = context.Query<CompositeResult<DbSecurityChallenge, DbSecurityUserChallengeAssoc>>(sqlQuery).Select(o => new SecurityChallenge()
+                    {
+                        ChallengeText = o.Object1.ChallengeText,
+                        Key = o.Object1.Key,
+                        ObsoletionTime = o.Object2.ExpiryTime
+                    }).ToList();
+
+                    var uname = context.FirstOrDefault<DbSecurityUser>(o => o.Key == userKey);
+                    // Only the current user can fetch their own security challenge questions 
+                    if (!uname.UserName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase)
+                        || !principal.Identity.IsAuthenticated)
+                        return retVal.Skip(this.m_random.Next(0, retVal.Count)).Take(1);
+                    else // Only a random option can be returned  
+                        return retVal;
+
+                }
+            }
+            catch (Exception e)
+            {
+                this.m_tracer.TraceError("Failed to fetch security challenges for user {0}: {1}", userKey, e);
+                throw new Exception($"Failed to fetch security challenges for {userKey}", e);
+            }
+        }
         /// <summary>
         /// Remove the specified challenge for this particular key
         /// </summary>
