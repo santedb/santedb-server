@@ -30,6 +30,7 @@ using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Configuration;
+using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
 using SanteDB.Persistence.Data.ADO.Data.Model.Error;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using System;
@@ -102,9 +103,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
 					if (!String.IsNullOrEmpty(fnResult.Object2.ErrorCode))
 	                {
 		                if (fnResult.Object2.ErrorCode.Contains("AUTH_LCK:"))
-		                {
 							UpdateCache(user, dataContext);
-						}
                         
 						throw new AuthenticationException(fnResult.Object2.ErrorCode);
 					}
@@ -262,7 +261,6 @@ namespace SanteDB.Persistence.Data.ADO.Security
                 if (this.m_securityUser.PhoneNumber != null)
                     claims.Add(new SanteDBClaim(SanteDBClaimTypes.Telephone, this.m_securityUser.PhoneNumber));
 
-              
                 this.AddClaims(claims);
 
                 var identities = new IClaimsIdentity[] { this };

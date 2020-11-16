@@ -52,7 +52,7 @@ namespace SanteDB.Core.Configuration
         /// </summary>
         [XmlIgnore, JsonIgnore]
         [DisplayName("Service Contract"), Description("The service contract this endpoint implements")]
-        [ReadOnly(true)]
+        [Browsable(true)]
         public Type Contract
         {
             get => this.ContractXml != null ? Type.GetType(this.ContractXml) : null;

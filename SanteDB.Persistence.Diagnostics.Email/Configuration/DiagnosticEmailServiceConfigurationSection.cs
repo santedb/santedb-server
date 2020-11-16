@@ -30,13 +30,7 @@ namespace SanteDB.Persistence.Diagnostics.Email.Configuration
     [XmlType(nameof(DiagnosticEmailServiceConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class DiagnosticEmailServiceConfigurationSection : IConfigurationSection
     {
-
-        /// <summary>
-        /// Gets or sets the SMTP configuration
-        /// </summary>
-        [XmlElement("smtp"), ConfigurationRequired]
-        public DxSmtpConfiguration Smtp { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the recipient
         /// </summary>

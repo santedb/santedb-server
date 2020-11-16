@@ -43,6 +43,7 @@ using SanteDB.Core.Model.Query;
 using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
 using SanteDB.Core.Model.Serialization;
+using SanteDB.Core.Notifications;
 
 namespace SanteDB.Persistence.Diagnostics.Email
 {
@@ -137,54 +138,31 @@ namespace SanteDB.Persistence.Diagnostics.Email
 
             try
             {
-                var issueId = Guid.NewGuid().ToString().Substring(0, 4);
-                // Setup message
+                var issueId = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
 
-                MailMessage bugMessage = new MailMessage();
-                bugMessage.From = new MailAddress(this.m_configuration.Smtp.From, $"SanteDB Bug on behalf of {storageData?.Submitter?.Names?.FirstOrDefault()?.Component?.FirstOrDefault(n => n.ComponentTypeKey == NameComponentKeys.Given)?.Value}");
-                foreach (var itm in this.m_configuration.Recipients)
-                    bugMessage.To.Add(itm);
-                bugMessage.Subject = $"ISSUE #{issueId}";
-                bugMessage.Body = $"{storageData.Note} - Username - {storageData.LoadProperty<SecurityUser>("CreatedBy")?.UserName ?? storageData?.Submitter?.LoadProperty<SecurityUser>("SecurityUser")?.UserName}";
-
-
-                // Add attachments
-                foreach (var itm in storageData.Attachments)
+                var subject = $"SANTEDB ISSUE MAILER #{issueId}";
+                var body = $"<html><body><p>{storageData.LoadProperty<SecurityUser>("CreatedBy")?.UserName ?? storageData?.Submitter?.LoadProperty<SecurityUser>("SecurityUser")?.UserName} has reported a bug</p><pre>{storageData.Note}</pre><p>You can reply directly to the reporter by pressing the Reply button in your mail client</p></body></html>";
+                var attachments = storageData.Attachments.Select(a =>
                 {
-                    if (itm is DiagnosticBinaryAttachment)
-                    {
-                        var bin = itm as DiagnosticBinaryAttachment;
-                        bugMessage.Attachments.Add(new Attachment(new MemoryStream(bin.Content), itm.FileDescription ?? itm.FileName, "application/x-gzip"));
-                    }
+                    if (a is DiagnosticBinaryAttachment bin)
+                        return new NotificationAttachment(a.FileName ?? a.FileDescription, a.ContentType ?? "application/x-gzip", bin.Content);
+                    else if (a is DiagnosticTextAttachment txt)
+                        return new NotificationAttachment(a.FileName ?? a.FileDescription, a.ContentType ?? "text/plain", txt.Content);
                     else
-                    {
-                        var txt = itm as DiagnosticTextAttachment;
-                        bugMessage.Attachments.Add(new Attachment(new MemoryStream(Encoding.UTF8.GetBytes(txt.Content)), itm.FileDescription ?? itm.FileName, "text/plain"));
-                    }
-                }
+                        return new NotificationAttachment(a.FileName ?? a.FileDescription, a.ContentType ?? "text/plain", $"Unknown attachment - {a}");
+                }).ToList();
 
                 // Attach the application information
                 using (var ms = new MemoryStream())
                 {
                     XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(typeof(DiagnosticApplicationInfo));
                     xsz.Serialize(ms, storageData.ApplicationInfo);
-                    bugMessage.Attachments.Add(new Attachment(new MemoryStream(ms.ToArray()), "appinfo.xml", "text/xml"));
+                    attachments.Add(new NotificationAttachment("appinfo.xml", "text/xml", ms.ToArray()));
                 }
 
-                SmtpClient smtpClient = new SmtpClient(this.m_configuration.Smtp.Server.Host, this.m_configuration.Smtp.Server.Port);
-                smtpClient.UseDefaultCredentials = String.IsNullOrEmpty(this.m_configuration.Smtp.Username);
-                smtpClient.EnableSsl = this.m_configuration.Smtp.Ssl;
-                if (!(smtpClient.UseDefaultCredentials))
-                    smtpClient.Credentials = new NetworkCredential(this.m_configuration.Smtp.Username, this.m_configuration.Smtp.Password);
-                smtpClient.SendCompleted += (o, e) =>
-                {
-                    this.m_traceSource.TraceInfo("Successfully sent message to {0}", bugMessage.To);
-                    if (e.Error != null)
-                        this.m_traceSource.TraceEvent(EventLevel.Error, e.Error.ToString());
-                    (o as IDisposable).Dispose();
-                };
-                this.m_traceSource.TraceInfo("Sending bug email message to {0}", bugMessage.To);
-                smtpClient.Send(bugMessage);
+                var notificationService = ApplicationServiceContext.Current.GetService<INotificationService>();
+                var recipients = this.m_configuration?.Recipients.Select(o => o.StartsWith("mailto:") ? o : $"mailto:{o}").ToArray();
+                notificationService?.Send(recipients, subject, body, null,  true, attachments.ToArray());
 
                 // Invoke
                 this.Inserted?.Invoke(this, new DataPersistedEventArgs<DiagnosticReport>(storageData, overrideAuthContext));

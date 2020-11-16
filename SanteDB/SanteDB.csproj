@@ -38,7 +38,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -80,6 +80,17 @@
     <None Include="applets\santedb.core.sln.pak">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="data\000-AddressUse.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="data\000-BirthRegistration.dataset" />
+    <None Include="data\000-EncounterTypes.dataset" />
+    <None Include="data\000-FamilyMembers.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="data\000-GenderConcept.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="data\000-NamePrefixSuffix.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
@@ -88,6 +99,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="data\000-PurposeOfUse.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="data\000-RegistrationEventTypes.dataset" />
+    <None Include="data\000-ObservationVerificationStatus.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="data\000-TelecomTypeCodes.dataset">
@@ -322,23 +337,23 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.BI" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Rest.BIS" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Cdss.Xml" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Matcher" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Matcher.Configuration.File" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Core.Model.AMI" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Core.Model.RISI" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Rest.AMI" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Rest.HDSI" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Core.Model.ViewModelSerializers" Version="2.0.40.0" />
+        <PackageReference Include="RestSrvr" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.BI" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Rest.BIS" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Cdss.Xml" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Matcher" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Matcher.Configuration.File" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Core.Model.AMI" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Core.Model.RISI" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Rest.AMI" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Rest.HDSI" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Core.Model.ViewModelSerializers" Version="2.0.48.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -347,10 +362,6 @@
     <ProjectReference Include="..\SanteDB.Authentication.OAuth\SanteDB.Authentication.OAuth2.csproj">
       <Project>{a3975c6f-4fdb-43be-81ab-3357b86173f1}</Project>
       <Name>SanteDB.Authentication.OAuth2</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Caching.Memory.Test\SanteDB.Caching.Memory.Test.csproj">
-      <Project>{b09a6d4c-862c-4b5b-9c05-4160ed7cca4a}</Project>
-      <Name>SanteDB.Caching.Memory.Test</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Caching.Memory\SanteDB.Caching.Memory.csproj">
       <Project>{8553abc7-abfa-4a21-b0e8-68b7de76129d}</Project>
@@ -363,10 +374,6 @@
     <ProjectReference Include="..\SanteDB.Configuration\SanteDB.Configuration.csproj">
       <Project>{032abf00-6c76-47c7-9eca-a840915a17ea}</Project>
       <Name>SanteDB.Configuration</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Core.Security.Tfa.Email\SanteDB.Core.Security.Tfa.Email.csproj">
-      <Project>{23699f04-da75-4889-aa00-7f6f4b5fcfbb}</Project>
-      <Name>SanteDB.Core.Security.Tfa.Email</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core.Security.Tfa.Twilio\SanteDB.Core.Security.Tfa.Twilio.csproj">
       <Project>{5a60d6e2-72dd-478a-91a6-e928208ca1ba}</Project>

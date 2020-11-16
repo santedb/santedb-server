@@ -4,7 +4,7 @@
 #define MyAppName "SanteDB Server"
 #define MyAppPublisher "SanteDB Community"
 #define MyAppURL "http://santesuite.org"
-
+#define MyAppVersion "2.0.47"
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -190,6 +190,7 @@ Source: ..\bin\Release\SanteDB.Persistence.Diagnostics.Email.dll; DestDir: {app}
 Source: ..\bin\Release\Antlr3.Runtime.dll; DestDir: {app}; Components: core\bre core\protocol core
 Source: ..\bin\Release\ExpressionEvaluator.dll; DestDir: {app}; Components: core\bre core\protocol                              
 Source: ..\bin\Release\Jint.dll; DestDir: {app}; Components: core\bre
+Source: ..\bin\Release\Esprima.dll; DestDir: {app}; Components: core\bre
 Source: ..\bin\Release\SanteDB.BusinessRules.JavaScript.dll; DestDir: {app}; Components: core\bre
 Source: ..\bin\Release\SanteDB.Cdss.Xml.dll; DestDir: {app}; Components: core\protocol
 

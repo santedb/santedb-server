@@ -31,9 +31,11 @@ using SanteDB.Core.Model.Map;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Caching;
 using System.Xml.Serialization;
 
 namespace SanteDB.Caching.Memory
@@ -59,6 +61,7 @@ namespace SanteDB.Caching.Memory
         private MemoryCacheConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<MemoryCacheConfigurationSection>();
         private Tracer m_tracer = new Tracer(MemoryCacheConstants.TraceSourceName);
 	    private static object s_lock = new object();
+        private MemoryCache m_cache;
 
         // Non cached types
         private HashSet<Type> m_nonCached = new HashSet<Type>();
@@ -111,12 +114,17 @@ namespace SanteDB.Caching.Memory
             this.Updated += (o, e) => this.EnsureCacheConsistency(e);
             this.Removed += (o, e) => this.EnsureCacheConsistency(e);
 
-            MemoryCache.Current.Clear();
+            var config = new NameValueCollection();
+            config.Add("cacheMemoryLimitMegabytes", this.m_configuration.MaxCacheSize.ToString());
+            config.Add("pollingInterval", "00:05:00");
+
+            this.m_cache = new MemoryCache("default", config);
+
 
             // handles when a item is being mapped
             this.m_mappingHandler = (o, e) =>
             {
-                var cacheItem = MemoryCache.Current.TryGetEntry(e.Key);
+                var cacheItem = this.m_cache.Get(e.Key.ToString());
                 if (cacheItem != null)
                 {
                     e.ModelObject = cacheItem as IdentifiedData;
@@ -130,23 +138,7 @@ namespace SanteDB.Caching.Memory
             ModelMapper.MappedToModel += this.m_mappedHandler;
             
 
-            // Now we start timers
-            var timerService = ApplicationServiceContext.Current.GetService<IJobManagerService>();
-            if(timerService != null && this.m_configuration.Types.Count > 0)
-            {
-                if (timerService.IsRunning)
-                {
-                    timerService.AddJob(new CacheCleanupTimerJob(), new TimeSpan(this.m_configuration.MaxCacheAge));
-                    timerService.AddJob(new CacheRegulatorTimerJob(), new TimeSpan(0, 1, 0));
-                }
-                else
-                    timerService.Started += (s, e) =>
-                    {
-                        timerService.AddJob(new CacheCleanupTimerJob(), new TimeSpan(this.m_configuration.MaxCacheAge));
-                        timerService.AddJob(new CacheRegulatorTimerJob(), new TimeSpan(0, 1, 0));
-                    };
-            }
-
+           
             // Look for non-cached types
             foreach (var itm in typeof(IdentifiedData).Assembly.GetTypes().Where(o => o.GetCustomAttribute<NonCachedAttribute>() != null || o.GetCustomAttribute<XmlRootAttribute>() == null))
                 this.m_nonCached.Add(itm);
@@ -193,7 +185,7 @@ namespace SanteDB.Caching.Memory
         /// <param name="e"></param>
         private void GetOrUpdateCacheItem(ModelMapEventArgs e)
         {
-            var cacheItem = MemoryCache.Current.TryGetEntry(e.Key);
+            var cacheItem = this.m_cache.Get(e.Key.ToString());
             if (cacheItem == null)
                 this.Add(e.ModelObject);
             else
@@ -221,6 +213,7 @@ namespace SanteDB.Caching.Memory
 
             this.m_mappingHandler = null;
             this.m_mappedHandler = null;
+            this.m_cache.Dispose();
 
             this.Stopped?.Invoke(this, EventArgs.Empty);
             return true;
@@ -232,7 +225,7 @@ namespace SanteDB.Caching.Memory
         /// <returns></returns>
         public TData GetCacheItem<TData>(Guid key) where TData : IdentifiedData
         {
-            return MemoryCache.Current.TryGetEntry(key) as TData;
+            return (TData)this.m_cache.Get(key.ToString());
         }
 
         /// <summary>
@@ -240,7 +233,7 @@ namespace SanteDB.Caching.Memory
         /// </summary>
         public object GetCacheItem(Guid key)
         {
-            return MemoryCache.Current.TryGetEntry(key);
+            return this.m_cache.Get(key.ToString());
         }
 
         /// <summary>
@@ -256,8 +249,19 @@ namespace SanteDB.Caching.Memory
 		        return;
 	        }
 
-            var exist = MemoryCache.Current.TryGetEntry(data.Key);
-            MemoryCache.Current.AddUpdateEntry(data);
+            var exist = this.m_cache.Get(data.Key.ToString());
+            this.m_cache.Set(data.Key.ToString(), data, DateTimeOffset.Now.AddSeconds(this.m_configuration.MaxCacheAge));
+
+            // If this is a relationship class we remove the source entity from the cache
+            if (data is ITargetedAssociation targetedAssociation)
+            {
+                this.m_cache.Remove(targetedAssociation.SourceEntityKey.ToString());
+                this.m_cache.Remove(targetedAssociation.TargetEntityKey.ToString());
+            }
+            else if (data is ISimpleAssociation simpleAssociation)
+                this.m_cache.Remove(simpleAssociation.SourceEntityKey.ToString());
+
+
             if (exist != null)
                 this.Updated?.Invoke(this, new DataCacheEventArgs(data));
             else
@@ -269,10 +273,10 @@ namespace SanteDB.Caching.Memory
         /// </summary>
         public void Remove(Guid key)
         {
-            var exist = MemoryCache.Current.TryGetEntry(key);
+            var exist = this.m_cache.Get(key.ToString());
             if (exist != null)
             {
-                MemoryCache.Current.RemoveObject(key);
+                this.m_cache.Remove(key.ToString());
                 this.Removed?.Invoke(this, new DataCacheEventArgs(exist));
             }
         }
@@ -282,12 +286,16 @@ namespace SanteDB.Caching.Memory
         /// </summary>
         public void Clear()
         {
-            MemoryCache.Current.Clear();
+            this.m_cache.Dispose();
+            var config = new NameValueCollection();
+            config.Add("cacheMemoryLimitMegabytes", this.m_configuration.MaxCacheSize.ToString());
+            config.Add("pollingInterval", "00:05:00");
+            this.m_cache = new MemoryCache("default", config);
         }
 
         /// <summary>
         /// Get the size of the cache in entries
         /// </summary>
-        public long Size {  get { return MemoryCache.Current.GetSize(); } }
+        public long Size {  get { return this.m_cache.GetLastSize(); } }
     }
 }

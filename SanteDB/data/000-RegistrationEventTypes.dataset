@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Causes of death">
+  <update insertIfNotExists="true">
+    <ConceptSet xmlns="http://santedb.org/model">
+      <id>f562dd96-17ca-11eb-adc1-0242ac120002</id>
+      <name>Registration Event Type Codes</name>
+      <mnemonic>RegistrationType</mnemonic>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.71</oid>
+      <url>http://santedb.org/conceptsets/contrib/RegistrationType</url>
+    </ConceptSet>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>f562e322-17ca-11eb-adc1-0242ac120002</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>RegistrationType-Birth</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptSet>f562dd96-17ca-11eb-adc1-0242ac120002</conceptSet>
+      <name>
+        <language>en</language>
+        <value>Birth Registration Event</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>f562e458-17ca-11eb-adc1-0242ac120002</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>RegistrationType-Death</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptSet>f562dd96-17ca-11eb-adc1-0242ac120002</conceptSet>
+      <name>
+        <language>en</language>
+        <value>Death Registration Event</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>f562e624-17ca-11eb-adc1-0242ac120002</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>RegistrationType-PatientAdmission</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptSet>f562dd96-17ca-11eb-adc1-0242ac120002</conceptSet>
+      <name>
+        <language>en</language>
+        <value>Patient Admission / Registration</value>
+      </name>
+    </Concept>
+  </update>
+</dataset>

@@ -17,6 +17,8 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
 using System;
@@ -34,6 +36,8 @@ namespace SanteDB.Core.Security
     public class DefaultTfaRelayService : ITfaRelayService
     {
 
+        private Tracer m_tracer = Tracer.GetTracer(typeof(DefaultTfaRelayService));
+
         /// <summary>
         /// Gets the service name
         /// </summary>
@@ -44,7 +48,13 @@ namespace SanteDB.Core.Security
         /// </summary>
         public DefaultTfaRelayService()
         {
-            this.Mechanisms = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes().Where(o => typeof(ITfaMechanism).IsAssignableFrom(o) && o.IsClass).Select(o => Activator.CreateInstance(o) as ITfaMechanism));
+            ApplicationContext.Current.Started += (o, e) =>
+            {
+                this.Mechanisms = ApplicationServiceContext.Current.GetService<IServiceManager>()
+                    .GetAllTypes()
+                    .Where(t => typeof(ITfaMechanism).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface)
+                    .Select(m => Activator.CreateInstance(m) as ITfaMechanism);
+            };
         }
 
         /// <summary>
@@ -58,7 +68,7 @@ namespace SanteDB.Core.Security
         /// <summary>
         /// Sends the secret via the specified mechanism
         /// </summary>
-        public void SendSecret(Guid mechanismId, SecurityUser user, string mechanismVerification, string tfaSecret)
+        public String SendSecret(Guid mechanismId, SecurityUser user)
         {
             // Get the mechanism
             var mechanism = this.Mechanisms.FirstOrDefault(o => o.Id == mechanismId);
@@ -66,7 +76,7 @@ namespace SanteDB.Core.Security
                 throw new SecurityException($"TFA mechanism {mechanismId} not found");
 
             // send the secret
-            mechanism.Send(user, mechanismVerification, tfaSecret);
+            return mechanism.Send(user);
         }
     }
 }

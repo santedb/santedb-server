@@ -321,10 +321,23 @@
       </name>
     </ReferenceTerm>
   </update>
+  
+  <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>fea4638c-6ddf-4c11-a70a-e3266c7478ff</id>
+      <mnemonic>21984-0</mnemonic>
+      <codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Cause of Death</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </update>
+  
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>d5e0a5be-d227-413a-a752-b7d79d7d4ede</id>
-      
       <previousVersion xsi:nil="true" />
       <version xsi:nil="true" />
       <sequence xsi:nil="true" />
@@ -334,6 +347,10 @@
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>bec4638c-6ddf-4c11-a70a-e3266c7478ff</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+      <referenceTerm>
+        <term>fea4638c-6ddf-4c11-a70a-e3266c7478ff</term>
         <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
       </referenceTerm>
       <name>

@@ -17,6 +17,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Query;
 using SanteDB.OrmLite;
@@ -75,8 +76,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
             catch (DbException ex)
             {
-                this.m_tracer.TraceEvent(EventLevel.Error,  "Error inserting {0} - {1}", data, ex.Message);
-                throw;
+                throw new DataPersistenceException($"Error updating {data}", this.TranslateDbException(ex));
             }
         }
 
@@ -113,8 +113,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
             catch (DbException ex)
             {
-                this.m_tracer.TraceEvent(EventLevel.Error,  "Error updating {0} - {1}", data, ex.Message);
-                throw;
+                throw new DataPersistenceException($"Error updating {data}", this.TranslateDbException(ex));
             }
 
         }

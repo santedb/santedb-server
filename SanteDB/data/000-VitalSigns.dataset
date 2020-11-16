@@ -278,7 +278,6 @@
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>850ca898-c656-4ba2-a7c1-ff74e3331396</id>
-      
       <previousVersion xsi:nil="true" />
       <version xsi:nil="true" />
       <sequence xsi:nil="true" />
@@ -340,7 +339,7 @@
         <effectiveVersionSequence xsi:nil="true" />
         <obsoleteVersionSequence xsi:nil="true" />
         <language>en</language>
-        <value>BODY HEIGHT^LYING</value>
+        <value>Height (Lying)</value>
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </Concept>

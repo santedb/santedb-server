@@ -42,7 +42,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class ActPersistenceService : VersionedDataPersistenceService<Core.Model.Acts.Act, DbActVersion, DbAct>
     {
-       
+
         /// <summary>
         /// To model instance
         /// </summary>
@@ -157,7 +157,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             DbActVersion dbActVersion = (dataInstance as CompositeResult)?.Values.OfType<DbActVersion>().FirstOrDefault() ?? dataInstance as DbActVersion ?? context.FirstOrDefault<DbActVersion>(o => o.VersionKey == (dataInstance as DbActSubTable).ParentKey);
             DbAct dbAct = (dataInstance as CompositeResult)?.Values.OfType<DbAct>().FirstOrDefault() ?? context.FirstOrDefault<DbAct>(o => o.Key == dbActVersion.Key);
             Act retVal = null;
-            var cache= new AdoPersistenceCache(context);
+            var cache = new AdoPersistenceCache(context);
 
             if (!dbActVersion.ObsoletionTime.HasValue)
                 switch (dbAct.ClassConceptKey.ToString().ToUpper())
@@ -241,7 +241,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             if (data.Participations != null && data.Participations.Any())
             {
-                data.Participations = data.Participations.Where(o => o != null && !o.IsEmpty()).Select(o => new ActParticipation(o.ParticipationRole?.EnsureExists(context)?.Key ?? o.ParticipationRoleKey , o.PlayerEntityKey) { Quantity = o.Quantity }).ToList();
+                data.Participations = data.Participations.Where(o => o != null && !o.IsEmpty()).Select(o => new ActParticipation(o.ParticipationRole?.EnsureExists(context)?.Key ?? o.ParticipationRoleKey, o.PlayerEntityKey) { Quantity = o.Quantity }).ToList();
                 base.UpdateVersionedAssociatedItems<Core.Model.Acts.ActParticipation, DbActParticipation>(
                    data.Participations,
                     retVal,
@@ -264,12 +264,23 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 foreach (var p in data.Protocols)
                 {
                     var proto = p.Protocol?.EnsureExists(context);
-                    if (proto == null) // maybe we can retrieve the protocol from the protocol repository?
+
+                    try
                     {
-                        int t = 0;
-                        proto = ApplicationServiceContext.Current.GetService<IClinicalProtocolRepositoryService>().FindProtocol(o => o.Key == p.ProtocolKey, 0, 1, out t).FirstOrDefault();
-                        proto = proto.EnsureExists(context);
+                        if (proto == null) // maybe we can retrieve the protocol from the protocol repository?
+                        {
+                            int t = 0;
+                            proto = ApplicationServiceContext.Current.GetService<IClinicalProtocolRepositoryService>().FindProtocol(o => o.Key == p.ProtocolKey, 0, 1, out t).FirstOrDefault();
+                            proto = proto.EnsureExists(context);
+                        }
+
                     }
+                    catch (Exception e)
+                    {
+                        // TODO: Add this to DI extension
+                        this.m_tracer.TraceWarning("Could not find protocol {0} - ignoring", p.ProtocolKey);
+                    }
+
                     if (proto != null)
                         context.Insert(new DbActProtocol()
                         {
@@ -280,12 +291,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
 
             // Persist policies
-            if(data.Policies != null && data.Policies.Any())
+            if (data.Policies != null && data.Policies.Any())
             {
-                foreach(var p in data.Policies)
+                foreach (var p in data.Policies)
                 {
                     var pol = p.Policy?.EnsureExists(context);
-                    if(pol == null) // maybe we can retrieve it from the PIP?
+                    if (pol == null) // maybe we can retrieve it from the PIP?
                     {
                         var pipInfo = ApplicationServiceContext.Current.GetService<IPolicyInformationService>().GetPolicy(p.PolicyKey.ToString());
                         if (pipInfo != null)
@@ -355,10 +366,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (data.Participations != null)
             {
                 // Correct mixed keys
-                if(this.m_persistenceService.GetConfiguration().DataCorrectionKeys.Contains("edmonton-participation-keyfix"))
+                if (this.m_persistenceService.GetConfiguration().DataCorrectionKeys.Contains("edmonton-participation-keyfix"))
                 {
                     // Obsolete all
-                    foreach(var itm in context.Query<DbActParticipation>(o=>o.SourceKey == retVal.Key && o.ObsoleteVersionSequenceId == null && o.ParticipationRoleKey == ActParticipationKey.Consumable)) {
+                    foreach (var itm in context.Query<DbActParticipation>(o => o.SourceKey == retVal.Key && o.ObsoleteVersionSequenceId == null && o.ParticipationRoleKey == ActParticipationKey.Consumable))
+                    {
                         itm.ObsoleteVersionSequenceId = retVal.VersionSequence;
                         context.Update(itm);
                     }
@@ -367,7 +379,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     {
 
                         var dItm = data.Participations.Find(o => o.Key == itm.Key);
-                        if(dItm != null)
+                        if (dItm != null)
                             itm.TargetKey = dItm.PlayerEntityKey.Value;
                         itm.ObsoleteVersionSequenceId = null;
                         context.Update(itm);

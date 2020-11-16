@@ -165,6 +165,7 @@ CREATE UNIQUE INDEX ent_rel_part_fam_unq_enf_sha1 ON ent_rel_part_fam_tbl (diges
 CREATE UNIQUE INDEX ent_rel_part_own_unq_enf_sha1 ON ent_rel_part_own_tbl (digest((src_ent_id::text || trg_ent_id::text) || rel_typ_cd_id::text, 'sha1'::text)) WHERE obslt_vrsn_seq_id IS NULL;
 CREATE UNIQUE INDEX ent_rel_part_stock_unq_enf_sha1 ON ent_rel_part_stock_tbl (digest((src_ent_id::text || trg_ent_id::text) || rel_typ_cd_id::text, 'sha1'::text)) WHERE obslt_vrsn_seq_id IS NULL;
 CREATE UNIQUE INDEX ent_rel_part_inf_unq_enf_sha1 ON ent_rel_part_inf_tbl (digest((src_ent_id::text || trg_ent_id::text) || rel_typ_cd_id::text, 'sha1'::text)) WHERE obslt_vrsn_seq_id IS NULL;
+CREATE UNIQUE INDEX ent_rel_part_bp_cit_tbl ON ent_rel_part_bp_cit_tbl (digest((src_ent_id::text || trg_ent_id::text) || rel_typ_cd_id::text, 'sha1'::text)) WHERE obslt_vrsn_seq_id IS NULL;
 --#!
 
 CREATE TRIGGER ent_rel_part_dsdl_tbl_vrfy BEFORE INSERT OR UPDATE ON ent_rel_part_dsdl_tbl FOR EACH ROW EXECUTE PROCEDURE trg_vrfy_ent_rel_tbl();
@@ -172,6 +173,8 @@ CREATE TRIGGER ent_rel_part_fam_tbl_vrfy BEFORE INSERT OR UPDATE ON ent_rel_part
 CREATE TRIGGER ent_rel_part_own_tbl_vrfy BEFORE INSERT OR UPDATE ON ent_rel_part_own_tbl FOR EACH ROW EXECUTE PROCEDURE trg_vrfy_ent_rel_tbl();
 CREATE TRIGGER ent_rel_part_stock_tbl_vrfy BEFORE INSERT OR UPDATE ON ent_rel_part_stock_tbl FOR EACH ROW EXECUTE PROCEDURE trg_vrfy_ent_rel_tbl();
 CREATE TRIGGER ent_rel_part_inf_tbl_vrfy BEFORE INSERT OR UPDATE ON ent_rel_part_inf_tbl FOR EACH ROW EXECUTE PROCEDURE trg_vrfy_ent_rel_tbl();
+CREATE TRIGGER ent_rel_part_bp_cit_tbl_vrfy BEFORE INSERT OR UPDATE ON ent_rel_part_bp_cit_tbl FOR EACH ROW EXECUTE PROCEDURE trg_vrfy_ent_rel_tbl();
+
 --#!
 
 ALTER TABLE ent_rel_tbl RENAME TO ent_rel_tbl_bak;

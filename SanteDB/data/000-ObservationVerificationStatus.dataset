@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="HL7v3 SeverityObservation Concept Set" xmlns="http://santedb.org/data">
+  <update insertIfNotExists="true">
+    <ConceptSet xmlns="http://santedb.org/model">
+      <id>975137e6-188f-11eb-adc1-0242ac120002</id>
+      <name>Verification Status</name>
+      <mnemonic>ObservationVerificationState</mnemonic>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.76</oid>
+      <url>http://santedb.org/conceptsets/contrib/ObservationVerificationState</url>
+    </ConceptSet>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>97513a16-188f-11eb-adc1-0242ac120002</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>VerificationStatus-Unconfirmed</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptSet>975137e6-188f-11eb-adc1-0242ac120002</conceptSet>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Unconfirmed</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>97513b10-188f-11eb-adc1-0242ac120002</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>VerificationStatus-Confirmed</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptSet>975137e6-188f-11eb-adc1-0242ac120002</conceptSet>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Confirmed</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>97513bec-188f-11eb-adc1-0242ac120002</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>VerificationStatus-Provisional</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptSet>975137e6-188f-11eb-adc1-0242ac120002</conceptSet>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Provisional / Tentative</value>
+      </name>
+    </Concept>
+  </update>
+
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>97513cbe-188f-11eb-adc1-0242ac120002</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>ObservationType-VerificationStatus</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Verification Status</value>
+      </name>
+    </Concept>
+  </update>
+</dataset>

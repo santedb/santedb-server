@@ -22,6 +22,7 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
+using System;
 using System.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
@@ -42,6 +43,18 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <returns>Returns the inserted reference term.</returns>
         public override ReferenceTerm InsertInternal(DataContext context, ReferenceTerm data)
 		{
+            // Re-Key? 
+            if (data.Key.HasValue)
+            {
+                var existing = context.FirstOrDefault<DbReferenceTerm>(o => o.Mnemonic == data.Mnemonic && o.ObsoletionTime == null && o.Key != data.Key);
+                // Obsolete the old
+                if (existing != null)
+                {
+                    existing.ObsoletionTime = DateTimeOffset.Now;
+                    existing.ObsoletedByKey = context.ContextId;
+                    context.Update(existing);
+                }
+            }
 			var referenceTerm = base.InsertInternal(context, data);
 
 			if (referenceTerm.DisplayNames != null)

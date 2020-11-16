@@ -97,18 +97,24 @@ namespace SanteDB.Messaging.FHIR.Rest.Serialization
                     {
 
                         // Now read the JSON data
-                        Object fhirObject = null;
+                        Hl7.Fhir.Model.Resource fhirObject = null;
                         using (StreamReader sr = new StreamReader(request.Body))
                         {
                             string fhirContent = sr.ReadToEnd();
-                            fhirObject = new FhirJsonParser().Parse(fhirContent);
+                            fhirObject = new FhirJsonParser().Parse(fhirContent) as Hl7.Fhir.Model.Resource;
                         }
 
                         // Now we want to serialize the FHIR MODEL object and re-parse as our own API bundle object
                         if (fhirObject != null)
                         {
                             MemoryStream ms = new MemoryStream(new FhirXmlSerializer().SerializeToBytes(fhirObject as Hl7.Fhir.Model.Resource));
-                            var xsz = XmlModelSerializerFactory.Current.CreateSerializer(fhirObject.GetType());
+
+                            var type = s_knownTypes.FirstOrDefault(o => o.GetCustomAttribute<XmlRootAttribute>()?.ElementName == fhirObject.ResourceType.ToString());
+                            if (type == null)
+                                throw new ArgumentException($"FHIR resource {fhirObject.ResourceType} is not supported");
+
+                            // Get the logical type
+                            var xsz = XmlModelSerializerFactory.Current.CreateSerializer(type);
                             parameters[pNumber] = xsz.Deserialize(ms);
                         }
                         else

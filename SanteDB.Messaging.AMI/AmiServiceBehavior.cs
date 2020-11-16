@@ -81,8 +81,7 @@ namespace SanteDB.Messaging.AMI.Wcf
                 CollectionItem = tfaRelay.Mechanisms.Select(o => new TfaMechanismInfo()
                 {
                     Id = o.Id,
-                    Name = o.Name,
-                    Description = o.Description
+                    Name = o.Name
                 }).OfType<Object>().ToList()
             };
         }

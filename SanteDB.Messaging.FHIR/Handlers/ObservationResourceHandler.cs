@@ -58,7 +58,6 @@ namespace SanteDB.Messaging.FHIR.Handlers
 
             if (model.Relationships.Any(o => o.RelationshipTypeKey == ActRelationshipTypeKeys.Replaces))
                 retVal.Status = new FhirCode<ObservationStatus>(ObservationStatus.Corrected);
-
             // RCT
             var rct = model.Participations.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget);
             if (rct != null)

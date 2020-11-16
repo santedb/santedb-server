@@ -93,47 +93,26 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override ActParticipation InsertInternal(DataContext context, ActParticipation data)
         {
             // Ensure we haven't already persisted this
-            if (data.PlayerEntity != null) data.PlayerEntity = data.PlayerEntity.EnsureExists(context) as Entity;
             data.PlayerEntityKey = data.PlayerEntity?.Key ?? data.PlayerEntityKey;
+            if (data.ParticipationRole != null) data.ParticipationRole = data.ParticipationRole.EnsureExists(context, false) as Concept;
             data.ParticipationRoleKey = data.ParticipationRole?.Key ?? data.ParticipationRoleKey;
-            if (data.Act != null) data.Act = data.Act.EnsureExists(context) as Act;
             data.ActKey = data.Act?.Key ?? data.ActKey;
 
-            byte[] target = data.PlayerEntityKey.Value.ToByteArray(),
-                source = data.SourceEntityKey.Value.ToByteArray(),
-                typeKey = data.ParticipationRoleKey.Value.ToByteArray();
+            // Lookup the original 
+            if (!data.EffectiveVersionSequenceId.HasValue)
+                data.EffectiveVersionSequenceId = context.FirstOrDefault<DbActVersion>(o => o.Key == data.SourceEntityKey)?.VersionSequenceId;
 
-            //SqlStatement sql = new SqlStatement<DbActParticipation>().SelectFrom()
-            //   .Where<DbActParticipation>(o => o.ActUuid == source )
-            //   .Limit(1).Build();
-
-            //IEnumerable<DbActParticipation> dbrelationships = context.TryGetData($"EX:{sql.ToString()}") as IEnumerable<DbActParticipation>;
-            //if (dbrelationships == null) { 
-            //    dbrelationships = context.Connection.Query<DbActParticipation>(sql.SQL, sql.Arguments.ToArray()).ToList();
-            //    context.AddData($"EX{sql.ToString()}", dbrelationships);
-            //}
-
-            //var existing = dbrelationships.FirstOrDefault(
-            //        o => o.ParticipationRoleUuid == typeKey &&
-            //        o.EntityUuid == target);
-
-            //if (existing == null)
-            //{
-            return base.InsertInternal(context, data);
-            //    (dbrelationships as List<DbActParticipation>).Add(new DbActParticipation()
-            //    {
-            //        Uuid = retVal.Key.Value.ToByteArray(),
-            //        ParticipationRoleUuid = typeKey,
-            //        ActUuid = source,
-            //        EntityUuid = target
-            //    });
-            //    return retVal;
-            //}
-            //else
-            //{
-            //    data.Key = new Guid(existing.Uuid);
-            //    return data;
-            //}
+            // Duplicate check 
+            var existing = context.FirstOrDefault<DbActParticipation>(r => r.SourceKey == data.SourceEntityKey && r.TargetKey == data.PlayerEntityKey && r.ParticipationRoleKey == data.ParticipationRoleKey && !r.ObsoleteVersionSequenceId.HasValue);
+            if (existing == null)
+                return base.InsertInternal(context, data);
+            else if (existing.Quantity != data.Quantity)
+            {
+                data.Key = existing.Key;
+                return base.UpdateInternal(context, data);
+            }
+            else
+                return this.ToModelInstance(existing, context);
         }
 
         /// <summary>
@@ -142,8 +121,27 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override ActParticipation UpdateInternal(DataContext context, ActParticipation data)
         {
             data.PlayerEntityKey = data.PlayerEntity?.Key ?? data.PlayerEntityKey;
+            if (data.ParticipationRole != null) data.ParticipationRole = data.ParticipationRole.EnsureExists(context, false) as Concept;
             data.ParticipationRoleKey = data.ParticipationRole?.Key ?? data.ParticipationRoleKey;
             data.ActKey = data.Act?.Key ?? data.ActKey;
+
+            if (data.ObsoleteVersionSequenceId == Int32.MaxValue)
+                data.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence ?? data.ObsoleteVersionSequenceId;
+
+            // Duplicate check 
+            var existing = context.FirstOrDefault<DbActParticipation>(r => r.SourceKey == data.SourceEntityKey && r.TargetKey == data.PlayerEntityKey && r.ParticipationRoleKey == data.ParticipationRoleKey && !r.ObsoleteVersionSequenceId.HasValue);
+            if (existing != null && existing.Key != data.Key) // There is an existing relationship which isn't this one, obsolete it 
+            {
+                existing.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence;
+                if (existing.ObsoleteVersionSequenceId.HasValue)
+                    context.Update(existing);
+                else
+                {
+                    this.m_tracer.TraceWarning("ActParticipation {0} would conflict with existing {1} -> {2} (role {3}, quantity {4}) already exists and this update would violate unique constraint.", data, existing.SourceKey, existing.TargetKey, existing.ParticipationRoleKey, existing.Quantity);
+                    existing.ObsoleteVersionSequenceId = 1;
+                    context.Update(existing);
+                }
+            }
 
             return base.UpdateInternal(context, data);
         }

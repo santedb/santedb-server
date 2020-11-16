@@ -42,9 +42,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\TfaEmailMechanismConfigurationSection.cs" />
-    <Compile Include="Configuration\TfaSmtpConfiguration.cs" />
-    <Compile Include="Configuration\TemplateConfiguration.cs" />
     <Compile Include="Resources\Strings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -76,13 +73,12 @@
           <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
           <Name>SanteDB.Core.Model</Name>
         </ProjectReference>
-
       </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.40.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.48.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

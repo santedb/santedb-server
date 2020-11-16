@@ -70,6 +70,7 @@
     <Compile Include="Shell\ApplicationContext.cs" />
     <Compile Include="Shell\CmdLets\AppletCmdlet.cs" />
     <Compile Include="Shell\CmdLets\AssigningAuthorityCmdlet.cs" />
+    <Compile Include="Shell\CmdLets\DataCmdlet.cs" />
     <Compile Include="Shell\CmdLets\DeviceCmdlet.cs" />
     <Compile Include="Shell\CmdLets\ApplicationCmdlet.cs" />
     <Compile Include="Shell\CmdLets\LogCmdlet.cs" />
@@ -111,11 +112,11 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.40.0" />
+        <PackageReference Include="RestSrvr" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.48.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -131,10 +132,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="SanteDB.Messaging.AMI.Client">
-      <Version>2.0.40</Version>
+      <Version>2.0.48</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.Messaging.HDSI.Client">
-      <Version>2.0.40</Version>
+      <Version>2.0.48</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

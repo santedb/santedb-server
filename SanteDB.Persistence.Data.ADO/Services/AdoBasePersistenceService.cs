@@ -256,8 +256,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 #endif
                             tx?.Rollback();
 
-                            this.TranslateDbException(e);
-                            throw;
+                            throw new DataPersistenceException($"Error inserting {data}", this.TranslateDbException(e));
                         }
                         catch (Exception e)
                         {
@@ -356,8 +355,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 #endif
                             tx?.Rollback();
 
-                            this.TranslateDbException(e);
-                            throw new DataPersistenceException($"Error updating {data}", e);
+                            throw new DataPersistenceException($"Error updating {data}", this.TranslateDbException(e));
                         }
                         catch (Exception e)
                         {
@@ -395,34 +393,34 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Translates a DB exception to an appropriate SanteDB exception
         /// </summary>
-        protected void TranslateDbException(DbException e)
+        protected Exception TranslateDbException(DbException e)
         {
             if (e.Data["SqlState"] != null)
             {
                 switch (e.Data["SqlState"].ToString())
                 {
                     case "O9001": // SanteDB => Data Validation Error
-                        throw new DetectedIssueException(
+                        return new DetectedIssueException(
                             new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.InvalidDataIssue));
                     case "O9002": // SanteDB => Codification error
-                        throw new DetectedIssueException(new List<DetectedIssue>() {
+                        return new DetectedIssueException(new List<DetectedIssue>() {
                                         new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(),  e.Message, DetectedIssueKeys.CodificationIssue),
                                         new DetectedIssue(DetectedIssuePriorityType.Information, e.Data["SqlState"].ToString(), "HINT: Select a code that is from the correct concept set or add the selected code to the concept set", DetectedIssueKeys.CodificationIssue)
                                     });
                     case "23502": // PGSQL - NOT NULL 
-                        throw new DetectedIssueException(
+                        return new DetectedIssueException(
                                         new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.InvalidDataIssue)
                                     );
                     case "23503": // PGSQL - FK VIOLATION
-                        throw new DetectedIssueException(
+                        return new DetectedIssueException(
                                         new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.FormalConstraintIssue)
                                     );
                     case "23505": // PGSQL - UQ VIOLATION
-                        throw new DetectedIssueException(
+                        return new DetectedIssueException(
                                         new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.AlreadyDoneIssue)
                                     );
                     case "23514": // PGSQL - CK VIOLATION
-                        throw new DetectedIssueException(new List<DetectedIssue>()
+                        return new DetectedIssueException(new List<DetectedIssue>()
                         {
                             new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.FormalConstraintIssue),
                             new DetectedIssue(DetectedIssuePriorityType.Information, e.Data["SqlState"].ToString(), "HINT: The code you're using may be incorrect for the given context", DetectedIssueKeys.CodificationIssue)

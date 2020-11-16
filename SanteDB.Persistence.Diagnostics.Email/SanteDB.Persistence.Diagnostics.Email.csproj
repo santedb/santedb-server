@@ -43,7 +43,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\DiagnosticEmailServiceConfigurationSection.cs" />
-    <Compile Include="Configuration\DxSmtpConfiguration.cs" />
     <Compile Include="DiagnosticReportPersistenceService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -56,7 +55,6 @@
   <Choose>
     <When Condition="$(SolutionName.Contains('-ext'))">
       <ItemGroup>
-
         <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
           <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
           <Name>SanteDB.Core.Api</Name>
@@ -69,18 +67,16 @@
           <Project>{65ef51c6-5cb8-43b8-ae65-4a68f0b44ad2}</Project>
           <Name>SanteDB.Core.Model.AMI</Name>
         </ProjectReference>
-
       </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.40.0" />
-        <PackageReference Include="SanteDB.Core.Model.AMI" Version="2.0.40.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.48.0" />
+        <PackageReference Include="SanteDB.Core.Model.AMI" Version="2.0.48.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
-
   <ItemGroup>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>

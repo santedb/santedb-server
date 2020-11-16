@@ -21,6 +21,7 @@ using SanteDB.Core;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
@@ -60,9 +61,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             else
             {
                 retVal.LoadState = Core.Model.LoadState.PartialLoad;
-                retVal.ConceptNames = context.Query<DbConceptName>(o => o.SourceKey == retVal.Key).Select(o => new ConceptName(o.Language, o.Name)).ToList();
+                retVal.ConceptNames = context.Query<DbConceptName>(o => o.SourceKey == retVal.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => new ConceptName(o.Language, o.Name)).ToList();
                 retVal.ReferenceTerms = context.Query<DbConceptReferenceTerm>(o => o.SourceKey == retVal.Key).Select(o => new ConceptReferenceTerm(o.TargetKey, o.RelationshipTypeKey)).ToList();
-
+                
             }
             return retVal;
         }
@@ -192,6 +193,47 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             int tr = 0;
             return this.QueryInternal(context, this.BuildSourceQuery<ConceptName>(id, versionSequenceId), Guid.Empty, 0, null, out tr, null, false).ToList();
+        }
+
+        /// <summary>
+        /// Insert the specified data
+        /// </summary>
+        public override ConceptName InsertInternal(DataContext context, ConceptName data)
+        {
+            // Does this inbound not have an ID, and if so, does the concept already have the same name language pair?
+            if (!data.Key.HasValue)
+            {
+                var existing = context.FirstOrDefault<DbConceptName>(o => o.Language == data.Language && o.SourceKey == data.SourceEntityKey && !o.ObsoleteVersionSequenceId.HasValue);
+                if (existing != null) // Obsolete the existing 
+                {
+                    existing.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence ?? context.FirstOrDefault<DbConceptVersion>(o => o.Key == data.SourceEntityKey && o.ObsoletionTime == null)?.VersionSequenceId;
+                    context.Update(existing);
+                }
+
+            }
+
+            // Remove concept from cache and create a new version
+            ApplicationContext.Current.GetService<IDataCachingService>().Remove(data.SourceEntityKey.Value);
+            var conceptVersion = context.FirstOrDefault<DbConceptVersion>(o => o.Key == data.SourceEntityKey.Value && o.ObsoletionTime == null);
+            var newVersion = new DbConceptVersion();
+            conceptVersion.ObsoletedByKey = context.ContextId;
+            conceptVersion.ObsoletionTime = DateTimeOffset.Now;
+            context.Update(conceptVersion);
+            
+            // Insert new version
+            conceptVersion.VersionSequenceId = null;
+            conceptVersion.ReplacesVersionKey = conceptVersion.VersionKey;
+
+            conceptVersion.VersionKey = Guid.Empty;
+            conceptVersion.ObsoletionTime = null;
+            conceptVersion.ObsoletedByKey = null;
+            conceptVersion.CreatedByKey = context.ContextId;
+            conceptVersion.CreationTime = default(DateTimeOffset);
+            conceptVersion= context.Insert(conceptVersion);
+
+            data.EffectiveVersionSequenceId = conceptVersion.VersionSequenceId;
+            return base.InsertInternal(context, data);
+
         }
     }
 }

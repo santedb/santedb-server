@@ -21,6 +21,8 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security.Claims;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Security.Tfa.Twilio.Configuration;
 using SanteDB.Core.Security.Tfa.Twilio.Resources;
 using SanteDB.Core.Services;
@@ -36,88 +38,73 @@ namespace SanteDB.Core.Security.Tfa.Twilio
     /// Represents a TFA mechanism that uses TWILIO
     /// </summary>
     public class TfaTwilioMechanism : ITfaMechanism
-	{
-		// Configuration
-		private TwilioTfaMechanismConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<TwilioTfaMechanismConfigurationSection>();
+    {
+        // Configuration
+        private TwilioTfaMechanismConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<TwilioTfaMechanismConfigurationSection>();
 
-		private Tracer m_tracer = new Tracer("SanteDB.Core.Security.Tfa.Twilio");
+        private Tracer m_tracer = new Tracer("SanteDB.Core.Security.Tfa.Twilio");
 
-		/// <summary>
-		/// Challenge string
-		/// </summary>
-		public string Description
-		{
-			get
-			{
-				return Strings.challenge_text;
-			}
-		}
 
-		/// <summary>
-		/// Identifier of the mechanism
-		/// </summary>
-		public Guid Id
-		{
-			get
-			{
-				return Guid.Parse("08124835-6C24-43C9-8650-9D605F6B5BD6");
-			}
-		}
+        /// <summary>
+        /// Identifier of the mechanism
+        /// </summary>
+        public Guid Id
+        {
+            get
+            {
+                return Guid.Parse("08124835-6C24-43C9-8650-9D605F6B5BD6");
+            }
+        }
 
-		/// <summary>
-		/// Gets the name
-		/// </summary>
-		public string Name
-		{
-			get
-			{
-				return Strings.mechanism_name;
-			}
-		}
+        /// <summary>
+        /// Gets the name
+        /// </summary>
+        public string Name
+        {
+            get
+            {
+                return Strings.mechanism_name;
+            }
+        }
 
-		/// <summary>
-		/// Send the secret
-		/// </summary>
-		public void Send(SecurityUser user, string challengeResponse, string tfaSecret)
-		{
-			if (user == null)
-				throw new ArgumentNullException(nameof(user));
-			else if (String.IsNullOrEmpty(challengeResponse))
-				throw new ArgumentNullException(nameof(challengeResponse));
-			else if (tfaSecret == null)
-				throw new ArgumentNullException(nameof(tfaSecret));
+        /// <summary>
+        /// Send the secret
+        /// </summary>
+        public String Send(SecurityUser user)
+        {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
 
-			// First, does this user have a phone number
-			string toNumber = user.PhoneNumber;
-			if (toNumber == null)
-			{
-				// Get preferred language for the user
-				var securityService = ApplicationServiceContext.Current.GetService<IRepositoryService<UserEntity>>();
-				var userEntity = securityService?.Find(o => o.SecurityUserKey == user.Key).FirstOrDefault();
-				if (userEntity != null)
-					toNumber = userEntity.Telecoms.FirstOrDefault(o => o.AddressUseKey == TelecomAddressUseKeys.MobileContact)?.Value;
-			}
+            // First, does this user have a phone number
+            string toNumber = user.PhoneNumber;
+            if (toNumber == null)
+            {
+                // Get preferred language for the user
+                var securityService = ApplicationServiceContext.Current.GetService<IRepositoryService<UserEntity>>();
+                var userEntity = securityService?.Find(o => o.SecurityUserKey == user.Key).FirstOrDefault();
+                if (userEntity != null)
+                    toNumber = userEntity.Telecoms.FirstOrDefault(o => o.AddressUseKey == TelecomAddressUseKeys.MobileContact)?.Value;
+            }
 
-			// To numbers fail
-			if (toNumber == null || challengeResponse.Length != 4 || !toNumber.EndsWith(challengeResponse))
-			{
-				this.m_tracer.TraceEvent(EventLevel.Warning, "Validation of {0} failed", user.UserName);
-			}
-			else
-			{
-				try
-				{
-					var client = new TW.TwilioRestClient(this.m_configuration.Sid, this.m_configuration.Auth);
-					var response = client.SendMessage(this.m_configuration.From, toNumber, String.Format(Strings.default_body, tfaSecret));
+            try
+            {
+                // Generate a TFA secret and add it as a claim on the user
+                var secret = ApplicationServiceContext.Current.GetService<ITwoFactorSecretGenerator>().GenerateTfaSecret();
+                ApplicationServiceContext.Current.GetService<IIdentityProviderService>().AddClaim(user.UserName, new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, secret), AuthenticationContext.SystemPrincipal, new TimeSpan(0, 5, 0));
 
-					if (response.RestException != null)
-						throw new Exception(response.RestException.Message ?? "" + " " + (response.RestException.Code ?? "") + " " + (response.RestException.MoreInfo ?? "") + " " + (response.RestException.Status ?? ""));
-				}
-				catch (Exception ex)
-				{
-					this.m_tracer.TraceEvent(EventLevel.Error,  "Error sending SMS: {0}", ex);
-				}
-			}
-		}
-	}
+                var client = new TW.TwilioRestClient(this.m_configuration.Sid, this.m_configuration.Auth);
+                var response = client.SendMessage(this.m_configuration.From, toNumber, String.Format(Strings.default_body, secret));
+
+                if (response.RestException != null)
+                    throw new Exception(response.RestException.Message ?? "" + " " + (response.RestException.Code ?? "") + " " + (response.RestException.MoreInfo ?? "") + " " + (response.RestException.Status ?? ""));
+
+                return $"Code sent to ******{user.PhoneNumber.Substring(user.PhoneNumber.Length - 4, 4)}";
+            }
+            catch (Exception ex)
+            {
+                this.m_tracer.TraceEvent(EventLevel.Error, "Error sending SMS: {0}", ex);
+                throw new Exception($"Could not dispatch SMS code to user", ex);
+            }
+        }
+    }
 }

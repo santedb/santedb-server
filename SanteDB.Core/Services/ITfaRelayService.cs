@@ -41,14 +41,11 @@ namespace SanteDB.Core.Services
         String Name { get; }
 
         /// <summary>
-        /// The description of this challenge mechanism
-        /// </summary>
-        String Description { get; }
-        
-        /// <summary>
         /// Send the specified two factor authentication via the mechanism 
         /// </summary>
-        void Send(SecurityUser user, String challengeResponse, String tfaSecret);
+        /// <param name="user">The user to send the TFA secret for</param>
+        /// <returns>Special instructional text</returns>
+        String Send(SecurityUser user);
 
     }
 
@@ -61,7 +58,7 @@ namespace SanteDB.Core.Services
         /// <summary>
         /// Send the secret for the specified user
         /// </summary>
-        void SendSecret(Guid mechanismId, SecurityUser user, String mechanismVerification, String tfaSecret);
+        string SendSecret(Guid mechanismId, SecurityUser user);
         
         /// <summary>
         /// Gets the tfa mechanisms supported by this relay service

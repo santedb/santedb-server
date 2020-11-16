@@ -82,31 +82,31 @@
   <section xsi:type="FileSystemQueueConfigurationSection" queueRoot=".\queue" />
   <section xsi:type="DataConfigurationSection">
       <connectionStrings>
-        <add name="FBSQL" value="initial catalog=|DataDirectory|\sdb_base.fdb;server type=Embedded;user id=sysdba" provider="Fbsql" />
-        <add name="AUDIT_FBSQL" value="initial catalog=|DataDirectory|\sdb_audit.fdb;server type=Embedded;user id=sysdba" provider="Fbsql"/>
+        <add name="FirebirdSQL" value="initial catalog=|DataDirectory|\sdb_base.fdb;server type=Embedded;user id=sysdba" provider="FirebirdSQL" />
+        <add name="AUDIT_FirebirdSQL" value="initial catalog=|DataDirectory|\sdb_audit.fdb;server type=Embedded;user id=sysdba" provider="FirebirdSQL"/>
       </connectionStrings>
   </section>
   <section xsi:type="OrmConfigurationSection">
     <providers>
       <add type="SanteDB.OrmLite.Providers.Postgres.PostgreSQLProvider, SanteDB.OrmLite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" invariant="npgsql" />
-      <add type="SanteDB.OrmLite.Providers.Firebird.FirebirdSQLProvider, SanteDB.OrmLite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" invariant="fbsql" />
+      <add type="SanteDB.OrmLite.Providers.Firebird.FirebirdSQLProvider, SanteDB.OrmLite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" invariant="FirebirdSQL" />
     </providers>
     <dbProviderFactories>
       <add name="PostgreSQL Data Provider" invariant="Npgsql" description=".Net Framework Data Provider for PostgreSQL" type="Npgsql.NpgsqlFactory, Npgsql, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7"/>
-      <add name="Firebird Data Provider" invariant="Fbsql" description="Firebird" type="FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient, Culture=neutral, PublicKeyToken=3750abcc3150b00c" />
+      <add name="Firebird Data Provider" invariant="FirebirdSQL" description="Firebird" type="FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient, Culture=neutral, PublicKeyToken=3750abcc3150b00c" />
     </dbProviderFactories>
   </section>
   <section xsi:type="AdoAuditConfigurationSection"
-		   readWriteConnectionString="AUDIT_FBSQL"
-		   readOnlyConnectionString="AUDIT_FBSQL"
+		   readWriteConnectionString="AUDIT_FirebirdSQL"
+		   readOnlyConnectionString="AUDIT_FirebirdSQL"
 		   traceSql="false"
-		   providerType="fbsql" />
+		   providerType="FirebirdSQL" />
   
   <section xsi:type="santempi:AdoConfigurationSection"
-      readWriteConnectionString="FBSQL"
-	    readOnlyConnectionString="FBSQL"
+      readWriteConnectionString="FirebirdSQL"
+	    readOnlyConnectionString="FirebirdSQL"
 	    traceSql="false"
-	    providerType="fbsql"
+	    providerType="FirebirdSQL"
 	    perpareStatements="false"
     />
   <section xsi:type="AppletConfigurationSection" appletDirectory=".\applets" allowUnsignedApplets="true">
@@ -491,10 +491,10 @@
   </section>
   <!-- This section controls the persistence for ADO.NET -->
   <section xsi:type="AdoPersistenceConfigurationSection"
-           readWriteConnectionString="FBSQL"
-           readOnlyConnectionString="FBSQL"
+           readWriteConnectionString="FirebirdSQL"
+           readOnlyConnectionString="FirebirdSQL"
            traceSql="false"
-			     providerType="fbsql"
+			     providerType="FirebirdSQL"
            staOnly="false"
 		       fuzzyTotal="false"
            autoUpdateExisting="true"
@@ -529,16 +529,16 @@
   </section>
   <!-- Reporting configuration -->
   <section xsi:type="ReportingConfiguration"
-           readWriteConnectionString="FBSQL"
-           readOnlyConnectionString="FBSQL"
+           readWriteConnectionString="FirebirdSQL"
+           readOnlyConnectionString="FirebirdSQL"
            traceSql="false"
-           	providerType="fbsql" />
+           	providerType="FirebirdSQL" />
   <!-- Data Warehouse Configuration -->
   <section xsi:type="AdoWarehouseConfigurationSection"
-           readWriteConnectionString="FBSQL"
-           readOnlyConnectionString="FBSQL"
+           readWriteConnectionString="FirebirdSQL"
+           readOnlyConnectionString="FirebirdSQL"
            traceSql="false"
-           	providerType="fbsql"  />
+           	providerType="FirebirdSQL"  />
   <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="8">
     <serviceProviders>
 

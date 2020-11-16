@@ -85,7 +85,7 @@ namespace SanteDB.Core.Security
                     retVal = new X509SigningCredentials(cert, new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("name", configuration.KeyName ?? "0")), signingAlgorithm, digestAlgorithm);
                     break;
                 case SignatureAlgorithm.HS256:
-                    byte[] secret = configuration.Secret.ToArray();
+                    byte[] secret = configuration.GetSecret().ToArray();
                     while (secret.Length < 16)
                         secret = secret.Concat(secret).ToArray();
                     retVal = new SigningCredentials(
@@ -114,9 +114,9 @@ namespace SanteDB.Core.Security
                     configuration = new SecuritySignatureConfiguration()
                     {
                         Algorithm = SignatureAlgorithm.HS256,
-                        KeyName = keyId,
-                        Secret = keyData
+                        KeyName = keyId
                     };
+                    configuration.SetSecret(keyData);
                     break;
                 case "RS256":
                 case "RS512":

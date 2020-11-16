@@ -25,6 +25,7 @@ using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Query;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
@@ -126,8 +127,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             if (existingObject == null)
                 throw new KeyNotFoundException(data.Key.ToString());
-            else if ((existingObject as IDbReadonly)?.IsReadonly == true ||
-                (nonVersionedObect as IDbReadonly)?.IsReadonly == true)
+            else if (((existingObject as IDbReadonly)?.IsReadonly == true ||
+                (nonVersionedObect as IDbReadonly)?.IsReadonly == true) &&
+                !AuthenticationContext.SystemApplicationSid.Equals(context.ContextId.ToString(), StringComparison.OrdinalIgnoreCase))
                 throw new AdoFormalConstraintException(AdoFormalConstraintType.UpdatedReadonlyObject);
             else if (existingObject.ObsoletionTime.HasValue)
                 this.m_tracer.TraceWarning("Current object {0} had no active versions - Will un-delete it", data);
