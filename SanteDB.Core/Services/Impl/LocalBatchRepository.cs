@@ -108,18 +108,7 @@ namespace SanteDB.Core.Services.Impl
             // Demand permission
             this.DemandAlter(data);
 
-            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Bundle>>();
-            var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<Bundle>();
-
-            if (persistenceService == null)
-                throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<Bundle>)}");
-
-            data = this.Validate(data);
-
-            data = businessRulesService?.BeforeUpdate(data) ?? data;
-            data = persistenceService.Update(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-            businessRulesService?.AfterUpdate(data);
-            return data;
+            return base.Save(data);
         }
     }
 }
