@@ -4,7 +4,7 @@
 #define MyAppName "SanteDB Server"
 #define MyAppPublisher "SanteDB Community"
 #define MyAppURL "http://santesuite.org"
-#define MyAppVersion "2.0.47"
+#define MyAppVersion "2.0.49"
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -185,6 +185,7 @@ Source: ..\bin\Release\SanteDB.OrmLite.dll; DestDir: {app}; Components: server
 Source: ..\bin\Release\SanteDB.Persistence.Auditing.ADO.dll; DestDir: {app}; Components: server
 Source: ..\bin\Release\SanteDB.Persistence.Data.ADO.dll; DestDir: {app}; Components: server
 Source: ..\bin\Release\SanteDB.Persistence.Diagnostics.Email.dll; DestDir: {app}; Components: server
+Source: ..\bin\Release\RazorTemplates.Core.dll; DestDir: {app}; Components: server
 
 ; Common BRE
 Source: ..\bin\Release\Antlr3.Runtime.dll; DestDir: {app}; Components: core\bre core\protocol core

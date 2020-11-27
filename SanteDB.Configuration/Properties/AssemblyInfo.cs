@@ -1,5 +1,4 @@
 ﻿/*
- * Based on OpenIZ - Copyright 2015-2019 Mohawk College of Applied Arts and Technology
  * Portions Copyright 2019-2020, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you 
@@ -51,6 +50,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.28.*")]
-[assembly: AssemblyVersion("2.0.48.0")]
-[assembly: AssemblyInformationalVersion("Langley")]
-[assembly: AssemblyFileVersion("2.0.48.0")]
+[assembly: AssemblyVersion("2.0.51.0")]
+[assembly: AssemblyInformationalVersion("Montreal")]
+[assembly: AssemblyFileVersion("2.0.51.0")]

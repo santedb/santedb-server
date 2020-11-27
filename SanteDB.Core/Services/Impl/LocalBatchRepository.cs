@@ -1,5 +1,4 @@
 ﻿/*
- * Based on OpenIZ - Based on OpenIZ, Copyright (C) 2015 - 2019 Mohawk College of Applied Arts and Technology
  * Portions Copyright 2019-2020, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you 
@@ -105,21 +104,7 @@ namespace SanteDB.Core.Services.Impl
                     (irsi as ISecuredRepositoryService).DemandAlter(itm);
             }
 
-            // Demand permission
-            this.DemandAlter(data);
-
-            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Bundle>>();
-            var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<Bundle>();
-
-            if (persistenceService == null)
-                throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<Bundle>)}");
-
-            data = this.Validate(data);
-
-            data = businessRulesService?.BeforeUpdate(data) ?? data;
-            data = persistenceService.Update(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-            businessRulesService?.AfterUpdate(data);
-            return data;
+            return base.Save(data);
         }
     }
 }

@@ -42,6 +42,9 @@
     <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IdentityModel" />
+    <PackageReference Include="RazorTemplates">
+      <Version>1.2.1</Version>
+    </PackageReference>
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="4.0.4.403061554" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
@@ -84,6 +87,7 @@
     <Compile Include="Http\DefaultRestClient.cs" />
     <Compile Include="Http\ServiceClientDescription.cs" />
     <Compile Include="Model\ModelExtensions.cs" />
+    <Compile Include="Notification\Templating\RazorNotificationTemplateFiller.cs" />
     <Compile Include="Rest\Behavior\ErrorServiceBehavior.cs" />
     <Compile Include="Rest\RestErrorHandler.cs" />
     <Compile Include="Rest\RestServiceFactory.cs" />
@@ -198,12 +202,12 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.48.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.48.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.48.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.48.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.48.0" />
-        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.48.0" />
+        <PackageReference Include="RestSrvr" Version="2.0.51.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.51.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.51.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.51.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.51.0" />
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.51.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

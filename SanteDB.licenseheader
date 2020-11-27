@@ -1,7 +1,6 @@
 ﻿extensions: designer.cs generated.cs
 extensions: .cs .cpp .h .js
 /*
- * Based on OpenIZ - Based on OpenIZ, Copyright (C) 2015 - 2019 Mohawk College of Applied Arts and Technology
  * Portions Copyright 2019-%CurrentYear%, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you 
@@ -22,7 +21,6 @@ extensions: .cs .cpp .h .js
 extensions: .aspx .ascx
 extensions:  .xml .config .xsd .xslt
 <!--
- - Portions Copyright 2015-2019 Mohawk College of Applied Arts and Technology
  - Portions Copyright (C) 2019 - %CurrentYear%, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE.md)
  - 
  - 
