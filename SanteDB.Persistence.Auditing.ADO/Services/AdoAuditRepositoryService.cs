@@ -369,7 +369,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
                     // metadata
                     if(storageData.Metadata != null)
-                        foreach(var meta in storageData.Metadata.Where(o=>!String.IsNullOrEmpty(o.Value)))
+                        foreach(var meta in storageData.Metadata.Where(o=>!String.IsNullOrEmpty(o.Value) && o.Key != AuditMetadataKey.CorrelationToken))
                             context.Insert(new DbAuditMetadata()
                             {
                                 AuditId = dbAudit.Key,

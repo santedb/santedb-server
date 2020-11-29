@@ -93,6 +93,7 @@
   <!-- Security Role -->
   <class modelClass="SanteDB.Core.Model.Security.SecurityPolicy, SanteDB.Core.Model, Version=1.1.0.0"
 		domainClass="SanteDB.Persistence.Data.ADO.Data.Model.Security.DbSecurityPolicy, SanteDB.Persistence.Data.ADO, Version=0.5.0.0">
+    <property modelName="ModifiedOn" domainName="CreationTime" />
   </class>
 
   <!-- Concepts -->
