@@ -57,12 +57,12 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
         {
             if(property.Name == nameof(IBaseEntityData.CreationTime) && typeof(IVersionedEntity).IsAssignableFrom(tmodel)) // filter by first creation time
             {
+                // Get the version table (which has 
                 var ormMap = scopedTables.SelectMany(o => o.Columns);
                 var replacesVersion = ormMap.FirstOrDefault(o => o.SourceProperty.Name == nameof(IDbVersionedData.ReplacesVersionKey));
-                // Find the join Column
-                var joinCol = replacesVersion.Table.Columns.FirstOrDefault(o => o.ForeignKey?.Table == scopedTables.Last().OrmType);
+                var joinCol = replacesVersion.Table.Columns.FirstOrDefault(o => o.SourceProperty.Name == nameof(IDbVersionedData.Key));
 
-                whereClause.And($"EXISTS (SELECT crt{replacesVersion.Table.TableName}.{joinCol.Name} FROM {replacesVersion.Table.TableName} AS crt{replacesVersion.Table.TableName} WHERE crt{replacesVersion.Table.TableName}.{joinCol.Name} = {queryPrefix}{replacesVersion.Table.TableName}.{joinCol.Name} AND crt{replacesVersion.Table.TableName}.{replacesVersion.Name} IS NULL ");
+                whereClause.And($"EXISTS (SELECT 1 FROM {replacesVersion.Table.TableName} AS crt{replacesVersion.Table.TableName} WHERE crt{replacesVersion.Table.TableName}.{joinCol.Name} = {queryPrefix}{replacesVersion.Table.TableName}.{joinCol.Name} AND crt{replacesVersion.Table.TableName}.{replacesVersion.Name} IS NULL ");
                 whereClause.And(builder.CreateWhereCondition(tmodel, predicate.Path, values, "crt", scopedTables.ToList()));
                 whereClause.Append(")");
                 return true;

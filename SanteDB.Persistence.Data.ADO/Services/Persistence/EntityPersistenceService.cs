@@ -32,6 +32,7 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model;
+using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
 using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
 using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
 using SanteDB.Persistence.Data.ADO.Data.Model.Extensibility;
@@ -713,5 +714,67 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
         }
 
+        /// <summary>
+        /// Perform a purge of this data
+        /// </summary>
+        protected override void BulkPurgeInternal(DataContext context, Guid[] keysToPurge)
+        {
+            // Purge the related fields
+            var versionKeys = context.Query<DbEntityVersion>(o => keysToPurge.Contains(o.Key)).Select(o => o.VersionKey).ToArray();
+
+            // Delete versions of this entity in sub table
+            context.Delete<DbPatient>(o => versionKeys.Contains(o.ParentKey));
+            context.Delete<DbProvider>(o => versionKeys.Contains(o.ParentKey));
+            context.Delete<DbUserEntity>(o => versionKeys.Contains(o.ParentKey));
+            
+            // Person fields
+            context.Delete<DbPersonLanguageCommunication>(o => keysToPurge.Contains(o.SourceKey));
+            context.Delete<DbPerson>(o => versionKeys.Contains(o.ParentKey));
+
+            // Other entities
+            context.Delete<DbDeviceEntity>(o => versionKeys.Contains(o.ParentKey));
+            context.Delete<DbApplicationEntity>(o => versionKeys.Contains(o.ParentKey));
+            context.Delete<DbPlace>(o => versionKeys.Contains(o.ParentKey));
+
+            // Purge the related entity fields
+
+            // Names
+            var col = TableMapping.Get(typeof(DbEntityNameComponent)).Columns.First(o => o.IsPrimaryKey);
+            var deleteStatement = context.CreateSqlStatement<DbEntityNameComponent>()
+                .SelectFrom(col)
+                .InnerJoin<DbEntityNameComponent, DbEntityName>(o => o.Key, o => o.Key)
+                .Where<DbEntityName>(o => keysToPurge.Contains(o.SourceKey));
+            context.Delete<DbEntityNameComponent>(deleteStatement);
+            context.Delete<DbEntityName>(o => keysToPurge.Contains(o.SourceKey));
+            
+            // Addresses
+            col = TableMapping.Get(typeof(DbEntityAddressComponent)).Columns.First(o => o.IsPrimaryKey);
+            deleteStatement = context.CreateSqlStatement<DbEntityAddressComponent>()
+                .SelectFrom(col)
+                .InnerJoin<DbEntityAddressComponent, DbEntityAddress>(o => o.Key, o => o.Key)
+                .Where<DbEntityAddress>(o => keysToPurge.Contains(o.SourceKey));
+            context.Delete<DbEntityAddressComponent>(deleteStatement);
+            context.Delete<DbEntityAddress>(o => keysToPurge.Contains(o.SourceKey));
+
+            // Other Relationships
+            context.Delete<DbEntityRelationship>(o => keysToPurge.Contains(o.SourceKey));
+            context.Delete<DbEntityIdentifier>(o => keysToPurge.Contains(o.SourceKey));
+            context.Delete<DbEntityExtension>(o => keysToPurge.Contains(o.SourceKey));
+            context.Delete<DbEntityTag>(o => keysToPurge.Contains(o.SourceKey));
+            context.Delete<DbEntityNote>(o => keysToPurge.Contains(o.SourceKey));
+
+            // Purge the core entity data
+            context.Delete<DbEntityVersion>(o => keysToPurge.Contains(o.Key));
+
+            // Create a version which indicates this is PURGED
+            foreach(var itm in keysToPurge)
+                context.Insert<DbEntityVersion>(new DbEntityVersion()
+                {
+                    CreatedByKey = context.ContextId,
+                    CreationTime = DateTimeOffset.Now,
+                    Key = itm, 
+                    StatusConceptKey = StatusKeys.Purged
+                });
+        }
     }
 }

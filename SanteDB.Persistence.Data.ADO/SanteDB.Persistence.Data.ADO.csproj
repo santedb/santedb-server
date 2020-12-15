@@ -74,6 +74,7 @@
     <Compile Include="Data\Model\Acts\DbProcedure.cs" />
     <Compile Include="Data\Model\Acts\DbProtocol.cs" />
     <Compile Include="Data\Model\Acts\DbSubstanceAdministration.cs" />
+    <Compile Include="Data\Model\IDbHasStatus.cs" />
     <Compile Include="Data\Model\Mail\DbMailMessage.cs" />
     <Compile Include="Data\Model\Mail\DbMailMessageRcptTo.cs" />
     <Compile Include="Data\Model\Security\DbSecurityChallenge.cs" />
@@ -317,10 +318,10 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.56.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.56.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.0.56.0" />
-        <PackageReference Include="SanteDB.BI" Version="2.0.56.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.57.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.57.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="2.0.57.0" />
+        <PackageReference Include="SanteDB.BI" Version="2.0.57.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -385,6 +386,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Data\SQL\Updates\20201128-PSQL.sql" />
+    <EmbeddedResource Include="Data\SQL\Updates\20201214-FBSQL.sql" />
+    <EmbeddedResource Include="Data\SQL\Updates\20201214-PSQL.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -18,6 +18,7 @@
  */
 using SanteDB.Core;
 using SanteDB.Core.Interfaces;
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
@@ -172,6 +173,30 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             return base.UpdateInternal(context, data);
         }
 
+        /// <summary>
+        /// Purge the context information
+        /// </summary>
+        protected override void BulkPurgeInternal(DataContext context, Guid[] keysToPurge)
+        {
+            context.Delete<DbConceptName>(o => keysToPurge.Contains(o.SourceKey));
+            context.Delete<DbConceptReferenceTerm>(o => keysToPurge.Contains(o.SourceKey));
+            context.Delete<DbConceptRelationship>(o => keysToPurge.Contains(o.SourceKey));
+            context.Delete<DbConceptSetConceptAssociation>(o => keysToPurge.Contains(o.ConceptKey));
+
+            // Now delete the versions but keep the mnemonic
+            foreach (var itm in keysToPurge) {
+                var cver = context.SingleOrDefault<DbConceptVersion>(o => o.Key == itm && o.ObsoletionTime == null);
+                context.Delete<DbConceptVersion>(o => o.Key == itm);
+                context.Insert(new DbConceptVersion()
+                {
+                    ClassKey = cver.ClassKey,
+                    CreatedByKey = context.ContextId,
+                    Mnemonic = cver.Mnemonic,
+                    StatusConceptKey = StatusKeys.Purged,
+                    CreationTime = DateTimeOffset.Now
+                }); // Ensure there is a current version that has been PURGED
+            }
+        }
     }
 
     /// <summary>

@@ -77,8 +77,6 @@
     <Compile Include="Configuration\SecurityPolicyConfiguration.cs" />
     <Compile Include="Configuration\Features\WindowsServiceFeature.cs" />
     <Compile Include="Diagnostics\ConsoleTraceWriter.cs" />
-    <Compile Include="Diagnostics\Performance\MachinePerformanceProbe.cs" />
-    <Compile Include="Diagnostics\Performance\WindowsPerformanceCounterProbe.cs" />
     <Compile Include="Diagnostics\RolloverTextWriterTraceWriter.cs" />
     <Compile Include="Diagnostics\SystemDiagnosticsTraceWriter.cs" />
     <Compile Include="ExtensionMethods.cs" />
@@ -110,7 +108,6 @@
     <Compile Include="Security\DefaultPolicyDecisionService.cs" />
     <Compile Include="Security\PasswordHashingServices.cs" />
     <Compile Include="Security\Privacy\ExemptablePolicyFilterService.cs" />
-    <Compile Include="Security\Tfa\TfaEmailMechanism.cs" />
     <Compile Include="Security\TwoFactorSecretGenerators.cs" />
     <Compile Include="Security\SecurityUtils.cs" />
     <Compile Include="Services\Daemons\AppletBusinessRulesDaemon.cs" />
@@ -202,12 +199,12 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.56.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.56.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.56.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.56.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.56.0" />
-        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.56.0" />
+        <PackageReference Include="RestSrvr" Version="2.0.57.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.57.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.57.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.57.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.57.0" />
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.57.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

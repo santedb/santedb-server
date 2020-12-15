@@ -104,11 +104,8 @@
   <class modelClass="SanteDB.Core.Model.DataTypes.Concept, SanteDB.Core.Model, Version=1.1.0.0"
          domainClass="SanteDB.Persistence.Data.ADO.Data.Model.Concepts.DbConceptVersion, SanteDB.Persistence.Data.ADO, Version=0.5.0.0">
     <property modelName="PreviousVersionKey" domainName="ReplacesVersionKey"/>
-    <property modelName="StatusConceptKey" domainName="StatusKey"/>
     <property modelName="VersionSequence" domainName="VersionSequenceId"/>
     <property modelName="ModifiedOn" domainName="CreationTime"/>
-
-
   </class>
 
   <class modelClass="SanteDB.Core.Model.DataTypes.ConceptClass, SanteDB.Core.Model, Version=1.1.0.0"

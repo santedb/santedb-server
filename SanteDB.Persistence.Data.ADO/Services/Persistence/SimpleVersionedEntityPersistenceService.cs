@@ -44,6 +44,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         where TQueryReturn : CompositeResult
     {
 
+        
         /// <summary>
         /// Append order by query
         /// </summary>

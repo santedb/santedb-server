@@ -437,7 +437,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Convert object to string
         /// </summary>
-        private String ObjectToString(TData data)
+        protected String ObjectToString(TData data)
         {
             if (data == null) return "null";
             IEnumerable<Type> extraTypes = new Type[] { typeof(TData) };

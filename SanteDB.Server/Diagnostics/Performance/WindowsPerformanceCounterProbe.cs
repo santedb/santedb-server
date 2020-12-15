@@ -16,6 +16,8 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-12-24
  */
+using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,7 +25,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.Core.Diagnostics.Performance
+namespace SanteDB.Server.Diagnostics.Performance
 {
     /// <summary>
     /// Allows the measuring of processor time

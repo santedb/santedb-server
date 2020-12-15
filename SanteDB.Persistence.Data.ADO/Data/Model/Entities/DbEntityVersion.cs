@@ -26,7 +26,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
     /// Represents an entity in the database
     /// </summary>
     [Table("ent_vrsn_tbl")]
-	public class DbEntityVersion : DbVersionedData
+	public class DbEntityVersion : DbVersionedData, IDbHasStatus
     {
         /// <summary>
         /// Gets or sets the key

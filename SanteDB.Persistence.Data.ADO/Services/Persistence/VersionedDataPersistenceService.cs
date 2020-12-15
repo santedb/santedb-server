@@ -21,6 +21,7 @@ using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Query;
@@ -566,8 +567,81 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 #endif
                 }
 
+        }
 
+        /// <summary>
+        /// Query keys for versioned objects 
+        /// </summary>
+        /// <remarks>This redirects the query from the primary key (on TDomain) into the primary key on the base object</remarks>
+        protected override IEnumerable<Guid> QueryKeysInternal(DataContext context, Expression<Func<TModel, bool>> query, int offset, int? count, out int totalResults)
+        {
+            if (!query.ToString().Contains("ObsoletionTime") && !query.ToString().Contains("VersionKey"))
+            {
+                var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
+                query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
+            }
 
+            // Construct the SQL query
+            var pk = TableMapping.Get(typeof(TDomainKey)).Columns.SingleOrDefault(o => o.IsPrimaryKey);
+            var domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, pk);
+
+            var results = context.Query<Guid>(domainQuery);
+
+            count = count ?? 100;
+            if (m_configuration.UseFuzzyTotals)
+            {
+                // Skip and take
+                results = results.Skip(offset).Take(count.Value + 1);
+                totalResults = offset + results.Count();
+            }
+            else
+            {
+                totalResults = results.Count();
+                results = results.Skip(offset).Take(count.Value);
+            }
+
+            return results.ToList(); // exhaust the results and continue
+        }
+
+        /// <summary>
+        /// Obsolete the specified keys
+        /// </summary>
+        protected sealed override void BulkObsoleteInternal(DataContext context, Guid[] keysToObsolete)
+        {
+            foreach (var k in keysToObsolete)
+            {
+                
+                // Get the current version
+                var currentVersion = context.SingleOrDefault<TDomain>(o => o.ObsoletionTime == null && o.Key == k);
+                // Create a new version
+                var newVersion = new TDomain();
+                newVersion.CopyObjectData(currentVersion);
+
+                // Create a new version which has a status of obsolete
+                if (newVersion is IDbHasStatus status)
+                {
+                    status.StatusConceptKey = StatusKeys.Obsolete;
+                    // Update the old version
+                    currentVersion.ObsoletedByKey = context.ContextId;
+                    currentVersion.ObsoletionTime = DateTimeOffset.Now;
+                    context.Update(currentVersion);
+                    // Provenance data
+                    newVersion.VersionSequenceId = null;
+                    newVersion.ReplacesVersionKey = currentVersion.VersionKey;
+                    newVersion.CreatedByKey = context.ContextId;
+                    newVersion.CreationTime = DateTimeOffset.Now;
+                    newVersion.VersionKey = Guid.Empty;
+                    context.Insert(newVersion);
+
+                }
+                else // Just remove the version
+                {
+                    // Update the old version
+                    currentVersion.ObsoletedByKey = context.ContextId;
+                    currentVersion.ObsoletionTime = DateTimeOffset.Now;
+                    context.Update(currentVersion);
+                }
+            }
         }
     }
 }
