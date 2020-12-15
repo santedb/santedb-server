@@ -19,13 +19,19 @@
 using SanteDB.Core;
 using SanteDB.Core.Event;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data.Model;
+using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
+using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
 using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
+using SanteDB.Persistence.Data.ADO.Data.Model.Extensibility;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
@@ -115,7 +121,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override TModel Get(Guid containerId, Guid? versionId, bool loadFast, IPrincipal principal = null)
         {
             var tr = 0;
-            
+
             // Fire retrieving 
             var preArgs = new DataRetrievingEventArgs<TModel>(containerId, versionId, principal);
             this.FireRetrieving(preArgs);
@@ -153,9 +159,95 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             if (typeof(TModel).BaseType == typeof(Core.Model.Entities.Entity))
                 this.m_entityPersister.ObsoleteInternal(context, data);
-            return base.InsertInternal(context, data);
+            return base.InsertInternal(context, data); // create a link to this version of the entity
         }
 
-     
+        /// <summary>
+        /// Bulk obsolete
+        /// </summary>
+        protected override void BulkObsoleteInternal(DataContext context, Guid[] keysToObsolete)
+        {
+            foreach (var k in keysToObsolete)
+            {
+                // Get the current version
+                var currentVersion = context.SingleOrDefault<DbEntityVersion>(o => o.ObsoletionTime == null && o.Key == k);
+                // Create a new version
+                var newVersion = new DbEntityVersion();
+                newVersion.CopyObjectData(currentVersion);
+
+                // Create a new version which has a status of obsolete
+                newVersion.StatusConceptKey = StatusKeys.Obsolete;
+                // Update the old version
+                currentVersion.ObsoletedByKey = context.ContextId;
+                currentVersion.ObsoletionTime = DateTimeOffset.Now;
+                context.Update(currentVersion);
+                // Provenance data
+                newVersion.VersionSequenceId = null;
+                newVersion.ReplacesVersionKey = currentVersion.VersionKey;
+                newVersion.CreatedByKey = context.ContextId;
+                newVersion.CreationTime = DateTimeOffset.Now;
+                newVersion.VersionKey = Guid.Empty;
+                newVersion = context.Insert(newVersion);
+
+                // Finally, insert a new version of sub data
+                var cversion = context.SingleOrDefault<TData>(o => o.ParentKey == currentVersion.VersionKey);
+                var newSubVersion = new TData();
+                newSubVersion.CopyObjectData(cversion);
+                newSubVersion.ParentKey = newVersion.VersionKey;
+                context.Insert(newSubVersion);
+
+            }
+        }
+
+        /// <summary>
+        /// Query for all keys
+        /// </summary>
+        protected override IEnumerable<Guid> QueryKeysInternal(DataContext context, Expression<Func<TModel, bool>> query, int offset, int? count, out int totalResults)
+        {
+            if (!query.ToString().Contains("ObsoletionTime") && !query.ToString().Contains("VersionKey"))
+            {
+                var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
+                query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
+            }
+
+            // Construct the SQL query
+            var pk = TableMapping.Get(typeof(DbEntity)).Columns.SingleOrDefault(o => o.IsPrimaryKey);
+            var domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, pk);
+
+            var results = context.Query<Guid>(domainQuery);
+
+            count = count ?? 100;
+            if (m_configuration.UseFuzzyTotals)
+            {
+                // Skip and take
+                results = results.Skip(offset).Take(count.Value + 1);
+                totalResults = offset + results.Count();
+            }
+            else
+            {
+                totalResults = results.Count();
+                results = results.Skip(offset).Take(count.Value);
+            }
+
+            return results.ToList(); // exhaust the results and continue
+        }
+
+        /// <summary>
+        /// Purge the specified records (redirects to the entity persister)
+        /// </summary>
+        public override void Purge(TransactionMode transactionMode, params Guid[] keysToPurge)
+        {
+            this.m_entityPersister.Purge(transactionMode, keysToPurge);
+        }
+
+        /// <summary>
+        /// Bulk purge
+        /// </summary>
+        protected override void BulkPurgeInternal(DataContext connection, Guid[] keysToPurge)
+        {
+            throw new NotSupportedException();
+        }
+
+
     }
 }

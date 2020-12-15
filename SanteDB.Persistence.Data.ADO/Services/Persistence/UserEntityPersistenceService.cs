@@ -69,7 +69,17 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             if(data.SecurityUser != null) data.SecurityUser = data.SecurityUser?.EnsureExists(context) as SecurityUser;
             data.SecurityUserKey = data.SecurityUser?.Key ?? data.SecurityUserKey;
-            var inserted = this.m_personPersister.InsertInternal(context, data);
+
+            if (data.Key.HasValue)
+            {
+                var isUpdate = this.m_personPersister.Get(context, data.Key.Value) != null;
+                if (isUpdate)
+                    this.m_personPersister.UpdateInternal(context, data);
+                else
+                    this.m_personPersister.InsertInternal(context, data);
+            }
+            else
+                this.m_personPersister.Insert(context, data);
 
             return base.InsertInternal(context, data);
         }

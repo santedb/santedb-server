@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Security;
@@ -26,9 +27,11 @@ using SanteDB.Persistence.Data.ADO.Data.Model;
 using SanteDB.Persistence.Data.ADO.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
-
+using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -43,7 +46,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// <summary>
     /// Base data persistence service
     /// </summary>
-    public abstract class BaseDataPersistenceService<TModel, TDomain, TQueryResult> : IdentifiedPersistenceService<TModel, TDomain, TQueryResult>
+    public abstract class BaseDataPersistenceService<TModel, TDomain, TQueryResult> : IdentifiedPersistenceService<TModel, TDomain, TQueryResult>, IBulkDataPersistenceService
         where TModel : BaseEntityData, new()
         where TDomain : class, IDbBaseData, new()
     {
@@ -114,7 +117,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             //if (currentObject.CreationTime == domainObject.CreationTime) // HACK: Someone keeps passing up the same data so we have to correct here
             //    domainObject.CreationTime = DateTimeOffset.Now;
 
-            if(currentObject.ObsoletedByKey.HasValue && !domainObject.ObsoletedByKey.HasValue) // We are un-deleting
+            if (currentObject.ObsoletedByKey.HasValue && !domainObject.ObsoletedByKey.HasValue) // We are un-deleting
             {
                 currentObject.ObsoletedByKey = null;
                 currentObject.ObsoletionTime = null;
@@ -161,6 +164,21 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             context.Update(currentObject);
             return data;
         }
+
+        /// <summary>
+        /// Perform the bulk obsoletion operation
+        /// </summary>
+        protected override void BulkObsoleteInternal(DataContext context, Guid[] keysToObsolete)
+        {
+            // By default we're just going to set obsoletion time
+            foreach (var itm in context.Query<TDomain>(o => keysToObsolete.Contains(o.Key)))
+            {
+                itm.ObsoletionTime = DateTimeOffset.Now;
+                itm.ObsoletedByKey = context.ContextId;
+                context.Update(itm);
+            }
+        }
+
 
 
     }

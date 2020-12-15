@@ -25,7 +25,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Concepts
     /// Physical data layer implemntation of concept
     /// </summary>
     [Table("cd_vrsn_tbl")]
-	public class DbConceptVersion : DbVersionedData
+	public class DbConceptVersion : DbVersionedData, IDbHasStatus
 	{
 
 		/// <summary>
@@ -42,7 +42,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Concepts
 		/// Gets or sets the status concept id
 		/// </summary>
 		[Column("sts_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-		public Guid StatusKey {
+		public Guid StatusConceptKey {
 			get;
 			set;
 		}

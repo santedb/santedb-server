@@ -482,5 +482,54 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             }
         }
+
+        /// <summary>
+        /// Perform a purge of this data
+        /// </summary>
+        protected override void BulkPurgeInternal(DataContext context, Guid[] keysToPurge)
+        {
+            // Purge the related fields
+            var versionKeys = context.Query<DbActVersion>(o => keysToPurge.Contains(o.Key)).Select(o => o.VersionKey).ToArray();
+
+            // Delete versions of this act in sub tables
+            context.Delete<DbTextObservation>(o => versionKeys.Contains(o.ParentKey));
+            context.Delete<DbQuantityObservation>(o => versionKeys.Contains(o.ParentKey));
+            context.Delete<DbCodedObservation>(o => versionKeys.Contains(o.ParentKey));
+            context.Delete<DbObservation>(o => versionKeys.Contains(o.ParentKey));
+            context.Delete<DbProcedure>(o => versionKeys.Contains(o.ParentKey));
+            context.Delete<DbSubstanceAdministration>(o => versionKeys.Contains(o.ParentKey));
+            context.Delete<DbControlAct>(o => versionKeys.Contains(o.ParentKey));
+            context.Delete<DbPatientEncounter>(o => versionKeys.Contains(o.ParentKey));
+            
+            // TODO: Other acts
+            
+
+            // Purge the related fields
+            context.Delete<DbActIdentifier>(o => keysToPurge.Contains(o.SourceKey));
+            context.Delete<DbActExtension>(o => keysToPurge.Contains(o.SourceKey));
+            context.Delete<DbActTag>(o => keysToPurge.Contains(o.SourceKey));
+            context.Delete<DbActNote>(o => keysToPurge.Contains(o.SourceKey));
+            context.Delete<DbActProtocol>(o => keysToPurge.Contains(o.SourceKey));
+            
+            // Note: Security tags are not deleted as they still apply even when this record is purged
+
+            // TODO: Do we orphan sub-objects (delete the link) or do we clean those up to?
+            context.Delete<DbActAssociation>(o => keysToPurge.Contains(o.SourceKey));
+            context.Delete<DbActParticipation>(o => keysToPurge.Contains(o.SourceKey));
+
+            // Purge the core entity data
+            context.Delete<DbActVersion>(o => keysToPurge.Contains(o.Key));
+
+            // Create a version which indicates this is PURGED
+            foreach (var itm in keysToPurge)
+                context.Insert<DbActVersion>(new DbActVersion()
+                {
+                    CreatedByKey = context.ContextId,
+                    CreationTime = DateTimeOffset.Now,
+                    Key = itm,
+                    StatusConceptKey = StatusKeys.Purged,
+                    
+                });
+        }
     }
 }

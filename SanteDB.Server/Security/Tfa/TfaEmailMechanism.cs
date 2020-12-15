@@ -30,8 +30,10 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Security.Claims;
 using System.Security;
 using SanteDB.Core.Security.Services;
+using SanteDB.Core;
+using SanteDB.Core.Security;
 
-namespace SanteDB.Core.Security.Tfa.Email
+namespace SanteDB.Server.Security.Tfa.Email
 {
     /// <summary>
     /// Represents a TFA mechanism which can send/receive TFA requests via e-mail

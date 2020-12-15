@@ -26,7 +26,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Acts
     /// Represents a table which can store act data
     /// </summary>
     [Table("act_vrsn_tbl")]
-    public class DbActVersion : DbVersionedData
+    public class DbActVersion : DbVersionedData, IDbHasStatus
     {
         /// <summary>
         /// True if negated

@@ -32,13 +32,16 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Diagnostics.Tracing;
 using System.Threading;
+using SanteDB.Core.Exceptions;
+using System.Data.Common;
+using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
     /// <summary>
     /// Core persistence service which contains helpful functions
     /// </summary>
-    public abstract class CorePersistenceService<TModel, TDomain, TQueryReturn> : AdoBasePersistenceService<TModel>
+    public abstract class CorePersistenceService<TModel, TDomain, TQueryReturn> : AdoBasePersistenceService<TModel>, IBulkDataPersistenceService
         where TModel : IdentifiedData, new()
         where TDomain : class, new()
     {
@@ -452,6 +455,107 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
         }
 
+        /// <summary>
+        /// Obsolete the object
+        /// </summary>
+        public virtual void Obsolete(TransactionMode transactionMode, IPrincipal principal, params Guid[] keysToObsolete)
+        {
+            // Obsolete object
+            using (var connection = m_configuration.Provider.GetWriteConnection())
+            {
+                connection.Open();
+                using (var tx = connection.BeginTransaction())
+                    try
+                    {
+                        var provenanceId = connection.EstablishProvenance(principal, null);
+
+                        this.BulkObsoleteInternal(connection, keysToObsolete);
+
+                        if (transactionMode == TransactionMode.Commit)
+                            tx.Commit();
+                    }
+                    catch (DbException e)
+                    {
+                        tx?.Rollback();
+                        throw new DataPersistenceException($"Error bulk obsoleting data", this.TranslateDbException(e));
+                    }
+                    catch (Exception e)
+                    {
+                        tx?.Rollback();
+                        throw new DataPersistenceException($"Error bulk obsoleting data", e);
+                    }
+            }
+        }
+
+        /// <summary>
+        /// Perform the bulk obsoletion operation
+        /// </summary>
+        protected abstract void BulkObsoleteInternal(DataContext context, Guid[] keysToObsolete);
+
+        /// <summary>
+        /// Purge the specified keys
+        /// </summary>
+        public virtual void Purge(TransactionMode transactionMode, params Guid[] keysToPurge)
+        {
+            // Purge object
+            using (var connection = m_configuration.Provider.GetWriteConnection())
+            {
+                connection.Open();
+                using (var tx = connection.BeginTransaction())
+                    try
+                    {
+                        this.BulkPurgeInternal(connection, keysToPurge);
+                        if (transactionMode == TransactionMode.Commit)
+                            tx.Commit();
+                    }
+                    catch (DbException e)
+                    {
+                        tx?.Rollback();
+                        throw new DataPersistenceException($"Error bulk obsoleting data", this.TranslateDbException(e));
+                    }
+                    catch (Exception e)
+                    {
+                        tx?.Rollback();
+                        throw new DataPersistenceException($"Error bulk obsoleting data", e);
+                    }
+            }
+        }
+
+        /// <summary>
+        /// Purge the specified object 
+        /// </summary>
+        protected abstract void BulkPurgeInternal(DataContext connection, Guid[] keysToPurge);
+
+        /// <summary>
+        /// Query the specified keys only
+        /// </summary>
+        public virtual IEnumerable<Guid> QueryKeys(Expression query, int offset, int? count, out int totalResults)
+        {
+            if (query is Expression<Func<TModel, bool>> castQuery)
+                using (var connection = m_configuration.Provider.GetWriteConnection())
+                {
+                    connection.Open();
+                    try
+                    {
+                        return this.QueryKeysInternal(connection, castQuery, offset, count, out totalResults);
+                    }
+                    catch (DbException e)
+                    {
+                        throw new DataPersistenceException($"Error bulk query data", this.TranslateDbException(e));
+                    }
+                    catch (Exception e)
+                    {
+                        throw new DataPersistenceException($"Error bulk query data", e);
+                    }
+                }
+            else
+                throw new ArgumentException($"Expression must be of type Expression<Func<{typeof(TModel).Name},bool>>", nameof(query));
+        }
+
+        /// <summary>
+        /// Perform the query for bulk keys with an open context
+        /// </summary>
+        protected abstract IEnumerable<Guid> QueryKeysInternal(DataContext context, Expression<Func<TModel, bool>> query, int offset, int? count, out int totalResults);
 
     }
 }
