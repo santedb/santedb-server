@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SanteDB.Persistence.Data.ADO</RootNamespace>
     <AssemblyName>SanteDB.Persistence.Data.ADO</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdoDataConstants.cs" />
+    <Compile Include="Configuration\AdoArchiveConfigurationSection.cs" />
     <Compile Include="Configuration\AdoPersistenceConfigurationSection.cs" />
     <Compile Include="Configuration\EntityValidationFlags.cs" />
     <Compile Include="Data\Extensions\DataModelExtensions.cs" />
@@ -89,6 +90,7 @@
       <DependentUpon>Locale.resx</DependentUpon>
     </Compile>
     <Compile Include="Security\AdoSecuritySession.cs" />
+    <Compile Include="Services\AdoArchiveService.cs" />
     <Compile Include="Services\AdoBasePersistenceService.cs" />
     <Compile Include="Data\Model\Concepts\DbCodeSystem.cs" />
     <Compile Include="Data\Model\Concepts\DbConceptReferenceTerm.cs" />
@@ -154,6 +156,8 @@
     <Compile Include="Services\AdoSecurityChallengeProvider.cs" />
     <Compile Include="Services\AdoSessionProvider.cs" />
     <Compile Include="Services\AdoSubscriptionExecutor.cs" />
+    <Compile Include="Services\IAdoCopyProvider.cs" />
+    <Compile Include="Services\IAdoPersistenceSettingsProvider.cs" />
     <Compile Include="Services\Persistence\EntityIdentifierPersistenceService.cs" />
     <Compile Include="Services\IAdoPersistenceService.cs" />
     <Compile Include="Services\Persistence\ActDerivedPersistenceService.cs" />

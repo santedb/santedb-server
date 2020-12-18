@@ -31,8 +31,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class ProviderPersistenceService : EntityDerivedPersistenceService<Core.Model.Roles.Provider, DbProvider>
     {
+
+        public ProviderPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+            this.m_personPersister = new PersonPersistenceService(settingsProvider);
+        }
+
         // Entity persisters
-        private PersonPersistenceService m_personPersister = new PersonPersistenceService();
+        private PersonPersistenceService m_personPersister;
 
         /// <summary>
         /// Model instance

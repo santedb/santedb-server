@@ -26,6 +26,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class ControlActPersistenceService : ActDerivedPersistenceService<Core.Model.Acts.ControlAct, DbControlAct, CompositeResult<DbControlAct, DbActVersion, DbAct>>
     {
+
+        public ControlActPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Convert to model instance
         /// </summary>

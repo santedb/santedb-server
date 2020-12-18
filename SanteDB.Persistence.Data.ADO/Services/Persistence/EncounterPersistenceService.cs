@@ -30,6 +30,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class EncounterPersistenceService : ActDerivedPersistenceService<Core.Model.Acts.PatientEncounter, DbPatientEncounter>
     {
 
+        public EncounterPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Convert database instance to patient encounter
         /// </summary>

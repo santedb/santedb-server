@@ -53,6 +53,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         where TDomainKey : IDbIdentified, new()
     {
 
+        public VersionedDataPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Return true if the specified object exists
         /// </summary>
@@ -67,7 +71,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override TModel InsertInternal(DataContext context, TModel data)
         {
             // first we map the TDataKey entity
-            var nonVersionedPortion = m_mapper.MapModelInstance<TModel, TDomainKey>(data);
+            var nonVersionedPortion = this.m_settingsProvider.GetMapper().MapModelInstance<TModel, TDomainKey>(data);
 
             // Domain object
             var domainObject = this.FromModelInstance(data, context) as TDomain;
@@ -231,13 +235,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         return this.GetStoredQueryResults(queryId, offset, count, out totalResults);
 
                     SqlStatement domainQuery = null;
-                    var expr = m_mapper.MapModelExpression<TModel, TDomain, bool>(query, false);
+                    var expr = this.m_settingsProvider.GetMapper().MapModelExpression<TModel, TDomain, bool>(query, false);
                     if (expr != null)
                         domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(typeof(TDomain), typeof(TDomainKey))
                             .InnerJoin<TDomain, TDomainKey>(o => o.Key, o => o.Key)
                             .Where<TDomain>(expr).Build();
                     else
-                        domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query).Build();
+                        domainQuery = this.m_settingsProvider.GetQueryBuilder().CreateQuery(query).Build();
 
                     // Create or extend queries
                     if (retVal == null)
@@ -272,7 +276,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         totalResults = keys.Count();
                         this.m_queryPersistence?.RegisterQuerySet(queryId, keys, queries, totalResults);
                     }
-                    else if (count.HasValue && countResults && !m_configuration.UseFuzzyTotals)
+                    else if (count.HasValue && countResults && !this.m_settingsProvider.GetConfiguration().UseFuzzyTotals)
                         totalResults = retVal.Count();
                     else
                         totalResults = 0;
@@ -280,7 +284,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     // Fuzzy totals - This will only fetch COUNT + 1 as the total results
                     if (count.HasValue)
                     {
-                        if ((overrideFuzzyTotalSetting || m_configuration.UseFuzzyTotals) && totalResults == 0)
+                        if ((overrideFuzzyTotalSetting || this.m_settingsProvider.GetConfiguration().UseFuzzyTotals) && totalResults == 0)
                         {
                             var fuzzResults = retVal.Skip(offset).Take(count.Value + 1).OfType<Object>().ToList();
                             totalResults = fuzzResults.Count();
@@ -373,7 +377,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
 
             // Query object
-            using (var connection = m_configuration.Provider.GetReadonlyConnection())
+            using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetReadonlyConnection())
                 try
                 {
                     connection.Open();
@@ -531,7 +535,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
 
             // Query object
-            using (var connection = m_configuration.Provider.GetWriteConnection())
+            using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetWriteConnection())
                 try
                 {
                     connection.Open();
@@ -583,12 +587,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             // Construct the SQL query
             var pk = TableMapping.Get(typeof(TDomainKey)).Columns.SingleOrDefault(o => o.IsPrimaryKey);
-            var domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, pk);
+            var domainQuery = this.m_settingsProvider.GetQueryBuilder().CreateQuery(query, pk);
 
             var results = context.Query<Guid>(domainQuery);
 
             count = count ?? 100;
-            if (m_configuration.UseFuzzyTotals)
+            if (this.m_settingsProvider.GetConfiguration().UseFuzzyTotals)
             {
                 // Skip and take
                 results = results.Skip(offset).Take(count.Value + 1);

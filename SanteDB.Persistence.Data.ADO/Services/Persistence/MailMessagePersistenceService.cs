@@ -30,6 +30,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class MailMessagePersistenceService : BaseDataPersistenceService<MailMessage, DbMailMessage>
 	{
+
+        public MailMessagePersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
 		/// <summary>
 		/// Converts a <see cref="MailMessage"/> instance to an <see cref="DbMailMessage"/> instance.
 		/// </summary>

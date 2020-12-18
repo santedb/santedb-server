@@ -40,7 +40,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class EntityDerivedPersistenceService<TModel, TData> : EntityDerivedPersistenceService<TModel, TData, CompositeResult<TData, DbEntityVersion, DbEntity>>
     where TModel : Core.Model.Entities.Entity, new()
     where TData : DbEntitySubTable, new()
-    { }
+    {
+
+        public EntityDerivedPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+    }
 
     /// <summary>
     /// Entity derived persistence services
@@ -51,8 +56,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         where TQueryReturn : CompositeResult
     {
 
+        public EntityDerivedPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+            this.m_entityPersister = new EntityPersistenceService(settingsProvider);
+        }
+
         // Entity persister
-        protected EntityPersistenceService m_entityPersister = new EntityPersistenceService();
+        protected EntityPersistenceService m_entityPersister;
 
         /// <summary>
         /// If the linked act exists
@@ -212,12 +222,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             // Construct the SQL query
             var pk = TableMapping.Get(typeof(DbEntity)).Columns.SingleOrDefault(o => o.IsPrimaryKey);
-            var domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, pk);
+            var domainQuery = this.m_settingsProvider.GetQueryBuilder().CreateQuery(query, pk);
 
             var results = context.Query<Guid>(domainQuery);
 
             count = count ?? 100;
-            if (m_configuration.UseFuzzyTotals)
+            if (this.m_settingsProvider.GetConfiguration().UseFuzzyTotals)
             {
                 // Skip and take
                 results = results.Skip(offset).Take(count.Value + 1);
@@ -235,9 +245,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Purge the specified records (redirects to the entity persister)
         /// </summary>
-        public override void Purge(TransactionMode transactionMode, params Guid[] keysToPurge)
+        public override void Purge(TransactionMode transactionMode, IPrincipal principal, params Guid[] keysToPurge)
         {
-            this.m_entityPersister.Purge(transactionMode, keysToPurge);
+            this.m_entityPersister.Purge(transactionMode, principal, keysToPurge);
         }
 
         /// <summary>
@@ -248,6 +258,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Copy specified keys
+        /// </summary>
+        public override void Copy(Guid[] keysToCopy, DataContext fromContext, DataContext toContext)
+        {
+            this.m_entityPersister.Copy(keysToCopy, fromContext, toContext);
+        }
 
     }
 }

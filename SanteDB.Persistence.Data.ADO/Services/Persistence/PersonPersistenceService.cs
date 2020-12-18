@@ -34,6 +34,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// table</remarks>
     public class PersonPersistenceService : EntityDerivedPersistenceService<Core.Model.Entities.Person, DbPerson, CompositeResult<DbPerson, DbEntityVersion, DbEntity>>
     {
+        public PersonPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         // Map
         public static readonly Dictionary<DatePrecision, String> PrecisionMap = new Dictionary<DatePrecision, String>()
         {

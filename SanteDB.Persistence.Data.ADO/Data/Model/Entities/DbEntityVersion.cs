@@ -65,6 +65,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
         /// </summary>
         [Column("crt_act_id")]
         public Guid? CreationActKey { get; set; }
+
     }
 }
 

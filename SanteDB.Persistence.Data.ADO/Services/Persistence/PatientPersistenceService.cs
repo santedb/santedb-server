@@ -33,7 +33,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class PatientPersistenceService : EntityDerivedPersistenceService<Patient, DbPatient, CompositeResult<DbPatient, DbPerson, DbEntityVersion, DbEntity>>
     {
 
-        private PersonPersistenceService m_personPersister = new PersonPersistenceService();
+        public PatientPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+            this.m_personPersister = new PersonPersistenceService(settingsProvider);
+        }
+
+        private PersonPersistenceService m_personPersister;
 
         /// <summary>
         /// From model instance

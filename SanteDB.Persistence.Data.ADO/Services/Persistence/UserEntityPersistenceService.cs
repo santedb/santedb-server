@@ -32,8 +32,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class UserEntityPersistenceService : EntityDerivedPersistenceService<Core.Model.Entities.UserEntity, DbUserEntity, CompositeResult<DbUserEntity, DbPerson, DbEntityVersion, DbEntity>>
     {
 
+        public UserEntityPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+            this.m_personPersister = new PersonPersistenceService(settingsProvider);
+        }
+
         // Entity persisters
-        private PersonPersistenceService m_personPersister = new PersonPersistenceService();
+        private PersonPersistenceService m_personPersister;
       
         /// <summary>
         /// To model instance

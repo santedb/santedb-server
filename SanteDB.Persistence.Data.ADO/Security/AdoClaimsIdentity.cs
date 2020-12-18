@@ -32,6 +32,7 @@ using SanteDB.Persistence.Data.ADO.Configuration;
 using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
 using SanteDB.Persistence.Data.ADO.Data.Model.Error;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
+using SanteDB.Persistence.Data.ADO.Services;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -305,7 +306,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
 		/// <param name="context">The context.</param>
 		private static void UpdateCache(DbSecurityUser user, DataContext context)
 	    {
-		    var securityUser = new SanteDB.Persistence.Data.ADO.Services.Persistence.SecurityUserPersistenceService().ToModelInstance(user, context);
+		    var securityUser = new SanteDB.Persistence.Data.ADO.Services.Persistence.SecurityUserPersistenceService(ApplicationServiceContext.Current.GetService<AdoPersistenceService>()).ToModelInstance(user, context);
 		    ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(securityUser);
 		}
     }

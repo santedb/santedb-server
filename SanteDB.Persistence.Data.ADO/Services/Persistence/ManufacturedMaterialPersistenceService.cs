@@ -27,8 +27,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class ManufacturedMaterialPersistenceService : EntityDerivedPersistenceService<Core.Model.Entities.ManufacturedMaterial, DbManufacturedMaterial, CompositeResult<DbManufacturedMaterial, DbMaterial, DbEntityVersion, DbEntity>>
     {
+
+        public ManufacturedMaterialPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+            this.m_materialPersister = new MaterialPersistenceService(settingsProvider);
+        }
+
         // Material persister
-        private MaterialPersistenceService m_materialPersister = new MaterialPersistenceService();
+        private MaterialPersistenceService m_materialPersister;
 
         /// <summary>
         /// Material persister

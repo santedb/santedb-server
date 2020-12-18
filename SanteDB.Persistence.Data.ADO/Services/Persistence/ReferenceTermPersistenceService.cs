@@ -32,6 +32,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class ReferenceTermPersistenceService : BaseDataPersistenceService<ReferenceTerm, DbReferenceTerm>
 	{
 
+        public ReferenceTermPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
 
         /// <summary>
         /// Inserts a reference term.

@@ -37,6 +37,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class SecurityProvenancePersistenceService : IdentifiedPersistenceService<SecurityProvenance, DbSecurityProvenance>
     {
+
+        public SecurityProvenancePersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Inserting with IDataContext is not permitted
         /// </summary>
@@ -69,6 +74,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 	public class SecurityApplicationPersistenceService : BaseDataPersistenceService<Core.Model.Security.SecurityApplication, DbSecurityApplication>
 	{
 
+        public SecurityApplicationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         protected override SqlStatement AppendOrderBy(SqlStatement rawQuery, ModelSort<SecurityApplication>[] orderBy)
         {
             if (orderBy == null || orderBy.Length == 0)
@@ -88,8 +97,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 				var policyQuery = context.CreateSqlStatement<DbSecurityApplicationPolicy>().SelectFrom(typeof(DbSecurityApplicationPolicy), typeof(DbSecurityPolicy))
 										.InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
 										.Where<DbSecurityApplicationPolicy>(o => o.SourceKey == application.Key);
-
-				application.Policies = context.Query<CompositeResult<DbSecurityApplicationPolicy, DbSecurityPolicy>>(policyQuery).Select(o => new SecurityPolicyInstance(m_mapper.MapDomainInstance<DbSecurityPolicy, SecurityPolicy>(o.Object2), (PolicyGrantType)o.Object1.GrantType)).ToList();
+                var mapper = this.m_settingsProvider.GetMapper();
+                application.Policies = context.Query<CompositeResult<DbSecurityApplicationPolicy, DbSecurityPolicy>>(policyQuery).ToArray().Select(o => new SecurityPolicyInstance(mapper.MapDomainInstance<DbSecurityPolicy, SecurityPolicy>(o.Object2), (PolicyGrantType)o.Object1.GrantType)).ToList();
 			}
 
 			return application;
@@ -131,7 +140,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 				.InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
 				.Where<DbSecurityApplicationPolicy>(o => o.SourceKey == retVal.Key);
 
-			retVal.Policies = context.Query<CompositeResult<DbSecurityApplicationPolicy, DbSecurityPolicy>>(policyQuery).Select(o => new SecurityPolicyInstance(m_mapper.MapDomainInstance<DbSecurityPolicy, SecurityPolicy>(o.Object2), (PolicyGrantType)o.Object1.GrantType)).ToList();
+            var mapper = this.m_settingsProvider.GetMapper();
+            retVal.Policies = context.Query<CompositeResult<DbSecurityApplicationPolicy, DbSecurityPolicy>>(policyQuery).ToArray().Select(o => new SecurityPolicyInstance(mapper.MapDomainInstance<DbSecurityPolicy, SecurityPolicy>(o.Object2), (PolicyGrantType)o.Object1.GrantType)).ToList();
 			return retVal;
 		}
 
@@ -170,6 +180,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 	/// </summary>
 	public class SecurityDevicePersistenceService : BaseDataPersistenceService<Core.Model.Security.SecurityDevice, DbSecurityDevice>
 	{
+        public SecurityDevicePersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         protected override SqlStatement AppendOrderBy(SqlStatement rawQuery, ModelSort<SecurityDevice>[] orderBy)
         {
             if (orderBy == null || orderBy.Length == 0)
@@ -190,8 +204,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 				var policyQuery = context.CreateSqlStatement<DbSecurityDevicePolicy>().SelectFrom(typeof(DbSecurityPolicy), typeof(DbSecurityDevicePolicy))
 										.InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
 										.Where<DbSecurityDevicePolicy>(o => o.SourceKey == device.Key);
-
-				device.Policies = context.Query<CompositeResult<DbSecurityDevicePolicy, DbSecurityPolicy>>(policyQuery).Select(o => new SecurityPolicyInstance(m_mapper.MapDomainInstance<DbSecurityPolicy, SecurityPolicy>(o.Object2), (PolicyGrantType)o.Object1.GrantType)).ToList();
+                var mapper = this.m_settingsProvider.GetMapper();
+                device.Policies = context.Query<CompositeResult<DbSecurityDevicePolicy, DbSecurityPolicy>>(policyQuery).ToArray().Select(o => new SecurityPolicyInstance(mapper.MapDomainInstance<DbSecurityPolicy, SecurityPolicy>(o.Object2), (PolicyGrantType)o.Object1.GrantType)).ToList();
 			}
 
 			return device;
@@ -233,7 +247,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 				.InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
 				.Where<DbSecurityDevicePolicy>(o => o.SourceKey == retVal.Key);
 
-			retVal.Policies = context.Query<CompositeResult<DbSecurityDevicePolicy, DbSecurityPolicy>>(policyQuery).Select(o => new SecurityPolicyInstance(m_mapper.MapDomainInstance<DbSecurityPolicy, SecurityPolicy>(o.Object2), (PolicyGrantType)o.Object1.GrantType)).ToList();
+            var mapper = this.m_settingsProvider.GetMapper();
+            retVal.Policies = context.Query<CompositeResult<DbSecurityDevicePolicy, DbSecurityPolicy>>(policyQuery).ToArray().Select(o => new SecurityPolicyInstance(mapper.MapDomainInstance<DbSecurityPolicy, SecurityPolicy>(o.Object2), (PolicyGrantType)o.Object1.GrantType)).ToList();
 			return retVal;
 		}
 
@@ -269,6 +284,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 	/// </summary>
 	public class SecurityPolicyPersistenceService : BaseDataPersistenceService<Core.Model.Security.SecurityPolicy, DbSecurityPolicy>
 	{
+        public SecurityPolicyPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         protected override SqlStatement AppendOrderBy(SqlStatement rawQuery, ModelSort<SecurityPolicy>[] orderBy)
         {
             if (orderBy == null || orderBy.Length == 0)
@@ -296,6 +315,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 	/// </summary>
 	public class SecurityRolePersistenceService : BaseDataPersistenceService<Core.Model.Security.SecurityRole, DbSecurityRole>
 	{
+
+        public SecurityRolePersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
 
         protected override SqlStatement AppendOrderBy(SqlStatement rawQuery, ModelSort<SecurityRole>[] orderBy)
         {
@@ -325,7 +348,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 										.InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
 										.Where<DbSecurityRolePolicy>(o => o.SourceKey == role.Key);
 
-				role.Policies = context.Query<CompositeResult<DbSecurityRolePolicy, DbSecurityPolicy>>(policyQuery).Select(o => new SecurityPolicyInstance(m_mapper.MapDomainInstance<DbSecurityPolicy, SecurityPolicy>(o.Object2), (PolicyGrantType)o.Object1.GrantType)).ToList();
+                var mapper = this.m_settingsProvider.GetMapper();
+				role.Policies = context.Query<CompositeResult<DbSecurityRolePolicy, DbSecurityPolicy>>(policyQuery).ToArray().Select(o => new SecurityPolicyInstance(mapper.MapDomainInstance<DbSecurityPolicy, SecurityPolicy>(o.Object2), (PolicyGrantType)o.Object1.GrantType)).ToList();
 			}
 
 			return role;
@@ -367,14 +391,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 			var policyQuery = context.CreateSqlStatement<DbSecurityRolePolicy>().SelectFrom(typeof(DbSecurityRolePolicy), typeof(DbSecurityPolicy))
 				.InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
 				.Where<DbSecurityRolePolicy>(o => o.SourceKey == retVal.Key);
-
-			retVal.Policies = context.Query<CompositeResult<DbSecurityRolePolicy, DbSecurityPolicy>>(policyQuery).Select(o => new SecurityPolicyInstance(m_mapper.MapDomainInstance<DbSecurityPolicy, SecurityPolicy>(o.Object2), (PolicyGrantType)o.Object1.GrantType)).ToList();
+            var mapper = this.m_settingsProvider.GetMapper();
+            retVal.Policies = context.Query<CompositeResult<DbSecurityRolePolicy, DbSecurityPolicy>>(policyQuery).ToArray().Select(o => new SecurityPolicyInstance(mapper.MapDomainInstance<DbSecurityPolicy, SecurityPolicy>(o.Object2), (PolicyGrantType)o.Object1.GrantType)).ToList();
 
 			var rolesQuery = context.CreateSqlStatement<DbSecurityUserRole>().SelectFrom(typeof(DbSecurityUser))
 				.InnerJoin<DbSecurityUser>(o => o.UserKey, o => o.Key)
 				.Where<DbSecurityUserRole>(o => o.RoleKey == retVal.Key);
 
-			retVal.Users = context.Query<DbSecurityUser>(rolesQuery).Select(o => m_mapper.MapDomainInstance<DbSecurityUser, Core.Model.Security.SecurityUser>(o)).ToList();
+            retVal.Users = context.Query<DbSecurityUser>(rolesQuery).ToArray().Select(o => mapper.MapDomainInstance<DbSecurityUser, Core.Model.Security.SecurityUser>(o)).ToList();
 
 			return retVal;
 		}
@@ -410,6 +434,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 	/// </summary>
 	public class SecurityUserPersistenceService : BaseDataPersistenceService<Core.Model.Security.SecurityUser, DbSecurityUser>
 	{
+
+        public SecurityUserPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
 
         protected override SqlStatement AppendOrderBy(SqlStatement rawQuery, ModelSort<SecurityUser>[] orderBy)
         {
@@ -466,14 +494,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 			var results = base.QueryInternal(context, query, queryId, offset, count, out totalResults, orderBy, countResults).ToList();
 
 			var users = new List<SecurityUser>();
-
+            var mapper = this.m_settingsProvider.GetMapper();
 			foreach (var user in results)
 			{
 				var rolesQuery = context.CreateSqlStatement<DbSecurityUserRole>().SelectFrom(typeof(DbSecurityUserRole), typeof(DbSecurityRole))
 					.InnerJoin<DbSecurityRole>(o => o.RoleKey, o => o.Key)
 					.Where<DbSecurityUserRole>(o => o.UserKey == user.Key);
 
-				user.Roles = context.Query<DbSecurityRole>(rolesQuery).Select(o => m_mapper.MapDomainInstance<DbSecurityRole, SecurityRole>(o)).ToList();
+				user.Roles = context.Query<DbSecurityRole>(rolesQuery).ToArray().Select(o => mapper.MapDomainInstance<DbSecurityRole, SecurityRole>(o)).ToList();
 
 				users.Add(user);
 			}
@@ -500,7 +528,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 				.InnerJoin<DbSecurityRole>(o => o.RoleKey, o => o.Key)
 				.Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key);
 
-			retVal.Roles = context.Query<DbSecurityRole>(rolesQuery).Select(o => m_mapper.MapDomainInstance<DbSecurityRole, Core.Model.Security.SecurityRole>(o)).ToList();
+            var mapper = this.m_settingsProvider.GetMapper();
+			retVal.Roles = context.Query<DbSecurityRole>(rolesQuery).ToArray().Select(o => mapper.MapDomainInstance<DbSecurityRole, Core.Model.Security.SecurityRole>(o)).ToList();
 
 			return retVal;
 		}
@@ -552,7 +581,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 				.InnerJoin<DbSecurityRole>(o => o.RoleKey, o => o.Key)
 				.Where<DbSecurityUserRole>(o => o.UserKey == key);
 
-			user.Roles = context.Query<DbSecurityRole>(rolesQuery).Select(o => m_mapper.MapDomainInstance<DbSecurityRole, SecurityRole>(o)).ToList();
+            var mapper = this.m_settingsProvider.GetMapper();
+            user.Roles = context.Query<DbSecurityRole>(rolesQuery).ToArray().Select(o => mapper.MapDomainInstance<DbSecurityRole, SecurityRole>(o)).ToList();
 
 			return user;
 		}

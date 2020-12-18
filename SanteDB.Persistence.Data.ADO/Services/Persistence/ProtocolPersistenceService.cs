@@ -30,6 +30,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class ProtocolPersistenceService : BaseDataPersistenceService<Protocol, DbProtocol, CompositeResult<DbProtocol, DbProtocolHandler>>
     {
 
+        public ProtocolPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Convert to model instance
         /// </summary>

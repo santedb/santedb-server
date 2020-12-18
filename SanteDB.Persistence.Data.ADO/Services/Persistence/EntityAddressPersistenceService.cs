@@ -34,6 +34,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class EntityAddressPersistenceService : IdentifiedPersistenceService<Core.Model.Entities.EntityAddress, DbEntityAddress>, IAdoAssociativePersistenceService
     {
 
+        public EntityAddressPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Convert data instance to model instance
         /// </summary>
@@ -130,6 +134,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class EntityAddressComponentPersistenceService : IdentifiedPersistenceService<Core.Model.Entities.EntityAddressComponent, DbEntityAddressComponent, CompositeResult<DbEntityAddressComponent, DbEntityAddressComponentValue>>, IAdoAssociativePersistenceService
     {
+        public EntityAddressComponentPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
 
         /// <summary>
         /// To model instance

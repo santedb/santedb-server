@@ -49,6 +49,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         // Progress has changed
         public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
 
+        public BundlePersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Bundles don't really exist
         /// </summary>
@@ -62,7 +66,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override object FromModelInstance(Bundle modelInstance, DataContext context)
         {
-            return m_mapper.MapModelInstance<Bundle, Object>(modelInstance);
+            return this.m_settingsProvider.GetMapper().MapModelInstance<Bundle, Object>(modelInstance);
         }
 
 
@@ -256,7 +260,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var reorganized = this.ReorganizeForInsert(data);
             this.m_tracer.TraceInfo("After reorganization has {0} objects...", reorganized.Item.Count);
 
-            context.PrepareStatements = this.m_persistenceService.GetConfiguration().PrepareStatements;
+            context.PrepareStatements = this.m_settingsProvider.GetConfiguration().PrepareStatements;
 
             // Ensure that provenance objects match
             var operationalItems = reorganized.Item.Where(o => !reorganized.ExpansionKeys.Any(k => o.Key == k)).ToArray();
@@ -267,7 +271,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             for (int i = 0; i < reorganized.Item.Count; i++)
             {
                 var itm = reorganized.Item[i];
-                var svc = this.m_persistenceService.GetPersister(itm.GetType());
+                var svc = this.m_settingsProvider.GetPersister(itm.GetType());
 
                 if (reorganized.ExpansionKeys.Any(k => itm.Key == k)) continue; // skip refs
 
@@ -351,7 +355,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Bundle ToModelInstance(object dataInstance, DataContext context)
         {
-            return m_mapper.MapModelInstance<Object, Bundle>(dataInstance);
+            return this.m_settingsProvider.GetMapper().MapModelInstance<Object, Bundle>(dataInstance);
 
         }
 
@@ -366,7 +370,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             return this.InsertInternal(context, data);
         }
-
 
     }
 }

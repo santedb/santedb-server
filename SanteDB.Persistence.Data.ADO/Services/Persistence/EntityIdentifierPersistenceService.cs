@@ -32,6 +32,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class EntityIdentifierPersistenceService : IdentifiedPersistenceService<EntityIdentifier, DbEntityIdentifier, CompositeResult<DbEntityIdentifier, DbAssigningAuthority>>, IAdoAssociativePersistenceService
     {
 
+        public EntityIdentifierPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Convert to model
         /// </summary>

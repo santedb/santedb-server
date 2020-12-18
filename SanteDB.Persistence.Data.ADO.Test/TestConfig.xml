@@ -23,6 +23,7 @@
     <add type="SanteDB.Core.Configuration.ApplicationServiceContextConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.DiagnosticsConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Persistence.Data.ADO.Configuration.AdoPersistenceConfigurationSection, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Persistence.Data.ADO.Configuration.AdoArchiveConfigurationSection, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api, Version=1.10.0.0"/>
     <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api, Version=1.10.0.0"/>
     <add type="SanteDB.OrmLite.Configuration.OrmConfigurationSection, SanteDB.OrmLite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
@@ -33,12 +34,24 @@
   <section xsi:type="DataConfigurationSection">
     <connectionStrings>
       <add name="TEST_CONNECTION" value="initial catalog=|DataDirectory|\santedb_test.fdb;server type=Embedded;user id=sysdba" provider="FirebirdSQL"/>
+      <add name="TEST_ARCHIVE" value="initial catalog=|DataDirectory|\santedb_archive.fdb;server type=Embedded;user id=sysdba" provider="FirebirdSQL"/>
     </connectionStrings>
   </section>
   <!-- This section controls the persistence for ADO.NET -->
   <section xsi:type="AdoPersistenceConfigurationSection"
            readWriteConnectionString="TEST_CONNECTION"
            readOnlyConnectionString="TEST_CONNECTION"
+           traceSql="false"
+           providerType="FirebirdSQL"
+           staOnly="false"
+           autoUpdateExisting="true"
+           autoInsertChildren="true"
+           prepareStatements="true">
+  </section>
+  <!-- This section controls the persistence for ADO.NET -->
+  <section xsi:type="AdoArchiveConfigurationSection"
+           readWriteConnectionString="TEST_ARCHIVE"
+           readOnlyConnectionString="TEST_ARCHIVE"
            traceSql="false"
            providerType="FirebirdSQL"
            staOnly="false"
@@ -62,6 +75,7 @@
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPolicyInformationService, SanteDB.Persistence.Data.ADO, Version=0.6.0.0" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoRoleProvider, SanteDB.Persistence.Data.ADO, Version=0.6.0.0" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoIdentityProvider, SanteDB.Persistence.Data.ADO, Version=0.6.0.0" />
+      <add type="SanteDB.Persistence.Data.ADO.Services.AdoArchiveService, SanteDB.Persistence.Data.ADO, Version=0.6.0.0" />
       <add type="SanteDB.Core.Security.SHA256PasswordHashingService, SanteDB.Core, Version=0.6.0.0" />
       <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core, Version=0.6.0.0" />
       <add type="SanteDB.Core.Services.Impl.LocalRepositoryService, SanteDB.Core, Version=0.6.0.0"/>

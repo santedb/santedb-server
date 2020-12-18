@@ -31,6 +31,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class ProcedurePersistenceService : ActDerivedPersistenceService<Core.Model.Acts.Procedure,DbProcedure>
     {
+        public ProcedurePersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Convert databased model to model
         /// </summary>

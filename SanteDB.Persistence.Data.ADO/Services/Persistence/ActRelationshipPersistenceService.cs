@@ -34,6 +34,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class ActRelationshipPersistenceService : IdentifiedPersistenceService<ActRelationship, DbActRelationship>, IAdoAssociativePersistenceService
     {
 
+        public ActRelationshipPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Get from source
         /// </summary>

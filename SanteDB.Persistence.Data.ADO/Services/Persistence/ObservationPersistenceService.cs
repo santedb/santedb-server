@@ -35,12 +35,16 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class ObservationPersistenceService : ActDerivedPersistenceService<Observation, DbObservation>
     {
 
+        public ObservationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Convert from model instance
         /// </summary>
         public override object FromModelInstance(Observation modelInstance, DataContext context)
         {
-            var retVal = m_mapper.MapModelInstance<Observation, DbObservation>(modelInstance);
+            var retVal = this.m_settingsProvider.GetMapper().MapModelInstance<Observation, DbObservation>(modelInstance);
             if (modelInstance is TextObservation)
                 retVal.ValueType = "ST";
             else if (modelInstance is CodedObservation)
@@ -113,7 +117,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class TextObservationPersistenceService : ActDerivedPersistenceService<Core.Model.Acts.TextObservation, DbTextObservation, CompositeResult<DbTextObservation, DbObservation, DbActVersion, DbAct>>
     {
 
-        private ObservationPersistenceService m_observationPersistence = new ObservationPersistenceService();
+        public TextObservationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+            this.m_observationPersistence = new ObservationPersistenceService(settingsProvider);
+        }
+
+        private ObservationPersistenceService m_observationPersistence;
 
         /// <summary>
         /// Query internal
@@ -185,7 +194,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class CodedObservationPersistenceService : ActDerivedPersistenceService<Core.Model.Acts.CodedObservation, DbCodedObservation, CompositeResult<DbCodedObservation, DbObservation, DbActVersion, DbAct>>
     {
 
-        private ObservationPersistenceService m_observationPersistence = new ObservationPersistenceService();
+        public CodedObservationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+            this.m_observationPersistence = new ObservationPersistenceService(settingsProvider);
+        }
+
+        private ObservationPersistenceService m_observationPersistence;
         /// <summary>
         /// Query internal
         /// </summary>
@@ -265,7 +279,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class QuantityObservationPersistenceService : ActDerivedPersistenceService<Core.Model.Acts.QuantityObservation, DbQuantityObservation, CompositeResult<DbQuantityObservation, DbObservation, DbActVersion, DbAct>>
     {
 
-        private ObservationPersistenceService m_observationPersistence = new ObservationPersistenceService();
+        public QuantityObservationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+            this.m_observationPersistence = new ObservationPersistenceService(settingsProvider);
+        }
+
+        private ObservationPersistenceService m_observationPersistence ;
 
         /// <summary>
         /// Query internal

@@ -82,6 +82,11 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model
         /// </summary>
         [Column("rplc_vrsn_id")]
         public Guid? ReplacesVersionKey { get; set; }
+
+        /// <summary>
+        /// True if replaces version key is being nulled
+        /// </summary>
+        public bool ReplacesVersionKeySpecified { get; set; }
     }
 
 }
