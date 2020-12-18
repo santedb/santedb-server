@@ -19,11 +19,10 @@
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
-using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using System;
 using System.Collections.Generic;
 
-namespace SanteDB.Persistence.Data.PSQL.Security
+namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
 {
     /// <summary>
     /// Represents a local policy
