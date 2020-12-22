@@ -75,8 +75,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             else
             {
                 retVal.LoadState = Core.Model.LoadState.PartialLoad;
-                retVal.ConceptNames = context.Query<DbConceptName>(o => o.SourceKey == retVal.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => new ConceptName(o.Language, o.Name)).ToList();
-                retVal.ReferenceTerms = context.Query<DbConceptReferenceTerm>(o => o.SourceKey == retVal.Key).Select(o => new ConceptReferenceTerm(o.TargetKey, o.RelationshipTypeKey)).ToList();
+                retVal.ConceptNames = context.Query<DbConceptName>(o => o.SourceKey == retVal.Key && !o.ObsoleteVersionSequenceId.HasValue).ToArray().Select(o => new ConceptName(o.Language, o.Name)).ToList();
+                retVal.ReferenceTerms = context.Query<DbConceptReferenceTerm>(o => o.SourceKey == retVal.Key).ToArray().Select(o => new ConceptReferenceTerm(o.TargetKey, o.RelationshipTypeKey)).ToList();
                 
             }
             return retVal;
@@ -227,6 +227,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     CreationTime = DateTimeOffset.Now
                 })); // Ensure there is a current version that has been PURGED
             }
+
+            context.ResetSequence("CD_VRSN_SEQ",
+                context.Query<DbConceptVersion>(o => true).Max(o => o.VersionSequenceId));
         }
 
         /// <summary>
@@ -306,6 +309,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 toContext.InsertOrUpdate(fromContext.Query<DbConceptSetConceptAssociation>(o => batchKeys.Contains(o.ConceptKey)));
 
             }
+
+            toContext.ResetSequence("CD_VRSN_SEQ",
+                toContext.Query<DbConceptVersion>(o => true).Max(o => o.VersionSequenceId));
+
         }
     }
 
@@ -351,7 +358,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
 
             // Remove concept from cache and create a new version
-            ApplicationContext.Current.GetService<IDataCachingService>().Remove(data.SourceEntityKey.Value);
+            ApplicationContext.Current.GetService<IDataCachingService>()?.Remove(data.SourceEntityKey.Value);
             var conceptVersion = context.FirstOrDefault<DbConceptVersion>(o => o.Key == data.SourceEntityKey.Value && o.ObsoletionTime == null);
             var newVersion = new DbConceptVersion();
             conceptVersion.ObsoletedByKey = context.ContextId;

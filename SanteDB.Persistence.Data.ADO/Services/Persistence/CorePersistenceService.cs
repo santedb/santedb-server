@@ -576,11 +576,18 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public void CopyTo(Guid[] keysToCopy, DataContext toContext)
         {
-            // Obsolete object
-            using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetReadonlyConnection())
+            try
             {
-                connection.Open();
-                this.Copy(keysToCopy, connection, toContext);
+                // Obsolete object
+                using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetReadonlyConnection())
+                {
+                    connection.Open();
+                    this.Copy(keysToCopy, connection, toContext);
+                }
+            }
+            catch(DbException e)
+            {
+                throw new DataPersistenceException("Could copy keys to data context", this.TranslateDbException(e));
             }
         }
 

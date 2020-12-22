@@ -34,6 +34,7 @@ using System.Linq;
 using NHapi.Model.V25.Message;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Caching.Memory.Configuration;
 
 namespace SanteDB.Messaging.HL7.Test
 {
@@ -48,6 +49,7 @@ namespace SanteDB.Messaging.HL7.Test
         [ClassInitialize]
         public static void Initialize(TestContext context)
         {
+            typeof(MemoryCacheConfigurationSection).Equals(null);
             // Force load of the DLL
             var p = FirebirdSql.Data.FirebirdClient.FbCharset.Ascii;
             TestApplicationContext.TestAssembly = typeof(TestMessageParsing).Assembly;
@@ -284,7 +286,7 @@ namespace SanteDB.Messaging.HL7.Test
         {
             AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
             var msg = TestUtil.GetMessage("QBP_XREF_PRE");
-            new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
+            var result = new AdtMessageHandler().HandleMessage(new Hl7MessageReceivedEventArgs(msg, new Uri("test://"), new Uri("test://"), DateTime.Now));
             var patient = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Patient>>().Query(o => o.Identifiers.Any(i => i.Value == "HL7-4"), AuthenticationContext.Current.Principal).SingleOrDefault();
             Assert.IsNotNull(patient);
             msg = TestUtil.GetMessage("QBP_XREF");

@@ -117,7 +117,7 @@ namespace SanteDB.Caching.Memory
             config.Add("cacheMemoryLimitMegabytes", this.m_configuration.MaxCacheSize.ToString());
             config.Add("pollingInterval", "00:05:00");
 
-            this.m_cache = new MemoryCache("default", config);
+            this.m_cache = new MemoryCache("santedb", config);
 
 
             // handles when a item is being mapped

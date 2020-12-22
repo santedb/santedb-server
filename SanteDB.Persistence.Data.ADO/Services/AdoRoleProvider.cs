@@ -180,7 +180,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         .AutoJoin<DbSecurityUser, DbSecurityUserRole>()
                         .Where(o => o.RoleKey == securityRole.Key);
 
-                    return dataContext.Query<DbSecurityUser>(query).Select(o => o.UserName).ToArray();
+                    return dataContext.Query<DbSecurityUser>(query).ToArray().Select(o => o.UserName).ToArray();
                 }
                 catch (Exception e)
                 {

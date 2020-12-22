@@ -46,7 +46,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             Assert.AreEqual(concept.StatusConceptKey, StatusKeys.Purged);
 
             persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Entity>>() as IBulkDataPersistenceService;
-            Expression<Func<Entity, bool>> entityExpr = o => o.ObsoletionTime != null;
+            Expression<Func<Entity, bool>> entityExpr = o => o.StatusConceptKey == StatusKeys.Active;
             keys = persistenceService.QueryKeys(entityExpr, 0, 10000, out int _).ToArray();
             if (archiveService.Exists(typeof(Entity), keys[0]))
                 archiveService.Purge(typeof(Entity), keys);

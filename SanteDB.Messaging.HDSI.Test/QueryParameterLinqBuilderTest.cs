@@ -298,7 +298,7 @@ namespace SanteDB.Messaging.HDSI.Test
             var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx(2018-01-01 12:00:00 AM) > 7305.00:00:00))";
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());
             NameValueCollection httpQueryParameters = new NameValueCollection();
-            httpQueryParameters.Add("dateOfBirth", ":(testEx|2018-01-01)>20y");
+            httpQueryParameters.Add("dateOfBirth", ":(testEx|2018-01-01)>p20y");
             var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
             Assert.AreEqual(expected, expr.ToString());
         }

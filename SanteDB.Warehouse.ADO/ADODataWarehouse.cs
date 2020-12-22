@@ -569,7 +569,7 @@ namespace SanteDB.Warehouse.ADO
                 {
 
                     context.Open();
-                    return context.Query<AdhocDatamart>(o => o.Name != null).Select(o => new DatamartDefinition()
+                    return context.Query<AdhocDatamart>(o => o.Name != null).ToArray().Select(o => new DatamartDefinition()
                     {
                         Id = o.DatamartId,
                         Name = o.Name,
@@ -927,7 +927,7 @@ namespace SanteDB.Warehouse.ADO
             };
 
             // Stored queries
-            retVal.Queries = context.Query<AdhocQuery>(o => o.SchemaId == id).Select(o =>
+            retVal.Queries = context.Query<AdhocQuery>(o => o.SchemaId == id).ToArray().Select(o =>
               new DatamartStoredQuery(){
                   Id = o.QueryId,
                   Name = o.Name,
@@ -946,7 +946,9 @@ namespace SanteDB.Warehouse.ADO
         /// </summary>
         private List<DatamartSchemaProperty> LoadProperties(DataContext context, Guid containerId)
         {
-            return context.Query<AdhocProperty>(o => o.ContainerId == containerId || o.SchemaId == containerId).Select(o => new DatamartSchemaProperty()
+            return context.Query<AdhocProperty>(o => o.ContainerId == containerId || o.SchemaId == containerId)
+                .ToArray()
+                .Select(o => new DatamartSchemaProperty()
             {
                 Attributes = (SchemaPropertyAttributes)o.Attributes,
                 Type = (SchemaPropertyType)o.TypeId,

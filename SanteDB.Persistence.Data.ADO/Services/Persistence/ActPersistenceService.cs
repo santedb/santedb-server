@@ -540,16 +540,25 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 // Purge the core entity data
                 context.Delete<DbActVersion>(o => batchKeys.Contains(o.Key));
 
+
                 // Create a version which indicates this is PURGED
-                context.Insert(batchKeys.Select(o => new DbActVersion()
-                {
-                    CreatedByKey = context.ContextId,
-                    CreationTime = DateTimeOffset.Now,
-                    Key = o,
-                    StatusConceptKey = StatusKeys.Purged
-                }));
+                context.Insert(context.Query<DbAct>(o => batchKeys.Contains(o.Key))
+                    .Select(o => o.Key)
+                    .Distinct()
+                    .ToArray()
+                    .Select(o => new DbActVersion()
+                    {
+                        CreatedByKey = context.ContextId,
+                        CreationTime = DateTimeOffset.Now,
+                        Key = o,
+                        StatusConceptKey = StatusKeys.Purged
+                    }));
             
             }
+
+            context.ResetSequence("ACT_VRSN_SEQ",
+                context.Query<DbActVersion>(o => true).Max(o => o.VersionSequenceId));
+
         }
 
         /// <summary>
@@ -706,6 +715,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 toContext.InsertOrUpdate(fromContext.Query<DbEntity>(o => additionalKeys.Contains(o.Key)));
                 toContext.InsertOrUpdate(fromContext.Query<DbActParticipation>(o => batchKeys.Contains(o.SourceKey)));
             }
+
+            toContext.ResetSequence("ACT_VRSN_SEQ", toContext.Query<DbActVersion>(o => true).Max(o => o.VersionSequenceId));
         }
+
     }
 }

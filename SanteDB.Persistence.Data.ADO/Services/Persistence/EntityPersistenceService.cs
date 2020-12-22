@@ -788,9 +788,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                 // Purge the core entity data
                 context.Delete<DbEntityVersion>(o => batchKeys.Contains(o.Key));
-
+                
                 // Create a version which indicates this is PURGED
-                context.Insert(batchKeys.Select(o => new DbEntityVersion()
+                context.Insert(
+                    context.Query<DbEntity>(o=>batchKeys.Contains(o.Key))
+                    .Select(o=>o.Key)
+                    .Distinct()
+                    .ToArray()
+                    .Select(o => new DbEntityVersion()
                 {
                     CreatedByKey = context.ContextId,
                     CreationTime = DateTimeOffset.Now,
@@ -799,6 +804,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }));
                 
             }
+
+            context.ResetSequence("ENT_VRSN_SEQ", context.Query<DbEntityVersion>(o => true).Max(o => o.VersionSequenceId));
+
         }
 
         /// <summary>
@@ -809,9 +817,28 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             toContext.InsertOrUpdate(fromContext.Query<DbPhoneticValue>(o => o.SequenceId >= 0));
             toContext.InsertOrUpdate(fromContext.Query<DbEntityAddressComponentValue>(o => o.SequenceId >= 0));
             toContext.InsertOrUpdate(fromContext.Query<DbTemplateDefinition>(o => o.ObsoletionTime == null));
+            var additionalKeys = fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null)
+                .Select(o => o.AssigningApplicationKey).Distinct().ToArray()
+                .Where(o => o.HasValue)
+                .Select(o => o.Value);
+            toContext.InsertOrUpdate(fromContext.Query<DbSecurityApplication>(o => additionalKeys.Contains(o.Key)).ToArray().Select(o=>new DbSecurityApplication()
+            {   
+                Key = o.Key,
+                CreatedByKey = o.CreatedByKey,
+                CreationTime =o.CreationTime,
+                InvalidAuthAttempts = 0,
+                Lockout = o.Lockout,
+                LastAuthentication = o.LastAuthentication,
+                PublicId = o.PublicId,
+                ObsoletionTime =o.ObsoletionTime,
+                ObsoletedByKey = o.ObsoletedByKey,
+                Secret = o.Secret ?? "XXXX",
+                UpdatedByKey = o.UpdatedByKey,
+                UpdatedTime = o.UpdatedTime
+            }));
             toContext.InsertOrUpdate(fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null));
             toContext.InsertOrUpdate(fromContext.Query<DbExtensionType>(o => o.ObsoletionTime == null));
-            var additionalKeys = fromContext.Query<DbEntityRelationship>(o => o.ObsoleteVersionSequenceId == null)
+            additionalKeys = fromContext.Query<DbEntityRelationship>(o => o.ObsoleteVersionSequenceId == null)
                    .Select(o => o.RelationshipTypeKey)
                    .Distinct()
                    .Union(
@@ -993,6 +1020,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                
                 toContext.InsertOrUpdate(fromContext.Query<DbEntityRelationship>(o => batchKeys.Contains(o.SourceKey)));
             }
+
+            toContext.ResetSequence("ENT_VRSN_SEQ", toContext.Query<DbEntityVersion>(o => true).Max(o => o.VersionSequenceId));
+
         }
     }
 }
