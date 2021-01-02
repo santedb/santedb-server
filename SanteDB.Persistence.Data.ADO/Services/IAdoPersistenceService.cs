@@ -28,6 +28,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// </summary>
     public interface IAdoPersistenceService : IDataPersistenceService
     {
+        
         /// <summary>
         /// Inserts the specified object
         /// </summary>

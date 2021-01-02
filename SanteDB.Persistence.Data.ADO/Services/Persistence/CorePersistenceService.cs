@@ -41,10 +41,17 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// <summary>
     /// Core persistence service which contains helpful functions
     /// </summary>
-    public abstract class CorePersistenceService<TModel, TDomain, TQueryReturn> : AdoBasePersistenceService<TModel>, IBulkDataPersistenceService
+    public abstract class CorePersistenceService<TModel, TDomain, TQueryReturn> : AdoBasePersistenceService<TModel>, IBulkDataPersistenceService, IAdoCopyProvider
         where TModel : IdentifiedData, new()
         where TDomain : class, new()
     {
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public CorePersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
 
         // Query persistence
         protected Core.Services.IQueryPersistenceService m_queryPersistence = ApplicationServiceContext.Current.GetService<Core.Services.IQueryPersistenceService>();
@@ -57,14 +64,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (orderBy != null && orderBy.Length > 0)
                 foreach (var ob in orderBy)
                 {
-                    var sorter = m_mapper.MapModelExpression<TModel, TDomain, dynamic>(ob.SortProperty, false);
+                    var sorter = this.m_settingsProvider.GetMapper().MapModelExpression<TModel, TDomain, dynamic>(ob.SortProperty, false);
                     if (sorter != null)
                         rawQuery = rawQuery.OrderBy(sorter, ob.SortOrder);
                 }
             return rawQuery;
         }
 
-       
+
 
         /// <summary>
         /// Maps the data to a model instance
@@ -74,7 +81,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override TModel ToModelInstance(object dataInstance, DataContext context)
         {
             var dInstance = (dataInstance as CompositeResult)?.Values.OfType<TDomain>().FirstOrDefault() ?? dataInstance as TDomain;
-            var retVal = m_mapper.MapDomainInstance<TDomain, TModel>(dInstance);
+            var retVal = this.m_settingsProvider.GetMapper().MapDomainInstance<TDomain, TModel>(dInstance);
             retVal.LoadAssociations(context);
             this.m_tracer.TraceEvent(EventLevel.Verbose, "Model instance {0} created", dataInstance);
 
@@ -140,7 +147,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var results = this.DoQueryInternal(context, query, queryId, offset, count, out resultCount, orderBy, countResults).ToList();
             totalResults = resultCount;
 
-            if (!this.m_persistenceService.GetConfiguration().SingleThreadFetch)
+            if (!this.m_settingsProvider.GetConfiguration().SingleThreadFetch)
             {
                 return results.AsParallel().AsOrdered().WithDegreeOfParallelism(2).Select(o =>
                 {
@@ -195,7 +202,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             OrmResultSet<TQueryReturn> retVal = null;
             Expression<Func<TModel, bool>>[] queries = new Expression<Func<TModel, bool>>[] { primaryQuery };
             // Are we intersecting?
-            if(context.Data.TryGetValue("UNION", out object others) &&
+            if (context.Data.TryGetValue("UNION", out object others) &&
                 others is Expression<Func<TModel, bool>>[])
             {
                 context.Data.Remove("UNION");
@@ -234,12 +241,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         selectTypes = selectTypes[0].GenericTypeArguments;
 
                     domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(selectTypes);
-                    var expression = m_mapper.MapModelExpression<TModel, TDomain, bool>(query, false);
+                    var expression = this.m_settingsProvider.GetMapper().MapModelExpression<TModel, TDomain, bool>(query, false);
                     if (expression != null)
                     {
                         Type lastJoined = typeof(TDomain);
                         if (typeof(CompositeResult).IsAssignableFrom(typeof(TQueryReturn)))
-                            foreach (var p in typeof(TQueryReturn).GenericTypeArguments.Select(o => this.m_persistenceService.GetMapper().MapModelType(o)))
+                            foreach (var p in typeof(TQueryReturn).GenericTypeArguments.Select(o => this.m_settingsProvider.GetMapper().MapModelType(o)))
                                 if (p != typeof(TDomain))
                                 {
                                     // Find the FK to join
@@ -252,10 +259,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     else
                     {
                         m_tracer.TraceEvent(EventLevel.Verbose, "Will use slow query construction due to complex mapped fields");
-                        if(q == queries.Last())
-                            domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, orderBy);
+                        if (q == queries.Last())
+                            domainQuery = this.m_settingsProvider.GetQueryBuilder().CreateQuery(query, orderBy);
                         else
-                            domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query);
+                            domainQuery = this.m_settingsProvider.GetQueryBuilder().CreateQuery(query);
                     }
 
                     if (retVal == null)
@@ -279,7 +286,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         this.m_queryPersistence?.RegisterQuerySet(queryId, keys, queries, totalResults);
 
                     }
-                    else if (count.HasValue && includeCount && !m_configuration.UseFuzzyTotals) // Get an exact total
+                    else if (count.HasValue && includeCount && !this.m_settingsProvider.GetConfiguration().UseFuzzyTotals) // Get an exact total
                     {
                         totalResults = retVal.Count();
                     }
@@ -289,7 +296,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     // Fuzzy totals - This will only fetch COUNT + 1 as the total results
                     if (count.HasValue)
                     {
-                        if ((overrideFuzzyTotalSetting || m_configuration.UseFuzzyTotals) && totalResults == 0)
+                        if ((overrideFuzzyTotalSetting || this.m_settingsProvider.GetConfiguration().UseFuzzyTotals) && totalResults == 0)
                         {
                             var fuzzResults = retVal.Skip(offset).Take(count.Value + 1).OfType<Object>().ToList();
                             totalResults = fuzzResults.Count();
@@ -335,7 +342,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             return keyResults.OfType<Object>();
         }
 
-      
+
         /// <summary>
         /// Perform a domain query
         /// </summary>
@@ -414,7 +421,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <param name="context">Context.</param>
         public override object FromModelInstance(TModel modelInstance, DataContext context)
         {
-            return m_mapper.MapModelInstance<TModel, TDomain>(modelInstance);
+            return this.m_settingsProvider.GetMapper().MapModelInstance<TModel, TDomain>(modelInstance);
         }
 
         /// <summary>
@@ -461,7 +468,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public virtual void Obsolete(TransactionMode transactionMode, IPrincipal principal, params Guid[] keysToObsolete)
         {
             // Obsolete object
-            using (var connection = m_configuration.Provider.GetWriteConnection())
+            using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetWriteConnection())
             {
                 connection.Open();
                 using (var tx = connection.BeginTransaction())
@@ -495,15 +502,16 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Purge the specified keys
         /// </summary>
-        public virtual void Purge(TransactionMode transactionMode, params Guid[] keysToPurge)
+        public virtual void Purge(TransactionMode transactionMode, IPrincipal principal, params Guid[] keysToPurge)
         {
             // Purge object
-            using (var connection = m_configuration.Provider.GetWriteConnection())
+            using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetWriteConnection())
             {
                 connection.Open();
                 using (var tx = connection.BeginTransaction())
                     try
                     {
+                        connection.EstablishProvenance(principal, null);
                         this.BulkPurgeInternal(connection, keysToPurge);
                         if (transactionMode == TransactionMode.Commit)
                             tx.Commit();
@@ -532,7 +540,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public virtual IEnumerable<Guid> QueryKeys(Expression query, int offset, int? count, out int totalResults)
         {
             if (query is Expression<Func<TModel, bool>> castQuery)
-                using (var connection = m_configuration.Provider.GetWriteConnection())
+                using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetWriteConnection())
                 {
                     connection.Open();
                     try
@@ -556,6 +564,33 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// Perform the query for bulk keys with an open context
         /// </summary>
         protected abstract IEnumerable<Guid> QueryKeysInternal(DataContext context, Expression<Func<TModel, bool>> query, int offset, int? count, out int totalResults);
+
+
+        /// <summary>
+        /// Copy the data from <paramref name="fromContext"/> to <paramref name="toContext"/>
+        /// </summary>
+        public abstract void Copy(Guid[] keysToCopy, DataContext fromContext, DataContext toContext);
+
+        /// <summary>
+        /// Copy the specified keys from this provider to the context
+        /// </summary>
+        public void CopyTo(Guid[] keysToCopy, DataContext toContext)
+        {
+            try
+            {
+                // Obsolete object
+                using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetReadonlyConnection())
+                {
+                    connection.Open();
+                    this.Copy(keysToCopy, connection, toContext);
+                }
+            }
+            catch(DbException e)
+            {
+                throw new DataPersistenceException("Could copy keys to data context", this.TranslateDbException(e));
+            }
+        }
+
 
     }
 }

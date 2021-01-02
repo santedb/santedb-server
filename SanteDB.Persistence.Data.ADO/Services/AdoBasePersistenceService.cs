@@ -71,27 +71,20 @@ namespace SanteDB.Persistence.Data.ADO.Services
         private static long m_currentRequests = 0;
 
         // Get the ado persistence service
-        protected AdoPersistenceService m_persistenceService;
+        protected IAdoPersistenceSettingsProvider m_settingsProvider;
 
         // Lock for editing 
-        protected object m_synkLock = new object();
+        protected object m_syncLock = new object();
 
         // Get tracer
         protected Tracer m_tracer = new Tracer(AdoDataConstants.TraceSourceName);
 
-        // Configuration
-        protected static AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
-
-        // Mapper
-        protected ModelMapper m_mapper;
-
         /// <summary>
         /// ADO Base persistence service
         /// </summary>
-        public AdoBasePersistenceService()
+        public AdoBasePersistenceService(IAdoPersistenceSettingsProvider settingsProvider)
         {
-            this.m_persistenceService = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
-            this.m_mapper = this.m_persistenceService.GetMapper();
+            this.m_settingsProvider = settingsProvider;
         }
 
         public event EventHandler<DataPersistingEventArgs<TData>> Inserting;
@@ -197,7 +190,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
 
             // Persist object
-            using (var connection = m_configuration.Provider.GetWriteConnection())
+            using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetWriteConnection())
             {
                 try
                 {
@@ -213,7 +206,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             var existing = data.TryGetExisting(connection, true);
                             if (existing != null)
                             {
-                                if (m_configuration.AutoUpdateExisting)
+                                if (this.m_settingsProvider.GetConfiguration().AutoUpdateExisting)
                                 {
                                     this.m_tracer.TraceEvent(EventLevel.Warning, "INSERT WOULD RESULT IN DUPLICATE CLASSIFIER: UPDATING INSTEAD {0}", data);
                                     data.Key = existing.Key;
@@ -280,8 +273,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         private void ThrowIfExceeded()
         {
-            if (this.m_persistenceService.GetConfiguration().MaxRequests == 0 ||
-                Interlocked.Read(ref m_currentRequests) < this.m_persistenceService.GetConfiguration().MaxRequests)
+            if (this.m_settingsProvider.GetConfiguration().MaxRequests == 0 ||
+                Interlocked.Read(ref m_currentRequests) < this.m_settingsProvider.GetConfiguration().MaxRequests)
                 Interlocked.Increment(ref m_currentRequests);
             else
                 throw new LimitExceededException("Data layer restricted maximum system requests");
@@ -310,7 +303,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
 
             // Persist object
-            using (var connection = m_configuration.Provider.GetWriteConnection())
+            using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetWriteConnection())
             {
                 try
                 {
@@ -471,7 +464,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
 
             // Obsolete object
-            using (var connection = m_configuration.Provider.GetWriteConnection())
+            using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetWriteConnection())
             {
                 try
                 {
@@ -548,7 +541,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
 
                 // Query object
-                using (var connection = m_configuration.Provider.GetReadonlyConnection())
+                using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetReadonlyConnection())
                     try
                     {
                         this.ThrowIfExceeded();
@@ -644,7 +637,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
             
             // Query object
-            using (var connection = m_configuration.Provider.GetReadonlyConnection())
+            using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetReadonlyConnection())
                 try
                 {
                     this.ThrowIfExceeded();
@@ -653,7 +646,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     this.m_tracer.TraceEvent(EventLevel.Verbose, "QUERY {0}", query);
 
                     // Is there an obsoletion item already specified?
-                    if ((count ?? 1000) > 25 && this.m_persistenceService.GetConfiguration().PrepareStatements)
+                    if ((count ?? 1000) > 25 && this.m_settingsProvider.GetConfiguration().PrepareStatements)
                         connection.PrepareStatements = true;
                     if (fastQuery)
                     {
@@ -889,7 +882,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
         {
             return this.QueryInternal(queries.First(), queryId, offset, count, out totalCount, false, overrideAuthContext, orderBy, queries.Skip(1).ToArray());
         }
-
 
         #endregion
 

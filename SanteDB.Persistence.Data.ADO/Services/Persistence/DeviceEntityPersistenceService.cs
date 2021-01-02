@@ -29,6 +29,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class DeviceEntityPersistenceService : EntityDerivedPersistenceService<Core.Model.Entities.DeviceEntity, DbDeviceEntity>
     {
 
+        public DeviceEntityPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Convert the database representation to a model instance
         /// </summary>

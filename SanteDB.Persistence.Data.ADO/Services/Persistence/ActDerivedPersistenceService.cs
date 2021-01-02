@@ -36,7 +36,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public abstract class ActDerivedPersistenceService<TModel, TData> : ActDerivedPersistenceService<TModel, TData, CompositeResult<TData, DbActVersion, DbAct>>
         where TModel : Core.Model.Acts.Act, new()
         where TData : DbActSubTable, new()
-    { }
+    {
+
+        public ActDerivedPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
+    }
 
     /// <summary>
     /// Represents a persistence service which is derived from an act
@@ -46,8 +52,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         where TData : DbActSubTable, new()
         where TQueryReturn : CompositeResult
     {
+
+        public ActDerivedPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+            this.m_actPersister = new ActPersistenceService(settingsProvider);
+        }
+
         // act persister
-        protected ActPersistenceService m_actPersister = new ActPersistenceService();
+        protected ActPersistenceService m_actPersister;
 
         /// <summary>
         /// If the linked act exists
@@ -110,9 +122,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Purge the specified records (redirects to the act persister)
         /// </summary>
-        public override void Purge(TransactionMode transactionMode, params Guid[] keysToPurge)
+        public override void Purge(TransactionMode transactionMode, IPrincipal principal, params Guid[] keysToPurge)
         {
-            this.m_actPersister.Purge(transactionMode, keysToPurge);
+            this.m_actPersister.Purge(transactionMode, principal, keysToPurge);
         }
 
         /// <summary>
@@ -161,6 +173,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         }
 
         /// <summary>
+        /// Copy keys
+        /// </summary>
+        public override void Copy(Guid[] keysToCopy, DataContext fromContext, DataContext toContext)
+        {
+            this.m_actPersister.Copy(keysToCopy, fromContext, toContext);
+        }
+
+        /// <summary>
         /// Query keys 
         /// </summary>
         protected override IEnumerable<Guid> QueryKeysInternal(DataContext context, Expression<Func<TModel, bool>> query, int offset, int? count, out int totalResults)
@@ -173,12 +193,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             // Construct the SQL query
             var pk = TableMapping.Get(typeof(DbAct)).Columns.SingleOrDefault(o => o.IsPrimaryKey);
-            var domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, pk);
+            var domainQuery = this.m_settingsProvider.GetQueryBuilder().CreateQuery(query, pk);
 
             var results = context.Query<Guid>(domainQuery);
 
             count = count ?? 100;
-            if (m_configuration.UseFuzzyTotals)
+            if (this.m_settingsProvider.GetConfiguration().UseFuzzyTotals)
             {
                 // Skip and take
                 results = results.Skip(offset).Take(count.Value + 1);

@@ -37,7 +37,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public abstract class IdentifiedPersistenceService<TModel, TDomain> : IdentifiedPersistenceService<TModel, TDomain, TDomain>
         where TModel : IdentifiedData, new()
         where TDomain : class, IDbIdentified, new()
-    { }
+    {
+
+        public IdentifiedPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+
+        }
+    }
 
     /// <summary>
     /// Generic persistence service which can persist between two simple types.
@@ -46,6 +52,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         where TModel : IdentifiedData, new()
         where TDomain : class, IDbIdentified, new()
     {
+
+        /// <summary>
+        /// Constructor for settings provider
+        /// </summary>
+        public IdentifiedPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
 
         #region implemented abstract members of LocalDataPersistenceService
 
@@ -183,7 +196,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // TODO: CASCADE DELETE - SCAN THE CONTEXT DOMAIN FOR TABLES WHICH POINT AT TDOMAIN 
             // AND CASCADE THE DELETION TO THEM WHERE THE FK THAT POINTS AT MY TABLE 
             // IS IN THE KEYS PROVIDED
-            connection.Delete<TDomain>(o => keysToPurge.Contains(o.Key));
+            var ofs = 0;
+            while (ofs < keysToPurge.Length)
+            {
+                var keys = keysToPurge.Skip(ofs).Take(100).ToArray();
+                ofs += 100;
+                connection.Delete<TDomain>(o => keys.Contains(o.Key));
+            }
         }
 
         /// <summary>
@@ -193,12 +212,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             // Construct the SQL query
             var pk = TableMapping.Get(typeof(TDomain)).Columns.SingleOrDefault(o => o.IsPrimaryKey);
-            var domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery(query, pk);
+            var domainQuery = this.m_settingsProvider.GetQueryBuilder().CreateQuery(query, pk);
 
             var results = context.Query<Guid>(domainQuery);
 
             count = count ?? 100;
-            if (m_configuration.UseFuzzyTotals)
+            if (this.m_settingsProvider.GetConfiguration().UseFuzzyTotals)
             {
                 // Skip and take
                 results = results.Skip(offset).Take(count.Value + 1);
@@ -213,6 +232,19 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             return results.ToList(); // exhaust the results and continue
         }
 
+        /// <summary>
+        /// Copy the specified keys
+        /// </summary>
+        public override void Copy(Guid[] keysToCopy, DataContext fromContext, DataContext toContext)
+        {
+            var ofs = 0;
+            while (ofs < keysToCopy.Length)
+            {
+                var keys = keysToCopy.Skip(ofs).Take(100).ToArray();
+                ofs += 100;
+                toContext.InsertOrUpdate(fromContext.Query<TDomain>(o => keys.Contains(o.Key)));
+            }
+        }
         #endregion
     }
 }

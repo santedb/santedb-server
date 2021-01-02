@@ -33,7 +33,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class PatientPersistenceService : EntityDerivedPersistenceService<Patient, DbPatient, CompositeResult<DbPatient, DbPerson, DbEntityVersion, DbEntity>>
     {
 
-        private PersonPersistenceService m_personPersister = new PersonPersistenceService();
+        public PatientPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+            this.m_personPersister = new PersonPersistenceService(settingsProvider);
+        }
+
+        private PersonPersistenceService m_personPersister;
 
         /// <summary>
         /// From model instance
@@ -62,7 +67,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             retVal.MultipleBirthOrder = (int?)patientInstance.MultipleBirthOrder;
             retVal.GenderConceptKey = patientInstance.GenderConceptKey;
-
+            retVal.OccupationKey = personInstance.OccupationKey;
+            retVal.LivingArrangementKey = patientInstance.LivingArrangementKey;
+            retVal.VipStatusKey = patientInstance.VipStatusKey;
+            retVal.EducationLevelKey = patientInstance.EducationLevelKey;
+            retVal.EthnicGroupCodeKey = patientInstance.EthnicGroupCodeKey;
+            retVal.MaritalStatusKey = patientInstance.MaritalStatusKey;
+            
             // Copy from person 
             retVal.DateOfBirth = personInstance?.DateOfBirth;
 
@@ -80,6 +91,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             if (data.GenderConcept != null) data.GenderConcept = data.GenderConcept?.EnsureExists(context) as Concept;
             data.GenderConceptKey = data.GenderConcept?.Key ?? data.GenderConceptKey;
+            if (data.VipStatus != null) data.VipStatus = data.VipStatus?.EnsureExists(context, false) as Concept;
+            data.VipStatusKey = data.VipStatus?.Key ?? data.VipStatusKey;
             this.m_personPersister.InsertInternal(context, data);
             return base.InsertInternal(context, data);
         }
@@ -92,7 +105,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Ensure exists
             if (data.GenderConcept != null) data.GenderConcept = data.GenderConcept?.EnsureExists(context) as Concept;
             data.GenderConceptKey = data.GenderConcept?.Key ?? data.GenderConceptKey;
-
+            if (data.VipStatus != null) data.VipStatus = data.VipStatus?.EnsureExists(context, false) as Concept;
+            data.VipStatusKey = data.VipStatus?.Key ?? data.VipStatusKey;
             this.m_personPersister.UpdateInternal(context, data);
             return base.UpdateInternal(context, data);
         }

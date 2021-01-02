@@ -83,9 +83,16 @@ namespace SanteDB.Persistence.Data.ADO.Test
 
             // Query for keys 
             var ts = new TimeSpan(1, 0, 0, 0); // 1 day
-            Expression<Func<Place, bool>> expression = o => o.CreationTime.DateTime.Age(DateTime.Now) > ts;
-            var keys = bulkService.QueryKeys(expression, 0, 100, out int tr);
+            Expression<Func<Place, bool>> expression = o => o.CreationTime.DateTime.Age(DateTime.Now) > ts && o.StatusConceptKey == StatusKeys.Active;
+            var keys = bulkService.QueryKeys(expression, 0, 10, out int tr);
+            Assert.AreEqual(255, tr);
+            Assert.AreEqual(10, keys.Count());
 
+            // Now we want to obsolete the first 10
+            bulkService.Purge(TransactionMode.Commit, AuthenticationContext.SystemPrincipal, keys.ToArray());
+            var keys2 = bulkService.QueryKeys(expression, 0, 10, out tr);
+            Assert.AreEqual(245, tr); // 10 should be "PURGED"
+            Assert.IsFalse(keys2.SequenceEqual(keys)); // 10 keys should not be the same
         }
     }
 }

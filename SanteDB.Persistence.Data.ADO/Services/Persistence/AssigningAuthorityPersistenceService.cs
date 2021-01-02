@@ -29,6 +29,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class AssigningAuthorityPersistenceService : BaseDataPersistenceService<Core.Model.DataTypes.AssigningAuthority, DbAssigningAuthority>
     {
 
+        public AssigningAuthorityPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Convert assigning authority to model
         /// </summary>

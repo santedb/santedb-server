@@ -60,7 +60,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// Represents a dummy service which just adds the persistence services to the context
     /// </summary>
     [ServiceProvider("ADO.NET Data Persistence Service", Configuration = typeof(AdoPersistenceConfigurationSection))]
-    public class AdoPersistenceService : IDaemonService, ISqlDataPersistenceService
+    public class AdoPersistenceService : IDaemonService, ISqlDataPersistenceService, IAdoPersistenceSettingsProvider
     {
 
         /// <summary>
@@ -69,7 +69,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
         public string ServiceName => "ADO.NET Data Persistence Service";
 
         private ModelMapper m_mapper;
+
         private AdoPersistenceConfigurationSection m_configuration;
+
         // Cache
         private Dictionary<Type, IAdoPersistenceService> m_persistenceCache = new Dictionary<Type, IAdoPersistenceService>();
 
@@ -166,6 +168,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
             where TModel : BaseEntityData, new()
         {
 
+            public GenericBasePersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+            {
+            }
+
             /// <summary>
             /// Ensure exists
             /// </summary>
@@ -209,6 +215,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
             where TModel : IdentifiedData, new()
             where TDomain : class, IDbIdentified, new()
         {
+
+            public GenericIdentityPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+            {
+            }
+
             /// <summary>
             /// Ensure exists
             /// </summary>
@@ -254,6 +265,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
             where TModel : BaseEntityData, ISimpleAssociation, new()
             where TDomain : class, IDbBaseData, new()
         {
+
+            public GenericBaseAssociationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+            {
+            }
+
             /// <summary>
             /// Get all the matching TModel object from source
             /// </summary>
@@ -272,6 +288,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
             where TModel : BaseEntityData, IVersionedAssociation, new()
             where TDomain : class, IDbBaseData, new()
         {
+
+            public GenericBaseVersionedAssociationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+            {
+            }
+
             /// <summary>
             /// Get all the matching TModel object from source
             /// </summary>
@@ -291,6 +312,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
             where TModel : IdentifiedData, ISimpleAssociation, new()
             where TDomain : class, IDbIdentified, new()
         {
+
+
+            public GenericIdentityAssociationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+            {
+            }
+
             /// <summary>
             /// Get all the matching TModel object from source
             /// </summary>
@@ -309,6 +336,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
             where TModel : IdentifiedData, IVersionedAssociation, new()
             where TDomain : class, IDbIdentified, new()
         {
+
+            public GenericIdentityVersionedAssociationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+            {
+            }
+
             /// <summary>
             /// Get all the matching TModel object from source
             /// </summary>
@@ -398,10 +430,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     this.m_tracer.TraceEvent(EventLevel.Informational,  "Loading {0}...", t.AssemblyQualifiedName);
 
                     // If the persistence service is generic then we should check if we're allowed
-                    if(!t.IsGenericType || 
+                    if (!t.IsGenericType ||
                         t.IsGenericType && (this.GetConfiguration().AllowedResources.Count == 0 ||
                         this.GetConfiguration().AllowedResources.Contains(t.GetGenericArguments()[0].GetCustomAttribute<XmlTypeAttribute>()?.TypeName)))
-	                    ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(t);
+                    {
+                        var instance = Activator.CreateInstance(t, this);
+                        ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(instance);
+                    }
 
 					// Add to cache since we're here anyways
 
@@ -410,6 +445,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 catch (Exception e)
                 {
                     this.m_tracer.TraceEvent(EventLevel.Error,  "Error adding service {0} : {1}", t.AssemblyQualifiedName, e);
+                    throw new InvalidOperationException($"Error adding service {t.AssemblyQualifiedName}", e);
                 }
             }
 
@@ -454,9 +490,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         else
                             pclass = typeof(GenericBasePersistenceService<,>);
                         pclass = pclass.MakeGenericType(modelClassType, domainClassType);
-                        ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(pclass);
+                        var instance = Activator.CreateInstance(pclass, this);
+                        ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(instance);
                         // Add to cache since we're here anyways
-                        this.m_persistenceCache.Add(modelClassType, Activator.CreateInstance(pclass) as IAdoPersistenceService);
+                        this.m_persistenceCache.Add(modelClassType, instance as IAdoPersistenceService);
                     }
                     else if (modelClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IIdentifiedEntity)) &&
                         domainClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDbIdentified)))
@@ -471,8 +508,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             pclass = typeof(GenericIdentityPersistenceService<,>);
 
                         pclass = pclass.MakeGenericType(modelClassType, domainClassType);
-                        ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(pclass);
-                        this.m_persistenceCache.Add(modelClassType, Activator.CreateInstance(pclass) as IAdoPersistenceService);
+                        var instance = Activator.CreateInstance(pclass, this);
+                        ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(instance);
+                        this.m_persistenceCache.Add(modelClassType, instance as IAdoPersistenceService);
                     }
                     else
                         this.m_tracer.TraceEvent(EventLevel.Warning, "Classmap {0}>{1} cannot be created, ignoring", modelClassType, domainClassType);
@@ -482,7 +520,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             catch (Exception e)
             {
                 this.m_tracer.TraceEvent(EventLevel.Error,  "Error initializing local persistence: {0}", e);
-                throw e;
+                throw new Exception("Error initializing local persistence",  e);
             }
 
             // Bind subscription execution

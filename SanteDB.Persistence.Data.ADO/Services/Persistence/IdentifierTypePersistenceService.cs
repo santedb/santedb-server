@@ -25,5 +25,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class IdentifierTypePersistenceService : IdentifiedPersistenceService<Core.Model.DataTypes.IdentifierType, DbIdentifierType>
 	{
+
+        public IdentifierTypePersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
 	}
 }

@@ -28,6 +28,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class ConceptSetPersistenceService : BaseDataPersistenceService<Core.Model.DataTypes.ConceptSet, DbConceptSet>
 	{
 
+        public ConceptSetPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
 		/// Converts a <see cref="Data.ConceptSet"/> instance to a <see cref="Core.Model.DataTypes.ConceptSet"/> instance.
 		/// </summary>
@@ -81,7 +85,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (data.ConceptsXml != null)
             {
                 // Special case m2m
-                var existingConceptSets = context.Query<DbConceptSetConceptAssociation>(o => o.ConceptSetKey == retVal.Key);
+                var existingConceptSets = context.Query<DbConceptSetConceptAssociation>(o => o.ConceptSetKey == retVal.Key).ToArray();
                 // Any new?
                 var newConcepts = data.ConceptsXml.Where(o => !existingConceptSets.Select(e => e.ConceptKey).ToList().Contains(o));
                 foreach (var i in newConcepts)

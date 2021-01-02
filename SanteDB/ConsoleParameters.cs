@@ -49,6 +49,7 @@ namespace SanteDB
         [Description("Load an alternate configuration file")]
         [Parameter("config")]
         public string ConfigFile { get; set; }
+
         /// <summary>
         /// Start test
         /// </summary>
@@ -77,5 +78,11 @@ namespace SanteDB
         [Description("Unregister the service in Windows")]
         public bool UnInstall { get; set; }
 
+        /// <summary>
+        /// Gets or sets the instance name
+        /// </summary>
+        [Parameter("name")]
+        [Description("Sets the instance name")]
+        public string InstanceName { get; set; }
     }
 }

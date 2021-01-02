@@ -21,16 +21,20 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model;
 using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
+using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
 using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
+using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
 using SanteDB.Persistence.Data.ADO.Data.Model.Extensibility;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Linq;
 
@@ -42,13 +46,17 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class ActPersistenceService : VersionedDataPersistenceService<Core.Model.Acts.Act, DbActVersion, DbAct>
     {
 
+        public ActPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// To model instance
         /// </summary>
         public virtual TActType ToModelInstance<TActType>(DbActVersion dbInstance, DbAct actInstance, DataContext context) where TActType : Core.Model.Acts.Act, new()
         {
 
-            var retVal = m_mapper.MapDomainInstance<DbActVersion, TActType>(dbInstance);
+            var retVal = this.m_settingsProvider.GetMapper().MapDomainInstance<DbActVersion, TActType>(dbInstance);
             if (retVal == null) return null;
 
             retVal.ClassConceptKey = actInstance?.ClassConceptKey;
@@ -74,14 +82,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             switch (dbAct.ClassConceptKey.ToString().ToUpper())
             {
                 case ActClassKeyStrings.ControlAct:
-                    retVal = new ControlActPersistenceService().ToModelInstance(
+                    retVal = new ControlActPersistenceService(this.m_settingsProvider).ToModelInstance(
                                 (dataInstance as CompositeResult)?.Values.OfType<DbControlAct>().FirstOrDefault() ?? context.FirstOrDefault<DbControlAct>(o => o.ParentKey == dbActVersion.VersionKey),
                                 dbActVersion,
                                 dbAct,
                                 context);
                     break;
                 case ActClassKeyStrings.SubstanceAdministration:
-                    retVal = new SubstanceAdministrationPersistenceService().ToModelInstance(
+                    retVal = new SubstanceAdministrationPersistenceService(this.m_settingsProvider).ToModelInstance(
                                 (dataInstance as CompositeResult)?.Values.OfType<DbSubstanceAdministration>().FirstOrDefault() ?? context.FirstOrDefault<DbSubstanceAdministration>(o => o.ParentKey == dbActVersion.VersionKey),
                                 dbActVersion,
                                 dbAct,
@@ -98,7 +106,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         switch (dbObs.ValueType)
                         {
                             case "ST":
-                                retVal = new TextObservationPersistenceService().ToModelInstance(
+                                retVal = new TextObservationPersistenceService(this.m_settingsProvider).ToModelInstance(
                                     (dataInstance as CompositeResult)?.Values.OfType<DbTextObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbTextObservation>(o => o.ParentKey == dbObs.ParentKey),
                                     dbObs,
                                     dbActVersion,
@@ -106,7 +114,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                     context);
                                 break;
                             case "CD":
-                                retVal = new CodedObservationPersistenceService().ToModelInstance(
+                                retVal = new CodedObservationPersistenceService(this.m_settingsProvider).ToModelInstance(
                                     (dataInstance as CompositeResult)?.Values.OfType<DbCodedObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbCodedObservation>(o => o.ParentKey == dbObs.ParentKey),
                                     dbObs,
                                     dbActVersion,
@@ -114,7 +122,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                     context);
                                 break;
                             case "PQ":
-                                retVal = new QuantityObservationPersistenceService().ToModelInstance(
+                                retVal = new QuantityObservationPersistenceService(this.m_settingsProvider).ToModelInstance(
                                     (dataInstance as CompositeResult)?.Values.OfType<DbQuantityObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbQuantityObservation>(o => o.ParentKey == dbObs.ParentKey),
                                     dbObs,
                                     dbActVersion,
@@ -122,7 +130,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                     context);
                                 break;
                             default:
-                                retVal = new ObservationPersistenceService().ToModelInstance(
+                                retVal = new ObservationPersistenceService(this.m_settingsProvider).ToModelInstance(
                                     dbObs,
                                     dbActVersion,
                                     dbAct,
@@ -131,7 +139,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         }
                     break;
                 case ActClassKeyStrings.Encounter:
-                    retVal = new EncounterPersistenceService().ToModelInstance(
+                    retVal = new EncounterPersistenceService(this.m_settingsProvider).ToModelInstance(
                                 (dataInstance as CompositeResult)?.Values.OfType<DbPatientEncounter>().FirstOrDefault() ?? context.FirstOrDefault<DbPatientEncounter>(o => o.ParentKey == dbActVersion.VersionKey),
                                 dbActVersion,
                                 dbAct,
@@ -365,7 +373,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (data.Participations != null)
             {
                 // Correct mixed keys
-                if (this.m_persistenceService.GetConfiguration().DataCorrectionKeys.Contains("edmonton-participation-keyfix"))
+                if (this.m_settingsProvider.GetConfiguration().DataCorrectionKeys.Contains("edmonton-participation-keyfix"))
                 {
                     // Obsolete all
                     foreach (var itm in context.Query<DbActParticipation>(o => o.SourceKey == retVal.Key && o.ObsoleteVersionSequenceId == null && o.ParticipationRoleKey == ActParticipationKey.Consumable))
@@ -427,23 +435,23 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             switch (data.ClassConceptKey.ToString().ToUpper())
             {
                 case ActClassKeyStrings.ControlAct:
-                    return new ControlActPersistenceService().InsertInternal(context, data.Convert<ControlAct>());
+                    return new ControlActPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<ControlAct>());
                 case ActClassKeyStrings.SubstanceAdministration:
-                    return new SubstanceAdministrationPersistenceService().InsertInternal(context, data.Convert<SubstanceAdministration>());
+                    return new SubstanceAdministrationPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<SubstanceAdministration>());
                 case ActClassKeyStrings.Observation:
                     switch (data.GetType().Name)
                     {
                         case "TextObservation":
-                            return new TextObservationPersistenceService().InsertInternal(context, data.Convert<TextObservation>());
+                            return new TextObservationPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<TextObservation>());
                         case "CodedObservation":
-                            return new CodedObservationPersistenceService().InsertInternal(context, data.Convert<CodedObservation>());
+                            return new CodedObservationPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<CodedObservation>());
                         case "QuantityObservation":
-                            return new QuantityObservationPersistenceService().InsertInternal(context, data.Convert<QuantityObservation>());
+                            return new QuantityObservationPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<QuantityObservation>());
                         default:
                             return this.InsertCoreProperties(context, data);
                     }
                 case ActClassKeyStrings.Encounter:
-                    return new EncounterPersistenceService().InsertInternal(context, data.Convert<PatientEncounter>());
+                    return new EncounterPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<PatientEncounter>());
                 case ActClassKeyStrings.Condition:
                 default:
                     return this.InsertCoreProperties(context, data);
@@ -459,23 +467,23 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             switch (data.ClassConceptKey.ToString().ToUpper())
             {
                 case ActClassKeyStrings.ControlAct:
-                    return new ControlActPersistenceService().UpdateInternal(context, data.Convert<ControlAct>());
+                    return new ControlActPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<ControlAct>());
                 case ActClassKeyStrings.SubstanceAdministration:
-                    return new SubstanceAdministrationPersistenceService().UpdateInternal(context, data.Convert<SubstanceAdministration>());
+                    return new SubstanceAdministrationPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<SubstanceAdministration>());
                 case ActClassKeyStrings.Observation:
                     switch (data.GetType().Name)
                     {
                         case "TextObservation":
-                            return new TextObservationPersistenceService().UpdateInternal(context, data.Convert<TextObservation>());
+                            return new TextObservationPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<TextObservation>());
                         case "CodedObservation":
-                            return new CodedObservationPersistenceService().UpdateInternal(context, data.Convert<CodedObservation>());
+                            return new CodedObservationPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<CodedObservation>());
                         case "QuantityObservation":
-                            return new QuantityObservationPersistenceService().UpdateInternal(context, data.Convert<QuantityObservation>());
+                            return new QuantityObservationPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<QuantityObservation>());
                         default:
                             return this.UpdateCoreProperties(context, data);
                     }
                 case ActClassKeyStrings.Encounter:
-                    return new EncounterPersistenceService().UpdateInternal(context, data.Convert<PatientEncounter>());
+                    return new EncounterPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<PatientEncounter>());
                 case ActClassKeyStrings.Condition:
                 default:
                     return this.UpdateCoreProperties(context, data);
@@ -489,47 +497,295 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         protected override void BulkPurgeInternal(DataContext context, Guid[] keysToPurge)
         {
             // Purge the related fields
-            var versionKeys = context.Query<DbActVersion>(o => keysToPurge.Contains(o.Key)).Select(o => o.VersionKey).ToArray();
+            int ofs = 0;
+            while (ofs < keysToPurge.Length)
+            {
+                var batchKeys = keysToPurge.Skip(ofs).Take(100).ToArray();
+                ofs += 100;
+                var versionKeys = context.Query<DbActVersion>(o => batchKeys.Contains(o.Key)).Select(o => o.VersionKey).ToArray();
 
-            // Delete versions of this act in sub tables
-            context.Delete<DbTextObservation>(o => versionKeys.Contains(o.ParentKey));
-            context.Delete<DbQuantityObservation>(o => versionKeys.Contains(o.ParentKey));
-            context.Delete<DbCodedObservation>(o => versionKeys.Contains(o.ParentKey));
-            context.Delete<DbObservation>(o => versionKeys.Contains(o.ParentKey));
-            context.Delete<DbProcedure>(o => versionKeys.Contains(o.ParentKey));
-            context.Delete<DbSubstanceAdministration>(o => versionKeys.Contains(o.ParentKey));
-            context.Delete<DbControlAct>(o => versionKeys.Contains(o.ParentKey));
-            context.Delete<DbPatientEncounter>(o => versionKeys.Contains(o.ParentKey));
-            
-            // TODO: Other acts
-            
+                // Delete versions of this act in sub tables
+                context.Delete<DbTextObservation>(o => versionKeys.Contains(o.ParentKey));
+                context.Delete<DbQuantityObservation>(o => versionKeys.Contains(o.ParentKey));
+                context.Delete<DbCodedObservation>(o => versionKeys.Contains(o.ParentKey));
+                context.Delete<DbObservation>(o => versionKeys.Contains(o.ParentKey));
+                context.Delete<DbProcedure>(o => versionKeys.Contains(o.ParentKey));
+                context.Delete<DbSubstanceAdministration>(o => versionKeys.Contains(o.ParentKey));
+                context.Delete<DbControlAct>(o => versionKeys.Contains(o.ParentKey));
+                context.Delete<DbPatientEncounter>(o => versionKeys.Contains(o.ParentKey));
 
-            // Purge the related fields
-            context.Delete<DbActIdentifier>(o => keysToPurge.Contains(o.SourceKey));
-            context.Delete<DbActExtension>(o => keysToPurge.Contains(o.SourceKey));
-            context.Delete<DbActTag>(o => keysToPurge.Contains(o.SourceKey));
-            context.Delete<DbActNote>(o => keysToPurge.Contains(o.SourceKey));
-            context.Delete<DbActProtocol>(o => keysToPurge.Contains(o.SourceKey));
-            
-            // Note: Security tags are not deleted as they still apply even when this record is purged
+                // TODO: Other acts
 
-            // TODO: Do we orphan sub-objects (delete the link) or do we clean those up to?
-            context.Delete<DbActAssociation>(o => keysToPurge.Contains(o.SourceKey));
-            context.Delete<DbActParticipation>(o => keysToPurge.Contains(o.SourceKey));
 
-            // Purge the core entity data
-            context.Delete<DbActVersion>(o => keysToPurge.Contains(o.Key));
+                // Purge the related fields
+                context.Delete<DbActIdentifier>(o => batchKeys.Contains(o.SourceKey));
+                context.Delete<DbActExtension>(o => batchKeys.Contains(o.SourceKey));
+                context.Delete<DbActTag>(o => batchKeys.Contains(o.SourceKey));
+                context.Delete<DbActNote>(o => batchKeys.Contains(o.SourceKey));
+                context.Delete<DbActProtocol>(o => batchKeys.Contains(o.SourceKey));
 
-            // Create a version which indicates this is PURGED
-            foreach (var itm in keysToPurge)
-                context.Insert<DbActVersion>(new DbActVersion()
+                // Note: Security tags are not deleted as they still apply even when this record is purged
+
+                // TODO: Do we orphan sub-objects (delete the link) or do we clean those up to?
+                context.Delete<DbActRelationship>(o => batchKeys.Contains(o.SourceKey));
+                context.Delete<DbActParticipation>(o => batchKeys.Contains(o.SourceKey));
+
+                // Detach keys which are being deleted will need to be removed from the version heirarchy
+                foreach (var rpl in context.Query<DbActVersion>(o => versionKeys.Contains(o.ReplacesVersionKey.Value)))
                 {
-                    CreatedByKey = context.ContextId,
-                    CreationTime = DateTimeOffset.Now,
-                    Key = itm,
-                    StatusConceptKey = StatusKeys.Purged,
-                    
-                });
+                    rpl.ReplacesVersionKey = null;
+                    rpl.ReplacesVersionKeySpecified = true;
+                    context.Update(rpl);
+                }
+
+                // Purge the core entity data
+                context.Delete<DbActVersion>(o => batchKeys.Contains(o.Key));
+
+
+                // Create a version which indicates this is PURGED
+                context.Insert(context.Query<DbAct>(o => batchKeys.Contains(o.Key))
+                    .Select(o => o.Key)
+                    .Distinct()
+                    .ToArray()
+                    .Select(o => new DbActVersion()
+                    {
+                        CreatedByKey = context.ContextId,
+                        CreationTime = DateTimeOffset.Now,
+                        Key = o,
+                        StatusConceptKey = StatusKeys.Purged
+                    }));
+
+            }
+
+            context.ResetSequence("ACT_VRSN_SEQ",
+                context.Query<DbActVersion>(o => true).Max(o => o.VersionSequenceId));
+
         }
+
+        /// <summary>
+        /// Copy the specified ACT data 
+        /// </summary>
+        public override void Copy(Guid[] keysToCopy, DataContext fromContext, DataContext toContext)
+        {
+            // TODO:Clean this mess up
+            // Purge the related fields
+            int ofs = 0;
+            IEnumerable<Guid> additionalKeys = fromContext.Query<DbExtensionType>(o => o.ObsoletionTime == null)
+                .Select(o => o.CreatedByKey)
+                .Distinct()
+                .Union(
+                    fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null)
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                )
+                .Union(
+                    fromContext.Query<DbProtocol>(o => o.ObsoletionTime == null)
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                )
+                .Union(
+                    fromContext.Query<DbTemplateDefinition>(o => o.ObsoletionTime == null)
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbProtocolHandler>(o => o.ObsoletionTime == null)
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbConceptVersion>(o => o.Key != null)
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                )
+                .ToArray();
+
+            toContext.InsertOrUpdate(fromContext.Query<DbSecurityProvenance>(o => additionalKeys.Contains(o.Key)));
+
+            // copy all concepts that are referenced in the Act tabls
+            additionalKeys = fromContext.Query<DbAct>(o => o.Key != null)
+                .Select(o => o.MoodConceptKey)
+                .Distinct()
+                .Union(
+                    fromContext.Query<DbAct>(o => o.Key != null)
+                    .Select(o => o.ClassConceptKey)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbActVersion>(o => o.Key != null)
+                    .Select(o => o.StatusConceptKey)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbActVersion>(o => o.Key != null)
+                    .Select(o => o.TypeConceptKey)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbPatientEncounter>(o => o.ParentKey != null)
+                    .Select(o => o.DischargeDispositionKey)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbSubstanceAdministration>(o => o.ParentKey != null)
+                    .Select(o => o.RouteConceptKey)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbSubstanceAdministration>(o => o.ParentKey != null)
+                    .Select(o => o.DoseUnitConceptKey)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbObservation>(o => o.ParentKey != null)
+                    .Select(o => o.InterpretationConceptKey)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbActRelationship>(o => o.Key != null)
+                    .Select(o => o.RelationshipTypeKey)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbActVersion>(o => o.Key != null)
+                    .Select(o => o.ReasonConceptKey)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbActParticipation>(o => o.Key != null)
+                    .Select(o => o.ParticipationRoleKey)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbQuantityObservation>(o => o.ParentKey != null)
+                    .Select(o => o.UnitOfMeasureKey)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbCodedObservation>(o => o.ParentKey != null)
+                    .Select(o => o.Value)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbSubstanceAdministration>(o => o.ParentKey != null)
+                    .Select(o => o.SiteConceptKey)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbProcedure>(o => o.ParentKey != null)
+                    .Select(o => o.TargetSiteConceptKey)
+                    .Distinct()
+                    .ToArray()
+                    .Where(o => o.HasValue)
+                    .Select(o => o.Value)
+                ).Union(
+                    fromContext.Query<DbProcedure>(o => o.ParentKey != null)
+                    .Select(o => o.MethodConceptKey)
+                    .Distinct()
+                    .ToArray()
+                    .Where(o => o.HasValue)
+                    .Select(o => o.Value)
+                ).Union(
+                    fromContext.Query<DbProcedure>(o => o.ParentKey != null)
+                    .Select(o => o.ApproachSiteConceptKey)
+                    .Distinct()
+                    .ToArray()
+                    .Where(o => o.HasValue)
+                    .Select(o => o.Value)
+                )
+                .ToArray();
+            toContext.InsertOrUpdate(fromContext.Query<DbConceptClass>(o => true));
+            toContext.InsertOrUpdate(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
+            toContext.InsertOrUpdate(fromContext.Query<DbConceptVersion>(o => additionalKeys.Contains(o.Key)).OrderBy(o => o.VersionSequenceId));
+            toContext.InsertOrUpdate(fromContext.Query<DbConceptSet>(o => true));
+            toContext.InsertOrUpdate(fromContext.Query<DbConceptSetConceptAssociation>(o => additionalKeys.Contains(o.ConceptKey)));
+
+            additionalKeys = fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null)
+               .Select(o => o.AssigningApplicationKey).Distinct().ToArray()
+               .Where(o => o.HasValue)
+               .Select(o => o.Value);
+
+            toContext.InsertOrUpdate(fromContext.Query<DbSecurityApplication>(o => additionalKeys.Contains(o.Key)).ToArray().Select(o => new DbSecurityApplication()
+            {
+                Key = o.Key,
+                CreatedByKey = o.CreatedByKey,
+                CreationTime = o.CreationTime,
+                InvalidAuthAttempts = 0,
+                Lockout = o.Lockout,
+                LastAuthentication = o.LastAuthentication,
+                PublicId = o.PublicId,
+                ObsoletionTime = o.ObsoletionTime,
+                ObsoletedByKey = o.ObsoletedByKey,
+                Secret = o.Secret ?? "XXXX",
+                UpdatedByKey = o.UpdatedByKey,
+                UpdatedTime = o.UpdatedTime
+            }));
+
+            toContext.InsertOrUpdate(fromContext.Query<DbProtocolHandler>(o => o.ObsoletionTime == null));
+            toContext.InsertOrUpdate(fromContext.Query<DbProtocol>(o => o.ObsoletionTime == null));
+            toContext.InsertOrUpdate(fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null));
+            toContext.InsertOrUpdate(fromContext.Query<DbExtensionType>(o => o.ObsoletionTime == null));
+            toContext.InsertOrUpdate(fromContext.Query<DbTemplateDefinition>(o => o.ObsoletionTime == null));
+
+            while (ofs < keysToCopy.Length)
+            {
+                var batchKeys = keysToCopy.Skip(ofs).Take(100).ToArray();
+                ofs += 100;
+                // Purge the related fields
+                var versionKeys = fromContext.Query<DbActVersion>(o => batchKeys.Contains(o.Key)).Select(o => o.VersionKey).ToArray();
+
+                // Copy users of interest
+                additionalKeys = fromContext.Query<DbActVersion>(o => batchKeys.Contains(o.Key))
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                    .Union(
+                        fromContext.Query<DbActTag>(o => batchKeys.Contains(o.SourceKey))
+                        .Select(o => o.CreatedByKey)
+                        .Distinct()
+                    )
+                    .Union(
+                        fromContext.Query<DbActVersion>(o => batchKeys.Contains(o.Key))
+                        .Select(o => o.ObsoletedByKey)
+                        .Distinct()
+                        .ToArray()
+                        .Where(o => o.HasValue)
+                        .Select(o => o.Value)
+                    )
+                    .ToArray();
+                toContext.InsertOrUpdate(fromContext.Query<DbSecurityProvenance>(o => additionalKeys.Contains(o.Key)));
+
+                toContext.InsertOrUpdate(fromContext.Query<DbAct>(o => batchKeys.Contains(o.Key)));
+                toContext.InsertOrUpdate(fromContext.Query<DbActVersion>(o => batchKeys.Contains(o.Key)));
+
+                // Other types of acts
+                toContext.InsertOrUpdate(fromContext.Query<DbPatientEncounter>(o => versionKeys.Contains(o.ParentKey)));
+                toContext.InsertOrUpdate(fromContext.Query<DbControlAct>(o => versionKeys.Contains(o.ParentKey)));
+                toContext.InsertOrUpdate(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdate(fromContext.Query<DbSubstanceAdministration>(o => versionKeys.Contains(o.ParentKey)));
+
+                toContext.InsertOrUpdate(fromContext.Query<DbProcedure>(o => versionKeys.Contains(o.ParentKey)));
+                toContext.InsertOrUpdate(fromContext.Query<DbObservation>(o => versionKeys.Contains(o.ParentKey)));
+
+                // Delete versions of this act in sub tables
+                toContext.InsertOrUpdate(fromContext.Query<DbTextObservation>(o => versionKeys.Contains(o.ParentKey)));
+                toContext.InsertOrUpdate(fromContext.Query<DbQuantityObservation>(o => versionKeys.Contains(o.ParentKey)));
+                toContext.InsertOrUpdate(fromContext.Query<DbCodedObservation>(o => versionKeys.Contains(o.ParentKey)));
+
+                // TODO: Other acts
+
+                // Purge the related fields
+                toContext.InsertOrUpdate(fromContext.Query<DbActIdentifier>(o => batchKeys.Contains(o.SourceKey) && o.ObsoleteVersionSequenceId == null));
+                toContext.InsertOrUpdate(fromContext.Query<DbActExtension>(o => batchKeys.Contains(o.SourceKey) && o.ObsoleteVersionSequenceId == null));
+                toContext.InsertOrUpdate(fromContext.Query<DbActTag>(o => batchKeys.Contains(o.SourceKey) && o.ObsoletionTime == null));
+                toContext.InsertOrUpdate(fromContext.Query<DbActNote>(o => batchKeys.Contains(o.SourceKey) && o.ObsoleteVersionSequenceId == null));
+
+                toContext.InsertOrUpdate(fromContext.Query<DbActProtocol>(o => batchKeys.Contains(o.SourceKey)));
+
+                // Note: Security tags are not deleted as they still apply even when this record is purged
+
+                additionalKeys = fromContext.Query<DbActRelationship>(o => batchKeys.Contains(o.SourceKey))
+                    .Select(o => o.TargetKey)
+                    .Distinct()
+                    .ToArray();
+                toContext.InsertOrUpdate(fromContext.Query<DbAct>(o => additionalKeys.Contains(o.Key)));
+
+                toContext.InsertOrUpdate(fromContext.Query<DbActRelationship>(o => batchKeys.Contains(o.SourceKey) && o.ObsoleteVersionSequenceId == null));
+
+                additionalKeys = fromContext.Query<DbActParticipation>(o => batchKeys.Contains(o.SourceKey))
+                   .Select(o => o.TargetKey)
+                   .Distinct()
+                   .ToArray();
+                toContext.InsertOrUpdate(fromContext.Query<DbEntity>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdate(fromContext.Query<DbActParticipation>(o => batchKeys.Contains(o.SourceKey) && o.ObsoleteVersionSequenceId == null));
+            }
+
+            toContext.ResetSequence("ACT_VRSN_SEQ", toContext.Query<DbActVersion>(o => true).Max(o => o.VersionSequenceId));
+        }
+
     }
 }

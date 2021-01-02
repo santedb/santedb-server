@@ -39,6 +39,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class EntityNamePersistenceService : IdentifiedPersistenceService<Core.Model.Entities.EntityName, DbEntityName>, IAdoAssociativePersistenceService
     {
 
+        public EntityNamePersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Convert data instance to model instance
         /// </summary>
@@ -133,6 +137,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class EntityNameComponentPersistenceService : IdentifiedPersistenceService<Core.Model.Entities.EntityNameComponent, DbEntityNameComponent, CompositeResult<DbEntityNameComponent, DbPhoneticValue>>, IAdoAssociativePersistenceService
     {
+
+        public EntityNameComponentPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
 
         /// <summary>
         /// Append order by

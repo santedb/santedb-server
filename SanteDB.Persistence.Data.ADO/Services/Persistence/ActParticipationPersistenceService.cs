@@ -36,6 +36,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class ActParticipationPersistenceService : IdentifiedPersistenceService<ActParticipation, DbActParticipation, DbActParticipation> ,IAdoAssociativePersistenceService
     {
+
+        public ActParticipationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Get from source id
         /// </summary>
@@ -78,7 +83,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             if (context.LoadState == Core.Model.LoadState.FullLoad)
             {
-                var concept = this.m_persistenceService.GetPersister(typeof(Concept)).Get(participationPart.ParticipationRoleKey);
+                var concept = this.m_settingsProvider.GetPersister(typeof(Concept)).Get(participationPart.ParticipationRoleKey);
                 if (concept != null)
                     retVal.ParticipationRole = concept as Concept;
             }

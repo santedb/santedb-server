@@ -35,6 +35,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class ReferenceTermNamePersistenceService : BaseDataPersistenceService<ReferenceTermName, DbReferenceTermName>, IAdoAssociativePersistenceService
     {
 
+        public ReferenceTermNamePersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Get names from source
         /// </summary>

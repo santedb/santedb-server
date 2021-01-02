@@ -446,7 +446,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     var updatedUser = dataContext.Update(user);
 
-	                var securityUser = new SecurityUserPersistenceService().ToModelInstance(updatedUser, dataContext);
+	                var securityUser = new SecurityUserPersistenceService(ApplicationServiceContext.Current.GetService<AdoPersistenceService>()).ToModelInstance(updatedUser, dataContext);
 					ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(securityUser);
                 }
 

@@ -44,6 +44,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         where TQueryReturn : CompositeResult
     {
 
+        public SimpleVersionedEntityPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
         
         /// <summary>
         /// Append order by query
@@ -77,7 +80,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
             else
             {
-                var domainQuery = this.m_persistenceService.GetQueryBuilder().CreateQuery<TModel>(o => o.Key == key && o.ObsoletionTime == null).Build();
+                var domainQuery = this.m_settingsProvider.GetQueryBuilder().CreateQuery<TModel>(o => o.Key == key && o.ObsoletionTime == null).Build();
                 domainQuery.OrderBy<TRootEntity>(o => o.VersionSequenceId, Core.Model.Map.SortOrderType.OrderByDescending);
                 cacheItem = this.ToModelInstance(context.FirstOrDefault<TQueryReturn>(domainQuery), context);
                 if (cacheService != null)
@@ -117,7 +120,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
 
             // Query object
-            using (var connection = m_configuration.Provider.GetReadonlyConnection())
+            using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetReadonlyConnection())
                 try
                 {
                     connection.Open();

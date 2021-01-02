@@ -20,10 +20,10 @@
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.10.0.23074" xmlns="http://santedb.org/configuration">
   <sections>
+    <add type="SanteDB.Caching.Memory.Configuration.MemoryCacheConfigurationSection, SanteDB.Caching.Memory, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.ApplicationServiceContextConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.DiagnosticsConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Authentication.OAuth2.Configuration.OAuthConfigurationSection, SanteDB.Authentication.OAuth2, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Caching.Memory.Configuration.MemoryCacheConfigurationSection, SanteDB.Caching.Memory, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Caching.Redis.Configuration.RedisConfigurationSection, SanteDB.Caching.Redis, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.JobConfigurationSection, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.RestConfigurationSection, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
@@ -44,6 +44,7 @@
     <add type="SanteDB.Persistence.Diagnostics.Jira.Configuration.JiraServiceConfigurationSection, SanteDB.Persistence.Diagnostics.Jira, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Persistence.MDM.Configuration.MdmConfigurationSection, SanteDB.Persistence.MDM, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Persistence.Reporting.ADO.Configuration.ReportingConfiguration, SanteDB.Persistence.Reporting.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Caching.Memory.Configuration.MemoryCacheConfigurationSection, SanteDB.Caching.Memory, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Reporting.Core.Configuration.ReportingConfigurationSection, SanteDB.Reporting.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Reporting.Jasper.Configuration.JasperConfigurationSection, SanteDB.Reporting.Jasper, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Warehouse.ADO.Configuration.AdoWarehouseConfigurationSection, SanteDB.Warehouse.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
@@ -66,7 +67,8 @@
       <add name="Firebird Data Provider" invariant="FirebirdSQL" description="Firebird" type="FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient, Culture=neutral, PublicKeyToken=3750abcc3150b00c" />
     </dbProviderFactories>
   </section>
-  <section xsi:type="MemoryCacheConfigurationSection" autoSubscribe="true" maxSize="10000" maxAge="36000000" />
+  <section xsi:type="MemoryCacheConfigurationSection" autoSubscribe="true" maxSize="10000" maxAge="3600" />
+
   <!-- Represents this server's internal security configuration -->
   <section xsi:type="SecurityConfigurationSection" passwordRegex="^(?=.*\d){1,}(?=.*[a-z]){1,}(?=.*[A-Z]){1,}(?=.*[^\w\d]){1,}.{6,}$" allowUnsignedApplets="true">
     <!-- Sets the thumbprints of publishers that should be trusted to run code-->

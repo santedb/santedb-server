@@ -102,18 +102,18 @@
           <Project>{407c87e6-a1f3-45e6-b883-a8176b350817}</Project>
           <Name>SanteDB.OrmLite</Name>
         </ProjectReference>
- <ProjectReference Include="..\santedb-restsvc\SanteDB.Core.Model.RISI\SanteDB.Core.Model.RISI.csproj">
-      <Project>{f3d2fa84-c398-4390-9834-1272cc2d6f89}</Project>
-      <Name>SanteDB.Core.Model.RISI</Name>
-    </ProjectReference>
+        <ProjectReference Include="..\santedb-restsvc\SanteDB.Core.Model.RISI\SanteDB.Core.Model.RISI.csproj">
+          <Project>{f3d2fa84-c398-4390-9834-1272cc2d6f89}</Project>
+          <Name>SanteDB.Core.Model.RISI</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.57.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.57.0" />
-        <PackageReference Include="SanteDB.Core.Model.RISI" Version="2.0.57.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.0.57.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.59.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.59.0" />
+        <PackageReference Include="SanteDB.Core.Model.RISI" Version="2.0.59.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="2.0.59.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

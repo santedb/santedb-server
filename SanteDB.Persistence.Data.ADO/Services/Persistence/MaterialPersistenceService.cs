@@ -30,6 +30,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class MaterialPersistenceService : EntityDerivedPersistenceService<Core.Model.Entities.Material, DbMaterial>
     {
 
+
+        public MaterialPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Creates the specified model instance
         /// </summary>

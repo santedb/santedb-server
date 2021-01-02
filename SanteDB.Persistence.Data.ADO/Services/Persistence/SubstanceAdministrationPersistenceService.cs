@@ -31,6 +31,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class SubstanceAdministrationPersistenceService : ActDerivedPersistenceService<Core.Model.Acts.SubstanceAdministration,DbSubstanceAdministration>
     {
+
+        public SubstanceAdministrationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Convert databased model to model
         /// </summary>
@@ -68,7 +73,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 data.RouteKey = NullReasonKeys.NoInformation;
 
             // JF: Correct dose unit key
-            if (this.m_persistenceService.GetConfiguration().DataCorrectionKeys.Contains("invalid-sbadm-dose-unit") &&
+            if (this.m_settingsProvider.GetConfiguration().DataCorrectionKeys.Contains("invalid-sbadm-dose-unit") &&
                 data.DoseUnitKey == Guid.Parse("a77b8d83-1cc9-4806-a268-5d1738154afa"))
                 data.DoseUnitKey = Guid.Parse("a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76");
             data.DoseUnitKey = data.DoseUnit?.Key ?? data.DoseUnitKey;

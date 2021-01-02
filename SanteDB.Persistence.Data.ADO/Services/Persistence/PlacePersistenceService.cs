@@ -26,6 +26,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class PlacePersistenceService : EntityDerivedPersistenceService<Core.Model.Entities.Place,DbPlace>
     {
+
+        public PlacePersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Load to a model instance
         /// </summary>

@@ -32,6 +32,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class ReferenceTermPersistenceService : BaseDataPersistenceService<ReferenceTerm, DbReferenceTerm>
 	{
 
+        public ReferenceTermPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
 
         /// <summary>
         /// Inserts a reference term.
@@ -45,7 +48,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Re-Key? 
             if (data.Key.HasValue)
             {
-                var existing = context.FirstOrDefault<DbReferenceTerm>(o => o.Mnemonic == data.Mnemonic && o.ObsoletionTime == null && o.Key != data.Key);
+                var existing = context.FirstOrDefault<DbReferenceTerm>(o => o.Mnemonic == data.Mnemonic && o.ObsoletionTime == null && o.Key != data.Key && o.CodeSystemKey == data.CodeSystemKey);
                 // Obsolete the old
                 if (existing != null)
                 {

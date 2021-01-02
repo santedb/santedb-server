@@ -173,7 +173,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             .InnerJoin<DbSecurityUserChallengeAssoc, DbSecurityUser>(o => o.UserKey, o => o.Key)
                             .Where<DbSecurityUser>(o => o.UserName.ToLower() == userName);
 
-                    var retVal = context.Query<CompositeResult<DbSecurityChallenge, DbSecurityUserChallengeAssoc>>(sqlQuery).Select(o => new SecurityChallenge()
+                    var retVal = context.Query<CompositeResult<DbSecurityChallenge, DbSecurityUserChallengeAssoc>>(sqlQuery).ToArray().Select(o => new SecurityChallenge()
                     {
                         ChallengeText = o.Object1.ChallengeText,
                         Key = o.Object1.Key,
@@ -213,7 +213,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             .InnerJoin<DbSecurityUserChallengeAssoc>(o => o.Key, o => o.ChallengeKey)
                             .Where<DbSecurityUserChallengeAssoc>(o => o.UserKey == userKey);
 
-                    var retVal = context.Query<CompositeResult<DbSecurityChallenge, DbSecurityUserChallengeAssoc>>(sqlQuery).Select(o => new SecurityChallenge()
+                    var retVal = context.Query<CompositeResult<DbSecurityChallenge, DbSecurityUserChallengeAssoc>>(sqlQuery).ToArray().Select(o => new SecurityChallenge()
                     {
                         ChallengeText = o.Object1.ChallengeText,
                         Key = o.Object1.Key,

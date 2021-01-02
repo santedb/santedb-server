@@ -288,7 +288,7 @@ namespace SanteDB.Messaging.HDSI.Test
             TimeSpan myTime = new TimeSpan(1, 0, 0, 0);
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.DateOfBirth.Value.TestExpressionEx(o.CreationTime.DateTime) < myTime);
             var expression = CreateQueryString(query.ToArray());
-            Assert.AreEqual("dateOfBirth=%3A%28testEx%7C%24_.creationTime%29%3C1.00%3A00%3A00", expression);
+            Assert.AreEqual("dateOfBirth=%3A%28testEx%7C%22%24_.creationTime%22%29%3C1.00%3A00%3A00", expression);
         }
 
     }

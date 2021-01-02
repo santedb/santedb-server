@@ -14,11 +14,12 @@
       <id>42765002-17be-11eb-adc1-0242ac120002</id>
       <isReadonly>false</isReadonly>
       <mnemonic>EncounterType-Ambulatory</mnemonic>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptSet>42764da0-17be-11eb-adc1-0242ac120002</conceptSet>
       <name>
         <language>en</language>
-        <value>Abulatory Visit</value>
+        <value>Ambulatory Visit</value>
       </name>
       <name>
         <language>en</language>
@@ -33,6 +34,7 @@
       <mnemonic>EncounterType-Emergency</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptSet>42764da0-17be-11eb-adc1-0242ac120002</conceptSet>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <name>
         <language>en</language>
         <value>Emergency Visit</value>
@@ -45,6 +47,7 @@
       <isReadonly>false</isReadonly>
       <mnemonic>EncounterType-Field</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <conceptSet>42764da0-17be-11eb-adc1-0242ac120002</conceptSet>
       <name>
         <language>en</language>
@@ -58,6 +61,7 @@
       <isReadonly>false</isReadonly>
       <mnemonic>EncounterType-Home</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <conceptSet>42764da0-17be-11eb-adc1-0242ac120002</conceptSet>
       <name>
         <language>en</language>
@@ -72,6 +76,7 @@
       <mnemonic>EncounterType-Inpatient</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptSet>42764da0-17be-11eb-adc1-0242ac120002</conceptSet>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <name>
         <language>en</language>
         <value>Inpatient Visit</value>
@@ -84,6 +89,7 @@
       <isReadonly>false</isReadonly>
       <mnemonic>EncounterType-PreAdmission</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <conceptSet>42764da0-17be-11eb-adc1-0242ac120002</conceptSet>
       <name>
         <language>en</language>
@@ -97,6 +103,7 @@
       <isReadonly>false</isReadonly>
       <mnemonic>EncounterType-Virtual</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <conceptSet>42764da0-17be-11eb-adc1-0242ac120002</conceptSet>
       <name>
         <language>en</language>

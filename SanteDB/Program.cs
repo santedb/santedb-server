@@ -88,24 +88,36 @@ namespace SanteDB
                 var parameters = parser.Parse(args);
                 EntitySource.Current = new EntitySource(new PersistenceEntitySource());
 
+                var instanceSuffix = !String.IsNullOrEmpty(parameters.InstanceName) ? $"-{parameters.InstanceName}" : null;
+
                 // What to do?
                 if (parameters.ShowHelp)
                     parser.WriteHelp(Console.Out);
                 else if (parameters.Install)
                 {
-                    if (!ServiceTools.ServiceInstaller.ServiceIsInstalled("SanteDB"))
+                    if (!ServiceTools.ServiceInstaller.ServiceIsInstalled($"SanteDB{instanceSuffix}"))
                     {
                         Console.WriteLine("Installing Service...");
-                        ServiceTools.ServiceInstaller.Install("SanteDB", "SanteDB Host Process", Assembly.GetEntryAssembly().Location, null, null, ServiceTools.ServiceBootFlag.AutoStart);
+                        if (!String.IsNullOrEmpty(instanceSuffix))
+                        {
+                            var configFile = parameters.ConfigFile;
+                            if(String.IsNullOrEmpty(configFile))
+                                configFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), $"santedb.config.{parameters.InstanceName}.xml");
+                            else if (!Path.IsPathRooted(configFile))
+                                configFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), configFile);
+                            ServiceTools.ServiceInstaller.Install($"SanteDB{instanceSuffix}", "SanteDB Host Process", $"{Assembly.GetEntryAssembly().Location} --name={parameters.InstanceName} --config={configFile}", null, null, ServiceTools.ServiceBootFlag.AutoStart);
+                        }
+                        else
+                            ServiceTools.ServiceInstaller.Install($"SanteDB", "SanteDB Host Process", $"{Assembly.GetEntryAssembly().Location}", null, null, ServiceTools.ServiceBootFlag.AutoStart);
                     }
                 }
                 else if (parameters.UnInstall)
                 {
-                    if (ServiceTools.ServiceInstaller.ServiceIsInstalled("SanteDB"))
+                    if (ServiceTools.ServiceInstaller.ServiceIsInstalled($"SanteDB-{parameters.InstanceName ?? "default" }"))
                     {
                         Console.WriteLine("Un-Installing Service...");
-                        ServiceTools.ServiceInstaller.StopService("SanteDB");
-                        ServiceTools.ServiceInstaller.Uninstall("SanteDB");
+                        ServiceTools.ServiceInstaller.StopService($"SanteDB{instanceSuffix}");
+                        ServiceTools.ServiceInstaller.Uninstall($"SanteDB{instanceSuffix}");
                     }
                 }
                 else if (parameters.GenConfig)
@@ -208,7 +220,7 @@ namespace SanteDB
                 {
                     if (prop.GetCustomAttribute<XmlAttributeAttribute>() != null)
                     {
-                        prop.SetValue(instance, GetDefaultValue(prop.PropertyType));
+                        prop.SetValue(instance, GetDefaultValue(prop.PropertyType, prop.Name));
                     }
                     else if (prop.GetCustomAttributes<XmlElementAttribute>().Count() > 0 ||
                         prop.GetCustomAttribute<XmlArrayAttribute>() != null)
@@ -219,7 +231,7 @@ namespace SanteDB
                         {
                             var value = Activator.CreateInstance(prop.PropertyType) as IList;
                             prop.SetValue(instance, value);
-                            var defaultValue = GetDefaultValue(prop.PropertyType.GetGenericArguments()[0]);
+                            var defaultValue = GetDefaultValue(prop.PropertyType.GetGenericArguments()[0], prop.Name);
                             if (defaultValue != null)
                                 value.Add(defaultValue);
                             else
@@ -229,7 +241,7 @@ namespace SanteDB
                         else
                         {
                             // TODO : Choice
-                            var defaultValue = GetDefaultValue(prop.PropertyType);
+                            var defaultValue = GetDefaultValue(prop.PropertyType, prop.Name);
                             if (defaultValue != null)
                                 prop.SetValue(instance, defaultValue);
                             else
@@ -249,14 +261,16 @@ namespace SanteDB
         /// <summary>
         /// Get default value for XML
         /// </summary>
-        private static object GetDefaultValue(Type propertyType)
+        private static object GetDefaultValue(Type propertyType, String fieldName)
         {
             if (propertyType == typeof(byte[]))
             {
-                Console.Write("Data for byte[] value:");
+                Console.Write("Data for byte[] for {0} value:", fieldName);
                 var data = Console.ReadLine();
                 return SHA256.Create().ComputeHash(Console.InputEncoding.GetBytes(data));
             }
+            else if (fieldName.StartsWith("Xml"))
+                return DateTime.Now.ToString("o");
             else
                 switch (propertyType.StripNullable().Name.ToLower())
                 {
@@ -290,7 +304,8 @@ namespace SanteDB
                     default:
                         if (propertyType.IsEnum)
                         {
-                            return Enum.ToObject(propertyType, 0);
+                            var field1 = propertyType.GetFields().Skip(1).FirstOrDefault();
+                            return Enum.ToObject(propertyType, field1.GetValue(null));
                         }
                         return null;
                 }

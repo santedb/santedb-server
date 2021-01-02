@@ -19,6 +19,7 @@
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// table</remarks>
     public class PersonPersistenceService : EntityDerivedPersistenceService<Core.Model.Entities.Person, DbPerson, CompositeResult<DbPerson, DbEntityVersion, DbEntity>>
     {
+        public PersonPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         // Map
         public static readonly Dictionary<DatePrecision, String> PrecisionMap = new Dictionary<DatePrecision, String>()
         {
@@ -73,6 +78,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 retVal.DateOfBirthPrecision = PrecisionMap.Where(o => o.Value == personInstance.DateOfBirthPrecision).Select(o => o.Key).First();
 
             retVal.LanguageCommunication = context.Query<DbPersonLanguageCommunication>(v => v.SourceKey == entityInstance.Key && v.EffectiveVersionSequenceId <= entityVersionInstance.VersionSequenceId && (v.ObsoleteVersionSequenceId == null || v.ObsoleteVersionSequenceId > entityVersionInstance.VersionSequenceId))
+                    .ToArray()
                     .Select(o => new Core.Model.Entities.PersonLanguageCommunication(o.LanguageCode, o.IsPreferred)
                     {
                         Key = o.Key
@@ -90,6 +96,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <returns></returns>
         public override Core.Model.Entities.Person InsertInternal(DataContext context, Core.Model.Entities.Person data)
         {
+
+            if (data.Occupation != null) data.Occupation = data.Occupation?.EnsureExists(context, false) as Concept;
+            data.OccupationKey = data.Occupation?.Key ?? data.OccupationKey;
+
             var retVal = base.InsertInternal(context, data);
             //byte[] sourceKey = retVal.Key.Value.ToByteArray();
 
@@ -107,6 +117,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Core.Model.Entities.Person UpdateInternal(DataContext context, Core.Model.Entities.Person data)
         {
+            if (data.Occupation != null) data.Occupation = data.Occupation?.EnsureExists(context, false) as Concept;
+            data.OccupationKey = data.Occupation?.Key ?? data.OccupationKey;
+
             var retVal = base.UpdateInternal(context, data);
             var sourceKey = retVal.Key.Value.ToByteArray();
 

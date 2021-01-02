@@ -19,7 +19,6 @@
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -37,6 +36,7 @@ using System.Security.Authentication;
 using System.Security.Principal;
 using System.Security.Cryptography;
 using System.Text;
+using SanteDB.Core.Security.Attribute;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {

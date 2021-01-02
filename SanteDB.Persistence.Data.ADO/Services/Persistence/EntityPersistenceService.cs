@@ -27,12 +27,14 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model;
 using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
+using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
 using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
 using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
 using SanteDB.Persistence.Data.ADO.Data.Model.Extensibility;
@@ -55,12 +57,16 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class EntityPersistenceService : VersionedDataPersistenceService<Core.Model.Entities.Entity, DbEntityVersion, DbEntity>
     {
 
+        public EntityPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// To model instance
         /// </summary>
         public virtual TEntityType ToModelInstance<TEntityType>(DbEntityVersion dbVersionInstance, DbEntity entInstance, DataContext context) where TEntityType : Core.Model.Entities.Entity, new()
         {
-            var retVal = m_mapper.MapDomainInstance<DbEntityVersion, TEntityType>(dbVersionInstance);
+            var retVal = this.m_settingsProvider.GetMapper().MapDomainInstance<DbEntityVersion, TEntityType>(dbVersionInstance);
 
             if (retVal == null) return null;
 
@@ -73,7 +79,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 .SelectFrom(typeof(DbEntitySecurityPolicy), typeof(DbSecurityPolicy))
                 .InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
                 .Where(o => o.SourceKey == retVal.Key  && (!o.ObsoleteVersionSequenceId.HasValue || o.ObsoleteVersionSequenceId > retVal.VersionSequence));
-            retVal.Policies = context.Query<CompositeResult<DbEntitySecurityPolicy, DbSecurityPolicy>>(policySql).Select(o => new SecurityPolicyInstance(new SecurityPolicy()
+            retVal.Policies = context.Query<CompositeResult<DbEntitySecurityPolicy, DbSecurityPolicy>>(policySql).ToArray().Select(o => new SecurityPolicyInstance(new SecurityPolicy()
             {
                 CanOverride = o.Object2.CanOverride,
                 CreatedByKey = o.Object2.CreatedByKey,
@@ -117,17 +123,19 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var dbEntity = (dataInstance as CompositeResult)?.Values.OfType<DbEntity>().FirstOrDefault() ?? context.FirstOrDefault<DbEntity>(o => o.Key == dbEntityVersion.Key);
             Entity retVal = null;
 
-            switch (dbEntity.ClassConceptKey.ToString().ToLower())
+            if(dbEntityVersion.StatusConceptKey == StatusKeys.Purged) // Purged data doesn't exist
+                retVal = this.ToModelInstance<Entity>(dbEntityVersion, dbEntity, context);
+            else switch (dbEntity.ClassConceptKey.ToString().ToLower())
             {
                 case EntityClassKeyStrings.Device:
-                    retVal = new DeviceEntityPersistenceService().ToModelInstance(
+                    retVal = new DeviceEntityPersistenceService(this.m_settingsProvider).ToModelInstance(
                         (dataInstance as CompositeResult)?.Values.OfType<DbDeviceEntity>().FirstOrDefault() ?? context.FirstOrDefault<DbDeviceEntity>(o => o.ParentKey == dbEntityVersion.VersionKey),
                         dbEntityVersion,
                         dbEntity,
                         context);
                     break;
                 case EntityClassKeyStrings.NonLivingSubject:
-                    retVal = new ApplicationEntityPersistenceService().ToModelInstance(
+                    retVal = new ApplicationEntityPersistenceService(this.m_settingsProvider).ToModelInstance(
                         (dataInstance as CompositeResult)?.Values.OfType<DbApplicationEntity>().FirstOrDefault() ?? context.FirstOrDefault<DbApplicationEntity>(o => o.ParentKey == dbEntityVersion.VersionKey),
                         dbEntityVersion,
                         dbEntity,
@@ -137,21 +145,21 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     var ue = (dataInstance as CompositeResult)?.Values.OfType<DbUserEntity>().FirstOrDefault() ?? context.FirstOrDefault<DbUserEntity>(o => o.ParentKey == dbEntityVersion.VersionKey);
 
                     if (ue != null)
-                        retVal = new UserEntityPersistenceService().ToModelInstance(
+                        retVal = new UserEntityPersistenceService(this.m_settingsProvider).ToModelInstance(
                             ue,
                             (dataInstance as CompositeResult)?.Values.OfType<DbPerson>().FirstOrDefault() ?? context.FirstOrDefault<DbPerson>(o => o.ParentKey == dbEntityVersion.VersionKey),
                             dbEntityVersion,
                             dbEntity,
                             context);
                     else
-                        retVal = new PersonPersistenceService().ToModelInstance(
+                        retVal = new PersonPersistenceService(this.m_settingsProvider).ToModelInstance(
                             (dataInstance as CompositeResult)?.Values.OfType<DbPerson>().FirstOrDefault() ?? context.FirstOrDefault<DbPerson>(o => o.ParentKey == dbEntityVersion.VersionKey),
                             dbEntityVersion,
                             dbEntity,
                             context);
                     break;
                 case EntityClassKeyStrings.Patient:
-                    retVal = new PatientPersistenceService().ToModelInstance(
+                    retVal = new PatientPersistenceService(this.m_settingsProvider).ToModelInstance(
                         (dataInstance as CompositeResult)?.Values.OfType<DbPatient>().FirstOrDefault() ?? context.FirstOrDefault<DbPatient>(o => o.ParentKey == dbEntityVersion.VersionKey),
                         (dataInstance as CompositeResult)?.Values.OfType<DbPerson>().FirstOrDefault() ?? context.FirstOrDefault<DbPerson>(o => o.ParentKey == dbEntityVersion.VersionKey),
                         dbEntityVersion,
@@ -159,7 +167,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         context);
                     break;
                 case EntityClassKeyStrings.Provider:
-                    retVal = new ProviderPersistenceService().ToModelInstance(
+                    retVal = new ProviderPersistenceService(this.m_settingsProvider).ToModelInstance(
                         (dataInstance as CompositeResult)?.Values.OfType<DbProvider>().FirstOrDefault() ?? context.FirstOrDefault<DbProvider>(o => o.ParentKey == dbEntityVersion.VersionKey),
                         (dataInstance as CompositeResult)?.Values.OfType<DbPerson>().FirstOrDefault() ?? context.FirstOrDefault<DbPerson>(o => o.ParentKey == dbEntityVersion.VersionKey),
                         dbEntityVersion,
@@ -172,28 +180,28 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 case EntityClassKeyStrings.CountyOrParish:
                 case EntityClassKeyStrings.State:
                 case EntityClassKeyStrings.ServiceDeliveryLocation:
-                    retVal = new PlacePersistenceService().ToModelInstance(
+                    retVal = new PlacePersistenceService(this.m_settingsProvider).ToModelInstance(
                         (dataInstance as CompositeResult)?.Values.OfType<DbPlace>().FirstOrDefault() ?? context.FirstOrDefault<DbPlace>(o => o.ParentKey == dbEntityVersion.VersionKey),
                         dbEntityVersion,
                         dbEntity,
                         context);
                     break;
                 case EntityClassKeyStrings.Organization:
-                    retVal = new OrganizationPersistenceService().ToModelInstance(
+                    retVal = new OrganizationPersistenceService(this.m_settingsProvider).ToModelInstance(
                         (dataInstance as CompositeResult)?.Values.OfType<DbOrganization>().FirstOrDefault() ?? context.FirstOrDefault<DbOrganization>(o => o.ParentKey == dbEntityVersion.VersionKey),
                         dbEntityVersion,
                         dbEntity,
                         context);
                     break;
                 case EntityClassKeyStrings.Material:
-                    retVal = new MaterialPersistenceService().ToModelInstance<Material>(
+                    retVal = new MaterialPersistenceService(this.m_settingsProvider).ToModelInstance<Material>(
                         (dataInstance as CompositeResult)?.Values.OfType<DbMaterial>().FirstOrDefault() ?? context.FirstOrDefault<DbMaterial>(o => o.ParentKey == dbEntityVersion.VersionKey),
                         dbEntityVersion,
                         dbEntity,
                         context);
                     break;
                 case EntityClassKeyStrings.ManufacturedMaterial:
-                    retVal = new ManufacturedMaterialPersistenceService().ToModelInstance(
+                    retVal = new ManufacturedMaterialPersistenceService(this.m_settingsProvider).ToModelInstance(
                         (dataInstance as CompositeResult)?.Values.OfType<DbManufacturedMaterial>().FirstOrDefault() ?? context.FirstOrDefault<DbManufacturedMaterial>(o => o.ParentKey == dbEntityVersion.VersionKey),
                         (dataInstance as CompositeResult)?.Values.OfType<DbMaterial>().FirstOrDefault() ?? context.FirstOrDefault<DbMaterial>(o => o.ParentKey == dbEntityVersion.VersionKey),
                         dbEntityVersion,
@@ -422,7 +430,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Validate unique values for IDs
             DbSecurityProvenance provenance = null;
             var issues = new List<DetectedIssue>();
-            var priority = this.m_persistenceService.GetConfiguration().Validation.ValidationLevel;
+            var priority = this.m_settingsProvider.GetConfiguration().Validation.ValidationLevel;
 
             foreach (var id in data.Identifiers)
             {
@@ -462,7 +470,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     issues.Add(new DetectedIssue(DetectedIssuePriorityType.Error, "id.target", $"Identifier of type {dbAuth.DomainName} cannot be assigned to object of type {data.ClassConceptKey}", DetectedIssueKeys.BusinessRuleViolationIssue));
 
                 // If the identity domain is unique, and we've been asked to raid identifier uq issues
-                if (dbAuth.IsUnique && this.m_persistenceService.GetConfiguration().Validation.IdentifierUniqueness &&
+                if (dbAuth.IsUnique && this.m_settingsProvider.GetConfiguration().Validation.IdentifierUniqueness &&
                     ownedByOthers.Any())
                     issues.Add(new DetectedIssue(priority, $"id.uniqueness", $"Identifier {id.Value} in domain {dbAuth.DomainName} violates unique constraint", DetectedIssueKeys.FormalConstraintIssue));
                 if (dbAuth.AssigningApplicationKey.HasValue) // Must have permission
@@ -476,7 +484,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         && !ownedByOthers.Any()) // and has not already been assigned to me or anyone else (it is a new , unknown identifier)
                         issues.Add(new DetectedIssue(DetectedIssuePriorityType.Error, $"id.authority", $"Application {provenance.ApplicationKey} does not have permission to assign {dbAuth.DomainName}", DetectedIssueKeys.SecurityIssue));
                 }
-                if (!String.IsNullOrEmpty(dbAuth.ValidationRegex) && this.m_persistenceService.GetConfiguration().Validation.IdentifierFormat) // must be valid
+                if (!String.IsNullOrEmpty(dbAuth.ValidationRegex) && this.m_settingsProvider.GetConfiguration().Validation.IdentifierFormat) // must be valid
                 {
                     var nonMatch = !new Regex(dbAuth.ValidationRegex).IsMatch(id.Value);
                     if (nonMatch)
@@ -650,28 +658,28 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             switch (data.ClassConceptKey.ToString().ToUpper())
             {
                 case EntityClassKeyStrings.Device:
-                    return new DeviceEntityPersistenceService().InsertInternal(context, data.Convert<DeviceEntity>());
+                    return new DeviceEntityPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<DeviceEntity>());
                 case EntityClassKeyStrings.NonLivingSubject:
-                    return new ApplicationEntityPersistenceService().InsertInternal(context, data.Convert<ApplicationEntity>());
+                    return new ApplicationEntityPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<ApplicationEntity>());
                 case EntityClassKeyStrings.Person:
-                    return new PersonPersistenceService().InsertInternal(context, data.Convert<Person>());
+                    return new PersonPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<Person>());
                 case EntityClassKeyStrings.Patient:
-                    return new PatientPersistenceService().InsertInternal(context, data.Convert<Patient>());
+                    return new PatientPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<Patient>());
                 case EntityClassKeyStrings.Provider:
-                    return new ProviderPersistenceService().InsertInternal(context, data.Convert<Provider>());
+                    return new ProviderPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<Provider>());
                 case EntityClassKeyStrings.Place:
                 case EntityClassKeyStrings.CityOrTown:
                 case EntityClassKeyStrings.Country:
                 case EntityClassKeyStrings.CountyOrParish:
                 case EntityClassKeyStrings.State:
                 case EntityClassKeyStrings.ServiceDeliveryLocation:
-                    return new PlacePersistenceService().InsertInternal(context, data.Convert<Place>());
+                    return new PlacePersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<Place>());
                 case EntityClassKeyStrings.Organization:
-                    return new OrganizationPersistenceService().InsertInternal(context, data.Convert<Organization>());
+                    return new OrganizationPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<Organization>());
                 case EntityClassKeyStrings.Material:
-                    return new MaterialPersistenceService().InsertInternal(context, data.Convert<Material>());
+                    return new MaterialPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<Material>());
                 case EntityClassKeyStrings.ManufacturedMaterial:
-                    return new ManufacturedMaterialPersistenceService().InsertInternal(context, data.Convert<ManufacturedMaterial>());
+                    return new ManufacturedMaterialPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<ManufacturedMaterial>());
                 default:
                     return this.InsertCoreProperties(context, data);
 
@@ -686,28 +694,28 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             switch (data.ClassConceptKey.ToString().ToUpper())
             {
                 case EntityClassKeyStrings.Device:
-                    return new DeviceEntityPersistenceService().UpdateInternal(context, data.Convert<DeviceEntity>());
+                    return new DeviceEntityPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<DeviceEntity>());
                 case EntityClassKeyStrings.NonLivingSubject:
-                    return new ApplicationEntityPersistenceService().UpdateInternal(context, data.Convert<ApplicationEntity>());
+                    return new ApplicationEntityPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<ApplicationEntity>());
                 case EntityClassKeyStrings.Person:
-                    return new PersonPersistenceService().UpdateInternal(context, data.Convert<Person>());
+                    return new PersonPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<Person>());
                 case EntityClassKeyStrings.Patient:
-                    return new PatientPersistenceService().UpdateInternal(context, data.Convert<Patient>());
+                    return new PatientPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<Patient>());
                 case EntityClassKeyStrings.Provider:
-                    return new ProviderPersistenceService().UpdateInternal(context, data.Convert<Provider>());
+                    return new ProviderPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<Provider>());
                 case EntityClassKeyStrings.Place:
                 case EntityClassKeyStrings.CityOrTown:
                 case EntityClassKeyStrings.Country:
                 case EntityClassKeyStrings.CountyOrParish:
                 case EntityClassKeyStrings.State:
                 case EntityClassKeyStrings.ServiceDeliveryLocation:
-                    return new PlacePersistenceService().UpdateInternal(context, data.Convert<Place>());
+                    return new PlacePersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<Place>());
                 case EntityClassKeyStrings.Organization:
-                    return new OrganizationPersistenceService().UpdateInternal(context, data.Convert<Organization>());
+                    return new OrganizationPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<Organization>());
                 case EntityClassKeyStrings.Material:
-                    return new MaterialPersistenceService().UpdateInternal(context, data.Convert<Material>());
+                    return new MaterialPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<Material>());
                 case EntityClassKeyStrings.ManufacturedMaterial:
-                    return new ManufacturedMaterialPersistenceService().UpdateInternal(context, data.Convert<ManufacturedMaterial>());
+                    return new ManufacturedMaterialPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<ManufacturedMaterial>());
                 default:
                     return this.UpdateCoreProperties(context, data);
 
@@ -720,61 +728,331 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         protected override void BulkPurgeInternal(DataContext context, Guid[] keysToPurge)
         {
             // Purge the related fields
-            var versionKeys = context.Query<DbEntityVersion>(o => keysToPurge.Contains(o.Key)).Select(o => o.VersionKey).ToArray();
+            int ofs = 0;
+            while (ofs < keysToPurge.Length)
+            {
+                var batchKeys = keysToPurge.Skip(ofs).Take(100).ToArray();
+                ofs += 100;
+                // Purge the related fields
+                var versionKeys = context.Query<DbEntityVersion>(o => batchKeys.Contains(o.Key)).Select(o => o.VersionKey).ToArray();
 
-            // Delete versions of this entity in sub table
-            context.Delete<DbPatient>(o => versionKeys.Contains(o.ParentKey));
-            context.Delete<DbProvider>(o => versionKeys.Contains(o.ParentKey));
-            context.Delete<DbUserEntity>(o => versionKeys.Contains(o.ParentKey));
-            
-            // Person fields
-            context.Delete<DbPersonLanguageCommunication>(o => keysToPurge.Contains(o.SourceKey));
-            context.Delete<DbPerson>(o => versionKeys.Contains(o.ParentKey));
+                // Delete versions of this entity in sub table
+                context.Delete<DbPatient>(o => versionKeys.Contains(o.ParentKey));
+                context.Delete<DbProvider>(o => versionKeys.Contains(o.ParentKey));
+                context.Delete<DbUserEntity>(o => versionKeys.Contains(o.ParentKey));
 
-            // Other entities
-            context.Delete<DbDeviceEntity>(o => versionKeys.Contains(o.ParentKey));
-            context.Delete<DbApplicationEntity>(o => versionKeys.Contains(o.ParentKey));
-            context.Delete<DbPlace>(o => versionKeys.Contains(o.ParentKey));
+                // Person fields
+                context.Delete<DbPersonLanguageCommunication>(o => batchKeys.Contains(o.SourceKey));
+                context.Delete<DbPerson>(o => versionKeys.Contains(o.ParentKey));
 
-            // Purge the related entity fields
+                // Other entities
+                context.Delete<DbDeviceEntity>(o => versionKeys.Contains(o.ParentKey));
+                context.Delete<DbApplicationEntity>(o => versionKeys.Contains(o.ParentKey));
+                context.Delete<DbPlace>(o => versionKeys.Contains(o.ParentKey));
+                context.Delete<DbManufacturedMaterial>(o => versionKeys.Contains(o.ParentKey));
+                context.Delete<DbMaterial>(o => versionKeys.Contains(o.ParentKey));
+                // Purge the related entity fields
 
-            // Names
-            var col = TableMapping.Get(typeof(DbEntityNameComponent)).Columns.First(o => o.IsPrimaryKey);
-            var deleteStatement = context.CreateSqlStatement<DbEntityNameComponent>()
-                .SelectFrom(col)
-                .InnerJoin<DbEntityNameComponent, DbEntityName>(o => o.Key, o => o.Key)
-                .Where<DbEntityName>(o => keysToPurge.Contains(o.SourceKey));
-            context.Delete<DbEntityNameComponent>(deleteStatement);
-            context.Delete<DbEntityName>(o => keysToPurge.Contains(o.SourceKey));
-            
-            // Addresses
-            col = TableMapping.Get(typeof(DbEntityAddressComponent)).Columns.First(o => o.IsPrimaryKey);
-            deleteStatement = context.CreateSqlStatement<DbEntityAddressComponent>()
-                .SelectFrom(col)
-                .InnerJoin<DbEntityAddressComponent, DbEntityAddress>(o => o.Key, o => o.Key)
-                .Where<DbEntityAddress>(o => keysToPurge.Contains(o.SourceKey));
-            context.Delete<DbEntityAddressComponent>(deleteStatement);
-            context.Delete<DbEntityAddress>(o => keysToPurge.Contains(o.SourceKey));
+                // Names
+                var col = TableMapping.Get(typeof(DbEntityNameComponent)).Columns.First(o => o.IsPrimaryKey);
+                var deleteStatement = context.CreateSqlStatement<DbEntityNameComponent>()
+                    .SelectFrom(col)
+                    .InnerJoin<DbEntityNameComponent, DbEntityName>(o => o.SourceKey, o => o.Key)
+                    .Where<DbEntityName>(o => batchKeys.Contains(o.SourceKey));
+                context.Delete<DbEntityNameComponent>(deleteStatement);
+                context.Delete<DbEntityName>(o => batchKeys.Contains(o.SourceKey));
 
-            // Other Relationships
-            context.Delete<DbEntityRelationship>(o => keysToPurge.Contains(o.SourceKey));
-            context.Delete<DbEntityIdentifier>(o => keysToPurge.Contains(o.SourceKey));
-            context.Delete<DbEntityExtension>(o => keysToPurge.Contains(o.SourceKey));
-            context.Delete<DbEntityTag>(o => keysToPurge.Contains(o.SourceKey));
-            context.Delete<DbEntityNote>(o => keysToPurge.Contains(o.SourceKey));
+                // Addresses
+                col = TableMapping.Get(typeof(DbEntityAddressComponent)).Columns.First(o => o.IsPrimaryKey);
+                deleteStatement = context.CreateSqlStatement<DbEntityAddressComponent>()
+                    .SelectFrom(col)
+                    .InnerJoin<DbEntityAddressComponent, DbEntityAddress>(o => o.SourceKey, o => o.Key)
+                    .Where<DbEntityAddress>(o => batchKeys.Contains(o.SourceKey));
+                context.Delete<DbEntityAddressComponent>(deleteStatement);
+                context.Delete<DbEntityAddress>(o => batchKeys.Contains(o.SourceKey));
 
-            // Purge the core entity data
-            context.Delete<DbEntityVersion>(o => keysToPurge.Contains(o.Key));
+                // Other Relationships
+                context.Delete<DbEntityRelationship>(o => batchKeys.Contains(o.SourceKey));
+                context.Delete<DbEntityIdentifier>(o => batchKeys.Contains(o.SourceKey));
+                context.Delete<DbEntityExtension>(o => batchKeys.Contains(o.SourceKey));
+                context.Delete<DbEntityTag>(o => batchKeys.Contains(o.SourceKey));
+                context.Delete<DbEntityNote>(o => batchKeys.Contains(o.SourceKey));
 
-            // Create a version which indicates this is PURGED
-            foreach(var itm in keysToPurge)
-                context.Insert<DbEntityVersion>(new DbEntityVersion()
+                // Detach keys which are being deleted will need to be removed from the version heirarchy
+                foreach(var rpl in context.Query<DbEntityVersion>(o => versionKeys.Contains(o.ReplacesVersionKey.Value)).ToArray())
+                {
+                    rpl.ReplacesVersionKey = null;
+                    rpl.ReplacesVersionKeySpecified = true;
+                    context.Update(rpl);
+                }
+
+                // Purge the core entity data
+                context.Delete<DbEntityVersion>(o => batchKeys.Contains(o.Key));
+                
+                // Create a version which indicates this is PURGED
+                context.Insert(
+                    context.Query<DbEntity>(o=>batchKeys.Contains(o.Key))
+                    .Select(o=>o.Key)
+                    .Distinct()
+                    .ToArray()
+                    .Select(o => new DbEntityVersion()
                 {
                     CreatedByKey = context.ContextId,
                     CreationTime = DateTimeOffset.Now,
-                    Key = itm, 
+                    Key = o,
                     StatusConceptKey = StatusKeys.Purged
-                });
+                }));
+                
+            }
+
+            context.ResetSequence("ENT_VRSN_SEQ", context.Query<DbEntityVersion>(o => true).Max(o => o.VersionSequenceId));
+
+        }
+
+        /// <summary>
+        /// Copy entity data from <paramref name="fromContext"/> to <paramref name="toContext"/>
+        /// </summary>
+        public override void Copy(Guid[] keysToCopy, DataContext fromContext, DataContext toContext)
+        {
+            // TODO:Clean this mess up
+
+            toContext.InsertOrUpdate(fromContext.Query<DbPhoneticValue>(o => o.SequenceId >= 0));
+            toContext.InsertOrUpdate(fromContext.Query<DbEntityAddressComponentValue>(o => o.SequenceId >= 0));
+
+            // Copy over users and protocols and other act tables
+            IEnumerable<Guid> additionalKeys = fromContext.Query<DbExtensionType>(o => o.ObsoletionTime == null)
+                .Select(o => o.CreatedByKey)
+                .Distinct()
+                .Union(
+                    fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null)
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                )
+                .Union(
+                    fromContext.Query<DbTemplateDefinition>(o => o.ObsoletionTime == null)
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                )
+                .Union(
+                    fromContext.Query<DbSecurityApplication>(o => o.ObsoletionTime == null)
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                )
+                .ToArray();
+            toContext.InsertOrUpdate(fromContext.Query<DbSecurityProvenance>(o => additionalKeys.Contains(o.Key)));
+            toContext.InsertOrUpdate(fromContext.Query<DbExtensionType>(o => o.ObsoletionTime == null));
+            toContext.InsertOrUpdate(fromContext.Query<DbTemplateDefinition>(o => o.ObsoletionTime == null));
+
+            additionalKeys = fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null)
+                .Select(o => o.AssigningApplicationKey).Distinct().ToArray()
+                .Where(o => o.HasValue)
+                .Select(o => o.Value);
+
+            toContext.InsertOrUpdate(fromContext.Query<DbSecurityApplication>(o => additionalKeys.Contains(o.Key)).ToArray().Select(o=>new DbSecurityApplication()
+            {   
+                Key = o.Key,
+                CreatedByKey = o.CreatedByKey,
+                CreationTime =o.CreationTime,
+                InvalidAuthAttempts = 0,
+                Lockout = o.Lockout,
+                LastAuthentication = o.LastAuthentication,
+                PublicId = o.PublicId,
+                ObsoletionTime =o.ObsoletionTime,
+                ObsoletedByKey = o.ObsoletedByKey,
+                Secret = o.Secret ?? "XXXX",
+                UpdatedByKey = o.UpdatedByKey,
+                UpdatedTime = o.UpdatedTime
+            }));
+            toContext.InsertOrUpdate(fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null));
+
+            additionalKeys = fromContext.Query<DbEntityRelationship>(o => o.ObsoleteVersionSequenceId == null)
+                   .Select(o => o.RelationshipTypeKey)
+                   .Distinct()
+                   .Union(
+                        fromContext.Query<DbEntity>(o => o.Key != null)
+                        .Select(o => o.DeterminerConceptKey)
+                        .Distinct()
+                    ).Union(
+                        fromContext.Query<DbEntity>(o => o.Key != null)
+                        .Select(o => o.ClassConceptKey)
+                        .Distinct()
+                    ).Union(
+                        fromContext.Query<DbEntityVersion>(o => o.VersionSequenceId > 0)
+                        .Select(o => o.StatusConceptKey)
+                        .Distinct()
+                    ).Union(
+                        fromContext.Query<DbEntityVersion>(o => o.VersionSequenceId > 0)
+                        .Select(o => o.TypeConceptKey)
+                        .Distinct()
+                        .ToArray()
+                        .Where(o => o.HasValue)
+                        .Select(o => o.Value)
+                    ).Union(
+                        fromContext.Query<DbPatient>(o => o.ParentKey != null)
+                        .Select(o => o.GenderConceptKey)
+                        .Distinct()
+                    )
+                   .ToArray();
+            additionalKeys = additionalKeys.Union(
+               fromContext.Query<DbPatient>(o => o.ParentKey != null)
+                        .Select(o => o.EducationLevelKey)
+                        .Distinct()
+                    .Union(
+                        fromContext.Query<DbPatient>(o => o.ParentKey != null)
+                        .Select(o => o.EthnicGroupCodeKey)
+                        .Distinct()
+                    )
+                    .Union(
+                        fromContext.Query<DbPatient>(o => o.ParentKey != null)
+                        .Select(o => o.LivingArrangementKey)
+                        .Distinct()
+                    )
+                    .Union(
+                        fromContext.Query<DbPatient>(o => o.ParentKey != null)
+                        .Select(o => o.MaritalStatusKey)
+                        .Distinct()
+                    )
+                    .Where(o=>o.HasValue)
+                    .Select(o=>o.Value)
+                ).ToArray();
+            toContext.InsertOrUpdate(fromContext.Query<DbConceptClass>(o => true));
+            toContext.InsertOrUpdate(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
+            toContext.InsertOrUpdate(fromContext.Query<DbConceptVersion>(o => additionalKeys.Contains(o.Key)).OrderBy(o => o.VersionSequenceId));
+            toContext.InsertOrUpdate(fromContext.Query<DbConceptSet>(o => true));
+            toContext.InsertOrUpdate(fromContext.Query<DbConceptSetConceptAssociation>(o => additionalKeys.Contains(o.ConceptKey)));
+
+            // Purge the related fields
+            int ofs = 0;
+            while (ofs < keysToCopy.Length)
+            {
+                var batchKeys = keysToCopy.Skip(ofs).Take(100).ToArray();
+                ofs += 100;
+
+                var versionKeys = fromContext.Query<DbEntityVersion>(o => batchKeys.Contains(o.Key)).Select(o => o.VersionKey).ToArray();
+
+                // copy the core entity data
+                toContext.InsertOrUpdate(fromContext.Query<DbEntity>(o => batchKeys.Contains(o.Key)));
+
+                // copy the core entity data
+                toContext.InsertOrUpdate(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
+
+                // Copy provenance of interest
+                additionalKeys = fromContext.Query<DbEntityVersion>(o => batchKeys.Contains(o.Key))
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                    .Union(
+                        fromContext.Query<DbEntityVersion>(o => batchKeys.Contains(o.Key))
+                        .Select(o => o.ObsoletedByKey)
+                        .Distinct()
+                        .ToArray()
+                        .Where(o => o.HasValue)
+                        .Select(o => o.Value)
+                    )
+                    .ToArray();
+                toContext.InsertOrUpdate(fromContext.Query<DbSecurityProvenance>(o => additionalKeys.Contains(o.Key)));
+
+                toContext.InsertOrUpdate(fromContext.Query<DbEntityVersion>(o => batchKeys.Contains(o.Key)));
+
+                additionalKeys = fromContext.Query<DbPlaceService>(o => batchKeys.Contains(o.SourceKey))
+                    .Select(o => o.ServiceConceptKey)
+                    .Distinct()
+                    .ToArray();
+                toContext.InsertOrUpdate(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdate(fromContext.Query<DbPlaceService>(o => batchKeys.Contains(o.SourceKey)));
+
+                // Person fields
+                toContext.InsertOrUpdate(fromContext.Query<DbPerson>(o => versionKeys.Contains(o.ParentKey)));
+                toContext.InsertOrUpdate(fromContext.Query<DbPersonLanguageCommunication>(o => batchKeys.Contains(o.SourceKey)));
+
+                // Copy versions of persons
+                toContext.InsertOrUpdate(fromContext.Query<DbPatient>(o => versionKeys.Contains(o.ParentKey)));
+
+                additionalKeys = fromContext.Query<DbProvider>(o => versionKeys.Contains(o.ParentKey))
+                    .Select(o => o.Specialty)
+                    .Distinct()
+                    .ToArray();
+                toContext.InsertOrUpdate(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
+
+                toContext.InsertOrUpdate(fromContext.Query<DbProvider>(o => versionKeys.Contains(o.ParentKey)));
+
+                // Security Users
+                additionalKeys = fromContext.Query<DbUserEntity>(o => versionKeys.Contains(o.ParentKey))
+                    .Select(o => o.SecurityUserKey)
+                    .Distinct()
+                    .ToArray();
+                toContext.InsertOrUpdate(fromContext.Query<DbSecurityUser>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdate(fromContext.Query<DbUserEntity>(o => versionKeys.Contains(o.ParentKey)));
+
+                // Other entities
+                additionalKeys = fromContext.Query<DbDeviceEntity>(o => versionKeys.Contains(o.ParentKey))
+                    .Select(o => o.SecurityDeviceKey)
+                    .Distinct()
+                    .ToArray();
+                toContext.InsertOrUpdate(fromContext.Query<DbSecurityDevice>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdate(fromContext.Query<DbDeviceEntity>(o => versionKeys.Contains(o.ParentKey)));
+
+                additionalKeys = fromContext.Query<DbApplicationEntity>(o => versionKeys.Contains(o.ParentKey))
+                   .Select(o => o.SecurityApplicationKey)
+                   .Distinct()
+                   .ToArray();
+                toContext.InsertOrUpdate(fromContext.Query<DbSecurityApplication>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdate(fromContext.Query<DbApplicationEntity>(o => versionKeys.Contains(o.ParentKey)));
+                toContext.InsertOrUpdate(fromContext.Query<DbPlace>(o => versionKeys.Contains(o.ParentKey)));
+
+                // Person fields
+                additionalKeys = fromContext.Query<DbMaterial>(o => versionKeys.Contains(o.ParentKey))
+                    .Select(o => o.QuantityConceptKey)
+                    .Distinct()
+                    .Union(
+                        fromContext.Query<DbMaterial>(o => versionKeys.Contains(o.ParentKey))
+                        .Select(o => o.FormConceptKey)
+                        .Distinct()
+                    )
+                    .ToArray();
+                toContext.InsertOrUpdate(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdate(fromContext.Query<DbMaterial>(o => versionKeys.Contains(o.ParentKey)));
+                toContext.InsertOrUpdate(fromContext.Query<DbManufacturedMaterial>(o => versionKeys.Contains(o.ParentKey)));
+
+                // Names
+                toContext.InsertOrUpdate(fromContext.Query<DbEntityName>(o => batchKeys.Contains(o.SourceKey)));
+
+                // Insert component links
+                var selectStatement = fromContext.CreateSqlStatement<DbEntityNameComponent>()
+                    .SelectFrom()
+                    .InnerJoin<DbEntityNameComponent, DbEntityName>(o => o.SourceKey, o => o.Key)
+                    .Where<DbEntityName>(o => batchKeys.Contains(o.SourceKey));
+                toContext.InsertOrUpdate(fromContext.Query<DbEntityNameComponent>(selectStatement));
+
+                // Addresses
+                
+                toContext.InsertOrUpdate(fromContext.Query<DbEntityAddress>(o => batchKeys.Contains(o.SourceKey)));
+
+                selectStatement = fromContext.CreateSqlStatement<DbEntityAddressComponent>()
+                    .SelectFrom()
+                    .InnerJoin<DbEntityAddressComponent, DbEntityAddress>(o => o.SourceKey, o => o.Key)
+                    .Where<DbEntityAddress>(o => batchKeys.Contains(o.SourceKey));
+                toContext.InsertOrUpdate(fromContext.Query<DbEntityAddressComponent>(selectStatement));
+
+                // Other Relationships
+                toContext.InsertOrUpdate(fromContext.Query<DbEntityIdentifier>(o => batchKeys.Contains(o.SourceKey)));
+
+                // Entity Extension types
+                toContext.InsertOrUpdate(fromContext.Query<DbEntityExtension>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdate(fromContext.Query<DbEntityTag>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdate(fromContext.Query<DbEntityNote>(o => batchKeys.Contains(o.SourceKey)));
+
+                additionalKeys = fromContext.Query<DbEntityRelationship>(o => batchKeys.Contains(o.SourceKey))
+                    .Select(o => o.TargetKey)
+                    .Distinct()
+                    .ToArray();
+                toContext.InsertOrUpdate(fromContext.Query<DbEntity>(o => additionalKeys.Contains(o.Key)));
+
+               
+                toContext.InsertOrUpdate(fromContext.Query<DbEntityRelationship>(o => batchKeys.Contains(o.SourceKey)));
+            }
+
+            toContext.ResetSequence("ENT_VRSN_SEQ", toContext.Query<DbEntityVersion>(o => true).Max(o => o.VersionSequenceId));
+
         }
     }
 }

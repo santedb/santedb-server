@@ -41,7 +41,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public abstract class BaseDataPersistenceService<TModel, TDomain> : BaseDataPersistenceService<TModel, TDomain, TDomain>
         where TModel : BaseEntityData, new()
         where TDomain : class, IDbBaseData, new()
-    { }
+    {
+        public BaseDataPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+    }
 
     /// <summary>
     /// Base data persistence service
@@ -50,6 +54,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         where TModel : BaseEntityData, new()
         where TDomain : class, IDbBaseData, new()
     {
+
+        public BaseDataPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
 
         /// <summary>
         /// Performthe actual insert.

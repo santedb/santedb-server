@@ -28,6 +28,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class ApplicationEntityPersistenceService : EntityDerivedPersistenceService<Core.Model.Entities.ApplicationEntity, DbApplicationEntity>
     {
+
+        public ApplicationEntityPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// To model instance
         /// </summary>

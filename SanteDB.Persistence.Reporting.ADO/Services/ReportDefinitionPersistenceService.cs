@@ -72,7 +72,7 @@ namespace SanteDB.Persistence.Reporting.ADO.Services
 
 			if (!loadFast)
 			{
-				reportDefinition.Parameters = context.Query<Model.ReportParameter>(r => r.ReportId == key).Select(r => new Core.Model.RISI.ReportParameter
+				reportDefinition.Parameters = context.Query<Model.ReportParameter>(r => r.ReportId == key).ToArray().Select(r => new Core.Model.RISI.ReportParameter
 				{
 					Key = r.Key,
 					Name = r.Name,

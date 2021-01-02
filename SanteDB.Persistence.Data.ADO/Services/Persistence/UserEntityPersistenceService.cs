@@ -32,8 +32,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     public class UserEntityPersistenceService : EntityDerivedPersistenceService<Core.Model.Entities.UserEntity, DbUserEntity, CompositeResult<DbUserEntity, DbPerson, DbEntityVersion, DbEntity>>
     {
 
+        public UserEntityPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+            this.m_personPersister = new PersonPersistenceService(settingsProvider);
+        }
+
         // Entity persisters
-        private PersonPersistenceService m_personPersister = new PersonPersistenceService();
+        private PersonPersistenceService m_personPersister;
       
         /// <summary>
         /// To model instance
@@ -52,6 +57,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 retVal.DateOfBirthPrecision = PersonPersistenceService.PrecisionMap.Where(o => o.Value == personInstance.DateOfBirthPrecision).Select(o => o.Key).First();
 
             retVal.LanguageCommunication = context.Query<DbPersonLanguageCommunication>(v => v.SourceKey == entityInstance.Key && v.EffectiveVersionSequenceId <= entityVersionInstance.VersionSequenceId && (v.ObsoleteVersionSequenceId == null || v.ObsoleteVersionSequenceId >= entityVersionInstance.VersionSequenceId))
+                    .ToArray()
                     .Select(o => new Core.Model.Entities.PersonLanguageCommunication(o.LanguageCode, o.IsPreferred)
                     {
                         Key = o.Key

@@ -28,7 +28,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class OrganizationPersistenceService : EntityDerivedPersistenceService<Core.Model.Entities.Organization, DbOrganization>
     {
-       
+
+        public OrganizationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Model instance
         /// </summary>
