@@ -322,10 +322,10 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.57.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.57.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.0.57.0" />
-        <PackageReference Include="SanteDB.BI" Version="2.0.57.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.58.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.58.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="2.0.58.0" />
+        <PackageReference Include="SanteDB.BI" Version="2.0.58.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

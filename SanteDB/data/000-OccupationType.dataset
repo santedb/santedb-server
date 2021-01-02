@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="HL7v3 AdministrableDrugForm Concept Set" xmlns="http://santedb.org/data">
+  <update insertIfNotExists="true">
+    <ConceptSet xmlns="http://santedb.org/model">
+      <id>f76f4eac-487c-11eb-b378-0242ac130002</id>
+      <name>Occupation Types</name>
+      <mnemonic>OccupationType</mnemonic>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.77</oid>
+      <url>http://santedb.org/conceptsets/contrib/OccupationType</url>
+    </ConceptSet>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>f76f5262-487c-11eb-b378-0242ac130002</id>
+      <isReadonly>false</isReadonly>
+      <conceptSet>f76f4eac-487c-11eb-b378-0242ac130002</conceptSet>
+      <mnemonic>OccupationType-Management</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Management or Administration</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>f76f5352-487c-11eb-b378-0242ac130002</id>
+      <isReadonly>false</isReadonly>
+      <conceptSet>f76f4eac-487c-11eb-b378-0242ac130002</conceptSet>
+      <mnemonic>OccupationType-BusinessFinance</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Business, Finance or Administration</value>
+      </name>
+    </Concept>
+  </update>
+
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>f76f5424-487c-11eb-b378-0242ac130002</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>OccupationType-NaturalOrAppliedSciences</mnemonic>
+      <conceptSet>f76f4eac-487c-11eb-b378-0242ac130002</conceptSet>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Natural and Applies Sciences (or related occupation)</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>f76f54e2-487c-11eb-b378-0242ac130002</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>OccupationType-Healthcare</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptSet>f76f4eac-487c-11eb-b378-0242ac130002</conceptSet>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Healthcare Professionals (Clinicians, Doctors, Nurses)</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>f76f55aa-487c-11eb-b378-0242ac130002</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>OccupationType-HealthcareSupport</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptSet>f76f4eac-487c-11eb-b378-0242ac130002</conceptSet>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Healthcare Support (Technicians, Technologists, etc.)</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>f76f5672-487c-11eb-b378-0242ac130002</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>OccupationType-Education</mnemonic>
+      <conceptSet>f76f4eac-487c-11eb-b378-0242ac130002</conceptSet>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Education (Teaching, Support, etc.)</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>f76f5942-487c-11eb-b378-0242ac130002</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>OccupationType-Law</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptSet>f76f4eac-487c-11eb-b378-0242ac130002</conceptSet>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Law and/or Social Services</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>f76f5a28-487c-11eb-b378-0242ac130002</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>OccupationType-Government</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptSet>f76f4eac-487c-11eb-b378-0242ac130002</conceptSet>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Community and Government Services</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>f76f5af0-487c-11eb-b378-0242ac130002</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>OccupationType-ArtsAndCultural</mnemonic>
+      <conceptSet>f76f4eac-487c-11eb-b378-0242ac130002</conceptSet>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Art, Culture, Recreation or Sport</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>78efebd4-487e-11eb-b378-0242ac130002</id>
+      <isReadonly>false</isReadonly>
+      <conceptSet>f76f4eac-487c-11eb-b378-0242ac130002</conceptSet>
+      <mnemonic>OccupationType-RetailSales</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Sales, Retail, and Services</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>78efeec2-487e-11eb-b378-0242ac130002</id>
+      <isReadonly>false</isReadonly>
+      <conceptSet>f76f4eac-487c-11eb-b378-0242ac130002</conceptSet>
+      <mnemonic>OccupationType-SkilledTrades</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Trades, Transport, and/or Equipment Operations</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>78eff002-487e-11eb-b378-0242ac130002</id>
+      <conceptSet>f76f4eac-487c-11eb-b378-0242ac130002</conceptSet>
+      <isReadonly>false</isReadonly>
+      <mnemonic>OccupationType-Manufacturing</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Manufacturing and/or primary Utilities (Power, Water, Gas, etc.)</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>78eff14c-487e-11eb-b378-0242ac130002</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>OccupationType-NaturalResourceAgriculture</mnemonic>
+      <conceptSet>f76f4eac-487c-11eb-b378-0242ac130002</conceptSet>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Natural Resources, Agriculture and related production</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>78eff2f0-487e-11eb-b378-0242ac130002</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>OccupationType-Hospitality</mnemonic>
+      <conceptSet>f76f4eac-487c-11eb-b378-0242ac130002</conceptSet>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Hospitality and Tourism</value>
+      </name>
+    </Concept>
+  </update>  
+</dataset>

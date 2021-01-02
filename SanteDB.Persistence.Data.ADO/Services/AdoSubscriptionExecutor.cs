@@ -219,14 +219,17 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             List<Object> values = new List<object>();
                             definitionQuery = this.m_parmRegex.Replace(definitionQuery, (o) =>
                             {
-                                var qValue = parameters["_" + o.Groups[2].Value.Substring(1, o.Groups[2].Value.Length - 2)];
-                                Guid uuid = Guid.Empty;
-                                if (Guid.TryParse(qValue.First(), out uuid))
-                                    values.AddRange(qValue.Select(v => Guid.Parse(v)).OfType<Object>());
-                                else
-                                    values.AddRange(qValue);
-                                return o.Groups[1].Value + String.Join(",", qValue.Select(v => "?"));
+                                if (parameters.TryGetValue("_" + o.Groups[2].Value.Substring(1, o.Groups[2].Value.Length - 2), out List<String> qValue))
+                                {
 
+                                    Guid uuid = Guid.Empty;
+                                    if (Guid.TryParse(qValue.First(), out uuid))
+                                        values.AddRange(qValue.Select(v => Guid.Parse(v)).OfType<Object>());
+                                    else
+                                        values.AddRange(qValue);
+                                    return o.Groups[1].Value + String.Join(",", qValue.Select(v => "?"));
+                                }
+                                return "NULL";
                             });
 
                             // Now we want to append 

@@ -779,7 +779,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 context.Delete<DbEntityNote>(o => batchKeys.Contains(o.SourceKey));
 
                 // Detach keys which are being deleted will need to be removed from the version heirarchy
-                foreach(var rpl in context.Query<DbEntityVersion>(o => versionKeys.Contains(o.ReplacesVersionKey.Value)))
+                foreach(var rpl in context.Query<DbEntityVersion>(o => versionKeys.Contains(o.ReplacesVersionKey.Value)).ToArray())
                 {
                     rpl.ReplacesVersionKey = null;
                     rpl.ReplacesVersionKeySpecified = true;
@@ -814,13 +814,40 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override void Copy(Guid[] keysToCopy, DataContext fromContext, DataContext toContext)
         {
+            // TODO:Clean this mess up
+
             toContext.InsertOrUpdate(fromContext.Query<DbPhoneticValue>(o => o.SequenceId >= 0));
             toContext.InsertOrUpdate(fromContext.Query<DbEntityAddressComponentValue>(o => o.SequenceId >= 0));
+
+            // Copy over users and protocols and other act tables
+            IEnumerable<Guid> additionalKeys = fromContext.Query<DbExtensionType>(o => o.ObsoletionTime == null)
+                .Select(o => o.CreatedByKey)
+                .Distinct()
+                .Union(
+                    fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null)
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                )
+                .Union(
+                    fromContext.Query<DbTemplateDefinition>(o => o.ObsoletionTime == null)
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                )
+                .Union(
+                    fromContext.Query<DbSecurityApplication>(o => o.ObsoletionTime == null)
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                )
+                .ToArray();
+            toContext.InsertOrUpdate(fromContext.Query<DbSecurityProvenance>(o => additionalKeys.Contains(o.Key)));
+            toContext.InsertOrUpdate(fromContext.Query<DbExtensionType>(o => o.ObsoletionTime == null));
             toContext.InsertOrUpdate(fromContext.Query<DbTemplateDefinition>(o => o.ObsoletionTime == null));
-            var additionalKeys = fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null)
+
+            additionalKeys = fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null)
                 .Select(o => o.AssigningApplicationKey).Distinct().ToArray()
                 .Where(o => o.HasValue)
                 .Select(o => o.Value);
+
             toContext.InsertOrUpdate(fromContext.Query<DbSecurityApplication>(o => additionalKeys.Contains(o.Key)).ToArray().Select(o=>new DbSecurityApplication()
             {   
                 Key = o.Key,
@@ -837,7 +864,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 UpdatedTime = o.UpdatedTime
             }));
             toContext.InsertOrUpdate(fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null));
-            toContext.InsertOrUpdate(fromContext.Query<DbExtensionType>(o => o.ObsoletionTime == null));
+
             additionalKeys = fromContext.Query<DbEntityRelationship>(o => o.ObsoleteVersionSequenceId == null)
                    .Select(o => o.RelationshipTypeKey)
                    .Distinct()
@@ -888,8 +915,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     .Where(o=>o.HasValue)
                     .Select(o=>o.Value)
                 ).ToArray();
-
+            toContext.InsertOrUpdate(fromContext.Query<DbConceptClass>(o => true));
             toContext.InsertOrUpdate(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
+            toContext.InsertOrUpdate(fromContext.Query<DbConceptVersion>(o => additionalKeys.Contains(o.Key)).OrderBy(o => o.VersionSequenceId));
+            toContext.InsertOrUpdate(fromContext.Query<DbConceptSet>(o => true));
+            toContext.InsertOrUpdate(fromContext.Query<DbConceptSetConceptAssociation>(o => additionalKeys.Contains(o.ConceptKey)));
 
             // Purge the related fields
             int ofs = 0;
@@ -906,7 +936,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 // copy the core entity data
                 toContext.InsertOrUpdate(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
 
-                // Copy users of interest
+                // Copy provenance of interest
                 additionalKeys = fromContext.Query<DbEntityVersion>(o => batchKeys.Contains(o.Key))
                     .Select(o => o.CreatedByKey)
                     .Distinct()
@@ -919,7 +949,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         .Select(o => o.Value)
                     )
                     .ToArray();
-                toContext.InsertOrUpdate(fromContext.Query<DbSecurityUser>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdate(fromContext.Query<DbSecurityProvenance>(o => additionalKeys.Contains(o.Key)));
 
                 toContext.InsertOrUpdate(fromContext.Query<DbEntityVersion>(o => batchKeys.Contains(o.Key)));
 
@@ -1004,7 +1034,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 toContext.InsertOrUpdate(fromContext.Query<DbEntityAddressComponent>(selectStatement));
 
                 // Other Relationships
-                                toContext.InsertOrUpdate(fromContext.Query<DbEntityIdentifier>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdate(fromContext.Query<DbEntityIdentifier>(o => batchKeys.Contains(o.SourceKey)));
 
                 // Entity Extension types
                 toContext.InsertOrUpdate(fromContext.Query<DbEntityExtension>(o => batchKeys.Contains(o.SourceKey)));

@@ -34,4 +34,16 @@ CREATE TRIGGER TG_ENT_VRSN_TBL_SEQ FOR ENT_VRSN_TBL ACTIVE BEFORE INSERT POSITIO
 	IF (NEW.VRSN_SEQ_ID IS NULL)
 		THEN NEW.VRSN_SEQ_ID = NEXT VALUE FOR ENT_VRSN_SEQ;
 END;--#!
+
+ALTER TABLE pat_tbl ADD vip_sts_cd_id UUID;--#!
+ALTER TABLE pat_tbl ADD CONSTRAINT fk_vip_sts_cd_cd_id FOREIGN KEY (vip_sts_cd_id) REFERENCES CD_TBL (CD_ID);--#!
+ALTER TABLE pat_tbl ADD CONSTRAINT ck_vip_sts_cd CHECK (vip_sts_cd_id IS NULL OR IS_CD_SET_MEM(vip_sts_cd_id, 'VipStatus') OR IS_CD_SET_MEM(vip_sts_cd_id, 'NullReason'));--#!
+ALTER TABLE psn_tbl ADD occ_cd_id UUID;--#!
+ALTER TABLE psn_tbl ADD CONSTRAINT fk_occ_cd_cd_id FOREIGN KEY (occ_cd_id) REFERENCES CD_TBL (CD_ID);--#!
+ALTER TABLE psn_tbl ADD CONSTRAINT ck_occ_cd CHECK (occ_cd_id IS NULL OR IS_CD_SET_MEM(occ_cd_id, 'OccupationType') OR IS_CD_SET_MEM(occ_cd_id, 'NullReason'));--#!
+
+
+ALTER TABLE ACT_VRSN_TBL DROP CONSTRAINT ck_act_vrsn_act_utc;--#!
+ALTER TABLE ACT_VRSN_TBL ADD CONSTRAINT ck_act_vrsn_act_utc CHECK (sts_cd_id = char_to_uuid('39995C08-0A5C-4549-8BA7-D187F9B3C4FD') OR ((act_utc IS NOT NULL) OR (act_start_utc IS NOT NULL) OR (act_stop_utc IS NOT NULL)));--#!
+
 SELECT REG_PATCH('20201214-01') FROM RDB$DATABASE;

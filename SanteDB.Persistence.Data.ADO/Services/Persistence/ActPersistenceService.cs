@@ -34,6 +34,7 @@ using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
 using SanteDB.Persistence.Data.ADO.Data.Model.Extensibility;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Linq;
 
@@ -553,7 +554,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         Key = o,
                         StatusConceptKey = StatusKeys.Purged
                     }));
-            
+
             }
 
             context.ResetSequence("ACT_VRSN_SEQ",
@@ -566,10 +567,41 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override void Copy(Guid[] keysToCopy, DataContext fromContext, DataContext toContext)
         {
+            // TODO:Clean this mess up
             // Purge the related fields
             int ofs = 0;
+            IEnumerable<Guid> additionalKeys = fromContext.Query<DbExtensionType>(o => o.ObsoletionTime == null)
+                .Select(o => o.CreatedByKey)
+                .Distinct()
+                .Union(
+                    fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null)
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                )
+                .Union(
+                    fromContext.Query<DbProtocol>(o => o.ObsoletionTime == null)
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                )
+                .Union(
+                    fromContext.Query<DbTemplateDefinition>(o => o.ObsoletionTime == null)
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbProtocolHandler>(o => o.ObsoletionTime == null)
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbConceptVersion>(o => o.Key != null)
+                    .Select(o => o.CreatedByKey)
+                    .Distinct()
+                )
+                .ToArray();
+
+            toContext.InsertOrUpdate(fromContext.Query<DbSecurityProvenance>(o => additionalKeys.Contains(o.Key)));
+
             // copy all concepts that are referenced in the Act tabls
-            var additionalKeys = fromContext.Query<DbAct>(o => o.Key != null)
+            additionalKeys = fromContext.Query<DbAct>(o => o.Key != null)
                 .Select(o => o.MoodConceptKey)
                 .Distinct()
                 .Union(
@@ -601,11 +633,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     .Select(o => o.InterpretationConceptKey)
                     .Distinct()
                 ).Union(
-                    fromContext.Query<DbActRelationship>(o => o.ObsoleteVersionSequenceId != null)
+                    fromContext.Query<DbActRelationship>(o => o.Key != null)
                     .Select(o => o.RelationshipTypeKey)
                     .Distinct()
                 ).Union(
-                    fromContext.Query<DbActParticipation>(o => o.ObsoleteVersionSequenceId != null)
+                    fromContext.Query<DbActVersion>(o => o.Key != null)
+                    .Select(o => o.ReasonConceptKey)
+                    .Distinct()
+                ).Union(
+                    fromContext.Query<DbActParticipation>(o => o.Key != null)
                     .Select(o => o.ParticipationRoleKey)
                     .Distinct()
                 ).Union(
@@ -643,7 +679,38 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     .Select(o => o.Value)
                 )
                 .ToArray();
+            toContext.InsertOrUpdate(fromContext.Query<DbConceptClass>(o => true));
             toContext.InsertOrUpdate(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
+            toContext.InsertOrUpdate(fromContext.Query<DbConceptVersion>(o => additionalKeys.Contains(o.Key)).OrderBy(o => o.VersionSequenceId));
+            toContext.InsertOrUpdate(fromContext.Query<DbConceptSet>(o => true));
+            toContext.InsertOrUpdate(fromContext.Query<DbConceptSetConceptAssociation>(o => additionalKeys.Contains(o.ConceptKey)));
+
+            additionalKeys = fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null)
+               .Select(o => o.AssigningApplicationKey).Distinct().ToArray()
+               .Where(o => o.HasValue)
+               .Select(o => o.Value);
+
+            toContext.InsertOrUpdate(fromContext.Query<DbSecurityApplication>(o => additionalKeys.Contains(o.Key)).ToArray().Select(o => new DbSecurityApplication()
+            {
+                Key = o.Key,
+                CreatedByKey = o.CreatedByKey,
+                CreationTime = o.CreationTime,
+                InvalidAuthAttempts = 0,
+                Lockout = o.Lockout,
+                LastAuthentication = o.LastAuthentication,
+                PublicId = o.PublicId,
+                ObsoletionTime = o.ObsoletionTime,
+                ObsoletedByKey = o.ObsoletedByKey,
+                Secret = o.Secret ?? "XXXX",
+                UpdatedByKey = o.UpdatedByKey,
+                UpdatedTime = o.UpdatedTime
+            }));
+
+            toContext.InsertOrUpdate(fromContext.Query<DbProtocolHandler>(o => o.ObsoletionTime == null));
+            toContext.InsertOrUpdate(fromContext.Query<DbProtocol>(o => o.ObsoletionTime == null));
+            toContext.InsertOrUpdate(fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null));
+            toContext.InsertOrUpdate(fromContext.Query<DbExtensionType>(o => o.ObsoletionTime == null));
+            toContext.InsertOrUpdate(fromContext.Query<DbTemplateDefinition>(o => o.ObsoletionTime == null));
 
             while (ofs < keysToCopy.Length)
             {
@@ -652,11 +719,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 // Purge the related fields
                 var versionKeys = fromContext.Query<DbActVersion>(o => batchKeys.Contains(o.Key)).Select(o => o.VersionKey).ToArray();
 
-                
                 // Copy users of interest
                 additionalKeys = fromContext.Query<DbActVersion>(o => batchKeys.Contains(o.Key))
                     .Select(o => o.CreatedByKey)
                     .Distinct()
+                    .Union(
+                        fromContext.Query<DbActTag>(o => batchKeys.Contains(o.SourceKey))
+                        .Select(o => o.CreatedByKey)
+                        .Distinct()
+                    )
                     .Union(
                         fromContext.Query<DbActVersion>(o => batchKeys.Contains(o.Key))
                         .Select(o => o.ObsoletedByKey)
@@ -666,7 +737,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         .Select(o => o.Value)
                     )
                     .ToArray();
-                toContext.InsertOrUpdate(fromContext.Query<DbSecurityUser>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdate(fromContext.Query<DbSecurityProvenance>(o => additionalKeys.Contains(o.Key)));
 
                 toContext.InsertOrUpdate(fromContext.Query<DbAct>(o => batchKeys.Contains(o.Key)));
                 toContext.InsertOrUpdate(fromContext.Query<DbActVersion>(o => batchKeys.Contains(o.Key)));
@@ -688,14 +759,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 // TODO: Other acts
 
                 // Purge the related fields
-                toContext.InsertOrUpdate(fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null));
-                toContext.InsertOrUpdate(fromContext.Query<DbActIdentifier>(o => batchKeys.Contains(o.SourceKey)));
-                toContext.InsertOrUpdate(fromContext.Query<DbExtensionType>(o => o.ObsoletionTime == null));
-                toContext.InsertOrUpdate(fromContext.Query<DbActExtension>(o => batchKeys.Contains(o.SourceKey)));
-                toContext.InsertOrUpdate(fromContext.Query<DbActTag>(o => batchKeys.Contains(o.SourceKey)));
-                toContext.InsertOrUpdate(fromContext.Query<DbActNote>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdate(fromContext.Query<DbActIdentifier>(o => batchKeys.Contains(o.SourceKey) && o.ObsoleteVersionSequenceId == null));
+                toContext.InsertOrUpdate(fromContext.Query<DbActExtension>(o => batchKeys.Contains(o.SourceKey) && o.ObsoleteVersionSequenceId == null));
+                toContext.InsertOrUpdate(fromContext.Query<DbActTag>(o => batchKeys.Contains(o.SourceKey) && o.ObsoletionTime == null));
+                toContext.InsertOrUpdate(fromContext.Query<DbActNote>(o => batchKeys.Contains(o.SourceKey) && o.ObsoleteVersionSequenceId == null));
 
-                toContext.InsertOrUpdate(fromContext.Query<DbProtocol>(o => o.ObsoletionTime == null));
                 toContext.InsertOrUpdate(fromContext.Query<DbActProtocol>(o => batchKeys.Contains(o.SourceKey)));
 
                 // Note: Security tags are not deleted as they still apply even when this record is purged
@@ -706,14 +774,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     .ToArray();
                 toContext.InsertOrUpdate(fromContext.Query<DbAct>(o => additionalKeys.Contains(o.Key)));
 
-                toContext.InsertOrUpdate(fromContext.Query<DbActRelationship>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdate(fromContext.Query<DbActRelationship>(o => batchKeys.Contains(o.SourceKey) && o.ObsoleteVersionSequenceId == null));
 
-                additionalKeys = fromContext.Query<DbActRelationship>(o => batchKeys.Contains(o.SourceKey))
+                additionalKeys = fromContext.Query<DbActParticipation>(o => batchKeys.Contains(o.SourceKey))
                    .Select(o => o.TargetKey)
                    .Distinct()
                    .ToArray();
                 toContext.InsertOrUpdate(fromContext.Query<DbEntity>(o => additionalKeys.Contains(o.Key)));
-                toContext.InsertOrUpdate(fromContext.Query<DbActParticipation>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdate(fromContext.Query<DbActParticipation>(o => batchKeys.Contains(o.SourceKey) && o.ObsoleteVersionSequenceId == null));
             }
 
             toContext.ResetSequence("ACT_VRSN_SEQ", toContext.Query<DbActVersion>(o => true).Max(o => o.VersionSequenceId));

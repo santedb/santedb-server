@@ -82,9 +82,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 			var modelInstance = base.ToModelInstance(dataInstance, context);
 
 			modelInstance.Flags = (MailMessageFlags)(dataInstance as DbMailMessage).Flags;
+			var tableMapping = TableMapping.Get(typeof(DbSecurityUser));
 
             SqlStatement rcptStatement = context.CreateSqlStatement()
-                .SelectFrom(typeof(DbSecurityUser))
+                .SelectFrom(tableMapping.OrmType, tableMapping.Columns.First(o=>o.IsPrimaryKey))
                 .InnerJoin<DbSecurityUser, DbMailMessageRcptTo> (o=>o.Key, o=>o.SourceKey)
                 .Where<DbMailMessageRcptTo>(o=>o.Key == modelInstance.Key).Build();
 

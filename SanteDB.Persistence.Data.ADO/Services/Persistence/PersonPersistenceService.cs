@@ -19,6 +19,7 @@
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
 using System;
 using System.Collections.Generic;
@@ -95,6 +96,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <returns></returns>
         public override Core.Model.Entities.Person InsertInternal(DataContext context, Core.Model.Entities.Person data)
         {
+
+            if (data.Occupation != null) data.Occupation = data.Occupation?.EnsureExists(context, false) as Concept;
+            data.OccupationKey = data.Occupation?.Key ?? data.OccupationKey;
+
             var retVal = base.InsertInternal(context, data);
             //byte[] sourceKey = retVal.Key.Value.ToByteArray();
 
@@ -112,6 +117,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Core.Model.Entities.Person UpdateInternal(DataContext context, Core.Model.Entities.Person data)
         {
+            if (data.Occupation != null) data.Occupation = data.Occupation?.EnsureExists(context, false) as Concept;
+            data.OccupationKey = data.Occupation?.Key ?? data.OccupationKey;
+
             var retVal = base.UpdateInternal(context, data);
             var sourceKey = retVal.Key.Value.ToByteArray();
 
