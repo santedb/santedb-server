@@ -227,10 +227,10 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.58.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.58.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.58.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.58.0" />
+        <PackageReference Include="RestSrvr" Version="2.0.59.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.59.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.59.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.59.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
