@@ -18,8 +18,16 @@
  - User: fyfej (Justin Fyfe)
  - Date: 2020-1-8
  -->
-<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.9.1.23074" xmlns:santempi="http://santedb.org/configuration/santempi" xmlns:santeguard="http://santedb.org/configuration/santeguard" xmlns="http://santedb.org/configuration">
+
+<!-- This is an empty configuration file for a standard SanteDB instance -->
+<!-- Note: You will need to enable the appropriate sections for your environment -->
+<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0.59.0" 
+                      xmlns:santempi="http://santedb.org/configuration/santempi" 
+                      xmlns:santeguard="http://santedb.org/configuration/santeguard" 
+                      xmlns="http://santedb.org/configuration">
+  <!-- Configuration Sections -->
   <sections>
+    <add type="SanteDB.Core.Configuration.EmailNotificationConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.DiagnosticsConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Messaging.Metadata.Configuration.MetadataConfigurationSection, SanteDB.Messaging.Metadata, Version=1.0.0.0"/>
     <add type="SanteDB.Core.Configuration.AppletConfigurationSection, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
@@ -57,34 +65,60 @@
     <add type="SanteDB.Tools.Debug.Configuration.DebugToolsConfigurationSection, SanteDB.Tools.Debug, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null"/>
     <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api, Version=1.10.0.0"/>
     <add type="SanteDB.Matcher.Configuration.File.FileMatchConfigurationSection, SanteDB.Matcher.Configuration.File, Version=1.0.0.0"/>
-    <add type="SanteGuard.Configuration.SanteGuardConfiguration, SanteGuard.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteGuard.Persistence.Ado.Configuration.SanteGuardAdoConfiguration, SanteGuard.Persistence.Ado, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.ResourceMergeConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0"/>
     <add type="SanteDB.Core.Data.Quality.Configuration.DataQualityConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0"/>
-    <add type="SanteMPI.Persistence.ADO.Configuration.AdoConfigurationSection, SanteMPI.Persistence.Ado, Version=2.0.0.0"/>
   </sections>
+  <!-- Built-in Audit Repository Filters -->
   <section xsi:type="AuditAccountabilityConfigurationSection" completeAuditTrail="false">
     <filters>
+      <!-- Filters are controlled by attributes as listed below:
+        @outcome = One or outcome codes to filter
+        @action = One or more action codes to filter : (c)reate, (u)pdate, (d)elete, (e)xecute, (r)ead
+        @event = One or more event codes to filter
+        @insert = Store the audit in our audit database (true|false)
+        @ship = Forward the audit to a central audit repository (true|false)
+      -->
       <add outcome="fail.minor fail.major fail.epic" insert="true" ship="true" />
       <add action="c r u d" insert="true" ship="true" />
       <add action="x" event="network security restrictedFn" outcome="ok" insert="false" ship="false" />
     </filters>
   </section>
-  <section xsi:type="FileMatchConfigurationSection">
-    <basePath>
-      <add readonly="false">C:\Users\fyfej\source\repos\santedb\sante-mpi\applet\matching</add>
-      <add readonly="false">C:\Users\fyfej\source\repos\santedb\santempi\applet\matching</add>
-    </basePath>
+  <!-- E-Mail Notification Subsystem Configuration -->
+  <section xsi:type="EmailNotificationConfigurationSection">
+    <!-- SMTP Server Details -->
+    <smtp>
+      <server>smtp://smtp.sendgrid.net:587</server>
+      <username>apikey</username>
+      <password></password>
+      <useTls>true</useTls>
+      <from>no-reply@fyfesoftware.ca</from>
+    </smtp>
+    <!-- Administrative Contacts -->
+    <adminContacts>
+      <add>justin@fyfesoftware.ca</add>
+    </adminContacts>
   </section>
-  <section xsi:type="MetadataConfigurationSection"/>
-
+  <!-- If Using FileMatchProvider plugin, the directory where match configuration files are stored  -->
+  <!--<section xsi:type="FileMatchConfigurationSection">
+    <basePath>
+      <add readonly="false">PATH_TO_YOUR_MATCH_CONFIG_FILES</add>
+    </basePath>
+  </section>-->
+  <!-- If using OpenAPI Plugin -->
+  <section xsi:type="MetadataConfigurationSection">
+    <!-- The host to emit in the Swagger JSON -->
+    <host>http://external_access_url</host>
+  </section>
+  <!-- If using File-System Persistent Queueing (like for outbound GS1 and HL7 messages) -->
   <section xsi:type="FileSystemQueueConfigurationSection" queueRoot=".\queue" />
+  <!-- Database Configuration -->
   <section xsi:type="DataConfigurationSection">
       <connectionStrings>
-        <add name="FirebirdSQL" value="initial catalog=|DataDirectory|\sdb_base.fdb;server type=Embedded;user id=sysdba" provider="FirebirdSQL" />
+        <add name="FirebirdSQL" value="initial catalog=|DataDirectory|\santedb_test.fdb;server type=Embedded;user id=sysdba" provider="FirebirdSQL" />
         <add name="AUDIT_FirebirdSQL" value="initial catalog=|DataDirectory|\sdb_audit.fdb;server type=Embedded;user id=sysdba" provider="FirebirdSQL"/>
       </connectionStrings>
   </section>
+  <!-- Object Relational Model Configuration -->
   <section xsi:type="OrmConfigurationSection">
     <providers>
       <add type="SanteDB.OrmLite.Providers.Postgres.PostgreSQLProvider, SanteDB.OrmLite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" invariant="npgsql" />
@@ -95,12 +129,14 @@
       <add name="Firebird Data Provider" invariant="FirebirdSQL" description="Firebird" type="FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient, Culture=neutral, PublicKeyToken=3750abcc3150b00c" />
     </dbProviderFactories>
   </section>
+  <!-- Local Audit Database Configuration -->
   <section xsi:type="AdoAuditConfigurationSection"
 		   readWriteConnectionString="AUDIT_FirebirdSQL"
 		   readOnlyConnectionString="AUDIT_FirebirdSQL"
 		   traceSql="false"
 		   providerType="FirebirdSQL" />
   
+  <!-- If using SanteMPI the configuration for MPI specific tables 
   <section xsi:type="santempi:AdoConfigurationSection"
       readWriteConnectionString="FirebirdSQL"
 	    readOnlyConnectionString="FirebirdSQL"
@@ -108,13 +144,18 @@
 	    providerType="FirebirdSQL"
 	    perpareStatements="false"
     />
+   -->
+  <!-- Configuraiton for AppletLoader -->
   <section xsi:type="AppletConfigurationSection" appletDirectory=".\applets" allowUnsignedApplets="true">
+    <!-- Digital Signing Thumbprints of Trusted Publishers -->
     <trustedPublishers>
       <add>82C63E1E9B87578D0727E871D7613F2F0FAF683B</add>
       <add>4326A4421216AC254DA93DC61B93160B08925BB1</add>
     </trustedPublishers>
   </section>
+  <!-- OpenID / OAUTH Configuration -->
   <section xsi:type="OAuthConfigurationSection" issuerName="http://localhost:8080/auth">
+    <!-- Claims that clients are allowed to attach to their authentication requests -->
     <allowedClaims>
       <add>scope</add>
       <add>PolicyOverride</add>
@@ -123,15 +164,22 @@
       <add>FacilityId</add>
       <add>OrganizationId</add>
     </allowedClaims>
+    <!-- Token type (JWT or BEARER for random bearer token) -->
     <tokenType>bearer</tokenType>
+    <!-- Allow client_credentials grants without device authentication -->
     <allowNodelessClientAuth>true</allowNodelessClientAuth>
   </section>
+  
+  <!-- If using Memory Caching -->
   <section xsi:type="MemoryCacheConfigurationSection" autoSubscribe="true" maxSize="10000" maxAge="3600" />
+  <!-- If using REDIS Caching
   <section xsi:type="RedisConfigurationSection" ttl="PT5H">
     <servers>
       <add>localhost:6379</add>
     </servers>
   </section>
+  -->
+  <!-- Built-In Diagnostics and Logging Configuration -->
   <section xsi:type="DiagnosticsConfigurationSection">
     <sources>
       <add name="SanteDB.Authentication.OAuth2" filter="Warning" />
@@ -178,18 +226,22 @@
       </add>
     </writers>
   </section>
+  <!-- Defualt Job Management -->
   <section xsi:type="JobConfigurationSection">
     <!-- This can be used to add jobs at a specified interval to the service 
     <jobs>
       <add type="value" interval="0" />
     </jobs>-->
   </section>
+  <!-- REST Endpoints -->
   <section xsi:type="RestConfigurationSection">
+    <!-- OpenAPI Endpoint -->
     <service name="META">
       <endpoint address="http://0.0.0.0:8080/api-docs" contract="SanteDB.Messaging.Metadata.Rest.IMetadataServiceContract, SanteDB.Messaging.Metadata, Version=1.0.0.0">
         <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common, Version=1.10.0.0"/>
       </endpoint>
     </service>
+    <!-- Primary HDSI Endpoint -->
     <service name="HDSI">
       <behaviors>
         <add type="SanteDB.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Core, Version=1.10.0.0"/>
@@ -202,6 +254,7 @@
         </behaviors>
       </endpoint>
     </service>
+    <!-- Business Intelligence Endpoint-->
     <service name="BIS">
       <behaviors>
         <add type="SanteDB.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Core, Version=1.10.0.0"/>
@@ -213,6 +266,7 @@
         </behaviors>
       </endpoint>
     </service>
+    <!-- Administration and Management API -->
     <service name="AMI">
       <behaviors>
         <add type="SanteDB.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Core, Version=1.10.0.0"/>
@@ -225,8 +279,7 @@
         </behaviors>
       </endpoint>
     </service>
-
-
+    <!-- HL7 FHIR R3 -->
     <service name="FHIR">
       <behaviors>
         <add type="SanteDB.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Core, Version=1.10.0.0"/>
@@ -259,22 +312,12 @@
         </behaviors>
       </endpoint>
     </service>
+    <!-- OAUTH 2 Endpoint -->
     <service name="OAuth2">
       <endpoint address="http://0.0.0.0:8080/auth" contract="SanteDB.Authentication.OAuth2.Rest.IOAuthTokenContract, SanteDB.Authentication.OAuth2, Version=1.10.0.0"/>
     </service>
   </section>
-  <!-- Basic Authorization Configuration -->
-  <section xsi:type="BasicAuthorizationConfigurationSection" requireClientAuth="true" realm="127.0.0.1">
-    <!-- X-SanteDB-ClientClaim allowed claims -->
-    <claims>
-      <add>scope</add>
-      <add>PolicyOverride</add>
-      <add>ResourceId</add>
-      <add>PurposeOfUse</add>
-      <add>FacilityId</add>
-      <add>OrganizationId</add>
-    </claims>
-  </section>
+  
   <!-- Used for authorizing clients using a claims token -->
   <section xsi:type="ClaimsAuthorizationConfigurationSection" realm="127.0.0.1">
     <issuer>
@@ -325,15 +368,9 @@
     <!-- To Configure X509 Signatures -->
     <!--<signing alg="rsa" findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />-->
   </section>
-  <!-- This section configures e-mail TFA authentication -->
-  <section xsi:type="TfaEmailMechanismConfigurationSection">
-    <smtp from="no-reply@santesuite.net" password="blah" server="smtp://smtp.sendgrid.net" ssl="false" username="auth" />
-    <templates>
-      <add lang="en" file="bugreport.html" />
-    </templates>
-  </section>
+  
   <!-- This section configures Twilio SMS TFA authentication -->
-  <section xsi:type="TwilioTfaMechanismConfigurationSection" auth="value" from="value" sid="value" />
+  <!--<section xsi:type="TwilioTfaMechanismConfigurationSection" auth="value" from="value" sid="value" />-->
   <!-- This section configures the AMI -->
   <section xsi:type="AmiConfigurationSection">
     <!-- This controls the allowed resources that can run on the AMI -->
@@ -348,7 +385,8 @@
     </endpoints>-->
   </section>
   <!-- Configures the FHIR service-->
-  <section xsi:type="FhirServiceConfigurationSection" restEndpoint="FHIR" index="value">
+  <!--<section xsi:type="FhirServiceConfigurationSection" restEndpoint="FHIR" index="home-page.html ">
+    --><!-- Resources which are permitted on the FHIR server --><!--
     <resourceHandlers>
       <add type="SanteDB.Messaging.FHIR.Handlers.EncounterResourceHandler, SanteDB.Messaging.FHIR, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"/>
       <add type="SanteDB.Messaging.FHIR.Handlers.AdverseEventResourceHandler, SanteDB.Messaging.FHIR, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"/>
@@ -362,28 +400,11 @@
       <add type="SanteDB.Messaging.FHIR.Handlers.ImmunizationRecommendationResourceHandler, SanteDB.Messaging.FHIR, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"/>
       <add type="SanteDB.Messaging.FHIR.Handlers.ImmunizationResourceHandler, SanteDB.Messaging.FHIR, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"/>
     </resourceHandlers>
-    <cors>
-      <add resource="*" domain="*">
-        <verbs>
-          <add>OPTIONS</add>
-          <add>POST</add>
-          <add>PUT</add>
-          <add>PATCH</add>
-          <add>DELETE</add>
-          <add>GET</add>
-        </verbs>
-        <headers>
-          <add>Content-Type</add>
-          <add>Accept-Encoding</add>
-          <add>Content-Encoding</add>
-        </headers>
-      </add>
-    </cors>
-    <!-- Sets the base path for reverse proxies -->
+    --><!-- Sets the base path for reverse proxies --><!--
     <base>http://localhost:8080/fhir</base>
-  </section>
+  </section>-->
   <!-- Configurations Related to GS1 -->
-  <section xsi:type="Gs1ConfigurationSection"
+  <!--<section xsi:type="Gs1ConfigurationSection"
            autoCreateMaterials="true"
            defaultAuthority="1.2.3.4.5.6.7"
            queueName="gs1"
@@ -395,19 +416,20 @@
       <endpoint>
         <add address="http://some-remote-lmis.com:3092" timeout="10000" />
       </endpoint>
-      <!-- To present a client certificate to the server 
+      --><!-- To present a client certificate to the server 
       <clientCertificate findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />
-      -->
+      --><!--
     </broker>
     <senderContactEmail>bob@bobstrading.com</senderContactEmail>
-  </section>
+  </section>-->
   <!-- This section configures the behavior of the HDSI -->
   <section xsi:type="HdsiConfigurationSection">
     <!-- Resources which are permitted to run on this HDSI instance -->
     <resources/>
   </section>
   <!-- Controls the HL7 v2 LLP Handler -->
-  <section xsi:type="Hl7ConfigurationSection" security="Msh8">
+  <!--<section xsi:type="Hl7ConfigurationSection" security="Msh8">
+    --><!-- Classes of PLACE which can be used for a Birthplace Lookup --><!--
     <birthplaceClasses>
       <add>79DD4F75-68E8-4722-A7F5-8BC2E08F5CD6</add>
       <add>48B2FFB3-07DB-47BA-AD73-FC8FB8502471</add>
@@ -415,24 +437,26 @@
       <add>FF34DFA7-C6D3-4F8B-BC9F-14BCDC13BA6C</add>
       <add>8CF4B0B0-84E5-4122-85FE-6AFA8240C218</add>
     </birthplaceClasses>
+    --><!-- The authority of your UUIDs --><!--
     <localAuthority>
-      <domainName xmlns="http://santedb.org/model">MOHS_GEN_NHID_MPI_INT</domainName>
+      <domainName xmlns="http://santedb.org/model">YOUR_LOCAL_V2_AUTHORITY</domainName>
       <oid xmlns="http://santedb.org/model">1.3.6.1.4.1.52820.5.1.1.1.999</oid>
-      <url xmlns="http://santedb.org/model">http://mpi.mohs.go.mm/identity/mohs/nhid/mpi/internal</url>
+      <url xmlns="http://santedb.org/model">http://your/fhir/authority</url>
     </localAuthority>
+    --><!-- The SSN Authority from PID segment (map to PID-3) --><!--
     <ssnAuthority>
-      <domainName xmlns="http://santedb.org/model">MOIP_NRC</domainName>
-      <oid xmlns="http://santedb.org/model">1.3.6.1.4.1.52820.5.1.1.1.7</oid>
-      <url xmlns="http://santedb.org/model">http://mpi.mohs.gov.mm/identity/moip/nrc</url>
+      <domainName xmlns="http://santedb.org/model">SSN</domainName>
+      <oid xmlns="http://santedb.org/model">2.16.840.1.113883.4.1</oid>
+      <url xmlns="http://santedb.org/model">http://hl7.org/fhir/sid/us-ssn</url>
     </ssnAuthority>
     <services>
       <add address="llp://0.0.0.0:2100" name="LLP" receiveTimeout="20000">
-        <!-- If you want to enable security Encryption
+        --><!-- If you want to enable security Encryption
         <sllp checkCrl="false" requireClientCert="false">
           <serverCertificate findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />
           <clientAuthorityCertificate findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />
         </sllp>
-        -->
+        --><!--
         <handler>
           <add type="SanteDB.Messaging.HL7.Messages.QbpMessageHandler, SanteDB.Messaging.HL7, Version=1.10.0.0">
             <message isQuery="true" name="QBP^Q22" />
@@ -447,9 +471,11 @@
         </handler>
       </add>
     </services>
-  </section>
+  </section>-->
+  <!-- Data Quality Configuration Section -->
   <section xsi:type="DataQualityConfigurationSection">
-    <ruleSet enabled="true" id="mempi" name="Myanmar National MPI">
+    <!-- Rule Set for data quality -->
+    <ruleSet enabled="true" id="default" name="My Data Quality Configuration">
       <resources>
         <add resource="Patient">
           <assert id="dob.required" name="Date of Birth Required" priority="Warning">
@@ -465,11 +491,8 @@
             <expression>name.component.value=!null</expression>
           </assert>
           <assert id="identifier.national" name="Identifier Required" evaluation="any" priority="Warning">
-            <expression>identifier[MOIP_NRC].value=!null</expression>
-            <expression>identifier[MOHS_GEN_NHID].value=!null</expression>
+            <expression>identifier[SSN].value=!null</expression>
             <expression>identifier[DLN].value=!null</expression>
-            <expression>identifier[MOHS_DC_TB_MDRTB_CASE].value=!null</expression>
-            <expression>identifier[MOHS_DC_HIV_NAP].value=!null</expression>
           </assert>
           <assert id="gender.required" name="Gender Required" priority="Warning">
             <expression>genderConcept=!null</expression>
@@ -484,10 +507,10 @@
       </resources>
     </ruleSet>
   </section>
-  <!-- ATNA Audit -->
-  <section xsi:type="AtnaConfigurationSection" endpoint="127.0.0.1:11515" enterpriseSiteID="SanteDB^^^&amp;1.2.3.4.5.6.7" format="DICOM" transport="udp">
-    <!--<clientCertificate findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />-->
-  </section>
+  <!-- ATNA Audit log Shipping -->
+  <!--<section xsi:type="AtnaConfigurationSection" endpoint="127.0.0.1:11515" enterpriseSiteID="SanteDB^^^&amp;1.2.3.4.5.6.7" format="DICOM" transport="udp">
+    --><!--<clientCertificate findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />--><!--
+  </section>-->
   <!-- This section controls the persistence for ADO.NET -->
   <section xsi:type="AdoPersistenceConfigurationSection"
            readWriteConnectionString="FirebirdSQL"
@@ -519,25 +542,15 @@
     </recipients>
   </section>
   <!-- Diagnostics via JIRA configuration-->
-  <section xsi:type="JiraServiceConfigurationSection" userName="value" password="value" project="value" url="value" />
+  <!--<section xsi:type="JiraServiceConfigurationSection" userName="value" password="value" project="value" url="value" />-->
   <!-- Master Data Management Configuration -->
   <section xsi:type="ResourceMergeConfigurationSection">
     <resources>
+      <!-- Note: You will have to install the Sante MATCH plugin for this to work and enable the FileMatchProvider -->
       <add type="Patient" matchConfiguration="org.santedb.smpi.matching.default" autoMerge="false" />
     </resources>
   </section>
-  <!-- Reporting configuration -->
-  <section xsi:type="ReportingConfiguration"
-           readWriteConnectionString="FirebirdSQL"
-           readOnlyConnectionString="FirebirdSQL"
-           traceSql="false"
-           	providerType="FirebirdSQL" />
-  <!-- Data Warehouse Configuration -->
-  <section xsi:type="AdoWarehouseConfigurationSection"
-           readWriteConnectionString="FirebirdSQL"
-           readOnlyConnectionString="FirebirdSQL"
-           traceSql="false"
-           	providerType="FirebirdSQL"  />
+  
   <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="8">
     <serviceProviders>
 
@@ -563,13 +576,18 @@
       <add type="SanteDB.Core.Security.DefaultPasswordValidationService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.SHA256PasswordHashingService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Messaging.Atna.AtnaAuditService, SanteDB.Messaging.Atna, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
 
-      <!-- Data Services -->
-      <!--<add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />-->
+      <!-- Caching Services -->
+      <add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Caching.Memory.MemoryQueryPersistenceService, SanteDB.Caching.Memory, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Caching.Memory.MemoryAdhocCache, SanteDB.Caching.Memory, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <!-- If using REDIS 
       <add type="SanteDB.Caching.Redis.RedisCacheService, SanteDB.Caching.Redis, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Caching.Redis.RedisQueryPersistenceService, SanteDB.Caching.Redis, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Caching.Redis.RedisAdhocCache, SanteDB.Caching.Redis, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      -->
+      
+      <!-- Data Services -->
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPersistenceService, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Auditing.ADO.Services.AdoAuditRepositoryService, SanteDB.Persistence.Auditing.ADO, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
 
@@ -579,58 +597,106 @@
       <add type="SanteDB.Core.Services.Impl.LocalMailMessageRepository, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Services.Impl.LocalStockManagementRepositoryService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Services.Impl.LocalTagPersistenceService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      
+      <!-- Subscription Management / Definition Service -->
       <add type="SanteDB.Core.Applets.Services.Impl.AppletSubscriptionRepository, SanteDB.Core.Applets, Version=1.30.0.0, Culture=neutral, PublicKeyToken=null"/>
       <add type="SanteDB.Core.Security.Audit.AuditDaemonService, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
 
-
       <!-- Data Migration & Management -->
       <add type="SanteDB.Core.Persistence.DataInitializationService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+
+      <!-- Care Planning Services -->
       <add type="SanteDB.Core.Protocol.SimpleCarePlanService, SanteDB.Core.Api, Version=1.9.1.24156, Culture=neutral, PublicKeyToken=null" />
-      <!--<add type="SanteDB.Persistence.MDM.Services.MdmDaemonService, SanteDB.Persistence.MDM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />-->
+
 
       <!-- Messaging Services-->
+      <!-- OAUTH 2.0 Plugin -->
       <add type="SanteDB.Authentication.OAuth2.OAuthMessageHandler, SanteDB.Authentication.OAuth2, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      
+      <!-- HL7 FHIR Plugin -->
       <add type="SanteDB.Messaging.FHIR.FhirMessageHandler, SanteDB.Messaging.FHIR, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
-      <!--<add type="SanteDB.Messaging.GS1.StockSubscriber, SanteDB.Messaging.GS1, Version=1.9.0.0, Culture=neutral, PublicKeyToken=null" />
+      
+      <!-- GS1 BMS Plugins
+      <add type="SanteDB.Messaging.GS1.StockSubscriber, SanteDB.Messaging.GS1, Version=1.9.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Messaging.GS1.StockServiceMessageHandler, SanteDB.Messaging.GS1, Version=1.9.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Messaging.GS1.Transport.AS2.As2IntegrationService, SanteDB.Messaging.GS1, Version=1.9.0.0, Culture=neutral, PublicKeyToken=null" />-->
+
+      <!-- HDSI Core API Plugin (dont remove) -->
       <add type="SanteDB.Messaging.HDSI.HdsiMessageHandler, SanteDB.Messaging.HDSI, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      
+      <!-- HL7v2 Plugin -->
       <add type="SanteDB.Messaging.HL7.HL7MessageHandler, SanteDB.Messaging.HL7, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+
+      <!-- Legacy RISI Plugin -->
       <!--<add type="SanteDB.Messaging.RISI.RisiMessageHandler, SanteDB.Messaging.RISI, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />-->
+
+      <!-- Legacy Data Sandbox Experiments Plugin -->
       <!--<add type="SanteDB.Tools.DataSandbox.DataSandboxService, SanteDB.Tools.DataSandbox, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />-->
+      
+      <!-- AMI Plugin (dont remove) -->
       <add type="SanteDB.Messaging.AMI.AmiMessageHandler, SanteDB.Messaging.AMI, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      
+      <!-- OpenAPI Plugin -->
       <add type="SanteDB.Messaging.Metadata.MetadataMessageHandler, SanteDB.Messaging.Metadata, Version=1.0.0.0"/>
 
-      <!-- Clinical Services -->
+      <!-- Patching Services -->
       <add type="SanteDB.Core.Services.Impl.SimplePatchService, SanteDB.Core.Api, Version=1.9.1.24156, Culture=neutral, PublicKeyToken=null" />
+      
+      <!-- Applet Management Service -->
       <add type="SanteDB.Core.Services.Impl.LocalAppletManagerService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+
+      <!-- Load Business Rules from Applets -->
       <add type="SanteDB.Core.Services.Daemons.AppletBusinessRulesDaemon, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
 
-      <!-- Anciliarry Services -->
+      <!-- E-Mail Bug Reports Plugin -->
       <add type="SanteDB.Persistence.Diagnostics.Email.DiagnosticReportPersistenceService, SanteDB.Persistence.Diagnostics.Email, Version=1.9.0.0, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Persistence.Diagnostics.Jira.DiagnosticReportPersistenceService, SanteDB.Persistence.Diagnostics.Jira, Version=1.1.2.24168, Culture=neutral, PublicKeyToken=null" />
-      <!--<add type="SanteDB.Persistence.Reporting.ADO.ReportingPersistenceService, SanteDB.Persistence.Reporting.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />-->
+      <!-- JIRA Reporting Services -->
+      <!-- <add type="SanteDB.Persistence.Diagnostics.Jira.DiagnosticReportPersistenceService, SanteDB.Persistence.Diagnostics.Jira, Version=1.1.2.24168, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Persistence.Reporting.ADO.ReportingPersistenceService, SanteDB.Persistence.Reporting.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />-->
+      
+      <!-- Legacy Ad-hoc Warehouse
       <add type="SanteDB.Warehouse.ADO.ADODataWarehouse, SanteDB.Warehouse.ADO, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-
-      <!-- SG Services -->
-      <!--<add type="SanteGuard.Services.LocalAuditTermLookupService, SanteGuard.Core, Version=1.0.0.0"/>
-	  <add type="SanteGuard.Services.Repositories.SanteGuardDataRepository, SanteGuard.Core, Version=1.0.0.0"/>-->
+      -->
+      <!-- SanteGuard Services -->
+      <!--
+      Audit Terminology Service:
+      <add type="SanteGuard.Services.LocalAuditTermLookupService, SanteGuard.Core, Version=1.0.0.0"/>
+      Enhanced Audit Repository:
+      <add type="SanteGuard.Persistence.Ado.Services.AdoAuditPersistenceService, SanteGuard.Persistence.Ado, Version=1.0.0.0"/>
+      <add type="SanteGuard.Services.Repositories.SanteGuardDataRepository, SanteGuard.Core, Version=1.0.0.0"/>
+      <add type="SanteGuard.Services.Repositories.SanteGuardAuditRepository, SanteGuard.Core, Version=1.0.0.0"/>
+      SYSLOG Receiver:
       <add type="SanteGuard.Messaging.Syslog.SyslogMessageHandler, SanteGuard.Messaging.Syslog, Version=1.0.0.0"/>
-      <!--  <add type="SanteGuard.Persistence.Ado.Services.AdoAuditPersistenceService, SanteGuard.Persistence.Ado, Version=1.0.0.0"/>-->
-      <!--<add type="SanteGuard.Services.Repositories.SanteGuardAuditRepository, SanteGuard.Core, Version=1.0.0.0"/>-->
+      End SanteGuard Services-->
 
       <!-- BI Services -->
+      <!-- Enable BI on REST API: -->
       <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS, Version=1.40.0.0"/>
+      <!-- Load BI definitions from applets: -->
       <add type="SanteDB.BI.Services.Impl.AppletBiRepository, SanteDB.BI, Version=1.40.0.0"/>
+      <!-- Use System RAM for PIVOT operations: -->
       <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI, Version=1.40.0.0"/>
+      <!-- Render Reports using Local Services -->
       <add type="SanteDB.BI.Services.Impl.LocalBiRenderService, SanteDB.BI, Version=1.40.0.0"/>
 
-      <add type="SanteDB.Persistence.MDM.Services.MdmDataManagementService, SanteDB.Persistence.MDM, Version=1.0.0.0"/>
+      <!-- If using Master Data Management -->
+      <!--<add type="SanteDB.Persistence.MDM.Services.MdmDaemonService, SanteDB.Persistence.MDM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Persistence.MDM.Services.MdmDataManagementService, SanteDB.Persistence.MDM, Version=1.0.0.0"/>-->
+      
+      <!-- Weighted Record Matching Services:
       <add type="SanteDB.Matcher.Matchers.WeightedRecordMatchingService, SanteDB.Matcher, Version=1.0.0.0"/>
+      Simple Record Matching Services;
+      <add type="SanteDB.Matcher.Matchers.SimpleRecordMatchingService, SanteDB.Matcher, Version=1.0.0.0"/> -->
+      <!-- Load Match configuration from files -->
       <add type="SanteDB.Matcher.Configuration.File.FileMatchConfigurationProvider, SanteDB.Matcher.Configuration.File, Version=1.0.0.0"/>
 
+      <!-- Default Data Quality Services -->
       <add type="SanteDB.Core.Data.Quality.DataQualityService, SanteDB.Core.Api, Version=1.0.0.0"/>
+      
+      <!-- SanteMPI Services: 
+      Name Alias Services:
       <add type="SanteMPI.Persistence.ADO.Services.AdoNameAliasService, SanteMPI.Persistence.ADO, Version=2.0.0.0"/>
+      -->
     </serviceProviders>
   </section>
 </SanteDBConfiguration>

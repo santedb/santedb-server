@@ -39,6 +39,9 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Design" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.5.0.0\lib\net45\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -114,6 +117,7 @@
     <None Include="..\SanteDB.licenseheader">
       <Link>SanteDB.licenseheader</Link>
     </None>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -153,10 +157,10 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.59.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.59.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.59.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.0.59.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.60.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.60.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.60.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="2.0.60.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

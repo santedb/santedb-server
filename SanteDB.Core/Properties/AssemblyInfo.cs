@@ -51,10 +51,10 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("2.0.59.*")][assembly: AssemblyInformationalVersion("2.0.59")]
-[assembly: AssemblyVersion("2.0.59.*")]
+// [assembly: AssemblyVersion("2.0.60.*")][assembly: AssemblyInformationalVersion("2.0.60")]
+[assembly: AssemblyVersion("2.0.60.*")]
 [assembly: AssemblyInformationalVersion("Montreal")]
-[assembly: AssemblyFileVersion("2.0.59.0")]
+[assembly: AssemblyFileVersion("2.0.60.0")]
 
 [assembly: Plugin(EnableByDefault = true, Environment = PluginEnvironment.Server, Group = FeatureGroup.System)]
 [assembly: PluginTraceSource(SanteDBConstants.WcfTraceSourceName)]
