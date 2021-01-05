@@ -61,5 +61,11 @@ namespace SanteDB.Caching.Memory.Configuration
         [XmlAttribute("maxAge")]
         public long MaxCacheAge { get; set; }
 
+        /// <summary>
+        /// Max query age
+        /// </summary>
+        [XmlAttribute("maxQueryAge")]
+        public long MaxQueryAge { get; set; }
+
     }
 }

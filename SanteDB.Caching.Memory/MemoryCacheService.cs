@@ -285,11 +285,8 @@ namespace SanteDB.Caching.Memory
         /// </summary>
         public void Clear()
         {
-            this.m_cache.Dispose();
-            var config = new NameValueCollection();
-            config.Add("cacheMemoryLimitMegabytes", this.m_configuration.MaxCacheSize.ToString());
-            config.Add("pollingInterval", "00:05:00");
-            this.m_cache = new MemoryCache("default", config);
+            this.m_cache.Trim(100);
+            
         }
 
         /// <summary>

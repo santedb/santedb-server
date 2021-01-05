@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>SanteDB.Server</id>
+    <version>2.0.60.1</version>
+    <title>SanteDB Server Runtime</title>
+    <authors>SanteDB Community</authors>
+    <owners>santedb.org</owners>
+    <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>http://santedb.org</projectUrl>
+    <iconUrl>http://santesuite.org/assets/img/logo.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Convenience package which allows developers to run an embedded copy of SanteDB to test plugins.  </description>
+    <releaseNotes>This NUGET Package includes embedded assemblies for Firebird. The License for these pre-compiled binaries can be found at https://www.firebirdsql.org/en/licensing/</releaseNotes>
+    <copyright>Copyright (C) 2015-2021 SanteSuite Contributors (See: NOTICES)</copyright>
+    <tags>cdr santedb server</tags>
+    <dependencies>
+      <dependency id="AtnaApi" version="1.1.4.0" />
+      <dependency id="SanteDB.Server.Plugin" version="2.0.60.0" />
+      <dependency id="SanteDB.Server.Plugin.Data" version="2.0.60.0" />
+      <dependency id="SanteDB.Server.Plugin.Data" version="2.0.60.0" />
+      <dependency id="SanteDB.Server.Messaging.OAuth2" version="2.0.60.0" />
+      <dependency id="SanteDB.BusinessRules.JavaScript" version="2.0.60.0" />
+      <dependency id="SanteDB.Messaging.Metadata" version="2.0.60.0" />
+      <dependency id="SanteDB.Core.Api" version="2.0.60.0" />
+      <dependency id="SanteDB.Core.Model" version="2.0.60.0" />
+      <dependency id="SanteDB.OrmLite" version="2.0.60.0"/>
+      <dependency id="SanteDB.Rest.Common" version="2.0.60.0"/>
+      <dependency id="SanteDB.Server.Plugin.Data.Audit" version="2.0.60" />
+      <dependency id="FirebirdSql.Data.FirebirdClient" version="7.5.0"/>
+    </dependencies>
+    <references>
+      <group targetFramework="net47">
+        <reference file="SanteDB.Server.dll"/>
+        <reference file="MohawkCollege.Util.Console.Parameters.dll"/>
+      </group>
+    </references>
+  </metadata>
+  <files>
+    <file src="..\bin\$configuration$\MohawkCollege.Util.Console.Parameters.dll" target="lib\net47" />
+    <file src="..\bin\$configuration$\SanteDB.Server.dll" target="lib\net47"/>
+    <file src="..\bin\$configuration$\SanteDB.exe" target="Build\" />
+    <file src="..\bin\$configuration$\SanteDB.Caching.Memory.dll" target="Build\" />
+    <file src="..\bin\$configuration$\SanteDB.Messaging.Ami.dll" target="Build\" />
+    <file src="..\bin\$configuration$\SanteDB.Messaging.Hdsi.dll" target="Build\" />
+    <file src="..\bin\$configuration$\SanteDB.Persistence.Diagnostics.Email.dll" target="Build\" />
+    <file src="..\bin\$configuration$\SanteDB.exe.config" target="Build\" />
+    <file src="..\bin\$configuration$\santedb.config.nuget.xml" target="Build\" />
+    <file src="..\Solution Items\santedb_test.fdb" target="Build\" />
+    <file src=".\Data\SDB_AUDIT.FDB" target="Build\" />
+    <file src="..\bin\$configuration$\fbclient.dll" target="build\"/>
+    <file src="..\bin\$configuration$\firebird.conf" target="build\"/>
+    <file src="..\bin\$configuration$\firebird.msg" target="build\"/>
+    <file src="..\bin\$configuration$\ib_util.dll" target="build\"/>
+    <file src="..\bin\$configuration$\icudt52.dll" target="build\"/>
+    <file src="..\bin\$configuration$\icudt52l.dat" target="build\"/>
+    <file src="..\bin\$configuration$\icuin52.dll" target="build\"/>
+    <file src="..\bin\$configuration$\icuuc52.dll" target="build\"/>
+    <file src="..\bin\$configuration$\plugins\engine12.dll" target="build\plugins"/>
+    <file src="SanteDB.Server.targets" target="Build\" />
+  </files>
+</package>
