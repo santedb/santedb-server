@@ -327,7 +327,8 @@
     </trustedPublishers>
     <!-- SanteDB signs a lot of data when communicating it, this is used for configuring how this server signs data -->
     <signingKeys>
-      <add alg="hmac" hmacKey="uuNQ0pAkW+M2uxHjK1pisFZBFYjvkgveJcGtDy2E8i8="/>
+      <add id="jwsdefault" alg="hmac" hmacSecret="@SanteDBDefault$$$409" />
+      <add id="default" alg="hmac" hmacSecret="@SanteDBDefault$$$409"/>
     </signingKeys>
     <!-- To Configure X509 Signatures -->
     <!--<signing alg="rsa" findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />-->
