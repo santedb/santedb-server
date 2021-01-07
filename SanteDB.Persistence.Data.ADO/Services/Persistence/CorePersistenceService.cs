@@ -375,7 +375,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (versionSequenceId == null)
                 return o => o.SourceEntityKey == sourceId && o.ObsoleteVersionSequenceId == null;
             else
-                return o => o.SourceEntityKey == sourceId && o.EffectiveVersionSequenceId <= versionSequenceId && (o.ObsoleteVersionSequenceId == null || o.ObsoleteVersionSequenceId > versionSequenceId);
+                return o => o.SourceEntityKey == sourceId && o.EffectiveVersionSequenceId <= versionSequenceId && o.ObsoleteVersionSequenceId == null;
         }
 
         /// <summary>
