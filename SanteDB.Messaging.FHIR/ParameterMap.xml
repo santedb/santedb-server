@@ -56,6 +56,7 @@
     <map fhir="family" model="name.component[Family].value"/>
     <map fhir="given" model="name.component[Given].value"/>
     <map fhir="address" model="address.component.value"/>
+    <map fhir="state" model="address.component[State].value"/>
     <map fhir="birthdate" model="dateOfBirth"/>
     <map fhir="gender" model="genderConcept" type="concept"/>
     <map fhir="identifier" model="identifier" type="identifier"/>

@@ -40,7 +40,6 @@ namespace SanteDB.Messaging.FHIR.Handlers
     /// </summary>
     public class PatientResourceHandler : RepositoryResourceHandlerBase<Patient, Core.Model.Roles.Patient>, IBundleResourceHandler
 	{
-		
 
 		/// <summary>
 		/// Map a patient object to FHIR.
@@ -51,7 +50,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		protected override Patient MapToFhir(Core.Model.Roles.Patient model, RestOperationContext restOperationContext)
 		{
 			var retVal = DataTypeConverter.CreateResource<Patient>(model, restOperationContext);
-			retVal.Active = model.StatusConceptKey == StatusKeys.Active;
+			retVal.Active = model.StatusConceptKey == StatusKeys.Active || model.StatusConceptKey == StatusKeys.New;
 			retVal.Address = model.LoadCollection<EntityAddress>("Addresses").Select(o => DataTypeConverter.ToFhirAddress(o)).ToList();
 			retVal.BirthDate = model.DateOfBirth;
             switch(model.DateOfBirthPrecision.GetValueOrDefault())
@@ -112,7 +111,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
                     });
                 else if (rel.RelationshipTypeKey?.ToString() == "97730a52-7e30-4dcd-94cd-fd532d111578") // MDM Master Record
                 {
-                    if(rel.SourceEntityKey != model.Key)
+                    if(rel.SourceEntityKey.HasValue &&  rel.SourceEntityKey != model.Key)
                         retVal.Link.Add(new PatientLink() // Is a master
                         {
                             Type = PatientLinkType.SeeAlso,
@@ -122,7 +121,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
                         retVal.Link.Add(new PatientLink()
                         {
                             Type = PatientLinkType.Refer,
-                            Other = Reference.CreateResourceReference<Patient>(DataTypeConverter.CreateResource<Patient>(rel.LoadProperty<Entity>(nameof(EntityRelationship.SourceEntity)), restOperationContext))
+                            Other = Reference.CreateResourceReference<Patient>(DataTypeConverter.CreateResource<Patient>(rel.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity)), restOperationContext))
                         });
                 }
             }
@@ -136,6 +135,9 @@ namespace SanteDB.Messaging.FHIR.Handlers
 						Data = photo.ExtensionValueXml
 					}
 				};
+
+            // Occupation code
+
 
 			// TODO: Links
 			return retVal;
@@ -170,9 +172,9 @@ namespace SanteDB.Messaging.FHIR.Handlers
             {
                 foreach(var id in patient.Identifiers) // try to lookup based on reliable id for the record to update
                 {
-                    if(id.Authority.IsUnique)
+                    if(id.LoadProperty<AssigningAuthority>(nameof(EntityIdentifier.Authority)).IsUnique)
                     {
-                        var match = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Core.Model.Roles.Patient>>().Query(o => o.Identifiers.Any(i => i.Authority.DomainName == id.Authority.DomainName && i.Value == id.Value), 0, 1, out int tr, AuthenticationContext.SystemPrincipal);
+                        var match = ApplicationServiceContext.Current.GetService<IRepositoryService<Core.Model.Roles.Patient>>().Find(o => o.Identifiers.Any(i => i.Authority.DomainName == id.Authority.DomainName && i.Value == id.Value), 0, 1, out int tr);
                         key = match.FirstOrDefault()?.Key ?? Guid.NewGuid();
                     }   
                 }

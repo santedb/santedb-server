@@ -131,6 +131,7 @@
     <Compile Include="DataTypes\IdRef.cs" />
     <Compile Include="DataTypes\Primitive.cs" />
     <Compile Include="DataTypes\ScheduleRepeat.cs" />
+    <Compile Include="Extensions\IFhirExtensionHandler.cs" />
     <Compile Include="FhirConstants.cs" />
     <Compile Include="FhirMessageHandler.cs" />
     <Compile Include="FhirQuery.cs" />
@@ -155,6 +156,7 @@
     <Compile Include="Handlers\ResourceHandlerBase.cs" />
     <Compile Include="Handlers\StructureDefinitionHandler.cs" />
     <Compile Include="Handlers\SubstanceResourceHandler.cs" />
+    <Compile Include="Profiles\IFhirProfileHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\Accreditation.cs" />
     <Compile Include="Resources\AdverseEvent.cs" />
@@ -227,10 +229,10 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.60.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.60.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.60.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.60.0" />
+        <PackageReference Include="RestSrvr" Version="2.0.62.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.62.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.62.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.62.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -263,9 +265,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="applet\controllers\config\fhir.js" />
     <None Include="applet\manifest.xml" />
