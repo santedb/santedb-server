@@ -223,7 +223,7 @@ namespace SanteDB.Messaging.HL7.Segments
             try
             {
 
-                Patient retVal = new Patient() { Key = Guid.NewGuid() };
+                Patient retVal = new Patient() { Key = Guid.NewGuid(), StatusConceptKey = StatusKeys.Active };
                 Person motherEntity = null;
                 List<IdentifiedData> retCollection = new List<IdentifiedData>();
 
@@ -350,7 +350,7 @@ namespace SanteDB.Messaging.HL7.Segments
                             Key = Guid.NewGuid(),
                             Identifiers = pidSegment.GetMotherSIdentifier().ToModel().ToList(),
                             Names = pidSegment.GetMotherSMaidenName().ToModel(NameUseKeys.MaidenName).ToList(),
-                            StatusConceptKey = StatusKeys.New,
+                            StatusConceptKey = StatusKeys.Active
 
                         };
 
@@ -478,7 +478,7 @@ namespace SanteDB.Messaging.HL7.Segments
                                         Value = pidSegment.PatientAccountNumber.IDNumber.Value
                                     }
                                 },
-                                StatusConceptKey = StatusKeys.New
+                                StatusConceptKey = StatusKeys.Active
                             }
                         });
                     }

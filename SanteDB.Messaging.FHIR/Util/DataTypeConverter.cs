@@ -502,7 +502,7 @@ namespace SanteDB.Messaging.FHIR.Util
 			// Return value
 			var retVal = new FhirAddress()
 			{
-				Use = DataTypeConverter.ToFhirCodeableConcept(address.AddressUse, "http://hl7.org/fhir/address-use")?.GetPrimaryCode()?.Code,
+				Use = DataTypeConverter.ToFhirCodeableConcept(address.LoadProperty<Concept>(nameof(EntityAddress.AddressUse)), "http://hl7.org/fhir/address-use")?.GetPrimaryCode()?.Code,
 				Line = new List<FhirString>()
 			};
 

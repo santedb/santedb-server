@@ -113,7 +113,7 @@ namespace SanteDB
                 }
                 else if (parameters.UnInstall)
                 {
-                    if (ServiceTools.ServiceInstaller.ServiceIsInstalled($"SanteDB-{parameters.InstanceName ?? "default" }"))
+                    if (ServiceTools.ServiceInstaller.ServiceIsInstalled($"SanteDB{instanceSuffix}"))
                     {
                         Console.WriteLine("Un-Installing Service...");
                         ServiceTools.ServiceInstaller.StopService($"SanteDB{instanceSuffix}");

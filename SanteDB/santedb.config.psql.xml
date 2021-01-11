@@ -138,7 +138,7 @@
     <trustedPublishers>
       <add>82C63E1E9B87578D0727E871D7613F2F0FAF683B</add>
       <add>4326A4421216AC254DA93DC61B93160B08925BB1</add>
-    </trustedPublishers>
+    </trustedPublishers>    
   </section>
   <!--<section xsi:type="santeguard:SanteGuardAdoConfiguration"
 	readWriteConnectionString="PSQL"

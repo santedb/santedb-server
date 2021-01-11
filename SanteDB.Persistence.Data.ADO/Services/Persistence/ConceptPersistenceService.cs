@@ -75,10 +75,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             else
             {
                 retVal.LoadState = Core.Model.LoadState.PartialLoad;
-                retVal.ConceptNames = context.Query<DbConceptName>(o => o.SourceKey == retVal.Key && !o.ObsoleteVersionSequenceId.HasValue).ToArray().Select(o => new ConceptName(o.Language, o.Name)).ToList();
-                retVal.ReferenceTerms = context.Query<DbConceptReferenceTerm>(o => o.SourceKey == retVal.Key).ToArray().Select(o => new ConceptReferenceTerm(o.TargetKey, o.RelationshipTypeKey)).ToList();
+                retVal.ReferenceTerms = context.Query<DbConceptReferenceTerm>(o => o.SourceKey == retVal.Key && o.ObsoleteVersionSequenceId == null).ToArray().Select(o => new ConceptReferenceTerm(o.TargetKey, o.RelationshipTypeKey)).ToList();
                 
             }
+
+            if(retVal.ConceptNames == null || retVal.ConceptNames.Count == 0)
+                retVal.ConceptNames = context.Query<DbConceptName>(o => o.SourceKey == retVal.Key && o.ObsoleteVersionSequenceId == null).ToArray().Select(o => new ConceptName(o.Language, o.Name)).ToList();
+
             return retVal;
         }
 
