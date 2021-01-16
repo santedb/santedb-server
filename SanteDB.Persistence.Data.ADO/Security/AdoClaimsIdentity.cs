@@ -45,6 +45,7 @@ using System.Security;
 using System.Security.Authentication;
 
 using System.Security.Principal;
+using System.Threading;
 
 namespace SanteDB.Persistence.Data.ADO.Security
 {
@@ -53,6 +54,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
     /// </summary>
     public class AdoClaimsIdentity : SanteDBClaimsIdentity, IIdentity, IClaimsIdentity
     {
+        
         // Trace source
         private static Tracer s_traceSource = new Tracer(AdoDataConstants.IdentityTraceSourceName);
 
@@ -95,10 +97,19 @@ namespace SanteDB.Persistence.Data.ADO.Security
                     // Attempt to get a user
                     var hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
-                    var passwordHash = hashingService.ComputeHash(password);
-                    var fnResult = dataContext.FirstOrDefault<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr", userName, passwordHash, s_securityConfiguration?.GetSecurityPolicy(SecurityPolicyIdentification.MaxInvalidLogins, 5) ?? 5);
-
-	                var user = fnResult.Object1;
+                    // Generate pepper
+                    var passwordHash = AdoDataConstants.PEPPER_CHARS.Select(o=> hashingService.ComputeHash($"{password}{o}"));
+                    CompositeResult<DbSecurityUser, FunctionErrorCode> fnResult;
+                    try
+                    {
+                        // v2 auth
+                        fnResult = dataContext.FirstOrDefault<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr_ex", userName, String.Join(";", passwordHash), s_securityConfiguration?.GetSecurityPolicy(SecurityPolicyIdentification.MaxInvalidLogins, 5) ?? 5);
+                    }
+                    catch
+                    {
+                        fnResult = dataContext.FirstOrDefault<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr", userName, passwordHash.First(), s_securityConfiguration?.GetSecurityPolicy(SecurityPolicyIdentification.MaxInvalidLogins, 5) ?? 5);
+                    }
+                    var user = fnResult.Object1;
 
 					if (!String.IsNullOrEmpty(fnResult.Object2.ErrorCode))
 	                {

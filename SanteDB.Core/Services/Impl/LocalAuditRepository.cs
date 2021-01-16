@@ -32,7 +32,7 @@ namespace SanteDB.Core.Services.Impl
     /// Represents an audit repository which stores and queries audit data.
     /// </summary>
     [ServiceProvider("Default Audit Repository")]
-    public class LocalAuditRepository : IAuditRepositoryService
+    public class LocalAuditRepository : IRepositoryService<AuditData>
     {
 
         /// <summary>

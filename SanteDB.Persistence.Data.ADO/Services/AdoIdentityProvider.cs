@@ -254,7 +254,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     using (var tx = dataContext.BeginTransaction())
                         try
                         {
-                            
+
                             var user = dataContext.SingleOrDefault<DbSecurityUser>(u => u.UserName.ToLower() == userName.ToLower() && !u.ObsoletionTime.HasValue);
                             if (user == null)
                                 throw new InvalidOperationException(String.Format("Cannot locate user {0}", userName));
@@ -269,7 +269,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 pdpOutcome != PolicyGrantType.Grant)
                                 throw new PolicyViolationException(principal, PermissionPolicyIdentifiers.ChangePassword, pdpOutcome.Value);
 
-                            var newPasswordHash = passwordHashingService.ComputeHash(newPassword);
+                            var newPasswordHash = passwordHashingService.ComputeHash(newPassword + AdoDataConstants.PEPPER_CHARS[DateTime.Now.Ticks % AdoDataConstants.PEPPER_CHARS.Length]);
                             if (this.m_securityConfiguration == null ||
                                 !this.m_securityConfiguration.GetSecurityPolicy<Boolean>(SecurityPolicyIdentification.PasswordHistory, false) ||
                                 !dataContext.Any<DbSecurityUser>(o=>o.Key == user.Key && o.Password == newPasswordHash))
@@ -339,7 +339,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             DbSecurityUser newIdentityUser = new DbSecurityUser()
                             {
                                 UserName = userName,
-                                Password = hashingService.ComputeHash(password),
+                                Password = hashingService.ComputeHash(password + AdoDataConstants.PEPPER_CHARS[DateTime.Now.Ticks % AdoDataConstants.PEPPER_CHARS.Length]),
                                 SecurityHash = Guid.NewGuid().ToString(),
                                 UserClass = UserClassKeys.HumanUser,
                                 InvalidLoginAttempts = 0

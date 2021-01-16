@@ -25,6 +25,10 @@ namespace SanteDB.Persistence.Data.ADO
     {
 
         /// <summary>
+        /// Pepper chars
+        /// </summary>
+        public static readonly string[] PEPPER_CHARS = new string[]{ "", "0", "A", "Z", "~", "k" };
+        /// <summary>
         /// Represents the trace source name
         /// </summary>
         public const string TraceSourceName = "SanteDB.Persistence.Data.ADO";

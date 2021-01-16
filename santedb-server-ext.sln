@@ -152,6 +152,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.OrmLite.Test", "san
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Caching.Memory.Test", "SanteDB.Caching.Memory.Test\SanteDB.Caching.Memory.Test.csproj", "{B09A6D4C-862C-4B5B-9C05-4160ED7CCA4A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Persistence.PubSub.ADO", "SanteDB.Persistence.PubSub.ADO\SanteDB.Persistence.PubSub.ADO.csproj", "{03052730-BE5D-4212-9B71-316C685DD245}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -374,6 +376,10 @@ Global
 		{B09A6D4C-862C-4B5B-9C05-4160ED7CCA4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B09A6D4C-862C-4B5B-9C05-4160ED7CCA4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B09A6D4C-862C-4B5B-9C05-4160ED7CCA4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03052730-BE5D-4212-9B71-316C685DD245}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03052730-BE5D-4212-9B71-316C685DD245}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03052730-BE5D-4212-9B71-316C685DD245}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03052730-BE5D-4212-9B71-316C685DD245}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -440,6 +446,7 @@ Global
 		{1D145E2A-C31E-467C-9F4A-6811E1604B67} = {58D303FA-0113-4888-AA67-A9436DDEBFAD}
 		{833375FE-DA04-4064-A821-921097FB1A38} = {C6921DBD-1FCB-43A7-98A6-AF24C3C6652A}
 		{B09A6D4C-862C-4B5B-9C05-4160ED7CCA4A} = {6150ED46-45C3-4CAA-ACC3-31A920124B2B}
+		{03052730-BE5D-4212-9B71-316C685DD245} = {C6921DBD-1FCB-43A7-98A6-AF24C3C6652A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E73A1AED-8AB7-492C-A4F0-C71FCC5C393C}
