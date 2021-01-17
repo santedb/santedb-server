@@ -130,7 +130,7 @@ namespace SanteDB.Messaging.Atna
                 if (ad.EventTypeCode != null)
                 {
                     IConceptRepositoryService icpcr = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>();
-                    var concept = icpcr.GetConcept(ad.EventTypeCode.Code);
+                    var concept = icpcr?.GetConcept(ad.EventTypeCode.Code);
                     if (concept != null)
                     {
                         var refTerm = icpcr.GetConceptReferenceTerm(concept.Key.Value, "DCM");

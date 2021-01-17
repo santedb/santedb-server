@@ -396,6 +396,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Data\SQL\Updates\20210107-PSQL.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Data\SQL\Performance\ZZ-Partition-PSQL10.sql" />
+    <Content Include="Data\SQL\Performance\ZZ-Partition-PSQL11.sql" />
+    <EmbeddedResource Include="Data\SQL\Updates\20210116-FBSQL.sql" />
+    <EmbeddedResource Include="Data\SQL\Updates\20210116-PSQL.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

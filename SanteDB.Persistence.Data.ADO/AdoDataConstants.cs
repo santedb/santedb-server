@@ -27,7 +27,7 @@ namespace SanteDB.Persistence.Data.ADO
         /// <summary>
         /// Pepper chars
         /// </summary>
-        public static readonly string[] PEPPER_CHARS = new string[]{ "", "0", "A", "Z", "~", "k" };
+        public static readonly string[] PEPPER_CHARS = new string[] { "", "0", "A", "B", "c", "D", "E", "f", "g", "I", "L", "q", "Z", "~", "k" };
         /// <summary>
         /// Represents the trace source name
         /// </summary>
