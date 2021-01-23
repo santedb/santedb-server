@@ -31,12 +31,6 @@ namespace SanteDB.Persistence.Reporting.ADO.Configuration
     [XmlType(nameof(ReportingConfiguration), Namespace = "http://santedb.org/configuration")]
     public class ReportingConfiguration : OrmConfigurationBase, IConfigurationSection
     {
-        /// <summary>
-        /// Resolve the connection string
-        /// </summary>
-        protected override string ResolveConnectionString(string connectionStringName)
-        {
-            return ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetConnectionString(connectionStringName)?.Value;
-        }
+        
     }
 }

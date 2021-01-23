@@ -527,7 +527,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(typeof(AdoSubscriptionExector));
 
             // Bind BI stuff
-            ApplicationServiceContext.Current.GetService<IBiMetadataRepository>()?.Insert(new SanteDB.BI.Model.BiDataSourceDefinition()
+            ApplicationServiceContext.Current.GetService<IBiMetadataRepository>().Insert(new SanteDB.BI.Model.BiDataSourceDefinition()
             {
                 IsSystemObject = true,
                 MetaData = new BiMetadata()

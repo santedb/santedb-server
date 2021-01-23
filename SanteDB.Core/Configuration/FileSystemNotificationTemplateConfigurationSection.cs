@@ -29,8 +29,8 @@ namespace SanteDB.Core.Configuration
     /// <summary>
     /// Represents a configuration section for file system queueing
     /// </summary>
-    [XmlType(nameof(FileSystemNotificationConfigurationSection), Namespace = "http://santedb.org/configuration")]
-    public class FileSystemNotificationConfigurationSection : IConfigurationSection
+    [XmlType(nameof(FileSystemNotificationTemplateConfigurationSection), Namespace = "http://santedb.org/configuration")]
+    public class FileSystemNotificationTemplateConfigurationSection : IConfigurationSection
     {
 
         /// <summary>

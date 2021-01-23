@@ -327,7 +327,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 					}
 				};
 
-                ApplicationServiceContext.Current.GetService<IAuditRepositoryService>()?.Insert(ad);
+                ApplicationServiceContext.Current.GetService<IRepositoryService<AuditData>>()?.Insert(ad);
                 ApplicationServiceContext.Current.GetService<IAuditDispatchService>()?.SendAudit(ad);
 				this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
 			}

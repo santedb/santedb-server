@@ -32,12 +32,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Configuration
     [XmlType(nameof(AdoAuditConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class AdoAuditConfigurationSection : OrmConfigurationBase, IConfigurationSection
     {
-        /// <summary>
-        /// Resolve connection string
-        /// </summary>
-        protected override string ResolveConnectionString(string connectionStringName)
-        {
-            return ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetConnectionString(connectionStringName)?.Value;
-        }
+        
     }
 }

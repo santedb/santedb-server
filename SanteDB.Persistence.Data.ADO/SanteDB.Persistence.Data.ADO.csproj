@@ -322,10 +322,10 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.62.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.62.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.0.62.0" />
-        <PackageReference Include="SanteDB.BI" Version="2.0.62.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.71.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.71.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="2.0.71.0" />
+        <PackageReference Include="SanteDB.BI" Version="2.0.71.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -386,15 +386,35 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Data\SQL\Updates\20201109-PSQL.sql" />
+    <EmbeddedResource Include="Data\SQL\Updates\20201109-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Data\SQL\Updates\20201128-PSQL.sql" />
-    <EmbeddedResource Include="Data\SQL\Updates\20201214-FBSQL.sql" />
-    <EmbeddedResource Include="Data\SQL\Updates\20201214-PSQL.sql" />
+    <EmbeddedResource Include="Data\SQL\Updates\20201128-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\Updates\20201214-FBSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\Updates\20201214-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Data\SQL\Updates\20210107-PSQL.sql" />
+    <EmbeddedResource Include="Data\SQL\Updates\20210107-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Data\SQL\Performance\ZZ-Partition-PSQL10.sql" />
+    <Content Include="Data\SQL\Performance\ZZ-Partition-PSQL11.sql" />
+    <EmbeddedResource Include="Data\SQL\Updates\20210116-FBSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\Updates\20210116-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

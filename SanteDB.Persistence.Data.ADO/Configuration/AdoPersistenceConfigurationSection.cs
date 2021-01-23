@@ -36,14 +36,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
     [XmlType(nameof(AdoPersistenceConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class AdoPersistenceConfigurationSection : OrmConfigurationBase, IConfigurationSection
     {
-        /// <summary>
-        /// Resolve the connection string
-        /// </summary>
-        protected override string ResolveConnectionString(string connectionStringName)
-        {
-            return ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetConnectionString(connectionStringName)?.Value;
-        }
-
+        
         // Data provider
         private IDbProvider m_dbp;
 

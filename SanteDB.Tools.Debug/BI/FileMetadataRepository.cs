@@ -64,6 +64,11 @@ namespace SanteDB.Tools.Debug.BI
         public bool IsRunning => this.m_scanTimer != null;
 
         /// <summary>
+        /// This is a local repository
+        /// </summary>
+        public bool IsLocal => true;
+
+        /// <summary>
         /// Service is starting
         /// </summary>
         public event EventHandler Starting;

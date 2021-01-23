@@ -34,7 +34,7 @@ namespace SanteDB.Core.Services.Impl
     /// <summary>
     /// File notification template service
     /// </summary>
-    [ServiceProvider("File System based Notification Template Repository", configurationType: typeof(FileSystemNotificationConfigurationSection))]
+    [ServiceProvider("File System based Notification Template Repository", configurationType: typeof(FileSystemNotificationTemplateConfigurationSection))]
     public class FileNotificationTemplateRepository : INotificationTemplateRepository
     {
 
@@ -42,7 +42,7 @@ namespace SanteDB.Core.Services.Impl
         private Tracer m_tracer = Tracer.GetTracer(typeof(FileNotificationTemplateRepository));
 
         // Configuration
-        private FileSystemNotificationConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<FileSystemNotificationConfigurationSection>();
+        private FileSystemNotificationTemplateConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<FileSystemNotificationTemplateConfigurationSection>();
 
         /// <summary>
         /// Gets the service name

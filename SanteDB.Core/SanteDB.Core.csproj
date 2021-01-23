@@ -66,7 +66,7 @@
     <Compile Include="Configuration\Features\LocalAppletManagerFeature.cs" />
     <Compile Include="Configuration\Features\RestServiceFeature.cs" />
     <Compile Include="Configuration\Features\ServerSecurityFeature.cs" />
-    <Compile Include="Configuration\FileSystemNotificationConfigurationSection.cs" />
+    <Compile Include="Configuration\FileSystemNotificationTemplateConfigurationSection.cs" />
     <Compile Include="Configuration\FileSystemQueueConfigurationSection.cs" />
     <Compile Include="Configuration\JobConfigurationSection.cs" />
     <Compile Include="Configuration\AppletConfigurationSection.cs" />
@@ -199,12 +199,12 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.62.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.62.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.62.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.62.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.62.0" />
-        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.62.0" />
+        <PackageReference Include="RestSrvr" Version="2.0.71.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.71.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.71.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.71.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.71.0" />
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.71.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

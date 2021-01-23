@@ -346,7 +346,14 @@ namespace SanteDB.Caching.Redis
         /// </summary>
         public void Clear()
         {
-            this.m_connection.GetServer(this.m_configuration.Servers.First()).FlushAllDatabases();
+            try
+            {
+                this.m_connection.GetServer(this.m_configuration.Servers.First()).FlushAllDatabases();
+            }
+            catch(Exception e)
+            {
+                this.m_tracer.TraceWarning("Could not flush REDIS cache: {0}", e);
+            }
         }
 
         /// <summary>
