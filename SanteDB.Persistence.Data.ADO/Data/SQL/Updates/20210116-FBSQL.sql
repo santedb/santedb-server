@@ -5,6 +5,9 @@
  * </feature>
  */
 
+ALTER TABLE PHON_VAL_TBL ALTER COLUMN VAL TYPE VARCHAR(256);--#!
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','bacd9c6f-3fa9-481e-9636-37457962804d','ACAFE0F2-E209-43BB-8633-3665FD7C90BA', 'Patient==[Birthplace]==>Precinct');--#!
+insert into cd_set_mem_assoc_tbl (set_id, cd_id) values ('4e6da567-0094-4f23-8555-11da499593af','ACAFE0F2-E209-43BB-8633-3665FD7C90BA');--#!
 --#!
 -- AUTHENTICATES THE USER IF APPLICABLE
 CREATE PROCEDURE AUTH_USR_EX (

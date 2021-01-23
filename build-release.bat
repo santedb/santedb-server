@@ -55,9 +55,9 @@ if exist "%nuget%" (
 		"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /d "SanteDB iCDR"  "%%G"
 	)
 	
-	%inno% "/o.\bin\dist" ".\installer\SanteDBInstall.iss" /d"MyAppVersion=%version%" /d"x64" /d"BUNDLED"
-	%inno% "/o.\bin\dist" ".\installer\SanteDBInstall.iss" /d"MyAppVersion=%version%" /d"BUNDLED"
-	%inno% "/o.\bin\dist" ".\installer\SanteDBInstall.iss" /d"MyAppVersion=%version%" /d"x64" 
+	%inno% "/o.\bin\dist" ".\installer\SanteDB-Server.iss" /d"MyAppVersion=%version%" /d"x64" /d"BUNDLED"
+	%inno% "/o.\bin\dist" ".\installer\SanteDB-Server.iss" /d"MyAppVersion=%version%" /d"BUNDLED"
+	%inno% "/o.\bin\dist" ".\installer\SanteDB-Server.iss" /d"MyAppVersion=%version%" /d"x64" 
 
 
 ) else (	

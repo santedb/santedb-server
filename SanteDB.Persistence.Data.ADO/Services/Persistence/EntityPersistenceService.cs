@@ -178,6 +178,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 case EntityClassKeyStrings.CityOrTown:
                 case EntityClassKeyStrings.Country:
                 case EntityClassKeyStrings.CountyOrParish:
+                case EntityClassKeyStrings.PrecinctOrBorough:
                 case EntityClassKeyStrings.State:
                 case EntityClassKeyStrings.ServiceDeliveryLocation:
                     retVal = new PlacePersistenceService(this.m_settingsProvider).ToModelInstance(
@@ -273,6 +274,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     case EntityClassKeyStrings.Country:
                     case EntityClassKeyStrings.CountyOrParish:
                     case EntityClassKeyStrings.State:
+                    case EntityClassKeyStrings.PrecinctOrBorough:
                     case EntityClassKeyStrings.ServiceDeliveryLocation:
                         retVal = cache?.GetCacheItem<Place>(dbEntity.Key);
 
@@ -672,6 +674,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 case EntityClassKeyStrings.Country:
                 case EntityClassKeyStrings.CountyOrParish:
                 case EntityClassKeyStrings.State:
+                case EntityClassKeyStrings.PrecinctOrBorough:
                 case EntityClassKeyStrings.ServiceDeliveryLocation:
                     return new PlacePersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<Place>());
                 case EntityClassKeyStrings.Organization:
@@ -707,6 +710,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 case EntityClassKeyStrings.CityOrTown:
                 case EntityClassKeyStrings.Country:
                 case EntityClassKeyStrings.CountyOrParish:
+                case EntityClassKeyStrings.PrecinctOrBorough:
                 case EntityClassKeyStrings.State:
                 case EntityClassKeyStrings.ServiceDeliveryLocation:
                     return new PlacePersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<Place>());

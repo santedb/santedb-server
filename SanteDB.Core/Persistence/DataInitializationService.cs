@@ -98,7 +98,7 @@ namespace SanteDB.Core.Persistence
 
                 int i = 0;
                 // Can this dataset be installed as a bundle?
-                if(ds.Action.All(o=>o is DataUpdate && (o as DataUpdate).InsertIfNotExists && !(o.Element is IVersionedAssociation)))
+                if(ds.Action.All(o=>o is DataUpdate && (o as DataUpdate).InsertIfNotExists && !(o.Element is IVersionedAssociation)) && ds.Action.Count < 1000)
                 {
                     this.m_traceSource.TraceVerbose("Will install as a bundle");
                     var bundle = new Bundle()
@@ -119,8 +119,8 @@ namespace SanteDB.Core.Persistence
                         try
                         {
                             this.ProgressChanged?.Invoke(this, new Services.ProgressChangedEventArgs(i++ / (float)ds.Action.Count, ds.Id));
-                            if (ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Size > 10000) // Probably a good idea to clear memcache
-                                ApplicationServiceContext.Current.GetService<IDataCachingService>().Clear();
+                            //if (ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Size > 10000) // Probably a good idea to clear memcache
+                            //    ApplicationServiceContext.Current.GetService<IDataCachingService>().Clear();
 
                             // IDP Type
                             Type idpType = typeof(IDataPersistenceService<>);
@@ -202,6 +202,8 @@ namespace SanteDB.Core.Persistence
                                 idpInstance.Insert(target);
                             else if (!(itm is DataInsert))
                                 typeof(IDataPersistenceService).GetMethod(itm.ActionName, new Type[] { typeof(Object) }).Invoke(idpInstance, new object[] { target });
+                            else if (existing != null && itm is DataObsolete)
+                                idpInstance.Obsolete(existing);
                         }
                         catch(Exception e)
                         {

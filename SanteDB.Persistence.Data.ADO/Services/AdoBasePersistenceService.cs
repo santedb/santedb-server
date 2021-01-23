@@ -387,6 +387,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         protected Exception TranslateDbException(DbException e)
         {
+            this.m_tracer.TraceError("Will Translate DBException: {0} - {1}", e.Data["SqlState"] ?? e.ErrorCode, e.Message);
             if (e.Data["SqlState"] != null)
             {
                 switch (e.Data["SqlState"].ToString())
@@ -418,12 +419,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             new DetectedIssue(DetectedIssuePriorityType.Information, e.Data["SqlState"].ToString(), "HINT: The code you're using may be incorrect for the given context", DetectedIssueKeys.CodificationIssue)
                         });
                     default:
-                        throw new DataPersistenceException(e.Message, e);
+                        return new DataPersistenceException(e.Message, e);
                 }
             }
             else
             {
-                throw new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, "dbexception", e.Message, DetectedIssueKeys.OtherIssue));
+                return new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, "dbexception", e.Message, DetectedIssueKeys.OtherIssue));
             }
         }
 
