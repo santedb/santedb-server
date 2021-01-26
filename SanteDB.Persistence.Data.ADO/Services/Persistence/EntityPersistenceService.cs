@@ -394,7 +394,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 foreach (var p in data.Policies)
                 {
                     var pol = p.Policy?.EnsureExists(context);
-                    if (pol == null) // maybe we can retrieve it from the PIP?
+                    var polKey = p.Policy?.Key ?? p.PolicyKey;
+                    if (polKey == null) // maybe we can retrieve it from the PIP?
                     {
                         var pipInfo = ApplicationServiceContext.Current.GetService<IPolicyInformationService>().GetPolicy(p.PolicyKey.ToString());
                         if (pipInfo != null)
@@ -406,6 +407,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 CanOverride = pipInfo.CanOverride
                             };
                             pol = p.Policy.EnsureExists(context);
+                            polKey = pol.Key;
                         }
                         else throw new InvalidOperationException("Cannot find policy information");
                     }
@@ -414,7 +416,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     context.Insert(new DbEntitySecurityPolicy()
                     {
                         Key = Guid.NewGuid(),
-                        PolicyKey = pol.Key.Value,
+                        PolicyKey = polKey.Value,
                         SourceKey = retVal.Key.Value,
                         EffectiveVersionSequenceId = retVal.VersionSequence.Value
                     });
@@ -612,7 +614,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 foreach (var p in data.Policies)
                 {
                     var pol = p.Policy?.EnsureExists(context);
-                    if (pol == null) // maybe we can retrieve it from the PIP?
+                    var polKey = pol?.Key ?? p.PolicyKey;
+                    if (polKey == null) // maybe we can retrieve it from the PIP?
                     {
                         var pipInfo = ApplicationServiceContext.Current.GetService<IPolicyInformationService>().GetPolicy(p.PolicyKey.ToString());
                         if (pipInfo != null)
@@ -624,16 +627,18 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 CanOverride = pipInfo.CanOverride
                             };
                             pol = p.Policy.EnsureExists(context);
+                            polKey = pol.Key;
+
                         }
                         else throw new InvalidOperationException("Cannot find policy information");
                     }
 
                     // Insert
-                    if(!context.Any<DbEntitySecurityPolicy>(o=>o.SourceKey == retVal.Key && o.ObsoleteVersionSequenceId == null && o.PolicyKey == pol.Key))
+                    if(!context.Any<DbEntitySecurityPolicy>(o=>o.SourceKey == retVal.Key && o.ObsoleteVersionSequenceId == null && o.PolicyKey == polKey.Value))
                         context.Insert(new DbEntitySecurityPolicy()
                         {
                             Key = Guid.NewGuid(),
-                            PolicyKey = pol.Key.Value,
+                            PolicyKey = polKey.Value,
                             SourceKey = retVal.Key.Value,
                             EffectiveVersionSequenceId = retVal.VersionSequence.Value
                         });

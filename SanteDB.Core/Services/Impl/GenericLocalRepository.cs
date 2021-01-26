@@ -157,7 +157,9 @@ namespace SanteDB.Core.Services.Impl
                     results = persistenceService.Query(preQueryEventArgs.Query, preQueryEventArgs.Offset, preQueryEventArgs.Count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
             }
             var retVal = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
-            this.Queried?.Invoke(this, new QueryResultEventArgs<TEntity>(query, retVal, offset, count, totalResults, queryId, AuthenticationContext.Current.Principal));
+            var postEvt = new QueryResultEventArgs<TEntity>(query, retVal, offset, count, totalResults, queryId, AuthenticationContext.AnonymousPrincipal);
+            this.Queried?.Invoke(this, postEvt);
+            totalResults = postEvt.TotalResults;
             return retVal;
         }
 
@@ -265,8 +267,9 @@ namespace SanteDB.Core.Services.Impl
             
             var result = persistenceService.Get(key, versionKey, true, AuthenticationContext.Current.Principal);
             var retVal = businessRulesService?.AfterRetrieve(result) ?? result;
-            this.Retrieved?.Invoke(this, new DataRetrievedEventArgs<TEntity>(retVal, AuthenticationContext.Current.Principal));
-            return retVal;
+            var postEvt = new DataRetrievedEventArgs<TEntity>(retVal, AuthenticationContext.Current.Principal);
+            this.Retrieved?.Invoke(this, postEvt);
+            return postEvt.Data;
         }
 
         /// <summary>

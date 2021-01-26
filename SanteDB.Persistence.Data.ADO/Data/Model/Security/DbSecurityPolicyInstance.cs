@@ -130,7 +130,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// Gets or sets the type of the grant.
         /// </summary>
         /// <value>The type of the grant.</value>
-        [Column("pol_act")]
+        [Column("pol_act"),NotNull]
         public int GrantType
         {
             get;
@@ -172,7 +172,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// Gets or sets the type of the grant.
         /// </summary>
         /// <value>The type of the grant.</value>
-        [Column("pol_act")]
+        [Column("pol_act"),NotNull]
         public int GrantType
         {
             get;
@@ -202,7 +202,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// Gets or sets the type of the grant.
         /// </summary>
         /// <value>The type of the grant.</value>
-        [Column("pol_act")]
+        [Column("pol_act"), NotNull]
         public int GrantType
         {
             get;

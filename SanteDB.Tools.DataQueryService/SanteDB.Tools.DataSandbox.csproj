@@ -101,10 +101,10 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.71.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.71.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.71.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.71.0" />
+        <PackageReference Include="RestSrvr" Version="2.0.74.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.74.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.74.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.74.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

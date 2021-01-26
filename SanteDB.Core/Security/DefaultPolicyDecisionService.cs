@@ -41,6 +41,14 @@ namespace SanteDB.Core.Security
         public String ServiceName => "Default PDP Decision Service";
 
         /// <summary>
+        /// This is not cached
+        /// </summary>
+        /// <param name="principal"></param>
+        public void ClearCache(IPrincipal principal)
+        {
+        }
+
+        /// <summary>
         /// Get a policy decision 
         /// </summary>
         public PolicyDecision GetPolicyDecision(IPrincipal principal, object securable)
