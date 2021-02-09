@@ -6,8 +6,8 @@
  */
 
 ALTER TABLE PHON_VAL_TBL ALTER COLUMN VAL TYPE VARCHAR(256);--#!
-INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'),char_to_uuid('ACAFE0F2-E209-43BB-8633-3665FD7C90BA'), 'Patient==[Birthplace]==>Precinct');--#!
-insert into cd_set_mem_assoc_tbl (set_id, cd_id) values (char_to_uuid('4e6da567-0094-4f23-8555-11da499593af'),char_to_uuid('ACAFE0F2-E209-43BB-8633-3665FD7C90BA'));--#!
+UPDATE OR INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'),char_to_uuid('ACAFE0F2-E209-43BB-8633-3665FD7C90BA'), 'Patient==[Birthplace]==>Precinct') matching (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id);--#!
+update or insert into cd_set_mem_assoc_tbl (set_id, cd_id) values (char_to_uuid('4e6da567-0094-4f23-8555-11da499593af'),char_to_uuid('ACAFE0F2-E209-43BB-8633-3665FD7C90BA')) matching (set_id, cd_id);--#!
 --#!
 -- AUTHENTICATES THE USER IF APPLICABLE
 CREATE OR ALTER PROCEDURE AUTH_USR_EX (

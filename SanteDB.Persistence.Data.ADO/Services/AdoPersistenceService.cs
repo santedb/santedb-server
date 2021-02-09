@@ -487,8 +487,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     this.m_tracer.TraceEvent(EventLevel.Verbose, "Creating map {0} > {1}", modelClassType, domainClassType);
 
-
-                    if (modelClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IBaseEntityData)) &&
+                    if (this.m_persistenceCache.ContainsKey(modelClassType))
+                        this.m_tracer.TraceWarning("Duplicate initialization of {0}", modelClassType);
+                    else  if (modelClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IBaseEntityData)) &&
                         domainClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDbBaseData)))
                     {
                         // Construct a type

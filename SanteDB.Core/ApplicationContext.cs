@@ -46,16 +46,20 @@ namespace SanteDB.Core
     /// </summary>
     /// <remarks>Allows components to be communicate with each other via a loosely coupled
     /// broker system.</remarks>
-    public class ApplicationContext : IServiceProvider, IServiceManager, IDisposable, IApplicationServiceContext, IPolicyEnforcementService
+    public class ApplicationContext : IServiceProvider, IDisposable, IApplicationServiceContext, IPolicyEnforcementService
     {
+
+        // Tracer
+        private Tracer m_tracer = Tracer.GetTracer(typeof(ApplicationContext));
 
         // Lock object
         private static Object s_lockObject = new object();
 
-        /// <summary>
-        /// Singleton context instance
-        /// </summary>
-        protected static ApplicationContext s_context = null;
+        // Singleton context instance
+        private static ApplicationContext s_context = null;
+
+        // Service proider
+        private DependencyServiceManager m_serviceProvider = new DependencyServiceManager();
 
         /// <summary>
         /// Singleton accessor
@@ -77,11 +81,6 @@ namespace SanteDB.Core
         }
 
         /// <summary>
-        /// Get the host configuration
-        /// </summary>
-        public ApplicationServiceContextConfigurationSection Configuration { get { return this.m_configuration; } }
-
-        /// <summary>
         /// Gets the identifier for this context
         /// </summary>
         public Guid ContextId { get; protected set; }
@@ -94,7 +93,7 @@ namespace SanteDB.Core
         /// <summary>
         /// Gets whether the domain is running
         /// </summary>
-        public bool IsRunning { get { return this.m_running; } }
+        public bool IsRunning { get; private set; }
 
         /// <summary>
         /// Get the operating system type
@@ -132,30 +131,6 @@ namespace SanteDB.Core
         public string ServiceName => "SanteDB Service Manager";
 
         /// <summary>
-        /// Configuration
-        /// </summary>
-        private ApplicationServiceContextConfigurationSection m_configuration;
-
-        /// <summary>
-        /// Activators for the construction of object services
-        /// </summary>
-        private ConcurrentDictionary<Type, Func<Object>> m_activators = new ConcurrentDictionary<Type, Func<Object>>();
-
-        // True with the object has been disposed
-        private bool m_disposed = false;
-
-        // Running?
-        private bool m_running = false;
-
-        /// <summary>
-        /// Cached services dictionary for singleton services
-        /// </summary>
-        private Dictionary<Type, object> m_cachedServices = new Dictionary<Type, object>();
-
-        // Service instances
-        private List<Object> m_serviceInstances = new List<object>();
-
-        /// <summary>
         /// Creates a new instance of the host context
         /// </summary>
         protected ApplicationContext()
@@ -187,7 +162,7 @@ namespace SanteDB.Core
         /// </summary>
         public bool Start()
         {
-            if (!this.m_running)
+            if (!this.IsRunning)
             {
                 Stopwatch startWatch = new Stopwatch();
 
@@ -201,14 +176,6 @@ namespace SanteDB.Core
                     // If there is no configuration manager then add the local
                     Trace.TraceInformation("STAGE0 START: Load Configuration");
 
-                    if (this.GetService<IConfigurationManager>() == null)
-                        throw new InvalidOperationException("Cannot find configuration manager!");
-
-                    this.m_configuration = this.GetService<IConfigurationManager>().GetSection<ApplicationServiceContextConfigurationSection>();
-
-                    if (this.m_configuration == null)
-                        throw new InvalidOperationException("Cannot load configuration, perhaps the services aren't installed?");
-
                     // Assign diagnostics
                     var config = this.GetService<IConfigurationManager>().GetSection<DiagnosticsConfigurationSection>();
 
@@ -219,36 +186,9 @@ namespace SanteDB.Core
                     else
                         Tracer.AddWriter(new SystemDiagnosticsTraceWriter(), System.Diagnostics.Tracing.EventLevel.LogAlways);
 #endif
-                    // Add this
-                    this.m_serviceInstances.Add(this);
-                    Trace.TraceInformation("STAGE1 START: Loading services");
 
-                    foreach (var svc in this.m_configuration.ServiceProviders)
-                    {
-                        if (svc.Type == null)
-                            Trace.TraceWarning("Cannot find service {0}, skipping", svc.TypeXml);
-                        else
-                        {
-                            var spa = svc.Type.GetCustomAttribute<ServiceProviderAttribute>();
-                            if (spa?.Type == ServiceInstantiationType.PerCall)
-                                this.m_serviceInstances.Add(spa?.Type);
-                            else if (!this.m_serviceInstances.Any(s => s.GetType() == svc.Type))
-                            {
-                                Trace.TraceInformation("Creating {0}...", svc.Type);
-                                var instance = this.CreateInjectedService(svc.Type);
-                                this.m_serviceInstances.Add(instance);
-                            }
-                        }
-                    }
-
-                    Trace.TraceInformation("STAGE2 START: Starting Daemons");
-                    foreach (var dc in this.m_serviceInstances.OfType<IDaemonService>().ToArray())
-                        if (!dc.Start())
-                            throw new Exception($"Service {dc} reported unsuccessful start");
-
-                    Trace.TraceInformation("STAGE3 START: Notify ApplicationContext has started");
-                    if (this.Started != null)
-                        this.Started(this, null);
+                    Trace.TraceInformation("STAGE1 START: Start Dependency Injection Manager");
+                    this.m_serviceProvider.Start();
 
                     this.StartTime = DateTime.Now;
 
@@ -260,7 +200,7 @@ namespace SanteDB.Core
                     startWatch.Stop();
                 }
                 Trace.TraceInformation("SanteDB startup completed successfully in {0} ms...", startWatch.ElapsedMilliseconds);
-                this.m_running = true;
+                this.IsRunning = true;
 
             }
 
@@ -276,17 +216,8 @@ namespace SanteDB.Core
             if (this.Stopping != null)
                 this.Stopping(this, null);
 
-            this.m_running = false;
-
-            foreach (var svc in this.m_serviceInstances.OfType<IDaemonService>().ToArray())
-            {
-                Trace.TraceInformation("Stopping daemon service {0}...", svc.GetType().Name);
-                svc.Stop();
-            }
-
-            // Dispose services
-            foreach (var svc in this.m_serviceInstances.OfType<IDisposable>().Where(o => o != this))
-                svc.Dispose();
+            this.IsRunning = false;
+            this.m_serviceProvider.Stop();
 
             AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStop);
 
@@ -299,90 +230,12 @@ namespace SanteDB.Core
         /// <summary>
         /// Get all registered services
         /// </summary>
-        public IEnumerable<Object> GetServices()
-        {
-            return this.m_serviceInstances;
-        }
-
-        /// <summary>
-        /// Create and inject the service instance 
-        /// </summary>
-        /// <param name="serviceImplementationType">The type of service to create</param>
-        /// <returns>An instance of the injected service</returns>
-        private object CreateInjectedService(Type serviceImplementationType)
-        {
-            // Is there already an object activator?
-            if (this.m_activators.TryGetValue(serviceImplementationType, out Func<Object> activator))
-            {
-                return activator();
-            }
-            else
-            {
-                // TODO: Check for circular dependencies
-                var constructors = serviceImplementationType.GetConstructors();
-
-                // Is it a parameterless constructor?
-                var constructor = constructors.FirstOrDefault(c => c.GetParameters().Length == 0);
-                if (constructor != null)
-                    activator = Expression.Lambda<Func<Object>>(Expression.New(constructor)).Compile();
-                else
-                {
-                    // Get a constructor that we can fulfill
-                    constructor = constructors.SingleOrDefault();
-                    if (constructor == null)
-                        throw new MissingMemberException($"Cannot find default constructor on {serviceImplementationType}");
-
-                    var parameterTypes = constructor.GetParameters().Select(p => new { Type = p.ParameterType, Required = !p.HasDefaultValue }).ToArray();
-                    var parameterValues = new object[parameterTypes.Length];
-                    for (int i = 0; i < parameterValues.Length; i++)
-                    {
-                        var dependencyInfo = parameterTypes[i];
-                        var candidateService = this.FindServiceInstance(dependencyInfo.Type); // We do this because we don't want GetService<> to initialize the type;
-                        if (candidateService == null && dependencyInfo.Required)
-                            throw new InvalidOperationException($"Service {serviceImplementationType} relies on {dependencyInfo.Type} but no service of type {dependencyInfo.Type.Name} has been registered!");
-                        else
-                            parameterValues[i] = candidateService;
-                    }
-
-                    // Now we can create our activator
-                    activator = Expression.Lambda<Func<Object>>(Expression.New(constructor, parameterValues.Select(parms => Expression.Constant(parms)).ToArray())).Compile();
-                }
-                this.m_activators.TryAdd(serviceImplementationType, activator);
-                return activator();
-            }
-        }
-
-        /// <summary>
-        /// Find a service instance from the registered services
-        /// </summary>
-        private object FindServiceInstance(Type serviceType)
-        {
-            return this.m_serviceInstances.Find(o => serviceType.Equals(o) || serviceType.GetTypeInfo().IsAssignableFrom(o.GetType().GetTypeInfo()));
-        }
+        public IEnumerable<Object> GetServices() => this.m_serviceProvider.GetServices();
 
         /// <summary>
         /// Get a service from this host context
         /// </summary>
-        public object GetService(Type serviceType)
-        {
-            ThrowIfDisposed();
-
-            Object candidateService = null;
-            if (!this.m_cachedServices.TryGetValue(serviceType, out candidateService))
-            {
-                candidateService = this.FindServiceInstance(serviceType);
-                if (candidateService is Type type) // The type was registered = this is a per-call 
-                    return this.CreateInjectedService(type);
-                else if (candidateService != null)
-                    lock (this.m_cachedServices)
-                        if (!this.m_cachedServices.ContainsKey(serviceType))
-                        {
-                            this.m_cachedServices.Add(serviceType, candidateService);
-                        }
-                        else candidateService = this.m_cachedServices[serviceType];
-            }
-            return candidateService;
-        }
+        public object GetService(Type serviceType) => this.m_serviceProvider.GetService(serviceType);
 
         /// <summary>
         /// Get strongly typed service
@@ -392,37 +245,18 @@ namespace SanteDB.Core
             return this.GetService(typeof(T)) as T;
         }
 
-        /// <summary>
-        /// Throw if disposed
-        /// </summary>
-        private void ThrowIfDisposed()
-        {
-            if (this.m_disposed)
-                throw new ObjectDisposedException(nameof(ApplicationContext));
-        }
-
 
         /// <summary>
         /// Add service provider type
         /// </summary>
-        public void AddServiceProvider(Type serviceType)
-        {
-            lock (this.m_serviceInstances)
-                this.m_serviceInstances.Add(this.CreateInjectedService(serviceType));
-        }
+        /// <remarks>You should really call IServiceManager.AddServiceProvider</remarks>
+        public void AddServiceProvider(Type serviceType) => this.m_serviceProvider.AddServiceProvider(serviceType);
 
 
         /// <summary>
         /// Remove service provider
         /// </summary>
-        public void RemoveServiceProvider(Type serviceType)
-        {
-            if (serviceType == typeof(ApplicationContext) || serviceType.IsAssignableFrom(typeof(ApplicationContext))) throw new InvalidOperationException("Cannot remove core application context service"); // Don't allow service to remove itself
-            if (this.m_cachedServices.ContainsKey(serviceType))
-                this.m_cachedServices.Remove(serviceType);
-            this.m_serviceInstances.RemoveAll(o => serviceType.IsAssignableFrom(o.GetType()));
-
-        }
+        public void RemoveServiceProvider(Type serviceType) => this.m_serviceProvider.RemoveServiceProvider(serviceType);
 
         #endregion
 
@@ -435,13 +269,7 @@ namespace SanteDB.Core
         /// </summary>
         public void Dispose()
         {
-            if (this.m_disposed) return;
-
-            this.m_disposed = true;
-            foreach (var kv in this.m_serviceInstances)
-                if (kv is IDisposable)
-                    (kv as IDisposable).Dispose();
-
+            this.m_serviceProvider.Dispose();
             Tracer.DisposeWriters();
 
         }
@@ -449,13 +277,7 @@ namespace SanteDB.Core
         /// <summary>
         /// Get all types
         /// </summary>
-        public IEnumerable<Type> GetAllTypes()
-        {
-            // HACK: The wierd TRY/CATCH in select many is to prevent mono from throwning a fit
-            return AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => !a.IsDynamic)
-                .SelectMany(a => { try { return a.ExportedTypes; } catch { return new List<Type>(); } });
-        }
+        public IEnumerable<Type> GetAllTypes() => this.m_serviceProvider.GetAllTypes();
 
 
         /// <summary>
@@ -477,11 +299,7 @@ namespace SanteDB.Core
         /// <summary>
         /// Add the specified service provider
         /// </summary>
-        public void AddServiceProvider(object serviceInstance)
-        {
-            lock (this.m_serviceInstances)
-                this.m_serviceInstances.Add(serviceInstance);
-        }
+        public void AddServiceProvider(object serviceInstance) => this.m_serviceProvider.AddServiceProvider(serviceInstance);
 
         #endregion
 
