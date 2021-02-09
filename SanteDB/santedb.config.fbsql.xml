@@ -576,6 +576,7 @@
       <add type="SanteDB.Caching.Redis.RedisQueryPersistenceService, SanteDB.Caching.Redis, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Caching.Redis.RedisAdhocCache, SanteDB.Caching.Redis, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />-->
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPersistenceService, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Persistence.Data.ADO.Services.AdoSubscriptionExecutor, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Auditing.ADO.Services.AdoAuditRepositoryService, SanteDB.Persistence.Auditing.ADO, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
 
       <!-- Repository Services -->

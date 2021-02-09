@@ -257,6 +257,9 @@
     <None Include="data\000-PlaceTypeConceptSet.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="santedb.config.fyfej.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="santedb.config.nuget.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

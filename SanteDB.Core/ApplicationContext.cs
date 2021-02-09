@@ -188,8 +188,11 @@ namespace SanteDB.Core
 #endif
 
                     Trace.TraceInformation("STAGE1 START: Start Dependency Injection Manager");
+                    this.m_serviceProvider.AddServiceProvider(this);
                     this.m_serviceProvider.Start();
 
+                    Trace.TraceInformation("STAGE2 START: Notify start");
+                    this.Started?.Invoke(this, EventArgs.Empty);
                     this.StartTime = DateTime.Now;
 
                     AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStart);

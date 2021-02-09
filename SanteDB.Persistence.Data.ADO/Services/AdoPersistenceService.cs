@@ -535,7 +535,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
 
             // Bind subscription execution
-            ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(typeof(AdoSubscriptionExector));
+            ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(typeof(AdoSubscriptionExecutor));
 
             // Bind BI stuff
             ApplicationServiceContext.Current.GetService<IBiMetadataRepository>().Insert(new SanteDB.BI.Model.BiDataSourceDefinition()
