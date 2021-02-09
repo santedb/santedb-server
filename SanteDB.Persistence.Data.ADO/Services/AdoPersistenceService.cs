@@ -34,8 +34,10 @@ using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.OrmLite.Migration;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.ADO.Configuration;
+using SanteDB.Persistence.Data.ADO.Configuration.Features;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Hax;
 using SanteDB.Persistence.Data.ADO.Data.Model;
@@ -401,6 +403,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
             // notify startup
             this.Starting?.Invoke(this, EventArgs.Empty);
             if (this.m_running) return true;
+
+            // Apply the migrations
+            this.m_tracer.TraceInfo("Scanning for schema updates...");
+
+            // TODO: Refactor this to a common library within the ORM tooling
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
+                context.UpgradeSchema("SanteDB.Persistence.Data.ADO");
+
 
             try
             {

@@ -15,8 +15,7 @@ CREATE UNIQUE INDEX cd_ref_term_cs_mnemonic_uq_idx
   WHERE (obslt_utc IS NULL);
 
 INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
-SELECT '9bbe0cfe-faab-4dc9-a28f-c001e3e95e6e', src_cls_cd_id, trg_cls_cd_id, REPLACE (err_desc, '[Birthplace]','[PlaceOfDeath]') FROM ENT_REL_VRFY_CDTBL WHERE rel_typ_Cd_id = 'f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'
-
+SELECT '9bbe0cfe-faab-4dc9-a28f-c001e3e95e6e', src_cls_cd_id, trg_cls_cd_id, REPLACE (err_desc, '[Birthplace]','[PlaceOfDeath]') FROM ENT_REL_VRFY_CDTBL WHERE rel_typ_Cd_id = 'f3ef7e48-d8b7-4030-b431-aff7e0e1cb76';
 
 -- AUTHENTICATES THE USER IF APPLICABLE
 CREATE OR REPLACE FUNCTION AUTH_USR (

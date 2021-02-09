@@ -52,9 +52,6 @@ namespace SanteDB.Caching.Redis
         // Redis trace source
         private Tracer m_tracer = new Tracer(RedisCacheConstants.TraceSourceName);
 
-        // Connection
-        private ConnectionMultiplexer m_connection;
-
         // Configuration
         private RedisConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RedisConfigurationSection>();
 
@@ -83,8 +80,8 @@ namespace SanteDB.Caching.Redis
         {
             try
             {
-                var db = this.m_connection.GetDatabase(RedisCacheConstants.AdhocCacheDatabaseId);
-                db.StringSet(key, JsonConvert.SerializeObject(value), expiry: timeout, flags: CommandFlags.FireAndForget);
+                var db = RedisConnectionManager.Current.Connection.GetDatabase(RedisCacheConstants.AdhocCacheDatabaseId);
+                db.StringSet(key, JsonConvert.SerializeObject(value), expiry: timeout ?? this.m_configuration.TTL, flags: CommandFlags.FireAndForget);
             }
             catch (Exception e)
             {
@@ -100,7 +97,7 @@ namespace SanteDB.Caching.Redis
         {
             try
             {
-                var db = this.m_connection?.GetDatabase(RedisCacheConstants.AdhocCacheDatabaseId);
+                var db = RedisConnectionManager.Current.Connection?.GetDatabase(RedisCacheConstants.AdhocCacheDatabaseId);
                 var str = db?.StringGet(key);
                 if (!String.IsNullOrEmpty(str))
                     return JsonConvert.DeserializeObject<T>(str);
@@ -126,15 +123,7 @@ namespace SanteDB.Caching.Redis
                 this.Starting?.Invoke(this, EventArgs.Empty);
 
                 this.m_tracer.TraceInfo("Starting REDIS ad-cache service to hosts {0}...", String.Join(";", this.m_configuration.Servers));
-
-                var configuration = new ConfigurationOptions()
-                {
-                    Password = this.m_configuration.Password
-                };
-                foreach (var itm in this.m_configuration.Servers)
-                    configuration.EndPoints.Add(itm);
-
-                this.m_connection = ConnectionMultiplexer.Connect(configuration);
+                this.m_tracer.TraceInfo("Using shared REDIS cache {0}", RedisConnectionManager.Current.Connection);
 
                 this.Started?.Invoke(this, EventArgs.Empty);
                 return true;
@@ -154,10 +143,27 @@ namespace SanteDB.Caching.Redis
         public bool Stop()
         {
             this.Stopping?.Invoke(this, EventArgs.Empty);
-            this.m_connection.Dispose();
-            this.m_connection = null;
+            RedisConnectionManager.Current.Dispose();
             this.Stopped?.Invoke(this, EventArgs.Empty);
             return true;
+        }
+
+        /// <summary>
+        /// Remove the object from the cache
+        /// </summary>
+        public bool Remove(string key)
+        {
+            try
+            {
+                var db = RedisConnectionManager.Current.Connection?.GetDatabase(RedisCacheConstants.AdhocCacheDatabaseId);
+                db?.KeyDelete(key);
+                return true;
+            }
+            catch (Exception e)
+            {
+                this.m_tracer.TraceError("Error removing entity from ad-hoc cache : {0}", e);
+                return false;
+            }
         }
     }
 }

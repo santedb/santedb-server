@@ -36,7 +36,7 @@ namespace SanteDB.Messaging.HL7
         private Tracer m_tracer = Tracer.GetTracer(typeof(HL7ThreadPool));
 
         // Number of threads to keep alive
-        private int m_concurrencyLevel = System.Environment.ProcessorCount * 2;
+        private int m_concurrencyLevel = System.Environment.ProcessorCount;
 
         // Queue of work items
         private Queue<WorkItem> m_queue = null;
