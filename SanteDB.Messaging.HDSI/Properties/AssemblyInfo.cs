@@ -51,13 +51,13 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("2.0.75.*")][assembly: AssemblyInformationalVersion("Nanaimo")]
-[assembly: AssemblyVersion("2.0.75.*")]
+// [assembly: AssemblyVersion("2.0.76.*")][assembly: AssemblyInformationalVersion("Nanaimo")]
+[assembly: AssemblyVersion("2.0.76.*")]
 [assembly: AssemblyInformationalVersion("Nanaimo")]
-[assembly: AssemblyFileVersion("2.0.75.0")]
+[assembly: AssemblyFileVersion("2.0.76.0")]
 
 
 [assembly: Plugin(EnableByDefault = true, Environment = PluginEnvironment.Server, Group = FeatureGroup.Messaging)]
-[assembly: PluginDependency("SanteDB.Core, Version=2.0.75.0")]
-[assembly: PluginDependency("RestSrvr, Version=2.0.75.0")]
+[assembly: PluginDependency("SanteDB.Core, Version=2.0.76.0")]
+[assembly: PluginDependency("RestSrvr, Version=2.0.76.0")]
 [assembly: PluginTraceSource(HdsiConstants.TraceSourceName)]
