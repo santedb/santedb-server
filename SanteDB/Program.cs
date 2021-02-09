@@ -58,7 +58,7 @@ namespace SanteDB
 
             // Trace copyright information
             Assembly entryAsm = Assembly.GetEntryAssembly();
-            
+
             // Dump some info
             Trace.TraceInformation("SanteDB Startup : v{0}", entryAsm.GetName().Version);
             Trace.TraceInformation("SanteDB Working Directory : {0}", entryAsm.Location);
@@ -101,7 +101,7 @@ namespace SanteDB
                         if (!String.IsNullOrEmpty(instanceSuffix))
                         {
                             var configFile = parameters.ConfigFile;
-                            if(String.IsNullOrEmpty(configFile))
+                            if (String.IsNullOrEmpty(configFile))
                                 configFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), $"santedb.config.{parameters.InstanceName}.xml");
                             else if (!Path.IsPathRooted(configFile))
                                 configFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), configFile);
@@ -162,7 +162,7 @@ namespace SanteDB
                     {
 
                         // Did the service start properly?
-                        if(!ApplicationContext.Current.IsRunning)
+                        if (!ApplicationContext.Current.IsRunning)
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("Application context did not start properly and is in maintenance mode...");
@@ -176,11 +176,11 @@ namespace SanteDB
                             ServiceUtil.Stop();
                             quitEvent.Set();
                         };
-                        
+
                         Console.WriteLine("Service started (CTRL+C to stop)...");
                         quitEvent.WaitOne();
                     }
-                    
+
                 }
                 else
                 {
@@ -195,13 +195,17 @@ namespace SanteDB
                 Trace.TraceError("011 899 981 199 911 9725 3!!! {0}", e.ToString());
                 if (hasConsole)
                     Console.WriteLine("011 899 981 199 911 9725 3!!! {0}", e.ToString());
-
-                EventLog.WriteEntry("SanteDB Host Process", $"011 899 981 199 911 9725 3!!! {e}", EventLogEntryType.Error, 911);
-
 #else
                 Trace.TraceError("Error encountered: {0}. Will terminate", e.Message);
 #endif
-
+                try
+                {
+                    EventLog.WriteEntry("SanteDB Host Process", $"011 899 981 199 911 9725 3!!! {e}", EventLogEntryType.Error, 911);
+                }
+                catch (Exception e1)
+                {
+                    Trace.TraceWarning("Could not emit the error to the EventLog - {0}", e1);
+                }
                 Environment.Exit(911);
 
             }

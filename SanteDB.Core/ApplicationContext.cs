@@ -36,6 +36,8 @@ using RestSrvr;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security.Services;
+using System.Collections.Concurrent;
+using System.Linq.Expressions;
 
 namespace SanteDB.Core
 {
@@ -101,7 +103,7 @@ namespace SanteDB.Core
         {
             get
             {
-                switch(Environment.OSVersion.Platform)
+                switch (Environment.OSVersion.Platform)
                 {
                     case PlatformID.MacOSX:
                         return OperatingSystemID.MacOS;
@@ -133,6 +135,11 @@ namespace SanteDB.Core
         /// Configuration
         /// </summary>
         private ApplicationServiceContextConfigurationSection m_configuration;
+
+        /// <summary>
+        /// Activators for the construction of object services
+        /// </summary>
+        private ConcurrentDictionary<Type, Func<Object>> m_activators = new ConcurrentDictionary<Type, Func<Object>>();
 
         // True with the object has been disposed
         private bool m_disposed = false;
@@ -220,14 +227,15 @@ namespace SanteDB.Core
                     {
                         if (svc.Type == null)
                             Trace.TraceWarning("Cannot find service {0}, skipping", svc.TypeXml);
-                        else {
+                        else
+                        {
                             var spa = svc.Type.GetCustomAttribute<ServiceProviderAttribute>();
                             if (spa?.Type == ServiceInstantiationType.PerCall)
                                 this.m_serviceInstances.Add(spa?.Type);
                             else if (!this.m_serviceInstances.Any(s => s.GetType() == svc.Type))
                             {
                                 Trace.TraceInformation("Creating {0}...", svc.Type);
-                                var instance = Activator.CreateInstance(svc.Type);
+                                var instance = this.CreateInjectedService(svc.Type);
                                 this.m_serviceInstances.Add(instance);
                             }
                         }
@@ -269,7 +277,7 @@ namespace SanteDB.Core
                 this.Stopping(this, null);
 
             this.m_running = false;
-            
+
             foreach (var svc in this.m_serviceInstances.OfType<IDaemonService>().ToArray())
             {
                 Trace.TraceInformation("Stopping daemon service {0}...", svc.GetType().Name);
@@ -277,7 +285,7 @@ namespace SanteDB.Core
             }
 
             // Dispose services
-            foreach (var svc in this.m_serviceInstances.OfType<IDisposable>().Where(o=>o != this))
+            foreach (var svc in this.m_serviceInstances.OfType<IDisposable>().Where(o => o != this))
                 svc.Dispose();
 
             AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStop);
@@ -297,6 +305,62 @@ namespace SanteDB.Core
         }
 
         /// <summary>
+        /// Create and inject the service instance 
+        /// </summary>
+        /// <param name="serviceImplementationType">The type of service to create</param>
+        /// <returns>An instance of the injected service</returns>
+        private object CreateInjectedService(Type serviceImplementationType)
+        {
+            // Is there already an object activator?
+            if (this.m_activators.TryGetValue(serviceImplementationType, out Func<Object> activator))
+            {
+                return activator();
+            }
+            else
+            {
+                // TODO: Check for circular dependencies
+                var constructors = serviceImplementationType.GetConstructors();
+
+                // Is it a parameterless constructor?
+                var constructor = constructors.FirstOrDefault(c => c.GetParameters().Length == 0);
+                if (constructor != null)
+                    activator = Expression.Lambda<Func<Object>>(Expression.New(constructor)).Compile();
+                else
+                {
+                    // Get a constructor that we can fulfill
+                    constructor = constructors.SingleOrDefault();
+                    if (constructor == null)
+                        throw new MissingMemberException($"Cannot find default constructor on {serviceImplementationType}");
+
+                    var parameterTypes = constructor.GetParameters().Select(p => new { Type = p.ParameterType, Required = !p.HasDefaultValue }).ToArray();
+                    var parameterValues = new object[parameterTypes.Length];
+                    for (int i = 0; i < parameterValues.Length; i++)
+                    {
+                        var dependencyInfo = parameterTypes[i];
+                        var candidateService = this.FindServiceInstance(dependencyInfo.Type); // We do this because we don't want GetService<> to initialize the type;
+                        if (candidateService == null && dependencyInfo.Required)
+                            throw new InvalidOperationException($"Service {serviceImplementationType} relies on {dependencyInfo.Type} but no service of type {dependencyInfo.Type.Name} has been registered!");
+                        else
+                            parameterValues[i] = candidateService;
+                    }
+
+                    // Now we can create our activator
+                    activator = Expression.Lambda<Func<Object>>(Expression.New(constructor, parameterValues.Select(parms => Expression.Constant(parms)).ToArray())).Compile();
+                }
+                this.m_activators.TryAdd(serviceImplementationType, activator);
+                return activator();
+            }
+        }
+
+        /// <summary>
+        /// Find a service instance from the registered services
+        /// </summary>
+        private object FindServiceInstance(Type serviceType)
+        {
+            return this.m_serviceInstances.Find(o => serviceType.Equals(o) || serviceType.GetTypeInfo().IsAssignableFrom(o.GetType().GetTypeInfo()));
+        }
+
+        /// <summary>
         /// Get a service from this host context
         /// </summary>
         public object GetService(Type serviceType)
@@ -306,9 +370,9 @@ namespace SanteDB.Core
             Object candidateService = null;
             if (!this.m_cachedServices.TryGetValue(serviceType, out candidateService))
             {
-                candidateService = this.m_serviceInstances.Find(o => serviceType.Equals(o) || serviceType.GetTypeInfo().IsAssignableFrom(o.GetType().GetTypeInfo()));
+                candidateService = this.FindServiceInstance(serviceType);
                 if (candidateService is Type type) // The type was registered = this is a per-call 
-                    return Activator.CreateInstance(type);
+                    return this.CreateInjectedService(type);
                 else if (candidateService != null)
                     lock (this.m_cachedServices)
                         if (!this.m_cachedServices.ContainsKey(serviceType))
@@ -344,7 +408,7 @@ namespace SanteDB.Core
         public void AddServiceProvider(Type serviceType)
         {
             lock (this.m_serviceInstances)
-                this.m_serviceInstances.Add(Activator.CreateInstance(serviceType));
+                this.m_serviceInstances.Add(this.CreateInjectedService(serviceType));
         }
 
 
@@ -393,7 +457,7 @@ namespace SanteDB.Core
                 .SelectMany(a => { try { return a.ExportedTypes; } catch { return new List<Type>(); } });
         }
 
-      
+
         /// <summary>
         /// Demand the policy
         /// </summary>
