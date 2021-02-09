@@ -118,7 +118,9 @@ namespace SanteDB.Core.Services.Impl
 
             ApplicationServiceContext.Current.Started += (o, e) =>
             {
-                foreach (var t in AppDomain.CurrentDomain.GetAssemblies().Where(a=>!a.IsDynamic).SelectMany(a => a.GetExportedTypes()).Where(t => typeof(IdentifiedData).IsAssignableFrom(t) && !t.IsAbstract && t.GetCustomAttribute<XmlRootAttribute>() != null && !t.ContainsGenericParameters))
+                var types = ApplicationServiceContext.Current.GetService<IServiceManager>().GetAllTypes();
+
+                foreach (var t in types.Where(t => typeof(IdentifiedData).IsAssignableFrom(t) && !t.IsAbstract && t.GetCustomAttribute<XmlRootAttribute>() != null && !t.ContainsGenericParameters))
                 {
                     var irst = typeof(IRepositoryService<>).MakeGenericType(t);
                     var irsi = ApplicationServiceContext.Current.GetService(irst);

@@ -53,18 +53,19 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			retVal.Active = model.StatusConceptKey == StatusKeys.Active || model.StatusConceptKey == StatusKeys.New;
 			retVal.Address = model.LoadCollection<EntityAddress>("Addresses").Select(o => DataTypeConverter.ToFhirAddress(o)).ToList();
 			retVal.BirthDate = model.DateOfBirth;
-            switch(model.DateOfBirthPrecision.GetValueOrDefault())
-            {
-                case DatePrecision.Day:
-                    retVal.BirthDate.Precision = DataTypes.DatePrecision.Day;
-                    break;
-                case DatePrecision.Month:
-                    retVal.BirthDate.Precision = DataTypes.DatePrecision.Month;
-                    break;
-                case DatePrecision.Year:
-                    retVal.BirthDate.Precision = DataTypes.DatePrecision.Year;
-                    break;
-            }
+            if(retVal.BirthDate != null)
+                switch(model.DateOfBirthPrecision.GetValueOrDefault())
+                {
+                    case DatePrecision.Day:
+                        retVal.BirthDate.Precision = DataTypes.DatePrecision.Day;
+                        break;
+                    case DatePrecision.Month:
+                        retVal.BirthDate.Precision = DataTypes.DatePrecision.Month;
+                        break;
+                    case DatePrecision.Year:
+                        retVal.BirthDate.Precision = DataTypes.DatePrecision.Year;
+                        break;
+                }
 			retVal.Deceased = model.DeceasedDate == DateTime.MinValue ? (object)new FhirBoolean(true) : model.DeceasedDate != null ? new FhirDate(model.DeceasedDate.Value) : null;
 			retVal.Gender = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("GenderConcept"), "http://hl7.org/fhir/administrative-gender")?.GetPrimaryCode()?.Code;
 

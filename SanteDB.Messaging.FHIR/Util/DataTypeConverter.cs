@@ -601,7 +601,7 @@ namespace SanteDB.Messaging.FHIR.Util
 			// Return value
 			var retVal = new FhirHumanName
 			{
-				Use = DataTypeConverter.ToFhirCodeableConcept(entityName.NameUse, "http://hl7.org/fhir/name-use")?.GetPrimaryCode()?.Code
+				Use = DataTypeConverter.ToFhirCodeableConcept(entityName.LoadProperty<Concept>(nameof(EntityName.NameUse)), "http://hl7.org/fhir/name-use")?.GetPrimaryCode()?.Code
 
             };
 

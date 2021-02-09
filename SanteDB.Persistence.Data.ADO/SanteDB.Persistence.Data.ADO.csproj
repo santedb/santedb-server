@@ -322,10 +322,10 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.74.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.74.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.0.74.0" />
-        <PackageReference Include="SanteDB.BI" Version="2.0.74.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.75.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.75.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="2.0.75.0" />
+        <PackageReference Include="SanteDB.BI" Version="2.0.75.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -336,9 +336,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Data\SQL\Updates\00OIZ-PSQL.sql">
+    <None Include="Data\SQL\Updates\00OIZ-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
+    </None>
     <EmbeddedResource Include="Data\SQL\Updates\20190322-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
