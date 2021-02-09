@@ -150,7 +150,7 @@ namespace SanteDB.Tools.AdminConsole.Util
             Console.WriteLine("\tEffective Policies:");
             foreach (var itm in policies)
             {
-                Console.Write("\t\t{0} : ", itm.Name);
+                Console.Write("\t\t{0} [{1}] : ", itm.Name,itm.Oid);
                 if (itm.Grant == (PolicyGrantType)10) // Lookup parent
                 {
                     var parent = policies.LastOrDefault(o => itm.Oid.StartsWith(o.Oid + ".") && itm.Oid != o.Oid);

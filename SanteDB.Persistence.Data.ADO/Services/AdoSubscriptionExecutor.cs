@@ -51,7 +51,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// Represents a default implementation of the subscription executor
     /// </summary>
     [ServiceProvider("ADO.NET Subscription Executor", Dependencies = new Type[] { typeof(ISqlDataPersistenceService) })]
-    public class AdoSubscriptionExector : ISubscriptionExecutor
+    public class AdoSubscriptionExecutor : ISubscriptionExecutor
     {
 
         // Parameter regex
@@ -74,7 +74,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Create the default subscription executor
         /// </summary>
-        public AdoSubscriptionExector()
+        public AdoSubscriptionExecutor()
         {
 
             var adoService = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();

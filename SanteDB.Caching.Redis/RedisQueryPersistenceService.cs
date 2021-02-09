@@ -94,7 +94,7 @@ namespace SanteDB.Caching.Redis
         {
             try
             {
-                var redisConn = this.m_connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
+                var redisConn = RedisConnectionManager.Current.Connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
                 if (redisConn.KeyExists($"{queryId}.{FIELD_QUERY_RESULT_IDX}"))
                     redisConn.ListRightPush($"{queryId}.{FIELD_QUERY_RESULT_IDX}", results.Select(o => (RedisValue)o.ToByteArray()).ToArray(), flags: CommandFlags.FireAndForget);
             }
@@ -120,7 +120,7 @@ namespace SanteDB.Caching.Redis
         {
             try
             {
-                var redisConn = this.m_connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
+                var redisConn = RedisConnectionManager.Current.Connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
 				var batch = redisConn.CreateBatch();
                 batch.KeyExpireAsync($"{queryId}.{FIELD_QUERY_RESULT_IDX}", this.m_configuration.TTL);
                 batch.KeyExpireAsync($"{queryId}.{FIELD_QUERY_TOTAL_RESULTS}", this.m_configuration.TTL);
@@ -144,7 +144,7 @@ namespace SanteDB.Caching.Redis
         {
             try
             {
-                var redisConn = this.m_connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
+                var redisConn = RedisConnectionManager.Current.Connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
                 return redisConn.StringGet($"{queryId}.{FIELD_QUERY_TAG_IDX}").ToString();
             }
             catch (Exception e)
@@ -161,7 +161,7 @@ namespace SanteDB.Caching.Redis
         {
             try
             {
-                var redisConn = this.m_connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
+                var redisConn = RedisConnectionManager.Current.Connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
                 return redisConn.KeyExists($"{queryId}.{FIELD_QUERY_RESULT_IDX}");
             }
             catch(Exception e)
@@ -178,7 +178,7 @@ namespace SanteDB.Caching.Redis
         {
             try
             {
-                var redisConn = this.m_connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
+                var redisConn = RedisConnectionManager.Current.Connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
                 var strTotalCount = redisConn.StringGet($"{queryId}.{FIELD_QUERY_TOTAL_RESULTS}");
                 if(strTotalCount.HasValue)
                     return BitConverter.ToInt32(strTotalCount, 0);
@@ -198,7 +198,7 @@ namespace SanteDB.Caching.Redis
         {
             try
             {
-                var redisConn = this.m_connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
+                var redisConn = RedisConnectionManager.Current.Connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
 				var batch = redisConn.CreateBatch();
                 batch.KeyDeleteAsync($"{queryId}.{FIELD_QUERY_RESULT_IDX}");
                 batch.ListRightPushAsync($"{queryId}.{FIELD_QUERY_RESULT_IDX}", results.Select(o => (RedisValue)o.ToByteArray()).ToArray());
@@ -225,7 +225,7 @@ namespace SanteDB.Caching.Redis
         {
             try
             {
-                var redisConn = this.m_connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
+                var redisConn = RedisConnectionManager.Current.Connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
                 if (redisConn.KeyExists($"{queryId}.{FIELD_QUERY_RESULT_IDX}"))
                     redisConn.StringSet($"{queryId}.{FIELD_QUERY_TAG_IDX}", value?.ToString(), flags: CommandFlags.FireAndForget, expiry: this.m_configuration.TTL);
             }
@@ -246,15 +246,7 @@ namespace SanteDB.Caching.Redis
                 this.Starting?.Invoke(this, EventArgs.Empty);
 
                 this.m_tracer.TraceInfo("Starting REDIS query service to hosts {0}...", String.Join(";", this.m_configuration.Servers));
-
-                var configuration = new ConfigurationOptions()
-                {
-                    Password = this.m_configuration.Password
-                };
-                foreach (var itm in this.m_configuration.Servers)
-                    configuration.EndPoints.Add(itm);
-
-                this.m_connection = ConnectionMultiplexer.Connect(configuration);
+                this.m_tracer.TraceInfo("Using shared REDIS cache {0}", RedisConnectionManager.Current.Connection);
                 
                 this.Started?.Invoke(this, EventArgs.Empty);
                 return true;
@@ -274,8 +266,7 @@ namespace SanteDB.Caching.Redis
         public bool Stop()
         {
             this.Stopping?.Invoke(this, EventArgs.Empty);
-            this.m_connection.Dispose();
-            this.m_connection = null;
+            RedisConnectionManager.Current.Dispose();
             this.Stopped?.Invoke(this, EventArgs.Empty);
             return true;
         }

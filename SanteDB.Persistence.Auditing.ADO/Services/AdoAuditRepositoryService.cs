@@ -237,8 +237,14 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     }
 
                     // Metadata
-                    foreach (var itm in context.Query<DbAuditMetadata>(o => o.AuditId == res.Object1.Key))
-                        retVal.AddMetadata((AuditMetadataKey)itm.MetadataKey, itm.Value);
+
+                    var stmt = context.CreateSqlStatement().SelectFrom(typeof(DbAuditMetadata))
+                        .InnerJoin<DbAuditMetadata, DbAuditMetadataValue>(o => o.ValueId, o => o.Key)
+                        .Where<DbAuditMetadata>(o => o.AuditId == res.Object1.Key);
+                    foreach (var itm in context.Query<CompositeResult<DbAuditMetadata, DbAuditMetadataValue>>(stmt))
+                    {
+                        retVal.AddMetadata((AuditMetadataKey)itm.Object1.MetadataKey, itm.Object2.Value);
+                    }
 
                     retVal.LoadState = Core.Model.LoadState.FullLoad;
                 }
@@ -339,17 +345,15 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             if (dbAct == null)
                             {
                                 dbAct = this.m_mapper.MapModelInstance<AuditActorData, DbAuditActor>(act);
-                                dbAct.Key = Guid.NewGuid();
                                 dbAct.ActorRoleCode = roleCode?.Key ?? Guid.Empty;
-                                context.Insert(dbAct);
+                                dbAct = context.Insert(dbAct);
                             }
                             context.Insert(new DbAuditActorAssociation()
                             {
                                 TargetKey = dbAct.Key,
                                 SourceKey = dbAudit.Key,
                                 UserIsRequestor = act.UserIsRequestor, 
-                                AccessPoint = act.NetworkAccessPointId,
-                                Key = Guid.NewGuid()
+                                AccessPoint = act.NetworkAccessPointId
                             });
                         }
 
@@ -363,19 +367,27 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             dbAo.Role = (int)(ao.Role ?? 0);
                             dbAo.Type = (int)(ao.Type);
                             dbAo.AuditId = dbAudit.Key;
-                            dbAo.Key = Guid.NewGuid();
                             context.Insert(dbAo);
                         }
 
                     // metadata
-                    if(storageData.Metadata != null)
-                        foreach(var meta in storageData.Metadata.Where(o=>!String.IsNullOrEmpty(o.Value) && o.Key != AuditMetadataKey.CorrelationToken))
+                    if (storageData.Metadata != null)
+                        foreach (var meta in storageData.Metadata.Where(o => !String.IsNullOrEmpty(o.Value) && o.Key != AuditMetadataKey.CorrelationToken))
+                        {
+                            var kv = context.FirstOrDefault<DbAuditMetadataValue>(o => o.Value == meta.Value);
+                            if (kv == null)
+                                kv = context.Insert(new DbAuditMetadataValue()
+                                {
+                                    Value = meta.Value
+                                });
+
                             context.Insert(new DbAuditMetadata()
                             {
                                 AuditId = dbAudit.Key,
                                 MetadataKey = (int)meta.Key,
-                                Value = meta.Value
+                                ValueId = kv.Key
                             });
+                        }
 
                     if (mode == TransactionMode.Commit)
                         tx.Commit();

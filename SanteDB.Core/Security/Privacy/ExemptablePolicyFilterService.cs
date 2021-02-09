@@ -51,6 +51,15 @@ namespace SanteDB.Core.Security.Privacy
         private SecurityConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
 
         /// <summary>
+        /// Creates a new instance with DI
+        /// </summary>
+        public ExemptablePolicyFilterService(IPasswordHashingService passwordService, IAdhocCacheService adhocCache, IPolicyDecisionService pdpService, ISubscriptionExecutor subscriptionExecutor, IDataCachingService dataCachingService)
+            : base(passwordService, pdpService, dataCachingService, subscriptionExecutor, adhocCache)
+        {
+
+        }
+
+        /// <summary>
         /// Handle post query event
         /// </summary>
         public override IEnumerable HandlePostQueryEvent(IEnumerable results)

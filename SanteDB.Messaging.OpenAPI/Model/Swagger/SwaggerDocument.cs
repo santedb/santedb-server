@@ -97,7 +97,7 @@ namespace SanteDB.Messaging.Metadata.Model.Swagger
             {
                 var bauth = AuthenticationContext.Current;
                 var tokenUrl = new Uri(MetadataComposerUtil.ResolveService("acs").BaseUrl.FirstOrDefault());
-                if (tokenUrl.Host == "0.0.0.0") // Host is vanialla
+                if (tokenUrl.Host == "0.0.0.0" || tokenUrl.Host == "127.0.0.1") // Host is vanialla
                     tokenUrl = new Uri($"{listen.Scheme}://{listen.Host}:{listen.Port}{tokenUrl.AbsolutePath}");
 
                 AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);

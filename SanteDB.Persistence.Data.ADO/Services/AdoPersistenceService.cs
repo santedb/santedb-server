@@ -34,8 +34,10 @@ using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.OrmLite.Migration;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.ADO.Configuration;
+using SanteDB.Persistence.Data.ADO.Configuration.Features;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Hax;
 using SanteDB.Persistence.Data.ADO.Data.Model;
@@ -402,6 +404,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
             this.Starting?.Invoke(this, EventArgs.Empty);
             if (this.m_running) return true;
 
+            // Apply the migrations
+            this.m_tracer.TraceInfo("Scanning for schema updates...");
+
+            // TODO: Refactor this to a common library within the ORM tooling
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
+                context.UpgradeSchema("SanteDB.Persistence.Data.ADO");
+
+
             try
             {
                 // Verify schema version
@@ -477,8 +487,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     this.m_tracer.TraceEvent(EventLevel.Verbose, "Creating map {0} > {1}", modelClassType, domainClassType);
 
-
-                    if (modelClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IBaseEntityData)) &&
+                    if (this.m_persistenceCache.ContainsKey(modelClassType))
+                        this.m_tracer.TraceWarning("Duplicate initialization of {0}", modelClassType);
+                    else  if (modelClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IBaseEntityData)) &&
                         domainClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDbBaseData)))
                     {
                         // Construct a type
@@ -524,7 +535,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
 
             // Bind subscription execution
-            ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(typeof(AdoSubscriptionExector));
+            ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(typeof(AdoSubscriptionExecutor));
 
             // Bind BI stuff
             ApplicationServiceContext.Current.GetService<IBiMetadataRepository>().Insert(new SanteDB.BI.Model.BiDataSourceDefinition()

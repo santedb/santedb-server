@@ -48,8 +48,15 @@ namespace SanteDB
             // Detect platform
             if (System.Environment.OSVersion.Platform != PlatformID.Win32NT)
                 Trace.TraceWarning("Not running on WindowsNT, some features may not function correctly");
-            else if (!EventLog.SourceExists("SanteDB Host Process"))
-                EventLog.CreateEventSource("SanteDB Host Process", "santedb");
+            else try
+                {
+                    if (!EventLog.SourceExists("SanteDB Host Process"))
+                        EventLog.CreateEventSource("SanteDB Host Process", "santedb");
+                }
+                catch(Exception e)
+                {
+                    Trace.TraceWarning("Error creating EventLog source. Not running as admin? {0}", e);
+                }
 
             // Do this because loading stuff is tricky ;)
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
@@ -58,19 +65,27 @@ namespace SanteDB
             {
                 // Initialize 
                 ApplicationServiceContext.Current = ApplicationContext.Current;
-                ApplicationContext.Current.AddServiceProvider(new FileConfigurationService(configFile));
+                ApplicationContext.Current.GetService<IServiceManager>().AddServiceProvider(new FileConfigurationService(configFile));
 
                 Trace.TraceInformation("Getting default message handler service.");
                 if (ApplicationContext.Current.Start())
                 {
                     Trace.TraceInformation("Service Started Successfully");
-                    EventLog.WriteEntry("SanteDB Host Process", $"SanteDB is ready to accept connections", EventLogEntryType.Information, 777);
+                    try
+                    {
+                        EventLog.WriteEntry("SanteDB Host Process", $"SanteDB is ready to accept connections", EventLogEntryType.Information, 777);
+                    }
+                    catch { }
                     return 0;
                 }
                 else
                 {
                     Trace.TraceError("No message handler service started. Terminating program");
-                    EventLog.WriteEntry("SanteDB Host Process", $"Please configure a  message handler to run this service", EventLogEntryType.Error, 1911);
+                    try // This is an ignorable error since we're just emitting to EVT Log
+                    {
+                        EventLog.WriteEntry("SanteDB Host Process", $"Please configure a  message handler to run this service", EventLogEntryType.Error, 1911);
+                    }
+                    catch { }
                     Stop();
                     return 1911;
                 }
@@ -78,7 +93,13 @@ namespace SanteDB
             catch (Exception e)
             {
                 Trace.TraceError("Fatal exception occurred: {0}", e.ToString());
-                EventLog.WriteEntry("SanteDB Host Process", $"Exception occurred starting up: {e}", EventLogEntryType.Error, 1064);
+
+                try
+                {
+                    EventLog.WriteEntry("SanteDB Host Process", $"Exception occurred starting up: {e}", EventLogEntryType.Error, 1064);
+                }
+                catch { }
+
                 Stop();
                 return 1064;
             }
@@ -92,7 +113,12 @@ namespace SanteDB
         /// </summary>
         public static void Stop()
         {
-            EventLog.WriteEntry("SanteDB Host Process", $"The SanteDB service is shutting down services", EventLogEntryType.Information, 666);
+            try
+            {
+                EventLog.WriteEntry("SanteDB Host Process", $"The SanteDB service is shutting down services", EventLogEntryType.Information, 666);
+            }
+            catch { }
+
             ApplicationContext.Current.Stop();
 
         }

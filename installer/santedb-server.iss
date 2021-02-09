@@ -4,6 +4,7 @@
 #define MyAppName "SanteDB Server"
 #define MyAppPublisher "SanteDB Community"
 #define MyAppURL "http://santesuite.org"
+#define MyAppVersion "2.0.75"
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -97,7 +98,7 @@ Source: .\vc2010.exe; DestDir: {tmp} ; Flags: dontcopy
 Source: ..\SanteDB\Data\SDB_BASE.FDB; DestDir: {app}; Components: demo 
 Source: ..\SanteDB\Data\SDB_AUDIT.FDB; DestDir: {app}; Components: demo
 Source: ..\bin\Release\fbclient.dll; DestDir: {app}; Components: db\fbsql
-Source: ..\bin\Release\fbembed.dll; DestDir: {app}; Components: db\fbsql
+; Source: ..\bin\Release\fbembed.dll; DestDir: {app}; Components: db\fbsql
 Source: ..\bin\Release\FirebirdSql.Data.FirebirdClient.dll; DestDir: {app}; Components: db\fbsql
 Source: ..\bin\Release\ib_util.dll; DestDir: {app}; Components: db\fbsql
 Source: ..\bin\Release\icudt52.dll; DestDir: {app}; Components: db\fbsql
@@ -107,7 +108,7 @@ Source: ..\bin\Release\plugins\engine12.dll; DestDir: {app}\plugins; Components:
 Source: ..\bin\Release\icudt52l.dat; DestDir: {app}; Components: db\fbsql
 Source: ..\bin\Release\firebird.conf; DestDir: {app}; Components: db\fbsql
 Source: ..\bin\Release\firebird.msg; DestDir: {app}; Components: db\fbsql
-Source: ..\bin\Release\fbembed.dll; DestDir: {app}; Components: db\fbsql
+;Source: ..\bin\Release\fbembed.dll; DestDir: {app}; Components: db\fbsql
 Source: ..\bin\Release\fbclient.dll; DestDir: {app}; Components: db\fbsql
 
 ; Demo Data

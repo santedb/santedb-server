@@ -30,7 +30,7 @@ namespace SanteDB.Core.Diagnostics
     /// <summary>
     /// Tracer writer that writes to the console
     /// </summary>
-    public class ConsoleTraceWriter : TraceWriter
+    public class ConsoleTraceWriter : TraceWriter, IDisposable
     {
         // Dispatch thread
         private Thread m_dispatchThread = null;
@@ -106,6 +106,7 @@ namespace SanteDB.Core.Diagnostics
                 {
                     if (this.m_logBacklog.TryDequeue(out var dq))
                     {
+                        if (this.m_disposing) return;
                         Console.ForegroundColor = dq.Key;
                         Console.WriteLine(dq.Value);
                         Console.ResetColor();

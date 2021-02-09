@@ -32,8 +32,8 @@ echo Will use NUGET in %nuget%
 echo Will use MSBUILD in %msbuild%
 
 if exist "%nuget%" (
-	%msbuild%\msbuild santedb-server-ext.sln /t:restore
-	%msbuild%\msbuild santedb-server-ext.sln /t:clean /t:rebuild /p:configuration=Release /m:1
+	rem %msbuild%\msbuild santedb-server-ext.sln /t:restore
+	rem %msbuild%\msbuild santedb-server-ext.sln /t:clean /t:rebuild /p:configuration=Release /m:1
 
 	FOR /R "%cwd%" %%G IN (*.nuspec) DO (
 		echo Packing %%~pG
@@ -59,6 +59,37 @@ if exist "%nuget%" (
 	%inno% "/o.\bin\dist" ".\installer\SanteDB-Server.iss" /d"MyAppVersion=%version%" /d"BUNDLED"
 	%inno% "/o.\bin\dist" ".\installer\SanteDB-Server.iss" /d"MyAppVersion=%version%" /d"x64" 
 
+	rem ################# TARBALLS 
+	echo Building Linux Tarball
+
+	 mkdir santedb-server-%version%
+	cd santedb-server-%version%
+	copy "..\bin\Release\*.dll"
+	copy "..\bin\Release\*.exe"
+	copy "..\bin\Release\*.exe.config"
+	
+	copy "..\bin\Release\*.pak"
+	xcopy /I "..\bin\Release\Schema\*.*" ".\Schema"
+	xcopy /I /E "..\bin\Release\Data\*.*" ".\Data"
+	xcopy /I "..\bin\Release\Applets\*.*" ".\Applets"
+	xcopy /I "..\bin\Release\Plugins\*.*" ".\Plugins"
+	mkdir elbonia
+	mkdir elbonia\data
+	copy "..\SanteDB\Data\*.fdb" elbonia
+	copy "..\SanteDB\Data\demo\*.*" elbonia\data
+	cd ..
+	"C:\program files\7-zip\7z" a -r -ttar .\bin\dist\santedb-server-%version%.tar .\santedb-server-%version%
+	"C:\program files\7-zip\7z" a -r -tzip .\bin\dist\santedb-server-%version%.zip .\santedb-server-%version%
+	"C:\program files\7-zip\7z" a -tbzip2 .\bin\dist\santedb-server-%version%.tar.bz2 .\bin\dist\santedb-server-%version%.tar
+	"C:\program files\7-zip\7z" a -tgzip .\bin\dist\santedb-server-%version%.tar.gz .\bin\dist\santedb-server-%version%.tar
+	del /q /s .\installsupp\*.* 
+	del /q /s .\santedb-server-%version%\*.*
+	rmdir .\santedb-server-%version%\schema
+	rmdir .\santedb-server-%version%\applets
+	rmdir .\santedb-server-%version%\data
+	rmdir .\santedb-server-%version%\plugins
+	rmdir .\santedb-server-%version%
+	rmdir .\installsupp
 
 ) else (	
 	echo Cannot find NUGET 

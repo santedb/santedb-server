@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>SanteDB.Messaging.GS1</id>
-    <version>2.0.71.0</version>
+    <version>2.0.76.0</version>
     <title>GS1 BMS Bindings for SanteDB Server</title>
     <authors>SanteDB Community</authors>
     <owners>santedb.org</owners>
@@ -15,10 +15,10 @@
     <copyright>Copyright (C) 2015-2021 SanteSuite Contributors (See: NOTICES)</copyright>
     <tags>cdr santedb gs1</tags>
     <dependencies>
-      <dependency id="SanteDB.Core.Api" version="2.0.71.0" />
-      <dependency id="SanteDB.Core.Model" version="2.0.71.0" />
-      <dependency id="Restsrvr" version="2.0.71.0" />
-      <dependency id="SanteDB.Rest.Common" version="2.0.71.0" />
+      <dependency id="SanteDB.Core.Api" version="2.0.76.0" />
+      <dependency id="SanteDB.Core.Model" version="2.0.76.0" />
+      <dependency id="Restsrvr" version="2.0.76.0" />
+      <dependency id="SanteDB.Rest.Common" version="2.0.76.0" />
     </dependencies>
   </metadata>
 </package>

@@ -175,12 +175,13 @@
       <add name="SanteDB.Rest.Common.ResourceHandlerTool" filter="Error"/>
       <add name="SanteDB.Core.DataSet" filter="Warning"/>
       <add name="SanteDB.Core.AppletManager" filter="Warning"/>
+      <add name="SanteDB.Core.Services.Impl.DependencyServiceManager" filter="Informational"/>
     </sources>
     <writers>
       <add name="main" initializationData="santedb.log" filter="Warning">
         <writer>SanteDB.Core.Diagnostics.RolloverTextWriterTraceWriter, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</writer>
       </add>
-      <add name="console" initializationData="santedb.log" filter="Warning">
+      <add name="console" initializationData="santedb.log" filter="Informational">
         <writer>SanteDB.Core.Diagnostics.ConsoleTraceWriter, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</writer>
       </add>
     </writers>
@@ -558,7 +559,7 @@
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoSessionProvider, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPolicyInformationService, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoRoleProvider, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Core.Security.Privacy.LocalDataPolicyFilterService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Core.Security.Privacy.DataPolicyFilterService, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.SimpleTfaSecretGenerator, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.DefaultTfaRelayService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.DefaultDataSigningService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
@@ -575,6 +576,7 @@
       <add type="SanteDB.Caching.Redis.RedisQueryPersistenceService, SanteDB.Caching.Redis, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Caching.Redis.RedisAdhocCache, SanteDB.Caching.Redis, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />-->
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPersistenceService, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Persistence.Data.ADO.Services.AdoSubscriptionExecutor, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Auditing.ADO.Services.AdoAuditRepositoryService, SanteDB.Persistence.Auditing.ADO, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
 
       <!-- Repository Services -->

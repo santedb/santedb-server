@@ -350,15 +350,6 @@ namespace SanteDB.Persistence.Data.ADO.Data
 
             var serviceInstance = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
 #if DEBUG
-            /*
-             * Me neez all the timez
-
-               /\_/\
-               >^.^<.---.
-              _'-`-'     )\
-             (6--\ |--\ (`.`-.
-                 --'  --'  ``-'
-            */
             Stopwatch sw = new Stopwatch();
             sw.Start();
 #endif
@@ -404,7 +395,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
                 }
             }
 
-            // Iterate over the properties and load the properties
+            // Iterate over the properties and load them if not loaded
             foreach (var pi in properties)
             {
                 if (loadProperties.Length > 0 &&

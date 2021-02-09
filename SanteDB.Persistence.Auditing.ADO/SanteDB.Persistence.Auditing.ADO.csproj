@@ -49,6 +49,7 @@
     <Compile Include="Data\Model\DbAuditCode.cs" />
     <Compile Include="Data\Model\DbAuditData.cs" />
     <Compile Include="Data\Model\DbAuditMetadata.cs" />
+    <Compile Include="Data\Model\DbAuditMetadataValue.cs" />
     <Compile Include="Data\Model\DbAuditObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AdoAuditRepositoryService.cs" />
@@ -58,10 +59,10 @@
     <EmbeddedResource Include="Data\Map\ModelMap.xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\SQL\FBSQL\audit_repo.sql">
+    <None Include="Data\SQL\AuditDB\FBSQL\audit_repo.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Data\SQL\PSQL\audit_repo.sql">
+    <None Include="Data\SQL\AuditDB\PSQL\audit_repo.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -103,13 +104,13 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.71.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.71.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.71.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.71.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.71.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.0.71.0" />
-        <PackageReference Include="SanteDB.BI" Version="2.0.71.0" />
+        <PackageReference Include="RestSrvr" Version="2.0.76.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.76.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.76.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.76.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.76.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="2.0.76.0" />
+        <PackageReference Include="SanteDB.BI" Version="2.0.76.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -126,6 +127,12 @@
     <None Include="SanteDB.Persistence.Auditing.ADO.nuspec">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Data\SQL\AuditDB\FBSQL\20210130-FBSQL.sql" />
+    <Content Include="Data\SQL\AuditDB\PSQL\20210124-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

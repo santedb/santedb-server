@@ -77,5 +77,12 @@ namespace SanteDB.Caching.Memory
             }
         }
 
+        /// <summary>
+        /// Remove the specified key
+        /// </summary>
+        public bool Remove(string key)
+        {
+            return this.m_cache.Remove(key) != null;
+        }
     }
 }

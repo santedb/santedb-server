@@ -303,6 +303,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 foreach (var p in data.Policies)
                 {
                     var pol = p.Policy?.EnsureExists(context);
+                    var polKey = pol?.Key ?? p.PolicyKey;
                     if (pol == null) // maybe we can retrieve it from the PIP?
                     {
                         var pipInfo = ApplicationServiceContext.Current.GetService<IPolicyInformationService>().GetPolicy(p.PolicyKey.ToString());
@@ -315,6 +316,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 CanOverride = pipInfo.CanOverride
                             };
                             pol = p.Policy.EnsureExists(context);
+                            polKey = pol.Key;
                         }
                         else throw new InvalidOperationException("Cannot find policy information");
                     }
@@ -323,7 +325,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     context.Insert(new DbActSecurityPolicy()
                     {
                         Key = Guid.NewGuid(),
-                        PolicyKey = pol.Key.Value,
+                        PolicyKey = polKey.Value,
                         SourceKey = retVal.Key.Value,
                         EffectiveVersionSequenceId = retVal.VersionSequence.Value
                     });

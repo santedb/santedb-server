@@ -54,12 +54,6 @@ namespace SanteDB.Caching.Redis
         // Redis trace source
         private Tracer m_tracer = new Tracer(RedisCacheConstants.TraceSourceName);
 
-        // Connection
-        private ConnectionMultiplexer m_connection;
-
-        // Subscriber
-        private ISubscriber m_subscriber;
-
         // Configuration
         private RedisConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RedisConfigurationSection>();
 
@@ -76,7 +70,7 @@ namespace SanteDB.Caching.Redis
         {
             get
             {
-                return this.m_connection != null;
+                return RedisConnectionManager.Current.Connection != null;
             }
         }
 
@@ -174,7 +168,7 @@ namespace SanteDB.Caching.Redis
             {
 
                 // We want to add only those when the connection is present
-                if (this.m_connection == null || data == null || !data.Key.HasValue ||
+                if (RedisConnectionManager.Current.Connection == null || data == null || !data.Key.HasValue ||
                     (data as BaseEntityData)?.ObsoletionTime.HasValue == true ||
                     this.m_nonCached.Contains(data.GetType()))
                 {
@@ -188,7 +182,8 @@ namespace SanteDB.Caching.Redis
                 //{
                 // Add
 
-                var redisDb = this.m_connection.GetDatabase(RedisCacheConstants.CacheDatabaseId);
+                var redisDb = RedisConnectionManager.Current.Connection.GetDatabase(RedisCacheConstants.CacheDatabaseId);
+                
                 redisDb.HashSet(data.Key.Value.ToString(), this.SerializeObject(data), CommandFlags.FireAndForget);
                 redisDb.KeyExpire(data.Key.Value.ToString(), this.m_configuration.TTL, CommandFlags.FireAndForget);
 
@@ -201,9 +196,9 @@ namespace SanteDB.Caching.Redis
 #endif
 
                     if (existing)
-                        this.m_connection.GetSubscriber().Publish("oiz.events", $"PUT http://{Environment.MachineName}/cache/{data.Key.Value}");
+                        RedisConnectionManager.Current.Connection.GetSubscriber().Publish("oiz.events", $"PUT http://{Environment.MachineName}/cache/{data.Key.Value}");
                     else
-                        this.m_connection.GetSubscriber().Publish("oiz.events", $"POST http://{Environment.MachineName}/cache/{data.Key.Value}");
+                        RedisConnectionManager.Current.Connection.GetSubscriber().Publish("oiz.events", $"POST http://{Environment.MachineName}/cache/{data.Key.Value}");
                     //}
                 }
             }
@@ -221,11 +216,11 @@ namespace SanteDB.Caching.Redis
             try
             {
                 // We want to add
-                if (this.m_connection == null)
+                if (RedisConnectionManager.Current.Connection == null)
                     return null;
 
                 // Add
-                var redisDb = this.m_connection.GetDatabase(RedisCacheConstants.CacheDatabaseId);
+                var redisDb = RedisConnectionManager.Current.Connection.GetDatabase(RedisCacheConstants.CacheDatabaseId);
                 redisDb.KeyExpire(key.ToString(), this.m_configuration.TTL, CommandFlags.FireAndForget);
                 return this.DeserializeObject(redisDb.HashGetAll(key.ToString()));
             }
@@ -254,15 +249,15 @@ namespace SanteDB.Caching.Redis
         public void Remove(Guid key)
         {
             // We want to add
-            if (this.m_connection == null)
+            if (RedisConnectionManager.Current.Connection == null)
                 return;
             // Add
             var existing = this.GetCacheItem(key);
-            var redisDb = this.m_connection.GetDatabase(RedisCacheConstants.CacheDatabaseId);
+            var redisDb = RedisConnectionManager.Current.Connection.GetDatabase(RedisCacheConstants.CacheDatabaseId);
             redisDb.KeyDelete(key.ToString(), CommandFlags.FireAndForget);
             this.EnsureCacheConsistency(new DataCacheEventArgs(existing), true);
 
-            this.m_connection.GetSubscriber().Publish("oiz.events", $"DELETE http://{Environment.MachineName}/cache/{key}");
+            RedisConnectionManager.Current.Connection.GetSubscriber().Publish("oiz.events", $"DELETE http://{Environment.MachineName}/cache/{key}");
         }
 
         /// <summary>
@@ -276,22 +271,13 @@ namespace SanteDB.Caching.Redis
 
                 this.m_tracer.TraceInfo("Starting REDIS cache service to hosts {0}...", String.Join(";", this.m_configuration.Servers));
 
-                var configuration = new ConfigurationOptions()
-                {
-                    Password = this.m_configuration.Password
-                };
-                foreach (var itm in this.m_configuration.Servers)
-                    configuration.EndPoints.Add(itm);
-
-                this.m_connection = ConnectionMultiplexer.Connect(configuration);
-                this.m_subscriber = this.m_connection.GetSubscriber();
                 // Look for non-cached types
                 foreach (var itm in typeof(IdentifiedData).Assembly.GetTypes().Where(o => o.GetCustomAttribute<NonCachedAttribute>() != null || o.GetCustomAttribute<XmlRootAttribute>() == null))
                     this.m_nonCached.Add(itm);
 
                 // Subscribe to SanteDB events
                 if(this.m_configuration.PublishChanges)
-                    m_subscriber.Subscribe("oiz.events", (channel, message) =>
+                    RedisConnectionManager.Current.Subscriber.Subscribe("oiz.events", (channel, message) =>
                     {
 
                         this.m_tracer.TraceVerbose("Received event {0} on {1}", message, channel);
@@ -335,8 +321,7 @@ namespace SanteDB.Caching.Redis
         public bool Stop()
         {
             this.Stopping?.Invoke(this, EventArgs.Empty);
-            this.m_connection.Dispose();
-            this.m_connection = null;
+            RedisConnectionManager.Current.Dispose();
             this.Stopped?.Invoke(this, EventArgs.Empty);
             return true;
         }
@@ -348,7 +333,7 @@ namespace SanteDB.Caching.Redis
         {
             try
             {
-                this.m_connection.GetServer(this.m_configuration.Servers.First()).FlushAllDatabases();
+                RedisConnectionManager.Current.Connection.GetServer(this.m_configuration.Servers.First()).FlushAllDatabases();
             }
             catch(Exception e)
             {
@@ -363,7 +348,7 @@ namespace SanteDB.Caching.Redis
         {
             get
             {
-                return this.m_connection.GetServer(this.m_configuration.Servers.First()).DatabaseSize();
+                return RedisConnectionManager.Current.Connection.GetServer(this.m_configuration.Servers.First()).DatabaseSize();
             }
         }
     }
