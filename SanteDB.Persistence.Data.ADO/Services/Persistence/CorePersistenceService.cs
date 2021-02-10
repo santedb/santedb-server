@@ -278,7 +278,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 {
 
                     // Stateful query identifier = We need to add query results
-                    if (queryId != Guid.Empty && ApplicationContext.Current.GetService<IQueryPersistenceService>() != null)
+                    if (queryId != Guid.Empty && ApplicationServiceContext.Current.GetService<IQueryPersistenceService>() != null)
                     {
                         // Create on a separate thread the query results
                         var keys = retVal.Keys<Guid>().ToArray();

@@ -569,6 +569,9 @@
     <serviceProviders>
 
       <!-- Core Services -->
+      <add type="SanteDB.Core.Services.Impl.DefaultOperatingSystemInfoService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Core.Services.Impl.DefaultPolicyEnforcementService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+
       <add type="SanteDB.Core.Services.Impl.FileConfigurationService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Services.DefaultJobManagerService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
 

@@ -18,6 +18,7 @@
  * Date: 2019-1-22
  */
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SanteDB.Core;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.Core.TestFramework;
@@ -46,7 +47,7 @@ namespace SanteDB.Caching.Memory.Test
         public void TestCanAddCacheItem()
         {
             Guid k = Guid.NewGuid();
-            TestApplicationContext.Current.GetService<IDataCachingService>().Add(new Concept()
+            ApplicationServiceContext.Current.GetService<IDataCachingService>().Add(new Concept()
             {
                 Key = k,
                 Mnemonic = "I AM A TEST",
@@ -56,7 +57,7 @@ namespace SanteDB.Caching.Memory.Test
                 }
             });
 
-            var ret = TestApplicationContext.Current.GetService<IDataCachingService>().GetCacheItem<Concept>(k);
+            var ret = ApplicationServiceContext.Current.GetService<IDataCachingService>().GetCacheItem<Concept>(k);
             Assert.IsNotNull(ret);
             Assert.AreEqual("I AM A TEST", ret.Mnemonic);
             Assert.AreEqual(1, ret.ConceptNames.Count);
@@ -69,7 +70,7 @@ namespace SanteDB.Caching.Memory.Test
         public void TestDoesNotReturnAfterExpiry()
         {
             Guid k = Guid.NewGuid();
-            TestApplicationContext.Current.GetService<IDataCachingService>().Add(new Concept()
+            ApplicationServiceContext.Current.GetService<IDataCachingService>().Add(new Concept()
             {
                 Key = k,
                 Mnemonic = "I AM A TEST TIMEOUT",
@@ -79,11 +80,11 @@ namespace SanteDB.Caching.Memory.Test
                 }
             });
 
-            var ret = TestApplicationContext.Current.GetService<IDataCachingService>().GetCacheItem<Concept>(k);
+            var ret = ApplicationServiceContext.Current.GetService<IDataCachingService>().GetCacheItem<Concept>(k);
             Assert.IsNotNull(ret);
 
             Thread.Sleep(10000); // wait 10 secs
-            ret = TestApplicationContext.Current.GetService<IDataCachingService>().GetCacheItem<Concept>(k);
+            ret = ApplicationServiceContext.Current.GetService<IDataCachingService>().GetCacheItem<Concept>(k);
             Assert.IsNull(ret);
         }
 
@@ -94,7 +95,7 @@ namespace SanteDB.Caching.Memory.Test
         public void TestClearsCache()
         {
             Guid k = Guid.NewGuid();
-            TestApplicationContext.Current.GetService<IDataCachingService>().Add(new Concept()
+            ApplicationServiceContext.Current.GetService<IDataCachingService>().Add(new Concept()
             {
                 Key = k,
                 Mnemonic = "I AM A TEST CLEAR",
@@ -104,11 +105,11 @@ namespace SanteDB.Caching.Memory.Test
                 }
             });
 
-            var ret = TestApplicationContext.Current.GetService<IDataCachingService>().GetCacheItem<Concept>(k);
+            var ret = ApplicationServiceContext.Current.GetService<IDataCachingService>().GetCacheItem<Concept>(k);
             Assert.IsNotNull(ret);
-            TestApplicationContext.Current.GetService<IDataCachingService>().Clear();
+            ApplicationServiceContext.Current.GetService<IDataCachingService>().Clear();
             Thread.Sleep(5000); // allow cache to clear
-            ret = TestApplicationContext.Current.GetService<IDataCachingService>().GetCacheItem<Concept>(k);
+            ret = ApplicationServiceContext.Current.GetService<IDataCachingService>().GetCacheItem<Concept>(k);
             Assert.IsNull(ret);
         }
 
@@ -116,7 +117,7 @@ namespace SanteDB.Caching.Memory.Test
         public void TestRemovesItemFromCache()
         {
             Guid k1 = Guid.NewGuid(), k2 = Guid.NewGuid();
-            TestApplicationContext.Current.GetService<IDataCachingService>().Add(new Concept()
+            ApplicationServiceContext.Current.GetService<IDataCachingService>().Add(new Concept()
             {
                 Key = k1,
                 Mnemonic = "I AM A TEST REMAIN",
@@ -125,7 +126,7 @@ namespace SanteDB.Caching.Memory.Test
                     new ConceptName("en","I AM A TEST REMAIN")
                 }
             });
-            TestApplicationContext.Current.GetService<IDataCachingService>().Add(new Concept()
+            ApplicationServiceContext.Current.GetService<IDataCachingService>().Add(new Concept()
             {
                 Key = k2,
                 Mnemonic = "I AM A TEST REMOVE",
@@ -135,40 +136,40 @@ namespace SanteDB.Caching.Memory.Test
                 }
             });
 
-            var ret = TestApplicationContext.Current.GetService<IDataCachingService>().GetCacheItem<Concept>(k1);
+            var ret = ApplicationServiceContext.Current.GetService<IDataCachingService>().GetCacheItem<Concept>(k1);
             Assert.IsNotNull(ret);
             Assert.AreEqual("I AM A TEST REMAIN", ret.Mnemonic);
-            ret = TestApplicationContext.Current.GetService<IDataCachingService>().GetCacheItem<Concept>(k2);
+            ret = ApplicationServiceContext.Current.GetService<IDataCachingService>().GetCacheItem<Concept>(k2);
             Assert.IsNotNull(ret);
             Assert.AreEqual("I AM A TEST REMOVE", ret.Mnemonic);
 
-            TestApplicationContext.Current.GetService<IDataCachingService>().Remove(k2);
-            ret = TestApplicationContext.Current.GetService<IDataCachingService>().GetCacheItem<Concept>(k2);
+            ApplicationServiceContext.Current.GetService<IDataCachingService>().Remove(k2);
+            ret = ApplicationServiceContext.Current.GetService<IDataCachingService>().GetCacheItem<Concept>(k2);
             Assert.IsNull(ret);
         }
 
         [TestMethod]
         public void TestAdHocCache()
         {
-            TestApplicationContext.Current.GetService<IAdhocCacheService>().Add("TEST", "I AM A TEST VALUE!");
-            Assert.AreEqual("I AM A TEST VALUE!", TestApplicationContext.Current.GetService<IAdhocCacheService>().Get<String>("TEST"));
-            TestApplicationContext.Current.GetService<IAdhocCacheService>().Add("COMPLEX", new
+            ApplicationServiceContext.Current.GetService<IAdhocCacheService>().Add("TEST", "I AM A TEST VALUE!");
+            Assert.AreEqual("I AM A TEST VALUE!", ApplicationServiceContext.Current.GetService<IAdhocCacheService>().Get<String>("TEST"));
+            ApplicationServiceContext.Current.GetService<IAdhocCacheService>().Add("COMPLEX", new
             {
                 Message = "I AM COMPLEX",
                 Value = 2
             }, new TimeSpan(0, 0, 5));
-            dynamic val = TestApplicationContext.Current.GetService<IAdhocCacheService>().Get<dynamic>("COMPLEX");
+            dynamic val = ApplicationServiceContext.Current.GetService<IAdhocCacheService>().Get<dynamic>("COMPLEX");
             Assert.AreEqual("I AM COMPLEX", val.Message);
             Thread.Sleep(10000);
             // Should be gone
-            val = TestApplicationContext.Current.GetService<IAdhocCacheService>().Get<dynamic>("COMPLEX");
+            val = ApplicationServiceContext.Current.GetService<IAdhocCacheService>().Get<dynamic>("COMPLEX");
             Assert.IsNull(val);
         }
 
         [TestMethod]
         public void TestCanRegisterQuery()
         {
-            var qps = TestApplicationContext.Current.GetService<IQueryPersistenceService>();
+            var qps = ApplicationServiceContext.Current.GetService<IQueryPersistenceService>();
             var qid = Guid.NewGuid();
             qps.RegisterQuerySet(qid, new Guid[] {
                 Guid.NewGuid(),

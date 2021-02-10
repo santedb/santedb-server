@@ -40,6 +40,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Server;
 
 namespace SanteDB
 {
@@ -162,7 +163,7 @@ namespace SanteDB
                     {
 
                         // Did the service start properly?
-                        if (!ApplicationContext.Current.IsRunning)
+                        if (!ApplicationServiceContext.Current.IsRunning)
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("Application context did not start properly and is in maintenance mode...");

@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Server;
 using System.ServiceProcess;
 
 namespace SanteDB

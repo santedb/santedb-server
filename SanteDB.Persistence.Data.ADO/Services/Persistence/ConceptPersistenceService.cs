@@ -361,7 +361,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
 
             // Remove concept from cache and create a new version
-            ApplicationContext.Current.GetService<IDataCachingService>()?.Remove(data.SourceEntityKey.Value);
+            ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(data.SourceEntityKey.Value);
             var conceptVersion = context.FirstOrDefault<DbConceptVersion>(o => o.Key == data.SourceEntityKey.Value && o.ObsoletionTime == null);
             var newVersion = new DbConceptVersion();
             conceptVersion.ObsoletedByKey = context.ContextId;

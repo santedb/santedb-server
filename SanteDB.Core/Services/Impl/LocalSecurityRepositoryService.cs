@@ -225,11 +225,11 @@ namespace SanteDB.Core.Services.Impl
 
             this.m_traceSource.TraceWarning("Locking device {0}", key);
 
-            var iids = ApplicationContext.Current.GetService<IDeviceIdentityProviderService>();
+            var iids = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>();
             if (iids == null)
                 throw new InvalidOperationException("Missing identity provider service");
 
-            var securityDevice = ApplicationContext.Current.GetService<IRepositoryService<SecurityDevice>>()?.Get(key);
+            var securityDevice = ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityDevice>>()?.Get(key);
             if (securityDevice == null)
                 throw new KeyNotFoundException(key.ToString());
 
@@ -244,11 +244,11 @@ namespace SanteDB.Core.Services.Impl
         {
             this.m_traceSource.TraceWarning("Locking application {0}", key);
 
-            var iids = ApplicationContext.Current.GetService<IApplicationIdentityProviderService>();
+            var iids = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
             if (iids == null)
                 throw new InvalidOperationException("Missing identity provider service");
 
-            var securityApplication = ApplicationContext.Current.GetService<IRepositoryService<SecurityApplication>>()?.Get(key);
+            var securityApplication = ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityApplication>>()?.Get(key);
             if (securityApplication == null)
                 throw new KeyNotFoundException(key.ToString());
 
@@ -263,11 +263,11 @@ namespace SanteDB.Core.Services.Impl
         {
             this.m_traceSource.TraceWarning("Unlocking device {0}", key);
 
-            var iids = ApplicationContext.Current.GetService<IDeviceIdentityProviderService>();
+            var iids = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>();
             if (iids == null)
                 throw new InvalidOperationException("Missing identity provider service");
 
-            var securityDevice = ApplicationContext.Current.GetService<IRepositoryService<SecurityDevice>>()?.Get(key);
+            var securityDevice = ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityDevice>>()?.Get(key);
             if (securityDevice == null)
                 throw new KeyNotFoundException(key.ToString());
 
@@ -282,11 +282,11 @@ namespace SanteDB.Core.Services.Impl
         {
             this.m_traceSource.TraceWarning("Unlocking application {0}", key);
 
-            var iids = ApplicationContext.Current.GetService<IApplicationIdentityProviderService>();
+            var iids = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
             if (iids == null)
                 throw new InvalidOperationException("Missing identity provider service");
 
-            var securityApplication = ApplicationContext.Current.GetService<IRepositoryService<SecurityApplication>>()?.Get(key);
+            var securityApplication = ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityApplication>>()?.Get(key);
             if (securityApplication == null)
                 throw new KeyNotFoundException(key.ToString());
 

@@ -76,7 +76,7 @@ namespace SanteDB.Tools.AdminConsole.Shell
         /// </summary>
         public static void Initialize(Parameters.ConsoleParameters configuration)
         {
-            ApplicationContext.Current = new ApplicationContext(configuration);
+            ApplicationServiceContext.Current = ApplicationContext.Current = new ApplicationContext(configuration);
         }
 
         /// <summary>

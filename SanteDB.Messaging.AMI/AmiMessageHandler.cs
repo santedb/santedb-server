@@ -136,7 +136,7 @@ namespace SanteDB.Messaging.AMI
         {
             get
             {
-                return (ServiceEndpointCapabilities)ApplicationContext.Current.GetService<IRestServiceFactory>().GetServiceCapabilities(this.m_webHost);
+                return (ServiceEndpointCapabilities)ApplicationServiceContext.Current.GetService<IRestServiceFactory>().GetServiceCapabilities(this.m_webHost);
             }
         }
 
@@ -176,7 +176,7 @@ namespace SanteDB.Messaging.AMI
                 this.Starting?.Invoke(this, EventArgs.Empty);
 
 
-                this.m_webHost = ApplicationContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(AmiServiceBehavior));
+                this.m_webHost = ApplicationServiceContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(AmiServiceBehavior));
                 this.m_webHost.AddServiceBehavior(new ErrorServiceBehavior());
 
                 // Add service behaviors

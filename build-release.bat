@@ -32,8 +32,9 @@ echo Will use NUGET in %nuget%
 echo Will use MSBUILD in %msbuild%
 
 if exist "%nuget%" (
-	rem %msbuild%\msbuild santedb-server-ext.sln /t:restore
-	rem %msbuild%\msbuild santedb-server-ext.sln /t:clean /t:rebuild /p:configuration=Release /m:1
+
+	%msbuild%\msbuild santedb-server-ext.sln /t:restore
+	%msbuild%\msbuild santedb-server-ext.sln /t:clean /t:rebuild /p:configuration=Release /m:1
 
 	FOR /R "%cwd%" %%G IN (*.nuspec) DO (
 		echo Packing %%~pG
@@ -55,9 +56,7 @@ if exist "%nuget%" (
 		"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /d "SanteDB iCDR"  "%%G"
 	)
 	
-	%inno% "/o.\bin\dist" ".\installer\SanteDB-Server.iss" /d"MyAppVersion=%version%" /d"x64" /d"BUNDLED"
-	%inno% "/o.\bin\dist" ".\installer\SanteDB-Server.iss" /d"MyAppVersion=%version%" /d"BUNDLED"
-	%inno% "/o.\bin\dist" ".\installer\SanteDB-Server.iss" /d"MyAppVersion=%version%" /d"x64" 
+	%inno% "/o.\bin\dist" ".\installer\SanteDB-Server.iss" /d"MyAppVersion=%version%" 
 
 	rem ################# TARBALLS 
 	echo Building Linux Tarball
@@ -84,11 +83,7 @@ if exist "%nuget%" (
 	"C:\program files\7-zip\7z" a -tgzip .\bin\dist\santedb-server-%version%.tar.gz .\bin\dist\santedb-server-%version%.tar
 	del /q /s .\installsupp\*.* 
 	del /q /s .\santedb-server-%version%\*.*
-	rmdir .\santedb-server-%version%\schema
-	rmdir .\santedb-server-%version%\applets
-	rmdir .\santedb-server-%version%\data
-	rmdir .\santedb-server-%version%\plugins
-	rmdir .\santedb-server-%version%
+	rmdir /q /s .\santedb-server-%version%
 	rmdir .\installsupp
 
 ) else (	
