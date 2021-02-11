@@ -68,10 +68,11 @@ if exist "%nuget%" (
 	copy "..\bin\Release\*.exe.config"
 	
 	copy "..\bin\Release\*.pak"
-	xcopy /I "..\bin\Release\Schema\*.*" ".\Schema"
-	xcopy /I /E "..\bin\Release\Data\*.*" ".\Data"
-	xcopy /I "..\bin\Release\Applets\*.*" ".\Applets"
-	xcopy /I "..\bin\Release\Plugins\*.*" ".\Plugins"
+	xcopy /I "..\bin\Release\Schema\*.*" ".\schema"
+	xcopy /I /E "..\bin\Release\Data\*.*" ".\data"
+	xcopy /I "..\bin\Release\Applets\*.*" ".\applets"
+	xcopy /I "..\bin\Release\Config\*.*" ".\config"
+	xcopy /I "..\bin\Release\Plugins\*.*" ".\plugins"
 	mkdir elbonia
 	mkdir elbonia\data
 	copy "..\SanteDB\Data\*.fdb" elbonia

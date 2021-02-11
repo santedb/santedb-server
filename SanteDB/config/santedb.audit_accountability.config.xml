@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
+  <sections>
+    <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api, Version=1.10.0.0"/>
+  </sections>
+  <section xsi:type="AuditAccountabilityConfigurationSection" completeAuditTrail="false">
+    <filters>
+      <add outcome="fail.minor fail.major fail.epic" insert="true" ship="true" />
+      <add action="c r u d" insert="true" ship="true" />
+      <add action="x" event="network security restrictedFn" outcome="ok" insert="false" ship="false" />
+    </filters>
+  </section>
+</SanteDBConfiguration>

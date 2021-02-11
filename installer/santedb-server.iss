@@ -125,6 +125,10 @@ Source: ..\bin\Release\SanteDB.Core.Model.AMI.dll; DestDir: {app}; Components: m
 Source: ..\bin\Release\SanteDB.Messaging.AMI.dll; DestDir: {app}; Components: msg\ami
 Source: ..\bin\Release\SanteDB.Rest.AMI.dll; DestDir: {app}; Components: msg\ami
 
+; Config Parts 
+; TODO: Individual files here
+Source: ..\bin\release\config\*.*; DestDir: {app}\config; Components: server
+
 ; Data Stuff
 Source: ..\bin\release\data\*.dataset; DestDir: {app}\data; Components: server
 Source: ..\bin\release\applets\*.pak; DestDir: {app}\applets; Components: server
