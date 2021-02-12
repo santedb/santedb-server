@@ -34,8 +34,8 @@ echo Will use MSBUILD in %msbuild%
 
 if exist "%nuget%" (
 
-	rem %msbuild%\msbuild santedb-server-ext.sln /t:restore
-	rem %msbuild%\msbuild santedb-server-ext.sln /t:clean /t:rebuild /p:configuration=Release /m:1
+	%msbuild%\msbuild santedb-server-ext.sln /t:restore
+	%msbuild%\msbuild santedb-server-ext.sln /t:clean /t:rebuild /p:configuration=Release /m:1
 
 	FOR /R "%cwd%" %%G IN (*.nuspec) DO (
 		echo Packing %%~pG
