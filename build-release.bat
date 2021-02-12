@@ -1,5 +1,6 @@
 @echo off
 
+set signtool="c:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x64\signtool.exe"
 set version=%1
 
 		if exist "c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\15.0\Bin\MSBuild.exe" (
@@ -32,8 +33,9 @@ echo Will use NUGET in %nuget%
 echo Will use MSBUILD in %msbuild%
 
 if exist "%nuget%" (
-	rem %msbuild%\msbuild santedb-server-ext.sln /t:restore
-	rem %msbuild%\msbuild santedb-server-ext.sln /t:clean /t:rebuild /p:configuration=Release /m:1
+
+	%msbuild%\msbuild santedb-server-ext.sln /t:restore
+	%msbuild%\msbuild santedb-server-ext.sln /t:clean /t:rebuild /p:configuration=Release /m:1
 
 	FOR /R "%cwd%" %%G IN (*.nuspec) DO (
 		echo Packing %%~pG
@@ -52,12 +54,10 @@ if exist "%nuget%" (
 
 	FOR /R "%cwd%\bin\Release" %%G IN (*.exe) DO (
 		echo Signing %%G
-		"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /d "SanteDB iCDR"  "%%G"
+		%signtool% sign /d "SanteDB iCDR"  "%%G"
 	)
 	
-	%inno% "/o.\bin\dist" ".\installer\SanteDB-Server.iss" /d"MyAppVersion=%version%" /d"x64" /d"BUNDLED"
-	%inno% "/o.\bin\dist" ".\installer\SanteDB-Server.iss" /d"MyAppVersion=%version%" /d"BUNDLED"
-	%inno% "/o.\bin\dist" ".\installer\SanteDB-Server.iss" /d"MyAppVersion=%version%" /d"x64" 
+	%inno% "/o.\bin\dist" ".\installer\SanteDB-Server.iss" /d"MyAppVersion=%version%" 
 
 	rem ################# TARBALLS 
 	echo Building Linux Tarball
@@ -69,10 +69,11 @@ if exist "%nuget%" (
 	copy "..\bin\Release\*.exe.config"
 	
 	copy "..\bin\Release\*.pak"
-	xcopy /I "..\bin\Release\Schema\*.*" ".\Schema"
-	xcopy /I /E "..\bin\Release\Data\*.*" ".\Data"
-	xcopy /I "..\bin\Release\Applets\*.*" ".\Applets"
-	xcopy /I "..\bin\Release\Plugins\*.*" ".\Plugins"
+	xcopy /I "..\bin\Release\Schema\*.*" ".\schema"
+	xcopy /I /E "..\bin\Release\Data\*.*" ".\data"
+	xcopy /I "..\bin\Release\Applets\*.*" ".\applets"
+	xcopy /I "..\bin\Release\Config\*.*" ".\config"
+	xcopy /I "..\bin\Release\Plugins\*.*" ".\plugins"
 	mkdir elbonia
 	mkdir elbonia\data
 	copy "..\SanteDB\Data\*.fdb" elbonia
@@ -84,11 +85,7 @@ if exist "%nuget%" (
 	"C:\program files\7-zip\7z" a -tgzip .\bin\dist\santedb-server-%version%.tar.gz .\bin\dist\santedb-server-%version%.tar
 	del /q /s .\installsupp\*.* 
 	del /q /s .\santedb-server-%version%\*.*
-	rmdir .\santedb-server-%version%\schema
-	rmdir .\santedb-server-%version%\applets
-	rmdir .\santedb-server-%version%\data
-	rmdir .\santedb-server-%version%\plugins
-	rmdir .\santedb-server-%version%
+	rmdir /q /s .\santedb-server-%version%
 	rmdir .\installsupp
 
 ) else (	

@@ -1,0 +1,62 @@
+﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
+  <sections>
+    <add type="SanteDB.Core.Configuration.DiagnosticsConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Persistence.Diagnostics.Email.Configuration.DiagnosticEmailServiceConfigurationSection, SanteDB.Persistence.Diagnostics.Email, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
+  </sections>
+  <!-- Diagnostic e-mail (bug) report configuration -->
+  <section xsi:type="DiagnosticEmailServiceConfigurationSection">
+    <smtp from="value" password="value" server="value" ssl="false" username="value" />
+    <recipients>
+      <add>value</add>
+    </recipients>
+  </section>
+  <!-- Logging Configuration -->
+  <section xsi:type="DiagnosticsConfigurationSection">
+    <sources>
+      <add name="SanteDB.Authentication.OAuth2" filter="Warning" />
+      <add name="SanteDB.Caching.Memory" filter="Warning" />
+      <add name="SanteDB.Caching.Memory.Query" filter="Warning" />
+      <add name="SanteDB.Caching.Redis" filter="Warning" />
+      <add name="SanteDB.Core.HttpRest" filter="Warning" />
+      <add name="SanteDB.Core.Data" filter="Warning" />
+      <add name="SanteDB.Core.Map" filter="Warning" />
+      <add name="SanteDB.Core.Security" filter="Warning" />
+      <add name="SanteDB.Core" filter="Warning" />
+      <add name="SanteDB.Core.Queue" filter="Warning" />
+      <add name="SanteDB.Core.Security.Tfa.Email" filter="Warning" />
+      <add name="SanteDB.Core.Security.Tfa.Twilio" filter="Warning" />
+      <add name="SanteDB.Messaging.AMI" filter="Warning" />
+      <add name="SanteDB.Messaging.FHIR" filter="Warning" />
+      <add name="SanteDB.Messaging.GS1" filter="Warning" />
+      <add name="SanteDB.Messaging.HDSI" filter="Warning" />
+      <add name="SanteDB.Messaging.HL7" filter="Informational" />
+      <add name="SanteDB.Messaging.Metadata" filter="Warning" />
+      <add name="SanteDB.Messaging.RISI" filter="Warning" />
+      <add name="SanteDB.OrmLite.PostgreSQL" filter="Warning" />
+      <add name="SanteDB.Matcher.Engine" filter="Verbose"/>
+      <add name="SanteDB.OrmLite.Sqlite" filter="Warning" />
+      <add name="SanteDB.OrmLite.FirebirdSQL" filter="Warning" />
+      <add name="SanteDB.OrmLite.Migration.SqlFeatureUtil" filter="Informational"/>
+      <add name="SanteDB.OrmLite" filter="Warning" />
+      <add name="SanteDB.Auditing.ADO" filter="Warning" />
+      <add name="SanteDB.Persistence.Data.ADO" filter="Warning" />
+      <add name="SanteDB.Matcher.Configuration.File.FileMatchConfigurationProvider" filter="Verbose"/>
+      <add name="SanteDB.Persistence.Diagnostics.Email" filter="Warning" />
+      <add name="SanteDB.Persistence.Diagnostics.Jira" filter="Warning" />
+      <add name="SanteDB.Persistence.MDM" filter="Verbose" />
+      <add name="SanteDB.Warehouse.ADO" filter="Warning" />
+      <add name="SanteDB.Rest.Common.ResourceHandlerTool" filter="Error"/>
+      <add name="SanteDB.Core.DataSet" filter="Warning"/>
+      <add name="SanteDB.Core.AppletManager" filter="Warning"/>
+      <add name="SanteDB.Core.Services.Impl.DependencyServiceManager" filter="Informational"/>
+    </sources>
+    <writers>
+      <add name="main" initializationData="santedb.log" filter="Warning">
+        <writer>SanteDB.Core.Diagnostics.RolloverTextWriterTraceWriter, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</writer>
+      </add>
+      <add name="console" initializationData="santedb.log" filter="Informational">
+        <writer>SanteDB.Core.Diagnostics.ConsoleTraceWriter, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</writer>
+      </add>
+    </writers>
+  </section>
+</SanteDBConfiguration>

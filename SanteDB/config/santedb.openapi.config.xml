@@ -1,0 +1,11 @@
+﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
+  <sections>
+    <add type="SanteDB.Messaging.Metadata.Configuration.MetadataConfigurationSection, SanteDB.Messaging.Metadata, Version=1.0.0.0"/>
+  </sections>
+  <section xsi:type="MetadataConfigurationSection">
+    <!-- The external host (if this is running behind a proxy 
+    	<host>https://elbonia.santesuite.net:8443/</host>
+    -->
+  </section>
+
+</SanteDBConfiguration>

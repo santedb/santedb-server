@@ -48,7 +48,7 @@ namespace SanteDB.Core.Security
         /// </summary>
         static SecurityUtils ()
         {
-            m_signatureConfiguration = new ConcurrentDictionary<string, SecuritySignatureConfiguration>(ApplicationContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>().Signatures.ToDictionary(o => o.KeyName ?? "default", o => o));
+            m_signatureConfiguration = new ConcurrentDictionary<string, SecuritySignatureConfiguration>(ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>().Signatures.ToDictionary(o => o.KeyName ?? "default", o => o));
         }
 
         /// <summary>

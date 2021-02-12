@@ -156,7 +156,7 @@ namespace SanteDB.Messaging.HDSI
                         .ToList(), typeof(IHdsiServiceContract)
                     );
                 
-                this.m_webHost = ApplicationContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(HdsiServiceBehavior));
+                this.m_webHost = ApplicationServiceContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(HdsiServiceBehavior));
                 this.m_webHost.AddServiceBehavior(new ErrorServiceBehavior());
 
                 // Add service behaviors

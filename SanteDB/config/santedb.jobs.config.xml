@@ -1,0 +1,11 @@
+﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
+  <sections>
+    <add type="SanteDB.Core.Configuration.JobConfigurationSection, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+  </sections>
+  <section xsi:type="JobConfigurationSection">
+    <!-- This can be used to add jobs at a specified interval to the service 
+    <jobs>
+      <add type="value" interval="0" />
+    </jobs>-->
+  </section>
+</SanteDBConfiguration>

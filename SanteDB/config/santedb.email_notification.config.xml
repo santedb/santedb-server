@@ -1,0 +1,17 @@
+﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
+  <sections>
+    <add type="SanteDB.Core.Configuration.EmailNotificationConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+  </sections>
+  <section xsi:type="EmailNotificationConfigurationSection">
+    <smtp>
+      <server>smtp://smtp.sendgrid.net:587</server>
+      <username>apikey</username>
+      <password></password>
+      <useTls>true</useTls>
+      <from>no-reply@fyfesoftware.ca</from>
+    </smtp>
+    <adminContacts>
+      <add>justin@fyfesoftware.ca</add>
+    </adminContacts>
+  </section>
+</SanteDBConfiguration>

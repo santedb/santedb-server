@@ -42,11 +42,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ServerApplicationContext.cs" />
     <Compile Include="Diagnostics\Performance\MachinePerformanceProbe.cs" />
     <Compile Include="Diagnostics\Performance\WindowsPerformanceCounterProbe.cs" />
     <Compile Include="Jobs\InactiveUserPruneJob.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\Tfa\TfaEmailMechanism.cs" />
+    <Compile Include="ServiceUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">

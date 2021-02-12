@@ -266,7 +266,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                     var results = domainResults.Keys<Guid>().OfType<Guid>().ToArray();
                                     this.m_tracer.TraceVerbose("Query for Keys: {0}", connection.GetQueryLiteral(domainResults.Keys<Guid>().ToSqlStatement()));
                                     totalResults = results.Count();
-                                    ApplicationContext.Current.GetService<IQueryPersistenceService>()?.RegisterQuerySet(queryId, results, null, totalResults);
+                                    ApplicationServiceContext.Current.GetService<IQueryPersistenceService>()?.RegisterQuerySet(queryId, results, null, totalResults);
                                     resultObjects = results.Skip(offset).Take(count ?? 100).OfType<Object>();
                                 }
                                 else if (m_configuration.UseFuzzyTotals || preArgs.UseFuzzyTotals)

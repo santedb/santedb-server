@@ -270,7 +270,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 else
                 {
 
-                    if (queryId != Guid.Empty && ApplicationContext.Current.GetService<IQueryPersistenceService>() != null)
+                    if (queryId != Guid.Empty && ApplicationServiceContext.Current.GetService<IQueryPersistenceService>() != null)
                     {
                         var keys = retVal.Keys<Guid>(false).ToArray();
                         totalResults = keys.Count();

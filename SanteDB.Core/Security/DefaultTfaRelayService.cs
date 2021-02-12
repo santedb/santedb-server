@@ -47,7 +47,7 @@ namespace SanteDB.Core.Security
         /// </summary>
         public DefaultTfaRelayService()
         {
-            ApplicationContext.Current.Started += (o, e) =>
+            ApplicationServiceContext.Current.Started += (o, e) =>
             {
                 this.Mechanisms = ApplicationServiceContext.Current.GetService<IServiceManager>()
                     .GetAllTypes()

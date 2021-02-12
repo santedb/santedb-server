@@ -408,8 +408,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
             this.m_tracer.TraceInfo("Scanning for schema updates...");
 
             // TODO: Refactor this to a common library within the ORM tooling
-            using (var context = this.m_configuration.Provider.GetWriteConnection())
-                context.UpgradeSchema("SanteDB.Persistence.Data.ADO");
+            ApplicationServiceContext.Current.Started += (o, e) =>
+            {
+                using (var context = this.m_configuration.Provider.GetWriteConnection())
+                    context.UpgradeSchema("SanteDB.Persistence.Data.ADO");
+            };
 
 
             try
@@ -538,7 +541,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(typeof(AdoSubscriptionExecutor));
 
             // Bind BI stuff
-            ApplicationServiceContext.Current.GetService<IBiMetadataRepository>().Insert(new SanteDB.BI.Model.BiDataSourceDefinition()
+            ApplicationServiceContext.Current.GetService<IBiMetadataRepository>()?.Insert(new SanteDB.BI.Model.BiDataSourceDefinition()
             {
                 IsSystemObject = true,
                 MetaData = new BiMetadata()
