@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data.ADO" id="20210116-01" name="Update:20200105-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="FirebirdSQL">
+ * <feature scope="SanteDB.Persistence.Data.ADO" id="20210116-01" name="Update:20210116-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="FirebirdSQL">
  *	<summary>Update: Adds support for peppered passwords</summary>
  *	<isInstalled>select ck_patch('20210116-01') from rdb$database</isInstalled>
  * </feature>
@@ -109,4 +109,4 @@ BEGIN
 	END
 END;
 --#!
-SELECT REG_PATCH('20210116-01') FROM RDB$DATABASE;--#!
+SELECT REG_PATCH('20210116-01') FROM RDB$DATABASE;

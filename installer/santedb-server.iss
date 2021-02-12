@@ -133,15 +133,11 @@ Source: ..\bin\release\config\*.*; DestDir: {app}\config; Components: server
 Source: ..\bin\release\data\*.dataset; DestDir: {app}\data; Components: server
 Source: ..\bin\release\applets\*.pak; DestDir: {app}\applets; Components: server
 
-; ADO Stuff
-Source: ..\bin\release\DATA\SQL\FBSQL\*.sql; DestDir: {app}\sql\fbsql; Components: db\fbsql
-Source: ..\bin\release\DATA\SQL\Updates\*-FBSQL.sql; DestDir: {app}\sql\updates; Components: db\fbsql
-Source: ..\bin\release\DATA\SQL\PSQL\*.sql; DestDir: {app}\sql\psql; Components: db\psql
-Source: ..\bin\release\DATA\SQL\Updates\*-PSQL.sql; DestDir: {app}\sql\updates; Components: db\psql
-Source: ..\bin\release\DATA\SQL\PSQL\*.sql; DestDir: {app}\sql; Components: db\psql
-
 ; Tools
 Source: ..\bin\release\sdbac.exe; DestDir: {app}; Components: tools
+Source: ..\bin\Release\SanteDB.exe.config; DestDir: {app}; DestName: sdbac.exe.config; Components: tools
+Source: ..\bin\release\SanteDB.Server.AdminConsole.Api.dll; DestDir: {app}; Components: tools
+
 Source: ..\bin\release\SanteDB.Messaging.AMI.Client.dll; DestDir: {app}; Components: tools
 Source: ..\bin\release\SanteDB.Tools.DataSandbox.dll; DestDir: {app}; Components: tools
 
@@ -225,10 +221,18 @@ Source: ..\bin\Release\SanteDB.Messaging.HL7.dll; DestDir: {app}; Components: in
 
 ; NPSQL
 Source: ..\bin\Release\Npgsql.dll; DestDir: {app}; Components: db\psql
+Source: ..\bin\Release\Data\SQL\PSQL\*.sql; DestDir: {app}\data\sql\psql; Components: db\psql;
+Source: ..\bin\Release\Data\SQL\Updates\*-PSQL*.sql; DestDir: {app}\data\sql\psql\updates; Components: db\psql;
+Source: ..\bin\Release\Data\SQL\AuditDB\PSQL\*.sql; DestDir: {app}\data\sql\psql\auditdb; Components: db\psql;
+
+Source: ..\bin\Release\Data\SQL\FBSQL\*.sql; DestDir: {app}\data\sql\fbsql; Components: db\fbsql;
+Source: ..\bin\Release\Data\SQL\Updates\*-FBSQL*.sql; DestDir: {app}\data\sql\fbsql\updates; Components: db\fbsql;
+Source: ..\bin\Release\Data\SQL\AuditDB\FBSQL\*.sql; DestDir: {app}\data\sql\fbsql\auditdb; Components: db\fbsql;
 
 ; Matching Infrastructure
 Source: ..\bin\Release\Phonix.dll; DestDir: {app}; Components: match
 Source: ..\bin\Release\SanteDB.Matcher.dll; DestDir: {app}; Components: match
+Source: ..\santedb-match\SanteDB.Matcher.Test\Matching\example.xml; DestDir: {app}\matching; Components: match
 
 ; OAUTH
 Source: ..\bin\Release\SanteDB.Authentication.OAuth2.dll; DestDir: {app}; Components: msg\auth

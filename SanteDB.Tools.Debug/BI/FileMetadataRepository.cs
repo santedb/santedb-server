@@ -18,6 +18,7 @@
  */
 using SanteDB.BI.Model;
 using SanteDB.BI.Services;
+using SanteDB.BI.Util;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Services;

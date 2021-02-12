@@ -61,9 +61,6 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.7.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -547,10 +544,6 @@
     <ProjectReference Include="..\SanteDB.Server\SanteDB.Server.csproj">
       <Project>{1d145e2a-c31e-467c-9f4a-6811e1604b67}</Project>
       <Name>SanteDB.Server</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Tools.AdminConsole\SanteDB.Tools.AdminConsole.csproj">
-      <Project>{98c8b04a-82de-4eef-a0a0-bf098be53ee4}</Project>
-      <Name>SanteDB.Tools.AdminConsole</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Tools.DataQueryService\SanteDB.Tools.DataSandbox.csproj">
       <Project>{5660297c-6db6-45fe-bf1d-de254e35a5b3}</Project>

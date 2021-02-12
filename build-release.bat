@@ -1,5 +1,6 @@
 @echo off
 
+set signtool="c:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x64\signtool.exe"
 set version=%1
 
 		if exist "c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\15.0\Bin\MSBuild.exe" (
@@ -33,8 +34,8 @@ echo Will use MSBUILD in %msbuild%
 
 if exist "%nuget%" (
 
-	%msbuild%\msbuild santedb-server-ext.sln /t:restore
-	%msbuild%\msbuild santedb-server-ext.sln /t:clean /t:rebuild /p:configuration=Release /m:1
+	rem %msbuild%\msbuild santedb-server-ext.sln /t:restore
+	rem %msbuild%\msbuild santedb-server-ext.sln /t:clean /t:rebuild /p:configuration=Release /m:1
 
 	FOR /R "%cwd%" %%G IN (*.nuspec) DO (
 		echo Packing %%~pG
@@ -53,7 +54,7 @@ if exist "%nuget%" (
 
 	FOR /R "%cwd%\bin\Release" %%G IN (*.exe) DO (
 		echo Signing %%G
-		"C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /d "SanteDB iCDR"  "%%G"
+		%signtool% sign /d "SanteDB iCDR"  "%%G"
 	)
 	
 	%inno% "/o.\bin\dist" ".\installer\SanteDB-Server.iss" /d"MyAppVersion=%version%" 

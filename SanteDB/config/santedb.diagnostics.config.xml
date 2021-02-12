@@ -36,6 +36,7 @@
       <add name="SanteDB.Matcher.Engine" filter="Verbose"/>
       <add name="SanteDB.OrmLite.Sqlite" filter="Warning" />
       <add name="SanteDB.OrmLite.FirebirdSQL" filter="Warning" />
+      <add name="SanteDB.OrmLite.Migration.SqlFeatureUtil" filter="Informational"/>
       <add name="SanteDB.OrmLite" filter="Warning" />
       <add name="SanteDB.Auditing.ADO" filter="Warning" />
       <add name="SanteDB.Persistence.Data.ADO" filter="Warning" />

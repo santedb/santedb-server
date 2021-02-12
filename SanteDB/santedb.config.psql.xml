@@ -63,7 +63,8 @@
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoSessionProvider, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPolicyInformationService, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoRoleProvider, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Core.Security.Privacy.DataPolicyFilterService, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Persistence.Data.ADO.Services.AdoPersistenceService, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Persistence.Data.ADO.Services.AdoSubscriptionExecutor, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.SimpleTfaSecretGenerator, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.DefaultTfaRelayService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.DefaultDataSigningService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
@@ -71,6 +72,7 @@
       <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.SHA256PasswordHashingService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Messaging.Atna.AtnaAuditService, SanteDB.Messaging.Atna, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Core.Security.Privacy.DataPolicyFilterService, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
 
       <!-- Data Services -->
       <add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
@@ -79,8 +81,6 @@
       <!--<add type="SanteDB.Caching.Redis.RedisCacheService, SanteDB.Caching.Redis, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Caching.Redis.RedisQueryPersistenceService, SanteDB.Caching.Redis, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Caching.Redis.RedisAdhocCache, SanteDB.Caching.Redis, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />-->
-      <add type="SanteDB.Persistence.Data.ADO.Services.AdoPersistenceService, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Persistence.Data.ADO.Services.AdoSubscriptionExecutor, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Auditing.ADO.Services.AdoAuditRepositoryService, SanteDB.Persistence.Auditing.ADO, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Core, Version=2.0.0.0" />
 
@@ -119,9 +119,9 @@
 
       <!-- Anciliarry Services -->
       <add type="SanteDB.Persistence.Diagnostics.Email.DiagnosticReportPersistenceService, SanteDB.Persistence.Diagnostics.Email, Version=1.9.0.0, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Persistence.Diagnostics.Jira.DiagnosticReportPersistenceService, SanteDB.Persistence.Diagnostics.Jira, Version=1.1.2.24168, Culture=neutral, PublicKeyToken=null" />
+      <!--<add type="SanteDB.Persistence.Diagnostics.Jira.DiagnosticReportPersistenceService, SanteDB.Persistence.Diagnostics.Jira, Version=1.1.2.24168, Culture=neutral, PublicKeyToken=null" />-->
       <!--<add type="SanteDB.Persistence.Reporting.ADO.ReportingPersistenceService, SanteDB.Persistence.Reporting.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />-->
-      <add type="SanteDB.Warehouse.ADO.ADODataWarehouse, SanteDB.Warehouse.ADO, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <!--<add type="SanteDB.Warehouse.ADO.ADODataWarehouse, SanteDB.Warehouse.ADO, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />-->
 
       <!-- SG Services -->
       <!--<add type="SanteGuard.Services.LocalAuditTermLookupService, SanteGuard.Core, Version=1.0.0.0"/>
@@ -138,7 +138,7 @@
 
       <add type="SanteDB.Persistence.MDM.Services.MdmDataManagementService, SanteDB.Persistence.MDM, Version=1.0.0.0"/>
       <add type="SanteDB.Matcher.Matchers.WeightedRecordMatchingService, SanteDB.Matcher, Version=1.0.0.0"/>
-      <add type="SanteDB.Matcher.Configuration.File.FileMatchConfigurationProvider, SanteDB.Matcher.Configuration.File, Version=1.0.0.0"/>
+      <add type="SanteDB.Matcher.Services.FileMatchConfigurationProvider, SanteDB.Matcher, Version=1.0.0.0"/>
 
       <add type="SanteDB.Core.Data.Quality.DataQualityService, SanteDB.Core.Api, Version=1.0.0.0"/>
       <!--<add type="SanteMPI.Persistence.ADO.Services.AdoNameAliasService, SanteMPI.Persistence.ADO, Version=2.0.0.0"/>-->
