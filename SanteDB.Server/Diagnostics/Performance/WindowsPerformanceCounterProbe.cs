@@ -18,6 +18,7 @@
  */
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -42,7 +43,7 @@ namespace SanteDB.Server.Diagnostics.Performance
         /// </summary>
         public WindowsPerformanceCounterProbe(Guid uuid, String name, String description, String category, String measure, String value) : base(name, description)
         {
-            if (ApplicationContext.Current.OperatingSystem == OperatingSystemID.Win32)
+            if (ApplicationServiceContext.Current.GetService<IOperatingSystemInfoService>().OperatingSystem == OperatingSystemID.Win32)
             {
                 this.m_windowsCounter = new PerformanceCounter(category, measure, value, true);
             }

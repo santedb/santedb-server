@@ -27,10 +27,10 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.BI" Version="2.0.76.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.0.80.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.0.80.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="2.0.80.0" />
+        <PackageReference Include="SanteDB.BI" Version="2.0.80.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

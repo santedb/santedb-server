@@ -133,7 +133,7 @@ namespace SanteDB.Authentication.OAuth2
             {
                 this.Starting?.Invoke(this, EventArgs.Empty);
 
-                this.m_serviceHost = ApplicationContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(OAuthTokenBehavior));
+                this.m_serviceHost = ApplicationServiceContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(OAuthTokenBehavior));
                 this.m_serviceHost.AddServiceBehavior(new OAuthErrorBehavior());
                 // Start the webhost
                 this.m_serviceHost.Start();

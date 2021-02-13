@@ -1,0 +1,24 @@
+﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
+  <sections>
+    <add type="SanteDB.Messaging.GS1.Configuration.Gs1ConfigurationSection, SanteDB.Messaging.GS1, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
+  </sections>
+  <!-- Configurations Related to GS1 -->
+  <section xsi:type="Gs1ConfigurationSection"
+           autoCreateMaterials="true"
+           defaultAuthority="1.2.3.4.5.6.7"
+           queueName="gs1"
+           partnerAuthority="urn:oid:1.2.3.4.5.6.7"
+           partnerIdentification="SanteDB">
+    <broker useAs2MimeEncoding="false" userName="bobby" password="fluffy_penguins">
+      <binding optimize="false" />
+      <enableTracing>false</enableTracing>
+      <endpoint>
+        <add address="http://some-remote-lmis.com:3092" timeout="10000" />
+      </endpoint>
+      <!-- To present a client certificate to the server 
+      <clientCertificate findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />
+      -->
+    </broker>
+    <senderContactEmail>bob@bobstrading.com</senderContactEmail>
+  </section>
+</SanteDBConfiguration>

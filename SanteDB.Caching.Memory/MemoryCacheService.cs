@@ -224,7 +224,15 @@ namespace SanteDB.Caching.Memory
         /// <returns></returns>
         public TData GetCacheItem<TData>(Guid key) where TData : IdentifiedData
         {
-            return (TData)this.m_cache.Get(key.ToString());
+            var retVal = this.m_cache.Get(key.ToString());
+            if (retVal is TData dat)
+                return dat;
+            else
+            {
+                this.Remove(key); // wrong type - 
+                return default(TData);
+
+            }
         }
 
         /// <summary>

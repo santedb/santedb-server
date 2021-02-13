@@ -1,0 +1,50 @@
+﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
+  <sections>
+    <add type="SanteDB.Messaging.HL7.Configuration.Hl7ConfigurationSection, SanteDB.Messaging.HL7, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+  </sections>
+  <section xsi:type="Hl7ConfigurationSection" security="Msh8">
+    <!-- Classes of PLACE which can be used for a Birthplace Lookup -->
+    <birthplaceClasses>
+      <add>79DD4F75-68E8-4722-A7F5-8BC2E08F5CD6</add>
+      <add>48B2FFB3-07DB-47BA-AD73-FC8FB8502471</add>
+      <add>D9489D56-DDAC-4596-B5C6-8F41D73D8DC5</add>
+      <add>FF34DFA7-C6D3-4F8B-BC9F-14BCDC13BA6C</add>
+      <add>8CF4B0B0-84E5-4122-85FE-6AFA8240C218</add>
+    </birthplaceClasses>
+    <!-- The authority of your UUIDs -->
+    <localAuthority>
+      <domainName xmlns="http://santedb.org/model">YOUR_LOCAL_V2_AUTHORITY</domainName>
+      <oid xmlns="http://santedb.org/model">1.3.6.1.4.1.52820.5.1.1.1.999</oid>
+      <url xmlns="http://santedb.org/model">http://your/fhir/authority</url>
+    </localAuthority>
+    <!-- The SSN Authority from PID segment (map to PID-3) -->
+    <ssnAuthority>
+      <domainName xmlns="http://santedb.org/model">SSN</domainName>
+      <oid xmlns="http://santedb.org/model">2.16.840.1.113883.4.1</oid>
+      <url xmlns="http://santedb.org/model">http://hl7.org/fhir/sid/us-ssn</url>
+    </ssnAuthority>
+    <services>
+      <add address="llp://0.0.0.0:2100" name="LLP" receiveTimeout="20000">
+        <!-- If you want to enable security Encryption
+        <sllp checkCrl="false" requireClientCert="false">
+          <serverCertificate findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />
+          <clientAuthorityCertificate findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />
+        </sllp>
+        -->
+        <handler>
+          <add type="SanteDB.Messaging.HL7.Messages.QbpMessageHandler, SanteDB.Messaging.HL7, Version=1.10.0.0">
+            <message isQuery="true" name="QBP^Q22" />
+            <message isQuery="true" name="QBP^Q23" />
+          </add>
+          <add type="SanteDB.Messaging.HL7.Messages.AdtMessageHandler, SanteDB.Messaging.HL7, Version=1.10.0.0">
+            <message isQuery="false" name="ADT^A01"/>
+            <message isQuery="false" name="ADT^A04"/>
+            <message isQuery="false" name="ADT^A08"/>
+            <message isQuery="false" name="ADT^A40"/>
+          </add>
+        </handler>
+      </add>
+    </services>
+  </section>
+
+</SanteDBConfiguration>

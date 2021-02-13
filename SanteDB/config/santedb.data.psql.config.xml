@@ -1,0 +1,52 @@
+﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
+  <sections>
+    <add type="SanteDB.OrmLite.Configuration.OrmConfigurationSection, SanteDB.OrmLite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Core.Configuration.Data.DataConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Persistence.Data.ADO.Configuration.AdoPersistenceConfigurationSection, SanteDB.Persistence.Data.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Persistence.Auditing.ADO.Configuration.AdoAuditConfigurationSection, SanteDB.Persistence.Auditing.ADO, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
+  </sections>
+  <section xsi:type="DataConfigurationSection">
+    <connectionStrings>
+      <add name="PSQL" value="server=localhost;port=5432; database=santedb; user id=postgres; password=postgres; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql"/>
+      <add name="AUDIT" value="server=localhost;port=5432; database=santedb_audit; user id=postgres; password=postgres; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql"/>
+    </connectionStrings>
+  </section>
+  <section xsi:type="OrmConfigurationSection">
+    <providers>
+      <add type="SanteDB.OrmLite.Providers.Postgres.PostgreSQLProvider, SanteDB.OrmLite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" invariant="npgsql" />
+      <add type="SanteDB.OrmLite.Providers.Firebird.FirebirdSQLProvider, SanteDB.OrmLite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" invariant="FirebirdSQL" />
+    </providers>
+    <dbProviderFactories>
+      <add name="PostgreSQL Data Provider" invariant="Npgsql" description=".Net Framework Data Provider for PostgreSQL" type="Npgsql.NpgsqlFactory, Npgsql, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7"/>
+      <add name="Firebird Data Provider" invariant="FirebirdSQL" description="Firebird" type="FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient, Culture=neutral, PublicKeyToken=3750abcc3150b00c" />
+    </dbProviderFactories>
+  </section>
+  <section xsi:type="AdoAuditConfigurationSection"
+     readWriteConnectionString="AUDIT"
+     readOnlyConnectionString="AUDIT"
+     traceSql="false"
+     providerType="npgsql" />
+  <section xsi:type="AdoPersistenceConfigurationSection"
+           readWriteConnectionString="PSQL"
+           readOnlyConnectionString="PSQL"
+           traceSql="false"
+			     providerType="Npgsql"
+           staOnly="false"
+		       fuzzyTotal="false"
+           autoUpdateExisting="true"
+           autoInsertChildren="true"
+           prepareStatements="true"
+      validationLevel="Warning">
+    <!-- Any corrective handlers should be added here 
+    <corrections>
+      <add>value</add>
+    </corrections>
+    To limit the resources that can be persisted in ADO.NET add them here
+    <resources>
+      <add>value</add>
+    </resources>
+    -->
+
+  </section>
+  
+</SanteDBConfiguration>

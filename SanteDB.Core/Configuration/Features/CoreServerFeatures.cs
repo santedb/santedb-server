@@ -41,7 +41,8 @@ namespace SanteDB.Core.Configuration.Features
         /// </summary>
         internal static readonly Type[] SERVICE_TYPES =
         {
-            typeof(FileConfigurationService),
+            typeof(DefaultPolicyEnforcementService),
+            typeof(DefaultOperatingSystemInfoService),
             typeof(DefaultThreadPoolService),
             typeof(DefaultNetworkInformationService),
             typeof(RestServiceFactory),

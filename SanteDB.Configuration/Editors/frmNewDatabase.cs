@@ -120,6 +120,11 @@ namespace SanteDB.Configuration.Editors
                 this.DialogResult = System.Windows.Forms.DialogResult.OK;
                 this.Close();
             }
+            catch(System.Reflection.TargetInvocationException ex)
+            {
+                MessageBox.Show(String.Format("Create database failed, error was : {0}", ex.InnerException.Message), "Creation Error");
+
+            }
             catch (Exception ex)
             {
                 MessageBox.Show(String.Format("Create database failed, error was : {0}", ex.Message), "Creation Error");

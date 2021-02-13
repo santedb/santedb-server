@@ -1,0 +1,26 @@
+﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
+  <sections>
+    <add type="SanteDB.Messaging.AMI.Configuration.AmiConfigurationSection, SanteDB.Messaging.AMI, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Messaging.HDSI.Configuration.HdsiConfigurationSection, SanteDB.Messaging.HDSI, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+  </sections>
+  <!-- This section configures the AMI -->
+  <section xsi:type="AmiConfigurationSection">
+    <!-- This controls the allowed resources that can run on the AMI -->
+    <!--<resources>
+      <add>value</add>
+    </resources>-->
+    <!-- Configures the Microsoft Certification Authority -->
+    <msftCertAuth autoApprove="false" name="value" server="value" />
+    <!-- In distributed environments this allows clients to discover where the other servers are located -->
+    <!--<endpoints>
+      <add type="hdsi" cap="none" />
+    </endpoints>-->
+  </section>
+
+
+  <!-- This section configures the behavior of the HDSI -->
+  <section xsi:type="HdsiConfigurationSection">
+    <!-- Resources which are permitted to run on this HDSI instance -->
+    <resources/>
+  </section>
+</SanteDBConfiguration>

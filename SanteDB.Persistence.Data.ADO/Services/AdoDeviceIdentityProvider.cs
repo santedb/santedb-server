@@ -189,7 +189,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     if (dev == null)
                         throw new KeyNotFoundException($"Device {name} not found");
 
-                    var phash = ApplicationContext.Current.GetService<IPasswordHashingService>();
+                    var phash = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
                     if (phash == null)
                         throw new InvalidOperationException("Cannot find password hashing service");
 

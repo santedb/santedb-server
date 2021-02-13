@@ -23,6 +23,7 @@ using SanteDB.Core.Configuration.Features;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Services;
+using SanteDB.Core.Services.Impl;
 using SanteDB.OrmLite.Configuration;
 using SanteDB.OrmLite.Providers;
 using System;
@@ -47,11 +48,8 @@ namespace SanteDB.Configuration
     public class ConfigurationContext : INotifyPropertyChanged, IApplicationServiceContext, IConfigurationManager, IServiceManager
     {
 
-
-        /// <summary>
-        /// Services
-        /// </summary>
-        private List<Object> m_services = new List<object>();
+        // Service manager
+        private DependencyServiceManager m_serviceManager ;
 
         // Configuration
         private SanteDBConfiguration m_configuration;
@@ -184,6 +182,9 @@ namespace SanteDB.Configuration
         /// </summary>
         private ConfigurationContext()
         {
+            this.m_serviceManager = new DependencyServiceManager();
+            this.m_serviceManager.AddServiceProvider(this);
+
             this.PluginAssemblies = new ObservableCollection<Assembly>();
             this.ConfigurationTasks = new ObservableCollection<IConfigurationTask>();
         }
@@ -233,7 +234,7 @@ namespace SanteDB.Configuration
         /// <summary>
         /// Host type
         /// </summary>
-        public SanteDBHostType HostType => SanteDBHostType.Other;
+        public SanteDBHostType HostType => SanteDBHostType.Configuration;
 
         /// <summary>
         /// Service name
@@ -274,12 +275,7 @@ namespace SanteDB.Configuration
         {
             this.Stopping?.Invoke(this, EventArgs.Empty);
 
-            foreach (var itm in this.m_services.OfType<IDisposable>())
-            {
-                itm.Dispose();
-                Application.DoEvents();
-            }
-            this.m_services.Clear();
+            this.m_serviceManager.Stop();
 
             this.Stopped?.Invoke(this, EventArgs.Empty);
         }
@@ -291,27 +287,7 @@ namespace SanteDB.Configuration
         {
             this.Starting?.Invoke(this, EventArgs.Empty);
 
-            foreach (var itm in this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders)
-            {
-                if (typeof(IConfigurationManager).IsAssignableFrom(itm.Type)) continue;
-                this.GetService(itm.Type);
-                Application.DoEvents();
-            }
-
-            foreach (var itm in this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.Where(s => typeof(IDaemonService).IsAssignableFrom(s.Type)))
-            {
-                try
-                {
-                    var svc = this.GetService(itm.Type) as IDaemonService;
-                    Application.DoEvents();
-                    svc.Start();
-                }
-                catch(Exception e)
-                {
-                    Trace.TraceError("Could not restart daemon: {0} - {1}", itm.Type, e.Message);
-                    MessageBox.Show($"Error Loading Configuration - Service {itm.Type.Name} failed to initialize because of {e.Message}");
-                }
-            }
+            this.m_serviceManager.Start();
 
             this.Features.Count();
 
@@ -322,32 +298,7 @@ namespace SanteDB.Configuration
         /// <summary>
         /// Get the specified service
         /// </summary>
-        public object GetService(Type serviceType)
-        {
-            try
-            {
-                if (serviceType.IsAssignableFrom(typeof(ConfigurationContext)))
-                    return this;
-                else
-                {
-                    var candidate = this.m_services.FirstOrDefault(o => serviceType.IsAssignableFrom(o.GetType()));
-                    if (candidate == null)
-                    {
-                        var dt = this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.FirstOrDefault(o => serviceType.IsAssignableFrom(o.Type))?.Type;
-                        if (dt != null)
-                            candidate = Activator.CreateInstance(dt);
-                        if (candidate != null)
-                            this.m_services.Add(candidate);
-                    }
-                    return candidate;
-                }
-            }
-            catch(Exception e)
-            {
-                Trace.TraceError("Error getting service {0} - {1}", serviceType, e.Message);
-                throw new InvalidOperationException($"Error getting service {serviceType}", e);
-            }
-        }
+        public object GetService(Type serviceType) => this.m_serviceManager.GetService(serviceType);
 
         /// <summary>
         /// Get the specified section
@@ -398,45 +349,27 @@ namespace SanteDB.Configuration
         /// <summary>
         /// Add a service provider to this context
         /// </summary>
-        public void AddServiceProvider(Type serviceType)
-        {
-            this.m_services.Add(Activator.CreateInstance(serviceType));
-        }
+        public void AddServiceProvider(Type serviceType) => this.m_serviceManager.AddServiceProvider(serviceType);
 
         /// <summary>
         /// Get all services
         /// </summary>
-        public IEnumerable<object> GetServices()
-        {
-            return this.m_services;
-        }
+        public IEnumerable<object> GetServices() => this.m_serviceManager.GetServices();
 
         /// <summary>
         /// Remove a service provider
         /// </summary>
-        public void RemoveServiceProvider(Type serviceType)
-        {
-            this.m_services.RemoveAll(o => o.GetType() == serviceType);
-        }
+        public void RemoveServiceProvider(Type serviceType) => this.m_serviceManager.RemoveServiceProvider(serviceType);
 
         /// <summary>
         /// Get all types
         /// </summary>
-        public IEnumerable<Type> GetAllTypes()
-        {
-            return AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => !a.IsDynamic)
-                .SelectMany(o => { try { return o.ExportedTypes; } catch { return new List<Type>(); } }); // HACK: Mono does not like all assemblies
-        }
+        public IEnumerable<Type> GetAllTypes() => this.m_serviceManager.GetAllTypes();
 
         /// <summary>
         /// Add the specified service provider
         /// </summary>
-        public void AddServiceProvider(object serviceInstance)
-        {
-            lock (this.m_services)
-                this.m_services.Add(serviceInstance);
-        }
+        public void AddServiceProvider(object serviceInstance) => this.m_serviceManager.AddServiceProvider(serviceInstance);
 
     }
 }

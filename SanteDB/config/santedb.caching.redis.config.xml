@@ -1,0 +1,10 @@
+﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
+  <sections>
+    <add type="SanteDB.Caching.Redis.Configuration.RedisConfigurationSection, SanteDB.Caching.Redis, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+  </sections>
+  <section xsi:type="RedisConfigurationSection" ttl="PT5H">
+    <servers>
+      <add>localhost:6379</add>
+    </servers>
+  </section>
+</SanteDBConfiguration>
