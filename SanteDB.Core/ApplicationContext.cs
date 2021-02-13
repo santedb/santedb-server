@@ -273,8 +273,6 @@ namespace SanteDB.Core
         public void Dispose()
         {
             this.m_serviceProvider.Dispose();
-            Tracer.DisposeWriters();
-
         }
 
         /// <summary>

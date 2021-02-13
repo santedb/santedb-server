@@ -16,7 +16,9 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Services;
 using SanteDB.Messaging.HL7.Configuration;
 using SanteDB.Messaging.HL7.Utils;
 using System;
@@ -91,7 +93,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
                 try
                 {
                     var client = this.m_listener.AcceptTcpClient();
-                    HL7ThreadPool.Current.QueueUserWorkItem(OnReceiveMessage, client);
+                    ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(OnReceiveMessage, client);
                 }
                 catch (Exception e)
                 {

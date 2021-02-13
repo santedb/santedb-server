@@ -141,7 +141,10 @@ namespace SanteDB.Messaging.HL7
             {
                 this.m_traceSource.TraceInfo("Detaching {0}...", incptr.GetType().FullName);
                 incptr.Detach();
+                if (incptr is IDisposable disp)
+                    disp.Dispose();
             }
+            
 
             this.m_traceSource.TraceInfo("All threads shutdown");
             this.Stopped?.Invoke(this, EventArgs.Empty);

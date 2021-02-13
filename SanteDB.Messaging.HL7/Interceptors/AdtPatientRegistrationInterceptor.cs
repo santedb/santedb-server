@@ -101,7 +101,7 @@ namespace SanteDB.Messaging.HL7.Interceptors
         /// </summary>
         protected void AdtPatientRegistrationInterceptor_Behavior(object sender, DataPersistedEventArgs<Patient> e)
         {
-            ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueNonPooledWorkItem(
+            ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(
                 (p) =>
                 {
                     AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);

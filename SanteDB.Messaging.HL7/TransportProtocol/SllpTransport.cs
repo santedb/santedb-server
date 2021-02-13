@@ -120,7 +120,7 @@ namespace SanteDB.Messaging.HL7.TransportProtocol
 			while (m_run) // run the service
 			{
 				var client = this.m_listener.AcceptTcpClient();
-                HL7ThreadPool.Current.QueueUserWorkItem(OnReceiveMessage, client);
+                ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(OnReceiveMessage, client);
 
             }
         }

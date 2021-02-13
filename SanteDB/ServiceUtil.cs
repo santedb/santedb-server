@@ -120,7 +120,7 @@ namespace SanteDB
             catch { }
 
             ApplicationContext.Current.Stop();
-
+            Tracer.DisposeWriters();
         }
 
         /// <summary>
