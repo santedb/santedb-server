@@ -33,6 +33,9 @@ namespace SanteDB.Core.Services.Impl
     public class DefaultNetworkInformationService : INetworkInformationService
     {
 
+        // Get host name of local machine
+        private readonly string m_hostName = Dns.GetHostName();
+
         /// <summary>
         /// Gets the service name
         /// </summary>
@@ -81,7 +84,7 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public string GetHostName()
         {
-            return Dns.GetHostName();
+            return this.m_hostName;
         }
 
         /// <summary>

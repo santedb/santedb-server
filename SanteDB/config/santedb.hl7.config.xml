@@ -2,7 +2,7 @@
   <sections>
     <add type="SanteDB.Messaging.HL7.Configuration.Hl7ConfigurationSection, SanteDB.Messaging.HL7, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
   </sections>
-  <section xsi:type="Hl7ConfigurationSection" security="Msh8">
+  <section xsi:type="Hl7ConfigurationSection" security="None">
     <!-- Classes of PLACE which can be used for a Birthplace Lookup -->
     <birthplaceClasses>
       <add>79DD4F75-68E8-4722-A7F5-8BC2E08F5CD6</add>

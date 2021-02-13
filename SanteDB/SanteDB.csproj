@@ -76,6 +76,9 @@
     <None Include="applets\santedb.core.sln.pak">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="config\santedb.privacy_filter.config.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="config\santedb.email_notification.config.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
