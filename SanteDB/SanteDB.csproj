@@ -320,6 +320,9 @@
     <None Include="data\000-PlaceTypeConceptSet.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="config\santedb.audit_accountability.config.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="santedb.config.nuget.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

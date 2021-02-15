@@ -37,7 +37,6 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
         /// </summary>
         public bool HackQuery(QueryBuilder builder, SqlStatement sqlStatement, SqlStatement whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, object values, IEnumerable<TableMapping> scopedTables, params KeyValuePair<String, object>[] queryFilter)
         {
-
             String cmpTblType = String.Empty, valTblType = String.Empty, keyName = String.Empty;
             Type guardType = null, componentType = null;
             // We can attempt to hack the address
@@ -70,7 +69,16 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
                 !String.IsNullOrEmpty(whereClause.SQL))
                 return false;
 
-            whereClause.And($"EXISTS (SELECT 1 FROM {valTblType} AS {queryPrefix}{valTblType} INNER JOIN  {cmpTblType} AS {queryPrefix}{cmpTblType} ON ({queryPrefix}{valTblType}.val_seq_id = {queryPrefix}{cmpTblType}.val_seq_id) WHERE (");
+            // Pop the last statement off
+            var fromClause = sqlStatement.RemoveLast();
+
+            var subQueryAlias = $"{queryPrefix}{scopedTables.First().TableName}";
+
+            // Now we want to select
+            sqlStatement.Append("FROM (").Append($"SELECT {subQueryAlias}.*, count(cmp_id) over (partition by {keyName}) ncomponent").Append(fromClause);
+            sqlStatement.Append($" LEFT JOIN {cmpTblType} AS {queryPrefix}{cmpTblType} USING ({keyName}) ");
+            sqlStatement.Append($" LEFT JOIN {valTblType} AS {queryPrefix}{valTblType} USING (val_seq_id) ");
+            sqlStatement.Where("(");
             // Filter through other name or address components which may be in the query at this query level
             int vCount = 0;
             foreach (var itm in queryFilter)
@@ -99,19 +107,19 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
                 vCount++;
 
                 // Filter based on type and prefix :)
-                whereClause.Append("(")
+                sqlStatement.Append("(")
                         .Append(builder.CreateSqlPredicate($"{queryPrefix}{valTblType}", "val", componentType.GetProperty("Value"), qValues))
                         .Append(guardFilter)
                         .Append(")")
                         .Append(" OR ");
             }
 
-            whereClause.RemoveLast();
-            whereClause.Append(")");
-            // Ensure that the left joined objects exist
-            whereClause.And($"({queryPrefix}{scopedTables.First().TableName}.{keyName} = {queryPrefix}{cmpTblType}.{keyName})");
+            sqlStatement.RemoveLast();
+            sqlStatement.Append(")");
+            sqlStatement.And("obslt_vrsn_seq_id IS NULL").Append($") AS {subQueryAlias} ");
 
-            whereClause.Append($" GROUP BY {keyName} HAVING COUNT(DISTINCT {queryPrefix}{cmpTblType}.cmp_id) >= {vCount})");
+            // Append the where clause
+            whereClause.And($" {subQueryAlias}.ncomponent = {vCount}");
 
             return true;
         }

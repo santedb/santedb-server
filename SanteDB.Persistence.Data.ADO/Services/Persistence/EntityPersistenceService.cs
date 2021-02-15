@@ -444,13 +444,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                 if (id.AuthorityKey.HasValue) // Attempt lookup in adhoc cache then by db
                 {
-                    dbAuth = adhocCache?.Get<DbAssigningAuthority>($"aa.{id.AuthorityKey}");
+                    dbAuth = adhocCache?.Get<DbAssigningAuthority>($"ado.aa.{id.AuthorityKey}");
                     if(dbAuth == null)
                         dbAuth = context.FirstOrDefault<DbAssigningAuthority>(o => o.Key == id.AuthorityKey);
                 }
                 else 
                 {
-                    dbAuth = adhocCache?.Get<DbAssigningAuthority>($"aa.{id.Authority.DomainName}");
+                    dbAuth = adhocCache?.Get<DbAssigningAuthority>($"ado.aa.{id.Authority.DomainName}");
                     if (dbAuth == null)
                     {
                         dbAuth = context.FirstOrDefault<DbAssigningAuthority>(o => o.DomainName == id.Authority.DomainName);
@@ -467,8 +467,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
                 else
                 {
-                    adhocCache?.Add($"aa.{id.AuthorityKey}", dbAuth, new TimeSpan(0, 5, 0));
-                    adhocCache?.Add($"aa.{dbAuth.DomainName}", dbAuth, new TimeSpan(0, 5, 0));
+                    adhocCache?.Add($"ado.aa.{id.AuthorityKey}", dbAuth, new TimeSpan(0, 5, 0));
+                    adhocCache?.Add($"ado.aa.{dbAuth.DomainName}", dbAuth, new TimeSpan(0, 5, 0));
                 }
 
                 // Get this identifier records which is not owned by my record
@@ -486,11 +486,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 ).Any();
 
                 // Verify scope
-                IEnumerable<DbAuthorityScope> scopes = adhocCache?.Get<DbAuthorityScope[]>($"aa.scp.{dbAuth.Key}");
+                IEnumerable<DbAuthorityScope> scopes = adhocCache?.Get<DbAuthorityScope[]>($"ado.aa.scp.{dbAuth.Key}");
                 if (scopes == null)
                 {
                     scopes = context.Query<DbAuthorityScope>(o => o.AssigningAuthorityKey == dbAuth.Key);
-                    adhocCache?.Add($"aa.scp.{dbAuth.Key}", scopes.ToArray());
+                    adhocCache?.Add($"ado.aa.scp.{dbAuth.Key}", scopes.ToArray());
                 }
 
                 if (scopes.Any() && !scopes.Any(s => s.ScopeConceptKey == data.ClassConceptKey) // This type of identifier is not allowed to be assigned to this type of object

@@ -69,7 +69,7 @@
       <add type="SanteDB.Core.Security.DefaultTfaRelayService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.DefaultDataSigningService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.DefaultPasswordValidationService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.SHA256PasswordHashingService, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Messaging.Atna.AtnaAuditService, SanteDB.Messaging.Atna, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Security.Privacy.DataPolicyFilterService, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />

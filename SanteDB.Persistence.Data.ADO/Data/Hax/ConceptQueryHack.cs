@@ -56,7 +56,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
 
                 // Has this already been joined? 
                 var mapType = property.DeclaringType;
-                if (mapType.GetTypeInfo().IsAbstract)
+                if (mapType.IsAbstract)
                     mapType = tmodel;
                 var declType = TableMapping.Get(this.m_mapper.MapModelType(mapType));
                 var keyProperty = property.PropertyType == typeof(Guid) ? property : mapType.GetRuntimeProperty(property.Name + "Key");

@@ -177,7 +177,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         var claims = cprincipal.Claims.ToList();
 
                         // Did the caller explicitly set policies?
-                        var pip = ApplicationServiceContext.Current.GetService<IPolicyInformationService>();
+                        var pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
                         // Is the principal only valid for pwd reset?
                         if (cprincipal.HasClaim(o => o.Type == SanteDBClaimTypes.SanteDBScopeClaim)) // Allow the createor to specify
                             ;
@@ -189,7 +189,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             if (!String.IsNullOrEmpty(purpose))
                                 claims.Add(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, purpose));
 
-                            var pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
                             foreach (var pol in policyDemands)
                             {
                                 // Get grant
@@ -208,9 +207,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         }
 
                         // Add default policies
-                        List<IPolicyInstance> oizPrincipalPolicies = new List<IPolicyInstance>();
-                        foreach (var pol in pip.GetActivePolicies(cprincipal).GroupBy(o => o.Policy.Oid))
-                            oizPrincipalPolicies.Add(pol.FirstOrDefault(o => (int)o.Rule == pol.Min(r => (int)r.Rule)));
+                        var oizPrincipalPolicies = pdp.GetEffectivePolicySet(cprincipal);
                         // Scopes user is allowed to access
                         claims.AddRange(oizPrincipalPolicies.Where(o => o.Rule == PolicyGrantType.Grant).Select(o => new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, o.Policy.Oid)));
 

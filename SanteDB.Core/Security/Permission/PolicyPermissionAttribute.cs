@@ -62,7 +62,7 @@ namespace SanteDB.Core.Security.Attribute
         /// <summary>
         /// Permission 
         /// </summary>
-        public override IPermission CreatePermission()
+        public override System.Security.IPermission CreatePermission()
         {
             return new PolicyPermission(PermissionState.Unrestricted, this.PolicyId);
         }
@@ -72,7 +72,7 @@ namespace SanteDB.Core.Security.Attribute
     /// A policy permission
     /// </summary>
     [Serializable]
-    public class PolicyPermission : IPermission, IUnrestrictedPermission
+    public class PolicyPermission : System.Security.IPermission, IUnrestrictedPermission
     {
 
         // True if unrestricted
@@ -106,7 +106,7 @@ namespace SanteDB.Core.Security.Attribute
         /// <summary>
         /// Copy the permission
         /// </summary>
-        public IPermission Copy()
+        public System.Security.IPermission Copy()
         {
             return new PolicyPermission(this.m_isUnrestricted ? PermissionState.Unrestricted : PermissionState.None, this.m_policyId);
         }
@@ -164,7 +164,7 @@ namespace SanteDB.Core.Security.Attribute
         /// <summary>
         /// Intersect the permission
         /// </summary>
-        public IPermission Intersect(IPermission target)
+        public System.Security.IPermission Intersect(System.Security.IPermission target)
         {
             if (target == null)
                 return null;
@@ -177,7 +177,7 @@ namespace SanteDB.Core.Security.Attribute
         /// <summary>
         /// If the two operations allow the exact set of operations
         /// </summary>
-        public bool IsSubsetOf(IPermission target)
+        public bool IsSubsetOf(System.Security.IPermission target)
         {
             if (target == null)
                 return !this.m_isUnrestricted;
@@ -215,7 +215,7 @@ namespace SanteDB.Core.Security.Attribute
 
         }
 
-        public IPermission Union(IPermission target)
+        public System.Security.IPermission Union(System.Security.IPermission target)
         {
             throw new NotImplementedException();
         }

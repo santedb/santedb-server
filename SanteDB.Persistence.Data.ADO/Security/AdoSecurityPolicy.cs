@@ -27,7 +27,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
     /// <summary>
     /// Represents a local policy
     /// </summary>
-    public class AdoSecurityPolicy : ILocalPolicy, IIdentifiedEntity
+    public class AdoSecurityPolicy : IHandledPolicy, IIdentifiedEntity
     {
 
         // Handler cache

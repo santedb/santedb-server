@@ -31,10 +31,12 @@ using SanteDB.Persistence.Data.ADO.Services;
 using SanteDB.Persistence.Data.ADO.Services.Persistence;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Security;
 
@@ -55,26 +57,23 @@ namespace SanteDB.Persistence.Data.ADO.Data
         private static Tracer s_traceSource = new Tracer(AdoDataConstants.TraceSourceName);
 
         // Field cache
-        private static Dictionary<Type, FieldInfo[]> s_fieldCache = new Dictionary<Type, FieldInfo[]>();
-
-        // Lock object
-        private static Object s_lockObject = new object();
+        private static ConcurrentDictionary<Type, FieldInfo[]> s_fieldCache = new ConcurrentDictionary<Type, FieldInfo[]>();
 
         // Constructor info
-        private static Dictionary<Type, ConstructorInfo> m_constructors = new Dictionary<Type, ConstructorInfo>();
+        private static ConcurrentDictionary<Type, Func<IEnumerable, IList>> m_constructors = new ConcurrentDictionary<Type, Func<IEnumerable, IList>>();
 
         // Classification properties for autoload
-        private static Dictionary<Type, PropertyInfo> s_classificationProperties = new Dictionary<Type, PropertyInfo>();
+        private static ConcurrentDictionary<Type, PropertyInfo> s_classificationProperties = new ConcurrentDictionary<Type, PropertyInfo>();
 
         // Runtime properties
-        private static Dictionary<String, IEnumerable<PropertyInfo>> s_runtimeProperties = new Dictionary<string, IEnumerable<PropertyInfo>>();
+        private static ConcurrentDictionary<String, IEnumerable<PropertyInfo>> s_runtimeProperties = new ConcurrentDictionary<string, IEnumerable<PropertyInfo>>();
 
         // Cache ids
-        private static Dictionary<String, Guid> m_classIdCache = new Dictionary<string, Guid>();
+        private static ConcurrentDictionary<String, Guid> m_classIdCache = new ConcurrentDictionary<string, Guid>();
 
-        private static Dictionary<String, Guid> m_userIdCache = new Dictionary<string, Guid>();
-        private static Dictionary<String, Guid> m_deviceIdCache = new Dictionary<string, Guid>();
-        private static Dictionary<String, Guid> m_applicationIdCache = new Dictionary<string, Guid>();
+        private static ConcurrentDictionary<String, Guid> m_userIdCache = new ConcurrentDictionary<string, Guid>();
+        private static ConcurrentDictionary<String, Guid> m_deviceIdCache = new ConcurrentDictionary<string, Guid>();
+        private static ConcurrentDictionary<String, Guid> m_applicationIdCache = new ConcurrentDictionary<string, Guid>();
 
         /// <summary>
         /// Get fields
@@ -86,9 +85,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
             if (!s_fieldCache.TryGetValue(type, out retVal))
             {
                 retVal = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic).Where(o => !typeof(MulticastDelegate).IsAssignableFrom(o.FieldType)).ToArray();
-                lock (s_lockObject)
-                    if (!s_fieldCache.ContainsKey(type))
-                        s_fieldCache.Add(type, retVal);
+                s_fieldCache.TryAdd(type, retVal);
             }
             return retVal;
         }
@@ -180,9 +177,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
                     dataObject = context.FirstOrDefault(dataType, stmt) as IDbIdentified;
                     if (dataObject != null)
                     {
-                        lock (m_classIdCache)
-                            if (!m_classIdCache.ContainsKey(classKey))
-                                m_classIdCache.Add(classKey, dataObject.Key);
+                        m_classIdCache.TryAdd(classKey, dataObject.Key);
                         var existCache = cacheService?.GetCacheItem((dataObject as IDbIdentified).Key);
                         if (existCache != null)
                             existing = existCache as IdentifiedData;
@@ -312,12 +307,12 @@ namespace SanteDB.Persistence.Data.ADO.Data
                 retVal = loaded.Key;
                 // TODO: Enable auto-creation of users via configuration
                 if (loaded == null)
+                {
                     throw new SecurityException("Object in authorization context does not exist or is obsolete");
+                }
                 else
                 {
-                    lock (m_userIdCache)
-                        if (!m_userIdCache.ContainsKey(me.Name.ToLower()))
-                            m_userIdCache.Add(me.Name.ToLower(), loaded.Key);
+                    m_userIdCache.TryAdd(me.Name.ToLower(), loaded.Key);
                 }
             }
 
@@ -358,12 +353,10 @@ namespace SanteDB.Persistence.Data.ADO.Data
             PropertyInfo classProperty = null;
             if (!s_classificationProperties.TryGetValue(typeof(TModel), out classProperty))
             {
-                classProperty = typeof(TModel).GetRuntimeProperty(typeof(TModel).GetTypeInfo().GetCustomAttribute<ClassifierAttribute>()?.ClassifierProperty ?? "____XXX");
+                classProperty = typeof(TModel).GetRuntimeProperty(typeof(TModel).GetCustomAttribute<ClassifierAttribute>()?.ClassifierProperty ?? "____XXX");
                 if (classProperty != null)
                     classProperty = typeof(TModel).GetRuntimeProperty(classProperty.GetCustomAttribute<SerializationReferenceAttribute>()?.RedirectProperty ?? classProperty.Name);
-                lock (s_lockObject)
-                    if (!s_classificationProperties.ContainsKey(typeof(TModel)))
-                        s_classificationProperties.Add(typeof(TModel), classProperty);
+                s_classificationProperties.TryAdd(typeof(TModel), classProperty);
             }
 
             // Classification property?
@@ -373,15 +366,10 @@ namespace SanteDB.Persistence.Data.ADO.Data
             IEnumerable<PropertyInfo> properties = null;
             var propertyCacheKey = $"{me.GetType()}.FullName[{classValue}]";
             if (!s_runtimeProperties.TryGetValue(propertyCacheKey, out properties))
-                lock (s_runtimeProperties)
-                {
-                    properties = me.GetType().GetRuntimeProperties().Where(o => o.GetCustomAttribute<DataIgnoreAttribute>() == null && o.GetCustomAttributes<AutoLoadAttribute>().Any(p => p.ClassCode == classValue || p.ClassCode == null) && typeof(IdentifiedData).IsAssignableFrom(o.PropertyType.StripGeneric())).ToList();
-
-                    if (!s_runtimeProperties.ContainsKey(propertyCacheKey))
-                    {
-                        s_runtimeProperties.Add(propertyCacheKey, properties);
-                    }
-                }
+            {
+                properties = me.GetType().GetRuntimeProperties().Where(o => o.GetCustomAttribute<DataIgnoreAttribute>() == null && o.GetCustomAttributes<AutoLoadAttribute>().Any(p => p.ClassCode == classValue || p.ClassCode == null) && typeof(IdentifiedData).IsAssignableFrom(o.PropertyType.StripGeneric())).ToList();
+                s_runtimeProperties.TryAdd(propertyCacheKey, properties);
+            }
 
             // Load fast or lean mode only root associations which will appear on the wire
             if (context.LoadState == LoadState.PartialLoad)
@@ -416,26 +404,24 @@ namespace SanteDB.Persistence.Data.ADO.Data
                     // We want to query based on our PK and version if applicable
                     decimal? versionSequence = (me as IBaseEntityData)?.ObsoletionTime.HasValue == true ? (me as IVersionedEntity)?.VersionSequence : null;
                     var assoc = assocPersister.GetFromSource(context, me.Key.Value, versionSequence);
-                    ConstructorInfo ci = null;
-                    if (!m_constructors.TryGetValue(pi.PropertyType, out ci))
+                    if (!m_constructors.TryGetValue(pi.PropertyType, out Func<IEnumerable, IList> creator))
                     {
                         var type = pi.PropertyType.StripGeneric();
-                        while (type != typeof(Object) && ci == null)
+                        var parmType = typeof(IEnumerable<>).MakeGenericType(type);
+                        var constructor = pi.PropertyType.GetConstructor(new Type[] { parmType });
+                        if (constructor != null)
                         {
-                            ci = pi.PropertyType.GetConstructor(new Type[] { typeof(IEnumerable<>).MakeGenericType(type) });
-                            type = type.BaseType;
-                        }
-                        if (ci != null)
-                        {
-                            lock (s_lockObject)
-                                if (!m_constructors.ContainsKey(pi.PropertyType))
-                                    m_constructors.Add(pi.PropertyType, ci);
+                            var lambdaParm = Expression.Parameter(typeof(IEnumerable));
+                            creator = Expression.Lambda<Func<IEnumerable, IList>>(
+                                Expression.New(constructor, Expression.Convert(lambdaParm, parmType)),
+                                lambdaParm
+                            ).Compile();
+                            m_constructors.TryAdd(pi.PropertyType, creator);
                         }
                         else
                             throw new InvalidOperationException($"This is odd, you seem to have a list with no constructor -> {pi.PropertyType}");
                     }
-                    var listValue = ci.Invoke(new object[] { assoc });
-                    pi.SetValue(me, listValue);
+                    pi.SetValue(me, creator(assoc));
                 }
                 else if (typeof(IIdentifiedEntity).IsAssignableFrom(pi.PropertyType)) // Single
                 {

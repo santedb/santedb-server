@@ -49,10 +49,34 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         }
     }
 
-	/// <summary>
-	/// Represents a relationship between an entity and security policy
-	/// </summary>
-	[Table("ent_pol_assoc_tbl")]
+    /// <summary>
+    /// Represents a security policy with action
+    /// </summary>
+    public class DbSecurityPolicyActionableInstance : DbSecurityPolicyInstance
+    {
+
+
+        /// <summary>
+        /// Gets or sets the type of the grant.
+        /// </summary>
+        /// <value>The type of the grant.</value>
+        [Column("pol_act"), NotNull]
+        public int GrantType
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Source key
+        /// </summary>
+        public override Guid SourceKey { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a relationship between an entity and security policy
+    /// </summary>
+    [Table("ent_pol_assoc_tbl")]
 	public class DbEntitySecurityPolicy : DbSecurityPolicyInstance, IDbVersionedAssociation
 	{
         /// <summary>
@@ -124,18 +148,8 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
     /// Represents a security policy applied to a role
     /// </summary>
     [Table("sec_rol_pol_assoc_tbl")]
-	public class DbSecurityRolePolicy : DbSecurityPolicyInstance
+	public class DbSecurityRolePolicy : DbSecurityPolicyActionableInstance
 	{
-        /// <summary>
-        /// Gets or sets the type of the grant.
-        /// </summary>
-        /// <value>The type of the grant.</value>
-        [Column("pol_act"),NotNull]
-        public int GrantType
-        {
-            get;
-            set;
-        }
 
         /// <summary>
         /// Gets or sets the source
@@ -155,7 +169,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
 	/// Represents a security policy applied to an application (this is "my" data)
 	/// </summary>
 	[Table("sec_app_pol_assoc_tbl")]
-	public class DbSecurityApplicationPolicy : DbSecurityPolicyInstance
+	public class DbSecurityApplicationPolicy : DbSecurityPolicyActionableInstance
 	{
         /// <summary>
         /// Gets or sets the source
@@ -168,24 +182,14 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
             set;
         }
 
-        /// <summary>
-        /// Gets or sets the type of the grant.
-        /// </summary>
-        /// <value>The type of the grant.</value>
-        [Column("pol_act"),NotNull]
-        public int GrantType
-        {
-            get;
-            set;
-        }
-
+       
     }
 
     /// <summary>
     /// Represents a security policy applied to a device
     /// </summary>
     [Table("sec_dev_pol_assoc_tbl")]
-	public class DbSecurityDevicePolicy : DbSecurityPolicyInstance
+	public class DbSecurityDevicePolicy : DbSecurityPolicyActionableInstance
 	{
         /// <summary>
         /// Gets or sets the source
@@ -198,17 +202,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
             set;
         }
 
-        /// <summary>
-        /// Gets or sets the type of the grant.
-        /// </summary>
-        /// <value>The type of the grant.</value>
-        [Column("pol_act"), NotNull]
-        public int GrantType
-        {
-            get;
-            set;
-        }
-
+        
     }
 }
 

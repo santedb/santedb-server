@@ -18,6 +18,7 @@
  */
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Query;
@@ -44,6 +45,34 @@ namespace SanteDB.Messaging.HDSI.Test
 
 			NameValueCollection httpQueryParameters = new NameValueCollection();
 			httpQueryParameters.Add("name.use.mnemonic", "L");
+			var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
+			Assert.AreEqual(expected.ToString(), expr.ToString());
+		}
+
+		/// <summary>
+		/// Test that using UUID as guard works
+		/// </summary>
+		[TestMethod]
+		public void TestBuildGuardMultiUuid()
+		{
+			String expected = "o => o.Names.Where(guard => ((guard.NameUseKey == Convert(effe122d-8d30-491d-805d-addcb4466c35)) OrElse (guard.NameUseKey == Convert(95e6843a-26ff-4046-b6f4-eb440d4b85f7)))).Any(name => name.Component.Any(component => (component.Value == \"SMITH\")))";
+
+			NameValueCollection httpQueryParameters = new NameValueCollection();
+			httpQueryParameters.Add($"name[{NameUseKeys.Legal}|{NameUseKeys.Anonymous}].component.value", "SMITH");
+			var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
+			Assert.AreEqual(expected.ToString(), expr.ToString());
+		}
+
+		/// <summary>
+		/// Test that using UUID as guard works
+		/// </summary>
+		[TestMethod]
+		public void TestBuildGuardUuid()
+		{
+			String expected = "o => o.Names.Where(guard => (guard.NameUseKey == Convert(effe122d-8d30-491d-805d-addcb4466c35))).Any(name => name.Component.Any(component => (component.Value == \"SMITH\")))";
+
+			NameValueCollection httpQueryParameters = new NameValueCollection();
+			httpQueryParameters.Add($"name[{NameUseKeys.Legal}].component.value", "SMITH");
 			var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
 			Assert.AreEqual(expected.ToString(), expr.ToString());
 		}

@@ -17,8 +17,10 @@
  * Date: 2019-11-27
  */
 using SanteDB.Core;
+using SanteDB.Core.Data;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
+using SanteDB.Core.Model.EntityLoader;
 using SanteDB.Core.Services.Impl;
 using System;
 using System.Collections.Generic;
@@ -66,6 +68,7 @@ namespace SanteDB.Server
                 // Initialize 
                 ApplicationServiceContext.Current = ServerApplicationContext.Current;
                 ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(new FileConfigurationService(configFile));
+                EntitySource.Current = new EntitySource(new PersistenceEntitySource());
 
                 Trace.TraceInformation("Getting default message handler service.");
                 if (ServerApplicationContext.Current.Start())
@@ -119,7 +122,7 @@ namespace SanteDB.Server
             }
             catch { }
 
-            ApplicationContext.Current.Stop();
+            ServerApplicationContext.Current.Stop();
             Tracer.DisposeWriters();
         }
 

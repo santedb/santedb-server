@@ -184,7 +184,7 @@ namespace SanteDB.Messaging.FHIR.Util
                 if (path.Contains("@")) // cast? 
                 {
                     var cast = path.Substring(path.IndexOf("@") + 1);
-                    scopeType = typeof(QueryExpressionParser).GetTypeInfo().Assembly.ExportedTypes.FirstOrDefault(o => o.GetTypeInfo().GetCustomAttribute<XmlTypeAttribute>()?.TypeName == cast);
+                    scopeType = typeof(QueryExpressionParser).Assembly.ExportedTypes.FirstOrDefault(o => o.GetCustomAttribute<XmlTypeAttribute>()?.TypeName == cast);
                 }
                 else
                 {

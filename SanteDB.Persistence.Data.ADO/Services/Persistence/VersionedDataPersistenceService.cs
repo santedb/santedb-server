@@ -275,6 +275,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         var keys = retVal.Keys<Guid>(false).ToArray();
                         totalResults = keys.Count();
                         this.m_queryPersistence?.RegisterQuerySet(queryId, keys, queries, totalResults);
+                        return keys.Skip(offset).Take(count.Value).OfType<Object>();
                     }
                     else if (count.HasValue && countResults && !this.m_settingsProvider.GetConfiguration().UseFuzzyTotals)
                         totalResults = retVal.Count();

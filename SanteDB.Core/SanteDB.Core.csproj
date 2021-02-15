@@ -102,9 +102,6 @@
     <Compile Include="Security\DevicePrincipal.cs" />
     <Compile Include="Security\DefaultPasswordValidationService.cs" />
     <Compile Include="Security\Permission\PolicyPermissionAttribute.cs" />
-    <Compile Include="Security\ILocalPolicy.cs" />
-    <Compile Include="Security\IPolicyHandler.cs" />
-    <Compile Include="Security\DefaultPolicyDecisionService.cs" />
     <Compile Include="Security\PasswordHashingServices.cs" />
     <Compile Include="Security\Privacy\ExemptablePolicyFilterService.cs" />
     <Compile Include="Security\TwoFactorSecretGenerators.cs" />
