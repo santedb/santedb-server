@@ -94,8 +94,6 @@ Source: .\netfx.exe; DestDir: {tmp} ; Flags: dontcopy
 Source: .\vc2010.exe; DestDir: {tmp} ; Flags: dontcopy
 
 ; Firebird SQL 
-Source: ..\SanteDB\Data\SDB_BASE.FDB; DestDir: {app}; Components: demo 
-Source: ..\SanteDB\Data\SDB_AUDIT.FDB; DestDir: {app}; Components: demo
 Source: ..\bin\Release\fbclient.dll; DestDir: {app}; Components: db\fbsql
 ; Source: ..\bin\Release\fbembed.dll; DestDir: {app}; Components: db\fbsql
 Source: ..\bin\Release\FirebirdSql.Data.FirebirdClient.dll; DestDir: {app}; Components: db\fbsql
@@ -116,8 +114,8 @@ Source: ..\SanteDB\santedb.config.fbsql.xml; DestDir: {app}; DestName: santedb.c
 
 ; Config Samples
 Source: ..\SanteDB\santedb.config.fbsql.xml; DestDir: {app}; DestName: santedb.config.fbsql.xml; Components: db\fbsql
-Source: ..\SanteDB\Data\SDB_BASE.FDB; DestDir: {app}; Components: db\fbsql
-Source: ..\SanteDB\Data\SDB_AUDIT.FDB; DestDir: {app}; Components: db\fbsql
+Source: ..\SanteDB\Data\SDB_BASE.FDB; DestDir: {app}; Components: db\fbsql demo; Flags: confirmoverwrite
+Source: ..\SanteDB\Data\SDB_AUDIT.FDB; DestDir: {app}; Components: db\fbsql demo; Flags: confirmoverwrite
 
 Source: ..\SanteDB\santedb.config.psql.xml; DestDir: {app}; DestName: santedb.config.psql.xml; Components: db\psql
 ; Security AMI stuff
