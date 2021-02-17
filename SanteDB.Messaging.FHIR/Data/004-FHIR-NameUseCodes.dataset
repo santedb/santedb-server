@@ -23,7 +23,7 @@
   <insert>
     <ConceptReferenceTerm xmlns="http://santedb.org/model">
       <source>a87a6d21-2ca6-4aea-88f3-6135cceb58d1</source>
-      <term>3E79D2AF-34E3-4B3B-9E57-587D32C46E0A</term>
+      <term>5C209379-E27D-48F7-8EA7-512E50A1E8FC</term>
       <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
     </ConceptReferenceTerm>
   </insert>
@@ -137,7 +137,7 @@
   <insert>
     <ConceptReferenceTerm xmlns="http://santedb.org/model">
       <source>0674c1c8-963a-4658-aff9-8cdcd308fa68</source>
-      <term>2BA2F6EB-5D96-4D57-8FB9-7ED194F22E66</term>
+      <term>63240A70-980E-49A6-93AB-C6088F5A907E</term>
       <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
     </ConceptReferenceTerm>
   </insert>

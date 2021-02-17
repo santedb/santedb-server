@@ -39,7 +39,7 @@ namespace SanteDB.Messaging.FHIR.Resources
         {
             this.Identifier = new List<FhirIdentifier>();
             this.Telecom = new List<FhirTelecom>();
-            this.Photo = new List<Attachment>();
+            this.Photo = new List<FhirAttachment>();
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace SanteDB.Messaging.FHIR.Resources
         [XmlElement("photo")]
         [Description("Photograph of the related person")]
         [FhirElement(MaxOccurs = -1)]
-        public List<Attachment> Photo { get; set; }
+        public List<FhirAttachment> Photo { get; set; }
 
         /// <summary>
         /// Write textual content

@@ -92,7 +92,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 
             var loc = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Location);
             if (loc != null)
-                retVal.Extension.Add(new Extension()
+                retVal.Extension.Add(new FhirExtension()
                 {
                     Url = "http://santedb.org/extensions/act/fhir/location",
                     Value = new FhirString(loc.PlayerEntityKey.ToString())

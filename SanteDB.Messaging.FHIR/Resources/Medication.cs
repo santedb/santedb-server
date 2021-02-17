@@ -89,7 +89,7 @@ namespace SanteDB.Messaging.FHIR.Resources
         /// </summary>
         [XmlElement("image")]
         [Description("A picture of the medication")]
-        public Attachment Image { get; set; }
+        public FhirAttachment Image { get; set; }
 
         /// <summary>
         /// Represent as a string

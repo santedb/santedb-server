@@ -85,5 +85,16 @@ namespace SanteDB.Messaging.FHIR.Resources
         [XmlElement("meta")]
         public ResourceMetadata Meta { get; set; }
 
+        /// <summary>
+        /// A set of rules under which this content was created
+        /// </summary>
+        [XmlElement("implicitRules")]
+        public FhirUri ImplicitRules { get; set; }
+
+        /// <summary>
+        /// Language of the resource content
+        /// </summary>
+        [XmlElement("language")]
+        public FhirCode<String> Language { get; set; }
     }
 }

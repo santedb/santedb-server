@@ -42,7 +42,7 @@ namespace SanteDB.Messaging.FHIR.Resources
         public DomainResourceBase()
         {
             this.m_namespaces.Add("", "http://hl7.org/fhir");
-            this.Contained = new List<ContainedResource>();
+            this.Contained = new List<FhirContainedResource>();
         }
 
         // The narrative
@@ -52,7 +52,7 @@ namespace SanteDB.Messaging.FHIR.Resources
         /// A list of contained resources
         /// </summary>
         [XmlElement("contained")]
-        public List<ContainedResource> Contained { get; set; }
+        public List<FhirContainedResource> Contained { get; set; }
 
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace SanteDB.Messaging.FHIR.Resources
         public void AddContainedResource(DomainResourceBase resource)
         {
             resource.MakeIdRef();
-            this.Contained.Add(new ContainedResource() { Item = resource });
+            this.Contained.Add(new FhirContainedResource() { Item = resource });
         }
     }
 }

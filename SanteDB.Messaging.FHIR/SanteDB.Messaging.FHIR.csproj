@@ -53,7 +53,6 @@
   <ItemGroup>
     <Compile Include="Attributes\FhirElementAttribute.cs" />
     <Compile Include="Attributes\FhirValueSetAttribute.cs" />
-    <Compile Include="Attributes\ParticipantObjectMapAttribute.cs" />
     <Compile Include="Backbone\AdverseEventSuspectEntity.cs" />
     <Compile Include="Backbone\AllergyIntoleranceReaction.cs" />
     <Compile Include="Backbone\Animal.cs" />
@@ -108,9 +107,10 @@
     <Compile Include="Backbone\SubstanceInstance.cs" />
     <Compile Include="Backbone\TypeRef.cs" />
     <Compile Include="Configuration\FhirServiceConfigurationSection.cs" />
-    <Compile Include="DataTypes\Attachment.cs" />
-    <Compile Include="DataTypes\ContainedResource.cs" />
-    <Compile Include="DataTypes\Extension.cs" />
+    <Compile Include="DataTypes\FhirAnnotation.cs" />
+    <Compile Include="DataTypes\FhirAttachment.cs" />
+    <Compile Include="DataTypes\FhirContainedResource.cs" />
+    <Compile Include="DataTypes\FhirExtension.cs" />
     <Compile Include="DataTypes\FhirAddress.cs" />
     <Compile Include="DataTypes\FhirChoice.cs" />
     <Compile Include="DataTypes\FhirCode.cs" />

@@ -79,7 +79,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
                 Key = Guid.NewGuid(),
                 Names = new List<EntityName>() { new EntityName(NameUseKeys.OfficialRecord, resource.Name) },
                 StatusConceptKey = resource.Active?.Value == true ? StatusKeys.Active : StatusKeys.Obsolete,
-                Telecoms = resource.Telecom.Select(DataTypeConverter.ToEntityTelecomAddress).ToList()
+                Telecoms = resource.Telecom.Select(DataTypeConverter.ToEntityTelecomAddress).OfType<EntityTelecomAddress>().ToList()
             };
 
             Guid key;

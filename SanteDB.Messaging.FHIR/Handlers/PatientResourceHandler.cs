@@ -91,7 +91,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
                     if (rel.TargetEntity is Core.Model.Roles.Patient)
                         relative.Patient = DataTypeConverter.CreateReference<Patient>(rel.TargetEntity, restOperationContext);
                     relative.Telecom = rel.TargetEntity.LoadCollection<EntityTelecomAddress>(nameof(Entity.Telecoms)).Select(o => DataTypeConverter.ToFhirTelecom(o)).ToList();
-                    retVal.Contained.Add(new ContainedResource()
+                    retVal.Contained.Add(new FhirContainedResource()
                     {
                         Item = relative
                     });
@@ -129,8 +129,8 @@ namespace SanteDB.Messaging.FHIR.Handlers
 
 			var photo = model.LoadCollection<EntityExtension>("Extensions").FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.JpegPhotoExtension);
 			if (photo != null)
-				retVal.Photo = new List<Attachment>() {
-					new Attachment()
+				retVal.Photo = new List<FhirAttachment>() {
+					new FhirAttachment()
 					{
 						ContentType = "image/jpg",
 						Data = photo.ExtensionValueXml
@@ -165,7 +165,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 				Names = resource.Name.Select(DataTypeConverter.ToEntityName).ToList(),
 				Relationships = resource.Contact.Select(DataTypeConverter.ToEntityRelationship).ToList(),
 				StatusConceptKey = resource.Active?.Value == true ? StatusKeys.Active : StatusKeys.Obsolete,
-				Telecoms = resource.Telecom.Select(DataTypeConverter.ToEntityTelecomAddress).ToList()
+				Telecoms = resource.Telecom.Select(DataTypeConverter.ToEntityTelecomAddress).OfType<EntityTelecomAddress>().ToList()
 			};
 
 			Guid key;
@@ -182,11 +182,11 @@ namespace SanteDB.Messaging.FHIR.Handlers
             }
 			patient.Key = key;
 
-			if (resource.Deceased is FhirDateTime)
+			if (resource.Deceased is FhirDateTime dtValue && !String.IsNullOrEmpty(dtValue.Value))
 			{
-				patient.DeceasedDate = (FhirDateTime)resource.Deceased;
+				patient.DeceasedDate = dtValue;
 			}
-			else if (resource.Deceased is FhirBoolean)
+			else if (resource.Deceased is FhirBoolean boolValue && boolValue == true)
 			{
 				// we don't have a field for "deceased indicator" to say that the patient is dead, but we don't know that actual date/time of death
 				// should find a better way to do this
@@ -198,9 +198,9 @@ namespace SanteDB.Messaging.FHIR.Handlers
             {
 				patient.MultipleBirthOrder = 0;
 			}
-			else if (resource.MultipleBirth is FhirInt)
+			else if (resource.MultipleBirth is FhirInt intValue)
 			{
-				patient.MultipleBirthOrder = ((FhirInt)resource.MultipleBirth).Value;
+				patient.MultipleBirthOrder = intValue.Value;
 			}
 
 			return patient;

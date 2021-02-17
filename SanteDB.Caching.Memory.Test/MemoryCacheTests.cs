@@ -181,7 +181,7 @@ namespace SanteDB.Caching.Memory.Test
             Assert.AreEqual(3, qps.GetQueryResults(qid, 0, 100).Count());
             Assert.AreEqual("TEST", qps.GetQueryTag(qid));
 
-            qps.AddResults(qid, new Guid[] { Guid.NewGuid() });
+            qps.AddResults(qid, new Guid[] { Guid.NewGuid() }, 1);
             Assert.AreEqual(4, qps.GetQueryResults(qid, 0, 100).Count());
 
             var q2 = qps.FindQueryId("TEST");

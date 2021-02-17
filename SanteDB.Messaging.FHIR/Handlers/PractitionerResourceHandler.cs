@@ -81,8 +81,8 @@ namespace SanteDB.Messaging.FHIR.Handlers
 
             var photo = (provider?.LoadCollection<EntityExtension>("Extensions") ?? model.LoadCollection<EntityExtension>("Extensions"))?.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.JpegPhotoExtension);
             if (photo != null)
-                retVal.Photo = new List<Attachment>() {
-                    new Attachment()
+                retVal.Photo = new List<FhirAttachment>() {
+                    new FhirAttachment()
                     {
                         ContentType = "image/jpg",
                         Data = photo.ExtensionValueXml

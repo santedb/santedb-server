@@ -206,6 +206,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                         }
 
+                        claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, dbSession.Key.ToString()));
+                        (cprincipal.Identity as IClaimsIdentity).AddClaim(claims.Last());
                         // Add default policies
                         var oizPrincipalPolicies = pdp.GetEffectivePolicySet(cprincipal);
                         // Scopes user is allowed to access

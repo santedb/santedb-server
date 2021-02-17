@@ -32,6 +32,7 @@ using SanteDB.Messaging.FHIR.DataTypes;
 using SanteDB.Messaging.FHIR.Resources;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Linq;
@@ -122,12 +123,12 @@ namespace SanteDB.Messaging.FHIR.Util
         }
 
         /// <summary>
-        /// Converts an <see cref="Extension"/> instance to an <see cref="ActExtension"/> instance.
+        /// Converts an <see cref="FhirExtension"/> instance to an <see cref="ActExtension"/> instance.
         /// </summary>
         /// <param name="fhirExtension">The FHIR extension.</param>
         /// <returns>Returns the converted act extension instance.</returns>
         /// <exception cref="System.ArgumentNullException">fhirExtension - Value cannot be null</exception>
-        public static ActExtension ToActExtension(Extension fhirExtension)
+        public static ActExtension ToActExtension(FhirExtension fhirExtension)
 		{
 			traceSource.TraceEvent(EventLevel.Verbose, "Mapping FHIR extension");
 
@@ -156,12 +157,12 @@ namespace SanteDB.Messaging.FHIR.Util
 		}
 
         /// <summary>
-        /// Converts an <see cref="Extension"/> instance to an <see cref="ActExtension"/> instance.
+        /// Converts an <see cref="FhirExtension"/> instance to an <see cref="ActExtension"/> instance.
         /// </summary>
         /// <param name="fhirExtension">The FHIR extension.</param>
         /// <returns>Returns the converted act extension instance.</returns>
         /// <exception cref="System.ArgumentNullException">fhirExtension - Value cannot be null</exception>
-        public static EntityExtension ToEntityExtension(Extension fhirExtension)
+        public static EntityExtension ToEntityExtension(FhirExtension fhirExtension)
         {
             traceSource.TraceEvent(EventLevel.Verbose, "Mapping FHIR extension");
 
@@ -239,6 +240,8 @@ namespace SanteDB.Messaging.FHIR.Util
 			var oidRegistrar = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>();
             var oid = oidRegistrar.Get(fhirSystem.Value);
 
+			if (oid == null)
+				throw new KeyNotFoundException($"Could not find identity domain {fhirSystem.Value}");
             return oid;
 		}
 
@@ -263,13 +266,13 @@ namespace SanteDB.Messaging.FHIR.Util
         /// <summary>
         /// Act Extension to Fhir Extension
         /// </summary>
-        public static Extension ToExtension(IModelExtension ext, RestOperationContext context)
+        public static FhirExtension ToExtension(IModelExtension ext, RestOperationContext context)
         {
 
             var extensionTypeService = ApplicationServiceContext.Current.GetService<IExtensionTypeRepository>();
             var eType = extensionTypeService.Get(ext.ExtensionTypeKey);
 
-            var retVal = new Extension()
+            var retVal = new FhirExtension()
             {
                 Url = eType.Name
             };
@@ -297,7 +300,10 @@ namespace SanteDB.Messaging.FHIR.Util
         public static Concept ToConcept(FhirCodeableConcept codeableConcept)
 		{
 			traceSource.TraceEvent(EventLevel.Verbose, "Mapping codeable concept");
-			return codeableConcept?.Coding.Select(o => DataTypeConverter.ToConcept(o)).FirstOrDefault(o => o != null);
+			var retVal = codeableConcept?.Coding.Select(o => DataTypeConverter.ToConcept(o)).FirstOrDefault(o => o != null);
+			if (retVal == null)
+				throw new ConstraintException($"Can't find any reference term mappings from '{codeableConcept.GetPrimaryCode().Code}' in {codeableConcept.GetPrimaryCode().System} to a Concept");
+			return retVal;
 		}
 
 		/// <summary>
@@ -360,7 +366,10 @@ namespace SanteDB.Messaging.FHIR.Util
 
 			traceSource.TraceEvent(EventLevel.Verbose, "Mapping FHIR code");
 
-			return ToConcept(new FhirCoding(new Uri(system), code.Value.ToString()));
+			var retVal = ToConcept(new FhirCoding(new Uri(system), code.Value.ToString()));
+			if (retVal == null)
+				throw new ConstraintException($"Could not find concept with reference term '{code.Value}' in {system}");
+			return retVal;
 		}
 
 		/// <summary>
@@ -397,10 +406,15 @@ namespace SanteDB.Messaging.FHIR.Util
 				address.Component.Add(new EntityAddressComponent(AddressComponentKeys.State, fhirAddress.State.Value));
 			}
 
-			if (fhirAddress.Zip?.Value != null)
+			if (fhirAddress.PostalCode?.Value != null)
 			{
-				address.Component.Add(new EntityAddressComponent(AddressComponentKeys.PostalCode, fhirAddress.Zip.Value));
+				address.Component.Add(new EntityAddressComponent(AddressComponentKeys.PostalCode, fhirAddress.PostalCode.Value));
 			}
+
+			if(fhirAddress.District?.Value != null)
+            {
+				address.Component.Add(new EntityAddressComponent(AddressComponentKeys.County, fhirAddress.District.Value));
+            }
 
 			return address;
 		}
@@ -432,8 +446,10 @@ namespace SanteDB.Messaging.FHIR.Util
 
             if (fhirId.Period != null)
             {
-                retVal.IssueDate = fhirId.Period.Start;
-                retVal.ExpiryDate = fhirId.Period.Stop;
+				if(fhirId.Period.Start != null)
+					retVal.IssueDate = fhirId.Period.Start;
+				if (fhirId.Period.Stop != null)
+					retVal.ExpiryDate = fhirId.Period.Stop;
             }
 			// TODO: Fill in use
 			return retVal;
@@ -469,7 +485,19 @@ namespace SanteDB.Messaging.FHIR.Util
 		/// <returns>Returns the mapped entity relationship instance..</returns>
 		public static EntityRelationship ToEntityRelationship(PatientContact patientContact)
 		{
-			return new EntityRelationship();
+
+			var retVal = new EntityRelationship();
+			retVal.TargetEntity = new Person()
+			{
+				Addresses = new List<EntityAddress>() { DataTypeConverter.ToEntityAddress(patientContact.Address) },
+				CreationTime = DateTimeOffset.Now,
+				// TODO: Extensions
+				Extensions = patientContact.Extension.Select(DataTypeConverter.ToEntityExtension).OfType<EntityExtension>().ToList(),
+				Names = new List<EntityName>() { DataTypeConverter.ToEntityName(patientContact.Name) },
+				Telecoms = patientContact.Telecom.Select(DataTypeConverter.ToEntityTelecomAddress).OfType<EntityTelecomAddress>().ToList()
+			};
+			retVal.RelationshipType = DataTypeConverter.ToConcept(patientContact.Relationship.FirstOrDefault());
+			return retVal;
 		}
 
 		/// <summary>
@@ -481,11 +509,13 @@ namespace SanteDB.Messaging.FHIR.Util
 		{
 			traceSource.TraceEvent(EventLevel.Verbose, "Mapping FHIR telecom");
 
-			return new EntityTelecomAddress
-			{
-				Value = fhirTelecom.Value.Value,
-				AddressUseKey = ToConcept(fhirTelecom.Use ?? "temp", "http://hl7.org/fhir/contact-point-use")?.Key
-			};
+			if(fhirTelecom.Value != null)
+				return new EntityTelecomAddress
+				{
+					Value = fhirTelecom.Value.Value,
+					AddressUseKey = ToConcept(fhirTelecom.Use ?? "temp", "http://hl7.org/fhir/contact-point-use")?.Key
+				};
+			return null;
 		}
 
 		/// <summary>
@@ -519,10 +549,12 @@ namespace SanteDB.Messaging.FHIR.Util
 				else if (com.ComponentTypeKey == AddressComponentKeys.State)
 					retVal.State = com.Value;
 				else if (com.ComponentTypeKey == AddressComponentKeys.PostalCode)
-					retVal.Zip = com.Value;
+					retVal.PostalCode = com.Value;
+				else if (com.ComponentTypeKey == AddressComponentKeys.County)
+					retVal.District = com.Value;
 				else
 				{
-					retVal.Extension.Add(new Extension()
+					retVal.Extension.Add(new FhirExtension()
 					{
 						Url = FhirConstants.SanteDBProfile + "#address-" + com.LoadProperty<Concept>(nameof(EntityAddressComponent.ComponentType)).Mnemonic,
 						Value = new FhirString(com.Value)

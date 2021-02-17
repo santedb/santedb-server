@@ -71,8 +71,14 @@ namespace SanteDB.Messaging.FHIR.DataTypes
         /// <summary>
         /// Gets or sets the zip
         /// </summary>
-        [XmlElement("zip")]
-        public FhirString Zip { get; set; }
+        [XmlElement("postalCode")]
+        public FhirString PostalCode { get; set; }
+
+        /// <summary>
+        /// Gets or sets the zip
+        /// </summary>
+        [XmlElement("district")]
+        public FhirString District { get; set; }
 
         /// <summary>
         /// Gets or sets the country
@@ -87,6 +93,12 @@ namespace SanteDB.Messaging.FHIR.DataTypes
         public FhirPeriod Period { get; set; }
 
         /// <summary>
+        /// Gets or sets the type
+        /// </summary>
+        [XmlElement("type")]
+        public FhirCode<String> Type { get; set; }
+
+        /// <summary>
         /// Represent as text
         /// </summary>
         internal override void WriteText(System.Xml.XmlWriter w)
@@ -97,7 +109,7 @@ namespace SanteDB.Messaging.FHIR.DataTypes
                 output.Add(l);
             output.Add(String.Format("{0}, {1}", this.City, this.State));
             output.Add(this.Country);
-            output.Add(this.Zip);
+            output.Add(this.PostalCode);
 
             w.WriteStartElement("table", NS_XHTML);
             w.WriteStartElement("tbody", NS_XHTML);

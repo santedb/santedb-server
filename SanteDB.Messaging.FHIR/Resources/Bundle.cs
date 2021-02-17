@@ -101,7 +101,7 @@ namespace SanteDB.Messaging.FHIR.Resources
         /// Gets or sets the type of the bundle
         /// </summary>
         [XmlElement("type")]
-        [FhirElement(Binding = typeof(BundleType), Comment = "The type of bundle", MaxOccurs = 1, MinOccurs = 1, MustSupport = true)]
+        [FhirElement(Comment = "The type of bundle", MaxOccurs = 1, MinOccurs = 1)]
         [Description("Identifies the type of bundle")]
         public FhirCode<BundleType> Type { get; set; }
 

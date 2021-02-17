@@ -111,7 +111,7 @@ namespace SanteDB.Caching.Memory
         /// <summary>
         /// Add results to id set
         /// </summary>
-        public void AddResults(Guid queryId, IEnumerable<Guid> results)
+        public void AddResults(Guid queryId, IEnumerable<Guid> results, int totalResults)
         {
             var cacheResult = this.m_cache.GetCacheItem($"qry.{queryId}");
             if (cacheResult == null)
@@ -119,8 +119,9 @@ namespace SanteDB.Caching.Memory
             else if (cacheResult.Value is MemoryQueryInfo retVal)
             {
                 this.m_tracer.TraceVerbose("Updating query {0} ({1} results)", queryId, results.Count());
-                lock (retVal.Results)
+                lock (retVal.Results) 
                     retVal.Results.AddRange(results.Where(o => !retVal.Results.Contains(o)).Select(o => o));
+                retVal.TotalResults = totalResults;
                 this.m_cache.Set(cacheResult.Key, cacheResult.Value, DateTimeOffset.Now.AddSeconds(this.m_configuration.MaxQueryAge));
                 //retVal.TotalResults = retVal.Results.Count();
             }

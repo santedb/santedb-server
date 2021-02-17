@@ -136,5 +136,10 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         [XmlElement("validation"), Category("Data Quality"), DisplayName("Validation"), Description("When set, enables data validation parameters")]
         public EntityValidationFlags Validation { get; set; }
 
+        /// <summary>
+        /// Max page size
+        /// </summary>
+        [XmlElement("maxPageSize")]
+        public int? MaxPageSize { get;  set; }
     }
 }

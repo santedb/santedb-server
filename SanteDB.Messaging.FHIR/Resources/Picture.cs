@@ -159,6 +159,6 @@ namespace SanteDB.Messaging.FHIR.Resources
         [XmlElement("content")]
         [Description("Actual picture or reference to data")]
         [FhirElement(MinOccurs = 1)]
-        public Attachment Content { get; set; }
+        public FhirAttachment Content { get; set; }
     }
 }

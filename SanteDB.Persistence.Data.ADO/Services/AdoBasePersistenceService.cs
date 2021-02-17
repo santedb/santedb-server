@@ -557,6 +557,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         else
                             connection.LoadState = LoadState.FullLoad;
 
+                        connection.AddData("principal", overrideAuthContext);
+
                         var result = this.Get(connection, containerId);
                         var postData = new DataRetrievedEventArgs<TData>(result, overrideAuthContext);
                         this.Retrieved?.Invoke(this, postData);
@@ -622,7 +624,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
         {
             if (query == null)
                 throw new ArgumentNullException(nameof(query));
-
+            else if (count.GetValueOrDefault() > (this.m_settingsProvider.GetConfiguration().MaxPageSize ?? 2500))
+                throw new ArgumentOutOfRangeException($"Server does not permit more than {this.m_settingsProvider.GetConfiguration().MaxPageSize ?? 2500} results in a single fetch");
 #if DEBUG
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -657,6 +660,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     else
                         connection.LoadState = LoadState.FullLoad;
 
+                    connection.AddData("principal", overrideAuthContext);
                     // Other results we want to intersect with?
                     if (unionWith != null)
                         connection.AddData("UNION", unionWith);

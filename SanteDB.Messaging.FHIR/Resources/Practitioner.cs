@@ -43,7 +43,7 @@ namespace SanteDB.Messaging.FHIR.Resources
             this.Name = new List<FhirHumanName>();
             this.Telecom = new List<FhirTelecom>();
             this.Address = new List<FhirAddress>();
-            this.Photo = new List<Attachment>();
+            this.Photo = new List<FhirAttachment>();
             this.Communication = new List<FhirCodeableConcept>();
         }
 
@@ -101,7 +101,7 @@ namespace SanteDB.Messaging.FHIR.Resources
         /// </summary>
         [XmlElement("photo")]
         [Description("Image of the person")]
-        public List<Attachment> Photo { get; set; }
+        public List<FhirAttachment> Photo { get; set; }
         
         /// <summary>
         /// Gets or sets the qualifications of the practicioner

@@ -5,7 +5,7 @@
   </sections>
   <section xsi:type="FileMatchConfigurationSection">
     <basePath>
-      <add readonly="false">PATH_TO_YOUR_MATCH_CONFIG_FILES</add>
+      <add readonly="false">.\matching</add>
     </basePath>
   </section>
 </SanteDBConfiguration>

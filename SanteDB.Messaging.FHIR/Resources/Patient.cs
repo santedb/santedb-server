@@ -34,7 +34,6 @@ namespace SanteDB.Messaging.FHIR.Resources
     /// </summary>
     [XmlType("Patient", Namespace = "http://hl7.org/fhir")]
     [XmlRoot("Patient", Namespace = "http://hl7.org/fhir")] 
-    [ParticipantObjectMap(IdType = AuditableObjectIdType.PatientNumber, Role = AuditableObjectRole.Patient, Type = AuditableObjectType.Person, OidName = "CR_CID")]
     public class Patient : DomainResourceBase
     {
         /// <summary>
@@ -55,7 +54,7 @@ namespace SanteDB.Messaging.FHIR.Resources
             this.Telecom = new List<FhirTelecom>();
             this.Address = new List<FhirAddress>();
             this.Communication = new List<Communication>();
-            this.Photo = new List<Attachment>();
+            this.Photo = new List<FhirAttachment>();
             this.Contact = new List<PatientContact>();
         }
 
@@ -139,7 +138,7 @@ namespace SanteDB.Messaging.FHIR.Resources
         /// </summary>
         [XmlElement("photo")]
         [Description("Image of the person")]
-        public List<Attachment> Photo { get; set; }
+        public List<FhirAttachment> Photo { get; set; }
 
         /// <summary>
         /// Contact details

@@ -35,7 +35,7 @@ namespace SanteDB.Messaging.FHIR.DataTypes
 
         // Extensions
         [NonSerialized]
-        private List<Extension> m_extensions;
+        private List<FhirExtension> m_extensions;
 
         /// <summary>
         /// XHTML namespace
@@ -47,7 +47,7 @@ namespace SanteDB.Messaging.FHIR.DataTypes
         /// </summary>
         public FhirElement()
         {
-            this.m_extensions = new List<DataTypes.Extension>();
+            this.m_extensions = new List<DataTypes.FhirExtension>();
         }
 
 
@@ -55,7 +55,7 @@ namespace SanteDB.Messaging.FHIR.DataTypes
         /// Extension
         /// </summary>
         [XmlElement("extension")]
-        public List<Extension> Extension { get { return this.m_extensions; } set { this.m_extensions = value; } }
+        public List<FhirExtension> Extension { get { return this.m_extensions; } set { this.m_extensions = value; } }
 
         /// <summary>
         /// Represents the ID of the object via XS:ID
