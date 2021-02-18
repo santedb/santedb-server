@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Model;
 using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
@@ -23,7 +24,6 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
-using SanteDB.Messaging.FHIR.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +36,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
     /// Resource handler for acts base
     /// </summary>
     public abstract class RepositoryResourceHandlerBase<TFhirResource, TModel> : ResourceHandlerBase<TFhirResource, TModel>
-		where TFhirResource : ResourceBase, new()
+		where TFhirResource : Resource, new()
 		where TModel : IdentifiedData, new()
 	{
 		// Repository service model
@@ -65,12 +65,12 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <summary>
 		/// Create concept set filter based on act type
 		/// </summary>
-		protected Expression CreateConceptSetFilter(Guid conceptSetKey, ParameterExpression queryParameter)
+		protected System.Linq.Expressions.Expression CreateConceptSetFilter(Guid conceptSetKey, ParameterExpression queryParameter)
 		{
-			var conceptSetRef = Expression.MakeMemberAccess(Expression.MakeMemberAccess(queryParameter, typeof(Act).GetProperty(nameof(Act.TypeConcept))), typeof(Concept).GetProperty(nameof(Concept.ConceptSets)));
-			var lParam = Expression.Parameter(typeof(ConceptSet));
-			var conceptSetFilter = Expression.MakeBinary(ExpressionType.Equal, Expression.Convert(Expression.MakeMemberAccess(lParam, typeof(ConceptSet).GetProperty(nameof(ConceptSet.Key))), typeof(Guid)), Expression.Constant(conceptSetKey));
-			return Expression.Call((MethodInfo)typeof(Enumerable).GetGenericMethod("Any", new Type[] { typeof(ConceptSet) }, new Type[] { typeof(IEnumerable<ConceptSet>), typeof(Func<ConceptSet, bool>) }), conceptSetRef, Expression.Lambda(conceptSetFilter, lParam));
+			var conceptSetRef = System.Linq.Expressions.Expression.MakeMemberAccess(System.Linq.Expressions.Expression.MakeMemberAccess(queryParameter, typeof(Act).GetProperty(nameof(Act.TypeConcept))), typeof(Concept).GetProperty(nameof(Concept.ConceptSets)));
+			var lParam = System.Linq.Expressions.Expression.Parameter(typeof(ConceptSet));
+			var conceptSetFilter = System.Linq.Expressions.Expression.MakeBinary(ExpressionType.Equal, System.Linq.Expressions.Expression.Convert(System.Linq.Expressions.Expression.MakeMemberAccess(lParam, typeof(ConceptSet).GetProperty(nameof(ConceptSet.Key))), typeof(Guid)), System.Linq.Expressions.Expression.Constant(conceptSetKey));
+			return System.Linq.Expressions.Expression.Call((MethodInfo)typeof(Enumerable).GetGenericMethod("Any", new Type[] { typeof(ConceptSet) }, new Type[] { typeof(IEnumerable<ConceptSet>), typeof(Func<ConceptSet, bool>) }), conceptSetRef, System.Linq.Expressions.Expression.Lambda(conceptSetFilter, lParam));
 		}
 
 		/// <summary>
@@ -103,8 +103,8 @@ namespace SanteDB.Messaging.FHIR.Handlers
         {
             if (typeof(TPredicate).GetProperty(nameof(Entity.StatusConceptKey)) != null)
 			{
-				var obsoletionReference = Expression.MakeBinary(ExpressionType.NotEqual, Expression.Convert(Expression.MakeMemberAccess(query.Parameters[0], typeof(TPredicate).GetProperty(nameof(Entity.StatusConceptKey))), typeof(Guid)), Expression.Constant(StatusKeys.Obsolete));
-				query = Expression.Lambda<Func<TPredicate, bool>>(Expression.AndAlso(obsoletionReference, query.Body), query.Parameters);
+				var obsoletionReference = System.Linq.Expressions.Expression.MakeBinary(ExpressionType.NotEqual, System.Linq.Expressions.Expression.Convert(System.Linq.Expressions.Expression.MakeMemberAccess(query.Parameters[0], typeof(TPredicate).GetProperty(nameof(Entity.StatusConceptKey))), typeof(Guid)), System.Linq.Expressions.Expression.Constant(StatusKeys.Obsolete));
+				query = System.Linq.Expressions.Expression.Lambda<Func<TPredicate, bool>>(System.Linq.Expressions.Expression.AndAlso(obsoletionReference, query.Body), query.Parameters);
 			}
 
             var repo = ApplicationServiceContext.Current.GetService<IRepositoryService<TPredicate>>();

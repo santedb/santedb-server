@@ -31,7 +31,6 @@ using System.Linq;
 using System.Reflection;
 using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
-using SanteDB.Messaging.FHIR.Resources;
 
 namespace SanteDB.Messaging.FHIR
 {
@@ -119,7 +118,6 @@ namespace SanteDB.Messaging.FHIR
 
                 // Start the web host
                 this.m_webHost.Start();
-                Reference.BaseUri = new Uri(this.m_configuration.ResourceBaseUri);
                 this.Started?.Invoke(this, EventArgs.Empty);
 
                 return true;

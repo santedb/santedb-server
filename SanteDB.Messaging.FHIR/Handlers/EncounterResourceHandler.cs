@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Model;
 using RestSrvr;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
@@ -23,13 +24,11 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.DataTypes;
-using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Hl7.Fhir.Model.CapabilityStatement;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -42,24 +41,24 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Map to model
         /// </summary>
-        public IdentifiedData MapToModel(BundleEntry bundleResource, RestOperationContext context, Bundle bundle)
+        public IdentifiedData MapToModel(Resource bundleResource, RestOperationContext context, Bundle bundle)
         {
-            return this.MapToModel(bundleResource.Resource.Resource as Encounter, context);
+            return this.MapToModel(bundleResource as Encounter, context);
         }
 
         /// <summary>
         /// Get the interactions supported
         /// </summary>
         /// <returns></returns>
-        protected override IEnumerable<InteractionDefinition> GetInteractions()
+        protected override IEnumerable<ResourceInteractionComponent> GetInteractions()
         {
             return new List<TypeRestfulInteraction>()
             {
-                TypeRestfulInteraction.Search,
+                TypeRestfulInteraction.SearchType,
                 TypeRestfulInteraction.Read,
-                TypeRestfulInteraction.VersionRead,
-                TypeRestfulInteraction.InstanceHistory
-            }.Select(o => new InteractionDefinition() { Type = o });
+                TypeRestfulInteraction.Vread,
+                TypeRestfulInteraction.HistoryInstance
+            }.Select(o => new ResourceInteractionComponent() { Code = o });
         }
 
         /// <summary>
@@ -76,57 +75,62 @@ namespace SanteDB.Messaging.FHIR.Handlers
             switch(model.StatusConceptKey.ToString().ToUpper())
             {
                 case StatusKeyStrings.Active:
-                    retVal.Status = EncounterStatus.InProgress;
+                case StatusKeyStrings.New:
+                    switch(model.MoodConceptKey.ToString().ToUpper())
+                    {
+                        case MoodConceptKeyStrings.Eventoccurrence:
+                        case MoodConceptKeyStrings.Request:
+                            retVal.Status = Encounter.EncounterStatus.InProgress;
+                            break;
+                        case MoodConceptKeyStrings.Intent:
+                        case MoodConceptKeyStrings.Promise:
+                            retVal.Status = Encounter.EncounterStatus.Planned;
+                            break;
+                    }
                     break;
                 case StatusKeyStrings.Cancelled:
+                    retVal.Status = Encounter.EncounterStatus.Cancelled;
+                    break;
                 case StatusKeyStrings.Nullified:
-                    retVal.Status = EncounterStatus.Cancelled;
+                    retVal.Status = Encounter.EncounterStatus.EnteredInError;
+                    break;
                     break;
                 case StatusKeyStrings.Completed:
-                    retVal.Status = EncounterStatus.Finished;
+                    retVal.Status = Encounter.EncounterStatus.Finished;
                     break;
             }
 
             if (model.StartTime.HasValue || model.StopTime.HasValue)
-                retVal.Period = new FhirPeriod()
-                {
-                    Start = model.StartTime?.DateTime,
-                    Stop = model.StopTime?.DateTime
-                };
+                retVal.Period = DataTypeConverter.ToPeriod(model.StartTime, model.StopTime);
             else
-                retVal.Period = new FhirPeriod()
-                {
-                    Start = model.ActTime.DateTime,
-                    Stop = model.ActTime.DateTime
-                };
+                retVal.Period = DataTypeConverter.ToPeriod(model.ActTime, model.ActTime);
 
-            retVal.Reason = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("ReasonConcept"));
-            retVal.Type = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("TypeConcept"));
+            retVal.ReasonCode = new List<CodeableConcept>() { DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("ReasonConcept")) };
+            retVal.Type = new List<CodeableConcept>() { DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("TypeConcept")) };
             
             // Map associated
             var associated = model.LoadCollection<ActParticipation>("Participations");
 
             // Subject of encounter
-            retVal.Subject = DataTypeConverter.CreateReference<SanteDB.Messaging.FHIR.Resources.Patient>(associated.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget)?.LoadProperty<Entity>("PlayerEntity"), restOperationContext);
+            retVal.Subject = DataTypeConverter.CreateVersionedReference<Hl7.Fhir.Model.Patient>(associated.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget)?.LoadProperty<Entity>("PlayerEntity"), restOperationContext);
 
             // Locations
-            retVal.Location = associated.Where(o => o.LoadProperty<Entity>("PlayerEntity") is Place).Select(o => new EncounterLocation()
+            retVal.Location = associated.Where(o => o.LoadProperty<Entity>("PlayerEntity") is Place).Select(o => new Encounter.LocationComponent()
             {
-                Period = new FhirPeriod() { Start = model.CreationTime.DateTime },
-                Location = DataTypeConverter.CreateReference<Location>(o.PlayerEntity, restOperationContext)
+                Period = DataTypeConverter.ToPeriod(model.CreationTime, null),
+                Location = DataTypeConverter.CreateVersionedReference<Location>(o.PlayerEntity, restOperationContext)
             }).ToList();
 
             // Service provider
             var cst = associated.FirstOrDefault(o => o.LoadProperty<Entity>("PlayerEntity") is Core.Model.Entities.Organization && o.ParticipationRoleKey == ActParticipationKey.Custodian);
             if (cst != null)
-                retVal.ServiceProvider = DataTypeConverter.CreateReference<SanteDB.Messaging.FHIR.Resources.Organization>(cst.PlayerEntity, restOperationContext);
+                retVal.ServiceProvider = DataTypeConverter.CreateVersionedReference<Hl7.Fhir.Model.Organization>(cst.PlayerEntity, restOperationContext);
 
             // Participants
-            retVal.Participant = associated.Where(o => o.LoadProperty<Entity>("PlayerEntity") is Provider || o.LoadProperty<Entity>("PlayerEntity") is UserEntity).Select(o => new EncounterParticipant()
+            retVal.Participant = associated.Where(o => o.LoadProperty<Entity>("PlayerEntity") is Provider || o.LoadProperty<Entity>("PlayerEntity") is UserEntity).Select(o => new Encounter.ParticipantComponent()
             {
-                Period = new FhirPeriod() { Start = model.CreationTime.DateTime },
-                Type = new List<FhirCodeableConcept>() { DataTypeConverter.ToFhirCodeableConcept(o.LoadProperty<Concept>("ParticipationRole")) },
-                Individual = DataTypeConverter.CreateReference<Practitioner>(o.PlayerEntity, restOperationContext)
+                Type = new List<CodeableConcept>() { DataTypeConverter.ToFhirCodeableConcept(o.LoadProperty<Concept>("ParticipationRole")) },
+                Individual = DataTypeConverter.CreateVersionedReference<Practitioner>(o.PlayerEntity, restOperationContext)
             }).ToList();
 
 
@@ -139,22 +143,22 @@ namespace SanteDB.Messaging.FHIR.Handlers
         protected override PatientEncounter MapToModel(Encounter resource, RestOperationContext webOperationContext)
         {
             // Organization
-            var status = resource.Status?.Value;
+            var status = resource.Status.Value;
             var retVal = new PatientEncounter()
             {
-                TypeConcept = DataTypeConverter.ToConcept(resource.Class, new Uri("http://openiz.org/conceptset/v3-ActEncounterCode")),
-                StartTime = resource.Period?.Start?.DateValue,
-                StopTime = resource.Period?.Stop?.DateValue,
+                TypeConcept = DataTypeConverter.ToConcept(resource.Class, "http://openiz.org/conceptset/v3-ActEncounterCode"),
+                StartTime = resource.Period?.StartElement?.ToDateTimeOffset(),
+                StopTime = resource.Period?.EndElement?.ToDateTimeOffset(),
                 // TODO: Extensions
                 Extensions = resource.Extension.Select(DataTypeConverter.ToActExtension).OfType<ActExtension>().ToList(),
                 Identifiers = resource.Identifier.Select(DataTypeConverter.ToActIdentifier).ToList(),
                 Key = Guid.NewGuid(),
-                StatusConceptKey = status == EncounterStatus.Finished ? StatusKeys.Completed :
-                    status == EncounterStatus.Cancelled ? StatusKeys.Cancelled :
-                    status == EncounterStatus.InProgress || status == EncounterStatus.Arrived ? StatusKeys.Active :
-                    status == EncounterStatus.Planned ? StatusKeys.Active : StatusKeys.Obsolete,
-                MoodConceptKey = status == EncounterStatus.Planned ? ActMoodKeys.Intent : ActMoodKeys.Eventoccurrence,
-                ReasonConcept = DataTypeConverter.ToConcept(resource.Reason)
+                StatusConceptKey = status == Encounter.EncounterStatus.Finished ? StatusKeys.Completed :
+                    status == Encounter.EncounterStatus.Cancelled ? StatusKeys.Cancelled :
+                    status == Encounter.EncounterStatus.InProgress || status == Encounter.EncounterStatus.Arrived ? StatusKeys.Active :
+                    status == Encounter.EncounterStatus.Planned ? StatusKeys.New : StatusKeys.Obsolete,
+                MoodConceptKey = status == Encounter.EncounterStatus.Planned ? ActMoodKeys.Intent : ActMoodKeys.Eventoccurrence,
+                ReasonConcept = DataTypeConverter.ToConcept(resource.ReasonCode.FirstOrDefault())
             };
 
             // Parse key
@@ -169,8 +173,8 @@ namespace SanteDB.Messaging.FHIR.Handlers
             if (resource.Subject != null)
             {
                 // Is the subject a uuid
-                if (resource.Subject.ReferenceUrl.Value.StartsWith("urn:uuid:"))
-                    retVal.Participations.Add(new ActParticipation(ActParticipationKey.RecordTarget, Guid.Parse(resource.Subject.ReferenceUrl.Value.Substring(9))));
+                if (resource.Subject.Reference.StartsWith("urn:uuid:"))
+                    retVal.Participations.Add(new ActParticipation(ActParticipationKey.RecordTarget, Guid.Parse(resource.Subject.Reference.Substring(9))));
                 else throw new NotSupportedException("Only UUID references are supported");
             }
 
@@ -178,8 +182,8 @@ namespace SanteDB.Messaging.FHIR.Handlers
             if (resource.ServiceProvider != null)
             {
                 // Is the subject a uuid
-                if (resource.ServiceProvider.ReferenceUrl.Value.StartsWith("urn:uuid:"))
-                    retVal.Participations.Add(new ActParticipation(ActParticipationKey.Custodian, Guid.Parse(resource.ServiceProvider.ReferenceUrl.Value.Substring(9))));
+                if (resource.ServiceProvider.Reference.StartsWith("urn:uuid:"))
+                    retVal.Participations.Add(new ActParticipation(ActParticipationKey.Custodian, Guid.Parse(resource.ServiceProvider.Reference.Substring(9))));
                 else throw new NotSupportedException("Only UUID references are supported");
             }
 

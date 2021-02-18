@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Model;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model;
@@ -23,8 +24,6 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Services;
-using SanteDB.Messaging.FHIR.DataTypes;
-using SanteDB.Messaging.FHIR.Resources;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -33,6 +32,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Xml.Serialization;
+using static Hl7.Fhir.Model.CapabilityStatement;
 
 namespace SanteDB.Messaging.FHIR.Util
 {
@@ -53,7 +53,7 @@ namespace SanteDB.Messaging.FHIR.Util
         /// </summary>
         public Expression<Func<TModel, bool>> ToPredicate()
         {
-            return Expression.Lambda<Func<TModel, bool>>(this.QueryExpression.Body, this.QueryExpression.Parameters);
+            return System.Linq.Expressions.Expression.Lambda<Func<TModel, bool>>(this.QueryExpression.Body, this.QueryExpression.Parameters);
         }
     }
 
@@ -76,8 +76,8 @@ namespace SanteDB.Messaging.FHIR.Util
         /// </summary>
         static QueryRewriter()
         {
-            OpenMapping(typeof(QueryRewriter).Assembly.GetManifestResourceStream("SanteDB.Messaging.FHIR.ParameterMap.xml"));
-            var externMap = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "ParameterMap.Fhir.xml");
+            OpenMapping(typeof(QueryRewriter).Assembly.GetManifestResourceStream("SanteDB.Messaging.FHIR.FhirParameterMap.xml"));
+            var externMap = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "FhirParameterMap.xml");
 
             if (File.Exists(externMap))
                 using (var s = File.OpenRead(externMap))
@@ -100,23 +100,23 @@ namespace SanteDB.Messaging.FHIR.Util
                 s_map.Merge(map);
             }
 
-            s_default = s_map.Map.FirstOrDefault(o => o.SourceType == typeof(ResourceBase));
+            s_default = s_map.Map.FirstOrDefault(o => o.SourceType == typeof(Resource));
         }
 
         /// <summary>
         /// Get a list of search parameters
         /// </summary>
-        public static IEnumerable<SanteDB.Messaging.FHIR.Backbone.SearchParamDefinition> GetSearchParams<TFhirResource, TModelType>()
+        public static IEnumerable<SearchParamComponent> GetSearchParams<TFhirResource, TModelType>()
         {
             var map = s_map.Map.FirstOrDefault(o => o.SourceType == typeof(TFhirResource));
-            if (map == null) return new SanteDB.Messaging.FHIR.Backbone.SearchParamDefinition[0];
+            if (map == null) return null;
             else
-                return map.Map.Select(o => new SanteDB.Messaging.FHIR.Backbone.SearchParamDefinition()
+                return map.Map.Select(o => new SearchParamComponent()
                 {
                     Name = o.FhirName,
                     Type = MapFhirParameterType<TModelType>(o.FhirType, o.ModelName),
-                    Documentation = o.Description,
-                    Definition = new FhirUri(new Uri($"/Profile/SanteDB#search-{map.SourceType.Name}.{o.FhirName}", UriKind.Relative))
+                    Documentation = new Markdown(o.Description),
+                    Definition = $"/Profile/SanteDB#search-{map.SourceType.Name}.{o.FhirName}"
                 });
 
         }
@@ -124,15 +124,15 @@ namespace SanteDB.Messaging.FHIR.Util
         /// <summary>
         /// Map FHIR parameter type
         /// </summary>
-        private static SanteDB.Messaging.FHIR.Backbone.SearchParamType MapFhirParameterType<TModelType>(string type, string definition)
+        private static SearchParamType MapFhirParameterType<TModelType>(string type, string definition)
         {
             switch (type)
             {
                 case "concept":
                 case "identifier":
-                    return SanteDB.Messaging.FHIR.Backbone.SearchParamType.Token;
+                    return SearchParamType.Token;
                 case "reference":
-                    return SanteDB.Messaging.FHIR.Backbone.SearchParamType.Reference;
+                    return SearchParamType.Reference;
                 default:
                     try
                     {
@@ -141,26 +141,26 @@ namespace SanteDB.Messaging.FHIR.Util
                         switch (GetQueryType<TModelType>(definition).StripNullable().Name)
                         {
                             case "String":
-                                return SanteDB.Messaging.FHIR.Backbone.SearchParamType.String;
+                                return SearchParamType.String;
                             case "Uri":
-                                return SanteDB.Messaging.FHIR.Backbone.SearchParamType.Uri;
+                                return SearchParamType.Uri;
                             case "Int32":
                             case "Int64":
                             case "Int16":
                             case "Double":
                             case "Decimal":
                             case "Float":
-                                return SanteDB.Messaging.FHIR.Backbone.SearchParamType.Number;
+                                return SearchParamType.Number;
                             case "DateTime":
                             case "DateTimeOffset":
-                                return SanteDB.Messaging.FHIR.Backbone.SearchParamType.Date;
+                                return SearchParamType.Date;
                             default:
-                                return SanteDB.Messaging.FHIR.Backbone.SearchParamType.Composite;
+                                return SearchParamType.Composite;
                         }
                     }
                     catch
                     {
-                        return SanteDB.Messaging.FHIR.Backbone.SearchParamType.String;
+                        return SearchParamType.String;
                     }
             }
         }
@@ -352,17 +352,17 @@ namespace SanteDB.Messaging.FHIR.Util
                                 var segs = itm.Split('|');
 
                                 string codeSystemUri = segs[0];
-                                CodeSystem codeSystem = null;
+                                Core.Model.DataTypes.CodeSystem codeSystem = null;
 
                                 if (codeSystemUri.StartsWith("urn:oid:"))
                                 {
                                     codeSystemUri = codeSystemUri.Substring(8);
-                                    codeSystem = ApplicationServiceContext.Current.GetService<IRepositoryService<CodeSystem>>().Find(o => o.Oid == codeSystemUri).FirstOrDefault();
+                                    codeSystem = ApplicationServiceContext.Current.GetService<IRepositoryService<Core.Model.DataTypes.CodeSystem>>().Find(o => o.Oid == codeSystemUri).FirstOrDefault();
                                 }
                                 else if (codeSystemUri.StartsWith("urn:") || codeSystemUri.StartsWith("http:"))
-                                    codeSystem = ApplicationServiceContext.Current.GetService<IRepositoryService<CodeSystem>>().Find(o => o.Url == codeSystemUri).FirstOrDefault();
+                                    codeSystem = ApplicationServiceContext.Current.GetService<IRepositoryService<Core.Model.DataTypes.CodeSystem>>().Find(o => o.Url == codeSystemUri).FirstOrDefault();
                                 else
-                                    codeSystem = ApplicationServiceContext.Current.GetService<IRepositoryService<CodeSystem>>().Find(o => o.Name == codeSystemUri).FirstOrDefault();
+                                    codeSystem = ApplicationServiceContext.Current.GetService<IRepositoryService<Core.Model.DataTypes.CodeSystem>>().Find(o => o.Name == codeSystemUri).FirstOrDefault();
 
 
                                 s_tracer.TraceInfo("Have translated FHIR domain {0} to {1}", codeSystemUri, codeSystem?.Name);

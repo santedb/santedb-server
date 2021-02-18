@@ -16,9 +16,9 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Introspection;
+using Hl7.Fhir.Model;
 using RestSrvr;
-using SanteDB.Messaging.FHIR.DataTypes;
-using SanteDB.Messaging.FHIR.Resources;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -40,41 +40,36 @@ namespace SanteDB.Messaging.FHIR.Util
 
             // Base structure definition
             Assembly entryAssembly = Assembly.GetEntryAssembly();
-            FhirUri baseStructureDefn = null;
-            if (isProfile)
-                baseStructureDefn = new Uri(Reference.CreateResourceReference<StructureDefinition>(me.GetStructureDefinition(false), RestOperationContext.Current.IncomingRequest.Url).ReferenceUrl, UriKind.Relative);
-            else if (typeof(ResourceBase).IsAssignableFrom(me.BaseType))
-                baseStructureDefn = new Uri($"http://hl7.org/fhir/StructureDefinition/{me.BaseType.GetCustomAttribute<XmlTypeAttribute>().TypeName}", UriKind.Absolute);
+            var fhirType = me.GetCustomAttribute<FhirTypeAttribute>();
 
             // Create the structure definition
             var retVal = new StructureDefinition()
             {
                 Abstract = me.IsAbstract,
-                Base = baseStructureDefn,
-                Contact = new List<Backbone.ContactDetail>()
+                Contact = new List<ContactDetail>()
                 {
-                    new Backbone.ContactDetail()
+                    new ContactDetail()
                     {
                         Name =  me.Assembly.GetCustomAttribute<AssemblyCompanyAttribute>().Company
                     }
                 },
-                Name = me.GetCustomAttribute<DescriptionAttribute>()?.Description ?? me.Name,
-                Description = me.GetCustomAttribute<DescriptionAttribute>()?.Description ?? me.Name,
-                FhirVersion = "4.0.0",
-                Date = DateTime.Now,
-                Kind = StructureDefinitionKind.Resource,
-                Type = me.GetCustomAttribute<XmlTypeAttribute>()?.TypeName ?? me.Name,
-                DerivationType = isProfile ? TypeDerivationRule.Constraint : TypeDerivationRule.Specialization,
+                Name = me.Name,
+                Description = new Markdown(me.GetCustomAttribute<DescriptionAttribute>()?.Description ?? me.Name),
+                FhirVersion = FHIRVersion.N4_0_0,
+                DateElement = new FhirDateTime(DateTime.Now),
+                Kind = fhirType.IsResource ? StructureDefinition.StructureDefinitionKind.Resource : StructureDefinition.StructureDefinitionKind.ComplexType,
+                Type = fhirType.Name,
+                Derivation = StructureDefinition.TypeDerivationRule.Constraint,
                 Id = me.GetCustomAttribute<XmlTypeAttribute>()?.TypeName ?? me.Name,
                 Version = entryAssembly.GetName().Version.ToString(),
                 VersionId = me.Assembly.GetName().Version.ToString(),
-                Copyright = me.Assembly.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright,
+                Copyright = new Markdown(me.Assembly.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright),
                 Experimental = true,
                 Publisher = me.Assembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company,
                 Status = PublicationStatus.Active
             };
 
-            // Structure definitions
+            // TODO: Scan for profile handlers
             return retVal;
         }
     }

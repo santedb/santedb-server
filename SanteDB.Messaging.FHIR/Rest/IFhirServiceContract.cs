@@ -16,8 +16,8 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Model;
 using RestSrvr.Attributes;
-using SanteDB.Messaging.FHIR.Resources;
 using System;
 using System.IO;
 using System.Xml.Schema;
@@ -31,22 +31,6 @@ namespace SanteDB.Messaging.FHIR.Rest
     /// This contract provides a wrapper for HL7 Fast Health Interoperability Resources (FHIR) STU3 resources.
     /// </remarks>
     [ServiceContract(Name = "FHIR")]
-    [ServiceKnownResource(typeof(Patient))]
-    [ServiceKnownResource(typeof(Organization))]
-    [ServiceKnownResource(typeof(Practitioner))]
-    [ServiceKnownResource(typeof(ValueSet))]
-    [ServiceKnownResource(typeof(StructureDefinition))]
-    [ServiceKnownResource(typeof(Bundle))]
-    [ServiceKnownResource(typeof(Immunization))]
-    [ServiceKnownResource(typeof(ImmunizationRecommendation))]
-    [ServiceKnownResource(typeof(CapabilityStatement))]
-    [ServiceKnownResource(typeof(RelatedPerson))]
-    [ServiceKnownResource(typeof(Encounter))]
-    [ServiceKnownResource(typeof(Condition))]
-    [ServiceKnownResource(typeof(AdverseEvent))]
-    [ServiceKnownResource(typeof(MedicationAdministration))]
-    [ServiceKnownResource(typeof(Location))]
-    [ServiceKnownResource(typeof(AllergyIntolerance))]
     [ServiceProduces("application/fhir+json")]
     [ServiceProduces("application/fhir+xml")]
     [ServiceConsumes("application/fhir+json")]
@@ -79,43 +63,43 @@ namespace SanteDB.Messaging.FHIR.Rest
         /// Read a resource
         /// </summary>
         [Get("/{resourceType}/{id}")]
-        ResourceBase ReadResource(string resourceType, string id);
+        Resource ReadResource(string resourceType, string id);
 
         /// <summary>
         /// Version read a resource
         /// </summary>
         [Get("/{resourceType}/{id}/_history/{vid}")]
-        ResourceBase VReadResource(string resourceType, string id, string vid);
+        Resource VReadResource(string resourceType, string id, string vid);
 
         /// <summary>
         /// Update a resource
         /// </summary>
         [RestInvoke(UriTemplate = "/{resourceType}/{id}", Method = "PUT")]
-        ResourceBase UpdateResource(string resourceType, string id, ResourceBase target);
+        Resource UpdateResource(string resourceType, string id, Resource target);
 
         /// <summary>
         /// Delete a resource
         /// </summary>
         [RestInvoke(UriTemplate = "/{resourceType}/{id}", Method = "DELETE")]
-        ResourceBase DeleteResource(string resourceType, string id);
+        Resource DeleteResource(string resourceType, string id);
 
         /// <summary>
         /// Create a resource
         /// </summary>
         [RestInvoke(UriTemplate = "/{resourceType}", Method = "POST")]
-        ResourceBase CreateResource(string resourceType, ResourceBase target);
+        Resource CreateResource(string resourceType, Resource target);
 
         /// <summary>
         /// Create a resource
         /// </summary>
         [RestInvoke(UriTemplate = "/{resourceType}/{id}", Method = "POST")]
-        ResourceBase CreateUpdateResource(string resourceType, string id, ResourceBase target);
+        Resource CreateUpdateResource(string resourceType, string id, Resource target);
 
         /// <summary>
         /// Validate a resource
         /// </summary>
         [RestInvoke(UriTemplate = "/{resourceType}/_validate/{id}", Method = "POST")]
-        OperationOutcome ValidateResource(string resourceType, string id, ResourceBase target);
+        OperationOutcome ValidateResource(string resourceType, string id, Resource target);
 
         /// <summary>
         /// Version read a resource

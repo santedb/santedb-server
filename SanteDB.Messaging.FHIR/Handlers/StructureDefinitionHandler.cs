@@ -16,13 +16,13 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Model;
 using SanteDB.Core.Services;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using static Hl7.Fhir.Model.CapabilityStatement;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -45,7 +45,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Create the specified definition
         /// </summary>
-        public ResourceBase Create(ResourceBase target, Core.Services.TransactionMode mode)
+        public Resource Create(Resource target, Core.Services.TransactionMode mode)
         {
             throw new NotSupportedException();
         }
@@ -53,7 +53,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Delete
         /// </summary>
-        public ResourceBase Delete(string id, Core.Services.TransactionMode mode)
+        public Resource Delete(string id, Core.Services.TransactionMode mode)
         {
             throw new NotSupportedException();
         }
@@ -61,29 +61,29 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Get the resource definition
         /// </summary>
-        public ResourceDefinition GetResourceDefinition()
+        public ResourceComponent GetResourceDefinition()
         {
-            return new ResourceDefinition()
+            return new ResourceComponent()
             {
                 ConditionalCreate = false,
                 ConditionalDelete = ConditionalDeleteStatus.NotSupported,
                 ConditionalUpdate = false,
-                Interaction = new List<InteractionDefinition>()
+                Interaction = new List<ResourceInteractionComponent>()
                 {
-                    new InteractionDefinition()
+                    new ResourceInteractionComponent()
                     {
-                        Type = TypeRestfulInteraction.Read
+                        Code = TypeRestfulInteraction.Read
                     },
-                    new InteractionDefinition()
+                    new ResourceInteractionComponent()
                     {
-                        Type = TypeRestfulInteraction.VersionRead
+                        Code = TypeRestfulInteraction.Vread
                     },
-                    new InteractionDefinition()
+                    new ResourceInteractionComponent()
                     {
-                        Type = TypeRestfulInteraction.Search
+                        Code = TypeRestfulInteraction.SearchType
                     }
                 },
-                Type = "StructureDefinition",
+                Type = ResourceType.StructureDefinition,
                 ReadHistory = true,
                 UpdateCreate = false,
                 Versioning = ResourceVersionPolicy.Versioned
@@ -117,7 +117,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Read the specified structure definition
         /// </summary>
-        public ResourceBase Read(string id, string versionId)
+        public Resource Read(string id, string versionId)
         {
             throw new NotSupportedException();
         }
@@ -125,7 +125,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Update
         /// </summary>
-        public ResourceBase Update(string id, ResourceBase target, Core.Services.TransactionMode mode)
+        public Resource Update(string id, Resource target, Core.Services.TransactionMode mode)
         {
             throw new NotSupportedException();
         }

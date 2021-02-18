@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Model;
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Model;
@@ -23,12 +24,11 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Hl7.Fhir.Model.CapabilityStatement;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -48,36 +48,45 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			retVal.Identifier = model.Identifiers.Select(o => DataTypeConverter.ToFhirIdentifier<Entity>(o)).ToList();
 
 			// sTatus
-			if (model.StatusConceptKey == StatusKeys.Active)
-				retVal.Status = SubstanceStatus.Active;
-			else if (model.StatusConceptKey == StatusKeys.Nullified)
-				retVal.Status = SubstanceStatus.Nullified;
-			else if (model.StatusConceptKey == StatusKeys.Obsolete)
-				retVal.Status = SubstanceStatus.Inactive;
+			switch(model.StatusConceptKey.ToString().ToUpper())
+            {
+				case StatusKeyStrings.New:
+				case StatusKeyStrings.Active:
+					retVal.Status = Substance.FHIRSubstanceStatus.Active;
+					break;
+				case StatusKeyStrings.Nullified:
+					retVal.Status = Substance.FHIRSubstanceStatus.EnteredInError;
+					break;
+				case StatusKeyStrings.Obsolete:
+					retVal.Status = Substance.FHIRSubstanceStatus.Inactive;
+					break;
+            }
 
 			// Category and code
-			if (model.LoadProperty<Concept>("TypeConcept").ConceptSetsXml.Any(o => o == ConceptSetKeys.VaccineTypeCodes))
-				retVal.Category = new SanteDB.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/substance-category"), "drug");
-			else
-				retVal.Category = new SanteDB.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/substance-category"), "material");
-
-			retVal.Code = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("TypeConcept"), "http://hl7.org/fhir/ValueSet/substance-code");
+			retVal.Category = new List<CodeableConcept>() { DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>(nameof(Entity.TypeConcept)), "http://terminology.hl7.org/CodeSystem/substance-category", true) };
+			retVal.Code = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("TypeConcept"), "http://snomed.info/sct", true);
 
 			retVal.Description = model.LoadCollection<EntityName>("Names").FirstOrDefault(o => o.NameUseKey == NameUseKeys.OfficialRecord)?.LoadCollection<EntityNameComponent>("Components")?.FirstOrDefault()?.Value;
 
 			// TODO: Instance or kind
-			if (model.DeterminerConceptKey == DeterminerKeys.Specific)
+			if(model.DeterminerConceptKey == DeterminerKeys.Described)
+            {
+				retVal.Instance = model.GetRelationships().Where(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Instance).Select(s => s.LoadProperty<Material>(nameof(EntityRelationship.TargetEntity))).Select(m => new Substance.InstanceComponent()
+				{
+					ExpiryElement = new FhirDateTime(m.ExpiryDate.Value),
+					Identifier = DataTypeConverter.ToFhirIdentifier( m.GetIdentifiers().FirstOrDefault()),
+					Quantity = DataTypeConverter.ToQuantity(m.Quantity, m.LoadProperty<Concept>(nameof(Material.QuantityConcept)))
+				}).ToList();
+            }
+			else if (model.DeterminerConceptKey == DeterminerKeys.Specific)
 			{
 				var conceptRepo = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>();
-				retVal.Instance = new List<SanteDB.Messaging.FHIR.Backbone.SubstanceInstance>()
+				retVal.Instance = new List<Substance.InstanceComponent>()
 				{
-					new SanteDB.Messaging.FHIR.Backbone.SubstanceInstance()
+					new Substance.InstanceComponent()
 					{
-						Expiry = model.ExpiryDate,
-						Quantity = new SanteDB.Messaging.FHIR.DataTypes.FhirQuantity() {
-							Units = model.QuantityConceptKey.HasValue ? conceptRepo.GetConceptReferenceTerm(model.QuantityConceptKey.Value, "UCUM").Mnemonic : null,
-							Value = model.Quantity
-						}
+						ExpiryElement = new FhirDateTime(model.ExpiryDate.Value),
+						Quantity = DataTypeConverter.ToQuantity(model.Quantity, model.LoadProperty<Concept>(nameof(Material.QuantityConcept)))
 					}
 				};
 			}
@@ -99,16 +108,16 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Get interactions
         /// </summary>
-        protected override IEnumerable<InteractionDefinition> GetInteractions()
+        protected override IEnumerable<ResourceInteractionComponent> GetInteractions()
         {
             return new TypeRestfulInteraction[]
             {
-                TypeRestfulInteraction.InstanceHistory,
+                TypeRestfulInteraction.HistoryInstance,
                 TypeRestfulInteraction.Read,
-                TypeRestfulInteraction.Search,
-                TypeRestfulInteraction.VersionRead,
+                TypeRestfulInteraction.SearchType,
+                TypeRestfulInteraction.Vread,
                 TypeRestfulInteraction.Delete
-            }.Select(o => new InteractionDefinition() { Type = o });
+            }.Select(o => new ResourceInteractionComponent() { Code = o });
         }
     }
 }

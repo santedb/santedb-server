@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Model;
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Model;
@@ -25,14 +26,12 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.DataTypes;
-using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using static Hl7.Fhir.Model.CapabilityStatement;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -52,16 +51,17 @@ namespace SanteDB.Messaging.FHIR.Handlers
 
 			// Clinical status of the condition
 			if (model.StatusConceptKey == StatusKeys.Active)
-				retVal.ClinicalStatus = ConditionClinicalStatus.Active;
+				retVal.ClinicalStatus = new CodeableConcept("http://terminology.hl7.org/CodeSystem/condition-clinical", "active");
 			else if (model.StatusConceptKey == StatusKeys.Completed)
-				retVal.ClinicalStatus = ConditionClinicalStatus.Resolved;
+				retVal.ClinicalStatus = new CodeableConcept("http://terminology.hl7.org/CodeSystem/condition-clinical", "resolved");
+
 			else if (model.StatusConceptKey == StatusKeys.Nullified)
-				retVal.VerificationStatus = ConditionVerificationStatus.EnteredInError;
+				retVal.VerificationStatus = new CodeableConcept("http://terminology.hl7.org/CodeSystem/condition-clinical", "entered-in-error");
 			else if (model.StatusConceptKey == StatusKeys.Obsolete)
-				retVal.ClinicalStatus = ConditionClinicalStatus.Inactive;
+				retVal.ClinicalStatus = new CodeableConcept("http://terminology.hl7.org/CodeSystem/condition-clinical", "inactive");
 
 			// Category
-			retVal.Category.Add(new SanteDB.Messaging.FHIR.DataTypes.FhirCodeableConcept(new Uri("http://hl7.org/fhir/condition-category"), "encounter-diagnosis"));
+			retVal.Category.Add(new CodeableConcept("http://hl7.org/fhir/condition-category", "encounter-diagnosis"));
 
 			// Severity?
 			var actRelationshipService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ActRelationship>>();
@@ -89,22 +89,22 @@ namespace SanteDB.Messaging.FHIR.Handlers
             if (recordTarget != null)
             {
                 this.traceSource.TraceInfo("RCT: {0}", recordTarget.PlayerEntityKey);
-                retVal.Subject = DataTypeConverter.CreateReference<Patient>(recordTarget.LoadProperty<Entity>("PlayerEntity"), restOperationContext);
+                retVal.Subject = DataTypeConverter.CreateVersionedReference<Patient>(recordTarget.LoadProperty<Entity>("PlayerEntity"), restOperationContext);
             }
 			// Onset
 			if (model.StartTime.HasValue || model.StopTime.HasValue)
-				retVal.Onset = new FhirPeriod()
+				retVal.Onset = new Period()
 				{
-					Start = model.StartTime?.DateTime,
-					Stop = model.StopTime?.DateTime
+					StartElement = model.StartTime.HasValue ? new FhirDateTime(model.StartTime.Value) : null,
+					EndElement = model.StopTime.HasValue ? new FhirDateTime(model.StopTime.Value) : null
 				};
 			else
-				retVal.Onset = new FhirDateTime(model.ActTime.DateTime);
+				retVal.Onset = new FhirDateTime(model.ActTime);
 
-			retVal.AssertionDate = model.CreationTime.LocalDateTime;
+			retVal.RecordedDateElement = new FhirDateTime(model.CreationTime);
 			var author = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Authororiginator);
 			if (author != null)
-				retVal.Asserter = DataTypeConverter.CreatePlainReference<Practitioner>(author.LoadProperty<Entity>("PlayerEntity"), restOperationContext);
+				retVal.Asserter = DataTypeConverter.CreateNonVersionedReference<Practitioner>(author.LoadProperty<Entity>("PlayerEntity"), restOperationContext);
 
 			return retVal;
 		}
@@ -126,7 +126,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		protected override IEnumerable<CodedObservation> Query(Expression<Func<CodedObservation, bool>> query, Guid queryId, int offset, int count, out int totalResults)
 		{
 			var anyRef = base.CreateConceptSetFilter(ConceptSetKeys.ProblemObservations, query.Parameters[0]);
-			query = Expression.Lambda<Func<CodedObservation, bool>>(Expression.AndAlso(query.Body, anyRef), query.Parameters);
+			query = System.Linq.Expressions.Expression.Lambda<Func<CodedObservation, bool>>(System.Linq.Expressions.Expression.AndAlso(query.Body, anyRef), query.Parameters);
 
 			return base.Query(query, queryId, offset, count, out totalResults);
 		}
@@ -134,16 +134,16 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Get interactions
         /// </summary>
-        protected override IEnumerable<InteractionDefinition> GetInteractions()
+        protected override IEnumerable<ResourceInteractionComponent> GetInteractions()
         {
             return new TypeRestfulInteraction[]
             {
-                TypeRestfulInteraction.InstanceHistory,
+                TypeRestfulInteraction.HistoryInstance,
                 TypeRestfulInteraction.Read,
-                TypeRestfulInteraction.Search,
-                TypeRestfulInteraction.VersionRead,
+                TypeRestfulInteraction.SearchType,
+                TypeRestfulInteraction.Vread,
                 TypeRestfulInteraction.Delete
-            }.Select(o => new InteractionDefinition() { Type = o });
+            }.Select(o => new ResourceInteractionComponent() { Code = o });
         }
     }
 }

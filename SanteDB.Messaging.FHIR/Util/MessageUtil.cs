@@ -16,16 +16,16 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Model;
 using RestSrvr;
 using SanteDB.Core;
+using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Services;
-using SanteDB.Messaging.FHIR.Backbone;
 using SanteDB.Messaging.FHIR.Configuration;
-using SanteDB.Messaging.FHIR.Resources;
-using SanteDB.Messaging.FHIR.Resources.Attributes;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace SanteDB.Messaging.FHIR.Util
 {
@@ -78,7 +78,7 @@ namespace SanteDB.Messaging.FHIR.Util
             int pageNo = queryResult == null || queryResult.Query.Quantity == 0 ? 0 : queryResult.Query.Start / queryResult.Query.Quantity,
                 nPages = queryResult == null || queryResult.Query.Quantity == 0 ? 1 : (queryResult.TotalResults / queryResult.Query.Quantity);
 
-            retVal.Type = BundleType.SearchResults;
+            retVal.Type = Bundle.BundleType.Searchset;
 
             retVal.Id = String.Format("urn:uuid:{0}", Guid.NewGuid());
 
@@ -122,20 +122,20 @@ namespace SanteDB.Messaging.FHIR.Util
             // Self URI
             if (queryResult != null && queryResult.TotalResults > queryResult.Results.Count)
             {
-                retVal.Link.Add(new BundleLink(new Uri(String.Format("{0}_page={1}&_count={2}", queryUri, pageNo, queryResult?.Query.Quantity ?? 100)), "self"));
+                retVal.Link.Add(new Bundle.LinkComponent() { Url = $"{queryUri}_page={pageNo}&_count={queryResult?.Query.Quantity ?? 100}", Relation = "self" });
                 if (pageNo > 0)
                 {
-                    retVal.Link.Add(new BundleLink(new Uri(String.Format("{0}_page=0&_count={1}", queryUri, queryResult?.Query.Quantity ?? 100)), "first"));
-                    retVal.Link.Add(new BundleLink(new Uri(String.Format("{0}_page={1}&_count={2}", queryUri, pageNo - 1, queryResult?.Query.Quantity ?? 100)), "previous"));
+                    retVal.Link.Add(new Bundle.LinkComponent() { Url = $"{queryUri}_page=0&_count={queryResult?.Query.Quantity ?? 100}", Relation = "first" });
+                    retVal.Link.Add(new Bundle.LinkComponent() { Url = $"{queryUri}_page={pageNo - 1}&_count={queryResult?.Query.Quantity ?? 100}", Relation = "previous" });
                 }
                 if (pageNo <= nPages)
                 {
-                    retVal.Link.Add(new BundleLink(new Uri(String.Format("{0}_page={1}&_count={2}", queryUri, pageNo + 1, queryResult?.Query.Quantity ?? 100)), "next"));
-                    retVal.Link.Add(new BundleLink(new Uri(String.Format("{0}_page={1}&_count={2}", queryUri, nPages + 1, queryResult?.Query.Quantity ?? 100)), "last"));
+                    retVal.Link.Add(new Bundle.LinkComponent() { Url = $"{queryUri}_page={pageNo + 1}&_count={queryResult?.Query.Quantity ?? 100}", Relation = "next" });
+                    retVal.Link.Add(new Bundle.LinkComponent() { Url = $"{queryUri}_page={nPages}&_count={queryResult?.Query.Quantity ?? 100}", Relation = "last" });
                 }
             }
             else
-                retVal.Link.Add(new BundleLink(new Uri(queryUri), "self"));
+                retVal.Link.Add(new Bundle.LinkComponent() { Url = queryUri, Relation = "self" });
 
             // Updated
             retVal.Timestamp = DateTime.Now;
@@ -149,28 +149,27 @@ namespace SanteDB.Messaging.FHIR.Util
             // Results
             if (result.Results != null)
             {
-                var feedItems = new List<BundleEntry>();
-                foreach (DomainResourceBase itm in result.Results)
+                retVal.Entry = result.Results.Select(itm =>
                 {
                     Uri resourceUrl = new Uri(String.Format("{0}/{1}?_format={2}", baseUri, String.Format("{0}/{1}/_history/{2}", itm.GetType().Name, itm.Id, itm.VersionId), format));
-                    BundleEntry feedResult = new BundleEntry(); //new Bundleentry(String.Format("{0} id {1} version {2}", itm.GetType().Name, itm.Id, itm.VersionId), null ,resourceUrl);
+                    var feedResult = new Bundle.EntryComponent(); //new Bundleentry(String.Format("{0} id {1} version {2}", itm.GetType().Name, itm.Id, itm.VersionId), null ,resourceUrl);
+                    feedResult.Link = new List<Bundle.LinkComponent>() { new Bundle.LinkComponent() { Relation = "_self", Url = $"/{itm.ResourceType}/{itm.Id}/_history/{itm.VersionId}" } };
+                    feedResult.FullUrl = $"urn:uuid:{itm.Id}";
 
-                    feedResult.Link = new List<BundleLink>() { new BundleLink(resourceUrl, "_self") };
-                    feedResult.FullUrl = new Uri($"urn:uuid:{itm.Id}");
-                    string summary = "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + itm.Text.ToString() + "</div>";
+                    // TODO: Generate the text with a util
+
 
                     // Add confidence if the attribute permits
-                    ConfidenceAttribute confidence = itm.Attributes.Find(a => a is ConfidenceAttribute) as ConfidenceAttribute;
+                    var confidence = itm.Annotations(typeof(ITag)).OfType<ITag>().FirstOrDefault(t => t.TagKey == "$conf");
                     if (confidence != null)
-                        feedResult.Search = new BundleSearch()
+                        feedResult.Search = new Bundle.SearchComponent()
                         {
-                            Score = confidence.Confidence
+                            Score = Decimal.Parse(confidence.Value)
                         };
 
-                    feedResult.Resource = new BundleResrouce(itm);
-                    feedItems.Add(feedResult);
-                }
-                retVal.Entry = feedItems;
+                    feedResult.Resource = itm;
+                    return feedResult;
+                }).ToList();
             }
 
             // Outcome

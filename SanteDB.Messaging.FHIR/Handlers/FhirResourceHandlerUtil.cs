@@ -16,8 +16,8 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Model;
 using RestSrvr;
-using SanteDB.Messaging.FHIR.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,12 +71,11 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Get REST definition
         /// </summary>
-        public static IEnumerable<Backbone.ResourceDefinition> GetRestDefinition()
+        public static IEnumerable<CapabilityStatement.ResourceComponent> GetRestDefinition()
         {
             return s_messageProcessors.Select(o => {
                 var resourceDef = o.GetResourceDefinition();
                 var structureDef = o.GetStructureDefinition();
-                resourceDef.Profile = Reference.CreateResourceReference(structureDef, RestOperationContext.Current.IncomingRequest.Url);
                 return resourceDef;
             });
         }

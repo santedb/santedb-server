@@ -16,18 +16,19 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Model;
 using RestSrvr;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
-using SanteDB.Messaging.FHIR.DataTypes;
-using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using static Hl7.Fhir.Model.CapabilityStatement;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -79,46 +80,45 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			ImmunizationRecommendation retVal = new ImmunizationRecommendation();
 
 			retVal.Id = model.Key.ToString();
-			retVal.Timestamp = DateTime.Now;
+			retVal.DateElement = new FhirDateTime(DateTimeOffset.Now);
 			retVal.Identifier = model.Identifiers.Select(o => DataTypeConverter.ToFhirIdentifier(o)).ToList();
 
-			var rct = model.Participations.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget).PlayerEntity;
+			var rct = model.LoadCollection<ActParticipation>(nameof(Act.Participations)).FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget)?.LoadProperty<Entity>(nameof(ActParticipation.PlayerEntity));
 			if (rct != null)
-				retVal.Patient = Reference.CreateResourceReference(new Patient() { Id = model.Key.ToString(), VersionId = model.VersionKey.ToString() }, RestOperationContext.Current.IncomingRequest.Url);
+				retVal.Patient = DataTypeConverter.CreateNonVersionedReference<Patient>(rct, restOperationContext);
 
 			var mat = model.Participations.FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Product).PlayerEntity;
 
 			// Recommend
 			string status = (model.StopTime ?? model.ActTime) < DateTimeOffset.Now ? "overdue" : "due";
-			var recommendation = new SanteDB.Messaging.FHIR.Backbone.ImmunizationRecommendation()
+			var recommendation = new ImmunizationRecommendation.RecommendationComponent()
 			{
-				Date = model.CreationTime.DateTime,
-				DoseNumber = model.SequenceId,
-				VaccineCode = DataTypeConverter.ToFhirCodeableConcept(mat?.TypeConcept),
-				ForecastStatus = new FhirCodeableConcept(new Uri("http://hl7.org/fhir/conceptset/immunization-recommendation-status"), status),
-                DateCriterion = new List<SanteDB.Messaging.FHIR.Backbone.ImmunizationRecommendationDateCriterion>()
+				DoseNumber = new PositiveInt(model.SequenceId),
+				VaccineCode = new List<CodeableConcept>() { DataTypeConverter.ToFhirCodeableConcept(mat?.TypeConcept) },
+				ForecastStatus = new CodeableConcept("http://hl7.org/fhir/conceptset/immunization-recommendation-status", status),
+                DateCriterion = new List<ImmunizationRecommendation.DateCriterionComponent>()
 				{
-					new SanteDB.Messaging.FHIR.Backbone.ImmunizationRecommendationDateCriterion()
+					new ImmunizationRecommendation.DateCriterionComponent()
 					{
-						Code = new FhirCodeableConcept(new Uri("http://hl7.org/fhir/conceptset/immunization-recommendation-date-criterion"), "recommended"),
-						Value = model.ActTime.DateTime
+						Code = new CodeableConcept("http://hl7.org/fhir/conceptset/immunization-recommendation-date-criterion", "recommended"),
+						ValueElement = new FhirDateTime(model.ActTime)
 					}
 				}
 			};
 			if (model.StartTime.HasValue)
-				recommendation.DateCriterion.Add(new SanteDB.Messaging.FHIR.Backbone.ImmunizationRecommendationDateCriterion()
+				recommendation.DateCriterion.Add(new ImmunizationRecommendation.DateCriterionComponent()
 				{
-					Code = new FhirCodeableConcept(new Uri("http://hl7.org/fhir/conceptset/immunization-recommendation-date-criterion"), "earliest"),
-					Value = model.StartTime.Value.DateTime
+					Code = new CodeableConcept("http://hl7.org/fhir/conceptset/immunization-recommendation-date-criterion", "earliest"),
+					ValueElement = new FhirDateTime(model.StartTime.Value)
 				});
 			if (model.StopTime.HasValue)
-				recommendation.DateCriterion.Add(new SanteDB.Messaging.FHIR.Backbone.ImmunizationRecommendationDateCriterion()
+				recommendation.DateCriterion.Add(new ImmunizationRecommendation.DateCriterionComponent()
 				{
-					Code = new FhirCodeableConcept(new Uri("http://hl7.org/fhir/conceptset/immunization-recommendation-date-criterion"), "overdue"),
-					Value = model.StopTime.Value.DateTime
+					Code = new CodeableConcept("http://hl7.org/fhir/conceptset/immunization-recommendation-date-criterion", "overdue"),
+					ValueElement = new FhirDateTime(model.StopTime.Value)
 				});
 
-			retVal.Recommendation = new List<SanteDB.Messaging.FHIR.Backbone.ImmunizationRecommendation>() { recommendation };
+			retVal.Recommendation = new List<ImmunizationRecommendation.RecommendationComponent>() { recommendation };
 			return retVal;
 		}
 
@@ -145,8 +145,8 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		protected override IEnumerable<SubstanceAdministration> Query(Expression<Func<SubstanceAdministration, bool>> query, Guid queryId, int offset, int count, out int totalResults)
 		{
 			// TODO: Hook this up to the forecaster
-			var obsoletionReference = Expression.MakeBinary(ExpressionType.NotEqual, Expression.MakeMemberAccess(query.Parameters[0], typeof(SubstanceAdministration).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
-			query = Expression.Lambda<Func<SubstanceAdministration, bool>>(Expression.AndAlso(obsoletionReference, query), query.Parameters);
+			var obsoletionReference = System.Linq.Expressions.Expression.MakeBinary(ExpressionType.NotEqual, System.Linq.Expressions.Expression.MakeMemberAccess(query.Parameters[0], typeof(SubstanceAdministration).GetProperty(nameof(BaseEntityData.ObsoletionTime))), System.Linq.Expressions.Expression.Constant(null));
+			query = System.Linq.Expressions.Expression.Lambda<Func<SubstanceAdministration, bool>>(System.Linq.Expressions.Expression.AndAlso(obsoletionReference, query), query.Parameters);
             totalResults = 0;
             //return this.repository.Find<SubstanceAdministration>(query, offset, count, out totalResults);
             return null;
@@ -180,11 +180,13 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Get interactions
         /// </summary>
-        protected override IEnumerable<SanteDB.Messaging.FHIR.Backbone.InteractionDefinition> GetInteractions()
+        protected override IEnumerable<ResourceInteractionComponent> GetInteractions()
         {
-            return new SanteDB.Messaging.FHIR.Backbone.TypeRestfulInteraction[]
+            return new TypeRestfulInteraction[]
             {
-            }.Select(o => new SanteDB.Messaging.FHIR.Backbone.InteractionDefinition() { Type = o });
+				TypeRestfulInteraction.Read,
+				TypeRestfulInteraction.SearchType
+            }.Select(o => new ResourceInteractionComponent() { Code = o });
         }
     }
 }

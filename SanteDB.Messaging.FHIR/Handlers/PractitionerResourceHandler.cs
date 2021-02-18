@@ -16,19 +16,18 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Model;
 using RestSrvr;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.DataTypes;
-using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Hl7.Fhir.Model.CapabilityStatement;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -40,16 +39,16 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Get the interactions that this resource handler supports
         /// </summary>
-        protected override IEnumerable<InteractionDefinition> GetInteractions()
+        protected override IEnumerable<ResourceInteractionComponent> GetInteractions()
         {
             return new TypeRestfulInteraction[]
             {
-                TypeRestfulInteraction.InstanceHistory,
+                TypeRestfulInteraction.HistoryInstance,
                 TypeRestfulInteraction.Read,
-                TypeRestfulInteraction.Search,
-                TypeRestfulInteraction.VersionRead,
+                TypeRestfulInteraction.SearchType,
+                TypeRestfulInteraction.Vread,
                 TypeRestfulInteraction.Delete
-            }.Select(o => new InteractionDefinition() { Type = o });
+            }.Select(o => new ResourceInteractionComponent() { Code = o });
         }
 
         /// <summary>
@@ -77,12 +76,12 @@ namespace SanteDB.Messaging.FHIR.Handlers
             retVal.Address = (provider?.LoadCollection<EntityAddress>("Addresses") ?? model.LoadCollection<EntityAddress>("Addresses"))?.Select(o => DataTypeConverter.ToFhirAddress(o)).ToList();
 
             // Birthdate
-            retVal.BirthDate = (provider?.DateOfBirth ?? model.DateOfBirth);
+            retVal.BirthDateElement = DataTypeConverter.ToFhirDate(provider?.DateOfBirth ?? model.DateOfBirth);
 
-            var photo = (provider?.LoadCollection<EntityExtension>("Extensions") ?? model.LoadCollection<EntityExtension>("Extensions"))?.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.JpegPhotoExtension);
+            var photo = (provider?.LoadCollection<EntityExtension>(nameof(Entity.Extensions)) ?? model.LoadCollection<EntityExtension>(nameof(Entity.Extensions)))?.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.JpegPhotoExtension);
             if (photo != null)
-                retVal.Photo = new List<FhirAttachment>() {
-                    new FhirAttachment()
+                retVal.Photo = new List<Attachment>() {
+                    new Attachment()
                     {
                         ContentType = "image/jpg",
                         Data = photo.ExtensionValueXml
@@ -90,13 +89,13 @@ namespace SanteDB.Messaging.FHIR.Handlers
                 };
 
             // Load the koala-fications 
-            retVal.Qualification = provider?.LoadCollection<Concept>("ProviderSpecialty").Select(o => new Qualification()
+            retVal.Qualification = provider?.LoadCollection<Concept>("ProviderSpecialty").Select(o => new Practitioner.QualificationComponent()
             {
                 Code = DataTypeConverter.ToFhirCodeableConcept(o)
             }).ToList();
 
             // Language of communication
-            retVal.Communication = (provider?.LoadCollection<PersonLanguageCommunication>("LanguageCommunication") ?? model.LoadCollection<PersonLanguageCommunication>("LanguageCommunication"))?.Select(o => new FhirCodeableConcept(new Uri("http://tools.ietf.org/html/bcp47"), o.LanguageCode)).ToList();
+            retVal.Communication = (provider?.LoadCollection<PersonLanguageCommunication>(nameof(Core.Model.Entities.Person.LanguageCommunication)) ?? model.LoadCollection<PersonLanguageCommunication>(nameof(Core.Model.Entities.Person.LanguageCommunication)))?.Select(o => new CodeableConcept("http://tools.ietf.org/html/bcp47", o.LanguageCode)).ToList();
 
             return retVal;
         }

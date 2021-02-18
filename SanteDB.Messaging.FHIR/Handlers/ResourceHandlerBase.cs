@@ -16,6 +16,8 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Introspection;
+using Hl7.Fhir.Model;
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
@@ -24,7 +26,6 @@ using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
-using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Xml.Serialization;
+using static Hl7.Fhir.Model.CapabilityStatement;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -45,7 +47,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
     /// <typeparam name="TModel">The type of the t model.</typeparam>
     /// <seealso cref="SanteDB.Messaging.FHIR.Handlers.IFhirResourceHandler" />
     public abstract class ResourceHandlerBase<TFhirResource, TModel> : IFhirResourceHandler
-		where TFhirResource : ResourceBase, new()
+		where TFhirResource : Resource, new()
 		where TModel : IdentifiedData, new()
 
 	{
@@ -69,7 +71,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <exception cref="System.ArgumentNullException">target</exception>
 		/// <exception cref="System.IO.InvalidDataException"></exception>
 		/// <exception cref="System.Data.SyntaxErrorException"></exception>
-		public virtual ResourceBase Create(ResourceBase target, TransactionMode mode)
+		public virtual Resource Create(Resource target, TransactionMode mode)
 		{
 			this.traceSource.TraceInfo("Creating resource {0} ({1})", this.ResourceName, target);
 
@@ -97,7 +99,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <returns>FhirOperationResult.</returns>
         /// <exception cref="System.ArgumentNullException">id</exception>
         /// <exception cref="System.ArgumentException"></exception>
-        public ResourceBase Delete(string id, TransactionMode mode)
+        public Resource Delete(string id, TransactionMode mode)
         {
             if (String.IsNullOrEmpty(id))
                 throw new ArgumentNullException(nameof(id));
@@ -119,25 +121,22 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Get definition for the specified resource
         /// </summary>
-        public virtual SanteDB.Messaging.FHIR.Backbone.ResourceDefinition GetResourceDefinition()
+        public virtual ResourceComponent GetResourceDefinition()
         {
-            return new SanteDB.Messaging.FHIR.Backbone.ResourceDefinition()
-            {
-                ConditionalCreate = false,
-                ConditionalUpdate = true,
-                ConditionalDelete = SanteDB.Messaging.FHIR.Backbone.ConditionalDeleteStatus.NotSupported,
-                ReadHistory = true,
-                UpdateCreate = true,
-                Versioning = typeof(IVersionedEntity).IsAssignableFrom(typeof(TModel)) ? 
-                    SanteDB.Messaging.FHIR.Backbone.ResourceVersionPolicy.Versioned :
-                    SanteDB.Messaging.FHIR.Backbone.ResourceVersionPolicy.NonVersioned,
-                Interaction = this.GetInteractions().ToList(),
-                SearchParams = QueryRewriter.GetSearchParams<TFhirResource, TModel>().ToList(),
-                Type = typeof(TFhirResource).GetCustomAttribute<XmlRootAttribute>().ElementName,
-                Profile = new Reference<StructureDefinition>()
-                {
-                    ReferenceUrl = $"/StructureDefinition/SanteDB/_history/{Assembly.GetEntryAssembly().GetName().Version}"
-                }
+			return new ResourceComponent()
+			{
+				ConditionalCreate = false,
+				ConditionalUpdate = true,
+				ConditionalDelete = ConditionalDeleteStatus.NotSupported,
+				ReadHistory = true,
+				UpdateCreate = true,
+				Versioning = typeof(IVersionedEntity).IsAssignableFrom(typeof(TModel)) ?
+					ResourceVersionPolicy.Versioned :
+					ResourceVersionPolicy.NoVersion,
+				Interaction = this.GetInteractions().ToList(),
+				SearchParam = QueryRewriter.GetSearchParams<TFhirResource, TModel>().ToList(),
+				Type = Hl7.Fhir.Utility.EnumUtility.ParseLiteral<ResourceType>(typeof(TFhirResource).GetCustomAttribute<FhirTypeAttribute>().Name),
+				Profile = $"/StructureDefinition/SanteDB/_history/{Assembly.GetEntryAssembly().GetName().Version}"
             };
         }
 
@@ -152,7 +151,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Get interactions supported by this handler
         /// </summary>
-        protected abstract IEnumerable<SanteDB.Messaging.FHIR.Backbone.InteractionDefinition> GetInteractions();
+        protected abstract IEnumerable<ResourceInteractionComponent> GetInteractions();
 
         /// <summary>
         /// Queries for a specified resource.
@@ -188,7 +187,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
                     {
                         AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.AnonymousPrincipal);
                     }
-                }).OfType<ResourceBase>().ToList(),
+                }).OfType<Resource>().ToList(),
 				Query = query,
 				TotalResults = totalResults
 			};
@@ -204,7 +203,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <exception cref="System.ArgumentException">
 		/// </exception>
 		/// <exception cref="System.Collections.Generic.KeyNotFoundException"></exception>
-		public ResourceBase Read(string id, string versionId)
+		public Resource Read(string id, string versionId)
 		{
 			if (String.IsNullOrEmpty(id))
 				throw new ArgumentNullException(nameof(id));
@@ -236,7 +235,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <exception cref="System.ArgumentException"></exception>
 		/// <exception cref="System.Reflection.AmbiguousMatchException"></exception>
 		/// <exception cref="System.Collections.Generic.KeyNotFoundException"></exception>
-		public ResourceBase Update(string id, ResourceBase target, TransactionMode mode)
+		public Resource Update(string id, Resource target, TransactionMode mode)
 		{
 			this.traceSource.TraceInfo("Updating resource {0}/{1} ({2})", this.ResourceName, id, target);
 
@@ -356,7 +355,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
             // FHIR Operation result
             return new FhirQueryResult()
             {
-                Results = results.Select(o => this.MapToFhir(o, RestOperationContext.Current)).OfType<ResourceBase>().ToList()
+                Results = results.Select(o => this.MapToFhir(o, RestOperationContext.Current)).OfType<Resource>().ToList()
             };
         }
     }

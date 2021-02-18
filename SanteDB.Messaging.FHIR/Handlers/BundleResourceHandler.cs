@@ -29,28 +29,27 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using System.Reflection;
 using SanteDB.Core.Diagnostics;
-using SanteDB.Messaging.FHIR.Backbone;
 using RestSrvr;
-using SanteDB.Messaging.FHIR.Resources;
+using static Hl7.Fhir.Model.CapabilityStatement;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
     /// <summary>
     /// Represents a FHIR resource handler for bundles
     /// </summary>
-    public class BundleResourceHandler : RepositoryResourceHandlerBase<SanteDB.Messaging.FHIR.Resources.Bundle, SanteDB.Core.Model.Collection.Bundle>
+    public class BundleResourceHandler : RepositoryResourceHandlerBase<Hl7.Fhir.Model.Bundle, SanteDB.Core.Model.Collection.Bundle>
     {
         
 
         /// Gets the interaction that this resource handler provider
         /// </summary>
         /// <returns></returns>
-        protected override IEnumerable<InteractionDefinition> GetInteractions()
+        protected override IEnumerable<ResourceInteractionComponent> GetInteractions()
         {
-            return new InteractionDefinition[]
+            return new ResourceInteractionComponent[]
             {
-                new InteractionDefinition() { Type = TypeRestfulInteraction.Create },
-                new InteractionDefinition() { Type = TypeRestfulInteraction.Update }
+                new ResourceInteractionComponent() { Code = TypeRestfulInteraction.Create },
+                new ResourceInteractionComponent() { Code = TypeRestfulInteraction.Update }
             };
         }
 
@@ -58,11 +57,11 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Maps a OpenIZ bundle as FHIR
         /// </summary>
-        protected override SanteDB.Messaging.FHIR.Resources.Bundle MapToFhir(Core.Model.Collection.Bundle model, RestOperationContext webOperationContext)
+        protected override Hl7.Fhir.Model.Bundle MapToFhir(Core.Model.Collection.Bundle model, RestOperationContext webOperationContext)
         {
-            return new SanteDB.Messaging.FHIR.Resources.Bundle()
+            return new Hl7.Fhir.Model.Bundle()
             {
-                Type = BundleType.Collection,
+                Type = Hl7.Fhir.Model.Bundle.BundleType.Collection,
                 // TODO: Actually construct a response bundle 
             };
             
@@ -71,12 +70,12 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Map FHIR resource to our bundle
         /// </summary>
-        protected override Core.Model.Collection.Bundle MapToModel(SanteDB.Messaging.FHIR.Resources.Bundle resource, RestOperationContext webOperationContext)
+        protected override Core.Model.Collection.Bundle MapToModel(Hl7.Fhir.Model.Bundle resource, RestOperationContext webOperationContext)
         {
             var retVal = new Core.Model.Collection.Bundle();
             foreach(var entry in resource.Entry)
             {
-                var entryType = entry.Resource.Resource?.GetType();
+                var entryType = entry.Resource.GetType();
                 if (entryType == null)
                     continue;
                 var handler = FhirResourceHandlerUtil.GetResourceHandler(entryType.GetCustomAttribute<XmlRootAttribute>().ElementName) as IBundleResourceHandler;
@@ -85,7 +84,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
                     this.traceSource.TraceWarning("Can't find bundle handler for {0}...", entryType.Name);
                     continue;
                 }
-                retVal.Add(handler.MapToModel(entry, webOperationContext, resource));
+                retVal.Add(handler.MapToModel(entry.Resource, webOperationContext, resource));
             }
             retVal.Item.RemoveAll(o => o == null);
             return retVal;

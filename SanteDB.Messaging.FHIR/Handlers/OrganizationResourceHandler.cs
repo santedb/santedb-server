@@ -21,73 +21,75 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Hl7.Fhir.Model;
 using RestSrvr;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
+using static Hl7.Fhir.Model.CapabilityStatement;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
     /// <summary>
     /// Organization resource provider
     /// </summary>
-    public class OrganizationResourceHandler : RepositoryResourceHandlerBase<SanteDB.Messaging.FHIR.Resources.Organization, SanteDB.Core.Model.Entities.Organization>, IBundleResourceHandler
+    public class OrganizationResourceHandler : RepositoryResourceHandlerBase<Hl7.Fhir.Model.Organization, SanteDB.Core.Model.Entities.Organization>, IBundleResourceHandler
     {
 
         /// <summary>
         /// Map to model
         /// </summary>
-        public IdentifiedData MapToModel(BundleEntry bundleResource, RestOperationContext context, Bundle bundle)
+        public IdentifiedData MapToModel(Resource bundleResource, RestOperationContext context, Bundle bundle)
         {
-            return this.MapToModel(bundleResource.Resource.Resource as SanteDB.Messaging.FHIR.Resources.Organization, context);
+            return this.MapToModel(bundleResource as Hl7.Fhir.Model.Organization, context);
         }
 
         /// <summary>
         /// Get the interactions 
         /// </summary>
-        protected override IEnumerable<InteractionDefinition> GetInteractions()
-        {
-            throw new NotImplementedException();
-        }
+        protected override IEnumerable<ResourceInteractionComponent> GetInteractions() =>
+            new TypeRestfulInteraction[]
+            {
+                TypeRestfulInteraction.Vread,
+                TypeRestfulInteraction.Read,
+                TypeRestfulInteraction.SearchType,
+                TypeRestfulInteraction.HistoryInstance
+            }.Select(o => new ResourceInteractionComponent() { Code = o });
 
         /// <summary>
         /// Map to FHIR
         /// </summary>
-        protected override SanteDB.Messaging.FHIR.Resources.Organization MapToFhir(Core.Model.Entities.Organization model, RestOperationContext webOperationContext)
+        protected override Hl7.Fhir.Model.Organization MapToFhir(Core.Model.Entities.Organization model, RestOperationContext webOperationContext)
         {
-            return DataTypeConverter.CreateResource<SanteDB.Messaging.FHIR.Resources.Organization>(model, webOperationContext);
+            return DataTypeConverter.CreateResource<Hl7.Fhir.Model.Organization>(model, webOperationContext);
         }
 
         /// <summary>
         /// Map to Model
         /// </summary>
-        protected override Core.Model.Entities.Organization MapToModel(SanteDB.Messaging.FHIR.Resources.Organization resource, RestOperationContext webOperationContext)
+        protected override Core.Model.Entities.Organization MapToModel(Hl7.Fhir.Model.Organization resource, RestOperationContext webOperationContext)
         {
             // Organization
             var retVal = new Core.Model.Entities.Organization()
             {
-                TypeConcept = DataTypeConverter.ToConcept(resource.Type),
+                TypeConcept = resource.Type.Select(o => DataTypeConverter.ToConcept(o)).OfType<Concept>().FirstOrDefault(),
                 Addresses = resource.Address.Select(DataTypeConverter.ToEntityAddress).ToList(),
                 CreationTime = DateTimeOffset.Now,
                 // TODO: Extensions
-                Extensions = resource.Extension.Select(DataTypeConverter.ToEntityExtension).OfType<EntityExtension>().ToList(),
                 Identifiers = resource.Identifier.Select(DataTypeConverter.ToEntityIdentifier).ToList(),
                 Key = Guid.NewGuid(),
                 Names = new List<EntityName>() { new EntityName(NameUseKeys.OfficialRecord, resource.Name) },
-                StatusConceptKey = resource.Active?.Value == true ? StatusKeys.Active : StatusKeys.Obsolete,
+                StatusConceptKey = !resource.Active.HasValue || resource.Active == true ? StatusKeys.Active : StatusKeys.Obsolete,
                 Telecoms = resource.Telecom.Select(DataTypeConverter.ToEntityTelecomAddress).OfType<EntityTelecomAddress>().ToList()
             };
+            retVal.Extensions = resource.Extension.Select(o => DataTypeConverter.ToEntityExtension(o, retVal)).OfType<EntityExtension>().ToList();
 
-            Guid key;
-            if (!Guid.TryParse(resource.Id, out key))
+            if (!Guid.TryParse(resource.Id, out Guid key))
             {
                 key = Guid.NewGuid();
             }
-
             retVal.Key = key;
 
             return retVal;

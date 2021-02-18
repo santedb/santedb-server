@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Model;
 using RestSrvr;
 using RestSrvr.Exceptions;
 using RestSrvr.Message;
@@ -26,8 +27,6 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
-using SanteDB.Messaging.FHIR.DataTypes;
-using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Rest.Serialization;
 using System;
 using System.Collections.Generic;
@@ -39,6 +38,7 @@ using System.IdentityModel.Tokens;
 using System.IO;
 using System.Linq;
 using System.Security;
+using static Hl7.Fhir.Model.OperationOutcome;
 
 namespace SanteDB.Messaging.FHIR.Rest.Behavior
 {
@@ -121,15 +121,15 @@ namespace SanteDB.Messaging.FHIR.Rest.Behavior
             // Construct an error result
             var errorResult = new OperationOutcome()
             {
-                Issue = new List<Issue>()
+                Issue = new List<OperationOutcome.IssueComponent>()
             {
-                new Issue() { Diagnostics  = error.Message, Severity = IssueSeverity.Error, Code = new FhirCoding(new Uri("http://hl7.org/fhir/issue-type"), "exception") }
+                new OperationOutcome.IssueComponent() { Diagnostics  = error.Message, Severity = IssueSeverity.Error, Code = IssueType.Exception }
             }
             };
 
-            if (error is DetectedIssueException)
-                foreach (var iss in (error as DetectedIssueException).Issues)
-                    errorResult.Issue.Add(new Issue()
+            if (error is DetectedIssueException dte)
+                foreach (var iss in dte.Issues)
+                    errorResult.Issue.Add(new OperationOutcome.IssueComponent()
                     {
                         Diagnostics = iss.Text,
                         Severity = iss.Priority == DetectedIssuePriorityType.Error ? IssueSeverity.Error :

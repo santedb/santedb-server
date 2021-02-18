@@ -36,7 +36,6 @@ namespace SanteDB.Messaging.FHIR
             this.QueryId = Guid.Empty;
             this.IncludeHistory = false;
             this.MinimumDegreeMatch = 1.0f;
-            this.TargetDomains = new List<String>();
             this.Start = 0;
             this.Quantity = 25;
         }
@@ -65,11 +64,6 @@ namespace SanteDB.Messaging.FHIR
         /// Include resources
         /// </summary>
         public List<String> IncludeResource { get; set; }
-
-        /// <summary>
-        /// Gets or sets the target domains
-        /// </summary>
-        public List<String> TargetDomains { get; set; }
 
         /// <summary>
         /// Minimum degree natcg

@@ -16,17 +16,17 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Model;
 using RestSrvr;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Hl7.Fhir.Model.CapabilityStatement;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -43,41 +43,35 @@ namespace SanteDB.Messaging.FHIR.Handlers
 			var retVal = DataTypeConverter.CreateResource<Medication>(model, restOperationContext);
 
 			// Code of medication code
-			retVal.Code = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("TypeConcept"));
-
-			if (model.StatusConceptKey == StatusKeys.Active)
-				retVal.Status = SubstanceStatus.Active;
-			else if (model.StatusConceptKey == StatusKeys.Obsolete)
-				retVal.Status = SubstanceStatus.Inactive;
-			else if (model.StatusConceptKey == StatusKeys.Nullified)
-				retVal.Status = SubstanceStatus.Nullified;
+			retVal.Code = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>(nameof(Entity.TypeConcept)), "http://snomed.info/sct");
+			retVal.Identifier = model.LoadCollection<EntityIdentifier>(nameof(Entity.Identifiers)).Select(o => DataTypeConverter.ToFhirIdentifier(o)).ToList();
+			switch (model.StatusConceptKey.ToString().ToUpper())
+            {
+				case StatusKeyStrings.Active:
+				case StatusKeyStrings.New:
+					retVal.Status = Medication.MedicationStatusCodes.Active;
+					break;
+				case StatusKeyStrings.Obsolete:
+					retVal.Status = Medication.MedicationStatusCodes.Inactive;
+					break;
+				case StatusKeyStrings.Nullified:
+					retVal.Status = Medication.MedicationStatusCodes.EnteredInError;
+					break;
+            }
 
 			// Is brand?
-			retVal.IsBrand = false;
-			retVal.IsOverTheCounter = model.Tags.Any(o => o.TagKey == "isOtc");
-
-			var manufacturer = model.LoadCollection<EntityRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.WarrantedProduct);
+			var manufacturer = model.LoadCollection<EntityRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.ManufacturedProduct);
 			if (manufacturer != null)
-				retVal.Manufacturer = DataTypeConverter.CreateReference<SanteDB.Messaging.FHIR.Resources.Organization>(manufacturer.LoadProperty<Entity>("TargetEntity"), restOperationContext);
+				retVal.Manufacturer = DataTypeConverter.CreateVersionedReference<Hl7.Fhir.Model.Organization>(manufacturer.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity)), restOperationContext);
 
 			// Form
 			retVal.Form = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("FormConcept"), "http://hl7.org/fhir/ValueSet/medication-form-codes");
-			retVal.Package = new SanteDB.Messaging.FHIR.Backbone.MedicationPackage();
-			retVal.Package.Batch = new SanteDB.Messaging.FHIR.Backbone.MedicationBatch()
+			retVal.Batch = new Medication.BatchComponent()
 			{
 				LotNumber = model.LotNumber,
-				Expiration = model.ExpiryDate
+				ExpirationDateElement = new FhirDateTime(model.ExpiryDate.Value)
 			};
 
-			// Picture of the object?
-
-			var photo = model.LoadCollection<EntityExtension>("Extensions").FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.JpegPhotoExtension);
-			if (photo != null)
-				retVal.Image = new SanteDB.Messaging.FHIR.DataTypes.FhirAttachment()
-				{
-					ContentType = "image/jpg",
-					Data = photo.ExtensionValueXml
-				};
 			return retVal;
 		}
 
@@ -95,16 +89,16 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Get interactions
         /// </summary>
-        protected override IEnumerable<InteractionDefinition> GetInteractions()
+        protected override IEnumerable<ResourceInteractionComponent> GetInteractions()
         {
             return new TypeRestfulInteraction[]
             {
-                TypeRestfulInteraction.InstanceHistory,
+                TypeRestfulInteraction.HistoryInstance,
                 TypeRestfulInteraction.Read,
-                TypeRestfulInteraction.Search,
-                TypeRestfulInteraction.VersionRead,
+                TypeRestfulInteraction.SearchType,
+                TypeRestfulInteraction.Vread,
                 TypeRestfulInteraction.Delete
-            }.Select(o => new InteractionDefinition() { Type = o });
+            }.Select(o => new ResourceInteractionComponent() { Code = o });
         }
     }
 }

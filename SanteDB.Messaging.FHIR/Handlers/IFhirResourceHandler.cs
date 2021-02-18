@@ -16,8 +16,8 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Model;
 using SanteDB.Core.Services;
-using SanteDB.Messaging.FHIR.Resources;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 
@@ -38,22 +38,22 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Read a specific version of a resource
         /// </summary>
-        ResourceBase Read(string id, string versionId);
+        Resource Read(string id, string versionId);
 
         /// <summary>
         /// Update a resource
         /// </summary>
-        ResourceBase Update(string id, ResourceBase target, TransactionMode mode);
+        Resource Update(string id, Resource target, TransactionMode mode);
 
         /// <summary>
         /// Delete a resource
         /// </summary>
-        ResourceBase Delete(string id, TransactionMode mode);
+        Resource Delete(string id, TransactionMode mode);
 
         /// <summary>
         /// Create a resource
         /// </summary>
-        ResourceBase Create(ResourceBase target, TransactionMode mode);
+        Resource Create(Resource target, TransactionMode mode);
 
         /// <summary>
         /// Query a FHIR resource
@@ -68,7 +68,7 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Get the definition for this resource
         /// </summary>
-        Backbone.ResourceDefinition GetResourceDefinition();
+        Hl7.Fhir.Model.CapabilityStatement.ResourceComponent GetResourceDefinition();
 
         /// <summary>
         /// Get the structure definition for this profile

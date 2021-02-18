@@ -16,18 +16,17 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Model;
 using RestSrvr;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.DataTypes;
-using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Hl7.Fhir.Model.CapabilityStatement;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -35,50 +34,58 @@ namespace SanteDB.Messaging.FHIR.Handlers
     /// Facility resource handler
     /// </summary>
     public class LocationResourceHandler : RepositoryResourceHandlerBase<Location, Place>
-	{
-		/// <summary>
-		/// Map the inbound place to a FHIR model
-		/// </summary>
-		protected override Location MapToFhir(Place model, RestOperationContext restOperationContext)
-		{
-			Location retVal = DataTypeConverter.CreateResource<Location>(model, restOperationContext);
-			retVal.Identifier = model.LoadCollection<EntityIdentifier>("Identifiers").Select(o => DataTypeConverter.ToFhirIdentifier<Entity>(o)).ToList();
+    {
+        /// <summary>
+        /// Map the inbound place to a FHIR model
+        /// </summary>
+        protected override Location MapToFhir(Place model, RestOperationContext restOperationContext)
+        {
+            Location retVal = DataTypeConverter.CreateResource<Location>(model, restOperationContext);
+            retVal.Identifier = model.LoadCollection<EntityIdentifier>("Identifiers").Select(o => DataTypeConverter.ToFhirIdentifier<Entity>(o)).ToList();
 
-			// Map status
-			if (model.StatusConceptKey == StatusKeys.Active)
-				retVal.Status = LocationStatus.Active;
-			else if (model.StatusConceptKey == StatusKeys.Obsolete)
-				retVal.Status = LocationStatus.Inactive;
-			else
-				retVal.Status = LocationStatus.Suspended;
+            // Map status
+            switch (model.StatusConceptKey.ToString().ToUpper())
+            {
+                case StatusKeyStrings.Active:
+                case StatusKeyStrings.New:
+                    retVal.Status = Location.LocationStatus.Active;
+                    break;
+                case StatusKeyStrings.Cancelled:
+                    retVal.Status = Location.LocationStatus.Suspended;
+                    break;
+                case StatusKeyStrings.Nullified:
+                case StatusKeyStrings.Obsolete:
+                    retVal.Status = Location.LocationStatus.Inactive;
+                    break;
+            }
 
-			retVal.Name = model.LoadCollection<EntityName>("Names").FirstOrDefault(o => o.NameUseKey == NameUseKeys.OfficialRecord)?.LoadCollection<EntityNameComponent>("Component")?.FirstOrDefault()?.Value;
-			retVal.Alias = model.LoadCollection<EntityName>("Names").Where(o => o.NameUseKey != NameUseKeys.OfficialRecord)?.Select(n => (FhirString)n.LoadCollection<EntityNameComponent>("Component")?.FirstOrDefault()?.Value).ToList();
+            retVal.Name = model.LoadCollection<EntityName>("Names").FirstOrDefault(o => o.NameUseKey == NameUseKeys.OfficialRecord)?.LoadCollection<EntityNameComponent>("Component")?.FirstOrDefault()?.Value;
+            retVal.Alias = model.LoadCollection<EntityName>("Names").Where(o => o.NameUseKey != NameUseKeys.OfficialRecord)?.Select(n => n.LoadCollection<EntityNameComponent>("Component")?.FirstOrDefault()?.Value).ToList();
 
-			// Convert the determiner code
-			if (model.DeterminerConceptKey == DeterminerKeys.Described)
-				retVal.Mode = LocationMode.Kind;
-			else
-				retVal.Mode = LocationMode.Instance;
+            // Convert the determiner code
+            if (model.DeterminerConceptKey == DeterminerKeys.Described)
+                retVal.Mode = Location.LocationMode.Kind;
+            else
+                retVal.Mode = Location.LocationMode.Instance;
 
-			retVal.Type = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("TypeConcept"), "http://hl7.org/fhir/ValueSet/v3-ServiceDeliveryLocationRoleType");
-			retVal.Telecom = model.LoadCollection<EntityTelecomAddress>("Telecoms").Select(o => DataTypeConverter.ToFhirTelecom(o)).ToList();
-			retVal.Address = DataTypeConverter.ToFhirAddress(model.LoadCollection<EntityAddress>("Addresses").FirstOrDefault());
+            retVal.Type = new List<CodeableConcept>() { DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>(nameof(Place.TypeConcept)), "http://hl7.org/fhir/ValueSet/v3-ServiceDeliveryLocationRoleType") };
+            retVal.Telecom = model.LoadCollection<EntityTelecomAddress>("Telecoms").Select(o => DataTypeConverter.ToFhirTelecom(o)).ToList();
+            retVal.Address = DataTypeConverter.ToFhirAddress(model.LoadCollection<EntityAddress>("Addresses").FirstOrDefault());
 
-            if(model.GeoTag != null)
-				retVal.Position = new SanteDB.Messaging.FHIR.Backbone.Position()
-				{
-					Latitude = (decimal)model.GeoTag.Lat,
-					Longitude = (decimal)model.GeoTag.Lng
-				};
+            if (model.GeoTag != null)
+                retVal.Position = new Location.PositionComponent()
+                {
+                    Latitude = (decimal)model.GeoTag.Lat,
+                    Longitude = (decimal)model.GeoTag.Lng
+                };
 
-			// Part of?
-			var parent = model.LoadCollection<EntityRelationship>("Relationships").FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Parent);
-			if (parent != null)
-				retVal.PartOf = DataTypeConverter.CreateReference<Location>(parent.LoadProperty<Entity>("TargetEntity"), restOperationContext);
+            // Part of?
+            var parent = model.LoadCollection<EntityRelationship>(nameof(Entity.Relationships)).FirstOrDefault(o => o.RelationshipTypeKey == EntityRelationshipTypeKeys.Parent);
+            if (parent != null)
+                retVal.PartOf = DataTypeConverter.CreateVersionedReference<Location>(parent.LoadProperty<Entity>(nameof(EntityRelationship.TargetEntity)), restOperationContext);
 
-			return retVal;
-		}
+            return retVal;
+        }
 
         /// <summary>
         /// Map the incoming FHIR reosurce to a MODEL resource
@@ -87,23 +94,23 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <param name="restOperationContext">The operation context under which this method is being called</param>
         /// <returns></returns>
 		protected override Place MapToModel(Location resource, RestOperationContext restOperationContext)
-		{
-			throw new NotImplementedException();
-		}
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Get interactions
         /// </summary>
-        protected override IEnumerable<InteractionDefinition> GetInteractions()
+        protected override IEnumerable<ResourceInteractionComponent> GetInteractions()
         {
             return new TypeRestfulInteraction[]
             {
-                TypeRestfulInteraction.InstanceHistory,
+                TypeRestfulInteraction.HistoryInstance,
                 TypeRestfulInteraction.Read,
-                TypeRestfulInteraction.Search,
-                TypeRestfulInteraction.VersionRead,
+                TypeRestfulInteraction.SearchType,
+                TypeRestfulInteraction.Vread,
                 TypeRestfulInteraction.Delete
-            }.Select(o => new InteractionDefinition() { Type = o });
+            }.Select(o => new ResourceInteractionComponent() { Code = o });
         }
     }
 }

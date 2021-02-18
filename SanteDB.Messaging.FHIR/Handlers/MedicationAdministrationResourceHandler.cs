@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Model;
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Model;
@@ -25,13 +26,12 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.Resources;
 using SanteDB.Messaging.FHIR.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
+
+using static Hl7.Fhir.Model.CapabilityStatement;
 
 namespace SanteDB.Messaging.FHIR.Handlers
 {
@@ -47,77 +47,85 @@ namespace SanteDB.Messaging.FHIR.Handlers
         {
             var retVal = DataTypeConverter.CreateResource<MedicationAdministration>(model, restOperationContext);
 
-            retVal.Identifier = model.LoadCollection<ActIdentifier>("Identifiers").Select(o => DataTypeConverter.ToFhirIdentifier(o)).ToList();
+            retVal.Identifier = model.LoadCollection<ActIdentifier>(nameof(Act.Identifiers)).Select(o => DataTypeConverter.ToFhirIdentifier(o)).ToList();
+            retVal.StatusReason = new List<CodeableConcept>() { DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>(nameof(Act.ReasonConcept))) };
+            switch(model.StatusConceptKey.ToString().ToUpper())
+            {
+                case StatusKeyStrings.Active:
+                    retVal.Status = MedicationAdministration.MedicationAdministrationStatusCodes.InProgress;
+                    break;
+                case StatusKeyStrings.Cancelled:
+                    retVal.Status = MedicationAdministration.MedicationAdministrationStatusCodes.Stopped;
+                    break;
+                case StatusKeyStrings.Nullified:
+                    retVal.Status = MedicationAdministration.MedicationAdministrationStatusCodes.EnteredInError;
+                    break;
+                case StatusKeyStrings.Completed:
+                    retVal.Status = MedicationAdministration.MedicationAdministrationStatusCodes.Completed;
+                    break;
+                case StatusKeyStrings.Obsolete:
+                    retVal.Status = MedicationAdministration.MedicationAdministrationStatusCodes.Unknown;
+                    break;
+            }
 
-            if (model.StatusConceptKey == StatusKeys.Active)
-                retVal.Status = MedicationAdministrationStatus.InProgress;
-            else if (model.StatusConceptKey == StatusKeys.Completed)
-                retVal.Status = MedicationAdministrationStatus.Completed;
-            else if (model.StatusConceptKey == StatusKeys.Nullified)
-                retVal.Status = MedicationAdministrationStatus.EnteredInError;
-            else if (model.StatusConceptKey == StatusKeys.Cancelled)
-                retVal.Status = MedicationAdministrationStatus.Stopped;
+            if (model.IsNegated)
+                retVal.Status = MedicationAdministration.MedicationAdministrationStatusCodes.NotDone;
 
-            retVal.Category = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("TypeConcept"), "http://hl7.org/fhir/medication-admin-category");
+            retVal.Category = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>(nameof(Entity.TypeConcept)), "http://hl7.org/fhir/medication-admin-category");
 
-            var consumableRelationship = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Consumable);
-            var productRelationship = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Product);
+            var consumableRelationship = model.LoadCollection<ActParticipation>(nameof(Act.Participations)).FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Consumable);
+            var productRelationship = model.LoadCollection<ActParticipation>(nameof(Act.Participations)).FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Product);
             if (consumableRelationship != null)
-                retVal.Medication = DataTypeConverter.CreateReference<Medication>(consumableRelationship.LoadProperty<ManufacturedMaterial>("PlayerEntity"), restOperationContext);
+                retVal.Medication = DataTypeConverter.CreateVersionedReference<Medication>(consumableRelationship.LoadProperty<ManufacturedMaterial>("PlayerEntity"), restOperationContext);
             else if (productRelationship != null)
             {
-                retVal.Medication = DataTypeConverter.CreateReference<Substance>(productRelationship.LoadProperty<Material>("PlayerEntity"), restOperationContext);
+                retVal.Medication = DataTypeConverter.CreateVersionedReference<Substance>(productRelationship.LoadProperty<Material>("PlayerEntity"), restOperationContext);
                 //retVal.Medication = DataTypeConverter.ToFhirCodeableConcept(productRelationship.LoadProperty<Material>("PlayerEntity").LoadProperty<Concept>("TypeConcept"));
             }
 
-            var rct = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget);
+            var rct = model.LoadCollection<ActParticipation>(nameof(Act.Participations)).FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.RecordTarget);
             if (rct != null)
-                retVal.Subject = DataTypeConverter.CreateReference<Patient>(rct.LoadProperty<Entity>("PlayerEntity"), restOperationContext);
+                retVal.Subject = DataTypeConverter.CreateVersionedReference<Patient>(rct.LoadProperty<Entity>("PlayerEntity"), restOperationContext);
 
             // Encounter
             var erService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityRelationship>>();
             int tr = 0;
-            var enc = erService.Query(o => o.TargetEntityKey == model.Key && o.RelationshipTypeKey == ActRelationshipTypeKeys.HasComponent, 0, 1,  out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
+            var enc = erService.Query(o => o.TargetEntityKey == model.Key && o.RelationshipTypeKey == ActRelationshipTypeKeys.HasComponent && o.ObsoleteVersionSequenceId == null, 0, 10,  out tr, AuthenticationContext.Current.Principal);
             if (enc != null)
             {
+                retVal.EventHistory = enc.Select(o => DataTypeConverter.CreateNonVersionedReference<Encounter>(o.TargetEntityKey, restOperationContext)).ToList();
                 // TODO: Encounter
             }
 
             // Effective time
-            retVal.EffectiveDate = model.ActTime.DateTime;
+            retVal.Effective = DataTypeConverter.ToPeriod(model.StartTime ?? model.ActTime, model.StopTime);
 
             // performer
-            var performer = model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Performer) ??
-                model.LoadCollection<ActParticipation>("Participations").FirstOrDefault(o => o.ParticipationRoleKey == ActParticipationKey.Authororiginator);
+            var performer = model.LoadCollection<ActParticipation>(nameof(Act.Participations)).Where(o => o.ParticipationRoleKey == ActParticipationKey.Performer || o.ParticipationRoleKey == ActParticipationKey.Authororiginator);
             if (performer != null)
-                retVal.Performer = new List<SanteDB.Messaging.FHIR.Backbone.MedicationPerformer>() {
-                    new SanteDB.Messaging.FHIR.Backbone.MedicationPerformer()
+                retVal.Performer = performer.Select(o => new MedicationAdministration.PerformerComponent()
                 {
-                    Actor = DataTypeConverter.CreateReference<Practitioner>(performer.LoadProperty<Entity>("PlayerEntity"), restOperationContext)
-                }
-                };
+                    Actor = DataTypeConverter.CreateVersionedReference<Practitioner>(o.LoadProperty<Entity>(nameof(ActParticipation.PlayerEntity)), restOperationContext)
+                }).ToList();
 
-            // Not given
-            retVal.NotGiven = model.IsNegated;
-            if (model.ReasonConceptKey.HasValue && model.IsNegated)
-                retVal.ReasonNotGiven = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("ReasonConcept"));
-            else if (model.ReasonConceptKey.HasValue)
-                retVal.ReasonCode = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("ReasonConcept"));
 
-            retVal.Dosage = new SanteDB.Messaging.FHIR.Backbone.MedicationDosage()
+            retVal.Dosage = new MedicationAdministration.DosageComponent()
             {
                 Site = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("Site")),
                 Route = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("Route")),
-                Dose = new SanteDB.Messaging.FHIR.DataTypes.FhirQuantity()
+                Dose = new SimpleQuantity()
                 {
                     Value = model.DoseQuantity,
-                    Units = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>("DoseUnit"), "http://hl7.org/fhir/sid/ucum").GetPrimaryCode()?.Code?.Value
+                    Unit = DataTypeConverter.ToFhirCodeableConcept(model.LoadProperty<Concept>(nameof(SubstanceAdministration.DoseUnit)), "http://hl7.org/fhir/sid/ucum").GetCoding()?.Code
                 }
             };
 
             return retVal;
         }
 
+        /// <summary>
+        /// Map from FHIR to model
+        /// </summary>
         protected override SubstanceAdministration MapToModel(MedicationAdministration resource, RestOperationContext restOperationContext)
         {
             throw new NotImplementedException();
@@ -132,14 +140,14 @@ namespace SanteDB.Messaging.FHIR.Handlers
 		/// <param name="totalResults">The total results.</param>
         /// <param name="queryId">The unique query state identifier</param>
 		/// <returns>Returns the list of models which match the given parameters.</returns>
-		protected override IEnumerable<SubstanceAdministration> Query(Expression<Func<SubstanceAdministration, bool>> query, Guid queryId, int offset, int count, out int totalResults)
+		protected override IEnumerable<SubstanceAdministration> Query(System.Linq.Expressions.Expression<Func<SubstanceAdministration, bool>> query, Guid queryId, int offset, int count, out int totalResults)
         {
             Guid drugTherapy = Guid.Parse("7D84A057-1FCC-4054-A51F-B77D230FC6D1");
 
-            var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.Convert(Expression.MakeMemberAccess(query.Parameters[0], typeof(SubstanceAdministration).GetProperty(nameof(SubstanceAdministration.StatusConceptKey))), typeof(Guid)), Expression.Constant(StatusKeys.Completed));
-            var typeReference = Expression.MakeBinary(ExpressionType.Equal, Expression.Convert(Expression.MakeMemberAccess(query.Parameters[0], typeof(SubstanceAdministration).GetProperty(nameof(SubstanceAdministration.TypeConceptKey))), typeof(Guid)), Expression.Constant(drugTherapy));
+            var obsoletionReference = System.Linq.Expressions.Expression.MakeBinary(System.Linq.Expressions.ExpressionType.Equal, System.Linq.Expressions.Expression.Convert(System.Linq.Expressions.Expression.MakeMemberAccess(query.Parameters[0], typeof(SubstanceAdministration).GetProperty(nameof(SubstanceAdministration.StatusConceptKey))), typeof(Guid)), System.Linq.Expressions.Expression.Constant(StatusKeys.Completed));
+            var typeReference = System.Linq.Expressions.Expression.MakeBinary(System.Linq.Expressions.ExpressionType.Equal, System.Linq.Expressions.Expression.Convert(System.Linq.Expressions.Expression.MakeMemberAccess(query.Parameters[0], typeof(SubstanceAdministration).GetProperty(nameof(SubstanceAdministration.TypeConceptKey))), typeof(Guid)), System.Linq.Expressions.Expression.Constant(drugTherapy));
 
-            query = Expression.Lambda<Func<SubstanceAdministration, bool>>(Expression.AndAlso(Expression.AndAlso(obsoletionReference, query.Body), typeReference), query.Parameters);
+            query = System.Linq.Expressions.Expression.Lambda<Func<SubstanceAdministration, bool>>(System.Linq.Expressions.Expression.AndAlso(System.Linq.Expressions.Expression.AndAlso(obsoletionReference, query.Body), typeReference), query.Parameters);
 
             if (queryId == Guid.Empty)
                 return this.m_repository.Find(query, offset, count, out totalResults);
@@ -150,16 +158,16 @@ namespace SanteDB.Messaging.FHIR.Handlers
         /// <summary>
         /// Get interactions
         /// </summary>
-        protected override IEnumerable<InteractionDefinition> GetInteractions()
+        protected override IEnumerable<ResourceInteractionComponent> GetInteractions()
         {
             return new TypeRestfulInteraction[]
             {
-                TypeRestfulInteraction.InstanceHistory,
+                TypeRestfulInteraction.HistoryInstance,
                 TypeRestfulInteraction.Read,
-                TypeRestfulInteraction.Search,
-                TypeRestfulInteraction.VersionRead,
+                TypeRestfulInteraction.SearchType,
+                TypeRestfulInteraction.Vread,
                 TypeRestfulInteraction.Delete
-            }.Select(o => new InteractionDefinition() { Type = o });
+            }.Select(o => new ResourceInteractionComponent() { Code = o });
         }
     }
 }

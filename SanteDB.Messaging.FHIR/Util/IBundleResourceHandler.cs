@@ -16,10 +16,9 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Hl7.Fhir.Model;
 using RestSrvr;
 using SanteDB.Core.Model;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +36,7 @@ namespace SanteDB.Messaging.FHIR.Util
         /// <summary>
         /// Maps the specified bundle entry resource to an identified data entry
         /// </summary>
-        IdentifiedData MapToModel(BundleEntry bundleResource, RestOperationContext context, Bundle bundle);
+        IdentifiedData MapToModel(Resource bundleResource, RestOperationContext context, Bundle containedInBundle);
 
     }
 }

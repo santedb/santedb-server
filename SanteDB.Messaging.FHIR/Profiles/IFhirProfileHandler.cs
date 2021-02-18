@@ -1,6 +1,5 @@
-﻿using SanteDB.Core.BusinessRules;
-using SanteDB.Messaging.FHIR.Backbone;
-using SanteDB.Messaging.FHIR.Resources;
+﻿using Hl7.Fhir.Model;
+using SanteDB.Core.BusinessRules;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +29,7 @@ namespace SanteDB.Messaging.FHIR.Profiles
         /// </summary>
         /// <param name="resource">The resource instance</param>
         /// <returns>The list of detected issues</returns>
-        List<DetectedIssue> Validate(TBaseResource resource);
+        List<Core.BusinessRules.DetectedIssue> Validate(TBaseResource resource);
 
     }
 }

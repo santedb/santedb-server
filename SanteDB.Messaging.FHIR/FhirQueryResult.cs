@@ -16,7 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
-using SanteDB.Messaging.FHIR.Resources;
+using Hl7.Fhir.Model;
 using System.Collections.Generic;
 
 namespace SanteDB.Messaging.FHIR
@@ -30,7 +30,7 @@ namespace SanteDB.Messaging.FHIR
         /// <summary>
         /// Gets or sets the results
         /// </summary>
-        public List<ResourceBase> Results { get; set; }
+        public List<Resource> Results { get; set; }
 
         /// <summary>
         /// Gets or sets the query that initiated the action
