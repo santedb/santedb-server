@@ -531,7 +531,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         var policy = dataContext.SingleOrDefault<DbSecurityPolicy>(o => o.Oid == policyOid);
                         if (policy != null)
                         {
-                            this.m_adhocCache.Add($"pip.{policyOid}", policy);
+                            this.m_adhocCache?.Add($"pip.{policyOid}", policy);
                             return new AdoSecurityPolicy(policy);
                         }
                         return null;
