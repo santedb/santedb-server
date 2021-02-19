@@ -24,7 +24,7 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
+using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
@@ -40,6 +40,7 @@ using System.Diagnostics.Tracing;
 using System.Linq;
 
 using System.Security.Principal;
+using SanteDB.Server.Core.Security;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -323,7 +324,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 var retVal = context.Query<CompositeResult<DbSecurityPolicy, DbSecurityDevicePolicy>>(query)
                                     .AsEnumerable().Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable)).ToList();
 
-                                var appClaim = dp.Identities.OfType<Core.Security.ApplicationIdentity>().SingleOrDefault()?.FindAll(SanteDBClaimTypes.Sid).SingleOrDefault() ??
+                                var appClaim = dp.Identities.OfType<Server.Core.Security.ApplicationIdentity>().SingleOrDefault()?.FindAll(SanteDBClaimTypes.Sid).SingleOrDefault() ??
                                        dp.FindAll(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim).SingleOrDefault();
 
                                 // There is an application claim so we want to add the application policies - most restrictive
@@ -376,7 +377,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             IEnumerable<CompositeResult<DbSecurityPolicy, DbSecurityPolicyActionableInstance>> retVal = null;
 
                             SqlStatement query = null;
-                            if (!(identity is Core.Security.ApplicationIdentity) &&
+                            if (!(identity is Server.Core.Security.ApplicationIdentity) &&
                                 !(identity is DeviceIdentity)) // Is this a user based claim?
                             {
                                 // Role policies
@@ -392,9 +393,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             // Claims principal, then we want device and app SID
                             if (securable is IClaimsPrincipal cp)
                             {
-                                var appClaim = cp.Identities.OfType<Core.Security.ApplicationIdentity>().SingleOrDefault()?.FindAll(SanteDBClaimTypes.Sid).SingleOrDefault() ??
+                                var appClaim = cp.Identities.OfType<Server.Core.Security.ApplicationIdentity>().SingleOrDefault()?.FindAll(SanteDBClaimTypes.Sid).SingleOrDefault() ??
                                     cp.FindAll(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim).SingleOrDefault();
-                                var devClaim = cp.Identities.OfType<Core.Security.DeviceIdentity>().SingleOrDefault()?.FindAll(SanteDBClaimTypes.Sid).SingleOrDefault() ??
+                                var devClaim = cp.Identities.OfType<Server.Core.Security.DeviceIdentity>().SingleOrDefault()?.FindAll(SanteDBClaimTypes.Sid).SingleOrDefault() ??
                                     cp.FindAll(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim).SingleOrDefault();
 
 

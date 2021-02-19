@@ -27,7 +27,7 @@ using System.Drawing.Design;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
-namespace SanteDB.Core.Configuration
+namespace SanteDB.Server.Core.Configuration
 {
     /// <summary>
     /// Represents a single behavior configuration element

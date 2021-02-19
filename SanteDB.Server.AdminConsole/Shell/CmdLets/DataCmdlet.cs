@@ -33,6 +33,7 @@ using SanteDB.Server.AdminConsole.Util;
 using System.Linq.Expressions;
 using SanteDB.Core.Model.Export;
 using System.Xml.Serialization;
+using SanteDB.Core.Interop;
 
 namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 {
@@ -41,7 +42,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
     {
 
         // hdsi client
-        private static HdsiServiceClient m_client = new HdsiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.HealthDataService));
+        private static HdsiServiceClient m_client = new HdsiServiceClient(ApplicationContext.Current.GetRestClient(ServiceEndpointType.HealthDataService));
 
         private static XmlSerializer m_xsz = new XmlSerializer(typeof(Dataset));
 

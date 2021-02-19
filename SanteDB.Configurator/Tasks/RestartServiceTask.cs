@@ -18,8 +18,8 @@
  */
 using SanteDB.Configuration;
 using SanteDB.Core.Configuration;
-using SanteDB.Core.Configuration.Tasks;
 using SanteDB.Core.Services;
+using SanteDB.Server.Core.Configuration.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;

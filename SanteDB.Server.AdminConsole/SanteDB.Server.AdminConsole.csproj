@@ -123,9 +123,9 @@
       <Project>{39e61451-f4fe-493d-b754-5f06eb284aac}</Project>
       <Name>SanteDB.Core.Applets</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
+    <ProjectReference Include="..\SanteDB.Core\SanteDB.Server.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
-      <Name>SanteDB.Core</Name>
+      <Name>SanteDB.Server.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Server.AdminConsole.Api\SanteDB.Server.AdminConsole.Api.csproj">
       <Project>{450e9519-c573-4f07-addd-8d0c74b975ff}</Project>

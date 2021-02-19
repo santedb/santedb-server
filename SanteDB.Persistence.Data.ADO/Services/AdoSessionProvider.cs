@@ -29,6 +29,7 @@ using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.ADO.Configuration;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using SanteDB.Persistence.Data.ADO.Security;
+using SanteDB.Server.Core.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data;

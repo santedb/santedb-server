@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace SanteDB.Core.Configuration
+namespace SanteDB.Server.Core.Configuration
 {
     /// <summary>
     /// Represents a simple job configuration

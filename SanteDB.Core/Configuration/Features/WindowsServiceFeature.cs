@@ -25,10 +25,11 @@ using System.Reflection;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Services;
 using ServiceTools;
 
-namespace SanteDB.Core.Configuration.Tasks
+namespace SanteDB.Server.Core.Configuration.Tasks
 {
 
     /// <summary>
@@ -183,14 +184,14 @@ namespace SanteDB.Core.Configuration.Tasks
             /// <summary>
             /// Progress has changed
             /// </summary>
-            public event EventHandler<Services.ProgressChangedEventArgs> ProgressChanged;
+            public event EventHandler<SanteDB.Core.Services.ProgressChangedEventArgs> ProgressChanged;
 
             /// <summary>
             /// Execute the installation task
             /// </summary>
             public bool Execute(SanteDBConfiguration configuration)
             {
-                this.ProgressChanged?.Invoke(this, new Services.ProgressChangedEventArgs(0.0f, $"Installing Windows Service {this.m_options.ServiceName}..."));
+                this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(0.0f, $"Installing Windows Service {this.m_options.ServiceName}..."));
                 if (!ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName))
                 {
                     ServiceInstaller.Install(this.m_options.ServiceName, "SanteDB Host Process",
@@ -200,7 +201,7 @@ namespace SanteDB.Core.Configuration.Tasks
                         this.m_options.StartBehavior);
                     configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.Add(new AppSettingKeyValuePair("w32instance.name", this.m_options.ServiceName));
                 }
-                this.ProgressChanged?.Invoke(this, new Services.ProgressChangedEventArgs(1.0f, null));
+                this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, null));
                 return true;
             }
 
@@ -268,21 +269,21 @@ namespace SanteDB.Core.Configuration.Tasks
             /// <summary>
             /// Progress has changed
             /// </summary>
-            public event EventHandler<Services.ProgressChangedEventArgs> ProgressChanged;
+            public event EventHandler<SanteDB.Core.Services.ProgressChangedEventArgs> ProgressChanged;
 
             /// <summary>
             /// Execute the installation task
             /// </summary>
             public bool Execute(SanteDBConfiguration configuration)
             {
-                this.ProgressChanged?.Invoke(this, new Services.ProgressChangedEventArgs(0.0f, $"Removing Windows Service {this.m_options.ServiceName}..."));
+                this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(0.0f, $"Removing Windows Service {this.m_options.ServiceName}..."));
                 if (ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName))
                 {
                     ServiceInstaller.StopService(this.m_options.ServiceName);
                     ServiceInstaller.Uninstall(this.m_options.ServiceName);
                     configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.RemoveAll(o => o.Key == "w32instance.name");
                 }
-                this.ProgressChanged?.Invoke(this, new Services.ProgressChangedEventArgs(1.0f, null));
+                this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, null));
                 return true;
             }
 

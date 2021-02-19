@@ -23,7 +23,7 @@ using SanteDB.Core.Model.AMI.Diagnostics;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
+using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Diagnostics.Jira.Configuration;
 using System;
@@ -40,6 +40,7 @@ using SanteDB.Core.Model.Query;
 using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
 using SanteDB.Core.Model.Serialization;
+using SanteDB.Server.Core.Http;
 
 namespace SanteDB.Persistence.Diagnostics.Jira
 {

@@ -371,5 +371,14 @@ namespace SanteDB.Configuration
         /// </summary>
         public void AddServiceProvider(object serviceInstance) => this.m_serviceManager.AddServiceProvider(serviceInstance);
 
+        /// <summary>
+        /// Create injected service
+        /// </summary>
+        public object CreateInjected(Type type) => this.m_serviceManager.CreateInjected(type);
+
+        /// <summary>
+        /// Create injected service
+        /// </summary>
+        public TObject CreateInjected<TObject>() => this.m_serviceManager.CreateInjected<TObject>();
     }
 }

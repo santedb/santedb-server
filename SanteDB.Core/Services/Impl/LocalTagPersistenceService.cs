@@ -16,14 +16,16 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
+using SanteDB.Core.Services;
 using System;
 using System.Linq;
 
-namespace SanteDB.Core.Services.Impl
+namespace SanteDB.Server.Core.Services.Impl
 {
     /// <summary>
     /// Tag persistence service for act
@@ -31,20 +33,26 @@ namespace SanteDB.Core.Services.Impl
     [ServiceProvider("Local Tag Persistence")]
     public class LocalTagPersistenceService : ITagPersistenceService
     {
+        private IDataCachingService m_cacheService;
 
         /// <summary>
         /// Gets the service name
         /// </summary>
         public string ServiceName => "Local Tag Persistence";
-        
+
+        /// <summary>
+        /// Create new local tag persistence service
+        /// </summary>
+        public LocalTagPersistenceService(IDataCachingService cacheService = null)
+        {
+            this.m_cacheService = cacheService;
+        }
 
         /// <summary>
         /// Save tag
         /// </summary>
         public void Save(Guid sourceKey, ITag tag)
         {
-            var cache = ApplicationServiceContext.Current.GetService<IDataCachingService>();
-
             // Don't persist empty tags
             if ((tag as IdentifiedData)?.IsEmpty() == true || tag.TagKey.StartsWith("$")) return;
 
@@ -90,7 +98,7 @@ namespace SanteDB.Core.Services.Impl
                 }
             }
 
-            cache.Remove(sourceKey);
+            this.m_cacheService?.Remove(sourceKey);
             
         }
     }

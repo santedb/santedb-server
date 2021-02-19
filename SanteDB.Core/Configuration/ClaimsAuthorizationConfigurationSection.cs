@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Configuration;
 using System;
@@ -29,7 +30,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Xml.Serialization;
 
-namespace SanteDB.Core.Configuration
+namespace SanteDB.Server.Core.Configuration
 {
     /// <summary>
     /// Represents claims authorization configuration

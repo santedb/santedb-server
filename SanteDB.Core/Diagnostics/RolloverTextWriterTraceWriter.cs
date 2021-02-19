@@ -27,8 +27,9 @@ using System.Threading;
 using System.Configuration;
 using System.Diagnostics.Tracing;
 using System.Collections.Concurrent;
+using SanteDB.Core.Diagnostics;
 
-namespace SanteDB.Core.Diagnostics
+namespace SanteDB.Server.Core.Diagnostics
 {
     /// <summary>
     /// Timed Trace listener

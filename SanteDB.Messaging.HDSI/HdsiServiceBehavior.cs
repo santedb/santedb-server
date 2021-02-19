@@ -23,7 +23,7 @@ using SanteDB.Core.Interop;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Patch;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
+using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Rest.Common;
 using SanteDB.Rest.HDSI;
 using System;

@@ -17,6 +17,8 @@
  * Date: 2020-1-12
  */
 using SanteDB.Configuration;
+using SanteDB.Core.Configuration;
+using SanteDB.Core.Configuration.Features;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -26,7 +28,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.Core.Configuration.Features
+namespace SanteDB.Server.Core.Configuration.Features
 {
     /// <summary>
     /// Configuration for REST services on the gateway

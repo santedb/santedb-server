@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
@@ -28,7 +29,7 @@ using System.Linq;
 
 using System.Security.Principal;
 
-namespace SanteDB.Core
+namespace SanteDB.Server.Core
 {
     /// <summary>
     /// Represents a series of extension methods for the <see cref="ApplicationServiceContext" /> class.

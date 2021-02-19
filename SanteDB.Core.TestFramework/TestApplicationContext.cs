@@ -24,6 +24,8 @@ using SanteDB.Core.Model.EntityLoader;
 using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl;
 using SanteDB.Persistence.Data.ADO.Services;
+using SanteDB.Server.Core.Diagnostics;
+using SanteDB.Server.Core.Services.Impl;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -90,6 +92,8 @@ namespace SanteDB.Core.TestFramework
         {
             this.ContextId = Guid.NewGuid();
             this.m_serviceProvider.AddServiceProvider(this);
+            this.m_serviceProvider.AddServiceProvider(typeof(TestConfigurationService));
+            this.m_serviceProvider.AddServiceProvider(typeof(DefaultThreadPoolService));
             this.m_serviceProvider.AddServiceProvider(typeof(DefaultPolicyEnforcementService));
             this.m_serviceProvider.AddServiceProvider(typeof(DefaultOperatingSystemInfoService));
         }

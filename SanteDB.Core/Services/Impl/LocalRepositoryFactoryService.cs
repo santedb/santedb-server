@@ -18,11 +18,12 @@
  */
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model;
+using SanteDB.Core.Services;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 
-namespace SanteDB.Core.Services.Impl
+namespace SanteDB.Server.Core.Services.Impl
 {
     /// <summary>
     /// Represents a generic resource repository factory

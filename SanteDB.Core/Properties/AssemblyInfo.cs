@@ -19,6 +19,7 @@
 using SanteDB.Core;
 using SanteDB.Core.Attributes;
 using SanteDB.Core.Configuration;
+using SanteDB.Server.Core;
 using System.Reflection;
 using System.Runtime.InteropServices;
 

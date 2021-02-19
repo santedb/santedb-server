@@ -18,7 +18,9 @@
  */
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Http;
+using SanteDB.Core.Http.Description;
 using SanteDB.Core.Interfaces;
+using SanteDB.Core.Interop;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
@@ -98,7 +100,7 @@ namespace SanteDB.Server.AdminConsole.Security
 
             try
             {
-                using (IRestClient restClient = ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AuthenticationService))
+                using (IRestClient restClient = ApplicationContext.Current.GetRestClient(ServiceEndpointType.AuthenticationService))
                 {
 
                     // Set credentials
@@ -114,7 +116,7 @@ namespace SanteDB.Server.AdminConsole.Security
                         request = new OAuthTokenRequest(principal.Identity.Name, null, scope);
 
                     // Set credentials
-                    if (restClient.Description.Binding.Security?.Mode == Core.Http.Description.SecurityScheme.Basic)
+                    if (restClient.Description.Binding.Security?.Mode == SecurityScheme.Basic)
                         restClient.Credentials = new OAuthTokenServiceCredentials(principal);
                     else
                     {

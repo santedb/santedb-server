@@ -16,10 +16,11 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core.Security.Claims;
 using System;
 using System.Security.Principal;
 
-namespace SanteDB.Core.Security.Claims
+namespace SanteDB.Server.Core.Security.Claims
 {
     /// <summary>
     /// Claim type handler

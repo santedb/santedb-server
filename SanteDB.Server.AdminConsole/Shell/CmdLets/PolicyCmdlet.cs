@@ -17,6 +17,7 @@
  * Date: 2019-11-27
  */
 using MohawkCollege.Util.Console.Parameters;
+using SanteDB.Core.Interop;
 using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Model.Security;
 using SanteDB.Messaging.AMI.Client;
@@ -37,7 +38,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
     public static class PolicyCmdlet
     {
 
-        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
+        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(ServiceEndpointType.AdministrationIntegrationService));
 
         /// <summary>
         /// List policy parameters

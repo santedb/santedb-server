@@ -22,7 +22,7 @@ using SanteDB.Core.Model.AMI.Collections;
 using SanteDB.Core.Model.Patch;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
+using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Server.AdminConsole.Attributes;
 using SanteDB.Server.AdminConsole.Util;
@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using SanteDB.Core.Interop;
 
 namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 {
@@ -57,7 +58,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         }
 
         // Ami client
-        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
+        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(ServiceEndpointType.AdministrationIntegrationService));
 
         #region Device Add 
 
@@ -101,7 +102,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             if (parms.DenyPolicies?.Count > 0)
                 policies = policies.Union(parms.DenyPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o))).ToList();
 
-            policies.ForEach(o => o.Grant = parms.GrantPolicies?.Contains(o.Oid) == true ? Core.Model.Security.PolicyGrantType.Grant : PolicyGrantType.Deny);
+            policies.ForEach(o => o.Grant = parms.GrantPolicies?.Contains(o.Oid) == true ?PolicyGrantType.Grant : PolicyGrantType.Deny);
 
             if (policies.Count != (parms.DenyPolicies?.Count ?? 0) + (parms.GrantPolicies?.Count ?? 0))
                 throw new InvalidOperationException("Could not find one or more policies");
@@ -115,7 +116,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             m_client.CreateDevice(new SecurityDeviceInfo()
             {
                 Policies = policies,
-                Entity = new Core.Model.Security.SecurityDevice()
+                Entity = new SecurityDevice()
                 {
                     Name = parms.DeviceId.OfType<String>().First(),
                     DeviceSecret = parms.Secret,
@@ -147,7 +148,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                     if (parms.DenyPolicies?.Count > 0)
                         policies = policies.Union(parms.DenyPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o))).ToList();
 
-                    policies.ForEach(o => o.Grant = parms.GrantPolicies?.Contains(o.Oid) == true ? Core.Model.Security.PolicyGrantType.Grant : PolicyGrantType.Deny);
+                    policies.ForEach(o => o.Grant = parms.GrantPolicies?.Contains(o.Oid) == true ? PolicyGrantType.Grant : PolicyGrantType.Deny);
 
                     // Altering policies?
                     if (policies.Count != (parms.DenyPolicies?.Count ?? 0) + (parms.GrantPolicies?.Count ?? 0))

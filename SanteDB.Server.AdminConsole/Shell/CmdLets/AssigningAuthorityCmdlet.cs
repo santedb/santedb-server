@@ -21,7 +21,7 @@ using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
+using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Messaging.HDSI.Client;
 using SanteDB.Server.AdminConsole.Attributes;
@@ -32,6 +32,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SanteDB.Core.Interop;
 
 namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 {
@@ -42,8 +43,8 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
     public static class AssigningAuthorityCmdlet
     {
         // Ami client
-        private static AmiServiceClient m_amiClient = new AmiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
-        private static HdsiServiceClient m_hdsiClient = new HdsiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.HealthDataService));
+        private static AmiServiceClient m_amiClient = new AmiServiceClient(ApplicationContext.Current.GetRestClient(ServiceEndpointType.AdministrationIntegrationService));
+        private static HdsiServiceClient m_hdsiClient = new HdsiServiceClient(ApplicationContext.Current.GetRestClient(ServiceEndpointType.HealthDataService));
 
         static AssigningAuthorityCmdlet()
         {

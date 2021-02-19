@@ -20,7 +20,7 @@
  -->
 <RestServiceConfiguration xmlns="http://santedb.org/configuration" name="AMI">
   <behaviors>
-    <add type="SanteDB.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Core, Version=1.10.0.0"/>
+    <add type="SanteDB.Server.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Server.Core, Version=1.10.0.0"/>
   </behaviors>
   <endpoint address="http://0.0.0.0:8080/ami" contract="SanteDB.Rest.AMI.IAmiServiceContract, SanteDB.Rest.AMI, Version=1.10.0.0">
     <behaviors>

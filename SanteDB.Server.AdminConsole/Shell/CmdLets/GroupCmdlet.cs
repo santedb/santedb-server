@@ -21,7 +21,7 @@ using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Model.AMI.Collections;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
+using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Server.AdminConsole.Attributes;
 using SanteDB.Server.AdminConsole.Util;
@@ -30,6 +30,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using SanteDB.Core.Interop;
 
 namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 {
@@ -56,7 +57,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         }
 
         // Ami client
-        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
+        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(ServiceEndpointType.AdministrationIntegrationService));
 
 
         #region Add Role
@@ -104,12 +105,12 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             if (parms.DenyPolicies?.Count > 0)
                 policies = policies.Union(parms.DenyPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o))).ToList();
 
-            policies.ForEach(o => o.Grant = parms.GrantPolicies?.Contains(o.Oid) == true ? Core.Model.Security.PolicyGrantType.Grant : PolicyGrantType.Deny);
+            policies.ForEach(o => o.Grant = parms.GrantPolicies?.Contains(o.Oid) == true ? PolicyGrantType.Grant : PolicyGrantType.Deny);
 
-            m_client.CreateRole(new Core.Model.AMI.Auth.SecurityRoleInfo()
+            m_client.CreateRole(new SecurityRoleInfo()
             {
                 Policies = policies,
-                Entity = new Core.Model.Security.SecurityRole()
+                Entity = new SecurityRole()
                 {
                     Name = parms.RoleName,
                     Description = parms.Description

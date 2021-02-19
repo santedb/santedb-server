@@ -38,8 +38,12 @@ using System.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Net.Security;
+using SanteDB.Core.Http;
+using SanteDB.Server.Core.Security;
+using SanteDB.Core;
+using SanteDB.Server.Core.Configuration;
 
-namespace SanteDB.Core.Http
+namespace SanteDB.Server.Core.Http
 {
     /// <summary>
     /// Represents an android enabled rest client

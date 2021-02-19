@@ -24,6 +24,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using SanteDB.Core.Interop;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Model.Security;
@@ -38,7 +39,7 @@ namespace SanteDB.Server.AdminConsole.Util
     public static class DisplayUtil
     {
         // Ami client
-        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
+        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(ServiceEndpointType.AdministrationIntegrationService));
 
         /// <summary>
         /// Print table 

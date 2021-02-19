@@ -17,10 +17,12 @@
  * Date: 2019-11-27
  */
 using RestSrvr;
+using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Services;
+using SanteDB.Server.Core.Configuration;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -29,7 +31,7 @@ using System.Linq;
 using System.Security;
 using System.Security.Cryptography.X509Certificates;
 
-namespace SanteDB.Core.Security
+namespace SanteDB.Server.Core.Security
 {
     /// <summary>
     /// Utilities for x509 certificates

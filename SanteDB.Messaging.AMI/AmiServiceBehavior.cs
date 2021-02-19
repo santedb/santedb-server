@@ -30,11 +30,10 @@ using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Model.AMI.Collections;
 using SanteDB.Core.Model.AMI.Diagnostics;
 using SanteDB.Core.Model.AMI.Logging;
-using SanteDB.Core.Rest;
+using SanteDB.Server.Core.Rest;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
-using SanteDB.Core.Security.Claims;
-using SanteDB.Core.Security.Services;
+using SanteDB.Server.Core.Security.Attribute;
+using SanteDB.Server.Core.Security.Claims;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.AMI.Configuration;
 using SanteDB.Rest.Common;
@@ -48,6 +47,8 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Security.Permissions;
+using SanteDB.Server.Core.Services;
+using SanteDB.Server.Core.Configuration;
 
 namespace SanteDB.Messaging.AMI.Wcf
 {

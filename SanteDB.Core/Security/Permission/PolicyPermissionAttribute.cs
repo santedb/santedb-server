@@ -16,9 +16,11 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Services;
 using System;
@@ -29,7 +31,7 @@ using System.Security.Permissions;
 using System.Security.Principal;
 using System.Text;
 
-namespace SanteDB.Core.Security.Attribute
+namespace SanteDB.Server.Core.Security.Attribute
 {
     /// <summary>
     /// Represents a security attribute which requires that a user be in the possession of a 

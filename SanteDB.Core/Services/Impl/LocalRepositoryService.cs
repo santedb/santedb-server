@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
@@ -23,6 +24,7 @@ using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
+using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,7 +32,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
 
-namespace SanteDB.Core.Services.Impl
+namespace SanteDB.Server.Core.Services.Impl
 {
     /// <summary>
     /// Daemon service which adds all the repositories for acts
@@ -45,11 +47,20 @@ namespace SanteDB.Core.Services.Impl
 
         // Trace source
         private Tracer m_tracer = new Tracer(SanteDBConstants.DataTraceSourceName);
+        private IServiceManager m_serviceManager;
 
         /// <summary>
         /// Return true if the act repository service is running
         /// </summary>
         public bool IsRunning => false;
+
+        /// <summary>
+        /// Create new local repository service
+        /// </summary>
+        public LocalRepositoryService(IServiceManager serviceManager)
+        {
+            this.m_serviceManager = serviceManager;
+        }
 
         /// <summary>
         /// Fired when starting
@@ -113,12 +124,12 @@ namespace SanteDB.Core.Services.Impl
             foreach (var t in repositoryServices)
             {
                 this.m_tracer.TraceInfo("Adding repository service for {0}...", t);
-                ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(t);
+                this.m_serviceManager.AddServiceProvider(t);
             }
 
             ApplicationServiceContext.Current.Started += (o, e) =>
             {
-                var types = ApplicationServiceContext.Current.GetService<IServiceManager>().GetAllTypes();
+                var types = this.m_serviceManager.GetAllTypes();
 
                 foreach (var t in types.Where(t => typeof(IdentifiedData).IsAssignableFrom(t) && !t.IsAbstract && t.GetCustomAttribute<XmlRootAttribute>() != null && !t.ContainsGenericParameters))
                 {
@@ -130,13 +141,13 @@ namespace SanteDB.Core.Services.Impl
                         {
                             this.m_tracer.TraceInfo("Adding Act repository service for {0}...", t.Name);
                             var mrst = typeof(GenericLocalActRepository<>).MakeGenericType(t);
-                            ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(mrst);
+                            this.m_serviceManager.AddServiceProvider(mrst);
                         }
                         else if (typeof(Entity).IsAssignableFrom(t))
                         {
                             this.m_tracer.TraceInfo("Adding Entity repository service for {0}...", t.Name);
                             var mrst = typeof(GenericLocalClinicalDataRepository<>).MakeGenericType(t);
-                            ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(mrst);
+                            this.m_serviceManager.AddServiceProvider(mrst);
                         }
                     }
                 }

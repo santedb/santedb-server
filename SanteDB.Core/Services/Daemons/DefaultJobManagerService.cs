@@ -27,8 +27,9 @@ using System.Timers;
 using System.ComponentModel;
 using SanteDB.Core.Jobs;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Services;
 
-namespace SanteDB.Core.Services
+namespace SanteDB.Server.Core.Services
 {
     /// <summary>
     /// Represents the default implementation of the timer
@@ -41,10 +42,9 @@ namespace SanteDB.Core.Services
         /// </summary>
         public string ServiceName => "Default Job Manager";
 
-        /// <summary>
-        /// Timer configuration
-        /// </summary>
-        private JobConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<JobConfigurationSection>();
+        // Timer configuration
+        private JobConfigurationSection m_configuration;
+        private IThreadPoolService m_threadPoolService;
 
         /// <summary>
         /// Timer thread
@@ -76,9 +76,10 @@ namespace SanteDB.Core.Services
         /// <summary>
         /// Creates a new instance of the timer
         /// </summary>
-        public DefaultJobManagerService()
+        public DefaultJobManagerService(IConfigurationManager configurationManager, IThreadPoolService threadPoolService)
         {
-            
+            this.m_configuration = configurationManager.GetSection<JobConfigurationSection>();
+            this.m_threadPoolService = threadPoolService;
         }
 
         #region ITimerService Members
@@ -254,7 +255,7 @@ namespace SanteDB.Core.Services
                 lock (this.m_log)
                     this.m_log.Add(job, DateTime.Now);
 
-            ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem((o)=> job.Run(this, EventArgs.Empty, parameters));
+            this.m_threadPoolService.QueueUserWorkItem((o)=> job.Run(this, EventArgs.Empty, parameters));
         }
 
         /// <summary>
