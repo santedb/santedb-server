@@ -22,7 +22,7 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
-namespace SanteDB.Core.Configuration
+namespace SanteDB.Server.Core.Configuration
 {
 
     /// <summary>

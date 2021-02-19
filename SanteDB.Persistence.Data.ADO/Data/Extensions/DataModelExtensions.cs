@@ -29,6 +29,7 @@ using SanteDB.Persistence.Data.ADO.Data.Model;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using SanteDB.Persistence.Data.ADO.Services;
 using SanteDB.Persistence.Data.ADO.Services.Persistence;
+using SanteDB.Server.Core.Security;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -297,7 +298,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
             IDbIdentified loaded = null;
             if (me is DeviceIdentity && !m_deviceIdCache.TryGetValue(me.Name.ToLower(), out retVal))
                 loaded = dataContext.SingleOrDefault<DbSecurityDevice>(o => o.PublicId.ToLower() == me.Name.ToLower() && !o.ObsoletionTime.HasValue);
-            else if (me is Core.Security.ApplicationIdentity && !m_applicationIdCache.TryGetValue(me.Name.ToLower(), out retVal))
+            else if (me is Server.Core.Security.ApplicationIdentity && !m_applicationIdCache.TryGetValue(me.Name.ToLower(), out retVal))
                 loaded = dataContext.SingleOrDefault<DbSecurityApplication>(o => o.PublicId.ToLower() == me.Name.ToLower() && !o.ObsoletionTime.HasValue);
             else if (!m_userIdCache.TryGetValue(me.Name.ToLower(), out retVal))
                 loaded = dataContext.SingleOrDefault<DbSecurityUser>(o => o.UserName.ToLower() == me.Name.ToLower() && !o.ObsoletionTime.HasValue);
@@ -483,7 +484,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
                 {
                     if (ident is DeviceIdentity)
                         retVal.DeviceKey = ident.GetKey(me);
-                    else if (ident is Core.Security.ApplicationIdentity)
+                    else if (ident is Server.Core.Security.ApplicationIdentity)
                         retVal.ApplicationKey = ident.GetKey(me).Value;
                     else
                         retVal.UserKey = ident.GetKey(me);

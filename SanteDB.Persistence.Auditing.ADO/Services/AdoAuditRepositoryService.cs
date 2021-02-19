@@ -166,7 +166,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             if (cacheItem == null)
             {
                 if(!String.IsNullOrEmpty(codeSystem))
-                    cacheItem = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().FindConceptsByReferenceTerm(code, codeSystem).FirstOrDefault();
+                    cacheItem = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptByReferenceTerm(code, codeSystem);
                 if (cacheItem == null)
                     cacheItem = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConcept(code);
                 if (cacheItem != null)

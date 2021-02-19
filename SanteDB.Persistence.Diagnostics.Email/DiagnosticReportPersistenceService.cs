@@ -23,7 +23,7 @@ using SanteDB.Core.Model.AMI.Diagnostics;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
+using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Diagnostics.Email.Configuration;
 using System;
@@ -43,6 +43,7 @@ using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
 using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Notifications;
+using SanteDB.Server.Core.Security.Attribute;
 
 namespace SanteDB.Persistence.Diagnostics.Email
 {

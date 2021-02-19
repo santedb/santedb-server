@@ -34,10 +34,10 @@ using SanteDB.Core.Diagnostics;
 using System.Security.Principal;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security.Services;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
+using SanteDB.Server.Core.Diagnostics;
 
 namespace SanteDB.Server
 {

@@ -22,7 +22,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace SanteDB.Core.Security
+namespace SanteDB.Server.Core.Security
 {
     /// <summary>
     /// SHA256 password generator service

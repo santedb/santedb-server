@@ -7,12 +7,12 @@
 
 BEGIN TRANSACTION ;
 
-CLUSTER ent_tbl USING ent_cls_cd_idx;
-
 -- INDEX ON ID VAL
-create index ent_id_val_idx on ent_id_tbl (id_val);
+create index if not exists ent_id_val_idx on ent_id_tbl (id_val);
 
-create index phon_val_val_btr_idx on phon_val_tbl(val);
-create index ent_id_val_gin_idx on ent_id_tbl USING gin (id_val gin_trgm_ops);
+create index if not exists phon_val_val_btr_idx on phon_val_tbl(val);
+create index  if not exists ent_id_val_gin_idx on ent_id_tbl USING gin (id_val gin_trgm_ops);
+insert into cd_set_mem_assoc_tbl (set_id, cd_id) values ('1dabe3e2-44b8-4c45-9102-25ea147e5710','F3132FC0-AADD-40B7-B875-961C40695389') on conflict do nothing;
+
 SELECT REG_PATCH('20210214-01');
 COMMIT;

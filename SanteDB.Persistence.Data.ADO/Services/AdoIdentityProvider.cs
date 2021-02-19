@@ -24,7 +24,7 @@ using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
+using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
@@ -42,6 +42,9 @@ using System.Linq;
 using System.Security;
 using System.Security.Authentication;
 using System.Security.Principal;
+using SanteDB.Server.Core.Configuration;
+using SanteDB.Server.Core.Security;
+using SanteDB.Server.Core.Services;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -578,7 +581,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     if (auth.Object1.NotAfter < DateTime.Now)
                         throw new AuthenticationException("Session is expired");
                     if (auth.Object2?.Key != null)
-                        identities.Add(new Core.Security.ApplicationIdentity(auth.Object2.Key, auth.Object2.PublicId, true));
+                        identities.Add(new Server.Core.Security.ApplicationIdentity(auth.Object2.Key, auth.Object2.PublicId, true));
                     if (auth.Object1.DeviceKey.HasValue)
                         identities.Add(new DeviceIdentity(auth.Object4.Key, auth.Object4.PublicId, true));
                     
@@ -651,7 +654,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     else
                     {
                         List<IIdentity> retVal = new List<IIdentity>(4);
-                        retVal.Add(new Core.Security.ApplicationIdentity(sessionData.Object1.ApplicationKey, sessionData.Object3.PublicId, false));
+                        retVal.Add(new Server.Core.Security.ApplicationIdentity(sessionData.Object1.ApplicationKey, sessionData.Object3.PublicId, false));
                         if (sessionData.Object1.DeviceKey.HasValue)
                             retVal.Add(new DeviceIdentity(sessionData.Object2.Key, sessionData.Object2.PublicId, false));
                         if (sessionData.Object1.UserKey.HasValue)

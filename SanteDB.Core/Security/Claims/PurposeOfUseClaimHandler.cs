@@ -16,14 +16,16 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Services;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Security.Principal;
 
-namespace SanteDB.Core.Security.Claims
+namespace SanteDB.Server.Core.Security.Claims
 {
     /// <summary>
     /// A claim handler which validates the purpose of use claim

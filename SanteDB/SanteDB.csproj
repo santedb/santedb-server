@@ -313,6 +313,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="santedb.config.fyfej.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="data\000-RouteOfAdministration.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
@@ -453,6 +456,22 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
       <Version>5.0.0</Version>
     </PackageReference>
+    <ProjectReference Include="..\santedb-fhir\SanteDB.Messaging.FHIR\SanteDB.Messaging.FHIR.csproj">
+      <Project>{33836324-c699-4139-ab9c-7524570a04d5}</Project>
+      <Name>SanteDB.Messaging.FHIR</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-gs1\SanteDB.Messaging.GS1\SanteDB.Messaging.GS1.csproj">
+      <Project>{ebf0386e-b082-47c3-9e2a-ab228e2035b3}</Project>
+      <Name>SanteDB.Messaging.GS1</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-hl7\SanteDB.Messaging.HL7\SanteDB.Messaging.HL7.csproj">
+      <Project>{c1f86ea3-fc84-456f-a9d9-0bf8db0d48d3}</Project>
+      <Name>SanteDB.Messaging.HL7</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-openapi\SanteDB.Messaging.OpenAPI\SanteDB.Messaging.Metadata.csproj">
+      <Project>{1b690052-ed2e-4389-838d-9b9fb188f541}</Project>
+      <Name>SanteDB.Messaging.Metadata</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Authentication.OAuth\SanteDB.Authentication.OAuth2.csproj">
       <Project>{a3975c6f-4fdb-43be-81ab-3357b86173f1}</Project>
       <Name>SanteDB.Authentication.OAuth2</Name>
@@ -477,9 +496,9 @@
       <Project>{ad73db46-cbb3-4746-b406-40fc435ab3db}</Project>
       <Name>SanteDB.Core.TestFramework</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
+    <ProjectReference Include="..\SanteDB.Core\SanteDB.Server.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
-      <Name>SanteDB.Core</Name>
+      <Name>SanteDB.Server.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Messaging.AMI\SanteDB.Messaging.AMI.csproj">
       <Project>{d882323c-2bc9-4a1d-b70f-d833cf2e91a1}</Project>
@@ -489,29 +508,9 @@
       <Project>{976e1627-b0da-4237-977d-9b3020b60dc1}</Project>
       <Name>SanteDB.Messaging.Atna</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Messaging.FHIR\SanteDB.Messaging.FHIR.csproj">
-      <Project>{33836324-c699-4139-ab9c-7524570a04d5}</Project>
-      <Name>SanteDB.Messaging.FHIR</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Messaging.GS1\SanteDB.Messaging.GS1.csproj">
-      <Project>{ebf0386e-b082-47c3-9e2a-ab228e2035b3}</Project>
-      <Name>SanteDB.Messaging.GS1</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Messaging.HDSI\SanteDB.Messaging.HDSI.csproj">
       <Project>{04e3c581-5a04-4691-82ac-f339947fce75}</Project>
       <Name>SanteDB.Messaging.HDSI</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Messaging.HL7\SanteDB.Messaging.HL7.csproj">
-      <Project>{c1f86ea3-fc84-456f-a9d9-0bf8db0d48d3}</Project>
-      <Name>SanteDB.Messaging.HL7</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Messaging.OpenAPI\SanteDB.Messaging.Metadata.csproj">
-      <Project>{1b690052-ed2e-4389-838d-9b9fb188f541}</Project>
-      <Name>SanteDB.Messaging.Metadata</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Messaging.RISI\SanteDB.Messaging.RISI.csproj">
-      <Project>{265614d8-df9d-4ac8-bb31-8766a0b0ca20}</Project>
-      <Name>SanteDB.Messaging.RISI</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Persistence.Auditing.ADO\SanteDB.Persistence.Auditing.ADO.csproj">
       <Project>{45ea67a6-48f6-4906-84ec-5c13c80c9cc4}</Project>
@@ -529,17 +528,13 @@
       <Project>{18a9f102-023e-4e17-8a70-a91365e1510d}</Project>
       <Name>SanteDB.Persistence.Diagnostics.Jira</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Persistence.PubSub.ADO\SanteDB.Persistence.PubSub.ADO.csproj">
+      <Project>{03052730-be5d-4212-9b71-316c685dd245}</Project>
+      <Name>SanteDB.Persistence.PubSub.ADO</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Persistence.Reporting.ADO\SanteDB.Persistence.Reporting.ADO.csproj">
       <Project>{aa364bac-ba47-4548-bd4b-31c0a73277b7}</Project>
       <Name>SanteDB.Persistence.Reporting.ADO</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Reporting.Core\SanteDB.Reporting.Core.csproj">
-      <Project>{f2b51ac4-4710-4b45-8bf7-e480f375fc90}</Project>
-      <Name>SanteDB.Reporting.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Reporting.Jasper\SanteDB.Reporting.Jasper.csproj">
-      <Project>{5e587d57-fbb9-4064-9444-47b40c4bad8f}</Project>
-      <Name>SanteDB.Reporting.Jasper</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Server\SanteDB.Server.csproj">
       <Project>{1d145e2a-c31e-467c-9f4a-6811e1604b67}</Project>

@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Collection;
@@ -32,7 +33,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
 
-namespace SanteDB.Core.Persistence
+namespace SanteDB.Server.Core.Persistence
 {
     /// <summary>
     /// Data initialization service
@@ -79,7 +80,7 @@ namespace SanteDB.Core.Persistence
         /// <summary>
         /// Fired when progress changes
         /// </summary>
-        public event EventHandler<Services.ProgressChangedEventArgs> ProgressChanged;
+        public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
 
         /// <summary>
         /// Event handler which fires after startup
@@ -118,7 +119,7 @@ namespace SanteDB.Core.Persistence
                     {
                         try
                         {
-                            this.ProgressChanged?.Invoke(this, new Services.ProgressChangedEventArgs(i++ / (float)ds.Action.Count, ds.Id));
+                            this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(i++ / (float)ds.Action.Count, ds.Id));
                             //if (ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Size > 10000) // Probably a good idea to clear memcache
                             //    ApplicationServiceContext.Current.GetService<IDataCachingService>().Clear();
 
@@ -245,7 +246,7 @@ namespace SanteDB.Core.Persistence
         /// <summary>
         /// Install data directory contents
         /// </summary>
-        public void InstallDataDirectory(EventHandler<Services.ProgressChangedEventArgs> fileProgress = null)
+        public void InstallDataDirectory(EventHandler<ProgressChangedEventArgs> fileProgress = null)
         {
             try
             {
@@ -273,7 +274,7 @@ namespace SanteDB.Core.Persistence
                         using (var fs = File.OpenRead(f))
                         {
                             var ds = xsz.Deserialize(fs) as Dataset;
-                            fileProgress?.Invoke(this, new Services.ProgressChangedEventArgs(++i / (float)datasetFiles.Length, ds.Id));
+                            fileProgress?.Invoke(this, new ProgressChangedEventArgs(++i / (float)datasetFiles.Length, ds.Id));
                             this.m_traceSource.TraceEvent(EventLevel.Informational,  "Installing {0}...", Path.GetFileName(f));
                             this.InstallDataset(ds);
                         }

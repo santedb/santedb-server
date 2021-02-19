@@ -108,7 +108,7 @@ CREATE TABLE ent_rel_part_stock_tbl PARTITION OF ent_rel_part_tbl FOR VALUES IN 
 CREATE TABLE ent_rel_part_inf_tbl PARTITION OF ent_rel_part_tbl FOR VALUES IN ('ac45a740-b0c7-4425-84d8-b3f8a41fef9f', 'd1578637-e1cb-415e-b319-4011da033813', '77b7a04b-c065-4faf-8ec0-2cdad4ae372b');
 CREATE TABLE ent_rel_part_bp_cit_tbl PARTITION OF ent_rel_part_tbl FOR VALUES IN ('F3EF7E48-D8B7-4030-B431-AFF7E0E1CB76', '35B13152-E43C-4BCB-8649-A9E83BEE33A2');
 CREATE TABLE ent_rel_part_mdm_tbl PARTITION OF ent_rel_part_tbl FOR VALUES IN ('97730a52-7e30-4dcd-94cd-fd532d111578','a2837281-7e30-4dcd-94cd-fd532d111578','1C778948-2CB6-4696-BC04-4A6ECA140C20','56cfb115-8207-4f89-b52e-d20dbad8f8cc','decfb115-8207-4f89-b52e-d20dbad8f8cc');
-create table ent_rel_part_oth_tbl partition of ent_rel_part_tbl for values in ('8ff9d9a5-a206-4566-82cd-67b770d7ce8a','b43c9513-1c1c-4ed0-92db-55a904c122e6','0c157566-d1e9-4976-8542-473caa9ba2a4');
+create table ent_rel_part_oth_tbl partition of ent_rel_part_tbl for values in ('9bbe0cfe-faab-4dc9-a28f-c001e3e95e6e','8ff9d9a5-a206-4566-82cd-67b770d7ce8a','b43c9513-1c1c-4ed0-92db-55a904c122e6','0c157566-d1e9-4976-8542-473caa9ba2a4');
 --#!
 INSERT INTO ENT_REL_PART_TBL SELECT * FROM ENT_REL_TBL;
 --#!

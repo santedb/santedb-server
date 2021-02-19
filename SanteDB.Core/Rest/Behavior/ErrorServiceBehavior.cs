@@ -19,7 +19,7 @@
 using RestSrvr;
 using SanteDB.Rest.Common.Serialization;
 
-namespace SanteDB.Core.Rest.Behavior
+namespace SanteDB.Server.Core.Rest.Behavior
 {
     /// <summary>
     /// Service behavior

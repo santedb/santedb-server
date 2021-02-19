@@ -36,7 +36,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Concepts
         /// <summary>
         /// Gets or sets the code syste
         /// </summary>
-        [Column("cs_id"), ForeignKey(typeof(DbCodeSystem), nameof(DbCodeSystem.Key))]
+        [Column("cs_id"), ForeignKey(typeof(DbCodeSystem), nameof(DbCodeSystem.Key)), AlwaysJoin]
         public Guid CodeSystemKey { get; set; }
 
         /// <summary>

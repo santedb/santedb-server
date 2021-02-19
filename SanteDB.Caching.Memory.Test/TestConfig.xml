@@ -18,7 +18,7 @@
       <add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Caching.Memory.MemoryAdhocCacheService, SanteDB.Caching.Memory, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Caching.Memory.MemoryQueryPersistenceService, SanteDB.Caching.Memory, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Core.Services.Impl.ThreadPoolService, SanteDB.Core, Version=0.6.0.0" />
+      <add type="SanteDB.Server.Core.Services.Impl.ThreadPoolService, SanteDB.Server.Core, Version=0.6.0.0" />
     </serviceProviders>
   </section>
 </SanteDBConfiguration>

@@ -16,9 +16,10 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Model.Export;
-using SanteDB.Core.Persistence;
 using SanteDB.Core.Services;
+using SanteDB.Server.Core.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,7 +29,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.Core.Configuration.Features
+namespace SanteDB.Server.Core.Configuration.Features
 {
     /// <summary>
     /// Represents a dataset installation feature

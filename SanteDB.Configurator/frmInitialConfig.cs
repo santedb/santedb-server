@@ -19,7 +19,7 @@
 using SanteDB.Configuration;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Data;
-using SanteDB.Core.Configuration.Tasks;
+using SanteDB.Server.Core.Configuration.Tasks;
 using SanteDB.OrmLite.Configuration;
 using System;
 using System.Collections.Generic;

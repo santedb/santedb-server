@@ -19,6 +19,8 @@
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model.Serialization;
+using SanteDB.Core.Services;
+using SanteDB.Server.Core.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,7 +30,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
 
-namespace SanteDB.Core.Services.Impl
+namespace SanteDB.Server.Core.Services.Impl
 {
     /// <summary>
     /// Represents a file system queue that monitors directories
@@ -116,7 +118,7 @@ namespace SanteDB.Core.Services.Impl
         }
 
         // Queue root directory
-        private FileSystemQueueConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<FileSystemQueueConfigurationSection>();
+        private FileSystemQueueConfigurationSection m_configuration;
 
         // Watchers
         private Dictionary<String, IDisposable> m_watchers = new Dictionary<string, IDisposable>();
@@ -129,8 +131,9 @@ namespace SanteDB.Core.Services.Impl
         /// <summary>
         /// Initializes the file system queue
         /// </summary>
-        public FileSystemQueueService()
+        public FileSystemQueueService(IConfigurationManager configurationManager)
         {
+            this.m_configuration = configurationManager.GetSection<FileSystemQueueConfigurationSection>();
             if (!Directory.Exists(this.m_configuration.QueuePath))
                 Directory.CreateDirectory(this.m_configuration.QueuePath);
         }

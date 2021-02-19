@@ -56,5 +56,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("2.0.80.0")]
 
 [assembly: Plugin(Group = FeatureGroup.Diagnostics, Environment = PluginEnvironment.Server, EnableByDefault = false)]
-[assembly: PluginDependency("SanteDB.Core, 2.0.80.0")]
 [assembly: PluginTraceSource("SanteDB.Persistence.Diagnostics.Jira")]

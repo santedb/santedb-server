@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
 
-namespace SanteDB.Core.Configuration
+namespace SanteDB.Server.Core.Configuration
 {
     /// <summary>
     /// Represents an endpoint configuration

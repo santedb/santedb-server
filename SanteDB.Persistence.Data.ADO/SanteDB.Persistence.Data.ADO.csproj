@@ -330,12 +330,6 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
-      <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
-      <Name>SanteDB.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Data\SQL\Updates\00OIZ-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -409,12 +403,24 @@
   <ItemGroup>
     <Content Include="Data\SQL\Performance\ZZ-Partition-PSQL10.sql" />
     <Content Include="Data\SQL\Performance\ZZ-Partition-PSQL11.sql" />
+    <EmbeddedResource Include="Data\SQL\Updates\20210217-FBSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\Updates\20210214-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Data\SQL\Updates\20210116-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Data\SQL\Updates\20210116-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SanteDB.Core\SanteDB.Server.Core.csproj">
+      <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
+      <Name>SanteDB.Server.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

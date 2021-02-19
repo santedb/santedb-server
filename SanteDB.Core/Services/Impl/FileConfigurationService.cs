@@ -25,8 +25,9 @@ using System.Reflection;
 using System.Xml;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Data;
+using SanteDB.Core.Services;
 
-namespace SanteDB.Core.Services.Impl
+namespace SanteDB.Server.Core.Services.Impl
 {
     /// <summary>
     /// Provides a redirected configuration service which reads configuration from a different file

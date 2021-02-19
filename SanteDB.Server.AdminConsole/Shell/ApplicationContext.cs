@@ -19,6 +19,7 @@
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Http;
+using SanteDB.Core.Http.Description;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
@@ -27,6 +28,7 @@ using SanteDB.Core.Services.Impl;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Server.AdminConsole.Security;
 using SanteDB.Server.AdminConsole.Util;
+using SanteDB.Server.Core.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -189,7 +191,7 @@ namespace SanteDB.Server.AdminConsole.Shell
                         config.Binding.Security = new SecurityConfigurationDescription()
                         {
                             CredentialProvider = new TokenCredentialProvider(),
-                            Mode = Core.Http.Description.SecurityScheme.Bearer,
+                            Mode = SecurityScheme.Bearer,
                             PreemptiveAuthentication = true
                         };
                     else if (itm.Capabilities.HasFlag(ServiceEndpointCapabilities.BasicAuth))
@@ -198,14 +200,14 @@ namespace SanteDB.Server.AdminConsole.Shell
                             config.Binding.Security = new SecurityConfigurationDescription()
                             {
                                 CredentialProvider = new OAuth2CredentialProvider(),
-                                Mode = this.m_configuration.OAuthBasic ? Core.Http.Description.SecurityScheme.Basic : Core.Http.Description.SecurityScheme.None,
+                                Mode = this.m_configuration.OAuthBasic ? SecurityScheme.Basic : SecurityScheme.None,
                                 PreemptiveAuthentication = true
                             };
                         else
                             config.Binding.Security = new SecurityConfigurationDescription()
                             {
                                 CredentialProvider = new HttpBasicTokenCredentialProvider(),
-                                Mode = Core.Http.Description.SecurityScheme.Basic,
+                                Mode = SecurityScheme.Basic,
                                 PreemptiveAuthentication = true
                             };
                     }

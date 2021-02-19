@@ -16,16 +16,18 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
+using SanteDB.Server.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 
-namespace SanteDB.Core.Security
+namespace SanteDB.Server.Core.Security
 {
     /// <summary>
     /// Represents a default implementation of a TFA relay service which scans the entire application domain for 
@@ -45,15 +47,12 @@ namespace SanteDB.Core.Security
         /// <summary>
         /// Construct the default relay service
         /// </summary>
-        public DefaultTfaRelayService()
+        public DefaultTfaRelayService(IServiceManager serviceManager)
         {
-            ApplicationServiceContext.Current.Started += (o, e) =>
-            {
-                this.Mechanisms = ApplicationServiceContext.Current.GetService<IServiceManager>()
-                    .GetAllTypes()
-                    .Where(t => typeof(ITfaMechanism).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface)
-                    .Select(m => Activator.CreateInstance(m) as ITfaMechanism);
-            };
+            this.Mechanisms = serviceManager
+                .GetAllTypes()
+                .Where(t => typeof(ITfaMechanism).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface)
+                .Select(m => Activator.CreateInstance(m) as ITfaMechanism);
         }
 
         /// <summary>

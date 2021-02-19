@@ -57,6 +57,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("2.0.80.0")]
 
 [assembly: Plugin(EnableByDefault = true, Environment = PluginEnvironment.Server, Group = FeatureGroup.Persistence)]
-[assembly: PluginDependency("SanteDB.Core, Version=1.10.0.0")]
 [assembly: PluginTraceSource(AdoDataConstants.IdentityTraceSourceName)]
 [assembly: PluginTraceSource(AdoDataConstants.TraceSourceName)]

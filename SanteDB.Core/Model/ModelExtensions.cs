@@ -16,13 +16,14 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using System;
 using System.Collections.Generic;
 
-namespace SanteDB.Core.Model
+namespace SanteDB.Server.Core.Model
 {
     /// <summary>
     /// Model extensions

@@ -53,6 +53,12 @@
     </None>
     <None Include="app.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SanteDB.Core\SanteDB.Server.Core.csproj">
+      <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
+      <Name>SanteDB.Server.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Choose>
     <When Condition="$(SolutionName.Contains('-ext'))">
       <ItemGroup>
@@ -78,12 +84,6 @@
       </ItemGroup>
     </Otherwise>
   </Choose>
-  <ItemGroup>
-    <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
-      <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
-      <Name>SanteDB.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -17,12 +17,14 @@
  * Date: 2020-11-16
  */
 using RazorTemplates.Core;
+using SanteDB.Core;
+using SanteDB.Core.Notifications;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SanteDB.Core.Notifications.Templating
+namespace SanteDB.Server.Core.Notifications.Templating
 {
     /// <summary>
     /// Represents a notification template filler that uses Razor engine

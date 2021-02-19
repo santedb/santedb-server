@@ -16,9 +16,12 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2020-11-13
  */
+using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Notifications;
+using SanteDB.Core.Services;
+using SanteDB.Server.Core.Configuration;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -29,7 +32,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.Core.Services.Impl
+namespace SanteDB.Server.Core.Services.Impl
 {
     /// <summary>
     /// File notification template service
@@ -42,7 +45,15 @@ namespace SanteDB.Core.Services.Impl
         private Tracer m_tracer = Tracer.GetTracer(typeof(FileNotificationTemplateRepository));
 
         // Configuration
-        private FileSystemNotificationTemplateConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<FileSystemNotificationTemplateConfigurationSection>();
+        private FileSystemNotificationTemplateConfigurationSection m_configuration;
+
+        /// <summary>
+        /// File notification repository
+        /// </summary>
+        public FileNotificationTemplateRepository(IConfigurationManager configurationManager)
+        {
+            this.m_configuration = configurationManager.GetSection<FileSystemNotificationTemplateConfigurationSection>();
+        }
 
         /// <summary>
         /// Gets the service name

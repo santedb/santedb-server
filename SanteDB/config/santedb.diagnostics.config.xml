@@ -52,10 +52,10 @@
     </sources>
     <writers>
       <add name="main" initializationData="santedb.log" filter="Warning">
-        <writer>SanteDB.Core.Diagnostics.RolloverTextWriterTraceWriter, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</writer>
+        <writer>SanteDB.Server.Core.Diagnostics.RolloverTextWriterTraceWriter, SanteDB.Server.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</writer>
       </add>
       <add name="console" initializationData="santedb.log" filter="Informational">
-        <writer>SanteDB.Core.Diagnostics.ConsoleTraceWriter, SanteDB.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</writer>
+        <writer>SanteDB.Server.Core.Diagnostics.ConsoleTraceWriter, SanteDB.Server.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</writer>
       </add>
     </writers>
   </section>

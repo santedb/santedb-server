@@ -664,13 +664,13 @@ BEGIN
 END;
 --#!
 
-CREATE FUNCTION CK_IS_CD_SET_MEM ( CD_ID_IN UUID, SET_MNEMONIC_IN VARCHAR(32), ALLOW_NULL_IN BOOLEAN) RETURNS BOOLEAN AS
+CREATE OR ALTER FUNCTION CK_IS_CD_SET_MEM ( CD_ID_IN UUID, SET_MNEMONIC_IN VARCHAR(32), ALLOW_NULL_IN BOOLEAN) RETURNS BOOLEAN AS
  BEGIN 
 	IF (IS_CD_SET_MEM(:cd_id_in, :set_mnemonic_in) OR :allow_null_in AND IS_CD_SET_MEM(:cd_id_in, 'NullReason')) THEN
 		RETURN TRUE;
 	ELSE 
 		EXCEPTION codification_error
-			 'Codification Error: Concept ' || uuid_to_char(cd_id_in) || ' is not in set ' || :set_mnemonic_in;
+			 'Codification Error: Concept ' || uuid_to_char(:cd_id_in) || ' is not in set ' || :set_mnemonic_in;
  END;
 --#!
 

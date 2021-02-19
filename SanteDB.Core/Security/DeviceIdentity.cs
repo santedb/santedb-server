@@ -21,7 +21,7 @@ using SanteDB.Core.Security.Principal;
 using System;
 
 
-namespace SanteDB.Core.Security
+namespace SanteDB.Server.Core.Security
 {
     /// <summary>
     /// Represents a device identity.

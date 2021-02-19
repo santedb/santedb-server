@@ -19,10 +19,11 @@
 using SanteDB.BusinessRules.JavaScript;
 using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Interfaces;
+using SanteDB.Core.Services;
 using System;
 using System.ComponentModel;
 
-namespace SanteDB.Core.Services.Daemons
+namespace SanteDB.Server.Core.Services.Daemons
 {
     /// <summary>
     /// A daemon which loads business rules from the applet manager
@@ -30,11 +31,22 @@ namespace SanteDB.Core.Services.Daemons
     [ServiceProvider("Applet JavaScript BRE", Dependencies = new Type[] { typeof(IAppletManagerService) })]
     public class AppletBusinessRulesDaemon : IDaemonService
     {
+        private IDataReferenceResolver m_dataResolver;
+        private IServiceManager m_serviceManager;
 
         /// <summary>
         /// Gets the service name
         /// </summary>
         public string ServiceName => "Applet JavaScript BRE";
+
+        /// <summary>
+        /// Applet business rules daemon
+        /// </summary>
+        public AppletBusinessRulesDaemon(IServiceManager serviceManager, IDataReferenceResolver dataResolver = null)
+        {
+            this.m_dataResolver = dataResolver;
+            this.m_serviceManager = serviceManager;
+        }
 
         /// <summary>
         /// Indicates whether the service is running
@@ -55,9 +67,9 @@ namespace SanteDB.Core.Services.Daemons
         /// Service is starting
         /// </summary>
         public event EventHandler Starting;
-       /// <summary>
-       /// Service has stopped
-       /// </summary>
+        /// <summary>
+        /// Service has stopped
+        /// </summary>
         public event EventHandler Stopped;
         /// <summary>
         /// Service is stopping
@@ -70,13 +82,9 @@ namespace SanteDB.Core.Services.Daemons
         public bool Start()
         {
             this.Starting?.Invoke(this, EventArgs.Empty);
-            ApplicationServiceContext.Current.Started += (o, e) =>
-            {
-                ApplicationServiceContext.Current = ApplicationServiceContext.Current;
-                if (ApplicationServiceContext.Current.GetService<IDataReferenceResolver>() == null)
-                    ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(typeof(AppletDataReferenceResolver));
-                new AppletBusinessRuleLoader().LoadRules();
-            };
+            if (this.m_dataResolver == null)
+                this.m_serviceManager.AddServiceProvider(typeof(AppletDataReferenceResolver));
+            new AppletBusinessRuleLoader().LoadRules();
             this.Started?.Invoke(this, EventArgs.Empty);
             return true;
         }

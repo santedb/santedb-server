@@ -55,5 +55,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("2.0.80.0")]
 
 [assembly: Plugin(EnableByDefault = false, Environment = PluginEnvironment.Server, Group = FeatureGroup.Diagnostics)]
-[assembly: PluginDependency("SanteDB.Core, Version=2.0.80.0")]
 [assembly: PluginTraceSource("SanteDB.Persistence.Diagnostics.Email")]

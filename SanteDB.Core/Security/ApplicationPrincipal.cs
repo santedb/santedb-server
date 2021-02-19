@@ -22,7 +22,7 @@ using System;
 
 using System.Security.Principal;
 
-namespace SanteDB.Core.Security
+namespace SanteDB.Server.Core.Security
 {
 
     /// <summary>

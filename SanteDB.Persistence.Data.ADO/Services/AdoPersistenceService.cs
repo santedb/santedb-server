@@ -30,7 +30,7 @@ using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
+using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;

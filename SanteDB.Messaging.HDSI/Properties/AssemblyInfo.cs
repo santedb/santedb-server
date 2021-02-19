@@ -58,6 +58,4 @@ using System.Runtime.InteropServices;
 
 
 [assembly: Plugin(EnableByDefault = true, Environment = PluginEnvironment.Server, Group = FeatureGroup.Messaging)]
-[assembly: PluginDependency("SanteDB.Core, Version=2.0.80.0")]
-[assembly: PluginDependency("RestSrvr, Version=2.0.80.0")]
 [assembly: PluginTraceSource(HdsiConstants.TraceSourceName)]

@@ -29,6 +29,7 @@ using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.ADO.Configuration;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using SanteDB.Persistence.Data.ADO.Security;
+using SanteDB.Server.Core.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -206,6 +207,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                         }
 
+                        claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, dbSession.Key.ToString()));
+                        (cprincipal.Identity as IClaimsIdentity).AddClaim(claims.Last());
                         // Add default policies
                         var oizPrincipalPolicies = pdp.GetEffectivePolicySet(cprincipal);
                         // Scopes user is allowed to access

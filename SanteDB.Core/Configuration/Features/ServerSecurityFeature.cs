@@ -16,11 +16,16 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core;
+using SanteDB.Core.Configuration;
+using SanteDB.Core.Configuration.Features;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Privacy;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
+using SanteDB.Server.Core.Security;
+using SanteDB.Server.Core.Security.Privacy;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,7 +33,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.Core.Configuration.Features
+namespace SanteDB.Server.Core.Configuration.Features
 {
     /// <summary>
     /// Represents the default password validation service feature
