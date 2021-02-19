@@ -313,6 +313,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="santedb.config.fyfej.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="data\000-RouteOfAdministration.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
@@ -453,6 +456,22 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
       <Version>5.0.0</Version>
     </PackageReference>
+    <ProjectReference Include="..\santedb-fhir\SanteDB.Messaging.FHIR\SanteDB.Messaging.FHIR.csproj">
+      <Project>{33836324-c699-4139-ab9c-7524570a04d5}</Project>
+      <Name>SanteDB.Messaging.FHIR</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-gs1\SanteDB.Messaging.GS1\SanteDB.Messaging.GS1.csproj">
+      <Project>{ebf0386e-b082-47c3-9e2a-ab228e2035b3}</Project>
+      <Name>SanteDB.Messaging.GS1</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-hl7\SanteDB.Messaging.HL7\SanteDB.Messaging.HL7.csproj">
+      <Project>{c1f86ea3-fc84-456f-a9d9-0bf8db0d48d3}</Project>
+      <Name>SanteDB.Messaging.HL7</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-openapi\SanteDB.Messaging.OpenAPI\SanteDB.Messaging.Metadata.csproj">
+      <Project>{1b690052-ed2e-4389-838d-9b9fb188f541}</Project>
+      <Name>SanteDB.Messaging.Metadata</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Authentication.OAuth\SanteDB.Authentication.OAuth2.csproj">
       <Project>{a3975c6f-4fdb-43be-81ab-3357b86173f1}</Project>
       <Name>SanteDB.Authentication.OAuth2</Name>
@@ -508,6 +527,10 @@
     <ProjectReference Include="..\SanteDB.Persistence.Diagnostics.Jira\SanteDB.Persistence.Diagnostics.Jira.csproj">
       <Project>{18a9f102-023e-4e17-8a70-a91365e1510d}</Project>
       <Name>SanteDB.Persistence.Diagnostics.Jira</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Persistence.PubSub.ADO\SanteDB.Persistence.PubSub.ADO.csproj">
+      <Project>{03052730-be5d-4212-9b71-316c685dd245}</Project>
+      <Name>SanteDB.Persistence.PubSub.ADO</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Persistence.Reporting.ADO\SanteDB.Persistence.Reporting.ADO.csproj">
       <Project>{aa364bac-ba47-4548-bd4b-31c0a73277b7}</Project>

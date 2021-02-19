@@ -82,7 +82,7 @@
       <add type="SanteDB.Caching.Redis.RedisQueryPersistenceService, SanteDB.Caching.Redis, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Caching.Redis.RedisAdhocCache, SanteDB.Caching.Redis, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />-->
       <add type="SanteDB.Persistence.Auditing.ADO.Services.AdoAuditRepositoryService, SanteDB.Persistence.Auditing.ADO, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Core, Version=2.0.0.0" />
+      <add type="SanteDB.Server.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Server.Core, Version=2.0.0.0" />
 
       <!-- Repository Services -->
       <add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryFactoryService, SanteDB.Server.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />

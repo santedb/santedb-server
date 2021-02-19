@@ -557,7 +557,7 @@
       <!-- Core Services -->
       <add type="SanteDB.Server.Core.Services.Impl.DefaultOperatingSystemInfoService, SanteDB.Server.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Server.Core.Services.Impl.DefaultPolicyEnforcementService, SanteDB.Server.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Core, Version=2.0.0.0" />
+      <add type="SanteDB.Server.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Server.Core, Version=2.0.0.0" />
 
       <add type="SanteDB.Server.Core.Services.Impl.FileConfigurationService, SanteDB.Server.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Server.Core.Services.DefaultJobManagerService, SanteDB.Server.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />

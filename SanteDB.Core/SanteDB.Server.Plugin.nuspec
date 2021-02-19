@@ -26,7 +26,7 @@
     </dependencies>
     <references>
       <group targetFramework="net47">
-        <reference file="SanteDB.Core.dll"/>
+        <reference file="SanteDB.Server.Core.dll"/>
         <reference file="SanteDB.Configuration.dll"/>
         <reference file="SanteDB.Messaging.Ami.dll"/>
         <reference file="SanteDB.Messaging.Hdsi.dll"/>

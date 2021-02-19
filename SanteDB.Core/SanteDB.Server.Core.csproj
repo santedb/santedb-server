@@ -67,7 +67,6 @@
     <Compile Include="Configuration\Features\ServerSecurityFeature.cs" />
     <Compile Include="Configuration\FileSystemNotificationTemplateConfigurationSection.cs" />
     <Compile Include="Configuration\FileSystemQueueConfigurationSection.cs" />
-    <Compile Include="Configuration\JobConfigurationSection.cs" />
     <Compile Include="Configuration\AppletConfigurationSection.cs" />
     <Compile Include="Configuration\RestBehaviorConfiguration.cs" />
     <Compile Include="Configuration\RestConfigurationSection.cs" />
