@@ -67,7 +67,6 @@
     <Compile Include="Configuration\Features\ServerSecurityFeature.cs" />
     <Compile Include="Configuration\FileSystemNotificationTemplateConfigurationSection.cs" />
     <Compile Include="Configuration\FileSystemQueueConfigurationSection.cs" />
-    <Compile Include="Configuration\JobConfigurationSection.cs" />
     <Compile Include="Configuration\AppletConfigurationSection.cs" />
     <Compile Include="Configuration\RestBehaviorConfiguration.cs" />
     <Compile Include="Configuration\RestConfigurationSection.cs" />
@@ -143,7 +142,6 @@
     <Compile Include="Services\Impl\LocalTagPersistenceService.cs" />
     <Compile Include="Services\Impl\FileConfigurationService.cs" />
     <Compile Include="Services\Impl\LocalUserEntityRepository.cs" />
-    <Compile Include="Services\Daemons\DefaultJobManagerService.cs" />
     <Compile Include="Services\IPersistentQueueService.cs" />
     <Compile Include="Services\ITfaRelayService.cs" />
     <Compile Include="Services\Impl\LocalConceptRepository.cs" />
