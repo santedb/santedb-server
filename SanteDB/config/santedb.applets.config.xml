@@ -1,6 +1,6 @@
 ﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.Server.Core.Configuration.AppletConfigurationSection, SanteDB.Server.Core,Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Server.Core.Configuration.AppletConfigurationSection, SanteDB.Server.Core,Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
   </sections>
   <section xsi:type="AppletConfigurationSection" appletDirectory=".\applets" allowUnsignedApplets="true">
     <trustedPublishers>

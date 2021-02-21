@@ -109,6 +109,8 @@ CREATE TABLE ent_rel_part_inf_tbl PARTITION OF ent_rel_part_tbl FOR VALUES IN ('
 CREATE TABLE ent_rel_part_bp_cit_tbl PARTITION OF ent_rel_part_tbl FOR VALUES IN ('F3EF7E48-D8B7-4030-B431-AFF7E0E1CB76', '35B13152-E43C-4BCB-8649-A9E83BEE33A2');
 CREATE TABLE ent_rel_part_mdm_tbl PARTITION OF ent_rel_part_tbl FOR VALUES IN ('97730a52-7e30-4dcd-94cd-fd532d111578','a2837281-7e30-4dcd-94cd-fd532d111578','1C778948-2CB6-4696-BC04-4A6ECA140C20','56cfb115-8207-4f89-b52e-d20dbad8f8cc','decfb115-8207-4f89-b52e-d20dbad8f8cc');
 create table ent_rel_part_oth_tbl partition of ent_rel_part_tbl for values in ('9bbe0cfe-faab-4dc9-a28f-c001e3e95e6e','8ff9d9a5-a206-4566-82cd-67b770d7ce8a','b43c9513-1c1c-4ed0-92db-55a904c122e6','0c157566-d1e9-4976-8542-473caa9ba2a4');
+create table ent_rel_part_scp_tbl partition of ent_rel_part_tbl for values in ('FCD37959-5BC2-48DB-BBB5-36AFD9EDF19A');
+
 --#!
 INSERT INTO ENT_REL_PART_TBL SELECT * FROM ENT_REL_TBL;
 --#!
@@ -122,6 +124,7 @@ ALTER TABLE ent_rel_part_stock_tbl ADD CONSTRAINT pk_ent_rel_part_stock_tbl PRIM
 ALTER TABLE ent_rel_part_inf_tbl ADD CONSTRAINT pk_ent_rel_part_inf_tbl PRIMARY KEY (ent_rel_id);
 ALTER TABLE ent_rel_part_bp_cit_tbl ADD CONSTRAINT pk_ent_rel_part_bp_cit_tbl PRIMARY KEY (ent_rel_id); 
 ALTER TABLE ent_rel_part_oth_tbl ADD CONSTRAINT pk_ent_rel_part_oth_tbl PRIMARY KEY (ent_rel_id); 
+ALTER TABLE ent_rel_part_scp_tbl ADD CONSTRAINT pk_ent_rel_part_scp_tbl PRIMARY KEY (ent_rel_id); 
 --#!
 
 -- ADD FKS
@@ -148,6 +151,9 @@ ALTER TABLE ent_rel_part_mdm_tbl ADD CONSTRAINT fk_ent_rel_part_mdm_trg_ent_id F
 ALTER TABLE ent_rel_part_oth_tbl ADD CONSTRAINT fk_ent_rel_part_oth_rel_typ_cd_id FOREIGN KEY (rel_typ_cd_id) REFERENCES cd_tbl (cd_id);
 ALTER TABLE ent_rel_part_oth_tbl ADD CONSTRAINT fk_ent_rel_part_oth_src_ent_id FOREIGN KEY (src_ent_id) REFERENCES ent_tbl (ent_id);
 ALTER TABLE ent_rel_part_oth_tbl ADD CONSTRAINT fk_ent_rel_part_oth_trg_ent_id FOREIGN KEY (trg_ent_id) REFERENCES ent_tbl (ent_id);
+ALTER TABLE ent_rel_part_scp_tbl ADD CONSTRAINT fk_ent_rel_part_scp_rel_typ_cd_id FOREIGN KEY (rel_typ_cd_id) REFERENCES cd_tbl (cd_id);
+ALTER TABLE ent_rel_part_scp_tbl ADD CONSTRAINT fk_ent_rel_part_scp_src_ent_id FOREIGN KEY (src_ent_id) REFERENCES ent_tbl (ent_id);
+ALTER TABLE ent_rel_part_scp_tbl ADD CONSTRAINT fk_ent_rel_part_scp_trg_ent_id FOREIGN KEY (trg_ent_id) REFERENCES ent_tbl (ent_id);
 
 --#!
 
@@ -159,6 +165,7 @@ CREATE INDEX ent_rel_part_own_src_ent_id_idx ON ent_rel_part_own_tbl(src_ent_id)
 CREATE INDEX ent_rel_part_stock_src_ent_id_idx ON ent_rel_part_stock_tbl(src_ent_id);
 CREATE INDEX ent_rel_part_inf_src_ent_id_idx ON ent_rel_part_inf_tbl(src_ent_id);
 CREATE INDEX ent_rel_part_oth_src_ent_id_idx ON ent_rel_part_oth_tbl(src_ent_id);
+CREATE INDEX ent_rel_part_scp_src_ent_id_idx ON ent_rel_part_scp_tbl(src_ent_id);
 --#!
 
 CREATE INDEX ent_rel_part_mdm_rel_typ_idx ON ent_rel_part_mdm_tbl(rel_typ_cd_id);
@@ -167,6 +174,7 @@ CREATE INDEX ent_rel_part_fam_rel_typ_idx ON ent_rel_part_fam_tbl(rel_typ_cd_id)
 CREATE INDEX ent_rel_part_stock_rel_typ_idx ON ent_rel_part_stock_tbl(rel_typ_cd_id);
 CREATE INDEX ent_rel_part_inf_rel_typ_idx ON ent_rel_part_inf_tbl(rel_typ_cd_id);
 CREATE INDEX ent_rel_part_oth_rel_typ_idx ON ent_rel_part_oth_tbl(rel_typ_cd_id);
+CREATE INDEX ent_rel_part_scp_rel_typ_idx ON ent_rel_part_scp_tbl(rel_typ_cd_id);
 --#!
 
 CREATE INDEX ent_rel_part_mdm_trg_ent_id_idx ON ent_rel_part_mdm_tbl(trg_ent_id);
@@ -176,6 +184,7 @@ CREATE INDEX ent_rel_part_own_trg_ent_id_idx ON ent_rel_part_own_tbl(trg_ent_id)
 CREATE INDEX ent_rel_part_stock_trg_ent_id_idx ON ent_rel_part_stock_tbl(trg_ent_id);
 CREATE INDEX ent_rel_part_inf_trg_ent_id_idx ON ent_rel_part_inf_tbl(trg_ent_id);
 CREATE INDEX ent_rel_part_oth_trg_ent_id_idx ON ent_rel_part_oth_tbl(trg_ent_id);
+CREATE INDEX ent_rel_part_scp_trg_ent_id_idx ON ent_rel_part_scp_tbl(trg_ent_id);
 --#!
 
 CREATE UNIQUE INDEX ent_rel_part_mdm_unq_enf_sha1 ON ent_rel_part_mdm_tbl (digest((src_ent_id::text || trg_ent_id::text) || rel_typ_cd_id::text, 'sha1'::text)) WHERE obslt_vrsn_seq_id IS NULL;
@@ -186,6 +195,7 @@ CREATE UNIQUE INDEX ent_rel_part_stock_unq_enf_sha1 ON ent_rel_part_stock_tbl (d
 CREATE UNIQUE INDEX ent_rel_part_inf_unq_enf_sha1 ON ent_rel_part_inf_tbl (digest((src_ent_id::text || trg_ent_id::text) || rel_typ_cd_id::text, 'sha1'::text)) WHERE obslt_vrsn_seq_id IS NULL;
 CREATE UNIQUE INDEX ent_rel_part_bp_cit_unq_enf_sha1 ON ent_rel_part_bp_cit_tbl (digest((src_ent_id::text || trg_ent_id::text) || rel_typ_cd_id::text, 'sha1'::text)) WHERE obslt_vrsn_seq_id IS NULL;
 CREATE UNIQUE INDEX ent_rel_part_oth_unq_enf_sha1 ON ent_rel_part_oth_tbl (digest((src_ent_id::text || trg_ent_id::text) || rel_typ_cd_id::text, 'sha1'::text)) WHERE obslt_vrsn_seq_id IS NULL;
+CREATE UNIQUE INDEX ent_rel_part_scp_unq_enf_sha1 ON ent_rel_part_scp_tbl (digest((src_ent_id::text || trg_ent_id::text) || rel_typ_cd_id::text, 'sha1'::text)) WHERE obslt_vrsn_seq_id IS NULL;
 --#!
 
 CREATE TRIGGER ent_rel_part_mdm_tbl_vrfy BEFORE INSERT OR UPDATE ON ent_rel_part_mdm_tbl FOR EACH ROW EXECUTE PROCEDURE trg_vrfy_ent_rel_tbl();

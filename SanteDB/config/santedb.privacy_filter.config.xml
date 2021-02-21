@@ -1,6 +1,6 @@
 ﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.Core.Security.Configuration.DataPolicyFilterConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0" />
+    <add type="SanteDB.Core.Security.Configuration.DataPolicyFilterConfigurationSection, SanteDB.Core.Api, Version=2.1.0.0" />
   </sections>
   <section xsi:type="DataPolicyFilterConfigurationSection" action="hide">
     <resources>

@@ -1,6 +1,6 @@
 ﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.Core.Configuration.DiagnosticsConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Core.Configuration.DiagnosticsConfigurationSection, SanteDB.Core.Api, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Persistence.Diagnostics.Email.Configuration.DiagnosticEmailServiceConfigurationSection, SanteDB.Persistence.Diagnostics.Email, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
   </sections>
   <!-- Diagnostic e-mail (bug) report configuration -->
@@ -52,10 +52,10 @@
     </sources>
     <writers>
       <add name="main" initializationData="santedb.log" filter="Warning">
-        <writer>SanteDB.Server.Core.Diagnostics.RolloverTextWriterTraceWriter, SanteDB.Server.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</writer>
+        <writer>SanteDB.Server.Core.Diagnostics.RolloverTextWriterTraceWriter, SanteDB.Server.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null</writer>
       </add>
       <add name="console" initializationData="santedb.log" filter="Informational">
-        <writer>SanteDB.Server.Core.Diagnostics.ConsoleTraceWriter, SanteDB.Server.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null</writer>
+        <writer>SanteDB.Server.Core.Diagnostics.ConsoleTraceWriter, SanteDB.Server.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null</writer>
       </add>
     </writers>
   </section>

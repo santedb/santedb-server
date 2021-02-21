@@ -1,6 +1,6 @@
 ﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.Matcher.Configuration.FileMatchConfigurationSection, SanteDB.Matcher, Version=1.0.0.0"/>
+    <add type="SanteDB.Matcher.Configuration.FileMatchConfigurationSection, SanteDB.Matcher, Version=2.1.0.0"/>
 
   </sections>
   <section xsi:type="FileMatchConfigurationSection">
