@@ -70,8 +70,6 @@ Name: interop\atna; Description: ATNA & DICOM Auditing; Types: full
 Name: interop\openapi; Description: OpenAPI; Types: full demo
 Name: reporting; Description: Reporting Services; Types: full
 Name: reporting\bis; Description: Business Intelligence Services; Types: full bis 
-Name: reporting\risi; Description: Report Integration Service (Legacy); Types: full 
-Name: reporting\jasper; Description: Jasper Reports Server Integration (Legacy); Types: full
 Name: tfa; Description: Two Factor Authentication; Types: full
 Name: tfa\twilio; Description: Twilio SMS TFA Adapter; Types: full
 Name: tfa\email; Description: Email TFA Adapter; Types: full
@@ -145,7 +143,6 @@ Source: ..\bin\Release\SanteDB.Authentication.OAuth2.xml; DestDir: {app}; Compon
 Source: ..\bin\Release\SanteDB.BI.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Core.Applets.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Core.Model.AMI.xml; DestDir: {app}; Components: interop\openapi
-Source: ..\bin\Release\SanteDB.Core.Model.RISI.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Core.Model.ViewModelSerializers.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Core.Model.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Messaging.AMI.xml; DestDir: {app}; Components: interop\openapi
@@ -153,7 +150,6 @@ Source: ..\bin\Release\SanteDB.Messaging.FHIR.xml; DestDir: {app}; Components: i
 Source: ..\bin\Release\SanteDB.Messaging.GS1.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Messaging.HDSI.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Messaging.Metadata.xml; DestDir: {app}; Components: interop\openapi
-Source: ..\bin\Release\SanteDB.Messaging.RISI.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Rest.AMI.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Rest.BIS.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Rest.Common.xml; DestDir: {app}; Components: interop\openapi
@@ -171,7 +167,8 @@ Source: ..\bin\Release\RestSrvr.dll; DestDir: {app}; Components: core server
 Source: ..\bin\Release\SanteDB.Configuration.dll; DestDir: {app}; Components: server
 Source: ..\bin\Release\SanteDB.Core.Api.dll; DestDir: {app}; Components: core server
 Source: ..\bin\Release\SanteDB.Core.Applets.dll; DestDir: {app}; Components: core server
-Source: ..\bin\Release\SanteDB.Core.dll; DestDir: {app}; Components: core
+Source: ..\bin\Release\SanteDB.Server.Core.dll; DestDir: {app}; Components: core
+Source: ..\bin\Release\SanteDB.Server.dll; DestDir: {app}; Components: core
 Source: ..\bin\Release\SanteDB.Core.Model.dll; DestDir: {app}; Components: core server
 Source: ..\bin\Release\SharpCompress.dll; DestDir: {app}; Components: core
 Source: ..\bin\release\System.Runtime.CompilerServices.Unsafe.dll; DestDir: {app}; Components: core
@@ -201,7 +198,7 @@ Source: ..\bin\Release\Hl7.Fhir.Serialization.dll; DestDir: {app}; Components: i
 Source: ..\bin\Release\Hl7.Fhir.Support.dll; DestDir: {app}; Components: interop\fhir
 Source: ..\bin\Release\Hl7.Fhir.Support.Poco.dll; DestDir: {app}; Components: interop\fhir
 Source: ..\bin\Release\Hl7.FhirPath.dll; DestDir: {app}; Components: interop\fhir
-Source: ..\SanteDB.Messaging.FHIR\Data\*.dataset; DestDir: {app}\data; Components: interop\fhir
+Source: ..\santedb-fhir\SanteDB.Messaging.FHIR\Data\*.dataset; DestDir: {app}\data; Components: interop\fhir
 Source: ..\bin\Release\SanteDB.Messaging.FHIR.dll; DestDir: {app}; Components: interop\fhir
 
 ; Twilio Integration
@@ -214,7 +211,7 @@ Source: ..\bin\Release\SanteDB.Core.Security.Tfa.Twilio.dll; DestDir: {app}; Com
 Source: ..\bin\Release\NHapi.Base.dll; DestDir: {app}; Components: interop\hl7
 Source: ..\bin\Release\NHapi.Model.V231.dll; DestDir: {app}; Components: interop\hl7
 Source: ..\bin\Release\NHapi.Model.V25.dll; DestDir: {app}; Components: interop\hl7
-Source: ..\SanteDB.Messaging.HL7\Data\*.dataset; DestDir: {app}\data; Components: interop\hl7
+Source: ..\santedb-hl7\SanteDB.Messaging.HL7\Data\*.dataset; DestDir: {app}\data; Components: interop\hl7
 Source: ..\bin\Release\SanteDB.Messaging.HL7.dll; DestDir: {app}; Components: interop\hl7
 
 ; NPSQL
@@ -253,7 +250,7 @@ Source: ..\bin\Release\SanteDB.Messaging.Atna.dll; DestDir: {app}; Components: i
 
 ; GS1
 Source: ..\bin\Release\SanteDB.Messaging.GS1.dll; DestDir: {app}; Components: interop\gs1
-Source: ..\SanteDB.Messaging.GS1\Data\*.dataset; DestDir: {app}\data; Components: interop\gs1
+Source: ..\santedb-gs1\SanteDB.Messaging.GS1\Data\*.dataset; DestDir: {app}\data; Components: interop\gs1
 
 ; JDSO
 Source: ..\bin\Release\SanteDB.Messaging.HDSI.dll; DestDir: {app}; Components: msg\hdsi
@@ -265,129 +262,18 @@ Source: ..\bin\Release\SanteDB.Persistence.Diagnostics.Jira.dll; DestDir: {app};
 Source: ..\bin\Release\SanteDB.Persistence.MDM.dll; DestDir: {app}; Components: mdm
 Source: ..\santedb-mdm\SanteDB.Persistence.MDM\Data\*.dataset; DestDir: {app}\data; Components: mdm
 
-; Jasper Report
-Source: ..\bin\Release\SanteDB.Reporting.Jasper.dll; DestDir: {app}; Components: reporting\jasper
-
 
 Source: ..\bin\Release\SanteDB.Rest.Common.dll; DestDir: {app}; Components: msg reporting
 Source: ..\bin\Release\SanteDB.Rest.HDSI.dll; DestDir: {app}; Components: msg\hdsi
-
-; Legacy RISI
-Source: ..\bin\Release\SanteDB.Core.Model.RISI.dll; DestDir: {app}; Components: reporting\risi
-Source: ..\bin\Release\SanteDB.Messaging.RISI.dll; DestDir: {app}; Components: reporting\risi
-Source: ..\bin\Release\SanteDB.Persistence.Reporting.ADO.dll; DestDir: {app}; Components: reporting\risi
-Source: ..\bin\Release\SanteDB.Reporting.Core.dll; DestDir: {app}; Components: reporting\risi
-Source: ..\bin\Release\SanteDB.Warehouse.ADO.dll; DestDir: {app}; Components: reporting\risi
+Source: ..\bin\Release\SanteDB.Warehouse.ADO.dll; DestDir: {app}; Components: db
 
 ; Common .NET Standard
 Source: ..\bin\Release\Microsoft.Bcl.AsyncInterfaces.dll; DestDir: {app}; 
 Source: ..\bin\Release\Microsoft.Diagnostics.Runtime.dll; DestDir: {app}; 
 Source: ..\bin\Release\Microsoft.Win32.Primitives.dll; DestDir: {app}; 
 Source: ..\bin\Release\netstandard.dll; DestDir: {app}; Components: core server
-Source: ..\bin\Release\System.AppContext.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Buffers.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Collections.Concurrent.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Collections.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Collections.NonGeneric.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Collections.Specialized.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.ComponentModel.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.ComponentModel.EventBasedAsync.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.ComponentModel.Primitives.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.ComponentModel.TypeConverter.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Console.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Data.Common.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Data.DataSetExtensions.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Diagnostics.Contracts.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Diagnostics.Debug.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Diagnostics.FileVersionInfo.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Diagnostics.Process.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Diagnostics.StackTrace.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Diagnostics.TextWriterTraceListener.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Diagnostics.Tools.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Diagnostics.TraceSource.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Diagnostics.Tracing.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Drawing.Primitives.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Dynamic.Runtime.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Globalization.Calendars.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Globalization.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Globalization.Extensions.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.IdentityModel.Tokens.Jwt.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.IO.Compression.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.IO.Compression.ZipFile.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.IO.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.IO.FileSystem.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.IO.FileSystem.DriveInfo.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.IO.FileSystem.Primitives.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.IO.FileSystem.Watcher.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.IO.IsolatedStorage.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.IO.MemoryMappedFiles.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.IO.Pipes.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.IO.UnmanagedMemoryStream.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Linq.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Linq.Expressions.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Linq.Parallel.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Linq.Queryable.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Memory.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Net.Http.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Net.NameResolution.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Net.NetworkInformation.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Net.Ping.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Net.Primitives.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Net.Requests.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Net.Security.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Net.Sockets.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Net.WebHeaderCollection.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Net.WebSockets.Client.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Net.WebSockets.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Numerics.Vectors.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.ObjectModel.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Reflection.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Reflection.Extensions.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Reflection.Primitives.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Resources.Reader.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Resources.ResourceManager.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Resources.Writer.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Runtime.CompilerServices.Unsafe.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Runtime.CompilerServices.VisualC.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Runtime.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Runtime.Extensions.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Runtime.Handles.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Runtime.InteropServices.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Runtime.InteropServices.RuntimeInformation.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Runtime.Numerics.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Runtime.Serialization.Formatters.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Runtime.Serialization.Json.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Runtime.Serialization.Primitives.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Runtime.Serialization.Xml.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Security.Claims.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Security.Cryptography.Algorithms.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Security.Cryptography.Csp.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Security.Cryptography.Encoding.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Security.Cryptography.Primitives.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Security.Cryptography.X509Certificates.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Security.Principal.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Security.SecureString.dll; DestDir: {app}; 
-;Source: ..\bin\Release\System.Text.Encoding.CodePages.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Text.Encoding.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Text.Encoding.Extensions.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Text.Encodings.Web.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Text.Json.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Text.RegularExpressions.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Threading.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Threading.Overlapped.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Threading.Tasks.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Threading.Tasks.Extensions.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Threading.Tasks.Parallel.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Threading.Thread.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Threading.ThreadPool.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Threading.Timer.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.ValueTuple.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Xml.ReaderWriter.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Xml.XDocument.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Xml.XmlDocument.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Xml.XmlSerializer.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Xml.XPath.dll; DestDir: {app}; 
-Source: ..\bin\Release\System.Xml.XPath.XDocument.dll; DestDir: {app}; 
+Source: ..\bin\Release\System.*.dll; DestDir: {app}; 
+
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
