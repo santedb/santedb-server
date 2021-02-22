@@ -10,7 +10,9 @@ fi;
 mkdir -p /bin/Release/data
 
 # Restore, build and compile 
-msbuild /t:clean /t:restore /t:build /p:Configuration=Release santedb-server-linux-ext.sln
+./submodule-pull.sh master
+msbuild /t:clean /t:restore santedb-server-linux-ext.sln
+msbuild /t:build /p:Configuration=Release santedb-server-linux-ext.sln
 
 # Build the tarball structure
 if [ -d santedb-server-$1 ]; then
