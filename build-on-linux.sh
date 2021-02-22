@@ -7,7 +7,7 @@ then
 fi;
 
 # Create output directories if not exists
-mkdir -p /bin/Release/data
+mkdir -p {./bin/Release/data,./santedb-fhir/bin/Release/data,./santedb-hl7/bin/Release/data,./santedb-gs1/bin/Release/data}
 
 # Restore, build and compile 
 ./submodule-pull.sh $2
@@ -21,6 +21,9 @@ fi;
 
 # MSBUILD on linux doesn't copy over documentation files for dependent projects so we're going to copy them manually
 cp ./santedb-model/bin/Release/*.XML ./bin/Release/ 
+cp -v ./santedb-fhir/SanteDB.Messaging.FHIR/Data/* ./bin/Release/data/
+cp -v ./santedb-hl7/SanteDB.Messaging.HL7/Data/* ./bin/Release/data/
+cp -v ./santedb-gs1/SanteDB.Messaging.GS1/Data/* ./bin/Release/data/
 mkdir santedb-server-$1
 cd santedb-server-$1
 cp ../bin/Release/*.dll ./
