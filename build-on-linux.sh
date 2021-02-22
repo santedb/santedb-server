@@ -53,6 +53,6 @@ fi;
 
 # Download the VC++ and NETFX Redist and expand the FireBird reference libraries
 unzip -o ./Solution\ Items/FirebirdSQL-3.0.3-Embedded.zip -d ./bin/Release/
-wget -o ./installer/vc2010.exe https://download.microsoft.com/download/3/2/2/3224B87F-CFA0-4E70-BDA3-3DE650EFEBA5/vcredist_x64.exe
-wget -o ./installer/netfx.exe https://download.visualstudio.microsoft.com/download/pr/014120d7-d689-4305-befd-3cb711108212/1f81f3962f75eff5d83a60abd3a3ec7b/ndp48-web.exe
+wget -q -O - https://download.microsoft.com/download/3/2/2/3224B87F-CFA0-4E70-BDA3-3DE650EFEBA5/vcredist_x64.exe > ./installer/vc2010.exe
+wget -q -O - https://download.visualstudio.microsoft.com/download/pr/014120d7-d689-4305-befd-3cb711108212/1f81f3962f75eff5d83a60abd3a3ec7b/ndp48-web.exe > ./installer/netfx.exe
 /usr/bin/wine /opt/inno/ISCC.exe /o./bin/dist ./installer/santedb-server.iss /d"MyAppVersion=$1" /d"UNSIGNED=true"
