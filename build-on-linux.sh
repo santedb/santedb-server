@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if (( $# < 1 ))
+if (( $# < 2 ))
 then
-	echo "Use: build-on-linux.sh VERSION_ID"
+	echo "Use: build-on-linux.sh VERSION_ID BRANCH_NAME"
 	exit -1;
 fi;
 
@@ -10,7 +10,7 @@ fi;
 mkdir -p /bin/Release/data
 
 # Restore, build and compile 
-./submodule-pull.sh master
+./submodule-pull.sh $2
 msbuild /t:clean /t:restore santedb-server-linux-ext.sln
 msbuild /t:build /p:Configuration=Release santedb-server-linux-ext.sln
 
