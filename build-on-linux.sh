@@ -7,7 +7,7 @@ then
 fi;
 
 # Create output directories if not exists
-mkdir -p /bin/Release/data
+mkdir -p {./bin/Release/data,./santedb-fhir/bin/Release/data,./santedb-hl7/bin/Release/data,./santedb-gs1/bin/Release/data}
 
 # Restore, build and compile 
 ./submodule-pull.sh $2
