@@ -4,7 +4,7 @@
 
 ## Releases 
 
-You can get the most recent builds from our [Jenkins server](https://jenkins.fyfesoftware.ca/job/santedb-icdr-master/7)
+You can get the most recent builds from our [Jenkins server](https://jenkins.fyfesoftware.ca/job/santedb-icdr-master)
 
 ## Building
 
