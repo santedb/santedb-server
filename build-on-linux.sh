@@ -24,6 +24,9 @@ cp ./santedb-model/bin/Release/*.XML ./bin/Release/
 cp -v ./santedb-fhir/SanteDB.Messaging.FHIR/Data/* ./bin/Release/data/
 cp -v ./santedb-hl7/SanteDB.Messaging.HL7/Data/* ./bin/Release/data/
 cp -v ./santedb-gs1/SanteDB.Messaging.GS1/Data/* ./bin/Release/data/
+mkdir -p ./bin/Release/data/SQL
+cp -rv ./SanteDB.Persistence.Data.ADO/Data/SQL/* ./bin/Release/data/SQL/
+
 mkdir santedb-server-$1
 cd santedb-server-$1
 cp ../bin/Release/*.dll ./
@@ -36,8 +39,8 @@ cp ../bin/Release/data/*.dataset ./data
 cp ../bin/Release/data/SQL/* ./data/sql -r
 cp ../bin/Release/config/* ./config
 cp ../bin/Release/applets/*.pak ./applets
-cp ../SanteDB/Data/demo/* elbonia/data
-cp ../SanteDB/Data/*.fdb elbonia
+cp ../SanteDB/data/demo/* elbonia/data
+cp ../SanteDB/data/*.FDB elbonia
 
 cd ..
 rmdir ./bin/dist -r
