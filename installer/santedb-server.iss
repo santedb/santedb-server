@@ -4,6 +4,7 @@
 #define MyAppName "SanteDB Server"
 #define MyAppPublisher "SanteDB Community"
 #define MyAppURL "http://santesuite.org"
+
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -35,9 +36,11 @@ AppCopyright = Copyright (C) 2015-2020 SanteSuite Contributors
 ArchitecturesInstallIn64BitMode = x64
 ArchitecturesAllowed =  x64
 WizardStyle=modern
+
+#ifndef UNSIGNED
 SignedUninstaller=yes
 SignTool=default sign /a /n $qFyfe Software$q /d $qSanteDB iCDR Server$q $f
-
+#endif
 ; SignTool=default sign $f
 ; SignedUninstaller=yes
 
@@ -141,18 +144,18 @@ Source: ..\bin\release\SanteDB.Tools.DataSandbox.dll; DestDir: {app}; Components
 Source: ..\bin\Release\RestSrvr.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Authentication.OAuth2.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.BI.xml; DestDir: {app}; Components: interop\openapi
-Source: ..\bin\Release\SanteDB.Core.Applets.xml; DestDir: {app}; Components: interop\openapi
-Source: ..\bin\Release\SanteDB.Core.Model.AMI.xml; DestDir: {app}; Components: interop\openapi
-Source: ..\bin\Release\SanteDB.Core.Model.ViewModelSerializers.xml; DestDir: {app}; Components: interop\openapi
+; Source: ..\bin\Release\SanteDB.Core.Applets.xml; DestDir: {app}; Components: interop\openapi
+;Source: ..\bin\Release\SanteDB.Core.Model.AMI.xml; DestDir: {app}; Components: interop\openapi
+;Source: ..\bin\Release\SanteDB.Core.Model.ViewModelSerializers.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Core.Model.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Messaging.AMI.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Messaging.FHIR.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Messaging.GS1.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Messaging.HDSI.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Messaging.Metadata.xml; DestDir: {app}; Components: interop\openapi
-Source: ..\bin\Release\SanteDB.Rest.AMI.xml; DestDir: {app}; Components: interop\openapi
-Source: ..\bin\Release\SanteDB.Rest.BIS.xml; DestDir: {app}; Components: interop\openapi
-Source: ..\bin\Release\SanteDB.Rest.Common.xml; DestDir: {app}; Components: interop\openapi
+;Source: ..\bin\Release\SanteDB.Rest.AMI.xml; DestDir: {app}; Components: interop\openapi
+;Source: ..\bin\Release\SanteDB.Rest.BIS.xml; DestDir: {app}; Components: interop\openapi
+;Source: ..\bin\Release\SanteDB.Rest.Common.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Rest.HDSI.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Messaging.Metadata.dll; DestDir: {app}; Components: interop\openapi
 ; Core Services
