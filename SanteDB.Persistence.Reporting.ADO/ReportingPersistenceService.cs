@@ -58,7 +58,7 @@ namespace SanteDB.Persistence.Reporting.ADO
 
 			try
 			{
-				ModelMapper = new ModelMapper(typeof(ReportingPersistenceService).GetTypeInfo().Assembly.GetManifestResourceStream(ReportingPersistenceConstants.MapResourceName));
+				ModelMapper = new ModelMapper(typeof(ReportingPersistenceService).Assembly.GetManifestResourceStream(ReportingPersistenceConstants.MapResourceName));
 				QueryBuilder = new QueryBuilder(ModelMapper, Configuration.Provider);
 			}
 			catch (ModelMapValidationException e)
@@ -146,7 +146,7 @@ namespace SanteDB.Persistence.Reporting.ADO
 				this.traceSource.TraceEvent(EventLevel.Informational,  $"Reporting configuration loaded, using connection string: { Configuration.ReadWriteConnectionString }");
 
 				// Iterate the persistence services
-				foreach (var t in typeof(ReportingPersistenceService).GetTypeInfo().Assembly.DefinedTypes.Where(o => o.Namespace == "SanteDB.Persistence.Reporting.ADO.Services" && !o.GetTypeInfo().IsAbstract && !o.IsGenericTypeDefinition))
+				foreach (var t in typeof(ReportingPersistenceService).Assembly.DefinedTypes.Where(o => o.Namespace == "SanteDB.Persistence.Reporting.ADO.Services" && !o.IsAbstract && !o.IsGenericTypeDefinition))
 				{
 					try
 					{

@@ -85,12 +85,12 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.80.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.80.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.80.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.80.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.80.0" />
-        <PackageReference Include="SanteDB.Core.Model.AMI" Version="2.0.80.0" />
+        <PackageReference Include="RestSrvr" Version="2.1.0.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.1.0.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.1.0.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.1.0.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.1.0.0" />
+        <PackageReference Include="SanteDB.Core.Model.AMI" Version="2.1.0.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -99,9 +99,9 @@
       <Project>{F14023E2-F8DF-4EBC-B2C4-34A825E3790E}</Project>
       <Name>SanteDB.Rest.AMI</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
+    <ProjectReference Include="..\SanteDB.Core\SanteDB.Server.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
-      <Name>SanteDB.Core</Name>
+      <Name>SanteDB.Server.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -19,20 +19,21 @@
 using RestSrvr;
 using RestSrvr.Attributes;
 using RestSrvr.Bindings;
+using SanteDB.Core;
 using SanteDB.Core.Api.Security;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interop;
-using SanteDB.Core.Rest.Behavior;
-using SanteDB.Core.Rest.Security;
 using SanteDB.Core.Services;
 using SanteDB.Rest.Common.Behavior;
 using SanteDB.Rest.Common.Security;
+using SanteDB.Server.Core.Configuration;
+using SanteDB.Server.Core.Rest.Security;
 using System;
 using System.Linq;
 using System.Reflection;
 
-namespace SanteDB.Core.Rest
+namespace SanteDB.Server.Core.Rest
 {
     /// <summary>
     /// Rest service tool to create rest services

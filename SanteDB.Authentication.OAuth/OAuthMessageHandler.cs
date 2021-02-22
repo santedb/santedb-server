@@ -22,7 +22,7 @@ using SanteDB.Authentication.OAuth2.Wcf;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interop;
-using SanteDB.Core.Rest;
+using SanteDB.Server.Core.Rest;
 using SanteDB.Core.Services;
 using System;
 using System.Diagnostics;

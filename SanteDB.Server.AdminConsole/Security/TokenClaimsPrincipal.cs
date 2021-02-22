@@ -19,6 +19,7 @@
 using Newtonsoft.Json.Linq;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
+using SanteDB.Server.Core.Security;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens;

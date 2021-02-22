@@ -48,6 +48,7 @@ namespace SanteDB.Caching.Memory
         {
             try
             {
+                if (Object.Equals(value, default(T))) return;
                 this.m_cache.Set(key, value, DateTimeOffset.Now.AddSeconds(timeout?.TotalSeconds ?? this.m_configuration.MaxCacheAge));
             }
             catch (Exception e)

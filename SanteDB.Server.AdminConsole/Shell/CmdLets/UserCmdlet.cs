@@ -23,7 +23,7 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Patch;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
+using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Server.AdminConsole.Attributes;
 using SanteDB.Server.AdminConsole.Util;
@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using SanteDB.Core.Interop;
 
 namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 {
@@ -59,7 +60,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         }
 
         // Ami client
-        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(Core.Interop.ServiceEndpointType.AdministrationIntegrationService));
+        private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(ServiceEndpointType.AdministrationIntegrationService));
 
         #region User Add
         internal class UseraddParms : GenericUserParms
@@ -108,7 +109,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                 throw new InvalidOperationException("Must specify a user");
 
             foreach (var un in parms.UserName)
-                m_client.CreateUser(new Core.Model.AMI.Auth.SecurityUserInfo()
+                m_client.CreateUser(new SecurityUserInfo()
                 {
                     Entity = new SecurityUser()
                     {

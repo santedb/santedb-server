@@ -29,7 +29,7 @@ using System.IO;
 using System.Reflection;
 using System.Xml.Serialization;
 
-namespace SanteDB.Core.Configuration
+namespace SanteDB.Server.Core.Configuration
 {
 
     /// <summary>

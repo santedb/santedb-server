@@ -36,3 +36,15 @@
 [submodule "santedb-mdm"]
 	path = santedb-mdm
 	url = https://github.com/santedb/santedb-mdm.git
+[submodule "santedb-hl7"]
+	path = santedb-hl7
+	url = https://github.com/santedb/santedb-hl7
+[submodule "santedb-gs1"]
+	path = santedb-gs1
+	url = https://github.com/santedb/santedb-gs1
+[submodule "santedb-fhir"]
+	path = santedb-fhir
+	url = https://github.com/santedb/santedb-fhir
+[submodule "santedb-openapi"]
+	path = santedb-openapi
+	url = https://github.com/santedb/santedb-openapi

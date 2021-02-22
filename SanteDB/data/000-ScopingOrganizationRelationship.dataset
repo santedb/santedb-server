@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Vital Signs Observation Types">
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>FCD37959-5BC2-48DB-BBB5-36AFD9EDF19A</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>Scoper</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <conceptSet>EE16A667-2085-440A-B1E7-4032D10B9F40</conceptSet>
+      <name>
+        <language>en</language>
+        <value>Scoping Entity</value>
+      </name>
+    </Concept>
+  </update>
+  <sql>
+    <exec invariant="npgsql">
+      <![CDATA[
+-- FOR MASTER RELATIONSHIP TYPE
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+	SELECT 
+		'FCD37959-5BC2-48DB-BBB5-36AFD9EDF19A', CD_ID, '7c08bd55-4d42-49cd-92f8-6388d6c4183f', 'SCOPING ORGANIZATION'
+	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = '4E6DA567-0094-4F23-8555-11DA499593AF'
+  ON CONFLICT DO NOTHING;
+      ]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[
+-- FOR MASTER RELATIONSHIP TYPE
+UPDATE OR INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+	SELECT 
+		char_to_uuid('FCD37959-5BC2-48DB-BBB5-36AFD9EDF19A'), CD_ID, char_to_uuid('7c08bd55-4d42-49cd-92f8-6388d6c4183f'), 'SCOPING ORGANIZATION'
+	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = char_to_uuid('4e6da567-0094-4f23-8555-11da499593af')
+   matching (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id);
+
+      ]]>
+    </exec>
+  </sql>
+</dataset>

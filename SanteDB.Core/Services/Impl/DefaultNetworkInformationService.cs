@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.Core.Services.Impl
+namespace SanteDB.Server.Core.Services.Impl
 {
     /// <summary>
     /// Default network information service
@@ -32,6 +33,9 @@ namespace SanteDB.Core.Services.Impl
     [ServiceProvider("Default Network Information Service")]
     public class DefaultNetworkInformationService : INetworkInformationService
     {
+
+        // Get host name of local machine
+        private readonly string m_hostName = Dns.GetHostName();
 
         /// <summary>
         /// Gets the service name
@@ -81,7 +85,7 @@ namespace SanteDB.Core.Services.Impl
         /// </summary>
         public string GetHostName()
         {
-            return Dns.GetHostName();
+            return this.m_hostName;
         }
 
         /// <summary>

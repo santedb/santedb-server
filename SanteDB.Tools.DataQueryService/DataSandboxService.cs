@@ -19,7 +19,6 @@
 using SanteDB.Core.Services;
 using RestSrvr;
 using SanteDB.Core;
-using SanteDB.Core.Rest;
 using SanteDB.Tools.DataSandbox.Wcf;
 using System;
 using System.ComponentModel;

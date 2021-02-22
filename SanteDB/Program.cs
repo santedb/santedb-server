@@ -87,7 +87,6 @@ namespace SanteDB
             try
             {
                 var parameters = parser.Parse(args);
-                EntitySource.Current = new EntitySource(new PersistenceEntitySource());
 
                 var instanceSuffix = !String.IsNullOrEmpty(parameters.InstanceName) ? $"-{parameters.InstanceName}" : null;
 

@@ -20,7 +20,7 @@ using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 
-namespace SanteDB.Core.Security
+namespace SanteDB.Server.Core.Security
 {
     /// <summary>
     /// Represents a TFA secret generator which uses the server's clock

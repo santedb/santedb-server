@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Services.Impl;
@@ -26,7 +27,7 @@ using System.ComponentModel;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml.Serialization;
 
-namespace SanteDB.Core.Configuration
+namespace SanteDB.Server.Core.Configuration
 {
 
     /// <summary>

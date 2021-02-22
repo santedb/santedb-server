@@ -17,10 +17,11 @@
  * Date: 2019-11-27
  */
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Services;
 using System;
 using System.Linq;
 
-namespace SanteDB.Core.Services.Impl
+namespace SanteDB.Server.Core.Services.Impl
 {
     /// <summary>
     /// Represents a local metadata repository service

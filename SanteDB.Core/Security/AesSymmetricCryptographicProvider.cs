@@ -16,8 +16,11 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2020-10-4
  */
+using SanteDB.Core;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.Server.Core.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +28,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.Core.Security
+namespace SanteDB.Server.Core.Security
 {
     /// <summary>
     /// Represents a symmetric cryptographic provider based on AES

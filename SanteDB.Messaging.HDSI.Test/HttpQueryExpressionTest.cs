@@ -17,6 +17,7 @@
  * Date: 2019-11-27
  */
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Query;
@@ -66,6 +67,18 @@ namespace SanteDB.Messaging.HDSI.Test
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Key == id);
             var expression = CreateQueryString(query.ToArray());
             Assert.AreEqual("id=00000000-0000-0000-0000-000000000000", expression);
+        }
+
+        /// <summary>
+        /// Test query by key
+        /// </summary>
+        [TestMethod]
+        public void TestWriteGuardByUuid()
+        {
+            Guid id = Guid.Empty;
+            var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Relationships.Where(g=>g.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother).Any(r=>r.TargetEntity.StatusConcept.Mnemonic == "ACTIVE"));
+            var expression = CreateQueryString(query.ToArray());
+            Assert.AreEqual("relationship[29ff64e5-b564-411a-92c7-6818c02a9e48].target.status.mnemonic=ACTIVE", expression);
         }
 
         /// <summary>

@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2020-11-13
  */
+using SanteDB.Core.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,7 +25,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace SanteDB.Core.Configuration
+namespace SanteDB.Server.Core.Configuration
 {
     /// <summary>
     /// Represents a configuration section for file system queueing

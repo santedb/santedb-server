@@ -19,7 +19,7 @@
 using SanteDB.Core.Security.Claims;
 using System.Security.Principal;
 
-namespace SanteDB.Core.Security
+namespace SanteDB.Server.Core.Security
 {
     /// <summary>
     /// Represents a device principal.

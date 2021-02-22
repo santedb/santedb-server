@@ -50,11 +50,10 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("2.0.80.*")][assembly: AssemblyInformationalVersion("Nanaimo")]
-[assembly: AssemblyVersion("2.0.80.*")]
-[assembly: AssemblyInformationalVersion("Nanaimo")]
-[assembly: AssemblyFileVersion("2.0.80.0")]
+// [assembly: AssemblyVersion("2.1.0.*")][assembly: AssemblyInformationalVersion("Ottawa")]
+[assembly: AssemblyVersion("2.1.0.*")]
+[assembly: AssemblyInformationalVersion("Ottawa")]
+[assembly: AssemblyFileVersion("2.1.0.0")]
 
 [assembly: Plugin(EnableByDefault = false, Environment = PluginEnvironment.Server, Group = FeatureGroup.Security)]
-[assembly: PluginDependency("SanteDB.Core, Version=2.0.80.0")]
 [assembly: PluginTraceSource("SanteDB.Core.Security.Tfa.Twilio")]

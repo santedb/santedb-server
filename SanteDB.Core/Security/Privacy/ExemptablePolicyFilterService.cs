@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2020-1-12
  */
+using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
@@ -27,10 +28,12 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Security;
-using SanteDB.Core.Security.Attribute;
+using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
+using SanteDB.Core.Security.Privacy;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
+using SanteDB.Server.Core.Configuration;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -40,7 +43,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Principal;
 
-namespace SanteDB.Core.Security.Privacy
+namespace SanteDB.Server.Core.Security.Privacy
 {
     /// <summary>
     /// Local policy enforcement point service
@@ -53,8 +56,8 @@ namespace SanteDB.Core.Security.Privacy
         /// <summary>
         /// Creates a new instance with DI
         /// </summary>
-        public ExemptablePolicyFilterService(IPasswordHashingService passwordService, IPolicyDecisionService pdpService, IDataCachingService dataCachingService, IAdhocCacheService adhocCache = null, ISubscriptionExecutor subscriptionExecutor = null)
-            : base(passwordService, pdpService, dataCachingService, subscriptionExecutor, adhocCache)
+        public ExemptablePolicyFilterService(IPasswordHashingService passwordService, IPolicyDecisionService pdpService, IThreadPoolService threadPoolService, IDataCachingService dataCachingService, IAdhocCacheService adhocCache = null, ISubscriptionExecutor subscriptionExecutor = null)
+            : base(passwordService, pdpService, threadPoolService, dataCachingService, subscriptionExecutor, adhocCache)
         {
         }
 

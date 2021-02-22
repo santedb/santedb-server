@@ -22,7 +22,7 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
+using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
@@ -38,6 +38,7 @@ using System.Security.Authentication;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using SanteDB.Server.Core.Configuration;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {

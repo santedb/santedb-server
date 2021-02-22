@@ -38,6 +38,7 @@ using System.Security.Authentication;
 using SanteDB.Core;
 using System.IdentityModel.Tokens;
 using System.Data.Linq;
+using SanteDB.Server.Core.Configuration;
 
 namespace SanteDB.Rest.Common.Serialization
 {

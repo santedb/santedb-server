@@ -18,11 +18,13 @@
  */
 using RestSrvr;
 using RestSrvr.Message;
+using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Services;
+using SanteDB.Server.Core.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,7 +34,7 @@ using System.IdentityModel.Tokens;
 using System.Linq;
 using System.Security.Principal;
 
-namespace SanteDB.Core.Rest.Security
+namespace SanteDB.Server.Core.Rest.Security
 {
     /// <summary>
     /// JwtToken SAM
@@ -66,7 +68,7 @@ namespace SanteDB.Core.Rest.Security
                 throw new SecurityTokenException("Invalid bearer token") ;
 
             RestOperationContext.Current.Data.Add(SanteDBConstants.RestPropertyNameSession, session);
-            Core.Security.AuthenticationContext.Current = new Core.Security.AuthenticationContext(principal);
+            SanteDB.Core.Security.AuthenticationContext.Current = new SanteDB.Core.Security.AuthenticationContext(principal);
 
             this.m_traceSource.TraceInfo("User {0} authenticated via SESSION BEARER", principal.Identity.Name);
         }
@@ -94,7 +96,7 @@ namespace SanteDB.Core.Rest.Security
                 throw new SecurityTokenException("Token not yet valid");
 
             // Copy to a SanteDBClaimsId
-            Core.Security.AuthenticationContext.Current = new Core.Security.AuthenticationContext(new SanteDBClaimsPrincipal(
+            SanteDB.Core.Security.AuthenticationContext.Current = new SanteDB.Core.Security.AuthenticationContext(new SanteDBClaimsPrincipal(
                 new SanteDBClaimsIdentity(identities.Identity.Name, identities.Identity.IsAuthenticated, identities.Identity.AuthenticationType, identities.Claims.Select(o=>new SanteDBClaim(o.Type, o.Value)))
             ));
 
@@ -120,7 +122,7 @@ namespace SanteDB.Core.Rest.Security
                 {
                     if (httpMessage.HttpMethod == "OPTIONS" || httpMessage.HttpMethod == "PING")
                     {
-                        Core.Security.AuthenticationContext.Current = new Core.Security.AuthenticationContext(Core.Security.AuthenticationContext.AnonymousPrincipal);
+                        SanteDB.Core.Security.AuthenticationContext.Current = new SanteDB.Core.Security.AuthenticationContext(SanteDB.Core.Security.AuthenticationContext.AnonymousPrincipal);
                         return;
                     }
                     else
@@ -160,7 +162,7 @@ namespace SanteDB.Core.Rest.Security
             finally
             {
                 // Disposed context so reset the auth
-                RestOperationContext.Current.Disposed += (o, e) => Core.Security.AuthenticationContext.Current = new Core.Security.AuthenticationContext(Core.Security.AuthenticationContext.AnonymousPrincipal);
+                RestOperationContext.Current.Disposed += (o, e) => SanteDB.Core.Security.AuthenticationContext.Current = new SanteDB.Core.Security.AuthenticationContext(SanteDB.Core.Security.AuthenticationContext.AnonymousPrincipal);
             }
         }
         /// <summary>

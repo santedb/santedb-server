@@ -270,11 +270,33 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 else
                 {
 
+                    if(context.Data.TryGetValue("principal", out object pRaw))
+                    {
+                        var currentPrincipal = pRaw as IPrincipal;
+                        countResults = countResults && currentPrincipal != AuthenticationContext.SystemPrincipal;
+                        overrideFuzzyTotalSetting = currentPrincipal == AuthenticationContext.SystemPrincipal;
+                    }
+
                     if (queryId != Guid.Empty && ApplicationServiceContext.Current.GetService<IQueryPersistenceService>() != null)
                     {
-                        var keys = retVal.Keys<Guid>(false).ToArray();
+                        var keys = retVal.Keys<Guid>(false).Take(5000).ToArray();
                         totalResults = keys.Count();
+                        if(totalResults == 5000) // result set is larger than 10,000 load in background
+                        {
+                            ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(o =>
+                            {
+                                var dynParm = o as dynamic;
+                                var subContext = dynParm.Context as DataContext;
+                                var statement = dynParm.Statement as SqlStatement;
+                                var qid = (Guid)dynParm.QueryId;
+
+                                // Get the rest of the keys
+                                var sk = subContext.Query<CompositeResult<TDomain, TDomainKey>>(statement).Keys<Guid>(false).ToArray();
+                                this.m_queryPersistence?.RegisterQuerySet(queryId, sk, statement, sk.Length);
+                            }, new { Context = context.OpenClonedContext(), Statement = retVal.Statement.Build(), QueryId = queryId });
+                        }
                         this.m_queryPersistence?.RegisterQuerySet(queryId, keys, queries, totalResults);
+                        return keys.Skip(offset).Take(count.Value).OfType<Object>();
                     }
                     else if (count.HasValue && countResults && !this.m_settingsProvider.GetConfiguration().UseFuzzyTotals)
                         totalResults = retVal.Count();
@@ -286,7 +308,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     {
                         if ((overrideFuzzyTotalSetting || this.m_settingsProvider.GetConfiguration().UseFuzzyTotals) && totalResults == 0)
                         {
-                            var fuzzResults = retVal.Skip(offset).Take(count.Value + 1).OfType<Object>().ToList();
+                            var fuzzResults = retVal.Skip(offset).Take(count.Value * 2).OfType<Object>().ToList();
                             totalResults = fuzzResults.Count();
                             return fuzzResults.Take(count.Value);
                         }

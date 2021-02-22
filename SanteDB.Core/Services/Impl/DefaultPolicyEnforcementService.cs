@@ -1,5 +1,5 @@
-﻿using SanteDB.Core.Security.Attribute;
-using SanteDB.Core.Security.Services;
+﻿using SanteDB.Core.Security.Services;
+using SanteDB.Server.Core.Security.Attribute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.Core.Services.Impl
+namespace SanteDB.Server.Core.Services.Impl
 {
     /// <summary>
     /// Policy enforcement service

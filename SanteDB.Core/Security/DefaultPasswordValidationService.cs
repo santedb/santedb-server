@@ -16,11 +16,13 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl;
+using SanteDB.Server.Core.Configuration;
 
-namespace SanteDB.Core.Security
+namespace SanteDB.Server.Core.Security
 {
     /// <summary>
     /// Represents a local regex password validator

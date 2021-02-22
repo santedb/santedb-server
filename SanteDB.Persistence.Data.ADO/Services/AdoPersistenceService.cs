@@ -30,7 +30,7 @@ using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
+using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -117,9 +117,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 retVal = ApplicationServiceContext.Current.GetService(idpType) as IAdoPersistenceService;
                 while(retVal == null && sDomain != typeof(object))
                 {
-                    sDomain = sDomain.BaseType;
                     idpType = typeof(IDataPersistenceService<>).MakeGenericType(sDomain);
                     retVal = ApplicationServiceContext.Current.GetService(idpType) as IAdoPersistenceService;
+                    sDomain = sDomain.BaseType;
                 }
 
                 if (retVal != null)
@@ -139,7 +139,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
             try
             {
-                this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).GetTypeInfo().Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName));
+                this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName));
 
                 List<IQueryBuilderHack> hax = new List<IQueryBuilderHack>() { new SecurityUserEntityQueryHack(),  new RelationshipGuardQueryHack(), new CreationTimeQueryHack(this.m_mapper), new EntityAddressNameQueryHack() };
                 if (this.GetConfiguration().DataCorrectionKeys.Any(k => k == "ConceptQueryHack"))
@@ -179,7 +179,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             /// </summary>
             public override TModel InsertInternal(DataContext context, TModel data)
             {
-                foreach (var rp in typeof(TModel).GetRuntimeProperties().Where(o => typeof(IdentifiedData).GetTypeInfo().IsAssignableFrom(o.PropertyType.GetTypeInfo())))
+                foreach (var rp in typeof(TModel).GetRuntimeProperties().Where(o => typeof(IdentifiedData).IsAssignableFrom(o.PropertyType)))
                 {
                     if (rp.GetCustomAttribute<DataIgnoreAttribute>() != null || !rp.CanRead || !rp.CanWrite)
                         continue;
@@ -196,7 +196,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             /// </summary>
             public override TModel UpdateInternal(DataContext context, TModel data)
             {
-                foreach (var rp in typeof(TModel).GetRuntimeProperties().Where(o => typeof(IdentifiedData).GetTypeInfo().IsAssignableFrom(o.PropertyType.GetTypeInfo())))
+                foreach (var rp in typeof(TModel).GetRuntimeProperties().Where(o => typeof(IdentifiedData).IsAssignableFrom(o.PropertyType)))
                 {
                     if (rp.GetCustomAttribute<DataIgnoreAttribute>() != null || !rp.CanRead || !rp.CanWrite)
                         continue;
@@ -227,7 +227,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             /// </summary>
             public override TModel InsertInternal(DataContext context, TModel data)
             {
-                foreach (var rp in typeof(TModel).GetRuntimeProperties().Where(o => typeof(IdentifiedData).GetTypeInfo().IsAssignableFrom(o.PropertyType.GetTypeInfo())))
+                foreach (var rp in typeof(TModel).GetRuntimeProperties().Where(o => typeof(IdentifiedData).IsAssignableFrom(o.PropertyType)))
                 {
                     if (rp.GetCustomAttribute<DataIgnoreAttribute>() != null || !rp.CanRead || !rp.CanWrite)
                         continue;
@@ -245,7 +245,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             /// </summary>
             public override TModel UpdateInternal(DataContext context, TModel data)
             {
-                foreach (var rp in typeof(TModel).GetRuntimeProperties().Where(o => typeof(IdentifiedData).GetTypeInfo().IsAssignableFrom(o.PropertyType.GetTypeInfo())))
+                foreach (var rp in typeof(TModel).GetRuntimeProperties().Where(o => typeof(IdentifiedData).IsAssignableFrom(o.PropertyType)))
                 {
                     if (rp.GetCustomAttribute<DataIgnoreAttribute>() != null || !rp.CanRead || !rp.CanWrite)
                         continue;
@@ -436,7 +436,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
 
             // Iterate the persistence services
-            foreach (var t in typeof(AdoPersistenceService).GetTypeInfo().Assembly.ExportedTypes.Where(o => o.Namespace == "SanteDB.Persistence.Data.ADO.Services.Persistence" && !o.GetTypeInfo().IsAbstract && !o.IsGenericTypeDefinition))
+            foreach (var t in typeof(AdoPersistenceService).Assembly.ExportedTypes.Where(o => o.Namespace == "SanteDB.Persistence.Data.ADO.Services.Persistence" && !o.IsAbstract && !o.IsGenericTypeDefinition))
             {
                 try
                 {
@@ -467,7 +467,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             {
                 this.m_tracer.TraceEvent(EventLevel.Informational,  "Creating secondary model maps...");
 
-                var map = ModelMap.Load(typeof(AdoPersistenceService).GetTypeInfo().Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName));
+                var map = ModelMap.Load(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName));
                 foreach (var itm in map.Class)
                 {
                     // Is there a persistence service?
@@ -492,14 +492,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     if (this.m_persistenceCache.ContainsKey(modelClassType))
                         this.m_tracer.TraceWarning("Duplicate initialization of {0}", modelClassType);
-                    else  if (modelClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IBaseEntityData)) &&
-                        domainClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDbBaseData)))
+                    else  if (modelClassType.Implements(typeof(IBaseEntityData)) &&
+                        domainClassType.Implements(typeof(IDbBaseData)))
                     {
                         // Construct a type
                         Type pclass = null;
-                        if (modelClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IVersionedAssociation)))
+                        if (modelClassType.Implements(typeof(IVersionedAssociation)))
                             pclass = typeof(GenericBaseVersionedAssociationPersistenceService<,>);
-                        else if (modelClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(ISimpleAssociation)))
+                        else if (modelClassType.Implements(typeof(ISimpleAssociation)))
                             pclass = typeof(GenericBaseAssociationPersistenceService<,>);
                         else
                             pclass = typeof(GenericBasePersistenceService<,>);
@@ -509,14 +509,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         // Add to cache since we're here anyways
                         this.m_persistenceCache.Add(modelClassType, instance as IAdoPersistenceService);
                     }
-                    else if (modelClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IIdentifiedEntity)) &&
-                        domainClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDbIdentified)))
+                    else if (modelClassType.Implements(typeof(IIdentifiedEntity)) &&
+                        domainClassType.Implements(typeof(IDbIdentified)))
                     {
                         // Construct a type
                         Type pclass = null;
-                        if (modelClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IVersionedAssociation)))
+                        if (modelClassType.Implements(typeof(IVersionedAssociation)))
                             pclass = typeof(GenericIdentityVersionedAssociationPersistenceService<,>);
-                        else if (modelClassType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(ISimpleAssociation)))
+                        else if (modelClassType.Implements(typeof(ISimpleAssociation)))
                             pclass = typeof(GenericIdentityAssociationPersistenceService<,>);
                         else
                             pclass = typeof(GenericIdentityPersistenceService<,>);

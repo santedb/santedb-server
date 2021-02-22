@@ -158,9 +158,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 {
                     totalResults = (int)queryService.QueryResultTotalQuantity(queryId);
                     result = queryService.GetQueryResults(queryId, offset, count ?? 100)
-                        .AsParallel()
-                        .AsOrdered()
-                        .WithDegreeOfParallelism(2)
                         .Select(o =>
                         {
                             try

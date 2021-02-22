@@ -19,12 +19,13 @@
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.ADO.Configuration;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.Security;
+using SanteDB.Server.Core.Security;
+using SanteDB.Server.Core.Security.Attribute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

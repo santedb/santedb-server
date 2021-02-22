@@ -77,15 +77,15 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.80.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.80.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.1.0.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.1.0.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
-      <Project>{DB9BC05E-45F1-4F96-A161-F36BDECAF566}</Project>
-      <Name>SanteDB.Core</Name>
+    <ProjectReference Include="..\SanteDB.Core\SanteDB.Server.Core.csproj">
+      <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
+      <Name>SanteDB.Server.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Persistence.Data.ADO\SanteDB.Persistence.Data.ADO.csproj">
       <Project>{F38ED54C-E4E4-499A-882E-736289F332C0}</Project>

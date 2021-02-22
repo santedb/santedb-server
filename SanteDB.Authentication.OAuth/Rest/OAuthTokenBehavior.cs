@@ -30,7 +30,6 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Attribute;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Services;
@@ -54,14 +53,18 @@ using SanteDB.Core.Http;
 using SanteDB.Core.Auditing;
 using System.Net;
 using SanteDB.Rest.Common;
-using SanteDB.Core.Rest.Behavior;
-using SanteDB.Core.Rest.Security;
+using SanteDB.Server.Core.Rest.Behavior;
+using SanteDB.Server.Core.Rest.Security;
 using SanteDB.Core.Applets.Model;
 using SanteDB.Core.Applets;
 using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Interop;
 using System.Xml;
 using SanteDB.Core.Exceptions;
+using SanteDB.Server.Core.Configuration;
+using SanteDB.Server.Core.Security.Attribute;
+using SanteDB.Server.Core.Security;
+using SanteDB.Server.Core;
 
 namespace SanteDB.Authentication.OAuth2.Rest
 {
@@ -405,7 +408,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         private OAuthTokenResponse EstablishSession(IPrincipal oizPrincipal, IPrincipal clientPrincipal, IPrincipal devicePrincipal, String scope, IEnumerable<IClaim> additionalClaims)
         {
             var claimsPrincipal = oizPrincipal as IClaimsPrincipal;
-            if (clientPrincipal is IClaimsPrincipal && !claimsPrincipal.Identities.OfType<Core.Security.ApplicationIdentity>().Any(o => o.Name == clientPrincipal.Identity.Name))
+            if (clientPrincipal is IClaimsPrincipal && !claimsPrincipal.Identities.OfType<Server.Core.Security.ApplicationIdentity>().Any(o => o.Name == clientPrincipal.Identity.Name))
                 claimsPrincipal.AddIdentity(clientPrincipal.Identity as IClaimsIdentity);
             if (devicePrincipal is IClaimsPrincipal && !claimsPrincipal.Identities.OfType<DeviceIdentity>().Any(o => o.Name == devicePrincipal.Identity.Name))
                 claimsPrincipal.AddIdentity(devicePrincipal.Identity as IClaimsIdentity);

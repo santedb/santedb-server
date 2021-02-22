@@ -299,7 +299,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         if ((overrideFuzzyTotalSetting || this.m_settingsProvider.GetConfiguration().UseFuzzyTotals) && totalResults == 0)
                         {
                             var fuzzResults = retVal.Skip(offset).Take(count.Value + 1).OfType<Object>().ToList();
-                            totalResults = fuzzResults.Count();
+                            totalResults = offset + fuzzResults.Count();
                             return fuzzResults.Take(count.Value);
                         }
                         else

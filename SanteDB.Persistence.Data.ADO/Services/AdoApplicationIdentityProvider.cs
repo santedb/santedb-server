@@ -36,7 +36,8 @@ using System.Security.Authentication;
 using System.Security.Principal;
 using System.Security.Cryptography;
 using System.Text;
-using SanteDB.Core.Security.Attribute;
+using SanteDB.Server.Core.Security.Attribute;
+using SanteDB.Server.Core.Security;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -87,7 +88,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     else if (client.Key == Guid.Empty)
                         throw new AuthenticationException(client.PublicId);
 
-                    IPrincipal applicationPrincipal = new ApplicationPrincipal(new SanteDB.Core.Security.ApplicationIdentity(client.Key, client.PublicId, true));
+                    IPrincipal applicationPrincipal = new ApplicationPrincipal(new Server.Core.Security.ApplicationIdentity(client.Key, client.PublicId, true));
                     new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService, applicationPrincipal).Demand();
                     return applicationPrincipal;
                 }
@@ -115,7 +116,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     if (client == null)
                         return null;
                     else 
-                        return new SanteDB.Core.Security.ApplicationIdentity(client.Key, client.PublicId, false);
+                        return new SanteDB.Server.Core.Security.ApplicationIdentity(client.Key, client.PublicId, false);
 
                 }
                 catch (Exception e)

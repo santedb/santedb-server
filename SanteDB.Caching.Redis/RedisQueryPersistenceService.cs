@@ -90,13 +90,19 @@ namespace SanteDB.Caching.Redis
         /// <summary>
         /// Add results to the query identifier
         /// </summary>
-        public void AddResults(Guid queryId, IEnumerable<Guid> results)
+        public void AddResults(Guid queryId, IEnumerable<Guid> results, int totalResults)
         {
             try
             {
                 var redisConn = RedisConnectionManager.Current.Connection.GetDatabase(RedisCacheConstants.QueryDatabaseId);
                 if (redisConn.KeyExists($"{queryId}.{FIELD_QUERY_RESULT_IDX}"))
-                    redisConn.ListRightPush($"{queryId}.{FIELD_QUERY_RESULT_IDX}", results.Select(o => (RedisValue)o.ToByteArray()).ToArray(), flags: CommandFlags.FireAndForget);
+                {
+                    var batch = redisConn.CreateBatch();
+                    batch.ListRightPushAsync($"{queryId}.{FIELD_QUERY_RESULT_IDX}", results.Select(o => (RedisValue)o.ToByteArray()).ToArray(), flags: CommandFlags.FireAndForget);
+                    batch.StringSetAsync($"{queryId}.{FIELD_QUERY_TOTAL_RESULTS}", BitConverter.GetBytes(totalResults), expiry: this.m_configuration.TTL);
+                    batch.KeyExpireAsync($"{queryId}.{FIELD_QUERY_RESULT_IDX}", this.m_configuration.TTL);
+                    batch.Execute();
+                }
             }
             catch (Exception e)
             {

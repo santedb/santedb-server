@@ -75,7 +75,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
 
             Assert.IsNotNull(ipoli);
 
-            var policies = ipoli.GetActivePolicies(new SecurityRole() { Name = "Administrators", Key = Guid.Parse("f6d2ba1d-5bb5-41e3-b7fb-2ec32418b2e1") });
+            var policies = ipoli.GetPolicies(new SecurityRole() { Name = "Administrators", Key = Guid.Parse("f6d2ba1d-5bb5-41e3-b7fb-2ec32418b2e1") });
             Assert.AreNotEqual(0, policies.Count());
 
         }
@@ -91,7 +91,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
 
             Assert.IsNotNull(ipoli);
 
-            var policies = ipoli.GetActivePolicies(new GenericIdentity("system"));
+            var policies = ipoli.GetPolicies(new GenericIdentity("system"));
             Assert.AreNotEqual(0, policies.Count());
 
         }

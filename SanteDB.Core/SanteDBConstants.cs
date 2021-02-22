@@ -18,7 +18,7 @@
  */
 using System;
 
-namespace SanteDB.Core
+namespace SanteDB.Server.Core
 {
     /// <summary>
     /// SanteDB constants

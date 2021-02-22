@@ -16,8 +16,11 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.Server.Core.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens;
@@ -26,7 +29,7 @@ using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.Core.Security
+namespace SanteDB.Server.Core.Security
 {
     /// <summary>
     /// Default data signature service

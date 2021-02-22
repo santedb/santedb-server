@@ -84,15 +84,15 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.80.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.80.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.1.0.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.1.0.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
+    <ProjectReference Include="..\SanteDB.Core\SanteDB.Server.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
-      <Name>SanteDB.Core</Name>
+      <Name>SanteDB.Server.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
