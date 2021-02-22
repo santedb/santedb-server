@@ -21,6 +21,9 @@ fi;
 
 # MSBUILD on linux doesn't copy over documentation files for dependent projects so we're going to copy them manually
 cp ./santedb-model/bin/Release/*.XML ./bin/Release/ 
+cp -v ./santedb-fhir/SanteDB.Messaging.FHIR/Data/* ./bin/Release/data/
+cp -v ./santedb-hl7/SanteDB.Messaging.HL7/Data/* ./bin/Release/data/
+cp -v ./santedb-gs1/SanteDB.Messaging.GS1/Data/* ./bin/Release/data/
 mkdir santedb-server-$1
 cd santedb-server-$1
 cp ../bin/Release/*.dll ./
