@@ -316,9 +316,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="santedb.config.fyfej.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="data\000-RouteOfAdministration.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
