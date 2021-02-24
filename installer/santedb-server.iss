@@ -4,7 +4,7 @@
 #define MyAppName "SanteDB Server"
 #define MyAppPublisher "SanteDB Community"
 #define MyAppURL "http://santesuite.org"
-#define MyAppVersion "2.1.0"
+
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -320,21 +320,25 @@ end;
 // Removes the 2.0 Assets which may be present in the installation directory
 procedure Remove20Assets() ;
 var 
-  files : Array [1..7] of string;
+  files : Array [0..7] of string;
   i : integer;
 begin
-  files[1] := ExpandConstant('{app}\SanteDB.Core.dll');
-  files[2] := ExpandConstant('{app}\SanteGuard.Core.dll');
-  files[3] := ExpandConstant('{app}\SanteGuard.Messaging.Ami.dll');
-  files[4] := ExpandConstant('{app}\SanteGuard.Messaging.Syslog.dll');
-  files[5] := ExpandConstant('{app}\SanteGuard.Persistence.Ado.dll');
-  files[6] := ExpandConstant('{app}\SanteMPI.Messaging.PixPdqv2.dll');
-  files[7] := ExpandConstant('{app}\SanteMPI.Persistence.ADO.dll');
+  files[0] := ExpandConstant('{app}\SanteDB.Core.dll');
+  files[1] := ExpandConstant('{app}\SanteGuard.Core.dll');
+  files[2] := ExpandConstant('{app}\SanteGuard.Messaging.Ami.dll');
+  files[3] := ExpandConstant('{app}\SanteGuard.Messaging.Syslog.dll');
+  files[4] := ExpandConstant('{app}\SanteGuard.Persistence.Ado.dll');
+  files[5] := ExpandConstant('{app}\SanteMPI.Messaging.PixPdqv2.dll');
+  files[6] := ExpandConstant('{app}\SanteMPI.Persistence.ADO.dll');
   
   if(FileExists(files[1]) and (MsgBox('You appear to have SanteDB 2.0.x plugins which might not be compatible with this version. Would you like to remove them?', mbConfirmation, MB_YESNO) = idYes)) then begin
-    for i :=  1 to 7 do begin
+    for i :=  0 to 7 do begin
       if(FileExists(files[i])) then begin
-        DeleteFile(files[i]);
+        try 
+          DeleteFile(files[i]);
+        except 
+          ShowExceptionMessage();
+        end;
       end; // if
     end; // for
   end;

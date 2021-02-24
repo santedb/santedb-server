@@ -558,7 +558,6 @@
       <add type="SanteDB.Server.Core.Services.Impl.DefaultOperatingSystemInfoService, SanteDB.Server.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Server.Core.Services.Impl.DefaultPolicyEnforcementService, SanteDB.Server.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Server.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Server.Core, Version=2.1.0.0" />
-
       <add type="SanteDB.Server.Core.Services.Impl.FileConfigurationService, SanteDB.Server.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Jobs.DefaultJobManagerService, SanteDB.Core.Api, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Services.Impl.DefaultThreadPoolService, SanteDB.Core.Api, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />

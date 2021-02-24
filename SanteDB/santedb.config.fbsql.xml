@@ -93,7 +93,6 @@
       <add type="SanteDB.Core.Applets.Services.Impl.AppletSubscriptionRepository, SanteDB.Core.Applets, Version=1.30.0.0, Culture=neutral, PublicKeyToken=null"/>
       <add type="SanteDB.Core.Security.Audit.AuditDaemonService, SanteDB.Core.Api, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
 
-
       <!-- Data Migration & Management -->
       <add type="SanteDB.Server.Core.Persistence.DataInitializationService, SanteDB.Server.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Protocol.SimpleCarePlanService, SanteDB.Core.Api, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
@@ -132,7 +131,6 @@
 
       <!-- BI Services -->
       <add type="SanteDB.Matcher.Services.FileMatchConfigurationProvider, SanteDB.Matcher, Version=2.1.0.0"/>
-
       <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS, Version=2.1.0.0"/>
       <add type="SanteDB.BI.Services.Impl.AppletBiRepository, SanteDB.BI, Version=2.1.0.0"/>
       <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI, Version=2.1.0.0"/>
