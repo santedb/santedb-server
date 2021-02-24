@@ -5,17 +5,17 @@
   <!-- Configures the FHIR service-->
   <section xsi:type="FhirServiceConfigurationSection" restEndpoint="FHIR" index="value">
     <resourceHandlers>
-      <add type="SanteDB.Messaging.FHIR.Handlers.EncounterResourceHandler, SanteDB.Messaging.FHIR, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"/>
-      <add type="SanteDB.Messaging.FHIR.Handlers.AdverseEventResourceHandler, SanteDB.Messaging.FHIR, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"/>
-      <add type="SanteDB.Messaging.FHIR.Handlers.AllergyIntoleranceResourceHandler, SanteDB.Messaging.FHIR, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"/>
-      <add type="SanteDB.Messaging.FHIR.Handlers.ConditionResourceHandler, SanteDB.Messaging.FHIR, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"/>
-      <add type="SanteDB.Messaging.FHIR.Handlers.LocationResourceHandler, SanteDB.Messaging.FHIR, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"/>
-      <add type="SanteDB.Messaging.FHIR.Handlers.MedicationResourceHandler, SanteDB.Messaging.FHIR, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"/>
-      <add type="SanteDB.Messaging.FHIR.Handlers.ObservationResourceHandler, SanteDB.Messaging.FHIR, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"/>
-      <add type="SanteDB.Messaging.FHIR.Handlers.SubstanceResourceHandler, SanteDB.Messaging.FHIR, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"/>
-      <add type="SanteDB.Messaging.FHIR.Handlers.PatientResourceHandler, SanteDB.Messaging.FHIR, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"/>
-      <add type="SanteDB.Messaging.FHIR.Handlers.ImmunizationRecommendationResourceHandler, SanteDB.Messaging.FHIR, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"/>
-      <add type="SanteDB.Messaging.FHIR.Handlers.ImmunizationResourceHandler, SanteDB.Messaging.FHIR, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null"/>
+      <add type="SanteDB.Messaging.FHIR.Handlers.EncounterResourceHandler, SanteDB.Messaging.FHIR"/>
+      <add type="SanteDB.Messaging.FHIR.Handlers.AdverseEventResourceHandler, SanteDB.Messaging.FHIR"/>
+      <add type="SanteDB.Messaging.FHIR.Handlers.AllergyIntoleranceResourceHandler, SanteDB.Messaging.FHIR"/>
+      <add type="SanteDB.Messaging.FHIR.Handlers.ConditionResourceHandler, SanteDB.Messaging.FHIR"/>
+      <add type="SanteDB.Messaging.FHIR.Handlers.LocationResourceHandler, SanteDB.Messaging.FHIR"/>
+      <add type="SanteDB.Messaging.FHIR.Handlers.MedicationResourceHandler, SanteDB.Messaging.FHIR"/>
+      <add type="SanteDB.Messaging.FHIR.Handlers.ObservationResourceHandler, SanteDB.Messaging.FHIR"/>
+      <add type="SanteDB.Messaging.FHIR.Handlers.SubstanceResourceHandler, SanteDB.Messaging.FHIR"/>
+      <add type="SanteDB.Messaging.FHIR.Handlers.PatientResourceHandler, SanteDB.Messaging.FHIR"/>
+      <add type="SanteDB.Messaging.FHIR.Handlers.ImmunizationRecommendationResourceHandler, SanteDB.Messaging.FHIR"/>
+      <add type="SanteDB.Messaging.FHIR.Handlers.ImmunizationResourceHandler, SanteDB.Messaging.FHIR"/>
     </resourceHandlers>
     <!-- Sets the base path for reverse proxies -->
     <base>http://localhost:8080/fhir</base>

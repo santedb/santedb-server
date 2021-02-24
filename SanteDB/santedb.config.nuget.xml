@@ -558,7 +558,6 @@
       <add type="SanteDB.Server.Core.Services.Impl.DefaultOperatingSystemInfoService, SanteDB.Server.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Server.Core.Services.Impl.DefaultPolicyEnforcementService, SanteDB.Server.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Server.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Server.Core, Version=2.1.0.0" />
-
       <add type="SanteDB.Server.Core.Services.Impl.FileConfigurationService, SanteDB.Server.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Jobs.DefaultJobManagerService, SanteDB.Core.Api, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Services.Impl.DefaultThreadPoolService, SanteDB.Core.Api, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
@@ -611,7 +610,7 @@
       <add type="SanteDB.Server.Core.Persistence.DataInitializationService, SanteDB.Server.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
 
       <!-- Care Planning Services -->
-      <add type="SanteDB.Core.Protocol.SimpleCarePlanService, SanteDB.Core.Api, Version=1.9.1.24156, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Core.Protocol.SimpleCarePlanService, SanteDB.Core.Api, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
 
 
       <!-- Messaging Services-->
@@ -622,9 +621,9 @@
       <add type="SanteDB.Messaging.FHIR.FhirMessageHandler, SanteDB.Messaging.FHIR, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       
       <!-- GS1 BMS Plugins
-      <add type="SanteDB.Messaging.GS1.StockSubscriber, SanteDB.Messaging.GS1, Version=1.9.0.0, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Messaging.GS1.StockServiceMessageHandler, SanteDB.Messaging.GS1, Version=1.9.0.0, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Messaging.GS1.Transport.AS2.As2IntegrationService, SanteDB.Messaging.GS1, Version=1.9.0.0, Culture=neutral, PublicKeyToken=null" />-->
+      <add type="SanteDB.Messaging.GS1.StockSubscriber, SanteDB.Messaging.GS1, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Messaging.GS1.StockServiceMessageHandler, SanteDB.Messaging.GS1, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Messaging.GS1.Transport.AS2.As2IntegrationService, SanteDB.Messaging.GS1, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />-->
 
       <!-- HDSI Core API Plugin (dont remove) -->
       <add type="SanteDB.Messaging.HDSI.HdsiMessageHandler, SanteDB.Messaging.HDSI, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
@@ -645,7 +644,7 @@
       <add type="SanteDB.Messaging.Metadata.MetadataMessageHandler, SanteDB.Messaging.Metadata, Version=2.1.0.0"/>
 
       <!-- Patching Services -->
-      <add type="SanteDB.Core.Services.Impl.SimplePatchService, SanteDB.Core.Api, Version=1.9.1.24156, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Core.Services.Impl.SimplePatchService, SanteDB.Core.Api, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       
       <!-- Applet Management Service -->
       <add type="SanteDB.Server.Core.Services.Impl.LocalAppletManagerService, SanteDB.Server.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
@@ -654,7 +653,7 @@
       <add type="SanteDB.Server.Core.Services.Daemons.AppletBusinessRulesDaemon, SanteDB.Server.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
 
       <!-- E-Mail Bug Reports Plugin -->
-      <add type="SanteDB.Persistence.Diagnostics.Email.DiagnosticReportPersistenceService, SanteDB.Persistence.Diagnostics.Email, Version=1.9.0.0, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Persistence.Diagnostics.Email.DiagnosticReportPersistenceService, SanteDB.Persistence.Diagnostics.Email, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       <!-- JIRA Reporting Services -->
       <!-- <add type="SanteDB.Persistence.Diagnostics.Jira.DiagnosticReportPersistenceService, SanteDB.Persistence.Diagnostics.Jira, Version=1.1.2.24168, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Persistence.Reporting.ADO.ReportingPersistenceService, SanteDB.Persistence.Reporting.ADO, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />-->
@@ -676,13 +675,13 @@
 
       <!-- BI Services -->
       <!-- Enable BI on REST API: -->
-      <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS, Version=1.40.0.0"/>
+      <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS, Version=2.1.0.0"/>
       <!-- Load BI definitions from applets: -->
-      <add type="SanteDB.BI.Services.Impl.AppletBiRepository, SanteDB.BI, Version=1.40.0.0"/>
+      <add type="SanteDB.BI.Services.Impl.AppletBiRepository, SanteDB.BI, Version=2.1.0.0"/>
       <!-- Use System RAM for PIVOT operations: -->
-      <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI, Version=1.40.0.0"/>
+      <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI, Version=2.1.0.0"/>
       <!-- Render Reports using Local Services -->
-      <add type="SanteDB.BI.Services.Impl.LocalBiRenderService, SanteDB.BI, Version=1.40.0.0"/>
+      <add type="SanteDB.BI.Services.Impl.LocalBiRenderService, SanteDB.BI, Version=2.1.0.0"/>
 
       <!-- If using Master Data Management -->
       <!--<add type="SanteDB.Persistence.MDM.Services.MdmDaemonService, SanteDB.Persistence.MDM, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />

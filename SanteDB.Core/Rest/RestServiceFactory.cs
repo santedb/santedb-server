@@ -104,11 +104,14 @@ namespace SanteDB.Server.Core.Rest
                     throw new InvalidOperationException($"Cannot find configuration for {sname}");
                 var retVal = new RestService(serviceType);
                 foreach (var bhvr in config.Behaviors)
+                {
+                    if (bhvr.Type == null)
+                        throw new InvalidOperationException($"Cannot find service behavior {bhvr.XmlType}");
                     retVal.AddServiceBehavior(
                         bhvr.Configuration == null ?
                         Activator.CreateInstance(bhvr.Type) as IServiceBehavior :
                         Activator.CreateInstance(bhvr.Type, bhvr.Configuration) as IServiceBehavior);
-
+                }
                 var demandPolicy = new OperationDemandPolicyBehavior(serviceType);
 
                 foreach (var ep in config.Endpoints)
@@ -116,6 +119,9 @@ namespace SanteDB.Server.Core.Rest
                     var se = retVal.AddServiceEndpoint(new Uri(ep.Address), ep.Contract, new RestHttpBinding());
                     foreach (var bhvr in ep.Behaviors)
                     {
+                        if (bhvr.Type == null)
+                            throw new InvalidOperationException($"Cannot find endpoint behavior {bhvr.XmlType}");
+
                         se.AddEndpointBehavior(
                             bhvr.Configuration == null ?
                             Activator.CreateInstance(bhvr.Type) as IEndpointBehavior :
