@@ -79,7 +79,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             Act retVal = null;
 
             // 
-            switch (dbAct.ClassConceptKey.ToString().ToLower())
+            switch (dbAct.ClassConceptKey.ToString().ToLowerInvariant())
             {
                 case ActClassKeyStrings.ControlAct:
                     retVal = new ControlActPersistenceService(this.m_settingsProvider).ToModelInstance(
@@ -434,7 +434,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Act InsertInternal(DataContext context, Act data)
         {
-            switch (data.ClassConceptKey.ToString().ToUpper())
+            switch (data.ClassConceptKey.ToString().ToLowerInvariant())
             {
                 case ActClassKeyStrings.ControlAct:
                     return new ControlActPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<ControlAct>());
