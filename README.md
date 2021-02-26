@@ -6,6 +6,10 @@
 
 You can get the most recent builds from our [Jenkins server](https://jenkins.fyfesoftware.ca/job/santedb-icdr-master)
 
+## Issue Tracker & Release Tracker
+
+If you have an issue, or would like to see our community roadmap, you can visit the [SanteDB Community](https://santesuite.atlassian.net/) JIRA project.
+
 ## Building
 
 ### Cloning the Code
