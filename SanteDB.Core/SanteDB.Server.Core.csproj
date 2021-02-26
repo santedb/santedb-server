@@ -118,6 +118,7 @@
     <Compile Include="Services\Impl\Repository\LocalEntityRelationshipRepository.cs" />
     <Compile Include="Services\Impl\Repository\LocalExtensionTypeRepository.cs" />
     <Compile Include="Services\Impl\Repository\LocalManufacturedMaterialRepository.cs" />
+    <Compile Include="Services\Impl\Repository\LocalPatientRepository.cs" />
     <Compile Include="Services\Impl\Repository\LocalProviderRepository.cs" />
     <Compile Include="Services\Impl\LocalRepositoryFactoryService.cs" />
     <Compile Include="Services\Impl\LocalRepositoryService.cs" />

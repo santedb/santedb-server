@@ -29,9 +29,18 @@ namespace SanteDB.Server.Core.Services.Impl
     /// <summary>
     /// Generic nullifiable local repository
     /// </summary>
-    public class GenericLocalRepositoryEx<TModel> : GenericLocalRepository<TModel>, IRepositoryServiceEx<TModel>
+    public abstract class GenericLocalRepositoryEx<TModel> : GenericLocalRepository<TModel>, IRepositoryServiceEx<TModel>
         where TModel : IdentifiedData, IHasState
     {
+
+        /// <summary>
+        /// Create a new privacy service
+        /// </summary>
+        public GenericLocalRepositoryEx(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        {
+
+        }
+
         /// <summary>
         /// Nullify the specified object
         /// </summary>

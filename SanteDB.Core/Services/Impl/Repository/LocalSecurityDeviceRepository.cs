@@ -29,6 +29,14 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalSecurityDeviceRepository : GenericLocalSecurityRepository<SecurityDevice>
     {
+
+        /// <summary>
+        /// Security device repository
+        /// </summary>
+        public LocalSecurityDeviceRepository(IPrivacyEnforcementService privacyService) : base(privacyService)
+        {
+
+        }
         protected override string WritePolicy => PermissionPolicyIdentifiers.CreateDevice;
         protected override string DeletePolicy => PermissionPolicyIdentifiers.CreateDevice;
         protected override string AlterPolicy => PermissionPolicyIdentifiers.CreateDevice;

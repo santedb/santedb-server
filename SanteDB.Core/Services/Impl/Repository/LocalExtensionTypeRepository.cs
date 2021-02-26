@@ -28,6 +28,7 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalExtensionTypeRepository : GenericLocalMetadataRepository<ExtensionType>, IExtensionTypeRepository
     {
+
         /// <summary>
         /// Get the xtension type by uri
         /// </summary>

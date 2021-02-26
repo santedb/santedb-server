@@ -17,27 +17,31 @@
  * Date: 2019-11-27
  */
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
 
 namespace SanteDB.Server.Core.Services.Impl
 {
     /// <summary>
-    /// Place repository that uses local persistence
+    /// Local material persistence service
     /// </summary>
-    public class LocalPlaceRepository : GenericLocalRepositoryEx<Place>
-	{
+    public class LocalPatientRepository : GenericLocalRepositoryEx<Patient>
+    {
 
         /// <summary>
-        /// Privacy enforcement service
+        /// Create a new patient repository
         /// </summary>
-        public LocalPlaceRepository(IPrivacyEnforcementService privacyService) : base(privacyService)
+        public LocalPatientRepository(IPrivacyEnforcementService privacyService) : base(privacyService)
         {
+
         }
 
-        protected override string QueryPolicy => PermissionPolicyIdentifiers.ReadPlacesAndOrgs;
-        protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadPlacesAndOrgs;
-        protected override string WritePolicy => PermissionPolicyIdentifiers.WritePlacesAndOrgs;
-        protected override string DeletePolicy => PermissionPolicyIdentifiers.DeletePlacesAndOrgs;
-        protected override string AlterPolicy => PermissionPolicyIdentifiers.WritePlacesAndOrgs;
+        protected override string QueryPolicy => PermissionPolicyIdentifiers.QueryClinicalData;
+        protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadClinicalData;
+        protected override string WritePolicy => PermissionPolicyIdentifiers.WriteClinicalData;
+        protected override string DeletePolicy => PermissionPolicyIdentifiers.DeleteClinicalData;
+        protected override string AlterPolicy => PermissionPolicyIdentifiers.WriteClinicalData;
     }
+
+   
 }
