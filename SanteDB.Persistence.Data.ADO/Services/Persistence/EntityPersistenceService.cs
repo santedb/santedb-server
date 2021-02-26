@@ -687,14 +687,17 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Entity InsertInternal(DataContext context, Entity data)
         {
-            switch (data.ClassConceptKey.ToString().ToUpper())
+            switch (data.ClassConceptKey.ToString().ToLowerInvariant())
             {
                 case EntityClassKeyStrings.Device:
                     return new DeviceEntityPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<DeviceEntity>());
                 case EntityClassKeyStrings.NonLivingSubject:
                     return new ApplicationEntityPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<ApplicationEntity>());
                 case EntityClassKeyStrings.Person:
-                    return new PersonPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<Person>());
+                    if (data is UserEntity ue)
+                        return new UserEntityPersistenceService(this.m_settingsProvider).InsertInternal(context, ue);
+                    else
+                        return new PersonPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<Person>());
                 case EntityClassKeyStrings.Patient:
                     return new PatientPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<Patient>());
                 case EntityClassKeyStrings.Provider:
@@ -724,14 +727,21 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Entity UpdateInternal(DataContext context, Entity data)
         {
-            switch (data.ClassConceptKey.ToString().ToUpper())
+            switch (data.ClassConceptKey.ToString().ToLowerInvariant())
             {
                 case EntityClassKeyStrings.Device:
                     return new DeviceEntityPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<DeviceEntity>());
                 case EntityClassKeyStrings.NonLivingSubject:
                     return new ApplicationEntityPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<ApplicationEntity>());
                 case EntityClassKeyStrings.Person:
-                    return new PersonPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<Person>());
+                    var sqlStmt = context.CreateSqlStatement<DbUserEntity>().SelectFrom()
+                       .InnerJoin<DbEntityVersion>(o => o.ParentKey, o => o.VersionKey)
+                       .Where<DbEntityVersion>(o => o.Key == data.Key)
+                       .OrderBy<DbEntityVersion>(o => o.VersionSequenceId, Core.Model.Map.SortOrderType.OrderByDescending);
+                    if (data is UserEntity || context.Query<DbUserEntity>(sqlStmt).Any())
+                        return new UserEntityPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<UserEntity>());
+                    else
+                        return new PersonPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<Person>());
                 case EntityClassKeyStrings.Patient:
                     return new PatientPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<Patient>());
                 case EntityClassKeyStrings.Provider:
