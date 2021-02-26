@@ -125,7 +125,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             if(dbEntityVersion.StatusConceptKey == StatusKeys.Purged) // Purged data doesn't exist
                 retVal = this.ToModelInstance<Entity>(dbEntityVersion, dbEntity, context);
-            else switch (dbEntity.ClassConceptKey.ToString().ToLower())
+            else switch (dbEntity.ClassConceptKey.ToString().ToLowerInvariant())
             {
                 case EntityClassKeyStrings.Device:
                     retVal = new DeviceEntityPersistenceService(this.m_settingsProvider).ToModelInstance(
@@ -246,7 +246,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var cache = new AdoPersistenceCache(context);
 
             if (!dbEntityVersion.ObsoletionTime.HasValue)
-                switch (dbEntity.ClassConceptKey.ToString().ToUpper())
+                switch (dbEntity.ClassConceptKey.ToString().ToLowerInvariant())
                 {
                     case EntityClassKeyStrings.Device:
                         retVal = cache?.GetCacheItem<DeviceEntity>(dbEntity.Key);
