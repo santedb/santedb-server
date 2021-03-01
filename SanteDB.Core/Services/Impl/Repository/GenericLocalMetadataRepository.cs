@@ -33,6 +33,13 @@ namespace SanteDB.Server.Core.Services.Impl
     {
 
         /// <summary>
+        /// Create a new local metadata repository
+        /// </summary>
+        public GenericLocalMetadataRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService) // No need for privacy on metadata
+        {
+        }
+
+        /// <summary>
         /// The query policy for metadata
         /// </summary>
         protected override string QueryPolicy => PermissionPolicyIdentifiers.ReadMetadata;

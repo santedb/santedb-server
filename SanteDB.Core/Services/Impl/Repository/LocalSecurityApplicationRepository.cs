@@ -28,6 +28,14 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalSecurityApplicationRepository : GenericLocalSecurityRepository<SecurityApplication>
     {
+
+        /// <summary>
+        /// Local security application repository
+        /// </summary>
+        public LocalSecurityApplicationRepository(IPrivacyEnforcementService privacyService) : base(privacyService)
+        {
+        }
+
         protected override string WritePolicy => PermissionPolicyIdentifiers.CreateApplication;
         protected override string DeletePolicy => PermissionPolicyIdentifiers.CreateApplication;
         protected override string AlterPolicy => PermissionPolicyIdentifiers.CreateApplication;

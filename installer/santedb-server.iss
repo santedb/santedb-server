@@ -4,6 +4,7 @@
 #define MyAppName "SanteDB Server"
 #define MyAppPublisher "SanteDB Community"
 #define MyAppURL "http://santesuite.org"
+
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -35,9 +36,11 @@ AppCopyright = Copyright (C) 2015-2020 SanteSuite Contributors
 ArchitecturesInstallIn64BitMode = x64
 ArchitecturesAllowed =  x64
 WizardStyle=modern
+
+#ifndef UNSIGNED
 SignedUninstaller=yes
 SignTool=default sign /a /n $qFyfe Software$q /d $qSanteDB iCDR Server$q $f
-
+#endif
 ; SignTool=default sign $f
 ; SignedUninstaller=yes
 
@@ -70,8 +73,6 @@ Name: interop\atna; Description: ATNA & DICOM Auditing; Types: full
 Name: interop\openapi; Description: OpenAPI; Types: full demo
 Name: reporting; Description: Reporting Services; Types: full
 Name: reporting\bis; Description: Business Intelligence Services; Types: full bis 
-Name: reporting\risi; Description: Report Integration Service (Legacy); Types: full 
-Name: reporting\jasper; Description: Jasper Reports Server Integration (Legacy); Types: full
 Name: tfa; Description: Two Factor Authentication; Types: full
 Name: tfa\twilio; Description: Twilio SMS TFA Adapter; Types: full
 Name: tfa\email; Description: Email TFA Adapter; Types: full
@@ -117,7 +118,7 @@ Source: ..\SanteDB\santedb.config.fbsql.xml; DestDir: {app}; DestName: santedb.c
 Source: ..\SanteDB\Data\SDB_BASE.FDB; DestDir: {app}; Components: db\fbsql demo; Flags: confirmoverwrite
 Source: ..\SanteDB\Data\SDB_AUDIT.FDB; DestDir: {app}; Components: db\fbsql demo; Flags: confirmoverwrite
 
-Source: ..\SanteDB\santedb.config.psql.xml; DestDir: {app}; DestName: santedb.config.psql.xml; Components: db\psql
+Source: ..\SanteDB\santedb.config.psql.xml; DestDir: {app}; DestName: santedb.config.psql.xml; Components: db\psql; 
 ; Security AMI stuff
 Source: ..\bin\Release\SanteDB.Core.Model.AMI.dll; DestDir: {app}; Components: msg\ami
 Source: ..\bin\Release\SanteDB.Messaging.AMI.dll; DestDir: {app}; Components: msg\ami
@@ -143,20 +144,18 @@ Source: ..\bin\release\SanteDB.Tools.DataSandbox.dll; DestDir: {app}; Components
 Source: ..\bin\Release\RestSrvr.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Authentication.OAuth2.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.BI.xml; DestDir: {app}; Components: interop\openapi
-Source: ..\bin\Release\SanteDB.Core.Applets.xml; DestDir: {app}; Components: interop\openapi
-Source: ..\bin\Release\SanteDB.Core.Model.AMI.xml; DestDir: {app}; Components: interop\openapi
-Source: ..\bin\Release\SanteDB.Core.Model.RISI.xml; DestDir: {app}; Components: interop\openapi
-Source: ..\bin\Release\SanteDB.Core.Model.ViewModelSerializers.xml; DestDir: {app}; Components: interop\openapi
+; Source: ..\bin\Release\SanteDB.Core.Applets.xml; DestDir: {app}; Components: interop\openapi
+;Source: ..\bin\Release\SanteDB.Core.Model.AMI.xml; DestDir: {app}; Components: interop\openapi
+;Source: ..\bin\Release\SanteDB.Core.Model.ViewModelSerializers.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Core.Model.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Messaging.AMI.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Messaging.FHIR.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Messaging.GS1.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Messaging.HDSI.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Messaging.Metadata.xml; DestDir: {app}; Components: interop\openapi
-Source: ..\bin\Release\SanteDB.Messaging.RISI.xml; DestDir: {app}; Components: interop\openapi
-Source: ..\bin\Release\SanteDB.Rest.AMI.xml; DestDir: {app}; Components: interop\openapi
-Source: ..\bin\Release\SanteDB.Rest.BIS.xml; DestDir: {app}; Components: interop\openapi
-Source: ..\bin\Release\SanteDB.Rest.Common.xml; DestDir: {app}; Components: interop\openapi
+;Source: ..\bin\Release\SanteDB.Rest.AMI.xml; DestDir: {app}; Components: interop\openapi
+;Source: ..\bin\Release\SanteDB.Rest.BIS.xml; DestDir: {app}; Components: interop\openapi
+;Source: ..\bin\Release\SanteDB.Rest.Common.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Rest.HDSI.xml; DestDir: {app}; Components: interop\openapi
 Source: ..\bin\Release\SanteDB.Messaging.Metadata.dll; DestDir: {app}; Components: interop\openapi
 ; Core Services
@@ -171,7 +170,8 @@ Source: ..\bin\Release\RestSrvr.dll; DestDir: {app}; Components: core server
 Source: ..\bin\Release\SanteDB.Configuration.dll; DestDir: {app}; Components: server
 Source: ..\bin\Release\SanteDB.Core.Api.dll; DestDir: {app}; Components: core server
 Source: ..\bin\Release\SanteDB.Core.Applets.dll; DestDir: {app}; Components: core server
-Source: ..\bin\Release\SanteDB.Core.dll; DestDir: {app}; Components: core
+Source: ..\bin\Release\SanteDB.Server.Core.dll; DestDir: {app}; Components: core
+Source: ..\bin\Release\SanteDB.Server.dll; DestDir: {app}; Components: core
 Source: ..\bin\Release\SanteDB.Core.Model.dll; DestDir: {app}; Components: core server
 Source: ..\bin\Release\SharpCompress.dll; DestDir: {app}; Components: core
 Source: ..\bin\release\System.Runtime.CompilerServices.Unsafe.dll; DestDir: {app}; Components: core
@@ -201,7 +201,7 @@ Source: ..\bin\Release\Hl7.Fhir.Serialization.dll; DestDir: {app}; Components: i
 Source: ..\bin\Release\Hl7.Fhir.Support.dll; DestDir: {app}; Components: interop\fhir
 Source: ..\bin\Release\Hl7.Fhir.Support.Poco.dll; DestDir: {app}; Components: interop\fhir
 Source: ..\bin\Release\Hl7.FhirPath.dll; DestDir: {app}; Components: interop\fhir
-Source: ..\SanteDB.Messaging.FHIR\Data\*.dataset; DestDir: {app}\data; Components: interop\fhir
+Source: ..\santedb-fhir\SanteDB.Messaging.FHIR\Data\*.dataset; DestDir: {app}\data; Components: interop\fhir
 Source: ..\bin\Release\SanteDB.Messaging.FHIR.dll; DestDir: {app}; Components: interop\fhir
 
 ; Twilio Integration
@@ -214,7 +214,7 @@ Source: ..\bin\Release\SanteDB.Core.Security.Tfa.Twilio.dll; DestDir: {app}; Com
 Source: ..\bin\Release\NHapi.Base.dll; DestDir: {app}; Components: interop\hl7
 Source: ..\bin\Release\NHapi.Model.V231.dll; DestDir: {app}; Components: interop\hl7
 Source: ..\bin\Release\NHapi.Model.V25.dll; DestDir: {app}; Components: interop\hl7
-Source: ..\SanteDB.Messaging.HL7\Data\*.dataset; DestDir: {app}\data; Components: interop\hl7
+Source: ..\santedb-hl7\SanteDB.Messaging.HL7\Data\*.dataset; DestDir: {app}\data; Components: interop\hl7
 Source: ..\bin\Release\SanteDB.Messaging.HL7.dll; DestDir: {app}; Components: interop\hl7
 
 ; NPSQL
@@ -253,7 +253,7 @@ Source: ..\bin\Release\SanteDB.Messaging.Atna.dll; DestDir: {app}; Components: i
 
 ; GS1
 Source: ..\bin\Release\SanteDB.Messaging.GS1.dll; DestDir: {app}; Components: interop\gs1
-Source: ..\SanteDB.Messaging.GS1\Data\*.dataset; DestDir: {app}\data; Components: interop\gs1
+Source: ..\santedb-gs1\SanteDB.Messaging.GS1\Data\*.dataset; DestDir: {app}\data; Components: interop\gs1
 
 ; JDSO
 Source: ..\bin\Release\SanteDB.Messaging.HDSI.dll; DestDir: {app}; Components: msg\hdsi
@@ -265,19 +265,10 @@ Source: ..\bin\Release\SanteDB.Persistence.Diagnostics.Jira.dll; DestDir: {app};
 Source: ..\bin\Release\SanteDB.Persistence.MDM.dll; DestDir: {app}; Components: mdm
 Source: ..\santedb-mdm\SanteDB.Persistence.MDM\Data\*.dataset; DestDir: {app}\data; Components: mdm
 
-; Jasper Report
-Source: ..\bin\Release\SanteDB.Reporting.Jasper.dll; DestDir: {app}; Components: reporting\jasper
-
 
 Source: ..\bin\Release\SanteDB.Rest.Common.dll; DestDir: {app}; Components: msg reporting
 Source: ..\bin\Release\SanteDB.Rest.HDSI.dll; DestDir: {app}; Components: msg\hdsi
-
-; Legacy RISI
-Source: ..\bin\Release\SanteDB.Core.Model.RISI.dll; DestDir: {app}; Components: reporting\risi
-Source: ..\bin\Release\SanteDB.Messaging.RISI.dll; DestDir: {app}; Components: reporting\risi
-Source: ..\bin\Release\SanteDB.Persistence.Reporting.ADO.dll; DestDir: {app}; Components: reporting\risi
-Source: ..\bin\Release\SanteDB.Reporting.Core.dll; DestDir: {app}; Components: reporting\risi
-Source: ..\bin\Release\SanteDB.Warehouse.ADO.dll; DestDir: {app}; Components: reporting\risi
+Source: ..\bin\Release\SanteDB.Warehouse.ADO.dll; DestDir: {app}; Components: db
 
 ; Common .NET Standard
 Source: ..\bin\Release\Microsoft.Bcl.AsyncInterfaces.dll; DestDir: {app}; 
@@ -321,6 +312,42 @@ begin
     ExtractTemporaryFile('vc2010.exe');
     Exec(ExpandConstant('{tmp}\vc2010.exe'), '/install /passive', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
     WizardForm.PreparingLabel.Caption := 'Installing Microsoft .NET Framework 4.8';
-     ExtractTemporaryFile('netfx.exe');
+    ExtractTemporaryFile('netfx.exe');
     Exec(ExpandConstant('{tmp}\netfx.exe'), '/q', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
+
+end;
+
+// Removes the 2.0 Assets which may be present in the installation directory
+procedure Remove20Assets() ;
+var 
+  files : Array [0..7] of string;
+  i : integer;
+begin
+  files[0] := ExpandConstant('{app}\SanteDB.Core.dll');
+  files[1] := ExpandConstant('{app}\SanteGuard.Core.dll');
+  files[2] := ExpandConstant('{app}\SanteGuard.Messaging.Ami.dll');
+  files[3] := ExpandConstant('{app}\SanteGuard.Messaging.Syslog.dll');
+  files[4] := ExpandConstant('{app}\SanteGuard.Persistence.Ado.dll');
+  files[5] := ExpandConstant('{app}\SanteMPI.Messaging.PixPdqv2.dll');
+  files[6] := ExpandConstant('{app}\SanteMPI.Persistence.ADO.dll');
+  
+  if(FileExists(files[1]) and (MsgBox('You appear to have SanteDB 2.0.x plugins which might not be compatible with this version. Would you like to remove them?', mbConfirmation, MB_YESNO) = idYes)) then begin
+    for i :=  0 to 7 do begin
+      if(FileExists(files[i])) then begin
+        try 
+          DeleteFile(files[i]);
+        except 
+          ShowExceptionMessage();
+        end;
+      end; // if
+    end; // for
+  end;
+end;
+
+
+procedure CurPageChanged(CurPageID: Integer);
+begin
+  if((CurPageID = wpInstalling)) then begin
+    Remove20Assets();
+  end;
 end;

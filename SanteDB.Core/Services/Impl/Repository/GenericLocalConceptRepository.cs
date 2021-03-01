@@ -27,7 +27,14 @@ namespace SanteDB.Server.Core.Services.Impl
     public class GenericLocalConceptRepository<TModel> : GenericLocalMetadataRepository<TModel>
         where TModel : IdentifiedData
     {
-        
+
+        /// <summary>
+        /// Creates a new generic local concept repository
+        /// </summary>
+        public GenericLocalConceptRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        {
+        }
+
         /// <summary>
         /// The query policy for concepts
         /// </summary>

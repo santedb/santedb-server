@@ -33,7 +33,14 @@ namespace SanteDB.Server.Core.Services.Impl
     public class LocalBatchRepository :
         GenericLocalRepository<Bundle>
 	{
-       
+
+        /// <summary>
+        /// Creates a new batch repository
+        /// </summary>
+        public LocalBatchRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        {
+        }
+
         /// <summary>
         /// Find the specified bundle (Not supported)
         /// </summary>

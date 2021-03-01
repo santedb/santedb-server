@@ -257,7 +257,7 @@ namespace SanteDB.Caching.Memory
 	        }
 
             var exist = this.m_cache.Get(data.Key.ToString());
-            this.m_cache.Set(data.Key.ToString(), data, DateTimeOffset.Now.AddSeconds(this.m_configuration.MaxCacheAge));
+            this.m_cache.Set(data.Key.ToString(), data.Clone(), DateTimeOffset.Now.AddSeconds(this.m_configuration.MaxCacheAge));
 
             // If this is a relationship class we remove the source entity from the cache
             if (data is ITargetedAssociation targetedAssociation)

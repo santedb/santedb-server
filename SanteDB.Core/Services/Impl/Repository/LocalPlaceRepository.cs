@@ -26,6 +26,14 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalPlaceRepository : GenericLocalRepositoryEx<Place>
 	{
+
+        /// <summary>
+        /// Privacy enforcement service
+        /// </summary>
+        public LocalPlaceRepository(IPrivacyEnforcementService privacyService) : base(privacyService)
+        {
+        }
+
         protected override string QueryPolicy => PermissionPolicyIdentifiers.ReadPlacesAndOrgs;
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadPlacesAndOrgs;
         protected override string WritePolicy => PermissionPolicyIdentifiers.WritePlacesAndOrgs;

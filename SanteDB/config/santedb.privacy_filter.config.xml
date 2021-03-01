@@ -4,6 +4,7 @@
   </sections>
   <section xsi:type="DataPolicyFilterConfigurationSection" action="hide">
     <resources>
+      <add action="redact" type="AssigningAuthority" />
       <add action="hide" type="Entity" />
       <add action="hide" type="Patient" />
       <add action="none" type="Place" />
