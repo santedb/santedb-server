@@ -18,6 +18,7 @@
  */
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
+using SanteDB.Core.Security;
 using System;
 
 namespace SanteDB.Server.Core.Services.Impl
@@ -29,6 +30,12 @@ namespace SanteDB.Server.Core.Services.Impl
         where TSecurityEntity : IdentifiedData
     {
 
+        /// <summary>
+        /// Create new local security repository
+        /// </summary>
+        public GenericLocalSecurityRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        {
+        }
 
         /// <summary>
         /// Insert the object

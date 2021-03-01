@@ -41,7 +41,8 @@
   <include>config\santedb.openapi.config.xml</include>
   <include>config\santedb.apis.config.xml</include>
   <include>config\santedb.atna.config.xml</include>
-  
+  <include>config\santedb.privacy_filter.config.xml</include>
+
   <section xsi:type="FileSystemQueueConfigurationSection" queueRoot=".\queue" />
   <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="8">
     <serviceProviders>
