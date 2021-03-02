@@ -279,7 +279,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                     if (queryId != Guid.Empty && ApplicationServiceContext.Current.GetService<IQueryPersistenceService>() != null)
                     {
-                        var keys = retVal.Keys<Guid>(false).Take(5000).ToArray();
+                        var keys = retVal.Keys<Guid>(false).Take(count.Value * 10).ToArray();
                         totalResults = keys.Count();
                         if(totalResults == 5000) // result set is larger than 10,000 load in background
                         {
@@ -298,7 +298,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         this.m_queryPersistence?.RegisterQuerySet(queryId, keys, queries, totalResults);
                         return keys.Skip(offset).Take(count.Value).OfType<Object>();
                     }
-                    else if (count.HasValue && countResults && !this.m_settingsProvider.GetConfiguration().UseFuzzyTotals)
+                    else if (count.HasValue && countResults && !overrideFuzzyTotalSetting && !this.m_settingsProvider.GetConfiguration().UseFuzzyTotals)
                         totalResults = retVal.Count();
                     else
                         totalResults = 0;
@@ -578,12 +578,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
                 catch (NotSupportedException e)
                 {
-                    throw new DataPersistenceException("Cannot perform LINQ query", e);
+                    throw new DataPersistenceException("Cannot perform LINQ query because underlying repository does not support it", e);
                 }
                 catch (Exception e)
                 {
                     this.m_tracer.TraceEvent(EventLevel.Error, "Error : {0}", e);
-                    throw;
+                    throw new DataPersistenceException($"Error touching record {key}", e);
                 }
                 finally
                 {

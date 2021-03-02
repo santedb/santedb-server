@@ -41,6 +41,7 @@ using System.Linq;
 
 using System.Security.Principal;
 using SanteDB.Server.Core.Security;
+using SanteDB.Core.Exceptions;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -192,7 +193,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 {
                     tx.Rollback();
                     this.m_traceSource.TraceEvent(EventLevel.Error, "Error adding policies to {0}: {1}", securable, e);
-                    throw;
+                    throw new DataPersistenceException($"Error adding policies to {securable}", e);
                 }
             }
         }
@@ -282,8 +283,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 catch (Exception e)
                 {
                     tx.Rollback();
-                    this.m_traceSource.TraceEvent(EventLevel.Error, "Error adding policies to {0}: {1}", securable, e);
-                    throw;
+                    this.m_traceSource.TraceEvent(EventLevel.Error, "Error removing policies to {0}: {1}", securable, e);
+                    throw new DataPersistenceException($"Error removing policies for {securable}", e);
                 }
             }
         }
@@ -510,7 +511,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 catch (Exception e)
                 {
                     this.m_traceSource.TraceEvent(EventLevel.Error, "Error getting policies: {0}", e);
-                    throw;
+                    throw new DataPersistenceException("Error getting policies", e);
                 }
         }
 
@@ -539,7 +540,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     catch (Exception e)
                     {
                         this.m_traceSource.TraceEvent(EventLevel.Error, "Error getting policy {0} : {1}", policyOid, e);
-                        throw;
+                        throw new DataPersistenceException($"Error retrieving policy {policyOid}");
                     }
                 }
             }

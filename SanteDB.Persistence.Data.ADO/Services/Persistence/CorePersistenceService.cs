@@ -35,6 +35,7 @@ using System.Threading;
 using SanteDB.Core.Exceptions;
 using System.Data.Common;
 using System.Security.Principal;
+using SanteDB.Core.Security;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -166,7 +167,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     catch (Exception e)
                     {
                         this.m_tracer.TraceEvent(EventLevel.Error, "Error performing sub-query: {0}", e);
-                        throw;
+                        throw new DataPersistenceException($"Error performing sub-query {query}", e);
                     }
                     finally
                     {
@@ -277,6 +278,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 if (count != 0)
                 {
 
+                    if (context.Data.TryGetValue("principal", out object pRaw))
+                    {
+                        var currentPrincipal = pRaw as IPrincipal;
+                        includeCount = includeCount && currentPrincipal != AuthenticationContext.SystemPrincipal;
+                        overrideFuzzyTotalSetting = currentPrincipal == AuthenticationContext.SystemPrincipal;
+                    }
+
                     // Stateful query identifier = We need to add query results
                     if (queryId != Guid.Empty && ApplicationServiceContext.Current.GetService<IQueryPersistenceService>() != null)
                     {
@@ -286,7 +294,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         this.m_queryPersistence?.RegisterQuerySet(queryId, keys, queries, totalResults);
 
                     }
-                    else if (count.HasValue && includeCount && !this.m_settingsProvider.GetConfiguration().UseFuzzyTotals) // Get an exact total
+                    else if (count.HasValue && includeCount && !overrideFuzzyTotalSetting && !this.m_settingsProvider.GetConfiguration().UseFuzzyTotals) // Get an exact total
                     {
                         totalResults = retVal.Count();
                     }
@@ -321,8 +329,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 if (retVal != null)
                     this.m_tracer.TraceEvent(EventLevel.Error, context.GetQueryLiteral(retVal.ToSqlStatement()));
                 context.Dispose(); // No longer important
-
-                throw;
+                throw new DataPersistenceException($"Error executing query {String.Join("UNION", queries.Select(o=>o.ToString()))}", ex);
             }
 #if DEBUG
             finally

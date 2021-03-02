@@ -139,18 +139,14 @@ namespace SanteDB.Persistence.Data.ADO.Security
 					return userIdentity;
                 }
             }
-            catch (AuthenticationException e)
+            catch (AuthenticationException e) when (e.Message.Contains("AUTH_INV:") || e.Message.Contains("AUTH_LCK:") || e.Message.Contains("AUTH_TFA:"))
             {
-                // TODO: Audit this
-                if (e.Message.Contains("AUTH_INV:") || e.Message.Contains("AUTH_LCK:") || e.Message.Contains("AUTH_TFA:"))
-                    throw new AuthenticationException(e.Message.Substring(0, e.Message.IndexOf(":")), e);
-                else
-                    throw;
+                throw new AuthenticationException(e.Message.Substring(0, e.Message.IndexOf(":")), e);
             }
-            catch (SecurityException)
+            catch (SecurityException e)
             {
                 // TODO: Audit this
-                throw;
+                throw new SecurityException($"Error authenticating {userName}", e);
             }
             catch (DbException e)
             {

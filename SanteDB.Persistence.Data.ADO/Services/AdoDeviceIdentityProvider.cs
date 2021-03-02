@@ -18,6 +18,7 @@
  */
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
@@ -143,7 +144,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 				catch (Exception e)
 				{
 					this.traceSource.TraceEvent(EventLevel.Error,  "Error getting identity data for {0} : {1}", name, e);
-					throw;
+                    throw new DataPersistenceException($"Error getting identity {name}", e);
 				}
 			}
 		}
@@ -171,7 +172,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 catch (Exception e)
                 {
                     this.traceSource.TraceEvent(EventLevel.Error, "Error getting identity data for {0} : {1}", name, e);
-                    throw;
+                    throw new DataPersistenceException($"Error setting lockout for {name}", e);
                 }
         }
 
@@ -202,7 +203,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 catch (Exception e)
                 {
                     this.traceSource.TraceEvent(EventLevel.Error, "Error setting secret identity data for {0} : {1}", name, e);
-                    throw;
+                    throw new DataPersistenceException($"Error canging secret for {name}", e);
                 }
         }
     }

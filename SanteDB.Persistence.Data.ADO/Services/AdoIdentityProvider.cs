@@ -105,7 +105,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                 this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, null, false));
-                throw;
+                throw new AuthenticationException($"General exception authenticating {userName}", e);
             }
         }
 
@@ -232,7 +232,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 this.m_traceSource.TraceEvent(EventLevel.Verbose, "Invalid credentials : {0}/{1}", userName, password);
                 this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, null, false));
-                throw;
+                throw new AuthenticationException($"Invalid credentials for {userName}", e);
             }
         }
 
@@ -364,7 +364,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             catch (Exception e)
             {
                 this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
-                throw;
+                throw new DataPersistenceException($"Error creating identity {userName}", e);
             }
 
         }
@@ -404,7 +404,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             catch (Exception e)
             {
                 this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
-                throw;
+                throw new DataPersistenceException($"Error deleting identity {userName}", e);
             }
         }
 
@@ -457,7 +457,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             catch (Exception e)
             {
                 this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
-                throw;
+                throw new DataPersistenceException($"Error setting lockout for {userName}");
             }
         }
 
@@ -518,7 +518,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             catch (Exception e)
             {
                 this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
-                throw;
+                throw new DataPersistenceException($"Error adding claim to {userName}", e);
             }
         }
 
@@ -550,7 +550,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             catch (Exception e)
             {
                 this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
-                throw;
+                throw new DataPersistenceException($"Error removing claim for {userName}", e);
             }
         }
 
@@ -605,7 +605,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 this.m_traceSource.TraceEvent(EventLevel.Verbose, "Invalid session auth: {0}", e.Message);
                 this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(null, null, false));
-                throw;
+                throw new AuthenticationException($"Could not perform session authentication", e);
             }
         }
 

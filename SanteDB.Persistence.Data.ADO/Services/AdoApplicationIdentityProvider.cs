@@ -38,6 +38,7 @@ using System.Security.Cryptography;
 using System.Text;
 using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Server.Core.Security;
+using SanteDB.Core.Exceptions;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -122,7 +123,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 catch (Exception e)
                 {
                     this.m_traceSource.TraceEvent(EventLevel.Error,  "Error getting identity data for {0} : {1}", name, e);
-                    throw;
+                    throw new Exception($"Error fetching {name}", e);
                 }
 
         }
@@ -151,7 +152,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 catch (Exception e)
                 {
                     this.m_traceSource.TraceEvent(EventLevel.Error, "Error getting identity data for {0} : {1}", name, e);
-                    throw;
+                    throw new DataPersistenceException($"Error setting lockout on {name}", e);
                 }
         }
 
@@ -182,7 +183,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 catch (Exception e)
                 {
                     this.m_traceSource.TraceEvent(EventLevel.Error, "Error setting secret for {0} : {1}", name, e);
-                    throw;
+                    throw new DataPersistenceException($"Error changing secret for {name}", e);
                 }
         }
 
@@ -208,7 +209,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 catch (Exception e)
                 {
                     this.m_traceSource.TraceEvent(EventLevel.Error, "Error setting secret for {0} : {1}", name, e);
-                    throw;
+                    throw new DataPersistenceException($"Error getting secure key for {name}", e);
                 }
         }
     }
