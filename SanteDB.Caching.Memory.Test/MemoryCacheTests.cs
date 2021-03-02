@@ -26,7 +26,7 @@ using System;
 using System.Linq;
 using System.Threading;
 
-namespace SanteDB.Caching.Memory.Test
+namespace SanteDB.Caching.Memory.Tests
 {
     [TestFixture(TestName = "Memory Cache Tests", Category = "Caching")]
     public class MemoryCacheTests
