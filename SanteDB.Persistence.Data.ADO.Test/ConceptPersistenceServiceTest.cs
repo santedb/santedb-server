@@ -16,7 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
@@ -28,25 +28,22 @@ using SanteDB.Core.TestFramework;
 using System.Linq;
 using System.Security.Principal;
 
-namespace SanteDB.Persistence.Data.ADO.Test
+namespace SanteDB.Persistence.Data.ADO.Tests
 {
     /// <summary>
     /// Concept persistence service test
     /// </summary>
-    [TestClass]
+    [TestFixture(Category = "Persistence")]
     public class ConceptPersistenceServiceTest : PersistenceTest<Concept>
     {
 
         private static IPrincipal s_authorization;
 
-        [ClassInitialize]
-        public static void ClassSetup(TestContext context)
+        [SetUp]
+        public void ClassSetup()
         {
             s_authorization = AuthenticationContext.SystemPrincipal;
             AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
-
-            TestApplicationContext.TestAssembly = typeof(AdoIdentityProviderTest).Assembly;
-            TestApplicationContext.Initialize(context.DeploymentDirectory);
 
         }
 
@@ -54,7 +51,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// Tests that the concept persistence service can successfully
         /// insert and retrieve a concept
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestInsertSimpleConcept()
         {
             Concept simpleConcept = new Concept()
@@ -73,7 +70,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// Tests that the concept persistence service can persist a 
         /// simple concept which has a display name
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestInsertNamedConcept()
         {
             Concept namedConcept = new Concept()
@@ -104,7 +101,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// Tests that the concept persistence service can persist a 
         /// simple concept which has a display name
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestUpdateNamedConcept()
         {
 
@@ -171,7 +168,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// Tests that the concept persistence service can persist a 
         /// simple concept which has a display name
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestInsertReferenceTermConcept()
         {
             Concept refTermConcept = new Concept()
@@ -219,7 +216,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// Tests that the concept persistence service can persist a 
         /// simple concept which has a display name
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestUpdateConceptReferenceTerm()
         {
             Concept refTermConcept = new Concept()

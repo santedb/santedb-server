@@ -24,6 +24,7 @@
       <dependency id="SanteDB.Server.Plugin" version="2.1.0.0"/>
       <dependency id="SanteDB.Server.Plugin.Data" version="2.1.0.0"/>
       <dependency id="FirebirdSql.Data.FirebirdClient" version="7.5.0"/>
+      <dependency id="NUnit" version="3.13.1"/>
     </dependencies>
   </metadata>
   <files>

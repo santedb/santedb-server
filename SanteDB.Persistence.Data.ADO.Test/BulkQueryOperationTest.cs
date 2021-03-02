@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using SanteDB.Core;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Security;
@@ -11,23 +11,21 @@ using System.Linq;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 
-namespace SanteDB.Persistence.Data.ADO.Test
+namespace SanteDB.Persistence.Data.ADO.Tests
 {
-    [TestClass]
+    [TestFixture(Category = "Persistence")]
     public class BulkQueryOperationTest :  DataTest
     {
-        [ClassInitialize]
-        public static void ClassSetup(TestContext context)
+        [SetUp]
+        public void ClassSetup()
         {
-            TestApplicationContext.TestAssembly = typeof(AdoIdentityProviderTest).Assembly;
-            TestApplicationContext.Initialize(context.DeploymentDirectory);
             AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
         }
 
         /// <summary>
         /// This method ensures that the QueryKeys() function returns appropriate values
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestShouldQueryForKeys()
         {
 
@@ -46,7 +44,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Tests that the Obsolete bulk operation works as expected
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestShouldObsoleteData()
         {
             var bulkService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Concept>>() as IBulkDataPersistenceService;
@@ -75,7 +73,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Tests that the data is purged from the database
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestShouldPurgeData()
         {
             var bulkService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Place>>() as IBulkDataPersistenceService;

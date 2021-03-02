@@ -24,7 +24,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace SanteDB.Messaging.HDSI.Test
+namespace SanteDB.Messaging.HDSI.Tests
 {
     /// <summary>
     /// Simple extension methods

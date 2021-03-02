@@ -66,7 +66,7 @@ namespace SanteDB.Server.Core.Security.Privacy
         /// </summary>
         public override IEnumerable<TData> Apply<TData>(IEnumerable<TData> results, IPrincipal principal)
         {
-
+                
             // If the current authentication context is a device (not a user) then we should allow the data to flow to the device
             switch(this.m_configuration.PepExemptionPolicy)
             {

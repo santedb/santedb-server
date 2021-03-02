@@ -16,7 +16,6 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SanteDB.Core;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
@@ -25,29 +24,18 @@ using SanteDB.Core.TestFramework;
 using System;
 using System.Linq;
 using System.Security.Principal;
+using NUnit.Framework;
 
-namespace SanteDB.Persistence.Data.ADO.Test
+namespace SanteDB.Persistence.Data.ADO.Tests
 {
-    [TestClass]
+    [TestFixture(Category = "Persistence")]
     public class AdoPolicyProviderTest : DataTest
     {
 
         /// <summary>
-        /// Class startup
-        /// </summary>
-        /// <param name="context"></param>
-        [ClassInitialize]
-        public static void ClassSetup(TestContext context)
-        {
-            TestApplicationContext.TestAssembly = typeof(AdoIdentityProviderTest).Assembly;
-            TestApplicationContext.Initialize(context.DeploymentDirectory);
-
-        }
-
-        /// <summary>
         /// Test that the service gets all policies
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestGetAllPolicies()
         {
 
@@ -67,7 +55,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test that the service gets all policies
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestGetRolePolicies()
         {
 
@@ -83,7 +71,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test that the service gets all policies
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestGetUserPolicies()
         {
 

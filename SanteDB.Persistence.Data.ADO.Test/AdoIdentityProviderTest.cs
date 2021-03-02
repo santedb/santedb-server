@@ -16,7 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using SanteDB.Core;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
@@ -25,9 +25,9 @@ using SanteDB.Core.Services;
 using SanteDB.Core.TestFramework;
 using System.Security.Authentication;
 
-namespace SanteDB.Persistence.Data.ADO.Test
+namespace SanteDB.Persistence.Data.ADO.Tests
 {
-    [TestClass]
+    [TestFixture(Category = "Persistence")]
     public class AdoIdentityProviderTest : DataTest
     {
 
@@ -35,12 +35,10 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// Class startup
         /// </summary>
         /// <param name="context"></param>
-        [ClassInitialize]
-        public static void ClassSetup(TestContext context)
+        [SetUp]
+        public void ClassSetup()
         {
 
-            TestApplicationContext.TestAssembly = typeof(AdoIdentityProviderTest).Assembly;
-            TestApplicationContext.Initialize(context.DeploymentDirectory);
             IPasswordHashingService hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
             AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
             var dataService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
@@ -57,7 +55,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Tests that the authenticate method successfully authenticates a user
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestAuthenticateSuccess()
         {
 
@@ -72,7 +70,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Tests that the authenticate method successfully retrieves a non-authenticated identity
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestGetNonAuthenticatedPrincipal()
         {
 
@@ -86,7 +84,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Tests that the authenticate method successfully logs an invalid login attempt
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestInvalidLoginAttemptCount()
         {
 
@@ -122,7 +120,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Tests that the authenticate method successfully locks a user account after three attempts
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestAuthenticateLockout()
         {
 
@@ -158,7 +156,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Tests that the authenticate method successfully authenticates a user
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestAuthenticateFailure()
         {
             try
@@ -174,7 +172,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Tests that the identity provider can change passwords
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestChangePassword()
         {
 
@@ -199,7 +197,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Tests that anonymous user creation works
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestAnonymousUserCreation()
         {
 
@@ -219,7 +217,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Tests that administrative user creation works
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestAdministrativeUserCreation()
         {
 

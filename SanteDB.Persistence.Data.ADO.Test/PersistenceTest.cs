@@ -16,7 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Interfaces;
@@ -29,7 +29,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Principal;
 
-namespace SanteDB.Persistence.Data.ADO.Test
+namespace SanteDB.Persistence.Data.ADO.Tests
 {
     /// <summary>
     /// Persistence test

@@ -16,7 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
@@ -28,16 +28,16 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace SanteDB.Messaging.HDSI.Test
+namespace SanteDB.Messaging.HDSI.Tests
 {
 
-    [TestClass]
+    [TestFixture(Category = "REST API")]
 	public class QueryParameterLinqBuilderTest
 	{
 		/// <summary>
 		/// Test tht building of a simple AND & OR method
 		/// </summary>
-		[TestMethod]
+		[Test]
 		public void TestAnyCondition()
 		{
 			var dtString = DateTime.Now;
@@ -52,7 +52,7 @@ namespace SanteDB.Messaging.HDSI.Test
 		/// <summary>
 		/// Test that using UUID as guard works
 		/// </summary>
-		[TestMethod]
+		[Test]
 		public void TestBuildGuardMultiUuid()
 		{
 			String expected = "o => o.Names.Where(guard => ((guard.NameUseKey == Convert(effe122d-8d30-491d-805d-addcb4466c35)) OrElse (guard.NameUseKey == Convert(95e6843a-26ff-4046-b6f4-eb440d4b85f7)))).Any(name => name.Component.Any(component => (component.Value == \"SMITH\")))";
@@ -66,7 +66,7 @@ namespace SanteDB.Messaging.HDSI.Test
 		/// <summary>
 		/// Test that using UUID as guard works
 		/// </summary>
-		[TestMethod]
+		[Test]
 		public void TestBuildGuardUuid()
 		{
 			String expected = "o => o.Names.Where(guard => (guard.NameUseKey == Convert(effe122d-8d30-491d-805d-addcb4466c35))).Any(name => name.Component.Any(component => (component.Value == \"SMITH\")))";
@@ -80,7 +80,7 @@ namespace SanteDB.Messaging.HDSI.Test
 		/// <summary>
 		/// Test tht building of a fuzzy date match
 		/// </summary>
-		[TestMethod]
+		[Test]
 		public void TestBuildFuzzyDate()
 		{
             String expected = "o => ((o.DateOfBirth != null) AndAlso (((o.DateOfBirth.Value >= Convert(2015-01-01 12:00:00 AM)) AndAlso (o.DateOfBirth.Value <= Convert(2015-12-31 11:59:59 PM))) == True))";
@@ -94,7 +94,7 @@ namespace SanteDB.Messaging.HDSI.Test
 		/// <summary>
 		/// Test tht building of a simple AND method
 		/// </summary>
-		[TestMethod]
+		[Test]
 		public void TestBuildSimpleAndLinqMethod()
 		{
 			Expression<Func<SecurityUser, bool>> expected = (o => o.UserName == "Charles" && o.Password == "20329132");
@@ -109,7 +109,7 @@ namespace SanteDB.Messaging.HDSI.Test
 		/// <summary>
 		/// Test tht building of a simple AND & OR method
 		/// </summary>
-		[TestMethod]
+		[Test]
 		public void TestBuildSimpleAndOrLinqMethod()
 		{
 			var dtString = DateTime.Now;
@@ -126,7 +126,7 @@ namespace SanteDB.Messaging.HDSI.Test
 		/// <summary>
 		/// Test the building of a simple LINQ expression
 		/// </summary>
-		[TestMethod]
+		[Test]
 		public void TestBuildSimpleLinqMethod()
 		{
 			Expression<Func<Concept, bool>> expected = (o => o.Mnemonic == "ENT");
@@ -140,7 +140,7 @@ namespace SanteDB.Messaging.HDSI.Test
 		/// <summary>
 		/// Test tht building of a simple OR method
 		/// </summary>
-		[TestMethod]
+		[Test]
 		public void TestBuildSimpleOrLinqMethod()
 		{
 			Expression<Func<Concept, bool>> expected = (o => o.Mnemonic == "EVN" || o.Mnemonic == "INT");
@@ -155,7 +155,7 @@ namespace SanteDB.Messaging.HDSI.Test
 		/// <summary>
 		/// Test query by entity identifier
 		/// </summary>
-		[TestMethod]
+		[Test]
 		public void TestEntityIdentifierChain()
 		{
 			var dtString = DateTime.Now;
@@ -171,7 +171,7 @@ namespace SanteDB.Messaging.HDSI.Test
 		/// <summary>
 		/// Test tht building of a simple AND & OR method
 		/// </summary>
-		[TestMethod]
+		[Test]
 		public void TestGuardAndCondition()
 		{
 			var dtString = DateTime.Now;
@@ -188,7 +188,7 @@ namespace SanteDB.Messaging.HDSI.Test
 		/// <summary>
 		/// Test tht building of a simple AND & OR method
 		/// </summary>
-		[TestMethod]
+		[Test]
 		public void TestGuardCondition()
 		{
 			var dtString = DateTime.Now;
@@ -202,7 +202,7 @@ namespace SanteDB.Messaging.HDSI.Test
 		/// <summary>
 		/// Test tht building of a simple AND & OR method
 		/// </summary>
-		[TestMethod]
+		[Test]
 		public void TestLessThanCreation()
 		{
 			var dtString = DateTime.Now;
@@ -217,7 +217,7 @@ namespace SanteDB.Messaging.HDSI.Test
 		/// <summary>
 		/// Guard with null
 		/// </summary>
-		[TestMethod]
+		[Test]
 		public void TestNullableCondition()
 		{
 			var dtString = new DateTime(1999, 01, 01);
@@ -233,7 +233,7 @@ namespace SanteDB.Messaging.HDSI.Test
 		/// <summary>
 		/// Guard with null
 		/// </summary>
-		[TestMethod]
+		[Test]
 		public void TestNullGuardCondition()
 		{
 			var dtString = DateTime.Now;
@@ -247,7 +247,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Tests creation of an OR guard condition
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestOrGuardCondition()
         {
             String expected = "o => o.Names.Where(guard => (((guard.NameUse ?? new Concept()).Mnemonic == \"Legal\") Or ((guard.NameUse ?? new Concept()).Mnemonic == \"OfficialRecord\"))).Any(name => name.Component.Where(guard => (((guard.ComponentType ?? new Concept()).Mnemonic == \"Given\") Or ((guard.ComponentType ?? new Concept()).Mnemonic == \"Family\"))).Any(component => (component.Value == \"John\")))";
@@ -262,7 +262,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Tests creation of an OR guard condition
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestOrGuardParse()
         {
             String expected = "o => o.Names.Where(guard => (guard.NameUse.Mnemonic == \"L\")).Any(name => name.Component.Where(guard => (guard.ComponentType == null)).Any(component => (component.Value == \"John\")))";
@@ -277,7 +277,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Tests of LINQ using non-serialized property
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestNonSerializedParse()
         {
             String expected = "o => o.Extensions.Any(extension => extension.ExtensionDisplay == \"1\")";
@@ -292,7 +292,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test the extended query filter has been parsed
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestExtendedQueryFilterParse()
         {
             var expected = "o => o.Names.Any(name => name.Component.Where(guard => ((guard.ComponentType ?? new Concept()).Mnemonic == \"OfficialRecord\")).Any(component => (component.Value.TestExpression() < 6)))";
@@ -306,7 +306,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test the extended query filter has been parsed
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestExtendedQueryFilterParseBool()
         {
             var expected = "o => o.Names.Any(name => name.Component.Where(guard => ((guard.ComponentType ?? new Concept()).Mnemonic == \"OfficialRecord\")).Any(component => (component.Value.BoolTest() == True)))";
@@ -321,7 +321,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test the extended query filter has been parsed
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestExtendedQueryFilterWithParameterParse()
         {
             var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx(2018-01-01 12:00:00 AM) > 7305.00:00:00))";
@@ -335,7 +335,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test the extended query filter has been parsed
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestExtendedQueryFilterWithParameterVariableParse()
         {
             var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx(Convert(Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableParse>b__18_0()))) > 7305.00:00:00))";
@@ -352,7 +352,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test the extended query filter has been parsed
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestExtendedQueryFilterWithParameterVariablePathParse()
         {
             var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => __xinstance.DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariablePathParse>b__19_0())) ?? default(DateTime))) > 730.12:00:00))";
@@ -369,7 +369,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test the extended query filter has been parsed
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestExtendedQueryFilterWithParameterVariableComplexPathParse()
         {
             var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => (((__xinstance.Relationships.Where(guard => ((guard.LoadProperty(\"RelationshipType\") ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).TargetEntity As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__20_0())) ?? default(DateTime))) > 730.12:00:00))";
@@ -386,7 +386,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test the extended query filter has been parsed
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestExtendedQueryFilterWithParameterVariableCrossReference()
         {
             var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => (((__xinstance.Relationships.Where(guard => ((guard.LoadProperty(\"RelationshipType\") ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).TargetEntity As Patient) ?? new Patient()).DateOfBirth, o) ?? default(DateTime))) > 7305.00:00:00))";
