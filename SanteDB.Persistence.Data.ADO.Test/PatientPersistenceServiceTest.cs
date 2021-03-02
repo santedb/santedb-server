@@ -16,7 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using SanteDB.Core;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
@@ -30,28 +30,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 
-namespace SanteDB.Persistence.Data.ADO.Test
+namespace SanteDB.Persistence.Data.ADO.Tests
 {
     /// <summary>
     /// Test class for patient persistence
     /// </summary>
-    [TestClass]
+    [TestFixture(Category = "Persistence")]
     public class PatientPersistenceServiceTest : PersistenceTest<Patient>
     {
         private static IPrincipal s_authorization;
-        [ClassInitialize]
-        public static void ClassSetup(TestContext context)
+        [SetUp]
+        public void ClassSetup()
         {
-            TestApplicationContext.TestAssembly = typeof(AdoIdentityProviderTest).Assembly;
-            TestApplicationContext.Initialize(context.DeploymentDirectory);
-
             s_authorization = AuthenticationContext.SystemPrincipal;
 
         }
         /// <summary>
         /// Test the persistence of a person
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestPersistPatient()
         {
 
@@ -139,7 +136,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test the persistence of a person
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestShouldAdhereToClassifierCodes()
         {
             AssigningAuthority aa = new AssigningAuthority()
@@ -221,7 +218,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test the persistence of a person
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestQueryByGender()
         {
             Patient p = new Patient()
@@ -285,7 +282,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test that the SQL per
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestModelQueryIdentifierClassifier()
         {
             Patient p = new Patient()
@@ -354,7 +351,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test the persistence of a person
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestQueryByCreationDate()
         {
             Patient p = new Patient()

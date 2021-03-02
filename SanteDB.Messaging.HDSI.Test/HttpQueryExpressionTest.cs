@@ -16,7 +16,6 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
@@ -25,13 +24,14 @@ using SanteDB.Core.Model.Roles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 
-namespace SanteDB.Messaging.HDSI.Test
+namespace SanteDB.Messaging.HDSI.Tests
 {
     /// <summary>
     /// Tests for the HTTP expression writer
     /// </summary>
-    [TestClass]
+    [TestFixture(Category = "REST API")]
     public class HttpQueryExpressionTest
     {
 
@@ -60,7 +60,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test query by key
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestWriteLookupByKey()
         {
             Guid id = Guid.Empty;
@@ -72,7 +72,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test query by key
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestWriteGuardByUuid()
         {
             Guid id = Guid.Empty;
@@ -84,7 +84,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test query by key
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestChainedParse()
         {
             Guid id = Guid.Empty;
@@ -98,7 +98,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test query by key
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestChainedWriter()
         {
             Guid id = Guid.Empty;
@@ -111,7 +111,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test query by key
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestChainedWriter2()
         {
             Guid id = Guid.Empty;
@@ -123,7 +123,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test query by key
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestWriteLookupAnd()
         {
             Guid id = Guid.Empty;
@@ -135,7 +135,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test query by or
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestWriteLookupOr()
         {
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.GenderConcept.Mnemonic == "Male" || o.GenderConcept.Mnemonic == "Female");
@@ -146,7 +146,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test write of lookup greater than equal to
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestWriteLookupGreaterThanEqual()
         {
             DateTime dt = DateTime.MinValue;
@@ -159,7 +159,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test write of lookup greater than equal to
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestWriteLookupGreaterThan()
         {
             DateTime dt = DateTime.MinValue;
@@ -172,7 +172,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test write of lookup greater than equal to
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestWriteLookupLessThanEqual()
         {
             DateTime dt = DateTime.MinValue;
@@ -185,7 +185,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test write of lookup greater than equal to
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestWriteLookupLessThan()
         {
             DateTime dt = DateTime.MinValue;
@@ -199,7 +199,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test write of lookup greater than equal to
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestWriteLookupNotEqual()
         {
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.GenderConcept.Mnemonic != "Male");
@@ -211,7 +211,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test write of lookup approximately
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestWriteLookupApproximately()
         {
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.GenderConcept.Mnemonic.Contains("M"));
@@ -222,7 +222,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test write of Any correctly
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestWriteLookupAny()
         {
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Names.Any(p=>p.NameUse.Mnemonic == "Legal"));
@@ -233,7 +233,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test write of Any correctly
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestWriteLookupAnyAnd()
         {
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Names.Any(p => p.NameUse.Mnemonic == "Legal" && p.Component.Any(n=>n.Value == "Smith")));
@@ -244,7 +244,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test write of Any correctly
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestWriteLookupWhereAnd()
         {
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Names.Where(p => p.NameUse.Mnemonic == "Legal").Any(p => p.Component.Any(n => n.Value == "Smith")));
@@ -256,7 +256,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Tests that the [QueryParameter] attribute is adhered to
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestWriteNonSerializedProperty()
         {
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Extensions.Any(e => e.ExtensionDisplay == "1"));
@@ -267,7 +267,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test that the query writes out extended filter
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestWriteSimpleExtendedFilter()
         {
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtension());
@@ -279,7 +279,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test that an HTTP query has extended filter
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestWriteSimpleExtendedFilterWithParms()
         {
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());
@@ -293,7 +293,7 @@ namespace SanteDB.Messaging.HDSI.Test
         /// <summary>
         /// Test that an HTTP query has extended filter
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestWriteSelfParameterRef()
         {
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());

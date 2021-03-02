@@ -16,7 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Security;
@@ -27,12 +27,12 @@ using SanteDB.Core.TestFramework;
 using System.Linq;
 using System.Security.Principal;
 
-namespace SanteDB.Persistence.Data.ADO.Test
+namespace SanteDB.Persistence.Data.ADO.Tests
 {
     /// <summary>
     /// Summary description for SecurityRolePersistenceServiceTest
     /// </summary>
-    [TestClass]
+    [TestFixture(Category = "Persistence")]
     public class SecurityRolePersistenceServiceTest : PersistenceTest<SecurityRole>
     {
 
@@ -40,12 +40,9 @@ namespace SanteDB.Persistence.Data.ADO.Test
         private static SecurityPolicy s_chickenCostumePolicy;
         private static IPrincipal s_authorization;
 
-        [ClassInitialize]
-        public static void ClassSetup(TestContext context)
+        [SetUp]
+        public void ClassSetup()
         {
-            TestApplicationContext.TestAssembly = typeof(AdoIdentityProviderTest).Assembly;
-            TestApplicationContext.Initialize(context.DeploymentDirectory);
-
 
             AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
             IIdentityProviderService identityProvider = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
@@ -72,7 +69,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test inseration of valid group
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestInsertValidGroupSimple()
         {
             var roleUnderTest = new SecurityRole()
@@ -87,7 +84,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Tests insertion of a group with valid policies
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestInsertValidGroupPolicies()
         {
 
@@ -104,7 +101,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test the updating of a valid group
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestUpdateValidGroup()
         {
 
@@ -120,7 +117,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test the updating of a valid group
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestUpdateValidGroupPermissions()
         {
 
@@ -143,7 +140,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Tests that the persistence layer removes a policy
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestRemoveRolePolicy()
         {
             var roleUnderTest = new SecurityRole()

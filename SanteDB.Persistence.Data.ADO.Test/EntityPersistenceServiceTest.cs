@@ -16,7 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using SanteDB.Core;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
@@ -31,25 +31,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 
-namespace SanteDB.Persistence.Data.ADO.Test
+namespace SanteDB.Persistence.Data.ADO.Tests
 {
     /// <summary>
     /// Test persistence of entities
     /// </summary>
-    [TestClass]
+    [TestFixture(Category = "Persistence")]
     public class EntityPersistenceServiceTest : PersistenceTest<Entity>
     {
 
         private static IPrincipal s_authorization;
 
-        [ClassInitialize]
-        public static void ClassSetup(TestContext context)
+        [SetUp]
+        public void ClassSetup()
         {
-            TestApplicationContext.TestAssembly = typeof(AdoIdentityProviderTest).Assembly;
-            TestApplicationContext.Initialize(context.DeploymentDirectory);
-
-            AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
-
+           
             s_authorization = AuthenticationContext.SystemPrincipal;
 
         }
@@ -57,7 +53,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test the insertion of an anonymous entity
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestInsertAnonymousEntity()
         {
             Entity strawberry = new Entity()
@@ -87,7 +83,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test the insert of an identified entity
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestInsertIdentifiedEntity()
         {
             var mid = String.Format("urn:uuid:{0}", Guid.NewGuid());
@@ -149,7 +145,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test the insertion of an anonymous entity
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestInsertAnonymousInstanceEntity()
         {
             Entity strawberry = new Entity()
@@ -176,7 +172,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Obsolete an entity
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestObsoleteEntity()
         {
             Entity toBeKilled = new Entity()
@@ -207,7 +203,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test query of data by name
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestQueryByName()
         {
             Entity toBeQueried = new Entity()
@@ -238,7 +234,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestRelateTwoEntities()
         {
             Entity e1 = new Entity()
@@ -273,7 +269,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestInvalidRelationshipThrowsValidationException()
         {
             Entity e1 = new Entity()
@@ -319,7 +315,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test persisting an entity with telecom address
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestEntityWithTelecom()
         {
             Entity e1 = new Entity()
@@ -346,7 +342,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Tests an entity with an extended attribute
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestEntityExtensions()
         {
             Entity person = new Entity()
@@ -379,7 +375,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test the adding of notes to a patient
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestEntityNotePersistence()
         {
             Entity person = new Entity()
@@ -413,7 +409,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test the adding of tags to a patient
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestEntityTagPersistence()
         {
             Entity person = new Entity()

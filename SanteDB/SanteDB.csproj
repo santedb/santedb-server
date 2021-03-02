@@ -222,6 +222,7 @@
     <None Include="data\000-ScopingOrganizationRelationship.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="data\000-VIPStatus.dataset" />
     <None Include="data\demo\990-demo.concepts.dataset" />
     <None Include="data\demo\991-demo.facilities.dataset" />
     <None Include="data\demo\992-demo.places.dataset" />
@@ -316,9 +317,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="santedb.config.user.fyfej.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="data\000-RouteOfAdministration.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
