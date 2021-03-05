@@ -30,7 +30,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Mohawk College of Applied Arts and Technology")]
 [assembly: AssemblyProduct("SanteDB (http://SanteDB.org)")]
-[assembly: AssemblyCopyright("Copyright (C) 2015-2018, Mohawk College of Applied Arts and Technology")]
+[assembly: AssemblyCopyright("Copyright (C) 2015-2021, Fyfe Software Inc. and the SanteSuite Contributors (see: NOTICE)")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -51,10 +51,10 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("2.1.0.*")][assembly: AssemblyInformationalVersion("Ottawa")]
-[assembly: AssemblyVersion("2.1.0.*")]
+// [assembly: AssemblyVersion("2.1.1.*")][assembly: AssemblyInformationalVersion("Ottawa")]
+[assembly: AssemblyVersion("2.1.1.*")]
 [assembly: AssemblyInformationalVersion("Ottawa")]
-[assembly: AssemblyFileVersion("2.1.0.0")]
+[assembly: AssemblyFileVersion("2.1.1.0")]
 
 [assembly: Plugin(EnableByDefault = true, Environment = PluginEnvironment.Server, Group = FeatureGroup.Persistence)]
 [assembly: PluginTraceSource(AdoDataConstants.IdentityTraceSourceName)]

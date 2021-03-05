@@ -5,7 +5,9 @@
   <!-- Master Data Management Configuration -->
   <section xsi:type="ResourceMergeConfigurationSection">
     <resources>
-      <add type="Patient" autoMerge="true" />
+      <add type="Patient" autoMerge="true">
+        <matchConfiguration>org.santedb.matcher.example</matchConfiguration>
+      </add>
     </resources>
   </section>
 </SanteDBConfiguration>
