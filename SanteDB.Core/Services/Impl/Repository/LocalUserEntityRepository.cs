@@ -32,6 +32,14 @@ namespace SanteDB.Server.Core.Services.Impl
     {
 
         /// <summary>
+        /// Privacy for a user entity
+        /// </summary>
+        /// <param name="privacyService"></param>
+        public LocalUserEntityRepository(IPrivacyEnforcementService privacyService) : base(privacyService)
+        {
+        }
+
+        /// <summary>
         /// Demand write
         /// </summary>
         public override void DemandWrite(object data)

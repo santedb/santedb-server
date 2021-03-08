@@ -18,6 +18,7 @@
  */
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Model.Interfaces;
@@ -514,7 +515,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
             catch (Exception e)
             {
                 s_traceSource.TraceWarning("Error creating context: {0}", e);
-                throw;
+                throw new DataPersistenceException($"Error establishing provenance for {principal.Identity.Name}", e);
             }
             return retVal.Key;
         }

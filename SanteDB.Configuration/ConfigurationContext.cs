@@ -45,7 +45,7 @@ namespace SanteDB.Configuration
     /// <summary>
     /// Configuration Context
     /// </summary>
-    public class ConfigurationContext : INotifyPropertyChanged, IApplicationServiceContext, IConfigurationManager, IServiceManager
+    public class ConfigurationContext : INotifyPropertyChanged, IApplicationServiceContext, IConfigurationManager
     {
 
         // Service manager
@@ -140,8 +140,8 @@ namespace SanteDB.Configuration
             // Initial settings for initial 
             this.Configuration.AddSection(new OrmConfigurationSection()
             {
-                AdoProvider = this.GetAllTypes().Where(t => typeof(DbProviderFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface ).Select(t => new ProviderRegistrationConfiguration(t.Namespace.StartsWith("System") ? t.Name : t.Namespace.Split('.')[0], t)).ToList(),
-                Providers = this.GetAllTypes().Where(t => typeof(IDbProvider).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).Select(t => new ProviderRegistrationConfiguration((Activator.CreateInstance(t) as IDbProvider).Invariant, t)).ToList()
+                AdoProvider = this.m_serviceManager.GetAllTypes().Where(t => typeof(DbProviderFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface ).Select(t => new ProviderRegistrationConfiguration(t.Namespace.StartsWith("System") ? t.Name : t.Namespace.Split('.')[0], t)).ToList(),
+                Providers = this.m_serviceManager.GetAllTypes().Where(t => typeof(IDbProvider).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).Select(t => new ProviderRegistrationConfiguration((Activator.CreateInstance(t) as IDbProvider).Invariant, t)).ToList()
             });
             this.Started?.Invoke(this, EventArgs.Empty);
         }
@@ -346,39 +346,5 @@ namespace SanteDB.Configuration
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Add a service provider to this context
-        /// </summary>
-        public void AddServiceProvider(Type serviceType) => this.m_serviceManager.AddServiceProvider(serviceType);
-
-        /// <summary>
-        /// Get all services
-        /// </summary>
-        public IEnumerable<object> GetServices() => this.m_serviceManager.GetServices();
-
-        /// <summary>
-        /// Remove a service provider
-        /// </summary>
-        public void RemoveServiceProvider(Type serviceType) => this.m_serviceManager.RemoveServiceProvider(serviceType);
-
-        /// <summary>
-        /// Get all types
-        /// </summary>
-        public IEnumerable<Type> GetAllTypes() => this.m_serviceManager.GetAllTypes();
-
-        /// <summary>
-        /// Add the specified service provider
-        /// </summary>
-        public void AddServiceProvider(object serviceInstance) => this.m_serviceManager.AddServiceProvider(serviceInstance);
-
-        /// <summary>
-        /// Create injected service
-        /// </summary>
-        public object CreateInjected(Type type) => this.m_serviceManager.CreateInjected(type);
-
-        /// <summary>
-        /// Create injected service
-        /// </summary>
-        public TObject CreateInjected<TObject>() => this.m_serviceManager.CreateInjected<TObject>();
     }
 }

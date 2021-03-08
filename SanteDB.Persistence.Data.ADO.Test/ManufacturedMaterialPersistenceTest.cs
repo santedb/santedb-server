@@ -16,7 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
@@ -25,24 +25,15 @@ using SanteDB.Core.TestFramework;
 using System;
 using System.Collections.Generic;
 
-namespace SanteDB.Persistence.Data.ADO.Test
+namespace SanteDB.Persistence.Data.ADO.Tests
 {
-    [TestClass]
+    [TestFixture(Category = "Persistence")]
     public class ManufacturedMaterialPersistenceTest : PersistenceTest<ManufacturedMaterial>
     {
-        [ClassInitialize]
-        public static void ClassSetup(TestContext context)
-        {
-
-            TestApplicationContext.TestAssembly = typeof(AdoIdentityProviderTest).Assembly;
-            TestApplicationContext.Initialize(context.DeploymentDirectory);
-
-
-        }
         /// <summary>
         /// Test the update of a manufactured material
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestUpdateManufacturedMaterial()
         {
             ManufacturedMaterial mmat = new ManufacturedMaterial()

@@ -39,6 +39,13 @@ namespace SanteDB.Server.Core.Services.Impl
     {
 
         /// <summary>
+        /// Privacy enforcement service
+        /// </summary>
+        public LocalConceptRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        {
+
+        }
+        /// <summary>
         /// Query policy for concepts
         /// </summary>
         protected override string QueryPolicy => PermissionPolicyIdentifiers.ReadMetadata;

@@ -85,7 +85,7 @@ namespace SanteDB.Caching.Redis
             }
             catch (Exception e)
             {
-                this.m_tracer.TraceError("Error adding {0} to cache", value);
+                this.m_tracer.TraceError("Error adding {0} to cache {1}", value, e.Message);
                 //throw new Exception($"Error adding {value} to cache", e);
             }
         }
@@ -106,7 +106,7 @@ namespace SanteDB.Caching.Redis
             }
             catch (Exception e)
             {
-                this.m_tracer.TraceError("Error fetch {0} from cache", key);
+                this.m_tracer.TraceError("Error fetch {0} from cache {1}", key, e.Message);
                 //throw new Exception($"Error fetching {key} ({typeof(T).FullName}) from cache", e);
                 return default(T);
             }

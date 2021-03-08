@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using SanteDB.Core;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
@@ -10,25 +10,22 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Core.TestFramework;
 
-namespace SanteDB.Persistence.Data.ADO.Test
+namespace SanteDB.Persistence.Data.ADO.Tests
 {
 
     /// <summary>
     /// 
     /// </summary>
-    [TestClass]
-    [DeploymentItem(@"santedb_archive.fdb")]
+    [TestFixture(Category = "Persistence")]
     public class ArchiveServiceTest : DataTest
     {
-        [ClassInitialize]
-        public static void ClassSetup(TestContext context)
+        [SetUp]
+        public void ClassSetup()
         {
-            TestApplicationContext.TestAssembly = typeof(AdoIdentityProviderTest).Assembly;
-            TestApplicationContext.Initialize(context.DeploymentDirectory);
             AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCanPurgeArchive()
         {
 
@@ -55,7 +52,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestCanArchive()
         {
 

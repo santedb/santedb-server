@@ -124,6 +124,17 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         protected virtual String AlterPolicy => PermissionPolicyIdentifiers.LoginAsService;
 
+        // Privacy service
+        private IPrivacyEnforcementService m_privacyService;
+
+        /// <summary>
+        /// Creates a new generic local repository with specified privacy service
+        /// </summary>
+        public GenericLocalRepository(IPrivacyEnforcementService privacyService)
+        {
+            this.m_privacyService = privacyService;
+        }
+
         /// <summary>
         /// Find with stored query parameters
         /// </summary>
@@ -158,10 +169,18 @@ namespace SanteDB.Server.Core.Services.Impl
                 else
                     results = persistenceService.Query(preQueryEventArgs.Query, preQueryEventArgs.Offset, preQueryEventArgs.Count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
             }
+            
+            // 1. Let the BRE run
             var retVal = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
+
+            // 2. Broadcast query performed
             var postEvt = new QueryResultEventArgs<TEntity>(query, retVal, offset, count, totalResults, queryId, AuthenticationContext.AnonymousPrincipal);
             this.Queried?.Invoke(this, postEvt);
             totalResults = postEvt.TotalResults;
+
+            // 2. Apply Filters if needed
+            retVal = this.m_privacyService?.Apply(retVal, AuthenticationContext.Current.Principal) ?? retVal;
+
             return retVal;
         }
 
@@ -176,6 +195,10 @@ namespace SanteDB.Server.Core.Services.Impl
             // Validate the resource
             data = this.Validate(data);
 
+            // Call privacy hook
+            if (!this.m_privacyService.ValidateWrite(data, AuthenticationContext.Current.Principal))
+                this.ThrowPrivacyValidationException(data);
+
             // Fire pre-persistence triggers
             var prePersistence = new DataPersistingEventArgs<TEntity>(data, AuthenticationContext.Current.Principal);
             this.Inserting?.Invoke(this, prePersistence);
@@ -184,15 +207,26 @@ namespace SanteDB.Server.Core.Services.Impl
                 this.m_traceSource.TraceWarning("Pre-persistence event signal cancel: {0}", data);
                 return prePersistence.Data;
             }
+            
             // Did the pre-persistence service change the type to a batch
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
+            
             var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TEntity>>();
             data = businessRulesService?.BeforeInsert(data) ?? prePersistence.Data;
             data = persistenceService.Insert(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             businessRulesService?.AfterInsert(data);
             this.Inserted?.Invoke(this, new DataPersistedEventArgs<TEntity>(data, AuthenticationContext.Current.Principal));
+            return this.m_privacyService?.Apply(data, AuthenticationContext.Current.Principal) ?? data;
+        }
 
-            return data;
+        /// <summary>
+        /// Throw a privacy validation exception
+        /// </summary>
+        private void ThrowPrivacyValidationException(TEntity data)
+        {
+            throw new DetectedIssueException(
+                new DetectedIssue(DetectedIssuePriorityType.Error, "privacy", "Privacy Validation Failed", DetectedIssueKeys.AlreadyDoneIssue)
+            );
         }
 
         /// <summary>
@@ -232,7 +266,7 @@ namespace SanteDB.Server.Core.Services.Impl
 
             this.Obsoleted?.Invoke(this, new DataPersistedEventArgs<TEntity>(entity, AuthenticationContext.Current.Principal));
 
-            return entity;
+            return this.m_privacyService?.Apply(entity, AuthenticationContext.Current.Principal) ?? entity;
         }
 
         /// <summary>
@@ -260,6 +294,7 @@ namespace SanteDB.Server.Core.Services.Impl
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
             var preRetrieve = new DataRetrievingEventArgs<TEntity>(key, versionKey, AuthenticationContext.Current.Principal);
+
             this.Retrieving?.Invoke(this, preRetrieve);
             if(preRetrieve.Cancel)
             {
@@ -271,7 +306,8 @@ namespace SanteDB.Server.Core.Services.Impl
             var retVal = businessRulesService?.AfterRetrieve(result) ?? result;
             var postEvt = new DataRetrievedEventArgs<TEntity>(retVal, AuthenticationContext.Current.Principal);
             this.Retrieved?.Invoke(this, postEvt);
-            return postEvt.Data;
+
+            return this.m_privacyService?.Apply(postEvt.Data, AuthenticationContext.Current.Principal) ?? postEvt.Data;
         }
 
         /// <summary>
@@ -295,6 +331,10 @@ namespace SanteDB.Server.Core.Services.Impl
 
             try
             {
+
+                if (this.m_privacyService?.ValidateWrite(data, AuthenticationContext.Current.Principal) == false)
+                    this.ThrowPrivacyValidationException(data);
+
                 var preSave = new DataPersistingEventArgs<TEntity>(data, AuthenticationContext.Current.Principal);
                 this.Saving?.Invoke(this, preSave);
                 if (preSave.Cancel)
@@ -307,7 +347,6 @@ namespace SanteDB.Server.Core.Services.Impl
 
                 if (data.Key.HasValue && persistenceService.Get(data.Key.Value, null, true, AuthenticationContext.Current.Principal) != null)
                 {
-                    
                     data = businessRulesService?.BeforeUpdate(data) ?? data;
                     data = persistenceService.Update(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                     businessRulesService?.AfterUpdate(data);
@@ -320,7 +359,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 }
 
                 this.Saved?.Invoke(this, new DataPersistedEventArgs<TEntity>(data, AuthenticationContext.Current.Principal));
-                return data;
+                return this.m_privacyService?.Apply(data, AuthenticationContext.Current.Principal) ?? data;
             }
             catch (KeyNotFoundException)
             {
@@ -392,7 +431,7 @@ namespace SanteDB.Server.Core.Services.Impl
 
             results = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
             this.Queried?.Invoke(this, new QueryResultEventArgs<TEntity>(query, results, offset, count, totalResults, queryId, AuthenticationContext.Current.Principal));
-            return results;
+            return this.m_privacyService.Apply(results, AuthenticationContext.Current.Principal) ?? results;
         }
 
         /// <summary>
@@ -500,5 +539,6 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             return this.Obsolete(key);
         }
+
     }
 }

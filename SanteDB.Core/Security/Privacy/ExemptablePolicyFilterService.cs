@@ -56,57 +56,59 @@ namespace SanteDB.Server.Core.Security.Privacy
         /// <summary>
         /// Creates a new instance with DI
         /// </summary>
-        public ExemptablePolicyFilterService(IPasswordHashingService passwordService, IPolicyDecisionService pdpService, IThreadPoolService threadPoolService, IDataCachingService dataCachingService, IAdhocCacheService adhocCache = null, ISubscriptionExecutor subscriptionExecutor = null)
-            : base(passwordService, pdpService, threadPoolService, dataCachingService, subscriptionExecutor, adhocCache)
+        public ExemptablePolicyFilterService(IConfigurationManager configManager, IPasswordHashingService passwordService, IPolicyDecisionService pdpService, IThreadPoolService threadPoolService, IDataCachingService dataCachingService, IAdhocCacheService adhocCache = null, ISubscriptionExecutor subscriptionExecutor = null)
+            : base(configManager, passwordService, pdpService, threadPoolService, dataCachingService, subscriptionExecutor, adhocCache)
         {
         }
 
         /// <summary>
         /// Handle post query event
         /// </summary>
-        public override IEnumerable HandlePostQueryEvent(IEnumerable results)
+        public override IEnumerable<TData> Apply<TData>(IEnumerable<TData> results, IPrincipal principal)
         {
-
+                
             // If the current authentication context is a device (not a user) then we should allow the data to flow to the device
             switch(this.m_configuration.PepExemptionPolicy)
             {
                 case PolicyEnforcementExemptionPolicy.AllExempt:
                     return results;
                 case PolicyEnforcementExemptionPolicy.DevicePrincipalsExempt:
-                    if (AuthenticationContext.Current.Principal.Identity is DeviceIdentity || AuthenticationContext.Current.Principal.Identity is ApplicationIdentity)
+                    if (principal.Identity is DeviceIdentity || principal.Identity is ApplicationIdentity)
                         return results;
                     break;
                 case PolicyEnforcementExemptionPolicy.UserPrincipalsExempt:
-                    if (!(AuthenticationContext.Current.Principal.Identity is DeviceIdentity || AuthenticationContext.Current.Principal.Identity is ApplicationIdentity))
+                    if (!(principal.Identity is DeviceIdentity || principal.Identity is ApplicationIdentity))
                         return results;
                     break;
             }
-            return base.HandlePostQueryEvent(results);
+            return base.Apply(results, principal);
         }
 
 
         /// <summary>
         /// Handle post query event
         /// </summary>
-        public override Object HandlePostRetrieveEvent(Object result)
+        /// 
+        public override TData Apply<TData>(TData result, IPrincipal principal)
         {
             if (result == null) // no result
                 return null;
+
             // If the current authentication context is a device (not a user) then we should allow the data to flow to the device
             switch (this.m_configuration.PepExemptionPolicy)
             {
                 case PolicyEnforcementExemptionPolicy.AllExempt:
                     return result;
                 case PolicyEnforcementExemptionPolicy.DevicePrincipalsExempt:
-                    if (AuthenticationContext.Current.Principal.Identity is DeviceIdentity || AuthenticationContext.Current.Principal.Identity is ApplicationIdentity)
+                    if (principal.Identity is DeviceIdentity || principal.Identity is ApplicationIdentity)
                         return result;
                     break;
                 case PolicyEnforcementExemptionPolicy.UserPrincipalsExempt:
-                    if (!(AuthenticationContext.Current.Principal.Identity is DeviceIdentity || AuthenticationContext.Current.Principal.Identity is ApplicationIdentity))
+                    if (!(principal.Identity is DeviceIdentity || principal.Identity is ApplicationIdentity))
                         return result;
                     break;
             }
-            return base.HandlePostRetrieveEvent(result);
+            return base.Apply(result, principal);
         }
         
 

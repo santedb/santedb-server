@@ -16,7 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using SanteDB.Core;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Security;
@@ -27,21 +27,18 @@ using System;
 using System.Linq;
 using SanteDB.Core.Model;
 
-namespace SanteDB.Persistence.Data.ADO.Test
+namespace SanteDB.Persistence.Data.ADO.Tests
 {
     /// <summary>
     /// Summary description for SecurityUserPersistenceServiceTest
     /// </summary>
-    [TestClass]
+    [TestFixture(Category = "Persistence")]
     public class SecurityUserPersistenceServiceTest : PersistenceTest<SecurityUser>
     {
 
-        [ClassInitialize]
-        public static void ClassSetup(TestContext context)
+        [SetUp]
+        public void ClassSetup()
         {
-            TestApplicationContext.TestAssembly = typeof(AdoIdentityProviderTest).Assembly;
-            TestApplicationContext.Initialize(context.DeploymentDirectory);
-
             AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
 
         }
@@ -49,7 +46,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test the insertion of a valid security user
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestInsertValidSecurityUser()
         {
 
@@ -70,7 +67,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test the updating of a valid security user
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestUpdateValidSecurityUser()
         {
 
@@ -102,7 +99,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Test valid query result
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestQueryValidResult()
         {
 
@@ -129,7 +126,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         /// <summary>
         /// Tests the delay loading of properties works
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestDelayLoadUserProperties()
         {
             IPasswordHashingService hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();

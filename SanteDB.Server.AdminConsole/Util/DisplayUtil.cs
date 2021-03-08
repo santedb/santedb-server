@@ -61,7 +61,7 @@ namespace SanteDB.Server.AdminConsole.Util
             // Column width
             int defaultWidth = (Console.WindowWidth - columns.Length) / columns.Length,
                 c = 0;
-            int[] cWidths = colWidths ?? columns.Select(o=>defaultWidth).ToArray();
+            int[] cWidths = colWidths ?? columns.Select(o=>defaultWidth-2).ToArray();
 
             foreach(var col in columns)
             {
@@ -75,10 +75,10 @@ namespace SanteDB.Server.AdminConsole.Util
 
                 var member = (body as MemberExpression)?.Member;
                 string colName = colNames?[c] ?? member?.GetCustomAttribute<DescriptionAttribute>()?.Description ?? member?.Name ?? "??";
-                if (colName.Length > colWidths[c])
+                if (colName.Length > cWidths[c])
                     Console.Write("{0}... ", colName.Substring(0, colWidths[c] - 3));
                 else
-                    Console.Write("{0}{1} ", colName, new String(' ', colWidths[c] - colName.Length));
+                    Console.Write("{0}{1} ", colName, new String(' ', cWidths[c] - colName.Length));
                 c++;
             }
 
@@ -95,15 +95,15 @@ namespace SanteDB.Server.AdminConsole.Util
                         Object value = col.Compile().DynamicInvoke(tuple);
                         String stringValue = value?.ToString();
                         if (stringValue == null)
-                            Console.Write(new string(' ', colWidths[c] + 1));
-                        else if (stringValue.Length > colWidths[c])
-                            Console.Write("{0}... ", stringValue.Substring(0, colWidths[c] - 3));
+                            Console.Write(new string(' ', cWidths[c] + 1));
+                        else if (stringValue.Length > cWidths[c])
+                            Console.Write("{0}... ", stringValue.Substring(0, cWidths[c] - 3));
                         else
-                            Console.Write("{0}{1} ", stringValue, new String(' ', colWidths[c] - stringValue.Length));
+                            Console.Write("{0}{1} ", stringValue, new String(' ', cWidths[c] - stringValue.Length));
                     }
                     catch
                     {
-                        Console.Write(new string(' ', colWidths[c] + 1));
+                        Console.Write(new string(' ', cWidths[c] + 1));
                     }
                     finally
                     {

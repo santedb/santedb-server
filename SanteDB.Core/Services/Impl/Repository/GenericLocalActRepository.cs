@@ -43,6 +43,14 @@ namespace SanteDB.Server.Core.Services.Impl
     public class GenericLocalActRepository<TAct> : GenericLocalClinicalDataRepository<TAct>, ICancelRepositoryService<TAct>
         where TAct : Act
     {
+
+        /// <summary>
+        /// Creates a new local act repository
+        /// </summary>
+        public GenericLocalActRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        {
+        }
+
         /// <summary>
         /// Insert or update the specified act
         /// </summary>

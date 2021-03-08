@@ -571,12 +571,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     }
                     catch (NotSupportedException e)
                     {
-                        throw new DataPersistenceException("Cannot perform LINQ query", e);
+                        throw new DataPersistenceException("Cannot perform LINQ query as underlying provider doesn't support it", e);
                     }
                     catch (Exception e)
                     {
                         this.m_tracer.TraceEvent(EventLevel.Error,  "Error : {0}", e);
-                        throw;
+                        throw new DataPersistenceException($"General error retrieving {containerId}", e);
                     }
                     finally
                     {
@@ -685,12 +685,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (NotSupportedException e)
                 {
-                    throw new DataPersistenceException("Cannot perform LINQ query", e);
+                    throw new DataPersistenceException("Cannot perform LINQ query as underlying persistence provider does not support it", e);
                 }
                 catch (Exception e)
                 {
                     this.m_tracer.TraceEvent(EventLevel.Error,  "Error : {0}", e);
-                    throw;
+                    throw new DataPersistenceException($"Error performing query {query}", e);
                 }
                 finally
                 {

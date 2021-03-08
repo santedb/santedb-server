@@ -17,6 +17,7 @@
  * Date: 2019-11-27
  */
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using System;
 using System.Linq;
@@ -31,6 +32,13 @@ namespace SanteDB.Server.Core.Services.Impl
         IAssigningAuthorityRepositoryService
     {
 
+        /// <summary>
+        /// Local AA 
+        /// </summary>
+        public LocalAssigningAuthorityRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        {
+
+        }
         /// <summary>
         /// Get the specified assigning authority
         /// </summary>

@@ -31,6 +31,14 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalProviderRepository : GenericLocalRepositoryEx<Provider>
     {
+        /// <summary>
+        /// Local provider repository
+        /// </summary>
+        public LocalProviderRepository(IPrivacyEnforcementService privacyService) : base(privacyService)
+        {
+
+        }
+
         protected override string QueryPolicy => PermissionPolicyIdentifiers.ReadMetadata;
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadMetadata;
         protected override string WritePolicy => PermissionPolicyIdentifiers.UnrestrictedMetadata;

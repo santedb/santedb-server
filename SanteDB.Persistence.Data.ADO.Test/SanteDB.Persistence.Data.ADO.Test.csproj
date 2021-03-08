@@ -27,7 +27,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -46,8 +46,10 @@
       <Version>12.0.3</Version>
     </PackageReference>
     <PackageReference Include="Npgsql" Version="4.1.3.1" />
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
+    <PackageReference Include="NUnit">
+      <Version>3.13.1</Version>
+    </PackageReference>
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
   </ItemGroup>
   <Choose>
@@ -61,6 +63,7 @@
   <ItemGroup>
     <Compile Include="ConceptPersistenceServiceTest.cs" />
     <Compile Include="EntityPersistenceServiceTest.cs" />
+    <Compile Include="FixtureInitialize.cs" />
     <Compile Include="ManufacturedMaterialPersistenceTest.cs" />
     <Compile Include="PatientPersistenceServiceTest.cs" />
     <Compile Include="PersistenceTest.cs" />
@@ -99,9 +102,9 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.1.0.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.1.0.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.1.0.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.1.2.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.1.2.0" />
+        <PackageReference Include="SanteDB.OrmLite" Version="2.1.2.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

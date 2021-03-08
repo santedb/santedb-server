@@ -33,6 +33,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SanteDB.Core.Interop;
+using SanteDB.Server.AdminConsole.Util;
 
 namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 {
@@ -60,6 +61,8 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             /// </summary>
             [Description("The authority domains to operate on")]
             [Parameter("*")]
+            [Parameter("n")]
+            [Parameter("nsid")]
             public StringCollection Authority { get; set; }
 
         }
@@ -113,10 +116,63 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         }
 
         /// <summary>
+        /// Add the assigning authority
+        /// </summary>
+        public class ListAssigningAuthorityParams : AssigningAuthorityParamsBase
+        {
+            /// <summary>
+            /// Gets or sets the OID
+            /// </summary>
+            [Parameter("o")]
+            [Description("The OID of the assigning authority")]
+            public String Oid { get; set; }
+
+            /// <summary>
+            /// Gets or sets the URL
+            /// </summary>
+            [Parameter("u")]
+            [Description("The URL of the assigning authority")]
+            public String Url { get; set; }
+
+            /// <summary>
+            /// Gets or sets the description
+            /// </summary>
+            [Parameter("d")]
+            [Description("Sets the description")]
+            public String Name { get; set; }
+
+        }
+
+        /// <summary>
+        /// Lists all assigning authorities
+        /// </summary>
+        [AdminCommand("aa.list", "Query assigning authorties/identity domains")]
+        [Description("This command will list all registered identity domains")]
+        public static void ListAssigningAuthority(ListAssigningAuthorityParams parms)
+        {
+            IEnumerable<AssigningAuthority> auths = null;
+            if (!String.IsNullOrEmpty(parms.Name))
+                auths = m_amiClient.GetAssigningAuthorities(o => o.Name.Contains(parms.Name)).CollectionItem.OfType<AssigningAuthority>();
+            else if (!String.IsNullOrEmpty(parms.Oid))
+                auths = m_amiClient.GetAssigningAuthorities(o => o.Oid == parms.Oid).CollectionItem.OfType<AssigningAuthority>();
+            else if (!String.IsNullOrEmpty(parms.Url))
+                auths = m_amiClient.GetAssigningAuthorities(o => o.Url == parms.Url).CollectionItem.OfType<AssigningAuthority>();
+            else
+                auths = m_amiClient.GetAssigningAuthorities(o=>o.CreationTime != null).CollectionItem.OfType<AssigningAuthority>();
+
+            DisplayUtil.TablePrint(auths,
+                o => o.DomainName,
+                o => o.Name,
+                o => o.Url,
+                o => o.IsUnique);
+
+        }
+
+        /// <summary>
         /// Create a new assigning authority
         /// </summary>
         /// <param name="parms"></param>
-        [AdminCommand("authority.add", "Add Assigning Authority application")]
+        [AdminCommand("aa.add", "Add Assigning Authority application")]
         [Description("This command will create a new assigning authority which can be used to identify external authorities")]
         // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedMetadata)]
         public static void AddAssigningAuthority(AddAssigningAuthorityParams parms)
@@ -133,7 +189,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 
             // Scope
             List<Concept> scope = new List<Concept>();
-            if(parms.Scope?.Count > 0)
+            if (parms.Scope?.Count > 0)
             {
                 foreach (var s in parms.Scope)
                 {
@@ -145,7 +201,8 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             }
 
             // Construct AA
-            foreach (var domainName in parms.Authority) {
+            foreach (var domainName in parms.Authority)
+            {
                 var aa = new AssigningAuthority(domainName, parms.Name, parms.Oid)
                 {
                     Url = parms.Url,

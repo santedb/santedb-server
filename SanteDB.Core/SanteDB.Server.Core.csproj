@@ -118,6 +118,7 @@
     <Compile Include="Services\Impl\Repository\LocalEntityRelationshipRepository.cs" />
     <Compile Include="Services\Impl\Repository\LocalExtensionTypeRepository.cs" />
     <Compile Include="Services\Impl\Repository\LocalManufacturedMaterialRepository.cs" />
+    <Compile Include="Services\Impl\Repository\LocalPatientRepository.cs" />
     <Compile Include="Services\Impl\Repository\LocalProviderRepository.cs" />
     <Compile Include="Services\Impl\LocalRepositoryFactoryService.cs" />
     <Compile Include="Services\Impl\LocalRepositoryService.cs" />
@@ -192,12 +193,12 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.1.0.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.1.0.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.1.0.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.1.0.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.1.0.0" />
-        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.1.0.0" />
+        <PackageReference Include="RestSrvr" Version="2.1.2.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="2.1.2.0" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="2.1.2.0" />
+        <PackageReference Include="SanteDB.Core.Model" Version="2.1.2.0" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="2.1.2.0" />
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.1.2.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

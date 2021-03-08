@@ -432,7 +432,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             catch (Exception e)
             {
                 this.m_tracer.TraceEvent(EventLevel.Error,  "Error starting ADO provider: {0}", e);
-                throw;
+                throw new InvalidOperationException("Could not start up ADO provider", e);
             }
 
             // Iterate the persistence services
@@ -619,7 +619,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 {
                     tx.Rollback();
                     this.m_tracer.TraceEvent(EventLevel.Error,  "Could not execute SQL: {0}", e);
-                    throw;
+#if DEBUG
+                    throw new DataPersistenceException($"Error executing query {sql}", e);
+#else
+                    throw new DataPersistenceException("Error querying undelying storage service", e);
+#endif
+
                 }
             }
         }

@@ -29,6 +29,14 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalEntityRelationshipRepository : GenericLocalRepository<EntityRelationship>
     {
+
+        /// <summary>
+        /// Entity relationship repository
+        /// </summary>
+        public LocalEntityRelationshipRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        {
+        }
+
         /// <summary>
         /// Query policy for entities
         /// </summary>

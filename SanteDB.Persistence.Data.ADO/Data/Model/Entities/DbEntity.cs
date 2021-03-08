@@ -28,8 +28,8 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
     /// <summary>
     /// Represents an entity in the database
     /// </summary>
-    [Table("ent_tbl")]
-	public class DbEntity : DbIdentified
+    [Table("ent_tbl"), SkipHint("template"), SkipHint("classConcept"), SkipHint("determinerConcept")]
+    public class DbEntity : DbIdentified
 	{
         /// <summary>
         /// Gets or sets the template

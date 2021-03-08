@@ -17,7 +17,7 @@
  * User: JustinFyfe
  * Date: 2019-1-22
  */
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using SanteDB.Core;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
@@ -26,24 +26,24 @@ using System;
 using System.Linq;
 using System.Threading;
 
-namespace SanteDB.Caching.Memory.Test
+namespace SanteDB.Caching.Memory.Tests
 {
-    [TestClass]
+    [TestFixture(TestName = "Memory Cache Tests", Category = "Caching")]
     public class MemoryCacheTests
     {
 
         /// <summary>
         /// Setup the test class
         /// </summary>
-        [ClassInitialize]
-        public static void ClassInitialize(TestContext context)
+        [SetUp]
+        public void ClassInitialize()
         {
             typeof(MemoryCacheService).Equals(null);
             TestApplicationContext.TestAssembly = typeof(MemoryCacheTests).Assembly;
-            TestApplicationContext.Initialize(context.DeploymentDirectory);
+            TestApplicationContext.Initialize(TestContext.CurrentContext.TestDirectory);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCanAddCacheItem()
         {
             Guid k = Guid.NewGuid();
@@ -66,7 +66,7 @@ namespace SanteDB.Caching.Memory.Test
         /// <summary>
         /// Tests that cache does not return expired data
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestDoesNotReturnAfterExpiry()
         {
             Guid k = Guid.NewGuid();
@@ -91,7 +91,7 @@ namespace SanteDB.Caching.Memory.Test
         /// <summary>
         /// Tests that the clear method works
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestClearsCache()
         {
             Guid k = Guid.NewGuid();
@@ -113,7 +113,7 @@ namespace SanteDB.Caching.Memory.Test
             Assert.IsNull(ret);
         }
 
-        [TestMethod]
+        [Test]
         public void TestRemovesItemFromCache()
         {
             Guid k1 = Guid.NewGuid(), k2 = Guid.NewGuid();
@@ -148,7 +148,7 @@ namespace SanteDB.Caching.Memory.Test
             Assert.IsNull(ret);
         }
 
-        [TestMethod]
+        [Test]
         public void TestAdHocCache()
         {
             ApplicationServiceContext.Current.GetService<IAdhocCacheService>().Add("TEST", "I AM A TEST VALUE!");
@@ -166,7 +166,7 @@ namespace SanteDB.Caching.Memory.Test
             Assert.IsNull(val);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCanRegisterQuery()
         {
             var qps = ApplicationServiceContext.Current.GetService<IQueryPersistenceService>();

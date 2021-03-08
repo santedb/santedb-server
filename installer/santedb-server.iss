@@ -118,7 +118,7 @@ Source: ..\SanteDB\santedb.config.fbsql.xml; DestDir: {app}; DestName: santedb.c
 Source: ..\SanteDB\Data\SDB_BASE.FDB; DestDir: {app}; Components: db\fbsql demo; Flags: confirmoverwrite
 Source: ..\SanteDB\Data\SDB_AUDIT.FDB; DestDir: {app}; Components: db\fbsql demo; Flags: confirmoverwrite
 
-Source: ..\SanteDB\santedb.config.psql.xml; DestDir: {app}; DestName: santedb.config.psql.xml; Components: db\psql
+Source: ..\SanteDB\santedb.config.psql.xml; DestDir: {app}; DestName: santedb.config.psql.xml; Components: db\psql; 
 ; Security AMI stuff
 Source: ..\bin\Release\SanteDB.Core.Model.AMI.dll; DestDir: {app}; Components: msg\ami
 Source: ..\bin\Release\SanteDB.Messaging.AMI.dll; DestDir: {app}; Components: msg\ami
@@ -312,6 +312,42 @@ begin
     ExtractTemporaryFile('vc2010.exe');
     Exec(ExpandConstant('{tmp}\vc2010.exe'), '/install /passive', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
     WizardForm.PreparingLabel.Caption := 'Installing Microsoft .NET Framework 4.8';
-     ExtractTemporaryFile('netfx.exe');
+    ExtractTemporaryFile('netfx.exe');
     Exec(ExpandConstant('{tmp}\netfx.exe'), '/q', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
+
+end;
+
+// Removes the 2.0 Assets which may be present in the installation directory
+procedure Remove20Assets() ;
+var 
+  files : Array [0..7] of string;
+  i : integer;
+begin
+  files[0] := ExpandConstant('{app}\SanteDB.Core.dll');
+  files[1] := ExpandConstant('{app}\SanteGuard.Core.dll');
+  files[2] := ExpandConstant('{app}\SanteGuard.Messaging.Ami.dll');
+  files[3] := ExpandConstant('{app}\SanteGuard.Messaging.Syslog.dll');
+  files[4] := ExpandConstant('{app}\SanteGuard.Persistence.Ado.dll');
+  files[5] := ExpandConstant('{app}\SanteMPI.Messaging.PixPdqv2.dll');
+  files[6] := ExpandConstant('{app}\SanteMPI.Persistence.ADO.dll');
+  
+  if(FileExists(files[1]) and (MsgBox('You appear to have SanteDB 2.0.x plugins which might not be compatible with this version. Would you like to remove them?', mbConfirmation, MB_YESNO) = idYes)) then begin
+    for i :=  0 to 7 do begin
+      if(FileExists(files[i])) then begin
+        try 
+          DeleteFile(files[i]);
+        except 
+          ShowExceptionMessage();
+        end;
+      end; // if
+    end; // for
+  end;
+end;
+
+
+procedure CurPageChanged(CurPageID: Integer);
+begin
+  if((CurPageID = wpInstalling)) then begin
+    Remove20Assets();
+  end;
 end;
