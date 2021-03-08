@@ -20,7 +20,7 @@ using RestSrvr;
 using RestSrvr.Attributes;
 using RestSrvr.Bindings;
 using SanteDB.Core;
-using SanteDB.Core.Api.Security;
+using SanteDB.Core.Security;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interop;
