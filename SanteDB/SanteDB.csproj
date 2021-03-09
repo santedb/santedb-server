@@ -317,9 +317,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="santedb.config.user.fyfej.xml">
+   <!-- <Content Include="santedb.config.user.fyfej.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </Content>-->
     <None Include="data\000-RouteOfAdministration.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
