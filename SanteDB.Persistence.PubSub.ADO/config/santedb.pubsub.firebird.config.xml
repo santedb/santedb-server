@@ -1,0 +1,16 @@
+﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
+  <sections>
+    <add type="SanteDB.Persistence.PubSub.ADO.Configuration.AdoPubSubConfigurationSection, SanteDB.Persistence.PubSub.ADO, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
+  </sections>
+  <section xsi:type="AdoPubSubConfigurationSection"
+    readWriteConnectionString="FirebirdSQL"
+    readOnlyConnectionString="FirebirdSQL"
+    traceSql="false"
+    providerType="FirebirdSQL"
+    staOnly="false"
+    fuzzyTotal="false"
+    autoUpdateExisting="true"
+    autoInsertChildren="true"
+    prepareStatements="true"
+      validationLevel="Warning"/>
+</SanteDBConfiguration>
