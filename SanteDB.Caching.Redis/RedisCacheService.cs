@@ -136,23 +136,25 @@ namespace SanteDB.Caching.Redis
         private void EnsureCacheConsistency(DataCacheEventArgs e, bool remove = false)
         {
             // If someone inserts a relationship directly, we need to unload both the source and target so they are re-loaded 
-            if (e.Object is ActParticipation ptcpt)
+            if (remove)
             {
-                this.Remove(ptcpt.SourceEntityKey.GetValueOrDefault());
-                this.Remove(ptcpt.PlayerEntityKey.GetValueOrDefault());
-                //MemoryCache.Current.RemoveObject(ptcpt.PlayerEntity?.GetType() ?? typeof(Entity), ptcpt.PlayerEntityKey);
+                if (e.Object is ActParticipation ptcpt)
+                {
+                    this.Remove(ptcpt.SourceEntityKey.GetValueOrDefault());
+                    this.Remove(ptcpt.PlayerEntityKey.GetValueOrDefault());
+                    //MemoryCache.Current.RemoveObject(ptcpt.PlayerEntity?.GetType() ?? typeof(Entity), ptcpt.PlayerEntityKey);
+                }
+                else if (e.Object is ActRelationship actrel)
+                {
+                    this.Remove(actrel.SourceEntityKey.GetValueOrDefault());
+                    this.Remove(actrel.TargetActKey.GetValueOrDefault());
+                }
+                else if (e.Object is EntityRelationship entrel)
+                {
+                    this.Remove(entrel.SourceEntityKey.GetValueOrDefault());
+                    this.Remove(entrel.TargetEntityKey.GetValueOrDefault());
+                }
             }
-            else if (e.Object is ActRelationship actrel)
-            {
-                this.Remove(actrel.SourceEntityKey.GetValueOrDefault());
-                this.Remove(actrel.TargetActKey.GetValueOrDefault());
-            }
-            else if (e.Object is EntityRelationship entrel)
-            {
-                this.Remove(entrel.SourceEntityKey.GetValueOrDefault());
-                this.Remove(entrel.TargetEntityKey.GetValueOrDefault());
-            }
-
         }
 
         /// <summary>

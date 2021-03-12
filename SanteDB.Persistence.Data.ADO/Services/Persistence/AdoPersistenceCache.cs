@@ -55,13 +55,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Get cache item
         /// </summary>
-        public TReturn GetCacheItem<TReturn>(Guid key)
+        public TReturn GetCacheItem<TReturn>(Guid key) where TReturn : IdentifiedData
         {
             object candidate = this.m_context.GetCacheCommit(key) ?? this.m_cache?.GetCacheItem(key);
             if (candidate is TReturn)
                 return (TReturn)candidate;
             else
-                return default(TReturn);
+            {
+                return this.m_cache.GetCacheItem(key) as TReturn ?? this.m_cache.GetCacheItem<TReturn>(key);
+            }
         }
 
         /// <summary>
