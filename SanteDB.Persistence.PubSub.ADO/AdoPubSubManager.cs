@@ -653,7 +653,7 @@ namespace SanteDB.Persistence.PubSub.ADO
             if (cache != null)
                 return cache;
             else
-                return this.FindSubscription(o => o.Key == key && o.ObsoletionTime == null, 0, 1, out int _).FirstOrDefault();
+                return this.FindSubscription(o => o.Key == key, 0, 1, out int _).FirstOrDefault();
         }
 
         /// <summary>

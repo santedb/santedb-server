@@ -26,7 +26,7 @@ namespace SanteDB.Persistence.PubSub.ADO.Data.Model
         /// <summary>
         /// Gets or sets the filter
         /// </summary>
-        [Column("filter"), NotNull]
+        [Column("flt"), NotNull]
         public String Filter { get; set; }
     }
 }

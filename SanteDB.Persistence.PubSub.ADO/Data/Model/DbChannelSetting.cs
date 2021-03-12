@@ -32,7 +32,7 @@ namespace SanteDB.Persistence.PubSub.ADO.Data.Model
         /// <summary>
         /// Gets or sets the value
         /// </summary>
-        [Column("value"), NotNull]
+        [Column("val"), NotNull]
         public String Value { get; set; }
 
     }
