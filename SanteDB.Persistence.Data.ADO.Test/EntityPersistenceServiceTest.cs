@@ -79,6 +79,18 @@ namespace SanteDB.Persistence.Data.ADO.Tests
             Assert.IsTrue(afterTest.Names.Exists(o => o.Component.Exists(c => c.Value == "Strawberries")));
         }
 
+        /// <summary>
+        /// Tests the ADO Provider loads the appropriate collection 
+        /// </summary>
+        [Test]
+        public void TestCollectionLoad()
+        {
+            var entity = ApplicationServiceContext.Current.GetService<IRepositoryService<Entity>>().Find(o => o.ObsoletionTime == null, 0, 1, out int _).FirstOrDefault();
+
+            // Should load names
+            Assert.IsNotNull(entity.LoadCollection(o => o.Names));
+            Assert.IsNotNull(entity.LoadProperty(o => o.StatusConcept));
+        }
 
         /// <summary>
         /// Test the insert of an identified entity

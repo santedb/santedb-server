@@ -62,7 +62,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 return (TReturn)candidate;
             else
             {
-                return this.m_cache.GetCacheItem(key) as TReturn ?? this.m_cache.GetCacheItem<TReturn>(key);
+                return this.m_cache?.GetCacheItem(key) as TReturn ?? this.m_cache?.GetCacheItem<TReturn>(key);
             }
         }
 
