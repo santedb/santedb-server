@@ -233,12 +233,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
                         query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
                     }
-
-
                     
                     SqlStatement domainQuery = null;
                     var expr = this.m_settingsProvider.GetMapper().MapModelExpression<TModel, TDomain, bool>(query, false);
-
 
                     // Fast query?
                     if (orderBy?.Length > 0)
@@ -306,7 +303,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                     if (queryId != Guid.Empty && ApplicationServiceContext.Current.GetService<IQueryPersistenceService>() != null)
                     {
-                        var keys = retVal.Keys<Guid>(false).Take(count.Value * 10).ToArray();
+                        var keys = retVal.Keys<Guid>().Take(count.Value * 10).OfType<Guid>().ToArray();
                         totalResults = keys.Length;
                         if(totalResults == count.Value * 10) // result set is larger than 10,000 load in background
                         {
