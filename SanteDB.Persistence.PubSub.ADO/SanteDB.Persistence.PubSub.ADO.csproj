@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>2.1.2</Version>
   </PropertyGroup>
 
   <Choose>
@@ -37,9 +38,28 @@
 
   <ItemGroup>
     <None Remove="Data\Map\ModelMap.xml" />
+    <None Remove="Data\Update\20210311-FBSQL.sql" />
+    <None Remove="Data\Update\20210311-PSQL.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Data\Map\ModelMap.xml" />
+    <EmbeddedResource Include="Data\Update\20210311-FBSQL.sql" />
+    <EmbeddedResource Include="Data\Update\20210311-PSQL.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Data\Update\20210311-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="config\santedb.pubsub.firebird.config.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="config\santedb.pubsub.postgres.config.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

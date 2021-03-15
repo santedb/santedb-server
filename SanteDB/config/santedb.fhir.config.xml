@@ -16,6 +16,7 @@
       <add type="SanteDB.Messaging.FHIR.Handlers.PatientResourceHandler, SanteDB.Messaging.FHIR"/>
       <add type="SanteDB.Messaging.FHIR.Handlers.ImmunizationRecommendationResourceHandler, SanteDB.Messaging.FHIR"/>
       <add type="SanteDB.Messaging.FHIR.Handlers.ImmunizationResourceHandler, SanteDB.Messaging.FHIR"/>
+      <add type="SanteDB.Messaging.FHIR.Handlers.SubscriptionResourceHandler, SanteDB.Messaging.FHIR" />
     </resourceHandlers>
     <!-- Sets the base path for reverse proxies -->
     <base>http://localhost:8080/fhir</base>
