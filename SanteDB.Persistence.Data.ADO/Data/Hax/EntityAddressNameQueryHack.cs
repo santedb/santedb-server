@@ -70,17 +70,12 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
                 return false;
 
             // Pop the last statement off
-            var fromClause = sqlStatement.RemoveLast();
+           // var fromClause = sqlStatement.RemoveLast();
 
             var subQueryAlias = $"{queryPrefix}{scopedTables.First().TableName}";
 
-            // Now we want to select
-            sqlStatement.Append("FROM (").Append($"SELECT {subQueryAlias}.*, count(cmp_id) over (partition by {keyName}) ncomponent").Append(fromClause);
-            sqlStatement.Append($" LEFT JOIN {cmpTblType} AS {queryPrefix}{cmpTblType} USING ({keyName}) ");
-            sqlStatement.Append($" LEFT JOIN {valTblType} AS {queryPrefix}{valTblType} USING (val_seq_id) ");
-            sqlStatement.Where("(");
-            // Filter through other name or address components which may be in the query at this query level
-            int vCount = 0;
+            whereClause.Append($"{subQueryAlias}.{keyName} IN (");
+
             foreach (var itm in queryFilter)
             {
                 var pred = QueryPredicate.Parse(itm.Key);
@@ -96,7 +91,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
                     if (guards.Any(o => o == null)) return false;
 
                     // Add to where clause
-                   guardFilter = $"AND {queryPrefix}{cmpTblType}.typ_cd_id IN ({String.Join(",", guards.Select(o => $"'{o}'"))})";
+                    guardFilter = $"AND {queryPrefix}{cmpTblType}.typ_cd_id IN ({String.Join(",", guards.Select(o => $"'{o}'"))})";
                 }
 
                 // Filter on the component value
@@ -104,22 +99,21 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
                 if (value is String)
                     value = new List<Object>() { value };
                 var qValues = value as List<Object>;
-                vCount++;
 
                 // Filter based on type and prefix :)
-                sqlStatement.Append("(")
-                        .Append(builder.CreateSqlPredicate($"{queryPrefix}{valTblType}", "val", componentType.GetProperty("Value"), qValues))
-                        .Append(guardFilter)
-                        .Append(")")
-                        .Append(" OR ");
+                whereClause
+                        .Append($" SELECT {queryPrefix}{cmpTblType}.{keyName} ")
+                            .Append($" FROM {cmpTblType} AS {queryPrefix}{cmpTblType} ")
+                            .Append(" WHERE ")
+                            .Append($" val_seq_id IN (SELECT val_seq_id FROM {valTblType} WHERE ")
+                            .Append(builder.CreateSqlPredicate($"{valTblType}", "val", componentType.GetProperty("Value"), qValues))
+                            .Append(") ")
+                            .Append(guardFilter)
+                            .Append(" INTERSECT ");
             }
-
-            sqlStatement.RemoveLast();
-            sqlStatement.Append(")");
-            sqlStatement.And("obslt_vrsn_seq_id IS NULL").Append($") AS {subQueryAlias} ");
-
-            // Append the where clause
-            whereClause.And($" {subQueryAlias}.ncomponent = {vCount}");
+            whereClause.RemoveLast();
+            whereClause.Append($") ");
+            whereClause.And($"{subQueryAlias}.obslt_vrsn_seq_id IS NULL");
 
             return true;
         }

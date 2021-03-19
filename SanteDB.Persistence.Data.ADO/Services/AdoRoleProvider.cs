@@ -33,6 +33,7 @@ using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Security;
 using System.Security.Principal;
+using SanteDB.Core.Exceptions;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -69,7 +70,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Adds the specified users to the specified roles
         /// </summary>
-        public void AddUsersToRoles(string[] users,  string[] roles, IPrincipal principal)
+        public void AddUsersToRoles(string[] users, string[] roles, IPrincipal principal)
         {
             this.VerifyPrincipal(principal, PermissionPolicyIdentifiers.AlterRoles);
 
@@ -81,38 +82,29 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     dataContext.Open();
                     using (var tx = dataContext.BeginTransaction())
                     {
-                        try
+                        foreach (var un in users)
                         {
-                            foreach (var un in users)
+                            DbSecurityUser user = dataContext.SingleOrDefault<DbSecurityUser>(u => u.UserName.ToLower() == un.ToLower());
+                            if (user == null)
+                                throw new KeyNotFoundException(String.Format("Could not locate user {0}", un));
+                            foreach (var rol in roles)
                             {
-                                DbSecurityUser user = dataContext.SingleOrDefault<DbSecurityUser>(u => u.UserName.ToLower() == un.ToLower());
-                                if (user == null)
-                                    throw new KeyNotFoundException(String.Format("Could not locate user {0}", un));
-                                foreach (var rol in roles)
+                                DbSecurityRole role = dataContext.SingleOrDefault<DbSecurityRole>(r => r.Name == rol);
+                                if (role == null)
+                                    throw new KeyNotFoundException(String.Format("Could not locate role {0}", rol));
+                                if (!dataContext.Any<DbSecurityUserRole>(o => o.RoleKey == role.Key && o.UserKey == user.Key))
                                 {
-                                    DbSecurityRole role = dataContext.SingleOrDefault<DbSecurityRole>(r => r.Name == rol);
-                                    if (role == null)
-                                        throw new KeyNotFoundException(String.Format("Could not locate role {0}", rol));
-                                    if (!dataContext.Any<DbSecurityUserRole>(o => o.RoleKey == role.Key && o.UserKey == user.Key))
-                                    {
-                                        // Insert
-                                        dataContext.Insert(new DbSecurityUserRole() { UserKey = user.Key, RoleKey = role.Key });
-                                    }
+                                    // Insert
+                                    dataContext.Insert(new DbSecurityUserRole() { UserKey = user.Key, RoleKey = role.Key });
                                 }
                             }
-                            tx.Commit();
                         }
-                        catch
-                        {
-                            tx.Rollback();
-                            throw;
-                        }
+                        tx.Commit();
                     }
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error adding {0} to {1} : {2}", String.Join(",", users), String.Join(",", roles), e);
-                    throw;
+                    throw new DataPersistenceException("Error inserting users into roles", e);
                 }
             }
         }
@@ -134,8 +126,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     dataContext.EstablishProvenance(principal, null);
                     using (var tx = dataContext.BeginTransaction())
                     {
-                        try
-                        {
+                       
                             DbSecurityUser user = dataContext.SingleOrDefault<DbSecurityUser>(u => u.UserName.ToLower() == principal.Identity.Name.ToLower());
 
                             // Insert
@@ -145,18 +136,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 Name = roleName
                             });
                             tx.Commit();
-                        }
-                        catch
-                        {
-                            tx.Rollback();
-                            throw;
-                        }
+                        
                     }
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error creating role {0} : {1}", roleName, e);
-                    throw;
+                    throw new DataPersistenceException($"Error creating new role {roleName}", e);
+
                 }
             }
 
@@ -184,8 +170,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error finding users for role {0} : {1}", role, e);
-                    throw;
+                    throw new DataPersistenceException($"Error searching role {role}", e);
                 }
             }
         }
@@ -204,8 +189,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error executing GetAllRoles() : {0}", e);
-                    throw;
+                    throw new DataPersistenceException("Error retrieving roles", e);
                 }
         }
 
@@ -232,8 +216,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error executing getting roles for {0} : {1}", userName, e);
-                    throw;
+                    throw new DataPersistenceException($"Error fetching roles for {userName}",e);
                 }
             }
         }
@@ -268,8 +251,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error determining role membership of user {0} in {1} : {2}", userName, roleName, e);
-                    throw;
+                    throw new DataPersistenceException($"Error determining role membership between {userName} and {roleName}");
                 }
             }
         }
@@ -287,8 +269,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     dataContext.Open();
                     using (var tx = dataContext.BeginTransaction())
                     {
-                        try
-                        {
+                       
                             foreach (var un in users)
                             {
                                 DbSecurityUser user = dataContext.SingleOrDefault<DbSecurityUser>(u => u.UserName.ToLower() == un.ToLower());
@@ -305,19 +286,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 }
                             }
                             tx.Commit();
-                        }
-                        catch
-                        {
-                            tx.Rollback();
-                            throw;
-                        }
+                       
 
                     }
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error removing {0} from {1} : {2}", String.Join(",", users), String.Join(",", roles), e);
-                    throw;
+                    throw new DataPersistenceException($"Error removing users from specified roles", e);
                 }
         }
     }

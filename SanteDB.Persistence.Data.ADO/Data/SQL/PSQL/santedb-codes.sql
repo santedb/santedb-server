@@ -1,10 +1,10 @@
 ﻿/** 
- * <feature id="0-002" scope="SanteDB.Persistence.Data.ADO" name="Core Codes" invariantName="npgsql">
- *	<summary>Install Core Codes</summary>
- *	<remarks>Install the core concept dictionary for SanteDB</remarks>
- *	<isInstalled>SELECT COUNT(1) > 0 FROM CD_TBL WHERE CD_ID = 'a87a6d21-2ca6-4aea-88f3-6135cceb58d1'</isInstalled>
+ * <feature scope="SanteDB.Persistence.Data.ADO" id="00010000-02" name="Initialize:001-02" invariantName="npgsql">
+ *	<summary>Core concept dictionary</summary>
+ *	<remarks>This script installs the necessary core concept dictionary into SanteDB</remarks>
+ *  <isInstalled mustSucceed="true">SELECT COUNT(CD_ID) = 1 FROM CD_TBL WHERE CD_ID = 'a87a6d21-2ca6-4aea-88f3-6135cceb58d1';</isInstalled>
  * </feature>
- */-- Concepts
+ */
 INSERT INTO CD_TBL VALUES('a87a6d21-2ca6-4aea-88f3-6135cceb58d1',TRUE);
 INSERT INTO CD_TBL VALUES('c8064cbd-fa06-4530-b430-1a52f1530c27',TRUE);
 INSERT INTO CD_TBL VALUES('bdef5f90-5497-4f26-956c-8f818cce2bd2',TRUE);

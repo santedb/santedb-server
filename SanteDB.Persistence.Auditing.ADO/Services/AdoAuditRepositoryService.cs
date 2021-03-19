@@ -42,6 +42,7 @@ using System.Diagnostics.Tracing;
 using SanteDB.BI.Services;
 using SanteDB.BI.Model;
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.OrmLite.Migration;
 
 namespace SanteDB.Persistence.Auditing.ADO.Services
 {
@@ -120,6 +121,9 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             {
                 ApplicationServiceContext.Current.Started += (o, e) =>
                 {
+
+                    using (var context = this.m_configuration.Provider.GetWriteConnection())
+                        context.UpgradeSchema("SanteDB.Persistence.Audit.ADO");
 
                     // Add audits as a BI data source
                     ApplicationServiceContext.Current.GetService<IBiMetadataRepository>()

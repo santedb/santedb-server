@@ -205,8 +205,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             sw.Start();
 #endif
 
+            // Query has been registered?
+            if (queryId != Guid.Empty && this.m_queryPersistence?.IsRegistered(queryId) == true)
+                return this.GetStoredQueryResults(queryId, offset, count, out totalResults);
+
+
             // Queries to be performed
-            OrmResultSet<CompositeResult<TDomain, TDomainKey>> retVal = null;
+            IOrmResultSet retVal = null;
             Expression<Func<TModel, bool>>[] queries = new Expression<Func<TModel, bool>>[] { primaryQuery };
             // Are we intersecting?
             if (context.Data.TryGetValue("UNION", out object others) &&
@@ -228,33 +233,52 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
                         query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
                     }
-
-
-                    // Query has been registered?
-                    if (queryId != Guid.Empty && this.m_queryPersistence?.IsRegistered(queryId) == true)
-                        return this.GetStoredQueryResults(queryId, offset, count, out totalResults);
-
+                    
                     SqlStatement domainQuery = null;
                     var expr = this.m_settingsProvider.GetMapper().MapModelExpression<TModel, TDomain, bool>(query, false);
-                    if (expr != null)
-                        domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(typeof(TDomain), typeof(TDomainKey))
-                            .InnerJoin<TDomain, TDomainKey>(o => o.Key, o => o.Key)
-                            .Where<TDomain>(expr).Build();
-                    else
-                        domainQuery = this.m_settingsProvider.GetQueryBuilder().CreateQuery(query).Build();
 
-                    // Create or extend queries
-                    if (retVal == null)
-                        retVal = this.DomainQueryInternal<CompositeResult<TDomain, TDomainKey>>(context, domainQuery);
+                    // Fast query?
+                    if (orderBy?.Length > 0)
+                    {
+                        if (expr != null)
+                            domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(typeof(TDomain), typeof(TDomainKey))
+                                .InnerJoin<TDomain, TDomainKey>(o => o.Key, o => o.Key)
+                                .Where<TDomain>(expr).Build();
+                        else
+                            domainQuery = this.m_settingsProvider.GetQueryBuilder().CreateQuery(query).Build();
+
+                        // Create or extend queries
+                        if (retVal == null)
+                            retVal = this.DomainQueryInternal<CompositeResult<TDomain, TDomainKey>>(context, domainQuery);
+                        else
+                            retVal = retVal.Union(this.DomainQueryInternal<CompositeResult<TDomain, TDomainKey>>(context, domainQuery));
+                    }
                     else
-                        retVal = retVal.Union(this.DomainQueryInternal<CompositeResult<TDomain, TDomainKey>>(context, domainQuery));
+                    {
+                        var linkCol = TableMapping.Get(typeof(TDomain)).GetColumn(typeof(TDomain).GetProperty(nameof(DbIdentified.Key)));
+                        var versionSeqCol = TableMapping.Get(typeof(TDomain)).GetColumn(typeof(TDomain).GetProperty(nameof(DbVersionedData.VersionSequenceId)));
+                        if (expr != null)
+                            domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(linkCol, versionSeqCol)
+                                .InnerJoin<TDomain, TDomainKey>(o => o.Key, o => o.Key)
+                                .Where<TDomain>(expr).Build();
+                        else
+                            domainQuery = this.m_settingsProvider.GetQueryBuilder().CreateQuery(query, linkCol, versionSeqCol).Build();
+
+                        // Create or extend queries
+                        if (retVal == null)
+                            retVal = this.DomainQueryInternal<Guid>(context, domainQuery);
+                        else
+                            retVal = retVal.Union(this.DomainQueryInternal<Guid>(context, domainQuery));
+                    }
+
+                    
                 }
 
                 // HACK: More than one query which indicates union was used, we need to wrap in a select statement to be adherent to SQL standard on Firebird and PSQL
                 if (queries.Count() > 1)
                 {
                     var query = this.AppendOrderBy(context.CreateSqlStatement("SELECT * FROM (").Append(retVal.ToSqlStatement()).Append(") AS domain_query "), orderBy);
-                    retVal = this.DomainQueryInternal<CompositeResult<TDomain, TDomainKey>>(context, query);
+                    retVal = this.DomainQueryInternal<Guid>(context, query);
                 }
                 else
                 {
@@ -279,23 +303,28 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                     if (queryId != Guid.Empty && ApplicationServiceContext.Current.GetService<IQueryPersistenceService>() != null)
                     {
-                        var keys = retVal.Keys<Guid>(false).Take(count.Value * 10).ToArray();
-                        totalResults = keys.Count();
-                        if(totalResults == 5000) // result set is larger than 10,000 load in background
+                        var keys = retVal.Keys<Guid>().Take(count.Value * 20).OfType<Guid>().ToArray();
+                        totalResults = keys.Length;
+                        this.m_queryPersistence?.RegisterQuerySet(queryId, keys, queries, totalResults);
+                        if (totalResults == count.Value * 20) // result set is larger than 10,000 load in background
                         {
                             ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(o =>
                             {
                                 var dynParm = o as dynamic;
                                 var subContext = dynParm.Context as DataContext;
                                 var statement = dynParm.Statement as SqlStatement;
+                                var type = dynParm.Type as Type;
                                 var qid = (Guid)dynParm.QueryId;
 
                                 // Get the rest of the keys
-                                var sk = subContext.Query<CompositeResult<TDomain, TDomainKey>>(statement).Keys<Guid>(false).ToArray();
+                                Guid[] sk = null;
+                                if(type == typeof(OrmResultSet<Guid>))
+                                    sk = subContext.Query<Guid>(statement).ToArray();
+                                else
+                                    sk = subContext.Query<CompositeResult<TDomain, TDomainKey>>(statement).Keys<Guid>(false).ToArray();
                                 this.m_queryPersistence?.RegisterQuerySet(queryId, sk, statement, sk.Length);
-                            }, new { Context = context.OpenClonedContext(), Statement = retVal.Statement.Build(), QueryId = queryId });
+                            }, new { Context = context.OpenClonedContext(), Statement = retVal.Statement.Build(), QueryId = queryId, Type = retVal.GetType() });
                         }
-                        this.m_queryPersistence?.RegisterQuerySet(queryId, keys, queries, totalResults);
                         return keys.Skip(offset).Take(count.Value).OfType<Object>();
                     }
                     else if (count.HasValue && countResults && !overrideFuzzyTotalSetting && !this.m_settingsProvider.GetConfiguration().UseFuzzyTotals)
@@ -308,8 +337,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     {
                         if ((overrideFuzzyTotalSetting || this.m_settingsProvider.GetConfiguration().UseFuzzyTotals) && totalResults == 0)
                         {
-                            var fuzzResults = retVal.Skip(offset).Take(count.Value * 2).OfType<Object>().ToList();
-                            totalResults = fuzzResults.Count();
+                            var fuzzResults = retVal.Skip(offset).Take(count.Value + 1).OfType<Object>().ToList();
+                            totalResults = fuzzResults.Count() + offset;
                             return fuzzResults.Take(count.Value);
                         }
                         else // We already counted as part of the queryId so no need to take + 1
@@ -327,12 +356,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                 throw new DataPersistenceException("Error executing query" , ex);
             }
-#if DEBUG
             finally
             {
+#if DEBUG
                 sw.Stop();
-            }
+              //  this.m_tracer.TraceVerbose("Query {0} in {1} ms", context.GetQueryLiteral(retVal.ToSqlStatement()), sw.ElapsedMilliseconds);
 #endif
+            }
 
         }
 
@@ -380,7 +410,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
 
                 var cacheItem = ApplicationServiceContext.Current.GetService<IDataCachingService>()?.GetCacheItem<TModel>(containerId) as TModel;
-                if (cacheItem != null && (cacheItem.VersionKey.HasValue && versionId == cacheItem.VersionKey.Value || versionId == Guid.Empty) &&
+                if (cacheItem != null && (cacheItem.VersionKey.HasValue && versionId == cacheItem.VersionKey.Value || versionId.GetValueOrDefault() == Guid.Empty) &&
                     (loadFast && cacheItem.LoadState >= LoadState.PartialLoad || !loadFast && cacheItem.LoadState == LoadState.FullLoad))
                     return cacheItem;
             }
