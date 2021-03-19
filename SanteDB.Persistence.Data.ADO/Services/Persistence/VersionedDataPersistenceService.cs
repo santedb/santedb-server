@@ -303,9 +303,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                     if (queryId != Guid.Empty && ApplicationServiceContext.Current.GetService<IQueryPersistenceService>() != null)
                     {
-                        var keys = retVal.Keys<Guid>().Take(count.Value * 10).OfType<Guid>().ToArray();
+                        var keys = retVal.Keys<Guid>().Take(count.Value * 20).OfType<Guid>().ToArray();
                         totalResults = keys.Length;
-                        if(totalResults == count.Value * 10) // result set is larger than 10,000 load in background
+                        this.m_queryPersistence?.RegisterQuerySet(queryId, keys, queries, totalResults);
+                        if (totalResults == count.Value * 20) // result set is larger than 10,000 load in background
                         {
                             ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(o =>
                             {
@@ -324,7 +325,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 this.m_queryPersistence?.RegisterQuerySet(queryId, sk, statement, sk.Length);
                             }, new { Context = context.OpenClonedContext(), Statement = retVal.Statement.Build(), QueryId = queryId, Type = retVal.GetType() });
                         }
-                        this.m_queryPersistence?.RegisterQuerySet(queryId, keys, queries, totalResults);
                         return keys.Skip(offset).Take(count.Value).OfType<Object>();
                     }
                     else if (count.HasValue && countResults && !overrideFuzzyTotalSetting && !this.m_settingsProvider.GetConfiguration().UseFuzzyTotals)

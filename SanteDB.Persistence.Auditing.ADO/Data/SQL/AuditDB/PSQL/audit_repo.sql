@@ -1,7 +1,10 @@
-﻿/**
- * CREATION SCRIPT FOR AUDIT REPOSITORY 
- *
- * A SIMPLE AUDIT REPOSITORY SERVICE FOR STORING BASIC INFORMATION ABOUT AUDITS
+﻿/** 
+ * <feature scope="SanteDB.Persistence.Audit.ADO" id="00010000-00" name="Initialize:001-01" invariantName="npgsql">
+ *	<summary>Installs the core schema for SanteDB Audit Repository</summary>
+ *	<remarks>This script installs the necessary core schema files for SanteDB</remarks>
+ *	<canInstall>SELECT to_regclass('public.aud_cd_tbl') IS NULL;</canInstall>
+ *  <isInstalled mustSucceed="true">SELECT to_regclass('public.aud_cd_tbl') IS NOT NULL;</isInstalled>
+ * </feature>
  */
 
  CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

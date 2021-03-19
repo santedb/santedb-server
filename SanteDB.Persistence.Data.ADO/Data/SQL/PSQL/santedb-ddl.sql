@@ -1,9 +1,9 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data.ADO" name="Core Schema" id="0-001" invariantName="npgsql">
- *	<summary>Install Schema</summary>
- *	<remarks>Install the core SanteDB data structures</remarks>
- *	<isInstalled>SELECT COUNT(1) > 0 FROM SEC_USR_TBL</isInstalled>
- *	<url>https://help.santesuite.org/ops/santedb/rim</url>
+ * <feature scope="SanteDB.Persistence.Data.ADO" id="00010000-00" name="Initialize:001-01" invariantName="npgsql">
+ *	<summary>Installs the core schema for SanteDB</summary>
+ *	<remarks>This script installs the necessary core schema files for SanteDB</remarks>
+ *	<canInstall>SELECT to_regclass('public.sec_usr_tbl') IS NULL;</canInstall>
+ *  <isInstalled mustSucceed="true">SELECT to_regclass('public.sec_usr_tbl') IS NOT NULL;</isInstalled>
  * </feature>
  */
 -- CREATE EXTENSIONS

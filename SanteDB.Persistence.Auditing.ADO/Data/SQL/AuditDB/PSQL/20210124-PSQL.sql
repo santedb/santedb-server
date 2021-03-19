@@ -1,4 +1,12 @@
-﻿create sequence aud_meta_seq start with 1 increment by 1;
+﻿/** 
+ * <feature scope="SanteDB.Persistence.Audit.ADO" id="20210124-00" name="Initialize:20210124-01" invariantName="npgsql">
+ *	<summary>Upgrades audit schema to optimize for large datasets</summary>
+ *	<remarks>This script installs the necessary core schema files for SanteDB audit</remarks>
+ *	<canInstall>SELECT to_regclass('public.aud_meta_val_cdtbl') IS NULL;</canInstall>
+ *  <isInstalled mustSucceed="true">SELECT to_regclass('public.aud_meta_val_cdtbl') IS NOT NULL;</isInstalled>
+ * </feature>
+ */
+create sequence aud_meta_seq start with 1 increment by 1;
 create sequence aud_act_seq start with 1 increment by 1;
 create sequence aud_act_assoc_seq start with 1 increment by 1;
 create sequence aud_obj_seq start with 1 increment by 1;

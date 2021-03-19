@@ -483,14 +483,6 @@
       <Project>{a3975c6f-4fdb-43be-81ab-3357b86173f1}</Project>
       <Name>SanteDB.Authentication.OAuth2</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Caching.Memory\SanteDB.Caching.Memory.csproj">
-      <Project>{8553abc7-abfa-4a21-b0e8-68b7de76129d}</Project>
-      <Name>SanteDB.Caching.Memory</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Caching.Redis\SanteDB.Caching.Redis.csproj">
-      <Project>{86672094-25cc-4cd5-b085-240e50ec4a5e}</Project>
-      <Name>SanteDB.Caching.Redis</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Configuration\SanteDB.Configuration.csproj">
       <Project>{032abf00-6c76-47c7-9eca-a840915a17ea}</Project>
       <Name>SanteDB.Configuration</Name>
