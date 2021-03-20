@@ -21,6 +21,7 @@ using SanteDB.Core.Data;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.EntityLoader;
+using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl;
 using SanteDB.Server.Core.Services.Impl;
 using System;
@@ -43,7 +44,7 @@ namespace SanteDB.Server
         /// <summary>
         /// Helper function to start the services
         /// </summary>
-        public static int Start(Guid activityId, String configFile)
+        public static int Start(Guid activityId, IConfigurationManager configManager)
         {
             Trace.CorrelationManager.ActivityId = activityId;
             Trace.TraceInformation("Starting host context on Console Presentation System at {0}", DateTime.Now);
@@ -68,7 +69,7 @@ namespace SanteDB.Server
             {
                 // Initialize 
                 ApplicationServiceContext.Current = ServerApplicationContext.Current;
-                ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(new FileConfigurationService(configFile));
+                ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(configManager);
                 EntitySource.Current = new EntitySource(new PersistenceEntitySource());
 
                 Trace.TraceInformation("Getting default message handler service.");

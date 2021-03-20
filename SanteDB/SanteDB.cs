@@ -17,6 +17,7 @@
  * Date: 2019-11-27
  */
 using SanteDB.Server;
+using SanteDB.Server.Core.Services.Impl;
 using System.ServiceProcess;
 
 namespace SanteDB
@@ -43,7 +44,7 @@ namespace SanteDB
 		/// <param name="args">Data passed by the start command.</param>
 		protected override void OnStart(string[] args)
 		{
-			ExitCode = ServiceUtil.Start(typeof(Program).GUID, string.Empty);
+			ExitCode = ServiceUtil.Start(typeof(Program).GUID, new FileConfigurationService(null));
 			if (ExitCode != 0)
 				Stop();
 		}
