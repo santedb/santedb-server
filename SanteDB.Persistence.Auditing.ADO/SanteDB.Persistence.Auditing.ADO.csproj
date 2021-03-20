@@ -62,9 +62,9 @@
     <None Include="Data\SQL\AuditDB\FBSQL\audit_repo.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Data\SQL\AuditDB\PSQL\audit_repo.sql">
+    <EmbeddedResource Include="Data\SQL\AuditDB\PSQL\audit_repo.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Jobs\" />
@@ -130,9 +130,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Data\SQL\AuditDB\FBSQL\20210130-FBSQL.sql" />
-    <Content Include="Data\SQL\AuditDB\PSQL\20210124-PSQL.sql">
+    <EmbeddedResource Include="Data\SQL\AuditDB\PSQL\20210124-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

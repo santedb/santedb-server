@@ -2,7 +2,6 @@
  * <feature scope="SanteDB.Persistence.Data.ADO" id="00010000-00" name="Initialize:001-01" invariantName="npgsql">
  *	<summary>Installs the core schema for SanteDB</summary>
  *	<remarks>This script installs the necessary core schema files for SanteDB</remarks>
- *	<canInstall>SELECT to_regclass('public.sec_usr_tbl') IS NULL;</canInstall>
  *  <isInstalled mustSucceed="true">SELECT to_regclass('public.sec_usr_tbl') IS NOT NULL;</isInstalled>
  * </feature>
  */
