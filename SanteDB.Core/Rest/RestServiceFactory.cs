@@ -75,7 +75,7 @@ namespace SanteDB.Server.Core.Rest
         {
             var retVal = ServiceEndpointCapabilities.None;
             // Any of the capabilities are for security?
-            if (me.ServiceBehaviors.OfType<TokenAuthorizationAccessBehavior>().Any())
+            if (me.ServiceBehaviors.OfType<SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior>().Any())
                 retVal |= ServiceEndpointCapabilities.BearerAuth;
             if (me.ServiceBehaviors.OfType<BasicAuthorizationAccessBehavior>().Any())
                 retVal |= ServiceEndpointCapabilities.BasicAuth;

@@ -105,9 +105,5 @@ namespace SanteDB.Server.Core
         public static readonly Guid MemoryUseCounter = new Guid("9E77D692-1F71-4442-BDA1-056D3DB1A487");
 
 
-        /// <summary>
-        /// Gets the session property name
-        /// </summary>
-        public const string RestPropertyNameSession = "Session";
     }
 }

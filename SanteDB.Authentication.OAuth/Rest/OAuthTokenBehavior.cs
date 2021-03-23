@@ -483,7 +483,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         public object Session()
         {
-            new TokenAuthorizationAccessBehavior().Apply(new RestRequestMessage(RestOperationContext.Current.IncomingRequest)); ;
+            new SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior().Apply(new RestRequestMessage(RestOperationContext.Current.IncomingRequest)); ;
             var principal = Core.Security.AuthenticationContext.Current.Principal as IClaimsPrincipal;
 
             if (principal != null)
@@ -499,7 +499,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 {
                     DateTime notBefore = DateTime.Parse(principal.FindFirst(SanteDBClaimTypes.AuthenticationInstant).Value), notAfter = DateTime.Parse(principal.FindFirst(SanteDBClaimTypes.Expiration).Value);
 
-                    var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDBConstants.RestPropertyNameSession] as ISession);
+                    var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior.RestPropertyNameSession] as ISession);
                     return new OAuthTokenResponse()
                     {
                         AccessToken = RestOperationContext.Current.IncomingRequest.Headers["Authorization"].Split(' ')[1],
@@ -835,7 +835,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         public Stream UserInfo()
         {
-            new TokenAuthorizationAccessBehavior().Apply(new RestRequestMessage(RestOperationContext.Current.IncomingRequest)); ;
+            new SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior().Apply(new RestRequestMessage(RestOperationContext.Current.IncomingRequest)); ;
             var principal = Core.Security.AuthenticationContext.Current.Principal as IClaimsPrincipal;
 
             if (principal != null)
@@ -844,7 +844,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     throw new SecurityException("No Such Session");
                 else
                 {
-                    var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDBConstants.RestPropertyNameSession] as ISession);
+                    var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior.RestPropertyNameSession] as ISession);
                     return new MemoryStream(Encoding.UTF8.GetBytes(jwt.Payload.SerializeToJson()));
                 }
             }
