@@ -366,11 +366,12 @@ namespace SanteDB.Authentication.OAuth2.Rest
             var appid = claims.Find(o => o.Type == SanteDBClaimTypes.SanteDBApplicationIdentifierClaim).Value;
 
             // Signing credentials for the application
+            // TODO: Expose this as a configuration option - which key to use other than default
             var signingCredentials = SecurityUtils.CreateSigningCredentials($"SA.{appid}");
 
             // Was there a signing credentials provided for this application? If so, then create for default
             if(signingCredentials == null)
-                signingCredentials = SecurityUtils.CreateSigningCredentials(null); // attempt to get default
+                signingCredentials = SecurityUtils.CreateSigningCredentials(this.m_configuration.JwtSigningKey); // attempt to get default
 
             // Is the default an HMAC256 key? 
             if ((signingCredentials == null ||
@@ -799,7 +800,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 var retVal = new OpenIdConfiguration();
 
                 // mex configuration
-                var mexConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RestConfigurationSection>();
+                var mexConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SanteDB.Rest.Common.Configuration.RestConfigurationSection>();
                 String boundHostPort = $"{RestOperationContext.Current.IncomingRequest.Url.Scheme}://{RestOperationContext.Current.IncomingRequest.Url.Host}:{RestOperationContext.Current.IncomingRequest.Url.Port}";
                 if (!String.IsNullOrEmpty(mexConfig.ExternalHostPort))
                 {

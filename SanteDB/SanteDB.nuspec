@@ -57,6 +57,7 @@
     <file src="..\bin\$configuration$\icuin52.dll" target="build\"/>
     <file src="..\bin\$configuration$\icuuc52.dll" target="build\"/>
     <file src="..\bin\$configuration$\plugins\engine12.dll" target="build\plugins"/>
+    <file src="..\bin\$configuration$\data\*.dataset" target="build\data"/>
     <file src="SanteDB.Server.targets" target="Build\" />
   </files>
 </package>

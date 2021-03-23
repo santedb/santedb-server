@@ -54,3 +54,6 @@
 [submodule "santedb-cache-redis"]
 	path = santedb-cache-redis
 	url = https://github.com/santedb/santedb-cache-redis
+[submodule "santedb-docker"]
+	path = santedb-docker
+	url = https://github.com/santedb/santedb-docker

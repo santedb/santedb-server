@@ -17,6 +17,9 @@
       <Link>%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="$(MSBuildThisFileDirectory)\data\*.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="$(MSBuildThisFileDirectory)SanteDB.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

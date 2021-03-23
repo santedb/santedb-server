@@ -42,17 +42,12 @@ namespace SanteDB.Server.Core.Rest.Security
     public class TokenAuthorizationAccessBehavior : IServicePolicy, IServiceBehavior
     {
 
-        // Configuration from main SanteDB
-        private ClaimsAuthorizationConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<ClaimsAuthorizationConfigurationSection>();
-
         // Trace source
         private Tracer m_traceSource = new Tracer(SanteDBConstants.SecurityTraceSourceName);
 
         /// <summary>
         /// Checks bearer access token
         /// </summary>
-        /// <param name="operationContext">The operation context within which the access token should be validated</param>
-        /// <param name="authorization">The authorization data </param>
         /// <returns>True if authorization is successful</returns>
         private void CheckBearerAccess(string authorizationToken)
         {
@@ -71,37 +66,6 @@ namespace SanteDB.Server.Core.Rest.Security
             SanteDB.Core.Security.AuthenticationContext.Current = new SanteDB.Core.Security.AuthenticationContext(principal);
 
             this.m_traceSource.TraceInfo("User {0} authenticated via SESSION BEARER", principal.Identity.Name);
-        }
-
-        /// <summary>
-        /// Validates the authorization header as a JWT token
-        /// </summary>
-        /// <param name="operationContext">The operation context within which this should be checked</param>
-        /// <param name="authorization">The authorization data</param>
-        /// <returns>True when authorization is successful</returns>
-        private void CheckJwtAccess(string authorizationToken)
-        {
-            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-
-            if (!handler.CanReadToken(authorizationToken))
-                throw new SecurityTokenException("Token is not in a valid format");
-
-            SecurityToken token = null;
-            var identities = handler.ValidateToken(authorizationToken, this.m_configuration?.ToConfigurationObject(), out token);
-
-            // Validate token expiry
-            if (token.ValidTo < DateTime.Now.ToUniversalTime())
-                throw new SecurityTokenException("Token expired");
-            else if (token.ValidFrom > DateTime.Now.ToUniversalTime())
-                throw new SecurityTokenException("Token not yet valid");
-
-            // Copy to a SanteDBClaimsId
-            SanteDB.Core.Security.AuthenticationContext.Current = new SanteDB.Core.Security.AuthenticationContext(new SanteDBClaimsPrincipal(
-                new SanteDBClaimsIdentity(identities.Identity.Name, identities.Identity.IsAuthenticated, identities.Identity.AuthenticationType, identities.Claims.Select(o=>new SanteDBClaim(o.Type, o.Value)))
-            ));
-
-            this.m_traceSource.TraceInfo("User {0} authenticated via JWT", identities.Identity.Name);
-            
         }
 
         /// <summary>
@@ -135,9 +99,6 @@ namespace SanteDB.Server.Core.Rest.Security
                 {
                     case "bearer":
                         this.CheckBearerAccess(auth[1]);
-                        break;
-                    case "urn:ietf:params:oauth:token-type:jwt": // Will use JWT authorization
-                        this.CheckJwtAccess(auth[1]);
                         break;
                     default:
                         throw new SecurityTokenException("Invalid authentication scheme");

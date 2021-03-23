@@ -68,17 +68,14 @@
     <Compile Include="Configuration\FileSystemNotificationTemplateConfigurationSection.cs" />
     <Compile Include="Configuration\FileSystemQueueConfigurationSection.cs" />
     <Compile Include="Configuration\AppletConfigurationSection.cs" />
-    <Compile Include="Configuration\RestBehaviorConfiguration.cs" />
     <Compile Include="Configuration\RestConfigurationSection.cs" />
-    <Compile Include="Configuration\RestEndpointConfiguration.cs" />
-    <Compile Include="Configuration\RestServiceConfiguration.cs" />
     <Compile Include="Configuration\SecurityPolicyConfiguration.cs" />
     <Compile Include="Configuration\Features\WindowsServiceFeature.cs" />
     <Compile Include="Diagnostics\ConsoleTraceWriter.cs" />
     <Compile Include="Diagnostics\RolloverTextWriterTraceWriter.cs" />
     <Compile Include="Diagnostics\SystemDiagnosticsTraceWriter.cs" />
+    <Compile Include="Docker\SecurityFeature.cs" />
     <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="Configuration\ClaimsAuthorizationConfigurationSection.cs" />
     <Compile Include="Configuration\SecurityConfigurationSection.cs" />
     <Compile Include="Http\DefaultRestClient.cs" />
     <Compile Include="Model\ModelExtensions.cs" />
@@ -189,6 +186,7 @@
           <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
           <Name>SanteDB.Core.Api</Name>
         </ProjectReference>
+        <ProjectReference Include=".\..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj" />
       </ItemGroup>
     </When>
     <Otherwise>
@@ -197,6 +195,7 @@
         <PackageReference Include="SanteDB.Core.Api" Version="2.1.3.0" />
         <PackageReference Include="SanteDB.Core.Applets" Version="2.1.3.0" />
         <PackageReference Include="SanteDB.Core.Model" Version="2.1.3.0" />
+        <PackageReference Include="SanteDB.Docker.Core" Version="2.1.3.0" />
         <PackageReference Include="SanteDB.Rest.Common" Version="2.1.3.0" />
         <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.1.3.0" />
       </ItemGroup>

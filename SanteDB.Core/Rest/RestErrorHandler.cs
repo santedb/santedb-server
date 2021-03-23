@@ -51,7 +51,6 @@ namespace SanteDB.Rest.Common.Serialization
 
         // Error tracer
         private Tracer m_traceSource = Tracer.GetTracer(typeof(RestErrorHandler));
-        private ClaimsAuthorizationConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<ClaimsAuthorizationConfigurationSection>();
 
         /// <summary>
         /// Handle error

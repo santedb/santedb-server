@@ -97,7 +97,14 @@ namespace SanteDB.Server.Core.Configuration
             return instance.Value;
         }
 
-     
+        /// <summary>
+        /// Convert this wrapper to timespan
+        /// </summary>
+        public static explicit operator PolicyValueTimeSpan(TimeSpan instance)
+        {
+            return new PolicyValueTimeSpan() { Value = instance };
+        }
+
     }
 
     /// <summary>
@@ -106,7 +113,25 @@ namespace SanteDB.Server.Core.Configuration
     [XmlType(nameof(SecurityPolicyConfiguration), Namespace = "http://santedb.org/configuration")]
     public class SecurityPolicyConfiguration
     {
-        
+
+        /// <summary>
+        /// Default ctor for serialization
+        /// </summary>
+        public SecurityPolicyConfiguration()
+        {
+
+        }
+
+        /// <summary>
+        /// Policy configuration ctor
+        /// </summary>
+        public SecurityPolicyConfiguration(SecurityPolicyIdentification policy, object value)
+        {
+            this.PolicyId = policy;
+            this.PolicyValue = value;
+            this.Enabled = true;
+        }
+
         /// <summary>
         /// True if the policy is enabled
         /// </summary>
@@ -130,5 +155,6 @@ namespace SanteDB.Server.Core.Configuration
         [XmlElement("bool", typeof(Boolean))]
         [XmlElement("real", typeof(double))]
         public Object PolicyValue { get; set; }
+
     }
 }

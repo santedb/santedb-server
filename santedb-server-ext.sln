@@ -164,6 +164,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Caching.Memory.Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SanteDB.Caching.Redis", "santedb-cache-redis\SanteDB.Caching.Redis\SanteDB.Caching.Redis.csproj", "{86672094-25CC-4CD5-B085-240E50EC4A5E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SanteDB.Docker.Core", "santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj", "{284CE885-78E0-48EA-A2E4-6957AD66EAB5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -382,6 +384,10 @@ Global
 		{86672094-25CC-4CD5-B085-240E50EC4A5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86672094-25CC-4CD5-B085-240E50EC4A5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86672094-25CC-4CD5-B085-240E50EC4A5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{284CE885-78E0-48EA-A2E4-6957AD66EAB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{284CE885-78E0-48EA-A2E4-6957AD66EAB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{284CE885-78E0-48EA-A2E4-6957AD66EAB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{284CE885-78E0-48EA-A2E4-6957AD66EAB5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -447,6 +453,7 @@ Global
 		{8553ABC7-ABFA-4A21-B0E8-68B7DE76129D} = {6150ED46-45C3-4CAA-ACC3-31A920124B2B}
 		{B09A6D4C-862C-4B5B-9C05-4160ED7CCA4A} = {6150ED46-45C3-4CAA-ACC3-31A920124B2B}
 		{86672094-25CC-4CD5-B085-240E50EC4A5E} = {6150ED46-45C3-4CAA-ACC3-31A920124B2B}
+		{284CE885-78E0-48EA-A2E4-6957AD66EAB5} = {F833B4D4-332A-403F-9754-EC00EB6B5CB7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E73A1AED-8AB7-492C-A4F0-C71FCC5C393C}
