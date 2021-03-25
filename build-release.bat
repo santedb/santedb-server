@@ -34,17 +34,17 @@ echo Will use MSBUILD in %msbuild%
 
 if exist "%nuget%" (
 
-	%msbuild%\msbuild santedb-server-ext.sln /t:restore
-	%msbuild%\msbuild santedb-server-ext.sln /t:clean /t:rebuild /p:configuration=Release /m:1
+	%msbuild%\msbuild santedb-server-ext.sln /t:restore /p:VersionNumber=%1
+	%msbuild%\msbuild santedb-server-ext.sln /t:clean /t:rebuild /p:configuration=Release /p:VersionNumber=%1 /m:1
 
 	FOR /R "%cwd%" %%G IN (*.nuspec) DO (
 		echo Packing %%~pG
 		pushd "%%~pG"
 		if [%2] == [] (
-			%nuget% pack -OutputDirectory "%localappdata%\NugetStaging" -prop Configuration=Release  -msbuildpath %msbuild%
+			%nuget% pack -OutputDirectory "%localappdata%\NugetStaging" -prop Configuration=Release  -msbuildpath %msbuild% -prop VersionNumber=%1
 		) else (
 			echo Publishing NUPKG
-			%nuget% pack -prop Configuration=Release -msbuildpath %msbuild%
+			%nuget% pack -prop Configuration=Release -msbuildpath %msbuild% -prop VersionNumber=%1
 			FOR /R %%F IN (*.nupkg) do (
 				%nuget% push "%%F" -Source https://api.nuget.org/v3/index.json -ApiKey %2 
 			)
