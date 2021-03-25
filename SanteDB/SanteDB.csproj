@@ -325,9 +325,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="santedb.config.user.fyfej.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <None Include="data\000-RouteOfAdministration.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
@@ -559,7 +556,7 @@
     </When>
     <Otherwise>
       <PropertyGroup>
-        <PreBuildEvent>"$(SolutionDir)\Solution Items\FirebirdSQL-3.0.3-Embedded.bat" "$(SolutionDir)\Solution Items" "$(TargetDir)"</PreBuildEvent>
+        <PreBuildEvent Condition="'$(NoFirebird)' == ''">"$(SolutionDir)\Solution Items\FirebirdSQL-3.0.3-Embedded.bat" "$(SolutionDir)\Solution Items" "$(TargetDir)"</PreBuildEvent>
       </PropertyGroup>
     </Otherwise>
   </Choose>

@@ -7,12 +7,12 @@ then
 fi;
 
 # Create output directories if not exists
-mkdir -p {./bin/Release/data,./santedb-fhir/bin/Release/data,./santedb-hl7/bin/Release/data,./santedb-gs1/bin/Release/data}
+mkdir -p {./bin/Release/data,./santedb-fhir/bin/Release/data,./santedb-hl7/bin/Release/data,./santedb-gs1/bin/Release/data,./santedb-mdm/bin/Release/data}
 
 # Restore, build and compile 
 ./submodule-pull.sh $2
-msbuild /t:clean /t:restore santedb-server-linux-ext.sln /p:VersionNumber=$1
-msbuild /t:build /p:Configuration=Release santedb-server-linux-ext.sln /p:VersionNumber=$1
+msbuild /t:clean /t:restore santedb-server-linux-ext.sln /p:VersionNumber=$1 /m
+msbuild /t:build /p:Configuration=Release santedb-server-linux-ext.sln /p:VersionNumber=$1 /p:NoFirebird=1 /m
 
 # Build the tarball structure
 if [ -d santedb-server-$1 ]; then
