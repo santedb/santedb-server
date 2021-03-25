@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
+  <PropertyGroup Condition="'$(VersionNumber)' == ''">
+    <VersionNumber>2.1.0-debug</VersionNumber>
+  </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -193,6 +197,7 @@
     <None Include="data\000-IndustryTypes.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Compile Include="Properties\Version.cs" />
     <Compile Include="SanteDBService.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -433,23 +438,23 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.BI" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Rest.BIS" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Cdss.Xml" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Matcher" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Matcher.Configuration.File" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Core.Model.AMI" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Core.Model.RISI" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Rest.AMI" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Rest.HDSI" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Core.Model.ViewModelSerializers" Version="2.0.76.0" />
+        <PackageReference Include="RestSrvr" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Api" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Model" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.OrmLite" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.BI" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Rest.BIS" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Cdss.Xml" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Matcher" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Matcher.Configuration.File" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Model.AMI" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Model.RISI" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Rest.AMI" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Rest.HDSI" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Model.ViewModelSerializers" Version="$(VersionNumber)" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -535,10 +540,6 @@
       <Project>{03052730-be5d-4212-9b71-316c685dd245}</Project>
       <Name>SanteDB.Persistence.PubSub.ADO</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Persistence.Reporting.ADO\SanteDB.Persistence.Reporting.ADO.csproj">
-      <Project>{aa364bac-ba47-4548-bd4b-31c0a73277b7}</Project>
-      <Name>SanteDB.Persistence.Reporting.ADO</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Server\SanteDB.Server.csproj">
       <Project>{1d145e2a-c31e-467c-9f4a-6811e1604b67}</Project>
       <Name>SanteDB.Server</Name>
@@ -550,10 +551,6 @@
     <ProjectReference Include="..\SanteDB.Tools.Debug\SanteDB.Tools.Debug.csproj">
       <Project>{223d4d87-6819-4f38-ae69-a82e249e1879}</Project>
       <Name>SanteDB.Tools.Debug</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Warehouse.ADO\SanteDB.Warehouse.ADO.csproj">
-      <Project>{bfc58f38-9023-4700-b35c-aa933a608e43}</Project>
-      <Name>SanteDB.Warehouse.ADO</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -573,4 +570,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="BeforeBuild" Condition="!$(VersionNumber.EndsWith('-debug'))">
+    <AssemblyInfo CodeLanguage="CS" OutputFile="$(MSBuildProjectDirectory)\Properties\Version.cs" AssemblyVersion="$(VersionNumber)" AssemblyFileVersion="$(VersionNumber)" />
+  </Target>
 </Project>
