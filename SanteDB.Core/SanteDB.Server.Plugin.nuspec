@@ -23,6 +23,7 @@
       <dependency id="SanteDB.Rest.HDSI" version="2.1.3.0"/>
       <dependency id="SanteDB.BusinessRules.JavaScript" version="2.1.3.0" />
       <dependency id="SanteDB.Rest.AMI" version="2.1.3.0"/>
+      <dependency id="SanteDB.Docker.Core" version="2.1.3.0"/>
     </dependencies>
     <references>
       <group targetFramework="net47">

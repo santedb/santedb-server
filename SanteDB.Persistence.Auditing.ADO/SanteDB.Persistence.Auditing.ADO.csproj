@@ -51,6 +51,7 @@
     <Compile Include="Data\Model\DbAuditMetadata.cs" />
     <Compile Include="Data\Model\DbAuditMetadataValue.cs" />
     <Compile Include="Data\Model\DbAuditObject.cs" />
+    <Compile Include="Docker\AuditRepositoryDockerFeature.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AdoAuditRepositoryService.cs" />
     <Compile Include="Services\AuditConstants.cs" />
@@ -100,6 +101,10 @@
           <Project>{030666AA-FC71-449E-9DFC-270F1C23C5DA}</Project>
           <Name>SanteDB.BI</Name>
         </ProjectReference>
+        <ProjectReference Include="..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj">
+          <Project>{284CE885-78E0-48EA-A2E4-6957AD66EAB5}</Project>
+          <Name>SanteDB.Docker.Core</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
@@ -111,6 +116,7 @@
         <PackageReference Include="SanteDB.Rest.Common" Version="2.1.3.0" />
         <PackageReference Include="SanteDB.OrmLite" Version="2.1.3.0" />
         <PackageReference Include="SanteDB.BI" Version="2.1.3.0" />
+        <PackageReference Include="SanteDB.Docker.Core" Version="2.1.3.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

@@ -16,7 +16,7 @@ namespace SanteDB.Messaging.AMI.Docker
     /// <summary>
     /// A docker feature for the AMI
     /// </summary>
-    public class AmiFeature : IDockerFeature
+    public class AmiDockerFeature : IDockerFeature
     {
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace SanteDB.Messaging.AMI.Docker
         /// <summary>
         /// Get the id of the docker feature
         /// </summary>
-        public string Id => "HDSI";
+        public string Id => "AMI";
 
         /// <summary>
         /// Get the settings

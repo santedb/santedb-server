@@ -44,7 +44,7 @@
   <ItemGroup>
     <Compile Include="AtnaAuditService.cs" />
     <Compile Include="Configuration\AtnaConfigurationSection.cs" />
-    <Compile Include="Docker\AtnaAuditFeature.cs" />
+    <Compile Include="Docker\AtnaAuditDockerFeature.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -63,7 +63,10 @@
           <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
           <Name>SanteDB.Core.Model</Name>
         </ProjectReference>
-        <ProjectReference Include=".\..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj" />
+        <ProjectReference Include="..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj">
+          <Project>{284CE885-78E0-48EA-A2E4-6957AD66EAB5}</Project>
+          <Name>SanteDB.Docker.Core</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>

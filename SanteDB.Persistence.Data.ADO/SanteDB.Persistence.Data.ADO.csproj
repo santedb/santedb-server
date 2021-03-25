@@ -82,6 +82,7 @@
     <Compile Include="Data\Model\Security\DbSecurityProvenance.cs" />
     <Compile Include="Data\Model\Security\DbSession.cs" />
     <Compile Include="Data\Model\Security\DbSessionClaim.cs" />
+    <Compile Include="Docker\AdoDataDockerFeature.cs" />
     <Compile Include="Exceptions\AdoFormalConstraintException.cs" />
     <Compile Include="Configuration\Features\AdoPersistenceFeature.cs" />
     <Compile Include="Resources\Locale.Designer.cs">
@@ -318,6 +319,10 @@
           <Project>{030666AA-FC71-449E-9DFC-270F1C23C5DA}</Project>
           <Name>SanteDB.BI</Name>
         </ProjectReference>
+        <ProjectReference Include="..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj">
+          <Project>{284CE885-78E0-48EA-A2E4-6957AD66EAB5}</Project>
+          <Name>SanteDB.Docker.Core</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
@@ -326,6 +331,7 @@
         <PackageReference Include="SanteDB.Core.Model" Version="2.1.3.0" />
         <PackageReference Include="SanteDB.OrmLite" Version="2.1.3.0" />
         <PackageReference Include="SanteDB.BI" Version="2.1.3.0" />
+        <PackageReference Include="SanteDB.Docker.Core" Version="2.1.3.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>

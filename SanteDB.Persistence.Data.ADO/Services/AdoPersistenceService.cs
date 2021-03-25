@@ -409,11 +409,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             this.m_tracer.TraceInfo("Scanning for schema updates...");
 
             // TODO: Refactor this to a common library within the ORM tooling
-
-            using (var context = this.m_configuration.Provider.GetWriteConnection())
-                context.UpgradeSchema("SanteDB.Persistence.Data.ADO");
-
-
+            this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Data.ADO");
 
             try
             {

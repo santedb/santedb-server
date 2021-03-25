@@ -74,7 +74,7 @@
     <Compile Include="Diagnostics\ConsoleTraceWriter.cs" />
     <Compile Include="Diagnostics\RolloverTextWriterTraceWriter.cs" />
     <Compile Include="Diagnostics\SystemDiagnosticsTraceWriter.cs" />
-    <Compile Include="Docker\SecurityFeature.cs" />
+    <Compile Include="Docker\SecurityDockerFeature.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Configuration\SecurityConfigurationSection.cs" />
     <Compile Include="Http\DefaultRestClient.cs" />
@@ -139,7 +139,6 @@
     <Compile Include="Services\Impl\LocalTagPersistenceService.cs" />
     <Compile Include="Services\Impl\FileConfigurationService.cs" />
     <Compile Include="Services\Impl\Repository\LocalUserEntityRepository.cs" />
-    <Compile Include="Services\IPersistentQueueService.cs" />
     <Compile Include="Services\ITfaRelayService.cs" />
     <Compile Include="Services\Impl\Repository\LocalConceptRepository.cs" />
     <Compile Include="Services\Impl\Repository\LocalSecurityRepositoryService.cs" />
@@ -186,7 +185,10 @@
           <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
           <Name>SanteDB.Core.Api</Name>
         </ProjectReference>
-        <ProjectReference Include=".\..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj" />
+        <ProjectReference Include="..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj">
+          <Project>{284CE885-78E0-48EA-A2E4-6957AD66EAB5}</Project>
+          <Name>SanteDB.Docker.Core</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>

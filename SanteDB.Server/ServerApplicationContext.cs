@@ -188,6 +188,10 @@ namespace SanteDB.Server
                     AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStart);
 
                 }
+                catch(Exception e)
+                {
+                    m_tracer.TraceError("Error starting up context: {0}", e);
+                }
                 finally
                 {
                     startWatch.Stop();

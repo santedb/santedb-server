@@ -19,6 +19,7 @@
       <dependency id="SanteDB.Core.Api" version="2.1.3.0" />
       <dependency id="SanteDB.Core.Model" version="2.1.3.0" />
       <dependency id="SanteDB.OrmLite" version="2.1.3.0"/>
+      <dependency id="SanteDB.Docker.Core" version="2.1.3.0"/>
     </dependencies>
   </metadata>
 </package>

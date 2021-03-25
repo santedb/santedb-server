@@ -50,7 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\HdsiConfigurationSection.cs" />
-    <Compile Include="Docker\HdsiFeature.cs" />
+    <Compile Include="Docker\HdsiDockerFeature.cs" />
     <Compile Include="HdsiConstants.cs" />
     <Compile Include="HdsiMessageHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -89,7 +89,10 @@
           <Project>{903e2e75-7b62-4c42-a001-404dc0235a6b}</Project>
           <Name>SanteDB.Rest.HDSI</Name>
         </ProjectReference>
-        <ProjectReference Include=".\..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj" />
+        <ProjectReference Include="..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj">
+          <Project>{284CE885-78E0-48EA-A2E4-6957AD66EAB5}</Project>
+          <Name>SanteDB.Docker.Core</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>

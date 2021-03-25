@@ -12,7 +12,7 @@ namespace SanteDB.Server.Core.Docker
     /// <summary>
     /// Security docker feature
     /// </summary>
-    public class SecurityFeature : IDockerFeature
+    public class SecurityDockerFeature : IDockerFeature
     {
 
      
@@ -104,6 +104,7 @@ namespace SanteDB.Server.Core.Docker
             {
                 if (!TimeSpan.TryParse(lockout, out TimeSpan sessionLengthTs))
                 {
+                    
                     throw new ArgumentException($"{lockout} is not a valid integer");
                 }
                 secSection.SetPolicy(SecurityPolicyIdentification.SessionLength, (PolicyValueTimeSpan)sessionLengthTs);

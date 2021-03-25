@@ -137,21 +137,22 @@ namespace SanteDB.Messaging.HDSI
         /// </summary>
         public bool Start()
         {
-            // Don't startup unless in SanteDB
-            if (Assembly.GetEntryAssembly().GetName().Name != "SanteDB")
+            // Don't start if we're in a test context
+            if (!Assembly.GetEntryAssembly().GetName().Name.StartsWith("SanteDB"))
                 return true;
 
             try
             {
                 this.Starting?.Invoke(this, EventArgs.Empty);
 
+                var serviceManager = ApplicationServiceContext.Current.GetService<IServiceManager>();
                 // Force startup
-                if(this.m_configuration.ResourceHandlers.Count() > 0)
+                if(this.m_configuration?.ResourceHandlers.Count() > 0)
                     HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.m_configuration.ResourceHandlers, typeof(IHdsiServiceContract));
                 else
                     HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(
-                        typeof(PatientResourceHandler).Assembly.ExportedTypes
-                        .Union(AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic).SelectMany(a => a.ExportedTypes))
+
+                        serviceManager.GetAllTypes()
                         .Where(t => !t.IsAbstract && !t.IsInterface && typeof(IApiResourceHandler).IsAssignableFrom(t))
                         .ToList(), typeof(IHdsiServiceContract)
                     );

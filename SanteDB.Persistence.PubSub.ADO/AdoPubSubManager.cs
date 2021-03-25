@@ -66,14 +66,9 @@ namespace SanteDB.Persistence.PubSub.ADO
             this.m_broker = broker;
             this.m_configuration = configurationManager.GetSection<AdoPubSubConfigurationSection>();
             this.m_policyEnforcementService = policyEnforcementService;
-            // TODO: Refactor this to a common library within the ORM tooling
-            ApplicationServiceContext.Current.Started += (o, e) =>
-            {
-                this.m_securityRepository = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>();
 
-                using (var context = this.m_configuration.Provider.GetWriteConnection())
-                    context.UpgradeSchema("SanteDB.Persistence.PubSub.ADO");
-            };
+            this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.PubSub.ADO");
+
         }
 
         // Ado Pub Sub Manager Tracer source
@@ -147,7 +142,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                 try
                 {
                     conn.Open();
-                    var domainInstance = conn.FirstOrDefault<DbChannel>(o => o.Key == id );
+                    var domainInstance = conn.FirstOrDefault<DbChannel>(o => o.Key == id);
                     if (domainInstance == null)
                         throw new KeyNotFoundException($"Channel {id} not found");
                     var retVal = this.MapInstance(conn, domainInstance);
@@ -502,7 +497,7 @@ namespace SanteDB.Persistence.PubSub.ADO
 
                         // First construct db instance 
                         var dbSubscription = this.m_mapper.MapModelInstance<PubSubSubscriptionDefinition, DbSubscription>(subscription);
-                        
+
                         dbSubscription.CreatedByKey = this.m_securityRepository.GetUser(AuthenticationContext.Current.Principal.Identity).Key.Value;
                         dbSubscription.CreationTime = DateTimeOffset.Now;
                         dbSubscription = conn.Insert(dbSubscription);
@@ -533,7 +528,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// <summary>
         /// Update the subscription
         /// </summary>
-        public PubSubSubscriptionDefinition UpdateSubscription(Guid key, string name, string description, PubSubEventType events, string hdsiFilter,  String supportAddress = null, DateTimeOffset? notBefore = null, DateTimeOffset? notAfter = null)
+        public PubSubSubscriptionDefinition UpdateSubscription(Guid key, string name, string description, PubSubEventType events, string hdsiFilter, String supportAddress = null, DateTimeOffset? notBefore = null, DateTimeOffset? notAfter = null)
         {
             this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.CreatePubSubSubscription);
 
@@ -625,7 +620,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                     conn.Update(dbExisting);
                     this.m_cache.Remove(key);
 
-                    if(isActive)
+                    if (isActive)
                     {
                         this.Activated?.Invoke(this, new DataPersistedEventArgs<PubSubSubscriptionDefinition>(subscription, AuthenticationContext.Current.Principal));
                     }

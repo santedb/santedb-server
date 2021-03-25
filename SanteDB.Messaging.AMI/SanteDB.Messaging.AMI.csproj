@@ -51,7 +51,7 @@
     <Compile Include="AmiMessageHandler.cs" />
     <Compile Include="Configuration\AmiConfigurationSection.cs" />
     <Compile Include="Configuration\CertificationAuthorityConfiguration.cs" />
-    <Compile Include="Docker\AmiFeature.cs" />
+    <Compile Include="Docker\AmiDockerFeature.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AmiServiceBehavior.cs" />
   </ItemGroup>
@@ -82,7 +82,10 @@
           <Project>{786bd0ee-1806-4158-ba45-80249ac6dfe7}</Project>
           <Name>SanteDB.Rest.Common</Name>
         </ProjectReference>
-        <ProjectReference Include=".\..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj" />
+        <ProjectReference Include="..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj">
+          <Project>{284CE885-78E0-48EA-A2E4-6957AD66EAB5}</Project>
+          <Name>SanteDB.Docker.Core</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>

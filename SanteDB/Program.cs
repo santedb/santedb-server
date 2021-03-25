@@ -186,7 +186,7 @@ namespace SanteDB
                 else
                 {
                     hasConsole = false;
-                    ServiceBase[] servicesToRun = new ServiceBase[] { new SanteDB() };
+                    ServiceBase[] servicesToRun = new ServiceBase[] { new SanteDBService() };
                     ServiceBase.Run(servicesToRun);
                 }
             }

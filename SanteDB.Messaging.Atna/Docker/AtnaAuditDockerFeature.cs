@@ -12,7 +12,7 @@ namespace SanteDB.Messaging.Atna.Docker
     /// <summary>
     /// Feature for atna audit shipping
     /// </summary>
-    public class AtnaAuditFeature : IDockerFeature
+    public class AtnaAuditDockerFeature : IDockerFeature
     {
 
         public const string TargetSetting = "TARGET";
@@ -96,6 +96,7 @@ namespace SanteDB.Messaging.Atna.Docker
                     StoreName = System.Security.Cryptography.X509Certificates.StoreName.My
                 };
             }
+
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace SanteDB
 {
-    partial class SanteDB
+    partial class SanteDBService
     {
         /// <summary> 
         /// Required designer variable.

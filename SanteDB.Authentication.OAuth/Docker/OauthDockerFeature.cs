@@ -17,7 +17,7 @@ namespace SanteDB.Authentication.OAuth2.Docker
     /// <summary>
     /// OAUTH feature for docker
     /// </summary>
-    public class OauthFeature : IDockerFeature
+    public class OauthDockerFeature : IDockerFeature
     {
         /// <summary>
         /// Claims which can be set by the client

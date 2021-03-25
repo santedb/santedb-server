@@ -1,7 +1,6 @@
 ﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
     <add type="SanteDB.Authentication.OAuth2.Configuration.OAuthConfigurationSection, SanteDB.Authentication.OAuth2, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Server.Core.Configuration.ClaimsAuthorizationConfigurationSection, SanteDB.Server.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
   </sections>
   <section xsi:type="OAuthConfigurationSection" issuerName="http://localhost:8080/auth">
     <allowedClaims>
@@ -14,19 +13,5 @@
     </allowedClaims>
     <tokenType>bearer</tokenType>
     <allowNodelessClientAuth>true</allowNodelessClientAuth>
-  </section>
-  <section xsi:type="ClaimsAuthorizationConfigurationSection" realm="127.0.0.1">
-    <issuer>
-      <add name="127.0.0.1" alg="hmac" hmacKey="uuNQ0pAkW+M2uxHjK1pisFZBFYjvkgveJcGtDy2E8i8=" />
-      <!-- To validate a sender using X509 certs -->
-      <!--<add name="127.0.0.1" alg="rsa" findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />-->
-    </issuer>
-    <audiences>
-      <add>http://localhost:8080/ami</add>
-      <add>http://localhost:8080/hdsi</add>
-      <add>http://localhost:8080/fhir</add>
-      <add>http://localhost:8080/risi</add>
-      <add>http://localhost:8080/sandbox</add>
-    </audiences>
   </section>
 </SanteDBConfiguration>

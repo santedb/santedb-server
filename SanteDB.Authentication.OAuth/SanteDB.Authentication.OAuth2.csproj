@@ -54,10 +54,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\OAuthConfigurationSection.cs" />
-    <None Include="Data\000-OAuthPolicies.dataset">
+    <None Include="data\000-OAuthPolicies.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Compile Include="Docker\OauthFeature.cs" />
+    <Compile Include="Docker\OauthDockerFeature.cs" />
     <Compile Include="Model\OAuthError.cs" />
     <Compile Include="Model\OAuthTokenRequest.cs" />
     <Compile Include="Model\OAuthTokenResponse.cs" />
@@ -94,7 +94,10 @@
           <Project>{786BD0EE-1806-4158-BA45-80249AC6DFE7}</Project>
           <Name>SanteDB.Rest.Common</Name>
         </ProjectReference>
-        <ProjectReference Include=".\..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj" />
+        <ProjectReference Include="..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj">
+          <Project>{284CE885-78E0-48EA-A2E4-6957AD66EAB5}</Project>
+          <Name>SanteDB.Docker.Core</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>

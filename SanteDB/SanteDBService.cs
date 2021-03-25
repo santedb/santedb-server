@@ -26,13 +26,13 @@ namespace SanteDB
     /// SanteDB service.
     /// </summary>
     /// <seealso cref="System.ServiceProcess.ServiceBase" />
-    public partial class SanteDB : ServiceBase
+    public partial class SanteDBService : ServiceBase
 	{
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="SanteDB"/> class.
+		/// Initializes a new instance of the <see cref="SanteDBService"/> class.
 		/// </summary>
-		public SanteDB()
+		public SanteDBService()
 		{
 			InitializeComponent();
 			this.ServiceName = "SanteDB Host Process";

@@ -193,11 +193,11 @@
     <None Include="data\000-IndustryTypes.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Compile Include="SanteDB.cs">
+    <Compile Include="SanteDBService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="SanteDB.Designer.cs">
-      <DependentUpon>SanteDB.cs</DependentUpon>
+    <Compile Include="SanteDBService.Designer.cs">
+      <DependentUpon>SanteDBService.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
