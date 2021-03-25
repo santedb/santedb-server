@@ -34,6 +34,7 @@ To compile on Windows you will require:
 * [Microsoft Visual Studio 2019 Enterprise, Professional, or Community](https://visualstudio.microsoft.com/)
 * [Inno Setup Compiler 6](https://jrsoftware.org/isdl.php)
 * [7-Zip](https://www.7-zip.org/download.html)
+* [Extended MSBuildTasks](https://github.com/loresoft/msbuildtasks)
 
 There are two solution files of note on Windows:
 
@@ -54,6 +55,7 @@ To build on Linux you will need to install the following packages on your linux 
 * Mono Project Version 6.x or higher to compile the C# code (sudo apt install mono-complete)
 * WINE Emulator to compile the Windows Installers (sudo apt install wine wine32)
 * UNZIP to compile Windows Installer (sudo apt install unzip)
+* [Extended MSBuildTasks](https://github.com/loresoft/msbuildtasks)
 
 You can manually build the project using msbuild:
 
