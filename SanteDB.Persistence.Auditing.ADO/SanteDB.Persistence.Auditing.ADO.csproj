@@ -1,6 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+    <PropertyGroup Condition="'$(VersionNumber)' == ''">
+    <VersionNumber>2.1.0-debug</VersionNumber>
+  </PropertyGroup>
+  <ItemGroup><PackageReference Include="MSBuildTasks" Version="1.5.0.235"><PrivateAssets>all</PrivateAssets><IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets></PackageReference></ItemGroup>
+  
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -51,6 +56,7 @@
     <Compile Include="Data\Model\DbAuditMetadata.cs" />
     <Compile Include="Data\Model\DbAuditMetadataValue.cs" />
     <Compile Include="Data\Model\DbAuditObject.cs" />
+    <Compile Include="Docker\AuditRepositoryDockerFeature.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AdoAuditRepositoryService.cs" />
     <Compile Include="Services\AuditConstants.cs" />
@@ -62,9 +68,9 @@
     <None Include="Data\SQL\AuditDB\FBSQL\audit_repo.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Data\SQL\AuditDB\PSQL\audit_repo.sql">
+    <EmbeddedResource Include="Data\SQL\AuditDB\PSQL\audit_repo.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Jobs\" />
@@ -100,17 +106,22 @@
           <Project>{030666AA-FC71-449E-9DFC-270F1C23C5DA}</Project>
           <Name>SanteDB.BI</Name>
         </ProjectReference>
+        <ProjectReference Include="..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj">
+          <Project>{284CE885-78E0-48EA-A2E4-6957AD66EAB5}</Project>
+          <Name>SanteDB.Docker.Core</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.1.2.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.1.2.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.1.2.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.1.2.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.1.2.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.1.2.0" />
-        <PackageReference Include="SanteDB.BI" Version="2.1.2.0" />
+        <PackageReference Include="RestSrvr" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Api" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Model" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.OrmLite" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.BI" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Docker.Core" Version="$(VersionNumber)" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -130,9 +141,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Data\SQL\AuditDB\FBSQL\20210130-FBSQL.sql" />
-    <Content Include="Data\SQL\AuditDB\PSQL\20210124-PSQL.sql">
+    <EmbeddedResource Include="Data\SQL\AuditDB\PSQL\20210124-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -142,4 +153,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+<Target Name="BeforeBuild" Condition="!$(VersionNumber.EndsWith('-debug'))">
+    <AssemblyInfo CodeLanguage="CS" OutputFile="$(MSBuildProjectDirectory)\Properties\Version.cs" AssemblyVersion="$(VersionNumber)" AssemblyFileVersion="$(VersionNumber)" />
+  </Target>
+  <ItemGroup>
+    <Compile Include="Properties\Version.cs" />
+  </ItemGroup>
 </Project>

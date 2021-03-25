@@ -196,7 +196,7 @@ namespace SanteDB.Server.Core.Services.Impl
             data = this.Validate(data);
 
             // Call privacy hook
-            if (!this.m_privacyService.ValidateWrite(data, AuthenticationContext.Current.Principal))
+            if (this.m_privacyService?.ValidateWrite(data, AuthenticationContext.Current.Principal) == false)
                 this.ThrowPrivacyValidationException(data);
 
             // Fire pre-persistence triggers
@@ -431,7 +431,7 @@ namespace SanteDB.Server.Core.Services.Impl
 
             results = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
             this.Queried?.Invoke(this, new QueryResultEventArgs<TEntity>(query, results, offset, count, totalResults, queryId, AuthenticationContext.Current.Principal));
-            return this.m_privacyService.Apply(results, AuthenticationContext.Current.Principal) ?? results;
+            return this.m_privacyService?.Apply(results, AuthenticationContext.Current.Principal) ?? results;
         }
 
         /// <summary>

@@ -268,7 +268,6 @@ Source: ..\santedb-mdm\SanteDB.Persistence.MDM\Data\*.dataset; DestDir: {app}\da
 
 Source: ..\bin\Release\SanteDB.Rest.Common.dll; DestDir: {app}; Components: msg reporting
 Source: ..\bin\Release\SanteDB.Rest.HDSI.dll; DestDir: {app}; Components: msg\hdsi
-Source: ..\bin\Release\SanteDB.Warehouse.ADO.dll; DestDir: {app}; Components: db
 
 ; Common .NET Standard
 Source: ..\bin\Release\Microsoft.Bcl.AsyncInterfaces.dll; DestDir: {app}; 

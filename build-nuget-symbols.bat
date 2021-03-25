@@ -18,12 +18,21 @@ set nuget="%cwd%\.nuget\nuget.exe"
 echo Will use NUGET in %nuget%
 echo Will use MSBUILD in %msbuild%
 
-%msbuild%\msbuild santedb-server-ext.sln /t:clean /t:restore 
-%msbuild%\msbuild santedb-server-ext.sln /t:build /p:configuration=debug /m
+IF [%1] == []  (
+	%msbuild%\msbuild santedb-server-ext.sln /t:clean /t:restore 
+	%msbuild%\msbuild santedb-server-ext.sln /t:build /p:configuration=debug  /m
+) ELSE (
+	%msbuild%\msbuild santedb-server-ext.sln /t:clean /t:restore /p:VersionNumber=%1
+	%msbuild%\msbuild santedb-server-ext.sln /t:build /p:configuration=debug /p:VersionNumber=%1 /m
+)
 
 FOR /R "%cwd%" %%G IN (*.nuspec) DO (
 	echo Packing %%~pG
 	pushd "%%~pG"
-	%nuget% pack -OutputDirectory "%localappdata%\NugetStaging" -prop Configuration=Debug -symbols -msbuildpath %msbuild%
+	IF [%1] == []  (
+		%nuget% pack -OutputDirectory "%localappdata%\NugetStaging" -prop VersionNumber=2.1.0-debug -prop Configuration=Debug -symbols -msbuildpath %msbuild%
+	) ELSE (
+		%nuget% pack -OutputDirectory "%localappdata%\NugetStaging" -prop VersionNumber=%1 -prop Configuration=Debug -symbols -msbuildpath %msbuild%
+	)
 	popd
 )

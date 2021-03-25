@@ -83,9 +83,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Get configuration
         /// </summary>
-        public AdoPersistenceConfigurationSection GetConfiguration() {
-            if(m_configuration == null)
-                m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>(); 
+        public AdoPersistenceConfigurationSection GetConfiguration()
+        {
+            if (m_configuration == null)
+                m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
             return m_configuration;
         }
 
@@ -115,7 +116,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 var sDomain = tDomain;
                 var idpType = typeof(IDataPersistenceService<>).MakeGenericType(sDomain);
                 retVal = ApplicationServiceContext.Current.GetService(idpType) as IAdoPersistenceService;
-                while(retVal == null && sDomain != typeof(object))
+                while (retVal == null && sDomain != typeof(object))
                 {
                     idpType = typeof(IDataPersistenceService<>).MakeGenericType(sDomain);
                     retVal = ApplicationServiceContext.Current.GetService(idpType) as IAdoPersistenceService;
@@ -141,7 +142,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             {
                 this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName));
 
-                List<IQueryBuilderHack> hax = new List<IQueryBuilderHack>() { new SecurityUserEntityQueryHack(),  new RelationshipGuardQueryHack(), new CreationTimeQueryHack(this.m_mapper), new EntityAddressNameQueryHack() };
+                List<IQueryBuilderHack> hax = new List<IQueryBuilderHack>() { new SecurityUserEntityQueryHack(), new RelationshipGuardQueryHack(), new CreationTimeQueryHack(this.m_mapper), new EntityAddressNameQueryHack() };
                 if (this.GetConfiguration().DataCorrectionKeys.Any(k => k == "ConceptQueryHack"))
                     hax.Add(new ConceptQueryHack(this.m_mapper));
 
@@ -152,12 +153,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
             catch (ModelMapValidationException ex)
             {
-                tracer.TraceEvent(EventLevel.Error,  "Error validating model map: {0}", ex);
+                tracer.TraceEvent(EventLevel.Error, "Error validating model map: {0}", ex);
                 throw ex;
             }
             catch (Exception ex)
             {
-                tracer.TraceEvent(EventLevel.Error,  "Error validating model map: {0}", ex);
+                tracer.TraceEvent(EventLevel.Error, "Error validating model map: {0}", ex);
                 throw ex;
             }
         }
@@ -408,12 +409,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             this.m_tracer.TraceInfo("Scanning for schema updates...");
 
             // TODO: Refactor this to a common library within the ORM tooling
-            ApplicationServiceContext.Current.Started += (o, e) =>
-            {
-                using (var context = this.m_configuration.Provider.GetWriteConnection())
-                    context.UpgradeSchema("SanteDB.Persistence.Data.ADO");
-            };
-
+            this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Data.ADO");
 
             try
             {
@@ -431,7 +427,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
             catch (Exception e)
             {
-                this.m_tracer.TraceEvent(EventLevel.Error,  "Error starting ADO provider: {0}", e);
+                this.m_tracer.TraceEvent(EventLevel.Error, "Error starting ADO provider: {0}", e);
                 throw new InvalidOperationException("Could not start up ADO provider", e);
             }
 
@@ -440,7 +436,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             {
                 try
                 {
-                    this.m_tracer.TraceEvent(EventLevel.Informational,  "Loading {0}...", t.AssemblyQualifiedName);
+                    this.m_tracer.TraceEvent(EventLevel.Informational, "Loading {0}...", t.AssemblyQualifiedName);
 
                     // If the persistence service is generic then we should check if we're allowed
                     if (!t.IsGenericType ||
@@ -451,13 +447,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(instance);
                     }
 
-					// Add to cache since we're here anyways
+                    // Add to cache since we're here anyways
 
-					//s_persistenceCache.Add(t.GetGenericArguments()[0], Activator.CreateInstance(t) as IAdoPersistenceService);
-				}
+                    //s_persistenceCache.Add(t.GetGenericArguments()[0], Activator.CreateInstance(t) as IAdoPersistenceService);
+                }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error adding service {0} : {1}", t.AssemblyQualifiedName, e);
+                    this.m_tracer.TraceEvent(EventLevel.Error, "Error adding service {0} : {1}", t.AssemblyQualifiedName, e);
                     throw new InvalidOperationException($"Error adding service {t.AssemblyQualifiedName}", e);
                 }
             }
@@ -465,7 +461,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             // Now iterate through the map file and ensure we have all the mappings, if a class does not exist create it
             try
             {
-                this.m_tracer.TraceEvent(EventLevel.Informational,  "Creating secondary model maps...");
+                this.m_tracer.TraceEvent(EventLevel.Informational, "Creating secondary model maps...");
 
                 var map = ModelMap.Load(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName));
                 foreach (var itm in map.Class)
@@ -492,8 +488,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     if (this.m_persistenceCache.ContainsKey(modelClassType))
                         this.m_tracer.TraceWarning("Duplicate initialization of {0}", modelClassType);
-                    else  if (modelClassType.Implements(typeof(IBaseEntityData)) &&
-                        domainClassType.Implements(typeof(IDbBaseData)))
+                    else if (modelClassType.Implements(typeof(IBaseEntityData)) &&
+                       domainClassType.Implements(typeof(IDbBaseData)))
                     {
                         // Construct a type
                         Type pclass = null;
@@ -533,8 +529,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
             catch (Exception e)
             {
-                this.m_tracer.TraceEvent(EventLevel.Error,  "Error initializing local persistence: {0}", e);
-                throw new Exception("Error initializing local persistence",  e);
+                this.m_tracer.TraceEvent(EventLevel.Error, "Error initializing local persistence: {0}", e);
+                throw new Exception("Error initializing local persistence", e);
             }
 
             // Bind subscription execution
@@ -605,20 +601,21 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     conn.Open();
                     tx = conn.BeginTransaction();
                     var rsql = sql;
-                    while (rsql.Contains(";")) {
+                    while (rsql.Contains(";"))
+                    {
                         conn.ExecuteNonQuery(conn.CreateSqlStatement(rsql.Substring(0, rsql.IndexOf(";"))));
                         rsql = rsql.Substring(rsql.IndexOf(";") + 1);
                     }
 
-                    if(!String.IsNullOrEmpty(rsql) && !String.IsNullOrWhiteSpace(rsql))
+                    if (!String.IsNullOrEmpty(rsql) && !String.IsNullOrWhiteSpace(rsql))
                         conn.ExecuteNonQuery(conn.CreateSqlStatement(rsql));
 
                     tx.Commit();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     tx.Rollback();
-                    this.m_tracer.TraceEvent(EventLevel.Error,  "Could not execute SQL: {0}", e);
+                    this.m_tracer.TraceEvent(EventLevel.Error, "Could not execute SQL: {0}", e);
 #if DEBUG
                     throw new DataPersistenceException($"Error executing query {sql}", e);
 #else

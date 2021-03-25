@@ -379,9 +379,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         var dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionId);
 
                         if (dbSession == null)
-                            throw new SecurityTokenException($"Session {BitConverter.ToString(sessionToken)} not found");
+                            throw new SecuritySessionException(SessionExceptionType.NotEstablished, $"Session {BitConverter.ToString(sessionToken)} not found", null);
                         else if (dbSession.NotAfter < DateTime.Now)
-                            throw new SecurityTokenExpiredException($"Session {BitConverter.ToString(sessionToken)} is expired");
+                            throw new SecuritySessionException(SessionExceptionType.Expired, new AdoSecuritySession(dbSession),  $"Session {BitConverter.ToString(sessionToken)} is expired", null);
+                        else if (dbSession.NotBefore > DateTime.Now)
+                            throw new SecuritySessionException(SessionExceptionType.NotYetValid, new AdoSecuritySession(dbSession), $"Session {BitConverter.ToString(sessionToken)} is expired", null);
                         else
                         {
                             sessionInfo = new KeyValuePair<DbSession, DbSessionClaim[]>(dbSession, context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Key).ToArray());
@@ -415,7 +417,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             catch (Exception e)
             {
                 this.m_traceSource.TraceError("Error getting session: {0}", e.Message);
-                throw new SecurityTokenException($"Could not get session token {BitConverter.ToString(sessionToken)}", e);
+                throw new SecuritySessionException(SessionExceptionType.Other, null, $"Could not get session token {BitConverter.ToString(sessionToken)}", e);
             }
         }
 

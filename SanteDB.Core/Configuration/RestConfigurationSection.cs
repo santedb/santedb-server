@@ -18,6 +18,7 @@
  */
 using Newtonsoft.Json;
 using SanteDB.Core.Configuration;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
@@ -29,27 +30,10 @@ namespace SanteDB.Server.Core.Configuration
     /// </summary>
     [XmlType(nameof(RestConfigurationSection), Namespace = "http://santedb.org/configuration")]
     [JsonObject]
-    public class RestConfigurationSection : IConfigurationSection
+    [Obsolete("Use SanteDB.Rest.Common.Configuration.RestConfigurationSection", true)]
+    public class RestConfigurationSection : SanteDB.Rest.Common.Configuration.RestConfigurationSection
     {
 
-        /// <summary>
-        /// Construct the AGS configuration
-        /// </summary>
-        public RestConfigurationSection()
-        {
-            this.Services = new List<RestServiceConfiguration>();
-        }
-
-        /// <summary>
-        /// Gets the base address
-        /// </summary>
-        [XmlElement("baseAddress"), JsonProperty("baseAddress")]
-        public string ExternalHostPort { get; set; }
-
-        /// <summary>
-        /// Gets or sets the service configuration
-        /// </summary>
-        [XmlElement("service"), JsonProperty("service"), Browsable(false)]
-        public List<RestServiceConfiguration> Services { get; set; }
+        
     }
 }

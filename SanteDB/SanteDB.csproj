@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <ItemGroup><PackageReference Include="MSBuildTasks" Version="1.5.0.235"><PrivateAssets>all</PrivateAssets><IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets></PackageReference></ItemGroup>
+  <PropertyGroup Condition="'$(VersionNumber)' == ''">
+    <VersionNumber>2.1.0-debug</VersionNumber>
+  </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -172,6 +176,9 @@
     <None Include="data\000-PlaceClassTypes.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="data\000-PubSubPolicies.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="data\000-PurposeOfUse.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -190,11 +197,12 @@
     <None Include="data\000-IndustryTypes.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Compile Include="SanteDB.cs">
+    <Compile Include="Properties\Version.cs" />
+    <Compile Include="SanteDBService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="SanteDB.Designer.cs">
-      <DependentUpon>SanteDB.cs</DependentUpon>
+    <Compile Include="SanteDBService.Designer.cs">
+      <DependentUpon>SanteDBService.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -317,9 +325,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-   <!-- <Content Include="santedb.config.user.fyfej.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>-->
     <None Include="data\000-RouteOfAdministration.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
@@ -430,23 +435,23 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="RestSrvr" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Core.Api" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Rest.Common" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.BI" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Rest.BIS" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Cdss.Xml" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Matcher" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Matcher.Configuration.File" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Core.Model.AMI" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Core.Model.RISI" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Rest.AMI" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Rest.HDSI" Version="2.0.76.0" />
-        <PackageReference Include="SanteDB.Core.Model.ViewModelSerializers" Version="2.0.76.0" />
+        <PackageReference Include="RestSrvr" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Api" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Model" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.OrmLite" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.BI" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Rest.BIS" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Cdss.Xml" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Matcher" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Matcher.Configuration.File" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Model.AMI" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Model.RISI" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Rest.AMI" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Rest.HDSI" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Model.ViewModelSerializers" Version="$(VersionNumber)" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -460,6 +465,14 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
       <Version>5.0.0</Version>
     </PackageReference>
+    <ProjectReference Include="..\santedb-cache-memory\SanteDB.Caching.Memory\SanteDB.Caching.Memory.csproj">
+      <Project>{8553abc7-abfa-4a21-b0e8-68b7de76129d}</Project>
+      <Name>SanteDB.Caching.Memory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-cache-redis\SanteDB.Caching.Redis\SanteDB.Caching.Redis.csproj">
+      <Project>{86672094-25cc-4cd5-b085-240e50ec4a5e}</Project>
+      <Name>SanteDB.Caching.Redis</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-fhir\SanteDB.Messaging.FHIR\SanteDB.Messaging.FHIR.csproj">
       <Project>{33836324-c699-4139-ab9c-7524570a04d5}</Project>
       <Name>SanteDB.Messaging.FHIR</Name>
@@ -479,14 +492,6 @@
     <ProjectReference Include="..\SanteDB.Authentication.OAuth\SanteDB.Authentication.OAuth2.csproj">
       <Project>{a3975c6f-4fdb-43be-81ab-3357b86173f1}</Project>
       <Name>SanteDB.Authentication.OAuth2</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Caching.Memory\SanteDB.Caching.Memory.csproj">
-      <Project>{8553abc7-abfa-4a21-b0e8-68b7de76129d}</Project>
-      <Name>SanteDB.Caching.Memory</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Caching.Redis\SanteDB.Caching.Redis.csproj">
-      <Project>{86672094-25cc-4cd5-b085-240e50ec4a5e}</Project>
-      <Name>SanteDB.Caching.Redis</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Configuration\SanteDB.Configuration.csproj">
       <Project>{032abf00-6c76-47c7-9eca-a840915a17ea}</Project>
@@ -532,10 +537,6 @@
       <Project>{03052730-be5d-4212-9b71-316c685dd245}</Project>
       <Name>SanteDB.Persistence.PubSub.ADO</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Persistence.Reporting.ADO\SanteDB.Persistence.Reporting.ADO.csproj">
-      <Project>{aa364bac-ba47-4548-bd4b-31c0a73277b7}</Project>
-      <Name>SanteDB.Persistence.Reporting.ADO</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Server\SanteDB.Server.csproj">
       <Project>{1d145e2a-c31e-467c-9f4a-6811e1604b67}</Project>
       <Name>SanteDB.Server</Name>
@@ -548,10 +549,6 @@
       <Project>{223d4d87-6819-4f38-ae69-a82e249e1879}</Project>
       <Name>SanteDB.Tools.Debug</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Warehouse.ADO\SanteDB.Warehouse.ADO.csproj">
-      <Project>{bfc58f38-9023-4700-b35c-aa933a608e43}</Project>
-      <Name>SanteDB.Warehouse.ADO</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Choose>
@@ -559,7 +556,7 @@
     </When>
     <Otherwise>
       <PropertyGroup>
-        <PreBuildEvent>"$(SolutionDir)\Solution Items\FirebirdSQL-3.0.3-Embedded.bat" "$(SolutionDir)\Solution Items" "$(TargetDir)"</PreBuildEvent>
+        <PreBuildEvent Condition="'$(NoFirebird)' == ''">"$(SolutionDir)\Solution Items\FirebirdSQL-3.0.3-Embedded.bat" "$(SolutionDir)\Solution Items" "$(TargetDir)"</PreBuildEvent>
       </PropertyGroup>
     </Otherwise>
   </Choose>
@@ -570,4 +567,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="BeforeBuild" Condition="!$(VersionNumber.EndsWith('-debug'))">
+    <AssemblyInfo CodeLanguage="CS" OutputFile="$(MSBuildProjectDirectory)\Properties\Version.cs" AssemblyVersion="$(VersionNumber)" AssemblyFileVersion="$(VersionNumber)" />
+  </Target>
 </Project>

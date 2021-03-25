@@ -42,6 +42,7 @@ using System.Diagnostics.Tracing;
 using SanteDB.BI.Services;
 using SanteDB.BI.Model;
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.OrmLite.Migration;
 
 namespace SanteDB.Persistence.Auditing.ADO.Services
 {
@@ -118,8 +119,12 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         {
             try
             {
+                this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Audit.ADO");
+
                 ApplicationServiceContext.Current.Started += (o, e) =>
                 {
+
+
 
                     // Add audits as a BI data source
                     ApplicationServiceContext.Current.GetService<IBiMetadataRepository>()
@@ -165,7 +170,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             var cacheItem = cache.GetCacheItem<Concept>(key);
             if (cacheItem == null)
             {
-                if(!String.IsNullOrEmpty(codeSystem))
+                if (!String.IsNullOrEmpty(codeSystem))
                     cacheItem = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptByReferenceTerm(code, codeSystem);
                 if (cacheItem == null)
                     cacheItem = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConcept(code);
@@ -335,7 +340,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                         {
 
                             var roleCode = this.GetOrCreateAuditCode(context, act.ActorRoleCode.FirstOrDefault());
-                            
+
                             DbAuditActor dbAct = null;
                             if (roleCode != null)
                                 dbAct = context.FirstOrDefault<DbAuditActor>(o => o.UserName == act.UserName && o.ActorRoleCode == roleCode.Key);
@@ -352,7 +357,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             {
                                 TargetKey = dbAct.Key,
                                 SourceKey = dbAudit.Key,
-                                UserIsRequestor = act.UserIsRequestor, 
+                                UserIsRequestor = act.UserIsRequestor,
                                 AccessPoint = act.NetworkAccessPointId
                             });
                         }

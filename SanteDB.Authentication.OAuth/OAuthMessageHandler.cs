@@ -126,7 +126,7 @@ namespace SanteDB.Authentication.OAuth2
         public bool Start()
         {
             // Don't startup unless in SanteDB
-            if (Assembly.GetEntryAssembly().GetName().Name != "SanteDB")
+            if (!Assembly.GetEntryAssembly().GetName().Name.StartsWith("SanteDB"))
                 return true;
 
             try
@@ -137,6 +137,7 @@ namespace SanteDB.Authentication.OAuth2
                 this.m_serviceHost.AddServiceBehavior(new OAuthErrorBehavior());
                 // Start the webhost
                 this.m_serviceHost.Start();
+                this.m_traceSource.TraceInfo("OAUTH2 On: {0}", this.m_serviceHost.Endpoints.First().Description.ListenUri);
 
                 this.Started?.Invoke(this, EventArgs.Empty);
                 return true;

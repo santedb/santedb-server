@@ -579,7 +579,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     // Identities
                     List<IClaimsIdentity> identities = new List<IClaimsIdentity>(3);
                     if (auth.Object1.NotAfter < DateTime.Now)
-                        throw new AuthenticationException("Session is expired");
+                        throw new SecuritySessionException(SessionExceptionType.Expired, "Session expired", null);
+                    else if(auth.Object1.NotBefore > DateTime.Now)
+                        throw new SecuritySessionException(SessionExceptionType.NotYetValid, "Session not yet valid", null);
+
                     if (auth.Object2?.Key != null)
                         identities.Add(new Server.Core.Security.ApplicationIdentity(auth.Object2.Key, auth.Object2.PublicId, true));
                     if (auth.Object1.DeviceKey.HasValue)
@@ -605,7 +608,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 this.m_traceSource.TraceEvent(EventLevel.Verbose, "Invalid session auth: {0}", e.Message);
                 this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(null, null, false));
-                throw new AuthenticationException($"Could not perform session authentication", e);
+                throw new SecuritySessionException(SessionExceptionType.Other, $"Could not perform session authentication", e);
             }
         }
 

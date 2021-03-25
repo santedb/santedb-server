@@ -79,7 +79,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             Bundle retVal = new Bundle() { Item = new List<IdentifiedData>() };
             foreach (var itm in bundle.Item.Where(o => o != null))
             {
-                this.m_tracer.TraceInfo("Reorganizing {0}..", itm.Key);
+                this.m_tracer.TraceVerbose("Reorganizing {0}..", itm.Key);
                 var idx = retVal.Item.FindIndex(o => o.Key == itm.Key);
 
                 // Are there any relationships
@@ -87,14 +87,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 {
                     foreach (var rel in ent.Relationships)
                     {
-                        this.m_tracer.TraceInfo("Processing {0} / relationship / {1} ..", itm.Key, rel.TargetEntityKey);
+                        this.m_tracer.TraceVerbose("Processing {0} / relationship / {1} ..", itm.Key, rel.TargetEntityKey);
 
                         var bitm = bundle.Item.FirstOrDefault(o => o.Key == rel.TargetEntityKey);
                         if (bitm == null) continue;
 
                         if (retVal.Item.Any(o => o.Key == rel.TargetEntityKey))
                             continue;
-                        this.m_tracer.TraceInfo("Bumping (due to relationship): {0}", bitm);
+                        this.m_tracer.TraceVerbose("Bumping (due to relationship): {0}", bitm);
 
                         if (idx > -1)
                             retVal.Item.Insert(idx, bitm); // make sure it gets inserted first
@@ -107,13 +107,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 {
                     foreach (var rel in act.Relationships)
                     {
-                        this.m_tracer.TraceInfo("Processing {0} / relationship / {1} ..", itm.Key, rel.TargetActKey);
+                        this.m_tracer.TraceVerbose("Processing {0} / relationship / {1} ..", itm.Key, rel.TargetActKey);
                         var bitm = bundle.Item?.FirstOrDefault(o => o.Key == rel?.TargetActKey);
                         if (bitm == null) continue;
 
                         if (retVal.Item.Any(o => o.Key == rel.TargetActKey))
                             continue;
-                        this.m_tracer.TraceInfo("Bumping (due to relationship): {0}", bitm);
+                        this.m_tracer.TraceVerbose("Bumping (due to relationship): {0}", bitm);
                         if (idx > -1)
                             retVal.Item.Insert(idx, bitm); // make sure it gets inserted first
                         else
@@ -123,14 +123,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                     foreach (var rel in act.Participations)
                     {
-                        this.m_tracer.TraceInfo("Processing {0} / participation / {1} ..", itm.Key, rel.PlayerEntityKey);
+                        this.m_tracer.TraceVerbose("Processing {0} / participation / {1} ..", itm.Key, rel.PlayerEntityKey);
                         var bitm = bundle.Item?.FirstOrDefault(o => o.Key == rel?.PlayerEntityKey);
                         if (bitm == null) continue;
 
                         if (retVal.Item.Any(o => o.Key == rel.PlayerEntityKey))
                             continue;
 
-                        this.m_tracer.TraceInfo("Bumping (due to participation): {0}", bitm);
+                        this.m_tracer.TraceVerbose("Bumping (due to participation): {0}", bitm);
                         if (idx > -1)
                             retVal.Item.Insert(idx, bitm); // make sure it gets inserted first
                         else
@@ -141,13 +141,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 else if (itm is Concept concept) {
                     foreach (var rel in concept.ReferenceTerms)
                     {
-                        this.m_tracer.TraceInfo("Processing {0} / referenceTerm / {1} ..", itm.Key, rel.ReferenceTermKey);
+                        this.m_tracer.TraceVerbose("Processing {0} / referenceTerm / {1} ..", itm.Key, rel.ReferenceTermKey);
                         var bitm = bundle.Item?.FirstOrDefault(o => o.Key == rel?.ReferenceTermKey);
                         if (bitm == null) continue;
 
                         if (retVal.Item.Any(o => o.Key == rel.ReferenceTermKey))
                             continue;
-                        this.m_tracer.TraceInfo("Bumping (due to relationship): {0}", bitm);
+                        this.m_tracer.TraceVerbose("Bumping (due to relationship): {0}", bitm);
                         if (idx > -1)
                             retVal.Item.Insert(idx, bitm); // make sure it gets inserted first
                         else
@@ -156,13 +156,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                     foreach (var rel in concept.Relationship)
                     {
-                        this.m_tracer.TraceInfo("Processing {0} / relationship / {1} ..", itm.Key, rel.TargetConceptKey);
+                        this.m_tracer.TraceVerbose("Processing {0} / relationship / {1} ..", itm.Key, rel.TargetConceptKey);
                         var bitm = bundle.Item?.FirstOrDefault(o => o.Key == rel?.TargetConceptKey);
                         if (bitm == null) continue;
 
                         if (retVal.Item.Any(o => o.Key == rel.TargetConceptKey))
                             continue;
-                        this.m_tracer.TraceInfo("Bumping (due to relationship): {0}", bitm);
+                        this.m_tracer.TraceVerbose("Bumping (due to relationship): {0}", bitm);
                         if (idx > -1)
                             retVal.Item.Insert(idx, bitm); // make sure it gets inserted first
                         else
@@ -177,7 +177,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     {
                         if (!retVal.Item.Any(o => o.Key == entRel.TargetEntityKey))
                         {
-                            this.m_tracer.TraceInfo("Bumping (due to relationship): {0}", bitm);
+                            this.m_tracer.TraceVerbose("Bumping (due to relationship): {0}", bitm);
                             if (idx > -1)
                                 retVal.Item.Insert(idx, bitm); // make sure it gets inserted first
                             else
@@ -190,7 +190,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     {
                         if (!retVal.Item.Any(o => o.Key == entRel.SourceEntityKey))
                         {
-                            this.m_tracer.TraceInfo("Bumping (due to relationship): {0}", bitm);
+                            this.m_tracer.TraceVerbose("Bumping (due to relationship): {0}", bitm);
                             if (idx > -1)
                                 retVal.Item.Insert(idx, bitm); // make sure it gets inserted first
                             else
@@ -205,7 +205,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     {
                         if (!retVal.Item.Any(o => o.Key == actRel.TargetActKey))
                         {
-                            this.m_tracer.TraceInfo("Bumping (due to relationship): {0}", bitm);
+                            this.m_tracer.TraceVerbose("Bumping (due to relationship): {0}", bitm);
                             if (idx > -1)
                                 retVal.Item.Insert(idx, bitm); // make sure it gets inserted first
                             else
@@ -217,7 +217,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     {
                         if (!retVal.Item.Any(o => o.Key == actRel.SourceEntityKey))
                         {
-                            this.m_tracer.TraceInfo("Bumping (due to relationship): {0}", bitm);
+                            this.m_tracer.TraceVerbose("Bumping (due to relationship): {0}", bitm);
                             if (idx > -1)
                                 retVal.Item.Insert(idx, bitm); // make sure it gets inserted first
                             else
@@ -233,7 +233,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     {
                         if (!retVal.Item.Any(o => o.Key == actPtcpt.PlayerEntityKey))
                         {
-                            this.m_tracer.TraceInfo("Bumping (due to participation): {0}", bitm);
+                            this.m_tracer.TraceVerbose("Bumping (due to participation): {0}", bitm);
                             if (idx > -1)
                                 retVal.Item.Insert(idx, bitm); // make sure it gets inserted first
                             else
@@ -241,7 +241,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         }
                     }
                 }
-                this.m_tracer.TraceInfo("Re-adding: {0}", itm);
+                this.m_tracer.TraceVerbose("Re-adding: {0}", itm);
                 if (!retVal.Item.Any(o => o.Key == itm.Key))
                     retVal.Item.Add(itm);
             }
@@ -256,9 +256,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override Bundle InsertInternal(DataContext context, Bundle data)
         {
 
-            this.m_tracer.TraceInfo("Bundle has {0} objects...", data.Item.Count);
+            this.m_tracer.TraceVerbose("Bundle has {0} objects...", data.Item.Count);
             var reorganized = this.ReorganizeForInsert(data);
-            this.m_tracer.TraceInfo("After reorganization has {0} objects...", reorganized.Item.Count);
+            this.m_tracer.TraceVerbose("After reorganization has {0} objects...", reorganized.Item.Count);
 
             context.PrepareStatements = this.m_settingsProvider.GetConfiguration().PrepareStatements;
 
@@ -283,12 +283,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                     if (itm.CheckExists(context))
                     {
-                        this.m_tracer.TraceInfo("Will update {0} object from bundle...", itm);
+                        this.m_tracer.TraceVerbose("Will update {0} object from bundle...", itm);
                         reorganized.Item[i] = svc.Update(context, itm) as IdentifiedData;
                     }
                     else
                     {
-                        this.m_tracer.TraceInfo("Will insert {0} object from bundle...", itm);
+                        this.m_tracer.TraceVerbose("Will insert {0} object from bundle...", itm);
                         reorganized.Item[i] = svc.Insert(context, itm) as IdentifiedData;
                     }
                 }
