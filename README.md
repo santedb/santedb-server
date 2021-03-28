@@ -4,7 +4,7 @@
 
 ## Releases 
 
-You can get the most recent builds from our [Jenkins server](https://jenkins.fyfesoftware.ca/job/santedb-icdr-master)
+You can get the most recent builds from our [Jenkins server](https://jenkins.fyfesoftware.ca/job/santedb-icdr-master). The most recent releases can be found in the Workspace/bin/dist folder.
 
 ## Issue Tracker & Release Tracker
 
