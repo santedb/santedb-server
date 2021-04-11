@@ -57,3 +57,6 @@
 [submodule "santedb-docker"]
 	path = santedb-docker
 	url = https://github.com/santedb/santedb-docker
+[submodule "santedb-i18n"]
+	path = santedb-i18n
+	url = https://github.com/santedb/santedb-i18n
