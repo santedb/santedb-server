@@ -45,6 +45,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
 
         }
 
+      
         /// <summary>
         /// Test the persistence of a person
         /// </summary>

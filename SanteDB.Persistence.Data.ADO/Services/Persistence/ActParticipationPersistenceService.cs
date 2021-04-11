@@ -97,6 +97,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override ActParticipation InsertInternal(DataContext context, ActParticipation data)
         {
             // Ensure we haven't already persisted this
+            if (data.PlayerEntity != null) data.PlayerEntity = data.PlayerEntity.EnsureExists(context, this.m_settingsProvider.GetConfiguration().AutoInsertChildren) as Entity;
             data.PlayerEntityKey = data.PlayerEntity?.Key ?? data.PlayerEntityKey;
             if (data.ParticipationRole != null) data.ParticipationRole = data.ParticipationRole.EnsureExists(context, false) as Concept;
             data.ParticipationRoleKey = data.ParticipationRole?.Key ?? data.ParticipationRoleKey;

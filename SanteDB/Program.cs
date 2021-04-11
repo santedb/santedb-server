@@ -41,6 +41,7 @@ using System.Text;
 using System.Threading;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Server;
+using SanteDB.Server.Core.Services.Impl;
 
 namespace SanteDB
 {
@@ -157,7 +158,7 @@ namespace SanteDB
                     Console.WriteLine("SanteDB (SanteDB) {0} ({1})", entryAsm.GetName().Version, entryAsm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
                     Console.WriteLine("{0}", entryAsm.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright);
                     Console.WriteLine("Complete Copyright information available at http://SanteDB.codeplex.com/wikipage?title=Contributions");
-                    ServiceUtil.Start(typeof(Program).GUID, parameters.ConfigFile);
+                    ServiceUtil.Start(typeof(Program).GUID, new FileConfigurationService(parameters.ConfigFile));
                     if (!parameters.StartupTest)
                     {
 
@@ -185,7 +186,7 @@ namespace SanteDB
                 else
                 {
                     hasConsole = false;
-                    ServiceBase[] servicesToRun = new ServiceBase[] { new SanteDB() };
+                    ServiceBase[] servicesToRun = new ServiceBase[] { new SanteDBService() };
                     ServiceBase.Run(servicesToRun);
                 }
             }

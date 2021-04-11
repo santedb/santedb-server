@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>SanteDB.Server</id>
-    <version>2.1.2.0</version>
+    <version>$VersionNumber$</version>
     <title>SanteDB Server Runtime</title>
     <authors>SanteDB Community</authors>
     <owners>santedb.org</owners>
@@ -16,17 +16,19 @@
     <tags>cdr santedb server</tags>
     <dependencies>
       <dependency id="AtnaApi" version="1.1.4.0" />
-      <dependency id="SanteDB.Server.Plugin" version="2.1.2.0" />
-      <dependency id="SanteDB.Server.Plugin.Data" version="2.1.2.0" />
-      <dependency id="SanteDB.Server.Plugin.Data" version="2.1.2.0" />
-      <dependency id="SanteDB.Server.Messaging.OAuth2" version="2.1.2.0" />
-      <dependency id="SanteDB.BusinessRules.JavaScript" version="2.1.2.0" />
-      <dependency id="SanteDB.Messaging.Metadata" version="2.1.2.0" />
-      <dependency id="SanteDB.Core.Api" version="2.1.2.0" />
-      <dependency id="SanteDB.Core.Model" version="2.1.2.0" />
-      <dependency id="SanteDB.OrmLite" version="2.1.2.0"/>
-      <dependency id="SanteDB.Rest.Common" version="2.1.2.0"/>
-      <dependency id="SanteDB.Server.Plugin.Data.Audit" version="2.1.2.0" />
+      <dependency id="SanteDB.Server.Plugin" version="$VersionNumber$" />
+      <dependency id="SanteDB.Server.Plugin.Data" version="$VersionNumber$" />
+      <dependency id="SanteDB.Server.Plugin.Data" version="$VersionNumber$" />
+      <dependency id="SanteDB.Server.Messaging.OAuth2" version="$VersionNumber$" />
+      <dependency id="SanteDB.BusinessRules.JavaScript" version="$VersionNumber$" />
+      <dependency id="SanteDB.Messaging.Metadata" version="$VersionNumber$" />
+      <dependency id="SanteDB.Core.Api" version="$VersionNumber$" />
+      <dependency id="SanteDB.Core.Model" version="$VersionNumber$" />
+      <dependency id="SanteDB.OrmLite" version="$VersionNumber$"/>
+      <dependency id="SanteDB.Rest.Common" version="$VersionNumber$"/>
+      <dependency id="SanteDB.Server.Plugin.Data.Audit" version="$VersionNumber$" />
+      <dependency id="SanteDB.Docker.Core" version="$VersionNumber$"/>
+
       <dependency id="FirebirdSql.Data.FirebirdClient" version="7.5.0"/>
     </dependencies>
     <references>
@@ -45,8 +47,7 @@
     <file src="..\bin\$configuration$\SanteDB.Messaging.Hdsi.dll" target="Build\" />
     <file src="..\bin\$configuration$\SanteDB.Persistence.Diagnostics.Email.dll" target="Build\" />
     <file src="..\bin\$configuration$\SanteDB.exe.config" target="Build\" />
-    <file src="..\bin\$configuration$\santedb.config.nuget.xml" target="Build\" />
-    <file src="..\Solution Items\santedb_test.fdb" target="Build\" />
+    <file src=".\Data\SDB_BASE.FDB" target="Build\" />
     <file src=".\Data\SDB_AUDIT.FDB" target="Build\" />
     <file src="..\bin\$configuration$\fbclient.dll" target="build\"/>
     <file src="..\bin\$configuration$\firebird.conf" target="build\"/>
@@ -57,6 +58,7 @@
     <file src="..\bin\$configuration$\icuin52.dll" target="build\"/>
     <file src="..\bin\$configuration$\icuuc52.dll" target="build\"/>
     <file src="..\bin\$configuration$\plugins\engine12.dll" target="build\plugins"/>
+    <file src="..\bin\$configuration$\data\*.dataset" target="build\data"/>
     <file src="SanteDB.Server.targets" target="Build\" />
   </files>
 </package>

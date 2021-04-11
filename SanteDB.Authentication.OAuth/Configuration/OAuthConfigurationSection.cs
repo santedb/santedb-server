@@ -42,6 +42,12 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         }
 
         /// <summary>
+        /// Gets the name of the key that is used to sign session
+        /// </summary>
+        [XmlAttribute("jwtSigningKey")]
+        public String JwtSigningKey { get; set; }
+
+        /// <summary>
         /// Gets or sets whether the ACS will validate client claims
         /// </summary>
         [XmlArray("allowedClaims"), XmlArrayItem("add")]

@@ -82,8 +82,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
 
             // Ensure we haven't already persisted this
-            if (data.InversionIndicator) 
+            if (data.InversionIndicator)
                 return data; // don't persist inverted
+            if (data.TargetEntity != null) data.TargetEntity = data.TargetEntity.EnsureExists(context, this.m_settingsProvider.GetConfiguration().AutoInsertChildren) as Entity;
             data.TargetEntityKey = data.TargetEntity?.Key ?? data.TargetEntityKey;
             if (data.RelationshipType != null) data.RelationshipType = data.RelationshipType.EnsureExists(context, false) as Concept;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
@@ -92,8 +93,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (!data.EffectiveVersionSequenceId.HasValue)
                 data.EffectiveVersionSequenceId = context.FirstOrDefault<DbEntityVersion>(o => o.Key == data.SourceEntityKey)?.VersionSequenceId;
 
-            // Duplicate check 
-            var existing = context.FirstOrDefault<DbEntityRelationship>(r => r.SourceKey == data.SourceEntityKey && r.TargetKey == data.TargetEntityKey && r.RelationshipTypeKey == data.RelationshipTypeKey && !r.ObsoleteVersionSequenceId.HasValue) ;
+            // Duplicate check  
+            var existing = context.FirstOrDefault<DbEntityRelationship>(r => r.SourceKey == data.SourceEntityKey && r.TargetKey == data.TargetEntityKey && r.RelationshipTypeKey == data.RelationshipTypeKey && !r.ObsoleteVersionSequenceId.HasValue);
             if (existing == null)
                 return base.InsertInternal(context, data);
             else if (existing.Quantity != data.Quantity)
@@ -116,7 +117,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override EntityRelationship UpdateInternal(DataContext context, EntityRelationship data)
         {
             // Ensure we haven't already persisted this
-            if (data.InversionIndicator) 
+            if (data.InversionIndicator)
                 return data; // don't persist inverted
 
             data.TargetEntityKey = data.TargetEntity?.Key ?? data.TargetEntityKey;
@@ -124,7 +125,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
 
             if (data.ObsoleteVersionSequenceId == Int32.MaxValue)
-                data.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence ?? context.FirstOrDefault<DbEntityVersion>(o=>o.Key == data.SourceEntityKey && o.ObsoletionTime == null)?.VersionSequenceId;
+                data.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence ?? context.FirstOrDefault<DbEntityVersion>(o => o.Key == data.SourceEntityKey && o.ObsoletionTime == null)?.VersionSequenceId;
 
             // Duplicate check 
             var existing = context.FirstOrDefault<DbEntityRelationship>(r => r.SourceKey == data.SourceEntityKey && r.TargetKey == data.TargetEntityKey && r.RelationshipTypeKey == data.RelationshipTypeKey && !r.ObsoleteVersionSequenceId.HasValue);
@@ -169,7 +170,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
                 return x.SourceEntityKey == y.SourceEntityKey &&
                     x.TargetEntityKey == y.TargetEntityKey &&
-                    (x.RelationshipTypeKey == y.RelationshipTypeKey ||  x.RelationshipType?.Mnemonic == y.RelationshipType?.Mnemonic);
+                    (x.RelationshipTypeKey == y.RelationshipTypeKey || x.RelationshipType?.Mnemonic == y.RelationshipType?.Mnemonic);
             }
 
             /// <summary>

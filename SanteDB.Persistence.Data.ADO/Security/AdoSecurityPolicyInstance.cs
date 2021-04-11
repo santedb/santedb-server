@@ -27,8 +27,16 @@ namespace SanteDB.Persistence.Data.PSQL.Security
     /// <summary>
     /// Represents a local security policy instance
     /// </summary>
-    public class AdoSecurityPolicyInstance : IPolicyInstance
+    internal class AdoSecurityPolicyInstance : IPolicyInstance
     {
+
+        /// <summary>
+        /// ADO Policy instance
+        /// </summary>
+        public AdoSecurityPolicyInstance()
+        {
+
+        }
 
         /// <summary>
         /// Create a policy from policy instance

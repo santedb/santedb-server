@@ -117,8 +117,8 @@
   <!-- Database Configuration -->
   <section xsi:type="DataConfigurationSection">
       <connectionStrings>
-        <add name="FirebirdSQL" value="initial catalog=|DataDirectory|\santedb_test.fdb;server type=Embedded;user id=sysdba" provider="FirebirdSQL" />
-        <add name="AUDIT_FirebirdSQL" value="initial catalog=|DataDirectory|\sdb_audit.fdb;server type=Embedded;user id=sysdba" provider="FirebirdSQL"/>
+        <add name="FirebirdSQL" value="initial catalog=SDB_DATA.FDB;server type=Embedded;user id=sysdba" provider="FirebirdSQL" />
+        <add name="AUDIT_FirebirdSQL" value="initial catalog=SDB_AUDIT.FDB;server type=Embedded;user id=sysdba" provider="FirebirdSQL"/>
       </connectionStrings>
   </section>
   <!-- Object Relational Model Configuration -->
@@ -317,21 +317,6 @@
     </service>
   </section>
   
-  <!-- Used for authorizing clients using a claims token -->
-  <section xsi:type="ClaimsAuthorizationConfigurationSection" realm="127.0.0.1">
-    <issuer>
-      <add name="127.0.0.1" alg="hmac" hmacKey="uuNQ0pAkW+M2uxHjK1pisFZBFYjvkgveJcGtDy2E8i8=" />
-      <!-- To validate a sender using X509 certs -->
-      <!--<add name="127.0.0.1" alg="rsa" findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />-->
-    </issuer>
-    <audiences>
-      <add>http://localhost:8080/ami</add>
-      <add>http://localhost:8080/hdsi</add>
-      <add>http://localhost:8080/fhir</add>
-      <add>http://localhost:8080/risi</add>
-      <add>http://localhost:8080/sandbox</add>
-    </audiences>
-  </section>
   <!-- Represents this server's internal security configuration -->
   <section xsi:type="SecurityConfigurationSection"
            passwordRegex="^(?=.*\d){1,}(?=.*[a-z]){1,}(?=.*[A-Z]){1,}(?=.*[^\w\d]){1,}.{6,}$"
@@ -362,7 +347,8 @@
     </trustedPublishers>
     <!-- SanteDB signs a lot of data when communicating it, this is used for configuring how this server signs data -->
     <signingKeys>
-      <add alg="hmac" hmacKey="uuNQ0pAkW+M2uxHjK1pisFZBFYjvkgveJcGtDy2E8i8="/>
+      <add id="jwsdefault" alg="hmac" hmacSecret="@SanteDBDefault$$$409" />
+      <add id="default" alg="hmac" hmacSecret="@SanteDBDefault$$$409"/>
     </signingKeys>
     <!-- To Configure X509 Signatures -->
     <!--<signing alg="rsa" findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />-->
@@ -700,6 +686,10 @@
       Name Alias Services:
       <add type="SanteMPI.Persistence.ADO.Services.AdoNameAliasService, SanteMPI.Persistence.ADO, Version=2.1.0.0"/>
       -->
+      <!-- PubSub -->
+      <add type="SanteDB.Core.PubSub.Broker.PubSubBroker, SanteDB.Core.Api, Version=2.1.0"/>
+      <add type="SanteDB.Persistence.PubSub.ADO.AdoPubSubManager, SanteDB.Persistence.PubSub.ADO, Version=2.1.0"/>
+
     </serviceProviders>
   </section>
 </SanteDBConfiguration>

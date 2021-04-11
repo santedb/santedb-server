@@ -3,7 +3,8 @@
     <add type="SanteDB.OrmLite.Configuration.OrmConfigurationSection, SanteDB.OrmLite, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.Data.DataConfigurationSection, SanteDB.Core.Api, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Persistence.Data.ADO.Configuration.AdoPersistenceConfigurationSection, SanteDB.Persistence.Data.ADO, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Persistence.Auditing.ADO.Configuration.AdoAuditConfigurationSection, SanteDB.Persistence.Auditing.ADO, Version=1.10.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Persistence.Auditing.ADO.Configuration.AdoAuditConfigurationSection, SanteDB.Persistence.Auditing.ADO, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Persistence.PubSub.ADO.Configuration.AdoPubSubConfigurationSection, SanteDB.Persistence.PubSub.ADO, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
   </sections>
   <section xsi:type="DataConfigurationSection">
     <connectionStrings>
@@ -26,6 +27,15 @@
      readOnlyConnectionString="AUDIT"
      traceSql="false"
      providerType="npgsql" />
+  <section xsi:type="AdoPubSubConfigurationSection"
+    readWriteConnectionString="PSQL"
+    readOnlyConnectionString="PSQL"
+    traceSql="false"
+    providerType="npgsql"
+    autoUpdateExisting="true"
+    autoInsertChildren="true"
+    prepareStatements="true"
+      validationLevel="Warning"/>
   <section xsi:type="AdoPersistenceConfigurationSection"
            readWriteConnectionString="PSQL"
            readOnlyConnectionString="PSQL"

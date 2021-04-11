@@ -48,3 +48,15 @@
 [submodule "santedb-openapi"]
 	path = santedb-openapi
 	url = https://github.com/santedb/santedb-openapi
+[submodule "santedb-cache-memory"]
+	path = santedb-cache-memory
+	url = https://github.com/santedb/santedb-cache-memory
+[submodule "santedb-cache-redis"]
+	path = santedb-cache-redis
+	url = https://github.com/santedb/santedb-cache-redis
+[submodule "santedb-docker"]
+	path = santedb-docker
+	url = https://github.com/santedb/santedb-docker
+[submodule "santedb-i18n"]
+	path = santedb-i18n
+	url = https://github.com/santedb/santedb-i18n

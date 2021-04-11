@@ -37,6 +37,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         // Policy handler
         private IPolicyHandler m_handler;
 
+        /// <summary>
+        /// New ADO Security policy
+        /// </summary>
+        public AdoSecurityPolicy()
+        {
+
+        }
 
         /// <summary>
         /// Create a local security policy

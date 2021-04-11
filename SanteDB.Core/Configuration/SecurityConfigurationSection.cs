@@ -112,6 +112,18 @@ namespace SanteDB.Server.Core.Configuration
         public ObservableCollection<string> TrustedCertificates { get; set; }
 
         /// <summary>
+        /// Set the specified policy
+        /// </summary>
+        internal void SetPolicy(SecurityPolicyIdentification policyId, object policyValue)
+        {
+            var pol = this.SecurityPolicy.Find(o => o.PolicyId == policyId);
+            if (pol == null)
+                this.SecurityPolicy.Add(new SecurityPolicyConfiguration(policyId, policyValue));
+            else
+                pol.PolicyValue = policyValue;
+        }
+
+        /// <summary>
         /// Gets or sets the security policy configuration
         /// </summary>
         [XmlArray("securityPolicy"), XmlArrayItem("add")]

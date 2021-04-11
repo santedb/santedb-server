@@ -296,10 +296,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         {
     
             List<AdoSecurityPolicyInstance> result = null;
-            if (securable is IdentifiedData id)
-                result = this.m_adhocCache?.Get<List<AdoSecurityPolicyInstance>>($"pip.{id.GetType().Name}.{id.Key}.{id.Tag}");
-            else
-                id = null;
+            
 
             if (result == null)
             {
@@ -480,11 +477,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         else
                             result = new List<AdoSecurityPolicyInstance>();
 
-                        // Cache
-                        if (id != null)
-                            this.m_adhocCache?.Add($"pip.{id.GetType().Name}.{id.Key}.{id.Tag}", result);
-                            
-
+                       
                     }
                     catch (Exception e)
                     {

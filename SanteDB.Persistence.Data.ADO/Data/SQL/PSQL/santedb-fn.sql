@@ -1,8 +1,8 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data.ADO" id="0-003" name="Core Functions" invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data.ADO" id="00010000-03" name="Initialize:001-03" invariantName="npgsql">
  *	<summary>Install Core Functions</summary>
  *	<remarks>Installs the core SanteDB database functions</remarks>
- *  <isInstalled>SELECT IS_USR_LOCK('SYSTEM') IS NULL;</isInstalled>
+ *  <isInstalled>select pg_get_functiondef(oid) IS NOT NULL from pg_proc where proname = 'is_usr_lock';</isInstalled>
  * </feature>
  */
  -- RETURNS WHETHER THE USER ACCOUNT IS LOCKED

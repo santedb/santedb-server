@@ -1,0 +1,17 @@
+﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
+  <sections>
+    <add type="SanteDB.Authentication.OAuth2.Configuration.OAuthConfigurationSection, SanteDB.Authentication.OAuth2, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
+  </sections>
+  <section xsi:type="OAuthConfigurationSection" issuerName="http://localhost:8080/auth">
+    <allowedClaims>
+      <add>scope</add>
+      <add>PolicyOverride</add>
+      <add>ResourceId</add>
+      <add>PurposeOfUse</add>
+      <add>FacilityId</add>
+      <add>OrganizationId</add>
+    </allowedClaims>
+    <tokenType>bearer</tokenType>
+    <allowNodelessClientAuth>true</allowNodelessClientAuth>
+  </section>
+</SanteDBConfiguration>

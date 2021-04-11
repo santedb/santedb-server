@@ -39,6 +39,7 @@ using SanteDB.Core;
 using System.IdentityModel.Tokens;
 using System.Data.Linq;
 using SanteDB.Server.Core.Configuration;
+using SanteDB.Core.Security;
 
 namespace SanteDB.Rest.Common.Serialization
 {
@@ -50,7 +51,6 @@ namespace SanteDB.Rest.Common.Serialization
 
         // Error tracer
         private Tracer m_traceSource = Tracer.GetTracer(typeof(RestErrorHandler));
-        private ClaimsAuthorizationConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<ClaimsAuthorizationConfigurationSection>();
 
         /// <summary>
         /// Handle error
@@ -119,6 +119,21 @@ namespace SanteDB.Rest.Common.Serialization
             else if (error is UnauthorizedAccessException)
             {
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+            }
+            else if (error is SecuritySessionException ses)
+            {
+                switch (ses.Type)
+                {
+                    case SessionExceptionType.Expired:
+                    case SessionExceptionType.NotYetValid:
+                    case SessionExceptionType.NotEstablished:
+                        faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
+                        faultMessage.Headers.Add("WWW-Authenticate", $"Bearer");
+                        break;
+                    default:
+                        faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+                        break;
+                }
             }
             else if (error is FaultException)
                 faultMessage.StatusCode = (int)(error as FaultException).StatusCode;

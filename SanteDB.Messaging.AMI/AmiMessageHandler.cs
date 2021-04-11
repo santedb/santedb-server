@@ -168,7 +168,7 @@ namespace SanteDB.Messaging.AMI
         public bool Start()
         {
             // Don't startup unless in SanteDB
-            if (Assembly.GetEntryAssembly().GetName().Name != "SanteDB")
+            if (!Assembly.GetEntryAssembly().GetName().Name.StartsWith("SanteDB"))
                 return true;
 
             try
@@ -189,7 +189,7 @@ namespace SanteDB.Messaging.AMI
                 this.m_webHost.Start();
                 ModelSerializationBinder.RegisterModelType(typeof(SecurityPolicyInfo));
 
-                if (this.m_configuration.ResourceHandlers.Count() > 0)
+                if (this.m_configuration?.ResourceHandlers.Count() > 0)
                     AmiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.configuration.ResourceHandlers, typeof(IAmiServiceContract));
                 else
                     AmiMessageHandler.ResourceHandler = new ResourceHandlerTool(

@@ -20,6 +20,7 @@ using SanteDB.Configuration;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Features;
 using SanteDB.Core.Services;
+using SanteDB.Rest.Common.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -132,16 +133,16 @@ namespace SanteDB.Server.Core.Configuration.Features
         {
 
             // First, is the REST service enabled?
-            if (!configuration.SectionTypes.Any(o => o.Type == typeof(RestConfigurationSection)))
-                configuration.AddSection(new RestConfigurationSection());
+            if (!configuration.SectionTypes.Any(o => typeof(SanteDB.Rest.Common.Configuration.RestConfigurationSection).IsAssignableFrom(o.Type)))
+                configuration.AddSection(new SanteDB.Rest.Common.Configuration.RestConfigurationSection());
 
             // Does the contract exist?
-            var restConfiguration = configuration.GetSection<RestConfigurationSection>().Services.FirstOrDefault(s => s.Endpoints.Any(e => e.Contract == this.m_contractType));
+            var restConfiguration = configuration.GetSection<SanteDB.Rest.Common.Configuration.RestConfigurationSection>().Services.FirstOrDefault(s => s.Endpoints.Any(e => e.Contract == this.m_contractType));
 
             // Create / add section type
             if (!configuration.SectionTypes.Any(t => t.Type == this.m_configurationType))
                 configuration.SectionTypes.Add(new TypeReferenceConfiguration(this.m_configurationType));
-            
+
             // Does the section exist?
             var serviceConfiguration = configuration.GetSection(this.m_configurationType);
 

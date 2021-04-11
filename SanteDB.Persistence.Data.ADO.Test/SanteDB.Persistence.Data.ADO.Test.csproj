@@ -1,5 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(VersionNumber)' == ''">
+    <VersionNumber>2.1.0-debug</VersionNumber>
+  </PropertyGroup>
+  <ItemGroup><PackageReference Include="MSBuildTasks" Version="1.5.0.235"><PrivateAssets>all</PrivateAssets><IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets></PackageReference></ItemGroup>
+
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -102,17 +107,13 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.1.2.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.1.2.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.1.2.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Model" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.OrmLite" Version="$(VersionNumber)" />
       </ItemGroup>
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <ProjectReference Include="..\SanteDB.Caching.Memory\SanteDB.Caching.Memory.csproj">
-      <Project>{8553abc7-abfa-4a21-b0e8-68b7de76129d}</Project>
-      <Name>SanteDB.Caching.Memory</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core.TestFramework\SanteDB.Core.TestFramework.csproj">
       <Project>{ad73db46-cbb3-4746-b406-40fc435ab3db}</Project>
       <Name>SanteDB.Core.TestFramework</Name>
@@ -149,12 +150,16 @@
   </Choose>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PreBuildEvent>"$(SolutionDir)\Solution Items\FirebirdSQL-3.0.3-Embedded.bat" "$(SolutionDir)\Solution Items" "$(TargetDir)"</PreBuildEvent>
-  </PropertyGroup>
-  <Target Name="BeforeBuild">
-    <Copy SourceFiles="..\Solution Items\santedb_test.fdb" DestinationFolder="$(OutputPath)" ContinueOnError="false" />
-  </Target>
+<Choose>
+    <When Condition="$(SolutionName.Contains('-linux'))">
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <PreBuildEvent Condition="'$(NoFirebird)' == ''">"$(SolutionDir)\Solution Items\FirebirdSQL-3.0.3-Embedded.bat" "$(SolutionDir)\Solution Items" "$(TargetDir)"</PreBuildEvent>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -162,4 +167,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="BeforeBuild" Condition="!$(VersionNumber.EndsWith('-debug'))">
+    <AssemblyInfo CodeLanguage="CS" OutputFile="$(MSBuildProjectDirectory)\Properties\Version.cs" AssemblyVersion="$(VersionNumber)" AssemblyFileVersion="$(VersionNumber)" />
+  </Target>
+  <ItemGroup>
+    <Compile Include="Properties\Version.cs" />
+  </ItemGroup>
 </Project>

@@ -75,7 +75,7 @@ namespace SanteDB.Server.Core.Rest
         {
             var retVal = ServiceEndpointCapabilities.None;
             // Any of the capabilities are for security?
-            if (me.ServiceBehaviors.OfType<TokenAuthorizationAccessBehavior>().Any())
+            if (me.ServiceBehaviors.OfType<SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior>().Any())
                 retVal |= ServiceEndpointCapabilities.BearerAuth;
             if (me.ServiceBehaviors.OfType<BasicAuthorizationAccessBehavior>().Any())
                 retVal |= ServiceEndpointCapabilities.BasicAuth;
@@ -97,7 +97,7 @@ namespace SanteDB.Server.Core.Rest
             try
             {
                 // Get the configuration
-                var configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RestConfigurationSection>();
+                var configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SanteDB.Rest.Common.Configuration.RestConfigurationSection>();
                 var sname = serviceType.GetCustomAttribute<ServiceBehaviorAttribute>()?.Name ?? serviceType.FullName;
                 var config = configuration.Services.FirstOrDefault(o => o.Name == sname);
                 if (config == null)

@@ -46,6 +46,7 @@ using SanteDB.Core.Model.Query;
 using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
 using SanteDB.Core.Model.Serialization;
+using SanteDB.Core.Model.Interfaces;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -225,8 +226,16 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             if (mode == TransactionMode.Commit)
                             {
                                 tx.Commit();
+                                var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
                                 foreach (var itm in connection.CacheOnCommit)
-                                    ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(itm);
+                                {
+                                    if (itm is ITargetedAssociation tgrt)
+                                    {
+                                        cacheService?.Remove(tgrt.TargetEntityKey.GetValueOrDefault());
+                                        cacheService?.Remove(tgrt.SourceEntityKey.GetValueOrDefault());
+                                    }
+                                        cacheService?.Add(itm);
+                                }
                             }
                             else
                                 tx.Rollback();
@@ -324,8 +333,16 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             if (mode == TransactionMode.Commit)
                             {
                                 tx.Commit();
+                                var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
                                 foreach (var itm in connection.CacheOnCommit)
-                                    ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(itm);
+                                {
+                                    if (itm is ITargetedAssociation tgrt)
+                                    {
+                                        cacheService?.Remove(tgrt.TargetEntityKey.GetValueOrDefault());
+                                        cacheService?.Remove(tgrt.SourceEntityKey.GetValueOrDefault());
+                                    }
+                                    cacheService?.Add(itm);
+                                }
 
                             }
                             else
@@ -484,8 +501,16 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             if (mode == TransactionMode.Commit)
                             {
                                 tx.Commit();
+                                var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
                                 foreach (var itm in connection.CacheOnCommit)
-                                    ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(itm.Key.Value);
+                                {
+                                    if (itm is ITargetedAssociation tgrt)
+                                    {
+                                        cacheService?.Remove(tgrt.TargetEntityKey.GetValueOrDefault());
+                                        cacheService?.Remove(tgrt.SourceEntityKey.GetValueOrDefault());
+                                    }
+                                    cacheService?.Remove(itm.Key.GetValueOrDefault());
+                                }
                             }
                             else
                                 tx.Rollback();
@@ -665,11 +690,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     if (unionWith != null)
                         connection.AddData("UNION", unionWith);
 
-                    var results = this.Query(connection, preArgs.Query, queryId, preArgs.Offset, preArgs.Count ?? 1000, out totalCount, orderBy, true);
+                    var results = this.Query(connection, preArgs.Query, queryId, preArgs.Offset, preArgs.Count ?? 1000, out totalCount, orderBy, true).ToList();
                     var postData = new QueryResultEventArgs<TData>(query, results.AsQueryable(), offset, count, totalCount, queryId, overrideAuthContext);
                     this.Queried?.Invoke(this, postData);
 
-                    var retVal = postData.Results.ToList();
+                    var retVal = postData.Results;
 
                     // Add to cache
                     foreach (var i in retVal.Where(i => i != null))

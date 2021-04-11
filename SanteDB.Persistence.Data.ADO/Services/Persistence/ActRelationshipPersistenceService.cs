@@ -53,6 +53,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override ActRelationship InsertInternal(DataContext context, ActRelationship data)
         {
             // Ensure we haven't already persisted this
+            if (data.TargetAct != null) data.TargetAct = data.TargetAct.EnsureExists(context, this.m_settingsProvider.GetConfiguration().AutoInsertChildren) as Act;
             data.TargetActKey = data.TargetAct?.Key ?? data.TargetActKey;
             if (data.RelationshipType != null) data.RelationshipType = data.RelationshipType.EnsureExists(context, false) as Concept;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;

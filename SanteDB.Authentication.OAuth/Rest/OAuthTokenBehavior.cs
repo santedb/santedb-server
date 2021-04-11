@@ -203,7 +203,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         else
                             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService, devicePrincipal).Demand();
 
-                        principal = devicePrincipal;
+                        principal = devicePrincipal ?? clientPrincipal;
                         // Demand "Login As Service" permission
                         break;
                     case OAuthConstants.GrantNamePassword:
@@ -366,11 +366,12 @@ namespace SanteDB.Authentication.OAuth2.Rest
             var appid = claims.Find(o => o.Type == SanteDBClaimTypes.SanteDBApplicationIdentifierClaim).Value;
 
             // Signing credentials for the application
+            // TODO: Expose this as a configuration option - which key to use other than default
             var signingCredentials = SecurityUtils.CreateSigningCredentials($"SA.{appid}");
 
             // Was there a signing credentials provided for this application? If so, then create for default
             if(signingCredentials == null)
-                signingCredentials = SecurityUtils.CreateSigningCredentials(null); // attempt to get default
+                signingCredentials = SecurityUtils.CreateSigningCredentials(this.m_configuration.JwtSigningKey); // attempt to get default
 
             // Is the default an HMAC256 key? 
             if ((signingCredentials == null ||
@@ -482,7 +483,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         public object Session()
         {
-            new TokenAuthorizationAccessBehavior().Apply(new RestRequestMessage(RestOperationContext.Current.IncomingRequest)); ;
+            new SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior().Apply(new RestRequestMessage(RestOperationContext.Current.IncomingRequest)); ;
             var principal = Core.Security.AuthenticationContext.Current.Principal as IClaimsPrincipal;
 
             if (principal != null)
@@ -498,7 +499,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 {
                     DateTime notBefore = DateTime.Parse(principal.FindFirst(SanteDBClaimTypes.AuthenticationInstant).Value), notAfter = DateTime.Parse(principal.FindFirst(SanteDBClaimTypes.Expiration).Value);
 
-                    var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDBConstants.RestPropertyNameSession] as ISession);
+                    var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior.RestPropertyNameSession] as ISession);
                     return new OAuthTokenResponse()
                     {
                         AccessToken = RestOperationContext.Current.IncomingRequest.Headers["Authorization"].Split(' ')[1],
@@ -799,7 +800,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 var retVal = new OpenIdConfiguration();
 
                 // mex configuration
-                var mexConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<RestConfigurationSection>();
+                var mexConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SanteDB.Rest.Common.Configuration.RestConfigurationSection>();
                 String boundHostPort = $"{RestOperationContext.Current.IncomingRequest.Url.Scheme}://{RestOperationContext.Current.IncomingRequest.Url.Host}:{RestOperationContext.Current.IncomingRequest.Url.Port}";
                 if (!String.IsNullOrEmpty(mexConfig.ExternalHostPort))
                 {
@@ -834,7 +835,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         public Stream UserInfo()
         {
-            new TokenAuthorizationAccessBehavior().Apply(new RestRequestMessage(RestOperationContext.Current.IncomingRequest)); ;
+            new SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior().Apply(new RestRequestMessage(RestOperationContext.Current.IncomingRequest)); ;
             var principal = Core.Security.AuthenticationContext.Current.Principal as IClaimsPrincipal;
 
             if (principal != null)
@@ -843,7 +844,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     throw new SecurityException("No Such Session");
                 else
                 {
-                    var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDBConstants.RestPropertyNameSession] as ISession);
+                    var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior.RestPropertyNameSession] as ISession);
                     return new MemoryStream(Encoding.UTF8.GetBytes(jwt.Payload.SerializeToJson()));
                 }
             }
