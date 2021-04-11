@@ -203,7 +203,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         else
                             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService, devicePrincipal).Demand();
 
-                        principal = devicePrincipal;
+                        principal = devicePrincipal ?? clientPrincipal;
                         // Demand "Login As Service" permission
                         break;
                     case OAuthConstants.GrantNamePassword:
