@@ -1,0 +1,186 @@
+﻿/** 
+ * <feature scope="SanteDB.Persistence.Data" id="20200105-01" name="Update:20200105-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="FirebirdSQL">
+ *	<summary>Update: Add relationship allowing devices to be assigned a delegate user, and adds support for security challenges</summary>
+ *	<remarks>This allows devices to be tracked to facilities and users</remarks>
+ *	<isInstalled>select ck_patch('20200105-01') from rdb$database</isInstalled>
+ * </feature>
+ */
+
+-- ASSIGNED ENTITY
+INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('1373ff04-a6ef-420a-b1d0-4a07465fe8e8'), char_to_uuid('455f1772-f580-47e8-86bd-b5ce25d351f9'), char_to_uuid('FF34DFA7-C6D3-4F8B-BC9F-14BCDC13BA6C'), 'Device=[DedicatedServiceDeliveryLocation]=>ServiceDeliveryLocation'); 
+--#!
+INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('1373ff04-a6ef-420a-b1d0-4a07465fe8e8'), char_to_uuid('77b7a04b-c065-4faf-8ec0-2cdad4ae372b'), char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'), 'Device=[AssignedEntity]=>Person'); 
+--#!
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'),char_to_uuid('79DD4F75-68E8-4722-A7F5-8BC2E08F5CD6'), 'Person ==[Birthplace]==> CityOrTown');
+--#!
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'),char_to_uuid('48B2FFB3-07DB-47BA-AD73-FC8FB8502471'), 'Person ==[Birthplace]==> Country');
+--#!
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'),char_to_uuid('D9489D56-DDAC-4596-B5C6-8F41D73D8DC5'), 'Person ==[Birthplace]==> CountyOrParish');
+--#!
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'),char_to_uuid('8CF4B0B0-84E5-4122-85FE-6AFA8240C218'), 'Person ==[Birthplace]==> State');
+--#!
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'),char_to_uuid('79DD4F75-68E8-4722-A7F5-8BC2E08F5CD6'), 'Patient ==[Birthplace]==> CityOrTown');
+--#!
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'),char_to_uuid('48B2FFB3-07DB-47BA-AD73-FC8FB8502471'), 'Patient ==[Birthplace]==> Country');
+--#!
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'),char_to_uuid('D9489D56-DDAC-4596-B5C6-8F41D73D8DC5'), 'Patient ==[Birthplace]==> CountyOrParish');
+--#!
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76'),char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'),char_to_uuid('8CF4B0B0-84E5-4122-85FE-6AFA8240C218'), 'Patient ==[Birthplace]==> State');
+--#!
+ALTER TABLE ASGN_AUT_TBL ADD POL_ID UUID;
+--#!
+ALTER TABLE ASGN_AUT_TBL ADD UPD_UTC TIMESTAMP;
+--#!
+ALTER TABLE ASGN_AUT_TBL ADD UPD_PROV_ID UUID;
+--#!
+ALTER TABLE ASGN_AUT_TBL ADD CONSTRAINT CK_ASGN_AUT_UPD CHECK (UPD_UTC IS NULL OR UPD_UTC IS NOT NULL AND UPD_PROV_ID IS NOT NULL);
+--#!
+ALTER TABLE SEC_USR_CLM_TBL ADD EXP_UTC TIMESTAMP;
+--#!
+CREATE TABLE SEC_CHL_TBL (
+	CHL_ID UUID NOT NULL,
+	CHL_TXT VARCHAR(128) NOT NULL,
+	CRT_UTC TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, -- THE TIME THAT THE CHALLENGE WAS CREATED
+    CRT_PROV_ID UUID, -- THE USER WHICH CREATED THIS CHALLENGE
+    OBSLT_UTC TIMESTAMP, -- THE TIME THAT THE CHALLENGE RECORD WAS OBSOLETED
+    OBSLT_PROV_ID UUID, -- THE USER WHICH OBSOLETED THIS CHALLENGE 
+    UPD_UTC TIMESTAMP, -- THE TIME WHEN THIS CHALLENGE RECORD WAS LAST UPDATED
+    UPD_PROV_ID UUID, -- THE USER ID WHICH WAS RESPONSIBLE FOR THE UPDATE
+	CONSTRAINT PK_SEC_CHL_TBL PRIMARY KEY (CHL_ID),
+    CONSTRAINT FK_SEC_CHL_OBSLT_PROV_ID FOREIGN KEY(OBSLT_PROV_ID) REFERENCES SEC_PROV_TBL(PROV_ID),
+    CONSTRAINT FK_SEC_CHL_UPD_PROV_ID FOREIGN KEY (UPD_PROV_ID) REFERENCES SEC_PROV_TBL(PROV_ID),
+    CONSTRAINT FK_SEC_CHL_CRT_PROV_ID FOREIGN KEY (CRT_PROV_ID) REFERENCES SEC_PROV_TBL(PROV_ID),
+    CONSTRAINT CK_SEC_CHL_OBSLT_USR CHECK (OBSLT_PROV_ID IS NOT NULL AND OBSLT_UTC IS NOT NULL OR OBSLT_PROV_ID IS NULL AND OBSLT_UTC IS NULL),
+    CONSTRAINT CK_SEC_CHL_UPD_USR CHECK (UPD_PROV_ID IS NOT NULL AND UPD_UTC IS NOT NULL OR UPD_PROV_ID IS NULL AND UPD_UTC IS NULL)
+);
+--#!
+CREATE TABLE SEC_USR_CHL_ASSOC_TBL (
+	CHL_ID UUID NOT NULL,
+	USR_ID UUID NOT NULL,
+	CHL_RSP VARCHAR(128) NOT NULL,
+	EXP_UTC DATE NOT NULL,
+	CONSTRAINT PK_SEC_USR_CHL_ASSOC_TBL PRIMARY KEY (CHL_ID, USR_ID),
+	CONSTRAINT FK_SEC_USR_CHL_USR_TBL FOREIGN KEY (USR_ID) REFERENCES SEC_USR_TBL(USR_ID),
+	CONSTRAINT FK_SEC_USR_CHL_CHL_TBL FOREIGN KEY (CHL_ID) REFERENCES SEC_CHL_TBL(CHL_ID)
+);
+--#!
+ALTER TABLE SEC_USR_TBL ADD PWD_EXP_UTC DATE;
+--#!
+ALTER TABLE SEC_USR_TBL ADD TFA_MECH UUID;
+--#!
+DROP PROCEDURE AUTH_USR;
+--#!
+-- AUTHENTICATES THE USER IF APPLICABLE
+CREATE PROCEDURE AUTH_USR (
+	USR_NAME_IN VARCHAR(64),
+	PASSWD_IN VARCHAR(128),
+	MAX_FAIL_LOGIN_IN INT
+) RETURNS (
+    USR_ID UUID,
+    CLS_ID UUID,
+    USR_NAME VARCHAR(64),
+    EMAIL VARCHAR(256),
+    EMAIL_CNF BOOLEAN,
+    PHN_NUM VARCHAR(128), 
+    PHN_CNF BOOLEAN,
+    TFA_ENABLED BOOLEAN,
+    LOCKED TIMESTAMP, -- TRUE IF THE ACCOUNT HAS BEEN LOCKED
+    PASSWD VARCHAR(128),
+    SEC_STMP VARCHAR(128),
+    FAIL_LOGIN INT,
+    LAST_LOGIN_UTC TIMESTAMP,
+    CRT_UTC TIMESTAMP,
+    CRT_PROV_ID UUID, 
+    OBSLT_UTC TIMESTAMP,
+    OBSLT_PROV_ID UUID, 
+    UPD_UTC TIMESTAMP,
+    UPD_PROV_ID UUID, 
+	PWD_EXP_UTC DATE,
+	TFA_MECH UUID,
+    ERR_CODE VARCHAR(128)
+) AS
+	DECLARE VARIABLE VAR_USR_ID UUID;
+ 	DECLARE VARIABLE VAR_USR_ERR VARCHAR(128);
+	DECLARE VARIABLE VAR_USR_LOCK TIMESTAMP;
+	DECLARE VARIABLE VAR_USR_PWD VARCHAR(128);
+	DECLARE VARIABLE VAR_FAIL_LOGIN SMALLINT;
+	DECLARE VARIABLE VAR_PWD_EXP DATE;
+BEGIN
+	
+
+	SELECT USR_ID, PASSWD, FAIL_LOGIN, LOCKED, PWD_EXP_UTC
+	FROM 
+		SEC_USR_TBL
+	WHERE 
+		LOWER(SEC_USR_TBL.USR_NAME) = LOWER(:USR_NAME_IN)
+		AND SEC_USR_TBL.OBSLT_UTC IS NULL
+	INTO
+		VAR_USR_ID, VAR_USR_PWD, VAR_FAIL_LOGIN, VAR_USR_LOCK, VAR_PWD_EXP;
+
+	IF (IS_USR_LOCK(:USR_NAME_IN)) THEN BEGIN
+
+		VAR_USR_LOCK = DATEADD(second, POWER((VAR_FAIL_LOGIN - :MAX_FAIL_LOGIN_IN), 1.5) * 30, COALESCE(VAR_USR_LOCK, CURRENT_TIMESTAMP));
+
+		UPDATE SEC_USR_TBL SET FAIL_LOGIN = SEC_USR_TBL.FAIL_LOGIN + 1, LOCKED = :VAR_USR_LOCK
+			WHERE SEC_USR_TBL.USR_ID = :VAR_USR_ID;
+		
+		VAR_USR_ERR = 'AUTH_LCK:' || datediff(minute, CURRENT_TIMESTAMP, VAR_USR_LOCK) || ' minutes';
+		--VAR_USR_ERR = 'AUTH_LCK:' || (VAR_USR_LOCK - CURRENT_TIMESTAMP);
+	END
+	ELSE BEGIN
+		-- LOCKOUT ACCOUNTS
+		
+		IF(VAR_FAIL_LOGIN > :MAX_FAIL_LOGIN_IN) THEN BEGIN
+			VAR_USR_LOCK = DATEADD(second, POWER((VAR_FAIL_LOGIN - :MAX_FAIL_LOGIN_IN), 1.5) * 30, COALESCE(VAR_USR_LOCK, CURRENT_TIMESTAMP));
+
+			UPDATE SEC_USR_TBL SET FAIL_LOGIN = COALESCE(SEC_USR_TBL.FAIL_LOGIN, 0) + 1, LOCKED = :VAR_USR_LOCK
+				WHERE SEC_USR_TBL.USR_ID = :VAR_USR_ID;
+
+			VAR_USR_ERR = 'AUTH_LCK:' || datediff(minute, CURRENT_TIMESTAMP, VAR_USR_LOCK) || ' minutes';
+		END
+		ELSE IF (VAR_USR_PWD = :PASSWD_IN) THEN BEGIN
+			UPDATE SEC_USR_TBL SET 
+				FAIL_LOGIN = 0,
+				LAST_LOGIN_UTC = CURRENT_TIMESTAMP,
+				UPD_PROV_ID = char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'),
+				UPD_UTC = CURRENT_TIMESTAMP
+			WHERE USR_ID = :VAR_USR_ID;
+			
+			VAR_USR_ERR = NULL;
+		END
+		ELSE BEGIN
+			UPDATE SEC_USR_TBL SET FAIL_LOGIN = COALESCE(SEC_USR_TBL.FAIL_LOGIN, 0) + 1 WHERE SEC_USR_TBL.USR_ID = :VAR_USR_ID;
+			VAR_USR_ERR = 'AUTH_INV:' || USR_NAME_IN;
+		END
+	END
+
+	FOR SELECT USR_ID, CLS_ID, USR_NAME, EMAIL, EMAIL_CNF, PHN_NUM, 
+				PHN_CNF, TFA_ENABLED, LOCKED, PASSWD, SEC_STMP, FAIL_LOGIN, 
+				LAST_LOGIN_UTC, CRT_UTC, CRT_PROV_ID, OBSLT_UTC, OBSLT_PROV_ID,
+				UPD_UTC, UPD_PROV_ID, PWD_EXP_UTC, TFA_MECH, :VAR_USR_ERR
+			FROM SEC_USR_TBL
+			WHERE
+				USR_ID = :VAR_USR_ID
+			INTO 
+				:USR_ID, :CLS_ID, :USR_NAME, :EMAIL, :EMAIL_CNF, :PHN_NUM, 
+				:PHN_CNF, :TFA_ENABLED, :LOCKED, :PASSWD, :SEC_STMP, :FAIL_LOGIN, 
+				:LAST_LOGIN_UTC, :CRT_UTC, :CRT_PROV_ID, :OBSLT_UTC, :OBSLT_PROV_ID,
+				:UPD_UTC, :UPD_PROV_ID, :PWD_EXP_UTC, :TFA_MECH, :ERR_CODE
+	DO BEGIN
+		SUSPEND;
+	END
+END;
+--#!
+INSERT INTO sec_chl_tbl (chl_id, chl_txt, crt_prov_id) VALUES (gen_uuid(), 'security.challenge.text1', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+--#!
+INSERT INTO sec_chl_tbl (chl_id, chl_txt, crt_prov_id) VALUES (gen_uuid(), 'security.challenge.text2', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+--#!
+INSERT INTO sec_chl_tbl (chl_id, chl_txt, crt_prov_id) VALUES (gen_uuid(), 'security.challenge.text3', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+--#!
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('e15b96ab-646c-4c00-9a58-ea09eee67dad'), '1.3.6.1.4.1.33349.3.1.5.9.2.1.0.1', 'Login for Password Reassignment', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+--#!
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES (char_to_uuid('e15b96ab-646c-4c00-9a58-ea09eee67dae'), '1.3.6.1.4.1.33349.3.1.5.9.2.600', 'Special Security Elevation', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+--#!
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID, IS_ELEV) VALUES (char_to_uuid('e15b96ab-646c-4c00-9a58-ea09eee67daf'), '1.3.6.1.4.1.33349.3.1.5.9.2.600.1', 'Change Security Challenge Question', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'), TRUE);
+--#!
+SELECT REG_PATCH('20200105-01') FROM RDB$DATABASE;

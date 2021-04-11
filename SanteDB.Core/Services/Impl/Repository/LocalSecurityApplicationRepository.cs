@@ -19,6 +19,7 @@
 using SanteDB.Core;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using System;
 namespace SanteDB.Server.Core.Services.Impl
@@ -29,11 +30,15 @@ namespace SanteDB.Server.Core.Services.Impl
     public class LocalSecurityApplicationRepository : GenericLocalSecurityRepository<SecurityApplication>
     {
 
+        // Id provider
+        private IApplicationIdentityProviderService m_identityProvider;
+
         /// <summary>
         /// Local security application repository
         /// </summary>
-        public LocalSecurityApplicationRepository(IPrivacyEnforcementService privacyService) : base(privacyService)
+        public LocalSecurityApplicationRepository(IPrivacyEnforcementService privacyService, IApplicationIdentityProviderService identityProvider) : base(privacyService)
         {
+            this.m_identityProvider = identityProvider;
         }
 
         protected override string WritePolicy => PermissionPolicyIdentifiers.CreateApplication;
@@ -45,11 +50,26 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public override SecurityApplication Insert(SecurityApplication data)
         {
-            if (!String.IsNullOrEmpty(data.ApplicationSecret))
-                data.ApplicationSecret = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(data.ApplicationSecret);
-
            
-            return base.Insert(data);
+            // Create the identity
+            var id = this.m_identityProvider.CreateIdentity(data.Name, data.ApplicationSecret, AuthenticationContext.Current.Principal);
+
+            // Now ensure local db record exists
+            Guid sid = Guid.Empty;
+            if(id is IClaimsIdentity cIdentity)
+            {
+                var sidClaim = cIdentity.FindFirst(SanteDBClaimTypes.Sid);
+                Guid.TryParse(sidClaim.Value, out sid);
+            }
+            else
+            {
+                sid = this.m_identityProvider.GetSid(id.Name);
+            }
+
+            data.Key = sid;
+            data.ApplicationSecret = null;
+            return base.Save(data);
+
         }
 
         /// <summary>
@@ -58,7 +78,10 @@ namespace SanteDB.Server.Core.Services.Impl
         public override SecurityApplication Save(SecurityApplication data)
         {
             if (!String.IsNullOrEmpty(data.ApplicationSecret))
-                data.ApplicationSecret = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(data.ApplicationSecret);
+            {
+                this.m_identityProvider.ChangeSecret(data.Name, data.ApplicationSecret, AuthenticationContext.Current.Principal);
+                data.ApplicationSecret = null;
+            }
             return base.Save(data);
         }
     }

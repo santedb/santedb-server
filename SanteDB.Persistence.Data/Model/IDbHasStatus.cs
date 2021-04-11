@@ -16,29 +16,19 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
-using SanteDB.Core.Configuration;
-using SanteDB.Core.Model.Map;
-using SanteDB.Core.Security.Configuration;
-using SanteDB.Core.Services.Impl;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Security.Cryptography.X509Certificates;
-using System.Xml.Serialization;
 
-namespace SanteDB.Server.Core.Configuration
+namespace SanteDB.Persistence.Data.Model
 {
-
-   
     /// <summary>
-    /// SanteDB Security configuration
+    /// Represents a class which has a status
     /// </summary>
-    /// <remarks>This class is kept for exising implementations </remarks>
-    [XmlType(nameof(SecurityConfigurationSection), Namespace = "http://santedb.org/configuration")]
-    [Obsolete("Use SanteDB.Core.Configuration.SecurityConfigurationSection", true)]
-    public class SecurityConfigurationSection : SanteDB.Core.Configuration.SecurityConfigurationSection
+    public interface IDbHasStatus
     {
 
+        /// <summary>
+        /// Gets or sets the status key
+        /// </summary>
+        Guid StatusConceptKey { get; set; }
     }
 }

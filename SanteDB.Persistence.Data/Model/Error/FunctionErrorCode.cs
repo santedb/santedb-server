@@ -16,29 +16,19 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
-using SanteDB.Core.Configuration;
-using SanteDB.Core.Model.Map;
-using SanteDB.Core.Security.Configuration;
-using SanteDB.Core.Services.Impl;
+using SanteDB.OrmLite.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Security.Cryptography.X509Certificates;
-using System.Xml.Serialization;
 
-namespace SanteDB.Server.Core.Configuration
+namespace SanteDB.Persistence.Data.Model.Error
 {
-
-   
     /// <summary>
-    /// SanteDB Security configuration
+    /// This class exists to be able to extract the function error code for functions which cannot raise an exception because
+    /// they the transaction manager will rollback
     /// </summary>
-    /// <remarks>This class is kept for exising implementations </remarks>
-    [XmlType(nameof(SecurityConfigurationSection), Namespace = "http://santedb.org/configuration")]
-    [Obsolete("Use SanteDB.Core.Configuration.SecurityConfigurationSection", true)]
-    public class SecurityConfigurationSection : SanteDB.Core.Configuration.SecurityConfigurationSection
+    public class FunctionErrorCode
     {
 
+        [Column("err_code")]
+        public String ErrorCode { get; set; }
     }
 }

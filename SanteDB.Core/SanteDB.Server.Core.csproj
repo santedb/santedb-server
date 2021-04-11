@@ -72,7 +72,6 @@
     <Compile Include="Configuration\FileSystemQueueConfigurationSection.cs" />
     <Compile Include="Configuration\AppletConfigurationSection.cs" />
     <Compile Include="Configuration\RestConfigurationSection.cs" />
-    <Compile Include="Configuration\SecurityPolicyConfiguration.cs" />
     <Compile Include="Configuration\Features\WindowsServiceFeature.cs" />
     <Compile Include="Diagnostics\ConsoleTraceWriter.cs" />
     <Compile Include="Diagnostics\RolloverTextWriterTraceWriter.cs" />
@@ -220,7 +219,12 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup><PackageReference Include="MSBuildTasks" Version="1.5.0.235"><PrivateAssets>all</PrivateAssets><IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets></PackageReference></ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MSBuildTasks" Version="1.5.0.235">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
   <Target Name="BeforeBuild" Condition="!$(VersionNumber.EndsWith('-debug'))">
     <AssemblyInfo CodeLanguage="CS" OutputFile="$(MSBuildProjectDirectory)\Properties\Version.cs" AssemblyVersion="$(VersionNumber)" AssemblyFileVersion="$(VersionNumber)" />
   </Target>
