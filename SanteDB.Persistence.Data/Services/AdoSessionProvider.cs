@@ -423,7 +423,7 @@ namespace SanteDB.Persistence.Data.Services
                 catch (Exception e)
                 {
                     this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, null, false, isOverride, purpose, scope));
-                    throw new SecuritySessionException(SessionExceptionType.NotEstablished, ErrorMessages.ERR_SESSION_GEN_ERROR, e);
+                    throw new SecuritySessionException(SessionExceptionType.NotEstablished, ErrorMessages.ERR_SESSION_GEN_ERR, e);
                 }
             }
         }
