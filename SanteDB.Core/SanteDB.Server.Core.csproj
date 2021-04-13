@@ -78,7 +78,6 @@
     <Compile Include="Diagnostics\SystemDiagnosticsTraceWriter.cs" />
     <Compile Include="Docker\SecurityDockerFeature.cs" />
     <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="Configuration\SecurityConfigurationSection.cs" />
     <Compile Include="Http\DefaultRestClient.cs" />
     <Compile Include="Model\ModelExtensions.cs" />
     <Compile Include="Notification\Templating\RazorNotificationTemplateFiller.cs" />

@@ -190,7 +190,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Get secure key for the unknown application name
         /// </summary>
-        public byte[] GetSecureKey(string name)
+        public byte[] GetPublicKey(string name)
         {
             using (DataContext dataContext = this.m_configuration.Provider.GetWriteConnection())
                 try

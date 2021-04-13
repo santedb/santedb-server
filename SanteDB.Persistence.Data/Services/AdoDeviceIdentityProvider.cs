@@ -4,6 +4,7 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Configuration;
@@ -182,7 +183,7 @@ namespace SanteDB.Persistence.Data.Services
             if (systemPrincipal.Identity.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
             {
                 this.m_pepService.Demand(ApplicationServiceContext.Current.HostType == SanteDBHostType.Server ?
-                    PermissionPolicyIdentifiers.AlterIdentity, systemPrincipal);
+                    PermissionPolicyIdentifiers.AlterIdentity: PermissionPolicyIdentifiers.AlterLocalIdentity, systemPrincipal);
             }
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
@@ -214,7 +215,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// Gets an unauthenticated device identity for the specified name
         /// </summary>
-        public IIdentity GetIdentity(string name)
+        public IDeviceIdentity GetIdentity(string name)
         {
             if(!String.IsNullOrEmpty(name))
             {
@@ -255,7 +256,23 @@ namespace SanteDB.Persistence.Data.Services
             }
 
             this.m_pepService.Demand(ApplicationServiceContext.Current.HostType == SanteDBHostType.Server ?
-                    PermissionPolicyIdentifiers.AlterIdentity, principal)
+                    PermissionPolicyIdentifiers.AlterIdentity : PermissionPolicyIdentifiers.AlterLocalIdentity, principal);
+        }
+
+        /// <summary>
+        /// Create a new device identity
+        /// </summary>
+        public IDeviceIdentity CreateIdentity(string deviceId, string secret, IPrincipal principal)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Get the security identifier
+        /// </summary>
+        public Guid GetSid(string name)
+        {
+            throw new NotImplementedException();
         }
     }
 }
