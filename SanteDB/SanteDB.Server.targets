@@ -5,9 +5,10 @@
       <Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    
     <None Include="$(MSBuildThisFileDirectory)\*.fdb">
       <Link>%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="$(MSBuildThisFileDirectory)\*.msg">
       <Link>%(FileName)%(Extension)</Link>
@@ -17,9 +18,6 @@
       <Link>%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="$(MSBuildThisFileDirectory)\data\*.dataset">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="$(MSBuildThisFileDirectory)SanteDB.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -27,11 +25,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)santedb.config.nuget.xml">
-      <Link>santedb.config.nuget.xml</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+  
+  <Target Name="CopyDatasetFiles" AfterTargets="AfterBuild">
+     <ItemGroup>
+      <DatasetFiles Include="$(MSBuildThisFileDirectory)\data\**\*.dataset" />
+    </ItemGroup>
+    <Copy SourceFiles="@(DatasetFiles)" DestinationFolder="$(OutDir)data\" />
+  </Target>
   
 </Project>

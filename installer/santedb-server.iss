@@ -32,7 +32,7 @@ Compression = none
 #else
 Compression = lzma
 #endif
-AppCopyright = Copyright (C) 2015-2020 SanteSuite Contributors
+AppCopyright = Copyright (C) 2015-2021 SanteSuite Contributors
 ArchitecturesInstallIn64BitMode = x64
 ArchitecturesAllowed =  x64
 WizardStyle=modern
@@ -171,6 +171,7 @@ Source: ..\bin\Release\SanteDB.Configuration.dll; DestDir: {app}; Components: se
 Source: ..\bin\Release\SanteDB.Core.Api.dll; DestDir: {app}; Components: core server
 Source: ..\bin\Release\SanteDB.Core.Applets.dll; DestDir: {app}; Components: core server
 Source: ..\bin\Release\SanteDB.Server.Core.dll; DestDir: {app}; Components: core
+Source: ..\bin\Release\SanteDB.Docker.Core.dll; DestDir: {app}; Components: core
 Source: ..\bin\Release\SanteDB.Server.dll; DestDir: {app}; Components: core
 Source: ..\bin\Release\SanteDB.Core.Model.dll; DestDir: {app}; Components: core server
 Source: ..\bin\Release\SharpCompress.dll; DestDir: {app}; Components: core
@@ -180,6 +181,7 @@ Source: ..\bin\Release\SanteDB.Messaging.HDSI.Client.dll; DestDir: {app}; Compon
 Source: ..\bin\Release\SanteDB.OrmLite.dll; DestDir: {app}; Components: server
 Source: ..\bin\Release\SanteDB.Persistence.Auditing.ADO.dll; DestDir: {app}; Components: server
 Source: ..\bin\Release\SanteDB.Persistence.Data.ADO.dll; DestDir: {app}; Components: server
+Source: ..\bin\Release\SanteDB.Persistence.PubSub.ADO.dll; DestDir: {app}; Components: server
 Source: ..\bin\Release\SanteDB.Persistence.Diagnostics.Email.dll; DestDir: {app}; Components: server
 Source: ..\bin\Release\RazorTemplates.Core.dll; DestDir: {app}; Components: server
 

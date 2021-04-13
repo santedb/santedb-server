@@ -7,7 +7,7 @@ then
 fi;
 
 # Create output directories if not exists
-mkdir -p {./bin/Release/data,./santedb-fhir/bin/Release/data,./santedb-hl7/bin/Release/data,./santedb-gs1/bin/Release/data,./santedb-mdm/bin/Release/data}
+mkdir -p {./bin/Release/data,./santedb-fhir/bin/Release/data,./santedb-hl7/bin/Release/data,./santedb-gs1/bin/Release/data,./santedb-mdm/bin/Release/data,./bin/Release/config}
 
 # Restore, build and compile 
 ./submodule-pull.sh $2
@@ -24,6 +24,7 @@ cp ./santedb-model/bin/Release/*.XML ./bin/Release/
 cp -v ./santedb-fhir/SanteDB.Messaging.FHIR/Data/* ./bin/Release/data/
 cp -v ./santedb-hl7/SanteDB.Messaging.HL7/Data/* ./bin/Release/data/
 cp -v ./santedb-gs1/SanteDB.Messaging.GS1/Data/* ./bin/Release/data/
+cp -v ./SanteDB/config/* ./bin/Release/config/
 mkdir -p ./bin/Release/data/SQL
 cp -rv ./SanteDB.Persistence.Data.ADO/Data/SQL/* ./bin/Release/data/SQL/
 

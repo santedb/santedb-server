@@ -47,8 +47,7 @@
     <file src="..\bin\$configuration$\SanteDB.Messaging.Hdsi.dll" target="Build\" />
     <file src="..\bin\$configuration$\SanteDB.Persistence.Diagnostics.Email.dll" target="Build\" />
     <file src="..\bin\$configuration$\SanteDB.exe.config" target="Build\" />
-    <file src="..\bin\$configuration$\santedb.config.nuget.xml" target="Build\" />
-    <file src="..\Solution Items\santedb_test.fdb" target="Build\" />
+    <file src=".\Data\SDB_BASE.FDB" target="Build\" />
     <file src=".\Data\SDB_AUDIT.FDB" target="Build\" />
     <file src="..\bin\$configuration$\fbclient.dll" target="build\"/>
     <file src="..\bin\$configuration$\firebird.conf" target="build\"/>
