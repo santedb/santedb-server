@@ -73,6 +73,17 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
         [Column("occ_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid? OccupationKey { get; set; }
 
+        /// <summary>
+        /// Gets or sets the gender concept
+        /// </summary>
+        /// <value>The gender concept.</value>
+        [Column("gndr_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        public Guid GenderConceptKey
+        {
+            get;
+            set;
+        }
+
     }
 }
 

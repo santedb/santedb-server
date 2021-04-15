@@ -932,7 +932,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         .Where(o => o.HasValue)
                         .Select(o => o.Value)
                     ).Union(
-                        fromContext.Query<DbPatient>(o => o.ParentKey != null)
+                        fromContext.Query<DbPerson>(o => o.ParentKey != null)
                         .Select(o => o.GenderConceptKey)
                         .Distinct()
                     )
