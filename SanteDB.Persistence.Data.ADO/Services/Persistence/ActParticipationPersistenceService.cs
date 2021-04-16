@@ -78,7 +78,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 LoadState = context.LoadState,
                 Quantity = participationPart.Quantity,
                 Key = participationPart.Key,
-                SourceEntityKey = participationPart.SourceKey
+                SourceEntityKey = participationPart.SourceKey,
+                ClassificationKey = participationPart.ClassificationKey
             };
 
             if (context.LoadState == Core.Model.LoadState.FullLoad)

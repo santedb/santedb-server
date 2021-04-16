@@ -66,7 +66,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 retVal.DeceasedDatePrecision = PersonPersistenceService.PrecisionMap.Where(o => o.Value == patientInstance.DeceasedDatePrecision).Select(o => o.Key).First();
 
             retVal.MultipleBirthOrder = (int?)patientInstance.MultipleBirthOrder;
-            retVal.GenderConceptKey = patientInstance.GenderConceptKey;
+            retVal.GenderConceptKey = personInstance.GenderConceptKey;
             retVal.OccupationKey = personInstance.OccupationKey;
             retVal.LivingArrangementKey = patientInstance.LivingArrangementKey;
             retVal.VipStatusKey = patientInstance.VipStatusKey;

@@ -71,7 +71,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 Quantity = entPart.Quantity,
                 LoadState = context.LoadState,
                 Key = entPart.Key,
-                SourceEntityKey = entPart.SourceKey
+                SourceEntityKey = entPart.SourceKey,
+                ClassificationKey = entPart.ClassificationKey
             };
         }
 
