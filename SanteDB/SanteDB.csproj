@@ -187,13 +187,14 @@
     <None Include="data\000-PurposeOfUse.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="data\000-ReferenceRelationship.dataset" />
     <None Include="data\000-RegistrationEventTypes.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="data\000-ObservationVerificationStatus.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="data\000-ReferenceRelationship.dataset">
+    <None Include="data\000-RelationshipClassifications.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="data\000-TelecomTypeCodes.dataset">

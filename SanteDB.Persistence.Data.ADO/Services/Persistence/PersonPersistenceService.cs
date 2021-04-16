@@ -72,6 +72,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var retVal = m_entityPersister.ToModelInstance<Person>(entityVersionInstance, entityInstance, context);
             if (retVal == null || personInstance == null) return retVal;
             retVal.DateOfBirth = personInstance.DateOfBirth;
+            retVal.OccupationKey = personInstance.OccupationKey;
+            retVal.GenderConceptKey = personInstance.GenderConceptKey;
 
             // Reverse lookup
             if (!String.IsNullOrEmpty(personInstance?.DateOfBirthPrecision))
