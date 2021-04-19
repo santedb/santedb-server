@@ -50,7 +50,7 @@ namespace SanteDB.Persistence.Data.Services
         // PEP
         private IPolicyEnforcementService m_pepService;
 
-        // TODO: Session 
+        // TODO: Session caching in a memory cache 
 
         /// <summary>
         /// Claims which are not to be stored or set in the session
@@ -79,9 +79,9 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// Creates a new ADO session identity provider with injected configuration manager
         /// </summary>
-        public AdoSessionProvider(IConfigurationManager configuration, 
-            IDataSigningService dataSigning, 
-            IPasswordHashingService passwordHashingService, 
+        public AdoSessionProvider(IConfigurationManager configuration,
+            IDataSigningService dataSigning,
+            IPasswordHashingService passwordHashingService,
             IPolicyDecisionService policyDecisionService,
             IPolicyInformationService policyInformationService,
             IPolicyEnforcementService policyEnforcementService)
@@ -108,6 +108,10 @@ namespace SanteDB.Persistence.Data.Services
         /// Fired when a session is abandoned
         /// </summary>
         public event EventHandler<SessionEstablishedEventArgs> Abandoned;
+        /// <summary>
+        /// Fired when a session is abandoned
+        /// </summary>
+        public event EventHandler<SessionEstablishedEventArgs> Extended;
 
         /// <summary>
         /// Extracts and validates the session token
@@ -126,7 +130,7 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public void Abandon(ISession session)
         {
-            if(session == null)
+            if (session == null)
             {
                 throw new ArgumentNullException(nameof(session), ErrorMessages.ERR_ARGUMENT_NULL);
             }
@@ -145,7 +149,7 @@ namespace SanteDB.Persistence.Data.Services
 
                     using (var tx = context.BeginTransaction())
                     {
-                        
+
                         var dbSession = context.FirstOrDefault<DbSession>(o => o.Key == sessionId && o.NotAfter > DateTimeOffset.Now);
                         if (dbSession == null)
                         {
@@ -163,7 +167,7 @@ namespace SanteDB.Persistence.Data.Services
                         this.Abandoned?.Invoke(this, new SessionEstablishedEventArgs(null, session, true, false, null, null));
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_tracer.TraceError("Cannot abandon session {0} - {1}", BitConverter.ToString(session.Id), e);
                     this.Abandoned?.Invoke(this, new SessionEstablishedEventArgs(null, session, false, false, null, null));
@@ -177,7 +181,348 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public IPrincipal Authenticate(ISession session)
         {
-            if(session == null)
+            var identities = this.GetSessionIdentities(session, true, out AdoSecuritySession adoSession);
+            return new AdoSessionPrincipal(adoSession, identities.OfType<IClaimsIdentity>());
+        }
+
+        /// <summary>
+        /// Establish a new session with the specified principal
+        /// </summary>
+        public ISession Establish(IPrincipal principal, string remoteEp, bool isOverride, string purpose, string[] scope, string lang)
+        {
+            if (principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            else if (!principal.Identity.IsAuthenticated)
+            {
+                throw new SecurityException(ErrorMessages.ERR_SESSION_NOT_AUTH_PRINCIPAL);
+            }
+            else if (isOverride && (String.IsNullOrEmpty(purpose) || scope == null || scope.Length == 0))
+            {
+                throw new InvalidOperationException(ErrorMessages.ERR_SESSION_OVERRIDE_WITH_INSUFFICIENT_DATA);
+            }
+
+            // Must be claims principal
+            if (!(principal is IClaimsPrincipal claimsPrincipal))
+            {
+                throw new SecurityException(ErrorMessages.ERR_SESSION_NOT_CLAIMS_PRINCIPAL);
+            }
+
+            // Claims principals may set override and scope which trumps the user provided ones
+            if(claimsPrincipal.HasClaim(o=>o.Type == SanteDBClaimTypes.SanteDBScopeClaim))
+            {
+                scope = claimsPrincipal.FindAll(SanteDBClaimTypes.SanteDBScopeClaim).Select(o => o.Value).ToArray();
+            }
+            if(claimsPrincipal.HasClaim(o=>o.Type == SanteDBClaimTypes.PurposeOfUse))
+            {
+                purpose = claimsPrincipal.FindFirst(SanteDBClaimTypes.PurposeOfUse).Value;
+            }
+
+            // Validate override permission for the user
+            if (isOverride)
+            {
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.OverridePolicyPermission, principal);
+            }
+            
+            // Validate scopes are valid or can be overridden
+            if (scope != null)
+            {
+                foreach (var pol in scope.Select(o => this.m_pipService.GetPolicy(o)))
+                {
+                    var grant = this.m_pdpService.GetPolicyOutcome(principal, pol.Oid);
+                    switch (grant)
+                    {
+                        case Core.Model.Security.PolicyGrantType.Deny:
+                            throw new PolicyViolationException(principal, pol, grant);
+                        case Core.Model.Security.PolicyGrantType.Elevate: // validate override
+                            if (!pol.CanOverride)
+                            {
+                                throw new PolicyViolationException(principal, pol, Core.Model.Security.PolicyGrantType.Deny);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+                    using (var tx = context.BeginTransaction())
+                    {
+
+                        // Generate refresh token
+                        IIdentity applicationId = claimsPrincipal.Identities.OfType<IApplicationIdentity>().FirstOrDefault(),
+                            deviceId = claimsPrincipal.Identities.OfType<IDeviceIdentity>().FirstOrDefault(),
+                            userId = claimsPrincipal.Identities.FirstOrDefault(o => !(o is IApplicationIdentity || o is IDeviceIdentity));
+
+                        if (applicationId == null)
+                        {
+                            throw new InvalidOperationException(ErrorMessages.ERR_SESSION_NO_APPLICATION_ID);
+                        }
+
+                        // Fetch the keys for the identities 
+                        Guid? applicationKey = null, deviceKey = null, userKey = null;
+
+                        // Application
+                        if (applicationId is AdoIdentity adoApplication)
+                        {
+                            applicationKey = adoApplication.Sid;
+                        }
+                        else if (applicationId is IClaimsIdentity claimApplication)
+                        {
+                            applicationKey = Guid.Parse(claimApplication.FindFirst(SanteDBClaimTypes.Sid)?.Value ?? claimApplication.FindFirst(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim)?.Value);
+                        }
+                        else
+                        {
+                            applicationKey = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationId.Name.ToLowerInvariant())?.Key;
+                        }
+
+                        // Device
+                        if (deviceId is AdoIdentity adoDevice)
+                        {
+                            deviceKey = adoDevice.Sid;
+                        }
+                        else if (deviceId is IClaimsIdentity claimDevice)
+                        {
+                            deviceKey = Guid.Parse(claimDevice.FindFirst(SanteDBClaimTypes.Sid)?.Value ?? claimDevice.FindFirst(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim)?.Value);
+                        }
+                        else
+                        {
+                            deviceKey = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == deviceId.Name.ToLowerInvariant())?.Key;
+                        }
+
+                        // User
+                        if (userId is AdoIdentity adoUser)
+                        {
+                            userKey = adoUser.Sid;
+                        }
+                        else if (userId is IClaimsIdentity claimUser)
+                        {
+                            userKey = Guid.Parse(claimUser.FindFirst(SanteDBClaimTypes.Sid)?.Value);
+                        }
+                        else
+                        {
+                            userKey = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userId.Name)?.Key;
+                        }
+
+                        // Establish time limit
+                        var expiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.SessionLength, new TimeSpan(1, 0, 0)));
+                        // User is not really logging in, they are attempting to change their password only
+                        if (scope?.Contains(PermissionPolicyIdentifiers.LoginPasswordOnly) == true &&
+                            (purpose?.Equals(PurposeOfUseKeys.SecurityAdmin.ToString(), StringComparison.OrdinalIgnoreCase) == true ||
+                            claimsPrincipal.FindFirst(SanteDBClaimTypes.PurposeOfUse)?.Value.Equals(PurposeOfUseKeys.SecurityAdmin.ToString(), StringComparison.OrdinalIgnoreCase) == true))
+                        {
+                            expiration = DateTimeOffset.Now.AddSeconds(120);
+                        }
+
+                        // Create sessoin data
+                        var refreshToken = Guid.NewGuid();
+                        var dbSession = new DbSession()
+                        {
+                            ApplicationKey = applicationKey.GetValueOrDefault(),
+                            DeviceKey = deviceKey,
+                            UserKey = userKey,
+                            NotBefore = DateTimeOffset.Now,
+                            NotAfter = expiration,
+                            RefreshExpiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.RefreshLength, new TimeSpan(1, 0, 0))),
+                            RefreshToken = this.m_passwordHashingService.ComputeHash(refreshToken.ToString())
+                        };
+
+                        dbSession = context.Insert(dbSession);
+
+                        // Claims to be added to session
+                        var claims = claimsPrincipal.Claims.ToList();
+                        claims.RemoveAll(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim || o.Type == SanteDBClaimTypes.SanteDBScopeClaim);
+
+                        // Default = *
+                        var sessionScopes = new List<string>();
+                        if (scope == null || scope.Contains("*"))
+                            sessionScopes.AddRange(this.m_pdpService.GetEffectivePolicySet(principal).Select(c => c.Policy.Oid));
+
+                        // Explicitly set scopes
+                        sessionScopes.AddRange(scope.Where(s => !"*".Equals(s)));
+
+                        // Add claims
+                        claims.AddRange(sessionScopes.Distinct().Select(o => new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, o)));
+
+                        // Override? 
+                        if (isOverride)
+                        {
+                            claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBOverrideClaim, "true"));
+                        }
+                        // POU?
+                        if (!String.IsNullOrEmpty(purpose))
+                        {
+                            claims.Add(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, purpose));
+                        }
+
+                        // Specialized language for this user?
+                        if (!String.IsNullOrEmpty(lang))
+                        {
+                            claims.Add(new SanteDBClaim(SanteDBClaimTypes.Language, lang));
+                        }
+
+                        // Insert claims to database
+                        var dbClaims = claims.Where(c => !this.m_nonSessionClaims.Contains(c.Type)).Select(o => new DbSessionClaim()
+                        {
+                            SessionKey = dbSession.Key,
+                            ClaimType = o.Type,
+                            ClaimValue = o.Value
+                        });
+                        context.Insert(dbClaims);
+
+                        tx.Commit();
+
+                        var signedToken = dbSession.Key.ToByteArray().Concat(m_dataSigningService.SignData(dbSession.Key.ToByteArray())).ToArray();
+                        var signedRefresh = refreshToken.ToByteArray().Concat(m_dataSigningService.SignData(refreshToken.ToByteArray())).ToArray();
+                        var session = new AdoSecuritySession(signedToken, signedRefresh, dbSession, dbClaims);
+
+                        this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, session, true, isOverride, purpose, scope));
+                        return session;
+                    }
+                }
+                catch (NullReferenceException e)
+                {
+                    this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, null, false, isOverride, purpose, scope));
+                    throw new SecuritySessionException(SessionExceptionType.NotEstablished, ErrorMessages.ERR_SESSION_MISSING_IDENTITY_DATA, e);
+                }
+                catch (Exception e)
+                {
+                    this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, null, false, isOverride, purpose, scope));
+                    throw new SecuritySessionException(SessionExceptionType.NotEstablished, ErrorMessages.ERR_SESSION_GEN_ERR, e);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Extend the provided session with the refresh token provided
+        /// </summary>
+        public ISession Extend(byte[] refreshToken)
+        {
+            if (refreshToken == null)
+            {
+                throw new ArgumentNullException(nameof(refreshToken), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+            // Validate tamper check
+            if (!this.ExtractValidateSessionKey(refreshToken, out Guid refreshTokenId))
+            {
+                throw new SecuritySessionException(SessionExceptionType.SignatureFailure, ErrorMessages.ERR_SESSION_TAMPER, null);
+            }
+
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    using (var tx = context.BeginTransaction())
+                    {
+                        var refreshHash = this.m_passwordHashingService.ComputeHash(refreshTokenId.ToString());
+                        var dbSession = context.SingleOrDefault<DbSession>(o => o.RefreshToken == refreshHash);
+
+                        if (dbSession == null)
+                        {
+                            throw new KeyNotFoundException(ErrorMessages.ERR_SESSION_TOKEN_INVALID);
+                        }
+                        else if (dbSession.NotAfter < DateTimeOffset.Now)
+                        {
+                            throw new SecuritySessionException(SessionExceptionType.Expired, ErrorMessages.ERR_SESSION_REFRESH_EXPIRE, null);
+                        }
+
+                        var dbClaims = context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Key).ToList();
+
+                        // Validate - Override sessions cannot be extended
+                        if (dbClaims.Any(c => c.ClaimType == SanteDBClaimTypes.SanteDBOverrideClaim && c.ClaimValue == "true"))
+                        {
+                            throw new SecurityException(ErrorMessages.ERR_ELEVATED_SESSION_NO_EXTENSION);
+                        }
+
+                        // Generate a new session for this 
+                        refreshTokenId = Guid.NewGuid();
+                        dbSession.RefreshToken = this.m_passwordHashingService.ComputeHash(refreshTokenId.ToString());
+                        dbSession.RefreshExpiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.RefreshLength, new TimeSpan(1, 0, 0)));
+                        dbSession.NotAfter = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.SessionLength, new TimeSpan(1, 0, 0)));
+                        dbSession.NotBefore = DateTimeOffset.Now;
+                        dbSession = context.Update(dbSession);
+
+                        tx.Commit();
+
+                        var signedToken = dbSession.Key.ToByteArray().Concat(m_dataSigningService.SignData(dbSession.Key.ToByteArray())).ToArray();
+                        var signedRefresh = refreshTokenId.ToByteArray().Concat(m_dataSigningService.SignData(refreshTokenId.ToByteArray())).ToArray();
+                        var session = new AdoSecuritySession(signedToken, signedRefresh, dbSession, dbClaims);
+                        this.Extended?.Invoke(this, new SessionEstablishedEventArgs(null, session, true, false,
+                            session.FindFirst(SanteDBClaimTypes.PurposeOfUse).Value,
+                            session.Find(SanteDBClaimTypes.SanteDBScopeClaim).Select(o => o.Value).ToArray()));
+                        return session;
+                    }
+                }
+                catch(SecuritySessionException)
+                {
+                    throw;
+                }
+                catch(Exception e)
+                {
+                    this.m_tracer.TraceError("Error extending session: {0}", e);
+                    throw new SecuritySessionException(SessionExceptionType.Other, ErrorMessages.ERR_SESSION_GEN_ERR, e);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get the specified session
+        /// </summary>
+        public ISession Get(byte[] sessionToken, bool allowExpired = false)
+        {
+            if(sessionToken == null)
+            {
+                throw new ArgumentNullException(nameof(sessionToken), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            
+            if(!this.ExtractValidateSessionKey(sessionToken, out Guid sessionId))
+            {
+                throw new SecuritySessionException(SessionExceptionType.SignatureFailure, ErrorMessages.ERR_SESSION_TAMPER, null);
+            }
+
+            using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    var dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionId);
+                    if(dbSession == null || !allowExpired && dbSession.NotAfter < DateTimeOffset.Now)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        return new AdoSecuritySession(sessionToken, null, dbSession, context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Key));
+                    }
+                }
+                catch(Exception e)
+                {
+                    this.m_tracer.TraceError("Error getting session data {0}", e);
+                    throw new DataPersistenceException(ErrorMessages.ERR_SESSION_GEN_ERR, e);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get all identities which are part of the session
+        /// </summary>
+        public IIdentity[] GetIdentities(ISession session) => this.GetSessionIdentities(session, false, out AdoSecuritySession _);
+
+        /// <summary>
+        /// Get all identiites for the valid session
+        /// </summary>
+        private IIdentity[] GetSessionIdentities(ISession session, bool authenticated, out AdoSecuritySession adoSession)
+        {
+            if (session == null)
             {
                 throw new ArgumentNullException(nameof(session), ErrorMessages.ERR_ARGUMENT_NULL);
             }
@@ -202,246 +547,52 @@ namespace SanteDB.Persistence.Data.Services
                         .Where<DbSession>(o => o.Key == sessionId);
                     var dbSession = context.FirstOrDefault<CompositeResult<DbSession, DbSecurityApplication, DbSecurityUser, DbSecurityDevice>>(sql);
 
-                    if(dbSession.Object1.NotAfter < DateTimeOffset.Now)
-                    {
-                        throw new SecuritySessionException(SessionExceptionType.Expired, ErrorMessages.ERR_SESSION_EXPIRE, null);
-                    }
-                    else if(dbSession.Object1.NotBefore > DateTimeOffset.Now)
-                    {
-                        throw new SecuritySessionException(SessionExceptionType.NotYetValid, ErrorMessages.ERR_SESSION_NOT_VALID, null);
-                    }
-
-                    var crtSession = new AdoSecuritySession(session.Id, null, dbSession.Object1, context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Object1.Key));
+                    adoSession = new AdoSecuritySession(session.Id, null, dbSession.Object1, context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Object1.Key));
 
                     // Precendence of identiites in the principal : User , App, Device
                     var identities = new IClaimsIdentity[3];
                     if (dbSession.Object3?.Key != null)
                     {
-                        identities[0] = new AdoUserIdentity(dbSession.Object3, "SESSION");
+                        if (authenticated)
+                        {
+                            identities[0] = new AdoUserIdentity(dbSession.Object3, "SESSION");
+                        }
+                        else
+                        {
+                            identities[0] = new AdoUserIdentity(dbSession.Object3);
+                        }
                     }
                     if (dbSession.Object2?.Key != null)
                     {
-                        identities[1] = new AdoApplicationIdentity(dbSession.Object2, "SESSION");
+                        if (authenticated)
+                        {
+                            identities[1] = new AdoApplicationIdentity(dbSession.Object2, "SESSION");
+                        }
+                        else
+                        {
+                            identities[1] = new AdoApplicationIdentity(dbSession.Object2);
+                        }
                     }
-                    if(dbSession.Object4?.Key != null)
+                    if (dbSession.Object4?.Key != null)
                     {
-                        identities[2] = new AdoDeviceIdentity(dbSession.Object4, "SESSION");
+                        if (authenticated)
+                        {
+                            identities[2] = new AdoDeviceIdentity(dbSession.Object4, "SESSION");
+                        }
+                        else
+                        {
+                            identities[2] = new AdoDeviceIdentity(dbSession.Object4);
+                        }
                     }
 
-                    return new AdoSessionPrincipal(crtSession, identities);
+                    return identities.OfType<IIdentity>().ToArray();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error authenticating based on session data - {0}", e);
                     throw new SecuritySessionException(SessionExceptionType.NotEstablished, ErrorMessages.ERR_SESSION_GEN_ERR, e);
                 }
             }
-        }
-
-        /// <summary>
-        /// Establish a new session with the specified principal
-        /// </summary>
-        public ISession Establish(IPrincipal principal, string remoteEp, bool isOverride, string purpose, string[] scope, string lang)
-        {
-            if(principal == null)
-            {
-                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
-            }
-            else if(!principal.Identity.IsAuthenticated)
-            {
-                throw new SecurityException(ErrorMessages.ERR_SESSION_NOT_AUTH_PRINCIPAL);
-            }
-            else if(isOverride && (String.IsNullOrEmpty(purpose) || scope == null || scope.Length == 0))
-            {
-                throw new InvalidOperationException(ErrorMessages.ERR_SESSION_OVERRIDE_WITH_INSUFFICIENT_DATA);
-            }
-
-            // Must be claims principal
-            if (!(principal is IClaimsPrincipal claimsPrincipal))
-            {
-                throw new SecurityException(ErrorMessages.ERR_SESSION_NOT_CLAIMS_PRINCIPAL);
-            }
-            
-            // Validate override permission for the user
-            if(isOverride)
-            {
-                this.m_pepService.Demand(PermissionPolicyIdentifiers.OverridePolicyPermission, principal);
-            }
-            // Validate scopes are valid or can be overridden
-            if(scope != null)
-            {
-                foreach(var pol in scope.Select(o=>this.m_pipService.GetPolicy(o)))
-                {
-                    var grant = this.m_pdpService.GetPolicyOutcome(principal, pol.Oid);
-                    switch(grant)
-                    {
-                        case Core.Model.Security.PolicyGrantType.Deny:
-                            throw new PolicyViolationException(principal, pol, grant);
-                        case Core.Model.Security.PolicyGrantType.Elevate: // validate override
-                            if(!pol.CanOverride)
-                            {
-                                throw new PolicyViolationException(principal, pol, Core.Model.Security.PolicyGrantType.Deny);
-                            }
-                            break;
-                    }
-                }
-            }
-
-            using (var context = this.m_configuration.Provider.GetWriteConnection())
-            {
-                try
-                {
-                    context.Open();
-                    using(var tx = context.BeginTransaction())
-                    {
-
-                        // Generate refresh token
-                        IIdentity applicationId = claimsPrincipal.Identities.OfType<IApplicationIdentity>().FirstOrDefault(),
-                            deviceId = claimsPrincipal.Identities.OfType<IDeviceIdentity>().FirstOrDefault(),
-                            userId = claimsPrincipal.Identities.FirstOrDefault(o => !(o is IApplicationIdentity || o is IDeviceIdentity));
-
-                        if(applicationId == null)
-                        {
-                            throw new InvalidOperationException(ErrorMessages.ERR_SESSION_NO_APPLICATION_ID);
-                        }
-
-                        // Fetch the keys for the identities 
-                        Guid? applicationKey = null, deviceKey = null, userKey = null;
-
-                        // Application
-                        if(applicationId is AdoIdentity adoApplication)
-                        {
-                            applicationKey = adoApplication.Sid;
-                        }
-                        else if(applicationId is IClaimsIdentity claimApplication)
-                        {
-                            applicationKey = Guid.Parse(claimApplication.FindFirst(SanteDBClaimTypes.Sid)?.Value ?? claimApplication.FindFirst(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim)?.Value);
-                        }
-                        else
-                        {
-                            applicationKey = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationId.Name.ToLowerInvariant())?.Key;
-                        }
-
-                        // Device
-                        if(deviceId is AdoIdentity adoDevice)
-                        {
-                            deviceKey = adoDevice.Sid;
-                        }
-                        else if (deviceId is IClaimsIdentity claimDevice)
-                        {
-                            deviceKey = Guid.Parse(claimDevice.FindFirst(SanteDBClaimTypes.Sid)?.Value ?? claimDevice.FindFirst(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim)?.Value);
-                        }
-                        else
-                        {
-                            deviceKey = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == deviceId.Name.ToLowerInvariant())?.Key;
-                        }
-
-                        // User
-                        if(userId is AdoIdentity adoUser)
-                        {
-                            userKey = adoUser.Sid;
-                        }
-                        else if(userId is IClaimsIdentity claimUser)
-                        {
-                            userKey = Guid.Parse(claimUser.FindFirst(SanteDBClaimTypes.Sid)?.Value);
-                        }
-                        else
-                        {
-                            userKey = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userId.Name)?.Key;
-                        }
-
-                        // Establish time limit
-                        var expiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.SessionLength, new TimeSpan(1, 0, 0)));
-                        // User is not really logging in, they are attempting to change their password only
-                        if(scope?.Contains(PermissionPolicyIdentifiers.LoginPasswordOnly) == true &&
-                            (purpose?.Equals(PurposeOfUseKeys.SecurityAdmin.ToString(), StringComparison.OrdinalIgnoreCase) == true ||
-                            claimsPrincipal.FindFirst(SanteDBClaimTypes.PurposeOfUse)?.Value.Equals(PurposeOfUseKeys.SecurityAdmin.ToString(), StringComparison.OrdinalIgnoreCase) == true))
-                        {
-                            expiration = DateTimeOffset.Now.AddSeconds(120);
-                        }
-
-                        // Create sessoin data
-                        var refreshToken = Guid.NewGuid();
-                        var dbSession = new DbSession()
-                        {
-                            ApplicationKey = applicationKey.GetValueOrDefault(),
-                            DeviceKey = deviceKey,
-                            UserKey = userKey,
-                            NotBefore = DateTimeOffset.Now,
-                            NotAfter = expiration,
-                            RefreshExpiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.RefreshLength, new TimeSpan(1, 0, 0))),
-                            RefreshToken = this.m_passwordHashingService.ComputeHash(refreshToken.ToString())
-                        };
-
-                        dbSession = context.Insert(dbSession);
-
-                        // Claims to be added to session
-                        var claims = claimsPrincipal.Claims.ToList();
-                        if(!claims.Any(c=>c.Type.Equals(SanteDBClaimTypes.SanteDBOverrideClaim)))
-                        {
-                            // Default = *
-                            var sessionScopes = new List<string>();
-                            if (scope == null || scope.Contains("*"))
-                                sessionScopes.AddRange(this.m_pdpService.GetEffectivePolicySet(principal).Select(c => c.Policy.Oid));
-
-                            // Explicitly set scopes
-                            sessionScopes.AddRange(scope.Where(s => !"*".Equals(s)));
-
-                            // Add claims
-                            claims.AddRange(sessionScopes.Distinct().Select(o => new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, o)));
-                        }
-
-                        // Specialized language for this user?
-                        if(!String.IsNullOrEmpty(lang))
-                        {
-                            claims.Add(new SanteDBClaim(SanteDBClaimTypes.Language, lang));
-                        }
-
-                        // Insert claims to database
-                        var dbClaims = claims.Where(c=>!this.m_nonSessionClaims.Contains(c.Type)).Select(o => new DbSessionClaim()
-                        {
-                            SessionKey = dbSession.Key,
-                            ClaimType = o.Type,
-                            ClaimValue = o.Value
-                        });
-                        context.Insert(dbClaims);
-
-                        tx.Commit();
-
-                        var signedToken = dbSession.Key.ToByteArray().Concat(m_dataSigningService.SignData(dbSession.Key.ToByteArray())).ToArray();
-                        var signedRefresh = refreshToken.ToByteArray().Concat(m_dataSigningService.SignData(refreshToken.ToByteArray())).ToArray();
-                        var session = new AdoSecuritySession(signedToken, signedRefresh, dbSession, dbClaims);
-                        this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, session, true, isOverride, purpose, scope));
-                        return session;
-                    }
-                }
-                catch (NullReferenceException e)
-                {
-                    this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, null, false, isOverride, purpose, scope));
-                    throw new SecuritySessionException(SessionExceptionType.NotEstablished, ErrorMessages.ERR_SESSION_MISSING_IDENTITY_DATA, e);
-                }
-                catch (Exception e)
-                {
-                    this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, null, false, isOverride, purpose, scope));
-                    throw new SecuritySessionException(SessionExceptionType.NotEstablished, ErrorMessages.ERR_SESSION_GEN_ERR, e);
-                }
-            }
-        }
-
-
-        public ISession Extend(byte[] refreshToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ISession Get(byte[] sessionToken, bool allowExpired = false)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IIdentity[] GetIdentities(ISession session)
-        {
-            throw new NotImplementedException();
         }
     }
 }

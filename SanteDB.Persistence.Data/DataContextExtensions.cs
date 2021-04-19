@@ -1,4 +1,4 @@
-﻿using SanteDB.Core.Model.Exceptions;
+﻿using SanteDB.Core.i18n;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
@@ -51,7 +51,7 @@ namespace SanteDB.Persistence.Data
                     }
                     else
                     {
-                        throw new SecurityException(ErrorMessageConstants.ERR_SEC_PROVENANCE_UNK_ID);
+                        throw new SecurityException(ErrorMessages.ERR_SEC_PROVENANCE_UNK_ID);
                     }
 
                     // Set apporopriate property
@@ -80,7 +80,7 @@ namespace SanteDB.Persistence.Data
 
                 if(!retVal.UserKey.HasValue)
                 {
-                    throw new SecurityException(ErrorMessageConstants.ERR_SEC_PROVENANCE_UNK_ID);
+                    throw new SecurityException(ErrorMessages.ERR_SEC_PROVENANCE_UNK_ID);
                 }
             }
 
@@ -102,7 +102,7 @@ namespace SanteDB.Persistence.Data
             }
             catch (Exception e)
             {
-                throw new SecurityException(ErrorMessageConstants.ERR_SEC_PROVENANCE_GEN_ERR, e);
+                throw new SecurityException(ErrorMessages.ERR_SEC_PROVENANCE_GEN_ERR, e);
             }
         }
     }

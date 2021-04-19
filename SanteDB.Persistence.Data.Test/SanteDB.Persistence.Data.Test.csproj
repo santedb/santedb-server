@@ -6,15 +6,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="7.5.0" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0"/>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SanteDB.Persistence.Data\SanteDB.Persistence.Data.csproj">
       <Name>SanteDB.Persistence.Data</Name>
     </ProjectReference>
+    
   </ItemGroup>
   <Choose>
     <When Condition="$(SolutionName.Contains('-ext'))">
@@ -27,6 +29,9 @@
         </ProjectReference>
         <ProjectReference Include="..\SanteDB.Core\SanteDB.Server.Core.csproj">
           <Name>SanteDB.Server.Core</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\SanteDB.Core.TestFramework\SanteDB.Core.TestFramework.csproj">
+          <Name>SanteDB.Core.TestFramework</Name>
         </ProjectReference>
       </ItemGroup>
     </When>

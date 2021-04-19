@@ -1,10 +1,12 @@
-﻿using SanteDB.Core.Model.Constants;
+﻿using SanteDB.Core.i18n;
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Security.Principal;
 using System.Text;
 
@@ -26,6 +28,16 @@ namespace SanteDB.Persistence.Data.Security
         /// <param name="authenticationMethod">The method used to authenticate (password, session, etc.)</param>
         internal AdoUserIdentity(DbSecurityUser userData, String authenticationMethod) : base(userData.UserName, authenticationMethod, true)
         {
+            // Has the user been locked since the session was established?
+            if (userData.Lockout > DateTimeOffset.Now)
+            {
+                throw new SecurityException(ErrorMessages.ERR_AUTH_USR_LOCKED);
+            }
+            else if (userData.ObsoletionTime.HasValue)
+            {
+                throw new SecurityException(ErrorMessages.ERR_AUTH_USR_INVALID);
+            }
+
             this.m_securityUser = userData;
             this.InitializeClaims();
         }
@@ -58,7 +70,7 @@ namespace SanteDB.Persistence.Data.Security
         /// <summary>
         /// Add role claims for the user authentication
         /// </summary>
-        private void AddRoleClaims(IEnumerable<String> roleNames)
+        internal void AddRoleClaims(IEnumerable<String> roleNames)
         {
             this.AddClaims(roleNames.Select(o=>new SanteDBClaim(SanteDBClaimTypes.DefaultRoleClaimType, o)));
         }

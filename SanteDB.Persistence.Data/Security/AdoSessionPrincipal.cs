@@ -11,7 +11,7 @@ namespace SanteDB.Persistence.Data.Security
     /// <summary>
     /// Represents a session principal from an ADO session
     /// </summary>
-    public class AdoSessionPrincipal : IClaimsPrincipal
+    internal class AdoSessionPrincipal : IClaimsPrincipal
     {
 
         // Session information

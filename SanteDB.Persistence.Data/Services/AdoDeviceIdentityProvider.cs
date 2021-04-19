@@ -130,6 +130,7 @@ namespace SanteDB.Persistence.Data.Services
                                 dev.Lockout = DateTimeOffset.Now.AddSeconds(lockoutSlide);
                             }
                         }
+                        context.Update(dev);
                         throw new AuthenticationException(ErrorMessages.ERR_AUTH_APP_INVALID);
                     }
 

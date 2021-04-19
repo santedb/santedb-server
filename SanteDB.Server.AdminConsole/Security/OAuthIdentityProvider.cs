@@ -254,6 +254,11 @@ namespace SanteDB.Server.AdminConsole.Security
             throw new NotImplementedException();
         }
 
+        public Guid GetSid(string name)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
     }
 }

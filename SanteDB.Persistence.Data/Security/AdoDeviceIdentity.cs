@@ -1,8 +1,10 @@
-﻿using SanteDB.Core.Security.Claims;
+﻿using SanteDB.Core.i18n;
+using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
+using System.Security;
 using System.Text;
 
 namespace SanteDB.Persistence.Data.Security
@@ -22,6 +24,16 @@ namespace SanteDB.Persistence.Data.Security
         /// </summary>
         internal AdoDeviceIdentity(DbSecurityDevice device, String authenticationMethod) : base(device.PublicId, authenticationMethod, true)
         {
+            // Has the user been locked since the session was established?
+            if (device.Lockout > DateTimeOffset.Now)
+            {
+                throw new SecurityException(ErrorMessages.ERR_AUTH_DEV_LOCKED);
+            }
+            else if (device.ObsoletionTime.HasValue)
+            {
+                throw new SecurityException(ErrorMessages.ERR_AUTH_DEV_INVALID);
+            }
+
             this.m_device = device;
             this.InitializeClaims();
         }

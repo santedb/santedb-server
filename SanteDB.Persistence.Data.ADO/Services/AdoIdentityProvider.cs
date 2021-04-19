@@ -192,11 +192,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 retVal = AdoClaimsIdentity.Create(dataContext, user, true, "Tfa+LastPasswordHash").CreateClaimsPrincipal();
                                 if (retVal.Identity is IClaimsIdentity ici)
                                 {
-                                    ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, PurposeOfUseKeys.SecurityAdmin.ToString()));
-                                    ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
-                                    ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
-                                    ici.RemoveClaim(retVal.FindFirst(SanteDBClaimTypes.Expiration));
-                                    ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, DateTime.Now.AddMinutes(5).ToString("o"))); // Special case, password
+                                    //ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, PurposeOfUseKeys.SecurityAdmin.ToString()));
+                                    //ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
+                                    //ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
+                                    //ici.RemoveClaim(retVal.FindFirst(SanteDBClaimTypes.Expiration));
+                                    //ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, DateTime.Now.AddMinutes(5).ToString("o"))); // Special case, password
                                 }
                             }
                             else if (!String.IsNullOrEmpty(password))
@@ -591,13 +591,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     var principal = auth.Object1.UserKey.GetValueOrDefault() == Guid.Empty ?
                         new SanteDBClaimsPrincipal(identities) : AdoClaimsIdentity.Create(context, auth.Object3, true, "SESSION").CreateClaimsPrincipal(identities);
                     
-                    identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, session.NotBefore.ToString("o")));
-                    identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, session.NotAfter.ToString("o")));
-                    identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, auth.Object1.Key.ToString()));
+                    //identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, session.NotBefore.ToString("o")));
+                    //identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, session.NotAfter.ToString("o")));
+                    //identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, auth.Object1.Key.ToString()));
 
-                    // Add claims from session
-                    foreach (var clm in session.Claims)
-                        identities.First().AddClaim(clm);
+                    //// Add claims from session
+                    //foreach (var clm in session.Claims)
+                    //    identities.First().AddClaim(clm);
                     
                     // TODO: Load additional claims made about the user on the session
                     return principal;
@@ -672,6 +672,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 this.m_traceSource.TraceError("Error getting identities for session {0}", session.Id);
                 throw new DataPersistenceException($"Error getting identities for session {BitConverter.ToString(session.Id)}");
             }
+        }
+
+        public Guid GetSid(string name)
+        {
+            throw new NotImplementedException();
         }
     }
 }

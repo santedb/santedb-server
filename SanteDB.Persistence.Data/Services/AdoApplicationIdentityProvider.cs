@@ -138,6 +138,7 @@ namespace SanteDB.Persistence.Data.Services
                                 app.Lockout = DateTimeOffset.Now.AddSeconds(lockoutSlide);
                             }
                         }
+                        context.Update(app);
                         throw new AuthenticationException(ErrorMessages.ERR_AUTH_APP_INVALID);
                     }
 
@@ -427,7 +428,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// Gets the device security identity
         /// </summary>
-        public Guid? GetSid(string name)
+        public Guid GetSid(string name)
         {
             if(String.IsNullOrEmpty(name))
             {
@@ -443,7 +444,7 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         throw new KeyNotFoundException(ErrorMessages.ERR_NOT_FOUND);
                     }
-                    return app;
+                    return app.Value;
                 }
                 catch(Exception e)
                 {

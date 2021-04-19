@@ -133,6 +133,11 @@ namespace SanteDB.Server.AdminConsole.Security
             throw new NotImplementedException();
         }
 
+        public Guid GetSid(string name)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Re-authenticates (extends) a session
         /// </summary>

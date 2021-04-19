@@ -68,6 +68,8 @@
   
   <ItemGroup>
     <None Remove="Map\ModelMap.xml" />
+    <None Remove="SQL\20210414-FBSQL.sql" />
+    <None Remove="SQL\20210414-PSQL.sql" />
     <None Remove="SQL\FBSQL\santedb-codes.sql" />
     <None Remove="SQL\FBSQL\santedb-ddl.sql" />
     <None Remove="SQL\FBSQL\santedb-fn.sql" />
@@ -126,6 +128,12 @@
   
   <ItemGroup>
     <EmbeddedResource Include="Map\ModelMap.xml" />
+    <EmbeddedResource Include="SQL\Updates\20210414-FBSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SQL\Updates\20210414-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="SQL\FBSQL\santedb-codes.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>

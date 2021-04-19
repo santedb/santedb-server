@@ -64,5 +64,14 @@ namespace SanteDB.Persistence.Data.Security
             this.NotAfter = sessionInfo.NotAfter;
         }
 
+        /// <summary>
+        /// Find first claim matching
+        /// </summary>
+        internal IClaim FindFirst(string claimType) => this.Claims.FirstOrDefault(o => o.Type == claimType);
+
+        /// <summary>
+        /// Find all claims
+        /// </summary>
+        internal IEnumerable<IClaim> Find(string claimType) => this.Claims.Where(o => o.Type == claimType);
     }
 }

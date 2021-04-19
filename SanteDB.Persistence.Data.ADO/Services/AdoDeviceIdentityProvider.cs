@@ -20,6 +20,7 @@ using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.ADO.Configuration;
@@ -205,6 +206,21 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     this.traceSource.TraceEvent(EventLevel.Error, "Error setting secret identity data for {0} : {1}", name, e);
                     throw new DataPersistenceException($"Error canging secret for {name}", e);
                 }
+        }
+
+        public IDeviceIdentity CreateIdentity(string deviceId, string secret, IPrincipal principal)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Guid GetSid(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        IDeviceIdentity IDeviceIdentityProviderService.GetIdentity(string name)
+        {
+            throw new NotImplementedException();
         }
     }
 }

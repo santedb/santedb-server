@@ -39,6 +39,7 @@ using System.Text;
 using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Server.Core.Security;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Security.Principal;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -211,6 +212,21 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     this.m_traceSource.TraceEvent(EventLevel.Error, "Error setting secret for {0} : {1}", name, e);
                     throw new DataPersistenceException($"Error getting secure key for {name}", e);
                 }
+        }
+
+        public IApplicationIdentity CreateIdentity(string applicationName, string password, IPrincipal principal)
+        {
+            throw new NotImplementedException();
+        }
+
+        IApplicationIdentity IApplicationIdentityProviderService.GetIdentity(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Guid GetSid(string name)
+        {
+            throw new NotImplementedException();
         }
     }
 }

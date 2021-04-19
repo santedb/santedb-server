@@ -55,7 +55,7 @@ namespace SanteDB.Persistence.Data.Model.Security
 		/// </summary>
 		/// <value><c>true</c> if lockout enabled; otherwise, <c>false</c>.</value>
 		[Column("locked")]
-		public DateTime? Lockout {
+		public DateTimeOffset? Lockout {
 			get;
 			set;
 		}
@@ -110,7 +110,7 @@ namespace SanteDB.Persistence.Data.Model.Security
 		/// </summary>
 		/// <value>The last login.</value>
 		[Column("last_login_utc")]
-		public DateTime? LastLoginTime {
+		public DateTimeOffset? LastLoginTime {
 			get;
 			set;
 		}
@@ -160,7 +160,7 @@ namespace SanteDB.Persistence.Data.Model.Security
         /// Password expiration
         /// </summary>
         [Column("pwd_exp_utc")]
-        public DateTime? PasswordExpiration { get; set; }
+        public DateTimeOffset? PasswordExpiration { get; set; }
 
         /// <summary>
         /// True if password expiry was specified

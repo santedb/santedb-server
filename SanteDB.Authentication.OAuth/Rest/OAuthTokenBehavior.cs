@@ -431,7 +431,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
             if (session != null)
             {
                 sessionId = BitConverter.ToString(session.Id).Replace("-", "");
-                (claimsPrincipal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim("jti", sessionId));
                 refreshToken = BitConverter.ToString(session.RefreshToken).Replace("-", "");
             }
             if (scope == PermissionPolicyIdentifiers.LoginPasswordOnly)
