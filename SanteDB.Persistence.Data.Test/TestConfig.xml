@@ -20,9 +20,9 @@
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.10.0.23074" xmlns="http://santedb.org/configuration">
   <sections>
+    <add type="SanteDB.Core.Configuration.SecurityConfigurationSection, SanteDB.Core.Api, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.ApplicationServiceContextConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.DiagnosticsConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Server.Core.Configuration.SecurityConfigurationSection, SanteDB.Server.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0"/>
     <add type="SanteDB.Persistence.Auditing.ADO.Configuration.AdoAuditConfigurationSection, SanteDB.Persistence.Auditing.ADO, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Persistence.Data.Configuration.AdoPersistenceConfigurationSection, SanteDB.Persistence.Data, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
@@ -44,14 +44,38 @@
       <add name="Firebird Data Provider" invariant="FirebirdSQL" description="Firebird" type="FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient, Culture=neutral, PublicKeyToken=3750abcc3150b00c" />
     </dbProviderFactories>
   </section>
-  <!-- Represents this server's internal security configuration -->
-  <section xsi:type="SecurityConfigurationSection" passwordRegex="^(?=.*\d){1,}(?=.*[a-z]){1,}(?=.*[A-Z]){1,}(?=.*[^\w\d]){1,}.{6,}$" allowUnsignedApplets="true">
+  <section xsi:type="SecurityConfigurationSection"
+           passwordRegex="^(?=.*\d){1,}(?=.*[a-z]){1,}(?=.*[A-Z]){1,}(?=.*[^\w\d]){1,}.{6,}$"
+           allowUnsignedApplets="true"
+           pepExemptionPolicy="devices">
+    <!-- Sets policies for the system -->
+    <securityPolicy>
+      <add enabled="true" policy="auth.pwd.maxAge">
+        <int>120</int>
+      </add>
+      <add enabled="true" policy="auth.pwd.history">
+        <bool>true</bool>
+      </add>
+      <add enabled="true" policy="auth.failLogin">
+        <int>5</int>
+      </add>
+      <add enabled="true" policy="auth.session.length">
+        <timespan>PT30M</timespan>
+      </add>
+      <add enabled="true" policy="auth.session.refresh">
+        <timespan>PT35M</timespan>
+      </add>
+    </securityPolicy>
     <!-- Sets the thumbprints of publishers that should be trusted to run code-->
     <trustedPublishers>
       <add>84BD51F0584A1F708D604CF0B8074A68D3BEB973</add>
+      <add>82C63E1E9B87578D0727E871D7613F2F0FAF683B</add>
     </trustedPublishers>
     <!-- SanteDB signs a lot of data when communicating it, this is used for configuring how this server signs data -->
-    <signing alg="hmac" hmacKey="uuNQ0pAkW+M2uxHjK1pisFZBFYjvkgveJcGtDy2E8i8="/>
+    <signingKeys>
+      <add id="jwsdefault" alg="hmac" hmacSecret="@SanteDBDefault$$$409" />
+      <add id="default" alg="hmac" hmacSecret="@SanteDBDefault$$$409"/>
+    </signingKeys>
     <!-- To Configure X509 Signatures -->
     <!--<signing alg="rsa" findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />-->
   </section>
@@ -87,6 +111,7 @@
       <add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryService, SanteDB.Server.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Server.Core.Security.Privacy.LocalPolicyEnforcementPointService, SanteDB.Server.Core,Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Server.Core.Services.Impl.DefaultNetworkInformationService, SanteDB.Server.Core,Version=2.0.0.0, Culture=neutral, PublicKeyToken=null"/>
+      <add type="SanteDB.Server.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Server.Core, Version=2.1.0.0" />
 
     </serviceProviders>
   </section>

@@ -101,6 +101,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
         public event EventHandler<SessionEstablishedEventArgs> Established;
 
         /// <summary>
+        /// Fired when the session is established
+        /// </summary>
+        public event EventHandler<SessionEstablishedEventArgs> Extended;
+
+        /// <summary>
         /// Fired when a session is abandoned
         /// </summary>
         public event EventHandler<SessionEstablishedEventArgs> Abandoned;
@@ -208,7 +213,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         }
 
                         claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, dbSession.Key.ToString()));
-                        (cprincipal.Identity as IClaimsIdentity).AddClaim(claims.Last());
+                        //(cprincipal.Identity as IClaimsIdentity).AddClaim(claims.Last());
                         // Add default policies
                         var oizPrincipalPolicies = pdp.GetEffectivePolicySet(cprincipal);
                         // Scopes user is allowed to access

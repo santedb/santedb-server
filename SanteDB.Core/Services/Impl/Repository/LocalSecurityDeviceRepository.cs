@@ -37,7 +37,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Security device repository
         /// </summary>
-        public LocalSecurityDeviceRepository(IPrivacyEnforcementService privacyService, IDeviceIdentityProviderService identityProvider) : base(privacyService)
+        public LocalSecurityDeviceRepository(IDeviceIdentityProviderService identityProvider, IPrivacyEnforcementService privacyService = null) : base(privacyService)
         {
             this.m_identityProvider = identityProvider;
         }

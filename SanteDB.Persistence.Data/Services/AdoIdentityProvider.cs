@@ -232,9 +232,7 @@ namespace SanteDB.Persistence.Data.Services
                         try
                         {
 
-                            // Claims to add to the principal
-                            var claims = context.Query<DbUserClaim>(o => o.SourceKey == dbUser?.Key && o.ClaimExpiry < DateTimeOffset.Now).ToList();
-
+                            
                             if (dbUser == null)
                             {
                                 throw new AuthenticationException(ErrorMessages.ERR_AUTH_USR_INVALID);
@@ -243,7 +241,11 @@ namespace SanteDB.Persistence.Data.Services
                             {
                                 throw new AuthenticationException(ErrorMessages.ERR_AUTH_USR_LOCKED);
                             }
-                            else if (!String.IsNullOrEmpty(password))
+
+                            // Claims to add to the principal
+                            var claims = context.Query<DbUserClaim>(o => o.SourceKey == dbUser.Key && o.ClaimExpiry < DateTimeOffset.Now).ToList();
+
+                            if (!String.IsNullOrEmpty(password))
                             {
                                 if (dbUser.PasswordExpiration.HasValue && dbUser.PasswordExpiration.Value < DateTimeOffset.Now)
                                 {
@@ -256,7 +258,7 @@ namespace SanteDB.Persistence.Data.Services
                                     throw new AuthenticationException(ErrorMessages.ERR_AUTH_USR_INVALID);
                                 }
                             }
-                            else if(String.IsNullOrEmpty(password) && !claims.Any(c=>c.ClaimType == SanteDBClaimTypes.SanteDBCodeAuth && "true".Equals(o.ClaimValue, StringComparison.OrdinalIgnoreCase)))
+                            else if(String.IsNullOrEmpty(password) && !claims.Any(c=>c.ClaimType == SanteDBClaimTypes.SanteDBCodeAuth && "true".Equals(c.ClaimValue, StringComparison.OrdinalIgnoreCase)))
                             {
                                 throw new AuthenticationException(ErrorMessages.ERR_AUTH_USR_INVALID);
                             }
@@ -418,7 +420,7 @@ namespace SanteDB.Persistence.Data.Services
                 catch(Exception e)
                 {
                     this.m_tracer.TraceError("Error updating user password - {0}", e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_USR_PWD_GEN_ERR, e);
+                    throw new DataPersistenceException(ErrorMessages.ERR_USR_PWD_GEN_ERR.Format(userName), e);
                 }
             }
         }
@@ -492,45 +494,254 @@ namespace SanteDB.Persistence.Data.Services
                 }
                 catch(Exception e)
                 {
-
+                    this.m_tracer.TraceError("Error creating identity {0} - {1}", userName, e.Message);
+                    throw new DataPersistenceException(ErrorMessages.ERR_USR_CREATE_GEN.Format(userName), e);
                 }
             }
 
         }
 
+        /// <summary>
+        /// Delete the specified identity
+        /// </summary>
         public void DeleteIdentity(string userName, IPrincipal principal)
         {
-            throw new NotImplementedException();
+            if(String.IsNullOrEmpty(userName))
+            {
+                throw new ArgumentNullException(nameof(userName), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            else if(principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+            if(ApplicationServiceContext.Current.HostType == SanteDBHostType.Server)
+            {
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
+            }
+            else
+            {
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterLocalIdentity, principal);
+            }
+
+            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    // Obsolete user
+                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null);
+                    if(dbUser == null)
+                    {
+                        throw new KeyNotFoundException(ErrorMessages.ERR_NOT_FOUND);
+                    }
+
+                    dbUser.ObsoletionTime = DateTimeOffset.Now;
+                    dbUser.ObsoletedByKey = context.EstablishProvenance(principal, null);
+                    context.Update(dbUser);
+
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceError("Could not delete identity {0} - {1}", userName, e.Message);
+                    throw new DataPersistenceException(ErrorMessages.ERR_USR_DEL_ERR.Format(userName), e);
+                }
+            }
         }
 
+        /// <summary>
+        /// Get an unauthenticated identity for the specified username
+        /// </summary>
+        /// <param name="userName">The user to fetch the identity for</param>
+        /// <returns>The un-authenticated identity</returns>
         public IIdentity GetIdentity(string userName)
         {
-            throw new NotImplementedException();
+            if(String.IsNullOrEmpty(userName))
+            {
+                throw new ArgumentNullException(nameof(userName), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+            using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null);
+                    if(dbUser == null)
+                    {
+                        return null;
+                    }
+
+                    return new AdoUserIdentity(dbUser);
+                }
+                catch(Exception e)
+                {
+                    this.m_tracer.TraceError("Error fetching user identity {0} - {1}", userName, e.Message);
+                    throw new DataPersistenceException(ErrorMessages.ERR_USR_GEN_ERR.Format(userName), e);
+                }
+            }
         }
 
+        /// <summary>
+        /// Get the user identity by security ID
+        /// </summary>
         public IIdentity GetIdentity(Guid sid)
         {
-            throw new NotImplementedException();
+            if (sid == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(sid), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.Key == sid && o.ObsoletionTime == null);
+                    if (dbUser == null)
+                    {
+                        return null;
+                    }
+
+                    return new AdoUserIdentity(dbUser);
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceError("Error fetching user identity {0} - {1}", sid, e.Message);
+                    throw new DataPersistenceException(ErrorMessages.ERR_USR_GEN_ERR.Format(sid), e);
+                }
+            }
         }
 
-        public Guid GetSid(string name)
+        /// <summary>
+        /// Gets the user sid by user name
+        /// </summary>
+        public Guid GetSid(string userName)
         {
-            throw new NotImplementedException();
+            if (String.IsNullOrEmpty(userName))
+            {
+                throw new ArgumentNullException(nameof(userName), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    var dbUser = context.Query<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null)
+                        .Select(o=>o.Key).FirstOrDefault();
+                    if (dbUser == null)
+                    {
+                        return Guid.Empty;
+                    }
+
+                    return dbUser;
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceError("Error fetching user identity {0} - {1}", userName, e.Message);
+                    throw new DataPersistenceException(ErrorMessages.ERR_USR_GEN_ERR.Format(userName), e);
+                }
+            }
         }
 
-        public IPrincipal ReAuthenticate(IPrincipal principal)
-        {
-            throw new NotImplementedException();
-        }
-
+        /// <summary>
+        /// Remove a claim from the specified user profile
+        /// </summary>
         public void RemoveClaim(string userName, string claimType, IPrincipal principal)
         {
-            throw new NotImplementedException();
+            if (String.IsNullOrEmpty(userName))
+            {
+                throw new ArgumentNullException(nameof(userName), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            else if (String.IsNullOrEmpty(claimType))
+            {
+                throw new ArgumentNullException(nameof(claimType), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            else if (principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
+
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null);
+                    if (dbUser == null)
+                    {
+                        throw new KeyNotFoundException(String.Format(ErrorMessages.ERR_USR_INVALID, userName));
+                    }
+
+                    context.Delete<DbUserClaim>(o => o.SourceKey == dbUser.Key && o.ClaimType.ToLowerInvariant() == claimType.ToLowerInvariant());
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceError("Error removing claim to {0} - {1}", userName, e);
+                    throw new DataPersistenceException(ErrorMessages.ERR_USER_CLAIM_GEN_ERR, e);
+                }
+            }
         }
 
+        /// <summary>
+        /// Set the lockout status of the user
+        /// </summary>
+        /// <param name="userName">The user to set the lockout status for</param>
+        /// <param name="lockout">The lockout status</param>
+        /// <param name="principal">The principal which is performing the lockout</param>
         public void SetLockout(string userName, bool lockout, IPrincipal principal)
         {
-            throw new NotImplementedException();
+            if(String.IsNullOrEmpty(userName))
+            {
+                throw new ArgumentNullException(nameof(userName), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            else if(principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+            if (ApplicationServiceContext.Current.HostType == SanteDBHostType.Server)
+            {
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
+            }
+            else
+            {
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterLocalIdentity, principal);
+            }
+
+            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null);
+                    if(dbUser == null)
+                    {
+                        throw new KeyNotFoundException(ErrorMessages.ERR_NOT_FOUND);
+                    }
+
+                    dbUser.UpdatedByKey = context.EstablishProvenance(principal, null);
+                    dbUser.UpdatedTime = DateTimeOffset.Now;
+                    dbUser.Lockout = lockout ? (DateTimeOffset?)DateTimeOffset.MaxValue : null;
+                    dbUser.LockoutSpecified = true;
+
+                    context.Update(dbUser);
+                }
+                catch (Exception e)
+                {
+
+                    throw;
+                }
+            }
         }
     }
 }

@@ -35,7 +35,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// Privacy for a user entity
         /// </summary>
         /// <param name="privacyService"></param>
-        public LocalUserEntityRepository(IPrivacyEnforcementService privacyService) : base(privacyService)
+        public LocalUserEntityRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
         {
         }
 

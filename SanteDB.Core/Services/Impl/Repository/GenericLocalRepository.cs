@@ -130,7 +130,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Creates a new generic local repository with specified privacy service
         /// </summary>
-        public GenericLocalRepository(IPrivacyEnforcementService privacyService)
+        public GenericLocalRepository(IPrivacyEnforcementService privacyService = null)
         {
             this.m_privacyService = privacyService;
         }
