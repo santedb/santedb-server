@@ -369,7 +369,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
             var propertyCacheKey = $"{me.GetType()}.FullName[{classValue}]";
             if (!s_runtimeProperties.TryGetValue(propertyCacheKey, out properties))
             {
-                properties = me.GetType().GetRuntimeProperties().Where(o => o.GetCustomAttribute<DataIgnoreAttribute>() == null && o.GetCustomAttributes<AutoLoadAttribute>().Any(p => p.ClassCode == classValue || p.ClassCode == null) && typeof(IdentifiedData).IsAssignableFrom(o.PropertyType.StripGeneric())).ToList();
+                properties = me.GetType().GetRuntimeProperties().Where(o => o.GetCustomAttribute<DataIgnoreAttribute>() == null && o.GetCustomAttributes<XmlElementAttribute>().Any() && typeof(IdentifiedData).IsAssignableFrom(o.PropertyType.StripGeneric())).ToList();
                 s_runtimeProperties.TryAdd(propertyCacheKey, properties);
             }
 

@@ -35,7 +35,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
     public class QueryExpressionWriterTest
     {
 
-        private QueryBuilder m_builder = new QueryBuilder(new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName)), new PostgreSQLProvider());
+        private QueryBuilder m_builder = new QueryBuilder(new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName), AdoDataConstants.ModelMapName), new PostgreSQLProvider());
 
         /// <summary>
         /// Test that the function constructs an empty select statement

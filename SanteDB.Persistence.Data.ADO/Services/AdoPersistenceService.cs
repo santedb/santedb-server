@@ -140,7 +140,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
             try
             {
-                this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName));
+                this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName), AdoDataConstants.ModelMapName);
 
                 List<IQueryBuilderHack> hax = new List<IQueryBuilderHack>() { new SecurityUserEntityQueryHack(), new RelationshipGuardQueryHack(), new CreationTimeQueryHack(this.m_mapper), new EntityAddressNameQueryHack() };
                 if (this.GetConfiguration().DataCorrectionKeys.Any(k => k == "ConceptQueryHack"))
@@ -417,7 +417,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 using (DataContext mdc = this.GetConfiguration().Provider.GetReadonlyConnection())
                 {
                     mdc.Open();
-                    Version dbVer = new Version(mdc.FirstOrDefault<String>("get_sch_vrsn")),
+                    Version dbVer = new Version(mdc.ExecuteProcedure<String>("get_sch_vrsn")),
                         oizVer = typeof(AdoPersistenceService).Assembly.GetName().Version;
 
                     if (oizVer < dbVer)

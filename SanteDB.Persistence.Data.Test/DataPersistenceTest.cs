@@ -33,7 +33,7 @@ namespace SanteDB.Persistence.Data.Test
             this.m_serviceManager.AddServiceProvider(typeof(AdoDeviceIdentityProvider));
             this.m_serviceManager.AddServiceProvider(typeof(AdoIdentityProvider));
             this.m_serviceManager.AddServiceProvider(typeof(AdoSessionProvider));
-
+            this.m_serviceManager.AddServiceProvider(typeof(AdoPersistenceService));
 
         }
     }

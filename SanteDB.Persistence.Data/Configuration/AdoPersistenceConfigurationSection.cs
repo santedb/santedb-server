@@ -45,8 +45,6 @@ namespace SanteDB.Persistence.Data.Configuration
         /// </summary>
         public AdoPersistenceConfigurationSection()
         {
-            this.DataCorrectionKeys = new List<string>();
-            this.AllowedResources = new List<string>();
             this.Validation = new EntityValidationFlags()
             {
                 IdentifierFormat = true,
@@ -72,15 +70,6 @@ namespace SanteDB.Persistence.Data.Configuration
         [DisplayName("Password peppering characters")]
         [Description("When set, identifies the pepper characters to use for authentication")]
         public String Pepper { get; set; }
-
-        /// <summary>
-        /// Multi-threaded fetch
-        /// </summary>
-        [XmlAttribute("staOnly")]
-        [Category("Performance")]
-        [DisplayName("Single-Threaded Fetch")]
-        [Description("When set, instructs ADO.NET data fetches to be on a single thread")]
-        public bool SingleThreadFetch { get; set; }
 
         /// <summary>
         /// Maximum requests
@@ -109,25 +98,6 @@ namespace SanteDB.Persistence.Data.Configuration
         [Description("When set, instructs the provider to automatically insert any child objects to ensure integrity of the object")]
         public bool AutoInsertChildren { get; set; }
 
-
-        /// <summary>
-        /// Gets a list of data corrections to apply
-        /// </summary>
-        [XmlArray("corrections"), XmlArrayItem("add")]
-        [Description("Identifies the data patches to be executed")]
-        [Category("Behavior")]
-        [DisplayName("Data Corrections")]
-        public List<String> DataCorrectionKeys { get; set; }
-
-        /// <summary>
-        /// Allowed resources
-        /// </summary>
-        [XmlArray("resources"), XmlArrayItem("add")]
-        [DisplayName("Allowed Resources")]
-        [Description("When set, instructs the provider to only provide access for the specified types")]
-        [Editor("SanteDB.Configuration.Editors.ResourceCollectionEditor, SanteDB.Configuration, Version=1.10.0.0", "System.Drawing.Design.UITypeEditor, System.Drawing, Version=4.0.0.0")]
-        [TypeConverter("SanteDB.Configuration.Converters.StringCollectionRenderConverter, SanteDB.Configuration, Version=1.10.0.0")]
-        public List<String> AllowedResources { get; set; }
 
         /// <summary>
         /// True if statements should be prepared

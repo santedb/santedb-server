@@ -8,9 +8,13 @@ namespace SanteDB.Persistence.Data
     /// <summary>
     /// Data constant variables
     /// </summary>
-    /// TODO: Localize these
     internal static class DataConstants
     {
+
+        /// <summary>
+        /// Mapper resource name
+        /// </summary>
+        internal const string MapResourceName = "SanteDB.Persistence.Data.Map.ModelMap.xml";
 
     }
 }

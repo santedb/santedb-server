@@ -54,5 +54,10 @@ namespace SanteDB.Persistence.Data.ADO
         /// The map resource file name
         /// </summary>
         public const string MapResourceName = "SanteDB.Persistence.Data.ADO.Data.Map.ModelMap.xml";
+
+        /// <summary>
+        /// Map name
+        /// </summary>
+        public const string ModelMapName = "AdoDataPersistence";
     }
 }

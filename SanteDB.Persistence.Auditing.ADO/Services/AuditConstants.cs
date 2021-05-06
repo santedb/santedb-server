@@ -51,5 +51,9 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// </summary>
         public readonly Guid StatusObsolete = Guid.Parse("41B03AD0-70FB-4BEE-A6BC-BDDFAC6BF4A4");
 
+        /// <summary>
+        /// Model map name of audit
+        /// </summary>
+        public const string ModelMapName = "AuditModelMap";
     }
 }

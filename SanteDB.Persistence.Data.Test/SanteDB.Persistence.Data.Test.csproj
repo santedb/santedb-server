@@ -46,6 +46,7 @@
     <Compile Include="AdoApplicationIdentityProviderTest.cs" />
     <Compile Include="DataPersistenceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ModelMapTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FirebirdSql.Data.FirebirdClient">

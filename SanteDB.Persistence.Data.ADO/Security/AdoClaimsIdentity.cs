@@ -104,11 +104,11 @@ namespace SanteDB.Persistence.Data.ADO.Security
                     try
                     {
                         // v2 auth
-                        fnResult = dataContext.FirstOrDefault<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr_ex", userName, String.Join(";", passwordHash), s_securityConfiguration?.GetSecurityPolicy(SecurityPolicyIdentification.MaxInvalidLogins, 5) ?? 5);
+                        fnResult = dataContext.ExecuteProcedure<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr_ex", userName, String.Join(";", passwordHash), s_securityConfiguration?.GetSecurityPolicy(SecurityPolicyIdentification.MaxInvalidLogins, 5) ?? 5);
                     }
                     catch(Exception e)
                     {
-                        fnResult = dataContext.FirstOrDefault<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr", userName, passwordHash.First(), s_securityConfiguration?.GetSecurityPolicy(SecurityPolicyIdentification.MaxInvalidLogins, 5) ?? 5);
+                        fnResult = dataContext.ExecuteProcedure<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr", userName, passwordHash.First(), s_securityConfiguration?.GetSecurityPolicy(SecurityPolicyIdentification.MaxInvalidLogins, 5) ?? 5);
                     }
                     var user = fnResult.Object1;
 

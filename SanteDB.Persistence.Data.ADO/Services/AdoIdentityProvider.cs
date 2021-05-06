@@ -205,7 +205,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                     retVal = this.Authenticate(userName, password) as IClaimsPrincipal;
                                 else if(user.TwoFactorEnabled && user.TwoFactorMechnaismKey.HasValue)
                                 {
-                                    var suser = ApplicationServiceContext.Current.GetService<AdoPersistenceService>().GetMapper().MapDomainInstance<DbSecurityUser, SecurityUser>(user, true);
+                                    var suser = ApplicationServiceContext.Current.GetService<AdoPersistenceService>().GetMapper().MapDomainInstance<DbSecurityUser, SecurityUser>(user);
                                     var secretResponse = ApplicationServiceContext.Current.GetService<ITfaRelayService>()?.SendSecret(user.TwoFactorMechnaismKey.Value, suser);
                                     throw new AuthenticationException($"TFA_MISMATCH:{secretResponse}");
                                 }

@@ -90,7 +90,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 					var hashService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
                     // TODO - Allow configuation of max login attempts
-					var client = dataContext.FirstOrDefault<DbSecurityDevice>("auth_dev", deviceId, hashService.ComputeHash(deviceSecret), 5);
+					var client = dataContext.ExecuteProcedure<DbSecurityDevice>("auth_dev", deviceId, hashService.ComputeHash(deviceSecret), 5);
 
                     if (client == null)
                         throw new SecurityException("Invalid device credentials");

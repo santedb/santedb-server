@@ -48,16 +48,6 @@ namespace SanteDB.Persistence.Data.Model.Roles
             }
         }
 
-        /// <summary>
-        /// Gets or sets the gender concept
-        /// </summary>
-        /// <value>The gender concept.</value>
-        [Column("gndr_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-		public Guid GenderConceptKey {
-			get;
-			set;
-		}
-
 		/// <summary>
 		/// Gets or sets the deceased date.
 		/// </summary>

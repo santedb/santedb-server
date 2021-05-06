@@ -32,7 +32,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         public string ServiceName => "ADO.NET PubSub Manager";
 
         // Load mapper
-        private ModelMapper m_mapper = new ModelMapper(typeof(AdoPubSubManager).Assembly.GetManifestResourceStream("SanteDB.Persistence.PubSub.ADO.Data.Map.ModelMap.xml"));
+        private ModelMapper m_mapper = new ModelMapper(typeof(AdoPubSubManager).Assembly.GetManifestResourceStream("SanteDB.Persistence.PubSub.ADO.Data.Map.ModelMap.xml"), "PubSubModelMap");
 
         // Configuration section
         private AdoPubSubConfigurationSection m_configuration;
@@ -161,7 +161,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// </summary>
         private PubSubChannelDefinition MapInstance(DataContext context, DbChannel domainInstance)
         {
-            var retVal = this.m_mapper.MapDomainInstance<DbChannel, PubSubChannelDefinition>(domainInstance, true);
+            var retVal = this.m_mapper.MapDomainInstance<DbChannel, PubSubChannelDefinition>(domainInstance);
             retVal.DispatcherFactoryTypeXml = domainInstance.DispatchFactoryType; // TODO: Refactor this mapping to a fn
             retVal.Endpoint = new Uri(domainInstance.Endpoint);
             retVal.Settings = context.Query<DbChannelSetting>(r => r.ChannelKey == retVal.Key).ToList().Select(r => new PubSubChannelSetting() { Name = r.Name, Value = r.Value }).ToList();
@@ -307,7 +307,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// </summary>
         private PubSubSubscriptionDefinition MapInstance(DataContext context, DbSubscription domainInstance)
         {
-            var retVal = this.m_mapper.MapDomainInstance<DbSubscription, PubSubSubscriptionDefinition>(domainInstance, false);
+            var retVal = this.m_mapper.MapDomainInstance<DbSubscription, PubSubSubscriptionDefinition>(domainInstance);
             retVal.ResourceTypeXml = domainInstance.ResourceType;
             retVal.Filter = context.Query<DbSubscriptionFilter>(r => r.SubscriptionKey == domainInstance.Key).Select(r => r.Filter).ToList();
 

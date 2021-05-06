@@ -147,7 +147,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                         });
                 };
 
-                this.m_mapper = new ModelMapper(typeof(AdoAuditRepositoryService).Assembly.GetManifestResourceStream("SanteDB.Persistence.Auditing.ADO.Data.Map.ModelMap.xml"));
+                this.m_mapper = new ModelMapper(typeof(AdoAuditRepositoryService).Assembly.GetManifestResourceStream("SanteDB.Persistence.Auditing.ADO.Data.Map.ModelMap.xml"), AuditConstants.ModelMapName);
                 this.m_builder = new QueryBuilder(this.m_mapper, this.m_configuration.Provider);
             }
             catch (ModelMapValidationException e)
