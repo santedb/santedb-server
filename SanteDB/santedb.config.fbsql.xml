@@ -103,6 +103,7 @@
       <!-- Messaging Services-->
       <add type="SanteDB.Authentication.OAuth2.OAuthMessageHandler, SanteDB.Authentication.OAuth2, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Messaging.FHIR.FhirMessageHandler, SanteDB.Messaging.FHIR, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.Messaging.FHIR.FhirDataInitializationService, SanteDB.Messaging.FHIR, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       <!--<add type="SanteDB.Messaging.GS1.StockSubscriber, SanteDB.Messaging.GS1, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Messaging.GS1.StockServiceMessageHandler, SanteDB.Messaging.GS1, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Messaging.GS1.Transport.AS2.As2IntegrationService, SanteDB.Messaging.GS1, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />-->
