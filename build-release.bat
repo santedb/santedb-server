@@ -86,8 +86,14 @@ if exist "%nuget%" (
 	del /q /s .\installsupp\*.* 
 	del /q /s .\santedb-server-%version%\*.*
 	rmdir /q /s .\santedb-server-%version%
-	rmdir .\installsupp
+	rmdir /q/s .\installsupp
 
+	call package-sdbac.bat %version%
+	pushd santedb-docker
+	pushd SanteDB.Docker.Server
+	docker build -t santesuite/santedb-icdr:%version% .
+	popd
+	popd
 ) else (	
 	echo Cannot find NUGET 
 )

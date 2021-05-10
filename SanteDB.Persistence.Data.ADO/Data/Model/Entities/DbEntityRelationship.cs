@@ -65,5 +65,11 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
         [Column("cls_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid? ClassificationKey { get; set; }
 
+        /// <summary>
+        /// Classification of this object
+        /// </summary>
+        [Column("rol_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        public Guid? RelationshipRoleKey { get; set; }
+
     }
 }
