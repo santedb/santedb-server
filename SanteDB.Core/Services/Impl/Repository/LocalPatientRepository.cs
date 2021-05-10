@@ -31,7 +31,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Create a new patient repository
         /// </summary>
-        public LocalPatientRepository(IPrivacyEnforcementService privacyService) : base(privacyService)
+        public LocalPatientRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
         {
 
         }

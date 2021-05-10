@@ -182,12 +182,14 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="data\000-PubSubPolicies.dataset">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="data\000-PurposeOfUse.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="data\000-ReferenceRelationship.dataset" />
+    <None Include="data\000-ReferenceRelationship.dataset">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="data\000-RegistrationEventTypes.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -239,7 +241,9 @@
     <None Include="data\000-ScopingOrganizationRelationship.dataset">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="data\000-VIPStatus.dataset" />
+    <None Include="data\000-VIPStatus.dataset">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="data\demo\990-demo.concepts.dataset" />
     <None Include="data\demo\991-demo.facilities.dataset" />
     <None Include="data\demo\992-demo.places.dataset" />

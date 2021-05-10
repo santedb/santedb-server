@@ -375,6 +375,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             IEnumerable<CompositeResult<DbSecurityPolicy, DbSecurityPolicyActionableInstance>> retVal = null;
 
                             SqlStatement query = null;
+                            
                             if (!(identity is Server.Core.Security.ApplicationIdentity) &&
                                 !(identity is DeviceIdentity)) // Is this a user based claim?
                             {
@@ -396,6 +397,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 var devClaim = cp.Identities.OfType<Server.Core.Security.DeviceIdentity>().SingleOrDefault()?.FindAll(SanteDBClaimTypes.Sid).SingleOrDefault() ??
                                     cp.FindAll(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim).SingleOrDefault();
 
+                                IEnumerable<CompositeResult<DbSecurityPolicy, DbSecurityPolicyActionableInstance>> appDevClaim = null;
 
                                 // There is an application claim so we want to add the application policies - most restrictive
                                 if (appClaim != null)
@@ -412,7 +414,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                     }
 
                                     var appResults = context.Query<CompositeResult<DbSecurityPolicy, DbSecurityPolicyActionableInstance>>(query);
-                                    retVal = retVal?.Union(appResults) ?? appResults;
+                                    appDevClaim = appDevClaim?.Union(appResults) ?? appResults;
                                 }
 
                                 // There is an device claim so we want to add the device policies - most restrictive
@@ -425,14 +427,15 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                                     if (retVal != null)
                                     {
-                                        var usrPolKeys = retVal.Select(o => o.Object2.PolicyKey).ToArray(); // App grant only overrides those policies which already exist on user
+                                        var usrPolKeys = retVal.Select(o => o.Object2.PolicyKey).ToArray(); // Dev grant only overrides those policies which already exist on user
                                         query.And<DbSecurityDevicePolicy>(o => usrPolKeys.Contains(o.PolicyKey));
                                     }
 
                                     var devResults = context.Query<CompositeResult<DbSecurityPolicy, DbSecurityPolicyActionableInstance>>(query);
-                                    retVal = retVal?.Union(devResults) ?? devResults;
+                                    appDevClaim = appDevClaim?.Union(devResults) ?? devResults;
                                 }
 
+                                retVal = retVal?.Union(appDevClaim) ?? appDevClaim;
                             }
 
                             result = retVal.AsEnumerable().Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable)).ToList();

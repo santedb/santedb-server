@@ -417,7 +417,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 using (DataContext mdc = this.GetConfiguration().Provider.GetReadonlyConnection())
                 {
                     mdc.Open();
-                    Version dbVer = new Version(mdc.FirstOrDefault<String>("get_sch_vrsn")),
+                    Version dbVer = new Version(mdc.ExecuteProcedure<String>("get_sch_vrsn")),
                         oizVer = typeof(AdoPersistenceService).Assembly.GetName().Version;
 
                     if (oizVer < dbVer)

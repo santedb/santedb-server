@@ -229,12 +229,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
                                 foreach (var itm in connection.CacheOnCommit)
                                 {
-                                    if (itm is ITargetedAssociation tgrt)
-                                    {
-                                        cacheService?.Remove(tgrt.TargetEntityKey.GetValueOrDefault());
-                                        cacheService?.Remove(tgrt.SourceEntityKey.GetValueOrDefault());
-                                    }
-                                        cacheService?.Add(itm);
+                                    cacheService?.Remove(itm.Key.Value);
                                 }
                             }
                             else
@@ -335,13 +330,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 tx.Commit();
                                 var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
                                 foreach (var itm in connection.CacheOnCommit)
-                                {
-                                    if (itm is ITargetedAssociation tgrt)
-                                    {
-                                        cacheService?.Remove(tgrt.TargetEntityKey.GetValueOrDefault());
-                                        cacheService?.Remove(tgrt.SourceEntityKey.GetValueOrDefault());
-                                    }
-                                    cacheService?.Add(itm);
+                                {   
+                                    cacheService?.Remove(itm.Key.Value);
                                 }
 
                             }

@@ -603,6 +603,7 @@
       <add type="SanteDB.Authentication.OAuth2.OAuthMessageHandler, SanteDB.Authentication.OAuth2, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       
       <!-- HL7 FHIR Plugin -->
+      <add type="SanteDB.Messaging.FHIR.FhirDataInitializationService, SanteDB.Messaging.FHIR, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Messaging.FHIR.FhirMessageHandler, SanteDB.Messaging.FHIR, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
       
       <!-- GS1 BMS Plugins

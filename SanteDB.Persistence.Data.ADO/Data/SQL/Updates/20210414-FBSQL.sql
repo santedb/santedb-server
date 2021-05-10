@@ -12,6 +12,12 @@ ALTER TABLE act_rel_tbl ADD CONSTRAINT ck_act_rel_cls_cd_id CHECK (cls_cd_id IS 
 ALTER TABLE act_ptcpt_tbl ADD CONSTRAINT ck_act_ptcpt_cls_cd_id CHECK (cls_cd_id IS NULL OR CK_IS_CD_SET_MEM(cls_cd_id, 'RelationshipClass', FALSE)); --#!
 ALTER TABLE ent_rel_tbl ADD CONSTRAINT ck_ent_rel_cls_cd_id CHECK (cls_cd_id IS NULL OR CK_IS_CD_SET_MEM(cls_cd_id, 'RelationshipClass', FALSE)); --#!
 
+ALTER TABLE ent_rel_tbl ADD rol_cd_id UUID;--#!
+
+ALTER TABLE act_rel_tbl ADD CONSTRAINT fk_act_rel_cls_cd_cd_id FOREIGN KEY (cls_cd_id) REFERENCES cd_tbl(cd_id);--#!
+ALTER TABLE ent_rel_tbl ADD CONSTRAINT fk_ent_rel_cls_cd_cd_id FOREIGN KEY (cls_cd_id) REFERENCES cd_tbl(cd_id);--#!
+ALTER TABLE ent_rel_tbl ADD CONSTRAINT fk_ent_rel_rol_cd_cd_id FOREIGN KEY (rol_cd_id) REFERENCES cd_tbl(cd_id);--#!
+ALTER TABLE act_ptcpt_tbl ADD CONSTRAINT fk_act_ptcpt_cls_cd_cd_id FOREIGN KEY (cls_cd_id) REFERENCES cd_tbl(cd_id);--#!
 
 ALTER TABLE psn_tbl ADD gndr_cd_id UUID;--#!
 ALTER TABLE psn_tbl ADD CONSTRAINT CK_PNS_GNDR_CD CHECK (GNDR_CD_ID IS NULL OR CK_IS_CD_SET_MEM(GNDR_CD_ID, 'AdministrativeGenderCode', TRUE));--#!
