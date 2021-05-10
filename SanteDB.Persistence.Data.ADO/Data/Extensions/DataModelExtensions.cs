@@ -119,9 +119,6 @@ namespace SanteDB.Persistence.Data.ADO.Data
             var serviceInstance = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
             var idpInstance = serviceInstance.GetPersister(me.GetType()) as IAdoPersistenceService;
 
-            if ((me as ITaggable)?.Tags.Any(o => o.TagKey == "$sys.reclass") == true) // The entity is being re-classified, so it needs to be saved
-                idpInstance = serviceInstance.GetPersister(me.GetType().BaseType) as IAdoPersistenceService;
-
             var cacheService = new AdoPersistenceCache(context);
 
             IIdentifiedEntity existing = null;
@@ -243,7 +240,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
             if (existing != null && me.Key.HasValue)
             {
                 // Exists but is an old version
-                if ((existing as IVersionedEntity)?.VersionKey != vMe?.VersionKey &&
+                if ((existing as IVersionedEntity)?.VersionSequence < vMe?.VersionSequence &&
                     vMe?.VersionKey != null && vMe?.VersionKey != Guid.Empty)
                 {
                     // Update method

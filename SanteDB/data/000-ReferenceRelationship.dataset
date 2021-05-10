@@ -2,15 +2,15 @@
 <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Vital Signs Observation Types">
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
-      <id>724B1FC7-94FC-43E5-B597-B6ED2FB8F660</id>
+      <id>395F4EDF-5D5D-4950-9F5E-F827F72E4B32</id>
       <isReadonly>false</isReadonly>
-      <mnemonic>ReferenceLink</mnemonic>
+      <mnemonic>EquivalentEntity</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <conceptSet>EE16A667-2085-440A-B1E7-4032D10B9F40</conceptSet>
       <name>
         <language>en</language>
-        <value>References / See Also</value>
+        <value>Equivalent Entity</value>
       </name>
     </Concept>
   </update>
@@ -19,20 +19,44 @@
       <![CDATA[
 INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
 	SELECT 
-		'724B1FC7-94FC-43E5-B597-B6ED2FB8F660', CD_ID, CD_ID, 'REFER'
+		'395F4EDF-5D5D-4950-9F5E-F827F72E4B32', CD_ID, CD_ID, 'EQUIVALENT'
 	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = '4E6DA567-0094-4F23-8555-11DA499593AF'
   ON CONFLICT DO NOTHING;
-      ]]>
+  
+ -- PERSON SUBCLASSES 
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','9de2a846-ddf2-4ebc-902e-84508c5089ea','bacd9c6f-3fa9-481e-9636-37457962804d','PERSON-[EQUIVALENT]->PATIENT');
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','bacd9c6f-3fa9-481e-9636-37457962804d','9de2a846-ddf2-4ebc-902e-84508c5089ea','PATIENT-[EQUIVALENT]->PERSON'); 
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','9de2a846-ddf2-4ebc-902e-84508c5089ea','6b04fed8-c164-469c-910b-f824c2bda4f0','PERSON-[EQUIVALENT]->PROVIDER');
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','6b04fed8-c164-469c-910b-f824c2bda4f0','9de2a846-ddf2-4ebc-902e-84508c5089ea','PROVIDER-[EQUIVALENT]->PERSON'); 
+]]>
     </exec>
     <exec invariant="FirebirdSQL">
       <![CDATA[
--- FOR MASTER RELATIONSHIP TYPE
 INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
 	SELECT 
-		char_to_uuid('724B1FC7-94FC-43E5-B597-B6ED2FB8F660'), CD_ID, CD_ID, 'REFER'
+		char_to_uuid('395F4EDF-5D5D-4950-9F5E-F827F72E4B32'), CD_ID, CD_ID, 'EQUIVALENT'
 	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = char_to_uuid('4e6da567-0094-4f23-8555-11da499593af')
  ;
-
+    ]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('395F4EDF-5D5D-4950-9F5E-F827F72E4B32'),char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'),char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'),'PERSON-[EQUIVALENT]->PATIENT');
+    ]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('395F4EDF-5D5D-4950-9F5E-F827F72E4B32'),char_to_uuid('bacd9c6f-3fa9-481e-9636-37457962804d'),char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'),'PATIENT-[EQUIVALENT]->PERSON');
+    ]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('395F4EDF-5D5D-4950-9F5E-F827F72E4B32'),char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'),char_to_uuid('6b04fed8-c164-469c-910b-f824c2bda4f0'),'PERSON-[EQUIVALENT]->PROVIDER');
+    ]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (char_to_uuid('395F4EDF-5D5D-4950-9F5E-F827F72E4B32'),char_to_uuid('6b04fed8-c164-469c-910b-f824c2bda4f0'),char_to_uuid('9de2a846-ddf2-4ebc-902e-84508c5089ea'),'PROVIDER-[EQUIVALENT]->PERSON');
       ]]>
     </exec>
   </sql>

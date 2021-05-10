@@ -32,7 +32,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Local security application repository
         /// </summary>
-        public LocalSecurityApplicationRepository(IPrivacyEnforcementService privacyService) : base(privacyService)
+        public LocalSecurityApplicationRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
         {
         }
 
