@@ -9,6 +9,7 @@ using System;
 
 namespace SanteDB.Persistence.Data.Test
 {
+
     [TestFixture]
     public class ModelMapTest
     {

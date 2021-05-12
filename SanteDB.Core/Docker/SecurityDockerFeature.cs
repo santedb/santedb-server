@@ -1,4 +1,5 @@
 ﻿using SanteDB.Core.Configuration;
+using SanteDB.Core.Security.Configuration;
 using SanteDB.Docker.Core;
 using SanteDB.Server.Core.Configuration;
 using System;

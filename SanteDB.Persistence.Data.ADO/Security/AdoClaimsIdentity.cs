@@ -47,6 +47,7 @@ using System.Security.Authentication;
 using System.Security.Principal;
 using System.Threading;
 using SanteDB.Server.Core.Configuration;
+using SanteDB.Core.Security.Configuration;
 
 namespace SanteDB.Persistence.Data.ADO.Security
 {

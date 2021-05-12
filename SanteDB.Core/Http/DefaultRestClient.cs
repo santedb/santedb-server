@@ -42,6 +42,7 @@ using SanteDB.Core.Http;
 using SanteDB.Server.Core.Security;
 using SanteDB.Core;
 using SanteDB.Server.Core.Configuration;
+using SanteDB.Core.Security.Configuration;
 
 namespace SanteDB.Server.Core.Http
 {

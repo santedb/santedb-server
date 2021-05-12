@@ -19,6 +19,7 @@
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Services;
 using SanteDB.Server.Core.Configuration;
 using System;
@@ -34,6 +35,7 @@ namespace SanteDB.Server.Core.Security
     /// <summary>
     /// Default data signature service
     /// </summary>
+    [Obsolete("Use SanteDB.Core.Security.HmacDataSigningService")]
     public class DefaultDataSigningService : IDataSigningService
     {
 

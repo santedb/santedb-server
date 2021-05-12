@@ -18,6 +18,8 @@
  */
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl;
 using SanteDB.Server.Core.Configuration;
@@ -33,7 +35,7 @@ namespace SanteDB.Server.Core.Security
         /// <summary>
         /// Local password validation service
         /// </summary>
-        public DefaultPasswordValidationService() : base(ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>().PasswordRegex ?? RegexPasswordValidator.DefaultPasswordPattern)
+        public DefaultPasswordValidationService(IConfigurationManager configurationManager) : base(configurationManager)
         {
             
         }

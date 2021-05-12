@@ -26,40 +26,9 @@ namespace SanteDB.Server.Core.Security
     /// Represents a TFA secret generator which uses the server's clock
     /// </summary>
     [ServiceProvider("Simple TFA Secret Generator")]
-    public class SimpleTfaSecretGenerator : ITwoFactorSecretGenerator
+    [Obsolete("Use SanteDB.Core.Security.SimpleTfaSecretGenerator", true)]
+    public class SimpleTfaSecretGenerator : SanteDB.Core.Security.SimpleTfaSecretGenerator
     {
-        /// <summary>
-        /// Gets the service name
-        /// </summary>
-        public String ServiceName => "Simple TFA Secret Generator";
-
-        /// <summary>
-        /// Gets the name
-        /// </summary>
-        public string Name
-        {
-            get
-            {
-                return "Simple TFA generator";
-            }
-        }
-
-        /// <summary>
-        /// Generate the TFA secret
-        /// </summary>
-        public string GenerateTfaSecret()
-        {
-            var secretInt = DateTime.Now.Ticks % 9999;
-            return String.Format("{0:0000}", secretInt);
-        }
-
-        /// <summary>
-        /// Validate the secret
-        /// </summary>
-        public bool Validate(string secret)
-        {
-            int toss;
-            return secret.Length == 4 && Int32.TryParse(secret, out toss);
-        }
+     
     }
 }

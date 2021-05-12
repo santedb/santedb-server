@@ -45,6 +45,7 @@ using System.Security.Principal;
 using SanteDB.Server.Core.Configuration;
 using SanteDB.Server.Core.Security;
 using SanteDB.Server.Core.Services;
+using SanteDB.Core.Security.Configuration;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {

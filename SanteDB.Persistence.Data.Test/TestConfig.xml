@@ -20,7 +20,7 @@
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.10.0.23074" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.Core.Configuration.SecurityConfigurationSection, SanteDB.Core.Api, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Core.Security.Configuration.SecurityConfigurationSection, SanteDB.Core.Api, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.ApplicationServiceContextConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.DiagnosticsConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api, Version=2.0.0.0"/>
@@ -104,7 +104,16 @@
     <serviceProviders>
       <add type="SanteDB.Persistence.Data.Services.AdoApplicationIdentityProvider, SanteDB.Persistence.Data, Version=2.1.0.0" />
       <add type="SanteDB.Persistence.Data.Services.AdoDeviceIdentityProvider, SanteDB.Persistence.Data, Version=2.1.0.0" />
+      <add type="SanteDB.Persistence.Data.Services.AdoIdentityProvider, SanteDB.Persistence.Data, Version=2.1.0.0" />
+      <add type="SanteDB.Persistence.Data.Services.AdoPolicyInformationService, SanteDB.Persistence.Data, Version=2.1.0.0" />
+      <add type="SanteDB.Persistence.Data.Services.AdoSessionProvider, SanteDB.Persistence.Data, Version=2.1.0.0" />
+      <add type="SanteDB.Persistence.Data.Services.AdoPersistenceService, SanteDB.Persistence.Data, Version=2.1.0.0" />
+      <add type="SanteDB.Persistence.Data.Services.AdoPersistenceService, SanteDB.Persistence.Data, Version=2.1.0.0" />
+      <add type="SanteDB.Core.Security.HmacDataSigningService, SanteDB.Core.Api, Version=2.1.0.0" />
+      <add type="SanteDB.Core.Security.SimpleTfaSecretGenerator, SanteDB.Core.Api, Version=2.1.0.0" />
       <add type="SanteDB.Server.Core.Security.SHA256PasswordHashingService, SanteDB.Server.Core,Version=0.6.0.0" />
+      <add type="SanteDB.Server.Core.Security.SHA256PasswordHashingService, SanteDB.Server.Core,Version=0.6.0.0" />
+      <add type="SanteDB.Core.Security.RegexPasswordValidator, SanteDB.Core.Api, Version=2.1.0.0"/>
       <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core.Api, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
       <add type="SanteDB.Core.Services.Impl.DefaultThreadPoolService, SanteDB.Core.Api, Version=0.6.0.0" />
       <add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryFactoryService, SanteDB.Server.Core,Version=2.0.0.0, Culture=neutral, PublicKeyToken=null" />
