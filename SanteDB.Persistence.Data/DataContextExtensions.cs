@@ -65,9 +65,18 @@ namespace SanteDB.Persistence.Data
 
                 // Session identifier 
                 var sidClaim = cprincipal?.FindFirst(SanteDBClaimTypes.SanteDBSessionIdClaim)?.Value;
-                if (Guid.TryParse(sidClaim, out Guid sessionId))
+                if (!String.IsNullOrEmpty(sidClaim) && Guid.TryParse(sidClaim, out Guid sessionId))
                     retVal.SessionKey = sessionId;
 
+                // Pure application credential
+                if(!retVal.UserKey.HasValue && !retVal.DeviceKey.HasValue)
+                {
+                    retVal.UserKey = Guid.Parse(AuthenticationContext.SystemUserSid);
+                }
+                if(retVal.ApplicationKey == Guid.Empty)
+                {
+                    retVal.ApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid); // System application SID fallback
+                }
             }
             else // Establish the slow way - using identity name
             {

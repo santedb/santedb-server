@@ -17,6 +17,9 @@ namespace SanteDB.Persistence.Data.Security
         // Session information
         private AdoSecuritySession m_session;
 
+        // Claims
+        private IEnumerable<IClaim> m_claims;
+
         /// <summary>
         /// Creates anew session principal based on a database session
         /// </summary>
@@ -24,12 +27,13 @@ namespace SanteDB.Persistence.Data.Security
         {
             this.m_session = session;
             this.Identities = identities.ToArray();
+            this.m_claims = session.Claims.Union(identities.SelectMany(i => i.Claims)).ToList();
         }
 
         /// <summary>
         /// Get all claims for this principal
         /// </summary>
-        public IEnumerable<IClaim> Claims => this.m_session.Claims;
+        public IEnumerable<IClaim> Claims => this.m_session.Claims.Union(this.Identities.SelectMany(r=>r.Claims));
 
         /// <summary>
         /// Get all identities associated with this session
@@ -52,12 +56,18 @@ namespace SanteDB.Persistence.Data.Security
         /// <summary>
         /// Find all claims 
         /// </summary>
-        public IEnumerable<IClaim> FindAll(string claimType) => this.Claims.Where(o => o.Type == claimType);
+        /// <remarks>
+        /// Searchs the claims on this session as well as any subordinate claims on identities
+        /// </remarks>
+        public IEnumerable<IClaim> FindAll(string claimType)
+        {
+            return this.Claims.Where(o => o.Type == claimType);
+        }
 
         /// <summary>
         /// Find the first object
         /// </summary>
-        public IClaim FindFirst(string claimType) => this.Claims.FirstOrDefault(o => o.Type == claimType);
+        public IClaim FindFirst(string claimType) => this.FindAll(claimType).FirstOrDefault();
 
         /// <summary>
         /// True if the object has the specified claim

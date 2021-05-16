@@ -43,7 +43,10 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdoDeviceIdentityProviderTest.cs" />
     <Compile Include="AdoApplicationIdentityProviderTest.cs" />
+    <Compile Include="AdoIdentityProviderTest.cs" />
+    <Compile Include="AdoSessionProviderTest.cs" />
     <Compile Include="DataPersistenceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ModelMapTest.cs" />

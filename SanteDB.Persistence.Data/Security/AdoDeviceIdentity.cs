@@ -53,6 +53,7 @@ namespace SanteDB.Persistence.Data.Security
         private void InitializeClaims()
         {
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Sid, this.m_device.Key.ToString()));
+            this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim, this.m_device.Key.ToString()));
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Actor, "DEVICE"));
         }
 

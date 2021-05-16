@@ -49,7 +49,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// Create new policy info service
         /// </summary>
-        public AdoPolicyInformationService(IAdhocCacheService adhocCache, IConfigurationManager configurationManager, IPolicyEnforcementService pepService)
+        public AdoPolicyInformationService(IConfigurationManager configurationManager, IPolicyEnforcementService pepService, IAdhocCacheService adhocCache = null)
         {
             this.m_policyEnforcement = pepService;
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
@@ -65,11 +65,11 @@ namespace SanteDB.Persistence.Data.Services
         /// <param name="policyOids">The policy OIDs to add</param>
         public void AddPolicies(object securable, PolicyGrantType rule, IPrincipal principal, params string[] policyOids)
         {
-            if(securable == null)
+            if (securable == null)
             {
                 throw new ArgumentNullException(nameof(securable), ErrorMessages.ERR_ARGUMENT_NULL);
             }
-            if(principal == null)
+            if (principal == null)
             {
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
             }
@@ -118,7 +118,7 @@ namespace SanteDB.Persistence.Data.Services
                         }
                         else if (securable is Entity entity)
                         {
-                                                        context.Delete<DbEntitySecurityPolicy>(o => o.SourceKey == entity.Key && policies.Contains(o.PolicyKey));
+                            context.Delete<DbEntitySecurityPolicy>(o => o.SourceKey == entity.Key && policies.Contains(o.PolicyKey));
                             context.Insert(policies.Select(o => new DbEntitySecurityPolicy()
                             {
                                 EffectiveVersionSequenceId = entity.VersionSequence.Value,
@@ -161,7 +161,7 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         private void Demand(object securable, IPrincipal principal)
         {
-            if (securable is SecurityRole || 
+            if (securable is SecurityRole ||
                 securable is SecurityApplication ||
                 securable is SecurityDevice sd)
             {
@@ -204,7 +204,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <returns></returns>
         public IEnumerable<IPolicyInstance> GetPolicies(object securable)
         {
-            if(securable == null)
+            if (securable == null)
             {
                 throw new ArgumentNullException(nameof(securable), ErrorMessages.ERR_ARGUMENT_NULL);
             }
@@ -215,29 +215,31 @@ namespace SanteDB.Persistence.Data.Services
                 results = this.m_adhocCache?.Get<AdoSecurityPolicyInstance[]>($"pip.{id.Type}.{id.Key}.{id.Tag}");
             }
 
-            if(results == null) // Load from DB
+            if (results == null) // Load from DB
             {
-                using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+                using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     try
                     {
                         context.Open();
 
                         // Security Device
-                        if(securable is SecurityDevice sd)
+                        if (securable is SecurityDevice sd)
                         {
                             results = context.Query<CompositeResult<DbSecurityDevicePolicy, DbSecurityPolicy>>(
                                 context.CreateSqlStatement<DbSecurityDevicePolicy>()
-                                .AutoJoin<DbSecurityPolicy, DbSecurityDevicePolicy>()
+                                    .SelectFrom(typeof(DbSecurityDevicePolicy), typeof(DbSecurityPolicy))
+                                .InnerJoin<DbSecurityPolicy, DbSecurityDevicePolicy>(o => o.Key, o => o.PolicyKey)
                                 .Where<DbSecurityDevicePolicy>(o => o.SourceKey == sd.Key))
                                 .ToArray()
                                 .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
                         }
-                        else if(securable is SecurityApplication sa)
+                        else if (securable is SecurityApplication sa)
                         {
                             results = context.Query<CompositeResult<DbSecurityApplicationPolicy, DbSecurityPolicy>>(
                                 context.CreateSqlStatement<DbSecurityApplicationPolicy>()
-                                .AutoJoin<DbSecurityPolicy, DbSecurityApplicationPolicy>()
+                                    .SelectFrom(typeof(DbSecurityApplicationPolicy), typeof(DbSecurityPolicy))
+                                .InnerJoin<DbSecurityPolicy, DbSecurityApplicationPolicy>(o => o.Key, o => o.PolicyKey)
                                 .Where<DbSecurityApplicationPolicy>(o => o.SourceKey == sa.Key))
                                 .ToArray()
                                 .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
@@ -247,33 +249,39 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             results = context.Query<CompositeResult<DbSecurityRolePolicy, DbSecurityPolicy>>(
                                 context.CreateSqlStatement<DbSecurityRolePolicy>()
-                                .AutoJoin<DbSecurityPolicy, DbSecurityRolePolicy>()
+                                    .SelectFrom(typeof(DbSecurityRolePolicy), typeof(DbSecurityPolicy))
+                                .InnerJoin<DbSecurityPolicy, DbSecurityRolePolicy>(o => o.Key, o => o.PolicyKey)
                                 .Where<DbSecurityRolePolicy>(o => o.SourceKey == sr.Key))
                                 .ToArray()
                                 .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
 
                         }
-                        else if(securable is IPrincipal principal)
+                        else if(securable is IIdentity identity)
+                        {
+                            results = this.GetIdentityPolicies(context, identity, new String[0]).ToArray();
+                        }
+                        else if (securable is IPrincipal principal)
                         {
                             var primaryId = principal.Identity;
 
-                            results = this.GetIdentityPolicies(context, primaryId, new String[0]);
+                            results = this.GetIdentityPolicies(context, primaryId, new String[0]).ToArray();
 
                             // Secondary identities
-                            if(principal is IClaimsPrincipal claimsPrincipal)
+                            if (principal is IClaimsPrincipal claimsPrincipal)
                             {
-                                foreach(var subId in claimsPrincipal.Identities.Where(o=>o != primaryId))
+                                foreach (var subId in claimsPrincipal.Identities.Where(o => o != primaryId))
                                 {
-                                    results = results.Union(this.GetIdentityPolicies(context, subId, results.Select(o=>o.Policy.Oid)));
+                                    results = results.Union(this.GetIdentityPolicies(context, subId, results.Select(o => o.Policy.Oid))).ToArray();
                                 }
                             }
 
                         }
-                        else if(securable is Entity entity)
+                        else if (securable is Entity entity)
                         {
                             results = context.Query<CompositeResult<DbEntitySecurityPolicy, DbSecurityPolicy>>(
                                 context.CreateSqlStatement<DbEntitySecurityPolicy>()
-                                    .AutoJoin<DbEntitySecurityPolicy, DbSecurityPolicy>()
+                                    .SelectFrom(typeof(DbEntitySecurityPolicy), typeof(DbSecurityPolicy))
+                                .InnerJoin<DbSecurityPolicy, DbEntitySecurityPolicy>(o => o.Key, o => o.PolicyKey)
                                     .Where<DbEntitySecurityPolicy>(o => o.SourceKey == entity.Key && o.ObsoleteVersionSequenceId == null))
                                 .ToArray()
                                 .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, entity));
@@ -282,7 +290,8 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             results = context.Query<CompositeResult<DbActSecurityPolicy, DbSecurityPolicy>>(
                                 context.CreateSqlStatement<DbActSecurityPolicy>()
-                                    .AutoJoin<DbActSecurityPolicy, DbSecurityPolicy>()
+                                    .SelectFrom(typeof(DbActSecurityPolicy), typeof(DbSecurityPolicy))
+                                .InnerJoin<DbSecurityPolicy, DbActSecurityPolicy>(o => o.Key, o => o.PolicyKey)
                                     .Where<DbActSecurityPolicy>(o => o.SourceKey == act.Key && o.ObsoleteVersionSequenceId == null))
                                 .ToArray()
                                 .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, act));
@@ -292,11 +301,12 @@ namespace SanteDB.Persistence.Data.Services
                             results = new List<AdoSecurityPolicyInstance>();
                         }
 
-                        if (securable is IdentifiedData id1) {
+                        if (securable is IdentifiedData id1)
+                        {
                             this.m_adhocCache?.Add($"pip.{id1.Type}.{id1.Key}.{id1.Tag}", results);
                         }
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         this.m_traceSource.TraceError("Error getting active policies for {0} : {1}", securable, e);
                         throw new DataPersistenceException(ErrorMessages.ERR_SEC_POL_GEN, e);
@@ -317,7 +327,8 @@ namespace SanteDB.Persistence.Data.Services
             {
                 retVal = context.Query<CompositeResult<DbSecurityPolicyActionableInstance, DbSecurityPolicy>>(
                     context.CreateSqlStatement<DbSecurityApplicationPolicy>()
-                        .AutoJoin<DbSecurityApplicationPolicy, DbSecurityPolicy>()
+                        .SelectFrom(typeof(DbSecurityApplicationPolicy), typeof(DbSecurityPolicy))
+                        .InnerJoin<DbSecurityApplicationPolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
                         .InnerJoin<DbSecurityApplicationPolicy, DbSecurityApplication>(o => o.SourceKey, o => o.Key)
                         .Where<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == appId.Name.ToLowerInvariant())
                     );
@@ -326,7 +337,8 @@ namespace SanteDB.Persistence.Data.Services
             {
                 retVal = context.Query<CompositeResult<DbSecurityPolicyActionableInstance, DbSecurityPolicy>>(
                     context.CreateSqlStatement<DbSecurityDevicePolicy>()
-                        .AutoJoin<DbSecurityDevicePolicy, DbSecurityPolicy>()
+                        .SelectFrom(typeof(DbSecurityDevicePolicy), typeof(DbSecurityPolicy))
+                        .InnerJoin<DbSecurityDevicePolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
                         .InnerJoin<DbSecurityDevicePolicy, DbSecurityDevice>(o => o.SourceKey, o => o.Key)
                         .Where<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == devId.Name.ToLowerInvariant())
                         );
@@ -335,15 +347,15 @@ namespace SanteDB.Persistence.Data.Services
             {
                 retVal = context.Query<CompositeResult<DbSecurityPolicyActionableInstance, DbSecurityPolicy>>(
                     context.CreateSqlStatement<DbSecurityRolePolicy>()
-                        .AutoJoin<DbSecurityRolePolicy, DbSecurityPolicy>()
-                        .InnerJoin<DbSecurityRolePolicy, DbSecurityRole>(o => o.SourceKey, o => o.Key)
-                        .InnerJoin<DbSecurityUserRole, DbSecurityRole>(o => o.RoleKey, o => o.Key)
-                        .InnerJoin<DbSecurityUser, DbSecurityUserRole>(o => o.Key, o => o.UserKey)
+                        .SelectFrom(typeof(DbSecurityRolePolicy), typeof(DbSecurityPolicy))
+                        .InnerJoin<DbSecurityRolePolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
+                        .InnerJoin<DbSecurityRolePolicy, DbSecurityUserRole>(o => o.SourceKey, o => o.RoleKey)
+                        .InnerJoin<DbSecurityUserRole, DbSecurityUser>(o => o.UserKey, o => o.Key)
                         .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == identity.Name.ToLowerInvariant())
                     );
             }
 
-            if(filterOids.Any())
+            if (filterOids.Any())
             {
                 retVal = retVal.ToArray().Where(o => filterOids.Contains(o.Object2.Oid));
             }
@@ -376,14 +388,14 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public IPolicy GetPolicy(string policyOid)
         {
-            if(String.IsNullOrEmpty(policyOid))
+            if (String.IsNullOrEmpty(policyOid))
             {
                 throw new ArgumentNullException(nameof(policyOid), ErrorMessages.ERR_ARGUMENT_NULL);
             }
 
             // Cache hit
             var retVal = this.m_adhocCache?.Get<DbSecurityPolicy>($"pip.{policyOid}");
-            if(retVal != null)
+            if (retVal != null)
             {
                 return new AdoSecurityPolicy(retVal);
             }
@@ -395,14 +407,14 @@ namespace SanteDB.Persistence.Data.Services
                     context.Open();
                     retVal = context.SingleOrDefault<DbSecurityPolicy>(o => o.Oid == policyOid && o.ObsoletionTime == null);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_traceSource.TraceError("Error fetching {0} : {1}", policyOid, e);
                     throw new DataPersistenceException(ErrorMessages.ERR_SEC_POL_GEN, e);
                 }
             }
 
-            if(retVal != null)
+            if (retVal != null)
             {
                 return new AdoSecurityPolicy(retVal);
             }

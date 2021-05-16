@@ -207,8 +207,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 else if(user.TwoFactorEnabled && user.TwoFactorMechnaismKey.HasValue)
                                 {
                                     var suser = ApplicationServiceContext.Current.GetService<AdoPersistenceService>().GetMapper().MapDomainInstance<DbSecurityUser, SecurityUser>(user);
-                                    var secretResponse = ApplicationServiceContext.Current.GetService<ITfaRelayService>()?.SendSecret(user.TwoFactorMechnaismKey.Value, suser);
-                                    throw new AuthenticationException($"TFA_MISMATCH:{secretResponse}");
+                                    //var secretResponse = ApplicationServiceContext.Current.GetService<ITfaRelayService>()?.SendSecret(user.TwoFactorMechnaismKey.Value, suser);
+                                    throw new AuthenticationException($"TFA_MISMATCH");
                                 }
                             }
                             else

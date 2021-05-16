@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
+using System.Security.Authentication;
 using System.Security.Principal;
 using System.Text;
 
@@ -227,7 +228,7 @@ namespace SanteDB.Persistence.Data.Services
             }
             
             // Validate scopes are valid or can be overridden
-            if (scope != null)
+            if (scope != null && !scope.Contains("*"))
             {
                 foreach (var pol in scope.Select(o => this.m_pipService.GetPolicy(o)))
                 {
@@ -328,6 +329,7 @@ namespace SanteDB.Persistence.Data.Services
                             UserKey = userKey,
                             NotBefore = DateTimeOffset.Now,
                             NotAfter = expiration,
+                            RemoteEndpoint = remoteEp,
                             RefreshExpiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.RefreshLength, new TimeSpan(1, 0, 0))),
                             RefreshToken = this.m_passwordHashingService.ComputeHash(refreshToken.ToString())
                         };
@@ -335,8 +337,7 @@ namespace SanteDB.Persistence.Data.Services
                         dbSession = context.Insert(dbSession);
 
                         // Claims to be added to session
-                        var claims = claimsPrincipal.Claims.ToList();
-                        claims.RemoveAll(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim || o.Type == SanteDBClaimTypes.SanteDBScopeClaim);
+                        var claims = new List<IClaim>();
 
                         // Default = *
                         var sessionScopes = new List<string>();
@@ -548,6 +549,15 @@ namespace SanteDB.Persistence.Data.Services
                         .Where<DbSession>(o => o.Key == sessionId);
                     var dbSession = context.FirstOrDefault<CompositeResult<DbSession, DbSecurityApplication, DbSecurityUser, DbSecurityDevice>>(sql);
 
+                    if(dbSession == null)
+                    {
+                        throw new KeyNotFoundException(ErrorMessages.ERR_SESSION_TOKEN_INVALID);
+                    }
+                    else if(authenticated && dbSession.Object1.NotAfter < DateTimeOffset.Now)
+                    {
+                        throw new SecuritySessionException(SessionExceptionType.Expired, ErrorMessages.ERR_SESSION_EXPIRE, null);
+                    }
+
                     adoSession = new AdoSecuritySession(session.Id, null, dbSession.Object1, context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Object1.Key));
 
                     // Precendence of identiites in the principal : User , App, Device
@@ -587,6 +597,10 @@ namespace SanteDB.Persistence.Data.Services
                     }
 
                     return identities.OfType<IIdentity>().ToArray();
+                }
+                catch(SecuritySessionException)
+                {
+                    throw;
                 }
                 catch (Exception e)
                 {

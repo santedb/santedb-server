@@ -20,12 +20,14 @@ using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Server.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
+using System.Security.Principal;
 
 namespace SanteDB.Server.Core.Security
 {
@@ -49,10 +51,7 @@ namespace SanteDB.Server.Core.Security
         /// </summary>
         public DefaultTfaRelayService(IServiceManager serviceManager)
         {
-            this.Mechanisms = serviceManager
-                .GetAllTypes()
-                .Where(t => typeof(ITfaMechanism).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface)
-                .Select(m => Activator.CreateInstance(m) as ITfaMechanism);
+            this.Mechanisms = serviceManager.CreateInjectedOfAll<ITfaMechanism>();
         }
 
         /// <summary>
@@ -66,7 +65,7 @@ namespace SanteDB.Server.Core.Security
         /// <summary>
         /// Sends the secret via the specified mechanism
         /// </summary>
-        public String SendSecret(Guid mechanismId, SecurityUser user)
+        public String SendSecret(Guid mechanismId, IIdentity user)
         {
             // Get the mechanism
             var mechanism = this.Mechanisms.FirstOrDefault(o => o.Id == mechanismId);
@@ -75,6 +74,20 @@ namespace SanteDB.Server.Core.Security
 
             // send the secret
             return mechanism.Send(user);
+        }
+
+        /// <summary>
+        /// Validate the secret
+        /// </summary>
+        public bool ValidateSecret(Guid mechanismId, IIdentity user, String secret)
+        {
+            // Get the mechanism
+            var mechanism = this.Mechanisms.FirstOrDefault(o => o.Id == mechanismId);
+            if (mechanism == null)
+                throw new SecurityException($"TFA mechanism {mechanismId} not found");
+
+            // send the secret
+            return mechanism.Validate(user, secret);
         }
     }
 }

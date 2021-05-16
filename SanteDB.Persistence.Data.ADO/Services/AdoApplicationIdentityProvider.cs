@@ -228,6 +228,16 @@ namespace SanteDB.Persistence.Data.ADO.Services
         {
             throw new NotImplementedException();
         }
+
+        public void SetPublicKey(string name, byte[] key, IPrincipal principal)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteIdentity(string name, IPrincipal principal)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 #pragma warning restore CS0067

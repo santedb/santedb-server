@@ -122,19 +122,21 @@ namespace SanteDB.Persistence.Data.Services
                     }
 
                     // Locked?
-                    if (app.Lockout.HasValue && app.Lockout.Value > DateTimeOffset.Now)
+                    if (app.Lockout.GetValueOrDefault() > DateTimeOffset.Now)
                     {
                         throw new AuthenticationException(ErrorMessages.ERR_AUTH_APP_LOCKED);
                     }
 
+                    var pepperSecret = this.m_configuration.GetPepperCombos(applicationSecret).Select(o => this.m_hasher.ComputeHash(o));
                     // Pepper authentication
-                    if (!this.m_configuration.GetPepperCombos(applicationSecret).Any(p=> this.m_hasher.ComputeHash(p) == app.Secret))
+                    if (!context.Any<DbSecurityApplication>(a=>a.PublicId.ToLowerInvariant() == applicationId.ToLower() && pepperSecret.Contains(a.Secret)))
                     {
-                        app.InvalidAuthAttempts++;
+                        app.InvalidAuthAttempts = app.InvalidAuthAttempts.GetValueOrDefault() + 1;
+
                         if (app.InvalidAuthAttempts > this.m_securityConfiguration.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxInvalidLogins))
                         {
                             var lockoutSlide = 30 * app.InvalidAuthAttempts.Value;
-                            if (app.Lockout < DateTimeOffset.MaxValue.AddSeconds(-lockoutSlide))
+                            if (DateTimeOffset.Now < DateTimeOffset.MaxValue.AddSeconds(-lockoutSlide))
                             {
                                 app.Lockout = DateTimeOffset.Now.AddSeconds(lockoutSlide);
                             }
@@ -145,7 +147,7 @@ namespace SanteDB.Persistence.Data.Services
 
                     // Re-pepper the password 
                     app.LastAuthentication = DateTimeOffset.Now;
-                    app.Secret = this.m_configuration.AddPepper(applicationSecret);
+                    app.Secret = this.m_hasher.ComputeHash( this.m_configuration.AddPepper(applicationSecret));
 
 
                     // Construct an identity and login
@@ -196,7 +198,7 @@ namespace SanteDB.Persistence.Data.Services
             }
 
             // Rule - Application can change its own password or ALTER_IDENTITY
-            if (!principal.Identity.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+            if (!principal.Identity.IsAuthenticated || !principal.Identity.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
             {
                 this.m_pepService.Demand(ApplicationServiceContext.Current.HostType == SanteDBHostType.Server ?
                     PermissionPolicyIdentifiers.AlterIdentity : PermissionPolicyIdentifiers.AlterLocalIdentity, principal);
@@ -322,8 +324,11 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
             }
 
-            this.m_pepService.Demand(ApplicationServiceContext.Current.HostType == SanteDBHostType.Server ?
+            if (!principal.Identity.IsAuthenticated || principal != AuthenticationContext.SystemPrincipal)
+            {
+                this.m_pepService.Demand(ApplicationServiceContext.Current.HostType == SanteDBHostType.Server ?
                     PermissionPolicyIdentifiers.AlterIdentity : PermissionPolicyIdentifiers.AlterLocalIdentity, principal);
+            }
 
             // Get the write connection
             using (var context = this.m_configuration.Provider.GetWriteConnection())
@@ -331,7 +336,7 @@ namespace SanteDB.Persistence.Data.Services
                 try
                 {
                     context.Open();
-                    var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant());
+                    var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
                     if (app == null)
                     {
                         throw new KeyNotFoundException(ErrorMessages.ERR_NOT_FOUND);
@@ -339,7 +344,7 @@ namespace SanteDB.Persistence.Data.Services
 
                     if (lockoutState)
                     {
-                        app.Lockout = DateTimeOffset.MaxValue;
+                        app.Lockout = DateTimeOffset.MaxValue.ToLocalTime();
                     }
                     else
                     {
@@ -347,7 +352,7 @@ namespace SanteDB.Persistence.Data.Services
                         app.LockoutSpecified = true;
                     }
 
-                    context.Update(app);
+                    app = context.Update(app);
                 }
                 catch (Exception e)
                 {
@@ -404,7 +409,8 @@ namespace SanteDB.Persistence.Data.Services
                             .InnerJoin<DbSecurityRole>(o => o.SourceKey, o => o.Key)
                             .Where<DbSecurityRole>(o => o.Name == "APPLICATIONS");
 
-                        context.Query<DbSecurityRolePolicy>(skelSql).ToList()
+                        context.Query<DbSecurityRolePolicy>(skelSql)
+                            .ToList()
                             .ForEach(o => context.Insert(new DbSecurityApplicationPolicy()
                             {
                                 GrantType = o.GrantType,
@@ -451,6 +457,98 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     this.m_tracer.TraceError("Error fetching SID for {0}", name);
                     throw new DataPersistenceException(ErrorMessages.ERR_DATA_GENERAL, e);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Set the public key used for symmetric encryption, etc.
+        /// </summary>
+        public void SetPublicKey(string name, byte[] key, IPrincipal principal)
+        {
+            if(String.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException(nameof(name), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            if(key == null || key.Length == 0)
+            {
+                throw new ArgumentException(nameof(key), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+            // Must be self or have unrestricted 
+            if (!principal.Identity.IsAuthenticated || !principal.Identity.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+            {
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration, principal);
+            }
+
+            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    var dbApp = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
+                    if(dbApp == null)
+                    {
+                        throw new KeyNotFoundException(ErrorMessages.ERR_FETCH_APPLICATION_KEY);
+                    }
+
+                    var iv = this.m_symmetricCryptographicProvider.GenerateIV();
+                    var encData = this.m_symmetricCryptographicProvider.Encrypt(key, this.m_symmetricCryptographicProvider.GetContextKey(), iv);
+                    byte[] storeData = new byte[iv.Length + encData.Length + 1];
+                    storeData[0] = (byte)iv.Length;
+                    Array.Copy(iv, 0, storeData, 1, iv.Length);
+                    Array.Copy(encData, 0, storeData, 1 + iv.Length, encData.Length);
+                    dbApp.SigningKey = storeData;
+                    dbApp.UpdatedByKey = context.EstablishProvenance(principal, null);
+                    dbApp.UpdatedTime = DateTimeOffset.Now;
+
+                    context.Update(dbApp);
+                }
+                catch(Exception e)
+                {
+                    this.m_tracer.TraceError("Error updating application key: {0}", e);
+                    throw new DataPersistenceException(ErrorMessages.ERR_APP_UPDATE_ERROR, e);
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Delete identity
+        /// </summary>
+        public void DeleteIdentity(string name, IPrincipal principal)
+        {
+            if (String.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException(nameof(name), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            else if (principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateDevice, principal);
+
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    var dbApp = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
+                    if(dbApp == null)
+                    {
+                        throw new KeyNotFoundException(ErrorMessages.ERR_FETCH_APPLICATION_KEY);
+                    }
+
+                    dbApp.ObsoletedByKey = context.EstablishProvenance(principal, null);
+                    dbApp.ObsoletionTime = DateTimeOffset.Now;
+                    context.Update(dbApp);
+                }
+                catch(Exception e)
+                {
+                    throw new DataPersistenceException(ErrorMessages.ERR_APP_DELETE_ERROR, e);
                 }
             }
         }

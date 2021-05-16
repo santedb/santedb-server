@@ -36,9 +36,15 @@ namespace SanteDB.Persistence.Data.Configuration
     [XmlType(nameof(AdoPersistenceConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class AdoPersistenceConfigurationSection : OrmConfigurationBase, IConfigurationSection
     {
-        
+
+        // Random
+        private Random m_random = new Random();
+
         // Data provider
         private IDbProvider m_dbp;
+
+        // PEPPER CHARS DEFAULT
+        private const string PEPPER_CHARS = "0ABcDEfgILqZ~k";
 
         /// <summary>
         /// ADO configuration
@@ -127,7 +133,7 @@ namespace SanteDB.Persistence.Data.Configuration
         {
             if(String.IsNullOrEmpty(this.Pepper))
             {
-                return new string[] { secret };
+                return new String[] { secret }.Union(PEPPER_CHARS.Select(p => $"{secret}{p}"));
             }
             else
             {
@@ -142,11 +148,11 @@ namespace SanteDB.Persistence.Data.Configuration
         {
             if (String.IsNullOrEmpty(this.Pepper))
             {
-                return secret;
+                return $"{secret}{PEPPER_CHARS[m_random.Next(PEPPER_CHARS.Length - 1)]}";
             }
             else
             {
-                return $"{secret}{this.Pepper[(int)DateTime.Now.Ticks % this.Pepper.Length]}";
+                return $"{secret}{this.Pepper[m_random.Next(this.Pepper.Length - 1)]}";
             }
         }
     }

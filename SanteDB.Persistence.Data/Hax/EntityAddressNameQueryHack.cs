@@ -18,6 +18,7 @@
  */
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Map;
 using SanteDB.OrmLite;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,8 @@ namespace SanteDB.Persistence.Data.Hax
     /// </summary>
     public class EntityAddressNameQueryHack : IQueryBuilderHack
     {
+
+
         /// <summary>
         /// Hack the query 
         /// </summary>

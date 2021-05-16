@@ -49,6 +49,7 @@ using System.Reflection;
 using System.Security.Permissions;
 using SanteDB.Server.Core.Services;
 using SanteDB.Server.Core.Configuration;
+using SanteDB.Core.Security.Services;
 
 namespace SanteDB.Messaging.AMI.Wcf
 {

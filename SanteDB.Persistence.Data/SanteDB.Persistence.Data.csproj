@@ -109,6 +109,7 @@
     <None Remove="SQL\Updates\20200912-FBSQL.sql" />
     <None Remove="SQL\Updates\20200912-PSQL.sql" />
     <None Remove="SQL\Updates\20201109-PSQL.sql" />
+    <None Remove="SQL\Updates\20201128-FBSQL.sql" />
     <None Remove="SQL\Updates\20201128-PSQL.sql" />
     <None Remove="SQL\Updates\20201214-FBSQL.sql" />
     <None Remove="SQL\Updates\20201214-PSQL.sql" />
@@ -119,6 +120,8 @@
     <None Remove="SQL\Updates\20210217-FBSQL.sql" />
     <None Remove="SQL\Updates\20210409-FBSQL.sql" />
     <None Remove="SQL\Updates\20210409-PSQL.sql" />
+    <None Remove="SQL\Updates\20210514-FBSQL.sql" />
+    <None Remove="SQL\Updates\20210514-PSQL.sql" />
   </ItemGroup>
   
   <ItemGroup>
@@ -128,6 +131,15 @@
   
   <ItemGroup>
     <EmbeddedResource Include="Map\ModelMap.xml" />
+    <EmbeddedResource Include="SQL\Updates\20201128-FBSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SQL\Updates\20210514-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SQL\Updates\20210514-FBSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="SQL\Updates\20210414-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>

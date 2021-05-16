@@ -1,6 +1,8 @@
-﻿using SanteDB.Core.Security.Claims;
+﻿using SanteDB.Core.i18n;
+using SanteDB.Core.Security.Claims;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Principal;
 using System.Text;
 
@@ -21,7 +23,7 @@ namespace SanteDB.Persistence.Data.Security
         /// <param name="focalIdentity">The focal identity (the primary identity)</param>
         internal AdoClaimsPrincipal(AdoIdentity focalIdentity) 
         {
-
+            this.m_identity = focalIdentity;
         }
 
         /// <summary>
@@ -47,29 +49,43 @@ namespace SanteDB.Persistence.Data.Security
             throw new NotSupportedException();
         }
 
-        public IEnumerable<IClaim> FindAll(string santeDBDeviceIdentifierClaim)
-        {
-            throw new NotImplementedException();
-        }
+        /// <summary>
+        /// Find all claims
+        /// </summary>
+        public IEnumerable<IClaim> FindAll(string claimType) => this.Claims.Where(o => o.Type == claimType);
 
-        public IClaim FindFirst(string santeDBDeviceIdentifierClaim)
-        {
-            throw new NotImplementedException();
-        }
+        /// <summary>
+        /// Find the first claim
+        /// </summary>
+        public IClaim FindFirst(string claimType) => this.FindAll(claimType).FirstOrDefault();
 
+        /// <summary>
+        /// True if the objet has a claim
+        /// </summary>
         public bool HasClaim(Func<IClaim, bool> predicate)
         {
-            throw new NotImplementedException();
+            return this.Claims.Any(predicate);
         }
 
+        /// <summary>
+        /// Is the user in role
+        /// </summary>
         public bool IsInRole(string role)
         {
-            throw new NotImplementedException();
+            if(String.IsNullOrEmpty(role))
+            {
+                throw new ArgumentNullException(nameof(role), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            return this.Claims.Any(c => c.Type == SanteDBClaimTypes.DefaultRoleClaimType && c.Value.Equals(role, StringComparison.OrdinalIgnoreCase));
         }
 
+        /// <summary>
+        /// Try to get the specified claim value
+        /// </summary>
         public bool TryGetClaimValue(string claimType, out string value)
         {
-            throw new NotImplementedException();
+            value = this.FindFirst(claimType)?.Value;
+            return !String.IsNullOrEmpty(value);
         }
     }
 }

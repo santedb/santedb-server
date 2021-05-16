@@ -222,5 +222,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
         {
             throw new NotImplementedException();
         }
+
+        public void DeleteIdentity(string name, IPrincipal principal)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

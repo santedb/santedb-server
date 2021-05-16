@@ -65,6 +65,7 @@ using SanteDB.Server.Core.Configuration;
 using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Server.Core.Security;
 using SanteDB.Server.Core;
+using SanteDB.Core.Security.Configuration;
 
 namespace SanteDB.Authentication.OAuth2.Rest
 {

@@ -51,8 +51,8 @@ namespace SanteDB.Persistence.Data.Security
         {
             var addlClaims = new List<IClaim>()
             {
-                new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, sessionInfo.NotBefore.ToString("o")),
-                new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, sessionInfo.NotAfter.ToString("o")),
+                new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, sessionInfo.NotBefore.ToUniversalTime().ToString("o")),
+                new SanteDBClaim(SanteDBClaimTypes.Expiration, sessionInfo.NotAfter.ToUniversalTime().ToString("o")),
                 new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, sessionInfo.Key.ToString())
             };
 

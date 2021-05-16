@@ -30,8 +30,10 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Linq;
+using System.Security.Principal;
 using TW = Twilio;
 
+// TODO: Re-Implement this to be a generic message sender
 namespace SanteDB.Core.Security.Tfa.Twilio
 {
     /// <summary>
@@ -70,28 +72,18 @@ namespace SanteDB.Core.Security.Tfa.Twilio
         /// <summary>
         /// Send the secret
         /// </summary>
-        public String Send(SecurityUser user)
+        public String Send(IIdentity user)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
-            // First, does this user have a phone number
-            string toNumber = user.PhoneNumber;
-            if (toNumber == null)
-            {
-                // Get preferred language for the user
-                var securityService = ApplicationServiceContext.Current.GetService<IRepositoryService<UserEntity>>();
-                var userEntity = securityService?.Find(o => o.SecurityUserKey == user.Key).FirstOrDefault();
-                if (userEntity != null)
-                    toNumber = userEntity.Telecoms.FirstOrDefault(o => o.AddressUseKey == TelecomAddressUseKeys.MobileContact)?.Value;
-            }
+           
 
             try
             {
                 // Generate a TFA secret and add it as a claim on the user
                 var secret = ApplicationServiceContext.Current.GetService<ITwoFactorSecretGenerator>().GenerateTfaSecret();
-                ApplicationServiceContext.Current.GetService<IIdentityProviderService>().AddClaim(user.UserName, new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, secret), AuthenticationContext.SystemPrincipal, new TimeSpan(0, 5, 0));
-
+                ApplicationServiceContext.Current.GetService<IIdentityProviderService>().AddClaim(user.Name, new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, secret), AuthenticationContext.SystemPrincipal, new TimeSpan(0, 5, 0));
                 var client = new TW.TwilioRestClient(this.m_configuration.Sid, this.m_configuration.Auth);
                 var response = client.SendMessage(this.m_configuration.From, toNumber, String.Format(Strings.default_body, secret));
 

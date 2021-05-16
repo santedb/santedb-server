@@ -21,7 +21,7 @@ namespace SanteDB.Persistence.Data.Test
         /// <summary>
         /// Setup the test
         /// </summary>
-        [SetUp]
+        [OneTimeSetUp]
         public void Setup()
         {
             // Force load of the DLL

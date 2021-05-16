@@ -38,7 +38,7 @@ namespace SanteDB.Persistence.Data.Services
         {
             this.m_configuration = configManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
-            this.m_queryBuilder = new QueryBuilder(this.m_mapper, this.m_configuration.Provider, serviceManager.CreateInjectedOfAll<IQueryBuilderHack>().ToArray());
+            this.m_queryBuilder = new QueryBuilder(this.m_mapper, this.m_configuration.Provider, serviceManager.CreateAll<IQueryBuilderHack>(this.m_mapper).ToArray());
 
             // Upgrade the schema
             this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Data");

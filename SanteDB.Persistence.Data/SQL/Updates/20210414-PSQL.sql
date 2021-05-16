@@ -19,6 +19,7 @@ ALTER TABLE psn_tbl ADD CONSTRAINT CK_PNS_GNDR_CD CHECK (GNDR_CD_ID IS NULL OR C
 -- INFO: Copying genders from Patient -> Person this may take a while
 UPDATE psn_tbl SET gndr_cd_id = pat_tbl.gndr_cd_id FROM pat_tbl WHERE pat_tbl.ent_vrsn_id = psn_tbl.ent_vrsn_id;
 ALTER TABLE pat_tbl DROP gndr_cd_id;
+UPDATE sec_rol_tbl SET rol_name = 'APPLICATIONS' WHERE rol_name = 'SYNCHRONIZERS';
 
 SELECT REG_PATCH('20210414-01');
 

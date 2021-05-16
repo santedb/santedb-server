@@ -106,5 +106,6 @@ namespace SanteDB.Persistence.Data.Test
             Assert.AreEqual(patient.VersionKey, revEntity.VersionKey);
 
         }
+
     }
 }

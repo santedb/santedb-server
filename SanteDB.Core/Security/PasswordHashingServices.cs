@@ -40,6 +40,10 @@ namespace SanteDB.Server.Core.Security
         /// </summary>
         public string ComputeHash(string password)
         {
+            if(String.IsNullOrEmpty(password))
+            {
+                throw new ArgumentNullException(nameof(password));
+            }
             SHA256 hasher = SHA256.Create();
             return BitConverter.ToString(hasher.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-","").ToLower();
         }
@@ -62,6 +66,11 @@ namespace SanteDB.Server.Core.Security
         /// </summary>
         public string ComputeHash(string password)
         {
+            if (String.IsNullOrEmpty(password))
+            {
+                throw new ArgumentNullException(nameof(password));
+            }
+
             SHA1 hasher = SHA1.Create();
             return BitConverter.ToString(hasher.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-","").ToLower();
         }
@@ -84,6 +93,11 @@ namespace SanteDB.Server.Core.Security
         /// </summary>
         public string ComputeHash(string password)
         {
+            if (String.IsNullOrEmpty(password))
+            {
+                throw new ArgumentNullException(nameof(password));
+            }
+
             MD5 hasher = MD5.Create();
             return BitConverter.ToString(hasher.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-","").ToLower();
         }

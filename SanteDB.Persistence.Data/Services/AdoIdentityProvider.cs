@@ -48,7 +48,7 @@ namespace SanteDB.Persistence.Data.Services
         private IPolicyEnforcementService m_pepService;
 
         // TFA generator
-        private ITwoFactorSecretGenerator m_tfaGenerator;
+        private ITfaRelayService m_tfaRelay;
 
         // The password validator
         private IPasswordValidatorService m_passwordValidator;
@@ -60,15 +60,15 @@ namespace SanteDB.Persistence.Data.Services
             IDataSigningService dataSigning,
             IPasswordHashingService passwordHashingService,
             IPolicyEnforcementService policyEnforcementService,
-            ITwoFactorSecretGenerator twoFactorSecretGenerator,
-            IPasswordValidatorService passwordValidator)
+            IPasswordValidatorService passwordValidator,
+            ITfaRelayService twoFactorSecretGenerator = null)
         {
             this.m_configuration = configuration.GetSection<AdoPersistenceConfigurationSection>();
             this.m_securityConfiguration = configuration.GetSection<SecurityConfigurationSection>();
             this.m_dataSigningService = dataSigning;
             this.m_passwordHashingService = passwordHashingService;
             this.m_pepService = policyEnforcementService;
-            this.m_tfaGenerator = twoFactorSecretGenerator;
+            this.m_tfaRelay = twoFactorSecretGenerator;
             this.m_passwordValidator = passwordValidator;
         }
 
@@ -238,13 +238,14 @@ namespace SanteDB.Persistence.Data.Services
                             {
                                 throw new AuthenticationException(ErrorMessages.ERR_AUTH_USR_INVALID);
                             }
-                            else if (dbUser.Lockout > DateTimeOffset.Now)
+                            else if (dbUser.Lockout.GetValueOrDefault() > DateTimeOffset.Now)
                             {
                                 throw new AuthenticationException(ErrorMessages.ERR_AUTH_USR_LOCKED);
                             }
 
                             // Claims to add to the principal
                             var claims = context.Query<DbUserClaim>(o => o.SourceKey == dbUser.Key && o.ClaimExpiry < DateTimeOffset.Now).ToList();
+                            claims.RemoveAll(o => o.ClaimType == SanteDBClaimTypes.SanteDBOTAuthCode);
 
                             if (!String.IsNullOrEmpty(password))
                             {
@@ -254,9 +255,15 @@ namespace SanteDB.Persistence.Data.Services
                                     claims.Add(new DbUserClaim() { ClaimType = SanteDBClaimTypes.SanteDBScopeClaim, ClaimValue = PermissionPolicyIdentifiers.LoginPasswordOnly });
                                     claims.Add(new DbUserClaim() { ClaimType = SanteDBClaimTypes.SanteDBScopeClaim, ClaimValue = PermissionPolicyIdentifiers.ReadMetadata });
                                 }
-                                else if (!this.m_configuration.GetPepperCombos(password).Any(p => this.m_passwordHashingService.ComputeHash(p) == dbUser.Password))
+                                else
                                 {
-                                    throw new AuthenticationException(ErrorMessages.ERR_AUTH_USR_INVALID);
+                                    // Peppered authentication
+                                    var pepperSecret = this.m_configuration.GetPepperCombos(password).Select(o => this.m_passwordHashingService.ComputeHash(o));
+                                    // Pepper authentication
+                                    if (!context.Any<DbSecurityUser>(a => a.UserName.ToLowerInvariant() == userName.ToLower() && pepperSecret.Contains(a.Password)))
+                                    {
+                                        throw new AuthenticationException(ErrorMessages.ERR_AUTH_USR_INVALID);
+                                    }
                                 }
                             }
                             else if(String.IsNullOrEmpty(password) && !claims.Any(c=>c.ClaimType == SanteDBClaimTypes.SanteDBCodeAuth && "true".Equals(c.ClaimValue, StringComparison.OrdinalIgnoreCase)))
@@ -265,26 +272,23 @@ namespace SanteDB.Persistence.Data.Services
                             }
 
                             // User requires TFA but the secret is empty
-                            if (dbUser.TwoFactorEnabled && String.IsNullOrEmpty(tfaSecret))
+                            if (dbUser.TwoFactorEnabled && String.IsNullOrEmpty(tfaSecret) &&
+                                dbUser.TwoFactorMechnaismKey.HasValue)
                             {
-                                var tfaSecretGen = this.m_passwordHashingService.ComputeHash(this.m_tfaGenerator.GenerateTfaSecret());
-                                this.AddClaim(userName, new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, tfaSecretGen), AuthenticationContext.SystemPrincipal, new TimeSpan(0, 5, 0));
+                                this.m_tfaRelay.SendSecret(dbUser.TwoFactorMechnaismKey.Value, new AdoUserIdentity(dbUser));
                                 throw new AuthenticationException(ErrorMessages.ERR_AUTH_USR_TFA_REQ);
                             }
 
                             // TFA supplied?
-                            if (!String.IsNullOrEmpty(tfaSecret) && this.m_passwordHashingService.ComputeHash(tfaSecret) != claims.FirstOrDefault(o => o.ClaimType == SanteDBClaimTypes.SanteDBOTAuthCode)?.ClaimValue)
+                            if (dbUser.TwoFactorEnabled && !this.m_tfaRelay.ValidateSecret(dbUser.TwoFactorMechnaismKey.Value, new AdoUserIdentity(dbUser), tfaSecret))
                             {
                                 throw new AuthenticationException(ErrorMessages.ERR_AUTH_USR_INVALID);
-                            }
-                            else
-                            {
-                                context.Delete<DbUserClaim>(o => o.SourceKey == dbUser.Key && o.ClaimType == SanteDBClaimTypes.SanteDBOTAuthCode);
                             }
 
                             // Reset invalid logins
                             dbUser.InvalidLoginAttempts = 0;
                             dbUser.LastLoginTime = DateTimeOffset.Now;
+                            dbUser.Password = this.m_passwordHashingService.ComputeHash(this.m_configuration.AddPepper(password));
 
                             dbUser = context.Update(dbUser);
 
@@ -311,11 +315,11 @@ namespace SanteDB.Persistence.Data.Services
                         }
                         catch(AuthenticationException e) when (e.Message == ErrorMessages.ERR_AUTH_USR_INVALID && dbUser != null)
                         {
-                            dbUser.InvalidLoginAttempts++;
+                            dbUser.InvalidLoginAttempts = dbUser.InvalidLoginAttempts.GetValueOrDefault() + 1;
                             if (dbUser.InvalidLoginAttempts > this.m_securityConfiguration.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxInvalidLogins, 5))
                             {
                                 var lockoutSlide = 30 * dbUser.InvalidLoginAttempts.Value;
-                                if (dbUser.Lockout < DateTimeOffset.MaxValue.AddSeconds(-lockoutSlide))
+                                if (DateTimeOffset.Now < DateTimeOffset.MaxValue.AddSeconds(-lockoutSlide))
                                 {
                                     dbUser.Lockout = DateTimeOffset.Now.AddSeconds(lockoutSlide);
                                 }
@@ -489,6 +493,18 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         newIdentity = context.Insert(newIdentity);
+
+                        // Register the group
+                        context.Insert(context.Query<DbSecurityRole>(context.CreateSqlStatement<DbSecurityRole>()
+                            .SelectFrom()
+                            .Where<DbSecurityRole>(o => o.Name == "USERS"))
+                            .ToArray()
+                            .Select(o => new DbSecurityUserRole()
+                            {
+                                RoleKey = o.Key,
+                                UserKey = newIdentity.Key
+                            }));
+                            
                         tx.Commit();
                         return new AdoUserIdentity(newIdentity);
                     }
@@ -575,9 +591,21 @@ namespace SanteDB.Persistence.Data.Services
                         return null;
                     }
 
-                    return new AdoUserIdentity(dbUser);
+                    var dbClaims = context.Query<DbUserClaim>(o => o.SourceKey == dbUser.Key &&
+                        (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now));
+                    var retVal = new AdoUserIdentity(dbUser);
+                    retVal.AddClaims(dbClaims.ToArray().Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
+
+                    // Establish role
+                    var roleSql = context.CreateSqlStatement<DbSecurityRole>()
+                                .SelectFrom()
+                                .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
+                                .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key);
+                    retVal.AddRoleClaims(context.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
+
+                    return retVal;
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error fetching user identity {0} - {1}", userName, e.Message);
                     throw new DataPersistenceException(ErrorMessages.ERR_USR_GEN_ERR.Format(userName), e);
@@ -607,7 +635,11 @@ namespace SanteDB.Persistence.Data.Services
                         return null;
                     }
 
-                    return new AdoUserIdentity(dbUser);
+                    var retVal = new AdoUserIdentity(dbUser);
+                    var claims = context.Query<DbUserClaim>(o => o.SourceKey == dbUser.Key && o.ClaimExpiry < DateTimeOffset.Now).ToList();
+                    retVal.AddClaims(claims.Select(o=>new SanteDBClaim(o.ClaimType, o.ClaimValue)));
+                    return retVal;
+
                 }
                 catch (Exception e)
                 {
@@ -732,7 +764,7 @@ namespace SanteDB.Persistence.Data.Services
 
                     dbUser.UpdatedByKey = context.EstablishProvenance(principal, null);
                     dbUser.UpdatedTime = DateTimeOffset.Now;
-                    dbUser.Lockout = lockout ? (DateTimeOffset?)DateTimeOffset.MaxValue : null;
+                    dbUser.Lockout = lockout ? (DateTimeOffset?)DateTimeOffset.MaxValue.ToLocalTime() : null;
                     dbUser.LockoutSpecified = true;
 
                     context.Update(dbUser);

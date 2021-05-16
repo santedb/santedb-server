@@ -140,7 +140,6 @@
     <Compile Include="Services\Impl\LocalTagPersistenceService.cs" />
     <Compile Include="Services\Impl\FileConfigurationService.cs" />
     <Compile Include="Services\Impl\Repository\LocalUserEntityRepository.cs" />
-    <Compile Include="Services\ITfaRelayService.cs" />
     <Compile Include="Services\Impl\Repository\LocalConceptRepository.cs" />
     <Compile Include="Services\Impl\Repository\LocalSecurityRepositoryService.cs" />
   </ItemGroup>
