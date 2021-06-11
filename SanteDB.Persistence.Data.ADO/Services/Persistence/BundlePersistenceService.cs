@@ -77,7 +77,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         private Bundle ReorganizeForInsert(Bundle bundle)
         {
             Bundle retVal = new Bundle() { Item = new List<IdentifiedData>() };
-            foreach (var itm in bundle.Item.Where(o => o != null))
+            foreach (var itm in bundle.Item.Where(o => o != null).Distinct())
             {
                 this.m_tracer.TraceVerbose("Reorganizing {0}..", itm.Key);
                 var idx = retVal.Item.FindIndex(o => o.Key == itm.Key);
@@ -242,7 +242,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     }
                 }
                 this.m_tracer.TraceVerbose("Re-adding: {0}", itm);
-                if (!retVal.Item.Any(o => o.Key == itm.Key))
+                if (!itm.Key.HasValue || !retVal.Item.Any(o => o.Key == itm.Key))
                     retVal.Item.Add(itm);
             }
 

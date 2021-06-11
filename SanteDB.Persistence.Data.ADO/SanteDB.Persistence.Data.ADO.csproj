@@ -418,6 +418,12 @@
   <ItemGroup>
     <Content Include="Data\SQL\Performance\ZZ-Partition-PSQL10.sql" />
     <Content Include="Data\SQL\Performance\ZZ-Partition-PSQL11.sql" />
+    <EmbeddedResource Include="Data\SQL\Updates\20210512-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\Updates\20210512-FBSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Data\SQL\Updates\20210414-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>

@@ -71,5 +71,10 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
         [Column("rol_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid? RelationshipRoleKey { get; set; }
 
+        /// <summary>
+        /// Strength / Confidence
+        /// </summary>
+        [Column("conf")]
+        public double? Strength { get; set; }
     }
 }
