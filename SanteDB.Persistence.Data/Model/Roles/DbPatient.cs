@@ -34,7 +34,7 @@ namespace SanteDB.Persistence.Data.Model.Roles
         /// <summary>
         /// Parent key
         /// </summary>
-        [JoinFilter(PropertyName = nameof(DbEntity.ClassConceptKey), Value = EntityClassKeyStrings.Patient)]
+        [JoinFilter(PropertyName = nameof(DbEntityVersion.ClassConceptKey), Value = EntityClassKeyStrings.Patient)]
         public override Guid ParentKey
         {
             get

@@ -35,8 +35,8 @@ namespace SanteDB.Persistence.Data.Model.Entities
         /// <summary>
         /// Parent key filter
         /// </summary>
-        [JoinFilter(PropertyName = nameof(DbEntity.ClassConceptKey), Value = EntityClassKeyStrings.Material)]
-        [JoinFilter(PropertyName = nameof(DbEntity.ClassConceptKey), Value = EntityClassKeyStrings.ManufacturedMaterial)]
+        [JoinFilter(PropertyName = nameof(DbEntityVersion.ClassConceptKey), Value = EntityClassKeyStrings.Material)]
+        [JoinFilter(PropertyName = nameof(DbEntityVersion.ClassConceptKey), Value = EntityClassKeyStrings.ManufacturedMaterial)]
         public override Guid ParentKey
         {
             get
@@ -111,7 +111,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
         /// <summary>
         /// Parent key filter
         /// </summary>
-        [Column("ent_vrsn_id"), ForeignKey(typeof(DbMaterial), nameof(DbMaterial.ParentKey)), PrimaryKey, AlwaysJoin, JoinFilter(PropertyName = nameof(DbEntity.ClassConceptKey), Value = EntityClassKeyStrings.ManufacturedMaterial)]
+        [Column("ent_vrsn_id"), ForeignKey(typeof(DbMaterial), nameof(DbMaterial.ParentKey)), PrimaryKey, AlwaysJoin, JoinFilter(PropertyName = nameof(DbEntityVersion.ClassConceptKey), Value = EntityClassKeyStrings.ManufacturedMaterial)]
         public override Guid ParentKey
         {
             get

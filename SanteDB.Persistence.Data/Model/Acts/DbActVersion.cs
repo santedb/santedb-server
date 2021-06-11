@@ -18,6 +18,7 @@
  */
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Concepts;
+using SanteDB.Persistence.Data.Model.Extensibility;
 using System;
 
 namespace SanteDB.Persistence.Data.Model.Acts
@@ -28,6 +29,25 @@ namespace SanteDB.Persistence.Data.Model.Acts
     [Table("act_vrsn_tbl")]
     public class DbActVersion : DbVersionedData, IDbHasStatus
     {
+
+        /// <summary>
+        /// Gets or sets the template
+        /// </summary>
+        [Column("tpl_id"), ForeignKey(typeof(DbTemplateDefinition), nameof(DbTemplateDefinition.Key))]
+        public Guid? TemplateKey { get; set; }
+
+        /// <summary>
+        /// Identifies the class concept
+        /// </summary>
+        [Column("cls_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        public Guid ClassConceptKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the mood of the act
+        /// </summary>
+        [Column("mod_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        public Guid MoodConceptKey { get; set; }
+
         /// <summary>
         /// True if negated
         /// </summary>

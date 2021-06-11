@@ -84,14 +84,7 @@ namespace SanteDB.Server.Core.Services.Impl
             return base.Find(query, offset, count, out totalResults, orderBy);
         }
 
-        /// <summary>
-        /// Finds the specified metadata
-        /// </summary>
-        public override IEnumerable<TMetadata> FindFast(Expression<Func<TMetadata, bool>> query, int offset, int? count, out int totalResults, Guid queryId)
-        {
-            return base.FindFast(query, offset, count, out totalResults, queryId);
-        }
-
+       
         /// <summary>
         /// Gets the specified metadata
         /// </summary>

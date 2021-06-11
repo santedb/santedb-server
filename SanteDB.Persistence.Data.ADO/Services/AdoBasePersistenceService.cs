@@ -57,7 +57,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
     public abstract class AdoBasePersistenceService<TData> : 
         IDataPersistenceService<TData>, 
         IStoredQueryDataPersistenceService<TData>, 
-        IFastQueryDataPersistenceService<TData>,
         IUnionQueryDataPersistenceService<TData>,
         IAdoPersistenceService
     where TData : IdentifiedData
@@ -686,12 +685,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     var retVal = postData.Results;
 
-                    // Add to cache
-                    foreach (var i in retVal.Where(i => i != null))
-                        connection.AddCacheCommit(i);
-
-                    foreach (var itm in connection.CacheOnCommit)
-                        ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(itm);
 
                     this.m_tracer.TraceEvent(EventLevel.Verbose, "Returning {0}..{1} or {2} results", offset, offset + (count ?? 1000), totalCount);
 
@@ -750,7 +743,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
             var retVal = this.UpdateInternal(context, data);
             //if (retVal != data) System.Diagnostics.Debugger.Break();
-            context.AddCacheCommit(retVal);
             return retVal;
 
         }

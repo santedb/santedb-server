@@ -162,6 +162,19 @@ namespace SanteDB.Server.Core.Diagnostics
                 this.m_dispatchThread = null;
             }
         }
+
+        /// <summary>
+        /// Trace data trace
+        /// </summary>
+        public override void TraceEventWithData(EventLevel level, string source, string message, object[] data)
+        {
+            foreach(var itm in data)
+            {
+                // TODO: 
+                this.WriteTrace(level, source, String.Format("++++ DATA ++++ \r\n{0}\r\n-----\r\n{1}\r\n----\r\n+++ END DATA +++", message, itm));
+            }
+        }
     }
+
 }
 

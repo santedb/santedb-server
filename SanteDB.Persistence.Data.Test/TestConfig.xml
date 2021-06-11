@@ -106,6 +106,7 @@
       <add type="SanteDB.Persistence.Data.Services.AdoDeviceIdentityProvider, SanteDB.Persistence.Data, Version=2.1.0.0" />
       <add type="SanteDB.Persistence.Data.Services.AdoIdentityProvider, SanteDB.Persistence.Data, Version=2.1.0.0" />
       <add type="SanteDB.Persistence.Data.Services.AdoPolicyInformationService, SanteDB.Persistence.Data, Version=2.1.0.0" />
+      <add type="SanteDB.Persistence.Data.Services.AdoRoleProvider, SanteDB.Persistence.Data, Version=2.1.0.0" />
       <add type="SanteDB.Persistence.Data.Services.AdoSessionProvider, SanteDB.Persistence.Data, Version=2.1.0.0" />
       <add type="SanteDB.Persistence.Data.Services.AdoPersistenceService, SanteDB.Persistence.Data, Version=2.1.0.0" />
       <add type="SanteDB.Persistence.Data.Services.AdoPersistenceService, SanteDB.Persistence.Data, Version=2.1.0.0" />

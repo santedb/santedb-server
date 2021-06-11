@@ -46,7 +46,6 @@ namespace SanteDB.Server.Core.Services.Impl
         IValidatingRepositoryService<TEntity>,
         IRepositoryService<TEntity>,
         IPersistableQueryRepositoryService<TEntity>,
-        IFastQueryRepositoryService<TEntity>,
         INotifyRepositoryService<TEntity>,
         ISecuredRepositoryService
         where TEntity : IdentifiedData
@@ -244,7 +243,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<TEntity>)}");
             }
 
-            var entity = persistenceService.Get(key, null, true, AuthenticationContext.Current.Principal);
+            var entity = persistenceService.Get(key, null, AuthenticationContext.Current.Principal);
 
             if (entity == null)
                 throw new KeyNotFoundException($"Entity {key} not found");
@@ -302,7 +301,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 return preRetrieve.Result;
             }
             
-            var result = persistenceService.Get(key, versionKey, true, AuthenticationContext.Current.Principal);
+            var result = persistenceService.Get(key, versionKey, AuthenticationContext.Current.Principal);
             var retVal = businessRulesService?.AfterRetrieve(result) ?? result;
             var postEvt = new DataRetrievedEventArgs<TEntity>(retVal, AuthenticationContext.Current.Principal);
             this.Retrieved?.Invoke(this, postEvt);
@@ -345,7 +344,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 else
                     data = preSave.Data; // Data may have been updated
 
-                if (data.Key.HasValue && persistenceService.Get(data.Key.Value, null, true, AuthenticationContext.Current.Principal) != null)
+                if (data.Key.HasValue && persistenceService.Get(data.Key.Value, null, AuthenticationContext.Current.Principal) != null)
                 {
                     data = businessRulesService?.BeforeUpdate(data) ?? data;
                     data = persistenceService.Update(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
@@ -400,40 +399,7 @@ namespace SanteDB.Server.Core.Services.Impl
             return p;
         }
 
-        /// <summary>
-        /// Perform a faster version of the query for an object
-        /// </summary>
-        public virtual IEnumerable<TEntity> FindFast(Expression<Func<TEntity, bool>> query, int offset, int? count, out int totalResults, Guid queryId)
-        {
-            // Demand permission
-            this.DemandQuery();
-
-            var persistenceService = ApplicationServiceContext.Current.GetService<IFastQueryDataPersistenceService<TEntity>>();
-
-            if (persistenceService == null)
-            {
-                return this.Find(query, offset, count, out totalResults, queryId);
-            }
-
-            var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
-
-            // Notify query 
-            var preQueryEventArgs = new QueryRequestEventArgs<TEntity>(query, offset, count, queryId, AuthenticationContext.Current.Principal);
-            this.Querying?.Invoke(this, preQueryEventArgs);
-            if (preQueryEventArgs.Cancel) /// Cancel the request
-            {
-                totalResults = preQueryEventArgs.TotalResults;
-                return preQueryEventArgs.Results;
-            }
-
-            IEnumerable<TEntity> results = null;
-            results = persistenceService.QueryFast(query, queryId, offset, count, out totalResults);
-
-            results = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
-            this.Queried?.Invoke(this, new QueryResultEventArgs<TEntity>(query, results, offset, count, totalResults, queryId, AuthenticationContext.Current.Principal));
-            return this.m_privacyService?.Apply(results, AuthenticationContext.Current.Principal) ?? results;
-        }
-
+        
         /// <summary>
         /// Perform a simple find
         /// </summary>

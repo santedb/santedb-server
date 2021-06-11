@@ -92,7 +92,7 @@ namespace SanteDB.Server.Core.Services.Impl
             var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditData>>();
             if (service == null)
                 throw new InvalidOperationException("Cannot find the data persistence service for audits");
-            var result = service.Get(key, versionKey, false, AuthenticationContext.Current.Principal);
+            var result = service.Get(key, versionKey, AuthenticationContext.Current.Principal);
             return result;
         }
 
@@ -131,7 +131,7 @@ namespace SanteDB.Server.Core.Services.Impl
             if (service == null)
                 throw new InvalidOperationException("Cannot find the data persistence service for audits");
 
-            var existing = service.Get(data.Key.Value, Guid.Empty, false, AuthenticationContext.Current.Principal);
+            var existing = service.Get(data.Key.Value, Guid.Empty, AuthenticationContext.Current.Principal);
             if (existing == null)
             {
                 data = service.Update(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);

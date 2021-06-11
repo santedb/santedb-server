@@ -31,32 +31,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
     [Table("ent_tbl"), SkipHint("template"), SkipHint("classConcept"), SkipHint("determinerConcept")]
     public class DbEntity : DbIdentified
 	{
-        /// <summary>
-        /// Gets or sets the template
-        /// </summary>
-        [Column("tpl_id"), ForeignKey(typeof(DbTemplateDefinition), nameof(DbTemplateDefinition.Key))]
-        public Guid? TemplateKey { get; set; }
-
-        /// <summary>
-        /// Gets or sets the class concept identifier.
-        /// </summary>
-        /// <value>The class concept identifier.</value>
-        [Column("cls_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-		public Guid ClassConceptKey {
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// Gets or sets the determiner concept identifier.
-		/// </summary>
-		/// <value>The determiner concept identifier.</value>
-		[Column("dtr_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-		public Guid DeterminerConceptKey {
-			get;
-			set;
-		}
-
+      
         /// <summary>
         /// Gets or sets the key
         /// </summary>

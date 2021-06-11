@@ -52,32 +52,38 @@ namespace SanteDB.Server.Core.Diagnostics
         {
         }
 
+        private TraceEventType Classify(EventLevel level)
+        {
+            switch (level)
+            {
+                case EventLevel.Critical:
+                    return TraceEventType.Critical;
+                case EventLevel.Error:
+                    return TraceEventType.Error;
+                case EventLevel.Informational:
+                    return TraceEventType.Information;
+                case EventLevel.Verbose:
+                    return TraceEventType.Verbose;
+                case EventLevel.Warning:
+                    return TraceEventType.Warning;
+                default:
+                    return TraceEventType.Information;
+            }
+        }
         /// <summary>
         /// Write the specified trace
         /// </summary>
         protected override void WriteTrace(EventLevel level, string source, string format, params object[] args)
         {
-            TraceEventType eventLvl = TraceEventType.Information;
-            switch (level)
-            {
-                case EventLevel.Critical:
-                    eventLvl = TraceEventType.Critical;
-                    break;
-                case EventLevel.Error:
-                    eventLvl = TraceEventType.Error;
-                    break;
-                case EventLevel.Informational:
-                    eventLvl = TraceEventType.Information;
-                    break;
-                case EventLevel.Verbose:
-                    eventLvl = TraceEventType.Verbose;
-                    break;
-                case EventLevel.Warning:
-                    eventLvl = TraceEventType.Warning;
-                    break;
-            }
+            this.m_traceSource.TraceEvent(this.Classify(level), 0, format, args);
+        }
 
-            this.m_traceSource.TraceEvent(eventLvl, 0, format, args);
+        /// <summary>
+        /// Trace event data 
+        /// </summary>
+        public override void TraceEventWithData(EventLevel level, string source, string message, object[] data)
+        {
+            this.m_traceSource.TraceData(this.Classify(level), 0, data);
         }
     }
 }

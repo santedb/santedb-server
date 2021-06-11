@@ -145,7 +145,7 @@ namespace SanteDB.Server.Core.Services.Impl
 				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<MailMessage>)));
 			}
 
-			var retVal = persistenceService.Get(id, null, false, AuthenticationContext.Current.Principal);
+			var retVal = persistenceService.Get(id, null, AuthenticationContext.Current.Principal);
             this.Retrieved?.Invoke(this, new RepositoryEventArgs<MailMessage>(retVal));
             return retVal;
 		}

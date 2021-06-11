@@ -18,6 +18,7 @@
  */
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Concepts;
+using SanteDB.Persistence.Data.Model.Extensibility;
 using System;
 
 namespace SanteDB.Persistence.Data.Model.Entities
@@ -31,8 +32,36 @@ namespace SanteDB.Persistence.Data.Model.Entities
         /// <summary>
         /// Gets or sets the key
         /// </summary>
-        [Column("ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.Key)), AlwaysJoin]
+        [Column("ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.Key))]
         public override Guid Key { get; set; }
+
+        /// <summary>
+        /// Gets or sets the template
+        /// </summary>
+        [Column("tpl_id"), ForeignKey(typeof(DbTemplateDefinition), nameof(DbTemplateDefinition.Key))]
+        public Guid? TemplateKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the class concept identifier.
+        /// </summary>
+        /// <value>The class concept identifier.</value>
+        [Column("cls_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        public Guid ClassConceptKey
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the determiner concept identifier.
+        /// </summary>
+        /// <value>The determiner concept identifier.</value>
+        [Column("dtr_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        public Guid DeterminerConceptKey
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the status concept identifier.

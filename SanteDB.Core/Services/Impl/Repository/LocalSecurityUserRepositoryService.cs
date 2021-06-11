@@ -68,7 +68,7 @@ namespace SanteDB.Server.Core.Services.Impl
 
             // Now ensure local db record exists
             int tr = 0;
-            var retVal = this.FindFast(o => o.UserName == data.UserName, 0, 1, out tr, Guid.Empty).FirstOrDefault();
+            var retVal = this.Find(o => o.UserName == data.UserName, 0, 1, out tr, Guid.Empty).FirstOrDefault();
             if (retVal == null)
             {
                 throw new InvalidOperationException("Could not find created user from identity provider");

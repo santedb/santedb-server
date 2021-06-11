@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using Newtonsoft.Json;
 using SanteDB.Core.Diagnostics;
 using System;
 using System.Collections.Concurrent;
@@ -88,6 +89,42 @@ namespace SanteDB.Server.Core.Diagnostics
             }
 
             this.m_logBacklog.Enqueue(new KeyValuePair<ConsoleColor, String>(color, String.Format("{0:yyyy/MM/dd HH:mm:ss} [{1}] : {2} {3}: 0 : {4}", DateTime.Now, String.IsNullOrEmpty(Thread.CurrentThread.Name) ? $"@{Thread.CurrentThread.ManagedThreadId}" : Thread.CurrentThread.Name, source, level, String.Format(format, args))));
+            this.m_resetEvent.Set();
+        }
+
+        /// <summary>
+        /// Trace event to the event log with data
+        /// </summary>
+        public override void TraceEventWithData(EventLevel level, string source, string message, object[] data)
+        {
+            ConsoleColor color = ConsoleColor.White;
+            switch (level)
+            {
+                case EventLevel.Verbose:
+
+                    color = ConsoleColor.Magenta;
+                    break;
+                case EventLevel.Informational:
+                    color = ConsoleColor.Cyan;
+                    break;
+                case EventLevel.Warning:
+                    color = ConsoleColor.Yellow;
+                    break;
+                case EventLevel.Error:
+                    color = ConsoleColor.Red;
+                    break;
+                case EventLevel.Critical:
+                    color = ConsoleColor.White;
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    break;
+            }
+
+            this.m_logBacklog.Enqueue(new KeyValuePair<ConsoleColor, String>(color, String.Format("{0:yyyy/MM/dd HH:mm:ss} [{1}] : {2} {3}: 0 : {4}", DateTime.Now, String.IsNullOrEmpty(Thread.CurrentThread.Name) ? $"@{Thread.CurrentThread.ManagedThreadId}" : Thread.CurrentThread.Name, source, level, String.Format(message))));
+
+            foreach (var itm in data)
+            {
+                this.m_logBacklog.Enqueue(new KeyValuePair<ConsoleColor, string>(color, String.Format("{0:yyyy/MM/dd HH:mm:ss} [{1}] : {2} {3}: 0 : ================= DATA BLOCK {5} ===============\r\n {4} \r\n ============== END DATA BLOCK {5} =============", DateTime.Now, String.IsNullOrEmpty(Thread.CurrentThread.Name) ? $"@{Thread.CurrentThread.ManagedThreadId}" : Thread.CurrentThread.Name, source, level, JsonConvert.SerializeObject(itm), itm.ToString())));
+            }
             this.m_resetEvent.Set();
         }
 

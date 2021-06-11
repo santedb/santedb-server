@@ -432,7 +432,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Gets the specified object by identifier
         /// </summary>
-        public AuditData Get(Guid containerId, Guid? versionId, bool loadFast = false, IPrincipal overrideAuthContext = null)
+        public AuditData Get(Guid containerId, Guid? versionId, IPrincipal overrideAuthContext = null)
         {
 
             var preEvtData = new DataRetrievingEventArgs<AuditData>(containerId, versionId, overrideAuthContext);

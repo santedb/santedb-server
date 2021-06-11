@@ -86,14 +86,6 @@ namespace SanteDB.Server.Core.Services.Impl
         }
 
         /// <summary>
-        /// Find the specified act in a fast load manner
-        /// </summary>
-        public override IEnumerable<TAct> FindFast(Expression<Func<TAct, bool>> query, int offset, int? count, out int totalResults, Guid queryId)
-        {
-            return base.FindFast(query, offset, count, out totalResults, queryId);
-        }
-
-        /// <summary>
         /// Get the specified act
         /// </summary>
         public override TAct Get(Guid key)

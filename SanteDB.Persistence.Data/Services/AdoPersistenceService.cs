@@ -44,10 +44,10 @@ namespace SanteDB.Persistence.Data.Services
             this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Data");
 
             // Iterate and register ADO data persistence services
-            foreach(var type in serviceManager.GetAllTypes().Where(t=>typeof(IAdoPersistenceService).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface))
-            {
-                serviceManager.AddServiceProvider(serviceManager.CreateInjected(type));
-            }
+            //foreach(var type in serviceManager.GetAllTypes().Where(t=>typeof(IAdoPersistenceService).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface))
+            //{
+            //    serviceManager.AddServiceProvider(serviceManager.CreateInjected(type));
+            //}
 
             // Now we want to register secondary types - These are types for which there is a registered database model map but not 
             // a concrete implementation class

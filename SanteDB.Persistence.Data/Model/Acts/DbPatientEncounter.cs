@@ -33,7 +33,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// <summary>
         /// Parent key
         /// </summary>
-        [JoinFilter(PropertyName = nameof(DbAct.ClassConceptKey), Value = ActClassKeyStrings.Encounter)]
+        [JoinFilter(PropertyName = nameof(DbActVersion.ClassConceptKey), Value = ActClassKeyStrings.Encounter)]
         public override Guid ParentKey
         {
             get

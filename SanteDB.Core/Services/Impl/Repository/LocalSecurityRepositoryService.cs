@@ -108,7 +108,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public SecurityProvenance GetProvenance(Guid provenanceId)
         {
-            return ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityProvenance>>().Get(provenanceId, null, true, AuthenticationContext.Current.Principal);
+            return ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityProvenance>>().Get(provenanceId, null, AuthenticationContext.Current.Principal);
         }
 
         /// <summary>
