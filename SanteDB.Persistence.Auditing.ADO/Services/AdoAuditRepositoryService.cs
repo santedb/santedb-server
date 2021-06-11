@@ -305,7 +305,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         {
 
             // Pre-event trigger
-            var preEvtData = new DataPersistingEventArgs<AuditData>(storageData, overrideAuthContext);
+            var preEvtData = new DataPersistingEventArgs<AuditData>(storageData, mode, overrideAuthContext);
             this.Inserting?.Invoke(this, preEvtData);
             if (preEvtData.Cancel)
             {
@@ -399,7 +399,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     else
                         tx.Rollback();
 
-                    var args = new DataPersistedEventArgs<AuditData>(storageData, overrideAuthContext);
+                    var args = new DataPersistedEventArgs<AuditData>(storageData, mode, overrideAuthContext);
 
                     this.Inserted?.Invoke(this, args);
 

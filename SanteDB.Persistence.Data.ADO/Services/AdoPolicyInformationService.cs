@@ -435,7 +435,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                     appDevClaim = appDevClaim?.Union(devResults) ?? devResults;
                                 }
 
-                                retVal = retVal?.Union(appDevClaim) ?? appDevClaim;
+                                if (appDevClaim != null)
+                                {
+                                    retVal = retVal?.Union(appDevClaim) ?? appDevClaim;
+                                }
                             }
 
                             result = retVal.AsEnumerable().Select(o => new AdoSecurityPolicyInstance(o.Object2, o.Object1, securable)).ToList();

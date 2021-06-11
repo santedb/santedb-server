@@ -60,6 +60,15 @@ namespace SanteDB.Persistence.Data.Configuration
         }
 
         /// <summary>
+        /// The persistence layer is not versioned
+        /// </summary>
+        [XmlAttribute("unversioned")]
+        [Category("Behavior")]
+        [DisplayName("Disable Versioning")]
+        [Description("When enabled, turns off versioning in the persistence layer")]
+        public bool Unversioned { get; set; }
+
+        /// <summary>
         /// Gets or sets whether fuzzy totals should be used
         /// </summary>
         [XmlAttribute("fuzzyTotal")]
@@ -72,7 +81,7 @@ namespace SanteDB.Persistence.Data.Configuration
         /// The peppering characters for authentication hashes
         /// </summary>
         [XmlAttribute("pepper")]
-        [Category("security")]
+        [Category("Security")]
         [DisplayName("Password peppering characters")]
         [Description("When set, identifies the pepper characters to use for authentication")]
         public String Pepper { get; set; }

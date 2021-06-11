@@ -199,7 +199,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 this.ThrowPrivacyValidationException(data);
 
             // Fire pre-persistence triggers
-            var prePersistence = new DataPersistingEventArgs<TEntity>(data, AuthenticationContext.Current.Principal);
+            var prePersistence = new DataPersistingEventArgs<TEntity>(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             this.Inserting?.Invoke(this, prePersistence);
             if (prePersistence.Cancel)
             {
@@ -214,7 +214,7 @@ namespace SanteDB.Server.Core.Services.Impl
             data = businessRulesService?.BeforeInsert(data) ?? prePersistence.Data;
             data = persistenceService.Insert(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             businessRulesService?.AfterInsert(data);
-            this.Inserted?.Invoke(this, new DataPersistedEventArgs<TEntity>(data, AuthenticationContext.Current.Principal));
+            this.Inserted?.Invoke(this, new DataPersistedEventArgs<TEntity>(data, TransactionMode.Commit, AuthenticationContext.Current.Principal));
             return this.m_privacyService?.Apply(data, AuthenticationContext.Current.Principal) ?? data;
         }
 
@@ -249,7 +249,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 throw new KeyNotFoundException($"Entity {key} not found");
 
             // Fire pre-persistence triggers
-            var prePersistence = new DataPersistingEventArgs<TEntity>(entity, AuthenticationContext.Current.Principal);
+            var prePersistence = new DataPersistingEventArgs<TEntity>(entity, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             this.Obsoleting?.Invoke(this, prePersistence);
             if (prePersistence.Cancel)
             {
@@ -263,7 +263,7 @@ namespace SanteDB.Server.Core.Services.Impl
             entity = persistenceService.Obsolete(entity, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             entity = businessRulesService?.AfterObsolete(entity) ?? entity;
 
-            this.Obsoleted?.Invoke(this, new DataPersistedEventArgs<TEntity>(entity, AuthenticationContext.Current.Principal));
+            this.Obsoleted?.Invoke(this, new DataPersistedEventArgs<TEntity>(entity, TransactionMode.Commit, AuthenticationContext.Current.Principal));
 
             return this.m_privacyService?.Apply(entity, AuthenticationContext.Current.Principal) ?? entity;
         }
@@ -298,7 +298,7 @@ namespace SanteDB.Server.Core.Services.Impl
             if(preRetrieve.Cancel)
             {
                 this.m_traceSource.TraceWarning("Pre-retrieve trigger signals cancel: {0}", key);
-                return preRetrieve.Result;
+                return this.m_privacyService?.Apply(preRetrieve.Result, AuthenticationContext.Current.Principal) ?? preRetrieve.Result;
             }
             
             var result = persistenceService.Get(key, versionKey, AuthenticationContext.Current.Principal);
@@ -334,7 +334,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 if (this.m_privacyService?.ValidateWrite(data, AuthenticationContext.Current.Principal) == false)
                     this.ThrowPrivacyValidationException(data);
 
-                var preSave = new DataPersistingEventArgs<TEntity>(data, AuthenticationContext.Current.Principal);
+                var preSave = new DataPersistingEventArgs<TEntity>(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                 this.Saving?.Invoke(this, preSave);
                 if (preSave.Cancel)
                 {
@@ -357,7 +357,7 @@ namespace SanteDB.Server.Core.Services.Impl
                     businessRulesService?.AfterInsert(data);
                 }
 
-                this.Saved?.Invoke(this, new DataPersistedEventArgs<TEntity>(data, AuthenticationContext.Current.Principal));
+                this.Saved?.Invoke(this, new DataPersistedEventArgs<TEntity>(data, TransactionMode.Commit, AuthenticationContext.Current.Principal));
                 return this.m_privacyService?.Apply(data, AuthenticationContext.Current.Principal) ?? data;
             }
             catch (KeyNotFoundException)

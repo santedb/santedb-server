@@ -118,6 +118,21 @@ namespace SanteDB.Server.Core.Security.Attribute
         /// </summary>
         public void Demand()
         {
+            var result = this.DemandSoft();
+            AuditUtil.AuditAccessControlDecision(this.m_principal, this.m_policyId, result);
+            if (result != PolicyGrantType.Grant)
+            {
+                throw new PolicyViolationException(this.m_principal, this.m_policyId, result);
+            }
+        }
+
+
+        /// <summary>
+        /// Demand softly (dont' throw)
+        /// </summary>
+        /// <returns></returns>
+        public PolicyGrantType DemandSoft()
+        {
             var pdp = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
             var principal = this.m_principal ?? AuthenticationContext.Current.Principal;
             var action = PolicyGrantType.Deny;
@@ -126,7 +141,7 @@ namespace SanteDB.Server.Core.Security.Attribute
             if (!principal.Identity.IsAuthenticated &&
                 principal != AuthenticationContext.SystemPrincipal &&
                 this.m_isUnrestricted == true)
-                throw new PolicyViolationException(principal, this.m_policyId, PolicyGrantType.Deny);
+                return PolicyGrantType.Deny;
             else
             {
                 if (pdp == null) // No way to verify 
@@ -138,13 +153,11 @@ namespace SanteDB.Server.Core.Security.Attribute
 
             this.m_traceSource.TraceInfo("Policy Enforce: {0}({1}) = {2}", principal?.Identity?.Name, this.m_policyId, action);
 
-            if(principal != AuthenticationContext.SystemPrincipal && 
+            if (principal != AuthenticationContext.SystemPrincipal &&
                 principal != AuthenticationContext.AnonymousPrincipal)
-                AuditUtil.AuditAccessControlDecision(principal, m_policyId, action);
-            if (action != PolicyGrantType.Grant)
-                throw new PolicyViolationException(principal, this.m_policyId, action);
+                return PolicyGrantType.Grant;
+            return action;
         }
-
         /// <summary>
         /// From XML
         /// </summary>

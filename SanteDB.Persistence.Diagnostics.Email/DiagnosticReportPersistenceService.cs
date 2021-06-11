@@ -128,7 +128,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.Login)]
         public DiagnosticReport Insert(DiagnosticReport storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
-            var persistenceArgs = new DataPersistingEventArgs<DiagnosticReport>(storageData, overrideAuthContext);
+            var persistenceArgs = new DataPersistingEventArgs<DiagnosticReport>(storageData, mode, overrideAuthContext);
             this.Inserting?.Invoke(this, persistenceArgs);
             if (persistenceArgs.Cancel)
             {
@@ -165,7 +165,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
                 notificationService?.Send(recipients, subject, body, null,  true, attachments.ToArray());
 
                 // Invoke
-                this.Inserted?.Invoke(this, new DataPersistedEventArgs<DiagnosticReport>(storageData, overrideAuthContext));
+                this.Inserted?.Invoke(this, new DataPersistedEventArgs<DiagnosticReport>(storageData, mode, overrideAuthContext));
                 storageData.CorrelationId = issueId;
                 storageData.Key = Guid.NewGuid();
                 return storageData;

@@ -14,6 +14,7 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class DefaultPolicyEnforcementService : IPolicyEnforcementService
     {
+
         /// <summary>
         /// Default policy enforcement
         /// </summary>
@@ -35,5 +36,13 @@ namespace SanteDB.Server.Core.Services.Impl
             new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, policyId, principal).Demand();
         }
 
+        /// <summary>
+        /// Soft demand
+        /// </summary>
+        public bool SoftDemand(string policyId, IPrincipal principal)
+        {
+            return new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, policyId).DemandSoft() == SanteDB.Core.Model.Security.PolicyGrantType.Grant;
+
+        }
     }
 }

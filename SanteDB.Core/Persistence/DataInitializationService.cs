@@ -284,7 +284,7 @@ namespace SanteDB.Server.Core.Persistence
                     }
                     catch (Exception ex)
                     {
-                        this.m_traceSource.TraceEvent(EventLevel.Verbose, "Error applying {0}: {1}", f, ex);
+                        this.m_traceSource.TraceEvent(EventLevel.Error, "Error applying {0}: {1}", f, ex);
                         throw;
                     }
                 }

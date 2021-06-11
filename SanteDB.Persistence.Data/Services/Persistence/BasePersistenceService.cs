@@ -16,6 +16,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Security.Principal;
 using System.Text;
@@ -27,7 +28,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     /// </summary>
     public abstract class BasePersistenceService<TModel, TDbModel> :
         IDataPersistenceService<TModel>,
-        IDataPersistenceServiceEx<TModel>,
         IStoredQueryDataPersistenceService<TModel>,
         IAdoQueryProvider<TModel>
         where TModel : IdentifiedData, new()
@@ -42,7 +42,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         // Data cache
         protected IDataCachingService m_dataCacheService;
 
-        // Query per    
+        // Query persistence service    
         protected IQueryPersistenceService m_queryPersistence;
 
         // Ad-hoc cache
@@ -179,10 +179,34 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected virtual TModel DoInsertModel(DataContext context, TModel data)
         {
-            var dbInstance = this.DoConvertToDataModel(context, data);
-            dbInstance = this.DoInsertInternal(context, dbInstance);
-            var retVal = this.DoConvertToInformationModel(context, dbInstance);
-            return retVal;
+            if(context == null)
+            {
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            else if(data == default(TModel))
+            {
+                throw new ArgumentNullException(nameof(data), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+#if PERFMON
+            Stopwatch sw = new Stopwatch();
+            try
+            {
+                sw.Start();
+#endif
+                var dbInstance = this.DoConvertToDataModel(context, data);
+                dbInstance = this.DoInsertInternal(context, dbInstance);
+                var retVal = this.DoConvertToInformationModel(context, dbInstance);
+                return retVal;
+#if PERFMON
+            }
+            finally
+            {
+                sw.Stop();
+                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoInsertModel - {sw.EllapsedMilliseconds}ms", data, new StackTrace());
+            }
+#endif
+
         }
 
         /// <summary>
@@ -190,10 +214,35 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected virtual TModel DoUpdateModel(DataContext context, TModel data)
         {
+
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            else if (data == default(TModel))
+            {
+                throw new ArgumentNullException(nameof(data), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+#if PERFMON
+            Stopwatch sw = new Stopwatch();
+            try
+            {
+                sw.Start();
+#endif
             var dbInstance = this.DoConvertToDataModel(context, data);
             dbInstance = this.DoUpdateInternal(context, dbInstance);
             var retVal = this.DoConvertToInformationModel(context, dbInstance);
             return retVal;
+
+#if PERFMON
+            }
+            finally
+            {
+                sw.Stop();
+                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoUpdateModel - {sw.EllapsedMilliseconds}ms", data, new StackTrace());
+            }
+#endif
         }
 
         /// <summary>
@@ -201,9 +250,29 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected virtual TModel DoObsoleteModel(DataContext context, Guid key)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            
+
+#if PERFMON
+            Stopwatch sw = new Stopwatch();
+            try
+            {
+                sw.Start();
+#endif
             var dbInstance = this.DoObsoleteInternal(context, key);
             var retVal = this.DoConvertToInformationModel(context, dbInstance);
             return retVal;
+#if PERFMON
+            }
+            finally
+            {
+                sw.Stop();
+                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoObsoleteModel - {sw.EllapsedMilliseconds}ms", data, new StackTrace());
+            }
+#endif
         }
 
         /// <summary>
@@ -216,6 +285,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
             }
 
+#if PERFMON
+            Stopwatch sw = new Stopwatch();
+            try
+            {
+                sw.Start();
+#endif
             // Attempt fetch from master cache
             TModel retVal = null;
             if (allowCached)
@@ -231,6 +306,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 
             return retVal;
+#if PERFMON
+            }
+            finally
+            {
+                sw.Stop();
+                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoGetModel - {sw.EllapsedMilliseconds}ms", data, new StackTrace());
+            }
+#endif
         }
 
         /// <summary>
@@ -423,40 +506,135 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 
             // Fire pre-event
-            var preEvent = new DataPersistingEventArgs<TModel>(data, principal);
+            var preEvent = new DataPersistingEventArgs<TModel>(data, mode, principal);
             this.Inserting?.Invoke(this, preEvent);
             if(preEvent.Cancel)
             {
-                this.m_tracer.TraceWarning
+                this.m_tracer.TraceVerbose("Pre-Persistence Event for INSERT {0} indicates cancel", data);
+                return preEvent.Data;
+            }
+
+            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    using (var tx = context.BeginTransaction()) {
+
+                        // Is this an update or insert?
+                        if (this.m_configuration.AutoUpdateExisting && data.Key.HasValue && this.Exists(context, data.Key.Value))
+                        {
+                            this.m_tracer.TraceVerbose("Object {0} already exists - updating instead", data);
+                            data = this.DoUpdateModel(context, data);
+                        }
+                        else
+                        {
+                            data = this.DoInsertModel(context, data);
+                        }
+
+                        if(mode == TransactionMode.Commit)
+                        {
+                            tx.Commit();
+                            // Cache - invalidate (force a reload)
+                            this.m_dataCacheService.Remove(data.Key.Value);
+                        }
+                    }
+                    
+                    // Post event
+                    var postEvt = new DataPersistedEventArgs<TModel>(data, mode, principal);
+                    this.Inserted?.Invoke(this, postEvt);
+
+                    return postEvt.Data;
+                }
+                catch (DbException e)
+                {
+                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing insert operation", data, e);
+                    throw this.TranslateDbException(e);
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing insert operation", data, e);
+                    throw new DataPersistenceException(ErrorMessages.ERR_DATA_GENERAL, e);
+                }
             }
         }
 
         /// <summary>
         /// Obsolete the specified data object 
         /// </summary>
-        public object Obsolete(DataContext context, object data)
+        public object Obsolete(DataContext context, Guid key)
         {
-            throw new NotImplementedException();
+            return this.DoObsoleteModel(context, key);
         }
 
         /// <summary>
         /// Obsolete the specified data object
         /// </summary>
-        public object Obsolete(object data)
+        public object Obsolete(Guid key)
         {
-            throw new NotImplementedException();
+            return this.Obsolete(key, TransactionMode.Commit, AuthenticationContext.Current.Principal);
         }
 
         /// <summary>
         /// Obsolete the specified 
         /// </summary>
-        /// <param name="data">The data object which is to be obsoleted</param>
+        /// <param name="id">The data object which is to be obsoleted</param>
         /// <param name="mode">The method of transaction control</param>
         /// <param name="principal">The principal which is obsoleting the data</param>
         /// <returns>The obsoleted data</returns>
-        public TModel Obsolete(TModel data, TransactionMode mode, IPrincipal principal)
+        public TModel Obsolete(Guid id, TransactionMode mode, IPrincipal principal)
         {
-            throw new NotImplementedException();
+            if(principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+            var preEvent = new DataPersistingEventArgs<TModel>(new TModel() { Key = id }, mode, principal);
+            this.Obsoleting?.Invoke(this, preEvent);
+            if(preEvent.Cancel)
+            {
+                this.m_tracer.TraceVerbose("Pre-Persistence event indicates cancel on Obsolete for {0}", id);
+                return preEvent.Data;
+            }
+
+            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    TModel retVal = default(TModel);
+                    using(var tx = context.BeginTransaction())
+                    {
+                        retVal = this.DoObsoleteModel(context, id);
+
+                        if(mode == TransactionMode.Commit)
+                        {
+                            tx.Commit();
+                            // Cache
+                            this.m_dataCacheService.Remove(id);
+                        }
+                    }
+
+                    
+                    // Post event
+                    var postEvt = new DataPersistedEventArgs<TModel>(retVal, mode, principal);
+                    this.Obsoleted?.Invoke(this, postEvt);
+
+                    return postEvt.Data;
+                }
+                catch (DbException e)
+                {
+                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing obsolete operation", id, e);
+                    throw this.TranslateDbException(e);
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing obsolete operation", id, e);
+                    throw new DataPersistenceException(ErrorMessages.ERR_DATA_GENERAL, e);
+                }
+            }
         }
 
         /// <summary>
@@ -496,7 +674,44 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public IEnumerable<TModel> Query(Expression<Func<TModel, bool>> query, IPrincipal principal)
         {
-            throw new NotImplementedException();
+            if(query == null)
+            {
+                throw new ArgumentNullException(nameof(query), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            if(principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+            var preEvt = new QueryRequestEventArgs<TModel>(query, principal);
+            this.Querying?.Invoke(this, preEvt);
+            if(preEvt.Cancel)
+            {
+                this.m_tracer.TraceVerbose("Pre-Query Event Signalled Cancel: {0}", query);
+                return preEvt.Results;
+            }
+
+            using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                try
+                {
+                    var results = this.DoQueryModel(context, query);
+
+                    var postEvt = new QueryResultEventArgs<TModel>(query, results, principal);
+                    this.Queried?.Invoke(this, postEvt);
+                    return postEvt.Results;
+                }
+                catch (DbException e)
+                {
+                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing query operation", query, e);
+                    throw this.TranslateDbException(e);
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing query operation", query, e);
+                    throw new DataPersistenceException(ErrorMessages.ERR_DATA_GENERAL, e);
+                }
+            }
         }
 
         /// <summary>
@@ -537,38 +752,124 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Convert an instance to model
         /// </summary>
-        /// <param name="domainInstance"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
+        /// <param name="domainInstance">Convert the object to model instance</param>
+        /// <param name="context">The data context to be used for querying</param>
+        /// <returns>The object as a model instance</returns>
         public object ToModelInstance(object domainInstance, DataContext context)
         {
-            throw new NotImplementedException();
+            if(domainInstance == null)
+            {
+                return null;
+            }
+            else if(context == null)
+            {
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            if (domainInstance is TDbModel dbModel)
+            {
+                return this.DoConvertToInformationModel(context, dbModel, null);
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(domainInstance), ErrorMessages.ERR_ARGUMENT_INCOMPATIBLE_TYPE.Format(typeof(TDbModel)));
+            }
         }
 
         /// <summary>
-        /// Touch the update time on a record. 
+        /// Update the specified object on the provided context
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="mode"></param>
-        /// <param name="principal"></param>
-        public void Touch(Guid key, TransactionMode mode, IPrincipal principal)
-        {
-            throw new NotImplementedException();
-        }
-
+        /// <param name="context">The context on which the data is to be updated</param>
+        /// <param name="data">The data which is to be updated</param>
+        /// <returns>The updated data instance</returns>
         public object Update(DataContext context, object data)
         {
-            throw new NotImplementedException();
+            if (data is TModel model)
+            {
+                return this.DoUpdateModel(context, model);
+            }
+            else
+            {
+                throw new ArgumentException(nameof(data), ErrorMessages.ERR_ARGUMENT_INCOMPATIBLE_TYPE.Format(typeof(TModel)));
+            }
         }
 
+        /// <summary>
+        /// Updates the provided object to match in the data store
+        /// </summary>
         public object Update(object data)
         {
-            throw new NotImplementedException();
+            if (data is TModel model)
+            {
+                return this.Update(model, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+            }
+            else
+            {
+                throw new ArgumentException(nameof(data), ErrorMessages.ERR_ARGUMENT_INCOMPATIBLE_TYPE.Format(typeof(TModel)));
+            }
         }
 
+        /// <summary>
+        /// Perform the actual update
+        /// </summary>
+        /// <param name="data">The data which is to be updated</param>
+        /// <param name="mode">The transaction control mode</param>
+        /// <param name="principal">The principal doing the update</param>
+        /// <returns>The updated object</returns>
         public TModel Update(TModel data, TransactionMode mode, IPrincipal principal)
         {
-            throw new NotImplementedException();
+            if(data == default(TModel))
+            {
+                throw new ArgumentNullException(nameof(data), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            else if(principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+            var preEvt = new DataPersistingEventArgs<TModel>(data, mode, principal);
+            this.Updating?.Invoke(this, preEvt);
+            if(preEvt.Cancel)
+            {
+                this.m_tracer.TraceVerbose("Pre-Persistence Event for Update indicates cancel for {0}", data);
+                return preEvt.Data;
+            }
+
+            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    using(var tx = context.BeginTransaction())
+                    {
+
+                        data = this.DoUpdateModel(context, data);
+                        if(mode == TransactionMode.Commit)
+                        {
+                            tx.Commit();
+
+                            // Cache - invalidate
+                            this.m_dataCacheService.Remove(data.Key.Value);
+                        }
+                    }
+
+                    // Broadcast
+                    var postEvt = new DataPersistedEventArgs<TModel>(data, mode, principal);
+                    this.Updated?.Invoke(this, postEvt);
+
+                    return postEvt.Data;
+                }
+                catch (DbException e)
+                {
+                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing update operation", data, e);
+                    throw this.TranslateDbException(e);
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing update operation", data, e);
+                    throw new DataPersistenceException(ErrorMessages.ERR_DATA_GENERAL, e);
+                }
+            }
         }
 
 
@@ -627,25 +928,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Get the ad-hoc cache key
         /// </summary>
         protected string GetAdHocCacheKey(IDbIdentified internalData) => $"{internalData.GetType().Name}.{internalData.Key}";
-
-        /// <summary>
-        /// Add the specified objects to the cache
-        /// </summary>
-        private void AddObjectsToCache(IEnumerable<KeyValuePair<Guid, Object>> dataObjects)
-        {
-            // TODO: Make timeouts configurable
-            foreach(var i in dataObjects)
-            {
-                if(i.Value is IDbIdentified dbi)
-                {
-                    this.m_adhocCache.Add(this.GetAdHocCacheKey(dbi), dbi, new TimeSpan(0, 5, 0));
-                }
-                else if(i.Value is IdentifiedData id)
-                {
-                    this.m_dataCacheService.Add(id);
-                }
-            }
-        }
 
         /// <summary>
         /// Execute the specified query on the specified object

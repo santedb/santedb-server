@@ -134,7 +134,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Creates a new instance of the ADO cache
         /// </summary>
-        public AdoPersistenceService()
+        public AdoPersistenceService(IServiceManager serviceManager)
         {
             var tracer = new Tracer(AdoDataConstants.TraceSourceName);
 
@@ -149,6 +149,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 this.m_queryBuilder = new QueryBuilder(this.m_mapper, this.GetConfiguration().Provider,
                     hax.Where(o => o != null).ToArray()
                 );
+
+
+                // Bind subscription execution
+                serviceManager.AddServiceProvider(typeof(AdoSubscriptionExecutor));
 
             }
             catch (ModelMapValidationException ex)
@@ -532,9 +536,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 this.m_tracer.TraceEvent(EventLevel.Error, "Error initializing local persistence: {0}", e);
                 throw new Exception("Error initializing local persistence", e);
             }
-
-            // Bind subscription execution
-            ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(typeof(AdoSubscriptionExecutor));
 
             // Bind BI stuff
             ApplicationServiceContext.Current.GetService<IBiMetadataRepository>()?.Insert(new SanteDB.BI.Model.BiDataSourceDefinition()
