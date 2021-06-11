@@ -73,7 +73,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 Key = entPart.Key,
                 SourceEntityKey = entPart.SourceKey,
                 ClassificationKey = entPart.ClassificationKey,
-                RelationshipRoleKey = entPart.RelationshipRoleKey
+                RelationshipRoleKey = entPart.RelationshipRoleKey,
+                Strength = entPart.Strength
             };
         }
 
@@ -99,7 +100,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var existing = context.FirstOrDefault<DbEntityRelationship>(r => r.SourceKey == data.SourceEntityKey && r.TargetKey == data.TargetEntityKey && r.RelationshipTypeKey == data.RelationshipTypeKey && !r.ObsoleteVersionSequenceId.HasValue);
             if (existing == null)
                 return base.InsertInternal(context, data);
-            else if (existing.Quantity != data.Quantity)
+            else if (existing.Quantity != data.Quantity || existing.Strength != data.Strength)
             {
                 data.Key = existing.Key;
                 return base.UpdateInternal(context, data);

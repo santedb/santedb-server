@@ -182,7 +182,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
 
-            DataPersistingEventArgs<TData> preArgs = new DataPersistingEventArgs<TData>(data, overrideAuthContext);
+            DataPersistingEventArgs<TData> preArgs = new DataPersistingEventArgs<TData>(data, mode, overrideAuthContext);
             this.Inserting?.Invoke(this, preArgs);
             if (preArgs.Cancel)
             {
@@ -235,7 +235,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             else
                                 tx.Rollback();
 
-                            var args = new DataPersistedEventArgs<TData>(data, overrideAuthContext);
+                            var args = new DataPersistedEventArgs<TData>(data,mode, overrideAuthContext);
 
                             this.Inserted?.Invoke(this, args);
 
@@ -298,7 +298,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             else if (data.Key == Guid.Empty)
                 throw new InvalidOperationException("Data missing key");
 
-            DataPersistingEventArgs<TData> preArgs = new DataPersistingEventArgs<TData>(data, overrideAuthContext);
+            DataPersistingEventArgs<TData> preArgs = new DataPersistingEventArgs<TData>(data, mode, overrideAuthContext);
             this.Updating?.Invoke(this, preArgs);
             if (preArgs.Cancel)
             {
@@ -338,7 +338,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             else
                                 tx.Rollback();
 
-                            var args = new DataPersistedEventArgs<TData>(data, overrideAuthContext);
+                            var args = new DataPersistedEventArgs<TData>(data, mode, overrideAuthContext);
 
                             this.Updated?.Invoke(this, args);
 
@@ -440,16 +440,20 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         protected String ObjectToString(TData data)
         {
-            if (data == null) return "null";
-            IEnumerable<Type> extraTypes = new Type[] { typeof(TData) };
-            if (data is Bundle)
-                extraTypes = extraTypes.Union((data as Bundle).Item.Select(o => o.GetType()));
-
-            XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(data.GetType(), extraTypes.ToArray());
-            using (MemoryStream ms = new MemoryStream())
+            try
             {
-                xsz.Serialize(ms, data);
-                return Encoding.UTF8.GetString(ms.ToArray());
+                if (data == null) return "null";
+               
+                XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(data.GetType());
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    xsz.Serialize(ms, data);
+                    return Encoding.UTF8.GetString(ms.ToArray());
+                }
+            }
+            catch(Exception e)
+            {
+                return e.Message;
             }
         }
 
@@ -463,7 +467,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             else if (data.Key == Guid.Empty)
                 throw new InvalidOperationException("Data missing key");
 
-            DataPersistingEventArgs<TData> preArgs = new DataPersistingEventArgs<TData>(data, overrideAuthContext);
+            DataPersistingEventArgs<TData> preArgs = new DataPersistingEventArgs<TData>(data, mode, overrideAuthContext);
             this.Obsoleting?.Invoke(this, preArgs);
             if (preArgs.Cancel)
             {
@@ -505,7 +509,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             else
                                 tx.Rollback();
 
-                            var args = new DataPersistedEventArgs<TData>(data, overrideAuthContext);
+                            var args = new DataPersistedEventArgs<TData>(data, mode, overrideAuthContext);
 
                             this.Obsoleted?.Invoke(this, args);
 

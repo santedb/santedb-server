@@ -125,8 +125,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dx", "Dx", "{86A42CDB-A7A4-4548-AEF7-ECCB242F5A48}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MDM", "MDM", "{12BB9926-8A67-44D5-BE68-7E27E3AE6DE9}"
+	ProjectSection(SolutionItems) = preProject
+		santedb-mdm\README.md = santedb-mdm\README.md
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Persistence.MDM", "santedb-mdm\SanteDB.Persistence.MDM\SanteDB.Persistence.MDM.csproj", "{20960967-3647-41A2-9DF6-3E15E2AA7019}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SanteDB.Persistence.MDM", "santedb-mdm\SanteDB.Persistence.MDM\SanteDB.Persistence.MDM.csproj", "{20960967-3647-41A2-9DF6-3E15E2AA7019}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Persistence.MDM.Test", "santedb-mdm\SanteDB.Persistence.MDM.Test\SanteDB.Persistence.MDM.Test.csproj", "{16BE3000-C76A-41FC-99DB-C5C90DD521E8}"
 EndProject

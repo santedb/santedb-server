@@ -272,7 +272,7 @@ namespace SanteDB.Persistence.PubSub.ADO
             if (subscription == null)
                 throw new KeyNotFoundException($"Subscription {key} not found");
 
-            var preEvt = new DataPersistingEventArgs<PubSubSubscriptionDefinition>(subscription, AuthenticationContext.Current.Principal);
+            var preEvt = new DataPersistingEventArgs<PubSubSubscriptionDefinition>(subscription, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             this.UnSubscribing?.Invoke(this, preEvt);
             if (preEvt.Cancel)
             {
@@ -479,7 +479,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                 ResourceTypeXml = modelType.GetSerializationName()
             };
 
-            var preEvent = new DataPersistingEventArgs<PubSubSubscriptionDefinition>(subscription, AuthenticationContext.Current.Principal);
+            var preEvent = new DataPersistingEventArgs<PubSubSubscriptionDefinition>(subscription, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             this.Subscribing?.Invoke(this, preEvent);
             if (preEvent.Cancel)
             {
@@ -513,7 +513,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                         tx.Commit();
 
                         subscription = this.MapInstance(conn, dbSubscription);
-                        this.Subscribed?.Invoke(this, new DataPersistedEventArgs<PubSubSubscriptionDefinition>(subscription, AuthenticationContext.Current.Principal));
+                        this.Subscribed?.Invoke(this, new DataPersistedEventArgs<PubSubSubscriptionDefinition>(subscription, TransactionMode.Commit, AuthenticationContext.Current.Principal));
                         this.m_cache?.Add(subscription);
                         return subscription;
                     }
@@ -597,7 +597,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                         throw new KeyNotFoundException($"Subscription {key} not found");
 
                     var subscription = this.MapInstance(conn, dbExisting);
-                    var preEvt = new DataPersistingEventArgs<PubSubSubscriptionDefinition>(subscription, AuthenticationContext.Current.Principal);
+                    var preEvt = new DataPersistingEventArgs<PubSubSubscriptionDefinition>(subscription, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                     if (isActive)
                     {
                         this.Activating?.Invoke(this, preEvt);
@@ -622,11 +622,11 @@ namespace SanteDB.Persistence.PubSub.ADO
 
                     if (isActive)
                     {
-                        this.Activated?.Invoke(this, new DataPersistedEventArgs<PubSubSubscriptionDefinition>(subscription, AuthenticationContext.Current.Principal));
+                        this.Activated?.Invoke(this, new DataPersistedEventArgs<PubSubSubscriptionDefinition>(subscription, TransactionMode.Commit, AuthenticationContext.Current.Principal));
                     }
                     else
                     {
-                        this.DeActivated?.Invoke(this, new DataPersistedEventArgs<PubSubSubscriptionDefinition>(subscription, AuthenticationContext.Current.Principal));
+                        this.DeActivated?.Invoke(this, new DataPersistedEventArgs<PubSubSubscriptionDefinition>(subscription, TransactionMode.Commit, AuthenticationContext.Current.Principal));
                     }
 
                     return subscription;
