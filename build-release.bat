@@ -36,7 +36,7 @@ if exist "%nuget%" (
 
 	%msbuild%\msbuild santedb-server-ext.sln /t:restore /p:VersionNumber=%1
 	%msbuild%\msbuild santedb-server-ext.sln /t:clean /t:rebuild /p:configuration=Release /p:VersionNumber=%1 /m:1
-
+	echo %version% > release-version
 	FOR /R "%cwd%" %%G IN (*.nuspec) DO (
 		echo Packing %%~pG
 		pushd "%%~pG"
