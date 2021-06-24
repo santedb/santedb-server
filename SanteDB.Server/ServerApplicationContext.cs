@@ -185,18 +185,19 @@ namespace SanteDB.Server
                     this.Started?.Invoke(this, EventArgs.Empty);
                     this.StartTime = DateTime.Now;
 
-                    AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStart);
+                    Trace.TraceInformation("SanteDB startup completed successfully in {0} ms...", startWatch.ElapsedMilliseconds);
 
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     m_tracer.TraceError("Error starting up context: {0}", e);
+                    Trace.TraceWarning("Server is running in Maintenance Mode due to error {0}...", e.Message);
                 }
                 finally
                 {
+                    AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStart);
                     startWatch.Stop();
                 }
-                Trace.TraceInformation("SanteDB startup completed successfully in {0} ms...", startWatch.ElapsedMilliseconds);
                 this.IsRunning = true;
 
             }
