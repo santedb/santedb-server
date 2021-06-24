@@ -229,7 +229,7 @@ namespace SanteDB.Server.Core.Services.Impl
 			{
 				// obsolete the alert
 				alert = message.ObsoletionTime.HasValue ? 
-					persistenceService.Obsolete(message, TransactionMode.Commit, AuthenticationContext.Current.Principal) : 
+					persistenceService.Obsolete(message.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal) : 
 					persistenceService.Update(message, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
 				this.Received?.Invoke(this, new MailMessageEventArgs(alert));

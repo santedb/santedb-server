@@ -207,7 +207,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         /// <summary>
         /// Not supported
         /// </summary>
-        public DiagnosticReport Obsolete(DiagnosticReport storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
+        public DiagnosticReport Obsolete(Guid storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
             throw new NotImplementedException();
         }

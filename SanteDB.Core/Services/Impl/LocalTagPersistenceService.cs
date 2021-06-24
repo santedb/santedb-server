@@ -65,7 +65,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 {
                     existing.Value = tag.Value;
                     if (existing.Value == null)
-                        idp.Obsolete(existing, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                        idp.Obsolete(existing.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                     else
                         idp.Update(existing as EntityTag, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                 }
@@ -86,7 +86,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 {
                     existing.Value = tag.Value;
                     if (existing.Value == null)
-                        idp.Obsolete(existing, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                        idp.Obsolete(existing.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                     else
                         idp.Update(existing as ActTag, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                 }

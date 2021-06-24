@@ -152,30 +152,33 @@ namespace SanteDB.Server.Core.Services.Impl
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
             // Notify query 
-            var preQueryEventArgs = new QueryRequestEventArgs<TEntity>(query, offset, count, queryId, AuthenticationContext.Current.Principal);
+            var preQueryEventArgs = new QueryRequestEventArgs<TEntity>(query, AuthenticationContext.Current.Principal);
             this.Querying?.Invoke(this, preQueryEventArgs);
             IEnumerable<TEntity> results = null; 
             if (preQueryEventArgs.Cancel) /// Cancel the request
             {
-                totalResults = preQueryEventArgs.TotalResults;
                 results = preQueryEventArgs.Results;
+                totalResults = results.Count();
             }
             else
             {
 
-                if (queryId != Guid.Empty && persistenceService is IStoredQueryDataPersistenceService<TEntity>)
-                    results = (persistenceService as IStoredQueryDataPersistenceService<TEntity>).Query(preQueryEventArgs.Query, preQueryEventArgs.QueryId.GetValueOrDefault(), preQueryEventArgs.Offset, preQueryEventArgs.Count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
-                else
-                    results = persistenceService.Query(preQueryEventArgs.Query, preQueryEventArgs.Offset, preQueryEventArgs.Count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
+                var resultSet = persistenceService.Query(preQueryEventArgs.Query, AuthenticationContext.Current.Principal).AsResultSet();
+
+                if(queryId != Guid.Empty)
+                {
+                    resultSet = resultSet.AsStateful(queryId);
+                }
+                totalResults = resultSet.Count();
+                results = resultSet.Skip(offset).Take(count ?? 25);
             }
             
             // 1. Let the BRE run
             var retVal = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
 
             // 2. Broadcast query performed
-            var postEvt = new QueryResultEventArgs<TEntity>(query, retVal, offset, count, totalResults, queryId, AuthenticationContext.AnonymousPrincipal);
+            var postEvt = new QueryResultEventArgs<TEntity>(query, retVal, AuthenticationContext.AnonymousPrincipal);
             this.Queried?.Invoke(this, postEvt);
-            totalResults = postEvt.TotalResults;
 
             // 2. Apply Filters if needed
             retVal = this.m_privacyService?.Apply(retVal, AuthenticationContext.Current.Principal) ?? retVal;
@@ -260,7 +263,7 @@ namespace SanteDB.Server.Core.Services.Impl
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
             entity = businessRulesService?.BeforeObsolete(entity) ?? entity;
-            entity = persistenceService.Obsolete(entity, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+            entity = persistenceService.Obsolete(entity.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             entity = businessRulesService?.AfterObsolete(entity) ?? entity;
 
             this.Obsoleted?.Invoke(this, new DataPersistedEventArgs<TEntity>(entity, TransactionMode.Commit, AuthenticationContext.Current.Principal));

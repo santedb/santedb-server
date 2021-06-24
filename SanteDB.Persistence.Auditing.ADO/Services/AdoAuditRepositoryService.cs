@@ -424,7 +424,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Obsolete the audit - Not supported
         /// </summary>
-        public AuditData Obsolete(AuditData storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
+        public AuditData Obsolete(Guid storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
             throw new NotSupportedException("Obsoletion of audits not permitted");
         }
@@ -496,7 +496,9 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         public IEnumerable<AuditData> Query(Expression<Func<AuditData, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext = null, params ModelSort<AuditData>[] orderBy)
         {
 
-            var preEvtData = new QueryRequestEventArgs<AuditData>(query, offset: offset, count: count, queryId: null, principal: overrideAuthContext);
+            // TODO: Refactor this with a yield IQueryResultSet iterator 
+
+            var preEvtData = new QueryRequestEventArgs<AuditData>(query, principal: overrideAuthContext);
             this.Querying?.Invoke(this, preEvtData);
             if (preEvtData.Cancel)
             {
@@ -533,7 +535,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     var results = itm.Select(o => this.ToModelInstance(context, o)).ToList().AsQueryable();
 
                     // Event args
-                    var postEvtArgs = new QueryResultEventArgs<AuditData>(query, results, offset, count, totalCount, null, overrideAuthContext);
+                    var postEvtArgs = new QueryResultEventArgs<AuditData>(query, results, overrideAuthContext);
                     this.Queried?.Invoke(this, postEvtArgs);
                     return postEvtArgs.Results;
 

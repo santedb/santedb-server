@@ -153,8 +153,7 @@ namespace SanteDB.Server.Core.Security.Attribute
 
             this.m_traceSource.TraceInfo("Policy Enforce: {0}({1}) = {2}", principal?.Identity?.Name, this.m_policyId, action);
 
-            if (principal != AuthenticationContext.SystemPrincipal &&
-                principal != AuthenticationContext.AnonymousPrincipal)
+            if (principal == AuthenticationContext.SystemPrincipal)
                 return PolicyGrantType.Grant;
             return action;
         }
