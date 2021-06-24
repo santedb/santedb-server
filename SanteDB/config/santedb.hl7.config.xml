@@ -1,6 +1,6 @@
 ﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.Messaging.HL7.Configuration.Hl7ConfigurationSection, SanteDB.Messaging.HL7, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Messaging.HL7.Configuration.Hl7ConfigurationSection, SanteDB.Messaging.HL7" />
   </sections>
   <section xsi:type="Hl7ConfigurationSection" security="None">
     <!-- Classes of PLACE which can be used for a Birthplace Lookup -->
@@ -32,11 +32,11 @@
         </sllp>
         -->
         <handler>
-          <add type="SanteDB.Messaging.HL7.Messages.QbpMessageHandler, SanteDB.Messaging.HL7, Version=1.10.0.0">
+          <add type="SanteDB.Messaging.HL7.Messages.QbpMessageHandler, SanteDB.Messaging.HL7">
             <message isQuery="true" name="QBP^Q22" />
             <message isQuery="true" name="QBP^Q23" />
           </add>
-          <add type="SanteDB.Messaging.HL7.Messages.AdtMessageHandler, SanteDB.Messaging.HL7, Version=1.10.0.0">
+          <add type="SanteDB.Messaging.HL7.Messages.AdtMessageHandler, SanteDB.Messaging.HL7">
             <message isQuery="false" name="ADT^A01"/>
             <message isQuery="false" name="ADT^A04"/>
             <message isQuery="false" name="ADT^A08"/>
