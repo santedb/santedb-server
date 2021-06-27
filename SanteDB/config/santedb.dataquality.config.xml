@@ -1,6 +1,6 @@
 ﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.Core.Data.Quality.Configuration.DataQualityConfigurationSection, SanteDB.Core.Api, Version=2.1.0.0"/>
+    <add type="SanteDB.Core.Data.Quality.Configuration.DataQualityConfigurationSection, SanteDB.Core.Api"/>
   </sections>
   <!-- Data Quality Configuration Section -->
   <section xsi:type="DataQualityConfigurationSection">

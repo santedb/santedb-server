@@ -1,45 +1,45 @@
 ﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.Server.Core.Configuration.RestConfigurationSection, SanteDB.Server.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Server.Core.Configuration.RestConfigurationSection, SanteDB.Server.Core" />
   </sections>
   <section xsi:type="RestConfigurationSection">
     <service name="META">
-      <endpoint address="http://0.0.0.0:8080/api-docs" contract="SanteDB.Messaging.Metadata.Rest.IMetadataServiceContract, SanteDB.Messaging.Metadata, Version=2.1.0.0">
-        <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common, Version=2.1.0.0"/>
+      <endpoint address="http://0.0.0.0:8080/api-docs" contract="SanteDB.Messaging.Metadata.Rest.IMetadataServiceContract, SanteDB.Messaging.Metadata">
+        <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common"/>
       </endpoint>
     </service>
     <service name="HDSI">
       <behaviors>
-        <add type="SanteDB.Server.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Server.Core, Version=2.1.0.0"/>
+        <add type="SanteDB.Server.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Server.Core"/>
       </behaviors>
-      <endpoint address="http://0.0.0.0:8080/hdsi" contract="SanteDB.Rest.HDSI.IHdsiServiceContract, SanteDB.Rest.HDSI, Version=2.1.0.0">
+      <endpoint address="http://0.0.0.0:8080/hdsi" contract="SanteDB.Rest.HDSI.IHdsiServiceContract, SanteDB.Rest.HDSI">
         <behaviors>
-          <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common, Version=2.1.0.0"/>
-          <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common, Version=2.1.0.0"/>
-          <add type="SanteDB.Rest.Common.Behavior.MessageDispatchFormatterBehavior, SanteDB.Rest.Common, Version=2.1.0.0"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageDispatchFormatterBehavior, SanteDB.Rest.Common"/>
         </behaviors>
       </endpoint>
     </service>
     <service name="BIS">
       <behaviors>
-        <add type="SanteDB.Server.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Server.Core, Version=2.1.0.0"/>
+        <add type="SanteDB.Server.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Server.Core"/>
       </behaviors>
-      <endpoint address="http://0.0.0.0:8080/bis" contract="SanteDB.Rest.BIS.IBisServiceContract, SanteDB.Rest.BIS, Version=2.1.0.0">
+      <endpoint address="http://0.0.0.0:8080/bis" contract="SanteDB.Rest.BIS.IBisServiceContract, SanteDB.Rest.BIS">
         <behaviors>
-          <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common, Version=2.1.0.0"/>
-          <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common, Version=2.1.0.0"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common"/>
         </behaviors>
       </endpoint>
     </service>
     <service name="AMI">
       <behaviors>
-        <add type="SanteDB.Server.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Server.Core, Version=2.1.0.0"/>
+        <add type="SanteDB.Server.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Server.Core"/>
       </behaviors>
-      <endpoint address="http://0.0.0.0:8080/ami" contract="SanteDB.Rest.AMI.IAmiServiceContract, SanteDB.Rest.AMI, Version=2.1.0.0">
+      <endpoint address="http://0.0.0.0:8080/ami" contract="SanteDB.Rest.AMI.IAmiServiceContract, SanteDB.Rest.AMI">
         <behaviors>
-          <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common, Version=2.1.0.0"/>
-          <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common, Version=2.1.0.0"/>
-          <add type="SanteDB.Rest.Common.Behavior.MessageDispatchFormatterBehavior, SanteDB.Rest.Common, Version=2.1.0.0"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageDispatchFormatterBehavior, SanteDB.Rest.Common"/>
         </behaviors>
       </endpoint>
     </service>
@@ -47,13 +47,13 @@
 
     <service name="FHIR">
       <behaviors>
-        <add type="SanteDB.Server.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Server.Core, Version=2.1.0.0"/>
+        <add type="SanteDB.Server.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Server.Core"/>
       </behaviors>
-      <endpoint address="http://0.0.0.0:8080/fhir" contract="SanteDB.Messaging.FHIR.Rest.IFhirServiceContract, SanteDB.Messaging.FHIR, Version=2.1.0.0">
+      <endpoint address="http://0.0.0.0:8080/fhir" contract="SanteDB.Messaging.FHIR.Rest.IFhirServiceContract, SanteDB.Messaging.FHIR">
         <behaviors>
-          <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common, Version=2.1.0.0"/>
-          <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common, Version=2.1.0.0"/>
-          <add type="SanteDB.Rest.Common.Behavior.CorsEndpointBehavior, SanteDB.Rest.Common, Version=2.1.0.0">
+          <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common"/>
+          <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common"/>
+          <add type="SanteDB.Rest.Common.Behavior.CorsEndpointBehavior, SanteDB.Rest.Common">
             <configuration>
               <CorsEndpointBehaviorConfiguration>
                 <resource name="*" domain="*">
@@ -78,7 +78,7 @@
       </endpoint>
     </service>
     <service name="OAuth2">
-      <endpoint address="http://0.0.0.0:8080/auth" contract="SanteDB.Authentication.OAuth2.Rest.IOAuthTokenContract, SanteDB.Authentication.OAuth2, Version=2.1.0.0"/>
+      <endpoint address="http://0.0.0.0:8080/auth" contract="SanteDB.Authentication.OAuth2.Rest.IOAuthTokenContract, SanteDB.Authentication.OAuth2"/>
     </service>
   </section>
 </SanteDBConfiguration>

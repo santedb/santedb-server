@@ -185,7 +185,7 @@ namespace SanteDB.Core.TestFramework
 
                     if (config != null)
                         foreach (var writer in config.TraceWriter)
-                            Tracer.AddWriter(Activator.CreateInstance(writer.TraceWriter, writer.Filter, writer.InitializationData) as TraceWriter, writer.Filter);
+                            Tracer.AddWriter(Activator.CreateInstance(writer.TraceWriter, writer.Filter, writer.InitializationData, config.Sources.ToDictionary(o=>o.SourceName, o=>o.Filter)) as TraceWriter, writer.Filter);
 #if DEBUG
                     else
                         Tracer.AddWriter(new SystemDiagnosticsTraceWriter(), System.Diagnostics.Tracing.EventLevel.LogAlways);

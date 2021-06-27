@@ -1,10 +1,10 @@
 ﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.OrmLite.Configuration.OrmConfigurationSection, SanteDB.OrmLite, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Core.Configuration.Data.DataConfigurationSection, SanteDB.Core.Api, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Persistence.Data.ADO.Configuration.AdoPersistenceConfigurationSection, SanteDB.Persistence.Data.ADO, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Persistence.Auditing.ADO.Configuration.AdoAuditConfigurationSection, SanteDB.Persistence.Auditing.ADO, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
-    <add type="SanteDB.Persistence.PubSub.ADO.Configuration.AdoPubSubConfigurationSection, SanteDB.Persistence.PubSub.ADO, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.OrmLite.Configuration.OrmConfigurationSection, SanteDB.OrmLite" />
+    <add type="SanteDB.Core.Configuration.Data.DataConfigurationSection, SanteDB.Core.Api" />
+    <add type="SanteDB.Persistence.Data.ADO.Configuration.AdoPersistenceConfigurationSection, SanteDB.Persistence.Data.ADO" />
+    <add type="SanteDB.Persistence.Auditing.ADO.Configuration.AdoAuditConfigurationSection, SanteDB.Persistence.Auditing.ADO" />
+    <add type="SanteDB.Persistence.PubSub.ADO.Configuration.AdoPubSubConfigurationSection, SanteDB.Persistence.PubSub.ADO" />
   </sections>
   <section xsi:type="DataConfigurationSection">
     <connectionStrings>
@@ -14,8 +14,8 @@
   </section>
   <section xsi:type="OrmConfigurationSection">
     <providers>
-      <add type="SanteDB.OrmLite.Providers.Postgres.PostgreSQLProvider, SanteDB.OrmLite, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" invariant="npgsql" />
-      <add type="SanteDB.OrmLite.Providers.Firebird.FirebirdSQLProvider, SanteDB.OrmLite, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" invariant="FirebirdSQL" />
+      <add type="SanteDB.OrmLite.Providers.Postgres.PostgreSQLProvider, SanteDB.OrmLite" invariant="npgsql" />
+      <add type="SanteDB.OrmLite.Providers.Firebird.FirebirdSQLProvider, SanteDB.OrmLite" invariant="FirebirdSQL" />
     </providers>
     <dbProviderFactories>
       <add name="PostgreSQL Data Provider" invariant="Npgsql" description=".Net Framework Data Provider for PostgreSQL" type="Npgsql.NpgsqlFactory, Npgsql, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7"/>

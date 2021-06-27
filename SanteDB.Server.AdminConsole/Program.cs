@@ -21,6 +21,7 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Server.AdminConsole.Parameters;
 using SanteDB.Server.AdminConsole.Shell;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Reflection;
 
@@ -47,9 +48,9 @@ namespace SanteDB.Server.AdminConsole
                 {
                     // Add a console trace output
                     if (!String.IsNullOrEmpty(options.Verbosity))
-                        Tracer.AddWriter(new Shell.ConsoleTraceWriter(options.Verbosity), (EventLevel)Enum.Parse(typeof(EventLevel), options.Verbosity));
+                        Tracer.AddWriter(new Shell.ConsoleTraceWriter(options.Verbosity, new Dictionary<String, EventLevel>()), (EventLevel)Enum.Parse(typeof(EventLevel), options.Verbosity));
                     else
-                        Tracer.AddWriter(new Shell.ConsoleTraceWriter("Error"), EventLevel.Error);
+                        Tracer.AddWriter(new Shell.ConsoleTraceWriter("Error", new Dictionary<String, EventLevel>()), EventLevel.Error);
 
                     ApplicationContext.Initialize(options);
                     if (ApplicationContext.Current.Start())
