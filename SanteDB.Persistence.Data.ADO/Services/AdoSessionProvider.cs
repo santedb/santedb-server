@@ -170,7 +170,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         };
 
                         if (dbSession.ApplicationKey == dbSession.UserKey) // SID == Application = Application Grant
-                            dbSession.UserKey = Guid.Empty;
+                            dbSession.UserKey = null;
 
                         dbSession = context.Insert(dbSession);
 
