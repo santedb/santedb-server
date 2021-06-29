@@ -1,6 +1,6 @@
 ﻿<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.Core.Security.Tfa.Twilio.Configuration.TwilioTfaMechanismConfigurationSection, SanteDB.Core.Security.Tfa.Twilio, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Core.Security.Tfa.Twilio.Configuration.TwilioTfaMechanismConfigurationSection, SanteDB.Core.Security.Tfa.Twilio" />
   </sections>
   <!-- This section configures Twilio SMS TFA authentication -->
   <section xsi:type="TwilioTfaMechanismConfigurationSection" auth="value" from="value" sid="value" />

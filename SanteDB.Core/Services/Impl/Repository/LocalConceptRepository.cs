@@ -273,6 +273,40 @@ namespace SanteDB.Server.Core.Services.Impl
             return persistence.Count(o => o.Key == set && o.ConceptsXml.Any(c => c == concept)) > 0;
         }
 
+        /// <summary>
+        /// Get the concept reference term in the code system by the concept mnemonic
+        /// </summary>
+        public ReferenceTerm GetConceptReferenceTerm(string conceptMnemonic, string codeSystem)
+        {
 
+            var adhocCache = ApplicationServiceContext.Current.GetService<IAdhocCacheService>();
+            var retVal = adhocCache?.Get<ReferenceTerm>($"refTerm.{conceptMnemonic}.{codeSystem}");
+
+            if (retVal != null)
+                return retVal;
+
+            // Concept is loaded
+            var refTermService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ConceptReferenceTerm>>();
+
+            if (refTermService == null)
+                throw new InvalidOperationException("Cannot find concept/reference term service");
+
+            int tr;
+            ConceptReferenceTerm refTermEnt = null;
+
+            Regex oidRegex = new Regex("^(\\d+?\\.){1,}\\d+$");
+            Uri uri = null;
+            if (oidRegex.IsMatch(codeSystem))
+                refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Oid == codeSystem) && o.SourceEntity.Mnemonic == conceptMnemonic&& o.ObsoleteVersionSequenceId == null && o.RelationshipTypeKey == ConceptRelationshipTypeKeys.SameAs, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
+            else if (Uri.TryCreate(codeSystem, UriKind.Absolute, out uri))
+                refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Url == codeSystem) && o.SourceEntity.Mnemonic == conceptMnemonic && o.ObsoleteVersionSequenceId == null && o.RelationshipTypeKey == ConceptRelationshipTypeKeys.SameAs, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
+            else
+                refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Authority == codeSystem) && o.SourceEntity.Mnemonic == conceptMnemonic && o.ObsoleteVersionSequenceId == null && o.RelationshipTypeKey == ConceptRelationshipTypeKeys.SameAs, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
+            retVal = refTermEnt.LoadProperty<ReferenceTerm>("ReferenceTerm");
+
+            adhocCache?.Add($"refTerm.{conceptMnemonic}.{codeSystem}", retVal, new TimeSpan(0, 0, 30));
+
+            return retVal;
+        }
     }
 }
