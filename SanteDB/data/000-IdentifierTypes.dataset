@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Identifier Type Codes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data">
+<update insertIfNotExists="true">
+    <ConceptSet xmlns="http://santedb.org/model">
+      <id>cb6e4f28-5a78-408e-9b5e-a41018057fb1</id>
+      <name>Identifier Type Codes</name>
+      <mnemonic>IdentifierType</mnemonic>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.80</oid>
+      <url>http://santedb.org/conceptsets/contrib/IdentifierType</url>
+    </ConceptSet>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>cb6e4f39-5a78-408e-9b5e-a41018057fb1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>IdentifierType-DriversLicense</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Drivers License</value>
+      </name>
+      <conceptSet>cb6e4f28-5a78-408e-9b5e-a41018057fb1</conceptSet>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>cb6e4f4a-5a78-408e-9b5e-a41018057fb1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>IdentifierType-Passport</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Passport Number</value>
+      </name>
+      <conceptSet>cb6e4f28-5a78-408e-9b5e-a41018057fb1</conceptSet>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>cb6e4f5b-5a78-408e-9b5e-a41018057fb1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>IdentifierType-MedicalRecordNumber</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>MRN / Medical Record Number</value>
+      </name>
+      <conceptSet>cb6e4f28-5a78-408e-9b5e-a41018057fb1</conceptSet>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>cb6e4f4a-5a6c-408e-9b5e-a41018057fb1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>IdentifierType-Employer</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Employee Number</value>
+      </name>
+      <conceptSet>cb6e4f28-5a78-408e-9b5e-a41018057fb1</conceptSet>
+    </Concept>
+  </update>
+<update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>cb6e4f7d-5a78-408e-9b5e-a41018057fb1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>IdentifierType-Tax</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Tax ID Number</value>
+      </name>
+      <conceptSet>cb6e4f28-5a78-408e-9b5e-a41018057fb1</conceptSet>
+    </Concept>
+  </update>
+<update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>cb6e4f8e-5a78-408e-9b5e-a41018057fb1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>IdentifierType-NationalInsurance</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>National Insurance Number</value>
+      </name>
+      <conceptSet>cb6e4f28-5a78-408e-9b5e-a41018057fb1</conceptSet>
+    </Concept>
+  </update>
+<update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>cb6e4f9f-5a78-408e-9b5e-a41018057fb1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>IdentifierType-PrimaryIdentifier</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Primary / Internal Identifier Number</value>
+      </name>
+      <conceptSet>cb6e4f28-5a78-408e-9b5e-a41018057fb1</conceptSet>
+    </Concept>
+  </update>
+<update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>cb6e4fa0-5a78-408e-9b5e-a41018057fb1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>IdentifierType-MedicalLicense</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Medical License Number</value>
+      </name>
+      <conceptSet>cb6e4f28-5a78-408e-9b5e-a41018057fb1</conceptSet>
+    </Concept>
+  </update>
+<update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>cb6e4fb1-5a78-408e-9b5e-a41018057fb1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>IdentifierType-JurisdictionalNumber</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Jurisdictional Number</value>
+      </name>
+      <conceptSet>cb6e4f28-5a78-408e-9b5e-a41018057fb1</conceptSet>
+    </Concept>
+  </update>
+<update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>cb6e4fb2-5a78-408e-9b5e-a41018057fb1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>IdentifierType-Bank</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Bank / Financial Number</value>
+      </name>
+      <conceptSet>cb6e4f28-5a78-408e-9b5e-a41018057fb1</conceptSet>
+    </Concept>
+  </update>
+<update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>cb6e4fc3-5a78-408e-9b5e-a41018057fb1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>IdentifierType-Temp</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Temporary Number</value>
+      </name>
+      <conceptSet>cb6e4f28-5a78-408e-9b5e-a41018057fb1</conceptSet>
+    </Concept>
+  </update>
+<update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>cb6e4fd4-5a78-408e-9b5e-a41018057fb1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>IdentifierType-PersonIdentifier</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Person Number</value>
+      </name>
+      <conceptSet>cb6e4f28-5a78-408e-9b5e-a41018057fb1</conceptSet>
+    </Concept>
+  </update>
+<update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>cb6e4fe5-5a78-408e-9b5e-a41018057fb1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>IdentifierType-ExternalIdentifier</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>External Identifier</value>
+      </name>
+      <conceptSet>cb6e4f28-5a78-408e-9b5e-a41018057fb1</conceptSet>
+    </Concept>
+  </update>
+</dataset>
