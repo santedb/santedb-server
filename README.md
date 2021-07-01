@@ -53,14 +53,14 @@ The process for compilation is as follows:
 To build on Linux you will need to install the following packages on your linux distribution (we've included package names for Ubuntu/Debian)
 
 * Mono Project Version 6.x or higher to compile the C# code (sudo apt install mono-complete)
-* WINE Emulator to compile the Windows Installers (sudo apt install wine wine32)
-* UNZIP to compile Windows Installer (sudo apt install unzip)
-* [Extended MSBuildTasks](https://github.com/loresoft/msbuildtasks)
+* (Optional) WINE Emulator to compile the Windows Installers (sudo apt install wine wine32)
+* (Optional) UNZIP to compile Windows Installer (sudo apt install unzip)
 
 You can manually build the project using msbuild:
 
 ```
-msbuild /t:clean /t:restore /t:build /p:Configuration=Debug /p:VersionNumber=`cat release-version` santedb-server-linux-ext.sln
+./submodule-pull.sh develop
+msbuild /t:clean /t:restore /t:build /p:Configuration=Debug /p:VersionNumber=`cat release-version` /p:NoFirebird=1 santedb-server-linux-ext.sln
 ```
 
 If you would like to build the installers and tarballs:
@@ -69,3 +69,13 @@ If you would like to build the installers and tarballs:
 ./build-on-linux.sh VERSION_ID SOURCE_BRANCH
 ```
 
+### On MacOS
+
+To build on MacOS you will first need to install Microsoft Visual Studio for Mac or the Mono Framework 6.x or higher. 
+
+You can build the project in debug mode with:
+
+```
+./submodule-pull.sh develop
+msbuild /t:clean /t:restore /t:build /p:Configuration=Debug /p:VersionNumber=`cat release-version` /p:NoFirebird=1 santedb-server-linux-ext.sln
+```
