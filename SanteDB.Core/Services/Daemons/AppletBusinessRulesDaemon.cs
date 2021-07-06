@@ -17,6 +17,7 @@
  * Date: 2019-11-27
  */
 using SanteDB.BusinessRules.JavaScript;
+using SanteDB.Core;
 using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Services;
@@ -81,11 +82,16 @@ namespace SanteDB.Server.Core.Services.Daemons
         /// </summary>
         public bool Start()
         {
-            this.Starting?.Invoke(this, EventArgs.Empty);
-            if (this.m_dataResolver == null)
-                this.m_serviceManager.AddServiceProvider(typeof(AppletDataReferenceResolver));
-            new AppletBusinessRuleLoader().LoadRules();
-            this.Started?.Invoke(this, EventArgs.Empty);
+            ApplicationServiceContext.Current.Started += (o, e) =>
+            {
+                this.Starting?.Invoke(this, EventArgs.Empty);
+
+                if (this.m_dataResolver == null)
+                    this.m_serviceManager.AddServiceProvider(typeof(AppletDataReferenceResolver));
+                new AppletBusinessRuleLoader().LoadRules();
+                this.Started?.Invoke(this, EventArgs.Empty);
+            };
+
             return true;
         }
 

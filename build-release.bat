@@ -91,6 +91,9 @@ if exist "%nuget%" (
 	call package-sdbac.bat %version%
 	cd santedb-docker
 	cd SanteDB.Docker.Server
+	cd bin\Release
+        ren Data data
+	cd ..\..
 	docker build --no-cache -t santesuite/santedb-icdr:%version% .
 	docker build --no-cache -t santesuite/santedb-icdr .
 	cd ..

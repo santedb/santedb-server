@@ -82,29 +82,35 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 this.m_tracer.TraceVerbose("Reorganizing {0}..", itm.Key);
                 var idx = retVal.Item.FindIndex(o => o.Key == itm.Key);
 
-                // Are there any relationships
+                // Are there any relationships on the entity?
                 if (itm is Entity ent)
                 {
                     foreach (var rel in ent.Relationships)
                     {
                         this.m_tracer.TraceVerbose("Processing {0} / relationship / {1} ..", itm.Key, rel.TargetEntityKey);
 
-                        var bitm = bundle.Item.FirstOrDefault(o => o.Key == rel.TargetEntityKey);
-                        if (bitm == null) continue;
+                        // Get the target that this rel points to
+                        var targetEntity = bundle.Item.FirstOrDefault(o => o.Key == rel.TargetEntityKey);
+                        if (targetEntity == null) continue;
 
                         if (retVal.Item.Any(o => o.Key == rel.TargetEntityKey))
                             continue;
-                        this.m_tracer.TraceVerbose("Bumping (due to relationship): {0}", bitm);
+                        this.m_tracer.TraceVerbose("Bumping (due to relationship): {0}", targetEntity);
 
                         if (idx > -1)
-                            retVal.Item.Insert(idx, bitm); // make sure it gets inserted first
+                        {
+                            retVal.Item.Insert(idx, targetEntity); // make sure the gets inserted before the current item
+                        }
                         else
-                            retVal.Item.Add(bitm);
+                        {
+                            retVal.Item.Add(targetEntity); // Add the target entity first
+                        }
                     }
 
                 }
                 else if (itm is Act act)
                 {
+                    retVal.Item.Add(act);
                     foreach (var rel in act.Relationships)
                     {
                         this.m_tracer.TraceVerbose("Processing {0} / relationship / {1} ..", itm.Key, rel.TargetActKey);
