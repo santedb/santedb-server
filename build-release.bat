@@ -89,11 +89,15 @@ if exist "%nuget%" (
 	rmdir /q/s .\installsupp
 
 	call package-sdbac.bat %version%
-	pushd santedb-docker
-	pushd SanteDB.Docker.Server
-	docker build -t santesuite/santedb-icdr:%version% .
-	popd
-	popd
+	cd santedb-docker
+	cd SanteDB.Docker.Server
+	cd bin\Release
+        ren Data data
+	cd ..\..
+	docker build --no-cache -t santesuite/santedb-icdr:%version% .
+	docker build --no-cache -t santesuite/santedb-icdr .
+	cd ..
+	cd ..
 ) else (	
 	echo Cannot find NUGET 
 )

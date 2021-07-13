@@ -18,6 +18,7 @@
  */
 using SanteDB.Core.Diagnostics;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 
 namespace SanteDB.Server.AdminConsole.Shell
@@ -30,10 +31,10 @@ namespace SanteDB.Server.AdminConsole.Shell
         /// <summary>
         /// Console trace writer
         /// </summary>
-        public ConsoleTraceWriter(string filter) : base((EventLevel)Enum.Parse(typeof(EventLevel), filter), null)
+        public ConsoleTraceWriter(string filter, IDictionary<String, EventLevel> sources) : base((EventLevel)Enum.Parse(typeof(EventLevel), filter), null, sources)
         {
         }
-
+        
         /// <summary>
         /// Not needed for this context
         /// </summary>

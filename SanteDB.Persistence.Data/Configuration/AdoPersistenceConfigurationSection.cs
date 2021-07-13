@@ -30,6 +30,46 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Data.Configuration
 {
+
+    /// <summary>
+    /// Versioning policy types
+    /// </summary>
+    [XmlType(nameof(AdoVersioningPolicyFlags), Namespace = "http://santedb.org/configuration"),Flags]
+    public enum AdoVersioningPolicyFlags
+    {
+        /// <summary>
+        /// When no-versioning is enabled, indicates that new versions should not be created per object
+        /// </summary>
+        [XmlEnum("none")]
+        None = 0,
+        /// <summary>
+        /// When full-versioning is enabled, then each update results in a new version of an object
+        /// </summary>
+        [XmlEnum("core-props")]
+        FullVersioning = 1,
+        /// <summary>
+        /// When core-versioning is enabled, any versioned associations will be removed meaning
+        /// that only core properties are versioned the associative properties are not.
+        /// </summary>
+        [XmlEnum("associated")]
+        AssociationVersioning = 2,
+        /// <summary>
+        /// Logical deletion
+        /// </summary>
+        [XmlEnum("logical-delete")]
+        LogicalDeletion = 4,
+        /// <summary>
+        /// Default flags
+        /// </summary>
+        [XmlEnum("default")]
+        Default = FullVersioning | AssociationVersioning | LogicalDeletion,
+        /// <summary>
+        /// Lean policy
+        /// </summary>
+        [XmlEnum("lean")]
+        Lean = None | LogicalDeletion
+    }
+
     /// <summary>
     /// Configuration section handler
     /// </summary>
@@ -62,11 +102,11 @@ namespace SanteDB.Persistence.Data.Configuration
         /// <summary>
         /// The persistence layer is not versioned
         /// </summary>
-        [XmlAttribute("unversioned")]
+        [XmlAttribute("versioning")]
         [Category("Behavior")]
-        [DisplayName("Disable Versioning")]
-        [Description("When enabled, turns off versioning in the persistence layer")]
-        public bool Unversioned { get; set; }
+        [DisplayName("Control Versioning")]
+        [Description("When enabled, changes the versioning behavior of the persistence layer")]
+        public AdoVersioningPolicyFlags VersioningPolicy { get; set; }
 
         /// <summary>
         /// Gets or sets whether fuzzy totals should be used

@@ -67,7 +67,7 @@ namespace SanteDB.Server.Core.Diagnostics
         /// <summary>
         /// Rollover text writer ctor
         /// </summary>
-        public RolloverTextWriterTraceWriter(EventLevel filter, string fileName) : base(filter, fileName)
+        public RolloverTextWriterTraceWriter(EventLevel filter, string fileName, IDictionary<String, EventLevel> sources) : base(filter, fileName, sources)
         {
             // Pass in the path of the logfile (ie. C:\Logs\MyAppLog.log)
             // The logfile will actually be created with a yyyymmdd format appended to the filename

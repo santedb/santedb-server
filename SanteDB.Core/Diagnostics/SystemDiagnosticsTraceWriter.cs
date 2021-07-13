@@ -41,14 +41,14 @@ namespace SanteDB.Server.Core.Diagnostics
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="fileName"></param>
-        public SystemDiagnosticsTraceWriter(EventLevel filter, string fileName) : base(filter, fileName)
+        public SystemDiagnosticsTraceWriter(EventLevel filter, string fileName, IDictionary<String, EventLevel> sources) : base(filter, fileName, sources)
         {
         }
 
         /// <summary>
         /// Creates a new diagnostics trace writer
         /// </summary>
-        public SystemDiagnosticsTraceWriter() : base (EventLevel.LogAlways, null)
+        public SystemDiagnosticsTraceWriter() : base (EventLevel.LogAlways, null, new Dictionary<String, EventLevel>())
         {
         }
 

@@ -37,7 +37,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Get tracer for the specified persistence class
         /// </summary>
-        private Tracer m_tracer = Tracer.GetTracer(typeof(BasePersistenceService<TModel, TDbModel>));
+        protected Tracer m_tracer = Tracer.GetTracer(typeof(BasePersistenceService<TModel, TDbModel>));
 
         // Data cache
         protected IDataCachingService m_dataCacheService;

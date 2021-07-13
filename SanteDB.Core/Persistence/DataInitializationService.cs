@@ -258,7 +258,7 @@ namespace SanteDB.Server.Core.Persistence
 
                 XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(typeof(Dataset));
                 var datasetFiles = Directory.GetFiles(dataDirectory, "*.dataset");
-                Array.Sort(datasetFiles);
+                datasetFiles = datasetFiles.OrderBy(o => Path.GetFileName(o)).ToArray();
                 int i = 0;
                 // Perform migrations
                 foreach (var f in datasetFiles)

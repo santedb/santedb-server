@@ -126,25 +126,24 @@
       <!--<add type="SanteDB.Warehouse.ADO.ADODataWarehouse, SanteDB.Warehouse.ADO" />-->
 
       <!-- SG Services -->
-      <!--<add type="SanteGuard.Services.LocalAuditTermLookupService, SanteGuard.Core, Version=2.1.0.0"/>
-	  <add type="SanteGuard.Services.Repositories.SanteGuardDataRepository, SanteGuard.Core, Version=2.1.0.0"/>-->
-      <!--<add type="SanteGuard.Messaging.Syslog.SyslogMessageHandler, SanteGuard.Messaging.Syslog, Version=2.1.0.0"/>-->
-      <!--  <add type="SanteGuard.Persistence.Ado.Services.AdoAuditPersistenceService, SanteGuard.Persistence.Ado, Version=2.1.0.0"/>-->
-      <!--<add type="SanteGuard.Services.Repositories.SanteGuardAuditRepository, SanteGuard.Core, Version=2.1.0.0"/>-->
+      <!--<add type="SanteGuard.Services.LocalAuditTermLookupService, SanteGuard.Core"/>
+	  <add type="SanteGuard.Services.Repositories.SanteGuardDataRepository, SanteGuard.Core"/>-->
+      <!--<add type="SanteGuard.Messaging.Syslog.SyslogMessageHandler, SanteGuard.Messaging.Syslog"/>-->
+      <!--  <add type="SanteGuard.Persistence.Ado.Services.AdoAuditPersistenceService, SanteGuard.Persistence.Ado"/>-->
+      <!--<add type="SanteGuard.Services.Repositories.SanteGuardAuditRepository, SanteGuard.Core"/>-->
 
       <!-- BI Services -->
-      <add type="SanteDB.Matcher.Services.FileMatchConfigurationProvider, SanteDB.Matcher, Version=2.1.0.0"/>
-      <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS, Version=2.1.0.0"/>
-      <add type="SanteDB.BI.Services.Impl.AppletBiRepository, SanteDB.BI, Version=2.1.0.0"/>
-      <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI, Version=2.1.0.0"/>
-      <add type="SanteDB.BI.Services.Impl.LocalBiRenderService, SanteDB.BI, Version=2.1.0.0"/>
+      <add type="SanteDB.Matcher.Services.FileMatchConfigurationProvider, SanteDB.Matcher"/>
+      <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS"/>
+      <add type="SanteDB.BI.Services.Impl.AppletBiRepository, SanteDB.BI"/>
+      <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI"/>
+      <add type="SanteDB.BI.Services.Impl.LocalBiRenderService, SanteDB.BI"/>
 
-      <add type="SanteDB.Persistence.MDM.Services.MdmDataManagementService, SanteDB.Persistence.MDM, Version=2.1.0.0"/>
-      <add type="SanteDB.Matcher.Matchers.WeightedRecordMatchingService, SanteDB.Matcher, Version=2.1.0.0"/>
-      <add type="SanteDB.Matcher.Configuration.File.FileMatchConfigurationProvider, SanteDB.Matcher.Configuration.File, Version=2.1.0.0"/>
+      <add type="SanteDB.Persistence.MDM.Services.MdmDataManagementService, SanteDB.Persistence.MDM"/>
+      <add type="SanteDB.Matcher.Matchers.WeightedRecordMatchingService, SanteDB.Matcher"/>
 
-      <add type="SanteDB.Core.Data.Quality.DataQualityService, SanteDB.Core.Api, Version=2.1.0.0"/>
-      <add type="SanteMPI.Persistence.ADO.Services.AdoNameAliasService, SanteMPI.Persistence.ADO, Version=2.1.0.0"/>
+      <add type="SanteDB.Core.Data.Quality.DataQualityService, SanteDB.Core.Api"/>
+      <add type="SanteMPI.Persistence.ADO.Services.AdoNameAliasService, SanteMPI.Persistence.ADO"/>
 
       <add type="SanteDB.Core.PubSub.Broker.PubSubBroker, SanteDB.Core.Api, Version=2.1.0"/>
       <add type="SanteDB.Persistence.PubSub.ADO.AdoPubSubManager, SanteDB.Persistence.PubSub.ADO, Version=2.1.0"/>

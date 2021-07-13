@@ -50,7 +50,7 @@ namespace SanteDB.Server.Core.Diagnostics
         /// <summary>
         /// Console trace writer
         /// </summary>
-        public ConsoleTraceWriter(EventLevel filter, string initializationData) : base(filter, initializationData)
+        public ConsoleTraceWriter(EventLevel filter, string initializationData, IDictionary<String, EventLevel> sources) : base(filter, initializationData, sources)
         {
             // Start log dispatch
             this.m_dispatchThread = new Thread(this.LogDispatcherLoop);

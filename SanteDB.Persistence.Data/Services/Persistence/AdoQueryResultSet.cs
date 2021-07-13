@@ -1,4 +1,5 @@
-﻿using SanteDB.Core.i18n;
+﻿using SanteDB.Core.Diagnostics;
+using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
@@ -6,6 +7,7 @@ using SanteDB.OrmLite;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -29,6 +31,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
         // The result set that this wraps
         private IOrmResultSet m_resultSet;
+
+        // Tracer 
+        private Tracer m_tracer = Tracer.GetTracer(typeof(AdoQueryResultSet<TData>));
 
         /// <summary>
         /// Creates a new persistence collection
@@ -112,6 +117,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public IEnumerator<TData> GetEnumerator()
         {
+#if DEBUG
+            var sw = new Stopwatch();
+            sw.Start();
+#endif
             try
             {
                 this.m_context.Open();
@@ -123,6 +132,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             finally
             {
                 this.m_context.Close();
+#if DEBUG
+                sw.Stop();
+                this.m_tracer.TraceVerbose("Performance: GetEnumerator({0}) took {1}ms", this.m_resultSet, sw.ElapsedMilliseconds);
+#endif
             }
         }
 
@@ -151,6 +164,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public TData FirstOrDefault()
         {
+            if (this.m_resultSet == null)
+            {
+                this.m_resultSet = this.m_provider.ExecuteQuery(this.m_context, o => true);
+            }
+#if DEBUG
+            var sw = new Stopwatch();
+            sw.Start();
+#endif
             try
             {
                 this.m_context.Open();
@@ -161,6 +182,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             finally
             {
                 this.m_context.Close();
+#if DEBUG
+                sw.Stop();
+                this.m_tracer.TraceVerbose("Performance: SingleOrDefault({0}) took {1}ms", this.m_resultSet, sw.ElapsedMilliseconds);
+#endif
             }
         }
 
@@ -182,6 +207,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public TData SingleOrDefault()
         {
+            if (this.m_resultSet == null)
+            {
+                this.m_resultSet = this.m_provider.ExecuteQuery(this.m_context, o => true);
+            }
+#if DEBUG
+            var sw = new Stopwatch();
+            sw.Start();
+#endif
             try
             {
                 this.m_context.Open();
@@ -199,6 +232,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             finally
             {
                 this.m_context.Close();
+#if DEBUG
+                sw.Stop();
+                this.m_tracer.TraceVerbose("Performance: SingleOrDefault({0}) took {1}ms", this.m_resultSet, sw.ElapsedMilliseconds);
+#endif
             }
         }
 
@@ -267,6 +304,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public IQueryResultSet<TData> AsStateful(Guid stateId)
         {
+#if DEBUG
+            var sw = new Stopwatch();
+            sw.Start();
+#endif
             try
             {
                 if (this.m_provider.QueryPersistence == null)
@@ -291,6 +332,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             finally
             {
                 this.m_context.Close();
+#if DEBUG
+                sw.Stop();
+                this.m_tracer.TraceVerbose("Performance: AsStateful({0}) took {1}ms", stateId, sw.ElapsedMilliseconds);
+#endif
             }
         }
 
@@ -299,7 +344,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public bool Any()
         {
-            if(this.m_resultSet == null)
+#if DEBUG
+            var sw = new Stopwatch();
+            sw.Start();
+#endif
+            if (this.m_resultSet == null)
             {
                 this.m_resultSet = this.m_provider.ExecuteQuery(this.m_context, o => true);
             }
@@ -318,6 +367,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public int Count()
         {
+#if DEBUG
+            var sw = new Stopwatch();
+            sw.Start();
+#endif
             if (this.m_resultSet == null)
             {
                 this.m_resultSet = this.m_provider.ExecuteQuery(this.m_context, o => true);
