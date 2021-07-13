@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security;
 
 namespace SanteDB.Persistence.PubSub.ADO
 {
@@ -58,6 +59,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         public AdoPubSubManager(IServiceManager serviceManager,
             IPolicyEnforcementService policyEnforcementService,
             IConfigurationManager configurationManager,
+            ISecurityRepositoryService securityRepository,
             IDataCachingService cachingService,
             IPubSubBroker broker)
         {
@@ -66,7 +68,7 @@ namespace SanteDB.Persistence.PubSub.ADO
             this.m_broker = broker;
             this.m_configuration = configurationManager.GetSection<AdoPubSubConfigurationSection>();
             this.m_policyEnforcementService = policyEnforcementService;
-
+            this.m_securityRepository = securityRepository;
             this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.PubSub.ADO");
 
         }
@@ -173,6 +175,18 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// </summary>
         public PubSubChannelDefinition RegisterChannel(string name, Type dispatcherFactory, Uri endpoint, IDictionary<string, string> settings)
         {
+            if(String.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+            else if(dispatcherFactory == null)
+            {
+                throw new ArgumentNullException(nameof(dispatcherFactory));
+            }
+            else if(endpoint == null)
+            {
+                throw new ArgumentNullException(nameof(endpoint));
+            }
 
             // Validate state
             this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.CreatePubSubSubscription);
@@ -197,7 +211,15 @@ namespace SanteDB.Persistence.PubSub.ADO
                     {
                         var dbChannel = this.m_mapper.MapModelInstance<PubSubChannelDefinition, DbChannel>(channel);
                         dbChannel.Endpoint = channel.Endpoint.ToString();
-                        dbChannel.CreatedByKey = this.m_securityRepository.GetUser(AuthenticationContext.Current.Principal.Identity).Key.Value;
+
+                        // Get the authorship
+                        var se = this.m_securityRepository.GetSecurityEntity(AuthenticationContext.Current.Principal);
+                        if(se == null)
+                        {
+                            throw new KeyNotFoundException($"Unable to determine structure data for {AuthenticationContext.Current.Principal.Identity.Name}");
+                        }
+
+                        dbChannel.CreatedByKey = se.Key.Value;
                         dbChannel.CreationTime = DateTimeOffset.Now;
                         dbChannel = conn.Insert(dbChannel);
 
@@ -248,7 +270,15 @@ namespace SanteDB.Persistence.PubSub.ADO
                     var dbExisting = conn.FirstOrDefault<DbChannel>(o => o.Key == key);
                     if (dbExisting == null)
                         throw new KeyNotFoundException($"Channel {key} not found");
-                    dbExisting.ObsoletedByKey = this.m_securityRepository.GetUser(AuthenticationContext.Current.Principal.Identity).Key.Value;
+
+                    // Get the authorship
+                    var se = this.m_securityRepository.GetSecurityEntity(AuthenticationContext.Current.Principal);
+                    if (se == null)
+                    {
+                        throw new KeyNotFoundException($"Unable to determine structure data for {AuthenticationContext.Current.Principal.Identity.Name}");
+                    }
+
+                    dbExisting.ObsoletedByKey = se.Key.Value;
                     dbExisting.ObsoletionTime = DateTimeOffset.Now;
                     conn.Update(dbExisting);
                     this.m_cache?.Remove(key);
@@ -289,7 +319,14 @@ namespace SanteDB.Persistence.PubSub.ADO
                     var dbExisting = conn.FirstOrDefault<DbSubscription>(o => o.Key == key);
                     if (dbExisting == null)
                         throw new KeyNotFoundException($"Subscription {key} not found");
-                    subscription.ObsoletedByKey = dbExisting.ObsoletedByKey = this.m_securityRepository.GetUser(AuthenticationContext.Current.Principal.Identity).Key.Value;
+
+                    // Get the authorship
+                    var se = this.m_securityRepository.GetSecurityEntity(AuthenticationContext.Current.Principal);
+                    if (se == null)
+                    {
+                        throw new KeyNotFoundException($"Unable to determine structure data for {AuthenticationContext.Current.Principal.Identity.Name}");
+                    }
+                    subscription.ObsoletedByKey = dbExisting.ObsoletedByKey = se.Key.Value;
                     subscription.ObsoletionTime = dbExisting.ObsoletionTime = DateTimeOffset.Now;
                     conn.Update(dbExisting);
                     this.m_cache.Remove(key);
@@ -417,7 +454,13 @@ namespace SanteDB.Persistence.PubSub.ADO
                         if (dbExisting == null)
                             throw new KeyNotFoundException($"Channel {key} not found");
 
-                        dbExisting.UpdatedByKey = this.m_securityRepository.GetUser(AuthenticationContext.Current.Principal.Identity).Key.Value;
+                        // Get the authorship
+                        var se = this.m_securityRepository.GetSecurityEntity(AuthenticationContext.Current.Principal);
+                        if (se == null)
+                        {
+                            throw new KeyNotFoundException($"Unable to determine structure data for {AuthenticationContext.Current.Principal.Identity.Name}");
+                        }
+                        dbExisting.UpdatedByKey = se.Key.Value;
                         dbExisting.UpdatedTime = DateTimeOffset.Now;
                         dbExisting.ObsoletedByKey = null;
                         dbExisting.ObsoletionTime = null;
@@ -498,7 +541,13 @@ namespace SanteDB.Persistence.PubSub.ADO
                         // First construct db instance 
                         var dbSubscription = this.m_mapper.MapModelInstance<PubSubSubscriptionDefinition, DbSubscription>(subscription);
 
-                        dbSubscription.CreatedByKey = this.m_securityRepository.GetUser(AuthenticationContext.Current.Principal.Identity).Key.Value;
+                        // Get the authorship
+                        var se = this.m_securityRepository.GetSecurityEntity(AuthenticationContext.Current.Principal);
+                        if (se == null)
+                        {
+                            throw new KeyNotFoundException($"Unable to determine structure data for {AuthenticationContext.Current.Principal.Identity.Name}");
+                        }
+                        dbSubscription.CreatedByKey = se.Key.Value;
                         dbSubscription.CreationTime = DateTimeOffset.Now;
                         dbSubscription = conn.Insert(dbSubscription);
 
@@ -544,7 +593,13 @@ namespace SanteDB.Persistence.PubSub.ADO
                             throw new KeyNotFoundException($"Subscription {key} not found");
 
                         var retVal = new PubSubSubscriptionDefinition();
-                        dbExisting.UpdatedByKey = this.m_securityRepository.GetUser(AuthenticationContext.Current.Principal.Identity).Key.Value;
+                        // Get the authorship
+                        var se = this.m_securityRepository.GetSecurityEntity(AuthenticationContext.Current.Principal);
+                        if (se == null)
+                        {
+                            throw new KeyNotFoundException($"Unable to determine structure data for {AuthenticationContext.Current.Principal.Identity.Name}");
+                        }
+                        dbExisting.UpdatedByKey = se.Key.Value;
                         dbExisting.UpdatedTime = DateTimeOffset.Now;
                         dbExisting.ObsoletedByKey = null;
                         dbExisting.ObsoletionTime = null;
@@ -613,9 +668,14 @@ namespace SanteDB.Persistence.PubSub.ADO
                         return preEvt.Data;
                     }
 
+                    var se = this.m_securityRepository.GetSecurityEntity(AuthenticationContext.Current.Principal);
+                    if(se == null)
+                    {
+                        throw new SecurityException($"Cannot determine SID for {AuthenticationContext.Current.Principal.Identity.Name}");
+                    }
                     dbExisting.IsActive = isActive;
                     subscription.IsActive = isActive;
-                    subscription.UpdatedByKey = dbExisting.UpdatedByKey = this.m_securityRepository.GetUser(AuthenticationContext.Current.Principal.Identity).Key.Value;
+                    subscription.UpdatedByKey = dbExisting.UpdatedByKey = se.Key.Value;
                     subscription.UpdatedTime = dbExisting.UpdatedTime = DateTimeOffset.Now;
                     conn.Update(dbExisting);
                     this.m_cache.Remove(key);

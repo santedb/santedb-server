@@ -1,4 +1,5 @@
-﻿using SanteDB.Core.Security.Services;
+﻿using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using SanteDB.Server.Core.Security.Attribute;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public void Demand(string policyId)
         {
-            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, policyId).Demand();
+            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, policyId, AuthenticationContext.Current.Principal).Demand();
         }
 
         /// <summary>
