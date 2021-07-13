@@ -52,7 +52,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected ModelMapper m_modelMapper;
         
         // The configuration for this object
-        private AdoPersistenceConfigurationSection m_configuration;
+        protected AdoPersistenceConfigurationSection m_configuration;
 
         /// <summary>
         /// Base persistence service
@@ -293,7 +293,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 #endif
             // Attempt fetch from master cache
             TModel retVal = null;
-            if (allowCached)
+            if (allowCached && (this.m_configuration.CachingPolicy?.Targets & AdoDataCachingPolicyTarget.ModelObjects) == AdoDataCachingPolicyTarget.ModelObjects)
             {
                 retVal = this.m_dataCacheService.GetCacheItem<TModel>(key);
             }
@@ -360,7 +360,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 
             bool retVal = false;
-            if(allowCache)
+            if(allowCache && (this.m_configuration.CachingPolicy?.Targets & AdoDataCachingPolicyTarget.ModelObjects) == AdoDataCachingPolicyTarget.ModelObjects)
             {
                 retVal |= this.m_dataCacheService.Exists<TModel>(id) ||
                     this.m_adhocCache.Exists(this.GetAdHocCacheKey(id));

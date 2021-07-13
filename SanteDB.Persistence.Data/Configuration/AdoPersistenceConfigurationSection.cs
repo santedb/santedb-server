@@ -136,6 +136,12 @@ namespace SanteDB.Persistence.Data.Configuration
         public int? MaxPageSize { get;  set; }
 
         /// <summary>
+        /// Identiifes the caching policy
+        /// </summary>
+        [XmlElement("caching"), Category("performance"), DisplayName("Caching Policy"), Description("Identifies the data caching policy for the database layer")]
+        public AdoPersistenceCachingPolicy CachingPolicy { get; set; }
+
+        /// <summary>
         /// Get all peppered combinations of the specified secret
         /// </summary>
         public IEnumerable<String> GetPepperCombos(String secret)
