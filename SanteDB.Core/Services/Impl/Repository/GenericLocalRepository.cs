@@ -205,7 +205,13 @@ namespace SanteDB.Server.Core.Services.Impl
             if (prePersistence.Cancel)
             {
                 this.m_traceSource.TraceWarning("Pre-persistence event signal cancel: {0}", data);
-                return prePersistence.Data;
+
+                // Fired inserted trigger
+                if (prePersistence.Success)
+                {
+                    this.Inserted?.Invoke(this, new DataPersistedEventArgs<TEntity>(prePersistence.Data, TransactionMode.Commit, AuthenticationContext.Current.Principal));
+                }
+                return this.m_privacyService?.Apply(prePersistence.Data, AuthenticationContext.Current.Principal) ?? data;
             }
             
             // Did the pre-persistence service change the type to a batch
@@ -255,7 +261,12 @@ namespace SanteDB.Server.Core.Services.Impl
             if (prePersistence.Cancel)
             {
                 this.m_traceSource.TraceWarning("Pre-persistence event signal cancel obsolete: {0}", key);
-                return prePersistence.Data;
+                // Fired inserted trigger
+                if (prePersistence.Success)
+                {
+                    this.Obsoleted?.Invoke(this, new DataPersistedEventArgs<TEntity>(prePersistence.Data, TransactionMode.Commit, AuthenticationContext.Current.Principal));
+                }
+                return this.m_privacyService?.Apply(prePersistence.Data, AuthenticationContext.Current.Principal);
             }
 
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
@@ -340,7 +351,12 @@ namespace SanteDB.Server.Core.Services.Impl
                 if (preSave.Cancel)
                 {
                     this.m_traceSource.TraceWarning("Persistence layer indicates pre-save cancel: {0}", data);
-                    return preSave.Data;
+                    // Fired inserted trigger
+                    if (preSave.Success)
+                    {
+                        this.Saved?.Invoke(this, new DataPersistedEventArgs<TEntity>(preSave.Data, TransactionMode.Commit, AuthenticationContext.Current.Principal));
+                    }
+                    return this.m_privacyService?.Apply(preSave.Data, AuthenticationContext.Current.Principal);
                 }
                 else
                     data = preSave.Data; // Data may have been updated
