@@ -388,8 +388,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public virtual TEntity Validate(TEntity p)
         {
-            p = (TEntity)p.Clean(); // clean up messy data
-
+            
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
             var details = businessRulesService?.Validate(p) ?? new List<DetectedIssue>();
