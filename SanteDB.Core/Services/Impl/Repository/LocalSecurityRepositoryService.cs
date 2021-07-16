@@ -159,7 +159,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public SecurityProvenance GetProvenance(Guid provenanceId)
         {
-            return this.m_provenancePersistence.Get(provenanceId, null, true, AuthenticationContext.Current.Principal);
+            return this.m_provenancePersistence.Get(provenanceId, null, AuthenticationContext.Current.Principal);
         }
 
         /// <summary>
