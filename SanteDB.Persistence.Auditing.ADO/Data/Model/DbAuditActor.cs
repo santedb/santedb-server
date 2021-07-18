@@ -25,7 +25,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Data.Model
     /// Audit actors
     /// </summary>
     [Table("aud_act_tbl")]
-    [AssociativeTable(typeof(DbAuditData), typeof(DbAuditActorAssociation))]
+    [AssociativeTable(typeof(DbAuditEventData), typeof(DbAuditActorAssociation))]
     public class DbAuditActor
     {
         /// <summary>

@@ -50,7 +50,7 @@ using System.Diagnostics.Tracing;
 using SanteDB.Core.Applets.Services;
 using System.Globalization;
 using SanteDB.Core.Http;
-using SanteDB.Core.Auditing;
+using SanteDB.Core.Model.Audit;
 using System.Net;
 using SanteDB.Rest.Common;
 using SanteDB.Server.Core.Rest.Behavior;
@@ -536,7 +536,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             var responseMode = RestOperationContext.Current.IncomingRequest.QueryString["response_mode"] ?? authorization["response_mode"] ?? "query";
             var nonce = RestOperationContext.Current.IncomingRequest.QueryString["nonce"] ?? authorization["nonce"];
 
-            AuditData audit = new AuditData(DateTime.Now, ActionType.Execute, OutcomeIndicator.Success, EventIdentifierType.SecurityAlert, AuditUtil.CreateAuditActionCode(EventTypeCodes.UserAuthentication));
+            AuditEventData audit = new AuditEventData(DateTime.Now, ActionType.Execute, OutcomeIndicator.Success, EventIdentifierType.SecurityAlert, AuditUtil.CreateAuditActionCode(EventTypeCodes.UserAuthentication));
             AuditUtil.AddLocalDeviceActor(audit);
 
             try

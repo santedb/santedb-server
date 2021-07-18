@@ -40,7 +40,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Data.Model
         /// <summary>
         /// Gets or sets the audit identifier
         /// </summary>
-        [Column("aud_id"), ForeignKey(typeof(DbAuditData), nameof(DbAuditData.Key))]
+        [Column("aud_id"), ForeignKey(typeof(DbAuditEventData), nameof(DbAuditEventData.Key))]
         public Guid AuditId { get; set; }
 
         /// <summary>

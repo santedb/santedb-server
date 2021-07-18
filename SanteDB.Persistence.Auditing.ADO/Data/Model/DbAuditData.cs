@@ -26,7 +26,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Data.Model
     /// </summary>
     [Table("aud_tbl")]
     [AssociativeTable(typeof(DbAuditActor), typeof(DbAuditActorAssociation))]
-    public class DbAuditData
+    public class DbAuditEventData
     {
         /// <summary>
         /// The identifier assigned to the audit number

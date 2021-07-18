@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<dataset xmlns="http://santedb.org/data" id="ListActClass Codes">
+
+  <update insertIfNotExists="true">
+    <CodeSystem xmlns="http://santedb.org/model">
+      <id>BAB1D66A-1E98-4BFD-9B4A-7C4BE88F35D1</id>
+      <name>ActClass</name>
+      <oid>2.16.840.1.113883.5.6</oid>
+      <authority>HL7 International</authority>
+      <url>http://santedb.org/conceptset/v3-ActClassClinicalDocument</url>
+      <description>Classification codes for Acts</description>
+    </CodeSystem>
+  </update>
+  <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>b1523489-9a09-411a-bb55-ff283830ea1a</id>
+      <mnemonic>LIST</mnemonic>
+      <codeSystem>BAB1D66A-1E98-4BFD-9B4A-7C4BE88F35D1</codeSystem>
+      <name>
+        <language>en</language>
+        <value>List</value>
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>b0323489-9a09-411a-bb55-ff283830ea1a</id>
+      <isReadonly>true</isReadonly>
+      <mnemonic>ActClassList</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>17FD5254-8C25-4ABB-B246-083FBE9AFA15</conceptClass>
+      <referenceTerm>
+        <term>b1523489-9a09-411a-bb55-ff283830ea1a</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+      <name>
+        <language>en</language>
+        <value>List Act</value>
+      </name>
+      <conceptSet>62C5FDE0-A3AA-45DF-94E9-242F4451644A</conceptSet>
+    </Concept>
+  </update>
+
+  <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>fe6944f7-8937-4e98-ae0d-452b1d8124f4</id>
+      <mnemonic>DOCCLIN</mnemonic>
+      <codeSystem>BAB1D66A-1E98-4BFD-9B4A-7C4BE88F35D1</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Clinical Document</value>
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>7a6944f7-8937-4e98-ae0d-452b1d8124f4</id>
+      <isReadonly>true</isReadonly>
+      <mnemonic>ActClassDocument</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>17FD5254-8C25-4ABB-B246-083FBE9AFA15</conceptClass>
+      <referenceTerm>
+        <term>fe6944f7-8937-4e98-ae0d-452b1d8124f4</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+      <name>
+        <language>en</language>
+        <value>Clinical Document</value>
+      </name>
+      <conceptSet>62C5FDE0-A3AA-45DF-94E9-242F4451644A</conceptSet>
+    </Concept>
+  </update>
+
+  <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>fa6ea735-f243-41f4-bf33-aa78eb2e8466</id>
+      <mnemonic>DOCSECT</mnemonic>
+      <codeSystem>BAB1D66A-1E98-4BFD-9B4A-7C4BE88F35D1</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Clinical Document Section</value>
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>e86ea735-f243-41f4-bf33-aa78eb2e8466</id>
+      <isReadonly>true</isReadonly>
+      <mnemonic>ActClassDocumentSection</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>17FD5254-8C25-4ABB-B246-083FBE9AFA15</conceptClass>
+      <referenceTerm>
+        <term>fa6ea735-f243-41f4-bf33-aa78eb2e8466</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+      <name>
+        <language>en</language>
+        <value>Clinical Document Section</value>
+      </name>
+      <conceptSet>62C5FDE0-A3AA-45DF-94E9-242F4451644A</conceptSet>
+    </Concept>
+  </update>
+
+  <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>f42232b9-a694-42e0-9708-f387393a6c80</id>
+      <mnemonic>GROUPING</mnemonic>
+      <codeSystem>BAB1D66A-1E98-4BFD-9B4A-7C4BE88F35D1</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Care Plan</value>
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>042232b9-a694-42e0-9708-f387393a6c80</id>
+      <isReadonly>true</isReadonly>
+      <mnemonic>ActClassCarePlan</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>17FD5254-8C25-4ABB-B246-083FBE9AFA15</conceptClass>
+      <referenceTerm>
+        <term>f42232b9-a694-42e0-9708-f387393a6c80</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+      <name>
+        <language>en</language>
+        <value>Care Plan</value>
+      </name>
+      <conceptSet>62C5FDE0-A3AA-45DF-94E9-242F4451644A</conceptSet>
+    </Concept>
+  </update>
+
+</dataset>

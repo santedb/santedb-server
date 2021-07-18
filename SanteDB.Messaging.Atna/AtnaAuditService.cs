@@ -31,9 +31,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
-using SdbAudit = SanteDB.Core.Auditing;
+using SdbAudit = SanteDB.Core.Model.Audit;
 using SanteDB.Core.Exceptions;
-using SanteDB.Core.Auditing;
+using SanteDB.Core.Model.Audit;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Diagnostics;
 
@@ -124,7 +124,7 @@ namespace SanteDB.Messaging.Atna
             try
             {
                 AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
-                var ad = state as SdbAudit.AuditData;
+                var ad = state as SdbAudit.AuditEventData;
 
                 // Translate codes to DICOM
                 if (ad.EventTypeCode != null)
@@ -240,7 +240,7 @@ namespace SanteDB.Messaging.Atna
         /// <summary>
         /// Send an audit to the endpoint
         /// </summary>
-        public void SendAudit(SdbAudit.AuditData ad)
+        public void SendAudit(SdbAudit.AuditEventData ad)
         {
             if (ApplicationServiceContext.Current.IsRunning)
                 ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(SendAuditAsync, ad);

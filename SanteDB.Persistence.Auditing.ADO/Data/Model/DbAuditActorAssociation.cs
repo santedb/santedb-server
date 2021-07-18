@@ -36,7 +36,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Data.Model
         /// <summary>
         /// Audit identifier
         /// </summary>
-        [Column("aud_id"), NotNull, ForeignKey(typeof(DbAuditData), nameof(DbAuditData.Key))]
+        [Column("aud_id"), NotNull, ForeignKey(typeof(DbAuditEventData), nameof(DbAuditEventData.Key))]
         public Guid SourceKey { get; set; }
 
         /// <summary>
