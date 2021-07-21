@@ -29,7 +29,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     public abstract class BasePersistenceService<TModel, TDbModel> :
         IDataPersistenceService<TModel>,
         IStoredQueryDataPersistenceService<TModel>,
-        IAdoQueryProvider<TModel>
+        IAdoQueryProvider<TModel>,
+        IDataPersistenceService
         where TModel : IdentifiedData, new()
         where TDbModel : DbIdentified, new()
     {
@@ -57,20 +58,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Base persistence service
         /// </summary>
-        public BasePersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService, IDataCachingService dataCaching = null, IQueryPersistenceService queryPersistence = null)
+        public BasePersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCaching = null, IQueryPersistenceService queryPersistence = null)
         {
             this.m_dataCacheService = dataCaching;
             this.m_queryPersistence = queryPersistence;
-            this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_adhocCache = adhocCacheService;
+            this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
 
         }
-
-        /// <summary>
-        /// Gets the configuration
-        /// </summary>
-        protected AdoPersistenceConfigurationSection Configuration => this.m_configuration;
 
         /// <summary>
         /// Gets the service name
@@ -80,7 +76,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// The provider 
         /// </summary>
-        public IDbProvider Provider => this.m_configuration.Provider;
+        public IDbProvider Provider { get; set; }
 
         /// <summary>
         /// Get the query persistence service
@@ -295,7 +291,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             TModel retVal = null;
             if (allowCached && (this.m_configuration.CachingPolicy?.Targets & AdoDataCachingPolicyTarget.ModelObjects) == AdoDataCachingPolicyTarget.ModelObjects)
             {
-                retVal = this.m_dataCacheService.GetCacheItem<TModel>(key);
+                retVal = this.m_dataCacheService?.GetCacheItem<TModel>(key);
             }
 
             // Fetch from database
@@ -329,7 +325,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 throw new ArgumentNullException(nameof(query), ErrorMessages.ERR_ARGUMENT_NULL);
             }
 
-            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+            using (var context = this.Provider.GetReadonlyConnection())
             {
                 try
                 {
@@ -362,7 +358,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             bool retVal = false;
             if(allowCache && (this.m_configuration.CachingPolicy?.Targets & AdoDataCachingPolicyTarget.ModelObjects) == AdoDataCachingPolicyTarget.ModelObjects)
             {
-                retVal |= this.m_dataCacheService.Exists<TModel>(id) ||
+                retVal |= this.m_dataCacheService?.Exists<TModel>(id) == true ||
                     this.m_adhocCache.Exists(this.GetAdHocCacheKey(id));
             }
 
@@ -426,11 +422,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 
             // Fetch from cache?
-            TModel retVal = this.m_dataCacheService.GetCacheItem<TModel>(key);
+            TModel retVal = this.m_dataCacheService?.GetCacheItem<TModel>(key);
             if (retVal == null || versionKey.HasValue)
             {
                 // Try-fetch
-                using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+                using (var context = this.Provider.GetReadonlyConnection())
                 {
                     try
                     {
@@ -514,13 +510,23 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return preEvent.Data;
             }
 
-            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            using(var context = this.Provider.GetWriteConnection())
             {
                 try
                 {
                     context.Open();
 
                     using (var tx = context.BeginTransaction()) {
+
+                        // Establish provenance object
+                        if (data is BaseEntityData be)
+                        {
+                            context.EstablishProvenance(principal, be.CreatedByKey);
+                        }
+                        else
+                        {
+                            context.EstablishProvenance(principal, null);
+                        }
 
                         // Is this an update or insert?
                         if (this.m_configuration.AutoUpdateExisting && data.Key.HasValue && this.Exists(context, data.Key.Value))
@@ -537,7 +543,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         {
                             tx.Commit();
                             // Cache - invalidate (force a reload)
-                            this.m_dataCacheService.Remove(data.Key.Value);
+                            this.m_dataCacheService?.Remove(data.Key.Value);
                         }
                     }
                     
@@ -598,7 +604,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return preEvent.Data;
             }
 
-            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            using(var context = this.Provider.GetWriteConnection())
             {
                 try
                 {
@@ -607,13 +613,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     TModel retVal = default(TModel);
                     using(var tx = context.BeginTransaction())
                     {
+
+                        // Establish provenance object
+                        context.EstablishProvenance(principal, null);
+
                         retVal = this.DoObsoleteModel(context, id);
 
                         if(mode == TransactionMode.Commit)
                         {
                             tx.Commit();
                             // Cache
-                            this.m_dataCacheService.Remove(id);
+                            this.m_dataCacheService?.Remove(id);
                         }
                     }
 
@@ -672,7 +682,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Executes the specified query returning the query set
         /// </summary>
-        public IEnumerable<TModel> Query(Expression<Func<TModel, bool>> query, IPrincipal principal)
+        public IQueryResultSet<TModel> Query(Expression<Func<TModel, bool>> query, IPrincipal principal)
         {
             if(query == null)
             {
@@ -688,10 +698,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             if(preEvt.Cancel)
             {
                 this.m_tracer.TraceVerbose("Pre-Query Event Signalled Cancel: {0}", query);
-                return preEvt.Results;
+                return preEvt.Results.AsResultSet<TModel>();
             }
 
-            using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+            using(var context = this.Provider.GetReadonlyConnection())
             {
                 try
                 {
@@ -699,7 +709,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                     var postEvt = new QueryResultEventArgs<TModel>(query, results, principal);
                     this.Queried?.Invoke(this, postEvt);
-                    return postEvt.Results;
+                    return postEvt.Results.AsResultSet<TModel>();
                 }
                 catch (DbException e)
                 {
@@ -834,7 +844,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return preEvt.Data;
             }
 
-            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            using(var context = this.Provider.GetWriteConnection())
             {
                 try
                 {
@@ -843,13 +853,23 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     using(var tx = context.BeginTransaction())
                     {
 
+                        // Establish provenance object
+                        if (data is BaseEntityData be)
+                        {
+                            context.EstablishProvenance(principal, be.CreatedByKey);
+                        }
+                        else
+                        {
+                            context.EstablishProvenance(principal, null);
+                        }
+
                         data = this.DoUpdateModel(context, data);
                         if(mode == TransactionMode.Commit)
                         {
                             tx.Commit();
 
                             // Cache - invalidate
-                            this.m_dataCacheService.Remove(data.Key.Value);
+                            this.m_dataCacheService?.Remove(data.Key.Value);
                         }
                     }
 

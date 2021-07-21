@@ -22,7 +22,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Creates a new instance of the non-versioned persistence service with specified DI services
         /// </summary>
-        public NonVersionedDataPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService, IDataCachingService dataCachingService, IQueryPersistenceService queryPersistence) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public NonVersionedDataPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 

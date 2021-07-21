@@ -13,14 +13,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     /// Represents an ADO query provider which is used by hte <see cref="AdoQueryResultSet{TData}"/>
     /// instance to calculate its result set.
     /// </summary>
-    public interface IAdoQueryProvider<TModel>
+    public interface IAdoQueryProvider<TModel> : IAdoPersistenceProvider
     {
 
-        /// <summary>
-        /// Get the provider that this instance of the provider uses
-        /// </summary>
-        IDbProvider Provider { get; }
-
+       
         /// <summary>
         /// Gets the instance of the query persistence service
         /// </summary>

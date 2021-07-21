@@ -5,8 +5,10 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -88,15 +90,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             TDbModel retVal = default(TDbModel);
             var cacheKey = this.GetAdHocCacheKey(key);
-            if (allowCache && (this.m_configuration?.CachingPolicy.Targets & Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects) == Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects)
+            if (allowCache && (this.m_configuration?.CachingPolicy?.Targets & Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects) == Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects)
             {
-                retVal = this.m_adhocCache?.Get<TDbModel>(cacheKey) ;
+                retVal = this.m_adhocCache?.Get<TDbModel>(cacheKey);
             }
             if (retVal == null)
             {
                 retVal = context.FirstOrDefault<TDbModel>(o => o.Key == key);
 
-                if ((this.m_configuration?.CachingPolicy.Targets & Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects) == Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects)
+                if ((this.m_configuration?.CachingPolicy?.Targets & Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects) == Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects)
                 {
                     this.m_adhocCache.Add<TDbModel>(cacheKey, retVal, this.m_configuration.CachingPolicy?.DataObjectExpiry);
                 }
@@ -250,5 +252,59 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 #endif
 
         }
+
+        /// <summary>
+        /// Update associated entities 
+        /// </summary>
+        /// <remarks>
+        /// Updates the associated items of <typeparamref name="TAssociativeTable"/> such that
+        /// <paramref name="data"/>'s associations are updated to match the list 
+        /// provided in <paramref name="related"/>
+        /// </remarks>
+        protected virtual IEnumerable<TAssociativeTable> UpdateModelAssociations<TAssociativeTable>(DataContext context, TModel data, IEnumerable<IdentifiedData> related)
+            where TAssociativeTable : DbAssociation, new()
+        {
+
+            var dbAssociations = related.Select(o => this.m_modelMapper.GetModelMapper(o.GetType()).MapToTarget(o)).OfType<TAssociativeTable>();
+            return this.UpdateInternalAssociations(context, data.Key.Value, dbAssociations);
+        }
+
+        /// <summary>
+        /// Update the internal
+        /// </summary>
+        /// <typeparam name="TAssociativeTable"></typeparam>
+        /// <param name="context"></param>
+        /// <param name="sourceKey"></param>
+        /// <param name="associations"></param>
+        /// <returns></returns>
+        protected virtual IEnumerable<TAssociativeTable> UpdateInternalAssociations<TAssociativeTable>(DataContext context, Guid sourceKey, IEnumerable<TAssociativeTable> associations)
+            where TAssociativeTable : DbAssociation, new()
+        {
+
+            // Existing associations in the database
+            var existing = context.Query<TAssociativeTable>(o => o.SourceKey == sourceKey).ToArray();
+
+            // Which ones are new?
+            var removeRelationships = existing.Where(e => !associations.Any(a => a.Equals(e)));
+            var addRelationships = associations.Where(a => !existing.Any(e => e.Equals(a)));
+
+            // First, remove the old
+            foreach (var itm in removeRelationships)
+            {
+                this.m_tracer.TraceVerbose("Will remove {0} of {1}", typeof(TAssociativeTable).Name, itm);
+                context.Delete(itm);
+            }
+
+            // Next, add the new
+            foreach (var itm in addRelationships)
+            {
+                this.m_tracer.TraceVerbose("Will add {0} of {1}", typeof(TAssociativeTable).Name, itm);
+                itm.SourceKey = sourceKey;
+                context.Insert(itm);
+            }
+
+            return existing.Where(o => !removeRelationships.Any(r => r.Equals(o))).Union(addRelationships);
+        }
+
     }
 }

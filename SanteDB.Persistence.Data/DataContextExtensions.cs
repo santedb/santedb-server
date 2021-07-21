@@ -104,6 +104,7 @@ namespace SanteDB.Persistence.Data
                 else
                 {
                     retVal = me.Insert(retVal);
+                    me.ContextId = retVal.Key;
                 }
 
                 return retVal.Key;

@@ -63,6 +63,10 @@ namespace SanteDB.Persistence.Data.Test
 
         }
 
+        // TODO: Add policies to a security device
+
+        // TODO: Remove policies from object 
+
         // TODO: Other get policies for ACT and ENTITY
 
         // TODO: Other add policies for ACT and ENTITY

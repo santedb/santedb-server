@@ -17,6 +17,7 @@
  * Date: 2019-11-27
  */
 using RestSrvr;
+using SanteDB.Core.Model;
 using SanteDB.Core;
 using SanteDB.Core.Model.Audit;
 using SanteDB.Core.Diagnostics;
@@ -482,10 +483,10 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Execute a query
         /// </summary>
-        public IEnumerable<AuditEventData> Query(Expression<Func<AuditEventData, bool>> query, IPrincipal overrideAuthContext = null)
+        public IQueryResultSet<AuditEventData> Query(Expression<Func<AuditEventData, bool>> query, IPrincipal overrideAuthContext = null)
         {
-            int tr = 0;
-            return this.Query(query, 0, null, out tr);
+            // TODO: Fully refactor the return set of this method to be a proper result set instead of this which will exhaust the entire result set.
+            return this.Query(query, 0, null, out _).AsResultSet<AuditEventData>();
         }
 
         /// <summary>

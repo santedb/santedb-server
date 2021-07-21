@@ -23,7 +23,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Creates a new base entity data with the specified data classes injected
         /// </summary>
-        public BaseEntityDataPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService, IDataCachingService dataCachingService, IQueryPersistenceService queryPersistence) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public BaseEntityDataPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 

@@ -103,13 +103,19 @@ namespace SanteDB.Persistence.Data.Model.DataType
     /// Identifier scope
     /// </summary>
     [Table("asgn_aut_scp_tbl")]
-    public class DbAuthorityScope 
+    public class DbAuthorityScope : DbAssociation
     {
+
+        /// <summary>
+        /// Gets or sets the unique key
+        /// </summary>
+        public override Guid Key { get; set; }
+
         /// <summary>
         /// Gets or sets the scope of the auhority
         /// </summary>
         [Column("aut_id"), PrimaryKey, ForeignKey(typeof(DbAssigningAuthority), nameof(DbAssigningAuthority.Key))]
-        public Guid AssigningAuthorityKey { get; set; }
+        public override Guid SourceKey { get; set; }
 
         /// <summary>
         /// Gets or sets the scope of the auhority

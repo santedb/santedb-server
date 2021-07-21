@@ -1,4 +1,6 @@
 ﻿using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.i18n;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Services;
@@ -44,13 +46,11 @@ namespace SanteDB.Persistence.Data.Services
             this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Data");
 
             // Iterate and register ADO data persistence services
-            //foreach(var type in serviceManager.GetAllTypes().Where(t=>typeof(IAdoPersistenceService).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface))
-            //{
-            //    serviceManager.AddServiceProvider(serviceManager.CreateInjected(type));
-            //}
-
-            // Now we want to register secondary types - These are types for which there is a registered database model map but not 
-            // a concrete implementation class
+            foreach(var pservice in serviceManager.CreateInjectedOfAll<IAdoPersistenceProvider>())
+            {
+                pservice.Provider = this.m_configuration.Provider;
+                serviceManager.AddServiceProvider(pservice);
+            }
 
         }
 
@@ -64,10 +64,34 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public string ServiceName => "ADO Persistence Service";
 
-
+        /// <summary>
+        /// Execute a non-query SQL script 
+        /// </summary>
         public void ExecuteNonQuery(string sql)
         {
-            throw new NotImplementedException();
+            if(String.IsNullOrEmpty(sql))
+            {
+                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    using (var tx = context.BeginTransaction())
+                    {
+                        context.ExecuteNonQuery(context.CreateSqlStatement(sql));
+                        tx.Commit();
+                    }
+                }
+                catch(Exception e)
+                {
+                    this.m_tracer.TraceError("Error executing SQL statement {0} - {1}", sql, e.Message);
+                    throw new DataPersistenceException("Error executing raw SQL", e);
+                }
+            }
         }
     
     }
