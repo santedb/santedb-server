@@ -19,7 +19,8 @@ namespace SanteDB.Persistence.Data.ADO.Tests
             TestApplicationContext.TestAssembly = typeof(AdoIdentityProviderTest).Assembly;
             TestApplicationContext.Initialize(TestContext.CurrentContext.TestDirectory);
 
-            AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
+            AuthenticationContext.EnterSystemContext();
+
         }
     }
 }

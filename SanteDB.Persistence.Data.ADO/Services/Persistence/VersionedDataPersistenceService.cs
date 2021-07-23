@@ -538,7 +538,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     obsVersion = source.VersionSequence.GetValueOrDefault();
 
 #if DEBUG
-                this.m_tracer.TraceInfo("----- OBSOLETING {0} {1} ---- ", del.GetType().Name, del.Key);
+                this.m_tracer.TraceVerbose("----- OBSOLETING {0} {1} ---- ", del.GetType().Name, del.Key);
 #endif
                 del.ObsoleteVersionSequenceId = obsVersion;
                 context.Update<TDomainAssociation>(del);

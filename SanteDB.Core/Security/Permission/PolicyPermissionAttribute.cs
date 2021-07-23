@@ -101,6 +101,7 @@ namespace SanteDB.Server.Core.Security.Attribute
         /// </summary>
         public PolicyPermission(PermissionState state, String policyId) : base()
         {
+            this.m_principal = AuthenticationContext.Current.Principal;
             this.m_isUnrestricted = state == PermissionState.Unrestricted;
             this.m_policyId = policyId;
         }

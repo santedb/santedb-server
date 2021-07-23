@@ -46,6 +46,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security;
 using System.Text.RegularExpressions;
 
@@ -763,6 +764,21 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 default:
                     return this.UpdateCoreProperties(context, data);
 
+            }
+        }
+
+        /// <summary>
+        /// Perform bulk purge on expression
+        /// </summary>
+        /// <remarks>Since there are so many dependent tables this really calls QueryKeys and then BulkPurge</remarks>
+        protected override void BulkPurgeInternal(DataContext connection, Expression<Func<Entity, bool>> expression)
+        {
+            int offset = 0, totalResults = 1;
+            while (offset < totalResults)
+            {
+                var k = this.QueryKeysInternal(connection, expression, offset, 1000, out totalResults).ToArray();
+                this.BulkPurgeInternal(connection, k);
+                offset += k.Length;
             }
         }
 

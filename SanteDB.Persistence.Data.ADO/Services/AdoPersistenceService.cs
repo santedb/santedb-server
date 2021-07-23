@@ -404,174 +404,176 @@ namespace SanteDB.Persistence.Data.ADO.Services
         public bool Start()
         {
             // Startup on system
-            AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
-            // notify startup
-            this.Starting?.Invoke(this, EventArgs.Empty);
-            if (this.m_running) return true;
-
-            // Apply the migrations
-            this.m_tracer.TraceInfo("Scanning for schema updates...");
-
-            // TODO: Refactor this to a common library within the ORM tooling
-            this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Data.ADO");
-
-            try
+            using (AuthenticationContext.EnterSystemContext())
             {
-                // Verify schema version
-                using (DataContext mdc = this.GetConfiguration().Provider.GetReadonlyConnection())
-                {
-                    mdc.Open();
-                    Version dbVer = new Version(mdc.ExecuteProcedure<String>("get_sch_vrsn")),
-                        oizVer = typeof(AdoPersistenceService).Assembly.GetName().Version;
+                // notify startup
+                this.Starting?.Invoke(this, EventArgs.Empty);
+                if (this.m_running) return true;
 
-                    if (oizVer < dbVer)
-                        throw new InvalidOperationException(String.Format("Invalid Schema Version. SanteDB version {0} is older than the database schema version {1}", oizVer, dbVer));
-                    this.m_tracer.TraceInfo("SanteDB Schema Version {0} on {1}", dbVer, this.GetConfiguration().Provider.Invariant);
-                }
-            }
-            catch (Exception e)
-            {
-                this.m_tracer.TraceEvent(EventLevel.Error, "Error starting ADO provider: {0}", e);
-                throw new InvalidOperationException("Could not start up ADO provider", e);
-            }
+                // Apply the migrations
+                this.m_tracer.TraceInfo("Scanning for schema updates...");
 
-            // Iterate the persistence services
-            foreach (var t in typeof(AdoPersistenceService).Assembly.ExportedTypes.Where(o => o.Namespace == "SanteDB.Persistence.Data.ADO.Services.Persistence" && !o.IsAbstract && !o.IsGenericTypeDefinition))
-            {
+                // TODO: Refactor this to a common library within the ORM tooling
+                this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Data.ADO");
+
                 try
                 {
-                    this.m_tracer.TraceEvent(EventLevel.Informational, "Loading {0}...", t.AssemblyQualifiedName);
-
-                    // If the persistence service is generic then we should check if we're allowed
-                    if (!t.IsGenericType ||
-                        t.IsGenericType && (this.GetConfiguration().AllowedResources.Count == 0 ||
-                        this.GetConfiguration().AllowedResources.Contains(t.GetGenericArguments()[0].GetCustomAttribute<XmlTypeAttribute>()?.TypeName)))
+                    // Verify schema version
+                    using (DataContext mdc = this.GetConfiguration().Provider.GetReadonlyConnection())
                     {
-                        var instance = Activator.CreateInstance(t, this);
-                        ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(instance);
+                        mdc.Open();
+                        Version dbVer = new Version(mdc.ExecuteProcedure<String>("get_sch_vrsn")),
+                            oizVer = typeof(AdoPersistenceService).Assembly.GetName().Version;
+
+                        if (oizVer < dbVer)
+                            throw new InvalidOperationException(String.Format("Invalid Schema Version. SanteDB version {0} is older than the database schema version {1}", oizVer, dbVer));
+                        this.m_tracer.TraceInfo("SanteDB Schema Version {0} on {1}", dbVer, this.GetConfiguration().Provider.Invariant);
                     }
-
-                    // Add to cache since we're here anyways
-
-                    //s_persistenceCache.Add(t.GetGenericArguments()[0], Activator.CreateInstance(t) as IAdoPersistenceService);
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(EventLevel.Error, "Error adding service {0} : {1}", t.AssemblyQualifiedName, e);
-                    throw new InvalidOperationException($"Error adding service {t.AssemblyQualifiedName}", e);
+                    this.m_tracer.TraceEvent(EventLevel.Error, "Error starting ADO provider: {0}", e);
+                    throw new InvalidOperationException("Could not start up ADO provider", e);
                 }
-            }
 
-            // Now iterate through the map file and ensure we have all the mappings, if a class does not exist create it
-            try
-            {
-                this.m_tracer.TraceEvent(EventLevel.Informational, "Creating secondary model maps...");
-
-                var map = ModelMap.Load(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName));
-                foreach (var itm in map.Class)
+                // Iterate the persistence services
+                foreach (var t in typeof(AdoPersistenceService).Assembly.ExportedTypes.Where(o => o.Namespace == "SanteDB.Persistence.Data.ADO.Services.Persistence" && !o.IsAbstract && !o.IsGenericTypeDefinition))
                 {
-                    // Is there a persistence service?
-                    var idpType = typeof(IDataPersistenceService<>);
-                    Type modelClassType = Type.GetType(itm.ModelClass),
-                        domainClassType = Type.GetType(itm.DomainClass);
-
-                    // Make sure we're allowed to run this
-                    if (this.GetConfiguration().AllowedResources.Count > 0 &&
-                        !this.GetConfiguration().AllowedResources.Contains(modelClassType.GetCustomAttribute<XmlTypeAttribute>()?.TypeName))
-                        continue;
-
-                    idpType = idpType.MakeGenericType(modelClassType);
-
-                    if (modelClassType.IsAbstract || domainClassType.IsAbstract) continue;
-
-                    // Already created
-                    if (ApplicationServiceContext.Current.GetService(idpType) != null)
-                        continue;
-
-                    this.m_tracer.TraceEvent(EventLevel.Verbose, "Creating map {0} > {1}", modelClassType, domainClassType);
-
-                    if (this.m_persistenceCache.ContainsKey(modelClassType))
-                        this.m_tracer.TraceWarning("Duplicate initialization of {0}", modelClassType);
-                    else if (modelClassType.Implements(typeof(IBaseEntityData)) &&
-                       domainClassType.Implements(typeof(IDbBaseData)))
+                    try
                     {
-                        // Construct a type
-                        Type pclass = null;
-                        if (modelClassType.Implements(typeof(IVersionedAssociation)))
-                            pclass = typeof(GenericBaseVersionedAssociationPersistenceService<,>);
-                        else if (modelClassType.Implements(typeof(ISimpleAssociation)))
-                            pclass = typeof(GenericBaseAssociationPersistenceService<,>);
-                        else
-                            pclass = typeof(GenericBasePersistenceService<,>);
-                        pclass = pclass.MakeGenericType(modelClassType, domainClassType);
-                        var instance = Activator.CreateInstance(pclass, this);
-                        ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(instance);
+                        this.m_tracer.TraceEvent(EventLevel.Informational, "Loading {0}...", t.AssemblyQualifiedName);
+
+                        // If the persistence service is generic then we should check if we're allowed
+                        if (!t.IsGenericType ||
+                            t.IsGenericType && (this.GetConfiguration().AllowedResources.Count == 0 ||
+                            this.GetConfiguration().AllowedResources.Contains(t.GetGenericArguments()[0].GetCustomAttribute<XmlTypeAttribute>()?.TypeName)))
+                        {
+                            var instance = Activator.CreateInstance(t, this);
+                            ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(instance);
+                        }
+
                         // Add to cache since we're here anyways
-                        this.m_persistenceCache.Add(modelClassType, instance as IAdoPersistenceService);
+
+                        //s_persistenceCache.Add(t.GetGenericArguments()[0], Activator.CreateInstance(t) as IAdoPersistenceService);
                     }
-                    else if (modelClassType.Implements(typeof(IIdentifiedEntity)) &&
-                        domainClassType.Implements(typeof(IDbIdentified)))
+                    catch (Exception e)
                     {
-                        // Construct a type
-                        Type pclass = null;
-                        if (modelClassType.Implements(typeof(IVersionedAssociation)))
-                            pclass = typeof(GenericIdentityVersionedAssociationPersistenceService<,>);
-                        else if (modelClassType.Implements(typeof(ISimpleAssociation)))
-                            pclass = typeof(GenericIdentityAssociationPersistenceService<,>);
-                        else
-                            pclass = typeof(GenericIdentityPersistenceService<,>);
-
-                        pclass = pclass.MakeGenericType(modelClassType, domainClassType);
-                        var instance = Activator.CreateInstance(pclass, this);
-                        ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(instance);
-                        this.m_persistenceCache.Add(modelClassType, instance as IAdoPersistenceService);
+                        this.m_tracer.TraceEvent(EventLevel.Error, "Error adding service {0} : {1}", t.AssemblyQualifiedName, e);
+                        throw new InvalidOperationException($"Error adding service {t.AssemblyQualifiedName}", e);
                     }
-                    else
-                        this.m_tracer.TraceEvent(EventLevel.Warning, "Classmap {0}>{1} cannot be created, ignoring", modelClassType, domainClassType);
-
                 }
-            }
-            catch (Exception e)
-            {
-                this.m_tracer.TraceEvent(EventLevel.Error, "Error initializing local persistence: {0}", e);
-                throw new Exception("Error initializing local persistence", e);
-            }
 
-            // Bind BI stuff
-            ApplicationServiceContext.Current.GetService<IBiMetadataRepository>()?.Insert(new SanteDB.BI.Model.BiDataSourceDefinition()
-            {
-                IsSystemObject = true,
-                MetaData = new BiMetadata()
+                // Now iterate through the map file and ensure we have all the mappings, if a class does not exist create it
+                try
                 {
-                    Version = typeof(AdoPersistenceService).Assembly.GetName().Version.ToString(),
-                    Status = BiDefinitionStatus.Active,
-                },
-                Id = "org.santedb.bi.dataSource.main",
-                Name = "main",
-                ConnectionString = this.m_configuration.ReadonlyConnectionString,
-                ProviderType = typeof(OrmBiDataProvider)
-            });
+                    this.m_tracer.TraceEvent(EventLevel.Informational, "Creating secondary model maps...");
 
-            // Bind some basic service stuff
-            ApplicationServiceContext.Current.GetService<IDataPersistenceService<Core.Model.Security.SecurityUser>>().Inserting += (o, e) =>
-            {
-                if (String.IsNullOrEmpty(e.Data.SecurityHash))
+                    var map = ModelMap.Load(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName));
+                    foreach (var itm in map.Class)
+                    {
+                        // Is there a persistence service?
+                        var idpType = typeof(IDataPersistenceService<>);
+                        Type modelClassType = Type.GetType(itm.ModelClass),
+                            domainClassType = Type.GetType(itm.DomainClass);
+
+                        // Make sure we're allowed to run this
+                        if (this.GetConfiguration().AllowedResources.Count > 0 &&
+                            !this.GetConfiguration().AllowedResources.Contains(modelClassType.GetCustomAttribute<XmlTypeAttribute>()?.TypeName))
+                            continue;
+
+                        idpType = idpType.MakeGenericType(modelClassType);
+
+                        if (modelClassType.IsAbstract || domainClassType.IsAbstract) continue;
+
+                        // Already created
+                        if (ApplicationServiceContext.Current.GetService(idpType) != null)
+                            continue;
+
+                        this.m_tracer.TraceEvent(EventLevel.Verbose, "Creating map {0} > {1}", modelClassType, domainClassType);
+
+                        if (this.m_persistenceCache.ContainsKey(modelClassType))
+                            this.m_tracer.TraceWarning("Duplicate initialization of {0}", modelClassType);
+                        else if (modelClassType.Implements(typeof(IBaseEntityData)) &&
+                           domainClassType.Implements(typeof(IDbBaseData)))
+                        {
+                            // Construct a type
+                            Type pclass = null;
+                            if (modelClassType.Implements(typeof(IVersionedAssociation)))
+                                pclass = typeof(GenericBaseVersionedAssociationPersistenceService<,>);
+                            else if (modelClassType.Implements(typeof(ISimpleAssociation)))
+                                pclass = typeof(GenericBaseAssociationPersistenceService<,>);
+                            else
+                                pclass = typeof(GenericBasePersistenceService<,>);
+                            pclass = pclass.MakeGenericType(modelClassType, domainClassType);
+                            var instance = Activator.CreateInstance(pclass, this);
+                            ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(instance);
+                            // Add to cache since we're here anyways
+                            this.m_persistenceCache.Add(modelClassType, instance as IAdoPersistenceService);
+                        }
+                        else if (modelClassType.Implements(typeof(IIdentifiedEntity)) &&
+                            domainClassType.Implements(typeof(IDbIdentified)))
+                        {
+                            // Construct a type
+                            Type pclass = null;
+                            if (modelClassType.Implements(typeof(IVersionedAssociation)))
+                                pclass = typeof(GenericIdentityVersionedAssociationPersistenceService<,>);
+                            else if (modelClassType.Implements(typeof(ISimpleAssociation)))
+                                pclass = typeof(GenericIdentityAssociationPersistenceService<,>);
+                            else
+                                pclass = typeof(GenericIdentityPersistenceService<,>);
+
+                            pclass = pclass.MakeGenericType(modelClassType, domainClassType);
+                            var instance = Activator.CreateInstance(pclass, this);
+                            ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(instance);
+                            this.m_persistenceCache.Add(modelClassType, instance as IAdoPersistenceService);
+                        }
+                        else
+                            this.m_tracer.TraceEvent(EventLevel.Warning, "Classmap {0}>{1} cannot be created, ignoring", modelClassType, domainClassType);
+
+                    }
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceEvent(EventLevel.Error, "Error initializing local persistence: {0}", e);
+                    throw new Exception("Error initializing local persistence", e);
+                }
+
+                // Bind BI stuff
+                ApplicationServiceContext.Current.GetService<IBiMetadataRepository>()?.Insert(new SanteDB.BI.Model.BiDataSourceDefinition()
+                {
+                    IsSystemObject = true,
+                    MetaData = new BiMetadata()
+                    {
+                        Version = typeof(AdoPersistenceService).Assembly.GetName().Version.ToString(),
+                        Status = BiDefinitionStatus.Active,
+                    },
+                    Id = "org.santedb.bi.dataSource.main",
+                    Name = "main",
+                    ConnectionString = this.m_configuration.ReadonlyConnectionString,
+                    ProviderType = typeof(OrmBiDataProvider)
+                });
+
+                // Bind some basic service stuff
+                ApplicationServiceContext.Current.GetService<IDataPersistenceService<Core.Model.Security.SecurityUser>>().Inserting += (o, e) =>
+                {
+                    if (String.IsNullOrEmpty(e.Data.SecurityHash))
+                        e.Data.SecurityHash = Guid.NewGuid().ToString();
+                };
+                ApplicationServiceContext.Current.GetService<IDataPersistenceService<Core.Model.Security.SecurityUser>>().Updating += (o, e) =>
+                {
                     e.Data.SecurityHash = Guid.NewGuid().ToString();
-            };
-            ApplicationServiceContext.Current.GetService<IDataPersistenceService<Core.Model.Security.SecurityUser>>().Updating += (o, e) =>
-            {
-                e.Data.SecurityHash = Guid.NewGuid().ToString();
-            };
+                };
 
-            // Unload configuration when app domain unloads
-            ApplicationServiceContext.Current.Stopped += (o, e) => this.m_configuration = null;
+                // Unload configuration when app domain unloads
+                ApplicationServiceContext.Current.Stopped += (o, e) => this.m_configuration = null;
 
-            // Attempt to cache concepts
-            this.m_tracer.TraceEvent(EventLevel.Verbose, "Caching concept dictionary...");
-            this.m_running = true;
-            this.Started?.Invoke(this, EventArgs.Empty);
+                // Attempt to cache concepts
+                this.m_tracer.TraceEvent(EventLevel.Verbose, "Caching concept dictionary...");
+                this.m_running = true;
+                this.Started?.Invoke(this, EventArgs.Empty);
 
-            return true;
+                return true;
+            }
         }
 
         /// <summary>

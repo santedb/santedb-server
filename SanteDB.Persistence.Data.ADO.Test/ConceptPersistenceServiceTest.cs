@@ -43,7 +43,8 @@ namespace SanteDB.Persistence.Data.ADO.Tests
         public void ClassSetup()
         {
             s_authorization = AuthenticationContext.SystemPrincipal;
-            AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
+            AuthenticationContext.EnterSystemContext();
+
 
         }
 

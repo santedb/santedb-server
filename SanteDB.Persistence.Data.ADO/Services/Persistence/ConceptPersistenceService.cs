@@ -29,6 +29,7 @@ using SanteDB.Persistence.Data.ADO.Data.Model.Security;
 using System;
 using System.Collections;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
@@ -188,6 +189,21 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             data.StatusConceptKey = StatusKeys.Obsolete;
             return base.UpdateInternal(context, data);
+        }
+
+        /// <summary>
+        /// Perform bulk purge on expression
+        /// </summary>
+        /// <remarks>Since there are so many dependent tables this really calls QueryKeys and then BulkPurge</remarks>
+        protected override void BulkPurgeInternal(DataContext connection, Expression<Func<Concept, bool>> expression)
+        {
+            int offset = 0, totalResults = 1;
+            while (offset < totalResults)
+            {
+                var k = this.QueryKeysInternal(connection, expression, offset, 1000, out totalResults).ToArray();
+                this.BulkPurgeInternal(connection, k);
+                offset += k.Length;
+            }
         }
 
         /// <summary>

@@ -31,8 +31,12 @@ namespace SanteDB.Server.AdminConsole.Security
     /// <summary>
     /// Represents a credential provider which provides a token
     /// </summary>
-    public class TokenCredentialProvider : ICredentialProvider
+    public class TokenCredentialProvider : ICredentialProvider, IDisposable
 	{
+
+        // Token cred
+        private IDisposable m_tokenCred = null;
+
 		#region ICredentialProvider implementation
 		/// <summary>
 		/// Gets or sets the credentials which are used to authenticate
@@ -45,7 +49,7 @@ namespace SanteDB.Server.AdminConsole.Security
                 AuthenticationContext.Current.Principal == AuthenticationContext.AnonymousPrincipal)
             {
                 var credentials = this.Authenticate(context);
-                AuthenticationContext.Current = new AuthenticationContext(credentials.Principal);
+                this.m_tokenCred = AuthenticationContext.EnterContext(credentials.Principal);
                 return credentials;
             }
             else
@@ -69,8 +73,8 @@ namespace SanteDB.Server.AdminConsole.Security
                 {
                     var idp = ApplicationContext.Current.GetService(typeof(IIdentityProviderService)) as IIdentityProviderService;
                     var principal = idp.Authenticate(null, null);   // Force a re-issue
-                    AuthenticationContext.Current = new AuthenticationContext(principal);
-                    //XamarinApplicationServiceContext.Current.SetDefaultPrincipal(principal);
+                    this.m_tokenCred = AuthenticationContext.EnterContext(principal);
+
                 }
                 else if (expiryTime > DateTime.Now) // Token is good?
                     return this.GetCredentials(context);
@@ -103,6 +107,14 @@ namespace SanteDB.Server.AdminConsole.Security
             }
         }
         #endregion
+
+        /// <summary>
+        /// Chain disposal
+        /// </summary>
+        public void Dispose()
+        {
+            this.m_tokenCred?.Dispose();
+        }
     }
 
 }

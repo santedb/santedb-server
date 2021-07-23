@@ -19,7 +19,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
         [SetUp]
         public void ClassSetup()
         {
-            AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
+            AuthenticationContext.EnterSystemContext();
         }
 
         /// <summary>

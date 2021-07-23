@@ -305,7 +305,10 @@ namespace SanteDB.Configuration
         /// </summary>
         public T GetSection<T>() where T : IConfigurationSection
         {
-            return this.Configuration.GetSection<T>();
+            if (this.Configuration == null)
+                return default(T);
+            else 
+                return this.Configuration.GetSection<T>();
         }
 
         /// <summary>
