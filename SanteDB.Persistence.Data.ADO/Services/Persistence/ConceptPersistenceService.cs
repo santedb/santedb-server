@@ -236,7 +236,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
 
                 context.Delete<DbConceptVersion>(o => batchKeys.Contains(o.Key));
-                context.Insert(cvers.Select(o => new DbConceptVersion()
+                context.InsertAll(cvers.Select(o => new DbConceptVersion()
                 {
                     Key = o.Key,
                     ClassKey = o.ClassKey,
@@ -257,7 +257,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public override void Copy(Guid[] keysToCopy, DataContext fromContext, DataContext toContext)
         {
             // Copy all code systems
-            toContext.InsertOrUpdate(fromContext.Query<DbCodeSystem>(o => o.ObsoletionTime == null));
+            toContext.InsertOrUpdateAll(fromContext.Query<DbCodeSystem>(o => o.ObsoletionTime == null));
 
             // Purge the related fields
             int ofs = 0;
@@ -267,7 +267,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 ofs += 100;
 
                 // copy core concepts
-                toContext.InsertOrUpdate(fromContext.Query<DbConcept>(o => batchKeys.Contains(o.Key)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbConcept>(o => batchKeys.Contains(o.Key)));
 
                 // Additional concept sreferenced
                 var extraKeys = fromContext.Query<DbConceptVersion>(o => batchKeys.Contains(o.Key))
@@ -283,7 +283,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         .Distinct()
                     )
                     .ToArray();
-                toContext.InsertOrUpdate(fromContext.Query<DbConcept>(o => extraKeys.Contains(o.Key)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbConcept>(o => extraKeys.Contains(o.Key)));
 
                 // Users 
                 extraKeys = fromContext.Query<DbConceptVersion>(o => batchKeys.Contains(o.Key))
@@ -298,34 +298,34 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         .Select(o=>o.Value)
                     )
                     .ToArray();
-                toContext.InsertOrUpdate(fromContext.Query<DbSecurityUser>(o => extraKeys.Contains(o.Key)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbSecurityUser>(o => extraKeys.Contains(o.Key)));
                 var extraSequence = fromContext.Query<DbConceptName>(o => batchKeys.Contains(o.SourceKey)).Select(o => o.EffectiveVersionSequenceId).Distinct().ToArray();
-                toContext.InsertOrUpdate(fromContext.Query<DbConceptVersion>(o => batchKeys.Contains(o.Key)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbConceptVersion>(o => batchKeys.Contains(o.Key)));
 
                 // Insert names
-                toContext.InsertOrUpdate(fromContext.Query<DbConceptName>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbConceptName>(o => batchKeys.Contains(o.SourceKey)));
 
                 // Grab reference terms
                 extraKeys = fromContext.Query<DbConceptReferenceTerm>(o => batchKeys.Contains(o.SourceKey))
                     .Select(o => o.TargetKey)
                     .Distinct()
                     .ToArray();
-                toContext.InsertOrUpdate(fromContext.Query<DbReferenceTerm>(o => extraKeys.Contains(o.Key)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbReferenceTerm>(o => extraKeys.Contains(o.Key)));
 
                 // Insert Reference term link
-                toContext.InsertOrUpdate(fromContext.Query<DbConceptReferenceTerm>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbConceptReferenceTerm>(o => batchKeys.Contains(o.SourceKey)));
 
                 // Insert relationship
-                toContext.InsertOrUpdate(fromContext.Query<DbConceptRelationshipType>(o => o.ObsoletionTime != null));
-                toContext.InsertOrUpdate(fromContext.Query<DbConceptRelationship>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbConceptRelationshipType>(o => o.ObsoletionTime != null));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbConceptRelationship>(o => batchKeys.Contains(o.SourceKey)));
 
                 // Insert sets
                 extraKeys = fromContext.Query<DbConceptSetConceptAssociation>(o => batchKeys.Contains(o.ConceptKey))
                     .Select(o => o.ConceptSetKey)
                     .Distinct()
                     .ToArray();
-                toContext.InsertOrUpdate(fromContext.Query<DbConceptSet>(o => extraKeys.Contains(o.Key)));
-                toContext.InsertOrUpdate(fromContext.Query<DbConceptSetConceptAssociation>(o => batchKeys.Contains(o.ConceptKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbConceptSet>(o => extraKeys.Contains(o.Key)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbConceptSetConceptAssociation>(o => batchKeys.Contains(o.ConceptKey)));
 
             }
 
@@ -364,38 +364,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override ConceptName InsertInternal(DataContext context, ConceptName data)
         {
-            // Does this inbound not have an ID, and if so, does the concept already have the same name language pair?
-            if (!data.Key.HasValue)
-            {
-                var existing = context.FirstOrDefault<DbConceptName>(o => o.Language == data.Language && o.SourceKey == data.SourceEntityKey && !o.ObsoleteVersionSequenceId.HasValue);
-                if (existing != null) // Obsolete the existing 
-                {
-                    existing.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence ?? context.FirstOrDefault<DbConceptVersion>(o => o.Key == data.SourceEntityKey && o.ObsoletionTime == null)?.VersionSequenceId;
-                    context.Update(existing);
-                }
-
-            }
-
+            
             // Remove concept from cache and create a new version
             ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(data.SourceEntityKey.Value);
-            var conceptVersion = context.FirstOrDefault<DbConceptVersion>(o => o.Key == data.SourceEntityKey.Value && o.ObsoletionTime == null);
-            var newVersion = new DbConceptVersion();
-            conceptVersion.ObsoletedByKey = context.ContextId;
-            conceptVersion.ObsoletionTime = DateTimeOffset.Now;
-            context.Update(conceptVersion);
-            
-            // Insert new version
-            conceptVersion.VersionSequenceId = null;
-            conceptVersion.ReplacesVersionKey = conceptVersion.VersionKey;
-
-            conceptVersion.VersionKey = Guid.Empty;
-            conceptVersion.ObsoletionTime = null;
-            conceptVersion.ObsoletedByKey = null;
-            conceptVersion.CreatedByKey = context.ContextId;
-            conceptVersion.CreationTime = default(DateTimeOffset);
-            conceptVersion= context.Insert(conceptVersion);
-
-            data.EffectiveVersionSequenceId = conceptVersion.VersionSequenceId;
+            if (!data.EffectiveVersionSequenceId.HasValue)
+            {
+                var conceptVersion = context.FirstOrDefault<DbConceptVersion>(o => o.Key == data.SourceEntityKey.Value && o.ObsoletionTime == null);
+                data.EffectiveVersionSequenceId = conceptVersion.VersionSequenceId;
+            }
             return base.InsertInternal(context, data);
 
         }

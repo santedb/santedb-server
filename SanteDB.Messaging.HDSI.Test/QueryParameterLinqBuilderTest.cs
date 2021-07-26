@@ -83,7 +83,7 @@ namespace SanteDB.Messaging.HDSI.Tests
 		[Test]
 		public void TestBuildFuzzyDate()
 		{
-            String expected = "o => ((o.DateOfBirth != null) AndAlso (((o.DateOfBirth.Value >= Convert(2015-01-01 12:00:00 AM)) AndAlso (o.DateOfBirth.Value <= Convert(2015-12-31 11:59:59 PM))) == True))";
+            String expected = $"o => ((o.DateOfBirth != null) AndAlso (((o.DateOfBirth.Value >= Convert({new DateTime(2015,01,01)})) AndAlso (o.DateOfBirth.Value <= Convert({new DateTime(2015, 12, 31, 23, 59, 59)}))) == True))";
 
             NameValueCollection httpQueryParameters = new NameValueCollection();
 			httpQueryParameters.Add("dateOfBirth", "~2015");
@@ -223,11 +223,11 @@ namespace SanteDB.Messaging.HDSI.Tests
 			var dtString = new DateTime(1999, 01, 01);
             var tzo = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
 
-            String expected = "o => ((o.StartTime != null) AndAlso (o.StartTime.Value > 1999-01-01";
+            String expected = $"o => ((o.StartTime != null) AndAlso (o.StartTime.Value > {dtString}";
 			NameValueCollection httpQueryParameters = new NameValueCollection();
 			httpQueryParameters.Add("startTime", ">" + dtString);
 			var expr = QueryExpressionParser.BuildLinqExpression<Act>(httpQueryParameters);
-			Assert.IsTrue(expr.ToString().StartsWith(expected), "Expression not as expected");
+			Assert.IsTrue(expr.ToString().StartsWith(expected));
 		}
 
 		/// <summary>
@@ -324,10 +324,10 @@ namespace SanteDB.Messaging.HDSI.Tests
         [Test]
         public void TestExtendedQueryFilterWithParameterParse()
         {
-            var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx(2018-01-01 12:00:00 AM) > 7305.00:00:00))";
+            var expected = $"o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx({new DateTime(2018,01,01)}) > 7300.00:00:00))";
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());
             NameValueCollection httpQueryParameters = new NameValueCollection();
-            httpQueryParameters.Add("dateOfBirth", ":(testEx|2018-01-01)>p20y");
+            httpQueryParameters.Add("dateOfBirth", ":(testEx|2018-01-01)>P20Y");
             var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
             Assert.AreEqual(expected, expr.ToString());
         }
@@ -338,7 +338,7 @@ namespace SanteDB.Messaging.HDSI.Tests
         [Test]
         public void TestExtendedQueryFilterWithParameterVariableParse()
         {
-            var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx(Convert(Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableParse>b__18_0()))) > 7305.00:00:00))";
+            var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx(Convert(Convert(value(SanteDB.Messaging.HDSI.Tests.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableParse>b__20_0()))) > 7305.00:00:00))";
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add("dateOfBirth", ":(testEx|$dateOfBirth)>20y");
@@ -355,7 +355,7 @@ namespace SanteDB.Messaging.HDSI.Tests
         [Test]
         public void TestExtendedQueryFilterWithParameterVariablePathParse()
         {
-            var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => __xinstance.DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariablePathParse>b__19_0())) ?? default(DateTime))) > 730.12:00:00))";
+            var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => __xinstance.DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Tests.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariablePathParse>b__21_0())) ?? default(DateTime))) > 730.12:00:00))";
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add("dateOfBirth", ":(testEx|$input.dateOfBirth)>2y");
@@ -372,7 +372,7 @@ namespace SanteDB.Messaging.HDSI.Tests
         [Test]
         public void TestExtendedQueryFilterWithParameterVariableComplexPathParse()
         {
-            var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => (((__xinstance.Relationships.Where(guard => ((guard.LoadProperty(\"RelationshipType\") ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).TargetEntity As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__20_0())) ?? default(DateTime))) > 730.12:00:00))";
+            var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => (((__xinstance.LoadCollection(\"Relationships\", False).Where(guard => ((guard.LoadProperty(\"RelationshipType\", False) ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).LoadProperty(\"TargetEntity\", False) As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Tests.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__22_0())) ?? default(DateTime))) > 730.12:00:00))";
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add("dateOfBirth", ":(testEx|$input.relationship[Mother].target@Patient.dateOfBirth)>2y");
@@ -389,10 +389,10 @@ namespace SanteDB.Messaging.HDSI.Tests
         [Test]
         public void TestExtendedQueryFilterWithParameterVariableCrossReference()
         {
-            var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => (((__xinstance.Relationships.Where(guard => ((guard.LoadProperty(\"RelationshipType\") ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).TargetEntity As Patient) ?? new Patient()).DateOfBirth, o) ?? default(DateTime))) > 7305.00:00:00))";
+            var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => (((__xinstance.LoadCollection(\"Relationships\", False).Where(guard => ((guard.LoadProperty(\"RelationshipType\", False) ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).LoadProperty(\"TargetEntity\", False) As Patient) ?? new Patient()).DateOfBirth, o) ?? default(DateTime))) > 7300.00:00:00))";
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());
             NameValueCollection httpQueryParameters = new NameValueCollection();
-            httpQueryParameters.Add("dateOfBirth", ":(testEx|$_.relationship[Mother].target@Patient.dateOfBirth)>20y");
+            httpQueryParameters.Add("dateOfBirth", ":(testEx|$_.relationship[Mother].target@Patient.dateOfBirth)>P20Y");
             var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
             Assert.AreEqual(expected, expr.ToString());
         }

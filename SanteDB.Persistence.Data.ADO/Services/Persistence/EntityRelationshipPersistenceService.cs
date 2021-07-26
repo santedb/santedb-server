@@ -95,6 +95,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Lookup the original 
             if (!data.EffectiveVersionSequenceId.HasValue)
                 data.EffectiveVersionSequenceId = context.FirstOrDefault<DbEntityVersion>(o => o.Key == data.SourceEntityKey)?.VersionSequenceId;
+            else if (data.ObsoleteVersionSequenceId.HasValue) // No sense in inserting an obsolete object
+                return data;
 
             // Duplicate check  
             var existing = context.FirstOrDefault<DbEntityRelationship>(r => r.SourceKey == data.SourceEntityKey && r.TargetKey == data.TargetEntityKey && r.RelationshipTypeKey == data.RelationshipTypeKey && !r.ObsoleteVersionSequenceId.HasValue);

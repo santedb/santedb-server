@@ -40,7 +40,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
         private static SecurityPolicy s_chickenCostumePolicy;
         private static IPrincipal s_authorization;
 
-        [SetUp]
+        [OneTimeSetUp]
         public void ClassSetup()
         {
 

@@ -76,9 +76,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// TODO: Refactor this (clean it up)
         private Bundle ReorganizeForInsert(Bundle bundle)
         {
+            // Assign keys to missing objects
+            bundle.Item.Where(o => !o.Key.HasValue).ToList().ForEach(o => o.Key = Guid.NewGuid());
+
             Bundle retVal = new Bundle() { Item = new List<IdentifiedData>() };
             foreach (var itm in bundle.Item.Where(o => o != null).Distinct())
             {
+
                 this.m_tracer.TraceVerbose("Reorganizing {0}..", itm.Key);
                 var idx = retVal.Item.FindIndex(o => o.Key == itm.Key);
 

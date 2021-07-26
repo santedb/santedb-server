@@ -809,6 +809,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 context.Delete<DbDeviceEntity>(o => versionKeys.Contains(o.ParentKey));
                 context.Delete<DbApplicationEntity>(o => versionKeys.Contains(o.ParentKey));
                 context.Delete<DbPlace>(o => versionKeys.Contains(o.ParentKey));
+                context.Delete<DbOrganization>(o => versionKeys.Contains(o.ParentKey));
                 context.Delete<DbManufacturedMaterial>(o => versionKeys.Contains(o.ParentKey));
                 context.Delete<DbMaterial>(o => versionKeys.Contains(o.ParentKey));
                 // Purge the related entity fields
@@ -850,7 +851,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 context.Delete<DbEntityVersion>(o => batchKeys.Contains(o.Key));
                 
                 // Create a version which indicates this is PURGED
-                context.Insert(
+                context.InsertAll(
                     context.Query<DbEntity>(o=>batchKeys.Contains(o.Key))
                     .Select(o=>o.Key)
                     .Distinct()
@@ -876,8 +877,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             // TODO:Clean this mess up
 
-            toContext.InsertOrUpdate(fromContext.Query<DbPhoneticValue>(o => o.SequenceId >= 0));
-            toContext.InsertOrUpdate(fromContext.Query<DbEntityAddressComponentValue>(o => o.SequenceId >= 0));
+            toContext.InsertOrUpdateAll(fromContext.Query<DbPhoneticValue>(o => o.SequenceId >= 0));
+            toContext.InsertOrUpdateAll(fromContext.Query<DbEntityAddressComponentValue>(o => o.SequenceId >= 0));
 
             // Copy over users and protocols and other act tables
             IEnumerable<Guid> additionalKeys = fromContext.Query<DbExtensionType>(o => o.ObsoletionTime == null)
@@ -899,16 +900,16 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     .Distinct()
                 )
                 .ToArray();
-            toContext.InsertOrUpdate(fromContext.Query<DbSecurityProvenance>(o => additionalKeys.Contains(o.Key)));
-            toContext.InsertOrUpdate(fromContext.Query<DbExtensionType>(o => o.ObsoletionTime == null));
-            toContext.InsertOrUpdate(fromContext.Query<DbTemplateDefinition>(o => o.ObsoletionTime == null));
+            toContext.InsertOrUpdateAll(fromContext.Query<DbSecurityProvenance>(o => additionalKeys.Contains(o.Key)));
+            toContext.InsertOrUpdateAll(fromContext.Query<DbExtensionType>(o => o.ObsoletionTime == null));
+            toContext.InsertOrUpdateAll(fromContext.Query<DbTemplateDefinition>(o => o.ObsoletionTime == null));
 
             additionalKeys = fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null)
                 .Select(o => o.AssigningApplicationKey).Distinct().ToArray()
                 .Where(o => o.HasValue)
                 .Select(o => o.Value);
 
-            toContext.InsertOrUpdate(fromContext.Query<DbSecurityApplication>(o => additionalKeys.Contains(o.Key)).ToArray().Select(o=>new DbSecurityApplication()
+            toContext.InsertOrUpdateAll(fromContext.Query<DbSecurityApplication>(o => additionalKeys.Contains(o.Key)).ToArray().Select(o=>new DbSecurityApplication()
             {   
                 Key = o.Key,
                 CreatedByKey = o.CreatedByKey,
@@ -923,7 +924,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 UpdatedByKey = o.UpdatedByKey,
                 UpdatedTime = o.UpdatedTime
             }));
-            toContext.InsertOrUpdate(fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null));
+            toContext.InsertOrUpdateAll(fromContext.Query<DbAssigningAuthority>(o => o.ObsoletionTime == null));
 
             additionalKeys = fromContext.Query<DbEntityRelationship>(o => o.ObsoleteVersionSequenceId == null)
                    .Select(o => o.RelationshipTypeKey)
@@ -975,11 +976,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     .Where(o=>o.HasValue)
                     .Select(o=>o.Value)
                 ).ToArray();
-            toContext.InsertOrUpdate(fromContext.Query<DbConceptClass>(o => true));
-            toContext.InsertOrUpdate(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
-            toContext.InsertOrUpdate(fromContext.Query<DbConceptVersion>(o => additionalKeys.Contains(o.Key)).OrderBy(o => o.VersionSequenceId));
-            toContext.InsertOrUpdate(fromContext.Query<DbConceptSet>(o => true));
-            toContext.InsertOrUpdate(fromContext.Query<DbConceptSetConceptAssociation>(o => additionalKeys.Contains(o.ConceptKey)));
+            toContext.InsertOrUpdateAll(fromContext.Query<DbConceptClass>(o => true));
+            toContext.InsertOrUpdateAll(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
+            toContext.InsertOrUpdateAll(fromContext.Query<DbConceptVersion>(o => additionalKeys.Contains(o.Key)).OrderBy(o => o.VersionSequenceId));
+            toContext.InsertOrUpdateAll(fromContext.Query<DbConceptSet>(o => true));
+            toContext.InsertOrUpdateAll(fromContext.Query<DbConceptSetConceptAssociation>(o => additionalKeys.Contains(o.ConceptKey)));
 
             // Purge the related fields
             int ofs = 0;
@@ -991,10 +992,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 var versionKeys = fromContext.Query<DbEntityVersion>(o => batchKeys.Contains(o.Key)).Select(o => o.VersionKey).ToArray();
 
                 // copy the core entity data
-                toContext.InsertOrUpdate(fromContext.Query<DbEntity>(o => batchKeys.Contains(o.Key)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbEntity>(o => batchKeys.Contains(o.Key)));
 
                 // copy the core entity data
-                toContext.InsertOrUpdate(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
 
                 // Copy provenance of interest
                 additionalKeys = fromContext.Query<DbEntityVersion>(o => batchKeys.Contains(o.Key))
@@ -1009,55 +1010,55 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         .Select(o => o.Value)
                     )
                     .ToArray();
-                toContext.InsertOrUpdate(fromContext.Query<DbSecurityProvenance>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbSecurityProvenance>(o => additionalKeys.Contains(o.Key)));
 
-                toContext.InsertOrUpdate(fromContext.Query<DbEntityVersion>(o => batchKeys.Contains(o.Key)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbEntityVersion>(o => batchKeys.Contains(o.Key)));
 
                 additionalKeys = fromContext.Query<DbPlaceService>(o => batchKeys.Contains(o.SourceKey))
                     .Select(o => o.ServiceConceptKey)
                     .Distinct()
                     .ToArray();
-                toContext.InsertOrUpdate(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
-                toContext.InsertOrUpdate(fromContext.Query<DbPlaceService>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbPlaceService>(o => batchKeys.Contains(o.SourceKey)));
 
                 // Person fields
-                toContext.InsertOrUpdate(fromContext.Query<DbPerson>(o => versionKeys.Contains(o.ParentKey)));
-                toContext.InsertOrUpdate(fromContext.Query<DbPersonLanguageCommunication>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbPerson>(o => versionKeys.Contains(o.ParentKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbPersonLanguageCommunication>(o => batchKeys.Contains(o.SourceKey)));
 
                 // Copy versions of persons
-                toContext.InsertOrUpdate(fromContext.Query<DbPatient>(o => versionKeys.Contains(o.ParentKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbPatient>(o => versionKeys.Contains(o.ParentKey)));
 
                 additionalKeys = fromContext.Query<DbProvider>(o => versionKeys.Contains(o.ParentKey))
                     .Select(o => o.Specialty)
                     .Distinct()
                     .ToArray();
-                toContext.InsertOrUpdate(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
 
-                toContext.InsertOrUpdate(fromContext.Query<DbProvider>(o => versionKeys.Contains(o.ParentKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbProvider>(o => versionKeys.Contains(o.ParentKey)));
 
                 // Security Users
                 additionalKeys = fromContext.Query<DbUserEntity>(o => versionKeys.Contains(o.ParentKey))
                     .Select(o => o.SecurityUserKey)
                     .Distinct()
                     .ToArray();
-                toContext.InsertOrUpdate(fromContext.Query<DbSecurityUser>(o => additionalKeys.Contains(o.Key)));
-                toContext.InsertOrUpdate(fromContext.Query<DbUserEntity>(o => versionKeys.Contains(o.ParentKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbSecurityUser>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbUserEntity>(o => versionKeys.Contains(o.ParentKey)));
 
                 // Other entities
                 additionalKeys = fromContext.Query<DbDeviceEntity>(o => versionKeys.Contains(o.ParentKey))
                     .Select(o => o.SecurityDeviceKey)
                     .Distinct()
                     .ToArray();
-                toContext.InsertOrUpdate(fromContext.Query<DbSecurityDevice>(o => additionalKeys.Contains(o.Key)));
-                toContext.InsertOrUpdate(fromContext.Query<DbDeviceEntity>(o => versionKeys.Contains(o.ParentKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbSecurityDevice>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbDeviceEntity>(o => versionKeys.Contains(o.ParentKey)));
 
                 additionalKeys = fromContext.Query<DbApplicationEntity>(o => versionKeys.Contains(o.ParentKey))
                    .Select(o => o.SecurityApplicationKey)
                    .Distinct()
                    .ToArray();
-                toContext.InsertOrUpdate(fromContext.Query<DbSecurityApplication>(o => additionalKeys.Contains(o.Key)));
-                toContext.InsertOrUpdate(fromContext.Query<DbApplicationEntity>(o => versionKeys.Contains(o.ParentKey)));
-                toContext.InsertOrUpdate(fromContext.Query<DbPlace>(o => versionKeys.Contains(o.ParentKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbSecurityApplication>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbApplicationEntity>(o => versionKeys.Contains(o.ParentKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbPlace>(o => versionKeys.Contains(o.ParentKey)));
 
                 // Person fields
                 additionalKeys = fromContext.Query<DbMaterial>(o => versionKeys.Contains(o.ParentKey))
@@ -1069,46 +1070,46 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         .Distinct()
                     )
                     .ToArray();
-                toContext.InsertOrUpdate(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
-                toContext.InsertOrUpdate(fromContext.Query<DbMaterial>(o => versionKeys.Contains(o.ParentKey)));
-                toContext.InsertOrUpdate(fromContext.Query<DbManufacturedMaterial>(o => versionKeys.Contains(o.ParentKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbConcept>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbMaterial>(o => versionKeys.Contains(o.ParentKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbManufacturedMaterial>(o => versionKeys.Contains(o.ParentKey)));
 
                 // Names
-                toContext.InsertOrUpdate(fromContext.Query<DbEntityName>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbEntityName>(o => batchKeys.Contains(o.SourceKey)));
 
                 // Insert component links
                 var selectStatement = fromContext.CreateSqlStatement<DbEntityNameComponent>()
                     .SelectFrom()
                     .InnerJoin<DbEntityNameComponent, DbEntityName>(o => o.SourceKey, o => o.Key)
                     .Where<DbEntityName>(o => batchKeys.Contains(o.SourceKey));
-                toContext.InsertOrUpdate(fromContext.Query<DbEntityNameComponent>(selectStatement));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbEntityNameComponent>(selectStatement));
 
                 // Addresses
                 
-                toContext.InsertOrUpdate(fromContext.Query<DbEntityAddress>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbEntityAddress>(o => batchKeys.Contains(o.SourceKey)));
 
                 selectStatement = fromContext.CreateSqlStatement<DbEntityAddressComponent>()
                     .SelectFrom()
                     .InnerJoin<DbEntityAddressComponent, DbEntityAddress>(o => o.SourceKey, o => o.Key)
                     .Where<DbEntityAddress>(o => batchKeys.Contains(o.SourceKey));
-                toContext.InsertOrUpdate(fromContext.Query<DbEntityAddressComponent>(selectStatement));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbEntityAddressComponent>(selectStatement));
 
                 // Other Relationships
-                toContext.InsertOrUpdate(fromContext.Query<DbEntityIdentifier>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbEntityIdentifier>(o => batchKeys.Contains(o.SourceKey)));
 
                 // Entity Extension types
-                toContext.InsertOrUpdate(fromContext.Query<DbEntityExtension>(o => batchKeys.Contains(o.SourceKey)));
-                toContext.InsertOrUpdate(fromContext.Query<DbEntityTag>(o => batchKeys.Contains(o.SourceKey)));
-                toContext.InsertOrUpdate(fromContext.Query<DbEntityNote>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbEntityExtension>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbEntityTag>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbEntityNote>(o => batchKeys.Contains(o.SourceKey)));
 
                 additionalKeys = fromContext.Query<DbEntityRelationship>(o => batchKeys.Contains(o.SourceKey))
                     .Select(o => o.TargetKey)
                     .Distinct()
                     .ToArray();
-                toContext.InsertOrUpdate(fromContext.Query<DbEntity>(o => additionalKeys.Contains(o.Key)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbEntity>(o => additionalKeys.Contains(o.Key)));
 
                
-                toContext.InsertOrUpdate(fromContext.Query<DbEntityRelationship>(o => batchKeys.Contains(o.SourceKey)));
+                toContext.InsertOrUpdateAll(fromContext.Query<DbEntityRelationship>(o => batchKeys.Contains(o.SourceKey)));
             }
 
             toContext.ResetSequence("ENT_VRSN_SEQ", toContext.Query<DbEntityVersion>(o => true).Max(o => o.VersionSequenceId));
