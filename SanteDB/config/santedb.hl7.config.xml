@@ -32,11 +32,11 @@
         </sllp>
         -->
         <handler>
-          <add type="SanteDB.Messaging.HL7.Messages.QbpMessageHandler, SanteDB.Messaging.HL7, Version=1.10.0.0">
+          <add type="SanteDB.Messaging.HL7.Messages.QbpMessageHandler, SanteDB.Messaging.HL7">
             <message isQuery="true" name="QBP^Q22" />
             <message isQuery="true" name="QBP^Q23" />
           </add>
-          <add type="SanteDB.Messaging.HL7.Messages.AdtMessageHandler, SanteDB.Messaging.HL7, Version=1.10.0.0">
+          <add type="SanteDB.Messaging.HL7.Messages.AdtMessageHandler, SanteDB.Messaging.HL7">
             <message isQuery="false" name="ADT^A01"/>
             <message isQuery="false" name="ADT^A04"/>
             <message isQuery="false" name="ADT^A08"/>

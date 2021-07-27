@@ -117,8 +117,8 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         [XmlArray("resources"), XmlArrayItem("add")]
         [DisplayName("Allowed Resources")]
         [Description("When set, instructs the provider to only provide access for the specified types")]
-        [Editor("SanteDB.Configuration.Editors.ResourceCollectionEditor, SanteDB.Configuration, Version=1.10.0.0", "System.Drawing.Design.UITypeEditor, System.Drawing, Version=4.0.0.0")]
-        [TypeConverter("SanteDB.Configuration.Converters.StringCollectionRenderConverter, SanteDB.Configuration, Version=1.10.0.0")]
+        [Editor("SanteDB.Configuration.Editors.ResourceCollectionEditor, SanteDB.Configuration", "System.Drawing.Design.UITypeEditor, System.Drawing, Version=4.0.0.0")]
+        [TypeConverter("SanteDB.Configuration.Converters.StringCollectionRenderConverter, SanteDB.Configuration")]
         public List<String> AllowedResources { get; set; }
 
         /// <summary>

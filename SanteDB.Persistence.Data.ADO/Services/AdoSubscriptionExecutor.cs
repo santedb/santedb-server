@@ -284,10 +284,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 result = resultObjects
                                     .Take(count ?? 100)
                                 .OfType<Object>()
-                                .ToList()
-                                .AsParallel()
-                                .AsOrdered()
-                                .WithDegreeOfParallelism(2)
                                 .Select(o =>
                                 {
                                     try

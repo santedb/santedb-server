@@ -76,9 +76,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// TODO: Refactor this (clean it up)
         private Bundle ReorganizeForInsert(Bundle bundle)
         {
+            // Assign keys to missing objects
+            bundle.Item.Where(o => !o.Key.HasValue).ToList().ForEach(o => o.Key = Guid.NewGuid());
+
             Bundle retVal = new Bundle() { Item = new List<IdentifiedData>() };
             foreach (var itm in bundle.Item.Where(o => o != null).Distinct())
             {
+
                 this.m_tracer.TraceVerbose("Reorganizing {0}..", itm.Key);
                 var idx = retVal.Item.FindIndex(o => o.Key == itm.Key);
 
@@ -91,7 +95,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                         // Get the target that this rel points to
                         var targetEntity = bundle.Item.FirstOrDefault(o => o.Key == rel.TargetEntityKey);
-                        if (targetEntity == null) continue;
+                        if (targetEntity == null) 
+                            continue;
 
                         if (retVal.Item.Any(o => o.Key == rel.TargetEntityKey))
                             continue;
@@ -269,7 +274,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             context.PrepareStatements = this.m_settingsProvider.GetConfiguration().PrepareStatements;
 
             // Ensure that provenance objects match
-            var operationalItems = reorganized.Item.Where(o => !reorganized.ExpansionKeys.Any(k => o.Key == k)).ToArray();
+            var operationalItems = reorganized.Item.Where(o => reorganized.FocalObjects.Any(k => o.Key == k)).ToArray();
             var provenance = operationalItems.OfType<NonVersionedEntityData>().Select(o => o.UpdatedByKey.GetValueOrDefault()).Union(operationalItems.OfType<BaseEntityData>().Select(o => o.CreatedByKey.GetValueOrDefault())).Where(o => o != Guid.Empty);
             if (provenance.Distinct().Count() > 1)
                 this.m_tracer.TraceError("PROVENANCE OF OBJECTS DO NOT MATCH. WHEN A BUNDLE IS PERSISTED PROVENANCE DATA MUST BE NULL OR MUST MATCH. {0}", String.Join(",", provenance.Distinct().Select(o => o.ToString())));
@@ -278,8 +283,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
                 var itm = reorganized.Item[i];
                 var svc = this.m_settingsProvider.GetPersister(itm.GetType());
-
-                if (reorganized.ExpansionKeys.Any(k => itm.Key == k)) continue; // skip refs
 
                 this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)(i + 1) / reorganized.Item.Count, itm));
                 try

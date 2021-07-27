@@ -248,51 +248,52 @@ namespace SanteDB.Server.Core.Persistence
         /// </summary>
         public void InstallDataDirectory(EventHandler<ProgressChangedEventArgs> fileProgress = null)
         {
-            try
+            using (AuthenticationContext.EnterSystemContext())
             {
-                // Set system principal 
-                AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
-
-                String dataDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "data");
-                this.m_traceSource.TraceEvent(EventLevel.Verbose, "Scanning Directory {0} for datasets", dataDirectory);
-
-                XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(typeof(Dataset));
-                var datasetFiles = Directory.GetFiles(dataDirectory, "*.dataset");
-                datasetFiles = datasetFiles.OrderBy(o => Path.GetFileName(o)).ToArray();
-                int i = 0;
-                // Perform migrations
-                foreach (var f in datasetFiles)
+                try
                 {
 
-                    try
+                    String dataDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "data");
+                    this.m_traceSource.TraceEvent(EventLevel.Verbose, "Scanning Directory {0} for datasets", dataDirectory);
+
+                    XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(typeof(Dataset));
+                    var datasetFiles = Directory.GetFiles(dataDirectory, "*.dataset");
+                    datasetFiles = datasetFiles.OrderBy(o => Path.GetFileName(o)).ToArray();
+                    int i = 0;
+                    // Perform migrations
+                    foreach (var f in datasetFiles)
                     {
 
-                        var logFile = Path.ChangeExtension(f, "completed");
-                        if (File.Exists(logFile))
-                            continue; // skip
-
-                        using (var fs = File.OpenRead(f))
+                        try
                         {
-                            var ds = xsz.Deserialize(fs) as Dataset;
-                            fileProgress?.Invoke(this, new ProgressChangedEventArgs(++i / (float)datasetFiles.Length, ds.Id));
-                            this.m_traceSource.TraceEvent(EventLevel.Informational,  "Installing {0}...", Path.GetFileName(f));
-                            this.InstallDataset(ds);
+
+                            var logFile = Path.ChangeExtension(f, "completed");
+                            if (File.Exists(logFile))
+                                continue; // skip
+
+                            using (var fs = File.OpenRead(f))
+                            {
+                                var ds = xsz.Deserialize(fs) as Dataset;
+                                fileProgress?.Invoke(this, new ProgressChangedEventArgs(++i / (float)datasetFiles.Length, ds.Id));
+                                this.m_traceSource.TraceEvent(EventLevel.Informational, "Installing {0}...", Path.GetFileName(f));
+                                this.InstallDataset(ds);
+                            }
+
+
+                            File.Move(f, logFile);
                         }
-
-
-                        File.Move(f, logFile);
-                    }
-                    catch (Exception ex)
-                    {
-                        this.m_traceSource.TraceEvent(EventLevel.Error, "Error applying {0}: {1}", f, ex);
-                        throw;
+                        catch (Exception ex)
+                        {
+                            this.m_traceSource.TraceEvent(EventLevel.Error, "Error applying {0}: {1}", f, ex);
+                            throw;
+                        }
                     }
                 }
-            }
-            finally
-            {
-                this.m_traceSource.TraceEvent(EventLevel.Verbose, "Un-binding event handler");
-                ApplicationServiceContext.Current.Started -= this.m_persistenceHandler;
+                finally
+                {
+                    this.m_traceSource.TraceEvent(EventLevel.Verbose, "Un-binding event handler");
+                    ApplicationServiceContext.Current.Started -= this.m_persistenceHandler;
+                }
             }
         }
 

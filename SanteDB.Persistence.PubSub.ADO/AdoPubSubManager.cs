@@ -512,7 +512,7 @@ namespace SanteDB.Persistence.PubSub.ADO
             {
                 ChannelKey = channelId,
                 Event = events,
-                Filter = new List<string>() { hdsiFilter },
+                Filter = String.IsNullOrEmpty(hdsiFilter) ? null : new List<string>() { hdsiFilter },
                 IsActive = false,
                 Name = name,
                 Description = description,
@@ -552,12 +552,15 @@ namespace SanteDB.Persistence.PubSub.ADO
                         dbSubscription = conn.Insert(dbSubscription);
 
                         // Insert settings
-                        foreach (var itm in subscription.Filter)
-                            conn.Insert(new DbSubscriptionFilter()
-                            {
-                                SubscriptionKey = dbSubscription.Key.Value,
-                                Filter = itm
-                            });
+                        if (subscription.Filter != null)
+                        {
+                            foreach (var itm in subscription.Filter)
+                                conn.Insert(new DbSubscriptionFilter()
+                                {
+                                    SubscriptionKey = dbSubscription.Key.Value,
+                                    Filter = itm
+                                });
+                        }
 
                         tx.Commit();
 

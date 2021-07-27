@@ -48,7 +48,9 @@ namespace SanteDB.Persistence.Data.ADO.Tests
             foreach(var fi in typeof(PermissionPolicyIdentifiers).GetFields(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public))
             {
                 var fiv = fi.GetValue(null);
-                Assert.IsTrue(policies.Any(o => o.Oid == fiv.ToString()), $"Missing policy {fiv}");
+                if(!fiv.Equals( PermissionPolicyIdentifiers.AlterLocalIdentity) &&
+                    !fiv.Equals(PermissionPolicyIdentifiers.CreateLocalIdentity))
+                    Assert.IsTrue(policies.Any(o => o.Oid == fiv.ToString()), $"Missing policy {fiv}");
             }
         }
 

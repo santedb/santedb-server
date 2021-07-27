@@ -167,6 +167,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Bulk purge
         /// </summary>
+        protected override void BulkPurgeInternal(DataContext connection, Expression<Func<TModel, bool>> expression)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Bulk purge
+        /// </summary>
         protected override void BulkPurgeInternal(DataContext connection, Guid[] keysToPurge)
         {
             throw new NotSupportedException();

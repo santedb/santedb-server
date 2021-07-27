@@ -80,7 +80,8 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                 // If the current principal is set-up then add the identity if not then don't
                 if(AuthenticationContext.Current.Principal == AuthenticationContext.AnonymousPrincipal)
                 {
-                    AuthenticationContext.Current = new AuthenticationContext(principal);
+                    var contextToken = AuthenticationContext.EnterContext(principal);
+                    RestOperationContext.Current.Disposed += (o, e) => contextToken.Dispose();
                 }
                 else
                 {
@@ -88,7 +89,6 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                 }
 
                 // Disposed context so reset the auth
-                RestOperationContext.Current.Disposed += (o, e) => AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.AnonymousPrincipal);
             }
             catch (Exception e)
             {

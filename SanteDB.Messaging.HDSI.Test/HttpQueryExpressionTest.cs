@@ -78,7 +78,7 @@ namespace SanteDB.Messaging.HDSI.Tests
             Guid id = Guid.Empty;
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Relationships.Where(g=>g.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother).Any(r=>r.TargetEntity.StatusConcept.Mnemonic == "ACTIVE"));
             var expression = CreateQueryString(query.ToArray());
-            Assert.AreEqual("relationship[29ff64e5-b564-411a-92c7-6818c02a9e48].target.status.mnemonic=ACTIVE", expression);
+            Assert.AreEqual("relationship[29ff64e5-b564-411a-92c7-6818c02a9e48].target.statusConcept.mnemonic=ACTIVE", expression);
         }
 
         /// <summary>
