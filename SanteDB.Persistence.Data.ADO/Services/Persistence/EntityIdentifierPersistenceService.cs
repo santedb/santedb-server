@@ -20,6 +20,7 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
+using SanteDB.Persistence.Data.ADO.Data.Model.Entities;
 using System;
 using System.Collections;
 using System.Linq;
@@ -43,6 +44,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             var identifier = (dataInstance as CompositeResult)?.Values.OfType<DbEntityIdentifier>().FirstOrDefault() ?? dataInstance as DbEntityIdentifier;
             var authority = (dataInstance as CompositeResult)?.Values.OfType<DbAssigningAuthority>().FirstOrDefault();
+
             return new EntityIdentifier()
             {
                 AuthorityKey = identifier.AuthorityKey,
@@ -73,6 +75,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             if (data.Authority != null) data.Authority = data.Authority.EnsureExists(context) as AssigningAuthority;
             data.AuthorityKey = data.Authority?.Key ?? data.AuthorityKey;
+
+            if (!data.EffectiveVersionSequenceId.HasValue) // Retrieve
+                data.EffectiveVersionSequenceId = context.Query<DbEntityVersion>(o => o.Key == data.SourceEntityKey && o.ObsoletionTime == null).Select(o => o.VersionSequenceId).First();
+
             return base.InsertInternal(context, data);
         }
 
@@ -83,6 +89,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             if (data.Authority != null) data.Authority = data.Authority.EnsureExists(context) as AssigningAuthority;
             data.AuthorityKey = data.Authority?.Key ?? data.AuthorityKey;
+
+            if (!data.EffectiveVersionSequenceId.HasValue) // Retrieve
+                data.EffectiveVersionSequenceId = context.Query<DbEntityVersion>(o => o.Key == data.SourceEntityKey && o.ObsoletionTime == null).Select(o => o.VersionSequenceId).First();
+            if(data.ObsoleteVersionSequenceId == Int32.MaxValue) // Retrieve for obs
+                data.ObsoleteVersionSequenceId = context.Query<DbEntityVersion>(o => o.Key == data.SourceEntityKey && o.ObsoletionTime == null).Select(o => o.VersionSequenceId).First();
+
             return base.UpdateInternal(context, data);
         }
 

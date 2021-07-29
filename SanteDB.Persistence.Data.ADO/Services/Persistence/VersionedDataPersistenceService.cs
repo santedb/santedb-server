@@ -121,12 +121,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (data.Key == Guid.Empty)
                 throw new AdoFormalConstraintException(AdoFormalConstraintType.NonIdentityUpdate);
 
-            // This is technically an insert and not an update
-            SqlStatement currentVersionQuery = context.CreateSqlStatement<TDomain>().SelectFrom()
-                .Where(o => o.Key == data.Key)
-                .OrderBy<TDomain>(o => o.VersionSequenceId, Core.Model.Map.SortOrderType.OrderByDescending);
-
-            var existingObject = context.FirstOrDefault<TDomain>(currentVersionQuery); // Get the last version (current)
+            var existingObject = context.Query<TDomain>(o=>o.Key == data.Key && !o.ObsoletionTime.HasValue).OrderByDescending(o=>o.VersionSequenceId).FirstOrDefault(); // Get the last version (current)
             var nonVersionedObect = context.FirstOrDefault<TDomainKey>(o => o.Key == data.Key);
 
             if (existingObject == null)
@@ -238,7 +233,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     var expr = this.m_settingsProvider.GetMapper().MapModelExpression<TModel, TDomain, bool>(query, false);
 
                     // Fast query?
-                    if (orderBy?.Length > 0)
+                    if (orderBy?.Length > 0 || q.ToString().Contains("VersionKey"))
                     {
                         if (expr != null)
                             domainQuery = context.CreateSqlStatement<TDomain>().SelectFrom(typeof(TDomain), typeof(TDomainKey))
@@ -445,7 +440,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     if (versionId.GetValueOrDefault() == Guid.Empty)
                         retVal = this.Get(connection, containerId);
                     else
-                        retVal = this.QueryInternal(connection, o => o.Key == containerId && o.VersionKey == versionId && o.ObsoletionTime == null || o.ObsoletionTime != null, Guid.Empty, 0, 1, out tr, null).FirstOrDefault();
+                        retVal = this.QueryInternal(connection, o => o.Key == containerId && o.VersionKey == versionId, Guid.Empty, 0, 1, out tr, null).FirstOrDefault();
 
                     var postData = new DataRetrievedEventArgs<TModel>(retVal, principal);
                     this.FireRetrieved(postData);
@@ -538,7 +533,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     obsVersion = source.VersionSequence.GetValueOrDefault();
 
 #if DEBUG
-                this.m_tracer.TraceInfo("----- OBSOLETING {0} {1} ---- ", del.GetType().Name, del.Key);
+                this.m_tracer.TraceVerbose("----- OBSOLETING {0} {1} ---- ", del.GetType().Name, del.Key);
 #endif
                 del.ObsoleteVersionSequenceId = obsVersion;
                 context.Update<TDomainAssociation>(del);

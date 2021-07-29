@@ -40,16 +40,16 @@ namespace SanteDB.Persistence.Data.ADO.Tests
         {
 
             IPasswordHashingService hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
-            AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
+            AuthenticationContext.EnterSystemContext();
             var dataService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
             if (dataService.GetIdentity("admin@identitytest.com") == null)
-                dataService.CreateIdentity("admin@identitytest.com",  "password", AuthenticationContext.Current.Principal);
+                dataService.CreateIdentity("admin@identitytest.com", "password", AuthenticationContext.Current.Principal);
             if (dataService.GetIdentity("user@identitytest.com") == null)
-                dataService.CreateIdentity("user@identitytest.com",  "password", AuthenticationContext.Current.Principal);
+                dataService.CreateIdentity("user@identitytest.com", "password", AuthenticationContext.Current.Principal);
 
             IRoleProviderService roleService = ApplicationServiceContext.Current.GetService<IRoleProviderService>();
-            roleService.AddUsersToRoles(new string[] { "admin@identitytest.com", "user@identitytest.com" },  new string[] { "USERS" },  AuthenticationContext.Current.Principal);
-            roleService.AddUsersToRoles(new string[] { "admin@identitytest.com" },  new string[] { "ADMINISTRATORS" }, AuthenticationContext.Current.Principal);
+            roleService.AddUsersToRoles(new string[] { "admin@identitytest.com", "user@identitytest.com" }, new string[] { "USERS" }, AuthenticationContext.Current.Principal);
+            roleService.AddUsersToRoles(new string[] { "admin@identitytest.com" }, new string[] { "ADMINISTRATORS" }, AuthenticationContext.Current.Principal);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
             // Reset data for test
             //var user = dataPersistence.Query(u => u.UserName == "user@identitytest.com", null).First();
             //user.Lockout = null;
-           // user.LastLoginTime = null;
+            // user.LastLoginTime = null;
             //user.InvalidLoginAttempts = 0;
             //dataPersistence.Update(user, TransactionMode.Commit);
 
@@ -165,7 +165,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
                 var principal = provider.Authenticate("admin@identitytest.com", "passwordz");
                 Assert.Fail("Should throw SecurityException");
             }
-            catch(AuthenticationException)
+            catch (AuthenticationException)
             { }
         }
 
@@ -176,7 +176,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
         public void TestChangePassword()
         {
 
-           // var dataPersistence = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityUser>>();
+            // var dataPersistence = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityUser>>();
             IIdentityProviderService identityProvider = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
             //var user = dataPersistence.Query(u => u.UserName == "admin@identitytest.com", null).First();
             // var existingPassword = user.PasswordHash;
@@ -205,7 +205,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
             var identityService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
             var hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
-            var identity = identityService.CreateIdentity("anonymous@identitytest.com",  "mypassword", AuthenticationContext.Current.Principal);
+            var identity = identityService.CreateIdentity("anonymous@identitytest.com", "mypassword", AuthenticationContext.Current.Principal);
             Assert.IsNotNull(identity);
             Assert.IsFalse(identity.IsAuthenticated);
 
@@ -221,23 +221,23 @@ namespace SanteDB.Persistence.Data.ADO.Tests
         public void TestAdministrativeUserCreation()
         {
 
-           // var dataPersistence = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityUser>>();
+            // var dataPersistence = ApplicationServiceContext.Current.GetService<IDataPersistenceService<SecurityUser>>();
             var identityService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
             var hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
-            var authContext = identityService.Authenticate("admin@identitytest.com", "password");
-            AuthenticationContext.Current = new AuthenticationContext(authContext);
-            var identity = identityService.CreateIdentity("admincreated@identitytest.com",  "mypassword", AuthenticationContext.Current.Principal);
-            AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
-            Assert.IsNotNull(identity);
-            Assert.IsFalse(identity.IsAuthenticated);
+            using (AuthenticationContext.EnterContext(identityService.Authenticate("admin@identitytest.com", "password")))
+            {
+                var identity = identityService.CreateIdentity("admincreated@identitytest.com", "mypassword", AuthenticationContext.Current.Principal);
+                Assert.IsNotNull(identity);
+                Assert.IsFalse(identity.IsAuthenticated);
+            }
 
             // Now verify with data persistence
             //var dataUser = dataPersistence.Query(u => u.UserName == "admincreated@identitytest.com", null).First();
             //Assert.AreEqual(hashingService.ComputeHash("mypassword"), dataUser.PasswordHash);
             //Assert.IsFalse(dataUser.Lockout.HasValue);
             //Assert.AreEqual(authContext.Identity.Name, dataUser.CreatedBy.UserName);
-            
+
 
         }
     }

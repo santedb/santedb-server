@@ -174,6 +174,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Docker.Server", "sa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Messaging.FHIR.Test", "santedb-fhir\SanteDB.Messaging.FHIR.Test\SanteDB.Messaging.FHIR.Test.csproj", "{059D74D5-FB36-41C6-ACCA-B3FFC5033C74}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.BusinessRules.JavaScript.Test", "santedb-bre-js\SanteDB.BusinessRules.JavaScript.Test\SanteDB.BusinessRules.JavaScript.Test.csproj", "{6AFCADBB-4505-43FD-A1BA-ED7DBC1BB232}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -404,6 +406,10 @@ Global
 		{059D74D5-FB36-41C6-ACCA-B3FFC5033C74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{059D74D5-FB36-41C6-ACCA-B3FFC5033C74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{059D74D5-FB36-41C6-ACCA-B3FFC5033C74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AFCADBB-4505-43FD-A1BA-ED7DBC1BB232}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AFCADBB-4505-43FD-A1BA-ED7DBC1BB232}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AFCADBB-4505-43FD-A1BA-ED7DBC1BB232}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AFCADBB-4505-43FD-A1BA-ED7DBC1BB232}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -473,6 +479,7 @@ Global
 		{284CE885-78E0-48EA-A2E4-6957AD66EAB5} = {E6D363F8-1029-48F4-A654-4A6F49C6EAA2}
 		{AA52CC57-FF46-454A-ACC4-0F1C4B009685} = {E6D363F8-1029-48F4-A654-4A6F49C6EAA2}
 		{059D74D5-FB36-41C6-ACCA-B3FFC5033C74} = {FE92CEE3-7E0D-4041-8F95-DA2855A50B7A}
+		{6AFCADBB-4505-43FD-A1BA-ED7DBC1BB232} = {58D303FA-0113-4888-AA67-A9436DDEBFAD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E73A1AED-8AB7-492C-A4F0-C71FCC5C393C}

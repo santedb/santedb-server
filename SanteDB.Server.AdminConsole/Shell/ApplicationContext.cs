@@ -58,6 +58,9 @@ namespace SanteDB.Server.AdminConsole.Shell
         /// </summary>
         private List<Object> m_services = new List<object>();
 
+        // Token auth
+        private IDisposable m_tokenAuth = null;
+
         /// <summary>
         /// Rest clients
         /// </summary>
@@ -273,7 +276,7 @@ namespace SanteDB.Server.AdminConsole.Shell
                     if (principal != null)
                     {
                         retVal = true;
-                        AuthenticationContext.Current = new AuthenticationContext(principal);
+                        this.m_tokenAuth = AuthenticationContext.EnterContext(principal);
                     }
                     else
                     {

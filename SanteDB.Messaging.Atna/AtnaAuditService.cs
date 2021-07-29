@@ -121,119 +121,122 @@ namespace SanteDB.Messaging.Atna
         private void SendAuditAsync(object state)
         {
 
-            try
+            using (AuthenticationContext.EnterSystemContext())
             {
-                AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
-                var ad = state as SdbAudit.AuditEventData;
-
-                // Translate codes to DICOM
-                if (ad.EventTypeCode != null)
+                try
                 {
-                    IConceptRepositoryService icpcr = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>();
-                    var concept = icpcr?.GetConcept(ad.EventTypeCode.Code);
-                    if (concept != null)
+                    var ad = state as SdbAudit.AuditData;
+
+                    // Translate codes to DICOM
+                    if (ad.EventTypeCode != null)
                     {
-                        var refTerm = icpcr.GetConceptReferenceTerm(concept.Key.Value, "DCM");
-                        if (refTerm != null)
-                            ad.EventTypeCode = new AuditCode(refTerm.Mnemonic, "DCM") { DisplayName = refTerm.LoadCollection<ReferenceTermName>("DisplayNames")?.FirstOrDefault()?.Name };
-                        else
-                            ad.EventTypeCode.DisplayName = concept.LoadCollection<ConceptName>("ConceptNames").FirstOrDefault()?.Name;
+                        IConceptRepositoryService icpcr = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>();
+                        var concept = icpcr?.GetConcept(ad.EventTypeCode.Code);
+                        if (concept != null)
+                        {
+                            var refTerm = icpcr.GetConceptReferenceTerm(concept.Key.Value, "DCM");
+                            if (refTerm != null)
+                                ad.EventTypeCode = new AuditCode(refTerm.Mnemonic, "DCM") { DisplayName = refTerm.LoadCollection<ReferenceTermName>("DisplayNames")?.FirstOrDefault()?.Name };
+                            else
+                                ad.EventTypeCode.DisplayName = concept.LoadCollection<ConceptName>("ConceptNames").FirstOrDefault()?.Name;
+                        }
+                        this.m_tracer.TraceVerbose("Mapped Audit Type Code - {0}-{1}-{2}", ad.EventTypeCode.CodeSystem, ad.EventTypeCode.Code, ad.EventTypeCode.DisplayName);
+
                     }
-                    this.m_tracer.TraceVerbose("Mapped Audit Type Code - {0}-{1}-{2}", ad.EventTypeCode.CodeSystem, ad.EventTypeCode.Code, ad.EventTypeCode.DisplayName);
 
-                }
+                    // Create the audit basic
+                    AuditMessage am = new AuditMessage(
+                        ad.Timestamp, (AtnaApi.Model.ActionType)Enum.Parse(typeof(AtnaApi.Model.ActionType), ad.ActionCode.ToString()),
+                        (AtnaApi.Model.OutcomeIndicator)Enum.Parse(typeof(AtnaApi.Model.OutcomeIndicator), ad.Outcome.ToString()),
+                        (AtnaApi.Model.EventIdentifierType)Enum.Parse(typeof(AtnaApi.Model.EventIdentifierType), ad.EventIdentifier.ToString()),
+                        null
+                    );
+                    if (ad.EventTypeCode != null)
+                        am.EventIdentification.EventType.Add(new CodeValue<String>(ad.EventTypeCode.Code, ad.EventTypeCode.CodeSystem) { DisplayName = ad.EventTypeCode.DisplayName });
 
-                // Create the audit basic
-                AuditMessage am = new AuditMessage(
-                    ad.Timestamp, (AtnaApi.Model.ActionType)Enum.Parse(typeof(AtnaApi.Model.ActionType), ad.ActionCode.ToString()),
-                    (AtnaApi.Model.OutcomeIndicator)Enum.Parse(typeof(AtnaApi.Model.OutcomeIndicator), ad.Outcome.ToString()),
-                    (AtnaApi.Model.EventIdentifierType)Enum.Parse(typeof(AtnaApi.Model.EventIdentifierType), ad.EventIdentifier.ToString()),
-                    null
-                );
-                if (ad.EventTypeCode != null)
-                    am.EventIdentification.EventType.Add(new CodeValue<String>(ad.EventTypeCode.Code, ad.EventTypeCode.CodeSystem) { DisplayName = ad.EventTypeCode.DisplayName });
-
-                am.SourceIdentification.Add(new AuditSourceIdentificationType()
-                {
-                    AuditEnterpriseSiteID = ad.Metadata.FirstOrDefault(o=>o.Key == SdbAudit.AuditMetadataKey.EnterpriseSiteID)?.Value ?? this.m_configuration.EnterpriseSiteId,
-                    AuditSourceID = ad.Metadata.FirstOrDefault(o => o.Key == SdbAudit.AuditMetadataKey.AuditSourceID)?.Value ?? Dns.GetHostName(),
-                    AuditSourceTypeCode = new List<CodeValue<AtnaApi.Model.AuditSourceType>>()
+                    am.SourceIdentification.Add(new AuditSourceIdentificationType()
+                    {
+                        AuditEnterpriseSiteID = ad.Metadata.FirstOrDefault(o => o.Key == SdbAudit.AuditMetadataKey.EnterpriseSiteID)?.Value ?? this.m_configuration.EnterpriseSiteId,
+                        AuditSourceID = ad.Metadata.FirstOrDefault(o => o.Key == SdbAudit.AuditMetadataKey.AuditSourceID)?.Value ?? Dns.GetHostName(),
+                        AuditSourceTypeCode = new List<CodeValue<AtnaApi.Model.AuditSourceType>>()
                     {
                         new CodeValue<AtnaApi.Model.AuditSourceType>(
                             (AtnaApi.Model.AuditSourceType)Enum.Parse(typeof(AtnaApi.Model.AuditSourceType), ad.Metadata.FirstOrDefault(o=>o.Key == SdbAudit.AuditMetadataKey.AuditSourceType)?.Value ?? "ApplicationServerProcess"))
                     }
-                });
-                
-                // Add additional data like the participant
-                bool thisFound = false;
-                string dnsName = Dns.GetHostName();
-                foreach (var adActor in ad.Actors)
-                {
-                    thisFound |= (adActor.NetworkAccessPointId == Environment.MachineName || adActor.NetworkAccessPointId == dnsName) &&
-                        adActor.NetworkAccessPointType == SdbAudit.NetworkAccessPointType.MachineName;
-                    var act = new AtnaApi.Model.AuditActorData()
-                    {
-                        NetworkAccessPointId = adActor.NetworkAccessPointId,
-                        NetworkAccessPointType = (AtnaApi.Model.NetworkAccessPointType)Enum.Parse(typeof(AtnaApi.Model.NetworkAccessPointType), adActor.NetworkAccessPointType.ToString()),
-                        NetworkAccessPointTypeSpecified = adActor.NetworkAccessPointType != 0,
-                        UserIdentifier = adActor.UserIdentifier,
-                        UserIsRequestor = adActor.UserIsRequestor,
-                        UserName = adActor.UserName,
-                        AlternativeUserId = adActor.AlternativeUserId
-                    };
+                    });
 
-                    if(adActor.ActorRoleCode != null)
-                        foreach (var rol in adActor.ActorRoleCode)
-                            act.ActorRoleCode.Add(new CodeValue<string>(rol.Code, rol.CodeSystem)
+                    // Add additional data like the participant
+                    bool thisFound = false;
+                    string dnsName = Dns.GetHostName();
+                    foreach (var adActor in ad.Actors)
+                    {
+                        thisFound |= (adActor.NetworkAccessPointId == Environment.MachineName || adActor.NetworkAccessPointId == dnsName) &&
+                            adActor.NetworkAccessPointType == SdbAudit.NetworkAccessPointType.MachineName;
+                        var act = new AtnaApi.Model.AuditActorData()
+                        {
+                            NetworkAccessPointId = adActor.NetworkAccessPointId,
+                            NetworkAccessPointType = (AtnaApi.Model.NetworkAccessPointType)Enum.Parse(typeof(AtnaApi.Model.NetworkAccessPointType), adActor.NetworkAccessPointType.ToString()),
+                            NetworkAccessPointTypeSpecified = adActor.NetworkAccessPointType != 0,
+                            UserIdentifier = adActor.UserIdentifier,
+                            UserIsRequestor = adActor.UserIsRequestor,
+                            UserName = adActor.UserName,
+                            AlternativeUserId = adActor.AlternativeUserId
+                        };
+
+                        if (adActor.ActorRoleCode != null)
+                            foreach (var rol in adActor.ActorRoleCode)
+                                act.ActorRoleCode.Add(new CodeValue<string>(rol.Code, rol.CodeSystem)
                                 {
                                     DisplayName = rol.DisplayName
                                 });
-                    am.Actors.Add(act);
-                }
+                        am.Actors.Add(act);
+                    }
 
-                
-                foreach (var aoPtctpt in ad.AuditableObjects)
-                {
-                    var atnaAo = new AtnaApi.Model.AuditableObject()
+
+                    foreach (var aoPtctpt in ad.AuditableObjects)
                     {
-                        IDTypeCode = aoPtctpt.IDTypeCode.HasValue ?
-                            aoPtctpt.IDTypeCode.Value != SdbAudit.AuditableObjectIdType.Custom ?
-                                new CodeValue<AtnaApi.Model.AuditableObjectIdType>((AtnaApi.Model.AuditableObjectIdType)Enum.Parse(typeof(AtnaApi.Model.AuditableObjectIdType), aoPtctpt?.IDTypeCode?.ToString())) :
-                                (aoPtctpt.CustomIdTypeCode != null ?
-                                  new CodeValue<AtnaApi.Model.AuditableObjectIdType>()
-                                  {
-                                      Code = aoPtctpt.CustomIdTypeCode?.Code,
-                                      CodeSystem = aoPtctpt.CustomIdTypeCode?.CodeSystem,
-                                      DisplayName = aoPtctpt.CustomIdTypeCode?.DisplayName
-                                  } : null) :
-                            null,
-                        LifecycleType = aoPtctpt.LifecycleType != SdbAudit.AuditableObjectLifecycle.NotSet && aoPtctpt.LifecycleType.HasValue ? (AtnaApi.Model.AuditableObjectLifecycle)Enum.Parse(typeof(AtnaApi.Model.AuditableObjectLifecycle), aoPtctpt.LifecycleType.ToString()) : 0,
-                        LifecycleTypeSpecified = aoPtctpt.LifecycleType != SdbAudit.AuditableObjectLifecycle.NotSet && aoPtctpt.LifecycleType.HasValue,
-                        ObjectId = aoPtctpt.ObjectId,
-                        Role = aoPtctpt.Role.HasValue ? (AtnaApi.Model.AuditableObjectRole)Enum.Parse(typeof(AtnaApi.Model.AuditableObjectRole), aoPtctpt.Role.ToString()) : 0,
-                        RoleSpecified = aoPtctpt.Role != 0,
-                        Type = aoPtctpt.Type == SdbAudit.AuditableObjectType.NotSpecified ? AtnaApi.Model.AuditableObjectType.Other : (AtnaApi.Model.AuditableObjectType)Enum.Parse(typeof(AtnaApi.Model.AuditableObjectType), aoPtctpt.Type.ToString()),
-                        TypeSpecified = aoPtctpt.Type != SdbAudit.AuditableObjectType.NotSpecified,
-                        ObjectSpec = aoPtctpt.QueryData ?? aoPtctpt.NameData,
-                        ObjectSpecChoice = aoPtctpt.QueryData == null ? ObjectDataChoiceType.ParticipantObjectName : ObjectDataChoiceType.ParticipantObjectQuery
-                    };
-                    // TODO: Object Data
-                    foreach(var kv in aoPtctpt.ObjectData)
-                        if(!String.IsNullOrEmpty(kv.Key))
-                            atnaAo.ObjectDetail.Add(new ObjectDetailType() {
-                                Type = kv.Key,
-                                Value = kv.Value
-                            });
-                    am.AuditableObjects.Add(atnaAo);
-                }
+                        var atnaAo = new AtnaApi.Model.AuditableObject()
+                        {
+                            IDTypeCode = aoPtctpt.IDTypeCode.HasValue ?
+                                aoPtctpt.IDTypeCode.Value != SdbAudit.AuditableObjectIdType.Custom ?
+                                    new CodeValue<AtnaApi.Model.AuditableObjectIdType>((AtnaApi.Model.AuditableObjectIdType)Enum.Parse(typeof(AtnaApi.Model.AuditableObjectIdType), aoPtctpt?.IDTypeCode?.ToString())) :
+                                    (aoPtctpt.CustomIdTypeCode != null ?
+                                      new CodeValue<AtnaApi.Model.AuditableObjectIdType>()
+                                      {
+                                          Code = aoPtctpt.CustomIdTypeCode?.Code,
+                                          CodeSystem = aoPtctpt.CustomIdTypeCode?.CodeSystem,
+                                          DisplayName = aoPtctpt.CustomIdTypeCode?.DisplayName
+                                      } : null) :
+                                null,
+                            LifecycleType = aoPtctpt.LifecycleType != SdbAudit.AuditableObjectLifecycle.NotSet && aoPtctpt.LifecycleType.HasValue ? (AtnaApi.Model.AuditableObjectLifecycle)Enum.Parse(typeof(AtnaApi.Model.AuditableObjectLifecycle), aoPtctpt.LifecycleType.ToString()) : 0,
+                            LifecycleTypeSpecified = aoPtctpt.LifecycleType != SdbAudit.AuditableObjectLifecycle.NotSet && aoPtctpt.LifecycleType.HasValue,
+                            ObjectId = aoPtctpt.ObjectId,
+                            Role = aoPtctpt.Role.HasValue ? (AtnaApi.Model.AuditableObjectRole)Enum.Parse(typeof(AtnaApi.Model.AuditableObjectRole), aoPtctpt.Role.ToString()) : 0,
+                            RoleSpecified = aoPtctpt.Role != 0,
+                            Type = aoPtctpt.Type == SdbAudit.AuditableObjectType.NotSpecified ? AtnaApi.Model.AuditableObjectType.Other : (AtnaApi.Model.AuditableObjectType)Enum.Parse(typeof(AtnaApi.Model.AuditableObjectType), aoPtctpt.Type.ToString()),
+                            TypeSpecified = aoPtctpt.Type != SdbAudit.AuditableObjectType.NotSpecified,
+                            ObjectSpec = aoPtctpt.QueryData ?? aoPtctpt.NameData,
+                            ObjectSpecChoice = aoPtctpt.QueryData == null ? ObjectDataChoiceType.ParticipantObjectName : ObjectDataChoiceType.ParticipantObjectQuery
+                        };
+                        // TODO: Object Data
+                        foreach (var kv in aoPtctpt.ObjectData)
+                            if (!String.IsNullOrEmpty(kv.Key))
+                                atnaAo.ObjectDetail.Add(new ObjectDetailType()
+                                {
+                                    Type = kv.Key,
+                                    Value = kv.Value
+                                });
+                        am.AuditableObjects.Add(atnaAo);
+                    }
 
-                // Send the message
-                this.m_tracer.TraceVerbose("Dispatching audit {0} via SYSLOG", ad.Key);
-                this.m_transporter.SendMessage(am);
-            }
-            catch (Exception e)
-            {
-                this.m_tracer.TraceError(e.ToString());
+                    // Send the message
+                    this.m_tracer.TraceVerbose("Dispatching audit {0} via SYSLOG", ad.Key);
+                    this.m_transporter.SendMessage(am);
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceError(e.ToString());
+                }
             }
         }
 

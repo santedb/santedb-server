@@ -101,6 +101,7 @@ namespace SanteDB.Server.Core.Security.Attribute
         /// </summary>
         public PolicyPermission(PermissionState state, String policyId) : base()
         {
+            this.m_principal = AuthenticationContext.Current.Principal;
             this.m_isUnrestricted = state == PermissionState.Unrestricted;
             this.m_policyId = policyId;
         }
@@ -153,7 +154,8 @@ namespace SanteDB.Server.Core.Security.Attribute
 
             this.m_traceSource.TraceInfo("Policy Enforce: {0}({1}) = {2}", principal?.Identity?.Name, this.m_policyId, action);
 
-            if (principal == AuthenticationContext.SystemPrincipal)
+            if (principal != AuthenticationContext.SystemPrincipal &&
+                principal != AuthenticationContext.AnonymousPrincipal)
                 return PolicyGrantType.Grant;
             return action;
         }

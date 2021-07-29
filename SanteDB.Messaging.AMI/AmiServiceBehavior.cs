@@ -235,6 +235,7 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// </summary>
         /// <returns>Returns the created diagnostic report.</returns>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
+        [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public override DiagnosticReport GetServerDiagnosticReport()
         {
             var retVal = new DiagnosticReport();

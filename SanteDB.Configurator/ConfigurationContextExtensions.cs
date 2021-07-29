@@ -68,35 +68,37 @@ namespace SanteDB.Configurator
                 Exception errCode = null;
                 var exeThd = new Thread(() =>
                 {
-                    try
+                    using (AuthenticationContext.EnterSystemContext())
                     {
-                        AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
-                        int i = 0, t = me.ConfigurationTasks.Count;
-                        var tasks = me.ConfigurationTasks.ToArray();
-                        foreach (var ct in tasks)
+                        try
                         {
-                            ct.ProgressChanged += (o, e) =>
+                            int i = 0, t = me.ConfigurationTasks.Count;
+                            var tasks = me.ConfigurationTasks.ToArray();
+                            foreach (var ct in tasks)
                             {
-                                progress.ActionStatusText = e.State?.ToString() ?? "...";
-                                progress.ActionStatus = (int)(e.Progress * 100);
-                                progress.OverallStatus = (int)((((float)i / t) + (e.Progress * 1.0f / t)) * 100);
-                            };
+                                ct.ProgressChanged += (o, e) =>
+                                {
+                                    progress.ActionStatusText = e.State?.ToString() ?? "...";
+                                    progress.ActionStatus = (int)(e.Progress * 100);
+                                    progress.OverallStatus = (int)((((float)i / t) + (e.Progress * 1.0f / t)) * 100);
+                                };
 
-                            progress.OverallStatusText = $"Applying {ct.Feature.Name}";
-                            if (ct.VerifyState(me.Configuration))
-                                ct.Execute(me.Configuration);
-                            me.ConfigurationTasks.Remove(ct);
-                            progress.OverallStatus = (int)(((float)++i / t) * 100.0);
+                                progress.OverallStatusText = $"Applying {ct.Feature.Name}";
+                                if (ct.VerifyState(me.Configuration))
+                                    ct.Execute(me.Configuration);
+                                me.ConfigurationTasks.Remove(ct);
+                                progress.OverallStatus = (int)(((float)++i / t) * 100.0);
+                            }
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        Trace.TraceError($"Error on component: {e}");
-                        errCode = e;
-                    }
-                    finally
-                    {
-                        complete = true;
+                        catch (Exception e)
+                        {
+                            Trace.TraceError($"Error on component: {e}");
+                            errCode = e;
+                        }
+                        finally
+                        {
+                            complete = true;
+                        }
                     }
                 });
 

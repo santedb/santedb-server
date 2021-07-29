@@ -213,7 +213,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 {
                     this.Inserted?.Invoke(this, new DataPersistedEventArgs<TEntity>(prePersistence.Data, TransactionMode.Commit, AuthenticationContext.Current.Principal));
                 }
-                return this.m_privacyService?.Apply(prePersistence.Data, AuthenticationContext.Current.Principal) ?? data;
+                return this.m_privacyService?.Apply(prePersistence.Data, AuthenticationContext.Current.Principal) ?? prePersistence.Data;
             }
             
             // Did the pre-persistence service change the type to a batch
@@ -268,7 +268,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 {
                     this.Obsoleted?.Invoke(this, new DataPersistedEventArgs<TEntity>(prePersistence.Data, TransactionMode.Commit, AuthenticationContext.Current.Principal));
                 }
-                return this.m_privacyService?.Apply(prePersistence.Data, AuthenticationContext.Current.Principal);
+                return this.m_privacyService?.Apply(prePersistence.Data, AuthenticationContext.Current.Principal) ?? prePersistence.Data;
             }
 
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
@@ -358,7 +358,7 @@ namespace SanteDB.Server.Core.Services.Impl
                     {
                         this.Saved?.Invoke(this, new DataPersistedEventArgs<TEntity>(preSave.Data, TransactionMode.Commit, AuthenticationContext.Current.Principal));
                     }
-                    return this.m_privacyService?.Apply(preSave.Data, AuthenticationContext.Current.Principal);
+                    return this.m_privacyService?.Apply(preSave.Data, AuthenticationContext.Current.Principal) ?? preSave.Data;
                 }
                 else
                     data = preSave.Data; // Data may have been updated

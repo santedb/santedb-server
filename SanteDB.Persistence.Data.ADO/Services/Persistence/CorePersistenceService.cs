@@ -542,12 +542,43 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         protected abstract void BulkPurgeInternal(DataContext connection, Guid[] keysToPurge);
 
         /// <summary>
+        /// Purge the specified object 
+        /// </summary>
+        protected abstract void BulkPurgeInternal(DataContext connection, Expression<Func<TModel, bool>> expression);
+
+        /// <summary>
+        /// Purge keys matching the specified pattern
+        /// </summary>
+        public virtual void Purge(TransactionMode mode, IPrincipal principal, Expression query)
+        {
+            if (query is Expression<Func<TModel, bool>> castQuery)
+                using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetWriteConnection())
+                {
+                    connection.Open();
+                    try
+                    {
+                        this.BulkPurgeInternal(connection, castQuery);
+                    }
+                    catch (DbException e)
+                    {
+                        throw new DataPersistenceException($"Error bulk purging data", this.TranslateDbException(e));
+                    }
+                    catch (Exception e)
+                    {
+                        throw new DataPersistenceException($"Error bulk purging data", e);
+                    }
+                }
+            else
+                throw new ArgumentException($"Expression must be of type Expression<Func<{typeof(TModel).Name},bool>>", nameof(query));
+        }
+
+        /// <summary>
         /// Query the specified keys only
         /// </summary>
         public virtual IEnumerable<Guid> QueryKeys(Expression query, int offset, int? count, out int totalResults)
         {
             if (query is Expression<Func<TModel, bool>> castQuery)
-                using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetWriteConnection())
+                using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetReadonlyConnection())
                 {
                     connection.Open();
                     try
@@ -567,11 +598,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 throw new ArgumentException($"Expression must be of type Expression<Func<{typeof(TModel).Name},bool>>", nameof(query));
         }
 
+
         /// <summary>
         /// Perform the query for bulk keys with an open context
         /// </summary>
         protected abstract IEnumerable<Guid> QueryKeysInternal(DataContext context, Expression<Func<TModel, bool>> query, int offset, int? count, out int totalResults);
-
 
         /// <summary>
         /// Copy the data from <paramref name="fromContext"/> to <paramref name="toContext"/>

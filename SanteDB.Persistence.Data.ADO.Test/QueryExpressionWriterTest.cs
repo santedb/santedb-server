@@ -121,7 +121,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
         {
 
             var query = m_builder.CreateQuery<Patient>(o => o.DeterminerConceptKey == DeterminerKeys.Specific).Build();
-            Assert.IsTrue(query.SQL.Contains("SELECT pat_tbl.ent_vrsn_id,pat_tbl.gndr_cd_id,pat_tbl.dcsd_utc,pat_tbl.dcsd_prec,pat_tbl.mb_ord,pat_tbl.mrtl_sts_cd_id,pat_tbl.edu_lvl_cd_id,pat_tbl.lvn_arg_cd_id,pat_tbl.eth_grp_cd_id,psn_tbl.dob,psn_tbl.dob_prec,ent_vrsn_tbl.ent_id,ent_vrsn_tbl.sts_cd_id,ent_vrsn_tbl.typ_cd_id,ent_vrsn_tbl.crt_act_id,ent_vrsn_tbl.vrsn_seq_id,ent_vrsn_tbl.rplc_vrsn_id,ent_vrsn_tbl.crt_prov_id,ent_vrsn_tbl.obslt_prov_id,ent_vrsn_tbl.crt_utc,ent_vrsn_tbl.obslt_utc,ent_tbl.tpl_id,ent_tbl.cls_cd_id,ent_tbl.dtr_cd_id  FROM pat_tbl"));
+            Assert.IsTrue(query.SQL.Contains("pat_tbl.ent_vrsn_id"));
             Assert.IsTrue(query.SQL.Contains("INNER JOIN ent_vrsn_tbl"));
 
         }
@@ -137,7 +137,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
             var query = m_builder.CreateQuery<Patient>(o => o.DeterminerConcept.Mnemonic == "Instance").Build();
             sw.Stop();
 
-            Assert.IsTrue(query.SQL.Contains("SELECT pat_tbl.ent_vrsn_id,pat_tbl.gndr_cd_id,pat_tbl.dcsd_utc,pat_tbl.dcsd_prec,pat_tbl.mb_ord,pat_tbl.mrtl_sts_cd_id,pat_tbl.edu_lvl_cd_id,pat_tbl.lvn_arg_cd_id,pat_tbl.eth_grp_cd_id,psn_tbl.dob,psn_tbl.dob_prec,ent_vrsn_tbl.ent_id,ent_vrsn_tbl.sts_cd_id,ent_vrsn_tbl.typ_cd_id,ent_vrsn_tbl.crt_act_id,ent_vrsn_tbl.vrsn_seq_id,ent_vrsn_tbl.rplc_vrsn_id,ent_vrsn_tbl.crt_prov_id,ent_vrsn_tbl.obslt_prov_id,ent_vrsn_tbl.crt_utc,ent_vrsn_tbl.obslt_utc,ent_tbl.tpl_id,ent_tbl.cls_cd_id,ent_tbl.dtr_cd_id  FROM pat_tbl"));
+            Assert.IsTrue(query.SQL.Contains("pat_tbl.ent_vrsn_id"));
             Assert.IsTrue(query.SQL.Contains("INNER JOIN ent_vrsn_tbl"));
             Assert.IsTrue(query.SQL.Contains("IN"));
             Assert.AreEqual(1, query.Arguments.Count());
@@ -171,7 +171,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
             var query = m_builder.CreateQuery<Patient>(o => o.Participations.Where(guard => guard.ParticipationRole.Mnemonic == "RecordTarget").Any(sub => sub.PlayerEntity.ObsoletionTime == null)).Build();
             sw.Stop();
 
-            Assert.IsTrue(query.SQL.Contains("SELECT pat_tbl.ent_vrsn_id,pat_tbl.gndr_cd_id,pat_tbl.dcsd_utc,pat_tbl.dcsd_prec,pat_tbl.mb_ord,pat_tbl.mrtl_sts_cd_id,pat_tbl.edu_lvl_cd_id,pat_tbl.lvn_arg_cd_id,pat_tbl.eth_grp_cd_id,psn_tbl.dob,psn_tbl.dob_prec,ent_vrsn_tbl.ent_id,ent_vrsn_tbl.sts_cd_id,ent_vrsn_tbl.typ_cd_id,ent_vrsn_tbl.crt_act_id,ent_vrsn_tbl.vrsn_seq_id,ent_vrsn_tbl.rplc_vrsn_id,ent_vrsn_tbl.crt_prov_id,ent_vrsn_tbl.obslt_prov_id,ent_vrsn_tbl.crt_utc,ent_vrsn_tbl.obslt_utc,ent_tbl.tpl_id,ent_tbl.cls_cd_id,ent_tbl.dtr_cd_id  FROM pat_tbl"));
+            Assert.IsTrue(query.SQL.Contains("pat_tbl.ent_vrsn_id"));
             Assert.IsTrue(query.SQL.Contains("INNER JOIN ent_vrsn_tbl"));
             Assert.IsTrue(query.SQL.Contains("IN"));
             Assert.AreEqual(1, query.Arguments.Count());

@@ -124,28 +124,28 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
                 ApplicationServiceContext.Current.Started += (o, e) =>
                 {
-
-
-
-                    // Add audits as a BI data source
-                    ApplicationServiceContext.Current.GetService<IBiMetadataRepository>()
-                        .Insert(new BiDataSourceDefinition()
-                        {
-                            IsSystemObject = true,
-                            ConnectionString = this.m_configuration.ReadonlyConnectionString,
-                            MetaData = new BiMetadata()
+                    using (AuthenticationContext.EnterSystemContext())
+                    {
+                        // Add audits as a BI data source
+                        ApplicationServiceContext.Current.GetService<IBiMetadataRepository>()
+                            .Insert(new BiDataSourceDefinition()
                             {
-                                Version = typeof(AdoAuditRepositoryService).Assembly.GetName().Version.ToString(),
-                                Status = BiDefinitionStatus.Active,
-                                Demands = new List<string>()
+                                IsSystemObject = true,
+                                ConnectionString = this.m_configuration.ReadonlyConnectionString,
+                                MetaData = new BiMetadata()
                                 {
+                                    Version = typeof(AdoAuditRepositoryService).Assembly.GetName().Version.ToString(),
+                                    Status = BiDefinitionStatus.Active,
+                                    Demands = new List<string>()
+                                    {
                                     PermissionPolicyIdentifiers.AccessAuditLog
-                                }
-                            },
-                            Id = "org.santedb.bi.dataSource.audit",
-                            Name = "audit",
-                            ProviderType = typeof(OrmBiDataProvider)
-                        });
+                                    }
+                                },
+                                Id = "org.santedb.bi.dataSource.audit",
+                                Name = "audit",
+                                ProviderType = typeof(OrmBiDataProvider)
+                            });
+                    }
                 };
 
                 this.m_mapper = new ModelMapper(typeof(AdoAuditRepositoryService).Assembly.GetManifestResourceStream("SanteDB.Persistence.Auditing.ADO.Data.Map.ModelMap.xml"), AuditConstants.ModelMapName);

@@ -61,10 +61,25 @@
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <name>
         <language>en</language>
-        <value>Internet/Email</value>
+        <value>Internet Address</value>
       </name>
     </Concept>
   </update>
+
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>c1c0a4ff-4238-4044-b89b-9c9798995b94</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>TelecomType-InternetEmail</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Internet Email</value>
+      </name>
+    </Concept>
+  </update> 
+  
   <update insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
       <id>0d79b02c-6444-40b5-aca4-4009fb03ad54</id>
@@ -79,6 +94,8 @@
       <concept>c1c0a4e9-4238-4044-b89b-9c9798995b92</concept>
       <concept>c1c0a4e9-4238-4044-b89b-9c9798995b93</concept>
       <concept>788000b4-e37a-4055-a2aa-c650089ce3b1</concept>
+      <concept>c1c0a4ff-4238-4044-b89b-9c9798995b94</concept>
+
     </ConceptSet>
   </update>
 </dataset>

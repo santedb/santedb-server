@@ -400,30 +400,30 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 {
                     case "O9001": // SanteDB => Data Validation Error
                         return new DetectedIssueException(
-                            new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.InvalidDataIssue));
+                            new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.InvalidDataIssue), e);
                     case "O9002": // SanteDB => Codification error
                         return new DetectedIssueException(new List<DetectedIssue>() {
                                         new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(),  e.Message, DetectedIssueKeys.CodificationIssue),
                                         new DetectedIssue(DetectedIssuePriorityType.Information, e.Data["SqlState"].ToString(), "HINT: Select a code that is from the correct concept set or add the selected code to the concept set", DetectedIssueKeys.CodificationIssue)
-                                    });
+                                    }, e);
                     case "23502": // PGSQL - NOT NULL 
                         return new DetectedIssueException(
-                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.InvalidDataIssue)
+                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.InvalidDataIssue),e
                                     );
                     case "23503": // PGSQL - FK VIOLATION
                         return new DetectedIssueException(
-                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.FormalConstraintIssue)
+                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.FormalConstraintIssue), e
                                     );
                     case "23505": // PGSQL - UQ VIOLATION
                         return new DetectedIssueException(
-                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.AlreadyDoneIssue)
+                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.AlreadyDoneIssue), e
                                     );
                     case "23514": // PGSQL - CK VIOLATION
                         return new DetectedIssueException(new List<DetectedIssue>()
                         {
                             new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.FormalConstraintIssue),
                             new DetectedIssue(DetectedIssuePriorityType.Information, e.Data["SqlState"].ToString(), "HINT: The code you're using may be incorrect for the given context", DetectedIssueKeys.CodificationIssue)
-                        });
+                        }, e);
                     default:
                         return new DataPersistenceException(e.Message, e);
                 }
