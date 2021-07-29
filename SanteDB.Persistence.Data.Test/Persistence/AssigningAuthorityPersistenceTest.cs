@@ -113,23 +113,223 @@ namespace SanteDB.Persistence.Data.Test.Persistence
 
         }
 
+        /// <summary>
+        /// Test that the update of an assigning authority is successful
+        /// </summary>
+        [Test]
         public void TestUpdateAssigningAuthority()
         {
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>();
+            Assert.IsNotNull(persistenceService);
 
+            // Insert an assigning authority
+            var aa = persistenceService.Insert(new AssigningAuthority()
+            {
+                Description = "A test authority",
+                DomainName = "TEST_AA_3",
+                IsUnique = true,
+                CustomValidator = "TEST.VALIDATOR",
+                Name = "TEST_AA_03",
+                Oid = "1.2.3.3",
+                Url = "http://google.com/test3"
+            }, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+
+            // First, assert that proper insert columns are set
+            Assert.IsNotNull(aa.Key);
+            Assert.IsNotNull(aa.CreatedByKey);
+            Assert.AreEqual(AuthenticationContext.SystemUserSid, aa.CreatedByKey.ToString());
+            Assert.IsNotNull(aa.CreationTime);
+
+            // Next update 
+            aa.Oid = "3.3.2.1";
+            var aa2 = persistenceService.Update(aa, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+
+            Assert.AreEqual("3.3.2.1", aa2.Oid);
         }
 
+        /// <summary>
+        /// Tests the adding / removing of related objects
+        /// </summary>
+        [Test]
         public void TestUpdateExtendedAssigningAuthority()
         {
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>();
+            Assert.IsNotNull(persistenceService);
+
+            // Insert an assigning authority
+            var aa = persistenceService.Insert(new AssigningAuthority()
+            {
+                Description = "A test authority",
+                DomainName = "TEST_AA_4",
+                IsUnique = true,
+                CustomValidator = "TEST.VALIDATOR",
+                Name = "TEST_AA_04",
+                Oid = "1.2.3.4",
+                Url = "http://google.com/test4",
+                AuthorityScopeXml = new List<Guid>()
+                {
+                    EntityClassKeys.Patient
+                }
+            }, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+
+            // First, assert that proper insert columns are set
+            Assert.IsNotNull(aa.Key);
+            Assert.IsNotNull(aa.CreatedByKey);
+            Assert.AreEqual(AuthenticationContext.SystemUserSid, aa.CreatedByKey.ToString());
+            Assert.IsNotNull(aa.CreationTime);
+            Assert.AreEqual(1, aa.AuthorityScope.Count);
+
+            // Add a scope
+            aa.AuthorityScopeXml.Add(EntityClassKeys.Material);
+            var aa2 = persistenceService.Update(aa, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+            Assert.AreEqual(2, aa2.AuthorityScopeXml.Count);
+
+            // Get and validate
+            var aa3 = persistenceService.Get(aa.Key.Value, null, AuthenticationContext.SystemPrincipal);
+            Assert.AreEqual(2, aa3.AuthorityScopeXml.Count);
+
+            // Remove scopes
+            aa3.AuthorityScopeXml.Remove(EntityClassKeys.Patient);
+            var aa4 = persistenceService.Update(aa3, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+            Assert.AreEqual(1, aa4.AuthorityScopeXml.Count);
+            Assert.AreEqual(EntityClassKeys.Material, aa4.AuthorityScopeXml.Single());
 
         }
 
+        /// <summary>
+        /// Tests that obsoletiong of a simple assigning authority removal
+        /// </summary>
+        [Test]
         public void TestObsoleteAssigningAuthority()
         {
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>();
+            Assert.IsNotNull(persistenceService);
+
+            // Insert an assigning authority
+            var aa = persistenceService.Insert(new AssigningAuthority()
+            {
+                Description = "A test authority",
+                DomainName = "TEST_AA_5",
+                IsUnique = true,
+                CustomValidator = "TEST.VALIDATOR",
+                Name = "TEST_AA_05",
+                Oid = "1.2.3.5",
+                Url = "http://google.com/test5"
+            }, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+
+            // First, assert that proper insert columns are set
+            Assert.IsNotNull(aa.Key);
+            Assert.IsNotNull(aa.CreatedByKey);
+            Assert.AreEqual(AuthenticationContext.SystemUserSid, aa.CreatedByKey.ToString());
+            Assert.IsNotNull(aa.CreationTime);
+
+            var aa2 = persistenceService.Obsolete(aa.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+            Assert.IsNotNull(aa2.ObsoletionTime);
+            Assert.IsNotNull(aa2.ObsoletedByKey);
+            Assert.AreEqual(AuthenticationContext.SystemUserSid, aa2.ObsoletedByKey.ToString());
+
+            // Validate that the AA is retrievable by fetch
+            var aa3 = persistenceService.Get(aa.Key.Value, null, AuthenticationContext.SystemPrincipal);
+            Assert.IsNotNull(aa3);
+
+            // Validate that AA is not found via the query method
+            var aa4 = persistenceService.Query(o => o.Url == "http://google.com/test5", AuthenticationContext.SystemPrincipal);
+            Assert.AreEqual(0, aa4.Count());
+
+            // Validate that AA can be found when explicitly querying for obsoleted 
+            var aa5 = persistenceService.Query(o => o.Url == "http://google.com/test5" && o.ObsoletionTime != null, AuthenticationContext.SystemPrincipal);
+            Assert.AreEqual(1, aa5.Count());
+        }
+
+        /// <summary>
+        /// Test obsoletion of an extended assigning authority
+        /// </summary>
+        [Test]
+        public void TestObsoleteExtendedAssigningAuthority()
+        {
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>();
+            Assert.IsNotNull(persistenceService);
+
+            // Insert an assigning authority
+            var aa = persistenceService.Insert(new AssigningAuthority()
+            {
+                Description = "A test authority",
+                DomainName = "TEST_AA_6",
+                IsUnique = true,
+                CustomValidator = "TEST.VALIDATOR",
+                Name = "TEST_AA_06",
+                Oid = "1.2.3.6",
+                Url = "http://google.com/test6",
+                AuthorityScopeXml = new List<Guid>()
+                {
+                    EntityClassKeys.Patient
+                }
+            }, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+
+            // First, assert that proper insert columns are set
+            Assert.IsNotNull(aa.Key);
+            Assert.IsNotNull(aa.CreatedByKey);
+            Assert.AreEqual(AuthenticationContext.SystemUserSid, aa.CreatedByKey.ToString());
+            Assert.IsNotNull(aa.CreationTime);
+            Assert.AreEqual(1, aa.AuthorityScope.Count);
+
+            var aa2 = persistenceService.Obsolete(aa.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+            Assert.IsNotNull(aa2.ObsoletionTime);
+            Assert.IsNotNull(aa2.ObsoletedByKey);
+            Assert.AreEqual(AuthenticationContext.SystemUserSid, aa2.ObsoletedByKey.ToString());
 
         }
 
-        public void TestObsoleteExtendedAssigningAuthority()
+        /// <summary>
+        /// Tests the un-deletion of an AA
+        /// </summary>
+        [Test]
+        public void TestUnDelete()
         {
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>();
+            Assert.IsNotNull(persistenceService);
+
+            // Insert an assigning authority
+            var aa = persistenceService.Insert(new AssigningAuthority()
+            {
+                Description = "A test authority",
+                DomainName = "TEST_AA_7",
+                IsUnique = true,
+                CustomValidator = "TEST.VALIDATOR",
+                Name = "TEST_AA_07",
+                Oid = "1.2.3.7",
+                Url = "http://google.com/test7",
+                AuthorityScopeXml = new List<Guid>()
+                {
+                    EntityClassKeys.Patient
+                }
+            }, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+
+            // First, assert that proper insert columns are set
+            Assert.IsNotNull(aa.Key);
+            Assert.IsNotNull(aa.CreatedByKey);
+            Assert.AreEqual(AuthenticationContext.SystemUserSid, aa.CreatedByKey.ToString());
+            Assert.IsNotNull(aa.CreationTime);
+            Assert.AreEqual(1, aa.AuthorityScope.Count);
+
+            var aa2 = persistenceService.Obsolete(aa.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+            Assert.IsNotNull(aa2.ObsoletionTime);
+            Assert.IsNotNull(aa2.ObsoletedByKey);
+            Assert.AreEqual(AuthenticationContext.SystemUserSid, aa2.ObsoletedByKey.ToString());
+
+            // Validate that AA is not found via the query method
+            var aa3 = persistenceService.Query(o => o.Url == "http://google.com/test7", AuthenticationContext.SystemPrincipal);
+            Assert.AreEqual(0, aa3.Count());
+
+            var aa4 = persistenceService.Update(aa2, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+            Assert.IsNull(aa4.ObsoletedByKey);
+            Assert.IsNull(aa4.ObsoletionTime);
+            Assert.IsNotNull(aa4.UpdatedByKey);
+            Assert.AreEqual(AuthenticationContext.SystemUserSid, aa4.UpdatedByKey.ToString());
+
+            // Validate that AA is now found via the query method
+            var aa5 = persistenceService.Query(o => o.Url == "http://google.com/test7", AuthenticationContext.SystemPrincipal);
+            Assert.AreEqual(1, aa5.Count());
 
         }
 

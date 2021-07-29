@@ -15,6 +15,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
     /// </summary>
     public class AssigningAuthorityPersistenceService : NonVersionedDataPersistenceService<AssigningAuthority, DbAssigningAuthority>
     {
+
         /// <summary>
         /// Assigning authority configuration manager
         /// </summary>
@@ -60,12 +61,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         protected override AssigningAuthority DoUpdateModel(DataContext context, AssigningAuthority data)
         {
 
-            data = base.DoUpdateModel(context, data); // updates the core properties
-            data.AuthorityScopeXml = base.UpdateInternalAssociations(context, data.Key.Value, data.AuthorityScopeXml?.Select(o => new DbAuthorityScope()
+            var retVal = base.DoUpdateModel(context, data); // updates the core properties
+            retVal.AuthorityScopeXml = base.UpdateInternalAssociations(context, retVal.Key.Value, data.AuthorityScopeXml?.Select(o => new DbAuthorityScope()
             {
                 ScopeConceptKey = o
             })).Select(o=>o.ScopeConceptKey).ToList();
-            return data;
+            return retVal;
 
         }
 
@@ -77,7 +78,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <returns>The obsoleted model</returns>
         protected override AssigningAuthority DoObsoleteModel(DataContext context, Guid key)
         {
-            context.Delete<DbAuthorityScope>(o => o.SourceKey == key); // Delete scopes
             return base.DoObsoleteModel(context, key); // Delete model
         }
     }

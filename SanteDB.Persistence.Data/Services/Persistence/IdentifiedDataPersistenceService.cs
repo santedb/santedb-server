@@ -253,6 +253,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
         }
 
+ 
         /// <summary>
         /// Update associated entities 
         /// </summary>
@@ -261,12 +262,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <paramref name="data"/>'s associations are updated to match the list 
         /// provided in <paramref name="related"/>
         /// </remarks>
-        protected virtual IEnumerable<TAssociativeTable> UpdateModelAssociations<TAssociativeTable>(DataContext context, TModel data, IEnumerable<IdentifiedData> related)
-            where TAssociativeTable : DbAssociation, new()
+        protected virtual IEnumerable<TModelAssociation> UpdateModelAssociations<TModelAssociation>(DataContext context, TModel data, IEnumerable<TModelAssociation> associations)
+            where TModelAssociation : ISimpleAssociation, new()
         {
+            associations = associations.Select(a => { a.SourceEntityKey = data.Key; return a; }).ToArray();
 
-            var dbAssociations = related.Select(o => this.m_modelMapper.GetModelMapper(o.GetType()).MapToTarget(o)).OfType<TAssociativeTable>();
-            return this.UpdateInternalAssociations(context, data.Key.Value, dbAssociations);
         }
 
         /// <summary>
@@ -280,6 +280,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<TAssociativeTable> UpdateInternalAssociations<TAssociativeTable>(DataContext context, Guid sourceKey, IEnumerable<TAssociativeTable> associations)
             where TAssociativeTable : DbAssociation, new()
         {
+            // Ensure the source by locking the IEnumerable
+            associations = associations.Select(a => { a.SourceKey = sourceKey; return a; }).ToArray();
 
             // Existing associations in the database
             var existing = context.Query<TAssociativeTable>(o => o.SourceKey == sourceKey).ToArray();
@@ -299,7 +301,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             foreach (var itm in addRelationships)
             {
                 this.m_tracer.TraceVerbose("Will add {0} of {1}", typeof(TAssociativeTable).Name, itm);
-                itm.SourceKey = sourceKey;
                 context.Insert(itm);
             }
 

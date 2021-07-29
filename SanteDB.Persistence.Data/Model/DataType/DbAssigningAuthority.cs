@@ -123,5 +123,21 @@ namespace SanteDB.Persistence.Data.Model.DataType
         [Column("cd_id"), PrimaryKey, ForeignKey(typeof(DbConceptVersion), nameof(DbConceptVersion.Key))]
         public Guid ScopeConceptKey { get; set; }
 
+        /// <summary>
+        /// Determines value equality between <paramref name="obj"/> and this object
+        /// </summary>
+        public override bool Equals(object obj)
+        {
+            if (obj is DbAuthorityScope dba)
+            {
+                return dba.ScopeConceptKey == this.ScopeConceptKey &&
+                    dba.SourceKey == this.SourceKey;
+            }
+            else
+            {
+                return base.Equals(obj);
+            }
+        }
+
     }
 }

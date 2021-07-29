@@ -84,6 +84,7 @@
            readOnlyConnectionString="TEST_CONNECTION"
            traceSql="false"
            providerType="FirebirdSQL"
+           versioning="default"
            staOnly="false"
            autoUpdateExisting="true"
            autoInsertChildren="true"

@@ -50,6 +50,7 @@
     <Compile Include="AdoRoleProviderTest.cs" />
     <Compile Include="AdoSessionProviderTest.cs" />
     <Compile Include="DataPersistenceTest.cs" />
+    <Compile Include="Persistence\CodeSystemAuthorityPersistenceTest.cs" />
     <Compile Include="Persistence\AssigningAuthorityPersistenceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ModelMapTest.cs" />

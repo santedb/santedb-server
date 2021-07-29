@@ -131,7 +131,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     dbData.ObsoletedByKey = context.ContextId;
                     dbData.ObsoletionTime = DateTimeOffset.Now;
 
-                    context.Delete(dbData);
+                    context.Update(dbData);
                     return dbData;
 #if DEBUG
                 }
