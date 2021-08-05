@@ -309,13 +309,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                             {
                                 this.m_tracer.TraceVerbose("Will update {0} object from bundle...", itm);
                                 reorganized.Item[i] = svc.Update(context, itm) as IdentifiedData;
-                                itm.BatchOperation = BatchOperationType.Update;
+                                reorganized.Item[i].BatchOperation = BatchOperationType.Update;
                             }
                             else
                             {
                                 this.m_tracer.TraceVerbose("Will insert {0} object from bundle...", itm);
                                 reorganized.Item[i] = svc.Insert(context, itm) as IdentifiedData;
-                                itm.BatchOperation = BatchOperationType.Insert;
+                                reorganized.Item[i].BatchOperation = BatchOperationType.Insert;
                             }
                             break;
                     }

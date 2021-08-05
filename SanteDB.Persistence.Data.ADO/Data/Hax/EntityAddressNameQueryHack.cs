@@ -74,7 +74,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
 
             var subQueryAlias = $"{queryPrefix}{scopedTables.First().TableName}";
 
-            whereClause.Append($"{subQueryAlias}.{keyName} IN (");
+            whereClause.And($" {subQueryAlias}.{keyName} IN (");
 
             foreach (var itm in queryFilter)
             {
@@ -91,7 +91,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
                     if (guards.Any(o => o == null)) return false;
 
                     // Add to where clause
-                    guardFilter = $"AND {queryPrefix}{cmpTblType}.typ_cd_id IN ({String.Join(",", guards.Select(o => $"'{o}'"))})";
+                    guardFilter = $"AND {queryPrefix}{cmpTblType}.typ_cd_id IN ({String.Join(",", guards.Select(o => $"'{o}'"))}) ";
                 }
 
                 // Filter on the component value
@@ -113,7 +113,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Hax
             }
             whereClause.RemoveLast();
             whereClause.Append($") ");
-            whereClause.And($"{subQueryAlias}.obslt_vrsn_seq_id IS NULL");
+            whereClause.And($"{subQueryAlias}.obslt_vrsn_seq_id IS NULL ");
 
             return true;
         }
