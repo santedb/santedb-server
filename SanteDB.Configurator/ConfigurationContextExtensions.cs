@@ -111,7 +111,7 @@ namespace SanteDB.Configurator
                 progress.OverallStatus = 100;
                 progress.ActionStatusText = "Reloading Configuration...";
                 progress.ActionStatus = 50;
-                me.RestartContext();
+                //me.RestartContext();
                 progress.ActionStatusText = "Reloading Configuration...";
                 progress.ActionStatus = 100;
             }

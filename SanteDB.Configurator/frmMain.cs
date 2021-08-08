@@ -62,7 +62,7 @@ namespace SanteDB.Configurator
         {
 
             // Load the license
-            using(var ms = typeof(frmMain).Assembly.GetManifestResourceStream("SanteDB.Configurator.License.rtf"))
+            using (var ms = typeof(frmMain).Assembly.GetManifestResourceStream("SanteDB.Configurator.License.rtf"))
                 rtbLicense.LoadFile(ms, RichTextBoxStreamType.RichText);
 
             var asm = Assembly.LoadFile(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.exe"));
@@ -74,7 +74,7 @@ namespace SanteDB.Configurator
             lsvConfigSections.Items.Clear();
             btnRestart.Enabled = ConfigurationContext.Current.Features.OfType<WindowsServiceFeature>().FirstOrDefault()?.QueryState(ConfigurationContext.Current.Configuration) == Core.Configuration.FeatureInstallState.Installed;
 
-            foreach(var sect in ConfigurationContext.Current.Configuration.Sections)
+            foreach (var sect in ConfigurationContext.Current.Configuration.Sections)
             {
                 var lvi = lsvConfigSections.Items.Add(sect.GetType().FullName, sect.GetType().GetCustomAttribute<XmlTypeAttribute>()?.TypeName, 3);
                 lvi.Tag = sect;
@@ -82,12 +82,12 @@ namespace SanteDB.Configurator
 
             // Now load all features from the application domain
             trvFeatures.Nodes.Clear();
-            foreach(var ftr in ConfigurationContext.Current.Features)
+            foreach (var ftr in ConfigurationContext.Current.Features)
             {
                 if (ftr.ConfigurationType == null) continue;
                 // Add the features
                 var trvParent = trvFeatures.Nodes.Find(ftr.Group, false).FirstOrDefault();
-                if(trvParent == null)
+                if (trvParent == null)
                 {
                     trvParent = trvFeatures.Nodes.Add(ftr.Group, ftr.Group, 6);
                     trvParent.SelectedImageIndex = 6;
@@ -95,7 +95,7 @@ namespace SanteDB.Configurator
 
                 // Create node for the object
                 var node = trvParent.Nodes.Add($"{ftr.Group}\\{ftr.Name}", ftr.Name, 0);
-                switch(ftr.QueryState(ConfigurationContext.Current.Configuration))
+                switch (ftr.QueryState(ConfigurationContext.Current.Configuration))
                 {
                     case Core.Configuration.FeatureInstallState.NotInstalled:
                         node.ImageIndex = 8;
@@ -121,7 +121,7 @@ namespace SanteDB.Configurator
                 pbEditor.SelectedObject = null;
             else
                 pbEditor.SelectedObject = lsvConfigSections.SelectedItems[0].Tag;
-                
+
         }
 
         /// <summary>
@@ -206,17 +206,11 @@ namespace SanteDB.Configurator
         /// </summary>
         private void btnApply_Click(object sender, EventArgs e)
         {
-
-            // If there are no tasks then we must save
-            if (ConfigurationContext.Current.ConfigurationTasks.Count == 0)
-            {
-                foreach(var tsk in ConfigurationContext.Current.Features.Where(o => 
-                        o.Flags.HasFlag(FeatureFlags.AlwaysConfigure))
-                    .SelectMany(o => o.CreateInstallTasks()))
-                    ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
-                
-                ConfigurationContext.Current.ConfigurationTasks.Add(new SaveConfigurationTask());
-            }
+            foreach (var tsk in ConfigurationContext.Current.Features.Where(o =>
+                     o.Flags.HasFlag(FeatureFlags.AlwaysConfigure))
+                .SelectMany(o => o.CreateInstallTasks()))
+                ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
+            ConfigurationContext.Current.ConfigurationTasks.Add(new SaveConfigurationTask());
             ConfigurationContext.Current.Apply();
         }
 
@@ -234,7 +228,7 @@ namespace SanteDB.Configurator
                 ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
 
             // Create install tasks
-            if(this.CurrentFeature.QueryState(ConfigurationContext.Current.Configuration) != FeatureInstallState.Installed)
+            if (this.CurrentFeature.QueryState(ConfigurationContext.Current.Configuration) != FeatureInstallState.Installed)
                 foreach (var tsk in this.CurrentFeature.CreateInstallTasks())
                     ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
 
@@ -253,7 +247,7 @@ namespace SanteDB.Configurator
                 ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
 
             // Create removal tasks
-            if(this.CurrentFeature.QueryState(ConfigurationContext.Current.Configuration) == FeatureInstallState.Installed)
+            if (this.CurrentFeature.QueryState(ConfigurationContext.Current.Configuration) == FeatureInstallState.Installed)
                 foreach (var tsk in this.CurrentFeature.CreateUninstallTasks())
                     ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
         }

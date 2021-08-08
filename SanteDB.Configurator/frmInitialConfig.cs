@@ -99,7 +99,7 @@ namespace SanteDB.Configurator
                 };
 
                 // Set all data connections
-                var autoFeatures = ConfigurationContext.Current.Features.Where(o => o.Flags.HasFlag(FeatureFlags.AutoSetup));
+                var autoFeatures = ConfigurationContext.Current.Features.Where(o => o.Flags.HasFlag(FeatureFlags.AutoSetup) && o.QueryState(ConfigurationContext.Current.Configuration) != FeatureInstallState.Installed);
                 foreach(var ftr in autoFeatures)
                 {
                     var ormConfig = (ftr.Configuration as OrmLite.Configuration.OrmConfigurationBase);

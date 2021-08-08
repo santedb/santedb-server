@@ -66,7 +66,6 @@ namespace SanteDB.Configurator
             AppDomain.CurrentDomain.SetData(
                "DataDirectory",
                Path.GetDirectoryName(typeof(Program).Assembly.Location));
-            ApplicationServiceContext.Current = ConfigurationContext.Current;
 
             using (AuthenticationContext.EnterSystemContext())
             {
@@ -96,6 +95,9 @@ namespace SanteDB.Configurator
                         Trace.TraceError("Unable to load {0}: {1}", file, e);
                     }
                 }
+
+                ApplicationServiceContext.Current = ConfigurationContext.Current;
+                ConfigurationContext.Current.InitializeFeatures();
 
                 // Load the current configuration
                 try
@@ -140,6 +142,7 @@ namespace SanteDB.Configurator
                     Environment.Exit(0);
                 }
             }
+
         }
 
         /// <summary>

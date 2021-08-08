@@ -431,7 +431,7 @@ namespace SanteDB.Server.Core.Services.Impl
                                     this.m_tracer.TraceEvent(EventLevel.Critical, "Duplicate solution {0} is not permitted", pkg.Meta.Id);
                                     throw new DuplicateKeyException(pkg.Meta.Id);
                                 }
-                                else if(!this.Install(pkg as AppletSolution, true))
+                                else if(!this.Install(pkg as AppletSolution, true) && ApplicationServiceContext.Current.HostType != SanteDBHostType.Configuration)
                                 {
                                     throw new InvalidOperationException($"Could not install applet solution {pkg.Meta.Id}");
                                 }
@@ -477,6 +477,9 @@ namespace SanteDB.Server.Core.Services.Impl
         public bool Stop()
         {
             this.Stopping?.Invoke(this, EventArgs.Empty);
+
+            this.m_solutions.Clear();
+            this.m_appletCollection.Clear();
             this.Stopped?.Invoke(this, EventArgs.Empty);
             return true;
         }

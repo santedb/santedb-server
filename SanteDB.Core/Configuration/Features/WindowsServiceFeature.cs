@@ -102,6 +102,8 @@ namespace SanteDB.Server.Core.Configuration.Tasks
 
             var options = this.Configuration as Options;
             options.ServiceName = configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.FirstOrDefault(o => o.Key == "w32instance.name")?.Value ?? options.ServiceName;
+            var config = ServiceTools.ServiceInstaller.GetServiceConfig(options.ServiceName);
+            options.StartBehavior = (ServiceBootFlag?)config?.dwStartType ?? ServiceBootFlag.AutoStart;
             return ServiceTools.ServiceInstaller.ServiceIsInstalled(options.ServiceName) ? FeatureInstallState.Installed : FeatureInstallState.NotInstalled;
         }
 
