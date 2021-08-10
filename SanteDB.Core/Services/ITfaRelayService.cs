@@ -27,6 +27,7 @@ namespace SanteDB.Server.Core.Services
     /// <summary>
     /// Represents the TFA mechanism
     /// </summary>
+    [System.ComponentModel.Description("TFA/MFA Message Relay Provider")]
     public interface ITfaMechanism
     {
 

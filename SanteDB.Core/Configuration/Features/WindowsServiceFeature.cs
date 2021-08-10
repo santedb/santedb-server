@@ -26,6 +26,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Services;
 using ServiceTools;
 
@@ -125,26 +126,26 @@ namespace SanteDB.Server.Core.Configuration.Tasks
             /// <summary>
             /// Gets or sets the service name
             /// </summary>
-            [Description("The name of the windows service")]
+            [DisplayName("Instance Name"), Description("The name of the windows service. Use this setting if you plan on running more than one copy of SanteDB on this server")]
             public String ServiceName { get; set; }
 
             /// <summary>
             /// Gets or sets the user
             /// </summary>
-            [Description("Identifies the logon user for the windows service")]
+            [DisplayName("Service Account"), Description("Identifies the logon user for the windows service. Leave this setting empty if you're running as LOCAL SERVICE")]
             public String User { get; set; }
 
             /// <summary>
             /// Gets or sets the password
             /// </summary>
-            [Description("Identifies the password for the login user")]
+            [DisplayName("Service Account Password"), Description("Identifies the password for the login user. Leave this setting empty if you're running as LOCAL SERVICE")]
             [PasswordPropertyText]
             public String Password { get; set; }
 
             /// <summary>
             /// Gets or sets the boot behavior
             /// </summary>
-            [Description("Identifies the boot behavior")]
+            [DisplayName("Startup Behavior"), Description("Identifies the boot behavior")]
             public ServiceBootFlag StartBehavior { get; set; }
         }
 
@@ -153,6 +154,9 @@ namespace SanteDB.Server.Core.Configuration.Tasks
         /// </summary>
         public class InstallTask : IConfigurationTask
         {
+
+            // Tracer
+            private Tracer m_tracer = new Tracer("Windows Service Installer");
 
             /// <summary>
             /// Get the name
@@ -193,18 +197,26 @@ namespace SanteDB.Server.Core.Configuration.Tasks
             /// </summary>
             public bool Execute(SanteDBConfiguration configuration)
             {
-                this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(0.0f, $"Installing Windows Service {this.m_options.ServiceName}..."));
-                if (!ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName))
+                try
                 {
-                    ServiceInstaller.Install(this.m_options.ServiceName, "SanteDB Host Process",
-                        Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.exe"),
-                        this.m_options.User,
-                        this.m_options.Password,
-                        this.m_options.StartBehavior);
-                    configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.Add(new AppSettingKeyValuePair("w32instance.name", this.m_options.ServiceName));
+                    this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(0.0f, $"Installing Windows Service {this.m_options.ServiceName}..."));
+                    if (!ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName))
+                    {
+                        ServiceInstaller.Install(this.m_options.ServiceName, "SanteDB Host Process",
+                            Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.exe"),
+                            this.m_options.User,
+                            this.m_options.Password,
+                            this.m_options.StartBehavior);
+                        configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.Add(new AppSettingKeyValuePair("w32instance.name", this.m_options.ServiceName));
+                    }
+                    this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, null));
+                    return true;
                 }
-                this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, null));
-                return true;
+                catch(Exception e)
+                {
+                    this.m_tracer.TraceError("Could not install Windows Service {0} => {1}", this.m_options.ServiceName, e.Message);
+                    return false;
+                }
             }
 
             /// <summary>
@@ -227,9 +239,8 @@ namespace SanteDB.Server.Core.Configuration.Tasks
             public bool VerifyState(SanteDBConfiguration configuration) {
                 WindowsIdentity identity = WindowsIdentity.GetCurrent();
                 WindowsPrincipal principal = new WindowsPrincipal(identity);
-                if (Environment.OSVersion.Platform == PlatformID.Win32NT && 
-                    principal.IsInRole(WindowsBuiltInRole.Administrator))
-                    return ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName);
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                    return !ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName);
                 return false;
             }
         }
@@ -239,6 +250,10 @@ namespace SanteDB.Server.Core.Configuration.Tasks
         /// </summary>
         public class UninstallTask : IConfigurationTask
         {
+
+            // Tracer
+            private Tracer m_tracer = new Tracer("Windows Service Installer");
+
             /// <summary>
             /// Get the name
             /// </summary>
@@ -278,15 +293,23 @@ namespace SanteDB.Server.Core.Configuration.Tasks
             /// </summary>
             public bool Execute(SanteDBConfiguration configuration)
             {
-                this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(0.0f, $"Removing Windows Service {this.m_options.ServiceName}..."));
-                if (ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName))
+                try
                 {
-                    ServiceInstaller.StopService(this.m_options.ServiceName);
-                    ServiceInstaller.Uninstall(this.m_options.ServiceName);
-                    configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.RemoveAll(o => o.Key == "w32instance.name");
+                    this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(0.0f, $"Removing Windows Service {this.m_options.ServiceName}..."));
+                    if (ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName))
+                    {
+                        ServiceInstaller.StopService(this.m_options.ServiceName);
+                        ServiceInstaller.Uninstall(this.m_options.ServiceName);
+                        configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.RemoveAll(o => o.Key == "w32instance.name");
+                    }
+                    this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, null));
+                    return true;
                 }
-                this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, null));
-                return true;
+                catch(Exception e )
+                {
+                    this.m_tracer.TraceError("Could not uninstall Windows Service {0} - {1}", this.m_options.ServiceName, e.Message);
+                    return false;
+                }
             }
 
             /// <summary>

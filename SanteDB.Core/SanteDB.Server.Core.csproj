@@ -37,6 +37,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <Reference Include="System" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -62,7 +63,6 @@
   <ItemGroup>
     <Compile Include="Configuration\Features\AppletBusinessRulesFeature.cs" />
     <Compile Include="Configuration\Features\CoreServerFeatures.cs" />
-    <Compile Include="Configuration\Features\DatasetInstallFeature.cs" />
     <Compile Include="Configuration\Features\FileSystemQueueFeature.cs" />
     <Compile Include="Configuration\Features\JobManagerFeature.cs" />
     <Compile Include="Configuration\Features\LocalAppletManagerFeature.cs" />
@@ -208,6 +208,10 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <ProjectReference Include="..\santedb-bis\SanteDB.BI\SanteDB.BI.csproj">
+      <Project>{030666AA-FC71-449E-9DFC-270F1C23C5DA}</Project>
+      <Name>SanteDB.BI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Configuration\SanteDB.Configuration.csproj">
       <Project>{032ABF00-6C76-47C7-9ECA-A840915A17EA}</Project>
       <Name>SanteDB.Configuration</Name>

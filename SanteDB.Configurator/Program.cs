@@ -96,7 +96,6 @@ namespace SanteDB.Configurator
                     }
                 }
 
-                ApplicationServiceContext.Current = ConfigurationContext.Current;
                 ConfigurationContext.Current.InitializeFeatures();
 
                 // Load the current configuration
@@ -123,10 +122,10 @@ namespace SanteDB.Configurator
                     else
                     {
                         splash.NotifyStatus("Loading Configuration...", -1f);
-                        ConfigurationContext.Current.Start();
                         splash.Close();
                     }
 
+                    var frmMain = new frmMain();
                     // Check for updates
                     foreach (var t in ConfigurationContext.Current.Features
                         .Where(o => o.Flags.HasFlag(FeatureFlags.AlwaysConfigure) && !o.Flags.HasFlag(FeatureFlags.SystemFeature))
@@ -135,7 +134,7 @@ namespace SanteDB.Configurator
                         ConfigurationContext.Current.ConfigurationTasks.Add(t);
                     ConfigurationContext.Current.Apply();
 
-                    Application.Run(new frmMain());
+                    Application.Run(frmMain);
                 }
                 finally
                 {

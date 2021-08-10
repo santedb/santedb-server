@@ -17,7 +17,9 @@
  * Date: 2019-11-27
  */
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Model.Serialization;
+using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -41,24 +43,16 @@ namespace SanteDB.Messaging.HDSI.Configuration
         }
 
         /// <summary>
-        /// Resources on the AMI that are forbidden
+        /// Resources on the HDSI that are allowed
         /// </summary>
-        [XmlIgnore, Browsable(false)]
-        public IEnumerable<Type> ResourceHandlers
+        [XmlArray("resources"), XmlArrayItem("add")]
+        [DisplayName("Allowed Resources"), Description("When set, instructs the HDSI to only allow these resources to be accessed (can also be used to specify custom resource handlers). LEAVE THIS BLANK IF YOU WANT THE HDSI TO USE THE DEFAULT CONFIGURATION")]
+        [Editor("SanteDB.Configuration.Editors.TypeSelectorEditor, SanteDB.Configuration", "System.Drawing.Design.UITypeEditor, System.Drawing"), Binding(typeof(IApiResourceHandler))]
+        public List<TypeReferenceConfiguration> ResourceHandlers
         {
-            get
-            {
-                var msb = new ModelSerializationBinder();
-                return this.ResourceHandlerXml?.Select(o => msb.BindToType(null, o));
-            }
+            get; set;
         }
-
-        /// <summary>
-        /// Gets or sets the resource in xml format
-        /// </summary>
-        [XmlArray("resources"), XmlArrayItem("add"), ReadOnly(true)]
-        public List<String> ResourceHandlerXml { get; set; }
-
+       
        
     }
 }

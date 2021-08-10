@@ -75,6 +75,30 @@ namespace SanteDB.Server.Core.Configuration
     {
 
         /// <summary>
+        /// Default ctor
+        /// </summary>
+        public PolicyValueTimeSpan()
+        {
+
+        }
+
+        /// <summary>
+        /// Timepsan value
+        /// </summary>
+        public PolicyValueTimeSpan(TimeSpan ts)
+        {
+            this.Value = ts;
+        }
+
+        /// <summary>
+        /// Policy value timespan
+        /// </summary>
+        public PolicyValueTimeSpan(int hours, int minutes, int seconds)
+        {
+            this.Value = new TimeSpan(hours, minutes, seconds);
+        }
+
+        /// <summary>
         /// Time to live for XML serialization
         /// </summary>
         [XmlText]
@@ -104,6 +128,11 @@ namespace SanteDB.Server.Core.Configuration
         {
             return new PolicyValueTimeSpan() { Value = instance };
         }
+
+        /// <summary>
+        /// Represent as value
+        /// </summary>
+        public override string ToString() => this.ValueXml;
 
     }
 
@@ -155,6 +184,12 @@ namespace SanteDB.Server.Core.Configuration
         [XmlElement("bool", typeof(Boolean))]
         [XmlElement("real", typeof(double))]
         public Object PolicyValue { get; set; }
+
+        /// <summary>
+        /// Convert to string
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString() => $"{this.PolicyId}={this.PolicyValue}";
 
     }
 }

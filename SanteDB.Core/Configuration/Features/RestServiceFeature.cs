@@ -19,6 +19,8 @@
 using SanteDB.Configuration;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Features;
+using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Interop;
 using SanteDB.Core.Services;
 using SanteDB.Rest.Common.Configuration;
 using SanteDB.Server.Core.Configuration.Tasks;
@@ -26,11 +28,13 @@ using SanteDB.Server.Core.Configuration.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SanteDB.Server.Core.Configuration.Features
 {
@@ -40,10 +44,14 @@ namespace SanteDB.Server.Core.Configuration.Features
     public class RestServiceFeature : IFeature
     {
 
+        // Tracer
+        internal readonly Tracer m_tracer;
+
         // Configuration
         private GenericFeatureConfiguration m_configuration;
 
         // Contract type
+        private Type m_behaviorType = null;
         private Type m_contractType = null;
 
         // Configuration type
@@ -75,11 +83,13 @@ namespace SanteDB.Server.Core.Configuration.Features
         public RestServiceFeature(Type serviceProviderType)
         {
             this.m_serviceType = serviceProviderType;
+
             this.m_configurationType = serviceProviderType.GetCustomAttribute<ApiServiceProviderAttribute>().Configuration;
-            this.m_contractType = serviceProviderType.GetCustomAttribute<ApiServiceProviderAttribute>().ContractType;
+            this.m_behaviorType = serviceProviderType.GetCustomAttribute<ApiServiceProviderAttribute>().BehaviorType;
+            this.m_contractType = this.m_behaviorType.GetInterfaces().First();
             this.Name = serviceProviderType.GetCustomAttribute<ApiServiceProviderAttribute>().Name ?? serviceProviderType.Name;
             this.Description = serviceProviderType.GetCustomAttribute<DescriptionAttribute>()?.Description;
-
+            this.m_tracer = new Tracer(this.Name);
             if (serviceProviderType.GetCustomAttribute<ApiServiceProviderAttribute>().Required)
             {
                 this.Flags = FeatureFlags.SystemFeature;
@@ -159,8 +169,12 @@ namespace SanteDB.Server.Core.Configuration.Features
                 configuration.AddSection(new SanteDB.Rest.Common.Configuration.RestConfigurationSection());
 
             // Does the contract exist?
-            var restConfiguration = configuration.GetSection<SanteDB.Rest.Common.Configuration.RestConfigurationSection>().Services.FirstOrDefault(s => s.Endpoints.Any(e => e.Contract == this.m_contractType));
+            var restConfiguration = configuration.GetSection<SanteDB.Rest.Common.Configuration.RestConfigurationSection>().Services.FirstOrDefault(s => s.ServiceType == this.m_behaviorType || s.Endpoints.Any(e => e.Contract == this.m_contractType));
 
+            if(restConfiguration != null && restConfiguration.ServiceType == null)
+            {
+                restConfiguration.ServiceType = this.m_behaviorType;
+            }
             // Create / add section type
             if (!configuration.SectionTypes.Any(t => t.Type == this.m_configurationType))
                 configuration.SectionTypes.Add(new TypeReferenceConfiguration(this.m_configurationType));
@@ -176,7 +190,10 @@ namespace SanteDB.Server.Core.Configuration.Features
             // Do either exist?
             if (restConfiguration == null)
                 using (var s = this.m_configurationType.Assembly.GetManifestResourceStream(this.m_configurationType.Namespace + ".Default.xml"))
+                {
                     restConfiguration = RestServiceConfiguration.Load(s);
+                    restConfiguration.ServiceType = this.m_behaviorType;
+                }
             if (serviceConfiguration == null)
                 serviceConfiguration = Activator.CreateInstance(this.m_configurationType);
 
@@ -315,7 +332,7 @@ namespace SanteDB.Server.Core.Configuration.Features
             if (restSection != null)
             {
                 this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(0.33f, null));
-                restSection.Services.RemoveAll(o => o.Name == this.m_restServiceConfiguration.Name);
+                restSection.Services.RemoveAll(o => o.ServiceType == this.m_restServiceConfiguration.ServiceType);
             }
 
             // Remove the HTTP bindings
@@ -347,7 +364,7 @@ namespace SanteDB.Server.Core.Configuration.Features
         {
             var restSection = configuration.GetSection<SanteDB.Rest.Common.Configuration.RestConfigurationSection>();
             if (restSection != null &&
-                !restSection.Services.Any(o => o.Name == this.m_restServiceConfiguration.Name))
+                !restSection.Services.Any(o => o.ServiceType == this.m_restServiceConfiguration.ServiceType))
             {
                 restSection.Services.Add(this.m_restServiceConfiguration);
             }
@@ -477,10 +494,8 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// </summary>
         public bool Execute(SanteDBConfiguration configuration)
         {
-            if (!configuration.Sections.Any(o => o.GetType() == this.m_serviceConfigurationObject.GetType()))
-            {
-                configuration.AddSection(this.m_serviceConfigurationObject);
-            }
+            configuration.Sections.RemoveAll(o => o.GetType() == this.m_serviceConfigurationObject.GetType());
+            configuration.AddSection(this.m_serviceConfigurationObject);
             return true;
         }
 
@@ -496,7 +511,7 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// <summary>
         /// Verify this task can be executed
         /// </summary>
-        public bool VerifyState(SanteDBConfiguration configuration) => !configuration.Sections.Any(o => o.GetType() == this.m_serviceConfigurationObject.GetType());
+        public bool VerifyState(SanteDBConfiguration configuration) => true;
 
     }
 
@@ -505,13 +520,17 @@ namespace SanteDB.Server.Core.Configuration.Features
     /// </summary>
     internal class RestEndpointInstallTask : IConfigurationTask
     {
+
+        // The feature
+        private readonly RestServiceFeature m_feature;
+
         // The service configuration
         private RestServiceConfiguration m_restServiceConfiguration;
 
         public RestEndpointInstallTask(RestServiceFeature feature, RestServiceConfiguration restServiceConfiguration)
         {
             this.m_restServiceConfiguration = restServiceConfiguration;
-            this.Feature = feature;
+            this.m_feature = feature;
         }
 
         /// <summary>
@@ -522,7 +541,7 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// <summary>
         /// Gets the feature to which this task is associated
         /// </summary>
-        public IFeature Feature { get; }
+        public IFeature Feature => this.m_feature;
 
         /// <summary>
         /// Gets the name
@@ -546,33 +565,39 @@ namespace SanteDB.Server.Core.Configuration.Features
                 configuration.AddSection(restSection);
             }
 
-            if (!restSection.Services.Any(o => o.Name == this.m_restServiceConfiguration.Name))
-            {
-                restSection.Services.Add(this.m_restServiceConfiguration);
-            }
+            restSection.Services.RemoveAll(o => o.ServiceType == this.m_restServiceConfiguration.ServiceType);
+            restSection.Services.Add(this.m_restServiceConfiguration);
 
             // Remove the HTTP bindings
             this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(0.5f, "Binding Certificates"));
             foreach (var ep in this.m_restServiceConfiguration.Endpoints)
             {
                 Uri address = new Uri(ep.Address);
-                if (address.Scheme == "https")
+                if (address.Scheme == "https" && Environment.OSVersion.Platform == PlatformID.Win32NT)
                 {
                     if (ep.CertificateBinding == null || String.IsNullOrEmpty(ep.CertificateBinding.FindValue))
                     {
                         throw new InvalidOperationException($"Endpoint binding for {ep.Address} requires a certificate binding if HTTPS is used as the scheme");
                     }
-                    // Reserve the SSL certificate on the IP address
-                    if (address.HostNameType == UriHostNameType.Dns)
+                    try
                     {
-                        var ipAddresses = Dns.GetHostAddresses(address.Host);
-                        HttpSslTool.BindCertificate(ipAddresses[0], address.Port, ep.CertificateBinding.Certificate.GetCertHash(), ep.CertificateBinding.StoreName, ep.CertificateBinding.StoreLocation);
+                        // Reserve the SSL certificate on the IP address
+                        ep.CertificateBinding.StoreLocationSpecified = ep.CertificateBinding.StoreNameSpecified = ep.CertificateBinding.FindTypeSpecified = true;
+                        if (address.HostNameType == UriHostNameType.Dns)
+                        {
+                            var ipAddresses = Dns.GetHostAddresses(address.Host);
+                            HttpSslTool.BindCertificate(ipAddresses[0], address.Port, ep.CertificateBinding.Certificate.GetCertHash(), ep.CertificateBinding.StoreName, ep.CertificateBinding.StoreLocation);
+                        }
+                        else
+                        {
+                            HttpSslTool.BindCertificate(IPAddress.Parse(address.Host), address.Port, ep.CertificateBinding.Certificate.GetCertHash(), ep.CertificateBinding.StoreName, ep.CertificateBinding.StoreLocation);
+                        }
                     }
-                    else
+                    catch(Exception e)
                     {
-                        HttpSslTool.BindCertificate(IPAddress.Parse(address.Host), address.Port, ep.CertificateBinding.Certificate.GetCertHash(), ep.CertificateBinding.StoreName, ep.CertificateBinding.StoreLocation);
+                        this.m_feature.m_tracer.TraceError($"Warning: Could not bind SSL certificate {ep.CertificateBinding.FindValue} to {ep.Address} - you can manually bind this certificate using netsh http add sslcert - Error: {e.Message}");
+                        this.m_feature.m_tracer.TraceWarning($"Run: netsh http add sslcert ipport={address.Host}:{address.Port} certhash={ep.CertificateBinding.FindValue} appid={{{{21F35B18-E417-4F8E-B9C7-73E98B7C71B8}}}}");
                     }
-                    ep.CertificateBinding.StoreLocationSpecified = ep.CertificateBinding.StoreNameSpecified = ep.CertificateBinding.FindTypeSpecified = true;
                 }
                 else
                 {

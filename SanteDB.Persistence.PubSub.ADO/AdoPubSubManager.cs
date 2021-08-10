@@ -24,7 +24,7 @@ namespace SanteDB.Persistence.PubSub.ADO
     /// <summary>
     /// Represents a pub/sub manager which stores definitions in a database
     /// </summary>
-    /// TODO: Add auditing
+    [ServiceProvider("ADO.NET Pub/Sub Subscription Manager")]
     public class AdoPubSubManager : IPubSubManagerService
     {
         /// <summary>

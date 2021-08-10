@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SanteDB.Core.Model;
 
 namespace SanteDB.Server.Core.Configuration.Features
 {
@@ -98,13 +99,25 @@ namespace SanteDB.Server.Core.Configuration.Features
             // Configuration of features
             var config = new GenericFeatureConfiguration();
             config.Options.Add("Configuration", () => ConfigurationOptionType.Object);
-            config.Values.Add("Configuration", configuration.GetSection(typeof(SecurityConfigurationSection)) ?? new SecurityConfigurationSection());
+            var configSection = configuration.GetSection<SecurityConfigurationSection>() ?? new SecurityConfigurationSection()
+            {
+                Signatures = new List<SanteDB.Core.Security.Configuration.SecuritySignatureConfiguration>()
+                {
+                    new SanteDB.Core.Security.Configuration.SecuritySignatureConfiguration()
+                    {
+                        KeyName ="jwsdefault",
+                        Algorithm = SanteDB.Core.Security.Configuration.SignatureAlgorithm.HS256,
+                        HmacSecret = "@SanteDBDefault$$$2021"
+                    }
+                }
+            };
+            config.Values.Add("Configuration", configSection);
 
             // Add options for password encrypting and such
-            config.Options.Add("PasswordHasher", () => ApplicationServiceContext.Current.GetService<IServiceManager>().GetAllTypes().Where(t => !t.IsInterface && !t.IsAbstract && typeof(IPasswordHashingService).IsAssignableFrom(t)));
-            config.Options.Add("PolicyDecisionProvider", () => ApplicationServiceContext.Current.GetService<IServiceManager>().GetAllTypes().Where(t => !t.IsInterface && !t.IsAbstract && typeof(IPolicyDecisionService).IsAssignableFrom(t)));
-            config.Options.Add("PolicyInformationProvider", () => ApplicationServiceContext.Current.GetService<IServiceManager>().GetAllTypes().Where(t => !t.IsInterface && !t.IsAbstract && typeof(IPolicyInformationService).IsAssignableFrom(t)));
-            config.Options.Add("PasswordValidator", () => ApplicationServiceContext.Current.GetService<IServiceManager>().GetAllTypes().Where(t => !t.IsInterface && !t.IsAbstract && typeof(IPasswordValidatorService).IsAssignableFrom(t)));
+            config.Options.Add("PasswordHasher", () => AppDomain.CurrentDomain.GetAllTypes().Where(t => !t.IsInterface && !t.IsAbstract && typeof(IPasswordHashingService).IsAssignableFrom(t)));
+            config.Options.Add("PolicyDecisionProvider", () => AppDomain.CurrentDomain.GetAllTypes().Where(t => !t.IsInterface && !t.IsAbstract && typeof(IPolicyDecisionService).IsAssignableFrom(t)));
+            config.Options.Add("PolicyInformationProvider", () => AppDomain.CurrentDomain.GetAllTypes().Where(t => !t.IsInterface && !t.IsAbstract && typeof(IPolicyInformationService).IsAssignableFrom(t)));
+            config.Options.Add("PasswordValidator", () => AppDomain.CurrentDomain.GetAllTypes().Where(t => !t.IsInterface && !t.IsAbstract && typeof(IPasswordValidatorService).IsAssignableFrom(t)));
 
             var appServices = configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders;
 
@@ -118,12 +131,30 @@ namespace SanteDB.Server.Core.Configuration.Features
             config.Values.Add("PolicyDecisionProvider", pdp ?? typeof(DefaultPolicyDecisionService));
             config.Values.Add("PolicyInformationProvider", pip ?? (config.Options["PolicyInformationProvider"]() as IEnumerable<Type>).FirstOrDefault());
 
-            if(this.Configuration == null)
+            if (this.Configuration == null)
                 this.Configuration = config;
 
+            // Add policies
+            config.Categories.Add("Policies", new String[] {
+                "PasswordAge",
+                "PasswordHistory",
+                "FailedLogins",
+                "SessionLength",
+                "SessionRefresh"
+            });
+            config.Options.Add("PasswordAge", () => ConfigurationOptionType.Numeric);
+            config.Options.Add("PasswordHistory", () => ConfigurationOptionType.Boolean);
+            config.Options.Add("FailedLogins", () => ConfigurationOptionType.Numeric);
+            config.Options.Add("SessionLength", () => Enumerable.Range(15, 180).Where(o => o % 15 == 0).Select(o => new PolicyValueTimeSpan(0, o, 0)));
+            config.Options.Add("SessionRefresh", () => Enumerable.Range(15, 180).Where(o => o % 15 == 0).Select(o => new PolicyValueTimeSpan(0, o, 0)));
+            config.Values.Add("PasswordAge", configSection.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxPasswordAge, 3650));
+            config.Values.Add("PasswordHistory", configSection.GetSecurityPolicy<bool>(SecurityPolicyIdentification.PasswordHistory, false));
+            config.Values.Add("FailedLogins", configSection.GetSecurityPolicy(SecurityPolicyIdentification.PasswordHistory, 5));
+            config.Values.Add("SessionLength", configSection.GetSecurityPolicy<PolicyValueTimeSpan>(SecurityPolicyIdentification.SessionLength, new PolicyValueTimeSpan(0, 30, 0)));
+            config.Values.Add("SessionRefresh", configSection.GetSecurityPolicy<PolicyValueTimeSpan>(SecurityPolicyIdentification.RefreshLength, new PolicyValueTimeSpan(0, 30, 0)));
             return hasher != null && validator != null && pdp != null && pip != null ? FeatureInstallState.Installed : FeatureInstallState.PartiallyInstalled;
 
-    }
+        }
 
         /// <summary>
         /// Install security services task
@@ -184,7 +215,8 @@ namespace SanteDB.Server.Core.Configuration.Features
                 }
 
                 configuration.RemoveSection<SecurityConfigurationSection>();
-                configuration.AddSection(config.Values["Configuration"] as SecurityConfigurationSection);
+                var secSection = config.Values["Configuration"] as SecurityConfigurationSection;
+                configuration.AddSection(secSection);
 
                 // Now add the services
                 appServices.RemoveAll(t => t.Type == typeof(ExemptablePolicyFilterService));
@@ -194,6 +226,12 @@ namespace SanteDB.Server.Core.Configuration.Features
                 appServices.Add(new TypeReferenceConfiguration(config.Values["PolicyDecisionProvider"] as Type));
                 appServices.Add(new TypeReferenceConfiguration(config.Values["PolicyInformationProvider"] as Type));
 
+                // Now set the policy values
+                secSection.SetPolicy(SecurityPolicyIdentification.MaxPasswordAge, (Int32)config.Values["PasswordAge"]);
+                secSection.SetPolicy(SecurityPolicyIdentification.PasswordHistory, (bool)config.Values["PasswordHistory"]);
+                secSection.SetPolicy(SecurityPolicyIdentification.MaxInvalidLogins, (Int32)config.Values["FailedLogins"]);
+                secSection.SetPolicy(SecurityPolicyIdentification.SessionLength, (PolicyValueTimeSpan)config.Values["SessionLength"]);
+                secSection.SetPolicy(SecurityPolicyIdentification.RefreshLength, (PolicyValueTimeSpan)config.Values["SessionRefresh"]);
                 return true;
             }
 

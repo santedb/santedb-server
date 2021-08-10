@@ -13,7 +13,7 @@
   <!-- Logging Configuration -->
   <section xsi:type="DiagnosticsConfigurationSection">
     <sources>
-      <add name="SanteDB" filter="Information" />
+      <add name="SanteDB" filter="Informational" />
       <add name="SanteMPI" filter="Informational"/>
     </sources>
     <writers>

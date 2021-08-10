@@ -20,9 +20,12 @@ using SanteDB.Core.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
+using System.Drawing.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.Design;
 using System.Xml.Serialization;
 
 namespace SanteDB.Server.Core.Configuration
@@ -39,6 +42,9 @@ namespace SanteDB.Server.Core.Configuration
         /// </summary>
         [XmlAttribute("queueRoot")]
         [Description("Identifies where file system queues should be created")]
+        [Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
+        
+        //[Editor("System.Windows.Forms.Design.FolderNameEditor, System.Design, Version=4.0.0.0", "System.Drawing.Design.UITypeEditor, System.Drawing, Version=4.0.0.0")]
         public String QueuePath { get; set; }
 
     }
