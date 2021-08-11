@@ -50,7 +50,6 @@
             this.btnEnable = new System.Windows.Forms.LinkLabel();
             this.tcSettings = new System.Windows.Forms.TabControl();
             this.tpSetting = new System.Windows.Forms.TabPage();
-            this.pgConfiguration = new SanteDB.Configuration.Controls.PropertyGridEx();
             this.lblDescription = new System.Windows.Forms.Label();
             this.lblDisabled = new System.Windows.Forms.Label();
             this.lblEnabled = new System.Windows.Forms.Label();
@@ -59,11 +58,20 @@
             this.spEditor = new System.Windows.Forms.SplitContainer();
             this.lsvConfigSections = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.pbEditor = new SanteDB.Configuration.Controls.PropertyGridEx();
             this.label2 = new System.Windows.Forms.Label();
             this.tspMain = new System.Windows.Forms.ToolStrip();
             this.btnApply = new System.Windows.Forms.ToolStripButton();
-            this.btnRestart = new System.Windows.Forms.ToolStripButton();
+            this.btnOpenConfig = new System.Windows.Forms.ToolStripButton();
+            this.spMainLog = new System.Windows.Forms.SplitContainer();
+            this.lsvLog = new System.Windows.Forms.ListView();
+            this.colStat = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colSource = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colDiagnostic = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.imlLog = new System.Windows.Forms.ImageList(this.components);
+            this.label3 = new System.Windows.Forms.Label();
+            this.btnRestartService = new System.Windows.Forms.ToolStripButton();
+            this.pgConfiguration = new SanteDB.Configuration.Controls.PropertyGridEx();
+            this.pbEditor = new SanteDB.Configuration.Controls.PropertyGridEx();
             this.tbMain.SuspendLayout();
             this.tpSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.spMainControl)).BeginInit();
@@ -82,6 +90,10 @@
             this.spEditor.Panel2.SuspendLayout();
             this.spEditor.SuspendLayout();
             this.tspMain.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.spMainLog)).BeginInit();
+            this.spMainLog.Panel1.SuspendLayout();
+            this.spMainLog.Panel2.SuspendLayout();
+            this.spMainLog.SuspendLayout();
             this.SuspendLayout();
             // 
             // tbMain
@@ -91,11 +103,11 @@
             this.tbMain.Controls.Add(this.tpAdvanced);
             this.tbMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbMain.ImageList = this.imlMain;
-            this.tbMain.Location = new System.Drawing.Point(0, 38);
+            this.tbMain.Location = new System.Drawing.Point(0, 0);
             this.tbMain.Multiline = true;
             this.tbMain.Name = "tbMain";
             this.tbMain.SelectedIndex = 0;
-            this.tbMain.Size = new System.Drawing.Size(818, 419);
+            this.tbMain.Size = new System.Drawing.Size(1068, 381);
             this.tbMain.TabIndex = 0;
             // 
             // tpSettings
@@ -105,7 +117,7 @@
             this.tpSettings.Location = new System.Drawing.Point(4, 4);
             this.tpSettings.Name = "tpSettings";
             this.tpSettings.Padding = new System.Windows.Forms.Padding(3);
-            this.tpSettings.Size = new System.Drawing.Size(810, 392);
+            this.tpSettings.Size = new System.Drawing.Size(1060, 354);
             this.tpSettings.TabIndex = 0;
             this.tpSettings.Text = "Settings";
             this.tpSettings.UseVisualStyleBackColor = true;
@@ -124,8 +136,8 @@
             // 
             this.spMainControl.Panel2.Controls.Add(this.pnlInfo);
             this.spMainControl.Panel2.Controls.Add(this.pnlFeature);
-            this.spMainControl.Size = new System.Drawing.Size(804, 386);
-            this.spMainControl.SplitterDistance = 210;
+            this.spMainControl.Size = new System.Drawing.Size(1054, 348);
+            this.spMainControl.SplitterDistance = 275;
             this.spMainControl.TabIndex = 0;
             // 
             // trvFeatures
@@ -138,7 +150,7 @@
             this.trvFeatures.Location = new System.Drawing.Point(0, 0);
             this.trvFeatures.Name = "trvFeatures";
             this.trvFeatures.SelectedImageIndex = 0;
-            this.trvFeatures.Size = new System.Drawing.Size(210, 386);
+            this.trvFeatures.Size = new System.Drawing.Size(275, 348);
             this.trvFeatures.TabIndex = 0;
             this.trvFeatures.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.trvFeatures_AfterSelect);
             // 
@@ -171,7 +183,7 @@
             this.pnlInfo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlInfo.Location = new System.Drawing.Point(0, 0);
             this.pnlInfo.Name = "pnlInfo";
-            this.pnlInfo.Size = new System.Drawing.Size(590, 386);
+            this.pnlInfo.Size = new System.Drawing.Size(775, 348);
             this.pnlInfo.TabIndex = 1;
             // 
             // panel1
@@ -183,7 +195,7 @@
             this.panel1.Controls.Add(this.label1);
             this.panel1.Location = new System.Drawing.Point(4, 97);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(586, 286);
+            this.panel1.Size = new System.Drawing.Size(771, 248);
             this.panel1.TabIndex = 9;
             // 
             // rtbLicense
@@ -193,7 +205,7 @@
             this.rtbLicense.Location = new System.Drawing.Point(0, 22);
             this.rtbLicense.Name = "rtbLicense";
             this.rtbLicense.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.rtbLicense.Size = new System.Drawing.Size(586, 264);
+            this.rtbLicense.Size = new System.Drawing.Size(771, 226);
             this.rtbLicense.TabIndex = 10;
             this.rtbLicense.Text = "";
             // 
@@ -206,7 +218,7 @@
             this.label1.Location = new System.Drawing.Point(0, 0);
             this.label1.Name = "label1";
             this.label1.Padding = new System.Windows.Forms.Padding(3);
-            this.label1.Size = new System.Drawing.Size(586, 22);
+            this.label1.Size = new System.Drawing.Size(771, 22);
             this.label1.TabIndex = 9;
             this.label1.Text = "License Notice(s)";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -281,7 +293,7 @@
             this.pnlFeature.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlFeature.Location = new System.Drawing.Point(0, 0);
             this.pnlFeature.Name = "pnlFeature";
-            this.pnlFeature.Size = new System.Drawing.Size(590, 386);
+            this.pnlFeature.Size = new System.Drawing.Size(775, 348);
             this.pnlFeature.TabIndex = 0;
             // 
             // btnDisable
@@ -289,7 +301,7 @@
             this.btnDisable.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnDisable.AutoSize = true;
             this.btnDisable.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.btnDisable.Location = new System.Drawing.Point(540, 27);
+            this.btnDisable.Location = new System.Drawing.Point(725, 27);
             this.btnDisable.Name = "btnDisable";
             this.btnDisable.Size = new System.Drawing.Size(42, 13);
             this.btnDisable.TabIndex = 13;
@@ -302,7 +314,7 @@
             this.btnEnable.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnEnable.AutoSize = true;
             this.btnEnable.BackColor = System.Drawing.SystemColors.Info;
-            this.btnEnable.Location = new System.Drawing.Point(542, 27);
+            this.btnEnable.Location = new System.Drawing.Point(727, 27);
             this.btnEnable.Name = "btnEnable";
             this.btnEnable.Size = new System.Drawing.Size(40, 13);
             this.btnEnable.TabIndex = 11;
@@ -319,7 +331,7 @@
             this.tcSettings.Location = new System.Drawing.Point(0, 100);
             this.tcSettings.Name = "tcSettings";
             this.tcSettings.SelectedIndex = 0;
-            this.tcSettings.Size = new System.Drawing.Size(590, 286);
+            this.tcSettings.Size = new System.Drawing.Size(775, 248);
             this.tcSettings.TabIndex = 8;
             // 
             // tpSetting
@@ -329,20 +341,10 @@
             this.tpSetting.Location = new System.Drawing.Point(4, 4);
             this.tpSetting.Name = "tpSetting";
             this.tpSetting.Padding = new System.Windows.Forms.Padding(3);
-            this.tpSetting.Size = new System.Drawing.Size(582, 259);
+            this.tpSetting.Size = new System.Drawing.Size(767, 221);
             this.tpSetting.TabIndex = 0;
             this.tpSetting.Text = "Configuration";
             this.tpSetting.UseVisualStyleBackColor = true;
-            // 
-            // pgConfiguration
-            // 
-            this.pgConfiguration.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pgConfiguration.Location = new System.Drawing.Point(3, 3);
-            this.pgConfiguration.Name = "pgConfiguration";
-            this.pgConfiguration.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.pgConfiguration.Size = new System.Drawing.Size(576, 253);
-            this.pgConfiguration.TabIndex = 1;
-            this.pgConfiguration.ToolbarVisible = false;
             // 
             // lblDescription
             // 
@@ -356,7 +358,7 @@
             this.lblDescription.Location = new System.Drawing.Point(0, 74);
             this.lblDescription.Name = "lblDescription";
             this.lblDescription.Padding = new System.Windows.Forms.Padding(3);
-            this.lblDescription.Size = new System.Drawing.Size(590, 26);
+            this.lblDescription.Size = new System.Drawing.Size(775, 26);
             this.lblDescription.TabIndex = 14;
             // 
             // lblDisabled
@@ -371,7 +373,7 @@
             this.lblDisabled.Location = new System.Drawing.Point(0, 48);
             this.lblDisabled.Name = "lblDisabled";
             this.lblDisabled.Padding = new System.Windows.Forms.Padding(3);
-            this.lblDisabled.Size = new System.Drawing.Size(590, 26);
+            this.lblDisabled.Size = new System.Drawing.Size(775, 26);
             this.lblDisabled.TabIndex = 10;
             this.lblDisabled.Text = "      This feature is disabled.";
             // 
@@ -387,7 +389,7 @@
             this.lblEnabled.Location = new System.Drawing.Point(0, 22);
             this.lblEnabled.Name = "lblEnabled";
             this.lblEnabled.Padding = new System.Windows.Forms.Padding(3);
-            this.lblEnabled.Size = new System.Drawing.Size(590, 26);
+            this.lblEnabled.Size = new System.Drawing.Size(775, 26);
             this.lblEnabled.TabIndex = 12;
             this.lblEnabled.Text = "       This feature is enabled";
             // 
@@ -400,7 +402,7 @@
             this.lblSelectedOption.Location = new System.Drawing.Point(0, 0);
             this.lblSelectedOption.Name = "lblSelectedOption";
             this.lblSelectedOption.Padding = new System.Windows.Forms.Padding(3);
-            this.lblSelectedOption.Size = new System.Drawing.Size(590, 22);
+            this.lblSelectedOption.Size = new System.Drawing.Size(775, 22);
             this.lblSelectedOption.TabIndex = 9;
             this.lblSelectedOption.Text = "Configuration";
             // 
@@ -412,7 +414,7 @@
             this.tpAdvanced.Location = new System.Drawing.Point(4, 4);
             this.tpAdvanced.Name = "tpAdvanced";
             this.tpAdvanced.Padding = new System.Windows.Forms.Padding(3);
-            this.tpAdvanced.Size = new System.Drawing.Size(810, 392);
+            this.tpAdvanced.Size = new System.Drawing.Size(1060, 354);
             this.tpAdvanced.TabIndex = 1;
             this.tpAdvanced.Text = "Setting Editor";
             this.tpAdvanced.UseVisualStyleBackColor = true;
@@ -430,8 +432,8 @@
             // spEditor.Panel2
             // 
             this.spEditor.Panel2.Controls.Add(this.pbEditor);
-            this.spEditor.Size = new System.Drawing.Size(804, 360);
-            this.spEditor.SplitterDistance = 267;
+            this.spEditor.Size = new System.Drawing.Size(1054, 322);
+            this.spEditor.SplitterDistance = 350;
             this.spEditor.TabIndex = 0;
             // 
             // lsvConfigSections
@@ -446,7 +448,7 @@
             this.lsvConfigSections.MultiSelect = false;
             this.lsvConfigSections.Name = "lsvConfigSections";
             this.lsvConfigSections.ShowGroups = false;
-            this.lsvConfigSections.Size = new System.Drawing.Size(267, 360);
+            this.lsvConfigSections.Size = new System.Drawing.Size(350, 322);
             this.lsvConfigSections.SmallImageList = this.imlMain;
             this.lsvConfigSections.TabIndex = 0;
             this.lsvConfigSections.UseCompatibleStateImageBehavior = false;
@@ -457,16 +459,6 @@
             // 
             this.columnHeader1.Text = "Section";
             this.columnHeader1.Width = 239;
-            // 
-            // pbEditor
-            // 
-            this.pbEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pbEditor.Location = new System.Drawing.Point(0, 0);
-            this.pbEditor.Name = "pbEditor";
-            this.pbEditor.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.pbEditor.Size = new System.Drawing.Size(533, 360);
-            this.pbEditor.TabIndex = 0;
-            this.pbEditor.ToolbarVisible = false;
             // 
             // label2
             // 
@@ -480,7 +472,7 @@
             this.label2.Location = new System.Drawing.Point(3, 3);
             this.label2.Name = "label2";
             this.label2.Padding = new System.Windows.Forms.Padding(3);
-            this.label2.Size = new System.Drawing.Size(804, 26);
+            this.label2.Size = new System.Drawing.Size(1054, 26);
             this.label2.TabIndex = 1;
             this.label2.Text = "      Editing the values in this panel can damage your installation of SanteDB";
             // 
@@ -489,11 +481,12 @@
             this.tspMain.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.tspMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.btnApply,
-            this.btnRestart});
+            this.btnRestartService,
+            this.btnOpenConfig});
             this.tspMain.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
             this.tspMain.Location = new System.Drawing.Point(0, 0);
             this.tspMain.Name = "tspMain";
-            this.tspMain.Size = new System.Drawing.Size(818, 38);
+            this.tspMain.Size = new System.Drawing.Size(1068, 23);
             this.tspMain.TabIndex = 1;
             this.tspMain.Text = "toolStrip1";
             // 
@@ -502,26 +495,128 @@
             this.btnApply.Image = ((System.Drawing.Image)(resources.GetObject("btnApply.Image")));
             this.btnApply.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnApply.Name = "btnApply";
-            this.btnApply.Size = new System.Drawing.Size(91, 35);
+            this.btnApply.Size = new System.Drawing.Size(107, 20);
             this.btnApply.Text = "Apply Changes";
-            this.btnApply.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
             // 
-            // btnRestart
+            // btnOpenConfig
             // 
-            this.btnRestart.Image = ((System.Drawing.Image)(resources.GetObject("btnRestart.Image")));
-            this.btnRestart.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnRestart.Name = "btnRestart";
-            this.btnRestart.Size = new System.Drawing.Size(87, 35);
-            this.btnRestart.Text = "Restart Service";
-            this.btnRestart.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.btnOpenConfig.Image = ((System.Drawing.Image)(resources.GetObject("btnOpenConfig.Image")));
+            this.btnOpenConfig.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnOpenConfig.Name = "btnOpenConfig";
+            this.btnOpenConfig.Size = new System.Drawing.Size(133, 20);
+            this.btnOpenConfig.Text = "Open Configuration";
+            this.btnOpenConfig.Click += new System.EventHandler(this.btnOpenConfig_Click);
+            // 
+            // spMainLog
+            // 
+            this.spMainLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.spMainLog.Location = new System.Drawing.Point(0, 23);
+            this.spMainLog.Name = "spMainLog";
+            this.spMainLog.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // spMainLog.Panel1
+            // 
+            this.spMainLog.Panel1.Controls.Add(this.tbMain);
+            // 
+            // spMainLog.Panel2
+            // 
+            this.spMainLog.Panel2.Controls.Add(this.lsvLog);
+            this.spMainLog.Panel2.Controls.Add(this.label3);
+            this.spMainLog.Size = new System.Drawing.Size(1068, 539);
+            this.spMainLog.SplitterDistance = 381;
+            this.spMainLog.TabIndex = 2;
+            // 
+            // lsvLog
+            // 
+            this.lsvLog.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.colStat,
+            this.colSource,
+            this.colDiagnostic});
+            this.lsvLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lsvLog.FullRowSelect = true;
+            this.lsvLog.HideSelection = false;
+            this.lsvLog.LargeImageList = this.imlLog;
+            this.lsvLog.Location = new System.Drawing.Point(0, 22);
+            this.lsvLog.Name = "lsvLog";
+            this.lsvLog.Size = new System.Drawing.Size(1068, 132);
+            this.lsvLog.SmallImageList = this.imlLog;
+            this.lsvLog.StateImageList = this.imlLog;
+            this.lsvLog.TabIndex = 11;
+            this.lsvLog.UseCompatibleStateImageBehavior = false;
+            this.lsvLog.View = System.Windows.Forms.View.Details;
+            // 
+            // colStat
+            // 
+            this.colStat.Text = "";
+            this.colStat.Width = 143;
+            // 
+            // colSource
+            // 
+            this.colSource.Text = "Source";
+            this.colSource.Width = 120;
+            // 
+            // colDiagnostic
+            // 
+            this.colDiagnostic.Text = "Description";
+            this.colDiagnostic.Width = 795;
+            // 
+            // imlLog
+            // 
+            this.imlLog.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imlLog.ImageStream")));
+            this.imlLog.TransparentColor = System.Drawing.Color.Transparent;
+            this.imlLog.Images.SetKeyName(0, "TriggerWarning_16x.png");
+            this.imlLog.Images.SetKeyName(1, "TriggerError_16x.png");
+            // 
+            // label3
+            // 
+            this.label3.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.label3.Dock = System.Windows.Forms.DockStyle.Top;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.label3.Location = new System.Drawing.Point(0, 0);
+            this.label3.Name = "label3";
+            this.label3.Padding = new System.Windows.Forms.Padding(3);
+            this.label3.Size = new System.Drawing.Size(1068, 22);
+            this.label3.TabIndex = 10;
+            this.label3.Text = "Diagnostics";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // btnRestartService
+            // 
+            this.btnRestartService.Enabled = false;
+            this.btnRestartService.Image = ((System.Drawing.Image)(resources.GetObject("btnRestartService.Image")));
+            this.btnRestartService.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnRestartService.Name = "btnRestartService";
+            this.btnRestartService.Size = new System.Drawing.Size(103, 20);
+            this.btnRestartService.Text = "Restart Service";
+            // 
+            // pgConfiguration
+            // 
+            this.pgConfiguration.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pgConfiguration.Location = new System.Drawing.Point(3, 3);
+            this.pgConfiguration.Name = "pgConfiguration";
+            this.pgConfiguration.PropertySort = System.Windows.Forms.PropertySort.Categorized;
+            this.pgConfiguration.Size = new System.Drawing.Size(761, 215);
+            this.pgConfiguration.TabIndex = 1;
+            this.pgConfiguration.ToolbarVisible = false;
+            // 
+            // pbEditor
+            // 
+            this.pbEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pbEditor.Location = new System.Drawing.Point(0, 0);
+            this.pbEditor.Name = "pbEditor";
+            this.pbEditor.PropertySort = System.Windows.Forms.PropertySort.Categorized;
+            this.pbEditor.Size = new System.Drawing.Size(700, 322);
+            this.pbEditor.TabIndex = 0;
+            this.pbEditor.ToolbarVisible = false;
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(818, 457);
-            this.Controls.Add(this.tbMain);
+            this.ClientSize = new System.Drawing.Size(1068, 562);
+            this.Controls.Add(this.spMainLog);
             this.Controls.Add(this.tspMain);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmMain";
@@ -548,6 +643,10 @@
             this.spEditor.ResumeLayout(false);
             this.tspMain.ResumeLayout(false);
             this.tspMain.PerformLayout();
+            this.spMainLog.Panel1.ResumeLayout(false);
+            this.spMainLog.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.spMainLog)).EndInit();
+            this.spMainLog.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -561,7 +660,7 @@
         private System.Windows.Forms.ImageList imlMain;
         private System.Windows.Forms.ToolStrip tspMain;
         private System.Windows.Forms.ToolStripButton btnApply;
-        private System.Windows.Forms.ToolStripButton btnRestart;
+        private System.Windows.Forms.ToolStripButton btnOpenConfig;
         private System.Windows.Forms.SplitContainer spEditor;
         private System.Windows.Forms.ListView lsvConfigSections;
         private System.Windows.Forms.ColumnHeader columnHeader1;
@@ -589,6 +688,14 @@
         private System.Windows.Forms.Label lblVersion;
         private System.Windows.Forms.Label lblApplication;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.SplitContainer spMainLog;
+        private System.Windows.Forms.ListView lsvLog;
+        private System.Windows.Forms.ColumnHeader colStat;
+        private System.Windows.Forms.ColumnHeader colSource;
+        private System.Windows.Forms.ColumnHeader colDiagnostic;
+        private System.Windows.Forms.ImageList imlLog;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ToolStripButton btnRestartService;
     }
 }
 

@@ -19,6 +19,7 @@
 using SanteDB.Core.Diagnostics;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Linq;
@@ -30,6 +31,7 @@ namespace SanteDB.Server.Core.Diagnostics
     /// <summary>
     /// Represents a trace writer to Tracer
     /// </summary>
+    [DisplayName("System/Debugger Trace Writer")]
     public class SystemDiagnosticsTraceWriter : TraceWriter
     {
 

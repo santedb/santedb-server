@@ -65,5 +65,10 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// Auto-setup the applet features
         /// </summary>
         public override FeatureFlags Flags => FeatureFlags.AutoSetup;
+
+        /// <summary>
+        /// Get the configuration type
+        /// </summary>
+        public override Type ConfigurationType => typeof(AppletConfigurationSection);
     }
 }

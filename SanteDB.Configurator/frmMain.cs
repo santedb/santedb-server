@@ -25,6 +25,7 @@ using SanteDB.Configurator.Tasks;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Features;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Services;
 using SanteDB.Server.Core.Configuration.Tasks;
 using System;
@@ -33,12 +34,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Drawing;
 using System.Drawing.Design;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
@@ -47,10 +50,48 @@ namespace SanteDB.Configurator
 {
     public partial class frmMain : Form
     {
+
+        #region Trace Writer
+
+        private class FormTraceWriter : TraceWriter
+        {
+
+            // Form for the error writer
+            private readonly frmMain m_form;
+
+            // Synchronization context
+            private SynchronizationContext m_syncContext;
+            
+            /// <summary>
+            /// Trace writer initialization
+            /// </summary>
+            public FormTraceWriter(frmMain mainForm) : base(System.Diagnostics.Tracing.EventLevel.Warning, null, new Dictionary<String, EventLevel>() { { "SanteDB", EventLevel.Warning } })
+            {
+                this.m_form = mainForm;
+                this.m_syncContext = SynchronizationContext.Current;
+            }
+
+            /// <summary>
+            /// Write trace
+            /// </summary>
+            protected override void WriteTrace(EventLevel level, string source, string format, params object[] args)
+            {
+                this.m_syncContext.Post((o) =>
+                {
+                    var lvi = this.m_form.lsvLog.Items.Add(level.ToString(), level == EventLevel.Warning ? 0 : 1);
+                    lvi.SubItems.Add(source);
+                    lvi.SubItems.Add(String.Format(format, args));
+                }, null);
+            }
+        }
+
+        #endregion
+
         public IFeature CurrentFeature { get; private set; }
 
         public frmMain()
         {
+            Tracer.AddWriter(new FormTraceWriter(this), EventLevel.LogAlways);
             InitializeComponent();
             this.PopulateConfiguration();
         }
@@ -61,20 +102,21 @@ namespace SanteDB.Configurator
         private void PopulateConfiguration()
         {
 
+            Tracer tracer = new Tracer("Configuration Tool");
             // Load the license
-            using(var ms = typeof(frmMain).Assembly.GetManifestResourceStream("SanteDB.Configurator.License.rtf"))
+            using (var ms = typeof(frmMain).Assembly.GetManifestResourceStream("SanteDB.Configurator.License.rtf"))
                 rtbLicense.LoadFile(ms, RichTextBoxStreamType.RichText);
 
             var asm = Assembly.LoadFile(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.exe"));
             lblVersion.Text = $"{asm.GetName().Version} ({asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
             lblCopyright.Text = $"{asm.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright}";
-            lblInstanceName.Text = $"{ApplicationServiceContext.Current.GetService<IConfigurationManager>()?.GetAppSetting("w32instance.name") ?? "DEFAULT"}";
+            lblInstanceName.Text = $"{ConfigurationContext.Current.GetAppSetting("w32instance.name") ?? "DEFAULT"}";
 
             // Load advanced view
             lsvConfigSections.Items.Clear();
-            btnRestart.Enabled = ConfigurationContext.Current.Features.OfType<WindowsServiceFeature>().FirstOrDefault()?.QueryState(ConfigurationContext.Current.Configuration) == Core.Configuration.FeatureInstallState.Installed;
+            btnRestartService.Enabled = ConfigurationContext.Current.Features.OfType<WindowsServiceFeature>().FirstOrDefault()?.QueryState(ConfigurationContext.Current.Configuration) == Core.Configuration.FeatureInstallState.Installed;
 
-            foreach(var sect in ConfigurationContext.Current.Configuration.Sections)
+            foreach (var sect in ConfigurationContext.Current.Configuration.Sections)
             {
                 var lvi = lsvConfigSections.Items.Add(sect.GetType().FullName, sect.GetType().GetCustomAttribute<XmlTypeAttribute>()?.TypeName, 3);
                 lvi.Tag = sect;
@@ -82,33 +124,40 @@ namespace SanteDB.Configurator
 
             // Now load all features from the application domain
             trvFeatures.Nodes.Clear();
-            foreach(var ftr in ConfigurationContext.Current.Features)
+            foreach (var ftr in ConfigurationContext.Current.Features)
             {
-                if (ftr.ConfigurationType == null) continue;
-                // Add the features
-                var trvParent = trvFeatures.Nodes.Find(ftr.Group, false).FirstOrDefault();
-                if(trvParent == null)
+                try
                 {
-                    trvParent = trvFeatures.Nodes.Add(ftr.Group, ftr.Group, 6);
-                    trvParent.SelectedImageIndex = 6;
-                }
+                    if (ftr.ConfigurationType == null) continue;
+                    // Add the features
+                    var trvParent = trvFeatures.Nodes.Find(ftr.Group, false).FirstOrDefault();
+                    if (trvParent == null)
+                    {
+                        trvParent = trvFeatures.Nodes.Add(ftr.Group, ftr.Group, 6);
+                        trvParent.SelectedImageIndex = 6;
+                    }
 
-                // Create node for the object
-                var node = trvParent.Nodes.Add($"{ftr.Group}\\{ftr.Name}", ftr.Name, 0);
-                switch(ftr.QueryState(ConfigurationContext.Current.Configuration))
-                {
-                    case Core.Configuration.FeatureInstallState.NotInstalled:
-                        node.ImageIndex = 8;
-                        break;
-                    case Core.Configuration.FeatureInstallState.Installed:
-                        node.ImageIndex = 9;
-                        break;
-                    case Core.Configuration.FeatureInstallState.PartiallyInstalled:
-                        node.ImageIndex = 10;
-                        break;
+                    // Create node for the object
+                    var node = trvParent.Nodes.Add($"{ftr.Group}\\{ftr.Name}", ftr.Name, 0);
+                    switch (ftr.QueryState(ConfigurationContext.Current.Configuration))
+                    {
+                        case Core.Configuration.FeatureInstallState.NotInstalled:
+                            node.ImageIndex = 8;
+                            break;
+                        case Core.Configuration.FeatureInstallState.Installed:
+                            node.ImageIndex = 9;
+                            break;
+                        case Core.Configuration.FeatureInstallState.PartiallyInstalled:
+                            node.ImageIndex = 10;
+                            break;
+                    }
+                    node.SelectedImageIndex = node.ImageIndex;
+                    node.Tag = ftr;
                 }
-                node.SelectedImageIndex = node.ImageIndex;
-                node.Tag = ftr;
+                catch(Exception e)
+                {
+                    tracer.TraceError("Could not load feature {0} - {1}", ftr.Name, e.Message);
+                }
             }
         }
 
@@ -121,7 +170,7 @@ namespace SanteDB.Configurator
                 pbEditor.SelectedObject = null;
             else
                 pbEditor.SelectedObject = lsvConfigSections.SelectedItems[0].Tag;
-                
+
         }
 
         /// <summary>
@@ -206,17 +255,11 @@ namespace SanteDB.Configurator
         /// </summary>
         private void btnApply_Click(object sender, EventArgs e)
         {
-
-            // If there are no tasks then we must save
-            if (ConfigurationContext.Current.ConfigurationTasks.Count == 0)
-            {
-                foreach(var tsk in ConfigurationContext.Current.Features.Where(o => 
-                        o.Flags.HasFlag(FeatureFlags.AlwaysConfigure))
-                    .SelectMany(o => o.CreateInstallTasks()))
-                    ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
-                
-                ConfigurationContext.Current.ConfigurationTasks.Add(new SaveConfigurationTask());
-            }
+            foreach (var tsk in ConfigurationContext.Current.Features.Where(o =>
+                     o.Flags.HasFlag(FeatureFlags.AlwaysConfigure))
+                .SelectMany(o => o.CreateInstallTasks()))
+                ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
+            ConfigurationContext.Current.ConfigurationTasks.Add(new SaveConfigurationTask());
             ConfigurationContext.Current.Apply();
         }
 
@@ -234,7 +277,7 @@ namespace SanteDB.Configurator
                 ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
 
             // Create install tasks
-            if(this.CurrentFeature.QueryState(ConfigurationContext.Current.Configuration) != FeatureInstallState.Installed)
+            if (this.CurrentFeature.QueryState(ConfigurationContext.Current.Configuration) != FeatureInstallState.Installed)
                 foreach (var tsk in this.CurrentFeature.CreateInstallTasks())
                     ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
 
@@ -253,9 +296,26 @@ namespace SanteDB.Configurator
                 ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
 
             // Create removal tasks
-            if(this.CurrentFeature.QueryState(ConfigurationContext.Current.Configuration) == FeatureInstallState.Installed)
+            if (this.CurrentFeature.QueryState(ConfigurationContext.Current.Configuration) == FeatureInstallState.Installed)
                 foreach (var tsk in this.CurrentFeature.CreateUninstallTasks())
                     ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
+        }
+
+        /// <summary>
+        /// Open configuration file
+        /// </summary>
+        private void btnOpenConfig_Click(object sender, EventArgs e)
+        {
+            var dlgOpen = new OpenFileDialog()
+            {
+                Title = "Open Alternate Configuration",
+                Filter = "Configuration File (*.config.*)|*.config.*"
+            };
+            if(dlgOpen.ShowDialog() == DialogResult.OK)
+            {
+                ConfigurationContext.Current.LoadConfiguration(dlgOpen.FileName);
+                this.PopulateConfiguration();
+            }
         }
     }
 }

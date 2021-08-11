@@ -16,8 +16,11 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Serialization;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
@@ -41,44 +44,87 @@ namespace SanteDB.Configuration.Editors
         /// </summary>
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
+            var msb = new ModelSerializationBinder();
+
             if (provider != null)
             {
                 var winService = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
-                var list = new ListView()
-                {
-                    View = View.Details,
-                    FullRowSelect = true,
-                    CheckBoxes = true,
-                    HeaderStyle = ColumnHeaderStyle.None,
-                    Sorting = SortOrder.Ascending
-                };
-                list.Columns.Add("default");
 
-                var listValue = (value as IEnumerable<String>).ToArray();
-                // Get the databases
-                try
+                if (typeof(IList).IsAssignableFrom(context.PropertyDescriptor.PropertyType)) // multi-select
                 {
-                    list.Items.AddRange(AppDomain.CurrentDomain.GetAssemblies()
-                        .Where(a=>!a.IsDynamic)
-                        .SelectMany(a=>a.ExportedTypes)
-                        .Where(t=>typeof(IdentifiedData).IsAssignableFrom(t) && t.GetCustomAttribute<XmlRootAttribute>(false) != null)
-                        .Select(o=>new ListViewItem(o.Name)
-                        {
-                            Checked = listValue.Contains(o.Name)
-                        })
-                        .ToArray());
+
+                    var itemType = context.PropertyDescriptor.PropertyType.GetGenericArguments()[0];
+                    var list = new ListView()
+                    {
+                        View = View.Details,
+                        FullRowSelect = true,
+                        CheckBoxes = true,
+                        HeaderStyle = ColumnHeaderStyle.None,
+                        Sorting = SortOrder.Ascending
+                    };
+                    list.Columns.Add("default");
+
+                    var listValue = value as IEnumerable<ResourceTypeReferenceConfiguration>;
+                    // Get the types
+                    try
+                    {
+
+                        list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes()
+                            .Where(t => typeof(IdentifiedData).IsAssignableFrom(t) && t.GetCustomAttribute<XmlRootAttribute>() != null && !t.IsGenericTypeDefinition && !t.IsInterface && t.GetCustomAttribute<ObsoleteAttribute>() == null && !t.IsAbstract)
+                            .Select(o =>
+                            {
+                                msb.BindToName(o, out string asm, out string type);
+                                return new ListViewItem(type)
+                                {
+                                    Checked = listValue?.Any(v => v.ResourceTypeXml == type) == true,
+                                    Tag = new ResourceTypeReferenceConfiguration() { ResourceTypeXml = type }
+                                };
+                            })
+                            .ToArray());
+
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show($"Error retrieving available types: {e.Message}");
+                        return value;
+                    }
+
+                    list.Columns[0].Width = -2;
+                    winService.DropDownControl(list);
+
+                    return Activator.CreateInstance(context.PropertyDescriptor.PropertyType, list.CheckedItems.OfType<ListViewItem>().Select(o => o.Tag).OfType<ResourceTypeReferenceConfiguration>());
                 }
-                catch (Exception e)
+                else // Single select
                 {
-                    MessageBox.Show($"Error retrieving resources providers: {e.Message}");
-                    return value;
+                    var list = new ListBox();
+                    list.Click += (o, e) => winService.CloseDropDown();
+
+                    // Get the databases
+                    try
+                    {
+
+                        list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes()
+                            .Where(t => typeof(IdentifiedData).IsAssignableFrom(t) && t.GetCustomAttribute<XmlRootAttribute>() != null && !t.IsGenericTypeDefinition && !t.IsInterface && t.GetCustomAttribute<ObsoleteAttribute>() == null && !t.IsAbstract)
+                            .Select(o =>
+                            {
+                                msb.BindToName(o, out string asm, out string type);
+                                return new ResourceTypeReferenceConfiguration() { ResourceTypeXml = type };
+                            })
+                            .ToArray());
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show($"Error retrieving available types : {e.Message}");
+                        return value;
+                    }
+
+                    winService.DropDownControl(list);
+
+                    if (list.SelectedItem != null)
+                    {
+                        return list.SelectedItem as ResourceTypeReferenceConfiguration;
+                    }
                 }
-
-                list.Columns[0].Width = -2;
-                winService.DropDownControl(list);
-
-                return Activator.CreateInstance(context.PropertyDescriptor.PropertyType, list.CheckedItems.OfType<ListViewItem>().Select(o => o.Text));
-                
             }
             return value;
 

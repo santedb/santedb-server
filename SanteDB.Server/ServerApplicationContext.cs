@@ -156,47 +156,50 @@ namespace SanteDB.Server
             {
                 Stopwatch startWatch = new Stopwatch();
 
-                try
+                using (AuthenticationContext.EnterSystemContext())
                 {
-                    startWatch.Start();
+                    try
+                    {
+                        startWatch.Start();
 
-                    if (this.Starting != null)
-                        this.Starting(this, null);
+                        if (this.Starting != null)
+                            this.Starting(this, null);
 
-                    // If there is no configuration manager then add the local
-                    Trace.TraceInformation("STAGE0 START: Load Configuration");
+                        // If there is no configuration manager then add the local
+                        Trace.TraceInformation("STAGE0 START: Load Configuration");
 
-                    // Assign diagnostics
-                    var config = this.GetService<IConfigurationManager>().GetSection<DiagnosticsConfigurationSection>();
+                        // Assign diagnostics
+                        var config = this.GetService<IConfigurationManager>().GetSection<DiagnosticsConfigurationSection>();
 
-                    if (config != null)
-                        foreach (var writer in config.TraceWriter)
-                            Tracer.AddWriter(Activator.CreateInstance(writer.TraceWriter, writer.Filter, writer.InitializationData, config.Sources.ToDictionary(o => o.SourceName, o => o.Filter)) as TraceWriter, writer.Filter);
+                        if (config != null)
+                            foreach (var writer in config.TraceWriter)
+                                Tracer.AddWriter(Activator.CreateInstance(writer.TraceWriter, writer.Filter, writer.InitializationData, config.Sources.ToDictionary(o => o.SourceName, o => o.Filter)) as TraceWriter, writer.Filter);
 #if DEBUG
-                    else
-                        Tracer.AddWriter(new SystemDiagnosticsTraceWriter(), System.Diagnostics.Tracing.EventLevel.LogAlways);
+                        else
+                            Tracer.AddWriter(new SystemDiagnosticsTraceWriter(), System.Diagnostics.Tracing.EventLevel.LogAlways);
 #endif
 
-                    Trace.TraceInformation("STAGE1 START: Start Dependency Injection Manager");
-                    this.m_serviceProvider.AddServiceProvider(this);
-                    this.m_serviceProvider.Start();
+                        Trace.TraceInformation("STAGE1 START: Start Dependency Injection Manager");
+                        this.m_serviceProvider.AddServiceProvider(this);
+                        this.m_serviceProvider.Start();
 
-                    Trace.TraceInformation("STAGE2 START: Notify start");
-                    this.Started?.Invoke(this, EventArgs.Empty);
-                    this.StartTime = DateTime.Now;
+                        Trace.TraceInformation("STAGE2 START: Notify start");
+                        this.Started?.Invoke(this, EventArgs.Empty);
+                        this.StartTime = DateTime.Now;
 
-                    Trace.TraceInformation("SanteDB startup completed successfully in {0} ms...", startWatch.ElapsedMilliseconds);
+                        Trace.TraceInformation("SanteDB startup completed successfully in {0} ms...", startWatch.ElapsedMilliseconds);
 
-                }
-                catch (Exception e)
-                {
-                    m_tracer.TraceError("Error starting up context: {0}", e);
-                    Trace.TraceWarning("Server is running in Maintenance Mode due to error {0}...", e.Message);
-                }
-                finally
-                {
-                    AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStart);
-                    startWatch.Stop();
+                    }
+                    catch (Exception e)
+                    {
+                        m_tracer.TraceError("Error starting up context: {0}", e);
+                        Trace.TraceWarning("Server is running in Maintenance Mode due to error {0}...", e.Message);
+                    }
+                    finally
+                    {
+                        AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStart);
+                        startWatch.Stop();
+                    }
                 }
                 this.IsRunning = true;
 

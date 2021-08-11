@@ -20,6 +20,7 @@ using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Data;
 using SanteDB.Core.Configuration.Features;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Services;
@@ -32,6 +33,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data.Common;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -45,11 +47,9 @@ namespace SanteDB.Configuration
     /// <summary>
     /// Configuration Context
     /// </summary>
-    public class ConfigurationContext : INotifyPropertyChanged, IApplicationServiceContext, IConfigurationManager
+    public class ConfigurationContext : INotifyPropertyChanged
     {
 
-        // Service manager
-        private DependencyServiceManager m_serviceManager ;
 
         // Configuration
         private SanteDBConfiguration m_configuration;
@@ -57,32 +57,33 @@ namespace SanteDB.Configuration
         private static ConfigurationContext m_current;
         // Providers
         private IEnumerable<IDataConfigurationProvider> m_providers;
-        // Features
-        private IList<IFeature> m_features;
+
+        // Tracer provider
+        private Tracer m_tracer = Tracer.GetTracer(typeof(ConfigurationContext));
+
+#if DEBUG
+        private string m_configurationFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.config.debug.xml");
+#else
+        private string m_configurationFile = return Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.config.xml");
+#endif 
+
 
         /// <summary>
         /// Gets the configuration file name
         /// </summary>
         public String ConfigurationFile
         {
-            get
-            {
-#if DEBUG
-                return Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.config.debug.xml");
-#else
-                return Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.config.xml");
-#endif 
-            }
+            get => this.m_configurationFile;
         }
         /// <summary>
         /// Gets the plugin assemblies
         /// </summary>
         public ObservableCollection<Assembly> PluginAssemblies { get; }
 
-	/// <summary>
-	/// Gets the start time of the context
-	/// </summary>
-	public DateTime StartTime { get; private set; }
+        /// <summary>
+        /// Gets the start time of the context
+        /// </summary>
+        public DateTime StartTime { get; private set; }
 
         /// <summary>
         /// Gets or sets the configuration handler
@@ -100,32 +101,57 @@ namespace SanteDB.Configuration
         /// <summary>
         /// Gets the features available in the current version of the object
         /// </summary>
-        public IList<IFeature> Features
+        public List<IFeature> Features
         {
-            get
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Initialize features
+        /// </summary>
+        public void InitializeFeatures()
+        {
+            this.Features.AddRange(AppDomain.CurrentDomain.GetAssemblies()
+                       .Where(o => !o.IsDynamic)
+                       .SelectMany(a => { try { return a.ExportedTypes; } catch { return new List<Type>(); } })
+                       .Where(t => typeof(IFeature).IsAssignableFrom(t) && !t.ContainsGenericParameters && !t.IsAbstract && !t.IsInterface)
+                       .Select(i =>
+                       {
+                           try
+                           {
+                               var feature = Activator.CreateInstance(i) as IFeature;
+                               if (feature.Flags == FeatureFlags.NonPublic)
+                               {
+                                   return null;
+                               }
+                               return feature;
+                           }
+                           catch (Exception e)
+                           {
+                               return null;
+                           }
+                       })
+                       .OfType<IFeature>());
+        }
+
+        /// <summary>
+        /// Get app setting
+        /// </summary>
+        public string GetAppSetting(string key)
+        {
+            // Use configuration setting 
+            String retVal = null;
+            try
             {
-                if (this.m_features == null)
-                {
-                    this.m_features = AppDomain.CurrentDomain.GetAssemblies()
-                        .Where(o => !o.IsDynamic)
-                        .SelectMany(a => { try { return a.ExportedTypes; } catch { return new List<Type>(); } })
-                        .Where(t => typeof(IFeature).IsAssignableFrom(t) && !t.ContainsGenericParameters && !t.IsAbstract && !t.IsInterface)
-                        .Select(i =>
-                        {
-                            try
-                            {
-                                return Activator.CreateInstance(i) as IFeature;
-                            }
-                            catch (Exception e)
-                            {
-                                return null;
-                            }
-                        })
-                        .OfType<IFeature>()
-                        .ToList();
-                }
-                return this.m_features;
+                retVal = this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>()?.AppSettings.Find(o => o.Key == key)?.Value;
             }
+            catch
+            {
+            }
+
+            return retVal;
+
         }
 
         /// <summary>
@@ -133,18 +159,29 @@ namespace SanteDB.Configuration
         /// </summary>
         public void InitialStart()
         {
-            this.Features.Count();
-            
+
             // Default configuration
             this.Configuration = new SanteDBConfiguration();
             // Initial settings for initial 
             this.Configuration.AddSection(new OrmConfigurationSection()
             {
-                AdoProvider = this.m_serviceManager.GetAllTypes().Where(t => typeof(DbProviderFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface ).Select(t => new ProviderRegistrationConfiguration(t.Namespace.StartsWith("System") ? t.Name : t.Namespace.Split('.')[0], t)).ToList(),
-                Providers = this.m_serviceManager.GetAllTypes().Where(t => typeof(IDbProvider).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).Select(t => new ProviderRegistrationConfiguration((Activator.CreateInstance(t) as IDbProvider).Invariant, t)).ToList()
+                AdoProvider = this.GetAllTypes().Where(t => typeof(DbProviderFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).Select(t => new ProviderRegistrationConfiguration(t.Namespace.StartsWith("System") ? t.Name : t.Namespace.Split('.')[0], t)).ToList(),
+                Providers = this.GetAllTypes().Where(t => typeof(IDbProvider).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).Select(t => new ProviderRegistrationConfiguration((Activator.CreateInstance(t) as IDbProvider).Invariant, t)).ToList()
             });
             this.Started?.Invoke(this, EventArgs.Empty);
         }
+
+        /// <summary>
+        /// Get all types
+        /// </summary>
+        public IEnumerable<Type> GetAllTypes()
+        {
+            // HACK: The weird TRY/CATCH in select many is to prevent mono from throwning a fit
+            return AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => !a.IsDynamic)
+                .SelectMany(a => { try { return a.ExportedTypes; } catch { return new List<Type>(); } });
+        }
+
 
         /// <summary>
         /// Get the configuration tasks
@@ -182,11 +219,10 @@ namespace SanteDB.Configuration
         /// </summary>
         private ConfigurationContext()
         {
-            this.m_serviceManager = new DependencyServiceManager();
-            this.m_serviceManager.AddServiceProvider(this);
-
             this.PluginAssemblies = new ObservableCollection<Assembly>();
             this.ConfigurationTasks = new ObservableCollection<IConfigurationTask>();
+            this.Features = new List<IFeature>();
+
         }
 
         /// <summary>
@@ -249,105 +285,22 @@ namespace SanteDB.Configuration
             try
             {
                 using (var s = File.OpenRead(filename))
+                {
                     this.Configuration = SanteDBConfiguration.Load(s);
+                    this.Features.Clear();
+                    this.InitializeFeatures();
+                    this.m_configurationFile = filename;
+                }
                 return true;
             }
             catch (Exception e)
             {
-                Trace.TraceError("Could not load configuration file {0}: {1}", filename, e);
+                this.m_tracer.TraceError("Could not load configuration file {0}: {1}", filename, e);
                 return false;
             }
         }
 
-        /// <summary>
-        /// Restart the service context
-        /// </summary>
-        public void RestartContext()
-        {
-            this.Stop();
-            this.Start();
-        }
 
-        /// <summary>
-        /// Stop the service
-        /// </summary>
-        public void Stop()
-        {
-            this.Stopping?.Invoke(this, EventArgs.Empty);
-
-            this.m_serviceManager.Stop();
-
-            this.Stopped?.Invoke(this, EventArgs.Empty);
-        }
-
-        /// <summary>
-        /// Start this service
-        /// </summary>
-        public void Start()
-        {
-            this.Starting?.Invoke(this, EventArgs.Empty);
-
-            this.m_serviceManager.Start();
-
-            this.Features.Count();
-
-            this.Started?.Invoke(this, EventArgs.Empty);
-	    this.StartTime = DateTime.Now;
-        }
-
-        /// <summary>
-        /// Get the specified service
-        /// </summary>
-        public object GetService(Type serviceType) => this.m_serviceManager.GetService(serviceType);
-
-        /// <summary>
-        /// Get the specified section
-        /// </summary>
-        public T GetSection<T>() where T : IConfigurationSection
-        {
-            if (this.Configuration == null)
-                return default(T);
-            else 
-                return this.Configuration.GetSection<T>();
-        }
-
-        /// <summary>
-        /// Get the specified app setting
-        /// </summary>
-        public string GetAppSetting(string key)
-        {
-            return this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.FirstOrDefault(o => o.Key == key)?.Value;
-        }
-
-        /// <summary>
-        /// Get the specified connection string
-        /// </summary>
-        public ConnectionString GetConnectionString(string key)
-        {
-            return this.Configuration.GetSection<DataConfigurationSection>().ConnectionString.FirstOrDefault(o => o.Name == key);
-
-        }
-
-        /// <summary>
-        /// Set an application setting
-        /// </summary>
-        public void SetAppSetting(string key, string value)
-        {
-            this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.RemoveAll(o => o.Key == key);
-            this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.Add(new AppSettingKeyValuePair()
-            {
-                Key = key,
-                Value = value
-            });
-        }
-
-        /// <summary>
-        /// Reload the specified configuration file
-        /// </summary>
-        public void Reload()
-        {
-            throw new NotImplementedException();
-        }
 
     }
 }

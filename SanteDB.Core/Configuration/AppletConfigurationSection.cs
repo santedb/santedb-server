@@ -21,11 +21,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.ComponentModel.Design;
+using System.Drawing.Design;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.Design;
 using System.Xml.Serialization;
 
 namespace SanteDB.Server.Core.Configuration
@@ -56,6 +59,7 @@ namespace SanteDB.Server.Core.Configuration
         [XmlAttribute("appletDirectory")]
         [DisplayName("Applet Directory")]
         [Description("Identifies the directory location where applets should be loaded")]
+        [Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
         public String AppletDirectory { get; set; }
 
         /// <summary>

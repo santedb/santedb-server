@@ -21,6 +21,7 @@ using SanteDB.Core.Diagnostics;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Text;
@@ -32,6 +33,7 @@ namespace SanteDB.Server.Core.Diagnostics
     /// <summary>
     /// Tracer writer that writes to the console
     /// </summary>
+    [DisplayName("Console Trace Writer")]
     public class ConsoleTraceWriter : TraceWriter, IDisposable
     {
         // Dispatch thread

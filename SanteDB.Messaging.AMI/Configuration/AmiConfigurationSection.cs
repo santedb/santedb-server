@@ -72,7 +72,7 @@ namespace SanteDB.Messaging.AMI.Configuration
 		/// Extra endpoints
 		/// </summary>
         [XmlArray("endpoints"), XmlArrayItem("add")]
-        [DisplayName("API Endpoints"), Description("The API endpoints which can't be auto-detected by the default AMI (if you're running in a distributed deployment)")]
+        [DisplayName("API Endpoints"), Description("The API endpoints which can't be auto-detected by the default AMI (if you're running in a distributed deployment). NOTE: DO NOT MODIFY THIS SETTING IF YOU'RE RUNNING THE ENTIRE INFRASTRUCTURE ON ONE SERVER")]
 		public List<ServiceEndpointOptions> Endpoints { get; set; }
 	}
 }

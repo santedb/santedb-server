@@ -253,6 +253,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                             throw new DataPersistenceException($"Error inserting {data}", this.TranslateDbException(e));
                         }
+                        catch(DataPersistenceException)
+                        {
+                            throw;
+                        }
                         catch (Exception e)
                         {
                             this.m_tracer.TraceEvent(EventLevel.Error,  "Error : {0} -- {1}", e, this.ObjectToString(data));

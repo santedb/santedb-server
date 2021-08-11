@@ -18,6 +18,7 @@
  */
 using SanteDB.Configuration;
 using SanteDB.Configurator.Tasks;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security;
 using System;
 using System.Collections.Generic;
@@ -41,6 +42,8 @@ namespace SanteDB.Configurator
         /// </summary>
         public static void Apply(this ConfigurationContext me)
         {
+
+            var tracer = new Tracer("Configuration Context");
 
             if (me.ConfigurationTasks.Count == 0)
                 return;
@@ -84,14 +87,15 @@ namespace SanteDB.Configurator
                                 };
 
                                 progress.OverallStatusText = $"Applying {ct.Feature.Name}";
-                                if (ct.VerifyState(me.Configuration))
-                                    ct.Execute(me.Configuration);
+                                if (ct.VerifyState(me.Configuration) && !ct.Execute(me.Configuration))
+                                    tracer.TraceWarning("Configuration task {0} reported unsuccessful deployment", ct.Name);
                                 me.ConfigurationTasks.Remove(ct);
                                 progress.OverallStatus = (int)(((float)++i / t) * 100.0);
                             }
                         }
                         catch (Exception e)
                         {
+                            tracer.TraceError("Error deploying configuration - {0}", e.Message);
                             Trace.TraceError($"Error on component: {e}");
                             errCode = e;
                         }
@@ -111,15 +115,15 @@ namespace SanteDB.Configurator
                 progress.OverallStatus = 100;
                 progress.ActionStatusText = "Reloading Configuration...";
                 progress.ActionStatus = 50;
-                me.RestartContext();
+                //me.RestartContext();
                 progress.ActionStatusText = "Reloading Configuration...";
                 progress.ActionStatus = 100;
             }
             catch (Exception e)
             {
                 // TODO: Rollback
+                tracer.TraceError("Error applying configuration: {0}", e);
                 MessageBox.Show($"Error applying configuration: {e.Message}");
-                Trace.TraceError("Error applying configuration: {0}", e);
             }
             finally
             {
