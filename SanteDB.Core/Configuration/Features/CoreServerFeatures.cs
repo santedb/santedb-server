@@ -67,7 +67,7 @@ namespace SanteDB.Server.Core.Configuration.Features
             typeof(LocalTemplateDefinitionRepositoryService),
             typeof(DefaultDataSigningService),
             typeof(AesSymmetricCrypographicProvider),
-            typeof(SimpleTfaSecretGenerator),
+            typeof(SanteDB.Core.Security.SimpleTfaSecretGenerator),
             typeof(AppletLocalizationService)
         };
 

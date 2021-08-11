@@ -125,7 +125,7 @@ namespace SanteDB.Messaging.Atna
             {
                 try
                 {
-                    var ad = state as SdbAudit.AuditData;
+                    var ad = state as SdbAudit.AuditEventData;
 
                     // Translate codes to DICOM
                     if (ad.EventTypeCode != null)

@@ -253,22 +253,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
         }
 
- 
-        /// <summary>
-        /// Update associated entities 
-        /// </summary>
-        /// <remarks>
-        /// Updates the associated items of <typeparamref name="TAssociativeTable"/> such that
-        /// <paramref name="data"/>'s associations are updated to match the list 
-        /// provided in <paramref name="related"/>
-        /// </remarks>
-        protected virtual IEnumerable<TModelAssociation> UpdateModelAssociations<TModelAssociation>(DataContext context, TModel data, IEnumerable<TModelAssociation> associations)
-            where TModelAssociation : ISimpleAssociation, new()
-        {
-            associations = associations.Select(a => { a.SourceEntityKey = data.Key; return a; }).ToArray();
-
-        }
-
         /// <summary>
         /// Update the internal
         /// </summary>

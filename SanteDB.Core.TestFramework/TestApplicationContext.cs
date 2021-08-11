@@ -23,7 +23,7 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model.EntityLoader;
 using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl;
-using SanteDB.Persistence.Data.ADO.Services;
+using SanteDB.Persistence.Data.Services;
 using SanteDB.Server.Core.Diagnostics;
 using SanteDB.Server.Core.Services.Impl;
 using System;
@@ -136,11 +136,7 @@ namespace SanteDB.Core.TestFramework
 
             // Start the daemon services
             var adoPersistenceService = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
-            if (adoPersistenceService?.IsRunning == false)
-            {
-                //adoPersistenceService.Start();
-                TestApplicationContext.Current.Start();
-            }
+            
         }
 
 

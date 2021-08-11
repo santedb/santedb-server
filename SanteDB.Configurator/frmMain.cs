@@ -72,6 +72,14 @@ namespace SanteDB.Configurator
             }
 
             /// <summary>
+            /// Trace an extended event with data
+            /// </summary>
+            public override void TraceEventWithData(EventLevel level, string source, string message, object[] data)
+            {
+                this.WriteTrace(level, source, message, data);
+            }
+
+            /// <summary>
             /// Write trace
             /// </summary>
             protected override void WriteTrace(EventLevel level, string source, string format, params object[] args)
