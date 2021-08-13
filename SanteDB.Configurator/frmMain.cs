@@ -40,6 +40,7 @@ using System.Drawing.Design;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,6 +52,7 @@ namespace SanteDB.Configurator
     public partial class frmMain : Form
     {
 
+       
         #region Trace Writer
 
         private class FormTraceWriter : TraceWriter
@@ -61,7 +63,7 @@ namespace SanteDB.Configurator
 
             // Synchronization context
             private SynchronizationContext m_syncContext;
-            
+
             /// <summary>
             /// Trace writer initialization
             /// </summary>
@@ -96,11 +98,44 @@ namespace SanteDB.Configurator
             this.PopulateConfiguration();
         }
 
+        // Configuration hash
+        private byte[] m_configHash;
+
+        /// <summary>
+        /// Has the configuration changed
+        /// </summary>
+        /// <returns></returns>
+        private bool HasChanged()
+        {
+
+            byte[] newHash = null;
+
+            try
+            {
+                using (var ms = new MemoryStream())
+                {
+                    ConfigurationContext.Current.Configuration.Save(ms);
+                    newHash = MD5.Create().ComputeHash(ms.ToArray());
+                    return !Enumerable.SequenceEqual(newHash, m_configHash ?? new byte[16]);
+                }
+            }
+            finally
+            {
+                this.m_configHash = newHash;
+            }
+        }
+
         /// <summary>
         /// Populate / load the configuration
         /// </summary>
         private void PopulateConfiguration()
         {
+
+            using (var ms = new MemoryStream())
+            {
+                ConfigurationContext.Current.Configuration.Save(ms);
+                this.m_configHash = MD5.Create().ComputeHash(ms.ToArray());
+            }
 
             Tracer tracer = new Tracer("Configuration Tool");
             // Load the license
@@ -154,7 +189,7 @@ namespace SanteDB.Configurator
                     node.SelectedImageIndex = node.ImageIndex;
                     node.Tag = ftr;
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     tracer.TraceError("Could not load feature {0} - {1}", ftr.Name, e.Message);
                 }
@@ -179,6 +214,7 @@ namespace SanteDB.Configurator
         private void trvFeatures_AfterSelect(object sender, TreeViewEventArgs e)
         {
             this.SelectFeature(e.Node.Tag as IFeature);
+
         }
 
         /// <summary>
@@ -255,6 +291,15 @@ namespace SanteDB.Configurator
         /// </summary>
         private void btnApply_Click(object sender, EventArgs e)
         {
+
+            if(this.HasChanged())
+            {
+                foreach (var itm in ConfigurationContext.Current.ConfigurationTasks.Where(o => o.Feature == this.CurrentFeature).ToArray())
+                    ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
+                foreach (var itm in this.CurrentFeature.CreateInstallTasks().ToArray())
+                    ConfigurationContext.Current.ConfigurationTasks.Add(itm);
+            }
+
             foreach (var tsk in ConfigurationContext.Current.Features.Where(o =>
                      o.Flags.HasFlag(FeatureFlags.AlwaysConfigure))
                 .SelectMany(o => o.CreateInstallTasks()))
@@ -277,9 +322,8 @@ namespace SanteDB.Configurator
                 ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
 
             // Create install tasks
-            if (this.CurrentFeature.QueryState(ConfigurationContext.Current.Configuration) != FeatureInstallState.Installed)
-                foreach (var tsk in this.CurrentFeature.CreateInstallTasks())
-                    ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
+            foreach (var tsk in this.CurrentFeature.CreateInstallTasks())
+                ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
 
         }
 
@@ -296,9 +340,8 @@ namespace SanteDB.Configurator
                 ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
 
             // Create removal tasks
-            if (this.CurrentFeature.QueryState(ConfigurationContext.Current.Configuration) == FeatureInstallState.Installed)
-                foreach (var tsk in this.CurrentFeature.CreateUninstallTasks())
-                    ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
+            foreach (var tsk in this.CurrentFeature.CreateUninstallTasks())
+                ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
         }
 
         /// <summary>
@@ -311,10 +354,24 @@ namespace SanteDB.Configurator
                 Title = "Open Alternate Configuration",
                 Filter = "Configuration File (*.config.*)|*.config.*"
             };
-            if(dlgOpen.ShowDialog() == DialogResult.OK)
+            if (dlgOpen.ShowDialog() == DialogResult.OK)
             {
                 ConfigurationContext.Current.LoadConfiguration(dlgOpen.FileName);
                 this.PopulateConfiguration();
+            }
+        }
+
+        /// <summary>
+        /// Feature configuration
+        /// </summary>
+        private void trvFeatures_BeforeSelect(object sender, TreeViewCancelEventArgs e)
+        {
+            if (e.Node.Tag is IFeature feature && this.HasChanged())
+            {
+                foreach (var itm in ConfigurationContext.Current.ConfigurationTasks.Where(o => o.Feature == this.CurrentFeature).ToArray())
+                    ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
+                foreach (var itm in this.CurrentFeature.CreateInstallTasks().ToArray())
+                    ConfigurationContext.Current.ConfigurationTasks.Add(itm);
             }
         }
     }

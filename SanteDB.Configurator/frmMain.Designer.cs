@@ -50,6 +50,7 @@
             this.btnEnable = new System.Windows.Forms.LinkLabel();
             this.tcSettings = new System.Windows.Forms.TabControl();
             this.tpSetting = new System.Windows.Forms.TabPage();
+            this.pgConfiguration = new SanteDB.Configuration.Controls.PropertyGridEx();
             this.lblDescription = new System.Windows.Forms.Label();
             this.lblDisabled = new System.Windows.Forms.Label();
             this.lblEnabled = new System.Windows.Forms.Label();
@@ -58,9 +59,11 @@
             this.spEditor = new System.Windows.Forms.SplitContainer();
             this.lsvConfigSections = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.pbEditor = new SanteDB.Configuration.Controls.PropertyGridEx();
             this.label2 = new System.Windows.Forms.Label();
             this.tspMain = new System.Windows.Forms.ToolStrip();
             this.btnApply = new System.Windows.Forms.ToolStripButton();
+            this.btnRestartService = new System.Windows.Forms.ToolStripButton();
             this.btnOpenConfig = new System.Windows.Forms.ToolStripButton();
             this.spMainLog = new System.Windows.Forms.SplitContainer();
             this.lsvLog = new System.Windows.Forms.ListView();
@@ -69,9 +72,6 @@
             this.colDiagnostic = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.imlLog = new System.Windows.Forms.ImageList(this.components);
             this.label3 = new System.Windows.Forms.Label();
-            this.btnRestartService = new System.Windows.Forms.ToolStripButton();
-            this.pgConfiguration = new SanteDB.Configuration.Controls.PropertyGridEx();
-            this.pbEditor = new SanteDB.Configuration.Controls.PropertyGridEx();
             this.tbMain.SuspendLayout();
             this.tpSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.spMainControl)).BeginInit();
@@ -152,6 +152,7 @@
             this.trvFeatures.SelectedImageIndex = 0;
             this.trvFeatures.Size = new System.Drawing.Size(275, 348);
             this.trvFeatures.TabIndex = 0;
+            this.trvFeatures.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.trvFeatures_BeforeSelect);
             this.trvFeatures.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.trvFeatures_AfterSelect);
             // 
             // imlMain
@@ -346,6 +347,16 @@
             this.tpSetting.Text = "Configuration";
             this.tpSetting.UseVisualStyleBackColor = true;
             // 
+            // pgConfiguration
+            // 
+            this.pgConfiguration.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pgConfiguration.Location = new System.Drawing.Point(3, 3);
+            this.pgConfiguration.Name = "pgConfiguration";
+            this.pgConfiguration.PropertySort = System.Windows.Forms.PropertySort.Categorized;
+            this.pgConfiguration.Size = new System.Drawing.Size(761, 215);
+            this.pgConfiguration.TabIndex = 1;
+            this.pgConfiguration.ToolbarVisible = false;
+            // 
             // lblDescription
             // 
             this.lblDescription.BackColor = System.Drawing.SystemColors.Control;
@@ -460,6 +471,16 @@
             this.columnHeader1.Text = "Section";
             this.columnHeader1.Width = 239;
             // 
+            // pbEditor
+            // 
+            this.pbEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pbEditor.Location = new System.Drawing.Point(0, 0);
+            this.pbEditor.Name = "pbEditor";
+            this.pbEditor.PropertySort = System.Windows.Forms.PropertySort.Categorized;
+            this.pbEditor.Size = new System.Drawing.Size(700, 322);
+            this.pbEditor.TabIndex = 0;
+            this.pbEditor.ToolbarVisible = false;
+            // 
             // label2
             // 
             this.label2.BackColor = System.Drawing.SystemColors.Info;
@@ -498,6 +519,15 @@
             this.btnApply.Size = new System.Drawing.Size(107, 20);
             this.btnApply.Text = "Apply Changes";
             this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
+            // 
+            // btnRestartService
+            // 
+            this.btnRestartService.Enabled = false;
+            this.btnRestartService.Image = ((System.Drawing.Image)(resources.GetObject("btnRestartService.Image")));
+            this.btnRestartService.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnRestartService.Name = "btnRestartService";
+            this.btnRestartService.Size = new System.Drawing.Size(103, 20);
+            this.btnRestartService.Text = "Restart Service";
             // 
             // btnOpenConfig
             // 
@@ -581,35 +611,6 @@
             this.label3.TabIndex = 10;
             this.label3.Text = "Diagnostics";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // btnRestartService
-            // 
-            this.btnRestartService.Enabled = false;
-            this.btnRestartService.Image = ((System.Drawing.Image)(resources.GetObject("btnRestartService.Image")));
-            this.btnRestartService.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnRestartService.Name = "btnRestartService";
-            this.btnRestartService.Size = new System.Drawing.Size(103, 20);
-            this.btnRestartService.Text = "Restart Service";
-            // 
-            // pgConfiguration
-            // 
-            this.pgConfiguration.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pgConfiguration.Location = new System.Drawing.Point(3, 3);
-            this.pgConfiguration.Name = "pgConfiguration";
-            this.pgConfiguration.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.pgConfiguration.Size = new System.Drawing.Size(761, 215);
-            this.pgConfiguration.TabIndex = 1;
-            this.pgConfiguration.ToolbarVisible = false;
-            // 
-            // pbEditor
-            // 
-            this.pbEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pbEditor.Location = new System.Drawing.Point(0, 0);
-            this.pbEditor.Name = "pbEditor";
-            this.pbEditor.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.pbEditor.Size = new System.Drawing.Size(700, 322);
-            this.pbEditor.TabIndex = 0;
-            this.pbEditor.ToolbarVisible = false;
             // 
             // frmMain
             // 

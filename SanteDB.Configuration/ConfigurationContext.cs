@@ -64,7 +64,7 @@ namespace SanteDB.Configuration
 #if DEBUG
         private string m_configurationFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.config.debug.xml");
 #else
-        private string m_configurationFile = return Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.config.xml");
+        private string m_configurationFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.config.xml");
 #endif 
 
 

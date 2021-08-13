@@ -50,6 +50,9 @@ namespace SanteDB.Server.Core.Configuration.Features
         // Configuration
         private GenericFeatureConfiguration m_configuration;
 
+        // The old configuration (for detecting if certificates need to be removed)
+        private RestServiceConfiguration m_oldConfiguration;
+
         // Contract type
         private Type m_behaviorType = null;
         private Type m_contractType = null;
@@ -83,7 +86,6 @@ namespace SanteDB.Server.Core.Configuration.Features
         public RestServiceFeature(Type serviceProviderType)
         {
             this.m_serviceType = serviceProviderType;
-
             this.m_configurationType = serviceProviderType.GetCustomAttribute<ApiServiceProviderAttribute>().Configuration;
             this.m_behaviorType = serviceProviderType.GetCustomAttribute<ApiServiceProviderAttribute>().BehaviorType;
             this.m_contractType = this.m_behaviorType.GetInterfaces().First();
@@ -135,15 +137,38 @@ namespace SanteDB.Server.Core.Configuration.Features
         public FeatureFlags Flags { get; }
 
         /// <summary>
+        /// Set the old configuration
+        /// </summary>
+        internal void SetOldConfiguration(RestServiceConfiguration oldConfiguration)
+        {
+            this.m_oldConfiguration = new RestServiceConfiguration(oldConfiguration);
+        }
+
+        /// <summary>
         /// Create installation tasks
         /// </summary>
         public IEnumerable<IConfigurationTask> CreateInstallTasks()
         {
-            return new IConfigurationTask[] {
+
+            var retVal = new List<IConfigurationTask>();
+
+            if (this.m_oldConfiguration != null) // There is an old configuration
+            {
+                if (this.m_oldConfiguration.Endpoints.Any(o => o.Address.StartsWith("https")))
+                {
+                    // There was an HTTPS so we're going to unbind the cert
+                    retVal.Add(new RestEndpointUninstallTask(this, this.m_oldConfiguration));
+                }
+            }
+
+            // Add configuration 
+            retVal.AddRange(new IConfigurationTask[] {
                 new RestMessageDaemonInstallTask(this, this.m_serviceType),
                 new RestEndpointInstallTask(this, this.m_configuration.Values["REST API"] as RestServiceConfiguration),
                 new RestServiceConfigurationInstallTask(this, this.m_configuration.Values["Service"])
-            };
+            });
+
+            return retVal;
         }
 
         /// <summary>
@@ -170,8 +195,12 @@ namespace SanteDB.Server.Core.Configuration.Features
 
             // Does the contract exist?
             var restConfiguration = configuration.GetSection<SanteDB.Rest.Common.Configuration.RestConfigurationSection>().Services.FirstOrDefault(s => s.ServiceType == this.m_behaviorType || s.Endpoints.Any(e => e.Contract == this.m_contractType));
+            if (restConfiguration != null)
+            {
+                this.m_oldConfiguration = new RestServiceConfiguration(restConfiguration);
+            }
 
-            if(restConfiguration != null && restConfiguration.ServiceType == null)
+            if (restConfiguration != null && restConfiguration.ServiceType == null)
             {
                 restConfiguration.ServiceType = this.m_behaviorType;
             }
@@ -291,8 +320,8 @@ namespace SanteDB.Server.Core.Configuration.Features
         // The rest configuration
         private RestServiceConfiguration m_restServiceConfiguration;
 
-        // Service options
-        private WindowsServiceFeature.Options m_serviceOptions;
+        // Service
+        private RestServiceFeature m_feature;
 
         /// <summary>
         /// Creates a new endpoint uninstall task
@@ -300,7 +329,7 @@ namespace SanteDB.Server.Core.Configuration.Features
         public RestEndpointUninstallTask(RestServiceFeature feature, RestServiceConfiguration restServiceConfiguration)
         {
             this.m_restServiceConfiguration = restServiceConfiguration;
-            this.Feature = feature;
+            this.Feature = this.m_feature = feature;
         }
 
         /// <summary>
@@ -341,15 +370,23 @@ namespace SanteDB.Server.Core.Configuration.Features
                 Uri address = new Uri(ep.Address);
                 if (address.Scheme == "https" && ep.CertificateBinding != null)
                 {
-                    // Reserve the SSL certificate on the IP address
-                    if (address.HostNameType == UriHostNameType.Dns)
+                    try
                     {
-                        var ipAddresses = Dns.GetHostAddresses(address.Host);
-                        HttpSslTool.RemoveCertificate(ipAddresses[0], address.Port, ep.CertificateBinding.Certificate.GetCertHash(), ep.CertificateBinding.StoreName, ep.CertificateBinding.StoreLocation);
+                        // Reserve the SSL certificate on the IP address
+                        if (address.HostNameType == UriHostNameType.Dns)
+                        {
+                            var ipAddresses = Dns.GetHostAddresses(address.Host);
+                            HttpSslTool.RemoveCertificate(ipAddresses[0], address.Port, ep.CertificateBinding.Certificate.GetCertHash(), ep.CertificateBinding.StoreName, ep.CertificateBinding.StoreLocation);
+                        }
+                        else
+                        {
+                            HttpSslTool.RemoveCertificate(IPAddress.Parse(address.Host), address.Port, ep.CertificateBinding.Certificate.GetCertHash(), ep.CertificateBinding.StoreName, ep.CertificateBinding.StoreLocation);
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        HttpSslTool.RemoveCertificate(IPAddress.Parse(address.Host), address.Port, ep.CertificateBinding.Certificate.GetCertHash(), ep.CertificateBinding.StoreName, ep.CertificateBinding.StoreLocation);
+                        this.m_feature.m_tracer.TraceError($"Warning: Could not un-bind SSL certificate {ep.CertificateBinding.FindValue} to {ep.Address} - you can manually bind this certificate using netsh http add sslcert - Error: {e.Message}");
+                        this.m_feature.m_tracer.TraceWarning($"Run: netsh http remove sslcert ipport={address.Host}:{address.Port} certhash={ep.CertificateBinding.FindValue} appid={{{{21F35B18-E417-4F8E-B9C7-73E98B7C71B8}}}}");
                     }
                 }
             }
@@ -593,7 +630,7 @@ namespace SanteDB.Server.Core.Configuration.Features
                             HttpSslTool.BindCertificate(IPAddress.Parse(address.Host), address.Port, ep.CertificateBinding.Certificate.GetCertHash(), ep.CertificateBinding.StoreName, ep.CertificateBinding.StoreLocation);
                         }
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         this.m_feature.m_tracer.TraceError($"Warning: Could not bind SSL certificate {ep.CertificateBinding.FindValue} to {ep.Address} - you can manually bind this certificate using netsh http add sslcert - Error: {e.Message}");
                         this.m_feature.m_tracer.TraceWarning($"Run: netsh http add sslcert ipport={address.Host}:{address.Port} certhash={ep.CertificateBinding.FindValue} appid={{{{21F35B18-E417-4F8E-B9C7-73E98B7C71B8}}}}");
@@ -605,6 +642,8 @@ namespace SanteDB.Server.Core.Configuration.Features
                 }
             }
 
+            // Set backup
+            (this.Feature as RestServiceFeature).SetOldConfiguration(this.m_restServiceConfiguration);
             return true;
         }
 
