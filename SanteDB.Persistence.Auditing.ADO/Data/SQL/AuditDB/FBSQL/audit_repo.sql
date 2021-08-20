@@ -1,7 +1,9 @@
-﻿/**
- * CREATION SCRIPT FOR AUDIT REPOSITORY 
- *
- * A SIMPLE AUDIT REPOSITORY SERVICE FOR STORING BASIC INFORMATION ABOUT AUDITS
+﻿/** 
+ * <feature scope="SanteDB.Persistence.Audit.ADO" id="00010000-00" name="Initialize:001-01" invariantName="FirebirdSQL">
+ *	<summary>Installs the core schema for SanteDB Audit Repository</summary>
+ *	<remarks>This script installs the necessary core schema files for SanteDB</remarks>
+ *  <isInstalled mustSucceed="true">select true from rdb$database where exists (select 1 from rdb$relations where rdb$relation_name = 'AUD_CD_TBL');</isInstalled>
+ * </feature>
  */
  
 -- CREATE DOMAIN FOR BOOLEAN

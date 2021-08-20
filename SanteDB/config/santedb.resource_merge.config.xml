@@ -5,6 +5,12 @@
   <!-- Master Data Management Configuration -->
   <section xsi:type="ResourceMergeConfigurationSection">
     <resources>
+      <add type="Patient" autoMerge="false" preserveOriginal="false">
+        <matching>
+          <config autoLink="true">$identity</config>
+          <config autoLink="false">org.santedb.matching.patient.default</config>
+        </matching>
+      </add>
     </resources>
   </section>
 </SanteDBConfiguration>

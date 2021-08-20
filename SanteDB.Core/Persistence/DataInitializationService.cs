@@ -316,6 +316,7 @@ namespace SanteDB.Server.Core.Persistence
             return true;
         }
     }
+
     #pragma warning enable CS0067
 
 }

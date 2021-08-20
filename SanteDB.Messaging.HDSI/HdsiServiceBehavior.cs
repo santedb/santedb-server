@@ -160,6 +160,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
         /// </summary>
         public override ServiceOptions Options()
         {
+            this.ThrowIfNotReady();
             return base.Options();
         }
 

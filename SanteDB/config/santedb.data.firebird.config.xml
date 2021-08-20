@@ -8,8 +8,8 @@
   </sections>
   <section xsi:type="DataConfigurationSection">
     <connectionStrings>
-      <add name="FirebirdSQL" value="initial catalog=SDB_BASE.FDB;server type=Embedded;user id=sysdba" provider="FirebirdSQL" />
-      <add name="AUDIT_FirebirdSQL" value="initial catalog=SDB_AUDIT.FDB;server type=Embedded;user id=sysdba" provider="FirebirdSQL"/>
+      <add name="FirebirdSQL" value="initial catalog=SDB_BASE.FDB;server type=Embedded;user id=sysdba;Charset=NONE;" provider="FirebirdSQL" />
+      <add name="AUDIT_FirebirdSQL" value="initial catalog=SDB_AUDIT.FDB;server type=Embedded;user id=sysdba;Charset=NONE;" provider="FirebirdSQL"/>
     </connectionStrings>
   </section>
   <section xsi:type="OrmConfigurationSection">

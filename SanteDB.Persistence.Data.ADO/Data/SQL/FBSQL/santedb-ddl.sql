@@ -2,7 +2,7 @@
  * <feature scope="SanteDB.Persistence.Data.ADO" id="0-001" name="Core Schema" invariantName="FirebirdSQL">
  *	<summary>Install Schema</summary>
  *	<remarks>Installs the core SanteDB schema including tables, views, and sequences needed for execution</remarks>
- *	<isInstalled>SELECT COUNT(1) > 0 FROM SEC_USR_TBL</isInstalled>
+ *	<isInstalled mustSucceed="true">select true from rdb$database where exists (select 1 from rdb$relations where rdb$relation_name = 'SEC_USR_TBL');</isInstalled>
  *	<url>https://help.santesuite.org/ops/santedb/rim</url>
  * </feature>
  */
@@ -1954,7 +1954,6 @@ END;
 --#!
  ALTER TABLE ACT_PTCPT_TBL ADD 	CONSTRAINT CK_ACT_PTCPT_ROL_CD CHECK (CK_IS_CD_SET_MEM(ROL_CD_ID, 'ActParticipationType', TRUE));
 --#!
-
 INSERT INTO SEC_PROV_TBL (PROV_ID, USR_ID, APP_ID) VALUES (char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'), char_to_uuid('FADCA076-3690-4A6E-AF9E-F1CD68E8C7E8'), char_to_uuid('4c5b9f8d-49f4-4101-9662-4270895224b2'));
 --#!
 

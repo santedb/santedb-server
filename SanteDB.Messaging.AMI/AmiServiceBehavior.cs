@@ -184,6 +184,7 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <returns>Returns options for the AMI service.</returns>
         public override ServiceOptions Options()
         {
+            this.ThrowIfNotReady();
             RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.OK;
             RestOperationContext.Current.OutgoingResponse.Headers.Add("Allow", $"GET, PUT, POST, OPTIONS, HEAD, DELETE{(ApplicationServiceContext.Current.GetService<IPatchService>() != null ? ", PATCH" : null)}");
 

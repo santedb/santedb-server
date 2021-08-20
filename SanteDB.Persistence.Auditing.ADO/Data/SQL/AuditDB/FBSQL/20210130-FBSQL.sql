@@ -1,4 +1,11 @@
-﻿create sequence aud_meta_seq start with 1 increment by 1;--#!
+﻿/** 
+ * <feature scope="SanteDB.Persistence.Audit.ADO" id="20210124-00" name="Initialize:20210124-01" invariantName="FirebirdSQL">
+ *	<summary>Upgrades audit schema to optimize for large datasets</summary>
+ *	<remarks>This script installs the necessary core schema files for SanteDB audit</remarks>
+ *  <isInstalled mustSucceed="true">select true from rdb$database where exists (select 1 from rdb$relations where rdb$relation_name = 'AUD_META_VAL_CDTBL');</isInstalled>
+ * </feature>
+ */
+create sequence aud_meta_seq start with 1 increment by 1;--#!
 create sequence aud_act_seq start with 1 increment by 1;--#!
 create sequence aud_act_assoc_seq start with 1 increment by 1;--#!
 create sequence aud_obj_seq start with 1 increment by 1;--#!

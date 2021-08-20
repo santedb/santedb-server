@@ -131,6 +131,7 @@ namespace SanteDB.Configurator
         private void PopulateConfiguration()
         {
 
+            this.Text = $"SanteDB Confgiuration Tool ({Path.GetFileName(ConfigurationContext.Current.ConfigurationFile)})";
             using (var ms = new MemoryStream())
             {
                 ConfigurationContext.Current.Configuration.Save(ms);
@@ -184,6 +185,9 @@ namespace SanteDB.Configurator
                             break;
                         case Core.Configuration.FeatureInstallState.PartiallyInstalled:
                             node.ImageIndex = 10;
+                            break;
+                        case FeatureInstallState.CantInstall:
+                            node.ImageIndex = 12;
                             break;
                     }
                     node.SelectedImageIndex = node.ImageIndex;
@@ -267,10 +271,14 @@ namespace SanteDB.Configurator
                     case FeatureInstallState.Installed:
                         tcSettings.Enabled = true;
                         btnDisable.Visible = lblEnabled.Visible = !feature.Flags.HasFlag(FeatureFlags.NoRemove);
-                        lblDisabled.Visible = btnEnable.Visible = false;
+                        lblNoInstall.Visible = lblDisabled.Visible = btnEnable.Visible = false;
+                        break;
+                    case FeatureInstallState.CantInstall:
+                        lblDisabled.Visible = lblEnabled.Visible = btnDisable.Visible = btnEnable.Visible = tcSettings.Enabled = false;
+                        lblNoInstall.Visible = true;
                         break;
                     default:
-                        tcSettings.Enabled = btnDisable.Visible = lblEnabled.Visible = false;
+                        lblNoInstall.Visible = tcSettings.Enabled = btnDisable.Visible = lblEnabled.Visible = false;
                         lblDisabled.Visible = btnEnable.Visible = true;
                         break;
                 }
@@ -306,6 +314,7 @@ namespace SanteDB.Configurator
                 ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
             ConfigurationContext.Current.ConfigurationTasks.Add(new SaveConfigurationTask());
             ConfigurationContext.Current.Apply();
+            this.PopulateConfiguration();
         }
 
         /// <summary>
