@@ -1,5 +1,5 @@
 ﻿<!--
- - Portions Copyright (C) 2019 - 2020, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE.md)
+ - Portions Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE.md)
  - 
  - 
  - Licensed under the Apache License, Version 2.0 (the "License"); you 
@@ -15,7 +15,7 @@
  - the License.
  - 
  - User: fyfej (Justin Fyfe)
- - Date: 2019-11-27
+ - Date: 2021-8-5
  -->
 <modelMap xmlns="http://santedb.org/model/map">
   <class modelClass="SanteDB.Core.Auditing.AuditData, SanteDB.Core.Model, Version=1.1.0.0"
