@@ -41,7 +41,7 @@ if exist "%nuget%" (
 		echo Packing %%~pG
 		pushd "%%~pG"
 		if [%2] == [] (
-			%nuget% pack -OutputDirectory "%localappdata%\NugetStaging" -prop Configuration=Release  -msbuildpath %msbuild% -prop VersionNumber=%1
+			%nuget% pack -OutputDirectory "%localappdata%\NugetRelease" -prop Configuration=Release  -msbuildpath %msbuild% -prop VersionNumber=%1
 		) else (
 			echo Publishing NUPKG
 			%nuget% pack -prop Configuration=Release -msbuildpath %msbuild% -prop VersionNumber=%1
