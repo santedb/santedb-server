@@ -46,6 +46,11 @@ namespace SanteDB.Server.Core.Configuration.Features
         }
 
         /// <summary>
+        /// Job Manager Configuration
+        /// </summary>
+        public override string Group => FeatureGroup.System;
+
+        /// <summary>
         /// Setup the job manager
         /// </summary>
         public override FeatureFlags Flags => FeatureFlags.AutoSetup; 
@@ -54,6 +59,11 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// Gets the description
         /// </summary>
         public override string Description => "Allows SanteDB to run scheduled or ad-hoc 'jobs' (such as compression, warehousing, backup)";
+
+        /// <summary>
+        /// Gets the configuration type
+        /// </summary>
+        public override Type ConfigurationType => typeof(JobConfigurationSection);
 
     }
 }

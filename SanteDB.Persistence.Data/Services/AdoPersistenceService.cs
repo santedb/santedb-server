@@ -52,6 +52,7 @@ namespace SanteDB.Persistence.Data.Services
                 serviceManager.AddServiceProvider(pservice);
             }
 
+            // TODO: Initialize further classes here
         }
 
         /// <summary>

@@ -79,7 +79,7 @@ namespace SanteDB.Configurator
                     new OrmLite.Configuration.OrmConfigurationSection()
                     {
                         Providers = ConfigurationContext.Current.DataProviders.Select(o => new OrmLite.Configuration.ProviderRegistrationConfiguration(o.Invariant, o.DbProviderType)).ToList(),
-                        AdoProvider = ConfigurationContext.Current.GetService<IServiceManager>().GetAllTypes().Where(t => typeof(DbProviderFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface ).Select(t => new ProviderRegistrationConfiguration(t.Namespace.StartsWith("System") ? t.Name : t.Namespace.Split('.')[0], t)).ToList(),
+                        AdoProvider = ConfigurationContext.Current.GetAllTypes().Where(t => typeof(DbProviderFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface ).Select(t => new ProviderRegistrationConfiguration(t.Namespace.StartsWith("System") ? t.Name : t.Namespace.Split('.')[0], t)).ToList(),
                     }
                 }
             };
@@ -99,7 +99,7 @@ namespace SanteDB.Configurator
                 };
 
                 // Set all data connections
-                var autoFeatures = ConfigurationContext.Current.Features.Where(o => o.Flags.HasFlag(FeatureFlags.AutoSetup));
+                var autoFeatures = ConfigurationContext.Current.Features.Where(o => o.Flags.HasFlag(FeatureFlags.AutoSetup) && o.QueryState(ConfigurationContext.Current.Configuration) != FeatureInstallState.Installed);
                 foreach(var ftr in autoFeatures)
                 {
                     var ormConfig = (ftr.Configuration as OrmLite.Configuration.OrmConfigurationBase);

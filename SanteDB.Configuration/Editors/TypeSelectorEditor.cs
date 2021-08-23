@@ -22,12 +22,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using SanteDB.Configuration.Attributes;
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Attributes;
+using SanteDB.Core.Services;
 
 namespace SanteDB.Configuration.Editors
 {
@@ -53,7 +56,7 @@ namespace SanteDB.Configuration.Editors
         /// <summary>
         /// Name of the type
         /// </summary>
-        public override string ToString() => this.Type.Name;
+        public override string ToString() => this.Type.GetCustomAttribute<ServiceProviderAttribute>()?.Name ?? this.Type.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? this.Type.Name;
     }
 
     /// <summary>
@@ -72,6 +75,8 @@ namespace SanteDB.Configuration.Editors
 
                 if (typeof(IList).IsAssignableFrom(context.PropertyDescriptor.PropertyType)) // multi-select
                 {
+
+                    var itemType = context.PropertyDescriptor.PropertyType.GetGenericArguments()[0];
                     var list = new ListView()
                     {
                         View = View.Details,
@@ -82,30 +87,28 @@ namespace SanteDB.Configuration.Editors
                     };
                     list.Columns.Add("default");
 
-                    var listValue = (value as IEnumerable<String>).ToArray();
+                    var listValue = value as IEnumerable<TypeReferenceConfiguration>;
                     // Get the types
                     try
                     {
 
-                        var bind = context.PropertyDescriptor.Attributes.OfType<TypeSelectorBindAttribute>().FirstOrDefault();
+                        var bind = context.PropertyDescriptor.Attributes.OfType<BindingAttribute>().FirstOrDefault();
                         if (bind != null)
-                            list.Items.AddRange(AppDomain.CurrentDomain.GetAssemblies()
-                                .Where(a => !a.IsDynamic)
-                                .SelectMany(a => a.ExportedTypes)
-                                .Where(t => bind.BindType.IsAssignableFrom(t))
-                                .Select(o => new ListViewItem(o.Name)
+                            list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes()
+                                .Where(t => bind.Binding.IsAssignableFrom(t) && !t.IsInterface && !t.IsGenericTypeDefinition && t.GetCustomAttribute<ObsoleteAttribute>() == null && !t.IsAbstract)
+                                .Select(o => new ListViewItem(new TypeSelectionWrapper(o).ToString())
                                 {
-                                    Checked = listValue.Contains(o.Name)
+                                    Checked = listValue?.Any(v=>v.Type == o) == true,
+                                    Tag = new TypeReferenceConfiguration(o)
                                 })
                                 .ToArray());
                         else
-                            list.Items.AddRange(AppDomain.CurrentDomain.GetAssemblies()
-                                .Where(a => !a.IsDynamic)
-                                .SelectMany(a => a.ExportedTypes)
-                                .Where(t => context.PropertyDescriptor.PropertyType.StripGeneric().IsAssignableFrom(t))
-                                .Select(o => new ListViewItem(o.Name)
+                            list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes()
+                                .Where(t => context.PropertyDescriptor.PropertyType.StripGeneric().IsAssignableFrom(t) && !t.IsGenericTypeDefinition && !t.IsInterface && t.GetCustomAttribute<ObsoleteAttribute>() == null && !t.IsAbstract)
+                                .Select(o => new ListViewItem(new TypeSelectionWrapper(o).ToString())
                                 {
-                                    Checked = listValue.Contains(o.Name)
+                                    Checked = listValue?.Any(v => v.Type == o) == true,
+                                    Tag = new TypeReferenceConfiguration(o)
                                 })
                                 .ToArray());
 
@@ -119,7 +122,7 @@ namespace SanteDB.Configuration.Editors
                     list.Columns[0].Width = -2;
                     winService.DropDownControl(list);
 
-                    return Activator.CreateInstance(context.PropertyDescriptor.PropertyType, list.CheckedItems.OfType<ListViewItem>().Select(o => o.Text));
+                    return Activator.CreateInstance(context.PropertyDescriptor.PropertyType, list.CheckedItems.OfType<ListViewItem>().Select(o => o.Tag).OfType<TypeReferenceConfiguration>());
                 }
                 else // Single select
                 {
@@ -129,19 +132,15 @@ namespace SanteDB.Configuration.Editors
                     // Get the databases
                     try
                     {
-                        var bind = context.PropertyDescriptor.Attributes.OfType<TypeSelectorBindAttribute>().FirstOrDefault();
+                        var bind = context.PropertyDescriptor.Attributes.OfType<BindingAttribute>().FirstOrDefault();
                         if (bind != null)
-                            list.Items.AddRange(AppDomain.CurrentDomain.GetAssemblies()
-                                .Where(a => !a.IsDynamic)
-                                .SelectMany(a => a.ExportedTypes)
-                                .Where(t => bind.BindType.IsAssignableFrom(t))
+                            list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes()
+                                .Where(t => bind.Binding.IsAssignableFrom(t) && !t.IsInterface && !t.IsGenericTypeDefinition && t.GetCustomAttribute<ObsoleteAttribute>() == null && !t.IsAbstract)
                                 .Select(o => new TypeSelectionWrapper(o))
                                 .ToArray());
                         else
-                            list.Items.AddRange(AppDomain.CurrentDomain.GetAssemblies()
-                                .Where(a => !a.IsDynamic)
-                                .SelectMany(a => a.ExportedTypes)
-                                .Where(t => context.PropertyDescriptor.PropertyType.IsAssignableFrom(t))
+                            list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes()
+                                .Where(t => context.PropertyDescriptor.PropertyType.IsAssignableFrom(t) && !t.IsGenericTypeDefinition && !t.IsInterface && t.GetCustomAttribute<ObsoleteAttribute>() == null && !t.IsAbstract)
                                 .Select(o => new TypeSelectionWrapper(o))
                                 .ToArray());
                     }
@@ -154,7 +153,12 @@ namespace SanteDB.Configuration.Editors
                     winService.DropDownControl(list);
 
                     if (list.SelectedItem != null)
-                        return (list.SelectedItem as TypeSelectionWrapper)?.Type;
+                    {
+                        if (context.PropertyDescriptor.PropertyType == typeof(TypeReferenceConfiguration))
+                            return new TypeReferenceConfiguration((list.SelectedItem as TypeSelectionWrapper)?.Type);
+                        else
+                            return (list.SelectedItem as TypeSelectionWrapper)?.Type;
+                    }
                 }
             }
             return value;

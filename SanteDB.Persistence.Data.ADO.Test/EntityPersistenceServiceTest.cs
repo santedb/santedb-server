@@ -317,9 +317,13 @@ namespace SanteDB.Persistence.Data.ADO.Tests
             {
 
             }
-            catch(Exception)
+            catch(DataPersistenceException ex) when (ex.InnerException is DetectedIssueException)
             {
-                Assert.Fail("Insert should throw DetectedIssueException");
+
+            }
+            catch(Exception e)
+            {
+                Assert.Fail($"Insert should throw DetectedIssueException - but threw {e.GetType().FullName}");
             }
 
         }

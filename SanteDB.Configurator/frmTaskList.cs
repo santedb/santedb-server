@@ -54,6 +54,13 @@ namespace SanteDB.Configurator
                     lvi.Checked = true;
                     lvi.Tag = itm;
                 }
+                else
+                {
+                    var lvi = lsvActions.Items.Add(Guid.NewGuid().ToString(), itm.Name, 2);
+                    lvi.SubItems.Add(itm.Description);
+                    lvi.Checked = true;
+                    lvi.Tag = itm;
+                }
             }
 
             base.OnShown(e);

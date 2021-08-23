@@ -66,7 +66,6 @@ namespace SanteDB.Configurator
             AppDomain.CurrentDomain.SetData(
                "DataDirectory",
                Path.GetDirectoryName(typeof(Program).Assembly.Location));
-            ApplicationServiceContext.Current = ConfigurationContext.Current;
 
             using (AuthenticationContext.EnterSystemContext())
             {
@@ -97,6 +96,8 @@ namespace SanteDB.Configurator
                     }
                 }
 
+                ConfigurationContext.Current.InitializeFeatures();
+
                 // Load the current configuration
                 try
                 {
@@ -121,10 +122,10 @@ namespace SanteDB.Configurator
                     else
                     {
                         splash.NotifyStatus("Loading Configuration...", -1f);
-                        ConfigurationContext.Current.Start();
                         splash.Close();
                     }
 
+                    var frmMain = new frmMain();
                     // Check for updates
                     foreach (var t in ConfigurationContext.Current.Features
                         .Where(o => o.Flags.HasFlag(FeatureFlags.AlwaysConfigure) && !o.Flags.HasFlag(FeatureFlags.SystemFeature))
@@ -133,13 +134,14 @@ namespace SanteDB.Configurator
                         ConfigurationContext.Current.ConfigurationTasks.Add(t);
                     ConfigurationContext.Current.Apply();
 
-                    Application.Run(new frmMain());
+                    Application.Run(frmMain);
                 }
                 finally
                 {
                     Environment.Exit(0);
                 }
             }
+
         }
 
         /// <summary>

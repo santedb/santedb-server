@@ -62,6 +62,7 @@
             this.imlMain.TransparentColor = System.Drawing.Color.Magenta;
             this.imlMain.Images.SetKeyName(0, "DeployDatabase_16x_24.bmp");
             this.imlMain.Images.SetKeyName(1, "DTSCustomTask_16x_24.bmp");
+            this.imlMain.Images.SetKeyName(2, "InstallerClass_16x.png");
             // 
             // lsvActions
             // 

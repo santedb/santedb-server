@@ -24,10 +24,10 @@ INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err
   ON CONFLICT DO NOTHING;
   
  -- PERSON SUBCLASSES 
-INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','9de2a846-ddf2-4ebc-902e-84508c5089ea','bacd9c6f-3fa9-481e-9636-37457962804d','PERSON-[EQUIVALENT]->PATIENT');
-INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','bacd9c6f-3fa9-481e-9636-37457962804d','9de2a846-ddf2-4ebc-902e-84508c5089ea','PATIENT-[EQUIVALENT]->PERSON'); 
-INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','9de2a846-ddf2-4ebc-902e-84508c5089ea','6b04fed8-c164-469c-910b-f824c2bda4f0','PERSON-[EQUIVALENT]->PROVIDER');
-INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','6b04fed8-c164-469c-910b-f824c2bda4f0','9de2a846-ddf2-4ebc-902e-84508c5089ea','PROVIDER-[EQUIVALENT]->PERSON'); 
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','9de2a846-ddf2-4ebc-902e-84508c5089ea','bacd9c6f-3fa9-481e-9636-37457962804d','PERSON-[EQUIVALENT]->PATIENT') ON CONFLICT DO NOTHING;
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','bacd9c6f-3fa9-481e-9636-37457962804d','9de2a846-ddf2-4ebc-902e-84508c5089ea','PATIENT-[EQUIVALENT]->PERSON') ON CONFLICT DO NOTHING; 
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','9de2a846-ddf2-4ebc-902e-84508c5089ea','6b04fed8-c164-469c-910b-f824c2bda4f0','PERSON-[EQUIVALENT]->PROVIDER') ON CONFLICT DO NOTHING;
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','6b04fed8-c164-469c-910b-f824c2bda4f0','9de2a846-ddf2-4ebc-902e-84508c5089ea','PROVIDER-[EQUIVALENT]->PERSON') ON CONFLICT DO NOTHING; 
 ]]>
     </exec>
     <exec invariant="FirebirdSQL">

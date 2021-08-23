@@ -28,12 +28,14 @@ using System.Configuration;
 using System.Diagnostics.Tracing;
 using System.Collections.Concurrent;
 using SanteDB.Core.Diagnostics;
+using System.ComponentModel;
 
 namespace SanteDB.Server.Core.Diagnostics
 {
     /// <summary>
     /// Timed Trace listener
     /// </summary>
+    [DisplayName("File Trace Writer")]
     public class RolloverTextWriterTraceWriter : TraceWriter, IDisposable
     {
 

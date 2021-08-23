@@ -290,16 +290,36 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     if (svc == null)
                         throw new InvalidOperationException($"Cannot find persister for {itm.GetType()}");
 
-                    if (itm.CheckExists(context))
+                    switch(itm.BatchOperation)
                     {
-                        this.m_tracer.TraceVerbose("Will update {0} object from bundle...", itm);
-                        reorganized.Item[i] = svc.Update(context, itm) as IdentifiedData;
+                        case BatchOperationType.Update:
+                            this.m_tracer.TraceVerbose("Will update {0} object from bundle...", itm);
+                            reorganized.Item[i] = svc.Update(context, itm) as IdentifiedData;
+                            break;
+                        case BatchOperationType.Insert:
+                            this.m_tracer.TraceVerbose("Will insert {0} object from bundle...", itm);
+                            reorganized.Item[i] = svc.Insert(context, itm) as IdentifiedData;
+                            break;
+                        case BatchOperationType.Obsolete:
+                            this.m_tracer.TraceVerbose("Will obsolete {0} object from bundle...", itm);
+                            reorganized.Item[i] = svc.Obsolete(context, itm) as IdentifiedData;
+                            break;
+                        default:
+                            if (itm.CheckExists(context))
+                            {
+                                this.m_tracer.TraceVerbose("Will update {0} object from bundle...", itm);
+                                reorganized.Item[i] = svc.Update(context, itm) as IdentifiedData;
+                                reorganized.Item[i].BatchOperation = BatchOperationType.Update;
+                            }
+                            else
+                            {
+                                this.m_tracer.TraceVerbose("Will insert {0} object from bundle...", itm);
+                                reorganized.Item[i] = svc.Insert(context, itm) as IdentifiedData;
+                                reorganized.Item[i].BatchOperation = BatchOperationType.Insert;
+                            }
+                            break;
                     }
-                    else
-                    {
-                        this.m_tracer.TraceVerbose("Will insert {0} object from bundle...", itm);
-                        reorganized.Item[i] = svc.Insert(context, itm) as IdentifiedData;
-                    }
+                    
                 }
                 catch (TargetInvocationException e)
                 {

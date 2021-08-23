@@ -42,7 +42,8 @@ namespace SanteDB.Messaging.HDSI
     /// <summary>
     /// The HDSI Message Handler Daemon class
     /// </summary>
-    [ApiServiceProvider("iCDR Message Service", typeof(IHdsiServiceContract), configurationType: typeof(HdsiConfigurationSection), required: true)]
+    [Description("The primary iCDR Health Data Messaging Service (HDSI) allows sharing of RIM objects in XML or JSON over HTTP")]
+    [ApiServiceProvider("iCDR HDSI Message Service", typeof(HdsiServiceBehavior), configurationType: typeof(HdsiConfigurationSection), required: true)]
     public class HdsiMessageHandler : IDaemonService, IApiEndpointProvider
     {
         /// <summary>
@@ -148,7 +149,7 @@ namespace SanteDB.Messaging.HDSI
                 var serviceManager = ApplicationServiceContext.Current.GetService<IServiceManager>();
                 // Force startup
                 if(this.m_configuration?.ResourceHandlers.Count() > 0)
-                    HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.m_configuration.ResourceHandlers, typeof(IHdsiServiceContract));
+                    HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.m_configuration.ResourceHandlers.Select(o=>o.Type), typeof(IHdsiServiceContract));
                 else
                     HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(
 

@@ -18,34 +18,47 @@
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Features;
-using SanteDB.Server.Core.Services.Daemons;
+using SanteDB.Core.Services;
+using SanteDB.OrmLite.Configuration;
+using SanteDB.OrmLite.Migration;
+using SanteDB.Persistence.Data.ADO.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.Server.Core.Configuration.Features
+namespace SanteDB.Persistence.Data.ADO.Configuration.Features
 {
     /// <summary>
-    /// Represents a feature for the applet business rules daemon
+    /// Represents an ADO persistence service
     /// </summary>
-    public class AppletBusinessRulesFeature : GenericServiceFeature<AppletBusinessRulesDaemon>
+    public class AdoArchiveFeature : GenericServiceFeature<AdoArchiveService>
     {
 
         /// <summary>
-        /// Gets the grouping
+        /// Set the default configuration
         /// </summary>
-        public override string Group => "Business Rules";
+        public AdoArchiveFeature() : base()
+        {
+            this.Configuration = new AdoArchiveConfigurationSection()
+            {
+                AutoInsertChildren = true,
+                AutoUpdateExisting = true,
+                PrepareStatements = true
+            };
+        }
 
         /// <summary>
-        /// Automatic setup of the business rules
+        /// Automatically setup
         /// </summary>
         public override FeatureFlags Flags => FeatureFlags.AutoSetup;
 
         /// <summary>
-        /// No configuration necessary
+        /// ADO Configuration service
         /// </summary>
-        public override Type ConfigurationType => null;
+        public override Type ConfigurationType => typeof(AdoArchiveFeature);
+
+        
     }
 }

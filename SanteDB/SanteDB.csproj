@@ -155,9 +155,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="config\config.skel" />
-    <None Include="data\000-ActClass.dataset" />
+    <None Include="data\000-ActClass.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="data\000-EntityClass.dataset">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="data\000-DuplicateRelationshipType.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -485,14 +487,6 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
       <Version>5.0.0</Version>
     </PackageReference>
-    <ProjectReference Include="..\santedb-cache-memory\SanteDB.Caching.Memory\SanteDB.Caching.Memory.csproj">
-      <Project>{8553abc7-abfa-4a21-b0e8-68b7de76129d}</Project>
-      <Name>SanteDB.Caching.Memory</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\santedb-cache-redis\SanteDB.Caching.Redis\SanteDB.Caching.Redis.csproj">
-      <Project>{86672094-25cc-4cd5-b085-240e50ec4a5e}</Project>
-      <Name>SanteDB.Caching.Redis</Name>
-    </ProjectReference>
     <ProjectReference Include="..\santedb-fhir\SanteDB.Messaging.FHIR\SanteDB.Messaging.FHIR.csproj">
       <Project>{33836324-c699-4139-ab9c-7524570a04d5}</Project>
       <Name>SanteDB.Messaging.FHIR</Name>
@@ -541,9 +535,9 @@
       <Project>{45ea67a6-48f6-4906-84ec-5c13c80c9cc4}</Project>
       <Name>SanteDB.Persistence.Auditing.ADO</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Persistence.Data.ADO\SanteDB.Persistence.Data.ADO.csproj">
-      <Project>{f38ed54c-e4e4-499a-882e-736289f332c0}</Project>
-      <Name>SanteDB.Persistence.Data.ADO</Name>
+    <ProjectReference Include="..\SanteDB.Persistence.Data\SanteDB.Persistence.Data.csproj">
+      <Project>{0cec131c-dfa0-43c3-9612-3f7d36086633}</Project>
+      <Name>SanteDB.Persistence.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Persistence.Diagnostics.Email\SanteDB.Persistence.Diagnostics.Email.csproj">
       <Project>{2a5cea66-8bb3-4567-bdfa-9c174fc215f7}</Project>

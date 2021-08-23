@@ -30,6 +30,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SanteDB.Core.PubSub.Broker;
+using SanteDB.BI.Services.Impl;
+using SanteDB.Core.Notifications;
+using SanteDB.Server.Core.Security;
+using SanteDB.Core.Applets.Services.Impl;
 
 namespace SanteDB.Server.Core.Configuration.Features
 {
@@ -55,7 +60,15 @@ namespace SanteDB.Server.Core.Configuration.Features
             typeof(LocalMailMessageRepository),
             typeof(LocalStockManagementRepositoryService),
             typeof(LocalTagPersistenceService),
-
+            typeof(PubSubBroker),
+            typeof(AppletBiRepository),
+            typeof(LocalBiRenderService),
+            typeof(DefaultNotificationService),
+            typeof(LocalTemplateDefinitionRepositoryService),
+            typeof(DefaultDataSigningService),
+            typeof(AesSymmetricCrypographicProvider),
+            typeof(SanteDB.Core.Security.SimpleTfaSecretGenerator),
+            typeof(AppletLocalizationService)
         };
 
         /// <summary>

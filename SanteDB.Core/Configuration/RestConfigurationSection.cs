@@ -28,8 +28,6 @@ namespace SanteDB.Server.Core.Configuration
     /// <summary>
     /// Represents the configuration for the AGS
     /// </summary>
-    [XmlType(nameof(RestConfigurationSection), Namespace = "http://santedb.org/configuration")]
-    [JsonObject]
     [Obsolete("Use SanteDB.Rest.Common.Configuration.RestConfigurationSection", true)]
     public class RestConfigurationSection : SanteDB.Rest.Common.Configuration.RestConfigurationSection
     {

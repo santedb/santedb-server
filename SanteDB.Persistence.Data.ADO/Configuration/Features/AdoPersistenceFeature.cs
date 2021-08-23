@@ -18,6 +18,7 @@
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Features;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite.Configuration;
 using SanteDB.OrmLite.Migration;
 using SanteDB.Persistence.Data.ADO.Services;
@@ -49,24 +50,101 @@ namespace SanteDB.Persistence.Data.ADO.Configuration.Features
         }
 
         /// <summary>
-        /// Create the installation tasks
+        /// Create installation tasks
         /// </summary>
         public override IEnumerable<IConfigurationTask> CreateInstallTasks()
         {
-            // Add installation tasks
-            List<IConfigurationTask> retVal = new List<IConfigurationTask>(base.CreateInstallTasks());
-            var conf = this.Configuration as OrmConfigurationBase;
+            return base.CreateInstallTasks().Union(new IConfigurationTask[] {
+                new RegisterAdoProvidersTask(this)
+            });
+        }
 
-            foreach (var feature in SqlFeatureUtil.GetFeatures(conf.Provider.Invariant).OfType<SqlFeature>().Where(o => o.Scope == "SanteDB.Persistence.Data.ADO").OrderBy(o => o.Id))
-                try
+        /// <summary>
+        /// ADO Configuration service
+        /// </summary>
+        public override Type ConfigurationType => typeof(AdoPersistenceConfigurationSection);
+
+        /// <summary>
+        /// Register ADO service providers
+        /// </summary>
+        private class RegisterAdoProvidersTask : IConfigurationTask
+        {
+
+            private readonly Type[] SERVICE_TYPES = new Type[]
+            {
+                typeof(AdoPersistenceService),
+                typeof(AdoApplicationIdentityProvider),
+                typeof(AdoDeviceIdentityProvider),
+                typeof(AdoFreetextSearchService),
+                typeof(AdoIdentityProvider),
+                typeof(AdoPolicyInformationService),
+                typeof(AdoApplicationIdentityProvider),
+                typeof(AdoSecurityChallengeProvider),
+                typeof(AdoRoleProvider),
+                typeof(AdoSubscriptionExecutor),
+                typeof(AdoSessionProvider)
+            };
+
+            /// <summary>
+            /// Creates a new ado provider task
+            /// </summary>
+            public RegisterAdoProvidersTask(IFeature feature)
+            {
+                this.Feature = feature;
+            }
+
+            /// <summary>
+            /// Gets the description of this task
+            /// </summary>
+            public string Description => "Configures the core ADO.NET Persistence Services which are required to use a data-based instance of SanteDB";
+
+            /// <summary>
+            /// Gets the feature
+            /// </summary>
+            public IFeature Feature { get; }
+
+            /// <summary>
+            /// Get the name
+            /// </summary>
+            public string Name => "Register ADO Providers";
+
+            /// <summary>
+            /// Progress has changed
+            /// </summary>
+            public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
+
+            /// <summary>
+            /// Execute the configuration
+            /// </summary>
+            public bool Execute(SanteDBConfiguration configuration)
+            {
+                var serviceConfiguration = configuration.GetSection<ApplicationServiceContextConfigurationSection>();
+                foreach(var itm in this.SERVICE_TYPES)
                 {
-                    retVal.Add(new SqlMigrationTask(this, feature));
+                    if(!serviceConfiguration.ServiceProviders.Any(o=>o.Type == itm))
+                    {
+                        serviceConfiguration.ServiceProviders.Add(new TypeReferenceConfiguration(itm));
+                    }
                 }
-                catch
-                {
-                    // Not allowed to be installed
-                }
-            return retVal;
+                return true;
+            }
+
+            /// <summary>
+            /// No rollback is supported
+            /// </summary>
+            public bool Rollback(SanteDBConfiguration configuration)
+            {
+                throw new NotSupportedException();
+            }
+
+            /// <summary>
+            /// Verify the state
+            /// </summary>
+            public bool VerifyState(SanteDBConfiguration configuration)
+            {
+                var serviceConfiguration = configuration.GetSection<ApplicationServiceContextConfigurationSection>();
+                return !SERVICE_TYPES.All(t => serviceConfiguration.ServiceProviders.Any(s => s.Type == t));
+            }
         }
     }
 }

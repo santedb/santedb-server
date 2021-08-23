@@ -47,7 +47,7 @@ namespace SanteDB.Configuration.Converters
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
             if (value is string)
-                return new DataProviderWrapper(ConfigurationContext.Current.DataProviders.FirstOrDefault(o => o.Invariant == value.ToString()))?.Provider.Name;
+                return new DataProviderWrapper(ConfigurationContext.Current.DataProviders.FirstOrDefault(o => o.Invariant.Equals(value.ToString(), StringComparison.OrdinalIgnoreCase)))?.Provider.Name;
             else
                 return value;
         }

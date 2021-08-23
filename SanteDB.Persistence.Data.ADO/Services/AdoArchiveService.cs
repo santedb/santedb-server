@@ -22,8 +22,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// <summary>
     /// The AdoArchiveService is an archival service which stores data in a secondary database 
     /// </summary>
+    [ServiceProvider("ADO.NET Archiving and Data Shipping")]
     public class AdoArchiveService : IAdoPersistenceSettingsProvider, IDataArchiveService
     {
+
 
         // Tracer
         private Tracer m_tracer = Tracer.GetTracer(typeof(AdoArchiveService));
@@ -39,6 +41,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
         // Get the query builder
         private QueryBuilder m_queryBuilder;
+
+        /// <summary>
+        /// Data retention archiving service name
+        /// </summary>
+        public string ServiceName => "ADO.NET Data Retention/Archiving Service";
 
         /// <summary>
         /// Get the configuration for the archive store

@@ -52,5 +52,9 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// </summary>
         public override string Group => FeatureGroup.System;
 
+        /// <summary>
+        /// File system queue configuration service
+        /// </summary>
+        public override Type ConfigurationType => typeof(FileSystemQueueConfigurationSection);
     }
 }
