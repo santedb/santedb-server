@@ -65,7 +65,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             else
             {
-                return new AdoQueryResultSet<TData>(this, this.m_provider.ExecuteQuery(this.m_context, query));
+                return new AdoQueryResultSet<TData>(this, this.m_provider.ExecuteQueryOrm(this.m_context, query));
             }
         }
 
@@ -76,11 +76,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (this.m_resultSet == null) // this is the first
             {
-                return new AdoQueryResultSet<TData>(this, this.m_provider.ExecuteQuery(this.m_context, query));
+                return new AdoQueryResultSet<TData>(this, this.m_provider.ExecuteQueryOrm(this.m_context, query));
             }
             else
             {
-                return new AdoQueryResultSet<TData>(this, this.m_resultSet.Union(this.m_provider.ExecuteQuery(this.m_context, query)));
+                return new AdoQueryResultSet<TData>(this, this.m_resultSet.Union(this.m_provider.ExecuteQueryOrm(this.m_context, query)));
             }
         }
 
@@ -91,11 +91,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (this.m_resultSet == null) // this is the first
             {
-                return new AdoQueryResultSet<TData>(this, this.m_provider.ExecuteQuery(this.m_context, query));
+                return new AdoQueryResultSet<TData>(this, this.m_provider.ExecuteQueryOrm(this.m_context, query));
             }
             else
             {
-                return new AdoQueryResultSet<TData>(this, this.m_resultSet.Intersect(this.m_provider.ExecuteQuery(this.m_context, query)));
+                return new AdoQueryResultSet<TData>(this, this.m_resultSet.Intersect(this.m_provider.ExecuteQueryOrm(this.m_context, query)));
             }
         }
 
@@ -106,7 +106,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (this.m_resultSet == null) // this is the first
             {
-                this.m_resultSet = this.m_provider.ExecuteQuery(this.m_context, o => true);
+                this.m_resultSet = this.m_provider.ExecuteQueryOrm(this.m_context, o => true);
             }
 
             return new AdoQueryResultSet<TData>(this, this.m_resultSet.Skip(count));
@@ -166,7 +166,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (this.m_resultSet == null)
             {
-                this.m_resultSet = this.m_provider.ExecuteQuery(this.m_context, o => true);
+                this.m_resultSet = this.m_provider.ExecuteQueryOrm(this.m_context, o => true);
             }
 #if DEBUG
             var sw = new Stopwatch();
@@ -209,7 +209,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (this.m_resultSet == null)
             {
-                this.m_resultSet = this.m_provider.ExecuteQuery(this.m_context, o => true);
+                this.m_resultSet = this.m_provider.ExecuteQueryOrm(this.m_context, o => true);
             }
 #if DEBUG
             var sw = new Stopwatch();
@@ -268,7 +268,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (this.m_resultSet == null)
             {
-                this.m_resultSet = this.m_provider.ExecuteQuery(this.m_context, o => true);
+                this.m_resultSet = this.m_provider.ExecuteQueryOrm(this.m_context, o => true);
             }
             return new AdoQueryResultSet<TData>(this, this.m_resultSet.Take(count));
         }
@@ -280,7 +280,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (this.m_resultSet == null) // this is the first
             {
-                this.m_resultSet = this.m_provider.ExecuteQuery(this.m_context, o => true);
+                this.m_resultSet = this.m_provider.ExecuteQueryOrm(this.m_context, o => true);
             }
 
             return new AdoQueryResultSet<TData>(this, this.m_resultSet.OrderBy(this.m_provider.MapSortExpression(sortExpression)));
@@ -293,7 +293,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (this.m_resultSet == null) // this is the first
             {
-                this.m_resultSet = this.m_provider.ExecuteQuery(this.m_context, o => true);
+                this.m_resultSet = this.m_provider.ExecuteQueryOrm(this.m_context, o => true);
             }
 
             return new AdoQueryResultSet<TData>(this, this.m_resultSet.OrderByDescending(this.m_provider.MapSortExpression(sortExpression)));
@@ -350,7 +350,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 #endif
             if (this.m_resultSet == null)
             {
-                this.m_resultSet = this.m_provider.ExecuteQuery(this.m_context, o => true);
+                this.m_resultSet = this.m_provider.ExecuteQueryOrm(this.m_context, o => true);
             }
             try
             {
@@ -373,7 +373,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 #endif
             if (this.m_resultSet == null)
             {
-                this.m_resultSet = this.m_provider.ExecuteQuery(this.m_context, o => true);
+                this.m_resultSet = this.m_provider.ExecuteQueryOrm(this.m_context, o => true);
             }
             try
             {

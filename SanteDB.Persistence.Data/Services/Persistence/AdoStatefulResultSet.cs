@@ -119,7 +119,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             try
             {
                 this.m_context.Open();
-                return this.m_provider.Get(this.m_context, this.FetchKeys().FirstOrDefault());
+                return this.m_provider.Get(this.m_context, this.FetchKeys().FirstOrDefault(), null);
             }
             finally
             {
@@ -140,7 +140,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 // TODO: Infinite rollthrough when there is no upper count bounds
                 foreach(var res in this.FetchKeys())
                 {
-                    yield return this.m_provider.Get(this.m_context, res);
+                    yield return this.m_provider.Get(this.m_context, res, null);
                 }
             }
             finally
@@ -203,7 +203,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             try
             {
                 this.m_context.Open();
-                return this.m_provider.Get(this.m_context, this.FetchKeys().SingleOrDefault());
+                return this.m_provider.Get(this.m_context, this.FetchKeys().SingleOrDefault(), null);
             }
             finally
             {

@@ -84,8 +84,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public IQueryPersistenceService QueryPersistence => this.m_queryPersistence;
 
-        IDbProvider IAdoPersistenceProvider<TModel>.Provider { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
         /// <summary>
         /// Fired after inserting has completed
         /// </summary>
@@ -899,7 +897,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Execute the specified query on the specified object
         /// </summary>
-        public IOrmResultSet ExecuteQuery(DataContext context, Expression<Func<TModel, bool>> query)
+        public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<TModel, bool>> query)
         {
             return this.DoQueryInternal(context, query, true);
         }

@@ -13,7 +13,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     /// Represents an ADO query provider which is used by hte <see cref="AdoQueryResultSet{TData}"/>
     /// instance to calculate its result set.
     /// </summary>
-    public interface IAdoQueryProvider<TModel> : IAdoPersistenceProvider
+    public interface IAdoQueryProvider<TModel> : IAdoPersistenceProvider<TModel>
     {
 
        
@@ -27,17 +27,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         /// <param name="query">The query to execute</param>
         /// <returns>The amount of results to return</returns>
-        IOrmResultSet ExecuteQuery(DataContext context, Expression<Func<TModel, bool>> query);
+        IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<TModel, bool>> query);
 
         /// <summary>
         /// Convert <paramref name="result"/> to model 
         /// </summary>
         TModel ToModelInstance(DataContext context, object result);
-
-        /// <summary>
-        /// Gets the specified object
-        /// </summary>
-        TModel Get(DataContext context, Guid key);
 
         /// <summary>
         /// Map sort expression
