@@ -54,7 +54,6 @@ namespace SanteDB.Server.Core.Security
             using (var aes = new AesCryptoServiceProvider())
             {
                 var decryptor = aes.CreateDecryptor(key, iv);
-                byte[] outputBuffer = new byte[1024];
                 return decryptor.TransformFinalBlock(data, 0, data.Length);
             }
         }
@@ -79,8 +78,8 @@ namespace SanteDB.Server.Core.Security
             using (var aes = new AesCryptoServiceProvider())
             {
                 var encryptor = aes.CreateEncryptor(key, iv);
-                byte[] outputBuffer = new byte[1024];
-                return encryptor.TransformFinalBlock(data, 0, data.Length);
+                var retVal = encryptor.TransformFinalBlock(data, 0, data.Length);
+                return retVal;
             }
         }
 

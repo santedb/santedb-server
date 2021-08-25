@@ -55,9 +55,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             return retVal;
         }
 
-        /// <summary>
+    /// <summary>
         /// Perform an update of the model and properties
-        /// </summary>
+    /// </summary>
         protected override Concept DoUpdateModel(DataContext context, Concept data)
         {
             var retVal = base.DoUpdateModel(context, data);
@@ -81,7 +81,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 
             // Update reference terms
             if (data.ReferenceTerms != null)
-            {
+    {
                 retVal.ReferenceTerms = base.UpdateModelVersionedAssociations<ConceptReferenceTerm>(context, retVal, data.ReferenceTerms).ToList();
             }
 

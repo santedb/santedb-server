@@ -10,10 +10,18 @@ namespace SanteDB.Persistence.Data.Test.Persistence
     /// <summary>
     /// Concept persistence service test
     /// </summary>
-    [TestFixture(Category = "Persistence", TestName = "ADO AssigningAuthority")]
+    [TestFixture(Category = "Persistence", TestName = "ADO Concepts")]
     public class ConceptPersistenceTest : DataPersistenceTest
     {
 
+        /// <summary>
+        /// Tests t
+        /// </summary>
+        [Test]
+        public void TestInsertConcept()
+        {
+
+        }
 
 
     }

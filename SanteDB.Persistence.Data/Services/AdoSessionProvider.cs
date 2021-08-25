@@ -374,7 +374,7 @@ namespace SanteDB.Persistence.Data.Services
                             ClaimType = o.Type,
                             ClaimValue = o.Value
                         });
-                        context.Insert(dbClaims);
+                        context.InsertAll(dbClaims);
 
                         tx.Commit();
 

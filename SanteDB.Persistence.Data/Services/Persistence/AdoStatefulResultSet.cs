@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using SanteDB.Core.Model;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
 {
