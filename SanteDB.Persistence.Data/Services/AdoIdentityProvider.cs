@@ -20,6 +20,7 @@ using System.Security;
 using System.Security.Authentication;
 using System.Security.Principal;
 using System.Text;
+using SanteDB.Core.Model;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -495,7 +496,7 @@ namespace SanteDB.Persistence.Data.Services
                         newIdentity = context.Insert(newIdentity);
 
                         // Register the group
-                        context.Insert(context.Query<DbSecurityRole>(context.CreateSqlStatement<DbSecurityRole>()
+                        context.InsertAll(context.Query<DbSecurityRole>(context.CreateSqlStatement<DbSecurityRole>()
                             .SelectFrom()
                             .Where<DbSecurityRole>(o => o.Name == "USERS"))
                             .ToArray()

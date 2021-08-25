@@ -66,6 +66,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             model.ObsoletedByKeySpecified = true;
             model.ObsoletionTime = null;
             model.ObsoletionTimeSpecified = true;
+
             return base.DoUpdateInternal(context, model);
 
         }

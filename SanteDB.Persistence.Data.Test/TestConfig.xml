@@ -101,6 +101,7 @@
   </section>
   <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="4">
     <serviceProviders>
+      <add type="SanteDB.Persistence.Data.Test.TestQueryPersistenceService, SanteDB.Persistence.Data.Test"/>
       <add type="SanteDB.Persistence.Data.Services.AdoApplicationIdentityProvider, SanteDB.Persistence.Data, Version=2.1.0.0" />
       <add type="SanteDB.Persistence.Data.Services.AdoDeviceIdentityProvider, SanteDB.Persistence.Data, Version=2.1.0.0" />
       <add type="SanteDB.Persistence.Data.Services.AdoIdentityProvider, SanteDB.Persistence.Data, Version=2.1.0.0" />
