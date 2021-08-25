@@ -29,6 +29,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     public abstract class BasePersistenceService<TModel, TDbModel> :
         IDataPersistenceService<TModel>,
         IStoredQueryDataPersistenceService<TModel>,
+        IAdoPersistenceProvider<TModel>,
         IAdoQueryProvider<TModel>,
         IDataPersistenceService
         where TModel : IdentifiedData, new()
@@ -82,6 +83,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Get the query persistence service
         /// </summary>
         public IQueryPersistenceService QueryPersistence => this.m_queryPersistence;
+
+        IDbProvider IAdoPersistenceProvider<TModel>.Provider { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Fired after inserting has completed
@@ -371,26 +374,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
-        /// Gets the specified object from the 
-        /// </summary>
-        /// <param name="context">The context which is being fetched from</param>
-        /// <param name="id">The identifier of the object to fetc</param>
-        /// <param name="allowCached">True if the cache should be used for fetching</param>
-        /// <returns>The converted model instance of the represented object</returns>
-        public virtual object Get(DataContext context, Guid id, bool allowCached = false)
-        {
-            return this.Get(context, id, null, allowCached);
-        }
-
-        /// <summary>
-        /// Get a cached version of an object on an existin context
-        /// </summary>
-        public virtual object Get(DataContext context, Guid id, Guid? versionId, bool allowCached = false)
-        {
-            return this.DoGetModel(context, id, versionId, allowCached);
-        }
-
-        /// <summary>
         /// Gets the specified object
         /// </summary>
         public object Get(Guid id)
@@ -434,6 +417,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                         // Is there an ad-hoc version from the database?
                         retVal = this.DoGetModel(context, key, versionKey, true);
+                        retVal.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
 
                     }
                     catch (DbException e)
@@ -451,21 +435,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             this.Retrieved?.Invoke(this, new DataRetrievedEventArgs<TModel>(retVal, principal));
             return retVal;
-        }
-
-        /// <summary>
-        /// Interface implementation of IAdoInsert
-        /// </summary>
-        public object Insert(DataContext context, object data)
-        {
-            if(data is TModel model)
-            {
-                return this.DoInsertModel(context, model);
-            }
-            else
-            {
-                throw new ArgumentException(nameof(data), ErrorMessages.ERR_ARGUMENT_INCOMPATIBLE_TYPE.Format(typeof(TModel)));
-            }
         }
 
         /// <summary>
@@ -528,6 +497,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             context.EstablishProvenance(principal, null);
                         }
 
+                        data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty);
                         // Is this an update or insert?
                         if (this.m_configuration.AutoUpdateExisting && data.Key.HasValue && this.Exists(context, data.Key.Value))
                         {
@@ -538,8 +508,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         {
                             data = this.DoInsertModel(context, data);
                         }
+                        data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
 
-                        if(mode == TransactionMode.Commit)
+                        if (mode == TransactionMode.Commit)
                         {
                             tx.Commit();
                             // Cache - invalidate (force a reload)
@@ -564,14 +535,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     throw new DataPersistenceException(ErrorMessages.ERR_DATA_GENERAL, e);
                 }
             }
-        }
-
-        /// <summary>
-        /// Obsolete the specified data object 
-        /// </summary>
-        public object Obsolete(DataContext context, Guid key)
-        {
-            return this.DoObsoleteModel(context, key);
         }
 
         /// <summary>
@@ -786,24 +749,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
-        /// Update the specified object on the provided context
-        /// </summary>
-        /// <param name="context">The context on which the data is to be updated</param>
-        /// <param name="data">The data which is to be updated</param>
-        /// <returns>The updated data instance</returns>
-        public object Update(DataContext context, object data)
-        {
-            if (data is TModel model)
-            {
-                return this.DoUpdateModel(context, model);
-            }
-            else
-            {
-                throw new ArgumentException(nameof(data), ErrorMessages.ERR_ARGUMENT_INCOMPATIBLE_TYPE.Format(typeof(TModel)));
-            }
-        }
-
-        /// <summary>
         /// Updates the provided object to match in the data store
         /// </summary>
         public object Update(object data)
@@ -863,8 +808,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             context.EstablishProvenance(principal, null);
                         }
 
+                        data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty);
                         data = this.DoUpdateModel(context, data);
-                        if(mode == TransactionMode.Commit)
+                        data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
+                        if (mode == TransactionMode.Commit)
                         {
                             tx.Commit();
 
@@ -972,7 +919,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             else if (result is TDbModel dbModel)
             {
-                return this.DoConvertToInformationModel(context, dbModel);
+                var retVal = this.DoConvertToInformationModel(context, dbModel);
+                return retVal;
             }
             else
             {
@@ -999,5 +947,30 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             return this.m_modelMapper.MapModelExpression<TModel, TDbModel, dynamic>(sortExpression);
         }
+
+        /// <summary>
+        /// ADO Persistence provider for query
+        /// </summary>
+        IQueryResultSet<TModel> IAdoPersistenceProvider<TModel>.Query(DataContext context, Expression<Func<TModel, bool>> filter) => this.DoQueryModel(context, filter);
+
+        /// <summary>
+        /// ADO Persistence provider for insert
+        /// </summary>
+        TModel IAdoPersistenceProvider<TModel>.Insert(DataContext context, TModel data) => this.DoInsertModel(context, data);
+
+        /// <summary>
+        /// ADO Persistence provider for update
+        /// </summary>
+        TModel IAdoPersistenceProvider<TModel>.Update(DataContext context, TModel data) => this.DoUpdateModel(context, data);
+
+        /// <summary>
+        /// ADO persistence obsolete
+        /// </summary>
+        TModel IAdoPersistenceProvider<TModel>.Obsolete(DataContext context, Guid key) => this.DoObsoleteModel(context, key);
+
+        /// <summary>
+        /// ADO persistence get
+        /// </summary>
+        TModel IAdoPersistenceProvider<TModel>.Get(DataContext context, Guid key, Guid? versionKey) => this.DoGetModel(context, key, versionKey, false);
     }
 }

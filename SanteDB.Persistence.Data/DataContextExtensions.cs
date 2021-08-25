@@ -1,4 +1,5 @@
 ﻿using SanteDB.Core.i18n;
+using SanteDB.Core.Model;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
@@ -13,11 +14,72 @@ using System.Text;
 
 namespace SanteDB.Persistence.Data
 {
+
+    /// <summary>
+    /// Key harmonization mode
+    /// </summary>
+    internal enum KeyHarmonizationMode
+    {
+        /// <summary>
+        /// When the harmonization process occurs, the priority is:
+        /// Key, if set is used and property is cleared
+        /// Property, if set overrides Key
+        /// </summary>
+        KeyOverridesProperty,
+        /// <summary>
+        /// When the harmonization process occurs, the priority is:
+        /// Property, if set overrides Key
+        /// </summary>
+        PropertyOverridesKey
+    }
+
     /// <summary>
     /// Data context extensions
     /// </summary>
     internal static class DataContextExtensions
     {
+
+        /// <summary>
+        /// Harmonize the keys with the delay load properties
+        /// </summary>
+        internal static TData HarmonizeKeys<TData>(this TData me, KeyHarmonizationMode harmonizationMode)
+            where TData : IdentifiedData, new()
+        {
+            me = me.Clone() as TData;
+
+            foreach (var pi in typeof(TData).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+            {
+                var piValue = pi.GetValue(me);
+
+                // Is the property a key?
+                if (piValue is IdentifiedData iddata)
+                {
+                    // Get the object which references this 
+                    var keyProperty = pi.GetSerializationRedirectProperty();
+                    var keyValue = keyProperty?.GetValue(me);
+                    switch (harmonizationMode)
+                    {
+                        case KeyHarmonizationMode.KeyOverridesProperty:
+                            if(keyValue != null) // There is a key for this which is populated, we want to use the key and clear the property
+                            {
+                                pi.SetValue(me, null);
+                            }
+                            break;
+                        case KeyHarmonizationMode.PropertyOverridesKey:
+                            if (iddata.Key.HasValue)
+                            {
+                                keyProperty.SetValue(me, iddata.Key);
+                            }
+                            else
+                            {
+                                pi.SetValue(me, null); // Let the identifier data stand
+                            }
+                            break;
+                    }
+                }
+            }
+            return me;
+        }
 
         /// <summary>
         /// Establish a provenance entry for the specified connection
@@ -69,11 +131,11 @@ namespace SanteDB.Persistence.Data
                     retVal.SessionKey = sessionId;
 
                 // Pure application credential
-                if(!retVal.UserKey.HasValue && !retVal.DeviceKey.HasValue)
+                if (!retVal.UserKey.HasValue && !retVal.DeviceKey.HasValue)
                 {
                     retVal.UserKey = Guid.Parse(AuthenticationContext.SystemUserSid);
                 }
-                if(retVal.ApplicationKey == Guid.Empty)
+                if (retVal.ApplicationKey == Guid.Empty)
                 {
                     retVal.ApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid); // System application SID fallback
                 }
@@ -87,7 +149,7 @@ namespace SanteDB.Persistence.Data
                 else
                     retVal.UserKey = me.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == principal.Identity.Name.ToLowerInvariant())?.Key;
 
-                if(!retVal.UserKey.HasValue)
+                if (!retVal.UserKey.HasValue)
                 {
                     throw new SecurityException(ErrorMessages.ERR_SEC_PROVENANCE_UNK_ID);
                 }

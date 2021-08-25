@@ -1,4 +1,6 @@
-﻿using SanteDB.Core.i18n;
+﻿using SanteDB.Core;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Services;
@@ -240,8 +242,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             try
             {
 #endif
-
-                return context.Update(model);
+                var existing = context.FirstOrDefault<TDbModel>(o => o.Key == model.Key);
+                if(existing == null)
+                {
+                    throw new KeyNotFoundException(ErrorMessages.ERR_NOT_FOUND.Format(model));
+                }
+                existing.CopyObjectData(model, true);
+                return context.Update(existing);
 #if DEBUG
             }
             finally
@@ -253,33 +260,67 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
         }
 
- 
+
         /// <summary>
         /// Update associated entities 
         /// </summary>
         /// <remarks>
-        /// Updates the associated items of <typeparamref name="TAssociativeTable"/> such that
+        /// Updates the associated items of <typeparamref name="TModelAssociation"/> such that
         /// <paramref name="data"/>'s associations are updated to match the list 
-        /// provided in <paramref name="related"/>
+        /// provided in <paramref name="associations"/>
         /// </remarks>
         protected virtual IEnumerable<TModelAssociation> UpdateModelAssociations<TModelAssociation>(DataContext context, TModel data, IEnumerable<TModelAssociation> associations)
-            where TModelAssociation : ISimpleAssociation, new()
+            where TModelAssociation : IdentifiedData, ISimpleAssociation, new()
         {
-            associations = associations.Select(a => { a.SourceEntityKey = data.Key; return a; }).ToArray();
+            // Ensure either the relationship points to (key) (either source or target)
+            associations = associations.Select(a =>
+            {
+                if (a is ITargetedAssociation target && target.Key != data.Key && a.SourceEntityKey != data.Key ||
+                    a.SourceEntityKey != data.Key) // The target is a target association
+                {
+                    a.SourceEntityKey = data.Key;
+                }
+                return a;
+            }).ToArray();
 
-            // TODO: Call / chain to the appropriate sub-persistence service which can 
+            // We now want to fetch the perssitence serivce of this 
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TModelAssociation>>() as IAdoPersistenceProvider<TModelAssociation>;
+            if (persistenceService == null)
+            {
+                throw new DataPersistenceException(ErrorMessages.ERR_ARGUMENT_INCOMPATIBLE_TYPE.Format(typeof(IAdoPersistenceProvider<TModelAssociation>), typeof(IDataPersistenceService<TModelAssociation>)));
+            }
+
+            // Next we want to perform a relationship query to establish what is being loaded and what is being persisted
+            var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key).ToArray();
+
+            // Which are new and which are not?
+            var removedRelationships = existing.Where(o => !associations.Any(a => a.Key == o.Key)).Select(a =>
+            {
+                persistenceService.Obsolete(context, a.Key.Value);
+                a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Obsolete;
+                return a;
+            });
+            var addedRelationships = associations.Where(o => !o.Key.HasValue || !existing.Any(a => a.Key == o.Key)).Select(a =>
+            {
+                persistenceService.Insert(context, a);
+                a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
+                return a;
+            });
+            var updatedRelationships = associations.Where(o => o.Key.HasValue && existing.Any(a => a.Key == o.Key)).Select(a =>
+            {
+                persistenceService.Update(context, a);
+                a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
+                return a;
+            });
+
+            return addedRelationships.Union(removedRelationships).Union(updatedRelationships).ToArray();
         }
 
         /// <summary>
         /// Update the internal
         /// </summary>
-        /// <typeparam name="TAssociativeTable"></typeparam>
-        /// <param name="context"></param>
-        /// <param name="sourceKey"></param>
-        /// <param name="associations"></param>
-        /// <returns></returns>
         protected virtual IEnumerable<TAssociativeTable> UpdateInternalAssociations<TAssociativeTable>(DataContext context, Guid sourceKey, IEnumerable<TAssociativeTable> associations)
-            where TAssociativeTable : DbAssociation, new()
+            where TAssociativeTable : IDbAssociation, new()
         {
             // Ensure the source by locking the IEnumerable
             associations = associations.Select(a => { a.SourceKey = sourceKey; return a; }).ToArray();

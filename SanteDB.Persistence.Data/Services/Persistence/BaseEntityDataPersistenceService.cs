@@ -61,12 +61,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 throw new ArgumentNullException(nameof(model), ErrorMessages.ERR_ARGUMENT_NULL);
             }
 
+            var existing = context.FirstOrDefault<TDbModel>(o => o.Key == model.Key);
+            if(existing == null)
+            {
+                throw new KeyNotFoundException(ErrorMessages.ERR_NOT_FOUND.Format(model));
+            }
+
             // Un-delete the object
-            model.ObsoletedByKey = null;
-            model.ObsoletedByKeySpecified = true;
-            model.ObsoletionTime = null;
-            model.ObsoletionTimeSpecified = true;
-            return base.DoUpdateInternal(context, model);
+            existing.CopyObjectData(model, true);
+            existing.ObsoletedByKey = null;
+            existing.ObsoletionTimeSpecified = model.ObsoletedByKeySpecified = true;
+            existing.ObsoletionTime = null;
+            return base.DoUpdateInternal(context, existing);
 
         }
 
@@ -103,7 +109,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected override TDbModel DoObsoleteInternal(DataContext context, Guid key)
         {
             // Logical deletion is enabled? Then the obsolete is an update
-            if ((this.m_configuration.VersioningPolicy & Data.Configuration.AdoVersioningPolicyFlags.LogicalDeletion) != 0)
+            if (this.m_configuration.VersioningPolicy.HasFlag(Data.Configuration.AdoVersioningPolicyFlags.LogicalDeletion))
             {
                 if (context == null)
                 {

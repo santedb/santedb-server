@@ -95,8 +95,9 @@ namespace SanteDB.Persistence.Data.Configuration
             {
                 IdentifierFormat = true,
                 IdentifierUniqueness = true,
-                ValidationLevel = Core.BusinessRules.DetectedIssuePriorityType.Warning
+                ValidationLevel = Core.BusinessRules.DetectedIssuePriorityType.Warning,
             };
+            this.VersioningPolicy = AdoVersioningPolicyFlags.Default;
         }
 
         /// <summary>

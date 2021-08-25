@@ -58,6 +58,11 @@ namespace SanteDB.Persistence.Data.Model
             }
             return base.Equals(obj);
         }
+
+        /// <summary>
+        /// Represent this object as a string 
+        /// </summary>
+        public override string ToString() => $"{this.GetType().Name} (K:{this.Key})";
     }
 
     

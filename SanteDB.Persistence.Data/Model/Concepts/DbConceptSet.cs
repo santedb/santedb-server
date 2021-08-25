@@ -72,28 +72,25 @@ namespace SanteDB.Persistence.Data.Model.Concepts
 	/// Concept set concept association.
 	/// </summary>
 	[Table("cd_set_mem_assoc_tbl")]
-	public class DbConceptSetConceptAssociation 
+	public class DbConceptSetConceptAssociation : IDbAssociation
 	{
 
-		/// <summary>
-		/// Gets or sets the concept identifier.
-		/// </summary>
-		/// <value>The concept identifier.</value>
-		[Column("cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key)), PrimaryKey]
+        /// <summary>
+        /// The source of this association
+        /// </summary>
+        [Column("set_id"), ForeignKey(typeof(DbConceptSet), nameof(DbConceptSet.Key)), PrimaryKey]
+		public Guid SourceKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the concept identifier.
+        /// </summary>
+        /// <value>The concept identifier.</value>
+        [Column("cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key)), PrimaryKey]
 		public Guid ConceptKey {
 			get;
 			set;
 		}
 
-		/// <summary>
-		/// Gets or sets the concept set identifier.
-		/// </summary>
-		/// <value>The concept set identifier.</value>
-		[Column("set_id"), ForeignKey(typeof(DbConceptSet), nameof(DbConceptSet.Key)), PrimaryKey]
-		public Guid ConceptSetKey {
-			get;
-			set;
-		}
 
        
     }

@@ -1,11 +1,15 @@
-﻿using SanteDB.OrmLite.Providers;
+﻿using SanteDB.Core.Model.Query;
+using SanteDB.OrmLite;
+using SanteDB.OrmLite.Providers;
+using System;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
 {
     /// <summary>
-    /// Represents an ADO persistence provider
+    /// Represents an ADO persistence provider for <paramref name="TModel"/>
     /// </summary>
-    public interface IAdoPersistenceProvider
+    public interface IAdoPersistenceProvider<TModel>
     {
 
         /// <summary>
@@ -13,5 +17,29 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         IDbProvider Provider { get; set;  }
 
+        /// <summary>
+        /// Query for <paramref name="filter"/> on <paramref name="context"/>
+        /// </summary>
+        IQueryResultSet<TModel> Query(DataContext context, Expression<Func<TModel, bool>> filter);
+
+        /// <summary>
+        /// Insert the specified object into the database
+        /// </summary>
+        TModel Insert(DataContext context, TModel data);
+
+        /// <summary>
+        /// Update the specified object in the database context
+        /// </summary>
+        TModel Update(DataContext context, TModel data);
+
+        /// <summary>
+        /// Do an obsolete of the model
+        /// </summary>
+        TModel Obsolete(DataContext context, Guid key);
+
+        /// <summary>
+        /// Perform a get on the context
+        /// </summary>
+        TModel Get(DataContext context, Guid key, Guid? versionKey);
     }
 }
