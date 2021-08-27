@@ -119,7 +119,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     dbModel.VersionKey = Guid.NewGuid();
                 }
-                dbModel.VersionSequenceId = default(int);
                 dbModel.CreationTime = DateTimeOffset.Now;
                 dbModel.CreatedByKey = context.ContextId;
 
@@ -267,10 +266,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected override OrmResultSet<TDbModel> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, bool allowCache = false)
         {
-            // First - we determine if the query has an explicit status concept set
-            if (typeof(IDbHasStatus).IsAssignableFrom(typeof(TDbModel)) && !query.ToString().Contains(nameof(IHasState.StatusConceptKey)))
+            if(context == null)
             {
-                var statusKeyProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TDbModel).GetProperty(nameof(IDbHasStatus.StatusConceptKey)));
+                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL, nameof(context));
+            }
+            else if (query == null)
+            {
+                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL, nameof(query));
+            }
+
+            // First - we determine if the query has an explicit status concept set
+            if (typeof(IHasState).IsAssignableFrom(typeof(TModel)) && !query.ToString().Contains(nameof(IHasState.StatusConceptKey)))
+            {
+                var statusKeyProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IHasState.StatusConceptKey)));
+                statusKeyProperty = Expression.MakeMemberAccess(statusKeyProperty, statusKeyProperty.Type.GetProperty("Value"));
                 query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, Expression.MakeBinary(ExpressionType.NotEqual, statusKeyProperty, Expression.Constant(StatusKeys.Obsolete))), query.Parameters);
             }
 
@@ -301,7 +310,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }).ToArray();
 
             // We now want to fetch the perssitence serivce of this 
-            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TModelAssociation>>() as IAdoPersistenceProvider<TModelAssociation>;
+            var persistenceService = base.GetRelatedPersistenceService<TModelAssociation>();
             if (persistenceService == null)
             {
                 throw new DataPersistenceException(ErrorMessages.ERR_ARGUMENT_INCOMPATIBLE_TYPE.Format(typeof(IAdoPersistenceProvider<TModelAssociation>), typeof(IDataPersistenceService<TModelAssociation>)));

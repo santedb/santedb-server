@@ -26,7 +26,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
         }
 
-
         /// <summary>
         /// Perform an update on the object and ensure that the keys
         /// </summary>

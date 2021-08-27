@@ -1,13 +1,18 @@
-﻿using SanteDB.Core.i18n;
+﻿using SanteDB.Core;
+using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Security;
+using SanteDB.Persistence.Data.Services.Persistence;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security;
 using System.Security.Principal;
 using System.Text;
@@ -39,20 +44,45 @@ namespace SanteDB.Persistence.Data
     internal static class DataContextExtensions
     {
 
+
+        /// <summary>
+        /// Ensure that the object exists in the database
+        /// </summary>
+        internal static TData EnsureExists<TData>(this TData me, DataContext context)
+            where TData : IdentifiedData, new()
+        {
+            var persistenceService = ApplicationServiceContext.Current.GetService<IAdoPersistenceProvider<TData>>();
+            if (!me.Key.HasValue || !persistenceService.Query(context, o => o.Key == me.Key).Any())
+            {
+                return persistenceService.Insert(context, me);
+            }
+            else
+            {
+                return me;
+            }
+
+        }
+
         /// <summary>
         /// Harmonize the keys with the delay load properties
         /// </summary>
         internal static TData HarmonizeKeys<TData>(this TData me, KeyHarmonizationMode harmonizationMode)
-            where TData : IdentifiedData, new()
+            where TData : IdentifiedData
         {
             me = me.Clone() as TData;
 
             foreach (var pi in typeof(TData).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
             {
+
+                if(!pi.CanWrite) 
+                { 
+                    continue; 
+                }
+
                 var piValue = pi.GetValue(me);
 
                 // Is the property a key?
-                if (piValue is IdentifiedData iddata)
+                if (piValue is IdentifiedData iddata && iddata.Key.HasValue)
                 {
                     // Get the object which references this 
                     var keyProperty = pi.GetSerializationRedirectProperty();
@@ -75,6 +105,13 @@ namespace SanteDB.Persistence.Data
                                 pi.SetValue(me, null); // Let the identifier data stand
                             }
                             break;
+                    }
+                }
+                else if (piValue is IList list)
+                {
+                    foreach(var itm in list.OfType<IdentifiedData>())
+                    {
+                        itm.HarmonizeKeys(harmonizationMode);
                     }
                 }
             }

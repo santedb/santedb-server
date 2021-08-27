@@ -34,6 +34,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
+        /// Prepare references
+        /// </summary>
+        protected override TModel PrepareReferences(DataContext context, TModel data) => data;
+
+        /// <summary>
         /// Convert <paramref name="model" /> to a <typeparamref name="TDbModel"/>
         /// </summary>
         /// <param name="context">The data context in case data access is required</param>
@@ -284,7 +289,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }).ToArray();
 
             // We now want to fetch the perssitence serivce of this 
-            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TModelAssociation>>() as IAdoPersistenceProvider<TModelAssociation>;
+            var persistenceService = base.GetRelatedPersistenceService<TModelAssociation>();
             if (persistenceService == null)
             {
                 throw new DataPersistenceException(ErrorMessages.ERR_ARGUMENT_INCOMPATIBLE_TYPE.Format(typeof(IAdoPersistenceProvider<TModelAssociation>), typeof(IDataPersistenceService<TModelAssociation>)));

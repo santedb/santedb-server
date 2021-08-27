@@ -1,4 +1,5 @@
-﻿using SanteDB.Core.BusinessRules;
+﻿using SanteDB.Core;
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
@@ -14,6 +15,7 @@ using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics;
@@ -36,25 +38,41 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         where TDbModel : DbIdentified, new()
     {
 
+
         /// <summary>
         /// Get tracer for the specified persistence class
         /// </summary>
         protected Tracer m_tracer = Tracer.GetTracer(typeof(BasePersistenceService<TModel, TDbModel>));
 
-        // Data cache
+        /// <summary>
+        /// Data caching service
+        /// </summary>
         protected IDataCachingService m_dataCacheService;
 
-        // Query persistence service    
+        /// <summary>
+        /// Query persistence service
+        /// </summary>
         protected IQueryPersistenceService m_queryPersistence;
 
-        // Ad-hoc cache
+        /// <summary>
+        /// Ad-hoc caching service
+        /// </summary>
         protected IAdhocCacheService m_adhocCache;
 
-        // Model map
+        /// <summary>
+        /// Model mapper
+        /// </summary>
         protected ModelMapper m_modelMapper;
         
-        // The configuration for this object
+        /// <summary>
+        /// Configuration reference
+        /// </summary>
         protected AdoPersistenceConfigurationSection m_configuration;
+
+        /// <summary>
+        /// Providers 
+        /// </summary>
+        private static IDictionary<Type, IAdoPersistenceProvider> s_providers = new ConcurrentDictionary<Type, IAdoPersistenceProvider>();
 
         /// <summary>
         /// Base persistence service
@@ -172,6 +190,28 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
+        /// Prepare all references 
+        /// </summary>
+        protected abstract TModel PrepareReferences(DataContext context, TModel data);
+
+        /// <summary>
+        /// Load a model object
+        /// </summary>
+        protected IAdoPersistenceProvider<TRelated> GetRelatedPersistenceService<TRelated>()
+        {
+            if(!s_providers.TryGetValue(typeof(TRelated), out IAdoPersistenceProvider provider))
+            {
+                provider = ApplicationServiceContext.Current.GetService<IAdoPersistenceProvider<TRelated>>();
+                if(provider != null)
+                {
+                    s_providers.Add(typeof(TRelated), provider);
+                }
+            }
+            return provider as IAdoPersistenceProvider<TRelated>;
+        }
+
+
+        /// <summary>
         /// Perform the actual insert of a model object
         /// </summary>
         protected virtual TModel DoInsertModel(DataContext context, TModel data)
@@ -184,6 +224,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 throw new ArgumentNullException(nameof(data), ErrorMessages.ERR_ARGUMENT_NULL);
             }
+
+            data = this.PrepareReferences(context, data);
 
 #if PERFMON
             Stopwatch sw = new Stopwatch();
@@ -220,6 +262,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 throw new ArgumentNullException(nameof(data), ErrorMessages.ERR_ARGUMENT_NULL);
             }
+
+            data = this.PrepareReferences(context, data);
 
 #if PERFMON
             Stopwatch sw = new Stopwatch();
@@ -281,7 +325,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
             }
-
+            else if (key == Guid.Empty) // empty get
+            {
+                return null;
+            }
 #if PERFMON
             Stopwatch sw = new Stopwatch();
             try

@@ -26,17 +26,9 @@ namespace SanteDB.Persistence.Data.Model.Concepts
     /// </summary>
     [Table("cd_tbl")]
     [AssociativeTable(typeof(DbConceptSet), typeof(DbConceptSetConceptAssociation))]
-	public class DbConcept : DbIdentified, IDbReadonly
+	public class DbConcept : DbIdentified
 	{
 
-		/// <summary>
-		/// Gets or sets whether the object is a system concept or not
-		/// </summary>
-		[Column("is_sys")]
-		public bool IsReadonly {
-			get;
-			set;
-		}
 
         /// <summary>
         /// Gets or sets the code identifier

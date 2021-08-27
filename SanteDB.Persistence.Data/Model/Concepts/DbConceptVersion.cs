@@ -38,6 +38,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
 			set;
 		}
 
+
 		/// <summary>
 		/// Gets or sets the status concept id
 		/// </summary>
