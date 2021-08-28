@@ -23,7 +23,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     public abstract class IdentifiedDataPersistenceService<TModel, TDbModel>
         : BasePersistenceService<TModel, TDbModel>
         where TModel : IdentifiedData, new()
-        where TDbModel : DbIdentified, new()
+        where TDbModel : class, IDbIdentified, new()
     {
 
         /// <summary>

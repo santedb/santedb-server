@@ -1,5 +1,6 @@
 ﻿using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
@@ -18,7 +19,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     /// <typeparam name="TDbModel">The physical model class</typeparam>
     public abstract class BaseEntityDataPersistenceService<TModel, TDbModel> : IdentifiedDataPersistenceService<TModel, TDbModel>
         where TModel : BaseEntityData, new()
-        where TDbModel : DbBaseData, new()
+        where TDbModel : class, IDbBaseData, new()
     {
         /// <summary>
         /// Creates a new base entity data with the specified data classes injected
@@ -70,8 +71,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // Un-delete the object
             existing.CopyObjectData(model, true);
             existing.ObsoletedByKey = null;
-            existing.ObsoletionTimeSpecified = model.ObsoletedByKeySpecified = true;
             existing.ObsoletionTime = null;
+            existing.ObsoletionTimeSpecified = existing.ObsoletedByKeySpecified = true;
+
             return base.DoUpdateInternal(context, existing);
 
         }
@@ -152,6 +154,26 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 return base.DoObsoleteInternal(context, key);
             }
+        }
+
+        /// <summary>
+        /// Convert the data model to the information model
+        /// </summary>
+        protected override TModel DoConvertToInformationModel(DataContext context, TDbModel dbModel, params IDbIdentified[] referenceObjects)
+        {
+            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+
+            switch(this.m_configuration.LoadStrategy)
+            {
+                case Configuration.LoadStrategyType.FullLoad:
+                    retVal.CreatedBy = base.GetRelatedPersistenceService<SecurityProvenance>().Get(context, dbModel.CreatedByKey, null);
+                    retVal.SetLoadIndicator(nameof(BaseEntityData.CreatedBy));
+                    retVal.ObsoletedBy = base.GetRelatedPersistenceService<SecurityProvenance>().Get(context, dbModel.ObsoletedByKey.GetValueOrDefault(), null);
+                    retVal.SetLoadIndicator(nameof(BaseEntityData.ObsoletedBy));
+                    break;
+            }
+
+            return retVal;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SanteDB.Core.Model.DataTypes;
+﻿using SanteDB.Core.Model;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
@@ -123,14 +124,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             {
                 case Configuration.LoadStrategyType.FullLoad:
                     retVal.Class = base.GetRelatedPersistenceService<ConceptClass>().Get(context, dbModel.ClassKey, null);
+                    retVal.SetLoadIndicator(nameof(Concept.Class));
                     goto case Configuration.LoadStrategyType.SyncLoad; // special case - FullLoad implies SyncLoad so we want a fallthrough - the only way to do this in C# is with this messy GOTO stuff
                 case Configuration.LoadStrategyType.SyncLoad:
                     retVal.ConceptNames = base.GetRelatedPersistenceService<ConceptName>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                    retVal.SetLoadIndicator(nameof(Concept.ConceptNames));
                     retVal.Relationship = base.GetRelatedPersistenceService<ConceptRelationship>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                    retVal.SetLoadIndicator(nameof(Concept.Relationship));
                     retVal.ReferenceTerms = this.GetRelatedPersistenceService<ConceptReferenceTerm>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                    retVal.SetLoadIndicator(nameof(Concept.ReferenceTerms));
                     goto case Configuration.LoadStrategyType.QuickLoad;
                 case Configuration.LoadStrategyType.QuickLoad:
                     retVal.ConceptSetsXml = context.Query<DbConceptSetConceptAssociation>(o => o.SourceKey == dbModel.Key).Select(o => o.SourceKey).ToList();
+                    retVal.SetLoadIndicator(nameof(Concept.ConceptSets));
                     break;
             }
 

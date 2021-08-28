@@ -89,9 +89,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
         {
             using (AuthenticationContext.EnterSystemContext())
             {
-
-                var refTerm = new ReferenceTerm();
-
                 var concept = new Concept()
                 {
                     Mnemonic = "TEST-03",
@@ -104,22 +101,46 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                     ReferenceTerms = new List<ConceptReferenceTerm>()
                     {
                         new ConceptReferenceTerm()
+                        {
+                            RelationshipTypeKey = ConceptRelationshipTypeKeys.SameAs,
+                            ReferenceTerm = new ReferenceTerm()
+                            {
+                                CodeSystemKey = CodeSystemKeys.CVX,
+                                Mnemonic = "032XX",
+                                DisplayNames = new List<ReferenceTermName>()
+                                {
+                                    new ReferenceTermName("This is a referene term")
+                                }
+                            }
+                        }
                     }
                 };
 
                 var afterInsert = base.TestInsert(concept);
-                Assert.AreEqual("TEST-02", afterInsert.Mnemonic);
+                Assert.AreEqual("TEST-03", afterInsert.Mnemonic);
                 Assert.AreEqual(ConceptClassKeys.Other, afterInsert.ClassKey);
                 Assert.AreEqual(1, afterInsert.ConceptNames.Count);
+                Assert.AreEqual(1, afterInsert.ReferenceTerms.Count);
+                Assert.AreEqual("032XX", afterInsert.ReferenceTerms.First().ReferenceTerm.Mnemonic);
+                Assert.AreEqual(ConceptRelationshipTypeKeys.SameAs, afterInsert.ReferenceTerms.First().RelationshipTypeKey);
 
                 // Fetch
-                var afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-02", 1).FirstOrDefault();
+                var afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-03", 1).FirstOrDefault();
                 Assert.AreEqual(ConceptClassKeys.Other, afterQuery.ClassKey);
-                Assert.AreEqual("TEST-02", afterQuery.Mnemonic);
+                Assert.AreEqual("TEST-03", afterQuery.Mnemonic);
 
                 // Rule 1: The names are empty
                 Assert.AreEqual(0, afterQuery.ConceptNames.Count);
                 Assert.AreEqual(1, afterQuery.LoadCollection(o => o.ConceptNames).Count());
+
+                // Rule 2: Reference terms are empty until loaded
+                Assert.AreEqual(0, afterQuery.ReferenceTerms.Count);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
+                Assert.AreEqual(ConceptRelationshipTypeKeys.SameAs, afterQuery.ReferenceTerms.First().RelationshipTypeKey);
+                Assert.IsNull(afterQuery.ReferenceTerms.First().ReferenceTerm);
+                Assert.AreEqual("032XX", afterQuery.ReferenceTerms.First().LoadProperty(o => o.ReferenceTerm).Mnemonic);
+                Assert.AreEqual(0, afterQuery.ReferenceTerms.First().ReferenceTerm.DisplayNames.Count);
+                Assert.AreEqual(1, afterQuery.ReferenceTerms.First().ReferenceTerm.LoadProperty(o => o.DisplayNames).Count);
             }
         }
 

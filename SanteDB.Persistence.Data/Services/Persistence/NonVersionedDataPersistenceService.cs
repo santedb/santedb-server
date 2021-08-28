@@ -1,5 +1,6 @@
 ﻿using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
@@ -45,6 +46,24 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             return base.DoUpdateInternal(context, model);
         }
 
+        /// <summary>
+        /// Convert the data model to information model
+        /// </summary>
+        protected override TModel DoConvertToInformationModel(DataContext context, TDbModel dbModel, params IDbIdentified[] referenceObjects)
+        {
+            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+
+            // Load strategy
+            switch(this.m_configuration.LoadStrategy)
+            {
+                case Configuration.LoadStrategyType.FullLoad:
+                    retVal.UpdatedBy = base.GetRelatedPersistenceService<SecurityProvenance>().Get(context, dbModel.UpdatedByKey.GetValueOrDefault(), null);
+                    retVal.SetLoadIndicator(nameof(NonVersionedEntityData.UpdatedBy));
+                    break;
+            }
+
+            return retVal;
+        }
 
     }
 }

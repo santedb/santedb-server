@@ -1,4 +1,5 @@
-﻿using SanteDB.Core.Model.DataTypes;
+﻿using SanteDB.Core.Model;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
@@ -27,7 +28,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         protected override ConceptReferenceTerm PrepareReferences(DataContext context, ConceptReferenceTerm data)
         {
             data.RelationshipTypeKey = data.RelationshipType?.EnsureExists(context)?.Key ?? data.RelationshipTypeKey;
-            data.ReferenceTermKey = data.RelationshipType?.EnsureExists(context)?.Key ?? data.ReferenceTermKey;
+            data.ReferenceTermKey = data.ReferenceTerm?.EnsureExists(context)?.Key ?? data.ReferenceTermKey;
             return data;
         }
 
@@ -42,6 +43,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             {
                 case Configuration.LoadStrategyType.FullLoad:
                     retVal.RelationshipType = base.GetRelatedPersistenceService<ConceptRelationshipType>().Get(context, dbModel.RelationshipTypeKey, null);
+                    retVal.SetLoadIndicator(nameof(ConceptReferenceTerm.RelationshipType));
                     break;
 
             }

@@ -1,6 +1,8 @@
-﻿using SanteDB.Core.Model.DataTypes;
+﻿using SanteDB.Core.Model;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
 using System.Collections.Generic;
@@ -29,6 +31,25 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             data.RelationshipTypeKey = data.RelationshipType?.EnsureExists(context)?.Key ?? data.RelationshipTypeKey;
             data.TargetConceptKey = data.TargetConcept?.EnsureExists(context)?.Key ?? data.TargetConceptKey;
             return data;
+        }
+
+        /// <summary>
+        /// Information model conversion
+        /// </summary>
+        protected override ConceptRelationship DoConvertToInformationModel(DataContext context, DbConceptRelationship dbModel, params IDbIdentified[] referenceObjects)
+        {
+            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+            switch(this.m_configuration.LoadStrategy)
+            {
+                case Configuration.LoadStrategyType.FullLoad:
+                    retVal.RelationshipType = base.GetRelatedPersistenceService<ConceptRelationshipType>().Get(context, dbModel.RelationshipTypeKey, null);
+                    retVal.SetLoadIndicator(nameof(ConceptRelationship.RelationshipType));
+                    retVal.TargetConcept = base.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TargetKey, null);
+                    retVal.SetLoadIndicator(nameof(ConceptRelationship.TargetConcept));
+                    break;
+            }
+            return retVal;
+
         }
     }
 }

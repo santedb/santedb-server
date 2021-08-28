@@ -35,9 +35,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         IAdoQueryProvider<TModel>,
         IDataPersistenceService
         where TModel : IdentifiedData, new()
-        where TDbModel : DbIdentified, new()
+        where TDbModel : class, IDbIdentified, new()
     {
-
 
         /// <summary>
         /// Get tracer for the specified persistence class
