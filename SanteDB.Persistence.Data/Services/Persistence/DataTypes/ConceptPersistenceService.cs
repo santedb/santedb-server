@@ -30,7 +30,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// </summary>
         protected override Concept PrepareReferences(DataContext context, Concept data)
         {
-            if(!data.StatusConceptKey.HasValue)
+            if (!data.StatusConceptKey.HasValue)
             {
                 // Set NEW as the default status
                 data.StatusConceptKey = StatusKeys.New;
@@ -63,7 +63,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                     {
                         ConceptKey = retVal.Key.Value,
                         SourceKey = o
-                    })).Select(o => o.SourceKey).ToList();
+                    }), o => o.ConceptKey == retVal.Key).Select(o => o.SourceKey).ToList();
             }
 
             // Reference terms
@@ -101,7 +101,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                     {
                         ConceptKey = retVal.Key.Value,
                         SourceKey = o
-                    })).Select(o => o.SourceKey).ToList();
+                    }), o => o.ConceptKey == retVal.Key).Select(o => o.SourceKey).ToList();
             }
 
             // Update reference terms

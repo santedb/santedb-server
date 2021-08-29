@@ -249,6 +249,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual(ConceptClassKeys.Other, afterUpdate.ClassKey);
                 Assert.AreEqual(StatusKeys.Active, afterUpdate.StatusConceptKey);
 
+                // Test we can retrieve the previous version
                 Assert.IsNotNull(afterUpdate.GetPreviousVersion());
                 Assert.AreEqual(afterInsert.VersionKey, afterUpdate.PreviousVersionKey);
                 Assert.AreEqual("TEST-05", afterUpdate.GetPreviousVersion().Mnemonic);
@@ -264,6 +265,113 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.IsNotNull(queryConcept.GetPreviousVersion());
                 Assert.AreEqual("TEST-05B", queryConcept.Mnemonic);
                 Assert.AreEqual("TEST-05", queryConcept.GetPreviousVersion().Mnemonic);
+
+            }
+        }
+
+        /// <summary>
+        /// This test ensures that the persistence layer is able to remove and add new related objects to the concept
+        /// </summary>
+        [Test]
+        public void TestUpdateRelatedConceptObjects()
+        {
+            using(AuthenticationContext.EnterSystemContext())
+            {
+                var concept = new Concept()
+                {
+                    Mnemonic = "TEST-06",
+                    ClassKey = ConceptClassKeys.Other,
+                    StatusConceptKey = StatusKeys.Active,
+                    ConceptNames = new List<ConceptName>()
+                    {
+                        new ConceptName("A new concept"),
+                        new ConceptName("fr", "Un concept nouveau"),
+                        new ConceptName("es", "Un concepto nuevo")
+                    },
+                    ConceptSetKeys = new List<Guid>()
+                    {
+                        ConceptSetKeys.AdministrativeGenderCode
+                    },
+                    ReferenceTerms = new List<ConceptReferenceTerm>()
+                    {
+                        new ConceptReferenceTerm()
+                        {
+                            RelationshipTypeKey = ConceptRelationshipTypeKeys.SameAs,
+                            ReferenceTerm = new ReferenceTerm("NEW", CodeSystemKeys.ICD9)
+                        }
+                    }
+                };
+
+                var afterInsert = base.TestInsert(concept);
+                Assert.AreEqual("TEST-06", afterInsert.Mnemonic);
+                Assert.AreEqual(3, afterInsert.ConceptNames.Count);
+                Assert.AreEqual(1, afterInsert.ConceptSetKeys.Count);
+                Assert.AreEqual(1, afterInsert.ReferenceTerms.Count);
+                
+                // First we will remove a name
+                var afterUpdate = base.TestUpdate(afterInsert, (o) =>
+                {
+                    o.ConceptNames.RemoveAt(2);
+                    return o;
+                });
+                Assert.AreEqual(2, afterUpdate.ConceptNames.Count);
+
+                // Query to ensure the name is not being loaded
+                var afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-06", 1).FirstOrDefault();
+                Assert.AreEqual(0, afterQuery.ConceptNames.Count);
+                Assert.AreEqual(2, afterQuery.LoadProperty(o=>o.ConceptNames).Count);
+                Assert.AreEqual("en", afterQuery.ConceptNames[0].Language);
+                Assert.AreEqual("fr", afterQuery.ConceptNames[1].Language);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
+
+                // Next, we'll add something that never existed before 
+                afterUpdate = base.TestUpdate(afterQuery, (o) =>
+                {
+                    o.Relationship.Add(new ConceptRelationship(ConceptRelationshipTypeKeys.SameAs, NullReasonKeys.NoInformation));
+                    return o;
+                });
+                Assert.AreEqual(1, afterUpdate.Relationship.Count);
+                Assert.AreEqual(2, afterUpdate.ConceptNames.Count);
+
+                // Ensure the query returns the same
+                afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-06", 1).FirstOrDefault();
+                Assert.AreEqual(0, afterQuery.ConceptNames.Count);
+                Assert.AreEqual(2, afterQuery.LoadProperty(o => o.ConceptNames).Count);
+                Assert.AreEqual(0, afterQuery.Relationship.Count);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Relationship).Count);
+                Assert.AreEqual("en", afterQuery.ConceptNames[0].Language);
+                Assert.AreEqual("fr", afterQuery.ConceptNames[1].Language);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
+
+
+                // Next, we'll update a few properties
+                afterUpdate = base.TestUpdate(afterQuery, (o) =>
+                {
+                    o.ConceptNames.RemoveAt(1);
+                    o.ConceptSetKeys.Clear();
+                    o.ReferenceTerms.Add(new ConceptReferenceTerm()
+                    {
+                        RelationshipTypeKey = ConceptRelationshipTypeKeys.SameAs,
+                        ReferenceTerm = new ReferenceTerm("OTH203", CodeSystemKeys.ICD10CM)
+                    });
+                    return o;
+                });
+
+                // Ensure the update reflects
+                Assert.AreEqual(1, afterUpdate.ConceptNames.Count);
+                Assert.AreEqual(2, afterUpdate.ReferenceTerms.Count);
+                Assert.AreEqual(0, afterUpdate.ConceptSetKeys.Count);
+                Assert.AreEqual(1, afterUpdate.Relationship.Count);
+
+                // Now re-query
+                afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-06", 1).FirstOrDefault();
+                Assert.AreEqual(0, afterQuery.ConceptNames.Count);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ConceptNames).Count);
+                Assert.AreEqual(0, afterQuery.Relationship.Count);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Relationship).Count);
+                Assert.AreEqual("en", afterQuery.ConceptNames[0].Language);
+                Assert.AreEqual(2, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
+                Assert.AreEqual(0, afterQuery.ConceptSetKeys.Count);
 
             }
         }

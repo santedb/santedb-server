@@ -274,6 +274,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <paramref name="data"/>'s associations are updated to match the list 
         /// provided in <paramref name="associations"/>
         /// </remarks>
+        /// <returns>The effective list of relationships on the <paramref name="data"/></returns>
         protected virtual IEnumerable<TModelAssociation> UpdateModelAssociations<TModelAssociation>(DataContext context, TModel data, IEnumerable<TModelAssociation> associations)
             where TModelAssociation : IdentifiedData, ISimpleAssociation, new()
         {
@@ -311,20 +312,24 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
                 return a;
             });
-            var updatedRelationships = associations.Where(o => o.Key.HasValue && existing.Any(a => a.Key == o.Key)).Select(a =>
+            var updatedRelationships = associations.Where(o => o.Key.HasValue && existing.Any(a => a.Key == o.Key && !o.SemanticEquals(a))).Select(a =>
             {
                 persistenceService.Update(context, a);
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
                 return a;
             });
 
-            return addedRelationships.Union(removedRelationships).Union(updatedRelationships).ToArray();
+            return existing.Where(e=>!removedRelationships.Any(r=>r.Key == e.Key)).Union(addedRelationships).ToArray();
         }
 
         /// <summary>
         /// Update the internal
         /// </summary>
-        protected virtual IEnumerable<TAssociativeTable> UpdateInternalAssociations<TAssociativeTable>(DataContext context, Guid sourceKey, IEnumerable<TAssociativeTable> associations)
+        /// <param name="associations">The associations which were on the inbound record</param>
+        /// <param name="context">The context on which the data is to be inserted/updated</param>
+        /// <param name="existingExpression">By default, this uses o=>o.SourceKey == <paramref name="sourceKey"/> , you can specify an alternate here to determine existing records</param>
+        /// <param name="sourceKey">The source record (from which the <paramref name="associations"/> point to)</param>
+        protected virtual IEnumerable<TAssociativeTable> UpdateInternalAssociations<TAssociativeTable>(DataContext context, Guid sourceKey, IEnumerable<TAssociativeTable> associations, Expression<Func<TAssociativeTable, bool>> existingExpression = null)
             where TAssociativeTable : IDbAssociation, new()
         {
 
@@ -339,7 +344,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }).ToArray();
 
             // Existing associations in the database
-            var existing = context.Query<TAssociativeTable>(o => o.SourceKey == sourceKey).ToArray();
+            TAssociativeTable[] existing = null;
+            if (existingExpression != null)
+            {
+                existing = context.Query<TAssociativeTable>(existingExpression).ToArray();
+            }
+            else
+            {
+                existing = context.Query<TAssociativeTable>(o => o.SourceKey == sourceKey).ToArray();
+            }
 
             // Which ones are new?
             var removeRelationships = existing.Where(e => !associations.Any(a => a.Equals(e)));

@@ -86,13 +86,24 @@ namespace SanteDB.Persistence.Data.Model.Concepts
         /// </summary>
         /// <value>The concept identifier.</value>
         [Column("cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key)), PrimaryKey]
-		public Guid ConceptKey {
-			get;
-			set;
-		}
+		public Guid ConceptKey { get; set; }
 
+        /// <summary>
+        /// Determine equality of this relationship and another
+        /// </summary>
+        public override bool Equals(object obj)
+        {
+            if(obj is DbConceptSetConceptAssociation cso)
+            {
+                return cso.SourceKey == this.SourceKey &&
+                    cso.ConceptKey == this.ConceptKey;
+            }
+            else
+            {
+                return base.Equals(obj);
+            }
+        }
 
-       
     }
 }
 
