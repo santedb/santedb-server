@@ -4,6 +4,7 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -324,7 +325,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     this.m_context.Open();
 
-                    var keySet = this.m_resultSet.Keys<Guid>().OfType<Guid>().ToArray();
+                    Guid[] keySet = null;
+                    if (typeof(IDbVersionedData).IsAssignableFrom(this.m_resultSet.ElementType))
+                    {
+                        keySet = this.m_resultSet.Select<Guid>(nameof(IDbVersionedData.Key)).Distinct().ToArray();
+                    }
+                    else
+                    {
+                         keySet = this.m_resultSet.Keys<Guid>().OfType<Guid>().ToArray();
+                    }
                     this.m_provider.QueryPersistence.RegisterQuerySet(stateId, keySet, this.m_resultSet.Statement, keySet.Length);
                     return new AdoStatefulResultSet<TData>(this.m_provider, stateId);
                 }

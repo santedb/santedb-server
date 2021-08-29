@@ -32,7 +32,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
         /// <summary>
         /// Gets or sets the key
         /// </summary>
-        [Column("ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.Key))]
+        [Column("ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.Key)), AlwaysJoin]
         public override Guid Key { get; set; }
 
         /// <summary>

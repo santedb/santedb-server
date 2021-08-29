@@ -76,6 +76,7 @@
     <Compile Include="Configuration\Utils\HttpSslTool.cs" />
     <Compile Include="Diagnostics\ConsoleTraceWriter.cs" />
     <Compile Include="Diagnostics\RolloverTextWriterTraceWriter.cs" />
+    <Compile Include="Diagnostics\DebugDiagnosticsTraceWriter.cs" />
     <Compile Include="Diagnostics\SystemDiagnosticsTraceWriter.cs" />
     <Compile Include="Docker\SecurityDockerFeature.cs" />
     <Compile Include="ExtensionMethods.cs" />

@@ -28,6 +28,16 @@
     <add type="SanteDB.OrmLite.Configuration.OrmConfigurationSection, SanteDB.OrmLite" />
     <add type="SanteDB.Core.Configuration.Data.DataConfigurationSection, SanteDB.Core.Api"/>
   </sections>
+  <section xsi:type="DiagnosticsConfigurationSection">
+    <sources>
+      <add name="SanteDB" filter="Verbose" />
+    </sources>
+    <writers>
+      <add name="main" initializationData="santedb.log" filter="Verbose">
+        <writer>SanteDB.Server.Core.Diagnostics.DebugDiagnosticsTraceWriter, SanteDB.Server.Core</writer>
+      </add>
+    </writers>
+  </section>
   <section xsi:type="DataConfigurationSection">
     <connectionStrings>
       <add name="TEST_CONNECTION" value="initial catalog=|DataDirectory|\santedb_test.fdb;server type=Embedded;user id=sysdba" provider="FirebirdSQL"/>
@@ -82,7 +92,7 @@
            fuzzyTotal="false"
            readWriteConnectionString="TEST_CONNECTION"
            readOnlyConnectionString="TEST_CONNECTION"
-           traceSql="false"
+           traceSql="true"
            providerType="FirebirdSQL"
            versioning="default"
            staOnly="false"

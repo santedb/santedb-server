@@ -2,6 +2,8 @@
 using SanteDB.Core;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
@@ -40,7 +42,8 @@ namespace SanteDB.Persistence.Data.Test
             "UpdatedBy", 
             "UpdatedTime", 
             "ObsoletedBy", 
-            "ObsoletionTime" 
+            "ObsoletionTime" ,
+            "StatusConceptKey"
         };
 
         /// <summary>
@@ -160,9 +163,16 @@ namespace SanteDB.Persistence.Data.Test
             Assert.IsNotNull(afterObsolete.Key);
             Assert.IsNotNull(afterObsolete.CreatedByKey);
             Assert.IsNotNull(afterObsolete.CreationTime);
-            Assert.IsNotNull(afterObsolete.ObsoletedByKey);
-            Assert.IsNotNull(afterObsolete.ObsoletionTime);
 
+            if (afterObsolete is IHasState state)
+            {
+                Assert.AreEqual(StatusKeys.Obsolete, state.StatusConceptKey);
+            }
+            else
+            {
+                Assert.IsNotNull(afterObsolete.ObsoletedByKey);
+                Assert.IsNotNull(afterObsolete.ObsoletionTime);
+            }
             this.AssertEqual(objectToTest, afterObsolete);
             return afterObsolete;
         }

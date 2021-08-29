@@ -204,7 +204,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             // Convert the query to a domain query so that the object persistence layer can turn the 
             // structured LINQ query into a SQL statement
-            var domainQuery = context.CreateSqlStatement<TDbModel>().SelectFrom(typeof(TDbModel));
+            var domainQuery = context.CreateSqlStatement().SelectFrom(typeof(TDbModel));
             var expression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(query, false);
             if (expression != null)
             {
@@ -213,7 +213,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             else
             {
                 this.m_tracer.TraceVerbose("Will use slow query construction due to complex mapped fields");
-                domainQuery.Where(context.GetQueryBuilder(this.m_modelMapper).CreateQuery(query));
+                domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateQuery(query);
             }
 
             return context.Query<TDbModel>(domainQuery.Build());

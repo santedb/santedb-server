@@ -29,59 +29,35 @@ using System.Threading.Tasks;
 namespace SanteDB.Server.Core.Diagnostics
 {
     /// <summary>
-    /// Represents a trace writer to Tracer
+    /// A trace writer that uses the System.Diagnostics.Debug class
     /// </summary>
-    /// <remarks>
-    /// This trace writer routes logging messages from the SanteDB PCL classes into the .NET server trace 
-    /// source SanteDB. You will need to enable the trace source in your configuration.
-    /// </remarks>
-    [DisplayName("System/Debugger Trace Writer")]
-    public class SystemDiagnosticsTraceWriter : TraceWriter
+    [DisplayName("Debug Trace Writer")]
+    public class DebugDiagnosticsTraceWriter : TraceWriter
     {
 
-        // Trace source
-        private TraceSource m_traceSource = new TraceSource("SanteDB");
 
         /// <summary>
         /// CTOR for diagnostics
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="fileName"></param>
-        public SystemDiagnosticsTraceWriter(EventLevel filter, string fileName, IDictionary<String, EventLevel> sources) : base(filter, fileName, sources)
+        public DebugDiagnosticsTraceWriter(EventLevel filter, string fileName, IDictionary<String, EventLevel> sources) : base(filter, fileName, sources)
         {
         }
 
         /// <summary>
         /// Creates a new diagnostics trace writer
         /// </summary>
-        public SystemDiagnosticsTraceWriter() : base (EventLevel.LogAlways, null, new Dictionary<String, EventLevel>())
+        public DebugDiagnosticsTraceWriter() : base (EventLevel.LogAlways, null, new Dictionary<String, EventLevel>())
         {
         }
 
-        private TraceEventType Classify(EventLevel level)
-        {
-            switch (level)
-            {
-                case EventLevel.Critical:
-                    return TraceEventType.Critical;
-                case EventLevel.Error:
-                    return TraceEventType.Error;
-                case EventLevel.Informational:
-                    return TraceEventType.Information;
-                case EventLevel.Verbose:
-                    return TraceEventType.Verbose;
-                case EventLevel.Warning:
-                    return TraceEventType.Warning;
-                default:
-                    return TraceEventType.Information;
-            }
-        }
         /// <summary>
         /// Write the specified trace
         /// </summary>
         protected override void WriteTrace(EventLevel level, string source, string format, params object[] args)
         {
-            this.m_traceSource.TraceEvent(this.Classify(level), 0, format, args);
+            Debug.WriteLine($"{source} [{level}] : {String.Format(format, args)}");
         }
 
         /// <summary>
@@ -89,7 +65,6 @@ namespace SanteDB.Server.Core.Diagnostics
         /// </summary>
         public override void TraceEventWithData(EventLevel level, string source, string message, object[] data)
         {
-            this.m_traceSource.TraceData(this.Classify(level), 0, data);
         }
     }
 }

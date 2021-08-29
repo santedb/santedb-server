@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SanteDB.Core.Model;
+using SanteDB.Core;
 
 namespace SanteDB.Persistence.Data.Test.Persistence
 {
@@ -121,7 +122,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual(ConceptClassKeys.Other, afterInsert.ClassKey);
                 Assert.AreEqual(1, afterInsert.ConceptNames.Count);
                 Assert.AreEqual(1, afterInsert.ReferenceTerms.Count);
-                Assert.AreEqual("032XX", afterInsert.ReferenceTerms.First().ReferenceTerm.Mnemonic);
+                Assert.AreEqual("032XX", afterInsert.ReferenceTerms.First().LoadProperty(o=>o.ReferenceTerm).Mnemonic);
                 Assert.AreEqual(ConceptRelationshipTypeKeys.SameAs, afterInsert.ReferenceTerms.First().RelationshipTypeKey);
 
                 // Fetch
@@ -150,7 +151,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
         [Test]
         public void TestInsertFullConcept()
         {
-            using(AuthenticationContext.EnterSystemContext())
+            using (AuthenticationContext.EnterSystemContext())
             {
                 var concept = new Concept()
                 {
@@ -198,7 +199,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 var afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-04", 1).First();
                 Assert.AreEqual("TEST-04", afterQuery.Mnemonic);
                 Assert.AreEqual(StatusKeys.Active, afterQuery.StatusConceptKey);
-                
+
                 // Relationships should not have data accoring to load condition
                 Assert.AreEqual(0, afterQuery.Relationship.Count);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Relationship).Count);
@@ -226,7 +227,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
         [Test]
         public void TestUpdateBasicConcept()
         {
-            using(AuthenticationContext.EnterSystemContext())
+            using (AuthenticationContext.EnterSystemContext())
             {
                 var concept = new Concept()
                 {
@@ -275,7 +276,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
         [Test]
         public void TestUpdateRelatedConceptObjects()
         {
-            using(AuthenticationContext.EnterSystemContext())
+            using (AuthenticationContext.EnterSystemContext())
             {
                 var concept = new Concept()
                 {
@@ -307,7 +308,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual(3, afterInsert.ConceptNames.Count);
                 Assert.AreEqual(1, afterInsert.ConceptSetKeys.Count);
                 Assert.AreEqual(1, afterInsert.ReferenceTerms.Count);
-                
+
                 // First we will remove a name
                 var afterUpdate = base.TestUpdate(afterInsert, (o) =>
                 {
@@ -319,7 +320,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 // Query to ensure the name is not being loaded
                 var afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-06", 1).FirstOrDefault();
                 Assert.AreEqual(0, afterQuery.ConceptNames.Count);
-                Assert.AreEqual(2, afterQuery.LoadProperty(o=>o.ConceptNames).Count);
+                Assert.AreEqual(2, afterQuery.LoadProperty(o => o.ConceptNames).Count);
                 Assert.AreEqual("en", afterQuery.ConceptNames[0].Language);
                 Assert.AreEqual("fr", afterQuery.ConceptNames[1].Language);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
@@ -374,6 +375,153 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual(0, afterQuery.ConceptSetKeys.Count);
 
             }
+        }
+
+        /// <summary>
+        /// Tests the various query functions in the concept persistence service.
+        /// </summary>
+        [Test]
+        public void TestQueryConceptWithOrdering()
+        {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+
+                var concept1 = new Concept()
+                {
+                    Mnemonic = "TEST-07A",
+                    ClassKey = ConceptClassKeys.Other,
+                    StatusConceptKey = StatusKeys.Active,
+                    ReferenceTerms = new List<ConceptReferenceTerm>()
+                    {
+                        new ConceptReferenceTerm()
+                        {
+                            RelationshipTypeKey = ConceptRelationshipTypeKeys.SameAs,
+                            ReferenceTerm = new ReferenceTerm()
+                            {
+                                Mnemonic = "TEST07A",
+                                CodeSystemKey = CodeSystemKeys.AdministrativeGender
+                            }
+                        }
+                    },
+                    ConceptNames = new List<ConceptName>()
+                    {
+                        new ConceptName("en", "Seven A"),
+                        new ConceptName("fr", "Sept A")
+                    }
+                };
+                var concept2 = new Concept()
+                {
+                    Mnemonic = "TEST-07B",
+                    ClassKey = ConceptClassKeys.Other,
+                    StatusConceptKey = StatusKeys.Active,
+                    ReferenceTerms = new List<ConceptReferenceTerm>()
+                    {
+                        new ConceptReferenceTerm()
+                        {
+                            RelationshipTypeKey = ConceptRelationshipTypeKeys.SameAs,
+                            ReferenceTerm = new ReferenceTerm()
+                            {
+                                Mnemonic = "TEST07B",
+                                CodeSystemKey = CodeSystemKeys.AdministrativeGender
+                            }
+                        }
+                    },
+                    ConceptNames = new List<ConceptName>()
+                    {
+                        new ConceptName("en", "Seven B"),
+                        new ConceptName("fr", "Sept B")
+                    }
+                };
+
+                var after1 = base.TestInsert(concept1);
+                var after2 = base.TestInsert(concept2);
+
+                Assert.IsTrue(after1.VersionSequence<after2.VersionSequence);
+
+                // Query filter on mnemonic (simple)
+                base.TestQuery<Concept>(o => o.Mnemonic == "TEST-07A" || o.Mnemonic == "TEST-07B", 2);
+                base.TestQuery<Concept>(o => o.Mnemonic == "TEST-07A", 1);
+
+                // Query filter on name
+                base.TestQuery<Concept>(o => o.ConceptNames.Any(n => n.Language == "en" && n.Name.StartsWith("Seven")), 2);
+                base.TestQuery<Concept>(o => o.ConceptNames.Any(n => n.Language == "fr" && n.Name.StartsWith("Seven")), 0);
+
+                // Test filte ron reference term
+                base.TestQuery<Concept>(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == "TEST07A"), 1);
+
+                // Test ordering
+                var result = base.TestQuery<Concept>(o => o.Mnemonic.StartsWith("TEST-07"), 2).AsResultSet();
+                var queryId = Guid.NewGuid();
+
+                // Ordering
+                Assert.AreEqual("TEST-07A", result.OrderBy(o => o.VersionSequence).First().Mnemonic);
+                Assert.AreEqual("TEST-07B", result.OrderByDescending(o => o.VersionSequence).First().Mnemonic);
+
+                // Stateful queries
+                ApplicationServiceContext.Current.GetService<TestQueryPersistenceService>().SetExpectedQueryStats(queryId, 2);
+                var stateful = result.OrderBy(o => o.VersionSequence).AsStateful(queryId);
+
+                Assert.AreEqual(2, stateful.Count());
+                Assert.AreEqual("TEST-07A", stateful.First().Mnemonic);
+
+            }
+        }
+
+        /// <summary>
+        /// Tests that a concept can be obsoleted
+        /// </summary>
+        [Test]
+        public void TestObsoleteConcept()
+        {
+
+            using(AuthenticationContext.EnterSystemContext())
+            {
+                var concept = new Concept()
+                {
+                    Mnemonic = "TEST-08",
+                    ClassKey = ConceptClassKeys.Other,
+                    ConceptNames = new List<ConceptName>()
+                    {
+                        new ConceptName("en", "I will be removed")
+                    },
+                    ReferenceTerms = new List<ConceptReferenceTerm>()
+                    {
+                        new ConceptReferenceTerm()
+                        {
+                            RelationshipTypeKey = ConceptRelationshipTypeKeys.SameAs,
+                            ReferenceTerm = new ReferenceTerm("TEST08", CodeSystemKeys.AdministrativeGender)
+                        }
+                    }
+                };
+
+                var afterInsert = base.TestInsert(concept);
+                Assert.AreEqual("TEST-08", afterInsert.Mnemonic);
+                Assert.AreEqual(StatusKeys.New, afterInsert.StatusConceptKey);
+
+                // Now query
+                var afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08", 1).FirstOrDefault();
+                afterQuery = base.TestQuery<Concept>(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == "TEST08"), 1).FirstOrDefault();
+
+                // Now obsolete
+                var afterObsolete = base.TestObsolete(afterInsert);
+                Assert.AreEqual(StatusKeys.Obsolete, afterObsolete.StatusConceptKey); // should be obsolete
+
+                // Should not be returned in query results
+                afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08", 0).FirstOrDefault();
+                Assert.IsNull(afterQuery);
+                afterQuery = base.TestQuery<Concept>(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == "TEST08"), 0).FirstOrDefault();
+                Assert.IsNull(afterQuery);
+
+                // Should return if Obsolete is specifically set
+                afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08" && o.StatusConceptKey == StatusKeys.Obsolete, 1).FirstOrDefault();
+                Assert.AreEqual(StatusKeys.Obsolete, afterQuery.StatusConceptKey);
+                Assert.AreEqual("TEST-08", afterQuery.Mnemonic);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ConceptNames).Count);
+
+                
+            }
+
         }
     }
 }

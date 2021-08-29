@@ -345,7 +345,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             if (retVal == null || versionKey.HasValue)
             {
                 var dbInstance = this.DoGetInternal(context, key, versionKey, allowCached);
-                retVal = this.DoConvertToInformationModel(context, dbInstance);
+                if (dbInstance == null) // not found
+                {
+                    retVal =  null;
+                }
+                else
+                {
+                    retVal = this.DoConvertToInformationModel(context, dbInstance);
+                }
             }
 
             return retVal;
