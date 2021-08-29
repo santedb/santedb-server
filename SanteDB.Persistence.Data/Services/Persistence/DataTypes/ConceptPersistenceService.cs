@@ -1,4 +1,5 @@
 ﻿using SanteDB.Core.Model;
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -29,6 +30,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// </summary>
         protected override Concept PrepareReferences(DataContext context, Concept data)
         {
+            if(!data.StatusConceptKey.HasValue)
+            {
+                // Set NEW as the default status
+                data.StatusConceptKey = StatusKeys.New;
+            }
             data.ClassKey = data.Class?.EnsureExists(context)?.Key ?? data.ClassKey;
             data.StatusConceptKey = data.StatusConcept?.EnsureExists(context)?.Key ?? data.StatusConceptKey;
             return data;
@@ -39,6 +45,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// </summary>
         protected override Concept DoInsertModel(DataContext context, Concept data)
         {
+
             // Do Insertion of themodel
             var retVal = base.DoInsertModel(context, data);
 
@@ -49,10 +56,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             }
 
             // Concept sets
-            if (data.ConceptSetsXml != null)
+            if (data.ConceptSetKeys != null)
             {
-                retVal.ConceptSetsXml = base.UpdateInternalAssociations<DbConceptSetConceptAssociation>(context, retVal.Key.Value,
-                    data.ConceptSetsXml.Select(o => new DbConceptSetConceptAssociation()
+                retVal.ConceptSetKeys = base.UpdateInternalAssociations<DbConceptSetConceptAssociation>(context, retVal.Key.Value,
+                    data.ConceptSetKeys.Select(o => new DbConceptSetConceptAssociation()
                     {
                         ConceptKey = retVal.Key.Value,
                         SourceKey = o
@@ -87,10 +94,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             }
 
             // Update concept sets
-            if (data.ConceptSetsXml != null)
+            if (data.ConceptSetKeys != null)
             {
-                retVal.ConceptSetsXml = base.UpdateInternalAssociations<DbConceptSetConceptAssociation>(context, retVal.Key.Value,
-                    data.ConceptSetsXml.Select(o => new DbConceptSetConceptAssociation()
+                retVal.ConceptSetKeys = base.UpdateInternalAssociations<DbConceptSetConceptAssociation>(context, retVal.Key.Value,
+                    data.ConceptSetKeys.Select(o => new DbConceptSetConceptAssociation()
                     {
                         ConceptKey = retVal.Key.Value,
                         SourceKey = o
@@ -135,7 +142,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                     retVal.SetLoadIndicator(nameof(Concept.ReferenceTerms));
                     goto case Configuration.LoadStrategyType.QuickLoad;
                 case Configuration.LoadStrategyType.QuickLoad:
-                    retVal.ConceptSetsXml = context.Query<DbConceptSetConceptAssociation>(o => o.SourceKey == dbModel.Key).Select(o => o.SourceKey).ToList();
+                    retVal.ConceptSetKeys = context.Query<DbConceptSetConceptAssociation>(o => o.ConceptKey == dbModel.Key).Select(o => o.SourceKey).ToList();
                     retVal.SetLoadIndicator(nameof(Concept.ConceptSets));
                     break;
             }

@@ -144,5 +144,128 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             }
         }
 
+        /// <summary>
+        /// Tests that a concept with full properties specified is inserted properly
+        /// </summary>
+        [Test]
+        public void TestInsertFullConcept()
+        {
+            using(AuthenticationContext.EnterSystemContext())
+            {
+                var concept = new Concept()
+                {
+                    Mnemonic = "TEST-04",
+                    ClassKey = ConceptClassKeys.Other,
+                    ConceptNames = new List<ConceptName>()
+                    {
+                        new ConceptName("This is yet another test concept")
+                    },
+                    ConceptSetKeys = new List<Guid>()
+                    {
+                        ConceptSetKeys.AdministrativeGenderCode
+                    },
+                    ReferenceTerms = new List<ConceptReferenceTerm>()
+                    {
+                        new ConceptReferenceTerm()
+                        {
+                            RelationshipTypeKey = ConceptRelationshipTypeKeys.SameAs,
+                            ReferenceTerm = new ReferenceTerm()
+                            {
+                                CodeSystemKey = CodeSystemKeys.AdministrativeGender,
+                                Mnemonic = "Foo",
+                                DisplayNames = new List<ReferenceTermName>()
+                                {
+                                    new ReferenceTermName("Foo is not female nor male, but foo")
+                                }
+                            }
+                        }
+                    },
+                    StatusConceptKey = StatusKeys.Active,
+                    Relationship = new List<ConceptRelationship>()
+                    {
+                        new ConceptRelationship(ConceptRelationshipTypeKeys.SameAs, NullReasonKeys.NotApplicable)
+                    }
+                };
+
+                var afterInsert = base.TestInsert(concept);
+                Assert.AreEqual("TEST-04", afterInsert.Mnemonic);
+                Assert.AreEqual(StatusKeys.Active, afterInsert.StatusConceptKey);
+                Assert.AreEqual(1, afterInsert.Relationship.Count);
+                Assert.AreEqual(1, afterInsert.ConceptNames.Count);
+                Assert.AreEqual(1, afterInsert.ReferenceTerms.Count);
+                Assert.AreEqual(1, afterInsert.ConceptSetKeys.Count);
+
+                var afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-04", 1).First();
+                Assert.AreEqual("TEST-04", afterQuery.Mnemonic);
+                Assert.AreEqual(StatusKeys.Active, afterQuery.StatusConceptKey);
+                
+                // Relationships should not have data accoring to load condition
+                Assert.AreEqual(0, afterQuery.Relationship.Count);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Relationship).Count);
+                Assert.AreEqual(ConceptRelationshipTypeKeys.SameAs, afterQuery.Relationship.First().RelationshipTypeKey);
+                Assert.AreEqual(NullReasonKeys.NotApplicable, afterQuery.Relationship.First().TargetConceptKey);
+                Assert.IsNull(afterQuery.Relationship.First().TargetConcept);
+                Assert.IsNotNull(afterQuery.Relationship.First().LoadProperty(o => o.TargetConcept));
+
+                // Ensure that the concept names count is 0
+                Assert.AreEqual(0, afterQuery.ConceptNames.Count);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ConceptNames).Count);
+
+                // Ensure reference terms are 0 until loaded
+                Assert.AreEqual(0, afterQuery.ReferenceTerms.Count);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
+
+                // Concept sets are not a delay loadable property 
+                Assert.AreEqual(1, afterQuery.ConceptSetKeys.Count);
+            }
+        }
+
+        /// <summary>
+        /// Tests that basic versioned concept updates work properly
+        /// </summary>
+        [Test]
+        public void TestUpdateBasicConcept()
+        {
+            using(AuthenticationContext.EnterSystemContext())
+            {
+                var concept = new Concept()
+                {
+                    Mnemonic = "TEST-05",
+                    ClassKey = ConceptClassKeys.Other,
+                    StatusConceptKey = StatusKeys.Active
+                };
+
+                var afterInsert = base.TestInsert(concept);
+                Assert.AreEqual("TEST-05", afterInsert.Mnemonic);
+                Assert.AreEqual(ConceptClassKeys.Other, afterInsert.ClassKey);
+                Assert.AreEqual(StatusKeys.Active, afterInsert.StatusConceptKey);
+
+                // Before update the current version is TEST-05
+                var afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-05", 1);
+
+                // Perform update
+                var afterUpdate = base.TestUpdate(afterInsert, (o) => { o.Mnemonic = "TEST-05B"; return o; });
+                Assert.AreEqual("TEST-05B", afterUpdate.Mnemonic);
+                Assert.AreEqual(ConceptClassKeys.Other, afterUpdate.ClassKey);
+                Assert.AreEqual(StatusKeys.Active, afterUpdate.StatusConceptKey);
+
+                Assert.IsNotNull(afterUpdate.GetPreviousVersion());
+                Assert.AreEqual(afterInsert.VersionKey, afterUpdate.PreviousVersionKey);
+                Assert.AreEqual("TEST-05", afterUpdate.GetPreviousVersion().Mnemonic);
+
+                // Query for TEST-05 should return 0 results
+                afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-05", 0);
+                // Query for TEST-05B returns 1 result
+                afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-05B", 1);
+                var queryConcept = afterQuery.First();
+
+                // Ensure load is proper
+                Assert.AreEqual(afterInsert.VersionKey, queryConcept.PreviousVersionKey);
+                Assert.IsNotNull(queryConcept.GetPreviousVersion());
+                Assert.AreEqual("TEST-05B", queryConcept.Mnemonic);
+                Assert.AreEqual("TEST-05", queryConcept.GetPreviousVersion().Mnemonic);
+
+            }
+        }
     }
 }

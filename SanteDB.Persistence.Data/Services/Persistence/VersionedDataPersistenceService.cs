@@ -188,6 +188,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 newVersion.CreatedByKey = context.ContextId;
                 newVersion.ObsoletedByKey = null;
                 newVersion.ObsoletionTime = null;
+                newVersion.VersionSequenceId = null;
+                
                 newVersion.ObsoletedByKeySpecified = model.ObsoletionTimeSpecified = true;
                 newVersion.VersionKey = Guid.NewGuid();
                 return context.Insert(newVersion);
@@ -266,7 +268,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected override OrmResultSet<TDbModel> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, bool allowCache = false)
         {
-            if(context == null)
+            if (context == null)
             {
                 throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL, nameof(context));
             }
@@ -302,7 +304,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             associations = associations.Select(a =>
             {
                 if (a is ITargetedAssociation target && target.Key != data.Key && a.SourceEntityKey != data.Key ||
-                    a.SourceEntityKey != data.Key) // The target is a target association
+                    a.SourceEntityKey.GetValueOrDefault() == Guid.Empty) // The target is a target association
                 {
                     a.SourceEntityKey = data.Key;
                 }
@@ -370,7 +372,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             where TAssociativeTable : IDbVersionedAssociation, new()
         {
             // Ensure the source by locking the IEnumerable
-            associations = associations.Select(a => { a.SourceKey = sourceKey; return a; }).ToArray();
+            associations = associations.Select(a =>
+            {
+                if (a.SourceKey == Guid.Empty)
+                {
+                    a.SourceKey = sourceKey;
+                }
+                return a;
+            }).ToArray();
 
             // Existing associations in the database
             var existing = context.Query<TAssociativeTable>(o => o.SourceKey == sourceKey && !o.ObsoleteVersionSequenceId.HasValue).ToArray();

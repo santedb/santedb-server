@@ -248,7 +248,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
 #endif
                 var existing = context.FirstOrDefault<TDbModel>(o => o.Key == model.Key);
-                if(existing == null)
+                if (existing == null)
                 {
                     throw new KeyNotFoundException(ErrorMessages.ERR_NOT_FOUND.Format(model));
                 }
@@ -281,7 +281,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             associations = associations.Select(a =>
             {
                 if (a is ITargetedAssociation target && target.Key != data.Key && a.SourceEntityKey != data.Key ||
-                    a.SourceEntityKey != data.Key) // The target is a target association
+                    a.SourceEntityKey.GetValueOrDefault() == Guid.Empty) // The target is a target association
                 {
                     a.SourceEntityKey = data.Key;
                 }
@@ -327,8 +327,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<TAssociativeTable> UpdateInternalAssociations<TAssociativeTable>(DataContext context, Guid sourceKey, IEnumerable<TAssociativeTable> associations)
             where TAssociativeTable : IDbAssociation, new()
         {
+
             // Ensure the source by locking the IEnumerable
-            associations = associations.Select(a => { a.SourceKey = sourceKey; return a; }).ToArray();
+            associations = associations.Select(a =>
+            {
+                if (a.SourceKey == Guid.Empty)
+                {
+                    a.SourceKey = sourceKey;
+                }
+                return a;
+            }).ToArray();
 
             // Existing associations in the database
             var existing = context.Query<TAssociativeTable>(o => o.SourceKey == sourceKey).ToArray();

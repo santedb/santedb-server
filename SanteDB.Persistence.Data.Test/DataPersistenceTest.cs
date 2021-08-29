@@ -25,7 +25,23 @@ namespace SanteDB.Persistence.Data.Test
         protected IServiceManager m_serviceManager;
 
         // Ignore property
-        private string[] IGNORE = new string[] { "ModifiedOn", "CreationTimeXml","UpdatedTimeXml","ObsoletedTimeXml", "VersionKey", "Key", "CreationTime", "CreatedBy", "UpdatedBy", "UpdatedTime", "ObsoletedBy", "ObsoletionTime" };
+        private string[] IGNORE = new string[] {
+            "PreviousVersionKey",
+            "Tag", 
+            "VersionSequence", 
+            "ModifiedOn", 
+            "CreationTimeXml",
+            "UpdatedTimeXml",
+            "ObsoletedTimeXml",
+            "VersionKey", 
+            "Key", 
+            "CreationTime", 
+            "CreatedBy", 
+            "UpdatedBy", 
+            "UpdatedTime", 
+            "ObsoletedBy", 
+            "ObsoletionTime" 
+        };
 
         /// <summary>
         /// Setup the test
@@ -56,7 +72,7 @@ namespace SanteDB.Persistence.Data.Test
             Assert.IsNotNull(persistenceService);
 
             var afterInsert = persistenceService.Insert(objectToTest, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-            
+
             // Assert core properties are inserted
             Assert.IsNotNull(afterInsert.Key);
             Assert.IsNotNull(afterInsert.CreatedByKey);
@@ -106,26 +122,24 @@ namespace SanteDB.Persistence.Data.Test
             var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TData>>();
             Assert.IsNotNull(persistenceService);
 
-            var afterUpdate = persistenceService.Update(objectToTest, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-
-            // Assert core properties are inserted
-            Assert.IsNotNull(afterUpdate.Key);
-            Assert.IsNotNull(afterUpdate.CreatedByKey);
-            Assert.IsNotNull(afterUpdate.CreationTime);
-
-            if(afterUpdate is NonVersionedEntityData nve)
-            {
-                Assert.IsNotNull(nve.UpdatedTime);
-                Assert.IsNotNull(nve.UpdatedByKey);
-            }
-
-            this.AssertEqual(objectToTest, afterUpdate);
+            TData afterUpdate = objectToTest;
 
             // Now we want to update the afterUpdate according to the update tests and then assert
-            foreach(var instr in updateInstructions)
+            foreach (var instr in updateInstructions)
             {
                 var iteration = instr(afterUpdate);
                 afterUpdate = persistenceService.Update(iteration, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+
+                // Assert core properties are inserted
+                Assert.IsNotNull(afterUpdate.Key);
+                Assert.IsNotNull(afterUpdate.CreatedByKey);
+                Assert.IsNotNull(afterUpdate.CreationTime);
+                if (afterUpdate is NonVersionedEntityData nve)
+                {
+                    Assert.IsNotNull(nve.UpdatedTime);
+                    Assert.IsNotNull(nve.UpdatedByKey);
+                }
+
                 this.AssertEqual(iteration, afterUpdate);
             }
 
@@ -135,7 +149,7 @@ namespace SanteDB.Persistence.Data.Test
         /// <summary>
         /// Test that the data is obsoleted
         /// </summary>
-        protected TData TestObsolete<TData>(TData objectToTest) where TData: BaseEntityData
+        protected TData TestObsolete<TData>(TData objectToTest) where TData : BaseEntityData
         {
             var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TData>>();
             Assert.IsNotNull(persistenceService);
@@ -146,8 +160,8 @@ namespace SanteDB.Persistence.Data.Test
             Assert.IsNotNull(afterObsolete.Key);
             Assert.IsNotNull(afterObsolete.CreatedByKey);
             Assert.IsNotNull(afterObsolete.CreationTime);
-                Assert.IsNotNull(afterObsolete.ObsoletedByKey);
-                Assert.IsNotNull(afterObsolete.ObsoletionTime);
+            Assert.IsNotNull(afterObsolete.ObsoletedByKey);
+            Assert.IsNotNull(afterObsolete.ObsoletionTime);
 
             this.AssertEqual(objectToTest, afterObsolete);
             return afterObsolete;
