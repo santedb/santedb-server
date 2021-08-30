@@ -23,11 +23,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("SanteDB Server")]
-[assembly: AssemblyDescription("SanteDB Server Core Executable")]
+[assembly: AssemblyDescription("SanteDB iCDR Server Core Executable")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("SanteSuite Contributors")]
-[assembly: AssemblyProduct("SanteDB Server")]
-[assembly: AssemblyCopyright("Copyright (C) 2015-2020, Fyfe Software Inc. and the SanteSuite Contributors")]
+[assembly: AssemblyProduct("SanteDB iCDR Server")]
+[assembly: AssemblyCopyright("Copyright (C) 2015-2021, SanteSuite Inc. and the SanteSuite Contributors")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -375,13 +375,22 @@ namespace SanteDB.Configurator
         /// </summary>
         private void trvFeatures_BeforeSelect(object sender, TreeViewCancelEventArgs e)
         {
-            if (e.Node.Tag is IFeature feature && this.HasChanged())
+            if (e.Node?.Tag is IFeature feature && this.HasChanged())
             {
                 foreach (var itm in ConfigurationContext.Current.ConfigurationTasks.Where(o => o.Feature == this.CurrentFeature).ToArray())
                     ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
                 foreach (var itm in this.CurrentFeature.CreateInstallTasks().ToArray())
                     ConfigurationContext.Current.ConfigurationTasks.Add(itm);
             }
+        }
+
+        /// <summary>
+        /// Value has changed
+        /// </summary>
+        private void pgConfiguration_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            // Force changed
+            this.m_configHash = new byte[0];
         }
     }
 }
