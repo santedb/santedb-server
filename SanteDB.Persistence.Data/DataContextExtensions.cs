@@ -46,24 +46,6 @@ namespace SanteDB.Persistence.Data
 
 
         /// <summary>
-        /// Ensure that the object exists in the database
-        /// </summary>
-        internal static TData EnsureExists<TData>(this TData me, DataContext context)
-            where TData : IdentifiedData, new()
-        {
-            var persistenceService = ApplicationServiceContext.Current.GetService<IAdoPersistenceProvider<TData>>();
-            if (!me.Key.HasValue || !persistenceService.Query(context, o => o.Key == me.Key).Any())
-            {
-                return persistenceService.Insert(context, me);
-            }
-            else
-            {
-                return me;
-            }
-
-        }
-
-        /// <summary>
         /// Harmonize the keys with the delay load properties
         /// </summary>
         internal static TData HarmonizeKeys<TData>(this TData me, KeyHarmonizationMode harmonizationMode)
@@ -93,6 +75,10 @@ namespace SanteDB.Persistence.Data
                             if(keyValue != null) // There is a key for this which is populated, we want to use the key and clear the property
                             {
                                 pi.SetValue(me, null);
+                            }
+                            else
+                            {
+                                keyProperty.SetValue(me, iddata.Key);
                             }
                             break;
                         case KeyHarmonizationMode.PropertyOverridesKey:

@@ -35,8 +35,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                 // Set NEW as the default status
                 data.StatusConceptKey = StatusKeys.New;
             }
-            data.ClassKey = data.Class?.EnsureExists(context)?.Key ?? data.ClassKey;
-            data.StatusConceptKey = data.StatusConcept?.EnsureExists(context)?.Key ?? data.StatusConceptKey;
+            data.ClassKey = this.EnsureExists(context, data.Class)?.Key ?? data.ClassKey;
+            data.StatusConceptKey = this.EnsureExists(context, data.StatusConcept)?.Key ?? data.StatusConceptKey;
             return data;
         }
 

@@ -29,7 +29,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Creates a new injected version of the IdentifiedDataPersistenceService
         /// </summary>
-        public IdentifiedDataPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService, IDataCachingService dataCachingService, IQueryPersistenceService queryPersistence) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public IdentifiedDataPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 

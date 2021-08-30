@@ -1023,5 +1023,40 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// ADO persistence get
         /// </summary>
         TModel IAdoPersistenceProvider<TModel>.Get(DataContext context, Guid key, Guid? versionKey) => this.DoGetModel(context, key, versionKey, false);
+
+        /// <summary>
+        /// Ensure that the object exists in the database
+        /// </summary>
+        protected TData EnsureExists<TData>(DataContext context, TData data)
+            where TData : IdentifiedData, new()
+        {
+            if(context == null)
+            {
+                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL, nameof(context));
+            }
+            else if(data == default(TData))
+            {
+                return default(TData);
+            }
+
+            var persistenceService = this.GetRelatedPersistenceService<TData>();
+            if (!data.Key.HasValue || !persistenceService.Query(context, o => o.Key == data.Key).Any())
+            {
+                if (this.m_configuration.AutoInsertChildren)
+                {
+                    return persistenceService.Insert(context, data);
+                }
+                else
+                {
+                    throw new KeyNotFoundException(ErrorMessages.ERR_RELATED_OBJECT_NOT_FOUND.Format(typeof(TData).Name, data.Key));
+                }
+            }
+            else
+            {
+                return data;
+            }
+
+        }
+
     }
 }

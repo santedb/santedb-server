@@ -52,6 +52,8 @@
     <Compile Include="Persistence\AssigningAuthorityPersistenceTest.cs" />
     <Compile Include="Persistence\ConceptClassPersistenceTest.cs" />
     <Compile Include="Persistence\ConceptPersistenceTest.cs" />
+    <Compile Include="Persistence\ConceptSetPersistenceServiceTest.cs" />
+    <Compile Include="Persistence\IdentifierTypePersistenceServiceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ModelMapTest.cs" />
     <Compile Include="TestQueryPersistenceService.cs" />

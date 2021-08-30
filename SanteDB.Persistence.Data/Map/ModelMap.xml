@@ -35,6 +35,7 @@
     <property modelName="Body" domainName="Body"/>
     <property modelName="To" domainName="ToInfo"/>
   </class>
+
   
   <!-- Security Users -->
   <class modelClass="SanteDB.Core.Model.Security.SecurityUser, SanteDB.Core.Model, Version=1.1.0.0"
@@ -209,6 +210,10 @@
 
   </class>
 
+  <class modelClass="SanteDB.Core.Model.DataTypes.GeoTag, SanteDB.Core.Model, Version=1.1.0.0"
+       domainClass="SanteDB.Persistence.Data.Model.DataType.DbGeoTag, SanteDB.Persistence.Data, Version=0.5.0.0">
+  </class>
+  
   <class modelClass="SanteDB.Core.Model.DataTypes.AssigningAuthority, SanteDB.Core.Model, Version=1.1.0.0"
        domainClass="SanteDB.Persistence.Data.Model.DataType.DbAssigningAuthority, SanteDB.Persistence.Data, Version=0.5.0.0">
     <property modelName="ModifiedOn" domainName="UpdatedTime"/>

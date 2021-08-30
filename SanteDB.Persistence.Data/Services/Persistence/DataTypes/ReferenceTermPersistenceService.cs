@@ -28,7 +28,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// </summary>
         protected override ReferenceTerm PrepareReferences(DataContext context, ReferenceTerm data)
         {
-            data.CodeSystemKey = data.CodeSystem?.EnsureExists(context)?.Key ?? data.CodeSystemKey;
+            data.CodeSystemKey = this.EnsureExists(context, data.CodeSystem)?.Key ?? data.CodeSystemKey;
             return base.PrepareReferences(context, data);
         }
 

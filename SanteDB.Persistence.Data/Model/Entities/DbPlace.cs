@@ -59,17 +59,6 @@ namespace SanteDB.Persistence.Data.Model.Entities
         [Column("mob_ind")]
         public bool IsMobile { get; set; }
 
-        /// <summary>
-        /// Identifies the known latitude of the place
-        /// </summary>
-        [Column("lat")]
-        public double Lat { get; set; }
-
-        /// <summary>
-        /// Identifies the known longitude of the place
-        /// </summary>
-        [Column("lng")]
-        public double Lng { get; set; }
 
     }
 }

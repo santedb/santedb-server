@@ -66,7 +66,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
         /// <summary>
         /// Gets or sets the key
         /// </summary>
-        [Column("cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key)), AlwaysJoin]
+        [Column("cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public override Guid Key { get; set; }
     }
 }

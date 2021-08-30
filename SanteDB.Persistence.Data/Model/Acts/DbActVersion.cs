@@ -18,6 +18,7 @@
  */
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Concepts;
+using SanteDB.Persistence.Data.Model.DataType;
 using SanteDB.Persistence.Data.Model.Extensibility;
 using System;
 
@@ -99,7 +100,13 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// <summary>
         /// Gets or sets the act identifier
         /// </summary>
-        [Column("act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.Key)), AlwaysJoin]
+        [Column("act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.Key))]
         public override Guid Key { get; set; }
+
+        /// <summary>
+        /// Reference to the geo graphic location of the entity
+        /// </summary>
+        [Column("geo_id"), ForeignKey(typeof(DbGeoTag), nameof(DbGeoTag.Key))]
+        public Guid? GeoTagKey { get; set; }
     }
 }

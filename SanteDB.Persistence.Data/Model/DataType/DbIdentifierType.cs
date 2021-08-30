@@ -49,7 +49,7 @@ namespace SanteDB.Persistence.Data.Model.DataType
         /// </summary>
         /// <value>The type concept identifier.</value>
         [Column("ent_scp_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-        public Guid? EntityScopeKey
+        public Guid? ScopeConceptKey
         {
             get;
             set;

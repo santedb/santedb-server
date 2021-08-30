@@ -250,7 +250,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 throw new InvalidOperationException($"{nameof(IDataPersistenceService<ConceptSet>)} not found");
             }
 
-            return persistence.Count(o => o.Key == set.Key && o.ConceptsXml.Any(c => c == concept.Key)) > 0;
+            return persistence.Count(o => o.Key == set.Key && o.ConceptKeys.Any(c => c == concept.Key)) > 0;
         }
 
         /// <summary>
@@ -270,7 +270,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 throw new InvalidOperationException($"{nameof(IDataPersistenceService<ConceptSet>)} not found");
             }
 
-            return persistence.Count(o => o.Key == set && o.ConceptsXml.Any(c => c == concept)) > 0;
+            return persistence.Count(o => o.Key == set && o.ConceptKeys.Any(c => c == concept)) > 0;
         }
 
         /// <summary>
