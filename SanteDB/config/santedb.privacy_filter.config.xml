@@ -23,10 +23,18 @@
   </sections>
   <section xsi:type="DataPolicyFilterConfigurationSection" action="hide">
     <resources>
-      <add action="redact" type="AssigningAuthority" />
-      <add action="hide" type="Entity" />
-      <add action="hide" type="Patient" />
-      <add action="none" type="Place" />
+      <add action="redact" >
+        <resourceType type="AssigningAuthority"/>
+      </add>
+      <add action="hide">
+        <resourceType type="Entity"/>
+      </add>
+      <add action="hide" >
+        <resourceType type="Patient"/>
+      </add>
+      <add action="none" >
+        <resourceType type="Place"/>
+      </add>
     </resources>
   </section>
 </SanteDBConfiguration>

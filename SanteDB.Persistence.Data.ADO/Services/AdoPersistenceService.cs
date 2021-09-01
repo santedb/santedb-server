@@ -446,7 +446,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         // If the persistence service is generic then we should check if we're allowed
                         if (!t.IsGenericType ||
                             t.IsGenericType && (this.GetConfiguration().AllowedResources.Count == 0 ||
-                            this.GetConfiguration().AllowedResources.Contains(t.GetGenericArguments()[0].GetCustomAttribute<XmlTypeAttribute>()?.TypeName)))
+                            this.GetConfiguration().AllowedResources.Any(r=>r.Type == t.GetGenericArguments()[0])))
                         {
                             var instance = Activator.CreateInstance(t, this);
                             ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(instance);
@@ -478,7 +478,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                         // Make sure we're allowed to run this
                         if (this.GetConfiguration().AllowedResources.Count > 0 &&
-                            !this.GetConfiguration().AllowedResources.Contains(modelClassType.GetCustomAttribute<XmlTypeAttribute>()?.TypeName))
+                            !this.GetConfiguration().AllowedResources.Any(t=>t.Type == modelClassType))
                             continue;
 
                         idpType = idpType.MakeGenericType(modelClassType);

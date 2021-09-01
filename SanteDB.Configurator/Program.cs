@@ -147,7 +147,7 @@ namespace SanteDB.Configurator
         /// <summary>
         /// Assembly resolution
         /// </summary>
-        private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        internal static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
                 if (args.Name == asm.FullName)

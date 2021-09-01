@@ -46,7 +46,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         public AdoPersistenceConfigurationSection()
         {
             this.DataCorrectionKeys = new List<string>();
-            this.AllowedResources = new List<string>();
+            this.AllowedResources = new List<ResourceTypeReferenceConfiguration>();
             this.Validation = new EntityValidationFlags()
             {
                 IdentifierFormat = true,
@@ -119,7 +119,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         [Description("When set, instructs the provider to only provide access for the specified types")]
         [Editor("SanteDB.Configuration.Editors.ResourceCollectionEditor, SanteDB.Configuration", "System.Drawing.Design.UITypeEditor, System.Drawing, Version=4.0.0.0")]
         [TypeConverter("SanteDB.Configuration.Converters.StringCollectionRenderConverter, SanteDB.Configuration")]
-        public List<String> AllowedResources { get; set; }
+        public List<ResourceTypeReferenceConfiguration> AllowedResources { get; set; }
 
         /// <summary>
         /// True if statements should be prepared

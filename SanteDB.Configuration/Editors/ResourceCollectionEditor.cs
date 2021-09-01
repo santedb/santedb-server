@@ -76,8 +76,8 @@ namespace SanteDB.Configuration.Editors
                                 msb.BindToName(o, out string asm, out string type);
                                 return new ListViewItem(type)
                                 {
-                                    Checked = listValue?.Any(v => v.ResourceTypeXml == type) == true,
-                                    Tag = new ResourceTypeReferenceConfiguration() { ResourceTypeXml = type }
+                                    Checked = listValue?.Any(v => v.TypeXml == type) == true,
+                                    Tag = new ResourceTypeReferenceConfiguration() { TypeXml = type }
                                 };
                             })
                             .ToArray());
@@ -108,7 +108,7 @@ namespace SanteDB.Configuration.Editors
                             .Select(o =>
                             {
                                 msb.BindToName(o, out string asm, out string type);
-                                return new ResourceTypeReferenceConfiguration() { ResourceTypeXml = type };
+                                return new ResourceTypeReferenceConfiguration() { TypeXml = type };
                             })
                             .ToArray());
                     }
