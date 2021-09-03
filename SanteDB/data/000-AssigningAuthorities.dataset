@@ -30,4 +30,14 @@
       <isUnique>true</isUnique>
     </AssigningAuthority>
   </insert>
+  <insert skipIfError="true" skipIfExists="true">
+    <AssigningAuthority xmlns="http://santedb.org/model">
+      <id>AF1ECAD7-0E74-4508-8818-ED2E5C021348</id>
+      <name>US Social Security Number</name>
+      <domainName>SSN</domainName>
+      <oid>2.16.840.1.113883.4.1</oid>
+      <url>http://hl7.org/fhir/sid/us-ssn</url>
+      <isUnique>false</isUnique>
+    </AssigningAuthority>
+  </insert>
 </dataset>

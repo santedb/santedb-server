@@ -1,7 +1,7 @@
 ﻿/// <reference path="../js/jquery.min.js"/>
 /// <reference path="../js/query-tool.js"/>
 /*
- * Portions Copyright 2019-2020, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE)
+ * Portions Copyright 2019-2021, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you 
  * may not use this file except in compliance with the License. You may 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej (Justin Fyfe)
- * Date: 2019-11-27
+ * Date: 2021-8-5
  */
 angular.module('layout').controller('AuthenticationController', ['$scope', '$rootScope', function ($scope, $rootScope) {
 

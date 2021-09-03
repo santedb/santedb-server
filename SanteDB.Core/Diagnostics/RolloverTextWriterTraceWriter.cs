@@ -1,5 +1,5 @@
 ﻿/*
- * Portions Copyright 2019-2020, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE)
+ * Portions Copyright 2019-2021, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you 
  * may not use this file except in compliance with the License. You may 
@@ -14,7 +14,7 @@
  * the License.
  * 
  * User: fyfej (Justin Fyfe)
- * Date: 2019-11-27
+ * Date: 2021-8-5
  */
 using System;
 using System.Collections.Generic;
@@ -133,14 +133,29 @@ namespace SanteDB.Server.Core.Diagnostics
                     if (this.m_disposing) return;
 
                     // Use file stream
-                    using (FileStream fs = File.Open(this.GenerateFilename(), FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
+                    var fileName = this.GenerateFilename();
+                    if (Directory.Exists(Path.GetDirectoryName(fileName)))
                     {
-                        fs.Seek(0, SeekOrigin.End);
-                        using (StreamWriter sw = new StreamWriter(fs))
+                        using (FileStream fs = File.Open(this.GenerateFilename(), FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
                         {
-                            while(!this.m_logBacklog.IsEmpty)
-                                if (this.m_logBacklog.TryDequeue(out var dq))
-                                    sw.WriteLine(dq); // This allows other threads to add to the write queue
+                            fs.Seek(0, SeekOrigin.End);
+                            using (StreamWriter sw = new StreamWriter(fs))
+                            {
+                                while (!this.m_logBacklog.IsEmpty)
+                                {
+                                    if (this.m_logBacklog.TryDequeue(out var dq))
+                                    {
+                                        sw.WriteLine(dq); // This allows other threads to add to the write queue
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        while (!this.m_logBacklog.IsEmpty) // exhaust the queue
+                        {
+                            this.m_logBacklog.TryDequeue(out string _);
                         }
                     }
                 }

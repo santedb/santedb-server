@@ -1,4 +1,22 @@
-﻿using SanteDB.Configuration.Controls;
+﻿/*
+ * Portions Copyright 2019-2021, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you 
+ * may not use this file except in compliance with the License. You may 
+ * obtain a copy of the License at 
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0 
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ * License for the specific language governing permissions and limitations under 
+ * the License.
+ * 
+ * User: fyfej (Justin Fyfe)
+ * Date: 2021-8-5
+ */
+using SanteDB.Configuration.Controls;
 
 namespace SanteDB.Configurator
 {
@@ -46,6 +64,8 @@ namespace SanteDB.Configurator
             this.btnCancel = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.rdoAdvanced = new System.Windows.Forms.RadioButton();
+            this.label5 = new System.Windows.Forms.Label();
+            this.cbxTemplate = new System.Windows.Forms.ComboBox();
             this.pnlLogo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -119,6 +139,8 @@ namespace SanteDB.Configurator
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.cbxTemplate);
+            this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.txtInstance);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.dbSelector);
@@ -131,7 +153,7 @@ namespace SanteDB.Configurator
             // 
             // txtInstance
             // 
-            this.txtInstance.Location = new System.Drawing.Point(114, 230);
+            this.txtInstance.Location = new System.Drawing.Point(114, 209);
             this.txtInstance.Name = "txtInstance";
             this.txtInstance.Size = new System.Drawing.Size(364, 20);
             this.txtInstance.TabIndex = 3;
@@ -140,7 +162,7 @@ namespace SanteDB.Configurator
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(18, 233);
+            this.label4.Location = new System.Drawing.Point(18, 212);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(79, 13);
             this.label4.TabIndex = 2;
@@ -157,7 +179,7 @@ namespace SanteDB.Configurator
             this.dbSelector.ConnectionString = connectionString1;
             this.dbSelector.Location = new System.Drawing.Point(6, 19);
             this.dbSelector.Name = "dbSelector";
-            this.dbSelector.Size = new System.Drawing.Size(478, 208);
+            this.dbSelector.Size = new System.Drawing.Size(478, 183);
             this.dbSelector.TabIndex = 1;
             this.dbSelector.ConfigurationChanged += new System.EventHandler(this.dbSelector_Configured);
             // 
@@ -205,6 +227,24 @@ namespace SanteDB.Configurator
             this.rdoAdvanced.Text = "Advanced Configuration";
             this.rdoAdvanced.UseVisualStyleBackColor = true;
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(46, 239);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(51, 13);
+            this.label5.TabIndex = 4;
+            this.label5.Text = "Template";
+            // 
+            // cbxTemplate
+            // 
+            this.cbxTemplate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxTemplate.FormattingEnabled = true;
+            this.cbxTemplate.Location = new System.Drawing.Point(114, 236);
+            this.cbxTemplate.Name = "cbxTemplate";
+            this.cbxTemplate.Size = new System.Drawing.Size(364, 21);
+            this.cbxTemplate.TabIndex = 5;
+            // 
             // frmInitialConfig
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -251,5 +291,7 @@ namespace SanteDB.Configurator
         private System.Windows.Forms.RadioButton rdoAdvanced;
         private System.Windows.Forms.TextBox txtInstance;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ComboBox cbxTemplate;
+        private System.Windows.Forms.Label label5;
     }
 }

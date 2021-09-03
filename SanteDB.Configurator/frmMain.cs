@@ -379,8 +379,11 @@ namespace SanteDB.Configurator
             {
                 foreach (var itm in ConfigurationContext.Current.ConfigurationTasks.Where(o => o.Feature == this.CurrentFeature).ToArray())
                     ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
-                foreach (var itm in this.CurrentFeature.CreateInstallTasks().ToArray())
-                    ConfigurationContext.Current.ConfigurationTasks.Add(itm);
+                if (this.CurrentFeature != null)
+                {
+                    foreach (var itm in this.CurrentFeature.CreateInstallTasks().ToArray())
+                        ConfigurationContext.Current.ConfigurationTasks.Add(itm);
+                }
             }
         }
 

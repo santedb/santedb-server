@@ -1,5 +1,5 @@
 ﻿/*
- * Portions Copyright 2019-2020, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE)
+ * Portions Copyright 2019-2021, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you 
  * may not use this file except in compliance with the License. You may 
@@ -14,7 +14,7 @@
  * the License.
  * 
  * User: fyfej (Justin Fyfe)
- * Date: 2019-11-27
+ * Date: 2021-8-5
  */
 using SanteDB.Configuration;
 using SanteDB.Core;
@@ -147,7 +147,7 @@ namespace SanteDB.Configurator
         /// <summary>
         /// Assembly resolution
         /// </summary>
-        private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        internal static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
                 if (args.Name == asm.FullName)
