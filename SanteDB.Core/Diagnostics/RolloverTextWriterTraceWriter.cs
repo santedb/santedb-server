@@ -133,14 +133,29 @@ namespace SanteDB.Server.Core.Diagnostics
                     if (this.m_disposing) return;
 
                     // Use file stream
-                    using (FileStream fs = File.Open(this.GenerateFilename(), FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
+                    var fileName = this.GenerateFilename();
+                    if (Directory.Exists(Path.GetDirectoryName(fileName)))
                     {
-                        fs.Seek(0, SeekOrigin.End);
-                        using (StreamWriter sw = new StreamWriter(fs))
+                        using (FileStream fs = File.Open(this.GenerateFilename(), FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
                         {
-                            while(!this.m_logBacklog.IsEmpty)
-                                if (this.m_logBacklog.TryDequeue(out var dq))
-                                    sw.WriteLine(dq); // This allows other threads to add to the write queue
+                            fs.Seek(0, SeekOrigin.End);
+                            using (StreamWriter sw = new StreamWriter(fs))
+                            {
+                                while (!this.m_logBacklog.IsEmpty)
+                                {
+                                    if (this.m_logBacklog.TryDequeue(out var dq))
+                                    {
+                                        sw.WriteLine(dq); // This allows other threads to add to the write queue
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        while (!this.m_logBacklog.IsEmpty) // exhaust the queue
+                        {
+                            this.m_logBacklog.TryDequeue(out string _);
                         }
                     }
                 }

@@ -4,7 +4,6 @@
 #define MyAppName "SanteDB Server"
 #define MyAppPublisher "SanteDB Community"
 #define MyAppURL "http://santesuite.org"
-
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -127,7 +126,7 @@ Source: ..\bin\Release\SanteDB.Rest.AMI.dll; DestDir: {app}; Components: msg\ami
 ; Config Parts 
 ; TODO: Individual files here
 Source: ..\bin\release\config\*.*; DestDir: {app}\config; Components: server
-Source: ..\bin\release\config\templates\*.*; DestDir: {app}\config; Components: server
+Source: ..\bin\release\config\template\*.*; DestDir: {app}\config; Components: server
 ; Data Stuff
 Source: ..\bin\release\data\*.dataset; DestDir: {app}\data; Components: server
 Source: ..\bin\release\applets\*.pak; DestDir: {app}\applets; Components: server
