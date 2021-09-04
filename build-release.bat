@@ -57,7 +57,7 @@ if exist "%nuget%" (
 		%signtool% sign /d "SanteDB iCDR"  "%%G"
 	)
 	
-	%inno% "/o.\bin\dist" ".\installer\SanteDB-Server.iss" /d"MyAppVersion=%version%" 
+	%inno% "/o.\bin\dist" ".\installer\SanteDB-icdr.iss" /d"MyAppVersion=%version%" 
 
 	rem ################# TARBALLS 
 	echo Building Linux Tarball
