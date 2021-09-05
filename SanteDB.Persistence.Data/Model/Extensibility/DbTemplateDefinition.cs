@@ -25,7 +25,7 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
     /// Represents a database template definition
     /// </summary>
     [Table("tpl_def_tbl")]
-    public class DbTemplateDefinition : DbBaseData
+    public class DbTemplateDefinition : DbNonVersionedBaseData
     {
         /// <summary>
         /// Gets or sets the key

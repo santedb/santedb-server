@@ -94,11 +94,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             if (dbModel == null)
             {
-                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL, nameof(dbModel));
+                throw new ArgumentNullException(nameof(dbModel), ErrorMessages.ERR_ARGUMENT_NULL);
             }
             if (context == null)
             {
-                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL, nameof(context));
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
             }
 
 #if DEBUG
@@ -141,11 +141,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (context == null)
             {
-                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL, nameof(context));
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
             }
             else if (model == null)
             {
-                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL, nameof(model));
+                throw new ArgumentNullException(nameof(model), ErrorMessages.ERR_ARGUMENT_NULL);
             }
 
 #if DEBUG
@@ -213,7 +213,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             if (context == null)
             {
-                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL, nameof(context));
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
             }
             else if (key == Guid.Empty)
             {
@@ -270,11 +270,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (context == null)
             {
-                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL, nameof(context));
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
             }
             else if (query == null)
             {
-                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL, nameof(query));
+                throw new ArgumentNullException(nameof(query), ErrorMessages.ERR_ARGUMENT_NULL);
             }
 
             // First - we determine if the query has an explicit status concept set

@@ -122,7 +122,7 @@ namespace SanteDB.Server.AdminConsole.Util
         /// <typeparam name="T"></typeparam>
         /// <param name="user"></param>
         public static void PrintPolicies<T>(ISecurityEntityInfo<T> user, String[] dataLabels, params Expression<Func<T, object>>[] data)
-            where T : SecurityEntity
+            where T : NonVersionedEntityData
         {
 
             int d = 0;

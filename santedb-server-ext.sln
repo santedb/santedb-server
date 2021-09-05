@@ -181,6 +181,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Caching.Memory.Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SanteDB.Caching.Redis", "santedb-cache-redis\SanteDB.Caching.Redis\SanteDB.Caching.Redis.csproj", "{86672094-25CC-4CD5-B085-240E50EC4A5E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Clients", "Clients", "{C2DEF8DA-BA4F-4F5D-8755-AC1750C98FF0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SanteDB.Messaging.HDSI.Client", "santedb-client\SanteDB.Messaging.HDSI.Client\SanteDB.Messaging.HDSI.Client.csproj", "{5024E9C8-4C73-4EA2-BFD7-C1F8CCF6A596}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SanteDB.Messaging.AMI.Client", "santedb-client\SanteDB.Messaging.AMI.Client\SanteDB.Messaging.AMI.Client.csproj", "{C6F08B75-FB88-4200-A0F4-0835DD0E77EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -419,6 +425,14 @@ Global
 		{86672094-25CC-4CD5-B085-240E50EC4A5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86672094-25CC-4CD5-B085-240E50EC4A5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86672094-25CC-4CD5-B085-240E50EC4A5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5024E9C8-4C73-4EA2-BFD7-C1F8CCF6A596}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5024E9C8-4C73-4EA2-BFD7-C1F8CCF6A596}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5024E9C8-4C73-4EA2-BFD7-C1F8CCF6A596}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5024E9C8-4C73-4EA2-BFD7-C1F8CCF6A596}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6F08B75-FB88-4200-A0F4-0835DD0E77EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6F08B75-FB88-4200-A0F4-0835DD0E77EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6F08B75-FB88-4200-A0F4-0835DD0E77EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6F08B75-FB88-4200-A0F4-0835DD0E77EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -490,6 +504,8 @@ Global
 		{8553ABC7-ABFA-4A21-B0E8-68B7DE76129D} = {6150ED46-45C3-4CAA-ACC3-31A920124B2B}
 		{B09A6D4C-862C-4B5B-9C05-4160ED7CCA4A} = {6150ED46-45C3-4CAA-ACC3-31A920124B2B}
 		{86672094-25CC-4CD5-B085-240E50EC4A5E} = {6150ED46-45C3-4CAA-ACC3-31A920124B2B}
+		{5024E9C8-4C73-4EA2-BFD7-C1F8CCF6A596} = {C2DEF8DA-BA4F-4F5D-8755-AC1750C98FF0}
+		{C6F08B75-FB88-4200-A0F4-0835DD0E77EB} = {C2DEF8DA-BA4F-4F5D-8755-AC1750C98FF0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E73A1AED-8AB7-492C-A4F0-C71FCC5C393C}

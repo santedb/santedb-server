@@ -198,6 +198,81 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <summary>
+        /// Return true if the specified object has the specified policy
+        /// </summary>
+        public bool HasPolicy(object securable, String policyId)
+        {
+            if (securable == null)
+            {
+                throw new ArgumentNullException(nameof(securable), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            if (String.IsNullOrEmpty(policyId))
+            {
+                throw new ArgumentNullException(nameof(policyId), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    // Security Device
+                    if (securable is SecurityDevice sd)
+                    {
+                        return context.Any(
+                            context.CreateSqlStatement<DbSecurityDevicePolicy>()
+                                .SelectFrom(typeof(DbSecurityDevicePolicy), typeof(DbSecurityPolicy))
+                            .InnerJoin<DbSecurityPolicy, DbSecurityDevicePolicy>(o => o.Key, o => o.PolicyKey)
+                            .Where<DbSecurityDevicePolicy>(o => o.SourceKey == sd.Key));
+                    }
+                    else if (securable is SecurityApplication sa)
+                    {
+                        return context.Any(
+                            context.CreateSqlStatement<DbSecurityApplicationPolicy>()
+                                .SelectFrom(typeof(DbSecurityApplicationPolicy), typeof(DbSecurityPolicy))
+                            .InnerJoin<DbSecurityPolicy, DbSecurityApplicationPolicy>(o => o.Key, o => o.PolicyKey)
+                            .Where<DbSecurityApplicationPolicy>(o => o.SourceKey == sa.Key));
+                    }
+                    else if (securable is SecurityRole sr)
+                    {
+                        return context.Any(
+                            context.CreateSqlStatement<DbSecurityRolePolicy>()
+                                .SelectFrom(typeof(DbSecurityRolePolicy), typeof(DbSecurityPolicy))
+                            .InnerJoin<DbSecurityPolicy, DbSecurityRolePolicy>(o => o.Key, o => o.PolicyKey)
+                            .Where<DbSecurityRolePolicy>(o => o.SourceKey == sr.Key));
+                    }
+                    else if (securable is Entity entity)
+                    {
+                        return context.Any(
+                            context.CreateSqlStatement<DbEntitySecurityPolicy>()
+                                .SelectFrom(typeof(DbEntitySecurityPolicy), typeof(DbSecurityPolicy))
+                            .InnerJoin<DbSecurityPolicy, DbEntitySecurityPolicy>(o => o.Key, o => o.PolicyKey)
+                                .Where<DbEntitySecurityPolicy>(o => o.SourceKey == entity.Key && o.ObsoleteVersionSequenceId == null));
+                    }
+                    else if (securable is Act act)
+                    {
+                        return context.Any(
+                            context.CreateSqlStatement<DbActSecurityPolicy>()
+                                .SelectFrom(typeof(DbActSecurityPolicy), typeof(DbSecurityPolicy))
+                            .InnerJoin<DbSecurityPolicy, DbActSecurityPolicy>(o => o.Key, o => o.PolicyKey)
+                                .Where<DbActSecurityPolicy>(o => o.SourceKey == act.Key && o.ObsoleteVersionSequenceId == null));
+                    }
+                    else
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(securable), ErrorMessages.ERR_ARGUMENT_INCOMPATIBLE_TYPE);
+                    }
+                }
+                catch (Exception e)
+                {
+                    this.m_traceSource.TraceError("Error getting active policies for {0} : {1}", securable, e);
+                    throw new DataPersistenceException(ErrorMessages.ERR_SEC_POL_GEN, e);
+                }
+            }
+        }
+
+        /// <summary>
         /// Get all policy instances for the specified securable
         /// </summary>
         /// <param name="securable"></param>
@@ -256,7 +331,7 @@ namespace SanteDB.Persistence.Data.Services
                                 .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
 
                         }
-                        else if(securable is IIdentity identity)
+                        else if (securable is IIdentity identity)
                         {
                             results = this.GetIdentityPolicies(context, identity, new String[0]).ToArray();
                         }

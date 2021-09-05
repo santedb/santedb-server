@@ -1032,7 +1032,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if(context == null)
             {
-                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL, nameof(context));
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
             }
             else if(data == default(TData))
             {

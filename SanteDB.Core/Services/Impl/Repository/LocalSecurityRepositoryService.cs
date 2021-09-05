@@ -19,6 +19,7 @@
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Query;
@@ -334,7 +335,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         /// <param name="principal">The principal to be fetched</param>
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
-        public SecurityEntity GetSecurityEntity(IPrincipal principal)
+        public IdentifiedData GetSecurityEntity(IPrincipal principal)
         {
             if (principal.Identity is DeviceIdentity deviceIdentity) // Device credential 
             {

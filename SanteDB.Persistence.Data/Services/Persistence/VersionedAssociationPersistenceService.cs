@@ -39,7 +39,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             if(context == null)
             {
-                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL, nameof(context));
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
             }
             else if(key == default(Guid))
             {
@@ -68,11 +68,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if(context == null)
             {
-                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL, nameof(context));
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
             }
             else if (dbModel == null)
             {
-                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL, nameof(dbModel));
+                throw new ArgumentNullException(nameof(dbModel), ErrorMessages.ERR_ARGUMENT_NULL);
             }
 
             // Effective seq set?
@@ -92,11 +92,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             if(context == null)
             {
-                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL, nameof(context));
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
             }
             else if (query == null)
             {
-                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL, nameof(query));
+                throw new ArgumentNullException(nameof(query), ErrorMessages.ERR_ARGUMENT_NULL);
             }
 
             // TODO: Write a utility function that looks for this
