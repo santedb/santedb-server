@@ -70,9 +70,9 @@
     <EmbeddedResource Include="Data\Map\ModelMap.xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\SQL\AuditDB\FBSQL\audit_repo.sql">
+    <EmbeddedResource Include="Data\SQL\AuditDB\FBSQL\audit_repo.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </EmbeddedResource>
     <EmbeddedResource Include="Data\SQL\AuditDB\PSQL\audit_repo.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -145,7 +145,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Data\SQL\AuditDB\FBSQL\20210130-FBSQL.sql" />
+    <EmbeddedResource Include="Data\SQL\AuditDB\FBSQL\20210130-FBSQL.sql" />
     <EmbeddedResource Include="Data\SQL\AuditDB\PSQL\20210124-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>

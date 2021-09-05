@@ -1,20 +1,22 @@
 ﻿/*
- * Portions Copyright 2019-2020, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE)
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you 
- * may not use this file except in compliance with the License. You may 
- * obtain a copy of the License at 
- * 
- * http://www.apache.org/licenses/LICENSE-2.0 
- * 
+ * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations under 
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
  * the License.
- * 
- * User: fyfej (Justin Fyfe)
- * Date: 2019-11-27
+ *
+ * User: fyfej
+ * Date: 2021-8-27
  */
 using SanteDB.Configuration;
 using SanteDB.Configuration.Controls;
@@ -40,6 +42,7 @@ using System.Drawing.Design;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,6 +54,7 @@ namespace SanteDB.Configurator
     public partial class frmMain : Form
     {
 
+
         #region Trace Writer
 
         private class FormTraceWriter : TraceWriter
@@ -61,7 +65,7 @@ namespace SanteDB.Configurator
 
             // Synchronization context
             private SynchronizationContext m_syncContext;
-            
+
             /// <summary>
             /// Trace writer initialization
             /// </summary>
@@ -72,11 +76,11 @@ namespace SanteDB.Configurator
             }
 
             /// <summary>
-            /// Trace an extended event with data
+            /// Write a trace event with supporting data
             /// </summary>
             public override void TraceEventWithData(EventLevel level, string source, string message, object[] data)
             {
-                this.WriteTrace(level, source, message, data);
+                this.WriteTrace(level, source, message);
             }
 
             /// <summary>
@@ -104,11 +108,45 @@ namespace SanteDB.Configurator
             this.PopulateConfiguration();
         }
 
+        // Configuration hash
+        private byte[] m_configHash;
+
+        /// <summary>
+        /// Has the configuration changed
+        /// </summary>
+        /// <returns></returns>
+        private bool HasChanged()
+        {
+
+            byte[] newHash = null;
+
+            try
+            {
+                using (var ms = new MemoryStream())
+                {
+                    ConfigurationContext.Current.Configuration.Save(ms);
+                    newHash = MD5.Create().ComputeHash(ms.ToArray());
+                    return !Enumerable.SequenceEqual(newHash, m_configHash ?? new byte[16]);
+                }
+            }
+            finally
+            {
+                this.m_configHash = newHash;
+            }
+        }
+
         /// <summary>
         /// Populate / load the configuration
         /// </summary>
         private void PopulateConfiguration()
         {
+
+            this.Text = $"SanteDB Confgiuration Tool ({Path.GetFileName(ConfigurationContext.Current.ConfigurationFile)})";
+            using (var ms = new MemoryStream())
+            {
+                ConfigurationContext.Current.Configuration.Save(ms);
+                this.m_configHash = MD5.Create().ComputeHash(ms.ToArray());
+            }
 
             Tracer tracer = new Tracer("Configuration Tool");
             // Load the license
@@ -158,11 +196,14 @@ namespace SanteDB.Configurator
                         case Core.Configuration.FeatureInstallState.PartiallyInstalled:
                             node.ImageIndex = 10;
                             break;
+                        case FeatureInstallState.CantInstall:
+                            node.ImageIndex = 12;
+                            break;
                     }
                     node.SelectedImageIndex = node.ImageIndex;
                     node.Tag = ftr;
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     tracer.TraceError("Could not load feature {0} - {1}", ftr.Name, e.Message);
                 }
@@ -187,6 +228,7 @@ namespace SanteDB.Configurator
         private void trvFeatures_AfterSelect(object sender, TreeViewEventArgs e)
         {
             this.SelectFeature(e.Node.Tag as IFeature);
+
         }
 
         /// <summary>
@@ -239,10 +281,14 @@ namespace SanteDB.Configurator
                     case FeatureInstallState.Installed:
                         tcSettings.Enabled = true;
                         btnDisable.Visible = lblEnabled.Visible = !feature.Flags.HasFlag(FeatureFlags.NoRemove);
-                        lblDisabled.Visible = btnEnable.Visible = false;
+                        lblNoInstall.Visible = lblDisabled.Visible = btnEnable.Visible = false;
+                        break;
+                    case FeatureInstallState.CantInstall:
+                        lblDisabled.Visible = lblEnabled.Visible = btnDisable.Visible = btnEnable.Visible = tcSettings.Enabled = false;
+                        lblNoInstall.Visible = true;
                         break;
                     default:
-                        tcSettings.Enabled = btnDisable.Visible = lblEnabled.Visible = false;
+                        lblNoInstall.Visible = tcSettings.Enabled = btnDisable.Visible = lblEnabled.Visible = false;
                         lblDisabled.Visible = btnEnable.Visible = true;
                         break;
                 }
@@ -263,12 +309,22 @@ namespace SanteDB.Configurator
         /// </summary>
         private void btnApply_Click(object sender, EventArgs e)
         {
+
+            if (this.HasChanged())
+            {
+                foreach (var itm in ConfigurationContext.Current.ConfigurationTasks.Where(o => o.Feature == this.CurrentFeature).ToArray())
+                    ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
+                foreach (var itm in this.CurrentFeature.CreateInstallTasks().ToArray())
+                    ConfigurationContext.Current.ConfigurationTasks.Add(itm);
+            }
+
             foreach (var tsk in ConfigurationContext.Current.Features.Where(o =>
                      o.Flags.HasFlag(FeatureFlags.AlwaysConfigure))
                 .SelectMany(o => o.CreateInstallTasks()))
                 ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
             ConfigurationContext.Current.ConfigurationTasks.Add(new SaveConfigurationTask());
             ConfigurationContext.Current.Apply();
+            this.PopulateConfiguration();
         }
 
         /// <summary>
@@ -285,9 +341,8 @@ namespace SanteDB.Configurator
                 ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
 
             // Create install tasks
-            if (this.CurrentFeature.QueryState(ConfigurationContext.Current.Configuration) != FeatureInstallState.Installed)
-                foreach (var tsk in this.CurrentFeature.CreateInstallTasks())
-                    ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
+            foreach (var tsk in this.CurrentFeature.CreateInstallTasks())
+                ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
 
         }
 
@@ -304,9 +359,8 @@ namespace SanteDB.Configurator
                 ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
 
             // Create removal tasks
-            if (this.CurrentFeature.QueryState(ConfigurationContext.Current.Configuration) == FeatureInstallState.Installed)
-                foreach (var tsk in this.CurrentFeature.CreateUninstallTasks())
-                    ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
+            foreach (var tsk in this.CurrentFeature.CreateUninstallTasks())
+                ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
         }
 
         /// <summary>
@@ -319,10 +373,24 @@ namespace SanteDB.Configurator
                 Title = "Open Alternate Configuration",
                 Filter = "Configuration File (*.config.*)|*.config.*"
             };
-            if(dlgOpen.ShowDialog() == DialogResult.OK)
+            if (dlgOpen.ShowDialog() == DialogResult.OK)
             {
                 ConfigurationContext.Current.LoadConfiguration(dlgOpen.FileName);
                 this.PopulateConfiguration();
+            }
+        }
+
+        /// <summary>
+        /// Feature configuration
+        /// </summary>
+        private void trvFeatures_BeforeSelect(object sender, TreeViewCancelEventArgs e)
+        {
+            if (e.Node.Tag is IFeature feature && this.HasChanged())
+            {
+                foreach (var itm in ConfigurationContext.Current.ConfigurationTasks.Where(o => o.Feature == this.CurrentFeature).ToArray())
+                    ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
+                foreach (var itm in this.CurrentFeature.CreateInstallTasks().ToArray())
+                    ConfigurationContext.Current.ConfigurationTasks.Add(itm);
             }
         }
     }

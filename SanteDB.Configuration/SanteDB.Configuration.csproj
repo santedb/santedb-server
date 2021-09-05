@@ -64,6 +64,7 @@
     <Compile Include="Converters\DataProviderConverter.cs" />
     <Compile Include="Converters\TypeDisplayConverter.cs" />
     <Compile Include="Editors\ConnectionStringEditor.cs" />
+    <Compile Include="Editors\TimespanPickerEditor.cs" />
     <Compile Include="Editors\DateTimePickerEditor.cs" />
     <Compile Include="Editors\TypeSelectorEditor.cs" />
     <Compile Include="Editors\X509Certificate2Editor.cs" />

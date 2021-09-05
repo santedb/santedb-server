@@ -44,6 +44,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\SanteDB.licenseheader" Link="SanteDB.licenseheader" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Data\Update\20210311-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
