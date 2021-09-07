@@ -35,6 +35,12 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalSecurityUserRepositoryService : GenericLocalSecurityRepository<SecurityUser>
     {
+        /// <summary>
+        /// Creates a DI security user repository
+        /// </summary>
+        public LocalSecurityUserRepositoryService(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        {
+        }
 
         protected override string WritePolicy => PermissionPolicyIdentifiers.CreateIdentity;
         protected override string DeletePolicy => PermissionPolicyIdentifiers.AlterIdentity;
@@ -47,7 +53,7 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             var su = data as SecurityUser;
             if (!su.UserName.Equals(AuthenticationContext.Current.Principal.Identity.Name, StringComparison.OrdinalIgnoreCase))
-                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AlterIdentity).Demand();
+                this.m_policyService.Demand(PermissionPolicyIdentifiers.AlterIdentity);
         }
 
         /// <summary>

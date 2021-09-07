@@ -28,11 +28,10 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalSecurityApplicationRepository : GenericLocalSecurityRepository<SecurityApplication>
     {
-
         /// <summary>
-        /// Local security application repository
+        /// DI constructor
         /// </summary>
-        public LocalSecurityApplicationRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        public LocalSecurityApplicationRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
         {
         }
 

@@ -20,6 +20,7 @@ using SanteDB.Core;
 using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -37,7 +38,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Creates a new batch repository
         /// </summary>
-        public LocalBatchRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        public LocalBatchRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService)
         {
         }
 

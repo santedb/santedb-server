@@ -63,14 +63,19 @@ namespace SanteDB.Persistence.Data.ADO.Services
         // Ad-hoc cache
         private IAdhocCacheService m_adhocCache;
 
+        // PEP
+        private IPolicyEnforcementService m_policyEnforcement;
+
+        // TRace source
         private Tracer m_traceSource = new Tracer(AdoDataConstants.IdentityTraceSourceName);
 
         /// <summary>
         /// Create new service with adhoc cache
         /// </summary>
-        public AdoPolicyInformationService(IAdhocCacheService adhocCache = null)
+        public AdoPolicyInformationService(IPolicyEnforcementService pepService, IAdhocCacheService adhocCache = null)
         {
             this.m_adhocCache = adhocCache;
+            this.m_policyEnforcement = pepService;
         }
 
 
@@ -98,7 +103,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         // Add
                         if (securable is SecurityRole sr)
                         {
-                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
+                            this.m_policyEnforcement.Demand( PermissionPolicyIdentifiers.AssignPolicy, principal);
                             // Delete the existing role
                             context.Delete<DbSecurityRolePolicy>(o => o.PolicyKey == policy.Key && o.SourceKey == sr.Key);
                             context.Insert(new DbSecurityRolePolicy()
@@ -110,7 +115,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         }
                         else if (securable is SecurityApplication sa)
                         {
-                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
+                            this.m_policyEnforcement.Demand( PermissionPolicyIdentifiers.AssignPolicy, principal);
                             // Delete the existing role
                             context.Delete<DbSecurityApplicationPolicy>(o => o.PolicyKey == policy.Key && o.SourceKey == sa.Key);
                             context.Insert(new DbSecurityApplicationPolicy()
@@ -124,7 +129,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         else if (securable is SecurityDevice sd)
                         {
                             // Delete the existing role
-                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
+                            this.m_policyEnforcement.Demand( PermissionPolicyIdentifiers.AssignPolicy, principal);
                             context.Delete<DbSecurityDevicePolicy>(o => o.PolicyKey == policy.Key && o.SourceKey == sd.Key);
                             context.Insert(new DbSecurityDevicePolicy()
                             {
@@ -137,13 +142,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         {
                             // Must either have write, must be the patient or must be their dedicated provider
                             if (securable is Patient)
-                                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.WriteClinicalData, principal).Demand();
+                                this.m_policyEnforcement.Demand( PermissionPolicyIdentifiers.WriteClinicalData, principal);
                             else if (securable is Material || securable is ManufacturedMaterial)
-                                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.WriteMaterials, principal).Demand();
+                                this.m_policyEnforcement.Demand( PermissionPolicyIdentifiers.WriteMaterials, principal);
                             else if (securable is Place || securable is Organization || securable is Provider)
-                                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.WritePlacesAndOrgs, principal).Demand();
+                                this.m_policyEnforcement.Demand( PermissionPolicyIdentifiers.WritePlacesAndOrgs, principal);
                             else
-                                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
+                                this.m_policyEnforcement.Demand( PermissionPolicyIdentifiers.AssignPolicy, principal);
 
                             var existing = context.FirstOrDefault<DbEntitySecurityPolicy>(e => e.SourceKey == ent.Key && e.PolicyKey == policy.Key && e.ObsoleteVersionSequenceId == null);
                             if (existing != null)
@@ -163,7 +168,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         else if (securable is Act act)
                         {
 
-                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.WriteClinicalData, principal).Demand();
+                            this.m_policyEnforcement.Demand( PermissionPolicyIdentifiers.WriteClinicalData, principal);
                             var existing = context.FirstOrDefault<DbActSecurityPolicy>(e => e.SourceKey == act.Key && e.PolicyKey == policy.Key && e.ObsoleteVersionSequenceId == null);
 
                             if (existing != null)
@@ -222,33 +227,33 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         // Add
                         if (securable is SecurityRole sr)
                         {
-                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
+                            this.m_policyEnforcement.Demand( PermissionPolicyIdentifiers.AssignPolicy, principal);
                             // Delete the existing role
                             context.Delete<DbSecurityRolePolicy>(o => o.PolicyKey == policy.Key && o.SourceKey == sr.Key);
                         }
                         else if (securable is SecurityApplication sa)
                         {
-                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
+                            this.m_policyEnforcement.Demand( PermissionPolicyIdentifiers.AssignPolicy, principal);
                             // Delete the existing role
                             context.Delete<DbSecurityApplicationPolicy>(o => o.PolicyKey == policy.Key && o.SourceKey == sa.Key);
                         }
                         else if (securable is SecurityDevice sd)
                         {
                             // Delete the existing role
-                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
+                            this.m_policyEnforcement.Demand( PermissionPolicyIdentifiers.AssignPolicy, principal);
                             context.Delete<DbSecurityDevicePolicy>(o => o.PolicyKey == policy.Key && o.SourceKey == sd.Key);
                         }
                         else if (securable is Entity ent)
                         {
                             // Must either have write, must be the patient or must be their dedicated provider
                             if (securable is Patient)
-                                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.WriteClinicalData, principal).Demand();
+                                this.m_policyEnforcement.Demand( PermissionPolicyIdentifiers.WriteClinicalData, principal);
                             else if (securable is Material || securable is ManufacturedMaterial)
-                                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.WriteMaterials, principal).Demand();
+                                this.m_policyEnforcement.Demand( PermissionPolicyIdentifiers.WriteMaterials, principal);
                             else if (securable is Place || securable is Organization || securable is Provider)
-                                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.WritePlacesAndOrgs, principal).Demand();
+                                this.m_policyEnforcement.Demand( PermissionPolicyIdentifiers.WritePlacesAndOrgs, principal);
                             else
-                                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AssignPolicy, principal).Demand();
+                                this.m_policyEnforcement.Demand( PermissionPolicyIdentifiers.AssignPolicy, principal);
 
                             var existing = context.FirstOrDefault<DbEntitySecurityPolicy>(e => e.SourceKey == ent.Key && e.PolicyKey == policy.Key && e.ObsoleteVersionSequenceId == null);
                             if (existing != null)
@@ -261,7 +266,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         else if (securable is Act act)
                         {
 
-                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.WriteClinicalData, principal).Demand();
+                            this.m_policyEnforcement.Demand( PermissionPolicyIdentifiers.WriteClinicalData, principal);
                             var existing = context.FirstOrDefault<DbActSecurityPolicy>(e => e.SourceKey == act.Key && e.PolicyKey == policy.Key && e.ObsoleteVersionSequenceId == null);
 
                             if (existing != null)

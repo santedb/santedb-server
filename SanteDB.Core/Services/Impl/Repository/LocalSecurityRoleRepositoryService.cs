@@ -18,6 +18,7 @@
  */
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 
 namespace SanteDB.Server.Core.Services.Impl
 {
@@ -26,6 +27,13 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalSecurityRoleRepositoryService : GenericLocalSecurityRepository<SecurityRole>
     {
+        /// <summary>
+        /// Local security DI constructor
+        /// </summary>
+        public LocalSecurityRoleRepositoryService(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        {
+        }
+
         protected override string WritePolicy => PermissionPolicyIdentifiers.CreateRoles;
         protected override string DeletePolicy => PermissionPolicyIdentifiers.AlterRoles;
         protected override string AlterPolicy => PermissionPolicyIdentifiers.AlterRoles;

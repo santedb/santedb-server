@@ -64,6 +64,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
         
         // The security user
         private DbSecurityUser m_securityUser;
+
         // The authentication type
         private String m_authenticationType;
         
@@ -99,39 +100,44 @@ namespace SanteDB.Persistence.Data.ADO.Security
                     var hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
                     // Generate pepper
-                    var passwordHash = AdoDataConstants.PEPPER_CHARS.Select(o=> hashingService.ComputeHash($"{password}{o}"));
+                    var passwordHash = AdoDataConstants.PEPPER_CHARS.Select(o => hashingService.ComputeHash($"{password}{o}"));
                     CompositeResult<DbSecurityUser, FunctionErrorCode> fnResult;
                     try
                     {
                         // v2 auth
                         fnResult = dataContext.ExecuteProcedure<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr_ex", userName, String.Join(";", passwordHash), s_securityConfiguration?.GetSecurityPolicy(SecurityPolicyIdentification.MaxInvalidLogins, 5) ?? 5);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         fnResult = dataContext.ExecuteProcedure<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr", userName, passwordHash.First(), s_securityConfiguration?.GetSecurityPolicy(SecurityPolicyIdentification.MaxInvalidLogins, 5) ?? 5);
                     }
                     var user = fnResult.Object1;
 
-					if (!String.IsNullOrEmpty(fnResult.Object2.ErrorCode))
-	                {
-		                if (fnResult.Object2.ErrorCode.Contains("AUTH_LCK:"))
-							UpdateCache(user, dataContext);
-                        
-						throw new AuthenticationException(fnResult.Object2.ErrorCode);
-					}
+                    if (!String.IsNullOrEmpty(fnResult.Object2.ErrorCode))
+                    {
+                        if (fnResult.Object2.ErrorCode.Contains("AUTH_LCK:"))
+                            UpdateCache(user, dataContext);
+
+                        throw new AuthenticationException(fnResult.Object2.ErrorCode);
+                    }
 
 
-                    var roles = dataContext.Query<DbSecurityRole>(dataContext.CreateSqlStatement< DbSecurityRole>().SelectFrom()
+                    var roles = dataContext.Query<DbSecurityRole>(dataContext.CreateSqlStatement<DbSecurityRole>().SelectFrom()
                         .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
                         .Where<DbSecurityUserRole>(o => o.UserKey == user.Key));
 
                     var userIdentity = new AdoClaimsIdentity(user, roles, true) { m_authenticationType = "Password" };
 
                     // Is user allowed to login?
+                    var pep = ApplicationServiceContext.Current.GetService<IPolicyEnforcementService>();
                     if (user.UserClass == UserClassKeys.HumanUser)
-                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.Login, new GenericPrincipal(userIdentity, null)).Demand();
+                    {
+                        pep.Demand(PermissionPolicyIdentifiers.Login, new GenericPrincipal(userIdentity, null));
+                    }
                     else if (user.UserClass == UserClassKeys.ApplicationUser)
-                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService, new GenericPrincipal(userIdentity, null)).Demand();
+                    {
+                        pep.Demand(PermissionPolicyIdentifiers.LoginAsService, new GenericPrincipal(userIdentity, null));
+                    }
 
 					// add the security user to the cache before exiting
 					UpdateCache(user, dataContext);

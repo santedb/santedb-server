@@ -80,6 +80,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
         // Query builder
         private QueryBuilder m_queryBuilder;
 
+        // Policy enforcement service
+        private IPolicyEnforcementService m_policyEnforcementService;
+
         /// <summary>
         /// Get configuration
         /// </summary>
@@ -134,8 +137,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Creates a new instance of the ADO cache
         /// </summary>
-        public AdoPersistenceService(IServiceManager serviceManager)
+        public AdoPersistenceService(IServiceManager serviceManager, IPolicyEnforcementService policyEnforcementService)
         {
+            this.m_policyEnforcementService = policyEnforcementService;
             var tracer = new Tracer(AdoDataConstants.TraceSourceName);
 
             try
@@ -594,7 +598,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
         {
 
             if (AuthenticationContext.Current.Principal != AuthenticationContext.SystemPrincipal)
-                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.UnrestrictedAdministration).Demand();
+            {
+                this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration);
+            }
 
             using (var conn = this.GetConfiguration().Provider.GetWriteConnection())
             {

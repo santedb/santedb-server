@@ -53,12 +53,24 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// The trace source.
         /// </summary>
-        private readonly Tracer traceSource = new Tracer(AdoDataConstants.IdentityTraceSourceName);
+        private readonly Tracer m_tracer = new Tracer(AdoDataConstants.IdentityTraceSourceName);
 
-		/// <summary>
-		/// The configuration.
-		/// </summary>
-		private readonly AdoPersistenceConfigurationSection configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
+        // Policy service
+        private IPolicyEnforcementService m_policyService;
+
+        /// <summary>
+        /// The configuration.
+        /// </summary>
+        private readonly AdoPersistenceConfigurationSection m_configuration;
+
+        /// <summary>
+        /// DI constructor
+        /// </summary>
+        public AdoDeviceIdentityProvider(IConfigurationManager configurationManager, IPolicyEnforcementService pepService)
+        {
+            this.m_policyService = pepService;
+            this.m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>(); 
+        }
 
 		/// <summary>
 		/// Fired after an authentication request has been made.
@@ -80,7 +92,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             if (!authMethod.HasFlag(AuthenticationMethod.Local))
                 throw new InvalidOperationException("ADO.NET provider only supports local authentication");
 
-			using (var dataContext = this.configuration.Provider.GetWriteConnection())
+			using (var dataContext = this.m_configuration.Provider.GetWriteConnection())
 			{
 				try
 				{
@@ -98,13 +110,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
 					IPrincipal devicePrincipal = new DevicePrincipal(new DeviceIdentity(client.Key, client.PublicId, true));
 
-					new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService, devicePrincipal).Demand();
+					this.m_policyService.Demand(PermissionPolicyIdentifiers.LoginAsService, devicePrincipal);
 
 					return devicePrincipal;
 				}
 				catch (Exception e)
 				{
-					this.traceSource.TraceEvent(EventLevel.Error,  "Error authenticating {0} : {1}", deviceId, e);
+					this.m_tracer.TraceEvent(EventLevel.Error,  "Error authenticating {0} : {1}", deviceId, e);
 					throw new AuthenticationException("Error authenticating application", e);
 				}
 			}
@@ -127,7 +139,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 		/// <returns>Returns the identity of the device.</returns>
 		public IIdentity GetIdentity(string name)
 		{
-			using (var dataContext = this.configuration.Provider.GetReadonlyConnection())
+			using (var dataContext = this.m_configuration.Provider.GetReadonlyConnection())
 			{
 				try
 				{
@@ -143,7 +155,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 				}
 				catch (Exception e)
 				{
-					this.traceSource.TraceEvent(EventLevel.Error,  "Error getting identity data for {0} : {1}", name, e);
+					this.m_tracer.TraceEvent(EventLevel.Error,  "Error getting identity data for {0} : {1}", name, e);
                     throw new DataPersistenceException($"Error getting identity {name}", e);
 				}
 			}
@@ -154,7 +166,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public void SetLockout(string name, bool lockoutState, IPrincipal principal)
         {
-            using (var dataContext = this.configuration.Provider.GetWriteConnection())
+            using (var dataContext = this.m_configuration.Provider.GetWriteConnection())
                 try
                 {
                     dataContext.Open();
@@ -171,7 +183,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.traceSource.TraceEvent(EventLevel.Error, "Error getting identity data for {0} : {1}", name, e);
+                    this.m_tracer.TraceEvent(EventLevel.Error, "Error getting identity data for {0} : {1}", name, e);
                     throw new DataPersistenceException($"Error setting lockout for {name}", e);
                 }
         }
@@ -181,7 +193,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public void ChangeSecret(string name, string deviceSecret, IPrincipal principal)
         {
-            using (var dataContext = this.configuration.Provider.GetWriteConnection())
+            using (var dataContext = this.m_configuration.Provider.GetWriteConnection())
                 try
                 {
                     dataContext.Open();
@@ -202,7 +214,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.traceSource.TraceEvent(EventLevel.Error, "Error setting secret identity data for {0} : {1}", name, e);
+                    this.m_tracer.TraceEvent(EventLevel.Error, "Error setting secret identity data for {0} : {1}", name, e);
                     throw new DataPersistenceException($"Error canging secret for {name}", e);
                 }
         }

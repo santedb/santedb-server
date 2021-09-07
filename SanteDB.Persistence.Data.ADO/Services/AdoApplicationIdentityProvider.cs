@@ -58,8 +58,19 @@ namespace SanteDB.Persistence.Data.ADO.Services
         private Tracer m_traceSource = new Tracer(AdoDataConstants.IdentityTraceSourceName);
 
         // Configuration
-        private AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
+        private AdoPersistenceConfigurationSection m_configuration;
 
+        // Policy enforcements
+        private IPolicyEnforcementService m_policyEnforcementService;
+
+        /// <summary>
+        /// DI constructor
+        /// </summary>
+        public AdoApplicationIdentityProvider(IConfigurationManager configurationManager, IPolicyEnforcementService pepService)
+        {
+            this.m_policyEnforcementService = pepService;
+            this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
+        }
         /// <summary>
         /// Fired prior to an authentication request being made
         /// </summary>
@@ -90,7 +101,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         throw new AuthenticationException(client.PublicId);
 
                     IPrincipal applicationPrincipal = new ApplicationPrincipal(new Server.Core.Security.ApplicationIdentity(client.Key, client.PublicId, true));
-                    new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService, applicationPrincipal).Demand();
+                    this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.LoginAsService, applicationPrincipal);
                     return applicationPrincipal;
                 }
                 catch (Exception e)

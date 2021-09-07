@@ -71,6 +71,17 @@ namespace SanteDB.Persistence.Data.ADO.Services
         // Security configuration
         private SecurityConfigurationSection m_securityConfiguration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
 
+        // Policy enforcement
+        private IPolicyEnforcementService m_policyEnforcement;
+
+        /// <summary>
+        /// DI constructor
+        /// </summary>
+        public AdoIdentityProvider(IPolicyEnforcementService policyEnforcement)
+        {
+            this.m_policyEnforcement = policyEnforcement;
+        }
+
         /// <summary>
         /// Fired prior to an authentication request being made
         /// </summary>
@@ -336,7 +347,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             var pdpService = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
 
                             // Demand create identity
-                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.CreateIdentity).Demand();
+                            this.m_policyEnforcement.Demand(PermissionPolicyIdentifiers.CreateIdentity);
 
                             // Does this principal have the ability to 
                             DbSecurityUser newIdentityUser = new DbSecurityUser()
@@ -386,7 +397,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 using (var dataContext = this.m_configuration.Provider.GetWriteConnection())
                 {
                     dataContext.Open();
-                    new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.UnrestrictedAdministration).Demand();
+                    this.m_policyEnforcement.Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration);
 
                     var user = dataContext.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLower() == userName.ToLower());
                     if (user == null)
@@ -425,7 +436,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 using (var dataContext = this.m_configuration.Provider.GetWriteConnection())
                 {
                     dataContext.Open();
-                    new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.UnrestrictedAdministration).Demand();
+                    this.m_policyEnforcement.Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration);
 
                     var user = dataContext.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLower() == userName.ToLower());
                     if (user == null)
@@ -620,7 +631,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             if (principal is null)
                 throw new ArgumentNullException(nameof(principal));
 
-            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, policyId, principal).Demand();
+            this.m_policyEnforcement.Demand(policyId, principal);
         }
 
         /// <summary>

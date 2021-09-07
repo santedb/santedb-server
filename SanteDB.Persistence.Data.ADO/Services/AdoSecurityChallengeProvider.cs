@@ -52,13 +52,26 @@ namespace SanteDB.Persistence.Data.ADO.Services
         private Tracer m_tracer = Tracer.GetTracer(typeof(AdoSecurityChallengeProvider));
 
         // Configuration section
-        private AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
+        private AdoPersistenceConfigurationSection m_configuration;
 
         // Security Configuration section
-        private SecurityConfigurationSection m_securityConfiguration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
+        private SecurityConfigurationSection m_securityConfiguration;
+
+        // Policy enforcement
+        private IPolicyEnforcementService m_policyEnforcementService;
 
         // The randomizer
         private Random m_random = new Random();
+
+        /// <summary>
+        /// DI constructor for ADO CHallenge
+        /// </summary>
+        public AdoSecurityChallengeProvider(IConfigurationManager configurationManager, IPolicyEnforcementService pepService)
+        {
+            this.m_policyEnforcementService = pepService;
+            this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
+            this.m_securityConfiguration = configurationManager.GetSection<SecurityConfigurationSection>();
+        }
 
         /// <summary>
         /// Gets the service name
@@ -136,7 +149,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     {
                         var principal = AdoClaimsIdentity.Create(context, dbUser.Object1, true, "Secret=" + challengeKey.ToString()).CreateClaimsPrincipal();
 
-                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.Login, principal).Demand(); // must still be allowed to login
+                        this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.Login, principal); // must still be allowed to login
 
                         (principal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, PurposeOfUseKeys.SecurityAdmin.ToString()));
                         (principal.Identity as IClaimsIdentity).AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
@@ -248,7 +261,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 throw new SecurityException($"Users may only modify their own security challenges");
 
             // Ensure that the user has been explicitly granted the special security policy
-            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AlterSecurityChallenge).Demand();
+            this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.AlterSecurityChallenge);
 
             try
             {
@@ -282,7 +295,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 throw new ArgumentNullException(nameof(response), "Response to challenge must be provided");
 
             // Ensure that the user has been explicitly granted the special security policy
-            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AlterSecurityChallenge).Demand();
+            this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.AlterSecurityChallenge);
 
             try
             {

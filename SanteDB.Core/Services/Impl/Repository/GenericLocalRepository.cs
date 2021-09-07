@@ -34,6 +34,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using SanteDB.Server.Core;
 using SanteDB.Server.Core.Security.Attribute;
+using SanteDB.Core.Security.Services;
 
 namespace SanteDB.Server.Core.Services.Impl
 {
@@ -126,13 +127,16 @@ namespace SanteDB.Server.Core.Services.Impl
 
         // Privacy service
         private IPrivacyEnforcementService m_privacyService;
+        // Policy enforcement
+        protected IPolicyEnforcementService m_policyService;
 
         /// <summary>
         /// Creates a new generic local repository with specified privacy service
         /// </summary>
-        public GenericLocalRepository(IPrivacyEnforcementService privacyService)
+        public GenericLocalRepository(IPrivacyEnforcementService privacyService, IPolicyEnforcementService policyService)
         {
             this.m_privacyService = privacyService;
+            this.m_policyService = policyService;
         }
 
         /// <summary>
@@ -471,7 +475,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public virtual void DemandWrite(object data)
         {
-            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, this.WritePolicy).Demand();
+            this.m_policyService.Demand(this.WritePolicy);
         }
 
         /// <summary>
@@ -480,7 +484,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <param name="key"></param>
         public virtual void DemandRead(Guid key)
         {
-            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, this.ReadPolicy).Demand();
+            this.m_policyService.Demand(this.ReadPolicy);
         }
 
         /// <summary>
@@ -488,7 +492,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public virtual void DemandDelete(Guid key)
         {
-            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, this.DeletePolicy).Demand();
+            this.m_policyService.Demand(this.DeletePolicy);
         }
 
         /// <summary>
@@ -496,7 +500,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public virtual void DemandAlter(object data)
         {
-            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, this.AlterPolicy).Demand();
+            this.m_policyService.Demand(this.AlterPolicy);
         }
 
         /// <summary>
@@ -504,7 +508,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public virtual void DemandQuery()
         {
-            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, this.QueryPolicy).Demand();
+            this.m_policyService.Demand(this.QueryPolicy);
         }
 
         /// <summary>

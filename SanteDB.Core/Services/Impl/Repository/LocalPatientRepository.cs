@@ -19,6 +19,7 @@
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 
 namespace SanteDB.Server.Core.Services.Impl
 {
@@ -31,7 +32,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Create a new patient repository
         /// </summary>
-        public LocalPatientRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        public LocalPatientRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
         {
 
         }

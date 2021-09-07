@@ -19,6 +19,7 @@
 using SanteDB.Core;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 
@@ -33,7 +34,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Entity relationship repository
         /// </summary>
-        public LocalEntityRelationshipRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        public LocalEntityRelationshipRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService)
         {
         }
 

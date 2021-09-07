@@ -21,6 +21,7 @@ using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -43,11 +44,10 @@ namespace SanteDB.Server.Core.Services.Impl
     public class GenericLocalActRepository<TAct> : GenericLocalClinicalDataRepository<TAct>, ICancelRepositoryService<TAct>
         where TAct : Act
     {
-
         /// <summary>
-        /// Creates a new local act repository
+        /// DI constructor
         /// </summary>
-        public GenericLocalActRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        public GenericLocalActRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
         {
         }
 

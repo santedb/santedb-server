@@ -18,6 +18,7 @@
  */
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
@@ -33,6 +34,18 @@ namespace SanteDB.Server.Core.Services.Impl
     [ServiceProvider("Local Data Repository Factory", Dependencies = new Type[] { typeof(IDataPersistenceService) })]
     public class LocalRepositoryFactoryService : IRepositoryServiceFactory
     {
+
+        // Service manager
+        private IServiceManager m_serviceManager;
+
+        /// <summary>
+        /// Service manager
+        /// </summary>
+        public LocalRepositoryFactoryService(IServiceManager serivceManager)
+        {
+            this.m_serviceManager = serivceManager;
+        }
+
         /// <summary>
         /// Gets the service name
         /// </summary>
@@ -44,7 +57,7 @@ namespace SanteDB.Server.Core.Services.Impl
         public IRepositoryService<T> CreateRepository<T>() where T : IdentifiedData
         {
             new Tracer(SanteDBConstants.DataTraceSourceName).TraceEvent(EventLevel.Warning, "Creating generic repository for {0}. Security may be compromised! Please register an appropriate repository service with the host", typeof(T).FullName);
-            return new GenericLocalRepository<T>(ApplicationServiceContext.Current.GetService<IPrivacyEnforcementService>());
+            return this.m_serviceManager.CreateInjected<GenericLocalRepository<T>>();
         }
 
     }

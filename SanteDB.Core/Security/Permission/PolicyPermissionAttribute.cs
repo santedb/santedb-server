@@ -66,14 +66,15 @@ namespace SanteDB.Server.Core.Security.Attribute
         /// </summary>
         public override System.Security.IPermission CreatePermission()
         {
-            return new PolicyPermission(PermissionState.Unrestricted, this.PolicyId);
+            return null;
+            //return new PolicyPermission(PermissionState.Unrestricted, this.PolicyId);
         }
     }
 
     /// <summary>
     /// A policy permission
     /// </summary>
-    [Serializable]
+    [Serializable, Obsolete("Use IPolicyEnforcementService", true)]
     public class PolicyPermission : System.Security.IPermission, IUnrestrictedPermission
     {
 
@@ -151,8 +152,7 @@ namespace SanteDB.Server.Core.Security.Attribute
                     action = pdp.GetPolicyOutcome(principal, this.m_policyId);
             }
 
-
-            this.m_traceSource.TraceInfo("Policy Enforce: {0}({1}) = {2}", principal?.Identity?.Name, this.m_policyId, action);
+            this.m_traceSource.TraceVerbose("Policy Enforce: {0}({1}) = {2}", principal?.Identity?.Name, this.m_policyId, action);
 
             return action;
         }

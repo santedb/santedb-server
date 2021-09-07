@@ -54,8 +54,19 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Configuration 
         /// </summary>
-        protected AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
+        private AdoPersistenceConfigurationSection m_configuration;
 
+        // Policy service
+        private IPolicyEnforcementService m_policyService;
+
+        /// <summary>
+        /// Creates a new DI injected policy manager
+        /// </summary>
+        public AdoRoleProvider(IConfigurationManager configurationManager, IPolicyEnforcementService pepService)
+        {
+            this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
+            this.m_policyService = pepService;
+        }
         /// <summary>
         /// Verify principal
         /// </summary>
@@ -63,7 +74,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         {
             if (principal == null)
                 throw new ArgumentNullException(nameof(principal));
-            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, policyId).Demand();
+            this.m_policyService.Demand(policyId, principal);
 
         }
 

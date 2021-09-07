@@ -19,6 +19,7 @@
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -35,7 +36,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Create a new local metadata repository
         /// </summary>
-        public GenericLocalMetadataRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService) // No need for privacy on metadata
+        public GenericLocalMetadataRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService) // No need for privacy on metadata
         {
         }
 

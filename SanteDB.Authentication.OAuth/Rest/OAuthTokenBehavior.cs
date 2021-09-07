@@ -72,7 +72,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
     /// OAuth2 Access Control Service
     /// </summary>
     /// <remarks>An Access Control Service and Token Service implemented using OAUTH 2.0</remarks>
-    [ServiceBehavior(Name = "OAuth2")]
+    [ServiceBehavior(Name = "OAuth2", InstanceMode = ServiceInstanceMode.Singleton)]
     public class OAuthTokenBehavior : IOAuthTokenContract
     {
 
@@ -80,13 +80,25 @@ namespace SanteDB.Authentication.OAuth2.Rest
         // Trace source name
         private Tracer m_traceSource = new Tracer(OAuthConstants.TraceSourceName);
 
+        // Policy Enforcement service
+        private IPolicyEnforcementService m_policyEnforcementService;
+
         // OAuth configuration
         private OAuthConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<OAuthConfigurationSection>();
 
         // Master configuration
         private SecurityConfigurationSection m_masterConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
+        
         // XHTML
         private const string XS_HTML = "http://www.w3.org/1999/xhtml";
+
+        /// <summary>
+        /// Policy enforcement service
+        /// </summary>
+        public OAuthTokenBehavior()
+        {
+            this.m_policyEnforcementService = ApplicationServiceContext.Current.GetService<IPolicyEnforcementService>();
+        }
 
         /// <summary>
         /// OAuth token request
@@ -179,9 +191,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         tokenRequest["scope"] = PermissionPolicyIdentifiers.LoginPasswordOnly;
 
                         // Password grants allowed for this application? Becuase this grant is only for password grants
-                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthResetFlowPolicy, clientPrincipal).Demand();
+                        this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthResetFlowPolicy, clientPrincipal);
                         if (devicePrincipal != null)
-                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthResetFlowPolicy, devicePrincipal).Demand();
+                            this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthResetFlowPolicy, devicePrincipal);
 
                         // Validate 
                         if (String.IsNullOrWhiteSpace(tokenRequest["username"]) || String.IsNullOrWhiteSpace(tokenRequest["challenge"]) || String.IsNullOrWhiteSpace(tokenRequest["response"]))
@@ -192,16 +204,16 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         principal = ApplicationServiceContext.Current.GetService<ISecurityChallengeIdentityService>().Authenticate(tokenRequest["username"], Guid.Parse(tokenRequest["challenge"]), tokenRequest["response"], tfa);
                         break;
                     case OAuthConstants.GrantNameClientCredentials:
-                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthClientCredentialFlowPolicy, clientPrincipal).Demand();
+                        this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthClientCredentialFlowPolicy, clientPrincipal);
                         if (devicePrincipal != null)
-                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal).Demand();
+                            this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal);
 
                         if (devicePrincipal == null && !this.m_configuration.AllowClientOnlyGrant)
                             throw new SecurityException("client_credentials grant requires device authentication either using X509 or X-Device-Authorization or enabling the DeviceAuthorizationAccessBehavior");
                         else if (devicePrincipal == null)
                             this.m_traceSource.TraceWarning("No device credential could be established, configuration allows for client only grant. Recommend disabling this in production environment");
                         else
-                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService, devicePrincipal).Demand();
+                            this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.LoginAsService, devicePrincipal);
 
                         principal = devicePrincipal ?? clientPrincipal;
                         // Demand "Login As Service" permission
@@ -209,9 +221,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     case OAuthConstants.GrantNamePassword:
 
                         // Password grants allowed for this application?
-                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, clientPrincipal).Demand();
+                        this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, clientPrincipal);
                         if (devicePrincipal != null)
-                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal).Demand();
+                            this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal);
 
                         // Validate 
                         if (String.IsNullOrWhiteSpace(tokenRequest["username"]) && String.IsNullOrWhiteSpace(tokenRequest["refresh_token"]))
@@ -233,9 +245,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     case OAuthConstants.GrantNameAuthorizationCode:
 
                         // First, ensure the authenticated application has permission to use this grant
-                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuthConstants.OAuthCodeFlowPolicy, clientPrincipal).Demand();
+                        this.m_policyEnforcementService.Demand(OAuthConstants.OAuthCodeFlowPolicy, clientPrincipal);
                         if (devicePrincipal != null)
-                            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal).Demand();
+                            this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal);
 
                         // We want to decode the token and verify ..
                         var token = Enumerable.Range(0, tokenRequest["code"].Length)

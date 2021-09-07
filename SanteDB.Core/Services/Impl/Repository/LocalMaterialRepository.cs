@@ -18,6 +18,7 @@
  */
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 
 namespace SanteDB.Server.Core.Services.Impl
 {
@@ -26,6 +27,13 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalMaterialRepository : GenericLocalRepositoryEx<Material>
     {
+        /// <summary>
+        /// DI constructor
+        /// </summary>
+        public LocalMaterialRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        {
+        }
+
         protected override string QueryPolicy => PermissionPolicyIdentifiers.QueryMaterials;
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadMaterials;
         protected override string WritePolicy => PermissionPolicyIdentifiers.WriteMaterials;

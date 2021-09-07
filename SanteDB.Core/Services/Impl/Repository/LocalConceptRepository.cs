@@ -21,6 +21,7 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Server.Core.Security.Attribute;
 using System;
@@ -41,7 +42,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Privacy enforcement service
         /// </summary>
-        public LocalConceptRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        public LocalConceptRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
         {
 
         }
