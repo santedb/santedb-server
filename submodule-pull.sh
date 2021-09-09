@@ -3,6 +3,7 @@ if [ -f .gitmodules ]; then
 	git submodule update --remote
 	for S in *; do
 		if [ -d "${S}" ]; then
+			echo Enter "${S}"
 			cd "${S}"
 			if [ -f .git ]; then
 				git checkout $1

@@ -132,7 +132,14 @@ namespace SanteDB.Configurator
             {
                 // Create feature
                 dbSelector.ConnectionString.Name = "main";
-                ConfigurationContext.Current.Configuration.GetSection<DataConfigurationSection>().ConnectionString.Add(dbSelector.ConnectionString);
+                var dataSection = ConfigurationContext.Current.Configuration.GetSection<DataConfigurationSection>();
+                if(dataSection == null)
+                {
+                    dataSection = new DataConfigurationSection();
+                    ConfigurationContext.Current.Configuration.AddSection(dataSection);
+                }
+                dataSection.ConnectionString.Clear();
+                dataSection.ConnectionString.Add(dbSelector.ConnectionString);
                 ConfigurationContext.Current.Configuration.Sections.OfType<OrmConfigurationBase>().ToList().ForEach(o =>
                 {
                     o.ReadonlyConnectionString = o.ReadWriteConnectionString = "main";

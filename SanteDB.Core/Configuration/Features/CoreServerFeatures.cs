@@ -56,7 +56,6 @@ namespace SanteDB.Server.Core.Configuration.Features
             typeof(DefaultThreadPoolService),
             typeof(DefaultNetworkInformationService),
             typeof(RestServiceFactory),
-            typeof(LocalRepositoryFactoryService),
             typeof(LocalRepositoryService),
             typeof(ExemptablePolicyFilterService),
             typeof(LocalMailMessageRepository),

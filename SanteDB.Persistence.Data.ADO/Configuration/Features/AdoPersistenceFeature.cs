@@ -43,12 +43,6 @@ namespace SanteDB.Persistence.Data.ADO.Configuration.Features
         /// </summary>
         public AdoPersistenceFeature() : base()
         {
-            this.Configuration = new AdoPersistenceConfigurationSection()
-            {
-                AutoInsertChildren = true,
-                AutoUpdateExisting = true,
-                PrepareStatements = true
-            };
         }
 
         /// <summary>
@@ -148,5 +142,15 @@ namespace SanteDB.Persistence.Data.ADO.Configuration.Features
                 return !SERVICE_TYPES.All(t => serviceConfiguration.ServiceProviders.Any(s => s.Type == t));
             }
         }
+
+        /// <summary>
+        /// Get default configuration
+        /// </summary>
+        protected override object GetDefaultConfiguration() => new AdoPersistenceConfigurationSection()
+        {
+            AutoInsertChildren = true,
+            AutoUpdateExisting = true,
+            PrepareStatements = true
+        };
     }
 }
