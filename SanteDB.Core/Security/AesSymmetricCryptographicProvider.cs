@@ -38,6 +38,9 @@ namespace SanteDB.Server.Core.Security
     public class AesSymmetricCrypographicProvider : ISymmetricCryptographicProvider
     {
 
+        // Context key
+        private byte[] m_contextKey;
+
         // Configuration
         private SecurityConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
 
@@ -116,8 +119,13 @@ namespace SanteDB.Server.Core.Security
         public byte[] GetContextKey()
         {
             // TODO: Is it possible to pull from CPU?
-            var defaultKey = this.m_configuration.Signatures.FirstOrDefault(o => String.IsNullOrEmpty(o.KeyName) || o.KeyName == "default");
-            return SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(defaultKey?.HmacSecret ?? "DEFAULTKEY"));
+            if (this.m_contextKey == null)
+            {
+                // TODO: Actually handle RSA data
+                var defaultKey = this.m_configuration.Signatures.FirstOrDefault(o => String.IsNullOrEmpty(o.KeyName) || o.KeyName == "default");
+                this.m_contextKey = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(defaultKey?.FindValue ?? defaultKey?.HmacSecret ?? "DEFAULTKEY"));
+            }
+            return this.m_contextKey;
         }
     }
 }

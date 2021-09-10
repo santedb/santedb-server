@@ -102,7 +102,7 @@ namespace SanteDB.Server.Core.Configuration
         /// </summary>
         [XmlArray("signingKeys"), XmlArrayItem("add")]
         [Description("Describes the algorithm and key for signing data originating from this server")]
-        [DisplayName("Data Signatures")]
+        [DisplayName("Signing Keys")]
         public List<SecuritySignatureConfiguration> Signatures { get; set; }
 
         /// <summary>

@@ -57,5 +57,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyInformationalVersion("Ottawa")]
 
 [assembly: Plugin(EnableByDefault = true, Environment = PluginEnvironment.Server, Group = FeatureGroup.Persistence)]
-[assembly: PluginTraceSource(AdoDataConstants.IdentityTraceSourceName)]
 [assembly: PluginTraceSource(AdoDataConstants.TraceSourceName)]

@@ -69,9 +69,7 @@ namespace SanteDB.Configurator
                "DataDirectory",
                Path.GetDirectoryName(typeof(Program).Assembly.Location));
 
-            using (AuthenticationContext.EnterSystemContext())
-            {
-
+            
                 // Current dir
                 var cwd = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
                 // Load assembly
@@ -142,7 +140,7 @@ namespace SanteDB.Configurator
                 {
                     Environment.Exit(0);
                 }
-            }
+            
 
         }
 

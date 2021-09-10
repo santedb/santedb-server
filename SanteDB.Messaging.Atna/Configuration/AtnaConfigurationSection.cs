@@ -22,6 +22,7 @@ using AtnaApi.Transport;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Security.Configuration;
 using System;
+using System.ComponentModel;
 using System.Net;
 using System.Xml.Serialization;
 
@@ -49,41 +50,64 @@ namespace SanteDB.Messaging.Atna.Configuration
     [XmlType(nameof(AtnaConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class AtnaConfigurationSection : IConfigurationSection
     {
-        
+
+        // Transport type
+        private AtnaTransportType m_transportType;
+
         /// <summary>
         /// Identifies the host that audits should be sent to
         /// </summary>
         [XmlAttribute("endpoint"), ConfigurationRequired]
+        [DisplayName("Endpoint"), Description("The endpoint in HOST:PORT format where the remote")]
         public String AuditTarget { get; set; }
 
         /// <summary>
         /// Gets or sets the publisher type
         /// </summary>
         [XmlAttribute("transport"), ConfigurationRequired]
-        public AtnaTransportType Transport { get; set; }
+        [DisplayName("Transport To Use"), Description("The transport to use to send audits (UDP or STCP are recommended)")]
+        public AtnaTransportType Transport
+        {
+            get => this.m_transportType;
+            set
+            {
+                this.m_transportType = value;
+                if(this.m_transportType == AtnaTransportType.Stcp)
+                {
+                    this.ClientCertificate = this.ClientCertificate ?? new X509ConfigurationElement();
+                    this.ServerCertificate = this.ServerCertificate ?? new X509ConfigurationElement();
+                }
+            }
+        }
 
         /// <summary>
         /// Enterprise site ID
         /// </summary>
         [XmlAttribute("enterpriseSiteID"), ConfigurationRequired]
+        [DisplayName("Enterprise Site"), Description("The enterprise site to affix to audits")]
         public string EnterpriseSiteId { get; set; }
 
         /// <summary>
         /// Gets or sets the certificate thumbprint
         /// </summary>
         [XmlElement("clientCertificate")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        [DisplayName("Client Certificate"), Description("If using a secure connection (STCP) the certificate to use to authenticate this node to the audit repository")]
         public X509ConfigurationElement ClientCertificate { get; set; }
 
         /// <summary>
         /// Gets or sets the certificate thumbprint
         /// </summary>
         [XmlElement("serverCertificate")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        [DisplayName("Server Certificate"), Description("If using a secure connection (STCP) the certificate this node expects the certificate to use")]
         public X509ConfigurationElement ServerCertificate { get; set; }
 
         /// <summary>
         /// Message format
         /// </summary>
         [XmlAttribute("format")]
+        [DisplayName("Format"), Description("The format of the message either RFC-3881 or DICOM")]
         public MessageFormatType Format { get; set; }
 
     }

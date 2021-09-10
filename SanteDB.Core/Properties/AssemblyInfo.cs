@@ -58,10 +58,3 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyInformationalVersion("Ottawa")]
 
 [assembly: Plugin(EnableByDefault = true, Environment = PluginEnvironment.Server, Group = FeatureGroup.System)]
-[assembly: PluginTraceSource(SanteDBConstants.WcfTraceSourceName)]
-[assembly: PluginTraceSource(SanteDBConstants.DataTraceSourceName)]
-[assembly: PluginTraceSource(SanteDBConstants.MapTraceSourceName)]
-[assembly: PluginTraceSource(SanteDBConstants.SecurityTraceSourceName)]
-[assembly: PluginTraceSource(SanteDBConstants.ServiceTraceSourceName)]
-[assembly: PluginTraceSource(SanteDBConstants.ServiceTraceSourceName + ".AppletManager")]
-[assembly: PluginTraceSource(SanteDBConstants.QueueTraceSourceName)]
