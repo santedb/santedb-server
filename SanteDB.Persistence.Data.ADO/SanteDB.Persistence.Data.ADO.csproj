@@ -85,6 +85,8 @@
     <Compile Include="Data\Model\Acts\DbProcedure.cs" />
     <Compile Include="Data\Model\Acts\DbProtocol.cs" />
     <Compile Include="Data\Model\Acts\DbSubstanceAdministration.cs" />
+    <Compile Include="Data\Model\Configuration\DbDataQualityRuleset.cs" />
+    <Compile Include="Data\Model\Configuration\DbMatchConfiguration.cs" />
     <Compile Include="Data\Model\IDbHasStatus.cs" />
     <Compile Include="Data\Model\Mail\DbMailMessage.cs" />
     <Compile Include="Data\Model\Mail\DbMailMessageRcptTo.cs" />

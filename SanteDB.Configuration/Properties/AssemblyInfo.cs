@@ -14,7 +14,7 @@
  * the License.
  * 
  * User: fyfej (Justin Fyfe)
- * Date: 2021-8-5
+ * Date: 2021-8-27
  */
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -50,4 +50,4 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.28.*")]
-[assembly: AssemblyInformationalVersion("Ottawa")]
+[assembly: AssemblyInformationalVersion("Paris")]

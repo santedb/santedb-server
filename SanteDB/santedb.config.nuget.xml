@@ -1,22 +1,23 @@
 <?xml version="1.0"?>
 <!--
- - Portions Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE.md)
- - 
- - 
- - Licensed under the Apache License, Version 2.0 (the "License"); you 
- - may not use this file except in compliance with the License. You may 
- - obtain a copy of the License at 
- - 
- - http://www.apache.org/licenses/LICENSE-2.0 
- - 
+ - Copyright 2021-2021 SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ - Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ - Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ -
+ - Licensed under the Apache License, Version 2.0 (the "License"); you
+ - may not use this file except in compliance with the License. You may
+ - obtain a copy of the License at
+ -
+ - http://www.apache.org/licenses/LICENSE-2.0
+ -
  - Unless required by applicable law or agreed to in writing, software
  - distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- - License for the specific language governing permissions and limitations under 
+ - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ - License for the specific language governing permissions and limitations under
  - the License.
- - 
- - User: fyfej (Justin Fyfe)
- - Date: 2021-8-5
+ -
+ - User: fyfej
+ - Date: 2021-8-27
  -->
 
 <!-- This is an empty configuration file for a standard SanteDB instance -->
@@ -68,7 +69,6 @@
     <add type="SanteDB.Tools.Debug.Configuration.DebugToolsConfigurationSection, SanteDB.Tools.Debug"/>
     <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api"/>
     <add type="SanteDB.Matcher.Configuration.FileMatchConfigurationSection, SanteDB.Matcher"/>
-    <add type="SanteDB.Core.Configuration.ResourceMergeConfigurationSection, SanteDB.Core.Api"/>
     <add type="SanteDB.Core.Data.Quality.Configuration.DataQualityConfigurationSection, SanteDB.Core.Api"/>
   </sections>
   <!-- Built-in Audit Repository Filters -->
@@ -528,13 +528,7 @@
   </section>
   <!-- Diagnostics via JIRA configuration-->
   <!--<section xsi:type="JiraServiceConfigurationSection" userName="value" password="value" project="value" url="value" />-->
-  <!-- Master Data Management Configuration -->
-  <section xsi:type="ResourceMergeConfigurationSection">
-    <resources>
-      <!-- Note: You will have to install the Sante MATCH plugin for this to work and enable the FileMatchProvider -->
-      <add type="Patient" matchConfiguration="org.santedb.smpi.matching.default" autoMerge="false" />
-    </resources>
-  </section>
+ 
   
   <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="8">
     <serviceProviders>
@@ -581,7 +575,9 @@
       <add type="SanteDB.Persistence.Auditing.ADO.Services.AdoAuditRepositoryService, SanteDB.Persistence.Auditing.ADO" />
 
       <!-- Repository Services -->
-      <add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryFactoryService, SanteDB.Server.Core" />
+      <!--<add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryFactoryService, SanteDB.Server.Core" />-->
+      <add type="SanteDB.BusinessRules.JavaScript.AppletDataReferenceResolver, SanteDB.BusinessRules.JavaScript"/>
+
       <add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryService, SanteDB.Server.Core" />
       <add type="SanteDB.Server.Core.Services.Impl.LocalMailMessageRepository, SanteDB.Server.Core" />
       <add type="SanteDB.Server.Core.Services.Impl.LocalStockManagementRepositoryService, SanteDB.Server.Core" />

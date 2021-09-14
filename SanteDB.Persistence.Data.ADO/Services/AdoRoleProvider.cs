@@ -1,20 +1,22 @@
 ﻿/*
- * Portions Copyright 2019-2021, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE)
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you 
- * may not use this file except in compliance with the License. You may 
- * obtain a copy of the License at 
- * 
- * http://www.apache.org/licenses/LICENSE-2.0 
- * 
+ * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations under 
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
  * the License.
- * 
- * User: fyfej (Justin Fyfe)
- * Date: 2021-8-5
+ *
+ * User: fyfej
+ * Date: 2021-8-27
  */
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
@@ -54,8 +56,19 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Configuration 
         /// </summary>
-        protected AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
+        private AdoPersistenceConfigurationSection m_configuration;
 
+        // Policy service
+        private IPolicyEnforcementService m_policyService;
+
+        /// <summary>
+        /// Creates a new DI injected policy manager
+        /// </summary>
+        public AdoRoleProvider(IConfigurationManager configurationManager, IPolicyEnforcementService pepService)
+        {
+            this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
+            this.m_policyService = pepService;
+        }
         /// <summary>
         /// Verify principal
         /// </summary>
@@ -63,7 +76,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         {
             if (principal == null)
                 throw new ArgumentNullException(nameof(principal));
-            new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, policyId).Demand();
+            this.m_policyService.Demand(policyId, principal);
 
         }
 

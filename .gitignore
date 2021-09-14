@@ -292,3 +292,4 @@ SanteDB.sln.GhostDoc.xml
 .vs/
 Help/
 /SanteDB/santedb.config.user.*.xml
+*Version.cs

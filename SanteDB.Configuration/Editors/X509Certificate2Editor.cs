@@ -14,7 +14,7 @@
  * the License.
  * 
  * User: fyfej (Justin Fyfe)
- * Date: 2021-8-5
+ * Date: 2021-8-27
  */
 using System;
 using System.ComponentModel;
@@ -26,6 +26,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using SanteDB.Core.Configuration.Data;
+using SanteDB.Core.Security.Configuration;
 
 namespace SanteDB.Configuration.Editors
 {
@@ -36,6 +37,14 @@ namespace SanteDB.Configuration.Editors
     /// </summary>
     public class X509Certificate2Editor : UITypeEditor
     {
+
+        /// <summary>
+        /// Needs a private key?
+        /// </summary>
+        public X509Certificate2Editor()
+        {
+
+        }
 
         /// <summary>
         /// Edit the value
@@ -50,11 +59,22 @@ namespace SanteDB.Configuration.Editors
                 X509Store store = new X509Store(findStore, findLocation);
                 try
                 {
+                    bool needsPrivateKey = true;
+                    // X509 Config element
+                    if(context.Instance is X509ConfigurationElement x509)
+                    {
+                        needsPrivateKey = !x509.ValidationOnly;
+                    }
+
                     store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
                     var coll = new X509Certificate2Collection();
                     foreach (var c in store.Certificates)
-                        if (c.HasPrivateKey)
+                    {
+                        if (c.HasPrivateKey || !needsPrivateKey)
+                        {
                             coll.Add(c);
+                        }
+                    }
                     store.Close();
 
                     var cert = X509Certificate2UI.SelectFromCollection(coll, "Select Certificate", "Please select the X.509 certificate for this configuration option", X509SelectionFlag.SingleSelection);
