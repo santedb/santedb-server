@@ -69,7 +69,6 @@
     <add type="SanteDB.Tools.Debug.Configuration.DebugToolsConfigurationSection, SanteDB.Tools.Debug"/>
     <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api"/>
     <add type="SanteDB.Matcher.Configuration.FileMatchConfigurationSection, SanteDB.Matcher"/>
-    <add type="SanteDB.Core.Configuration.ResourceMergeConfigurationSection, SanteDB.Core.Api"/>
     <add type="SanteDB.Core.Data.Quality.Configuration.DataQualityConfigurationSection, SanteDB.Core.Api"/>
   </sections>
   <!-- Built-in Audit Repository Filters -->
@@ -529,13 +528,7 @@
   </section>
   <!-- Diagnostics via JIRA configuration-->
   <!--<section xsi:type="JiraServiceConfigurationSection" userName="value" password="value" project="value" url="value" />-->
-  <!-- Master Data Management Configuration -->
-  <section xsi:type="ResourceMergeConfigurationSection">
-    <resources>
-      <!-- Note: You will have to install the Sante MATCH plugin for this to work and enable the FileMatchProvider -->
-      <add type="Patient" matchConfiguration="org.santedb.smpi.matching.default" autoMerge="false" />
-    </resources>
-  </section>
+ 
   
   <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="8">
     <serviceProviders>

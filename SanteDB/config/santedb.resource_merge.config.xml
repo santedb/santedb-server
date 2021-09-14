@@ -20,17 +20,12 @@
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.Core.Configuration.ResourceMergeConfigurationSection, SanteDB.Core.Api"/>
+    <add type="SanteDB.Core.Configuration.ResourceManagementConfigurationSection, SanteDB.Core.Api"/>
   </sections>
   <!-- Master Data Management Configuration -->
-  <section xsi:type="ResourceMergeConfigurationSection">
+  <section xsi:type="ResourceManagementConfigurationSection">
     <resources>
-      <add type="Patient" autoMerge="false" preserveOriginal="false">
-        <matching>
-          <config autoLink="true">$identity</config>
-          <config autoLink="false">org.santedb.matching.patient.default</config>
-        </matching>
-      </add>
+      <add type="Patient" />
     </resources>
   </section>
 </SanteDBConfiguration>
