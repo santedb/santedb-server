@@ -21,6 +21,7 @@
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using System;
 
 namespace SanteDB.Server.Core.Services.Impl
@@ -35,7 +36,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Create new local security repository
         /// </summary>
-        public GenericLocalSecurityRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        public GenericLocalSecurityRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
         {
         }
 

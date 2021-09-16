@@ -43,24 +43,28 @@ namespace SanteDB.Persistence.Data.ADO.Configuration.Features
         /// </summary>
         public AdoArchiveFeature() : base()
         {
-            this.Configuration = new AdoArchiveConfigurationSection()
-            {
-                AutoInsertChildren = true,
-                AutoUpdateExisting = true,
-                PrepareStatements = true
-            };
         }
 
         /// <summary>
         /// Automatically setup
         /// </summary>
-        public override FeatureFlags Flags => FeatureFlags.AutoSetup;
+        public override FeatureFlags Flags => FeatureFlags.None;
 
         /// <summary>
         /// ADO Configuration service
         /// </summary>
         public override Type ConfigurationType => typeof(AdoArchiveFeature);
 
-        
+        /// <summary>
+        /// Get default ocnfiguration
+        /// </summary>
+        protected override object GetDefaultConfiguration() => new AdoArchiveConfigurationSection()
+        {
+            AutoInsertChildren = true,
+            AutoUpdateExisting = true,
+            PrepareStatements = true
+        };
+
+
     }
 }

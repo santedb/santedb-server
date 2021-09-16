@@ -37,10 +37,7 @@ namespace SanteDB.Persistence.PubSub.ADO.Configuration
         /// </summary>
         public AdoPubSubFeature() : base()
         {
-            this.Configuration = new AdoPubSubConfigurationSection()
-            {
-                TraceSql = false
-            };
+            
         }
 
         /// <summary>
@@ -57,5 +54,13 @@ namespace SanteDB.Persistence.PubSub.ADO.Configuration
         /// Group for this setting
         /// </summary>
         public override string Group => FeatureGroup.Persistence;
+
+        /// <summary>
+        /// Get default configuration
+        /// </summary>
+        protected override object GetDefaultConfiguration() => new AdoPubSubConfigurationSection()
+        {
+            TraceSql = false
+        };
     }
 }

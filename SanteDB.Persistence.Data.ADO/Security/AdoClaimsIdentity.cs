@@ -1,20 +1,22 @@
 ﻿/*
- * Portions Copyright 2019-2020, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE)
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you 
- * may not use this file except in compliance with the License. You may 
- * obtain a copy of the License at 
- * 
- * http://www.apache.org/licenses/LICENSE-2.0 
- * 
+ * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations under 
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
  * the License.
- * 
- * User: fyfej (Justin Fyfe)
- * Date: 2019-11-27
+ *
+ * User: fyfej
+ * Date: 2021-8-27
  */
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
@@ -65,6 +67,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
         
         // The security user
         private DbSecurityUser m_securityUser;
+
         // The authentication type
         private String m_authenticationType;
         
@@ -100,39 +103,44 @@ namespace SanteDB.Persistence.Data.ADO.Security
                     var hashingService = ApplicationServiceContext.Current.GetService<IPasswordHashingService>();
 
                     // Generate pepper
-                    var passwordHash = AdoDataConstants.PEPPER_CHARS.Select(o=> hashingService.ComputeHash($"{password}{o}"));
+                    var passwordHash = AdoDataConstants.PEPPER_CHARS.Select(o => hashingService.ComputeHash($"{password}{o}"));
                     CompositeResult<DbSecurityUser, FunctionErrorCode> fnResult;
                     try
                     {
                         // v2 auth
                         fnResult = dataContext.ExecuteProcedure<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr_ex", userName, String.Join(";", passwordHash), s_securityConfiguration?.GetSecurityPolicy(SecurityPolicyIdentification.MaxInvalidLogins, 5) ?? 5);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         fnResult = dataContext.ExecuteProcedure<CompositeResult<DbSecurityUser, FunctionErrorCode>>("auth_usr", userName, passwordHash.First(), s_securityConfiguration?.GetSecurityPolicy(SecurityPolicyIdentification.MaxInvalidLogins, 5) ?? 5);
                     }
                     var user = fnResult.Object1;
 
-					if (!String.IsNullOrEmpty(fnResult.Object2.ErrorCode))
-	                {
-		                if (fnResult.Object2.ErrorCode.Contains("AUTH_LCK:"))
-							UpdateCache(user, dataContext);
-                        
-						throw new AuthenticationException(fnResult.Object2.ErrorCode);
-					}
+                    if (!String.IsNullOrEmpty(fnResult.Object2.ErrorCode))
+                    {
+                        if (fnResult.Object2.ErrorCode.Contains("AUTH_LCK:"))
+                            UpdateCache(user, dataContext);
+
+                        throw new AuthenticationException(fnResult.Object2.ErrorCode);
+                    }
 
 
-                    var roles = dataContext.Query<DbSecurityRole>(dataContext.CreateSqlStatement< DbSecurityRole>().SelectFrom()
+                    var roles = dataContext.Query<DbSecurityRole>(dataContext.CreateSqlStatement<DbSecurityRole>().SelectFrom()
                         .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
                         .Where<DbSecurityUserRole>(o => o.UserKey == user.Key));
 
                     var userIdentity = new AdoClaimsIdentity(user, roles, true) { m_authenticationType = "Password" };
 
                     // Is user allowed to login?
+                    var pep = ApplicationServiceContext.Current.GetService<IPolicyEnforcementService>();
                     if (user.UserClass == UserClassKeys.HumanUser)
-                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.Login, new GenericPrincipal(userIdentity, null)).Demand();
+                    {
+                        pep.Demand(PermissionPolicyIdentifiers.Login, new GenericPrincipal(userIdentity, null));
+                    }
                     else if (user.UserClass == UserClassKeys.ApplicationUser)
-                        new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.LoginAsService, new GenericPrincipal(userIdentity, null)).Demand();
+                    {
+                        pep.Demand(PermissionPolicyIdentifiers.LoginAsService, new GenericPrincipal(userIdentity, null));
+                    }
 
 					// add the security user to the cache before exiting
 					UpdateCache(user, dataContext);

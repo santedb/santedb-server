@@ -43,10 +43,6 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// </summary>
         public FileSystemQueueFeature()
         {
-            this.Configuration = new FileSystemQueueConfigurationSection()
-            {
-                QueuePath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "queue")
-            };
         }
 
         /// <summary>
@@ -58,5 +54,13 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// File system queue configuration service
         /// </summary>
         public override Type ConfigurationType => typeof(FileSystemQueueConfigurationSection);
+
+        /// <summary>
+        /// Get default configuration
+        /// </summary>
+        protected override object GetDefaultConfiguration() => new FileSystemQueueConfigurationSection()
+        {
+            QueuePath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "queue")
+        };
     }
 }

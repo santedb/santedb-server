@@ -20,6 +20,7 @@
  */
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 
 namespace SanteDB.Server.Core.Services.Impl
 {
@@ -32,7 +33,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Privacy enforcement service
         /// </summary>
-        public LocalPlaceRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        public LocalPlaceRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
         {
         }
 

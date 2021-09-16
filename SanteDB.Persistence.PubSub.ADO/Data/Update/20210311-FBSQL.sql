@@ -2,7 +2,6 @@
  * <feature scope="SanteDB.Persistence.PubSub.ADO" id="20210311-01" name="Update:20210311-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="FirebirdSQL">
  *	<summary>Update: Installs the Pub/Sub ADO Tables</summary>
  *	<remarks>This table is used to register channels and subscriptions</remarks>
- *	<canInstall>select true from rdb$database where not exists (select 1 from rdb$relations where rdb$relation_name = 'SUB_TBL');</canInstall>
  *  <isInstalled mustSucceed="true">select true from rdb$database where exists (select 1 from rdb$relations where rdb$relation_name = 'SUB_TBL');</isInstalled>
  * </feature>
  */

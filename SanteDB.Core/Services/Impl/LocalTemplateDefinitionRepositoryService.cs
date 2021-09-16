@@ -19,6 +19,8 @@
  * Date: 2021-8-27
  */
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 using System.Linq;
@@ -32,6 +34,12 @@ namespace SanteDB.Server.Core.Services.Impl
         GenericLocalMetadataRepository<TemplateDefinition>,
         ITemplateDefinitionRepositoryService
     {
+        /// <summary>
+        /// Creates a new template repository
+        /// </summary>
+        public LocalTemplateDefinitionRepositoryService(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        {
+        }
 
         /// <summary>
         /// Get a template definition by mnemonic

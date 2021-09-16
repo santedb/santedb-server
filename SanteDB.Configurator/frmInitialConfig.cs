@@ -35,6 +35,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core;
+using System.IO;
+using System.Reflection;
 
 namespace SanteDB.Configurator
 {
@@ -43,6 +45,23 @@ namespace SanteDB.Configurator
         public frmInitialConfig()
         {
             InitializeComponent();
+            InitializeTemplates();
+        }
+
+        /// <summary>
+        /// Initialize templates 
+        /// </summary>
+        private void InitializeTemplates()
+        {
+            try
+            {
+                cbxTemplate.Items.Clear();
+                foreach (var f in Directory.GetFiles(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "config", "template"), "*.xml"))
+                {
+                    cbxTemplate.Items.Add(Path.GetFileNameWithoutExtension(f));
+                }
+            }
+            catch { }
         }
 
         private void rdoEasy_CheckedChanged(object sender, EventArgs e)
@@ -68,31 +87,64 @@ namespace SanteDB.Configurator
 
             ConfigurationContext.Current.ConfigurationTasks.Clear();
             // Create a default configuration with minimal sections
-            ConfigurationContext.Current.Configuration = new SanteDBConfiguration()
+            if (cbxTemplate.SelectedItem != null)
             {
-                Sections = new List<object>()
+                try
                 {
-                    new DataConfigurationSection(),
-                    new DiagnosticsConfigurationSection(),
-                    new ApplicationServiceContextConfigurationSection()
+                    var fileName = Path.ChangeExtension(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "config", "template", cbxTemplate.SelectedItem.ToString()), "xml");
+                    using (var s = File.OpenRead(fileName))
                     {
-                        ThreadPoolSize = Environment.ProcessorCount
-                    },
-                    new OrmLite.Configuration.OrmConfigurationSection()
-                    {
-                        Providers = ConfigurationContext.Current.DataProviders.Select(o => new OrmLite.Configuration.ProviderRegistrationConfiguration(o.Invariant, o.DbProviderType)).ToList(),
-                        AdoProvider = ConfigurationContext.Current.GetAllTypes().Where(t => typeof(DbProviderFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface ).Select(t => new ProviderRegistrationConfiguration(t.Namespace.StartsWith("System") ? t.Name : t.Namespace.Split('.')[0], t)).ToList(),
+                        ConfigurationContext.Current.Configuration = SanteDBConfiguration.Load(s);
                     }
+
                 }
-            };
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error loading template: {ex.Message}");
+                }
+            }
+            else
+            {
+                ConfigurationContext.Current.Configuration = new SanteDBConfiguration()
+                {
+                    Sections = new List<object>()
+                    {
+                        new DataConfigurationSection(),
+                        new DiagnosticsConfigurationSection(),
+                        new ApplicationServiceContextConfigurationSection()
+                        {
+                            ThreadPoolSize = Environment.ProcessorCount
+                        }
+                        
+                    }
+                };
+            }
+
+            ConfigurationContext.Current.Configuration.RemoveSection<OrmLite.Configuration.OrmConfigurationSection>();
+            ConfigurationContext.Current.Configuration.AddSection(new OrmLite.Configuration.OrmConfigurationSection()
+            {
+                Providers = ConfigurationContext.Current.DataProviders.Select(o => new OrmLite.Configuration.ProviderRegistrationConfiguration(o.Invariant, o.DbProviderType)).ToList(),
+                AdoProvider = ConfigurationContext.Current.GetAllTypes().Where(t => typeof(DbProviderFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).Select(t => new ProviderRegistrationConfiguration(t.Namespace.StartsWith("System") ? t.Name : t.Namespace.Split('.')[0], t)).ToList(),
+            });
 
             // Push the initial configuration features onto the service
-            if(rdoEasy.Checked)
+            if (rdoEasy.Checked)
             {
                 // Create feature
                 dbSelector.ConnectionString.Name = "main";
-                ConfigurationContext.Current.Configuration.GetSection<DataConfigurationSection>().ConnectionString.Add(dbSelector.ConnectionString);
-
+                var dataSection = ConfigurationContext.Current.Configuration.GetSection<DataConfigurationSection>();
+                if(dataSection == null)
+                {
+                    dataSection = new DataConfigurationSection();
+                    ConfigurationContext.Current.Configuration.AddSection(dataSection);
+                }
+                dataSection.ConnectionString.Clear();
+                dataSection.ConnectionString.Add(dbSelector.ConnectionString);
+                ConfigurationContext.Current.Configuration.Sections.OfType<OrmConfigurationBase>().ToList().ForEach(o =>
+                {
+                    o.ReadonlyConnectionString = o.ReadWriteConnectionString = "main";
+                    o.ProviderType = dbSelector.Provider.Invariant;
+                });
                 // Configuration of windows service parameters
                 ConfigurationContext.Current.Features.OfType<WindowsServiceFeature>().FirstOrDefault().Configuration = new WindowsServiceFeature.Options()
                 {
@@ -102,17 +154,17 @@ namespace SanteDB.Configurator
 
                 // Set all data connections
                 var autoFeatures = ConfigurationContext.Current.Features.Where(o => o.Flags.HasFlag(FeatureFlags.AutoSetup) && o.QueryState(ConfigurationContext.Current.Configuration) != FeatureInstallState.Installed);
-                foreach(var ftr in autoFeatures)
+                foreach (var ftr in autoFeatures)
                 {
                     var ormConfig = (ftr.Configuration as OrmLite.Configuration.OrmConfigurationBase);
-                    if(ormConfig != null)
+                    if (ormConfig != null)
                     {
                         ormConfig.ReadWriteConnectionString = ormConfig.ReadonlyConnectionString = dbSelector.ConnectionString.Name;
                         ormConfig.ProviderType = dbSelector.Provider.Invariant;
                         ormConfig.TraceSql = false;
                     }
                     // Add configuration 
-                    foreach(var tsk in ftr.CreateInstallTasks().Where(o=>o.VerifyState(ConfigurationContext.Current.Configuration)))
+                    foreach (var tsk in ftr.CreateInstallTasks().Where(o => o.VerifyState(ConfigurationContext.Current.Configuration)))
                         ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
                 }
 

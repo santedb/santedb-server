@@ -1,23 +1,22 @@
 <?xml version="1.0"?>
 <!--
- - Copyright 2021-2021 SanteSuite Contributors (See NOTICE.md for full copyright notices)
- - Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
- - Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
- -
- - Licensed under the Apache License, Version 2.0 (the "License"); you
- - may not use this file except in compliance with the License. You may
- - obtain a copy of the License at
- -
- - http://www.apache.org/licenses/LICENSE-2.0
- -
+ - Portions Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE.md)
+ - 
+ - 
+ - Licensed under the Apache License, Version 2.0 (the "License"); you 
+ - may not use this file except in compliance with the License. You may 
+ - obtain a copy of the License at 
+ - 
+ - http://www.apache.org/licenses/LICENSE-2.0 
+ - 
  - Unless required by applicable law or agreed to in writing, software
  - distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- - License for the specific language governing permissions and limitations under
+ - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ - License for the specific language governing permissions and limitations under 
  - the License.
- -
- - User: fyfej
- - Date: 2021-8-27
+ - 
+ - User: fyfej (Justin Fyfe)
+ - Date: 2021-8-5
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.9.1.23074" xmlns:santempi="http://santedb.org/configuration/santempi" xmlns:santeguard="http://santedb.org/configuration/santeguard" xmlns="http://santedb.org/configuration">
   <sections>
@@ -81,16 +80,13 @@
       <add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory" />
       <add type="SanteDB.Caching.Memory.MemoryQueryPersistenceService, SanteDB.Caching.Memory" />
       <add type="SanteDB.Caching.Memory.MemoryAdhocCacheService, SanteDB.Caching.Memory" />
-      <!--<add type="SanteDB.Caching.Redis.RedisCacheService, SanteDB.Caching.Redis" />
-      <add type="SanteDB.Caching.Redis.RedisQueryPersistenceService, SanteDB.Caching.Redis" />
-      <add type="SanteDB.Caching.Redis.RedisAdhocCache, SanteDB.Caching.Redis" />-->
       <add type="SanteDB.Persistence.Auditing.ADO.Services.AdoAuditRepositoryService, SanteDB.Persistence.Auditing.ADO" />
-      <add type="SanteDB.Server.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Server.Core, Version=2.1.0.0" />
+      <add type="SanteDB.Server.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Server.Core" />
 
       <!-- Repository Services -->
+      <!--<add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryFactoryService, SanteDB.Server.Core" />-->
       <add type="SanteDB.BusinessRules.JavaScript.AppletDataReferenceResolver, SanteDB.BusinessRules.JavaScript"/>
 
-      <!--<add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryFactoryService, SanteDB.Server.Core" />-->
       <add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryService, SanteDB.Server.Core" />
       <add type="SanteDB.Server.Core.Services.Impl.LocalMailMessageRepository, SanteDB.Server.Core" />
       <add type="SanteDB.Server.Core.Services.Impl.LocalStockManagementRepositoryService, SanteDB.Server.Core" />
@@ -101,21 +97,15 @@
       <!-- Data Migration & Management -->
       <add type="SanteDB.Server.Core.Persistence.DataInitializationService, SanteDB.Server.Core" />
       <add type="SanteDB.Core.Protocol.SimpleCarePlanService, SanteDB.Core.Api" />
-      <!--<add type="SanteDB.Persistence.MDM.Services.MdmDaemonService, SanteDB.Persistence.MDM" />-->
 
       <!-- Messaging Services-->
       <add type="SanteDB.Authentication.OAuth2.OAuthMessageHandler, SanteDB.Authentication.OAuth2" />
       <add type="SanteDB.Messaging.FHIR.FhirMessageHandler, SanteDB.Messaging.FHIR" />
       <add type="SanteDB.Messaging.FHIR.FhirDataInitializationService, SanteDB.Messaging.FHIR" />
-      <!--<add type="SanteDB.Messaging.GS1.StockSubscriber, SanteDB.Messaging.GS1" />
-      <add type="SanteDB.Messaging.GS1.StockServiceMessageHandler, SanteDB.Messaging.GS1" />
-      <add type="SanteDB.Messaging.GS1.Transport.AS2.As2IntegrationService, SanteDB.Messaging.GS1" />-->
       <add type="SanteDB.Messaging.HDSI.HdsiMessageHandler, SanteDB.Messaging.HDSI" />
       <add type="SanteDB.Messaging.HL7.HL7MessageHandler, SanteDB.Messaging.HL7" />
-      <!--<add type="SanteDB.Messaging.RISI.RisiMessageHandler, SanteDB.Messaging.RISI" />-->
-      <!--<add type="SanteDB.Tools.DataSandbox.DataSandboxService, SanteDB.Tools.DataSandbox" />-->
       <add type="SanteDB.Messaging.AMI.AmiMessageHandler, SanteDB.Messaging.AMI" />
-      <add type="SanteDB.Messaging.Metadata.MetadataMessageHandler, SanteDB.Messaging.Metadata, Version=2.1.0.0"/>
+      <add type="SanteDB.Messaging.Metadata.MetadataMessageHandler, SanteDB.Messaging.Metadata"/>
 
       <!-- Clinical Services -->
       <add type="SanteDB.Core.Services.Impl.SimplePatchService, SanteDB.Core.Api" />
@@ -124,17 +114,7 @@
 
       <!-- Anciliarry Services -->
       <add type="SanteDB.Persistence.Diagnostics.Email.DiagnosticReportPersistenceService, SanteDB.Persistence.Diagnostics.Email" />
-      <!--<add type="SanteDB.Persistence.Diagnostics.Jira.DiagnosticReportPersistenceService, SanteDB.Persistence.Diagnostics.Jira, Version=1.1.2.24168, Culture=neutral, PublicKeyToken=null" />-->
-      <!--<add type="SanteDB.Persistence.Reporting.ADO.ReportingPersistenceService, SanteDB.Persistence.Reporting.ADO" />-->
-      <!--<add type="SanteDB.Warehouse.ADO.ADODataWarehouse, SanteDB.Warehouse.ADO" />-->
-
-      <!-- SG Services -->
-      <!--<add type="SanteGuard.Services.LocalAuditTermLookupService, SanteGuard.Core"/>
-	  <add type="SanteGuard.Services.Repositories.SanteGuardDataRepository, SanteGuard.Core"/>-->
-      <!--<add type="SanteGuard.Messaging.Syslog.SyslogMessageHandler, SanteGuard.Messaging.Syslog"/>-->
-      <!--  <add type="SanteGuard.Persistence.Ado.Services.AdoAuditPersistenceService, SanteGuard.Persistence.Ado"/>-->
-      <!--<add type="SanteGuard.Services.Repositories.SanteGuardAuditRepository, SanteGuard.Core"/>-->
-
+    
       <!-- BI Services -->
       <add type="SanteDB.Matcher.Services.FileMatchConfigurationProvider, SanteDB.Matcher"/>
       <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS"/>

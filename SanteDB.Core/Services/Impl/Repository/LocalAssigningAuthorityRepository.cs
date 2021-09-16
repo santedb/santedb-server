@@ -20,6 +20,7 @@
  */
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 using System.Linq;
@@ -37,7 +38,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Local AA 
         /// </summary>
-        public LocalAssigningAuthorityRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        public LocalAssigningAuthorityRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
         {
 
         }

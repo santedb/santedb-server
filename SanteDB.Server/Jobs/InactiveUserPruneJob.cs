@@ -52,6 +52,11 @@ namespace SanteDB.Server.Jobs
         private bool m_cancelFlag = false;
 
         /// <summary>
+        /// Get the id of this job
+        /// </summary>
+        public Guid Id => Guid.Parse("B4D43458-F032-4811-979C-43154B30E5F4");
+
+        /// <summary>
         /// Get the name of the job
         /// </summary>
         public string Name => "Prune Inactive Users";

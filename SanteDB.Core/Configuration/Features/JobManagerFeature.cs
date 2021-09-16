@@ -41,10 +41,6 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// </summary>
         public JobManagerFeature()
         {
-            this.Configuration = new JobConfigurationSection()
-            {
-                Jobs = new List<JobItemConfiguration>()
-            };
         }
 
         /// <summary>
@@ -66,6 +62,14 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// Gets the configuration type
         /// </summary>
         public override Type ConfigurationType => typeof(JobConfigurationSection);
+
+        /// <summary>
+        /// Get default configuration
+        /// </summary>
+        protected override object GetDefaultConfiguration() => new JobConfigurationSection()
+        {
+            Jobs = new List<JobItemConfiguration>()
+        };
 
     }
 }

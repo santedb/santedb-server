@@ -40,10 +40,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Configuration
         /// </summary>
         public AdoAuditFeature()
         {
-            this.Configuration = new AdoAuditConfigurationSection()
-            {
-                TraceSql = false
-            };
+            
         }
 
         /// <summary>
@@ -60,5 +57,13 @@ namespace SanteDB.Persistence.Auditing.ADO.Configuration
         /// Gets the type of configuration
         /// </summary>
         public override Type ConfigurationType => typeof(AdoAuditConfigurationSection);
+
+        /// <summary>
+        /// Get default configuration
+        /// </summary>
+        protected override object GetDefaultConfiguration() => new AdoAuditConfigurationSection()
+        {
+            TraceSql = false
+        };
     }
 }

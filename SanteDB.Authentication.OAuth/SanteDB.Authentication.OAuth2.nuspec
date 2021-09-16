@@ -16,7 +16,7 @@
     <tags>cdr santedb server ado</tags>
     <dependencies>
       <dependency id="SanteDB.Server.Plugin" version="$VersionNumber$" />
-      <dependency id="NewtonSoft.Json" version="12.0.3.0" />
+      <dependency id="NewtonSoft.Json" version="13.0.1.0" />
       <dependency id="SanteDB.Core.Api" version="$VersionNumber$" />
       <dependency id="SanteDB.Core.Model" version="$VersionNumber$" />
       <dependency id="RestSrvr" version="$VersionNumber$"/>

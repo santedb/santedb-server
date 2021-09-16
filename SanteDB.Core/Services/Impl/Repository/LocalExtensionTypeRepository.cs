@@ -19,6 +19,8 @@
  * Date: 2021-8-27
  */
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 using System.Linq;
@@ -30,6 +32,12 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalExtensionTypeRepository : GenericLocalMetadataRepository<ExtensionType>, IExtensionTypeRepository
     {
+        /// <summary>
+        /// Local extension type repository
+        /// </summary>
+        public LocalExtensionTypeRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        {
+        }
 
         /// <summary>
         /// Get the xtension type by uri

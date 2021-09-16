@@ -1,20 +1,22 @@
 ﻿/*
- * Portions Copyright 2019-2020, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE)
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you 
- * may not use this file except in compliance with the License. You may 
- * obtain a copy of the License at 
- * 
- * http://www.apache.org/licenses/LICENSE-2.0 
- * 
+ * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations under 
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
  * the License.
- * 
- * User: fyfej (Justin Fyfe)
- * Date: 2019-11-27
+ *
+ * User: fyfej
+ * Date: 2021-8-27
  */
 using SanteDB.BI;
 using SanteDB.BI.Model;
@@ -62,7 +64,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// Represents a dummy service which just adds the persistence services to the context
     /// </summary>
     [ServiceProvider("ADO.NET Data Persistence Service", Configuration = typeof(AdoPersistenceConfigurationSection))]
-    public class AdoPersistenceService : IDaemonService, ISqlDataPersistenceService, IAdoPersistenceSettingsProvider
+    public class AdoPersistenceService : IDaemonService, ISqlDataPersistenceService, IAdoPersistenceSettingsProvider, IServiceFactory
     {
 
         /// <summary>
@@ -79,6 +81,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
         // Query builder
         private QueryBuilder m_queryBuilder;
+
+        // Policy enforcement service
+        private IPolicyEnforcementService m_policyEnforcementService;
 
         /// <summary>
         /// Get configuration
@@ -134,9 +139,17 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Creates a new instance of the ADO cache
         /// </summary>
-        public AdoPersistenceService(IServiceManager serviceManager)
+        public AdoPersistenceService(IServiceManager serviceManager, IPolicyEnforcementService policyEnforcementService)
         {
+            this.m_policyEnforcementService = policyEnforcementService;
             var tracer = new Tracer(AdoDataConstants.TraceSourceName);
+
+
+            // Apply the migrations
+            this.m_tracer.TraceInfo("Scanning for schema updates...");
+
+            // TODO: Refactor this to a common library within the ORM tooling
+            this.GetConfiguration().Provider.UpgradeSchema("SanteDB.Persistence.Data.ADO");
 
             try
             {
@@ -410,12 +423,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 this.Starting?.Invoke(this, EventArgs.Empty);
                 if (this.m_running) return true;
 
-                // Apply the migrations
-                this.m_tracer.TraceInfo("Scanning for schema updates...");
-
-                // TODO: Refactor this to a common library within the ORM tooling
-                this.GetConfiguration().Provider.UpgradeSchema("SanteDB.Persistence.Data.ADO");
-
                 try
                 {
                     // Verify schema version
@@ -446,15 +453,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         // If the persistence service is generic then we should check if we're allowed
                         if (!t.IsGenericType ||
                             t.IsGenericType && (this.GetConfiguration().AllowedResources.Count == 0 ||
-                            this.GetConfiguration().AllowedResources.Contains(t.GetGenericArguments()[0].GetCustomAttribute<XmlTypeAttribute>()?.TypeName)))
+                            this.GetConfiguration().AllowedResources.Any(r => r.Type == t.GetGenericArguments()[0])))
                         {
                             var instance = Activator.CreateInstance(t, this);
                             ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(instance);
                         }
-
-                        // Add to cache since we're here anyways
-
-                        //s_persistenceCache.Add(t.GetGenericArguments()[0], Activator.CreateInstance(t) as IAdoPersistenceService);
                     }
                     catch (Exception e)
                     {
@@ -478,7 +481,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                         // Make sure we're allowed to run this
                         if (this.GetConfiguration().AllowedResources.Count > 0 &&
-                            !this.GetConfiguration().AllowedResources.Contains(modelClassType.GetCustomAttribute<XmlTypeAttribute>()?.TypeName))
+                            !this.GetConfiguration().AllowedResources.Any(t => t.Type == modelClassType))
                             continue;
 
                         idpType = idpType.MakeGenericType(modelClassType);
@@ -594,7 +597,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
         {
 
             if (AuthenticationContext.Current.Principal != AuthenticationContext.SystemPrincipal)
-                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.UnrestrictedAdministration).Demand();
+            {
+                this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration);
+            }
 
             using (var conn = this.GetConfiguration().Provider.GetWriteConnection())
             {
@@ -629,6 +634,109 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
         }
 
+        /// <summary>
+        /// Try to create service <typeparamref name="TService"/>
+        /// </summary>
+        public bool TryCreateService<TService>(out TService serviceInstance)
+        {
+            if (this.TryCreateService(typeof(TService), out object service))
+            {
+                serviceInstance = (TService)service;
+                return true;
+            }
+            serviceInstance = default(TService);
+            return false;
+        }
+
+        /// <summary>
+        /// Try to create service <paramref name="serviceType"/>
+        /// </summary>
+        public bool TryCreateService(Type serviceType, out object serviceInstance)
+        {
+
+            // Look for concrete services
+            var st = AppDomain.CurrentDomain.GetAllTypes().FirstOrDefault(o => typeof(IAdoPersistenceService).IsAssignableFrom(o) && serviceType.IsAssignableFrom(o));
+            if (st != null)
+            {
+                serviceInstance = Activator.CreateInstance(st, this);
+                return true;
+            }
+            else if (st == null && typeof(IDataPersistenceService).IsAssignableFrom(serviceType) && serviceType.IsGenericType)
+            {
+                serviceInstance = null;
+                var wrappedType = serviceType.GetGenericArguments()[0];
+                var map = ModelMap.Load(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName));
+                var classMapData = map.Class.FirstOrDefault(m => m.ModelType == wrappedType);
+                if (classMapData != null) // We have a map!!!
+                {
+                    // Is there a persistence service?
+                    var idpType = typeof(IDataPersistenceService<>);
+                    Type modelClassType = Type.GetType(classMapData.ModelClass),
+                        domainClassType = Type.GetType(classMapData.DomainClass);
+
+                    // Make sure we're allowed to run this
+                    if (this.GetConfiguration().AllowedResources.Count > 0 &&
+                        !this.GetConfiguration().AllowedResources.Any(t => t.Type == modelClassType))
+                    {
+                        return false;
+                    }
+
+                    idpType = idpType.MakeGenericType(modelClassType);
+
+                    if (modelClassType.IsAbstract || domainClassType.IsAbstract)
+                    {
+                        return false;
+                    }
+
+                    this.m_tracer.TraceEvent(EventLevel.Verbose, "Creating map {0} > {1}", modelClassType, domainClassType);
+
+                    if (this.m_persistenceCache.ContainsKey(modelClassType))
+                        this.m_tracer.TraceWarning("Duplicate initialization of {0}", modelClassType);
+                    else if (modelClassType.Implements(typeof(IBaseEntityData)) &&
+                       domainClassType.Implements(typeof(IDbBaseData)))
+                    {
+                        // Construct a type
+                        Type pclass = null;
+                        if (modelClassType.Implements(typeof(IVersionedAssociation)))
+                            pclass = typeof(GenericBaseVersionedAssociationPersistenceService<,>);
+                        else if (modelClassType.Implements(typeof(ISimpleAssociation)))
+                            pclass = typeof(GenericBaseAssociationPersistenceService<,>);
+                        else
+                            pclass = typeof(GenericBasePersistenceService<,>);
+                        pclass = pclass.MakeGenericType(modelClassType, domainClassType);
+                        serviceInstance = Activator.CreateInstance(pclass, this);
+                        // Add to cache since we're here anyways
+                        this.m_persistenceCache.Add(modelClassType, serviceInstance as IAdoPersistenceService);
+                        return true;
+                    }
+                    else if (modelClassType.Implements(typeof(IIdentifiedEntity)) &&
+                        domainClassType.Implements(typeof(IDbIdentified)))
+                    {
+                        // Construct a type
+                        Type pclass = null;
+                        if (modelClassType.Implements(typeof(IVersionedAssociation)))
+                            pclass = typeof(GenericIdentityVersionedAssociationPersistenceService<,>);
+                        else if (modelClassType.Implements(typeof(ISimpleAssociation)))
+                            pclass = typeof(GenericIdentityAssociationPersistenceService<,>);
+                        else
+                            pclass = typeof(GenericIdentityPersistenceService<,>);
+
+                        pclass = pclass.MakeGenericType(modelClassType, domainClassType);
+                        serviceInstance = Activator.CreateInstance(pclass, this);
+                        this.m_persistenceCache.Add(modelClassType, serviceInstance as IAdoPersistenceService);
+                        return true;
+                    }
+                    else
+                    {
+                        this.m_tracer.TraceEvent(EventLevel.Warning, "Classmap {0}>{1} cannot be created, ignoring", modelClassType, domainClassType);
+                        return false;
+                    }
+                }
+            }
+            serviceInstance = null;
+            return false;
+
+        }
     }
 }
 

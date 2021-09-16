@@ -34,6 +34,7 @@ using SanteDB.Server.Core.Rest.Security;
 using System;
 using System.Linq;
 using System.Reflection;
+using SanteDB.Core.Interfaces;
 
 namespace SanteDB.Server.Core.Rest
 {
@@ -42,13 +43,23 @@ namespace SanteDB.Server.Core.Rest
     /// </summary>
     public class RestServiceFactory : IRestServiceFactory
     {
+
+        // Configuration
+        private SanteDB.Rest.Common.Configuration.RestConfigurationSection m_configuration;
+
+        // Service manager instance 
+        private IServiceManager m_serviceManager;
+
         /// <summary>
         /// Rest service factory
         /// </summary>
-        public RestServiceFactory()
+        public RestServiceFactory(IConfigurationManager configurationManager, IServiceManager serviceManager)
         {
             // Register a remote endpoint util that uses the RestOperationContext
             RemoteEndpointUtil.Current.AddEndpointProvider(this.GetRemoteEndpointInfo);
+            this.m_configuration = configurationManager.GetSection<SanteDB.Rest.Common.Configuration.RestConfigurationSection>();
+            this.m_serviceManager = serviceManager;
+
         }
 
         /// <summary>
@@ -99,9 +110,8 @@ namespace SanteDB.Server.Core.Rest
             try
             {
                 // Get the configuration
-                var configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SanteDB.Rest.Common.Configuration.RestConfigurationSection>();
                 var sname = serviceType.GetCustomAttribute<ServiceBehaviorAttribute>()?.Name ?? serviceType.FullName;
-                var config = configuration.Services.FirstOrDefault(o => o.Name == sname);
+                var config = this.m_configuration.Services.FirstOrDefault(o => o.Name == sname);
                 if (config == null)
                     throw new InvalidOperationException($"Cannot find configuration for {sname}");
                 var retVal = new RestService(serviceType);

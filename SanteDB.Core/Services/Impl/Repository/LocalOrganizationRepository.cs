@@ -20,6 +20,7 @@
  */
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 
 namespace SanteDB.Server.Core.Services.Impl
 {
@@ -28,6 +29,13 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalOrganizationRepository : GenericLocalRepositoryEx<Organization>
     {
+        /// <summary>
+        /// DI constructor
+        /// </summary>
+        public LocalOrganizationRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        {
+        }
+
         protected override string QueryPolicy => PermissionPolicyIdentifiers.ReadPlacesAndOrgs;
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadPlacesAndOrgs;
         protected override string WritePolicy => PermissionPolicyIdentifiers.WritePlacesAndOrgs;

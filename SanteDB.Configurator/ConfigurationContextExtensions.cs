@@ -73,8 +73,7 @@ namespace SanteDB.Configurator
                 Exception errCode = null;
                 var exeThd = new Thread(() =>
                 {
-                    using (AuthenticationContext.EnterSystemContext())
-                    {
+                    
                         try
                         {
                             int i = 0, t = me.ConfigurationTasks.Count;
@@ -105,7 +104,7 @@ namespace SanteDB.Configurator
                         {
                             complete = true;
                         }
-                    }
+                    
                 });
 
                 exeThd.Start();

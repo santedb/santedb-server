@@ -20,6 +20,7 @@
  */
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 
 namespace SanteDB.Server.Core.Services.Impl
 {
@@ -28,6 +29,12 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalSecurityPolicyRepository : GenericLocalSecurityRepository<SecurityPolicy>
     {
+        /// <summary>
+        /// DI constructor 
+        /// </summary>
+        public LocalSecurityPolicyRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        {
+        }
 
         protected override string WritePolicy => PermissionPolicyIdentifiers.AlterPolicy;
         protected override string DeletePolicy => PermissionPolicyIdentifiers.AlterPolicy;

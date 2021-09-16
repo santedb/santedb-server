@@ -69,9 +69,7 @@ namespace SanteDB.Configurator
                "DataDirectory",
                Path.GetDirectoryName(typeof(Program).Assembly.Location));
 
-            using (AuthenticationContext.EnterSystemContext())
-            {
-
+            
                 // Current dir
                 var cwd = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
                 // Load assembly
@@ -142,14 +140,14 @@ namespace SanteDB.Configurator
                 {
                     Environment.Exit(0);
                 }
-            }
+            
 
         }
 
         /// <summary>
         /// Assembly resolution
         /// </summary>
-        private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        internal static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
                 if (args.Name == asm.FullName)

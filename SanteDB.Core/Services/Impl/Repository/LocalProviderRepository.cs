@@ -20,6 +20,7 @@
  */
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +37,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Local provider repository
         /// </summary>
-        public LocalProviderRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        public LocalProviderRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
         {
 
         }

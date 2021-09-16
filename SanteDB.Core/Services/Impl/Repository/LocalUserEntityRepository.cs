@@ -21,6 +21,7 @@
 using SanteDB.Core;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Server.Core.Security.Attribute;
 using System;
@@ -37,7 +38,8 @@ namespace SanteDB.Server.Core.Services.Impl
         /// Privacy for a user entity
         /// </summary>
         /// <param name="privacyService"></param>
-        public LocalUserEntityRepository(IPrivacyEnforcementService privacyService = null) : base(privacyService)
+        /// <param name="policyService"></param>
+        public LocalUserEntityRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
         {
         }
 
@@ -64,7 +66,9 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             var user = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>()?.GetUser(AuthenticationContext.Current.Principal.Identity);
             if (user?.Key != entity.SecurityUserKey)
-                new PolicyPermission(System.Security.Permissions.PermissionState.Unrestricted, PermissionPolicyIdentifiers.AlterIdentity).Demand();
+            {
+                this.m_policyService.Demand(PermissionPolicyIdentifiers.AlterIdentity);
+            }
         }
 
         /// <summary>

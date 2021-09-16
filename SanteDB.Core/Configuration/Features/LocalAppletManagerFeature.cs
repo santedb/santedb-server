@@ -43,7 +43,6 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// </summary>
         public LocalAppletManagerFeature()
         {
-            this.Configuration = new AppletConfigurationSection();
         }
 
         /// <summary>
@@ -72,5 +71,10 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// Get the configuration type
         /// </summary>
         public override Type ConfigurationType => typeof(AppletConfigurationSection);
+
+        /// <summary>
+        /// Get default configuration
+        /// </summary>
+        protected override object GetDefaultConfiguration() => new AppletConfigurationSection();
     }
 }

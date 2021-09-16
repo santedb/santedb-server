@@ -35,7 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <Reference Include="System" />
     <Reference Include="System.Design" />
     <Reference Include="System.Runtime" />
@@ -120,7 +120,6 @@
     <Compile Include="Services\Impl\Repository\LocalManufacturedMaterialRepository.cs" />
     <Compile Include="Services\Impl\Repository\LocalPatientRepository.cs" />
     <Compile Include="Services\Impl\Repository\LocalProviderRepository.cs" />
-    <Compile Include="Services\Impl\LocalRepositoryFactoryService.cs" />
     <Compile Include="Services\Impl\LocalRepositoryService.cs" />
     <Compile Include="Services\Impl\Repository\LocalMailMessageRepository.cs" />
     <Compile Include="Services\Impl\Repository\LocalAppletManagerService.cs" />

@@ -49,5 +49,10 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// No configuration necessary
         /// </summary>
         public override Type ConfigurationType => null;
+
+        /// <summary>
+        /// Get default configuration
+        /// </summary>
+        protected override object GetDefaultConfiguration() => null;
     }
 }
