@@ -203,6 +203,79 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 #endif
         }
 
+
+        /// <summary>
+        /// Obsolete all objects
+        /// </summary>
+        protected override void DoObsoleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            if (expression == null)
+            {
+                throw new ArgumentException(nameof(expression), ErrorMessages.ERR_ARGUMENT_RANGE);
+            }
+
+
+#if DEBUG
+            var sw = new Stopwatch();
+            sw.Start();
+            try
+            {
+#endif
+                // First - we determine if the query has an explicit status concept set
+                if (typeof(IHasState).IsAssignableFrom(typeof(TModel)) && !expression.ToString().Contains(nameof(IHasState.StatusConceptKey)))
+                {
+                    var statusKeyProperty = Expression.MakeMemberAccess(expression.Parameters[0], typeof(TModel).GetProperty(nameof(IHasState.StatusConceptKey)));
+                    statusKeyProperty = Expression.MakeMemberAccess(statusKeyProperty, statusKeyProperty.Type.GetProperty("Value"));
+                    expression = Expression.Lambda<Func<TModel, bool>>(Expression.And(expression.Body, Expression.MakeBinary(ExpressionType.NotEqual, statusKeyProperty, Expression.Constant(StatusKeys.Obsolete))), expression.Parameters);
+                }
+
+                if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
+                {
+                    // Convert the query to a domain query so that the object persistence layer can turn the 
+                    // structured LINQ query into a SQL statement
+                    var domainQuery = context.CreateSqlStatement().SelectFrom(typeof(TDbModel));
+                    var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
+                    if (domainExpression != null)
+                    {
+                        domainQuery = domainQuery.Where(domainExpression);
+                    }
+                    else
+                    {
+                        this.m_tracer.TraceVerbose("Will use slow query construction due to complex mapped fields");
+                        domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateWhere(expression);
+                    }
+
+                    // Now we want to update each 
+                    foreach (var obj in context.Query<TDbModel>(domainQuery))
+                    {
+                        if (obj is IDbHasStatus state) // set status to obsolete
+                        {
+                            state.StatusConceptKey = StatusKeys.Obsolete;
+                            this.DoUpdateInternal(context, obj);
+                        }
+                        else // remove the object
+                        {
+                            obj.ObsoletionTime = DateTimeOffset.Now;
+                            obj.ObsoletedByKey = context.ContextId;
+                            context.Update(obj);
+                        }
+                    }
+                }
+                else
+                    base.DoObsoleteAllInternal(context, expression);
+#if DEBUG
+            }
+            finally
+            {
+                sw.Stop();
+                this.m_tracer.TraceVerbose("Obsolete all {0} took {1}ms", expression, sw.ElapsedMilliseconds);
+            }
+#endif
+        }
         /// <summary>
         /// Perform an obsoletion of the object in the datamodel
         /// </summary>

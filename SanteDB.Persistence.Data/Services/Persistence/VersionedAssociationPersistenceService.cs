@@ -6,6 +6,7 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -30,6 +31,67 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Get the current version sequence for the source key
         /// </summary>
         protected abstract int GetCurrentVersionSequenceForSource(DataContext context, Guid sourceKey);
+
+        /// <summary>
+        /// Obsolete all objects
+        /// </summary>
+        protected override void DoObsoleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            if (expression == null)
+            {
+                throw new ArgumentException(nameof(expression), ErrorMessages.ERR_ARGUMENT_RANGE);
+            }
+
+
+#if DEBUG
+            var sw = new Stopwatch();
+            sw.Start();
+            try
+            {
+#endif
+                
+                if (!expression.ToString().Contains(nameof(IVersionedAssociation.ObsoleteVersionSequenceId)))
+                {
+                    var obsoletionVersionSequenceClause = Expression.MakeMemberAccess(expression.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedAssociation.ObsoleteVersionSequenceId)));
+                    expression = Expression.Lambda<Func<TModel, bool>>(Expression.And(expression.Body, Expression.MakeBinary(ExpressionType.Equal, obsoletionVersionSequenceClause, Expression.Constant(null))), expression.Parameters);
+                }
+
+                // Convert the query to a domain query so that the object persistence layer can turn the 
+                // structured LINQ query into a SQL statement
+                var domainQuery = context.CreateSqlStatement().SelectFrom(typeof(TDbModel));
+                var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
+                if (domainExpression != null)
+                {
+                    domainQuery = domainQuery.Where(domainExpression);
+                }
+                else
+                {
+                    this.m_tracer.TraceVerbose("Will use slow query construction due to complex mapped fields");
+                    domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateWhere(expression);
+                }
+
+                // Get maximum source key
+                var sourceKey = context.Query<TDbModel>(domainQuery).OrderByDescending(o => o.EffectiveVersionSequenceId).Select(o => o.SourceKey).FirstOrDefault();
+                var sourceSequence = this.GetCurrentVersionSequenceForSource(context, sourceKey);
+
+                context.UpdateAll(context.Query<TDbModel>(domainQuery), o =>
+                {
+                    o.ObsoleteVersionSequenceId = sourceSequence;
+                    return o;
+                });
+#if DEBUG
+            }
+            finally
+            {
+                sw.Stop();
+                this.m_tracer.TraceVerbose("Obsolete all {0} took {1}ms", expression, sw.ElapsedMilliseconds);
+            }
+#endif
+        }
 
         /// <summary>
         /// Perform an obsoletion of the association

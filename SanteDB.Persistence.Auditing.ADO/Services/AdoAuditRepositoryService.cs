@@ -498,7 +498,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         {
 
             // TODO: Refactor this with a yield IQueryResultSet iterator 
-
             var preEvtData = new QueryRequestEventArgs<AuditEventData>(query, principal: overrideAuthContext);
             this.Querying?.Invoke(this, preEvtData);
             if (preEvtData.Cancel)
@@ -548,6 +547,14 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 this.m_traceSource.TraceError("Could not query audit {0}: {1}", query, e);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Obsolete all data matching <paramref name="matching"/>
+        /// </summary>
+        public void ObsoleteAll(Expression<Func<AuditEventData, bool>> matching, TransactionMode mode, IPrincipal principal)
+        {
+            throw new NotSupportedException();
         }
     }
 #pragma warning restore CS0067

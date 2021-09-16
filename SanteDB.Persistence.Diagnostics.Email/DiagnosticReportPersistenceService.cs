@@ -211,6 +211,14 @@ namespace SanteDB.Persistence.Diagnostics.Email
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Not supported - obsoleting DX reports
+        /// </summary>
+        public void ObsoleteAll(Expression<Func<DiagnosticReport, bool>> matching, TransactionMode mode, IPrincipal principal)
+        {
+            throw new NotImplementedException();
+        }
     }
     #pragma warning restore CS0067
 

@@ -143,6 +143,52 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 #endif
         }
 
+
+        /// <summary>
+        /// Obsolete all objects
+        /// </summary>
+        protected override void DoObsoleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            if (expression == null)
+            {
+                throw new ArgumentException(nameof(expression), ErrorMessages.ERR_ARGUMENT_RANGE);
+            }
+
+
+#if DEBUG
+            var sw = new Stopwatch();
+            sw.Start();
+            try
+            {
+#endif
+                // Convert the query to a domain query so that the object persistence layer can turn the 
+                // structured LINQ query into a SQL statement
+                var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
+                if (domainExpression != null)
+                {
+                    context.Delete<TDbModel>(domainExpression);
+                }
+                else
+                {
+                    this.m_tracer.TraceVerbose("Will use slow query construction due to complex mapped fields");
+                    var domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateWhere(expression);
+                    context.Delete(domainQuery.Build());
+                }
+
+#if DEBUG
+            }
+            finally
+            {
+                sw.Stop();
+                this.m_tracer.TraceVerbose("Obsolete all {0} took {1}ms", expression, sw.ElapsedMilliseconds);
+            }
+#endif
+        }
+
         /// <summary>
         /// Obsolete the specified object which for the generic identified data persistene service means deletion
         /// </summary>

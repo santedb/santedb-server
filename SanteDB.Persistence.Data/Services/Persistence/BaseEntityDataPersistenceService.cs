@@ -79,6 +79,64 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
+        /// Obsolete all objects
+        /// </summary>
+        protected override void DoObsoleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            if (expression == null)
+            {
+                throw new ArgumentException(nameof(expression), ErrorMessages.ERR_ARGUMENT_RANGE);
+            }
+
+
+#if DEBUG
+            var sw = new Stopwatch();
+            sw.Start();
+            try
+            {
+#endif
+
+                // If the user has not explicitly set the obsoletion time parameter then we will add it
+                if (!expression.ToString().Contains(nameof(BaseEntityData.ObsoletionTime)))
+                {
+                    var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(expression.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
+                    expression = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, expression.Body), expression.Parameters);
+                }
+
+                // Convert the query to a domain query so that the object persistence layer can turn the 
+                // structured LINQ query into a SQL statement
+                var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
+                if (domainExpression != null)
+                {
+                    context.UpdateAll(domainExpression, o=> o.ObsoletionTime == DateTimeOffset.Now, o=> o.ObsoletedByKey == context.ContextId);
+                }
+                else
+                {
+                    this.m_tracer.TraceVerbose("Will use slow query construction due to complex mapped fields");
+                    var domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateQuery(expression);
+                    context.UpdateAll<TDbModel>(context.Query<TDbModel>(domainQuery), o =>
+                    {
+                        o.ObsoletedByKey = context.ContextId;
+                        o.ObsoletionTime = DateTimeOffset.Now;
+                        return o;
+                    });
+                }
+
+#if DEBUG
+            }
+            finally
+            {
+                sw.Stop();
+                this.m_tracer.TraceVerbose("Obsolete all {0} took {1}ms", expression, sw.ElapsedMilliseconds);
+            }
+#endif
+        }
+
+        /// <summary>
         /// Performs the specified query on the <paramref name="context"/>
         /// </summary>
         /// <param name="context">The context on which the query should be executed</param>

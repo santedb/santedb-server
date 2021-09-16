@@ -181,6 +181,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected abstract TDbModel DoObsoleteInternal(DataContext context, Guid key);
 
         /// <summary>
+        /// Perform an obsoletion for all objects matching <paramref name="expression"/>
+        /// </summary>
+        protected abstract void DoObsoleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression);
+
+        /// <summary>
         /// Perform a query on the model
         /// </summary>
         protected virtual IQueryResultSet<TModel> DoQueryModel(DataContext context, Expression<Func<TModel, bool>> query)
@@ -281,6 +286,38 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 sw.Stop();
                 this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoUpdateModel - {sw.EllapsedMilliseconds}ms", data, new StackTrace());
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Do the obsoletion all model objects which match
+        /// </summary>
+        protected virtual void DoObsoleteAllModel(DataContext context, Expression<Func<TModel, bool>> expression)
+        {
+            if(context == null)
+            {
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+            else if(expression == null)
+            {
+                throw new ArgumentNullException(nameof(expression), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+
+#if PERFMON
+            Stopwatch sw = new Stopwatch();
+            try
+            {
+                sw.Start();
+#endif
+            this.DoObsoleteAllInternal(context, expression);
+#if PERFMON
+            }
+            finally
+            {
+                sw.Stop();
+                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoObsoleteModel - {sw.EllapsedMilliseconds}ms", data, new StackTrace());
             }
 #endif
         }
@@ -594,6 +631,54 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         public object Obsolete(Guid key)
         {
             return this.Obsolete(key, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+        }
+
+        /// <summary>
+        /// Obsolete all matching objects
+        /// </summary>
+        public void ObsoleteAll(Expression<Func<TModel, bool>> expression, TransactionMode mode, IPrincipal principal)
+        {
+            if(expression == null)
+            {
+                throw new ArgumentNullException(nameof(expression), ErrorMessages.ERR_ARGUMENT_NULL);
+            } 
+            if (principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+            }
+
+            using (var context = this.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    using (var tx = context.BeginTransaction())
+                    {
+
+                        // Establish provenance object
+                        context.EstablishProvenance(principal, null);
+
+                        this.DoObsoleteAllModel(context, expression);
+
+                        if (mode == TransactionMode.Commit)
+                        {
+                            tx.Commit();
+                        }
+                    }
+
+                }
+                catch (DbException e)
+                {
+                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing obsolete all operation", expression, e);
+                    throw this.TranslateDbException(e);
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing obsolete all operation", expression, e);
+                    throw new DataPersistenceException(ErrorMessages.ERR_DATA_GENERAL, e);
+                }
+            }
         }
 
         /// <summary>

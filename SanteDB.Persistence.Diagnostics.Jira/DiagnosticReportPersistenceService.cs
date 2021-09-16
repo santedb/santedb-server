@@ -237,6 +237,14 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Not supported = deletion
+        /// </summary>
+        public void ObsoleteAll(Expression<Func<DiagnosticReport, bool>> matching, TransactionMode mode, IPrincipal principal)
+        {
+            throw new NotSupportedException();
+        }
     }
 #pragma warning restore CS0067
 
