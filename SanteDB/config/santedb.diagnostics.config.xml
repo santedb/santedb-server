@@ -37,8 +37,8 @@
       <add name="SanteMPI" filter="Informational"/>
     </sources>
     <writers>
-      <add name="main" initializationData="santedb.log" filter="Informational">
-        <writer>SanteDB.Server.Core.Diagnostics.ConsoleTraceWriter, SanteDB.Server.Core</writer>
+      <add name="main" initializationData="santedb.log" filter="Warning">
+        <writer>SanteDB.Server.Core.Diagnostics.RolloverTextWriterTraceWriter, SanteDB.Server.Core</writer>
       </add>
     </writers>
   </section>

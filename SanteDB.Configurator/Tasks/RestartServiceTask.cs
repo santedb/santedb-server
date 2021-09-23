@@ -26,7 +26,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SanteDB.Configurator.Tasks
 {
@@ -74,8 +76,14 @@ namespace SanteDB.Configurator.Tasks
         /// </summary>
         public bool Execute(SanteDBConfiguration configuration)
         {
+
             this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(0.0f, $"Stopping {this.m_configuration.ServiceName}"));
             ServiceTools.ServiceInstaller.StopService(this.m_configuration.ServiceName);
+            while(ServiceTools.ServiceInstaller.GetServiceStatus(this.m_configuration.ServiceName) != ServiceTools.ServiceState.Stop)
+            {
+                Application.DoEvents();
+                Thread.Sleep(1000);
+            } // HACK: wait for stop 
             this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(0.5f, $"Starting {this.m_configuration.ServiceName}"));
             ServiceTools.ServiceInstaller.StartService(this.m_configuration.ServiceName);
             this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(1.0f, null));

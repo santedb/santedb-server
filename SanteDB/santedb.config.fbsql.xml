@@ -56,8 +56,8 @@
       <add type="SanteDB.Core.Jobs.DefaultJobManagerService, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Services.Impl.DefaultThreadPoolService, SanteDB.Core.Api" />
       <add type="SanteDB.Server.Core.Services.Impl.FileSystemQueueService, SanteDB.Server.Core" />
-      <add type="SanteDB.Server.Core.Rest.RestServiceFactory, SanteDB.Server.Core"/>
-      <add type="SanteDB.Server.Core.Services.Impl.DefaultNetworkInformationService, SanteDB.Server.Core"/>
+      <add type="SanteDB.Server.Core.Rest.RestServiceFactory, SanteDB.Server.Core" />
+      <add type="SanteDB.Server.Core.Services.Impl.DefaultNetworkInformationService, SanteDB.Server.Core" />
       <!-- Security Services -->
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoApplicationIdentityProvider, SanteDB.Persistence.Data.ADO" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoDeviceIdentityProvider, SanteDB.Persistence.Data.ADO" />
@@ -88,14 +88,14 @@
       <add type="SanteDB.Server.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Server.Core" />
 
       <!-- Repository Services -->
-      <add type="SanteDB.BusinessRules.JavaScript.AppletDataReferenceResolver, SanteDB.BusinessRules.JavaScript"/>
+      <add type="SanteDB.BusinessRules.JavaScript.AppletDataReferenceResolver, SanteDB.BusinessRules.JavaScript" />
 
       <!--<add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryFactoryService, SanteDB.Server.Core" />-->
       <add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryService, SanteDB.Server.Core" />
       <add type="SanteDB.Server.Core.Services.Impl.LocalMailMessageRepository, SanteDB.Server.Core" />
       <add type="SanteDB.Server.Core.Services.Impl.LocalStockManagementRepositoryService, SanteDB.Server.Core" />
       <add type="SanteDB.Server.Core.Services.Impl.LocalTagPersistenceService, SanteDB.Server.Core" />
-      <add type="SanteDB.Core.Applets.Services.Impl.AppletSubscriptionRepository, SanteDB.Core.Applets"/>
+      <add type="SanteDB.Core.Applets.Services.Impl.AppletSubscriptionRepository, SanteDB.Core.Applets" />
       <add type="SanteDB.Core.Security.Audit.AuditDaemonService, SanteDB.Core.Api" />
 
       <!-- Data Migration & Management -->
@@ -115,11 +115,12 @@
       <!--<add type="SanteDB.Messaging.RISI.RisiMessageHandler, SanteDB.Messaging.RISI" />-->
       <!--<add type="SanteDB.Tools.DataSandbox.DataSandboxService, SanteDB.Tools.DataSandbox" />-->
       <add type="SanteDB.Messaging.AMI.AmiMessageHandler, SanteDB.Messaging.AMI" />
-      <add type="SanteDB.Messaging.Metadata.MetadataMessageHandler, SanteDB.Messaging.Metadata"/>
+      <add type="SanteDB.Messaging.Metadata.MetadataMessageHandler, SanteDB.Messaging.Metadata" />
 
       <!-- Clinical Services -->
       <add type="SanteDB.Core.Services.Impl.SimplePatchService, SanteDB.Core.Api" />
       <add type="SanteDB.Server.Core.Services.Impl.LocalAppletManagerService, SanteDB.Server.Core" />
+      <add type="SanteDB.Core.Services.Impl.CachedResourceCheckoutService, SanteDB.Core.Api" />
       <add type="SanteDB.Server.Core.Services.Daemons.AppletBusinessRulesDaemon, SanteDB.Server.Core" />
 
       <!-- Anciliarry Services -->
@@ -129,27 +130,26 @@
       <!--<add type="SanteDB.Warehouse.ADO.ADODataWarehouse, SanteDB.Warehouse.ADO" />-->
 
       <!-- SG Services -->
-      <!--<add type="SanteGuard.Services.LocalAuditTermLookupService, SanteGuard.Core"/>
-	  <add type="SanteGuard.Services.Repositories.SanteGuardDataRepository, SanteGuard.Core"/>-->
-      <!--<add type="SanteGuard.Messaging.Syslog.SyslogMessageHandler, SanteGuard.Messaging.Syslog"/>-->
-      <!--  <add type="SanteGuard.Persistence.Ado.Services.AdoAuditPersistenceService, SanteGuard.Persistence.Ado"/>-->
-      <!--<add type="SanteGuard.Services.Repositories.SanteGuardAuditRepository, SanteGuard.Core"/>-->
+      <!--<add type="SanteGuard.Services.LocalAuditTermLookupService, SanteGuard.Core" />
+	  <add type="SanteGuard.Services.Repositories.SanteGuardDataRepository, SanteGuard.Core" />-->
+      <!--<add type="SanteGuard.Messaging.Syslog.SyslogMessageHandler, SanteGuard.Messaging.Syslog" />-->
+      <!--  <add type="SanteGuard.Persistence.Ado.Services.AdoAuditPersistenceService, SanteGuard.Persistence.Ado" />-->
+      <!--<add type="SanteGuard.Services.Repositories.SanteGuardAuditRepository, SanteGuard.Core" />-->
 
       <!-- BI Services -->
-      <add type="SanteDB.Matcher.Services.FileMatchConfigurationProvider, SanteDB.Matcher"/>
-      <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS"/>
-      <add type="SanteDB.BI.Services.Impl.AppletBiRepository, SanteDB.BI"/>
-      <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI"/>
-      <add type="SanteDB.BI.Services.Impl.LocalBiRenderService, SanteDB.BI"/>
+      <add type="SanteDB.Matcher.Services.FileMatchConfigurationProvider, SanteDB.Matcher" />
+      <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS" />
+      <add type="SanteDB.BI.Services.Impl.AppletBiRepository, SanteDB.BI" />
+      <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI" />
+      <add type="SanteDB.BI.Services.Impl.LocalBiRenderService, SanteDB.BI" />
 
-      <add type="SanteDB.Persistence.MDM.Services.MdmDataManagementService, SanteDB.Persistence.MDM"/>
-      <add type="SanteDB.Matcher.Matchers.WeightedRecordMatchingService, SanteDB.Matcher"/>
+      <add type="SanteDB.Persistence.MDM.Services.MdmDataManagementService, SanteDB.Persistence.MDM" />
+      <add type="SanteDB.Matcher.Matchers.WeightedRecordMatchingService, SanteDB.Matcher" />
 
-      <add type="SanteDB.Core.Data.Quality.DataQualityService, SanteDB.Core.Api"/>
+      <add type="SanteDB.Core.Data.Quality.DataQualityService, SanteDB.Core.Api" />
 
-      <add type="SanteDB.Core.PubSub.Broker.PubSubBroker, SanteDB.Core.Api, Version=2.1.0"/>
-      <add type="SanteDB.Persistence.PubSub.ADO.AdoPubSubManager, SanteDB.Persistence.PubSub.ADO, Version=2.1.0"/>
-
+      <add type="SanteDB.Core.PubSub.Broker.PubSubBroker, SanteDB.Core.Api, Version=2.1.0" />
+      <add type="SanteDB.Persistence.PubSub.ADO.AdoPubSubManager, SanteDB.Persistence.PubSub.ADO, Version=2.1.0" />
     </serviceProviders>
   </section>
 </SanteDBConfiguration>

@@ -498,7 +498,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         public IEnumerable<AuditData> Query(Expression<Func<AuditData, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext = null, params ModelSort<AuditData>[] orderBy)
         {
 
-            var preEvtData = new QueryRequestEventArgs<AuditData>(query, offset: offset, count: count, queryId: null, principal: overrideAuthContext);
+            var preEvtData = new QueryRequestEventArgs<AuditData>(query, offset: offset, count: count, queryId: null, principal: overrideAuthContext, orderBy: orderBy);
             this.Querying?.Invoke(this, preEvtData);
             if (preEvtData.Cancel)
             {

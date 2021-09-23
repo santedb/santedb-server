@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using RestSrvr;
 using RestSrvr.Exceptions;
 using RestSrvr.Message;
@@ -50,7 +51,6 @@ namespace SanteDB.Rest.Common.Serialization
     /// </summary>
     public class RestErrorHandler : IServiceErrorHandler
     {
-
         // Error tracer
         private Tracer m_traceSource = Tracer.GetTracer(typeof(RestErrorHandler));
 
@@ -67,7 +67,6 @@ namespace SanteDB.Rest.Common.Serialization
         /// </summary>
         public bool ProvideFault(Exception error, RestResponseMessage faultMessage)
         {
-
             var uriMatched = RestOperationContext.Current.IncomingRequest.Url;
 
             while (error.InnerException != null)
@@ -78,6 +77,11 @@ namespace SanteDB.Rest.Common.Serialization
             // Formulate appropriate response
             if (error is DomainStateException)
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.ServiceUnavailable;
+            else if (error is ObjectLockedException lockException)
+            {
+                faultMessage.StatusCode = 423;
+                fault.Data.Add(lockException.LockedUser);
+            }
             else if (error is PolicyViolationException)
             {
                 var pve = error as PolicyViolationException;
@@ -87,7 +91,6 @@ namespace SanteDB.Rest.Common.Serialization
                     faultMessage.StatusCode = 401;
                     var authHeader = $"{(RestOperationContext.Current.AppliedPolicies.OfType<BasicAuthorizationAccessBehavior>().Any() ? "Basic" : "Bearer")} realm=\"{RestOperationContext.Current.IncomingRequest.Url.Host}\" error=\"insufficient_scope\" scope=\"{pve.PolicyId}\"  error_description=\"{error.Message}\"";
                     RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", authHeader);
-
                 }
                 else
                 {
@@ -103,11 +106,10 @@ namespace SanteDB.Rest.Common.Serialization
                 // TODO: Audit this
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
                 var authHeader = $"Bearer realm=\"{RestOperationContext.Current.IncomingRequest.Url.Host}\" error=\"invalid_token\" error_description=\"{error.Message}\"";
-                RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", authHeader );
+                RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", authHeader);
             }
             else if (error is LimitExceededException)
             {
-
                 faultMessage.StatusCode = (int)(HttpStatusCode)429;
                 faultMessage.StatusDescription = "Too Many Requests";
                 faultMessage.Headers.Add("Retry-After", "1200");
@@ -132,6 +134,7 @@ namespace SanteDB.Rest.Common.Serialization
                         faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
                         faultMessage.Headers.Add("WWW-Authenticate", $"Bearer");
                         break;
+
                     default:
                         faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
                         break;
@@ -154,34 +157,34 @@ namespace SanteDB.Rest.Common.Serialization
                 faultMessage.StatusCode = (int)HttpStatusCode.NotImplemented;
             else if (error is NotSupportedException)
                 faultMessage.StatusCode = (int)HttpStatusCode.MethodNotAllowed;
-            else if (error is PatchException )
+            else if (error is PatchException)
                 faultMessage.StatusCode = (int)HttpStatusCode.Conflict;
             else
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
 
-            switch(faultMessage.StatusCode)
+            switch (faultMessage.StatusCode)
             {
                 case 409:
                 case 429:
                 case 503:
                     this.m_traceSource.TraceInfo("Issue on REST pipeline: {0}", error);
                     break;
+
                 case 401:
                 case 403:
                 case 501:
                 case 405:
                     this.m_traceSource.TraceWarning("Warning on REST pipeline: {0}", error);
                     break;
+
                 default:
                     this.m_traceSource.TraceError("Error on REST pipeline: {0}", error);
                     break;
             }
 
-
             RestMessageDispatchFormatter.CreateFormatter(RestOperationContext.Current.ServiceEndpoint.Description.Contract.Type).SerializeResponse(faultMessage, null, fault);
             AuditUtil.AuditNetworkRequestFailure(error, uriMatched, RestOperationContext.Current.IncomingRequest.Headers.AllKeys.ToDictionary(o => o, o => RestOperationContext.Current.IncomingRequest.Headers[o]), RestOperationContext.Current.OutgoingResponse.Headers.AllKeys.ToDictionary(o => o, o => RestOperationContext.Current.OutgoingResponse.Headers[o]));
             return true;
-            
         }
     }
 }
