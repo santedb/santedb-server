@@ -123,7 +123,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
             try
             {
-                var preArgs = new QueryRequestEventArgs<IdentifiedData>(o => o.Key == subscription.Key, offset, count, queryId, AuthenticationContext.Current.Principal, parameters);
+                var preArgs = new QueryRequestEventArgs<IdentifiedData>(o => o.Key == subscription.Key, offset, count, queryId, AuthenticationContext.Current.Principal, new ModelSort<IdentifiedData>[0], parameters);
                 this.Executing?.Invoke(this, preArgs);
                 if (preArgs.Cancel)
                 {

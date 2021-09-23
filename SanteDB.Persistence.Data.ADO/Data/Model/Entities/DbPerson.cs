@@ -80,7 +80,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
         /// </summary>
         /// <value>The gender concept.</value>
         [Column("gndr_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-        public Guid GenderConceptKey
+        public Guid? GenderConceptKey
         {
             get;
             set;

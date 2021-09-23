@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Configuration;
 using SanteDB.Server.Core.Persistence;
 using SanteDB.Server.Core.Rest;
@@ -45,7 +46,6 @@ namespace SanteDB.Server.Core.Configuration.Features
     /// </summary>
     public class CoreServerFeatures : IFeature
     {
-
         /// <summary>
         /// Services in this configuration
         /// </summary>
@@ -69,7 +69,8 @@ namespace SanteDB.Server.Core.Configuration.Features
             typeof(DefaultDataSigningService),
             typeof(AesSymmetricCrypographicProvider),
             typeof(SimpleTfaSecretGenerator),
-            typeof(AppletLocalizationService)
+            typeof(AppletLocalizationService),
+            typeof(CachedResourceCheckoutService)
         };
 
         /// <summary>
@@ -140,7 +141,6 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// </summary>
         public class InstallCoreServicesTask : IConfigurationTask
         {
-
             /// <summary>
             /// Create a new install core services task
             /// </summary>

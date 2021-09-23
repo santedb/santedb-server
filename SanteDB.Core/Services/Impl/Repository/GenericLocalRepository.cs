@@ -159,7 +159,7 @@ namespace SanteDB.Server.Core.Services.Impl
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
             // Notify query 
-            var preQueryEventArgs = new QueryRequestEventArgs<TEntity>(query, offset, count, queryId, AuthenticationContext.Current.Principal);
+            var preQueryEventArgs = new QueryRequestEventArgs<TEntity>(query, offset, count, queryId, AuthenticationContext.Current.Principal, orderBy);
             this.Querying?.Invoke(this, preQueryEventArgs);
             IEnumerable<TEntity> results = null; 
             if (preQueryEventArgs.Cancel) /// Cancel the request
@@ -439,7 +439,7 @@ namespace SanteDB.Server.Core.Services.Impl
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
             // Notify query 
-            var preQueryEventArgs = new QueryRequestEventArgs<TEntity>(query, offset, count, queryId, AuthenticationContext.Current.Principal);
+            var preQueryEventArgs = new QueryRequestEventArgs<TEntity>(query, offset, count, queryId, AuthenticationContext.Current.Principal, new ModelSort<TEntity>[0]);
             this.Querying?.Invoke(this, preQueryEventArgs);
             if (preQueryEventArgs.Cancel) /// Cancel the request
             {
