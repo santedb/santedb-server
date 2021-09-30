@@ -542,7 +542,7 @@
   <!-- Diagnostics via JIRA configuration-->
   <!--<section xsi:type="JiraServiceConfigurationSection" userName="value" password="value" project="value" url="value" />-->
 
-  <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="8">
+  <section xsi:type="ApplicationServiceContextConfigurationSection" allowUnsignedAssemblies="true" threadPoolSize="8">
     <serviceProviders>
 
       <!-- Core Services -->

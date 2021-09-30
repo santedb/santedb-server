@@ -44,6 +44,7 @@ using System.Threading;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Server;
 using SanteDB.Server.Core.Services.Impl;
+using SanteDB.Core.Security;
 
 namespace SanteDB
 {
@@ -96,6 +97,11 @@ namespace SanteDB
                 // What to do?
                 if (parameters.ShowHelp)
                     parser.WriteHelp(Console.Out);
+                else if(parameters.InstallCerts)
+                {
+                    Console.WriteLine("Installing security certificates...");
+                    SecurityExtensions.InstallCertsForChain();
+                }
                 else if (parameters.Install)
                 {
                     if (!ServiceTools.ServiceInstaller.ServiceIsInstalled($"SanteDB{instanceSuffix}"))

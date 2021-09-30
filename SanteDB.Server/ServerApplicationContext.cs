@@ -219,10 +219,13 @@ namespace SanteDB.Server
             if (this.Stopping != null)
                 this.Stopping(this, null);
 
+            if (this.IsRunning)
+            {
+                AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStop);
+            }
+
             this.IsRunning = false;
             this.m_serviceProvider.Stop();
-
-            AuditUtil.AuditApplicationStartStop(EventTypeCodes.ApplicationStop);
 
             if (this.Stopped != null)
                 this.Stopped(this, null);
