@@ -125,7 +125,7 @@ Source: ..\bin\Release\SanteDB.Rest.AMI.dll; DestDir: {app}; Components: msg\ami
 
 ; Config Parts 
 ; TODO: Individual files here
-Source: ..\bin\release\config\*.*; DestDir: {app}\config; Components: server
+Source: ..\bin\release\config\*.*; DestDir: {app}\config; Components: server; Flags: recursesubdirs
 Source: ..\bin\release\config\template\*.*; DestDir: {app}\config; Components: server
 ; Data Stuff
 Source: ..\bin\release\data\*.dataset; DestDir: {app}\data; Components: server
@@ -277,16 +277,17 @@ Source: ..\bin\Release\Microsoft.Win32.Primitives.dll; DestDir: {app};
 Source: ..\bin\Release\netstandard.dll; DestDir: {app}; Components: core server
 Source: ..\bin\Release\System.*.dll; DestDir: {app}; 
 
+[UninstallDelete]
+Type: filesandordirs; Name: "{app}\data\*.completed"
+Type: files; Name: "{app}\santedb.config.xml"
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Run]
-;Filename: "{app}\ConfigTool.exe";  Description: "Configure SanteDB Server"; Flags: postinstall ; 
-Filename: "{app}\SanteDB.exe"; Parameters:"--install"; Flags: runhidden runascurrentuser; StatusMsg: "Registering SanteDB Service"
+Filename: "{app}\ConfigTool.exe";  Description: "Configure SanteDB Server"; Flags: postinstall ; 
 Filename: "c:\windows\system32\netsh.exe"; Parameters: "advfirewall firewall add rule name=""SanteDB REST Ports"" dir=in protocol=TCP localport=8080 action=allow"; StatusMsg: "Configuring Firewall"; Flags: runhidden; 
 Filename: "c:\windows\system32\netsh.exe"; Parameters: "advfirewall firewall add rule name=""SanteDB HL7 Ports"" dir=in protocol=TCP localport=2100 action=allow"; StatusMsg: "Configuring Firewall"; Flags: runhidden; 
-Filename: "net.exe";StatusMsg: "Starting Services..."; Parameters: "start santedb"; Flags: runhidden; Components: demo
 
 
 [UninstallRun]

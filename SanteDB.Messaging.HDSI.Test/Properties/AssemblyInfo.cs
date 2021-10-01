@@ -29,7 +29,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Mohawk College of Applied Arts and Technology")]
 [assembly: AssemblyProduct("SanteDB (http://SanteDB.org)")]
-[assembly: AssemblyCopyright("Copyright (C) 2015-2018, Mohawk College of Applied Arts and Technology")]
+[assembly: AssemblyCopyright("Copyright (C) 2021 SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md)")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
