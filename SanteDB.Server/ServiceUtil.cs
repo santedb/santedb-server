@@ -108,7 +108,7 @@ namespace SanteDB.Server
                 catch { }
 
                 Stop();
-                return 1064;
+                throw;
             }
             finally
             {

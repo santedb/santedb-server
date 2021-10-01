@@ -86,5 +86,12 @@ namespace SanteDB
         [Parameter("name")]
         [Description("Sets the instance name")]
         public string InstanceName { get; set; }
+
+        /// <summary>
+        /// Certificates installation
+        /// </summary>
+        [Parameter("install-certs")]
+        [Description("Install the certificiates")]
+        public bool InstallCerts { get; set; }
     }
 }
