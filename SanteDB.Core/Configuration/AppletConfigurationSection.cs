@@ -48,7 +48,6 @@ namespace SanteDB.Server.Core.Configuration
         public AppletConfigurationSection()
         {
             this.AppletDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "applets");
-            this.TrustedPublishers = new List<string>();
 
 #if DEBUG
             this.AllowUnsignedApplets = true;
@@ -78,6 +77,7 @@ namespace SanteDB.Server.Core.Configuration
         [XmlArray("trustedPublishers"), XmlArrayItem("add")]
         [DisplayName("Trusted Publishers")]
         [Description("Identifies the thumbprints of software publishers that are treated as TRUSTED in this environment")]
+        [Obsolete("Trusted Publishers can no longer be configured via command line - certificates must be installed into host trust store", true)]
         public List<string> TrustedPublishers { get; set; }
 
     }

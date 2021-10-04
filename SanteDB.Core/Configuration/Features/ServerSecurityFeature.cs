@@ -35,6 +35,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SanteDB.Core.Model;
+using System.Windows.Forms;
 
 namespace SanteDB.Server.Core.Configuration.Features
 {
@@ -156,6 +157,66 @@ namespace SanteDB.Server.Core.Configuration.Features
             config.Values.Add("SessionRefresh", configSection.GetSecurityPolicy<PolicyValueTimeSpan>(SecurityPolicyIdentification.RefreshLength, new PolicyValueTimeSpan(0, 30, 0)));
             return hasher != null && validator != null && pdp != null && pip != null ? FeatureInstallState.Installed : FeatureInstallState.PartiallyInstalled;
 
+        }
+
+        /// <summary>
+        /// Install security certificates
+        /// </summary>
+        private class InstallCertificatesTask : IConfigurationTask
+        {
+
+            /// <summary>
+            /// Create a new install certificates features
+            /// </summary>
+            public InstallCertificatesTask(IFeature feature)
+            {
+                this.Feature = feature;
+            }
+
+            /// <summary>
+            /// Description of the feature
+            /// </summary>
+            public string Description => "Install SanteDB's applet signing certificates into the machine's certificate store";
+
+            /// <summary>
+            /// The feature to be installed
+            /// </summary>
+            public IFeature Feature { get; }
+
+            /// <summary>
+            /// Gets the nameof the feature
+            /// </summary>
+            public string Name => "Install Certificates";
+
+            /// <summary>
+            /// Progress has changed
+            /// </summary>
+            public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
+
+            /// <summary>
+            /// Execute
+            /// </summary>
+            public bool Execute(SanteDBConfiguration configuration)
+            {
+                SecurityExtensions.InstallCertsForChain();
+                return true;
+            }
+
+            /// <summary>
+            /// Rollback
+            /// </summary>
+            public bool Rollback(SanteDBConfiguration configuration)
+            {
+                return true;
+            }
+
+            /// <summary>
+            /// Verify state
+            /// </summary>
+            public bool VerifyState(SanteDBConfiguration configuration)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         /// <summary>

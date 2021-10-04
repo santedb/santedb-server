@@ -73,9 +73,6 @@ namespace SanteDB.Server.Core.Services.Impl
         // Tracer
         private Tracer m_tracer = new Tracer(SanteDBConstants.ServiceTraceSourceName + ".AppletManager");
 
-        // Issuer certificate
-        private X509Certificate2 m_caIssuerCert = null;
-
         /// <summary>
         /// Indicates whether the service is running 
         /// </summary>
@@ -89,13 +86,6 @@ namespace SanteDB.Server.Core.Services.Impl
             this.m_appletCollection.Add(String.Empty, new AppletCollection()); // Default applet
             this.m_readonlyAppletCollection.Add(String.Empty, this.m_appletCollection[String.Empty].AsReadonly());
             this.m_readonlyAppletCollection.First().Value.CollectionChanged += (o, e) => this.Changed?.Invoke(o, e);
-
-            using (var str = typeof(AppletManifest).Assembly.GetManifestResourceStream("SanteDB.Core.Applets.Publisher.appca.santesuite.net.cer"))
-            {
-                var cbytes = new byte[str.Length];
-                str.Read(cbytes, 0, cbytes.Length);
-                this.m_caIssuerCert = new X509Certificate2(cbytes); 
-            }
         }
 
         /// <summary>
@@ -108,7 +98,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 return this.m_readonlyAppletCollection[String.Empty];
             }
         }
-        
+
         /// <summary>
         /// Get the solutions
         /// </summary>
@@ -157,7 +147,7 @@ namespace SanteDB.Server.Core.Services.Impl
 
             // Install
             String pakFile = null;
-            if(this.m_fileDictionary.TryGetValue($"{solutionId}{appletId}", out pakFile) && File.Exists(pakFile))
+            if (this.m_fileDictionary.TryGetValue($"{solutionId}{appletId}", out pakFile) && File.Exists(pakFile))
                 return File.ReadAllBytes(pakFile);
             else
                 throw new FileNotFoundException($"Applet {appletId} not found");
@@ -175,7 +165,7 @@ namespace SanteDB.Server.Core.Services.Impl
             if (applet == null) // Might be solution
             {
                 var soln = this.m_solutions.FirstOrDefault(o => o.Meta.Id == packageId);
-                if(soln == null)
+                if (soln == null)
                     throw new FileNotFoundException($"Applet {packageId} is not installed");
                 else
                 {
@@ -219,7 +209,7 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             this.m_tracer.TraceInfo("Installing {0}", package.Meta);
 
-        
+
             var appletScope = owner?.Meta.Id ?? String.Empty;
             // TODO: Verify package hash / signature
             if (!this.VerifyPackage(package))
@@ -231,7 +221,7 @@ namespace SanteDB.Server.Core.Services.Impl
 
             // Save the applet
             var appletDir = this.m_configuration.AppletDirectory;
-            if(!Path.IsPathRooted(appletDir))
+            if (!Path.IsPathRooted(appletDir))
                 appletDir = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), this.m_configuration.AppletDirectory);
             if (owner != null)
                 appletDir = Path.Combine(appletDir, owner.Meta.Id);
@@ -240,25 +230,25 @@ namespace SanteDB.Server.Core.Services.Impl
 
             // Install
             var pakFile = Path.Combine(appletDir, package.Meta.Id + ".pak");
-            if (this.m_appletCollection[appletScope].Any(o=>o.Info.Id == package.Meta.Id) && File.Exists(pakFile) && !isUpgrade)
+            if (this.m_appletCollection[appletScope].Any(o => o.Info.Id == package.Meta.Id) && File.Exists(pakFile) && !isUpgrade)
                 throw new InvalidOperationException($"Cannot replace {package.Meta} unless upgrade is specifically specified");
 
-	        using (var fs = File.Create(pakFile))
-	        {
-				package.Save(fs);
-			}
+            using (var fs = File.Create(pakFile))
+            {
+                package.Save(fs);
+            }
 
-	        lock (this.m_fileDictionary)
-		        if (!this.m_fileDictionary.ContainsKey($"{appletScope}{package.Meta.Id}"))
-			        this.m_fileDictionary.Add($"{appletScope}{package.Meta.Id}", pakFile);
+            lock (this.m_fileDictionary)
+                if (!this.m_fileDictionary.ContainsKey($"{appletScope}{package.Meta.Id}"))
+                    this.m_fileDictionary.Add($"{appletScope}{package.Meta.Id}", pakFile);
 
             var pkg = package.Unpack();
 
-			// remove the package from the collection if this is an upgrade
-	        if (isUpgrade)
-	        {
-		        this.m_appletCollection[appletScope].Remove(pkg);
-	        }
+            // remove the package from the collection if this is an upgrade
+            if (isUpgrade)
+            {
+                this.m_appletCollection[appletScope].Remove(pkg);
+            }
 
             this.m_appletCollection[appletScope].Add(pkg);
 
@@ -267,8 +257,8 @@ namespace SanteDB.Server.Core.Services.Impl
 
             // Install templates
             var idp = ApplicationServiceContext.Current.GetService<ITemplateDefinitionRepositoryService>();
-            if(idp != null)
-                foreach(var itm in pkg.Templates)
+            if (idp != null)
+                foreach (var itm in pkg.Templates)
                 {
                     if (idp.GetTemplateDefinition(itm.Mnemonic) == null)
                     {
@@ -295,12 +285,13 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             byte[] verifyBytes = package.Manifest;
             // First check: Hash - Make sure the HASH is ok
-            if (package is AppletSolution) {
+            if (package is AppletSolution)
+            {
                 verifyBytes = (package as AppletSolution).Include.SelectMany(o => o.Manifest).ToArray();
                 if (BitConverter.ToString(SHA256.Create().ComputeHash(verifyBytes)) != BitConverter.ToString(package.Meta.Hash))
                     throw new InvalidOperationException($"Package contents of {package.Meta.Id} appear to be corrupt!");
             }
-            else if(BitConverter.ToString(SHA256.Create().ComputeHash(package.Manifest)) != BitConverter.ToString(package.Meta.Hash))
+            else if (BitConverter.ToString(SHA256.Create().ComputeHash(package.Manifest)) != BitConverter.ToString(package.Meta.Hash))
                 throw new InvalidOperationException($"Package contents of {package.Meta.Id} appear to be corrupt!");
 
             if (package.Meta.Signature != null)
@@ -320,23 +311,9 @@ namespace SanteDB.Server.Core.Services.Impl
                         {
                             // Embedded cert and trusted CA
                             X509Certificate2 embCert = new X509Certificate2(package.PublicKey);
-                                
-                            // Not explicitly trusted to we need to build a chain
-                            if (!this.m_caIssuerCert.Subject.Equals(embCert.Issuer) && !this.m_configuration.TrustedPublishers.Contains(embCert.Thumbprint))
+                            if (!embCert.IsTrustedIntern(out IEnumerable<X509ChainStatus> chainStatus))
                             {
-                                // Build the certificate chain
-                                var embChain = new X509Chain();
-                                embChain.Build(embCert);
-
-                                // Validate the chain elements if possible
-                                bool isTrusted = false;
-                                foreach (var itm in embChain.ChainElements)
-                                    isTrusted |= this.m_configuration.TrustedPublishers.Contains(itm.Certificate.Thumbprint);
-
-                                if (!isTrusted || embChain.ChainStatus.Any(o => o.Status != X509ChainStatusFlags.RevocationStatusUnknown) && !this.m_configuration.TrustedPublishers.Contains(embCert.Issuer))
-                                    throw new SecurityException($"Cannot verify identity of publisher {embCert.Subject}");
-                                else
-                                    cert = new X509Certificate2Collection(embCert);
+                                throw new SecurityException($"Cannot verify identity of publisher {embCert.Subject} - {String.Join(",", chainStatus.Select(o=>o.Status))}");
                             }
                             else
                                 cert = new X509Certificate2Collection(embCert);
@@ -345,11 +322,11 @@ namespace SanteDB.Server.Core.Services.Impl
                         else
                             throw new SecurityException($"Cannot find public key of publisher information for {package.Meta.PublicKeyToken} or the local certificate is invalid");
                     }
-                                     
+
                     // Verify signature
                     RSACryptoServiceProvider rsa = cert[0].PublicKey.Key as RSACryptoServiceProvider;
 
-                    var retVal =  rsa.VerifyData(verifyBytes, CryptoConfig.MapNameToOID("SHA1"), package.Meta.Signature);
+                    var retVal = rsa.VerifyData(verifyBytes, CryptoConfig.MapNameToOID("SHA1"), package.Meta.Signature);
 
                     // Verify timestamp
                     var timestamp = package.Unpack().Info.TimeStamp;
@@ -360,17 +337,17 @@ namespace SanteDB.Server.Core.Services.Impl
 
                     if (retVal == true)
                     {
-                        this.m_tracer.TraceEvent(EventLevel.Informational,  "SUCCESSFULLY VALIDATED: {0} v.{1}\r\n" +
+                        this.m_tracer.TraceEvent(EventLevel.Informational, "SUCCESSFULLY VALIDATED: {0} v.{1}\r\n" +
                             "\tKEY TOKEN: {2}\r\n" +
                             "\tSIGNED BY: {3}\r\n" +
                             "\tVALIDITY: {4:yyyy-MMM-dd} - {5:yyyy-MMM-dd}\r\n" +
-                            "\tISSUER: {6}", 
+                            "\tISSUER: {6}",
                             package.Meta.Id, package.Meta.Version, cert[0].Thumbprint, cert[0].Subject, cert[0].NotBefore, cert[0].NotAfter, cert[0].Issuer);
                     }
                     else
                     {
                         this.m_tracer.TraceEvent(EventLevel.Critical, ">> SECURITY ALERT : {0} v.{1} <<\r\n" +
-                            "\tPACKAGE HAS BEEN TAMPERED WITH\r\n" + 
+                            "\tPACKAGE HAS BEEN TAMPERED WITH\r\n" +
                             "\tKEY TOKEN (CLAIMED): {2}\r\n" +
                             "\tSIGNED BY  (CLAIMED): {3}\r\n" +
                             "\tVALIDITY: {4:yyyy-MMM-dd} - {5:yyyy-MMM-dd}\r\n" +
@@ -406,8 +383,8 @@ namespace SanteDB.Server.Core.Services.Impl
 
             this.Starting?.Invoke(this, EventArgs.Empty);
 
-	        try
-	        {
+            try
+            {
                 // Load packages from applets/ filesystem directory
                 var appletDir = this.m_configuration.AppletDirectory;
                 if (!Path.IsPathRooted(appletDir))
@@ -418,7 +395,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 else
                 {
                     this.m_tracer.TraceEvent(EventLevel.Verbose, "Scanning {0} for applets...", appletDir);
-                    foreach (var f in Directory.GetFiles(appletDir).OrderBy(o=>o.EndsWith(".sln.pak") ? 0 : 1))
+                    foreach (var f in Directory.GetFiles(appletDir).OrderBy(o => o.EndsWith(".sln.pak") ? 0 : 1))
                     {
                         // Try to open the file
                         this.m_tracer.TraceInfo("Loading {0}...", f);
@@ -433,7 +410,7 @@ namespace SanteDB.Server.Core.Services.Impl
                                     this.m_tracer.TraceEvent(EventLevel.Critical, "Duplicate solution {0} is not permitted", pkg.Meta.Id);
                                     throw new DuplicateKeyException(pkg.Meta.Id);
                                 }
-                                else if(!this.Install(pkg as AppletSolution, true) && ApplicationServiceContext.Current.HostType != SanteDBHostType.Configuration)
+                                else if (!this.Install(pkg as AppletSolution, true) && ApplicationServiceContext.Current.HostType != SanteDBHostType.Configuration)
                                 {
                                     throw new InvalidOperationException($"Could not install applet solution {pkg.Meta.Id}");
                                 }
@@ -457,16 +434,16 @@ namespace SanteDB.Server.Core.Services.Impl
 
                     }
                 }
-	        }
-	        catch (SecurityException e)
-	        {
-				this.m_tracer.TraceEvent(EventLevel.Error,  "Error loading applets: {0}", e);
-		        throw new InvalidOperationException("Cannot proceed while untrusted applets are present");
-			}
+            }
+            catch (SecurityException e)
+            {
+                this.m_tracer.TraceEvent(EventLevel.Error, "Error loading applets: {0}", e);
+                throw new InvalidOperationException("Cannot proceed while untrusted applets are present");
+            }
             catch (Exception ex)
             {
-                this.m_tracer.TraceEvent(EventLevel.Error,  "Error loading applets: {0}", ex);
-	            throw;
+                this.m_tracer.TraceEvent(EventLevel.Error, "Error loading applets: {0}", ex);
+                throw;
             }
 
             this.Started?.Invoke(this, EventArgs.Empty);
@@ -549,9 +526,9 @@ namespace SanteDB.Server.Core.Services.Impl
             var pakFile = Path.Combine(appletDir, solution.Meta.Id + ".pak");
             if (this.m_solutions.Any(o => o.Meta.Id == solution.Meta.Id) && File.Exists(pakFile) && !isUpgrade)
                 throw new InvalidOperationException($"Cannot replace {solution.Meta} unless upgrade is specifically specified");
-            
+
             // Unpack items from the solution package and install if needed
-            foreach(var itm in solution.Include.Where(o=>o.Manifest != null))
+            foreach (var itm in solution.Include.Where(o => o.Manifest != null))
             {
                 var installedApplet = this.GetApplet(solution.Meta.Id, itm.Meta.Id);
                 if (installedApplet == null ||
@@ -566,7 +543,7 @@ namespace SanteDB.Server.Core.Services.Impl
             lock (this.m_fileDictionary)
                 if (!this.m_fileDictionary.ContainsKey(solution.Meta.Id + ".sln"))
                     this.m_fileDictionary.Add(solution.Meta.Id + ".sln", pakFile);
-            
+
             this.m_solutions.Add(solution);
 
             return true;
