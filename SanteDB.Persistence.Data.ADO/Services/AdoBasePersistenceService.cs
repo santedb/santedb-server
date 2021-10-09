@@ -655,7 +655,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             sw.Start();
 #endif
 
-            QueryRequestEventArgs<TData> preArgs = new QueryRequestEventArgs<TData>(query, offset, count, queryId, overrideAuthContext);
+            QueryRequestEventArgs<TData> preArgs = new QueryRequestEventArgs<TData>(query, offset, count, queryId, overrideAuthContext, orderBy);
             this.Querying?.Invoke(this, preArgs);
             if (preArgs.Cancel)
             {

@@ -57,7 +57,7 @@
     </dbProviderFactories>
 
   </section>
-  <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="4">
+  <section xsi:type="ApplicationServiceContextConfigurationSection" allowUnsignedAssemblies="true" threadPoolSize="4">
     <serviceProviders>
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPersistenceService, SanteDB.Persistence.Data.ADO, Version=2.0.0.0" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPolicyInformationService, SanteDB.Persistence.Data.ADO, Version=2.0.0.0" />

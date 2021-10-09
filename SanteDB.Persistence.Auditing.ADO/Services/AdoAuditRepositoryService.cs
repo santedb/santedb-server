@@ -187,7 +187,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         }
 
         /// <summary>
-        /// Convert a db audit to model 
+        /// Convert a db audit to model
         /// </summary>
         private AuditEventData ToModelInstance(DataContext context, CompositeResult<DbAuditEventData, DbAuditCode> res, bool summary = true)
         {
@@ -195,7 +195,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             if (retVal == null ||
                 !summary)
             {
-
                 retVal = new AuditEventData()
                 {
                     ActionCode = (ActionType)res.Object1.ActionCode,
@@ -211,7 +210,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 // Get actors and objects
                 if (!summary)
                 {
-
                     // Actors
                     var sql = context.CreateSqlStatement<DbAuditActorAssociation>().SelectFrom(typeof(DbAuditActorAssociation), typeof(DbAuditActor), typeof(DbAuditCode))
                             .InnerJoin<DbAuditActorAssociation, DbAuditActor>(o => o.TargetKey, o => o.Key)
@@ -253,7 +251,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     {
                         retVal.AddMetadata((AuditMetadataKey)itm.Object1.MetadataKey, itm.Object2.Value);
                     }
-
                 }
                 else
                 {
@@ -274,8 +271,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             NetworkAccessPointId = itm.Object1.AccessPoint,
                             ActorRoleCode = new List<AuditCode>() { this.ResolveCode(itm.Object2.ActorRoleCode, itm.Object3.Code, itm.Object3.CodeSystem) }.OfType<AuditCode>().ToList()
                         });
-
-
                 }
 
                 ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(retVal);
@@ -304,7 +299,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// </summary>
         public AuditEventData Insert(AuditEventData storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
-
             // Pre-event trigger
             var preEvtData = new DataPersistingEventArgs<AuditEventData>(storageData, mode, overrideAuthContext);
             this.Inserting?.Invoke(this, preEvtData);
@@ -339,7 +333,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     if (storageData.Actors != null)
                         foreach (var act in storageData.Actors)
                         {
-
                             var roleCode = this.GetOrCreateAuditCode(context, act.ActorRoleCode.FirstOrDefault());
 
                             DbAuditActor dbAct = null;
@@ -435,7 +428,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// </summary>
         public AuditEventData Get(Guid containerId, Guid? versionId, IPrincipal overrideAuthContext = null)
         {
-
             var preEvtData = new DataRetrievingEventArgs<AuditEventData>(containerId, versionId, overrideAuthContext);
             this.Retrieving?.Invoke(this, preEvtData);
             if (preEvtData.Cancel)
@@ -446,10 +438,9 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
             try
             {
-
                 var pk = containerId;
 
-                // Fetch 
+                // Fetch
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     context.Open();
@@ -462,7 +453,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     this.Retrieved?.Invoke(this, postEvtData);
 
                     return postEvtData.Data;
-
                 }
             }
             catch (Exception e)
@@ -496,8 +486,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// </summary>
         public IEnumerable<AuditEventData> Query(Expression<Func<AuditEventData, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext = null, params ModelSort<AuditEventData>[] orderBy)
         {
-
-            // TODO: Refactor this with a yield IQueryResultSet iterator 
+            // TODO: Refactor this with a yield IQueryResultSet iterator
             var preEvtData = new QueryRequestEventArgs<AuditEventData>(query, principal: overrideAuthContext);
             this.Querying?.Invoke(this, preEvtData);
             if (preEvtData.Cancel)
@@ -538,7 +527,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     var postEvtArgs = new QueryResultEventArgs<AuditEventData>(query, results, overrideAuthContext);
                     this.Queried?.Invoke(this, postEvtArgs);
                     return postEvtArgs.Results;
-
                 }
             }
             catch (Exception e)
@@ -558,5 +546,4 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         }
     }
 #pragma warning restore CS0067
-
 }

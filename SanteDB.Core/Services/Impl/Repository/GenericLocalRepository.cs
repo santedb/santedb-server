@@ -53,7 +53,6 @@ namespace SanteDB.Server.Core.Services.Impl
         ISecuredRepositoryService
         where TEntity : IdentifiedData
     {
-
         /// <summary>
         /// Gets the service name
         /// </summary>
@@ -145,7 +144,6 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> query, int offset, int? count, out int totalResults, Guid queryId, params ModelSort<TEntity>[] orderBy)
         {
-
             // Demand permission
             this.DemandQuery();
 
@@ -157,10 +155,10 @@ namespace SanteDB.Server.Core.Services.Impl
             }
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
-            // Notify query 
+            // Notify query
             var preQueryEventArgs = new QueryRequestEventArgs<TEntity>(query, AuthenticationContext.Current.Principal);
             this.Querying?.Invoke(this, preQueryEventArgs);
-            IEnumerable<TEntity> results = null; 
+            IEnumerable<TEntity> results = null;
             if (preQueryEventArgs.Cancel) /// Cancel the request
             {
                 results = preQueryEventArgs.Results;
@@ -168,7 +166,6 @@ namespace SanteDB.Server.Core.Services.Impl
             }
             else
             {
-
                 var resultSet = persistenceService.Query(preQueryEventArgs.Query, AuthenticationContext.Current.Principal).AsResultSet();
 
                 if(queryId != Guid.Empty)
@@ -178,7 +175,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 totalResults = resultSet.Count();
                 results = resultSet.Skip(offset).Take(count ?? 25);
             }
-            
+
             // 1. Let the BRE run
             var retVal = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
 
@@ -221,10 +218,10 @@ namespace SanteDB.Server.Core.Services.Impl
                 }
                 return this.m_privacyService?.Apply(prePersistence.Data, AuthenticationContext.Current.Principal) ?? prePersistence.Data;
             }
-            
+
             // Did the pre-persistence service change the type to a batch
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
-            
+
             var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TEntity>>();
             data = businessRulesService?.BeforeInsert(data) ?? prePersistence.Data;
             data = persistenceService.Insert(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
@@ -320,7 +317,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 this.m_traceSource.TraceWarning("Pre-retrieve trigger signals cancel: {0}", key);
                 return this.m_privacyService?.Apply(preRetrieve.Result, AuthenticationContext.Current.Principal) ?? preRetrieve.Result;
             }
-            
+
             var result = persistenceService.Get(key, versionKey, AuthenticationContext.Current.Principal);
             var retVal = businessRulesService?.AfterRetrieve(result) ?? result;
             var postEvt = new DataRetrievedEventArgs<TEntity>(retVal, AuthenticationContext.Current.Principal);
@@ -350,7 +347,6 @@ namespace SanteDB.Server.Core.Services.Impl
 
             try
             {
-
                 if (this.m_privacyService?.ValidateWrite(data, AuthenticationContext.Current.Principal) == false)
                     this.ThrowPrivacyValidationException(data);
 
@@ -396,7 +392,6 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public virtual TEntity Validate(TEntity p)
         {
-            
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
             var details = businessRulesService?.Validate(p) ?? new List<DetectedIssue>();
@@ -423,7 +418,6 @@ namespace SanteDB.Server.Core.Services.Impl
             return p;
         }
 
-        
         /// <summary>
         /// Perform a simple find
         /// </summary>
@@ -475,7 +469,7 @@ namespace SanteDB.Server.Core.Services.Impl
         }
 
         /// <summary>
-        /// Demand query 
+        /// Demand query
         /// </summary>
         public virtual void DemandQuery()
         {
@@ -529,6 +523,5 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             return this.Obsolete(key);
         }
-
     }
 }

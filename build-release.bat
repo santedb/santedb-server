@@ -1,5 +1,4 @@
 @echo off
-
 set signtool="C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\signtool.exe"
 set version=%1
 
@@ -26,6 +25,7 @@ if exist "c:\Program Files (x86)\Inno Setup 6\ISCC.exe" (
 	)
 )
 
+set signtool="C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\signtool.exe"
 set cwd=%cd%
 set nuget="%cwd%\.nuget\nuget.exe"
 echo Will build version %version%
@@ -35,8 +35,28 @@ echo Will use MSBUILD in %msbuild%
 if exist "%nuget%" (
 
 	%msbuild%\msbuild santedb-server-ext.sln /t:restore /p:VersionNumber=%1
-	%msbuild%\msbuild santedb-server-ext.sln /t:clean /t:rebuild /p:configuration=Release /p:VersionNumber=%1 /m:1
+	%msbuild%\msbuild santedb-server-ext.sln /t:clean /t:rebuild /p:configuration=Release /p:VersionNumber=%1 /m:2
 	echo %version% > release-version
+	
+	FOR /R "%cwd%\bin\Release" %%G IN (*.exe) DO (
+		echo Signing %%G
+		%signtool% sign /sha1 a11164321e30c84bd825ab20225421434622c52a /d "SanteDB iCDR"  "%%G"
+	)
+	FOR /R "%cwd%\bin\Release" %%G IN (SanteDB.*.dll) DO (
+		echo Signing %%G
+		%signtool% sign /sha1 a11164321e30c84bd825ab20225421434622c52a /d "SanteDB iCDR"  "%%G"
+	)
+
+	FOR /R "%cwd%\santedb-docker\SanteDB.Docker.Server\bin\Release" %%G IN (*.exe) DO (
+		echo Signing %%G
+		%signtool% sign /sha1 f3bea1ee156254656669f00c03eeafe8befc4441 /d "SanteDB iCDR"  "%%G"
+	)
+	FOR /R "%cwd%\santedb-docker\SanteDB.Docker.Server\bin\Release" %%G IN (SanteDB.*.dll) DO (
+		echo Signing %%G
+		%signtool% sign /sha1 f3bea1ee156254656669f00c03eeafe8befc4441 /d "SanteDB iCDR"  "%%G"
+	)
+	
+
 	FOR /R "%cwd%" %%G IN (*.nuspec) DO (
 		echo Packing %%~pG
 		pushd "%%~pG"
@@ -44,20 +64,18 @@ if exist "%nuget%" (
 			%nuget% pack -OutputDirectory "%localappdata%\NugetRelease" -prop Configuration=Release  -msbuildpath %msbuild% -prop VersionNumber=%1
 		) else (
 			echo Publishing NUPKG
+			del /s /q *.nupkg
 			%nuget% pack -prop Configuration=Release -msbuildpath %msbuild% -prop VersionNumber=%1
 			FOR /R %%F IN (*.nupkg) do (
+				copy "%%F" "%localappdata%\NugetRelease"
 				%nuget% push "%%F" -Source https://api.nuget.org/v3/index.json -ApiKey %2 
 			)
 		) 
 		popd
 	)
 
-	FOR /R "%cwd%\bin\Release" %%G IN (*.exe) DO (
-		echo Signing %%G
-		%signtool% sign /d "SanteDB iCDR"  "%%G"
-	)
 	
-	%inno% "/o.\bin\dist" ".\installer\SanteDB-Server.iss" /d"MyAppVersion=%version%" 
+	%inno% "/o.\bin\dist" ".\installer\SanteDB-icdr.iss" /d"MyAppVersion=%version%" 
 
 	rem ################# TARBALLS 
 	echo Building Linux Tarball
