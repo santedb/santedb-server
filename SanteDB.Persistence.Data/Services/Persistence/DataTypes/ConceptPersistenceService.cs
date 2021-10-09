@@ -17,7 +17,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
     /// </summary>
     public class ConceptPersistenceService : VersionedDataPersistenceService<Concept, DbConceptVersion, DbConcept>
     {
-
         /// <summary>
         /// Creates a DI instance of hte conept persistence service
         /// </summary>
@@ -26,7 +25,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         }
 
         /// <summary>
-        /// Prepare references 
+        /// Prepare references
         /// </summary>
         protected override Concept PrepareReferences(DataContext context, Concept data)
         {
@@ -45,7 +44,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// </summary>
         protected override Concept DoInsertModel(DataContext context, Concept data)
         {
-
             // Do Insertion of themodel
             var retVal = base.DoInsertModel(context, data);
 
@@ -119,7 +117,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             return retVal;
         }
 
-
         /// <summary>
         /// Convert the <paramref name="dbModel"/> to <typeparamref name="TModel"/>
         /// </summary>
@@ -134,11 +131,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                     retVal.SetLoadIndicator(nameof(Concept.Class));
                     goto case Configuration.LoadStrategyType.SyncLoad; // special case - FullLoad implies SyncLoad so we want a fallthrough - the only way to do this in C# is with this messy GOTO stuff
                 case Configuration.LoadStrategyType.SyncLoad:
-                    retVal.ConceptNames = base.GetRelatedPersistenceService<ConceptName>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                    retVal.ConceptNames = base.GetRelatedPersistenceService<ConceptName>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
                     retVal.SetLoadIndicator(nameof(Concept.ConceptNames));
-                    retVal.Relationship = base.GetRelatedPersistenceService<ConceptRelationship>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                    retVal.Relationship = base.GetRelatedPersistenceService<ConceptRelationship>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
                     retVal.SetLoadIndicator(nameof(Concept.Relationship));
-                    retVal.ReferenceTerms = this.GetRelatedPersistenceService<ConceptReferenceTerm>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                    retVal.ReferenceTerms = this.GetRelatedPersistenceService<ConceptReferenceTerm>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
                     retVal.SetLoadIndicator(nameof(Concept.ReferenceTerms));
                     goto case Configuration.LoadStrategyType.QuickLoad;
                 case Configuration.LoadStrategyType.QuickLoad:

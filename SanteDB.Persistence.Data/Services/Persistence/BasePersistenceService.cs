@@ -37,7 +37,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         where TModel : IdentifiedData, new()
         where TDbModel : class, IDbIdentified, new()
     {
-
         /// <summary>
         /// Get tracer for the specified persistence class
         /// </summary>
@@ -62,14 +61,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Model mapper
         /// </summary>
         protected ModelMapper m_modelMapper;
-        
+
         /// <summary>
         /// Configuration reference
         /// </summary>
         protected AdoPersistenceConfigurationSection m_configuration;
 
         /// <summary>
-        /// Providers 
+        /// Providers
         /// </summary>
         private static IDictionary<Type, IAdoPersistenceProvider> s_providers = new ConcurrentDictionary<Type, IAdoPersistenceProvider>();
 
@@ -83,7 +82,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             this.m_adhocCache = adhocCacheService;
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
-
         }
 
         /// <summary>
@@ -92,7 +90,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         public string ServiceName => $"SanteDB ADO.NET Persistence for {typeof(TModel).Name}";
 
         /// <summary>
-        /// The provider 
+        /// The provider
         /// </summary>
         public IDbProvider Provider { get; set; }
 
@@ -105,38 +103,47 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Fired after inserting has completed
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<TModel>> Inserted;
+
         /// <summary>
         /// Fired when inserting
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<TModel>> Inserting;
+
         /// <summary>
         /// Fired after updating
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<TModel>> Updated;
+
         /// <summary>
         /// Fired prior to updating
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<TModel>> Updating;
+
         /// <summary>
         /// Fired after obsoletion occurs
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<TModel>> Obsoleted;
+
         /// <summary>
         /// Fired after obsoleting
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<TModel>> Obsoleting;
+
         /// <summary>
         /// Fired after data has been queried
         /// </summary>
         public event EventHandler<QueryResultEventArgs<TModel>> Queried;
+
         /// <summary>
         /// Fired prior to data querying
         /// </summary>
         public event EventHandler<QueryRequestEventArgs<TModel>> Querying;
+
         /// <summary>
         /// Fired when data is being retrieved
         /// </summary>
         public event EventHandler<DataRetrievingEventArgs<TModel>> Retrieving;
+
         /// <summary>
         /// Fired after data is retrieved
         /// </summary>
@@ -194,7 +201,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
-        /// Prepare all references 
+        /// Prepare all references
         /// </summary>
         protected abstract TModel PrepareReferences(DataContext context, TModel data);
 
@@ -203,10 +210,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected IAdoPersistenceProvider<TRelated> GetRelatedPersistenceService<TRelated>()
         {
-            if(!s_providers.TryGetValue(typeof(TRelated), out IAdoPersistenceProvider provider))
+            if (!s_providers.TryGetValue(typeof(TRelated), out IAdoPersistenceProvider provider))
             {
                 provider = ApplicationServiceContext.Current.GetService<IAdoPersistenceProvider<TRelated>>();
-                if(provider != null)
+                if (provider != null)
                 {
                     s_providers.Add(typeof(TRelated), provider);
                 }
@@ -214,17 +221,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             return provider as IAdoPersistenceProvider<TRelated>;
         }
 
-
         /// <summary>
         /// Perform the actual insert of a model object
         /// </summary>
         protected virtual TModel DoInsertModel(DataContext context, TModel data)
         {
-            if(context == null)
+            if (context == null)
             {
                 throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
             }
-            else if(data == default(TModel))
+            else if (data == default(TModel))
             {
                 throw new ArgumentNullException(nameof(data), ErrorMessages.ERR_ARGUMENT_NULL);
             }
@@ -237,10 +243,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 sw.Start();
 #endif
-                var dbInstance = this.DoConvertToDataModel(context, data);
-                dbInstance = this.DoInsertInternal(context, dbInstance);
-                var retVal = this.DoConvertToInformationModel(context, dbInstance);
-                return retVal;
+            var dbInstance = this.DoConvertToDataModel(context, data);
+            dbInstance = this.DoInsertInternal(context, dbInstance);
+            var retVal = this.DoConvertToInformationModel(context, dbInstance);
+            return retVal;
 #if PERFMON
             }
             finally
@@ -249,7 +255,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoInsertModel - {sw.EllapsedMilliseconds}ms", data, new StackTrace());
             }
 #endif
-
         }
 
         /// <summary>
@@ -257,7 +262,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected virtual TModel DoUpdateModel(DataContext context, TModel data)
         {
-
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
@@ -295,15 +299,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected virtual void DoObsoleteAllModel(DataContext context, Expression<Func<TModel, bool>> expression)
         {
-            if(context == null)
+            if (context == null)
             {
                 throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
             }
-            else if(expression == null)
+            else if (expression == null)
             {
                 throw new ArgumentNullException(nameof(expression), ErrorMessages.ERR_ARGUMENT_NULL);
             }
-
 
 #if PERFMON
             Stopwatch sw = new Stopwatch();
@@ -331,7 +334,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
             }
-            
 
 #if PERFMON
             Stopwatch sw = new Stopwatch();
@@ -384,7 +386,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var dbInstance = this.DoGetInternal(context, key, versionKey, allowCached);
                 if (dbInstance == null) // not found
                 {
-                    retVal =  null;
+                    retVal = null;
                 }
                 else
                 {
@@ -404,7 +406,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
-        /// Count the 
+        /// Count the
         /// </summary>
         /// <param name="query">The query for which count is to be executed</param>
         /// <param name="authContext">The principal/authentication context being used</param>
@@ -441,19 +443,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public virtual bool Exists(DataContext context, Guid id, bool allowCache = false)
         {
-            if(context == null)
+            if (context == null)
             {
                 throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
             }
 
             bool retVal = false;
-            if(allowCache && (this.m_configuration.CachingPolicy?.Targets & AdoDataCachingPolicyTarget.ModelObjects) == AdoDataCachingPolicyTarget.ModelObjects)
+            if (allowCache && (this.m_configuration.CachingPolicy?.Targets & AdoDataCachingPolicyTarget.ModelObjects) == AdoDataCachingPolicyTarget.ModelObjects)
             {
                 retVal |= this.m_dataCacheService?.Exists<TModel>(id) == true ||
                     this.m_adhocCache.Exists(this.GetAdHocCacheKey(id));
             }
 
-            if(!retVal)
+            if (!retVal)
             {
                 retVal |= this.DoQueryInternal(context, o => o.Key == id).Any();
             }
@@ -478,8 +480,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <returns>The fetched object</returns>
         public virtual TModel Get(Guid key, Guid? versionKey, IPrincipal principal)
         {
-
-            if(principal == null)
+            if (principal == null)
             {
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
             }
@@ -487,7 +488,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // Pre-persistence object argument
             var preEvent = new DataRetrievingEventArgs<TModel>(key, versionKey, principal);
             this.Retrieving?.Invoke(this, preEvent);
-            if(preEvent.Cancel)
+            if (preEvent.Cancel)
             {
                 return preEvent.Result;
             }
@@ -506,7 +507,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         // Is there an ad-hoc version from the database?
                         retVal = this.DoGetModel(context, key, versionKey, true);
                         retVal.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
-
                     }
                     catch (DbException e)
                     {
@@ -530,7 +530,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public object Insert(object data)
         {
-            if (data is TModel model) 
+            if (data is TModel model)
             {
                 return this.Insert(model, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             }
@@ -549,11 +549,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <returns>The persisted object</returns>
         public TModel Insert(TModel data, TransactionMode mode, IPrincipal principal)
         {
-            if(data == default(TModel))
+            if (data == default(TModel))
             {
                 throw new ArgumentNullException(nameof(data), ErrorMessages.ERR_ARGUMENT_NULL);
             }
-            else if(principal == null )
+            else if (principal == null)
             {
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
             }
@@ -561,20 +561,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // Fire pre-event
             var preEvent = new DataPersistingEventArgs<TModel>(data, mode, principal);
             this.Inserting?.Invoke(this, preEvent);
-            if(preEvent.Cancel)
+            if (preEvent.Cancel)
             {
                 this.m_tracer.TraceVerbose("Pre-Persistence Event for INSERT {0} indicates cancel", data);
                 return preEvent.Data;
             }
 
-            using(var context = this.Provider.GetWriteConnection())
+            using (var context = this.Provider.GetWriteConnection())
             {
                 try
                 {
                     context.Open();
 
-                    using (var tx = context.BeginTransaction()) {
-
+                    using (var tx = context.BeginTransaction())
+                    {
                         // Establish provenance object
                         if (data is BaseEntityData be)
                         {
@@ -605,7 +605,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             this.m_dataCacheService?.Remove(data.Key.Value);
                         }
                     }
-                    
+
                     // Post event
                     var postEvt = new DataPersistedEventArgs<TModel>(data, mode, principal);
                     this.Inserted?.Invoke(this, postEvt);
@@ -638,10 +638,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public void ObsoleteAll(Expression<Func<TModel, bool>> expression, TransactionMode mode, IPrincipal principal)
         {
-            if(expression == null)
+            if (expression == null)
             {
                 throw new ArgumentNullException(nameof(expression), ErrorMessages.ERR_ARGUMENT_NULL);
-            } 
+            }
             if (principal == null)
             {
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
@@ -655,7 +655,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                     using (var tx = context.BeginTransaction())
                     {
-
                         // Establish provenance object
                         context.EstablishProvenance(principal, null);
 
@@ -666,7 +665,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             tx.Commit();
                         }
                     }
-
                 }
                 catch (DbException e)
                 {
@@ -682,7 +680,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
-        /// Obsolete the specified 
+        /// Obsolete the specified
         /// </summary>
         /// <param name="id">The data object which is to be obsoleted</param>
         /// <param name="mode">The method of transaction control</param>
@@ -690,35 +688,34 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <returns>The obsoleted data</returns>
         public TModel Obsolete(Guid id, TransactionMode mode, IPrincipal principal)
         {
-            if(principal == null)
+            if (principal == null)
             {
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
             }
 
             var preEvent = new DataPersistingEventArgs<TModel>(new TModel() { Key = id }, mode, principal);
             this.Obsoleting?.Invoke(this, preEvent);
-            if(preEvent.Cancel)
+            if (preEvent.Cancel)
             {
                 this.m_tracer.TraceVerbose("Pre-Persistence event indicates cancel on Obsolete for {0}", id);
                 return preEvent.Data;
             }
 
-            using(var context = this.Provider.GetWriteConnection())
+            using (var context = this.Provider.GetWriteConnection())
             {
                 try
                 {
                     context.Open();
 
                     TModel retVal = default(TModel);
-                    using(var tx = context.BeginTransaction())
+                    using (var tx = context.BeginTransaction())
                     {
-
                         // Establish provenance object
                         context.EstablishProvenance(principal, null);
 
                         retVal = this.DoObsoleteModel(context, id);
 
-                        if(mode == TransactionMode.Commit)
+                        if (mode == TransactionMode.Commit)
                         {
                             tx.Commit();
                             // Cache
@@ -726,7 +723,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         }
                     }
 
-                    
                     // Post event
                     var postEvt = new DataPersistedEventArgs<TModel>(retVal, mode, principal);
                     this.Obsoleted?.Invoke(this, postEvt);
@@ -747,11 +743,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
-        /// Query the specified data store 
+        /// Query the specified data store
         /// </summary>
         public IEnumerable Query(Expression query, int offset, int? count, out int totalResults)
         {
-            if(query is Expression<Func<TModel, bool>> expr)
+            if (query is Expression<Func<TModel, bool>> expr)
             {
                 var retVal = this.Query(expr, AuthenticationContext.Current.Principal).AsResultSet<TModel>();
                 totalResults = retVal.Count();
@@ -783,24 +779,24 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public IQueryResultSet<TModel> Query(Expression<Func<TModel, bool>> query, IPrincipal principal)
         {
-            if(query == null)
+            if (query == null)
             {
                 throw new ArgumentNullException(nameof(query), ErrorMessages.ERR_ARGUMENT_NULL);
             }
-            if(principal == null)
+            if (principal == null)
             {
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
             }
 
             var preEvt = new QueryRequestEventArgs<TModel>(query, principal);
             this.Querying?.Invoke(this, preEvt);
-            if(preEvt.Cancel)
+            if (preEvt.Cancel)
             {
                 this.m_tracer.TraceVerbose("Pre-Query Event Signalled Cancel: {0}", query);
                 return preEvt.Results.AsResultSet<TModel>();
             }
 
-            using(var context = this.Provider.GetReadonlyConnection())
+            using (var context = this.Provider.GetReadonlyConnection())
             {
                 try
                 {
@@ -866,11 +862,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <returns>The object as a model instance</returns>
         public object ToModelInstance(object domainInstance, DataContext context)
         {
-            if(domainInstance == null)
+            if (domainInstance == null)
             {
                 return null;
             }
-            else if(context == null)
+            else if (context == null)
             {
                 throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
             }
@@ -908,32 +904,31 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <returns>The updated object</returns>
         public TModel Update(TModel data, TransactionMode mode, IPrincipal principal)
         {
-            if(data == default(TModel))
+            if (data == default(TModel))
             {
                 throw new ArgumentNullException(nameof(data), ErrorMessages.ERR_ARGUMENT_NULL);
             }
-            else if(principal == null)
+            else if (principal == null)
             {
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
             }
 
             var preEvt = new DataPersistingEventArgs<TModel>(data, mode, principal);
             this.Updating?.Invoke(this, preEvt);
-            if(preEvt.Cancel)
+            if (preEvt.Cancel)
             {
                 this.m_tracer.TraceVerbose("Pre-Persistence Event for Update indicates cancel for {0}", data);
                 return preEvt.Data;
             }
 
-            using(var context = this.Provider.GetWriteConnection())
+            using (var context = this.Provider.GetWriteConnection())
             {
                 try
                 {
                     context.Open();
 
-                    using(var tx = context.BeginTransaction())
+                    using (var tx = context.BeginTransaction())
                     {
-
                         // Establish provenance object
                         if (data is BaseEntityData be)
                         {
@@ -975,7 +970,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
         }
 
-
         /// <summary>
         /// Translates a DB exception to an appropriate SanteDB exception
         /// </summary>
@@ -989,29 +983,35 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     case "O9001": // SanteDB => Data Validation Error
                         return new DetectedIssueException(
                             new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.InvalidDataIssue));
+
                     case "O9002": // SanteDB => Codification error
                         return new DetectedIssueException(new List<DetectedIssue>() {
                                         new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(),  e.Message, DetectedIssueKeys.CodificationIssue),
                                         new DetectedIssue(DetectedIssuePriorityType.Information, e.Data["SqlState"].ToString(), "HINT: Select a code that is from the correct concept set or add the selected code to the concept set", DetectedIssueKeys.CodificationIssue)
                                     });
-                    case "23502": // PGSQL - NOT NULL 
+
+                    case "23502": // PGSQL - NOT NULL
                         return new DetectedIssueException(
                                         new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.InvalidDataIssue)
                                     );
+
                     case "23503": // PGSQL - FK VIOLATION
                         return new DetectedIssueException(
                                         new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.FormalConstraintIssue)
                                     );
+
                     case "23505": // PGSQL - UQ VIOLATION
                         return new DetectedIssueException(
                                         new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.AlreadyDoneIssue)
                                     );
+
                     case "23514": // PGSQL - CK VIOLATION
                         return new DetectedIssueException(new List<DetectedIssue>()
                         {
                             new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.FormalConstraintIssue),
                             new DetectedIssue(DetectedIssuePriorityType.Information, e.Data["SqlState"].ToString(), "HINT: The code you're using may be incorrect for the given context", DetectedIssueKeys.CodificationIssue)
                         });
+
                     default:
                         return new DataPersistenceException(e.Message, e);
                 }
@@ -1045,7 +1045,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public TModel ToModelInstance(DataContext context, object result)
         {
-            if(context == null)
+            if (context == null)
             {
                 throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
             }
@@ -1077,7 +1077,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public Expression MapSortExpression(Expression<Func<TModel, dynamic>> sortExpression)
         {
-            if(sortExpression == null)
+            if (sortExpression == null)
             {
                 throw new ArgumentNullException(nameof(sortExpression), ErrorMessages.ERR_ARGUMENT_NULL);
             }
@@ -1115,11 +1115,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected TData EnsureExists<TData>(DataContext context, TData data)
             where TData : IdentifiedData, new()
         {
-            if(context == null)
+            if (context == null)
             {
                 throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
             }
-            else if(data == default(TData))
+            else if (data == default(TData))
             {
                 return default(TData);
             }
@@ -1140,8 +1140,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 return data;
             }
-
         }
-
     }
 }

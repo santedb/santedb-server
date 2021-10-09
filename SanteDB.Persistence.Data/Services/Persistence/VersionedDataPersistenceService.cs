@@ -91,7 +91,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected override TDbModel DoInsertInternal(DataContext context, TDbModel dbModel)
         {
-
             if (dbModel == null)
             {
                 throw new ArgumentNullException(nameof(dbModel), ErrorMessages.ERR_ARGUMENT_NULL);
@@ -189,7 +188,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 newVersion.ObsoletedByKey = null;
                 newVersion.ObsoletionTime = null;
                 newVersion.VersionSequenceId = null;
-                
+
                 newVersion.ObsoletedByKeySpecified = model.ObsoletionTimeSpecified = true;
                 newVersion.VersionKey = Guid.NewGuid();
                 return context.Insert(newVersion);
@@ -202,7 +201,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 #endif
         }
-
 
         /// <summary>
         /// Obsolete all objects
@@ -217,7 +215,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 throw new ArgumentException(nameof(expression), ErrorMessages.ERR_ARGUMENT_RANGE);
             }
-
 
 #if DEBUG
             var sw = new Stopwatch();
@@ -235,7 +232,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                 if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
                 {
-                    // Convert the query to a domain query so that the object persistence layer can turn the 
+                    // Convert the query to a domain query so that the object persistence layer can turn the
                     // structured LINQ query into a SQL statement
                     var domainQuery = context.CreateSqlStatement().SelectFrom(typeof(TDbModel));
                     var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
@@ -249,7 +246,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateWhere(expression);
                     }
 
-                    // Now we want to update each 
+                    // Now we want to update each
                     foreach (var obj in context.Query<TDbModel>(domainQuery))
                     {
                         if (obj is IDbHasStatus state) // set status to obsolete
@@ -276,6 +273,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 #endif
         }
+
         /// <summary>
         /// Perform an obsoletion of the object in the datamodel
         /// </summary>
@@ -283,7 +281,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <param name="key">The key of the object which is to be obsoleted</param>
         protected override TDbModel DoObsoleteInternal(DataContext context, Guid key)
         {
-
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
@@ -363,11 +360,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
-        /// Update associated entities 
+        /// Update associated entities
         /// </summary>
         /// <remarks>
         /// Updates the associated items of <typeparamref name="TModelAssociation"/> such that
-        /// <paramref name="data"/>'s associations are updated to match the list 
+        /// <paramref name="data"/>'s associations are updated to match the list
         /// provided in <paramref name="associations"/>
         /// </remarks>
         protected virtual IEnumerable<TModelAssociation> UpdateModelVersionedAssociations<TModelAssociation>(DataContext context, TModel data, IEnumerable<TModelAssociation> associations)
@@ -384,7 +381,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return a;
             }).ToArray();
 
-            // We now want to fetch the perssitence serivce of this 
+            // We now want to fetch the perssitence serivce of this
             var persistenceService = base.GetRelatedPersistenceService<TModelAssociation>();
             if (persistenceService == null)
             {
@@ -404,7 +401,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
                 else
                 {
-                   a =  persistenceService.Obsolete(context, a.Key.Value);
+                    a = persistenceService.Obsolete(context, a.Key.Value);
                 }
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Obsolete;
                 return a;
@@ -418,7 +415,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             });
             var updatedRelationships = associations.Where(o => o.Key.HasValue && existing.Any(a => a.Key == o.Key && !a.SemanticEquals(o))).Select(a =>
             {
-                
                 // We are versioning so obsolete existing and then create new
                 if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.AssociationVersioning))
                 {
@@ -438,7 +434,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             });
 
             return existing.Where(e => !removedRelationships.Any(r => r.Key == e.Key)).Union(addedRelationships).ToArray();
-
         }
 
         /// <summary>

@@ -3,9 +3,11 @@ using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
+using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,7 +19,7 @@ using System.Text;
 namespace SanteDB.Persistence.Data.Services.Persistence
 {
     /// <summary>
-    /// This persistence class represents a persistence service which is capable of storing and maintaining 
+    /// This persistence class represents a persistence service which is capable of storing and maintaining
     /// an IdentifiedData instance and its equivalent IDbIdentified
     /// </summary>
     public abstract class IdentifiedDataPersistenceService<TModel, TDbModel>
@@ -25,7 +27,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         where TModel : IdentifiedData, new()
         where TDbModel : class, IDbIdentified, new()
     {
-
         /// <summary>
         /// Creates a new injected version of the IdentifiedDataPersistenceService
         /// </summary>
@@ -143,7 +144,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 #endif
         }
 
-
         /// <summary>
         /// Obsolete all objects
         /// </summary>
@@ -158,14 +158,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 throw new ArgumentException(nameof(expression), ErrorMessages.ERR_ARGUMENT_RANGE);
             }
 
-
 #if DEBUG
             var sw = new Stopwatch();
             sw.Start();
             try
             {
 #endif
-                // Convert the query to a domain query so that the object persistence layer can turn the 
+                // Convert the query to a domain query so that the object persistence layer can turn the
                 // structured LINQ query into a SQL statement
                 var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
                 if (domainExpression != null)
@@ -231,7 +230,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
-        /// Perform a query for the specified object 
+        /// Perform a query for the specified object
         /// </summary>
         /// <param name="context">The context on which the query should be executed</param>
         /// <param name="query">The query in the model format which should be executed</param>
@@ -248,7 +247,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 throw new ArgumentNullException(nameof(query), ErrorMessages.ERR_ARGUMENT_NULL);
             }
 
-            // Convert the query to a domain query so that the object persistence layer can turn the 
+            // Convert the query to a domain query so that the object persistence layer can turn the
             // structured LINQ query into a SQL statement
             var domainQuery = context.CreateSqlStatement().SelectFrom(typeof(TDbModel));
             var expression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(query, false);
@@ -286,7 +285,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 throw new ArgumentException(nameof(model.Key), ErrorMessages.ERR_NON_IDENTITY_UPDATE);
             }
 
-            // perform 
+            // perform
 #if DEBUG
             var sw = new Stopwatch();
             sw.Start();
@@ -308,16 +307,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 this.m_tracer.TraceVerbose("Update {0} took {1}ms", model, sw.ElapsedMilliseconds);
             }
 #endif
-
         }
 
-
         /// <summary>
-        /// Update associated entities 
+        /// Update associated entities
         /// </summary>
         /// <remarks>
         /// Updates the associated items of <typeparamref name="TModelAssociation"/> such that
-        /// <paramref name="data"/>'s associations are updated to match the list 
+        /// <paramref name="data"/>'s associations are updated to match the list
         /// provided in <paramref name="associations"/>
         /// </remarks>
         /// <returns>The effective list of relationships on the <paramref name="data"/></returns>
@@ -335,7 +332,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return a;
             }).ToArray();
 
-            // We now want to fetch the perssitence serivce of this 
+            // We now want to fetch the perssitence serivce of this
             var persistenceService = base.GetRelatedPersistenceService<TModelAssociation>();
             if (persistenceService == null)
             {
@@ -365,7 +362,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return a;
             });
 
-            return existing.Where(e=>!removedRelationships.Any(r=>r.Key == e.Key)).Union(addedRelationships).ToArray();
+            return existing.Where(e => !removedRelationships.Any(r => r.Key == e.Key)).Union(addedRelationships).ToArray();
         }
 
         /// <summary>
@@ -378,7 +375,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<TAssociativeTable> UpdateInternalAssociations<TAssociativeTable>(DataContext context, Guid sourceKey, IEnumerable<TAssociativeTable> associations, Expression<Func<TAssociativeTable, bool>> existingExpression = null)
             where TAssociativeTable : IDbAssociation, new()
         {
-
             // Ensure the source by locking the IEnumerable
             associations = associations.Select(a =>
             {
@@ -420,6 +416,5 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             return existing.Where(o => !removeRelationships.Any(r => r.Equals(o))).Union(addRelationships);
         }
-
     }
 }

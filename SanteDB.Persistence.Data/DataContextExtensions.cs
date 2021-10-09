@@ -19,7 +19,6 @@ using System.Text;
 
 namespace SanteDB.Persistence.Data
 {
-
     /// <summary>
     /// Key harmonization mode
     /// </summary>
@@ -31,6 +30,7 @@ namespace SanteDB.Persistence.Data
         /// Property, if set overrides Key
         /// </summary>
         KeyOverridesProperty,
+
         /// <summary>
         /// When the harmonization process occurs, the priority is:
         /// Property, if set overrides Key
@@ -43,8 +43,6 @@ namespace SanteDB.Persistence.Data
     /// </summary>
     internal static class DataContextExtensions
     {
-
-
         /// <summary>
         /// Harmonize the keys with the delay load properties
         /// </summary>
@@ -55,10 +53,9 @@ namespace SanteDB.Persistence.Data
 
             foreach (var pi in typeof(TData).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
             {
-
-                if(!pi.CanWrite) 
-                { 
-                    continue; 
+                if (!pi.CanWrite)
+                {
+                    continue;
                 }
 
                 var piValue = pi.GetValue(me);
@@ -66,13 +63,13 @@ namespace SanteDB.Persistence.Data
                 // Is the property a key?
                 if (piValue is IdentifiedData iddata && iddata.Key.HasValue)
                 {
-                    // Get the object which references this 
+                    // Get the object which references this
                     var keyProperty = pi.GetSerializationRedirectProperty();
                     var keyValue = keyProperty?.GetValue(me);
                     switch (harmonizationMode)
                     {
                         case KeyHarmonizationMode.KeyOverridesProperty:
-                            if(keyValue != null) // There is a key for this which is populated, we want to use the key and clear the property
+                            if (keyValue != null) // There is a key for this which is populated, we want to use the key and clear the property
                             {
                                 pi.SetValue(me, null);
                             }
@@ -81,6 +78,7 @@ namespace SanteDB.Persistence.Data
                                 keyProperty.SetValue(me, iddata.Key);
                             }
                             break;
+
                         case KeyHarmonizationMode.PropertyOverridesKey:
                             if (iddata.Key.HasValue)
                             {
@@ -95,13 +93,30 @@ namespace SanteDB.Persistence.Data
                 }
                 else if (piValue is IList list)
                 {
-                    foreach(var itm in list.OfType<IdentifiedData>())
+                    foreach (var itm in list.OfType<IdentifiedData>())
                     {
                         itm.HarmonizeKeys(harmonizationMode);
                     }
                 }
             }
             return me;
+        }
+
+        /// <summary>
+        /// Get provenance from the context
+        /// </summary>
+        public static DbSecurityProvenance GetProvenance(this DataContext me)
+        {
+            if (me.Data.TryGetValue("provenance", out object provenance))
+            {
+                return provenance as DbSecurityProvenance;
+            }
+            else
+            {
+                var retVal = me.FirstOrDefault<DbSecurityProvenance>(o => o.Key == me.ContextId);
+                me.AddData("provenance", retVal);
+                return retVal;
+            }
         }
 
         /// <summary>
@@ -119,7 +134,7 @@ namespace SanteDB.Persistence.Data
             };
 
             // Establish identities
-            if (principal is IClaimsPrincipal cprincipal) // claims principal? 
+            if (principal is IClaimsPrincipal cprincipal) // claims principal?
             {
                 foreach (var ident in cprincipal.Identities)
                 {
@@ -148,7 +163,7 @@ namespace SanteDB.Persistence.Data
                         retVal.UserKey = sid;
                 }
 
-                // Session identifier 
+                // Session identifier
                 var sidClaim = cprincipal?.FindFirst(SanteDBClaimTypes.SanteDBSessionIdClaim)?.Value;
                 if (!String.IsNullOrEmpty(sidClaim) && Guid.TryParse(sidClaim, out Guid sessionId))
                     retVal.SessionKey = sessionId;
@@ -192,8 +207,8 @@ namespace SanteDB.Persistence.Data
                     me.ContextId = retVal.Key;
                 }
 
+                me.AddData("provenance", retVal);
                 return retVal.Key;
-
             }
             catch (Exception e)
             {
