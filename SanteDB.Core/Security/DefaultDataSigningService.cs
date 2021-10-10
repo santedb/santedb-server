@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Security;
@@ -37,66 +38,14 @@ namespace SanteDB.Server.Core.Security
     /// <summary>
     /// Default data signature service
     /// </summary>
-    [Obsolete("Use SanteDB.Core.Security.HmacDataSigningService")]
-    public class DefaultDataSigningService : IDataSigningService
+    [Obsolete("Use SanteDB.Core.Security.DefaultDataSigningService", true)]
+    public class DefaultDataSigningService : SanteDB.Core.Security.DefaultDataSigningService
     {
-
-        
         /// <summary>
-        /// Gets the name of the service
+        /// CTOR with DI
         /// </summary>
-        public string ServiceName => "Digital Signature Service";
-
-        // Master configuration
-        private SecurityConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
-
-        /// <summary>
-        /// Sign the specfiied data
-        /// </summary>
-        public byte[] SignData(byte[] data, string keyId = null)
+        public DefaultDataSigningService(IConfigurationManager configurationManager) : base(configurationManager)
         {
-            var credentials = SecurityUtils.CreateSigningCredentials(keyId);
-            if (credentials == null)
-                throw new InvalidOperationException($"Couldn't create signature for key {keyId}");
-            using (var signatureProvider = new SignatureProviderFactory().CreateForSigning(credentials.SigningKey, credentials.SignatureAlgorithm))
-                return signatureProvider.Sign(data);
-        }
-
-        /// <summary>
-        /// Verify the signature
-        /// </summary>
-        public bool Verify(byte[] data, byte[] signature, string keyId = null)
-        {
-            var credentials = SecurityUtils.CreateSigningCredentials(keyId);
-            using (var signatureProvider = new SignatureProviderFactory().CreateForVerifying(credentials.SigningKey, credentials.SignatureAlgorithm))
-                return signatureProvider.Verify(data, signature);
-        }
-
-        /// <summary>
-        /// Get the specified signature algorithm
-        /// </summary>
-        public string GetSignatureAlgorithm(string keyId = null)
-        {
-            return SecurityUtils.CreateSigningCredentials(keyId)?.SignatureAlgorithm;
-        }
-
-        /// <summary>
-        /// Get all available keys
-        /// </summary>
-        public IEnumerable<string> GetKeys()
-        {
-            return SecurityUtils.GetKeyIdentifiers();
-        }
-
-        /// <summary>
-        /// Add signing key to the service
-        /// </summary>
-        /// <param name="keyId"></param>
-        /// <param name="keyData"></param>
-        /// <param name="signatureAlgorithm"></param>
-        public void AddSigningKey(string keyId, byte[] keyData, string signatureAlgorithm)
-        {
-            SecurityUtils.AddSigningCredentials(keyId, keyData, signatureAlgorithm);
         }
     }
 }

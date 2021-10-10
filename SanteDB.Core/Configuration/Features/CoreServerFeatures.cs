@@ -36,7 +36,6 @@ using System.Threading.Tasks;
 using SanteDB.Core.PubSub.Broker;
 using SanteDB.BI.Services.Impl;
 using SanteDB.Core.Notifications;
-using SanteDB.Server.Core.Security;
 using SanteDB.Core.Applets.Services.Impl;
 
 namespace SanteDB.Server.Core.Configuration.Features
