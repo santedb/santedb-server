@@ -159,7 +159,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Npgsql">
-      <Version>5.0.7</Version>
+      <Version>5.0.10</Version>
     </PackageReference>
   </ItemGroup>
   <Target Name="BeforeBuild" Condition="!$(VersionNumber.EndsWith('-debug'))">

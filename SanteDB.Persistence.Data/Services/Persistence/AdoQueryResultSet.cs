@@ -23,7 +23,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     public class AdoQueryResultSet<TData> : IQueryResultSet<TData>, IDisposable
         where TData : IdentifiedData
     {
-
         // The data context
         private DataContext m_context;
 
@@ -33,7 +32,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         // The result set that this wraps
         private IOrmResultSet m_resultSet;
 
-        // Tracer 
+        // Tracer
         private Tracer m_tracer = Tracer.GetTracer(typeof(AdoQueryResultSet<TData>));
 
         /// <summary>
@@ -53,7 +52,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             this.m_resultSet = resultSet;
             this.m_context = copyFrom.m_context;
         }
-
 
         /// <summary>
         /// Where clause for filtering on provider
@@ -176,7 +174,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             try
             {
                 this.m_context.Open();
-
 
                 return this.m_provider.ToModelInstance(this.m_context, this.m_resultSet.FirstOrDefault());
             }
@@ -301,7 +298,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
-        /// Creates a query set or loads the specified query set 
+        /// Creates a query set or loads the specified query set
         /// </summary>
         public IQueryResultSet<TData> AsStateful(Guid stateId)
         {
@@ -332,7 +329,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     }
                     else
                     {
-                         keySet = this.m_resultSet.Keys<Guid>().OfType<Guid>().ToArray();
+                        keySet = this.m_resultSet.Keys<Guid>().OfType<Guid>().ToArray();
                     }
                     this.m_provider.QueryPersistence.RegisterQuerySet(stateId, keySet, this.m_resultSet.Statement, keySet.Length);
                     return new AdoStatefulResultSet<TData>(this.m_provider, stateId);
@@ -366,7 +363,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 this.m_context.Open();
                 return this.m_resultSet.Any();
             }
-            finally {
+            finally
+            {
                 this.m_context.Close();
             }
         }
@@ -410,7 +408,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             this.m_context.Dispose();
         }
-
 
         /// <summary>
         /// Non-generic version of where
