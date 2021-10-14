@@ -55,6 +55,16 @@ namespace SanteDB.Configurator
             this.spMainControl = new System.Windows.Forms.SplitContainer();
             this.trvFeatures = new System.Windows.Forms.TreeView();
             this.imlMain = new System.Windows.Forms.ImageList(this.components);
+            this.pnlInfo = new System.Windows.Forms.Panel();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.rtbLicense = new System.Windows.Forms.RichTextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.lblInstanceName = new System.Windows.Forms.Label();
+            this.lblSupport = new System.Windows.Forms.LinkLabel();
+            this.lblCopyright = new System.Windows.Forms.Label();
+            this.lblVersion = new System.Windows.Forms.Label();
+            this.lblApplication = new System.Windows.Forms.Label();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pnlFeature = new System.Windows.Forms.Panel();
             this.lblDescription = new System.Windows.Forms.Label();
             this.lblNoInstall = new System.Windows.Forms.Label();
@@ -66,16 +76,6 @@ namespace SanteDB.Configurator
             this.lblDisabled = new System.Windows.Forms.Label();
             this.lblEnabled = new System.Windows.Forms.Label();
             this.lblSelectedOption = new System.Windows.Forms.Label();
-            this.pnlInfo = new System.Windows.Forms.Panel();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.rtbLicense = new System.Windows.Forms.RichTextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.lblInstanceName = new System.Windows.Forms.Label();
-            this.lblSupport = new System.Windows.Forms.LinkLabel();
-            this.lblCopyright = new System.Windows.Forms.Label();
-            this.lblVersion = new System.Windows.Forms.Label();
-            this.lblApplication = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.tpAdvanced = new System.Windows.Forms.TabPage();
             this.spEditor = new System.Windows.Forms.SplitContainer();
             this.lsvConfigSections = new System.Windows.Forms.ListView();
@@ -99,12 +99,12 @@ namespace SanteDB.Configurator
             this.spMainControl.Panel1.SuspendLayout();
             this.spMainControl.Panel2.SuspendLayout();
             this.spMainControl.SuspendLayout();
-            this.pnlFeature.SuspendLayout();
-            this.tcSettings.SuspendLayout();
-            this.tpSetting.SuspendLayout();
             this.pnlInfo.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.pnlFeature.SuspendLayout();
+            this.tcSettings.SuspendLayout();
+            this.tpSetting.SuspendLayout();
             this.tpAdvanced.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.spEditor)).BeginInit();
             this.spEditor.Panel1.SuspendLayout();
@@ -193,158 +193,6 @@ namespace SanteDB.Configurator
             this.imlMain.Images.SetKeyName(10, "PartiallyComplete_16x_24.bmp");
             this.imlMain.Images.SetKeyName(11, "PropertyShortcut_16x_24.bmp");
             this.imlMain.Images.SetKeyName(12, "NoCheck_16x.png");
-            // 
-            // pnlFeature
-            // 
-            this.pnlFeature.Controls.Add(this.lblDescription);
-            this.pnlFeature.Controls.Add(this.lblNoInstall);
-            this.pnlFeature.Controls.Add(this.btnDisable);
-            this.pnlFeature.Controls.Add(this.btnEnable);
-            this.pnlFeature.Controls.Add(this.tcSettings);
-            this.pnlFeature.Controls.Add(this.lblDisabled);
-            this.pnlFeature.Controls.Add(this.lblEnabled);
-            this.pnlFeature.Controls.Add(this.lblSelectedOption);
-            this.pnlFeature.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlFeature.Location = new System.Drawing.Point(0, 0);
-            this.pnlFeature.Name = "pnlFeature";
-            this.pnlFeature.Size = new System.Drawing.Size(775, 348);
-            this.pnlFeature.TabIndex = 0;
-            // 
-            // lblDescription
-            // 
-            this.lblDescription.BackColor = System.Drawing.SystemColors.Control;
-            this.lblDescription.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblDescription.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDescription.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.lblDescription.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.lblDescription.ImageIndex = 5;
-            this.lblDescription.ImageList = this.imlMain;
-            this.lblDescription.Location = new System.Drawing.Point(0, 100);
-            this.lblDescription.Name = "lblDescription";
-            this.lblDescription.Padding = new System.Windows.Forms.Padding(3);
-            this.lblDescription.Size = new System.Drawing.Size(775, 26);
-            this.lblDescription.TabIndex = 14;
-            // 
-            // lblNoInstall
-            // 
-            this.lblNoInstall.BackColor = System.Drawing.Color.LightCoral;
-            this.lblNoInstall.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblNoInstall.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblNoInstall.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.lblNoInstall.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.lblNoInstall.ImageIndex = 12;
-            this.lblNoInstall.ImageList = this.imlMain;
-            this.lblNoInstall.Location = new System.Drawing.Point(0, 74);
-            this.lblNoInstall.Name = "lblNoInstall";
-            this.lblNoInstall.Padding = new System.Windows.Forms.Padding(3);
-            this.lblNoInstall.Size = new System.Drawing.Size(775, 26);
-            this.lblNoInstall.TabIndex = 15;
-            this.lblNoInstall.Text = "      This feature cannot be enabled. There may be a conflicting service.";
-            // 
-            // btnDisable
-            // 
-            this.btnDisable.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDisable.AutoSize = true;
-            this.btnDisable.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.btnDisable.Location = new System.Drawing.Point(725, 27);
-            this.btnDisable.Name = "btnDisable";
-            this.btnDisable.Size = new System.Drawing.Size(42, 13);
-            this.btnDisable.TabIndex = 13;
-            this.btnDisable.TabStop = true;
-            this.btnDisable.Text = "Disable";
-            this.btnDisable.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.btnDisable_LinkClicked);
-            // 
-            // btnEnable
-            // 
-            this.btnEnable.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnEnable.AutoSize = true;
-            this.btnEnable.BackColor = System.Drawing.SystemColors.Info;
-            this.btnEnable.Location = new System.Drawing.Point(727, 27);
-            this.btnEnable.Name = "btnEnable";
-            this.btnEnable.Size = new System.Drawing.Size(40, 13);
-            this.btnEnable.TabIndex = 11;
-            this.btnEnable.TabStop = true;
-            this.btnEnable.Text = "Enable";
-            this.btnEnable.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.btnEnable_LinkClicked);
-            // 
-            // tcSettings
-            // 
-            this.tcSettings.Alignment = System.Windows.Forms.TabAlignment.Bottom;
-            this.tcSettings.Controls.Add(this.tpSetting);
-            this.tcSettings.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tcSettings.ImageList = this.imlMain;
-            this.tcSettings.Location = new System.Drawing.Point(0, 74);
-            this.tcSettings.Name = "tcSettings";
-            this.tcSettings.SelectedIndex = 0;
-            this.tcSettings.Size = new System.Drawing.Size(775, 274);
-            this.tcSettings.TabIndex = 8;
-            // 
-            // tpSetting
-            // 
-            this.tpSetting.Controls.Add(this.pgConfiguration);
-            this.tpSetting.ImageIndex = 11;
-            this.tpSetting.Location = new System.Drawing.Point(4, 4);
-            this.tpSetting.Name = "tpSetting";
-            this.tpSetting.Padding = new System.Windows.Forms.Padding(3);
-            this.tpSetting.Size = new System.Drawing.Size(767, 247);
-            this.tpSetting.TabIndex = 0;
-            this.tpSetting.Text = "Configuration";
-            this.tpSetting.UseVisualStyleBackColor = true;
-            // 
-            // pgConfiguration
-            // 
-            this.pgConfiguration.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pgConfiguration.Location = new System.Drawing.Point(3, 3);
-            this.pgConfiguration.Name = "pgConfiguration";
-            this.pgConfiguration.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.pgConfiguration.Size = new System.Drawing.Size(761, 241);
-            this.pgConfiguration.TabIndex = 1;
-            this.pgConfiguration.ToolbarVisible = false;
-            // 
-            // lblDisabled
-            // 
-            this.lblDisabled.BackColor = System.Drawing.SystemColors.Info;
-            this.lblDisabled.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblDisabled.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDisabled.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.lblDisabled.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.lblDisabled.ImageIndex = 4;
-            this.lblDisabled.ImageList = this.imlMain;
-            this.lblDisabled.Location = new System.Drawing.Point(0, 48);
-            this.lblDisabled.Name = "lblDisabled";
-            this.lblDisabled.Padding = new System.Windows.Forms.Padding(3);
-            this.lblDisabled.Size = new System.Drawing.Size(775, 26);
-            this.lblDisabled.TabIndex = 10;
-            this.lblDisabled.Text = "      This feature is disabled.";
-            // 
-            // lblEnabled
-            // 
-            this.lblEnabled.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.lblEnabled.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblEnabled.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblEnabled.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.lblEnabled.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.lblEnabled.ImageIndex = 9;
-            this.lblEnabled.ImageList = this.imlMain;
-            this.lblEnabled.Location = new System.Drawing.Point(0, 22);
-            this.lblEnabled.Name = "lblEnabled";
-            this.lblEnabled.Padding = new System.Windows.Forms.Padding(3);
-            this.lblEnabled.Size = new System.Drawing.Size(775, 26);
-            this.lblEnabled.TabIndex = 12;
-            this.lblEnabled.Text = "       This feature is enabled";
-            // 
-            // lblSelectedOption
-            // 
-            this.lblSelectedOption.BackColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.lblSelectedOption.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblSelectedOption.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSelectedOption.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.lblSelectedOption.Location = new System.Drawing.Point(0, 0);
-            this.lblSelectedOption.Name = "lblSelectedOption";
-            this.lblSelectedOption.Padding = new System.Windows.Forms.Padding(3);
-            this.lblSelectedOption.Size = new System.Drawing.Size(775, 22);
-            this.lblSelectedOption.TabIndex = 9;
-            this.lblSelectedOption.Text = "Configuration";
             // 
             // pnlInfo
             // 
@@ -455,6 +303,158 @@ namespace SanteDB.Configurator
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
+            // 
+            // pnlFeature
+            // 
+            this.pnlFeature.Controls.Add(this.tcSettings);
+            this.pnlFeature.Controls.Add(this.lblDescription);
+            this.pnlFeature.Controls.Add(this.lblNoInstall);
+            this.pnlFeature.Controls.Add(this.btnDisable);
+            this.pnlFeature.Controls.Add(this.btnEnable);
+            this.pnlFeature.Controls.Add(this.lblDisabled);
+            this.pnlFeature.Controls.Add(this.lblEnabled);
+            this.pnlFeature.Controls.Add(this.lblSelectedOption);
+            this.pnlFeature.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlFeature.Location = new System.Drawing.Point(0, 0);
+            this.pnlFeature.Name = "pnlFeature";
+            this.pnlFeature.Size = new System.Drawing.Size(775, 348);
+            this.pnlFeature.TabIndex = 0;
+            // 
+            // lblDescription
+            // 
+            this.lblDescription.BackColor = System.Drawing.SystemColors.Control;
+            this.lblDescription.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblDescription.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDescription.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.lblDescription.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.lblDescription.ImageIndex = 5;
+            this.lblDescription.ImageList = this.imlMain;
+            this.lblDescription.Location = new System.Drawing.Point(0, 100);
+            this.lblDescription.Name = "lblDescription";
+            this.lblDescription.Padding = new System.Windows.Forms.Padding(3);
+            this.lblDescription.Size = new System.Drawing.Size(775, 26);
+            this.lblDescription.TabIndex = 14;
+            // 
+            // lblNoInstall
+            // 
+            this.lblNoInstall.BackColor = System.Drawing.Color.LightCoral;
+            this.lblNoInstall.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblNoInstall.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblNoInstall.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.lblNoInstall.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.lblNoInstall.ImageIndex = 12;
+            this.lblNoInstall.ImageList = this.imlMain;
+            this.lblNoInstall.Location = new System.Drawing.Point(0, 74);
+            this.lblNoInstall.Name = "lblNoInstall";
+            this.lblNoInstall.Padding = new System.Windows.Forms.Padding(3);
+            this.lblNoInstall.Size = new System.Drawing.Size(775, 26);
+            this.lblNoInstall.TabIndex = 15;
+            this.lblNoInstall.Text = "      This feature cannot be enabled. There may be a conflicting service.";
+            // 
+            // btnDisable
+            // 
+            this.btnDisable.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDisable.AutoSize = true;
+            this.btnDisable.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.btnDisable.Location = new System.Drawing.Point(725, 27);
+            this.btnDisable.Name = "btnDisable";
+            this.btnDisable.Size = new System.Drawing.Size(42, 13);
+            this.btnDisable.TabIndex = 13;
+            this.btnDisable.TabStop = true;
+            this.btnDisable.Text = "Disable";
+            this.btnDisable.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.btnDisable_LinkClicked);
+            // 
+            // btnEnable
+            // 
+            this.btnEnable.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnEnable.AutoSize = true;
+            this.btnEnable.BackColor = System.Drawing.SystemColors.Info;
+            this.btnEnable.Location = new System.Drawing.Point(727, 27);
+            this.btnEnable.Name = "btnEnable";
+            this.btnEnable.Size = new System.Drawing.Size(40, 13);
+            this.btnEnable.TabIndex = 11;
+            this.btnEnable.TabStop = true;
+            this.btnEnable.Text = "Enable";
+            this.btnEnable.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.btnEnable_LinkClicked);
+            // 
+            // tcSettings
+            // 
+            this.tcSettings.Alignment = System.Windows.Forms.TabAlignment.Bottom;
+            this.tcSettings.Controls.Add(this.tpSetting);
+            this.tcSettings.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tcSettings.ImageList = this.imlMain;
+            this.tcSettings.Location = new System.Drawing.Point(0, 126);
+            this.tcSettings.Name = "tcSettings";
+            this.tcSettings.SelectedIndex = 0;
+            this.tcSettings.Size = new System.Drawing.Size(775, 222);
+            this.tcSettings.TabIndex = 8;
+            // 
+            // tpSetting
+            // 
+            this.tpSetting.Controls.Add(this.pgConfiguration);
+            this.tpSetting.ImageIndex = 11;
+            this.tpSetting.Location = new System.Drawing.Point(4, 4);
+            this.tpSetting.Name = "tpSetting";
+            this.tpSetting.Padding = new System.Windows.Forms.Padding(3);
+            this.tpSetting.Size = new System.Drawing.Size(767, 195);
+            this.tpSetting.TabIndex = 0;
+            this.tpSetting.Text = "Configuration";
+            this.tpSetting.UseVisualStyleBackColor = true;
+            // 
+            // pgConfiguration
+            // 
+            this.pgConfiguration.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pgConfiguration.Location = new System.Drawing.Point(3, 3);
+            this.pgConfiguration.Name = "pgConfiguration";
+            this.pgConfiguration.PropertySort = System.Windows.Forms.PropertySort.Categorized;
+            this.pgConfiguration.Size = new System.Drawing.Size(761, 189);
+            this.pgConfiguration.TabIndex = 1;
+            this.pgConfiguration.ToolbarVisible = false;
+            // 
+            // lblDisabled
+            // 
+            this.lblDisabled.BackColor = System.Drawing.SystemColors.Info;
+            this.lblDisabled.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblDisabled.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDisabled.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.lblDisabled.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.lblDisabled.ImageIndex = 4;
+            this.lblDisabled.ImageList = this.imlMain;
+            this.lblDisabled.Location = new System.Drawing.Point(0, 48);
+            this.lblDisabled.Name = "lblDisabled";
+            this.lblDisabled.Padding = new System.Windows.Forms.Padding(3);
+            this.lblDisabled.Size = new System.Drawing.Size(775, 26);
+            this.lblDisabled.TabIndex = 10;
+            this.lblDisabled.Text = "      This feature is disabled.";
+            // 
+            // lblEnabled
+            // 
+            this.lblEnabled.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.lblEnabled.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblEnabled.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblEnabled.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.lblEnabled.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.lblEnabled.ImageIndex = 9;
+            this.lblEnabled.ImageList = this.imlMain;
+            this.lblEnabled.Location = new System.Drawing.Point(0, 22);
+            this.lblEnabled.Name = "lblEnabled";
+            this.lblEnabled.Padding = new System.Windows.Forms.Padding(3);
+            this.lblEnabled.Size = new System.Drawing.Size(775, 26);
+            this.lblEnabled.TabIndex = 12;
+            this.lblEnabled.Text = "       This feature is enabled";
+            // 
+            // lblSelectedOption
+            // 
+            this.lblSelectedOption.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.lblSelectedOption.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblSelectedOption.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSelectedOption.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.lblSelectedOption.Location = new System.Drawing.Point(0, 0);
+            this.lblSelectedOption.Name = "lblSelectedOption";
+            this.lblSelectedOption.Padding = new System.Windows.Forms.Padding(3);
+            this.lblSelectedOption.Size = new System.Drawing.Size(775, 22);
+            this.lblSelectedOption.TabIndex = 9;
+            this.lblSelectedOption.Text = "Configuration";
             // 
             // tpAdvanced
             // 
@@ -668,14 +668,14 @@ namespace SanteDB.Configurator
             this.spMainControl.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.spMainControl)).EndInit();
             this.spMainControl.ResumeLayout(false);
-            this.pnlFeature.ResumeLayout(false);
-            this.pnlFeature.PerformLayout();
-            this.tcSettings.ResumeLayout(false);
-            this.tpSetting.ResumeLayout(false);
             this.pnlInfo.ResumeLayout(false);
             this.pnlInfo.PerformLayout();
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.pnlFeature.ResumeLayout(false);
+            this.pnlFeature.PerformLayout();
+            this.tcSettings.ResumeLayout(false);
+            this.tpSetting.ResumeLayout(false);
             this.tpAdvanced.ResumeLayout(false);
             this.spEditor.Panel1.ResumeLayout(false);
             this.spEditor.Panel2.ResumeLayout(false);

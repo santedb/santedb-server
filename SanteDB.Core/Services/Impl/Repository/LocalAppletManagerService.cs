@@ -311,7 +311,7 @@ namespace SanteDB.Server.Core.Services.Impl
                         {
                             // Embedded cert and trusted CA
                             X509Certificate2 embCert = new X509Certificate2(package.PublicKey);
-                            if (!embCert.IsTrustedIntern(out IEnumerable<X509ChainStatus> chainStatus))
+                            if (!embCert.IsTrustedIntern(null, out IEnumerable<X509ChainStatus> chainStatus))
                             {
                                 throw new SecurityException($"Cannot verify identity of publisher {embCert.Subject} - {String.Join(",", chainStatus.Select(o=>o.Status))}");
                             }
