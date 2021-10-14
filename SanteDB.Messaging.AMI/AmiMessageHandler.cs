@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Services;
 using RestSrvr;
 using SanteDB.Core;
@@ -43,14 +44,11 @@ using SanteDB.Core.Interfaces;
 
 namespace SanteDB.Messaging.AMI
 {
-
-
     /// <summary>
     /// Http helper extensions
     /// </summary>
     public static class HttpHelperExtensions
     {
-
         /// <summary>
         /// Convert query types
         /// </summary>
@@ -67,7 +65,7 @@ namespace SanteDB.Messaging.AMI
     /// AMI Message handler
     /// </summary>
     [Description("The AMI provides administrative operations for SanteDB over HTTP")]
-    [ApiServiceProvider("Administrative REST Daemon", typeof(AmiServiceBehavior), configurationType: typeof(AmiConfigurationSection), required: true)]
+    [ApiServiceProvider("Administrative Messaging Interface", typeof(AmiServiceBehavior), configurationType: typeof(AmiConfigurationSection), required: true)]
     public class AmiMessageHandler : IDaemonService, IApiEndpointProvider
     {
         /// <summary>
@@ -120,7 +118,7 @@ namespace SanteDB.Messaging.AMI
         /// Fired when the service is stopping.
         /// </summary>
         public event EventHandler Stopping;
-       
+
         /// <summary>
         /// Gets the API type
         /// </summary>
@@ -178,7 +176,6 @@ namespace SanteDB.Messaging.AMI
             {
                 this.Starting?.Invoke(this, EventArgs.Empty);
 
-
                 this.m_webHost = ApplicationServiceContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(AmiServiceBehavior));
                 this.m_webHost.AddServiceBehavior(new ErrorServiceBehavior());
 
@@ -201,7 +198,7 @@ namespace SanteDB.Messaging.AMI
                         .ToList(),
                         typeof(IAmiServiceContract)
                     );
-                
+
                 this.Started?.Invoke(this, EventArgs.Empty);
                 return true;
             }

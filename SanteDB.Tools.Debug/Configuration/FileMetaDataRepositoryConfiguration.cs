@@ -18,8 +18,11 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing.Design;
+using System.Windows.Forms.Design;
 using System.Xml.Serialization;
 
 namespace SanteDB.Tools.Debug.Configuration
@@ -30,14 +33,13 @@ namespace SanteDB.Tools.Debug.Configuration
     [XmlType(nameof(FileMetaDataRepositoryConfiguration), Namespace = "http://santedb.org/configuration")]
     public class FileMetaDataRepositoryConfiguration
     {
-
         /// <summary>
         /// Metadata repository
         /// </summary>
-        [XmlArray("paths")]
-        [XmlArrayItem("add")]
+        [XmlAttribute("path")]
         [Description("Sets the base directory for the BI repository")]
-        public List<string> Paths { get; set; }
+        [Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
+        public string Path { get; set; }
 
         /// <summary>
         /// Rescan time
@@ -45,6 +47,5 @@ namespace SanteDB.Tools.Debug.Configuration
         [XmlAttribute("rescan")]
         [Description("The time between scans on the repository ")]
         public int RescanTime { get; set; }
-
     }
 }

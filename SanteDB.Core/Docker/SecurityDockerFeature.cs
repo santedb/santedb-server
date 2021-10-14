@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Configuration;
 using SanteDB.Docker.Core;
 using SanteDB.Server.Core.Configuration;
@@ -34,20 +35,21 @@ namespace SanteDB.Server.Core.Docker
     /// </summary>
     public class SecurityDockerFeature : IDockerFeature
     {
-
-     
         /// <summary>
         /// Password pattern setting
         /// </summary>
         public const String PasswordPatternSetting = "PWD_REGEX";
+
         /// <summary>
         /// Session length policy
         /// </summary>
         public const String SessionLengthSetting = "POL_SESSION";
+
         /// <summary>
         /// Session length policy
         /// </summary>
         public const String LockoutSetting = "POL_LOCK";
+
         /// <summary>
         /// Key setting
         /// </summary>
@@ -69,17 +71,13 @@ namespace SanteDB.Server.Core.Docker
         public void Configure(SanteDBConfiguration configuration, IDictionary<string, string> settings)
         {
             var secSection = configuration.GetSection<SecurityConfigurationSection>();
-            if(secSection == null)
+            if (secSection == null)
             {
                 secSection = new SecurityConfigurationSection()
                 {
                     PasswordRegex = @"^(?=.*\d){1,}(?=.*[a-z]){1,}(?=.*[A-Z]){1,}(?=.*[^\w\d]){1,}.{6,}$",
                     PepExemptionPolicy = PolicyEnforcementExemptionPolicy.NoExemptions,
-                    TrustedCertificates = new System.Collections.ObjectModel.ObservableCollection<string>()
-                    {
-                        "84BD51F0584A1F708D604CF0B8074A68D3BEB973",
-                        "82C63E1E9B87578D0727E871D7613F2F0FAF683B"
-                    },
+
                     SecurityPolicy = new List<SecurityPolicyConfiguration>()
                     {
                         new SecurityPolicyConfiguration(SecurityPolicyIdentification.PasswordHistory, true),
@@ -106,14 +104,14 @@ namespace SanteDB.Server.Core.Docker
                 configuration.AddSection(secSection);
             }
 
-            if(settings.TryGetValue(PasswordPatternSetting, out string passwordRegex))
+            if (settings.TryGetValue(PasswordPatternSetting, out string passwordRegex))
             {
                 secSection.PasswordRegex = passwordRegex;
             }
 
             if (settings.TryGetValue(LockoutSetting, out string lockout))
             {
-                if(!Int32.TryParse(lockout, out int lockoutInt))
+                if (!Int32.TryParse(lockout, out int lockoutInt))
                 {
                     throw new ArgumentException($"{lockout} is not a valid integer");
                 }
@@ -124,7 +122,6 @@ namespace SanteDB.Server.Core.Docker
             {
                 if (!TimeSpan.TryParse(lockout, out TimeSpan sessionLengthTs))
                 {
-                    
                     throw new ArgumentException($"{lockout} is not a valid integer");
                 }
                 secSection.SetPolicy(SecurityPolicyIdentification.SessionLength, (PolicyValueTimeSpan)sessionLengthTs);
@@ -133,18 +130,18 @@ namespace SanteDB.Server.Core.Docker
             foreach (var set in settings)
             {
                 // Key setting
-                if(set.Key.StartsWith(KeySetting))
+                if (set.Key.StartsWith(KeySetting))
                 {
                     var keyName = set.Key.Substring(KeySetting.Length);
                     secSection.Signatures.RemoveAll(o => o.KeyName == keyName);
 
                     var keyConfigData = set.Value.Split(':');
-                    if(keyConfigData.Length != 2)
+                    if (keyConfigData.Length != 2)
                     {
                         throw new ArgumentException($"Signature key {set.Key} is invalid, format is - (rs256|rs512|hs256):(keyvalue)");
                     }
 
-                    switch(keyConfigData[0].ToLowerInvariant())
+                    switch (keyConfigData[0].ToLowerInvariant())
                     {
                         case "hs256":
                             secSection.Signatures.Add(new SanteDB.Core.Security.Configuration.SecuritySignatureConfiguration()
@@ -154,6 +151,7 @@ namespace SanteDB.Server.Core.Docker
                                 KeyName = keyName
                             });
                             break;
+
                         case "rs256":
                             secSection.Signatures.Add(new SanteDB.Core.Security.Configuration.SecuritySignatureConfiguration()
                             {
@@ -165,6 +163,7 @@ namespace SanteDB.Server.Core.Docker
                                 KeyName = keyName
                             });
                             break;
+
                         case "rs512":
                             secSection.Signatures.Add(new SanteDB.Core.Security.Configuration.SecuritySignatureConfiguration()
                             {

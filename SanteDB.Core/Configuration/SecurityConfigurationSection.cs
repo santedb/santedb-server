@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Security.Configuration;
@@ -31,7 +32,6 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Server.Core.Configuration
 {
-
     /// <summary>
     /// Identifies the policy enforcement exception
     /// </summary>
@@ -43,16 +43,19 @@ namespace SanteDB.Server.Core.Configuration
         /// </summary>
         [XmlEnum("none")]
         NoExemptions = 0,
+
         /// <summary>
         /// Devices exempt
         /// </summary>
         [XmlEnum("devices")]
         DevicePrincipalsExempt = 0x1,
+
         /// <summary>
         /// Users exempt
         /// </summary>
         [XmlEnum("humans")]
         UserPrincipalsExempt = 0x2,
+
         /// <summary>
         /// Devices and humans are exempt
         /// </summary>
@@ -66,7 +69,6 @@ namespace SanteDB.Server.Core.Configuration
     [XmlType(nameof(SecurityConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class SecurityConfigurationSection : IConfigurationSection
     {
-
         /// <summary>
         /// Security configuration section
         /// </summary>
@@ -74,7 +76,7 @@ namespace SanteDB.Server.Core.Configuration
         {
             this.Signatures = new List<SecuritySignatureConfiguration>();
             this.PasswordRegex = RegexPasswordValidator.DefaultPasswordPattern;
-            this.TrustedCertificates = new ObservableCollection<string>();
+            //this.TrustedCertificates = new ObservableCollection<string>();
             this.SecurityPolicy = new List<SecurityPolicyConfiguration>();
         }
 
@@ -92,8 +94,8 @@ namespace SanteDB.Server.Core.Configuration
         [XmlAttribute("pepExemptionPolicy")]
         [DisplayName("PEP Exemption Policy")]
         [Description("Identifies the policy enforcement exception." +
-            "When set, certain types of security principals will not be subject to PEP rules." + 
-            "DevicePrincipalsExempt indicates that userless principals should not be subject to PEP enforcement" + 
+            "When set, certain types of security principals will not be subject to PEP rules." +
+            "DevicePrincipalsExempt indicates that userless principals should not be subject to PEP enforcement" +
             "UserPrincipalsExempt indicates that user principals should be should not be subject to PEP enforcement")]
         public PolicyEnforcementExemptionPolicy PepExemptionPolicy { get; set; }
 
@@ -104,14 +106,6 @@ namespace SanteDB.Server.Core.Configuration
         [Description("Describes the algorithm and key for signing data originating from this server")]
         [DisplayName("Signing Keys")]
         public List<SecuritySignatureConfiguration> Signatures { get; set; }
-
-        /// <summary>
-        /// Trusted publishers
-        /// </summary>
-        [XmlArray("trustedCertificates"), XmlArrayItem("add")]
-        [DisplayName("Trusted Certificates")]
-        [Description("Individual X.509 certificate thumbprints to trust")]
-        public ObservableCollection<string> TrustedCertificates { get; set; }
 
         /// <summary>
         /// Set the specified policy

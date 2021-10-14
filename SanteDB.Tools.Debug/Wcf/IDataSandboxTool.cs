@@ -18,31 +18,30 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using RestSrvr.Attributes;
 using System.IO;
 
-namespace SanteDB.Tools.DataSandbox.Wcf
+namespace SanteDB.Tools.Debug.Wcf
 {
     /// <summary>
     /// Query tool contract
     /// </summary>
-    [ServiceContract]
+    [ServiceContract(Name = "HDSI_Sandbox")]
     public interface IDataSandboxTool
     {
-
         /// <summary>
-        /// Create dataset 
+        /// Create dataset
         /// </summary>
         [RestInvoke(Method = "POST", UriTemplate = "/dataset")]
         Stream CreateDataset(Stream datasetSource);
 
         /// <summary>
-        /// Get static content 
+        /// Get static content
         /// </summary>
         /// <param name="content">The content to retrieve</param>
         /// <returns>The static content</returns>
         [RestInvoke(Method = "GET", UriTemplate = "/{*content}")]
         Stream StaticContent(string content);
-
     }
 }

@@ -43,40 +43,14 @@
   <ItemGroup>
     <Compile Include="DataSandboxService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Wcf\IDataSandboxTool.cs" />
-    <Compile Include="Wcf\DataSandboxTool.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\css\fonts\glyphicons-halflings-regular.eot" />
-    <EmbeddedResource Include="Resources\css\fonts\glyphicons-halflings-regular.ttf" />
-    <EmbeddedResource Include="Resources\css\fonts\glyphicons-halflings-regular.woff" />
-    <EmbeddedResource Include="Resources\css\fonts\glyphicons-halflings-regular.woff2" />
     <None Include="..\SanteDB.licenseheader">
       <Link>SanteDB.licenseheader</Link>
     </None>
     <None Include="sandbox.config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\codeSystem.html" />
-    <EmbeddedResource Include="Resources\controllers\authenticate.js" />
-    <EmbeddedResource Include="Resources\controllers\codeSystem.js" />
-    <EmbeddedResource Include="Resources\controllers\index.js" />
-    <EmbeddedResource Include="Resources\css\bootstrap.min.css" />
-    <EmbeddedResource Include="Resources\css\select2.min.css" />
-    <EmbeddedResource Include="Resources\index.html" />
-    <EmbeddedResource Include="Resources\js\angular.min.js" />
-    <EmbeddedResource Include="Resources\js\bootstrap.min.js" />
-    <EmbeddedResource Include="Resources\js\jquery.datefix.min.js" />
-    <EmbeddedResource Include="Resources\js\jquery.min.js" />
-    <EmbeddedResource Include="Resources\js\query-tool.js" />
-    <EmbeddedResource Include="Resources\js\santedb-model.js" />
-    <EmbeddedResource Include="Resources\js\santedb-ng.js" />
-    <EmbeddedResource Include="Resources\js\santedb.js" />
-    <EmbeddedResource Include="Resources\js\select2-extended-ajax.min.js" />
-    <EmbeddedResource Include="Resources\js\select2.min.js" />
-    <EmbeddedResource Include="Resources\requestBuilder.html" />
   </ItemGroup>
   <Choose>
     <When Condition="$(SolutionName.Contains('-ext'))">

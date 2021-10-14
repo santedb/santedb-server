@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.BI.Model;
 using SanteDB.BI.Services;
 using SanteDB.BI.Util;
@@ -43,14 +44,13 @@ namespace SanteDB.Tools.Debug.BI
     [ServiceProvider("File Based BI Repository")]
     public class FileMetadataRepository : IBiMetadataRepository, IDaemonService
     {
-
         // Timer
         private Timer m_scanTimer;
 
         // Tracer for logs
         private Tracer m_tracer = Tracer.GetTracer(typeof(FileMetadataRepository));
 
-        // Asset dictionary 
+        // Asset dictionary
         private ConcurrentDictionary<String, String> m_assetDictionary = new ConcurrentDictionary<string, string>();
 
         // Configuration
@@ -75,14 +75,17 @@ namespace SanteDB.Tools.Debug.BI
         /// Service is starting
         /// </summary>
         public event EventHandler Starting;
+
         /// <summary>
         /// Service is started
         /// </summary>
         public event EventHandler Started;
+
         /// <summary>
         /// Service is stopping
         /// </summary>
         public event EventHandler Stopping;
+
         /// <summary>
         /// Service is stopped
         /// </summary>
@@ -94,13 +97,13 @@ namespace SanteDB.Tools.Debug.BI
         public FileMetadataRepository()
         {
             // Validate paths
-            for (var i = this.m_configuration.BiMetadataRepository.Paths.Count - 1; i >= 0; i--)
+            for (var i = this.m_configuration.BiMetadataRepository.Count - 1; i >= 0; i--)
             {
-                var dir = this.m_configuration.BiMetadataRepository.Paths[i];
+                var dir = this.m_configuration.BiMetadataRepository[i].Path;
                 if (!Directory.Exists(dir))
                 {
                     this.m_tracer.TraceWarning("Cannot find directory {0}, removing from configuration", dir);
-                    this.m_configuration.BiMetadataRepository.Paths.RemoveAt(i);
+                    this.m_configuration.BiMetadataRepository.RemoveAt(i);
                 }
             }
         }
@@ -125,7 +128,7 @@ namespace SanteDB.Tools.Debug.BI
                         return (TBisDefinition)BiDefinition.Load(fs);
                     }
                 }
-                catch(InvalidCastException)
+                catch (InvalidCastException)
                 {
                     return null;
                 }
@@ -137,7 +140,6 @@ namespace SanteDB.Tools.Debug.BI
             }
             else
                 throw new KeyNotFoundException($"Cannot find definition for {id}");
-
         }
 
         /// <summary>
@@ -148,16 +150,14 @@ namespace SanteDB.Tools.Debug.BI
         /// <returns>The stored metadata parameter</returns>
         public TBisDefinition Insert<TBisDefinition>(TBisDefinition metadata) where TBisDefinition : BiDefinition
         {
-
-
-            string path = this.m_configuration.BiMetadataRepository.Paths.First();
+            string path = this.m_configuration.BiMetadataRepository.First().Path;
             foreach (var s in metadata.Id.Split('.'))
                 path = Path.Combine(path, s);
             path += ".xml";
 
             try
             {
-                if(this.m_assetDictionary.ContainsKey(metadata.Id))
+                if (this.m_assetDictionary.ContainsKey(metadata.Id))
                 {
                     this.m_tracer.TraceInfo("Removing existing definition for {0}", metadata.Id);
                     this.m_assetDictionary.TryRemove(metadata.Id, out path);
@@ -235,13 +235,11 @@ namespace SanteDB.Tools.Debug.BI
             this.m_tracer.TraceInfo("Starting File-Based Asset Definition Repository...");
             this.Starting?.Invoke(this, EventArgs.Empty);
 
-           
             this.m_scanTimer = new Timer(_ =>
             {
-                foreach(var path in this.m_configuration.BiMetadataRepository.Paths)
-                    this.LoadDefinitions(path);
-
-            }, null, 0, this.m_configuration.BiMetadataRepository.RescanTime);
+                foreach (var path in this.m_configuration.BiMetadataRepository)
+                    this.LoadDefinitions(path.Path);
+            }, null, 0, this.m_configuration.BiMetadataRepository.First().RescanTime);
 
             this.Started?.Invoke(this, EventArgs.Empty);
             return true;
@@ -256,7 +254,7 @@ namespace SanteDB.Tools.Debug.BI
 
             foreach (var subDir in Directory.GetDirectories(path))
                 this.LoadDefinitions(subDir);
-            foreach(var f in Directory.GetFiles(path, "*.xml"))
+            foreach (var f in Directory.GetFiles(path, "*.xml"))
             {
                 try
                 {
@@ -277,9 +275,8 @@ namespace SanteDB.Tools.Debug.BI
                     }
                     else
                         this.m_assetDictionary.TryAdd(asset.Id, f);
-
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_tracer.TraceWarning("File {0} could not be loaded : {1}", f, e);
                 }
