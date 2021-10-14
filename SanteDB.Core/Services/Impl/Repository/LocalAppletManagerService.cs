@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Applets;
 using SanteDB.Core.Applets.Model;
@@ -49,7 +50,6 @@ namespace SanteDB.Server.Core.Services.Impl
     [ServiceProvider("Local Applet Repository/Manager", Configuration = typeof(AppletConfigurationSection))]
     public class LocalAppletManagerService : IAppletManagerService, IAppletSolutionManagerService, IDaemonService
     {
-
         /// <summary>
         /// Gets the service name
         /// </summary>
@@ -74,7 +74,7 @@ namespace SanteDB.Server.Core.Services.Impl
         private Tracer m_tracer = new Tracer(SanteDBConstants.ServiceTraceSourceName + ".AppletManager");
 
         /// <summary>
-        /// Indicates whether the service is running 
+        /// Indicates whether the service is running
         /// </summary>
         public bool IsRunning => true;
 
@@ -108,18 +108,22 @@ namespace SanteDB.Server.Core.Services.Impl
         /// The daemon has started
         /// </summary>
         public event EventHandler Started;
+
         /// <summary>
         /// The daemon is starting
         /// </summary>
         public event EventHandler Starting;
+
         /// <summary>
         /// The daemon has stopped
         /// </summary>
         public event EventHandler Stopped;
+
         /// <summary>
         /// The daemon is stopping
         /// </summary>
         public event EventHandler Stopping;
+
         /// <summary>
         /// Applet has changed
         /// </summary>
@@ -158,7 +162,6 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public bool UnInstall(String packageId)
         {
-
             this.m_tracer.TraceInfo("Un-installing {0}", packageId);
             // Applet check
             var applet = this.m_appletCollection[String.Empty].FirstOrDefault(o => o.Info.Id == packageId);
@@ -195,7 +198,7 @@ namespace SanteDB.Server.Core.Services.Impl
         }
 
         /// <summary>
-        /// Install package 
+        /// Install package
         /// </summary>
         public bool Install(AppletPackage package, bool isUpgrade = false)
         {
@@ -203,12 +206,11 @@ namespace SanteDB.Server.Core.Services.Impl
         }
 
         /// <summary>
-        /// Performs an installation 
+        /// Performs an installation
         /// </summary>
         public bool Install(AppletPackage package, bool isUpgrade, AppletSolution owner)
         {
             this.m_tracer.TraceInfo("Installing {0}", package.Meta);
-
 
             var appletScope = owner?.Meta.Id ?? String.Empty;
             // TODO: Verify package hash / signature
@@ -298,7 +300,7 @@ namespace SanteDB.Server.Core.Services.Impl
             {
                 this.m_tracer.TraceInfo("Will verify package {0}", package.Meta.Id.ToString());
 
-                // Get the public key 
+                // Get the public key
                 var x509Store = new X509Store(StoreName.TrustedPublisher, StoreLocation.LocalMachine);
                 try
                 {
@@ -311,13 +313,12 @@ namespace SanteDB.Server.Core.Services.Impl
                         {
                             // Embedded cert and trusted CA
                             X509Certificate2 embCert = new X509Certificate2(package.PublicKey);
-                            if (!embCert.IsTrustedIntern(null, out IEnumerable<X509ChainStatus> chainStatus))
+                            if (!embCert.IsTrustedIntern(new X509Certificate2Collection(), out IEnumerable<X509ChainStatus> chainStatus))
                             {
-                                throw new SecurityException($"Cannot verify identity of publisher {embCert.Subject} - {String.Join(",", chainStatus.Select(o=>o.Status))}");
+                                throw new SecurityException($"Cannot verify identity of publisher {embCert.Subject} - {String.Join(",", chainStatus.Select(o => o.Status))}");
                             }
                             else
                                 cert = new X509Certificate2Collection(embCert);
-
                         }
                         else
                             throw new SecurityException($"Cannot find public key of publisher information for {package.Meta.PublicKeyToken} or the local certificate is invalid");
@@ -374,11 +375,10 @@ namespace SanteDB.Server.Core.Services.Impl
         }
 
         /// <summary>
-        /// Starts the daemon service 
+        /// Starts the daemon service
         /// </summary>
         public bool Start()
         {
-
             this.m_tracer.TraceInfo("Starting applet manager service...");
 
             this.Starting?.Invoke(this, EventArgs.Empty);
@@ -431,14 +431,13 @@ namespace SanteDB.Server.Core.Services.Impl
                                 throw new SecurityException("Cannot proceed while untrusted applets are present");
                             }
                         }
-
                     }
                 }
             }
             catch (SecurityException e)
             {
                 this.m_tracer.TraceEvent(EventLevel.Error, "Error loading applets: {0}", e);
-                throw new InvalidOperationException("Cannot proceed while untrusted applets are present");
+                throw new InvalidOperationException("Cannot proceed while untrusted applets are present - Run `santedb --install-certs` or install the publisher certificate into `TrustedPublishers` certificate store", e);
             }
             catch (Exception ex)
             {
@@ -494,7 +493,6 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             throw new SecurityException("Loading applet manifests directly is disabled for security reasons");
         }
-
 
         /// <summary>
         /// Install the specified applet solution

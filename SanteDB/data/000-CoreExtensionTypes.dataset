@@ -3,28 +3,36 @@
   <update insertIfNotExists="true">
     <ExtensionType xmlns="http://santedb.org/model">
       <id>77B53CBA-C32F-442B-B7A7-ED08184A0FA5</id>
-      <handlerClass>SanteDB.Core.Extensions.BinaryExtensionHandler, SanteDB.Core.Model, Version=1.1.0.0</handlerClass>
+      <handlerClass>SanteDB.Core.Extensions.BinaryExtensionHandler, SanteDB.Core.Model</handlerClass>
       <name>http://santedb.org/extensions/core/jpegPhoto</name>
     </ExtensionType>
   </update>
   <update insertIfNotExists="true">
     <ExtensionType xmlns="http://santedb.org/model">
+      <id>07B1A3CD-4A22-49DD-B2EC-9E4DEC234B10</id>
+      <handlerClass>SanteDB.Core.Extensions.ReferenceExtensionHandler, SanteDB.Core.Model</handlerClass>
+      <name>http://santedb.org/extensions/ext/raceCode</name>
+    </ExtensionType>
+  </update>
+
+  <update insertIfNotExists="true">
+    <ExtensionType xmlns="http://santedb.org/model">
       <id>B944E7A9-8225-4E33-BB5B-3C3BC3DFA802</id>
-      <handlerClass>SanteDB.Core.Extensions.DateExtensionHandler, SanteDB.Core.Model, Version=1.1.0.0</handlerClass>
+      <handlerClass>SanteDB.Core.Extensions.DateExtensionHandler, SanteDB.Core.Model</handlerClass>
       <name>http://santedb.org/extensions/core/originalDate</name>
     </ExtensionType>
   </update>
   <update insertIfNotExists="true">
     <ExtensionType xmlns="http://santedb.org/model">
       <id>5d91d3d5-783d-4024-bb20-d50bc101f7fc</id>
-      <handlerClass>SanteDB.Core.Extensions.ReferenceExtensionHandler, SanteDB.Core.Model, Version=1.1.0.0</handlerClass>
+      <handlerClass>SanteDB.Core.Extensions.ReferenceExtensionHandler, SanteDB.Core.Model</handlerClass>
       <name>http://santedb.org/extensions/core/contactRole</name>
     </ExtensionType>
   </update>
   <update insertIfNotExists="true">
     <ExtensionType xmlns="http://santedb.org/model">
       <id>6DE54C16-8D1C-48E4-B750-7A2F4552E86D</id>
-      <handlerClass>SanteDB.Core.Extensions.DictionaryExtensionHandler, SanteDB.Core.Model, Version=1.1.0.0</handlerClass>
+      <handlerClass>SanteDB.Core.Extensions.DictionaryExtensionHandler, SanteDB.Core.Model</handlerClass>
       <name>http://santedb.org/extensions/core/detectedIssue</name>
     </ExtensionType>
   </update>
