@@ -167,6 +167,7 @@
     <Compile Include="Services\AdoPolicyInformationService.cs" />
     <Compile Include="Services\AdoRoleProvider.cs" />
     <Compile Include="Services\AdoSecurityChallengeProvider.cs" />
+    <Compile Include="Services\AdoServiceFactory.cs" />
     <Compile Include="Services\AdoSessionProvider.cs" />
     <Compile Include="Services\AdoSubscriptionExecutor.cs" />
     <Compile Include="Services\IAdoCopyProvider.cs" />

@@ -83,29 +83,13 @@ namespace SanteDB.Tools.Debug.Wcf
 
                 if (filename == "config.json")
                 {
-                    return typeof(DataSandboxTool).Assembly.GetManifestResourceStream("SanteDB.Tools.Debug.santedb.config.json");
+                    return typeof(DataSandboxTool).Assembly.GetManifestResourceStream($"{typeof(DataSandboxService).Namespace}.sandbox.config.json");
                 }
                 else
                 {
                     // Get the query tool stream
-#if DEBUG
-                    var contentPath = Path.Combine(Path.GetDirectoryName(typeof(DataSandboxTool).Assembly.Location), "SandboxTool", filename);
 
-                    if (!File.Exists(contentPath))
-                    {
-                        RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.NotFound;
-                        return null;
-                    }
-                    else
-                    {
-                        RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.OK;
-                        RestOperationContext.Current.OutgoingResponse.ContentLength64 = new FileInfo(contentPath).Length;
-                        RestOperationContext.Current.OutgoingResponse.ContentType = DefaultContentTypeMapper.GetContentType(contentPath);
-
-                        return File.OpenRead(contentPath);
-                    }
-#else
-                    var contentPath = $"SanteDB.Tools.DataSandbox.Resources.{filename.Replace("/", ".")}";
+                    var contentPath = $"{typeof(DataSandboxService).Namespace}.Resources.{filename.Replace("/", ".")}";
 
                     if (!typeof(DataSandboxTool).Assembly.GetManifestResourceNames().Contains(contentPath))
                     {
@@ -120,7 +104,6 @@ namespace SanteDB.Tools.Debug.Wcf
 
                         return typeof(DataSandboxTool).Assembly.GetManifestResourceStream(contentPath);
                     }
-#endif
                 }
             }
             catch (Exception e)

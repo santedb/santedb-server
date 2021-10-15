@@ -1,8 +1,10 @@
-﻿using SanteDB.Core.Configuration;
+﻿using SanteDB.BI.Services;
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Features;
 using SanteDB.Rest.Common.Behavior;
 using SanteDB.Rest.Common.Configuration;
 using SanteDB.Tools.Debug.BI;
+using SanteDB.Tools.Debug.Wcf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,7 +65,7 @@ namespace SanteDB.Tools.Debug.Configuration.Features
         /// </summary>
         public IEnumerable<IConfigurationTask> CreateInstallTasks()
         {
-            yield return new InstallServiceTask(this, typeof(FileMetadataRepository), () => (bool)this.m_configuration.Values[BiFileRepositoryEnabledSetting] == true, true);
+            yield return new InstallServiceTask(this, typeof(FileMetadataRepository), () => (bool)this.m_configuration.Values[BiFileRepositoryEnabledSetting] == true, typeof(IBiMetadataRepository));
             yield return new InstallServiceTask(this, typeof(DataSandboxService), () => (bool)this.m_configuration.Values[SanteboxServiceEnabledSetting] == true);
             yield return new InstallRestServiceTask(this, this.m_configuration.Values[SanteboxServiceSetting] as RestServiceConfiguration, () => (bool)this.m_configuration.Values[SanteboxServiceEnabledSetting] == true);
             yield return new InstallConfigurationSectionTask(this, this.m_configuration.Values[BiFileRepositorySetting] as IConfigurationSection, "Debug Tools");
@@ -100,10 +102,12 @@ namespace SanteDB.Tools.Debug.Configuration.Features
             this.m_configuration.Values.Add(SanteboxServiceSetting, configuration.GetSection<RestConfigurationSection>().Services.FirstOrDefault(o => o.Name == "HDSI_Sandbox") ?? new RestServiceConfiguration()
             {
                 Name = "HDSI_Sandbox",
+                ServiceType = typeof(DataSandboxTool),
                 Endpoints = new List<RestEndpointConfiguration>() {
                 new RestEndpointConfiguration()
                 {
-                    Address = "http://127.0.0.1:8080/hdsi-sandbox",
+                    Contract = typeof(IDataSandboxTool),
+                    Address = "http://127.0.0.1:8080/sandbox",
                     Behaviors = new List<RestEndpointBehaviorConfiguration>()
                     {
                         new RestEndpointBehaviorConfiguration(typeof(MessageCompressionEndpointBehavior)),

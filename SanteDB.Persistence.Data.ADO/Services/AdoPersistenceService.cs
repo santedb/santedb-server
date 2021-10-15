@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.BI;
 using SanteDB.BI.Model;
 using SanteDB.BI.Services;
@@ -58,15 +59,12 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
-
-
     /// <summary>
     /// Represents a dummy service which just adds the persistence services to the context
     /// </summary>
     [ServiceProvider("ADO.NET Data Persistence Service", Configuration = typeof(AdoPersistenceConfigurationSection))]
-    public class AdoPersistenceService : IDaemonService, ISqlDataPersistenceService, IAdoPersistenceSettingsProvider, IServiceFactory
+    public class AdoPersistenceService : IDaemonService, ISqlDataPersistenceService, IAdoPersistenceSettingsProvider
     {
-
         /// <summary>
         /// Gets the service name
         /// </summary>
@@ -144,7 +142,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
             this.m_policyEnforcementService = policyEnforcementService;
             var tracer = new Tracer(AdoDataConstants.TraceSourceName);
 
-
             // Apply the migrations
             this.m_tracer.TraceInfo("Scanning for schema updates...");
 
@@ -163,10 +160,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     hax.Where(o => o != null).ToArray()
                 );
 
-
                 // Bind subscription execution
                 serviceManager.AddServiceProvider(typeof(AdoSubscriptionExecutor));
-
             }
             catch (ModelMapValidationException ex)
             {
@@ -180,216 +175,27 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
         }
 
-        /// <summary>
-        /// Generic versioned persister service for any non-customized persister
-        /// </summary>
-        internal class GenericBasePersistenceService<TModel, TDomain> : BaseDataPersistenceService<TModel, TDomain>
-            where TDomain : class, IDbBaseData, new()
-            where TModel : BaseEntityData, new()
-        {
-
-            public GenericBasePersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
-            {
-            }
-
-            /// <summary>
-            /// Ensure exists
-            /// </summary>
-            public override TModel InsertInternal(DataContext context, TModel data)
-            {
-                foreach (var rp in typeof(TModel).GetRuntimeProperties().Where(o => typeof(IdentifiedData).IsAssignableFrom(o.PropertyType)))
-                {
-                    if (rp.GetCustomAttribute<DataIgnoreAttribute>() != null || !rp.CanRead || !rp.CanWrite)
-                        continue;
-
-                    var instance = rp.GetValue(data);
-                    if (instance != null)
-                        rp.SetValue(data, DataModelExtensions.EnsureExists(instance as IdentifiedData, context));
-                }
-                return base.InsertInternal(context, data);
-            }
-
-            /// <summary>
-            /// Update the specified object
-            /// </summary>
-            public override TModel UpdateInternal(DataContext context, TModel data)
-            {
-                foreach (var rp in typeof(TModel).GetRuntimeProperties().Where(o => typeof(IdentifiedData).IsAssignableFrom(o.PropertyType)))
-                {
-                    if (rp.GetCustomAttribute<DataIgnoreAttribute>() != null || !rp.CanRead || !rp.CanWrite)
-                        continue;
-
-                    var instance = rp.GetValue(data);
-                    if (instance != null)
-                        rp.SetValue(data, DataModelExtensions.EnsureExists(instance as IdentifiedData, context));
-
-                }
-                return base.UpdateInternal(context, data);
-            }
-        }
-
-        /// <summary>
-        /// Generic versioned persister service for any non-customized persister
-        /// </summary>
-        internal class GenericIdentityPersistenceService<TModel, TDomain> : IdentifiedPersistenceService<TModel, TDomain>
-            where TModel : IdentifiedData, new()
-            where TDomain : class, IDbIdentified, new()
-        {
-
-            public GenericIdentityPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
-            {
-            }
-
-            /// <summary>
-            /// Ensure exists
-            /// </summary>
-            public override TModel InsertInternal(DataContext context, TModel data)
-            {
-                foreach (var rp in typeof(TModel).GetRuntimeProperties().Where(o => typeof(IdentifiedData).IsAssignableFrom(o.PropertyType)))
-                {
-                    if (rp.GetCustomAttribute<DataIgnoreAttribute>() != null || !rp.CanRead || !rp.CanWrite)
-                        continue;
-
-                    var instance = rp.GetValue(data);
-                    if (instance != null)
-                        rp.SetValue(data, DataModelExtensions.EnsureExists(instance as IdentifiedData, context));
-
-                }
-                return base.InsertInternal(context, data);
-            }
-
-            /// <summary>
-            /// Update the specified object
-            /// </summary>
-            public override TModel UpdateInternal(DataContext context, TModel data)
-            {
-                foreach (var rp in typeof(TModel).GetRuntimeProperties().Where(o => typeof(IdentifiedData).IsAssignableFrom(o.PropertyType)))
-                {
-                    if (rp.GetCustomAttribute<DataIgnoreAttribute>() != null || !rp.CanRead || !rp.CanWrite)
-                        continue;
-
-                    var instance = rp.GetValue(data);
-                    if (instance != null)
-                        rp.SetValue(data, DataModelExtensions.EnsureExists(instance as IdentifiedData, context));
-
-                }
-                return base.UpdateInternal(context, data);
-            }
-        }
-
-        /// <summary>
-        /// Generic association persistence service
-        /// </summary>
-        internal class GenericBaseAssociationPersistenceService<TModel, TDomain> :
-            GenericBasePersistenceService<TModel, TDomain>, IAdoAssociativePersistenceService
-            where TModel : BaseEntityData, ISimpleAssociation, new()
-            where TDomain : class, IDbBaseData, new()
-        {
-
-            public GenericBaseAssociationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
-            {
-            }
-
-            /// <summary>
-            /// Get all the matching TModel object from source
-            /// </summary>
-            public IEnumerable GetFromSource(DataContext context, Guid sourceId, decimal? versionSequenceId)
-            {
-                int tr = 0;
-                return this.QueryInternal(context, base.BuildSourceQuery<TModel>(sourceId), Guid.Empty, 0, null, out tr, null).ToList();
-            }
-        }
-
-        /// <summary>
-        /// Generic association persistence service
-        /// </summary>
-        internal class GenericBaseVersionedAssociationPersistenceService<TModel, TDomain> :
-            GenericBasePersistenceService<TModel, TDomain>, IAdoAssociativePersistenceService
-            where TModel : BaseEntityData, IVersionedAssociation, new()
-            where TDomain : class, IDbBaseData, new()
-        {
-
-            public GenericBaseVersionedAssociationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
-            {
-            }
-
-            /// <summary>
-            /// Get all the matching TModel object from source
-            /// </summary>
-            public IEnumerable GetFromSource(DataContext context, Guid sourceId, decimal? versionSequenceId)
-            {
-                int tr = 0;
-                // TODO: Check that this query is actually building what it is supposed to.
-                return this.QueryInternal(context, base.BuildSourceQuery<TModel>(sourceId, versionSequenceId), Guid.Empty, 0, null, out tr, null).ToList();
-            }
-        }
-
-        /// <summary>
-        /// Generic association persistence service
-        /// </summary>
-        internal class GenericIdentityAssociationPersistenceService<TModel, TDomain> :
-            GenericIdentityPersistenceService<TModel, TDomain>, IAdoAssociativePersistenceService
-            where TModel : IdentifiedData, ISimpleAssociation, new()
-            where TDomain : class, IDbIdentified, new()
-        {
-
-
-            public GenericIdentityAssociationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
-            {
-            }
-
-            /// <summary>
-            /// Get all the matching TModel object from source
-            /// </summary>
-            public IEnumerable GetFromSource(DataContext context, Guid sourceId, decimal? versionSequenceId)
-            {
-                int tr = 0;
-                return this.QueryInternal(context, base.BuildSourceQuery<TModel>(sourceId), Guid.Empty, 0, null, out tr, null).ToList();
-            }
-        }
-
-        /// <summary>
-        /// Generic association persistence service
-        /// </summary>
-        internal class GenericIdentityVersionedAssociationPersistenceService<TModel, TDomain> :
-            GenericIdentityPersistenceService<TModel, TDomain>, IAdoAssociativePersistenceService
-            where TModel : IdentifiedData, IVersionedAssociation, new()
-            where TDomain : class, IDbIdentified, new()
-        {
-
-            public GenericIdentityVersionedAssociationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
-            {
-            }
-
-            /// <summary>
-            /// Get all the matching TModel object from source
-            /// </summary>
-            public IEnumerable GetFromSource(DataContext context, Guid sourceId, decimal? versionSequenceId)
-            {
-                int tr = 0;
-                // TODO: Check that this query is actually building what it is supposed to.
-                return this.QueryInternal(context, base.BuildSourceQuery<TModel>(sourceId, versionSequenceId), Guid.Empty, 0, null, out tr, null).ToList();
-            }
-        }
-
-
         // Tracer
         private Tracer m_tracer = new Tracer(AdoDataConstants.TraceSourceName);
 
         // When service is running
         private bool m_running = false;
+
         /// <summary>
         /// Service is starting
         /// </summary>
         public event EventHandler Starting;
+
         /// <summary>
         /// Service is stopping
         /// </summary>
         public event EventHandler Stopping;
+
         /// <summary>
         /// Service has started
         /// </summary>
         public event EventHandler Started;
+
         /// <summary>
         /// Service has stopped
         /// </summary>
@@ -466,81 +272,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     }
                 }
 
-                // Now iterate through the map file and ensure we have all the mappings, if a class does not exist create it
-                try
-                {
-                    this.m_tracer.TraceEvent(EventLevel.Informational, "Creating secondary model maps...");
-
-                    var map = ModelMap.Load(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName));
-                    foreach (var itm in map.Class)
-                    {
-                        // Is there a persistence service?
-                        var idpType = typeof(IDataPersistenceService<>);
-                        Type modelClassType = Type.GetType(itm.ModelClass),
-                            domainClassType = Type.GetType(itm.DomainClass);
-
-                        // Make sure we're allowed to run this
-                        if (this.GetConfiguration().AllowedResources.Count > 0 &&
-                            !this.GetConfiguration().AllowedResources.Any(t => t.Type == modelClassType))
-                            continue;
-
-                        idpType = idpType.MakeGenericType(modelClassType);
-
-                        if (modelClassType.IsAbstract || domainClassType.IsAbstract) continue;
-
-                        // Already created
-                        if (ApplicationServiceContext.Current.GetService(idpType) != null)
-                            continue;
-
-                        this.m_tracer.TraceEvent(EventLevel.Verbose, "Creating map {0} > {1}", modelClassType, domainClassType);
-
-                        if (this.m_persistenceCache.ContainsKey(modelClassType))
-                            this.m_tracer.TraceWarning("Duplicate initialization of {0}", modelClassType);
-                        else if (modelClassType.Implements(typeof(IBaseEntityData)) &&
-                           domainClassType.Implements(typeof(IDbBaseData)))
-                        {
-                            // Construct a type
-                            Type pclass = null;
-                            if (modelClassType.Implements(typeof(IVersionedAssociation)))
-                                pclass = typeof(GenericBaseVersionedAssociationPersistenceService<,>);
-                            else if (modelClassType.Implements(typeof(ISimpleAssociation)))
-                                pclass = typeof(GenericBaseAssociationPersistenceService<,>);
-                            else
-                                pclass = typeof(GenericBasePersistenceService<,>);
-                            pclass = pclass.MakeGenericType(modelClassType, domainClassType);
-                            var instance = Activator.CreateInstance(pclass, this);
-                            ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(instance);
-                            // Add to cache since we're here anyways
-                            this.m_persistenceCache.Add(modelClassType, instance as IAdoPersistenceService);
-                        }
-                        else if (modelClassType.Implements(typeof(IIdentifiedEntity)) &&
-                            domainClassType.Implements(typeof(IDbIdentified)))
-                        {
-                            // Construct a type
-                            Type pclass = null;
-                            if (modelClassType.Implements(typeof(IVersionedAssociation)))
-                                pclass = typeof(GenericIdentityVersionedAssociationPersistenceService<,>);
-                            else if (modelClassType.Implements(typeof(ISimpleAssociation)))
-                                pclass = typeof(GenericIdentityAssociationPersistenceService<,>);
-                            else
-                                pclass = typeof(GenericIdentityPersistenceService<,>);
-
-                            pclass = pclass.MakeGenericType(modelClassType, domainClassType);
-                            var instance = Activator.CreateInstance(pclass, this);
-                            ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(instance);
-                            this.m_persistenceCache.Add(modelClassType, instance as IAdoPersistenceService);
-                        }
-                        else
-                            this.m_tracer.TraceEvent(EventLevel.Warning, "Classmap {0}>{1} cannot be created, ignoring", modelClassType, domainClassType);
-
-                    }
-                }
-                catch (Exception e)
-                {
-                    this.m_tracer.TraceEvent(EventLevel.Error, "Error initializing local persistence: {0}", e);
-                    throw new Exception("Error initializing local persistence", e);
-                }
-
                 // Bind BI stuff
                 ApplicationServiceContext.Current.GetService<IBiMetadataRepository>()?.Insert(new SanteDB.BI.Model.BiDataSourceDefinition()
                 {
@@ -595,7 +326,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public void ExecuteNonQuery(string sql)
         {
-
             if (AuthenticationContext.Current.Principal != AuthenticationContext.SystemPrincipal)
             {
                 this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration);
@@ -629,114 +359,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
 #else
                     throw new DataPersistenceException("Error querying undelying storage service", e);
 #endif
-
                 }
             }
-        }
-
-        /// <summary>
-        /// Try to create service <typeparamref name="TService"/>
-        /// </summary>
-        public bool TryCreateService<TService>(out TService serviceInstance)
-        {
-            if (this.TryCreateService(typeof(TService), out object service))
-            {
-                serviceInstance = (TService)service;
-                return true;
-            }
-            serviceInstance = default(TService);
-            return false;
-        }
-
-        /// <summary>
-        /// Try to create service <paramref name="serviceType"/>
-        /// </summary>
-        public bool TryCreateService(Type serviceType, out object serviceInstance)
-        {
-
-            // Look for concrete services
-            var st = AppDomain.CurrentDomain.GetAllTypes().FirstOrDefault(o => typeof(IAdoPersistenceService).IsAssignableFrom(o) && serviceType.IsAssignableFrom(o));
-            if (st != null)
-            {
-                serviceInstance = Activator.CreateInstance(st, this);
-                return true;
-            }
-            else if (st == null && typeof(IDataPersistenceService).IsAssignableFrom(serviceType) && serviceType.IsGenericType)
-            {
-                serviceInstance = null;
-                var wrappedType = serviceType.GetGenericArguments()[0];
-                var map = ModelMap.Load(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(AdoDataConstants.MapResourceName));
-                var classMapData = map.Class.FirstOrDefault(m => m.ModelType == wrappedType);
-                if (classMapData != null) // We have a map!!!
-                {
-                    // Is there a persistence service?
-                    var idpType = typeof(IDataPersistenceService<>);
-                    Type modelClassType = Type.GetType(classMapData.ModelClass),
-                        domainClassType = Type.GetType(classMapData.DomainClass);
-
-                    // Make sure we're allowed to run this
-                    if (this.GetConfiguration().AllowedResources.Count > 0 &&
-                        !this.GetConfiguration().AllowedResources.Any(t => t.Type == modelClassType))
-                    {
-                        return false;
-                    }
-
-                    idpType = idpType.MakeGenericType(modelClassType);
-
-                    if (modelClassType.IsAbstract || domainClassType.IsAbstract)
-                    {
-                        return false;
-                    }
-
-                    this.m_tracer.TraceEvent(EventLevel.Verbose, "Creating map {0} > {1}", modelClassType, domainClassType);
-
-                    if (this.m_persistenceCache.ContainsKey(modelClassType))
-                        this.m_tracer.TraceWarning("Duplicate initialization of {0}", modelClassType);
-                    else if (modelClassType.Implements(typeof(IBaseEntityData)) &&
-                       domainClassType.Implements(typeof(IDbBaseData)))
-                    {
-                        // Construct a type
-                        Type pclass = null;
-                        if (modelClassType.Implements(typeof(IVersionedAssociation)))
-                            pclass = typeof(GenericBaseVersionedAssociationPersistenceService<,>);
-                        else if (modelClassType.Implements(typeof(ISimpleAssociation)))
-                            pclass = typeof(GenericBaseAssociationPersistenceService<,>);
-                        else
-                            pclass = typeof(GenericBasePersistenceService<,>);
-                        pclass = pclass.MakeGenericType(modelClassType, domainClassType);
-                        serviceInstance = Activator.CreateInstance(pclass, this);
-                        // Add to cache since we're here anyways
-                        this.m_persistenceCache.Add(modelClassType, serviceInstance as IAdoPersistenceService);
-                        return true;
-                    }
-                    else if (modelClassType.Implements(typeof(IIdentifiedEntity)) &&
-                        domainClassType.Implements(typeof(IDbIdentified)))
-                    {
-                        // Construct a type
-                        Type pclass = null;
-                        if (modelClassType.Implements(typeof(IVersionedAssociation)))
-                            pclass = typeof(GenericIdentityVersionedAssociationPersistenceService<,>);
-                        else if (modelClassType.Implements(typeof(ISimpleAssociation)))
-                            pclass = typeof(GenericIdentityAssociationPersistenceService<,>);
-                        else
-                            pclass = typeof(GenericIdentityPersistenceService<,>);
-
-                        pclass = pclass.MakeGenericType(modelClassType, domainClassType);
-                        serviceInstance = Activator.CreateInstance(pclass, this);
-                        this.m_persistenceCache.Add(modelClassType, serviceInstance as IAdoPersistenceService);
-                        return true;
-                    }
-                    else
-                    {
-                        this.m_tracer.TraceEvent(EventLevel.Warning, "Classmap {0}>{1} cannot be created, ignoring", modelClassType, domainClassType);
-                        return false;
-                    }
-                }
-            }
-            serviceInstance = null;
-            return false;
-
         }
     }
 }
-

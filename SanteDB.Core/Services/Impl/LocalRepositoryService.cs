@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
@@ -42,7 +43,6 @@ namespace SanteDB.Server.Core.Services.Impl
     [ServiceProvider("Local (database) repository service", Dependencies = new Type[] { typeof(IDataPersistenceService) })]
     public class LocalRepositoryService : IDaemonService, IServiceFactory
     {
-
         // Repository services
         private readonly Type[] r_repositoryServices = new Type[] {
                 typeof(LocalConceptRepository),
@@ -82,6 +82,7 @@ namespace SanteDB.Server.Core.Services.Impl
 
         // Trace source
         private Tracer m_tracer = new Tracer(SanteDBConstants.DataTraceSourceName);
+
         private IServiceManager m_serviceManager;
 
         /// <summary>
@@ -101,14 +102,17 @@ namespace SanteDB.Server.Core.Services.Impl
         /// Fired when starting
         /// </summary>
         public event EventHandler Starting;
+
         /// <summary>
         /// Fired when stopping
         /// </summary>
         public event EventHandler Stopping;
+
         /// <summary>
         /// Fired when started
         /// </summary>
         public event EventHandler Started;
+
         /// <summary>
         /// Fired when stopped
         /// </summary>
@@ -120,7 +124,6 @@ namespace SanteDB.Server.Core.Services.Impl
         public bool Start()
         {
             this.Starting?.Invoke(this, EventArgs.Empty);
-
 
             foreach (var t in r_repositoryServices)
             {
@@ -174,7 +177,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public bool TryCreateService<TService>(out TService serviceInstance)
         {
-            if(this.TryCreateService(typeof(TService), out object service))
+            if (this.TryCreateService(typeof(TService), out object service))
             {
                 serviceInstance = (TService)service;
                 return true;
@@ -188,29 +191,31 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public bool TryCreateService(Type serviceType, out object serviceInstance)
         {
-
             // Is this service type in the services?
             var st = r_repositoryServices.FirstOrDefault(s => s == serviceType || serviceType.IsAssignableFrom(s));
-            if(st == null && typeof(IRepositoryService).IsAssignableFrom(serviceType) && serviceType.IsGenericType)
+            if (st == null && (typeof(IRepositoryService).IsAssignableFrom(serviceType) || serviceType.IsGenericType && serviceType.GetGenericTypeDefinition() == typeof(IRepositoryService<>)))
             {
                 var wrappedType = serviceType.GenericTypeArguments[0];
                 var irst = typeof(IRepositoryService<>).MakeGenericType(wrappedType);
-                var irsi = ApplicationServiceContext.Current.GetService(irst);
-                if (irsi == null)
+
+                if (typeof(Act).IsAssignableFrom(wrappedType))
                 {
-                    if (typeof(Act).IsAssignableFrom(wrappedType))
-                    {
-                        this.m_tracer.TraceInfo("Adding Act repository service for {0}...", wrappedType.Name);
-                        st = typeof(GenericLocalActRepository<>).MakeGenericType(wrappedType);
-                    }
-                    else if (typeof(Entity).IsAssignableFrom(wrappedType))
-                    {
-                        this.m_tracer.TraceInfo("Adding Entity repository service for {0}...", wrappedType);
-                        st = typeof(GenericLocalClinicalDataRepository<>).MakeGenericType(wrappedType);
-                    }
+                    this.m_tracer.TraceInfo("Adding Act repository service for {0}...", wrappedType.Name);
+                    st = typeof(GenericLocalActRepository<>).MakeGenericType(wrappedType);
                 }
+                else if (typeof(Entity).IsAssignableFrom(wrappedType))
+                {
+                    this.m_tracer.TraceInfo("Adding Entity repository service for {0}...", wrappedType);
+                    st = typeof(GenericLocalClinicalDataRepository<>).MakeGenericType(wrappedType);
+                }
+                else
+                {
+                    this.m_tracer.TraceInfo("Adding generic repository service for {0}...", wrappedType);
+                    st = typeof(GenericLocalRepository<>).MakeGenericType(wrappedType);
+                }
+
             }
-            else if(st == null)
+            else if (st == null)
             {
                 serviceInstance = null;
                 return false;
@@ -218,8 +223,6 @@ namespace SanteDB.Server.Core.Services.Impl
 
             serviceInstance = this.m_serviceManager.CreateInjected(st);
             return true;
-
         }
     }
-
 }

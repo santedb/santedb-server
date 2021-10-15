@@ -81,7 +81,8 @@ namespace SanteDB.Server.Core.Configuration.Features
         {
             return new IConfigurationTask[]
             {
-                new InstallSecurityServicesTask(this)
+                new InstallSecurityServicesTask(this),
+                new InstallCertificatesTask(this)
             };
         }
 
@@ -213,10 +214,7 @@ namespace SanteDB.Server.Core.Configuration.Features
             /// <summary>
             /// Verify state
             /// </summary>
-            public bool VerifyState(SanteDBConfiguration configuration)
-            {
-                throw new NotImplementedException();
-            }
+            public bool VerifyState(SanteDBConfiguration configuration) => true;
         }
 
         /// <summary>
