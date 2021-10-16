@@ -55,6 +55,16 @@ namespace SanteDB.Configurator
             this.spMainControl = new System.Windows.Forms.SplitContainer();
             this.trvFeatures = new System.Windows.Forms.TreeView();
             this.imlMain = new System.Windows.Forms.ImageList(this.components);
+            this.pnlInfo = new System.Windows.Forms.Panel();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.rtbLicense = new System.Windows.Forms.RichTextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.lblInstanceName = new System.Windows.Forms.Label();
+            this.lblSupport = new System.Windows.Forms.LinkLabel();
+            this.lblCopyright = new System.Windows.Forms.Label();
+            this.lblVersion = new System.Windows.Forms.Label();
+            this.lblApplication = new System.Windows.Forms.Label();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pnlFeature = new System.Windows.Forms.Panel();
             this.tcSettings = new System.Windows.Forms.TabControl();
             this.tpSetting = new System.Windows.Forms.TabPage();
@@ -66,16 +76,6 @@ namespace SanteDB.Configurator
             this.lblDisabled = new System.Windows.Forms.Label();
             this.lblEnabled = new System.Windows.Forms.Label();
             this.lblSelectedOption = new System.Windows.Forms.Label();
-            this.pnlInfo = new System.Windows.Forms.Panel();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.rtbLicense = new System.Windows.Forms.RichTextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.lblInstanceName = new System.Windows.Forms.Label();
-            this.lblSupport = new System.Windows.Forms.LinkLabel();
-            this.lblCopyright = new System.Windows.Forms.Label();
-            this.lblVersion = new System.Windows.Forms.Label();
-            this.lblApplication = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.tpAdvanced = new System.Windows.Forms.TabPage();
             this.spEditor = new System.Windows.Forms.SplitContainer();
             this.lsvConfigSections = new System.Windows.Forms.ListView();
@@ -99,12 +99,12 @@ namespace SanteDB.Configurator
             this.spMainControl.Panel1.SuspendLayout();
             this.spMainControl.Panel2.SuspendLayout();
             this.spMainControl.SuspendLayout();
-            this.pnlFeature.SuspendLayout();
-            this.tcSettings.SuspendLayout();
-            this.tpSetting.SuspendLayout();
             this.pnlInfo.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.pnlFeature.SuspendLayout();
+            this.tcSettings.SuspendLayout();
+            this.tpSetting.SuspendLayout();
             this.tpAdvanced.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.spEditor)).BeginInit();
             this.spEditor.Panel1.SuspendLayout();
@@ -193,6 +193,116 @@ namespace SanteDB.Configurator
             this.imlMain.Images.SetKeyName(10, "PartiallyComplete_16x_24.bmp");
             this.imlMain.Images.SetKeyName(11, "PropertyShortcut_16x_24.bmp");
             this.imlMain.Images.SetKeyName(12, "NoCheck_16x.png");
+            // 
+            // pnlInfo
+            // 
+            this.pnlInfo.Controls.Add(this.panel1);
+            this.pnlInfo.Controls.Add(this.lblInstanceName);
+            this.pnlInfo.Controls.Add(this.lblSupport);
+            this.pnlInfo.Controls.Add(this.lblCopyright);
+            this.pnlInfo.Controls.Add(this.lblVersion);
+            this.pnlInfo.Controls.Add(this.lblApplication);
+            this.pnlInfo.Controls.Add(this.pictureBox1);
+            this.pnlInfo.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlInfo.Location = new System.Drawing.Point(0, 0);
+            this.pnlInfo.Name = "pnlInfo";
+            this.pnlInfo.Size = new System.Drawing.Size(775, 348);
+            this.pnlInfo.TabIndex = 1;
+            // 
+            // panel1
+            // 
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Controls.Add(this.rtbLicense);
+            this.panel1.Controls.Add(this.label1);
+            this.panel1.Location = new System.Drawing.Point(4, 97);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(771, 248);
+            this.panel1.TabIndex = 9;
+            // 
+            // rtbLicense
+            // 
+            this.rtbLicense.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.rtbLicense.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.rtbLicense.Location = new System.Drawing.Point(0, 22);
+            this.rtbLicense.Name = "rtbLicense";
+            this.rtbLicense.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
+            this.rtbLicense.Size = new System.Drawing.Size(771, 226);
+            this.rtbLicense.TabIndex = 10;
+            this.rtbLicense.Text = "";
+            // 
+            // label1
+            // 
+            this.label1.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.label1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.label1.Location = new System.Drawing.Point(0, 0);
+            this.label1.Name = "label1";
+            this.label1.Padding = new System.Windows.Forms.Padding(3);
+            this.label1.Size = new System.Drawing.Size(771, 22);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "License Notice(s)";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // lblInstanceName
+            // 
+            this.lblInstanceName.AutoSize = true;
+            this.lblInstanceName.Location = new System.Drawing.Point(100, 59);
+            this.lblInstanceName.Name = "lblInstanceName";
+            this.lblInstanceName.Size = new System.Drawing.Size(79, 13);
+            this.lblInstanceName.TabIndex = 6;
+            this.lblInstanceName.Text = "Instance Name";
+            // 
+            // lblSupport
+            // 
+            this.lblSupport.AutoSize = true;
+            this.lblSupport.Location = new System.Drawing.Point(100, 75);
+            this.lblSupport.Name = "lblSupport";
+            this.lblSupport.Size = new System.Drawing.Size(178, 13);
+            this.lblSupport.TabIndex = 5;
+            this.lblSupport.TabStop = true;
+            this.lblSupport.Text = "Support (https://help.santesuite.org)";
+            this.lblSupport.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lblSupport_LinkClicked);
+            // 
+            // lblCopyright
+            // 
+            this.lblCopyright.AutoSize = true;
+            this.lblCopyright.Location = new System.Drawing.Point(100, 43);
+            this.lblCopyright.Name = "lblCopyright";
+            this.lblCopyright.Size = new System.Drawing.Size(51, 13);
+            this.lblCopyright.TabIndex = 4;
+            this.lblCopyright.Text = "Copyright";
+            // 
+            // lblVersion
+            // 
+            this.lblVersion.AutoSize = true;
+            this.lblVersion.Location = new System.Drawing.Point(100, 27);
+            this.lblVersion.Name = "lblVersion";
+            this.lblVersion.Size = new System.Drawing.Size(42, 13);
+            this.lblVersion.TabIndex = 3;
+            this.lblVersion.Text = "Version";
+            // 
+            // lblApplication
+            // 
+            this.lblApplication.AutoSize = true;
+            this.lblApplication.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblApplication.Location = new System.Drawing.Point(99, 4);
+            this.lblApplication.Name = "lblApplication";
+            this.lblApplication.Size = new System.Drawing.Size(177, 20);
+            this.lblApplication.TabIndex = 2;
+            this.lblApplication.Text = "SanteSuite SanteDB";
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::SanteDB.Configurator.Properties.Resources.icon;
+            this.pictureBox1.Location = new System.Drawing.Point(4, 4);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(89, 87);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 1;
+            this.pictureBox1.TabStop = false;
             // 
             // pnlFeature
             // 
@@ -345,116 +455,6 @@ namespace SanteDB.Configurator
             this.lblSelectedOption.Size = new System.Drawing.Size(775, 22);
             this.lblSelectedOption.TabIndex = 9;
             this.lblSelectedOption.Text = "Configuration";
-            // 
-            // pnlInfo
-            // 
-            this.pnlInfo.Controls.Add(this.panel1);
-            this.pnlInfo.Controls.Add(this.lblInstanceName);
-            this.pnlInfo.Controls.Add(this.lblSupport);
-            this.pnlInfo.Controls.Add(this.lblCopyright);
-            this.pnlInfo.Controls.Add(this.lblVersion);
-            this.pnlInfo.Controls.Add(this.lblApplication);
-            this.pnlInfo.Controls.Add(this.pictureBox1);
-            this.pnlInfo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlInfo.Location = new System.Drawing.Point(0, 0);
-            this.pnlInfo.Name = "pnlInfo";
-            this.pnlInfo.Size = new System.Drawing.Size(775, 348);
-            this.pnlInfo.TabIndex = 1;
-            // 
-            // panel1
-            // 
-            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel1.Controls.Add(this.rtbLicense);
-            this.panel1.Controls.Add(this.label1);
-            this.panel1.Location = new System.Drawing.Point(4, 97);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(771, 248);
-            this.panel1.TabIndex = 9;
-            // 
-            // rtbLicense
-            // 
-            this.rtbLicense.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.rtbLicense.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.rtbLicense.Location = new System.Drawing.Point(0, 22);
-            this.rtbLicense.Name = "rtbLicense";
-            this.rtbLicense.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.rtbLicense.Size = new System.Drawing.Size(771, 226);
-            this.rtbLicense.TabIndex = 10;
-            this.rtbLicense.Text = "";
-            // 
-            // label1
-            // 
-            this.label1.BackColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.label1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.label1.Location = new System.Drawing.Point(0, 0);
-            this.label1.Name = "label1";
-            this.label1.Padding = new System.Windows.Forms.Padding(3);
-            this.label1.Size = new System.Drawing.Size(771, 22);
-            this.label1.TabIndex = 9;
-            this.label1.Text = "License Notice(s)";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // lblInstanceName
-            // 
-            this.lblInstanceName.AutoSize = true;
-            this.lblInstanceName.Location = new System.Drawing.Point(100, 59);
-            this.lblInstanceName.Name = "lblInstanceName";
-            this.lblInstanceName.Size = new System.Drawing.Size(79, 13);
-            this.lblInstanceName.TabIndex = 6;
-            this.lblInstanceName.Text = "Instance Name";
-            // 
-            // lblSupport
-            // 
-            this.lblSupport.AutoSize = true;
-            this.lblSupport.Location = new System.Drawing.Point(100, 75);
-            this.lblSupport.Name = "lblSupport";
-            this.lblSupport.Size = new System.Drawing.Size(178, 13);
-            this.lblSupport.TabIndex = 5;
-            this.lblSupport.TabStop = true;
-            this.lblSupport.Text = "Support (https://help.santesuite.org)";
-            this.lblSupport.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lblSupport_LinkClicked);
-            // 
-            // lblCopyright
-            // 
-            this.lblCopyright.AutoSize = true;
-            this.lblCopyright.Location = new System.Drawing.Point(100, 43);
-            this.lblCopyright.Name = "lblCopyright";
-            this.lblCopyright.Size = new System.Drawing.Size(51, 13);
-            this.lblCopyright.TabIndex = 4;
-            this.lblCopyright.Text = "Copyright";
-            // 
-            // lblVersion
-            // 
-            this.lblVersion.AutoSize = true;
-            this.lblVersion.Location = new System.Drawing.Point(100, 27);
-            this.lblVersion.Name = "lblVersion";
-            this.lblVersion.Size = new System.Drawing.Size(42, 13);
-            this.lblVersion.TabIndex = 3;
-            this.lblVersion.Text = "Version";
-            // 
-            // lblApplication
-            // 
-            this.lblApplication.AutoSize = true;
-            this.lblApplication.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblApplication.Location = new System.Drawing.Point(99, 4);
-            this.lblApplication.Name = "lblApplication";
-            this.lblApplication.Size = new System.Drawing.Size(177, 20);
-            this.lblApplication.TabIndex = 2;
-            this.lblApplication.Text = "SanteSuite SanteDB";
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::SanteDB.Configurator.Properties.Resources.icon;
-            this.pictureBox1.Location = new System.Drawing.Point(4, 4);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(89, 87);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 1;
-            this.pictureBox1.TabStop = false;
             // 
             // tpAdvanced
             // 
@@ -668,14 +668,14 @@ namespace SanteDB.Configurator
             this.spMainControl.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.spMainControl)).EndInit();
             this.spMainControl.ResumeLayout(false);
-            this.pnlFeature.ResumeLayout(false);
-            this.pnlFeature.PerformLayout();
-            this.tcSettings.ResumeLayout(false);
-            this.tpSetting.ResumeLayout(false);
             this.pnlInfo.ResumeLayout(false);
             this.pnlInfo.PerformLayout();
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.pnlFeature.ResumeLayout(false);
+            this.pnlFeature.PerformLayout();
+            this.tcSettings.ResumeLayout(false);
+            this.tpSetting.ResumeLayout(false);
             this.tpAdvanced.ResumeLayout(false);
             this.spEditor.Panel1.ResumeLayout(false);
             this.spEditor.Panel2.ResumeLayout(false);
