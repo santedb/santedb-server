@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using MohawkCollege.Util.Console.Parameters;
 using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Model.AMI.Collections;
@@ -43,26 +44,23 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
     [AdminCommandlet]
     public static class DeviceCmdlet
     {
-
         /// <summary>
         /// Base class for user operations
         /// </summary>
         internal class GenericDeviceParms
         {
-
             /// <summary>
             /// Gets or sets the username
             /// </summary>
             [Description("The identity of the device")]
             [Parameter("*")]
             public StringCollection DeviceId { get; set; }
-
         }
 
         // Ami client
         private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(ServiceEndpointType.AdministrationIntegrationService));
 
-        #region Device Add 
+        #region Device Add
 
         /// <summary>
         /// Parameters for adding devices
@@ -77,19 +75,18 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             public string Secret { get; set; }
 
             /// <summary>
-            /// The policies to add 
+            /// The policies to add
             /// </summary>
             [Description("The policies to grant device")]
             [Parameter("g")]
             public StringCollection GrantPolicies { get; set; }
 
             /// <summary>
-            /// The policies to deny 
+            /// The policies to deny
             /// </summary>
             [Description("The policies to deny the device")]
             [Parameter("d")]
             public StringCollection DenyPolicies { get; set; }
-
         }
 
         [AdminCommand("device.add", "Add security device")]
@@ -104,7 +101,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             if (parms.DenyPolicies?.Count > 0)
                 policies = policies.Union(parms.DenyPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o))).ToList();
 
-            policies.ForEach(o => o.Grant = parms.GrantPolicies?.Contains(o.Oid) == true ?PolicyGrantType.Grant : PolicyGrantType.Deny);
+            policies.ForEach(o => o.Grant = parms.GrantPolicies?.Contains(o.Oid) == true ? PolicyGrantType.Grant : PolicyGrantType.Deny);
 
             if (policies.Count != (parms.DenyPolicies?.Count ?? 0) + (parms.GrantPolicies?.Count ?? 0))
                 throw new InvalidOperationException("Could not find one or more policies");
@@ -125,7 +122,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                 }
             });
             Console.WriteLine("CREATE {0}", parms.DeviceId[0]);
-
         }
 
         [AdminCommand("device.alter", "Alter security device")]
@@ -133,7 +129,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateDevice)]
         internal static void AlterDevice(AddDeviceParms parms)
         {
-
             // Retrieve device
             foreach (var deviceName in parms.DeviceId)
             {
@@ -174,9 +169,8 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         /// <summary>
         /// User list parameters
         /// </summary>
-        internal class DeviceListParams 
+        internal class DeviceListParams
         {
-
             /// <summary>
             /// Locked
             /// </summary>
@@ -190,10 +184,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             [Description("Include non-active devices")]
             [Parameter("a")]
             public bool Active { get; set; }
-
-           
         }
-
 
         [AdminCommand("device.list", "List Security Devices")]
         [Description("This command will list all security devices in the SanteDB instance")]
@@ -210,7 +201,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                 list = m_client.Query<SecurityDevice>(o => o.ObsoletionTime == null, 0, 100, out tr);
 
             DisplayUtil.TablePrint(list.CollectionItem.OfType<SecurityDeviceInfo>(),
-                new String[]{ "SID", "Name", "Last Auth.", "Lockout", "ILA", "A" },
+                new String[] { "SID", "Name", "Last Auth.", "Lockout", "ILA", "A" },
                 new int[] { 38, 24, 22, 22, 4, 2 },
                 o => o.Entity.Key,
                 o => o.Entity.Name,
@@ -218,7 +209,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                 o => o.Entity.LockoutXml,
                 o => o.Entity.InvalidAuthAttempts ?? 0,
                 o => !o.Entity.ObsoletionTime.HasValue ? "*" : null);
-
         }
 
         /// <summary>
@@ -229,7 +219,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         [Description("This command will display detailed information about the specified security device account. It will status, and effective policies")]
         internal static void DeviceInfo(GenericDeviceParms parms)
         {
-
             if (parms.DeviceId == null)
                 throw new InvalidOperationException("Must specify a device");
 
@@ -245,16 +234,15 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                     u => u.Key,
                     u => u.InvalidAuthAttempts,
                     u => u.LockoutXml,
-                    u=>u.LastAuthenticationXml,
+                    u => u.LastAuthenticationXml,
                     u => String.Format("{0} ({1})", u.CreationTimeXml, m_client.GetUser(m_client.GetProvenance(u.CreatedByKey.Value).UserKey.Value).Entity.UserName),
                     u => String.Format("{0} ({1})", u.UpdatedTimeXml, m_client.GetUser(m_client.GetProvenance(u.UpdatedByKey.Value).UserKey.Value).Entity.UserName),
                     u => String.Format("{0} ({1})", u.ObsoletionTimeXml, m_client.GetUser(m_client.GetProvenance(u.ObsoletedByKey.Value).UserKey.Value).Entity.UserName)
                 );
-
             }
         }
-        #endregion
 
+        #endregion Device Add
 
         #region Device Delete/Lock Commands
 
@@ -263,7 +251,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         /// </summary>
         internal class DeviceLockParms : GenericDeviceParms
         {
-
             /// <summary>
             /// The time to set the lock util
             /// </summary>
@@ -291,7 +278,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 
                 m_client.DeleteDevice(user.Entity.Key.Value);
             }
-
         }
 
         /// <summary>
@@ -320,7 +306,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                         new PatchOperation(PatchOperationType.Remove, "obsoletionTime", null)
                     }
                 };
-                m_client.Client.Patch($"SecurityDevice/{device.Key}", m_client.Client.Accept, device.Tag, patch);
+                m_client.Client.Patch($"SecurityDevice/{device.Key}", device.Tag, patch);
             }
         }
 
@@ -348,6 +334,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             }
         }
 
-        #endregion
+        #endregion Device Delete/Lock Commands
     }
 }

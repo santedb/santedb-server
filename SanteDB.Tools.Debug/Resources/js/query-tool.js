@@ -55,6 +55,7 @@ var QueryTool = {
     getConfiguration: function (scopeVar) {
         $.getJSON("config.json", function (result) {
             scopeVar.configuration = result;
+            scopeVar.configuration.resources = scopeVar.configuration.parameters.id.scope.map(o => { return { resource: o, cap: [ "Get" ] } });
             scopeVar.$apply();
         });
     },

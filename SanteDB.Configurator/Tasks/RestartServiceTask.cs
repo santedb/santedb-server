@@ -86,6 +86,11 @@ namespace SanteDB.Configurator.Tasks
             } // HACK: wait for stop 
             this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(0.5f, $"Starting {this.m_configuration.ServiceName}"));
             ServiceTools.ServiceInstaller.StartService(this.m_configuration.ServiceName);
+            while (ServiceTools.ServiceInstaller.GetServiceStatus(this.m_configuration.ServiceName) != ServiceTools.ServiceState.Run)
+            {
+                Application.DoEvents();
+                Thread.Sleep(1000);
+            } // HACK: wait for stop 
             this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(1.0f, null));
             return true;
         }

@@ -15,6 +15,7 @@
       <isReadonly>false</isReadonly>
       <mnemonic>RegistrationType-Birth</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <conceptSet>f562dd96-17ca-11eb-adc1-0242ac120002</conceptSet>
       <name>
         <language>en</language>
@@ -28,6 +29,7 @@
       <isReadonly>false</isReadonly>
       <mnemonic>RegistrationType-Death</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <conceptSet>f562dd96-17ca-11eb-adc1-0242ac120002</conceptSet>
       <name>
         <language>en</language>
@@ -41,6 +43,7 @@
       <isReadonly>false</isReadonly>
       <mnemonic>RegistrationType-PatientAdmission</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <conceptSet>f562dd96-17ca-11eb-adc1-0242ac120002</conceptSet>
       <name>
         <language>en</language>

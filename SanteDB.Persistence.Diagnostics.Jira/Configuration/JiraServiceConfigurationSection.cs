@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Http;
 using SanteDB.Core.Http.Description;
@@ -38,8 +39,12 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
         /// </summary>
         public JiraServiceConfigurationSection()
         {
-            
         }
+
+        /// <summary>
+        /// Accept
+        /// </summary>
+        public string Accept => "application/json";
 
         /// <summary>
         /// Gets or sets the username
@@ -59,13 +64,13 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
         [XmlAttribute("project"), ConfigurationRequired]
         public String Project { get; set; }
 
-	    /// <summary>
-	    /// Gets whether a tracing is enabled.
-	    /// </summary>
+        /// <summary>
+        /// Gets whether a tracing is enabled.
+        /// </summary>
         [XmlAttribute("trace")]
-	    public bool Trace { get; }
+        public bool Trace { get; }
 
-	    /// <summary>
+        /// <summary>
         /// Gets or sets the endpoint information
         /// </summary>
         [XmlAttribute("url"), ConfigurationRequired]

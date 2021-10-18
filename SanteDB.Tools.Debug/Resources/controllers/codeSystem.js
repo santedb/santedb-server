@@ -19,13 +19,12 @@
  * Date: 2021-8-27
  */
 angular.module('layout').controller('CodeSystemCreatorController', ['$scope', '$rootScope', function ($scope, $rootScope) {
-
-    var uuidv4 = function() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-          var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
+    var uuidv4 = function () {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
         });
-      };
+    };
 
     $rootScope.$watch(function (s) { return s.session; }, function (n, o) {
         if (n) {
@@ -34,32 +33,31 @@ angular.module('layout').controller('CodeSystemCreatorController', ['$scope', '$
                     "Accept": "application/json+sdb-viewmodel",
                 },
                 continueWith: function (data) {
-                    $scope.filteredCodeSystems = $scope.codeSystems = data.item;
+                    $scope.filteredCodeSystems = $scope.codeSystems = data.resource;
                     $scope.$apply();
                 }
             });
             QueryTool.execute("GET", "/hdsi/ConceptClass", {
-
-                continueWith: function(d) {
-                    $scope.conceptClasses = d.item;
+                continueWith: function (d) {
+                    $scope.conceptClasses = d.resource;
                 }
             });
         }
     });
 
-    $scope.importTerms = function(conceptSet) {
-        if(conceptSet != "" && conceptSet != null) {
-            if($scope.current.refTerms.length > 0 && !confirm("This action will erase the registered reference terms. Continue?")) return;
+    $scope.importTerms = function (conceptSet) {
+        if (conceptSet != "" && conceptSet != null) {
+            if ($scope.current.refTerms.length > 0 && !confirm("This action will erase the registered reference terms. Continue?")) return;
             QueryTool.execute("GET", "/hdsi/ConceptSet/" + conceptSet, {
-                headers: { Accept: "application/json+sdb-viewmodel"},
-                continueWith: function(d) {
+                headers: { Accept: "application/json+sdb-viewmodel" },
+                continueWith: function (d) {
                     $scope.current.oid = $scope.current.oid || d.oid;
                     $scope.current.url = $scope.current.url || d.url;
                     $scope.current.authority = $scope.current.authority || d.mnemonic;
                     $scope.current.refTerms = [];
-                    for(var k in d.concept) {
+                    for (var k in d.concept) {
                         QueryTool.execute("GET", "/hdsi/Concept/" + d.concept[k], {
-                            continueWith: function(c) {
+                            continueWith: function (c) {
                                 $scope.current.refTerms.push({
                                     term: {
                                         id: uuidv4(),
@@ -76,7 +74,7 @@ angular.module('layout').controller('CodeSystemCreatorController', ['$scope', '$
                                         mnemonic: c.mnemonic
                                     }
                                 });
-                                try { $scope.$apply(); } catch {}
+                                try { $scope.$apply(); } catch { }
                             }
                         })
                     }
@@ -93,7 +91,7 @@ angular.module('layout').controller('CodeSystemCreatorController', ['$scope', '$
         })
     }
 
-    $scope.createConcept = function(r) {
+    $scope.createConcept = function (r) {
         $("#dlgCreateConcept").modal('show');
         r.concept = {};
         r.concept.id = "00000000-0000-0000-0000-000000000000";
@@ -106,7 +104,7 @@ angular.module('layout').controller('CodeSystemCreatorController', ['$scope', '$
         $scope.newConcept = r.concept;
     }
 
-    $scope.removeMnemonic = function(term) {
+    $scope.removeMnemonic = function (term) {
         term.concept.mnemonic = null;
         term.concept.id = null;
     }
@@ -120,12 +118,12 @@ angular.module('layout').controller('CodeSystemCreatorController', ['$scope', '$
             headers: {
                 "Accept": "application/json+sdb-viewmodel",
             },
-            continueWith: function(data) {
-                $scope.current.refTerms = data.item.map(function(term) {
+            continueWith: function (data) {
+                $scope.current.refTerms = data.resource.map(function (term) {
                     var names = term.name;
                     term.name = [];
-                    for(var k in names)
-                        term.name.push({language: k, value: names[k]});
+                    for (var k in names)
+                        term.name.push({ language: k, value: names[k] });
 
                     var retVal = {
                         term: term,
@@ -135,12 +133,12 @@ angular.module('layout').controller('CodeSystemCreatorController', ['$scope', '$
                         }
                     };
                     QueryTool.execute("GET", "/hdsi/Concept", {
-                        query: "referenceTerm.term=" + term.id + "&_lean=true&_count=1", 
-                        continueWith: function(d) {
-                            if(d.item && d.item.length == 1){
-                                retVal.concept.id =  d.item[0].id;
-                                retVal.concept.mnemonic = d.item[0].mnemonic;
-                                try { $scope.$apply(); } catch {}
+                        query: "referenceTerm.term=" + term.id + "&_lean=true&_count=1",
+                        continueWith: function (d) {
+                            if (d.resource && d.resource.length == 1) {
+                                retVal.concept.id = d.resource[0].id;
+                                retVal.concept.mnemonic = d.resource[0].mnemonic;
+                                try { $scope.$apply(); } catch { }
                             }
                         }
                     });
@@ -151,42 +149,42 @@ angular.module('layout').controller('CodeSystemCreatorController', ['$scope', '$
         });
     }
 
-    $scope.addTerm = function() {
+    $scope.addTerm = function () {
         $scope.current.refTerms.push({
-            term: { 
+            term: {
                 id: uuidv4(),
                 name: [
-                    { language : "en", value : "" }
+                    { language: "en", value: "" }
                 ]
             }
         })
     };
 
-    $scope.removeTerm = function(i) {
+    $scope.removeTerm = function (i) {
         $scope.current.refTerms.splice(i, 1);
     };
-    
-    $scope.cancel = function() {
-        if(confirm("Are you sure you want to cancel your changes?")) {
+
+    $scope.cancel = function () {
+        if (confirm("Are you sure you want to cancel your changes?")) {
             $scope.current = null;
             $scope.bundle = null;
         }
     }
 
-    $scope.download = function() {
+    $scope.download = function () {
         var refTerms = $scope.current.refTerms;
         var codeSystem = angular.copy($scope.current);
-        delete(codeSystem.refTerms);
-        
+        delete (codeSystem.refTerms);
+
         // Create a bundle
-        var bundle = { $type: "Bundle", item: [codeSystem] };
+        var bundle = { $type: "Bundle", resource: [codeSystem] };
         // reference terms
-        refTerms.forEach(function(r) {
+        refTerms.forEach(function (r) {
             var names = {};
-            r.term.name.forEach(function(n) { 
+            r.term.name.forEach(function (n) {
                 names[n.language] = n.value;
             });
-            bundle.item.push({
+            bundle.resource.push({
                 $type: "ReferenceTerm",
                 id: r.term.id,
                 mnemonic: r.term.mnemonic,
@@ -196,7 +194,7 @@ angular.module('layout').controller('CodeSystemCreatorController', ['$scope', '$
 
             // Is the concept new?
             var conceptId = r.concept.id;
-            if(conceptId == "00000000-0000-0000-0000-000000000000") {
+            if (conceptId == "00000000-0000-0000-0000-000000000000") {
                 conceptId = uuidv4();
                 names = {};
                 names[r.concept.name.language] = r.concept.name.value;
@@ -209,31 +207,30 @@ angular.module('layout').controller('CodeSystemCreatorController', ['$scope', '$
                     statusConcept: r.concept.statusConcept
                 };
 
-                if(r.concept.conceptSet)
+                if (r.concept.conceptSet)
                     cncpt.conceptSet = [r.concept.conceptSet];
-                bundle.item.push(cncpt);
+                bundle.resource.push(cncpt);
             }
-            bundle.item.push({
+            bundle.resource.push({
                 $type: "ConceptReferenceTerm",
                 id: uuidv4(),
                 relationshipType: "2c4dafc2-566a-41ae-9ebc-3097d7d22f4a",
-                source: conceptId, 
+                source: conceptId,
                 term: r.term.id
             });
         });
 
-        $.ajax({ 
-            type: "POST", 
-            dataType: "xml", 
-            contentType: "application/json", 
-            url: "./dataset", 
-            data: JSON.stringify(bundle), 
-            success: function(data, status, jqXHR) {
+        $.ajax({
+            type: "POST",
+            dataType: "xml",
+            contentType: "application/octet-stream",
+            url: "./dataset",
+            data: JSON.stringify(bundle),
+            success: function (data, status, jqXHR) {
                 $scope.bundle = jqXHR.responseText;
                 $scope.$apply();
             }
         });
-
     }
 
     $scope.new = function () {
@@ -245,7 +242,7 @@ angular.module('layout').controller('CodeSystemCreatorController', ['$scope', '$
                     term: {
                         id: uuidv4(),
                         name: [
-                            { language : "en", value : "" }
+                            { language: "en", value: "" }
                         ]
                     }
                 }

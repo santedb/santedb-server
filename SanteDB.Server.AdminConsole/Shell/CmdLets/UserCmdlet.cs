@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using MohawkCollege.Util.Console.Parameters;
 using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Model.AMI.Collections;
@@ -44,13 +45,11 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
     [AdminCommandlet]
     public static class UserCmdlet
     {
-
         /// <summary>
         /// Base class for user operations
         /// </summary>
         internal class GenericUserParms
         {
-
             /// <summary>
             /// Gets or sets the username
             /// </summary>
@@ -58,16 +57,15 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             [Parameter("*")]
             [Parameter("u")]
             public StringCollection UserName { get; set; }
-
         }
 
         // Ami client
         private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(ServiceEndpointType.AdministrationIntegrationService));
 
         #region User Add
+
         internal class UseraddParms : GenericUserParms
         {
-
             /// <summary>
             /// Gets or sets the password
             /// </summary>
@@ -98,7 +96,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         // // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.CreateIdentity)]
         internal static void Useradd(UseraddParms parms)
         {
-
             var roles = new List<SecurityRoleInfo>();
             if (parms.Roles?.Count > 0)
                 roles = parms.Roles.OfType<String>().Select(o => m_client.GetRoles(r => r.Name == o).CollectionItem.FirstOrDefault()).OfType<SecurityRoleInfo>().ToList();
@@ -121,10 +118,9 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                     },
                     Roles = parms.Roles.OfType<String>().ToList()
                 });
-
         }
 
-        #endregion
+        #endregion User Add
 
         #region User Delete/Lock Commands
 
@@ -133,7 +129,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         /// </summary>
         internal class UserLockParms : GenericUserParms
         {
-
             /// <summary>
             /// The time to set the lock util
             /// </summary>
@@ -161,7 +156,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 
                 m_client.DeleteUser(user.Entity.Key.Value);
             }
-
         }
 
         /// <summary>
@@ -190,7 +184,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                         new PatchOperation(PatchOperationType.Remove, "obsoletionTime", null)
                     }
                 };
-                m_client.Client.Patch($"SecurityUser/{user.Key}", m_client.Client.Accept, user.Tag, patch);
+                m_client.Client.Patch($"SecurityUser/{user.Key}", user.Tag, patch);
             }
         }
 
@@ -220,7 +214,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             }
         }
 
-        #endregion
+        #endregion User Delete/Lock Commands
 
         #region User List
 
@@ -229,7 +223,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         /// </summary>
         internal class UserListParms : GenericUserParms
         {
-
             /// <summary>
             /// Locked
             /// </summary>
@@ -292,7 +285,8 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                 o => o.Entity.ObsoletionTime.HasValue ? null : "*"
             );
         }
-        #endregion
+
+        #endregion User List
 
         #region Change Roles
 
@@ -333,7 +327,8 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                 m_client.UpdateUser(user.Entity.Key.Value, user);
             }
         }
-        #endregion
+
+        #endregion Change Roles
 
         /// <summary>
         /// Gets or sets the password
@@ -372,7 +367,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                         Console.WriteLine("Aborted");
                         continue;
                     }
-                    else if(passwd != DisplayUtil.PasswordPrompt($"CONFIRM Password for {user.Entity.UserName}:"))
+                    else if (passwd != DisplayUtil.PasswordPrompt($"CONFIRM Password for {user.Entity.UserName}:"))
                     {
                         Console.WriteLine("Passwords do not match!");
                         continue;
@@ -395,7 +390,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         [Description("This command will display detailed information about the specified security user account. It will show groups, status, and effective policies")]
         internal static void UserInfo(GenericUserParms parms)
         {
-
             if (parms.UserName == null)
                 throw new InvalidOperationException("Must specify a user");
 
@@ -419,9 +413,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                     u => String.Format("{0} ({1})", u.ObsoletionTimeXml, m_client.GetUser(m_client.GetProvenance(u.ObsoletedByKey.Value).UserKey.Value).Entity.UserName),
                     u => String.Join(" , ", user.Roles)
                 );
-
             }
         }
-
     }
 }

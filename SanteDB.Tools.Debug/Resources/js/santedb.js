@@ -131,6 +131,9 @@ var SanteDB = {
                 entity.address !== undefined ? (entity.address.Direct || entity.address.HomeAddress || entity.address.PhysicalVisit || result.name.$other) :
                 (entity.Direct || entity.HomeAddress || entity.PhysicalVisit || entity.$other);
             var retVal = "";
+
+            if (Array.isArray(address))
+                address = address[0];
             if (address.component) {
                 if (address.component.AdditionalLocator)
                     retVal += address.component.AdditionalLocator + ", ";
@@ -198,6 +201,8 @@ var SanteDB = {
             else {
                 if (entityName.component === undefined)
                     entityName = entityName[Object.keys(entityName)[0]];
+                if (Array.isArray(entityName))
+                    entityName = entityName[0];
                 if (entityName.component !== undefined) {
                     var nameStr = "";
                     if (entityName.component.Given !== undefined) {

@@ -263,7 +263,7 @@ angular.module('santedb', [])
                             },
                             processResults: function (data, params) {
                                 //params.page = params.page || 0;
-                                var data = data.$type == "Bundle" ? data.item : data.item || data;
+                                var data = data.$type == "Bundle" ? data.resource : data.resource || data;
                                 var retVal = { results: [] };
 
                                 if (groupString == null && data !== undefined) {
