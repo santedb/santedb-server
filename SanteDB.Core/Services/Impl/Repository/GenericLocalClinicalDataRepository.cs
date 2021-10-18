@@ -22,6 +22,7 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
+using SanteDB.Core.Services;
 
 namespace SanteDB.Server.Core.Services.Impl
 {
@@ -34,7 +35,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Creates anew generic local clinic data repo
         /// </summary>
-        public GenericLocalClinicalDataRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        public GenericLocalClinicalDataRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
         {
         }
 

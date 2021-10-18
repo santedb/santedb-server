@@ -25,6 +25,7 @@ using SanteDB.Core.Security.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using SanteDB.Core.Services;
 
 namespace SanteDB.Server.Core.Services.Impl
 {
@@ -38,7 +39,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Create a new local metadata repository
         /// </summary>
-        public GenericLocalMetadataRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService) // No need for privacy on metadata
+        public GenericLocalMetadataRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService, localizationService) // No need for privacy on metadata
         {
         }
 

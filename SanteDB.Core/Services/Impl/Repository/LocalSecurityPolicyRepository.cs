@@ -21,6 +21,7 @@
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
+using SanteDB.Core.Services;
 
 namespace SanteDB.Server.Core.Services.Impl
 {
@@ -32,7 +33,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// DI constructor 
         /// </summary>
-        public LocalSecurityPolicyRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        public LocalSecurityPolicyRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
         {
         }
 

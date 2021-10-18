@@ -35,7 +35,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Local extension type repository
         /// </summary>
-        public LocalExtensionTypeRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        public LocalExtensionTypeRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
         {
         }
 
