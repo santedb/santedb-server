@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using MohawkCollege.Util.Console.Parameters;
 using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Model.AMI.Collections;
@@ -43,26 +44,23 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
     [AdminCommandlet]
     public static class ApplicationCmdlet
     {
-
         /// <summary>
         /// Base class for user operations
         /// </summary>
         internal class GenericApplicationParms
         {
-
             /// <summary>
             /// Gets or sets the username
             /// </summary>
             [Description("The identity of the application")]
             [Parameter("*")]
             public StringCollection ApplictionId { get; set; }
-
         }
 
         // Ami client
         private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(ServiceEndpointType.AdministrationIntegrationService));
 
-        #region Application Add 
+        #region Application Add
 
         /// <summary>
         /// Parameters for adding applications
@@ -77,14 +75,14 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             public string Secret { get; set; }
 
             /// <summary>
-            /// The policies to add 
+            /// The policies to add
             /// </summary>
             [Description("The policies to grant deny application")]
             [Parameter("g")]
             public StringCollection GrantPolicies { get; set; }
 
             /// <summary>
-            /// The policies to deny 
+            /// The policies to deny
             /// </summary>
             [Description("The policies to deny the application")]
             [Parameter("d")]
@@ -117,7 +115,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 
             if (String.IsNullOrEmpty(parms.Secret))
             {
-                parms.Secret = BitConverter.ToString(Guid.NewGuid().ToByteArray()).Replace("-","").Substring(0, 12);
+                parms.Secret = BitConverter.ToString(Guid.NewGuid().ToByteArray()).Replace("-", "").Substring(0, 12);
                 Console.WriteLine("Application secret: {0}", parms.Secret);
             }
 
@@ -131,7 +129,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                 }
             });
             Console.WriteLine("CREATE {0}", parms.ApplictionId[0]);
-
         }
 
         /// <summary>
@@ -139,7 +136,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         /// </summary>
         internal class ApplicationListParams
         {
-
             /// <summary>
             /// Locked
             /// </summary>
@@ -153,10 +149,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             [Description("Include non-active application")]
             [Parameter("a")]
             public bool Active { get; set; }
-
-
         }
-
 
         [AdminCommand("application.list", "List Security Applications")]
         [Description("This command will list all security applications in the SanteDB instance")]
@@ -191,7 +184,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         [Description("This command will display detailed information about the specified security application account. It will status, and effective policies")]
         internal static void ApplicationInfo(GenericApplicationParms parms)
         {
-
             if (parms.ApplictionId == null)
                 throw new InvalidOperationException("Must specify a application");
 
@@ -212,11 +204,10 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                     u => String.Format("{0} ({1})", u.UpdatedTimeXml, m_client.GetUser(m_client.GetProvenance(u.UpdatedByKey.Value).UserKey.Value).Entity.UserName),
                     u => String.Format("{0} ({1})", u.ObsoletionTimeXml, m_client.GetUser(m_client.GetProvenance(u.ObsoletedByKey.Value).UserKey.Value).Entity.UserName)
                 );
-
             }
         }
-        #endregion
 
+        #endregion Application Add
 
         #region Application Delete/Lock Commands
 
@@ -225,7 +216,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         /// </summary>
         internal class ApplicationLockParms : GenericApplicationParms
         {
-
             /// <summary>
             /// The time to set the lock util
             /// </summary>
@@ -253,7 +243,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 
                 m_client.DeleteApplication(user.Entity.Key.Value);
             }
-
         }
 
         /// <summary>
@@ -282,7 +271,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                         new PatchOperation(PatchOperationType.Remove, "obsoletionTime", null)
                     }
                 };
-                m_client.Client.Patch($"SecurityApplication/{application.Key}", m_client.Client.Accept, application.Tag, patch);
+                m_client.Client.Patch($"SecurityApplication/{application.Key}", application.Tag, patch);
             }
         }
 
@@ -310,6 +299,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             }
         }
 
-        #endregion
+        #endregion Application Delete/Lock Commands
     }
 }

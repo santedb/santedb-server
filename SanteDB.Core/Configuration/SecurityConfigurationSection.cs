@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Security.Configuration;
@@ -31,8 +32,6 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Server.Core.Configuration
 {
-
-   
     /// <summary>
     /// SanteDB Security configuration
     /// </summary>
@@ -41,6 +40,5 @@ namespace SanteDB.Server.Core.Configuration
     [Obsolete("Use SanteDB.Core.Configuration.SecurityConfigurationSection", true)]
     public class SecurityConfigurationSection : SanteDB.Core.Configuration.SecurityConfigurationSection
     {
-
     }
 }

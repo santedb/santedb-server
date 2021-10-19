@@ -38,10 +38,23 @@ namespace SanteDB.Server.Core.Services.Impl
     public class LocalStockManagementRepositoryService : IStockManagementRepositoryService
 	{
 
+        //localization service
+        private readonly ILocalizationService m_localizationService;
+
         /// <summary>
         /// Gets the service name
         /// </summary>
         public string ServiceName => "Local Stock Management Repository";
+
+
+        /// <summary>
+        /// LocalStockManagementRepositoryService constructor
+        /// </summary>
+        /// <param name="localizationService"></param>
+        public LocalStockManagementRepositoryService(ILocalizationService localizationService)
+        {
+            this.m_localizationService = localizationService;
+        }
 
         /// <summary>
         /// Performs a stock adjustment for the specified facility and material.
@@ -54,7 +67,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <exception cref="System.NotImplementedException"></exception>
         public Act Adjust(ManufacturedMaterial manufacturedMaterial, Place place, int quantity, Concept reason)
 		{
-			throw new NotImplementedException();
+			throw new NotImplementedException(this.m_localizationService.GetString("error.type.NotImplementedException"));
 		}
 
 		/// <summary>
@@ -66,7 +79,7 @@ namespace SanteDB.Server.Core.Services.Impl
 		/// <exception cref="System.NotImplementedException"></exception>
 		public int GetBalance(Place place, ManufacturedMaterial manufacturedMaterial)
 		{
-			throw new NotImplementedException();
+			throw new NotImplementedException(this.m_localizationService.GetString("error.type.NotImplementedException"));
 		}
 
 		/// <summary>
@@ -84,7 +97,10 @@ namespace SanteDB.Server.Core.Services.Impl
 
 	        if (persistenceService == null)
 	        {
-				throw new InvalidOperationException($"Unable to locate persistence service: {nameof(IDataPersistenceService<Act>)}");
+				throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
+                {
+                    param = nameof(IDataPersistenceService<Act>)
+                }));
 			}
 
             return persistenceService.Query(o => o.ClassConceptKey == ActClassKeys.AccountManagement && o.ActTime >= startPeriod.Value && o.ActTime <= endPeriod.Value &&
@@ -100,7 +116,10 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ActParticipation>>();
             if (persistenceService == null)
-                throw new InvalidOperationException($"Unabled to locate persistence service for ActParticipations");
+                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
+                {
+                    param = nameof(IDataPersistenceService<ActParticipation>)
+                }));
 
             return persistenceService.Query(o => o.ParticipationRoleKey == ActParticipationKey.Consumable && o.PlayerEntityKey == manufacturedMaterialKey && o.Act.ActTime >= startPeriod  && o.Act.ActTime <= endPeriod && o.Act.Participations.Where(p => p.ParticipationRole.Mnemonic == "Location").Any(p => p.PlayerEntityKey == placeKey), AuthenticationContext.Current.Principal);
         }

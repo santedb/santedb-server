@@ -24,6 +24,8 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using System;
+using SanteDB.Core.Services;
+
 namespace SanteDB.Server.Core.Services.Impl
 {
     /// <summary>
@@ -31,14 +33,13 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalSecurityApplicationRepository : GenericLocalSecurityRepository<SecurityApplication>
     {
-
         // Id provider
         private IApplicationIdentityProviderService m_identityProvider;
 
         /// <summary>
         /// DI constructor
         /// </summary>
-        public LocalSecurityApplicationRepository(IApplicationIdentityProviderService identityProvider, IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        public LocalSecurityApplicationRepository(IApplicationIdentityProviderService identityProvider, IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
         {
             this.m_identityProvider = identityProvider;
         }
@@ -52,13 +53,12 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public override SecurityApplication Insert(SecurityApplication data)
         {
-           
             // Create the identity
             var id = this.m_identityProvider.CreateIdentity(data.Name, data.ApplicationSecret, AuthenticationContext.Current.Principal);
 
             // Now ensure local db record exists
             Guid sid = Guid.Empty;
-            if(id is IClaimsIdentity cIdentity)
+            if (id is IClaimsIdentity cIdentity)
             {
                 var sidClaim = cIdentity.FindFirst(SanteDBClaimTypes.Sid);
                 Guid.TryParse(sidClaim.Value, out sid);
@@ -71,7 +71,6 @@ namespace SanteDB.Server.Core.Services.Impl
             data.Key = sid;
             data.ApplicationSecret = null;
             return base.Save(data);
-
         }
 
         /// <summary>

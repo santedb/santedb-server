@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using MohawkCollege.Util.Console.Parameters;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Model.AMI.Auth;
@@ -39,7 +40,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
     [AdminCommandlet]
     public static class PolicyCmdlet
     {
-
         private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(ServiceEndpointType.AdministrationIntegrationService));
 
         /// <summary>
@@ -47,7 +47,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         /// </summary>
         internal class ListPolicyParms
         {
-
             /// <summary>
             /// List all with name
             /// </summary>
@@ -61,7 +60,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             [Parameter("o")]
             [Description("List policies with specified OID pattern")]
             public String Oid { get; set; }
-
         }
 
         /// <summary>
@@ -71,7 +69,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         [Description("Lists all security policies configured on the server")]
         internal static void ListPolicies(ListPolicyParms parms)
         {
-
             IEnumerable<SecurityPolicy> policies = null;
 
             if (!String.IsNullOrEmpty(parms.Name))
@@ -85,16 +82,16 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             DisplayUtil.TablePrint(policies,
                 new String[] { "SID", "Name", "Oid" },
                 new int[] { 38, 38, 44 },
-                p=>p.Key,
-                p=>p.Name,
-                p=>p.Oid
+                p => p.Key,
+                p => p.Name,
+                p => p.Oid
             );
         }
 
         /// <summary>
         /// Assign policy parameters
         /// </summary>
-        internal class PolicyAssignParms 
+        internal class PolicyAssignParms
         {
             /// <summary>
             /// Gets or sets the roles
@@ -144,7 +141,6 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         [Description("Assigns policies to devices, roles, and/or applications")]
         internal static void AssignPolicy(PolicyAssignParms parms)
         {
-
             // Identify the grant type
             PolicyGrantType grant = PolicyGrantType.Deny;
             if (!String.IsNullOrEmpty(parms.GrantType))
@@ -157,7 +153,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 
             List<SecurityPolicyInfo> policies = null;
             if (parms.Policy?.Count > 0)
-                policies = parms.Policy.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o=> new SecurityPolicyInfo()
+                policies = parms.Policy.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo()
                 {
                     CanOverride = false,
                     Grant = grant,
@@ -172,14 +168,14 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             var policyGrant = String.Join(";", policies.Select(o => o.Name));
 
             // Apply to roles?
-            if(parms.Role != null)
+            if (parms.Role != null)
             {
-                foreach(var r in parms.Role)
+                foreach (var r in parms.Role)
                 {
                     var role = m_client.Query<SecurityRole>(o => o.Name == r, 0, 1, out int _).CollectionItem.FirstOrDefault() as SecurityRoleInfo;
                     if (role == null)
                         throw new KeyNotFoundException($"Role {r} not found");
-                    policies.ForEach(o => m_client.Client.Post<SecurityPolicyInfo,SecurityPolicyInfo>($"SecurityRole/{role.Entity.Key}/policy", m_client.Client.Accept, o));
+                    policies.ForEach(o => m_client.Client.Post<SecurityPolicyInfo, SecurityPolicyInfo>($"SecurityRole/{role.Entity.Key}/policy", o));
                     Console.WriteLine("{2}: {1} TO {0}", r, policyGrant, grant);
                 }
             }
@@ -192,7 +188,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                     var device = m_client.Query<SecurityDevice>(o => o.Name == d, 0, 1, out int _).CollectionItem.FirstOrDefault() as SecurityDeviceInfo;
                     if (device == null)
                         throw new KeyNotFoundException($"Device {d} not found");
-                    policies.ForEach(o => m_client.Client.Post<SecurityPolicyInfo, SecurityPolicyInfo>($"SecurityDevice/{device.Entity.Key}/policy", m_client.Client.Accept, o));
+                    policies.ForEach(o => m_client.Client.Post<SecurityPolicyInfo, SecurityPolicyInfo>($"SecurityDevice/{device.Entity.Key}/policy", o));
                     Console.WriteLine("{2}: {1} TO {0}", d, policyGrant, grant);
                 }
             }
@@ -201,14 +197,13 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             {
                 foreach (var a in parms.Application)
                 {
-                    var application = m_client.Query<SecurityApplication>(o => o.Name ==a, 0, 1, out int _).CollectionItem.FirstOrDefault() as SecurityApplicationInfo;
+                    var application = m_client.Query<SecurityApplication>(o => o.Name == a, 0, 1, out int _).CollectionItem.FirstOrDefault() as SecurityApplicationInfo;
                     if (application == null)
                         throw new KeyNotFoundException($"Application {a} not found");
-                    policies.ForEach(o => m_client.Client.Post<SecurityPolicyInfo, SecurityPolicyInfo>($"SecurityApplication/{application.Entity.Key}/policy", m_client.Client.Accept, o));
+                    policies.ForEach(o => m_client.Client.Post<SecurityPolicyInfo, SecurityPolicyInfo>($"SecurityApplication/{application.Entity.Key}/policy", o));
                     Console.WriteLine("{2}: {1} TO {0}", a, policyGrant, grant);
                 }
             }
-
         }
     }
 }

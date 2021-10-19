@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
@@ -40,12 +41,11 @@ using System.Reflection;
 
 namespace SanteDB.Messaging.HDSI
 {
-
     /// <summary>
     /// The HDSI Message Handler Daemon class
     /// </summary>
     [Description("The primary iCDR Health Data Messaging Service (HDSI) allows sharing of RIM objects in XML or JSON over HTTP")]
-    [ApiServiceProvider("iCDR HDSI Message Service", typeof(HdsiServiceBehavior), configurationType: typeof(HdsiConfigurationSection), required: true)]
+    [ApiServiceProvider("Health Data Services Interface", typeof(HdsiServiceBehavior), configurationType: typeof(HdsiConfigurationSection), required: true)]
     public class HdsiMessageHandler : IDaemonService, IApiEndpointProvider
     {
         /// <summary>
@@ -67,7 +67,7 @@ namespace SanteDB.Messaging.HDSI
         private Tracer m_traceSource = new Tracer(HdsiConstants.TraceSourceName);
 
         // configuration
-        private HdsiConfigurationSection m_configuration= ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<HdsiConfigurationSection>();
+        private HdsiConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<HdsiConfigurationSection>();
 
         // web host
         private RestService m_webHost;
@@ -87,20 +87,21 @@ namespace SanteDB.Messaging.HDSI
         /// Fired when the object is starting up
         /// </summary>
         public event EventHandler Started;
+
         /// <summary>
         /// Fired when the object is starting
         /// </summary>
         public event EventHandler Starting;
+
         /// <summary>
         /// Fired when the service has stopped
         /// </summary>
         public event EventHandler Stopped;
+
         /// <summary>
         /// Fired when the service is stopping
         /// </summary>
         public event EventHandler Stopping;
-
-
 
         /// <summary>
         /// Gets the API type
@@ -150,8 +151,8 @@ namespace SanteDB.Messaging.HDSI
 
                 var serviceManager = ApplicationServiceContext.Current.GetService<IServiceManager>();
                 // Force startup
-                if(this.m_configuration?.ResourceHandlers.Count() > 0)
-                    HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.m_configuration.ResourceHandlers.Select(o=>o.Type), typeof(IHdsiServiceContract));
+                if (this.m_configuration?.ResourceHandlers.Count() > 0)
+                    HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(this.m_configuration.ResourceHandlers.Select(o => o.Type), typeof(IHdsiServiceContract));
                 else
                     HdsiMessageHandler.ResourceHandler = new ResourceHandlerTool(
 
@@ -159,7 +160,7 @@ namespace SanteDB.Messaging.HDSI
                         .Where(t => !t.IsAbstract && !t.IsInterface && typeof(IApiResourceHandler).IsAssignableFrom(t))
                         .ToList(), typeof(IHdsiServiceContract)
                     );
-                
+
                 this.m_webHost = ApplicationServiceContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(HdsiServiceBehavior));
                 this.m_webHost.AddServiceBehavior(new ErrorServiceBehavior());
 
@@ -168,14 +169,14 @@ namespace SanteDB.Messaging.HDSI
                     this.m_traceSource.TraceInfo("Starting HDSI on {0}...", endpoint.Description.ListenUri);
 
                 // Start the webhost
-                ApplicationServiceContext.Current.Started += (o,e) => this.m_webHost.Start();
+                ApplicationServiceContext.Current.Started += (o, e) => this.m_webHost.Start();
 
                 this.Started?.Invoke(this, EventArgs.Empty);
                 return true;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error, e.ToString());
                 return false;
             }
         }
@@ -187,7 +188,7 @@ namespace SanteDB.Messaging.HDSI
         {
             this.Stopping?.Invoke(this, EventArgs.Empty);
 
-            if(this.m_webHost != null)
+            if (this.m_webHost != null)
             {
                 this.m_webHost.Stop();
                 this.m_webHost = null;

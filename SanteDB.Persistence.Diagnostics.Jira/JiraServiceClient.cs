@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Http;
 using SanteDB.Core.Interop.Clients;
 using SanteDB.Persistence.Diagnostics.Jira.Configuration;
@@ -32,13 +33,11 @@ namespace SanteDB.Persistence.Diagnostics.Jira
     /// </summary>
     public class JiraServiceClient : ServiceClientBase
     {
-
         /// <summary>
         /// Creates the specified service client
         /// </summary>
         public JiraServiceClient(IRestClient restClient) : base(restClient)
         {
-            this.Client.Accept = this.Client.Accept ?? "application/json";
         }
 
         /// <summary>
@@ -65,7 +64,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         public void CreateAttachment(JiraIssueResponse issue, MultipartAttachment attachment)
         {
             String boundary = String.Format("------{0:N}", Guid.NewGuid());
-            this.Client.Post<MultipartAttachment, Object>(String.Format("api/2/issue/{0}/attachments", issue.Key), String.Format("multipart/form-data; boundary={0}", boundary), attachment); 
+            this.Client.Post<MultipartAttachment, Object>(String.Format("api/2/issue/{0}/attachments", issue.Key), String.Format("multipart/form-data; boundary={0}", boundary), attachment);
         }
 
         /// <summary>

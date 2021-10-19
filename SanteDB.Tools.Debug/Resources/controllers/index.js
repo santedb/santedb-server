@@ -98,7 +98,7 @@ angular.module('layout').controller('IndexController', ['$scope', '$rootScope', 
     $scope.hasParameter = function (resource) {
         for (var p in $rootScope.configuration.parameters) {
             if ($rootScope.configuration.parameters[p].scope.indexOf(resource.resource) > -1)
-                return true && resource.cap.indexOf('Get') > -1;
+                return resource.cap.find(o=>o.cap == 'Get') != null;
         }
         return false;
     }

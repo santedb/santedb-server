@@ -49,7 +49,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// DI constructor
         /// </summary>
-        public GenericLocalActRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        public GenericLocalActRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
         {
         }
 
@@ -146,7 +146,10 @@ namespace SanteDB.Server.Core.Services.Impl
         public override TAct Validate(TAct data)
         {
             if (data == null)
-                throw new ArgumentNullException($"{nameof(data)} cannot be null");
+                throw new ArgumentNullException(this.m_localizationService.FormatString("error.type.ArgumentNullException.param", new
+                    {
+                        param = nameof(data)
+                    }));
             base.Validate(data);
 
             var userService = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>();

@@ -40,7 +40,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Creates a new batch repository
         /// </summary>
-        public LocalBatchRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService)
+        public LocalBatchRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService, localizationService)
         {
         }
 
@@ -49,7 +49,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public override IEnumerable<Bundle> Find(Expression<Func<Bundle, bool>> query)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException(this.m_localizationService.GetString("error.type.NotSupportedException"));
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public override IEnumerable<Bundle> Find(Expression<Func<Bundle, bool>> query, int offset, int? count, out int totalResults, params ModelSort<Bundle>[] orderBy)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException(this.m_localizationService.GetString("error.type.NotSupportedException"));
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public override Bundle Get(Guid key)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException(this.m_localizationService.GetString("error.type.NotSupportedException"));
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public override Bundle Get(Guid key, Guid versionKey)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException(this.m_localizationService.GetString("error.type.NotSupportedException"));
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <returns></returns>
         public override Bundle Obsolete(Guid key)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException(this.m_localizationService.GetString("error.type.NotSupportedException"));
         }
 
         /// <summary>

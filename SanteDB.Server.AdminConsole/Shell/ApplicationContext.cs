@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Http;
@@ -46,7 +47,6 @@ namespace SanteDB.Server.AdminConsole.Shell
     /// </summary>
     public class ApplicationContext : IServiceProvider, IApplicationServiceContext
     {
-
         // Tracer
         private Tracer m_tracer = Tracer.GetTracer(typeof(ApplicationServiceContext));
 
@@ -56,7 +56,7 @@ namespace SanteDB.Server.AdminConsole.Shell
         private Parameters.ConsoleParameters m_configuration;
 
         /// <summary>
-        /// Services 
+        /// Services
         /// </summary>
         private List<Object> m_services = new List<object>();
 
@@ -69,14 +69,17 @@ namespace SanteDB.Server.AdminConsole.Shell
         private Dictionary<ServiceEndpointType, IRestClient> m_restClients = new Dictionary<ServiceEndpointType, IRestClient>();
 
         public event EventHandler Starting;
+
         public event EventHandler Started;
+
         public event EventHandler Stopping;
+
         public event EventHandler Stopped;
 
-	    /// <summary>
-	    /// Gets the time that the application context was started
-	    /// </summary>
-	    public DateTime StartTime { get; private set; }
+        /// <summary>
+        /// Gets the time that the application context was started
+        /// </summary>
+        public DateTime StartTime { get; private set; }
 
         /// <summary>
         /// Initialize the application context
@@ -87,7 +90,7 @@ namespace SanteDB.Server.AdminConsole.Shell
         }
 
         /// <summary>
-        /// Get the services provided 
+        /// Get the services provided
         /// </summary>
         public object GetService(Type serviceType)
         {
@@ -145,24 +148,23 @@ namespace SanteDB.Server.AdminConsole.Shell
         /// </summary>
         public bool Start()
         {
-
             ApplicationServiceContext.Current = this;
             this.m_tracer.TraceInfo("Starting mini-context");
 
             String scheme = this.m_configuration.UseTls ? "https" : "http",
                 host = $"{scheme}://{this.m_configuration.RealmId}:{this.m_configuration.Port}/";
-            
+
             this.m_tracer.TraceInfo("Contacting {0}", host);
             try
             {
-
                 // Options on AMI
                 var optionDescription = new AdminClientDescription()
                 {
                     Binding = new ServiceClientBindingDescription()
                     {
                         Security = new SecurityConfigurationDescription()
-                    }
+                    },
+                    Accept = "application/xml"
                 };
 
                 if (!String.IsNullOrEmpty(this.m_configuration.Proxy))
@@ -187,10 +189,9 @@ namespace SanteDB.Server.AdminConsole.Shell
                 {
                     this.m_tracer.TraceInfo("Server supports {0} at {1}", itm.ServiceType, String.Join(",", itm.BaseUrl).Replace("0.0.0.0", this.m_configuration.RealmId));
 
-                    var config = new AdminClientDescription() { Binding = new ServiceClientBindingDescription() };
+                    var config = new AdminClientDescription() { Accept = "application/xml", Binding = new ServiceClientBindingDescription() };
                     if (itm.Capabilities.HasFlag(ServiceEndpointCapabilities.Compression))
                         config.Binding.Optimize = true;
-
 
                     if (itm.Capabilities.HasFlag(ServiceEndpointCapabilities.BearerAuth))
                         config.Binding.Security = new SecurityConfigurationDescription()
@@ -220,7 +221,7 @@ namespace SanteDB.Server.AdminConsole.Shell
                     config.Endpoint.AddRange(itm.BaseUrl.Select(o => new AdminClientEndpointDescription(o.Replace("0.0.0.0", this.m_configuration.RealmId))));
 
                     // Add client
-                    if(!this.m_restClients.ContainsKey(itm.ServiceType))
+                    if (!this.m_restClients.ContainsKey(itm.ServiceType))
                         this.m_restClients.Add(itm.ServiceType, new RestClient(
                             config
                         ));
@@ -228,7 +229,7 @@ namespace SanteDB.Server.AdminConsole.Shell
 
                 // Attempt to get server time from clinical interface which should challenge
                 var data = this.GetRestClient(ServiceEndpointType.HealthDataService)?.Get("/time");
-		
+
                 return true;
             }
             catch (Exception ex)
@@ -268,7 +269,6 @@ namespace SanteDB.Server.AdminConsole.Shell
                 else
                     Console.WriteLine("Password:{0}", new String('*', this.m_configuration.Password.Length * 2));
 
-
                 // Now authenticate
                 try
                 {
@@ -290,7 +290,6 @@ namespace SanteDB.Server.AdminConsole.Shell
                     this.m_tracer.TraceError("Authentication error: {0}", e.Message);
                     this.m_configuration.Password = null;
                 }
-
             }
 
             return retVal;

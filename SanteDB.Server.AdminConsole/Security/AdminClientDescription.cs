@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Http;
 using SanteDB.Core.Http.Description;
 using System.Collections.Generic;
@@ -29,7 +30,6 @@ namespace SanteDB.Server.AdminConsole.Security
     /// </summary>
     public class AdminClientDescription : IRestClientDescription
     {
-
         // Endpoints
         private List<IRestClientEndpointDescription> m_endpoints = new List<IRestClientEndpointDescription>();
 
@@ -38,8 +38,12 @@ namespace SanteDB.Server.AdminConsole.Security
         /// </summary>
         public AdminClientDescription()
         {
-            
         }
+
+        /// <summary>
+        /// Gets or sets the accept
+        /// </summary>
+        public string Accept { get; set; }
 
         /// <summary>
         /// Bidning description
@@ -70,7 +74,6 @@ namespace SanteDB.Server.AdminConsole.Security
                 return this.m_endpoints;
             }
         }
-
 
         /// <summary>
         /// Trace?

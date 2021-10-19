@@ -137,7 +137,7 @@ Source: ..\bin\Release\SanteDB.exe.config; DestDir: {app}; DestName: sdbac.exe.c
 Source: ..\bin\release\SanteDB.Server.AdminConsole.Api.dll; DestDir: {app}; Components: tools
 
 Source: ..\bin\release\SanteDB.Messaging.AMI.Client.dll; DestDir: {app}; Components: tools
-Source: ..\bin\release\SanteDB.Tools.DataSandbox.dll; DestDir: {app}; Components: tools
+Source: ..\bin\release\SanteDB.Tools.Debug.dll; DestDir: {app}; Components: tools
 
 ;Documentation For OpenAPI
 Source: ..\bin\Release\RestSrvr.xml; DestDir: {app}; Components: interop\openapi

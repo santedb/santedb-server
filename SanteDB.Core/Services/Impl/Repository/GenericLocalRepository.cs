@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Diagnostics;
@@ -67,38 +68,47 @@ namespace SanteDB.Server.Core.Services.Impl
         /// Fired prior to inserting the record
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<TEntity>> Inserting;
+
         /// <summary>
         /// Fired after the record has been inserted
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<TEntity>> Inserted;
+
         /// <summary>
         /// Fired before the record is saved
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<TEntity>> Saving;
+
         /// <summary>
         /// Fired after the record has been persisted
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<TEntity>> Saved;
+
         /// <summary>
         /// Fired prior to the record being retrieved
         /// </summary>
         public event EventHandler<DataRetrievingEventArgs<TEntity>> Retrieving;
+
         /// <summary>
         /// Fired after the record has been retrieved
         /// </summary>
         public event EventHandler<DataRetrievedEventArgs<TEntity>> Retrieved;
+
         /// <summary>
         /// Fired before a query is executed
         /// </summary>
         public event EventHandler<QueryRequestEventArgs<TEntity>> Querying;
+
         /// <summary>
         /// Fired after query results have been executed
         /// </summary>
         public event EventHandler<QueryResultEventArgs<TEntity>> Queried;
+
         /// <summary>
         /// Data is obsoleting
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<TEntity>> Obsoleting;
+
         /// <summary>
         /// Data has obsoleted
         /// </summary>
@@ -108,18 +118,22 @@ namespace SanteDB.Server.Core.Services.Impl
         /// Gets the policy required for querying
         /// </summary>
         protected virtual String QueryPolicy => PermissionPolicyIdentifiers.LoginAsService;
+
         /// <summary>
         /// Gets the policy required for reading
         /// </summary>
         protected virtual String ReadPolicy => PermissionPolicyIdentifiers.LoginAsService;
+
         /// <summary>
         /// Gets the policy required for writing
         /// </summary>
         protected virtual String WritePolicy => PermissionPolicyIdentifiers.LoginAsService;
+
         /// <summary>
         /// Gets the policy required for deleting
         /// </summary>
         protected virtual String DeletePolicy => PermissionPolicyIdentifiers.LoginAsService;
+
         /// <summary>
         /// Gets the policy for altering
         /// </summary>
@@ -127,16 +141,21 @@ namespace SanteDB.Server.Core.Services.Impl
 
         // Privacy service
         private IPrivacyEnforcementService m_privacyService;
+
+        // Localization service
+        protected readonly ILocalizationService m_localizationService;
+
         // Policy enforcement
         protected IPolicyEnforcementService m_policyService;
 
         /// <summary>
         /// Creates a new generic local repository with specified privacy service
         /// </summary>
-        public GenericLocalRepository(IPrivacyEnforcementService privacyService, IPolicyEnforcementService policyService)
+        public GenericLocalRepository(IPrivacyEnforcementService privacyService, IPolicyEnforcementService policyService, ILocalizationService localizationService)
         {
             this.m_privacyService = privacyService;
             this.m_policyService = policyService;
+            this.m_localizationService = localizationService;
         }
 
         /// <summary>
@@ -151,7 +170,10 @@ namespace SanteDB.Server.Core.Services.Impl
 
             if (persistenceService == null)
             {
-                throw new InvalidOperationException($"Unable to locate {typeof(IDataPersistenceService<TEntity>).FullName}");
+                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
+                    {
+                        param = typeof(IDataPersistenceService<TEntity>).FullName
+                    }));
             }
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
@@ -209,7 +231,7 @@ namespace SanteDB.Server.Core.Services.Impl
             this.Inserting?.Invoke(this, prePersistence);
             if (prePersistence.Cancel)
             {
-                this.m_traceSource.TraceWarning("Pre-persistence event signal cancel: {0}", data);
+                this.m_traceSource.TraceInfo("Pre-persistence event signal cancel: {0}", data);
 
                 // Fired inserted trigger
                 if (prePersistence.Success)
@@ -236,7 +258,10 @@ namespace SanteDB.Server.Core.Services.Impl
         private void ThrowPrivacyValidationException(TEntity data)
         {
             throw new DetectedIssueException(
-                new DetectedIssue(DetectedIssuePriorityType.Error, "privacy", "Privacy Validation Failed", DetectedIssueKeys.AlreadyDoneIssue)
+                new DetectedIssue(DetectedIssuePriorityType.Error, "privacy", this.m_localizationService.FormatString("error.server.core.validationFail", new
+                {
+                    param = "Privacy"
+                }), DetectedIssueKeys.AlreadyDoneIssue)
             );
         }
 
@@ -252,20 +277,26 @@ namespace SanteDB.Server.Core.Services.Impl
 
             if (persistenceService == null)
             {
-                throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<TEntity>)}");
+                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
+                    {
+                        param = nameof(IDataPersistenceService<TEntity>)
+                    }));
             }
 
             var entity = persistenceService.Get(key, null, AuthenticationContext.Current.Principal);
 
             if (entity == null)
-                throw new KeyNotFoundException($"Entity {key} not found");
+                throw new KeyNotFoundException(this.m_localizationService.FormatString("error.type.KeyNotFoundException.notFound",new
+                {
+                    param = $"Entity {key}"
+                }));
 
             // Fire pre-persistence triggers
             var prePersistence = new DataPersistingEventArgs<TEntity>(entity, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             this.Obsoleting?.Invoke(this, prePersistence);
             if (prePersistence.Cancel)
             {
-                this.m_traceSource.TraceWarning("Pre-persistence event signal cancel obsolete: {0}", key);
+                this.m_traceSource.TraceInfo("Pre-persistence event signal cancel obsolete: {0}", key);
                 // Fired inserted trigger
                 if (prePersistence.Success)
                 {
@@ -304,7 +335,10 @@ namespace SanteDB.Server.Core.Services.Impl
 
             if (persistenceService == null)
             {
-                throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<TEntity>)}");
+                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
+                    {
+                        param = nameof(IDataPersistenceService<TEntity>)
+                    }));
             }
 
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
@@ -312,9 +346,9 @@ namespace SanteDB.Server.Core.Services.Impl
             var preRetrieve = new DataRetrievingEventArgs<TEntity>(key, versionKey, AuthenticationContext.Current.Principal);
 
             this.Retrieving?.Invoke(this, preRetrieve);
-            if(preRetrieve.Cancel)
+            if (preRetrieve.Cancel)
             {
-                this.m_traceSource.TraceWarning("Pre-retrieve trigger signals cancel: {0}", key);
+                this.m_traceSource.TraceInfo("Pre-retrieve trigger signals cancel: {0}", key);
                 return this.m_privacyService?.Apply(preRetrieve.Result, AuthenticationContext.Current.Principal) ?? preRetrieve.Result;
             }
 
@@ -338,7 +372,10 @@ namespace SanteDB.Server.Core.Services.Impl
 
             if (persistenceService == null)
             {
-                throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<TEntity>)}");
+                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
+                    {
+                        param = nameof(IDataPersistenceService<TEntity>)
+                    }));
             }
 
             data = this.Validate(data);
@@ -354,7 +391,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 this.Saving?.Invoke(this, preSave);
                 if (preSave.Cancel)
                 {
-                    this.m_traceSource.TraceWarning("Persistence layer indicates pre-save cancel: {0}", data);
+                    this.m_traceSource.TraceInfo("Persistence layer indicates pre-save cancel: {0}", data);
                     // Fired inserted trigger
                     if (preSave.Success)
                     {

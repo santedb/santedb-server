@@ -24,6 +24,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using System;
+using SanteDB.Core.Services;
 
 namespace SanteDB.Server.Core.Services.Impl
 {
@@ -32,14 +33,13 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalSecurityDeviceRepository : GenericLocalSecurityRepository<SecurityDevice>
     {
-
         // ID Provider
         private IDeviceIdentityProviderService m_identityProvider;
 
         /// <summary>
         /// DI constructor
         /// </summary>
-        public LocalSecurityDeviceRepository(IDeviceIdentityProviderService identityProvider, IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        public LocalSecurityDeviceRepository(IDeviceIdentityProviderService identityProvider, IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
         {
             this.m_identityProvider = identityProvider;
         }
@@ -53,7 +53,6 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public override SecurityDevice Insert(SecurityDevice data)
         {
-
             // Create the identity
             var id = this.m_identityProvider.CreateIdentity(data.Name, data.DeviceSecret, AuthenticationContext.Current.Principal);
 

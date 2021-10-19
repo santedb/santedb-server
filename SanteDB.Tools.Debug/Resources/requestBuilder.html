@@ -187,7 +187,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="res in results.item track by $index">
+                        <tr ng-repeat="res in results.resource track by $index">
                             <td>{{$index + 1}}</td>
                             <td>{{res.id}}</td>
                             <td ng-if="search.resourceType != 'Concept'">{{res.$type}}</td>

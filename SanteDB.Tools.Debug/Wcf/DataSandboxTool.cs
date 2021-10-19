@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using RestSrvr;
 using RestSrvr.Attributes;
 using SanteDB.Core.Applets.ViewModel.Json;
@@ -34,16 +35,15 @@ using System.Linq;
 using System.Net;
 using System.Xml.Serialization;
 
-namespace SanteDB.Tools.DataSandbox.Wcf
+namespace SanteDB.Tools.Debug.Wcf
 {
     /// <summary>
     /// Query tool behavior
     /// </summary>
-    [ServiceBehavior(Name = "DataSandboxTool")]
+    [ServiceBehavior(Name = "HDSI_Sandbox")]
     public class DataSandboxTool : IDataSandboxTool
     {
-
-        private Tracer m_traceSource = new Tracer("SanteDB.Tools.DataSandbox");
+        private Tracer m_traceSource = new Tracer("SanteDB.Tools.Debug");
 
         /// <summary>
         /// Create dataset
@@ -65,7 +65,6 @@ namespace SanteDB.Tools.DataSandbox.Wcf
             XmlModelSerializerFactory.Current.CreateSerializer(typeof(Dataset)).Serialize(ms, output);
             ms.Seek(0, SeekOrigin.Begin);
             return ms;
-
         }
 
         /// <summary>
@@ -84,32 +83,13 @@ namespace SanteDB.Tools.DataSandbox.Wcf
 
                 if (filename == "config.json")
                 {
-                    var cpath = Path.Combine(Path.GetDirectoryName(typeof(DataSandboxTool).Assembly.Location), "sandbox.config.json");
-                    RestOperationContext.Current.OutgoingResponse.ContentType = DefaultContentTypeMapper.GetContentType(cpath);
-                    return File.OpenRead(cpath);
+                    return typeof(DataSandboxTool).Assembly.GetManifestResourceStream($"{typeof(DataSandboxService).Namespace}.sandbox.config.json");
                 }
                 else
                 {
                     // Get the query tool stream
-#if DEBUG
-                    var contentPath = Path.Combine(Path.GetDirectoryName(typeof(DataSandboxTool).Assembly.Location), "SandboxTool", filename);
 
-                    if (!File.Exists(contentPath))
-                    {
-                        RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.NotFound;
-                        return null;
-                    }
-                    else
-                    {
-
-                        RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.OK;
-                        RestOperationContext.Current.OutgoingResponse.ContentLength64 = new FileInfo(contentPath).Length;
-                        RestOperationContext.Current.OutgoingResponse.ContentType = DefaultContentTypeMapper.GetContentType(contentPath);
-
-                        return File.OpenRead(contentPath);
-                    }
-#else
-                    var contentPath = $"SanteDB.Tools.DataSandbox.Resources.{filename.Replace("/", ".")}";
+                    var contentPath = $"{typeof(DataSandboxService).Namespace}.Resources.{filename.Replace("/", ".")}";
 
                     if (!typeof(DataSandboxTool).Assembly.GetManifestResourceNames().Contains(contentPath))
                     {
@@ -118,26 +98,21 @@ namespace SanteDB.Tools.DataSandbox.Wcf
                     }
                     else
                     {
-
                         RestOperationContext.Current.OutgoingResponse.StatusCode = 200; /// HttpStatusCode.OK;
                         //RestOperationContext.Current.OutgoingResponse.ContentLength = new FileInfo(contentPath).Length;
                         RestOperationContext.Current.OutgoingResponse.ContentType = DefaultContentTypeMapper.GetContentType(contentPath);
 
                         return typeof(DataSandboxTool).Assembly.GetManifestResourceStream(contentPath);
                     }
-#endif
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 RestOperationContext.Current.OutgoingResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error, e.ToString());
                 return null;
             }
-
         }
-
-        
     }
 }

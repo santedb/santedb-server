@@ -75,7 +75,8 @@ if exist "%nuget%" (
 	)
 
 	
-	%inno% "/o.\bin\dist" ".\installer\SanteDB-icdr.iss" /d"MyAppVersion=%version%" 
+	mkdir .\bin\dist
+	%inno% "/o.\bin\dist" ".\installer\santedb-icdr.iss" /d"MyAppVersion=%version%" 
 
 	rem ################# TARBALLS 
 	echo Building Linux Tarball

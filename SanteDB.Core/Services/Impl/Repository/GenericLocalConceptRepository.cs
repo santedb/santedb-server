@@ -21,6 +21,7 @@
 using SanteDB.Core.Model;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
+using SanteDB.Core.Services;
 
 namespace SanteDB.Server.Core.Services.Impl
 {
@@ -34,7 +35,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Creates a new generic local concept repository
         /// </summary>
-        public GenericLocalConceptRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        public GenericLocalConceptRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
         {
         }
 

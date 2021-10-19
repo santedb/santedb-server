@@ -53,7 +53,8 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Privacy enforcement service
         /// </summary>
-        public LocalConceptRepository(IDataPersistenceService<Concept> conceptService, IDataPersistenceService<ConceptSet> conceptSetService, IDataPersistenceService<ConceptReferenceTerm> conceptRefTermService, IPolicyEnforcementService policyService, IAdhocCacheService adhocCacheService = null, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        public LocalConceptRepository(IDataPersistenceService<Concept> conceptService, IDataPersistenceService<ConceptSet> conceptSetService, IDataPersistenceService<ConceptReferenceTerm> conceptRefTermService, IPolicyEnforcementService policyService, ILocalizationService localizationService,
+            IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
         {
             this.m_conceptService = conceptService;
             this.m_referenceTermService = conceptRefTermService;
@@ -232,7 +233,7 @@ namespace SanteDB.Server.Core.Services.Impl
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         public bool Implies(Concept a, Concept b)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException(this.m_localizationService.GetString("error.type.NotImplementedException"));
         }
 
         /// <summary>

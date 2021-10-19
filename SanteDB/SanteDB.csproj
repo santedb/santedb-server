@@ -561,10 +561,6 @@
       <Project>{1d145e2a-c31e-467c-9f4a-6811e1604b67}</Project>
       <Name>SanteDB.Server</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Tools.DataQueryService\SanteDB.Tools.DataSandbox.csproj">
-      <Project>{5660297c-6db6-45fe-bf1d-de254e35a5b3}</Project>
-      <Name>SanteDB.Tools.DataSandbox</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Tools.Debug\SanteDB.Tools.Debug.csproj">
       <Project>{223d4d87-6819-4f38-ae69-a82e249e1879}</Project>
       <Name>SanteDB.Tools.Debug</Name>

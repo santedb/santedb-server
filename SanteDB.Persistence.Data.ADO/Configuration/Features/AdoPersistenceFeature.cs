@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Features;
 using SanteDB.Core.Services;
@@ -37,7 +38,6 @@ namespace SanteDB.Persistence.Data.ADO.Configuration.Features
     /// </summary>
     public class AdoPersistenceFeature : GenericServiceFeature<AdoPersistenceService>
     {
-
         /// <summary>
         /// Set the default configuration
         /// </summary>
@@ -65,7 +65,6 @@ namespace SanteDB.Persistence.Data.ADO.Configuration.Features
         /// </summary>
         private class RegisterAdoProvidersTask : IConfigurationTask
         {
-
             private readonly Type[] SERVICE_TYPES = new Type[]
             {
                 typeof(AdoPersistenceService),
@@ -78,7 +77,8 @@ namespace SanteDB.Persistence.Data.ADO.Configuration.Features
                 typeof(AdoSecurityChallengeProvider),
                 typeof(AdoRoleProvider),
                 typeof(AdoSubscriptionExecutor),
-                typeof(AdoSessionProvider)
+                typeof(AdoSessionProvider),
+                typeof(SanteDB.Persistence.Data.ADO.Services.AdoServiceFactory)
             };
 
             /// <summary>
@@ -115,9 +115,9 @@ namespace SanteDB.Persistence.Data.ADO.Configuration.Features
             public bool Execute(SanteDBConfiguration configuration)
             {
                 var serviceConfiguration = configuration.GetSection<ApplicationServiceContextConfigurationSection>();
-                foreach(var itm in this.SERVICE_TYPES)
+                foreach (var itm in this.SERVICE_TYPES)
                 {
-                    if(!serviceConfiguration.ServiceProviders.Any(o=>o.Type == itm))
+                    if (!serviceConfiguration.ServiceProviders.Any(o => o.Type == itm))
                     {
                         serviceConfiguration.ServiceProviders.Add(new TypeReferenceConfiguration(itm));
                     }

@@ -18,16 +18,17 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Services;
 using RestSrvr;
 using SanteDB.Core;
-using SanteDB.Tools.DataSandbox.Wcf;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Tools.Debug.Wcf;
 
-namespace SanteDB.Tools.DataSandbox
+namespace SanteDB.Tools.Debug
 {
     /// <summary>
     /// Represents a daemon service that exports Swagger documentation
@@ -55,14 +56,17 @@ namespace SanteDB.Tools.DataSandbox
         /// Fired when service has started
         /// </summary>
         public event EventHandler Started;
+
         /// <summary>
         /// Fired when service is starting
         /// </summary>
         public event EventHandler Starting;
+
         /// <summary>
         /// Fired when service has stopped
         /// </summary>
         public event EventHandler Stopped;
+
         /// <summary>
         /// Fired when service is stopping
         /// </summary>
@@ -77,9 +81,8 @@ namespace SanteDB.Tools.DataSandbox
 
             ApplicationServiceContext.Current.Started += (o, e) =>
             {
-
                 this.m_traceSource.TraceInfo("Starting Query Builder Service...");
-                
+
                 this.m_webHost = ApplicationServiceContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(DataSandboxTool));
                 this.m_webHost.Start();
                 this.Started?.Invoke(this, EventArgs.Empty);

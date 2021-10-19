@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Configuration;
 using System;
 using System.Collections.Generic;
@@ -35,12 +36,16 @@ namespace SanteDB.Tools.Debug.Configuration
     [XmlType(nameof(DebugToolsConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class DebugToolsConfigurationSection : IConfigurationSection
     {
+        // Metdata repository
+        public DebugToolsConfigurationSection()
+        {
+            this.BiMetadataRepository = new List<FileMetaDataRepositoryConfiguration>();
+        }
 
         /// <summary>
         /// Metadata repository configuration
         /// </summary>
-        [XmlElement("biFileRepository")]
-        public FileMetaDataRepositoryConfiguration BiMetadataRepository { get; set; }
-
+        [XmlArray("biFileRepository"), XmlArrayItem("folder"), DisplayName("BI Metadata Folders"), Description("The folder(s) where the file-based BI definition loader should look for definitions")]
+        public List<FileMetaDataRepositoryConfiguration> BiMetadataRepository { get; set; }
     }
 }

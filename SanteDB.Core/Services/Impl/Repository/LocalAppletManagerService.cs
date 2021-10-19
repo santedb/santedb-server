@@ -32,6 +32,7 @@ using SanteDB.Rest.Common.Attributes;
 using SanteDB.Server.Core.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.Linq;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
@@ -56,7 +57,7 @@ namespace SanteDB.Server.Core.Services.Impl
         public string ServiceName => "Local Applet Repository/Manager";
 
         // Solutions registered
-        private List<AppletSolution> m_solutions = new List<AppletSolution>();
+        private ObservableCollection<AppletSolution> m_solutions = new ObservableCollection<AppletSolution>();
 
         // Applet collection
         private Dictionary<String, AppletCollection> m_appletCollection = new Dictionary<string, AppletCollection>();
@@ -544,6 +545,16 @@ namespace SanteDB.Server.Core.Services.Impl
 
             this.m_solutions.Add(solution);
 
+            foreach (var apl in this.m_appletCollection[solution.Meta.Id])
+            {
+                var existing = this.m_appletCollection[String.Empty].FirstOrDefault(o => o.Info.Id == apl.Info.Id);
+                if (existing == null || new Version(existing.Info.Version) < new Version(apl.Info.Version))
+                {
+                    this.m_appletCollection[String.Empty].Remove(apl);
+                    this.m_appletCollection[String.Empty].Add(apl);
+                    this.m_readonlyAppletCollection[String.Empty] = this.m_appletCollection[String.Empty].AsReadonly();
+                }
+            }
             return true;
         }
     }

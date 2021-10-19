@@ -18,12 +18,16 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
+using SanteDB.Core.Security;
 using SharpCompress.IO;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Http.Description;
 using SanteDB.Core.Model.Query;
+
 using SanteDB.Core.Security;
+
 using SanteDB.Core.Services;
 using SanteDB.Rest.Common.Fault;
 using SharpCompress.Compressors;
@@ -110,7 +114,6 @@ namespace SanteDB.Server.Core.Http
             if (this.ClientCertificates != null)
                 retVal.ClientCertificates.AddRange(this.ClientCertificates);
 
-
             if (this.Description?.Binding?.Security?.CertificateValidator != null)
                 retVal.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) =>
                 {
@@ -121,15 +124,15 @@ namespace SanteDB.Server.Core.Http
                 {
                     if (sslPolicyErrors == System.Net.Security.SslPolicyErrors.None)
                         return true;
-                    else { 
+                    else
+                    {
                         var configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
                         this.traceSource.TraceEvent(EventLevel.Warning, "Checking for certificate override for {0}", (certificate as X509Certificate2).Thumbprint);
-                        if (configuration.TrustedCertificates.Contains((certificate as X509Certificate2).Thumbprint))
+                        if (new X509Certificate2(certificate).IsTrustedIntern(null, out _))
                             return true;
                         else return false;
                     }
                 };
-
 
             if (this.Description.Binding.Optimize)
                 retVal.Headers[HttpRequestHeader.AcceptEncoding] = "gzip, deflate";
@@ -263,13 +266,12 @@ namespace SanteDB.Server.Core.Http
                                     throw responseError;
                             }
                             responseHeaders = response.Headers;
-
                         }
 
                         var validationResult = this.CategorizeResponse(response);
                         if (validationResult != ServiceClientErrorType.Ok)
                         {
-                            this.traceSource.TraceEvent(EventLevel.Error,  "Response failed validation : {0}", validationResult);
+                            this.traceSource.TraceEvent(EventLevel.Error, "Response failed validation : {0}", validationResult);
                             throw new WebException("Response failed validation", null, WebExceptionStatus.Success, response);
                         }
                         // De-serialize
@@ -300,15 +302,18 @@ namespace SanteDB.Server.Core.Http
                                     using (GZipStream df = new GZipStream(new NonDisposingStream(ms), CompressionMode.Decompress))
                                         retVal = (TResult)serializer.DeSerialize(df);
                                     break;
+
                                 case "bzip2":
                                     using (var bzs = new BZip2Stream(new NonDisposingStream(ms), CompressionMode.Decompress, false))
                                         retVal = (TResult)serializer.DeSerialize(bzs);
                                     break;
+
                                 case "lzma":
                                     using (var lzmas = new LZipStream(new NonDisposingStream(ms), CompressionMode.Decompress))
                                         retVal = (TResult)serializer.DeSerialize(lzmas);
 
                                     break;
+
                                 default:
                                     retVal = (TResult)serializer.DeSerialize(ms);
                                     break;
@@ -325,12 +330,12 @@ namespace SanteDB.Server.Core.Http
                 }
                 catch (TimeoutException e)
                 {
-                    this.traceSource.TraceEvent(EventLevel.Error,  "Request timed out:{0}", e);
+                    this.traceSource.TraceEvent(EventLevel.Error, "Request timed out:{0}", e);
                     throw;
                 }
                 catch (WebException e)
                 {
-                    this.traceSource.TraceEvent(EventLevel.Error,  e.ToString());
+                    this.traceSource.TraceEvent(EventLevel.Error, e.ToString());
 
                     // status
                     switch (e.Status)
@@ -354,18 +359,22 @@ namespace SanteDB.Server.Core.Http
                                         using (DeflateStream df = new DeflateStream(new NonDisposingStream(errorResponse.GetResponseStream()), CompressionMode.Decompress))
                                             errorResult = serializer.DeSerialize(df);
                                         break;
+
                                     case "gzip":
                                         using (GZipStream df = new GZipStream(new NonDisposingStream(errorResponse.GetResponseStream()), CompressionMode.Decompress))
                                             errorResult = serializer.DeSerialize(df);
                                         break;
+
                                     case "bzip2":
                                         using (var bzs = new BZip2Stream(new NonDisposingStream(errorResponse.GetResponseStream()), CompressionMode.Decompress, false))
                                             errorResult = serializer.DeSerialize(bzs);
                                         break;
+
                                     case "lzma":
                                         using (var lzmas = new LZipStream(new NonDisposingStream(errorResponse.GetResponseStream()), CompressionMode.Decompress))
                                             errorResult = serializer.DeSerialize(lzmas);
                                         break;
+
                                     default:
                                         errorResult = serializer.DeSerialize(errorResponse.GetResponseStream());
                                         break;
@@ -380,7 +389,7 @@ namespace SanteDB.Server.Core.Http
                                 throw new RestClientException<TResult>((TResult)errorResult, e, e.Status, e.Response);
                             else
                                 throw new RestClientException<RestServiceFault>((RestServiceFault)errorResult, e, e.Status, e.Response);
-                            
+
                         default:
                             throw;
                     }
