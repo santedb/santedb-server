@@ -1,4 +1,5 @@
 ﻿using SanteDB.Core;
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
 using SanteDB.Core.Security;
@@ -6,6 +7,7 @@ using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Security;
 using SanteDB.Persistence.Data.Services.Persistence;
@@ -43,6 +45,27 @@ namespace SanteDB.Persistence.Data
     /// </summary>
     internal static class DataContextExtensions
     {
+        /// <summary>
+        /// Convert validation enforcement to priority
+        /// </summary>
+        internal static DetectedIssuePriorityType ToPriority(this AdoValidationEnforcement me)
+        {
+            switch (me)
+            {
+                case AdoValidationEnforcement.Off:
+                    return DetectedIssuePriorityType.Information;
+
+                case AdoValidationEnforcement.Loose:
+                    return DetectedIssuePriorityType.Warning;
+
+                case AdoValidationEnforcement.Strict:
+                    return DetectedIssuePriorityType.Error;
+
+                default:
+                    return DetectedIssuePriorityType.Error;
+            }
+        }
+
         /// <summary>
         /// Harmonize the keys with the delay load properties
         /// </summary>

@@ -14,15 +14,16 @@ namespace SanteDB.Persistence.Data.Docker
     /// </summary>
     public class AdoDataDockerFeature : IDockerFeature
     {
-
         /// <summary>
         /// Readwrite connection
         /// </summary>
         public const string ConnectionStringSetting = "RW_CONNECTION";
+
         /// <summary>
         /// Readonly connection
         /// </summary>
         public const string ReadonlyConnectionSetting = "RO_CONNECTION";
+
         /// <summary>
         /// Fuzzy counts
         /// </summary>
@@ -43,9 +44,8 @@ namespace SanteDB.Persistence.Data.Docker
         /// </summary>
         public void Configure(SanteDBConfiguration configuration, IDictionary<string, string> settings)
         {
-
             var configSection = configuration.GetSection<AdoPersistenceConfigurationSection>();
-            if(configSection == null)
+            if (configSection == null)
             {
                 configSection = new AdoPersistenceConfigurationSection()
                 {
@@ -56,29 +56,34 @@ namespace SanteDB.Persistence.Data.Docker
                     ReadonlyConnectionString = "MAIN",
                     ReadWriteConnectionString = "MAIN",
                     UseFuzzyTotals = false,
-                    Validation = new EntityValidationFlags()
+                    Validation = new List<AdoValidationPolicy>()
                     {
-                        IdentifierFormat = true,
-                        IdentifierUniqueness = true,
-                        ValidationLevel = Core.BusinessRules.DetectedIssuePriorityType.Warning
+                        new AdoValidationPolicy()
+                        {
+                            Authority = AdoValidationEnforcement.Loose,
+                            Format = AdoValidationEnforcement.Loose,
+                            Scope = AdoValidationEnforcement.Strict,
+                            Uniqueness = AdoValidationEnforcement.Loose,
+                            CheckDigit = AdoValidationEnforcement.Loose
+                        }
                     }
                 };
                 configuration.AddSection(configSection);
             }
 
-            if(settings.TryGetValue(ReadonlyConnectionSetting, out string roConnection))
+            if (settings.TryGetValue(ReadonlyConnectionSetting, out string roConnection))
             {
                 configSection.ReadonlyConnectionString = roConnection;
             }
 
-            if(settings.TryGetValue(ConnectionStringSetting, out string rwConnection))
+            if (settings.TryGetValue(ConnectionStringSetting, out string rwConnection))
             {
                 configSection.ReadWriteConnectionString = rwConnection;
             }
 
-            if(settings.TryGetValue(FuzzyTotalSetting, out string fuzzyTotal))
+            if (settings.TryGetValue(FuzzyTotalSetting, out string fuzzyTotal))
             {
-                if(!Boolean.TryParse(fuzzyTotal, out bool fuzzyTotalBool))
+                if (!Boolean.TryParse(fuzzyTotal, out bool fuzzyTotalBool))
                 {
                     throw new ArgumentException($"{fuzzyTotal} is not a valid Boolean");
                 }

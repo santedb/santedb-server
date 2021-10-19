@@ -1,21 +1,22 @@
 ﻿/*
  * Portions Copyright 2019-2020, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE)
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you 
- * may not use this file except in compliance with the License. You may 
- * obtain a copy of the License at 
- * 
- * http://www.apache.org/licenses/LICENSE-2.0 
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations under 
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
  * the License.
- * 
+ *
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Exceptions;
@@ -30,11 +31,10 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Data.Configuration
 {
-
     /// <summary>
     /// Versioning policy types
     /// </summary>
-    [XmlType(nameof(AdoVersioningPolicyFlags), Namespace = "http://santedb.org/configuration"),Flags]
+    [XmlType(nameof(AdoVersioningPolicyFlags), Namespace = "http://santedb.org/configuration"), Flags]
     public enum AdoVersioningPolicyFlags
     {
         /// <summary>
@@ -42,27 +42,32 @@ namespace SanteDB.Persistence.Data.Configuration
         /// </summary>
         [XmlEnum("none")]
         None = 0,
+
         /// <summary>
         /// When full-versioning is enabled, then each update results in a new version of an object
         /// </summary>
         [XmlEnum("core-props")]
         FullVersioning = 1,
+
         /// <summary>
         /// When core-versioning is enabled, any versioned associations will be removed meaning
         /// that only core properties are versioned the associative properties are not.
         /// </summary>
         [XmlEnum("associated")]
         AssociationVersioning = 2,
+
         /// <summary>
         /// Logical deletion
         /// </summary>
         [XmlEnum("logical-delete")]
         LogicalDeletion = 4,
+
         /// <summary>
         /// Default flags
         /// </summary>
         [XmlEnum("default")]
         Default = FullVersioning | AssociationVersioning | LogicalDeletion,
+
         /// <summary>
         /// Lean policy
         /// </summary>
@@ -73,7 +78,7 @@ namespace SanteDB.Persistence.Data.Configuration
     /// <summary>
     /// Load strategy
     /// </summary>
-    [XmlType(nameof(LoadStrategyType), Namespace = "http://santedb.org/configuration"),Flags]
+    [XmlType(nameof(LoadStrategyType), Namespace = "http://santedb.org/configuration"), Flags]
     public enum LoadStrategyType
     {
         /// <summary>
@@ -81,11 +86,13 @@ namespace SanteDB.Persistence.Data.Configuration
         /// </summary>
         [XmlEnum("quick")]
         QuickLoad,
+
         /// <summary>
         /// Sync loading - only properties which are necessary for synchronization
         /// </summary>
         [XmlEnum("sync")]
         SyncLoad,
+
         /// <summary>
         /// Full loading - load all properties
         /// </summary>
@@ -99,7 +106,6 @@ namespace SanteDB.Persistence.Data.Configuration
     [XmlType(nameof(AdoPersistenceConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class AdoPersistenceConfigurationSection : OrmConfigurationBase, IConfigurationSection
     {
-
         // Random
         private Random m_random = new Random();
 
@@ -114,12 +120,7 @@ namespace SanteDB.Persistence.Data.Configuration
         /// </summary>
         public AdoPersistenceConfigurationSection()
         {
-            this.Validation = new EntityValidationFlags()
-            {
-                IdentifierFormat = true,
-                IdentifierUniqueness = true,
-                ValidationLevel = Core.BusinessRules.DetectedIssuePriorityType.Warning,
-            };
+            this.Validation = new List<AdoValidationPolicy>();
             this.VersioningPolicy = AdoVersioningPolicyFlags.Default;
         }
 
@@ -177,7 +178,6 @@ namespace SanteDB.Persistence.Data.Configuration
         [Description("When set, instructs the provider to automatically insert any child objects to ensure integrity of the object")]
         public bool AutoInsertChildren { get; set; }
 
-
         /// <summary>
         /// True if statements should be prepared
         /// </summary>
@@ -191,13 +191,13 @@ namespace SanteDB.Persistence.Data.Configuration
         /// Validation flags
         /// </summary>
         [XmlElement("validation"), Category("Data Quality"), DisplayName("Validation"), Description("When set, enables data validation parameters")]
-        public EntityValidationFlags Validation { get; set; }
+        public List<AdoValidationPolicy> Validation { get; set; }
 
         /// <summary>
         /// Max page size
         /// </summary>
         [XmlElement("maxPageSize")]
-        public int? MaxPageSize { get;  set; }
+        public int? MaxPageSize { get; set; }
 
         /// <summary>
         /// Identiifes the caching policy
@@ -216,7 +216,7 @@ namespace SanteDB.Persistence.Data.Configuration
         /// </summary>
         public IEnumerable<String> GetPepperCombos(String secret)
         {
-            if(String.IsNullOrEmpty(this.Pepper))
+            if (String.IsNullOrEmpty(this.Pepper))
             {
                 return new String[] { secret }.Union(PEPPER_CHARS.Select(p => $"{secret}{p}"));
             }

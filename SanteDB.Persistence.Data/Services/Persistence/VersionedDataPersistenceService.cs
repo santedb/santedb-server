@@ -1,18 +1,22 @@
 ﻿using SanteDB.Core;
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
+using SanteDB.Persistence.Data.Model.DataType;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
 {
@@ -29,6 +33,126 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public VersionedDataPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
         {
+        }
+
+        /// <summary>
+        /// Verify identities on the specified entity
+        /// </summary>
+        protected virtual IEnumerable<DetectedIssue> VerifyEntity<TToVerify>(DataContext context, TToVerify objectToVerify)
+            where TToVerify : TModel, IHasIdentifiers
+        {
+            // Validate unique values for IDs
+            var validation = this.m_configuration.Validation.Find(o => o.Target.Type == objectToVerify.GetType());
+            if (validation == null) // no special validation
+            {
+                yield break;
+            }
+
+            foreach (var id in objectToVerify.Identifiers)
+            {
+                // Get ID
+                DbAssigningAuthority dbAuth = null;
+
+                if (id.Authority.Key.HasValue) // Attempt lookup in adhoc cache then by db
+                {
+                    dbAuth = this.m_adhocCache?.Get<DbAssigningAuthority>($"{DataConstants.AdhocAuthorityKey}{id.Authority.Key}");
+                    if (dbAuth == null)
+                        dbAuth = context.FirstOrDefault<DbAssigningAuthority>(o => o.Key == id.Authority.Key);
+                }
+                else
+                {
+                    dbAuth = this.m_adhocCache?.Get<DbAssigningAuthority>($"{DataConstants.AdhocAuthorityKey}{id.Authority.DomainName}");
+                    if (dbAuth == null)
+                    {
+                        dbAuth = context.FirstOrDefault<DbAssigningAuthority>(o => o.DomainName == id.Authority.DomainName);
+                        if (dbAuth != null)
+                            id.Authority.Key = dbAuth.Key;
+                    }
+                }
+
+                if (dbAuth == null)
+                {
+                    yield return new DetectedIssue(DetectedIssuePriorityType.Error, "id.aa.notFound", $"Missing assigning authority with ID {String.Join(",", objectToVerify.Identifiers.Select(o => o.Authority.Key))}", DetectedIssueKeys.SafetyConcernIssue);
+                    continue;
+                }
+                else
+                {
+                    this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityKey}{id.Authority.Key}", dbAuth, new TimeSpan(0, 5, 0));
+                    this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityKey}{dbAuth.DomainName}", dbAuth, new TimeSpan(0, 5, 0));
+                }
+
+                // Get this identifier records which is not owned by my record
+                var ownedByOthers = context.Query<DbEntityIdentifier>(
+                    context.CreateSqlStatement()
+                    .SelectFrom(typeof(DbEntityIdentifier))
+                    .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.AuthorityKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
+                    .And("NOT EXISTS (SELECT 1 FROM ent_rel_tbl WHERE (src_ent_id = ? AND trg_ent_id = ent_id_tbl.ent_id OR trg_ent_id = ? AND src_ent_id = ent_id_tbl.ent_id) AND obslt_vrsn_seq_id IS NULL)", objectToVerify.Key, objectToVerify.Key)
+                ).Any();
+                var ownedByMe = context.Query<DbEntityIdentifier>(
+                    context.CreateSqlStatement()
+                    .SelectFrom(typeof(DbEntityIdentifier))
+                    .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.AuthorityKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null)
+                    .And("(ent_id = ? OR EXISTS (SELECT 1 FROM ent_rel_tbl WHERE (src_ent_id = ?  AND trg_ent_id = ent_id_tbl.ent_id) OR (trg_ent_id = ? AND src_ent_id = ent_id_tbl.ent_id) AND obslt_vrsn_seq_id IS NULL))", objectToVerify.Key, objectToVerify.Key, objectToVerify.Key)
+                ).Any();
+
+                // Verify scope
+                IEnumerable<DbAuthorityScope> scopes = this.m_adhocCache?.Get<DbAuthorityScope[]>($"ado.aa.scp.{dbAuth.Key}");
+                if (scopes == null)
+                {
+                    scopes = context.Query<DbAuthorityScope>(o => o.SourceKey == dbAuth.Key);
+                    this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityScopeKey}{dbAuth.Key}", scopes.ToArray());
+                }
+
+                if (objectToVerify is IHasClassConcept classObject &&
+                    scopes.Any() && !scopes.Any(s => s.ScopeConceptKey == classObject.ClassConceptKey) // This type of identifier is not allowed to be assigned to this type of object
+                    && !ownedByOthers
+                    && !ownedByMe) // Unless it was already associated to another type of object related to me
+                    yield return new DetectedIssue(validation.Scope.ToPriority(), "id.target", $"Identifier of type {dbAuth.DomainName} cannot be assigned to object of type {classObject.ClassConceptKey}", DetectedIssueKeys.BusinessRuleViolationIssue);
+
+                // If the identity domain is unique, and we've been asked to raid identifier uq issues
+                if (dbAuth.IsUnique &&
+                    ownedByOthers)
+                {
+                    yield return new DetectedIssue(validation.Uniqueness.ToPriority(), $"id.uniqueness", $"Identifier {id.Value} in domain {dbAuth.DomainName} violates unique constraint", DetectedIssueKeys.FormalConstraintIssue);
+                }
+
+                if (dbAuth.AssigningApplicationKey.HasValue) // Must have permission
+                {
+                    if (context.GetProvenance().ApplicationKey == dbAuth.AssigningApplicationKey)
+                    {
+                        id.Reliability = IdentifierReliability.Authoritative;
+                    }
+                    else if (objectToVerify.CreatedByKey != dbAuth.AssigningApplicationKey  // original prov key
+                        && !ownedByMe
+                        && !ownedByOthers) // and has not already been assigned to me or anyone else (it is a new , unknown identifier)
+                    {
+                        id.Reliability = IdentifierReliability.Informative;
+                        // Is the validation set to deny unauthorized assignment?
+                        yield return new DetectedIssue(validation.Authority.ToPriority(), $"id.authority", $"Application does not have permission to assign {dbAuth.DomainName}", DetectedIssueKeys.SecurityIssue);
+                    }
+                }
+
+                if (!String.IsNullOrEmpty(dbAuth.ValidationRegex) && validation.Format != Configuration.AdoValidationEnforcement.Off) // must be valid
+                {
+                    var nonMatch = !new Regex(dbAuth.ValidationRegex).IsMatch(id.Value);
+                    if (nonMatch)
+                        yield return new DetectedIssue(validation.Format.ToPriority(), $"id.format", $"Identifier {id.Value} in domain {dbAuth.DomainName} failed format validation", DetectedIssueKeys.FormalConstraintIssue);
+                }
+
+                if (validation.CheckDigit != Configuration.AdoValidationEnforcement.Off)
+                {
+                    var type = Type.GetType(dbAuth.CustomValidator);
+                    if (type == null)
+                    {
+                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), "id.check.val", $"Custom validator {dbAuth.CustomValidator} not found", DetectedIssueKeys.OtherIssue);
+                    }
+                    var validator = Activator.CreateInstance(type) as IIdentifierValidator;
+                    if (validator?.IsValid(id) != true)
+                    {
+                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), "id.check", $"Custom validator for {id.Value} in {dbAuth.DomainName} failed", DetectedIssueKeys.FormalConstraintIssue);
+                    }
+                }
+            }
         }
 
         /// <summary>
