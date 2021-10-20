@@ -27,8 +27,8 @@ namespace SanteDB.Persistence.Auditing.ADO.Data.Model
     /// <summary>
     /// Represents a target object
     /// </summary>
-    [Table("aud_obj_tbl")]
-    public class DbAuditObject
+    [Table("aud_obj_dat_tbl")]
+    public class DbAuditObjectData
     {
         /// <summary>
         /// Identifier of the object
@@ -39,55 +39,19 @@ namespace SanteDB.Persistence.Auditing.ADO.Data.Model
         /// <summary>
         /// Gets or sets the audit identifier
         /// </summary>
-        [Column("aud_id"), ForeignKey(typeof(DbAuditData), nameof(DbAuditData.Key))]
-        public Guid AuditId { get; set; }
+        [Column("obj_id"), ForeignKey(typeof(DbAuditObject), nameof(DbAuditObject.Key))]
+        public long ObjectId { get; set; }
 
         /// <summary>
         /// The identifier of the object
         /// </summary>
-        [Column("obj_id")]
-        public string ObjectId { get; set; }
+        [Column("key")]
+        public string Name { get; set; }
 
         /// <summary>
         /// The object type identifier
         /// </summary>
-        [Column("obj_typ")]
-        public int Type { get; set; }
-
-        /// <summary>
-        /// Gets or sets the role
-        /// </summary>
-        [Column("rol_cs")]
-        public int Role { get; set; }
-
-        /// <summary>
-        /// The lifecycle
-        /// </summary>
-        [Column("lcycl_cs")]
-        public int LifecycleType { get; set; }
-
-        /// <summary>
-        /// Identifier type code
-        /// </summary>
-        [Column("id_typ_cs")]
-        public int IDTypeCode { get; set; }
-
-        /// <summary>
-        /// The query associated
-        /// </summary>
-        [Column("qry_dat")]
-        public String QueryData { get; set; }
-
-        /// <summary>
-        /// The name data associated
-        /// </summary>
-        [Column("nam_dat")]
-        public String NameData { get; set; }
-
-        /// <summary>
-        /// Gets the custom ID type
-        /// </summary>
-        [Column("cst_id_typ")]
-        public Guid? CustomIdType { get; set; }
+        [Column("val")]
+        public byte[] Value { get; set; }
     }
 }
