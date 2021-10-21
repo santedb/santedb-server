@@ -20,6 +20,7 @@
  */
 using SanteDB.Core;
 using SanteDB.Core.Auditing;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
@@ -38,6 +39,22 @@ namespace SanteDB.Server.Core.Services.Impl
     [ServiceProvider("Default Audit Repository")]
     public class LocalAuditRepository : IRepositoryService<AuditData>
     {
+
+        // Localization Service
+        private readonly ILocalizationService m_localizationService;
+
+        // Tracer
+
+        private Tracer m_tracer = Tracer.GetTracer(typeof(LocalAuditRepository));
+
+        /// <summary>
+        /// Construct instance of LocalAuditRepository
+        /// </summary>
+        /// <param name="localizationService"></param>
+        public LocalAuditRepository(ILocalizationService localizationService)
+        {
+            this.m_localizationService = localizationService;
+        }
 
         /// <summary>
         /// Gets the service name
@@ -64,7 +81,10 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditData>>();
             if (service == null)
-                throw new InvalidOperationException("Cannot find the data persistence service for audits");
+            {
+                this.m_tracer.TraceError("Cannot find the data persistence service for audits");
+                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.auditPersistenceService"));
+            }
             var results = service.Query(query, offset, count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
             return results;
         }
@@ -93,7 +113,10 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditData>>();
             if (service == null)
-                throw new InvalidOperationException("Cannot find the data persistence service for audits");
+            {
+                this.m_tracer.TraceError("Cannot find the data persistence service for audits");
+                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.auditPersistenceService"));
+            }
             var result = service.Get(key, versionKey, false, AuthenticationContext.Current.Principal);
             return result;
         }
@@ -105,7 +128,10 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditData>>();
             if (service == null)
-                    throw new InvalidOperationException("Cannot find the data persistence service for audits");
+            {
+                this.m_tracer.TraceError("Cannot find the data persistence service for audits");
+                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.auditPersistenceService"));
+            }
             var result = service.Insert(audit, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             return result;
         }
@@ -118,7 +144,10 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditData>>();
             if (service == null)
-                throw new InvalidOperationException("Cannot find the data persistence service for audits");
+            {
+                this.m_tracer.TraceError("Cannot find the data persistence service for audits");
+                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.auditPersistenceService"));
+            } 
             var result = service.Obsolete(new AuditData() { Key = key }, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             return result;
         }
@@ -131,8 +160,10 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditData>>();
             if (service == null)
-                throw new InvalidOperationException("Cannot find the data persistence service for audits");
-
+            {
+                this.m_tracer.TraceError("Cannot find the data persistence service for audits");
+                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.auditPersistenceService"));
+            }
             var existing = service.Get(data.Key.Value, Guid.Empty, false, AuthenticationContext.Current.Principal);
             if (existing == null)
             {
