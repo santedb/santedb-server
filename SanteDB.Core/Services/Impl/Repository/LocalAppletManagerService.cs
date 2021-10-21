@@ -74,9 +74,6 @@ namespace SanteDB.Server.Core.Services.Impl
         // Tracer
         private Tracer m_tracer = new Tracer(SanteDBConstants.ServiceTraceSourceName + ".AppletManager");
 
-        // Localizaiton Service
-        private readonly ILocalizationService m_localizationService;
-
         /// <summary>
         /// Indicates whether the service is running
         /// </summary>
@@ -85,12 +82,11 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Local applet manager ctor
         /// </summary>
-        public LocalAppletManagerService(ILocalizationService localizationService)
+        public LocalAppletManagerService()
         {
             this.m_appletCollection.Add(String.Empty, new AppletCollection()); // Default applet
             this.m_readonlyAppletCollection.Add(String.Empty, this.m_appletCollection[String.Empty].AsReadonly());
             this.m_readonlyAppletCollection.First().Value.CollectionChanged += (o, e) => this.Changed?.Invoke(o, e);
-            this.m_localizationService = localizationService;
         }
 
         /// <summary>
@@ -159,13 +155,7 @@ namespace SanteDB.Server.Core.Services.Impl
             if (this.m_fileDictionary.TryGetValue($"{solutionId}{appletId}", out pakFile) && File.Exists(pakFile))
                 return File.ReadAllBytes(pakFile);
             else
-            {
-                this.m_tracer.TraceError($"Applet {appletId} not found");
-                throw new FileNotFoundException(this.m_localizationService.FormatString("error.server.core.applet.notFound", new
-                {
-                    param = appletId
-                }));
-            }
+                throw new FileNotFoundException($"Applet {appletId} not found");
         }
 
         /// <summary>
@@ -180,13 +170,7 @@ namespace SanteDB.Server.Core.Services.Impl
             {
                 var soln = this.m_solutions.FirstOrDefault(o => o.Meta.Id == packageId);
                 if (soln == null)
-                {
-                    this.m_tracer.TraceError($"Applet {packageId} is not installed");
-                    throw new FileNotFoundException(this.m_localizationService.FormatString("error.server.core.applet.notInstalled", new
-                    {
-                        param = packageId
-                    }));
-                }
+                    throw new FileNotFoundException($"Applet {packageId} is not installed");
                 else
                 {
                     this.m_solutions.Remove(soln);
@@ -200,14 +184,8 @@ namespace SanteDB.Server.Core.Services.Impl
                 // Dependency check
                 var dependencies = this.m_appletCollection[String.Empty].Where(o => o.Info.Dependencies.Any(d => d.Id == packageId));
                 if (dependencies.Any())
-                {
-                    this.m_tracer.TraceError($"Uninstalling {packageId} would break : {string.Join(", ", dependencies.Select(o => o.Info))}");
-                    throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.uninstallingBreak", new
-                    {
-                        param = packageId,
-                        param2 = string.Join(", ", dependencies.Select(o => o.Info))
-                    }));
-                }
+                    throw new InvalidOperationException($"Uninstalling {packageId} would break : {String.Join(", ", dependencies.Select(o => o.Info))}");
+
                 // We're good to go!
                 this.m_appletCollection[String.Empty].Remove(applet);
 
@@ -238,11 +216,7 @@ namespace SanteDB.Server.Core.Services.Impl
             var appletScope = owner?.Meta.Id ?? String.Empty;
             // TODO: Verify package hash / signature
             if (!this.VerifyPackage(package))
-            {
-                this.m_tracer.TraceError("Applet failed validation");
-                throw new SecurityException(this.m_localizationService.GetString("error.server.core.applet.failedValidation"));
-
-            }
+                throw new SecurityException("Applet failed validation");
             else if (!this.m_appletCollection[appletScope].VerifyDependencies(package.Meta))
             {
                 this.m_tracer.TraceWarning($"Applet {package.Meta} depends on : [{String.Join(", ", package.Meta.Dependencies.Select(o => o.ToString()))}] which are missing or incompatible");
@@ -260,13 +234,7 @@ namespace SanteDB.Server.Core.Services.Impl
             // Install
             var pakFile = Path.Combine(appletDir, package.Meta.Id + ".pak");
             if (this.m_appletCollection[appletScope].Any(o => o.Info.Id == package.Meta.Id) && File.Exists(pakFile) && !isUpgrade)
-            {
-                this.m_tracer.TraceError($"Cannot replace {package.Meta} unless upgrade is specifically specified");
-                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.upgrade", new
-                {
-                    param = package.Meta
-                }));
-            }
+                throw new InvalidOperationException($"Cannot replace {package.Meta} unless upgrade is specifically specified");
 
             using (var fs = File.Create(pakFile))
             {
@@ -324,22 +292,10 @@ namespace SanteDB.Server.Core.Services.Impl
             {
                 verifyBytes = (package as AppletSolution).Include.SelectMany(o => o.Manifest).ToArray();
                 if (BitConverter.ToString(SHA256.Create().ComputeHash(verifyBytes)) != BitConverter.ToString(package.Meta.Hash))
-                {
-                    this.m_tracer.TraceError($"Package contents of {package.Meta.Id} appear to be corrupt!");
-                    throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.contentsCorrupted", new
-                    {
-                        param = package.Meta.Id
-                    }));
-                }
+                    throw new InvalidOperationException($"Package contents of {package.Meta.Id} appear to be corrupt!");
             }
             else if (BitConverter.ToString(SHA256.Create().ComputeHash(package.Manifest)) != BitConverter.ToString(package.Meta.Hash))
-            {
-                this.m_tracer.TraceError($"Package contents of {package.Meta.Id} appear to be corrupt!");
-                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.contentsCorrupted", new
-                {
-                    param = package.Meta.Id
-                }));
-            }
+                throw new InvalidOperationException($"Package contents of {package.Meta.Id} appear to be corrupt!");
 
             if (package.Meta.Signature != null)
             {
@@ -359,26 +315,14 @@ namespace SanteDB.Server.Core.Services.Impl
                             // Embedded cert and trusted CA
                             X509Certificate2 embCert = new X509Certificate2(package.PublicKey);
                             if (!embCert.IsTrustedIntern(new X509Certificate2Collection(), out IEnumerable<X509ChainStatus> chainStatus))
-                            { 
-                                this.m_tracer.TraceError($"Cannot verify identity of publisher {embCert.Subject} - {string.Join(",", chainStatus.Select(o => o.Status))}");
-                                throw new SecurityException(this.m_localizationService.FormatString("error.server.core.publisherIdentity", new
-                                {
-                                    param = embCert.Subject,
-                                    param2 = string.Join(",", chainStatus.Select(o => o.Status))
-                                }));
+                            {
+                                throw new SecurityException($"Cannot verify identity of publisher {embCert.Subject} - {String.Join(",", chainStatus.Select(o => o.Status))}");
                             }
                             else
                                 cert = new X509Certificate2Collection(embCert);
                         }
                         else
-                        {
-                           this.m_tracer.TraceError($"Cannot find public key of publisher information for {package.Meta.PublicKeyToken} or the local certificate is invalid");
-                            throw new SecurityException(this.m_localizationService.FormatString("error.server.core.publicKey", new
-                            {
-                                param = package.Meta.PublicKeyToken
-
-                            }));
-                        }
+                            throw new SecurityException($"Cannot find public key of publisher information for {package.Meta.PublicKeyToken} or the local certificate is invalid");
                     }
 
                     // Verify signature
@@ -389,22 +333,9 @@ namespace SanteDB.Server.Core.Services.Impl
                     // Verify timestamp
                     var timestamp = package.Unpack().Info.TimeStamp;
                     if (timestamp > DateTime.Now)
-                    {
-                        this.m_tracer.TraceError($"Package {package.Meta.Id} was published in the future! Something's fishy, refusing to load");
-                        throw new SecurityException(this.m_localizationService.FormatString("error.server.core.packageFishy", new
-                        {
-                            param = package.Meta.Id
-                        }));
-                    }
+                        throw new SecurityException($"Package {package.Meta.Id} was published in the future! Something's fishy, refusing to load");
                     else if (cert[0].NotAfter < timestamp || cert[0].NotBefore > timestamp)
-                    {
-                        this.m_tracer.TraceError($"Cannot find public key of publisher information for {package.Meta.PublicKeyToken} or the local certificate is invalid");
-                        throw new SecurityException(this.m_localizationService.FormatString("error.server.core.publicKey", new
-                        {
-                            param = package.Meta.PublicKeyToken
-
-                        }));
-                    }
+                        throw new SecurityException($"Cannot find public key of publisher information for {package.Meta.PublicKeyToken} or the local certificate is invalid");
 
                     if (retVal == true)
                     {
@@ -478,18 +409,11 @@ namespace SanteDB.Server.Core.Services.Impl
                                 if (this.m_solutions.Any(o => o.Meta.Id == pkg.Meta.Id))
                                 {
                                     this.m_tracer.TraceEvent(EventLevel.Critical, "Duplicate solution {0} is not permitted", pkg.Meta.Id);
-                                    throw new DuplicateKeyException(this.m_localizationService.FormatString("error.server.core.duplicateSolution", new
-                                    {
-                                        param = pkg.Meta.Id
-                                    }));
+                                    throw new DuplicateKeyException(pkg.Meta.Id);
                                 }
                                 else if (!this.Install(pkg as AppletSolution, true) && ApplicationServiceContext.Current.HostType != SanteDBHostType.Configuration)
                                 {
-                                   this.m_tracer.TraceError($"Could not install applet solution {pkg.Meta.Id}");
-                                    throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.appletSolution", new
-                                    {
-                                        param = pkg.Meta.Id
-                                    }));
+                                    throw new InvalidOperationException($"Could not install applet solution {pkg.Meta.Id}");
                                 }
                             }
                             else if (this.m_fileDictionary.ContainsKey(pkg.Meta.Id))
@@ -505,7 +429,7 @@ namespace SanteDB.Server.Core.Services.Impl
                             else
                             {
                                 this.m_tracer.TraceEvent(EventLevel.Critical, "Cannot proceed while untrusted applets are present");
-                                throw new SecurityException(this.m_localizationService.GetString("error.server.core.untrustedApplets"));
+                                throw new SecurityException("Cannot proceed while untrusted applets are present");
                             }
                         }
                     }
@@ -514,7 +438,7 @@ namespace SanteDB.Server.Core.Services.Impl
             catch (SecurityException e)
             {
                 this.m_tracer.TraceEvent(EventLevel.Error, "Error loading applets: {0}", e);
-                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.untrustedApplets.details"),e);
+                throw new InvalidOperationException("Cannot proceed while untrusted applets are present - Run `santedb --install-certs` or install the publisher certificate into `TrustedPublishers` certificate store", e);
             }
             catch (Exception ex)
             {
@@ -568,8 +492,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public bool LoadApplet(AppletManifest applet)
         {
-            this.m_tracer.TraceError("Loading applet manifests directly is disabled for security reasons");
-            throw new SecurityException(this.m_localizationService.GetString("error.server.core.loadingDisabled"));
+            throw new SecurityException("Loading applet manifests directly is disabled for security reasons");
         }
 
         /// <summary>
@@ -584,10 +507,7 @@ namespace SanteDB.Server.Core.Services.Impl
 
             // TODO: Verify package hash / signature
             if (!this.VerifyPackage(solution))
-            {
-                this.m_tracer.TraceError("Applet failed validation");
-                throw new SecurityException(this.m_localizationService.GetString("error.server.core.applet.failedValidation"));
-            }
+                throw new SecurityException("Applet failed validation");
 
             this.m_appletCollection.Add(solution.Meta.Id, new AppletCollection());
             this.m_readonlyAppletCollection.Add(solution.Meta.Id, this.m_appletCollection[solution.Meta.Id].AsReadonly());
@@ -603,14 +523,8 @@ namespace SanteDB.Server.Core.Services.Impl
 
             // Install
             var pakFile = Path.Combine(appletDir, solution.Meta.Id + ".pak");
-            if (this.m_solutions.Any(o => o.Meta.Id == solution.Meta.Id) && File.Exists(pakFile) && !isUpgrade) 
-            {
-                this.m_tracer.TraceError($"Cannot replace {solution.Meta} unless upgrade is specifically specified");
-                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.upgrade", new
-                {
-                    param = solution.Meta
-                }));      
-            }
+            if (this.m_solutions.Any(o => o.Meta.Id == solution.Meta.Id) && File.Exists(pakFile) && !isUpgrade)
+                throw new InvalidOperationException($"Cannot replace {solution.Meta} unless upgrade is specifically specified");
 
             // Unpack items from the solution package and install if needed
             foreach (var itm in solution.Include.Where(o => o.Manifest != null))
