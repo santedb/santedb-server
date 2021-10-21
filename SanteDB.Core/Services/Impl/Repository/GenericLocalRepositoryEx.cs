@@ -39,9 +39,9 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Create a new privacy service
         /// </summary>
-        public GenericLocalRepositoryEx(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService)
+        public GenericLocalRepositoryEx(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService, localizationService)
         {
-
+            
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 exPersistence.Touch(id, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             }
             else
-                throw new InvalidOperationException("Repository must support TOUCH");
+                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.supportTouch"));
         }
     }
 }

@@ -42,6 +42,9 @@ namespace SanteDB.Server.Core.Services.Impl
     public class LocalMailMessageRepository : IMailMessageRepositoryService,
         IRepositoryService<MailMessage>
 	{
+        // Localization Service
+        private readonly ILocalizationService m_localizationService;
+
         /// <summary>
         /// Gets the service name
         /// </summary>
@@ -77,6 +80,15 @@ namespace SanteDB.Server.Core.Services.Impl
         /// Queried
         /// </summary>
         public event EventHandler<RepositoryEventArgs<IEnumerable<MailMessage>>> Queried;
+
+        /// <summary>
+        /// Initialize the instance variable 
+        /// </summary>
+        /// <param name="localizationService"></param>
+        public LocalMailMessageRepository(ILocalizationService localizationService)
+        {
+            this.m_localizationService = localizationService;
+        }
 
         /// <summary>
         /// Broadcasts an alert.
@@ -121,8 +133,12 @@ namespace SanteDB.Server.Core.Services.Impl
 
 			if (persistenceService == null)
 			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<MailMessage>)));
-			}
+                this.traceSource.TraceError($"{nameof(IDataPersistenceService<MailMessage>)} not found");
+                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.persistenceService", new
+                {
+                    param = nameof(IDataPersistenceService<MailMessage>)
+                }));
+            }
 
             // Non archived messages
             var qry = new NameValueCollection(QueryExpressionBuilder.BuildQuery(predicate).ToArray());
@@ -144,8 +160,12 @@ namespace SanteDB.Server.Core.Services.Impl
 
 			if (persistenceService == null)
 			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<MailMessage>)));
-			}
+                this.traceSource.TraceError($"{nameof(IDataPersistenceService<MailMessage>)} not found");
+                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.persistenceService", new
+                {
+                    param = nameof(IDataPersistenceService<MailMessage>)
+                }));
+            }
 
 			var retVal = persistenceService.Get(id, null, false, AuthenticationContext.Current.Principal);
             this.Retrieved?.Invoke(this, new RepositoryEventArgs<MailMessage>(retVal));
@@ -164,11 +184,18 @@ namespace SanteDB.Server.Core.Services.Impl
             var roleService = ApplicationServiceContext.Current.GetService<IRoleProviderService>();
 
             if (String.IsNullOrEmpty(message.To) || string.IsNullOrEmpty(message.From))
-                throw new InvalidOperationException("Mail messages must of TO and FROM fields");
+            {
+                this.traceSource.TraceError("Mail messages must of TO and FROM fields");
+                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.mailMessage"));
+            }
             if (persistenceService == null)
 			{
-				throw new InvalidOperationException(string.Format("{0} not found", nameof(IDataPersistenceService<MailMessage>)));
-			}
+                this.traceSource.TraceError($"{nameof(IDataPersistenceService<MailMessage>)} not found");
+                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.persistenceService", new
+                {
+                    param = nameof(IDataPersistenceService<MailMessage>)
+                }));
+            }
 
 			MailMessage alert;
 
@@ -222,8 +249,12 @@ namespace SanteDB.Server.Core.Services.Impl
 
 			if (persistenceService == null)
 			{
-				throw new InvalidOperationException($"{nameof(IDataPersistenceService<MailMessage>)} not found");
-			}
+                this.traceSource.TraceError($"{nameof(IDataPersistenceService<MailMessage>)} not found");
+                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.persistenceService", new
+                {
+                    param = nameof(IDataPersistenceService<MailMessage>)
+                }));
+            }
 
 			MailMessage alert;
 

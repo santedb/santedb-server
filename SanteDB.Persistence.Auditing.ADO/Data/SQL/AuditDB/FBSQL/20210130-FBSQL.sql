@@ -57,3 +57,6 @@ END;
 CREATE TRIGGER aud_act_tbl_seq FOR aud_act_tbl ACTIVE BEFORE INSERT POSITION 0 AS BEGIN
 	NEW.id = NEXT VALUE FOR aud_act_seq;
 END;
+--#!
+alter table aud_obj_tbl add cst_id_typ uuid;--#!
+alter table aud_obj_tbl add constraint fk_aud_obj_cst_id foreign key (cst_id_typ) references aud_cd_tbl(id);--#!

@@ -60,6 +60,7 @@
     <Compile Include="Data\Model\DbAuditData.cs" />
     <Compile Include="Data\Model\DbAuditMetadata.cs" />
     <Compile Include="Data\Model\DbAuditMetadataValue.cs" />
+    <Compile Include="Data\Model\DbAuditObjectData.cs" />
     <Compile Include="Data\Model\DbAuditObject.cs" />
     <Compile Include="Docker\AuditRepositoryDockerFeature.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

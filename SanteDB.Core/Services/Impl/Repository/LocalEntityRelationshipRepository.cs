@@ -36,7 +36,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Entity relationship repository
         /// </summary>
-        public LocalEntityRelationshipRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService)
+        public LocalEntityRelationshipRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService, localizationService)
         {
         }
 

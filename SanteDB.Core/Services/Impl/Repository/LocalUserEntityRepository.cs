@@ -39,7 +39,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         /// <param name="privacyService"></param>
         /// <param name="policyService"></param>
-        public LocalUserEntityRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        public LocalUserEntityRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
         {
         }
 

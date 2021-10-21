@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Auditing;
@@ -81,34 +82,42 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// Fired when data is has been inserted
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<AuditData>> Inserted;
+
         /// <summary>
         /// Fired when data is being updated
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<AuditData>> Updating;
+
         /// <summary>
         /// Fired when data is has been inserted
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<AuditData>> Updated;
+
         /// <summary>
         /// Fired when data is being obsoleted
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<AuditData>> Obsoleting;
+
         /// <summary>
         /// Fired when data is has been inserted
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<AuditData>> Obsoleted;
+
         /// <summary>
         /// Fired when data is being retrieved
         /// </summary>
         public event EventHandler<DataRetrievingEventArgs<AuditData>> Retrieving;
+
         /// <summary>
         /// Fired when data is has been retrieved
         /// </summary>
         public event EventHandler<DataRetrievedEventArgs<AuditData>> Retrieved;
+
         /// <summary>
         /// Fired when data is being queryed
         /// </summary>
         public event EventHandler<QueryRequestEventArgs<AuditData>> Querying;
+
         /// <summary>
         /// Fired when data is has been queried
         /// </summary>
@@ -162,7 +171,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         }
 
         /// <summary>
-        /// Resolve code
+        /// Resolve code from central code repository
         /// </summary>
         private AuditCode ResolveCode(Guid key, String code, String codeSystem)
         {
@@ -186,7 +195,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         }
 
         /// <summary>
-        /// Convert a db audit to model 
+        /// Convert a db audit to model
         /// </summary>
         private AuditData ToModelInstance(DataContext context, CompositeResult<DbAuditData, DbAuditCode> res, bool summary = true)
         {
@@ -194,7 +203,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             if (retVal == null ||
                 !summary && retVal.LoadState < Core.Model.LoadState.FullLoad)
             {
-
                 retVal = new AuditData()
                 {
                     ActionCode = (ActionType)res.Object1.ActionCode,
@@ -210,7 +218,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 // Get actors and objects
                 if (!summary)
                 {
-
                     // Actors
                     var sql = context.CreateSqlStatement<DbAuditActorAssociation>().SelectFrom(typeof(DbAuditActorAssociation), typeof(DbAuditActor), typeof(DbAuditCode))
                             .InnerJoin<DbAuditActorAssociation, DbAuditActor>(o => o.TargetKey, o => o.Key)
@@ -229,18 +236,33 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                         });
 
                     // Objects
-                    foreach (var itm in context.Query<DbAuditObject>(o => o.AuditId == res.Object1.Key))
+                    sql = context.CreateSqlStatement<DbAuditObject>().SelectFrom(typeof(DbAuditObject), typeof(DbAuditCode))
+                        .Join<DbAuditObject, DbAuditCode>("LEFT", o => o.CustomIdType, o => o.Key)
+                        .Where<DbAuditObject>(o => o.AuditId == res.Object1.Key);
+                    foreach (var itm in context.Query<CompositeResult<DbAuditObject, DbAuditCode>>(sql).ToArray())
                     {
-                        retVal.AuditableObjects.Add(new AuditableObject()
+                        var ao = new AuditableObject()
                         {
-                            IDTypeCode = (AuditableObjectIdType?)itm.IDTypeCode,
-                            LifecycleType = (AuditableObjectLifecycle?)itm.LifecycleType,
-                            NameData = itm.NameData,
-                            ObjectId = itm.ObjectId,
-                            QueryData = itm.QueryData,
-                            Role = (AuditableObjectRole?)itm.Role,
-                            Type = (AuditableObjectType)itm.Type
-                        });
+                            IDTypeCode = (AuditableObjectIdType?)itm.Object1.IDTypeCode,
+                            LifecycleType = (AuditableObjectLifecycle?)itm.Object1.LifecycleType,
+                            NameData = itm.Object1.NameData,
+                            ObjectId = itm.Object1.ObjectId,
+                            QueryData = itm.Object1.QueryData,
+                            Role = (AuditableObjectRole?)itm.Object1.Role,
+                            Type = (AuditableObjectType)itm.Object1.Type
+                        };
+
+                        if (itm.Object1.CustomIdType.HasValue)
+                        {
+                            ao.CustomIdTypeCode = new AuditCode(itm.Object2.Code, itm.Object2.CodeSystem);
+                        }
+
+                        retVal.AuditableObjects.Add(ao);
+
+                        foreach(var dat in context.Query<DbAuditObjectData>(o=>o.ObjectId == itm.Object1.Key))
+                        {
+                            ao.ObjectData.Add(new ObjectDataExtension(dat.Name, dat.Value));
+                        }
                     }
 
                     // Metadata
@@ -276,7 +298,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                         });
 
                     retVal.LoadState = Core.Model.LoadState.PartialLoad;
-
                 }
 
                 ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(retVal);
@@ -305,7 +326,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// </summary>
         public AuditData Insert(AuditData storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
-
             // Pre-event trigger
             var preEvtData = new DataPersistingEventArgs<AuditData>(storageData, mode, overrideAuthContext);
             this.Inserting?.Invoke(this, preEvtData);
@@ -340,7 +360,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     if (storageData.Actors != null)
                         foreach (var act in storageData.Actors)
                         {
-
                             var roleCode = this.GetOrCreateAuditCode(context, act.ActorRoleCode.FirstOrDefault());
 
                             DbAuditActor dbAct = null;
@@ -374,7 +393,27 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             dbAo.Role = (int)(ao.Role ?? 0);
                             dbAo.Type = (int)(ao.Type);
                             dbAo.AuditId = dbAudit.Key;
-                            context.Insert(dbAo);
+
+                            if (ao.CustomIdTypeCode != null)
+                            {
+                                var code = this.GetOrCreateAuditCode(context, ao.CustomIdTypeCode);
+                                dbAo.CustomIdType = code.Key;
+                            }
+
+                            dbAo = context.Insert(dbAo);
+
+                            if (ao.ObjectData?.Count > 0)
+                            {
+                                foreach (var od in ao.ObjectData)
+                                {
+                                    context.Insert(new DbAuditObjectData()
+                                    {
+                                        Name = od.Key,
+                                        Value = od.Value,
+                                        ObjectId = dbAo.Key
+                                    });
+                                }
+                            }
                         }
 
                     // metadata
@@ -436,7 +475,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// </summary>
         public AuditData Get(Guid containerId, Guid? versionId, bool loadFast = false, IPrincipal overrideAuthContext = null)
         {
-
             var preEvtData = new DataRetrievingEventArgs<AuditData>(containerId, versionId, overrideAuthContext);
             this.Retrieving?.Invoke(this, preEvtData);
             if (preEvtData.Cancel)
@@ -447,10 +485,9 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
             try
             {
-
                 var pk = containerId;
 
-                // Fetch 
+                // Fetch
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     context.Open();
@@ -463,7 +500,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     this.Retrieved?.Invoke(this, postEvtData);
 
                     return postEvtData.Data;
-
                 }
             }
             catch (Exception e)
@@ -497,7 +533,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// </summary>
         public IEnumerable<AuditData> Query(Expression<Func<AuditData, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext = null, params ModelSort<AuditData>[] orderBy)
         {
-
             var preEvtData = new QueryRequestEventArgs<AuditData>(query, offset: offset, count: count, queryId: null, principal: overrideAuthContext, orderBy: orderBy);
             this.Querying?.Invoke(this, preEvtData);
             if (preEvtData.Cancel)
@@ -538,7 +573,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     var postEvtArgs = new QueryResultEventArgs<AuditData>(query, results, offset, count, totalCount, null, overrideAuthContext);
                     this.Queried?.Invoke(this, postEvtArgs);
                     return postEvtArgs.Results;
-
                 }
             }
             catch (Exception e)
@@ -549,6 +583,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             }
         }
     }
-#pragma warning restore CS0067
 
+#pragma warning restore CS0067
 }

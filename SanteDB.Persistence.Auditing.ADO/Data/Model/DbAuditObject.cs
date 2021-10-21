@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.OrmLite.Attributes;
 using System;
 
@@ -78,9 +79,15 @@ namespace SanteDB.Persistence.Auditing.ADO.Data.Model
         public String QueryData { get; set; }
 
         /// <summary>
-        /// The name data associated 
+        /// The name data associated
         /// </summary>
         [Column("nam_dat")]
         public String NameData { get; set; }
+
+        /// <summary>
+        /// Gets the custom ID type
+        /// </summary>
+        [Column("cst_id_typ")]
+        public Guid? CustomIdType { get; set; }
     }
 }

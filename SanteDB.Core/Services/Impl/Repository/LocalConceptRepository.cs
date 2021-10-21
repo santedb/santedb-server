@@ -48,7 +48,8 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Privacy enforcement service
         /// </summary>
-        public LocalConceptRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        public LocalConceptRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService,
+            IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
         {
         }
 
@@ -109,7 +110,7 @@ namespace SanteDB.Server.Core.Services.Impl
             var refTermService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ConceptReferenceTerm>>();
 
             if (refTermService == null)
-                throw new InvalidOperationException("Cannot find concept/reference term service");
+                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.conceptTerm"));
 
             if (codeSystemDomain.StartsWith("urn:oid:"))
                 codeSystemDomain = codeSystemDomain.Substring(8);
@@ -182,7 +183,7 @@ namespace SanteDB.Server.Core.Services.Impl
             var refTermService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ConceptReferenceTerm>>();
 
             if (refTermService == null)
-                throw new InvalidOperationException("Cannot find concept/reference term service");
+                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.conceptTerm"));
 
             // Filter expression
             Expression<Func<ConceptReferenceTerm, bool>> filterExpression = null;
@@ -216,7 +217,7 @@ namespace SanteDB.Server.Core.Services.Impl
             var refTermService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ConceptReferenceTerm>>();
 
             if (refTermService == null)
-                throw new InvalidOperationException("Cannot find concept/reference term service");
+                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.conceptTerm"));
 
             int tr;
             IEnumerable<ConceptReferenceTerm> refTermEnt = null;
@@ -247,7 +248,7 @@ namespace SanteDB.Server.Core.Services.Impl
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         public bool Implies(Concept a, Concept b)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException(this.m_localizationService.GetString("error.type.NotImplementedException"));
         }
 
         /// <summary>
@@ -264,7 +265,10 @@ namespace SanteDB.Server.Core.Services.Impl
 
             if (persistence == null)
             {
-                throw new InvalidOperationException($"{nameof(IDataPersistenceService<ConceptSet>)} not found");
+                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
+                    {
+                        param = nameof(IDataPersistenceService<ConceptSet>)
+                    }));
             }
 
             return persistence.Count(o => o.Key == set.Key && o.ConceptsXml.Any(c => c == concept.Key)) > 0;
@@ -284,7 +288,10 @@ namespace SanteDB.Server.Core.Services.Impl
 
             if (persistence == null)
             {
-                throw new InvalidOperationException($"{nameof(IDataPersistenceService<ConceptSet>)} not found");
+                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
+                    {
+                        param = nameof(IDataPersistenceService<ConceptSet>)
+                    }));
             }
 
             return persistence.Count(o => o.Key == set && o.ConceptsXml.Any(c => c == concept)) > 0;
@@ -305,7 +312,7 @@ namespace SanteDB.Server.Core.Services.Impl
             var refTermService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ConceptReferenceTerm>>();
 
             if (refTermService == null)
-                throw new InvalidOperationException("Cannot find concept/reference term service");
+                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.conceptTerm"));
 
             int tr;
             ConceptReferenceTerm refTermEnt = null;

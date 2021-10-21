@@ -143,16 +143,20 @@ namespace SanteDB.Server.Core.Services.Impl
         // Privacy service
         private IPrivacyEnforcementService m_privacyService;
 
+        // Localization service
+        protected readonly ILocalizationService m_localizationService;
+
         // Policy enforcement
         protected IPolicyEnforcementService m_policyService;
 
         /// <summary>
         /// Creates a new generic local repository with specified privacy service
         /// </summary>
-        public GenericLocalRepository(IPrivacyEnforcementService privacyService, IPolicyEnforcementService policyService)
+        public GenericLocalRepository(IPrivacyEnforcementService privacyService, IPolicyEnforcementService policyService, ILocalizationService localizationService)
         {
             this.m_privacyService = privacyService;
             this.m_policyService = policyService;
+            this.m_localizationService = localizationService;
         }
 
         /// <summary>
@@ -167,7 +171,10 @@ namespace SanteDB.Server.Core.Services.Impl
 
             if (persistenceService == null)
             {
-                throw new InvalidOperationException($"Unable to locate {typeof(IDataPersistenceService<TEntity>).FullName}");
+                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
+                    {
+                        param = typeof(IDataPersistenceService<TEntity>).FullName
+                    }));
             }
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
@@ -249,7 +256,10 @@ namespace SanteDB.Server.Core.Services.Impl
         private void ThrowPrivacyValidationException(TEntity data)
         {
             throw new DetectedIssueException(
-                new DetectedIssue(DetectedIssuePriorityType.Error, "privacy", "Privacy Validation Failed", DetectedIssueKeys.AlreadyDoneIssue)
+                new DetectedIssue(DetectedIssuePriorityType.Error, "privacy", this.m_localizationService.FormatString("error.server.core.validationFail", new
+                {
+                    param = "Privacy"
+                }), DetectedIssueKeys.AlreadyDoneIssue)
             );
         }
 
@@ -265,13 +275,20 @@ namespace SanteDB.Server.Core.Services.Impl
 
             if (persistenceService == null)
             {
-                throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<TEntity>)}");
+                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
+                    {
+                        param = nameof(IDataPersistenceService<TEntity>)
+
+                    }));
             }
 
             var entity = persistenceService.Get(key, null, true, AuthenticationContext.Current.Principal);
 
             if (entity == null)
-                throw new KeyNotFoundException($"Entity {key} not found");
+                throw new KeyNotFoundException(this.m_localizationService.FormatString("error.type.KeyNotFoundException.notFound",new
+                {
+                    param = $"Entity {key}"
+                }));
 
             // Fire pre-persistence triggers
             var prePersistence = new DataPersistingEventArgs<TEntity>(entity, TransactionMode.Commit, AuthenticationContext.Current.Principal);
@@ -317,7 +334,10 @@ namespace SanteDB.Server.Core.Services.Impl
 
             if (persistenceService == null)
             {
-                throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<TEntity>)}");
+                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
+                    {
+                        param = nameof(IDataPersistenceService<TEntity>)
+                    }));
             }
 
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
@@ -351,7 +371,10 @@ namespace SanteDB.Server.Core.Services.Impl
 
             if (persistenceService == null)
             {
-                throw new InvalidOperationException($"Unable to locate {nameof(IDataPersistenceService<TEntity>)}");
+                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
+                    {
+                        param = nameof(IDataPersistenceService<TEntity>)
+                    }));
             }
 
             data = this.Validate(data);

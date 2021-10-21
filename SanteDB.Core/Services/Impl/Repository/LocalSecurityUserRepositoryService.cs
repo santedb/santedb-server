@@ -29,6 +29,7 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Linq;
+using SanteDB.Core.Services;
 
 namespace SanteDB.Server.Core.Services.Impl
 {
@@ -37,10 +38,11 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalSecurityUserRepositoryService : GenericLocalSecurityRepository<SecurityUser>
     {
+
         /// <summary>
         /// Creates a DI security user repository
         /// </summary>
-        public LocalSecurityUserRepositoryService(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        public LocalSecurityUserRepositoryService(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
         {
         }
 
@@ -69,7 +71,10 @@ namespace SanteDB.Server.Core.Services.Impl
 
             // Verify password meets requirements
             if (ApplicationServiceContext.Current.GetService<IPasswordValidatorService>()?.Validate(data.Password) == false)
-                throw new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, "err.password", "Password failed validation", DetectedIssueKeys.SecurityIssue));
+                throw new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, "err.password", this.m_localizationService.FormatString("error.server.core.validationFail", new
+                {
+                    param = "Password"
+                }), DetectedIssueKeys.SecurityIssue));
 
             // Create the identity
             var id = iids.CreateIdentity(data.UserName,  data.Password, AuthenticationContext.Current.Principal);
@@ -79,7 +84,7 @@ namespace SanteDB.Server.Core.Services.Impl
             var retVal = this.FindFast(o => o.UserName == data.UserName, 0, 1, out tr, Guid.Empty).FirstOrDefault();
             if (retVal == null)
             {
-                throw new InvalidOperationException("Could not find created user from identity provider");
+                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.userCreated"));
             }
             else
             {

@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Event;
@@ -56,15 +57,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// Represents a data persistence service which stores data in the local SQLite data store
     /// </summary>
     [ServiceProvider("ADO.NET Generic Persistence Provider")]
-    public abstract class AdoBasePersistenceService<TData> : 
-        IDataPersistenceService<TData>, 
-        IStoredQueryDataPersistenceService<TData>, 
+    public abstract class AdoBasePersistenceService<TData> :
+        IDataPersistenceService<TData>,
+        IStoredQueryDataPersistenceService<TData>,
         IFastQueryDataPersistenceService<TData>,
         IUnionQueryDataPersistenceService<TData>,
         IAdoPersistenceService
     where TData : IdentifiedData
     {
-
         /// <summary>
         /// Gets the service name
         /// </summary>
@@ -76,7 +76,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         // Get the ado persistence service
         protected IAdoPersistenceSettingsProvider m_settingsProvider;
 
-        // Lock for editing 
+        // Lock for editing
         protected object m_syncLock = new object();
 
         // Get tracer
@@ -91,14 +91,23 @@ namespace SanteDB.Persistence.Data.ADO.Services
         }
 
         public event EventHandler<DataPersistingEventArgs<TData>> Inserting;
+
         public event EventHandler<DataPersistedEventArgs<TData>> Inserted;
+
         public event EventHandler<DataPersistingEventArgs<TData>> Updating;
+
         public event EventHandler<DataPersistedEventArgs<TData>> Updated;
+
         public event EventHandler<DataPersistingEventArgs<TData>> Obsoleting;
+
         public event EventHandler<DataPersistedEventArgs<TData>> Obsoleted;
+
         public event EventHandler<DataRetrievingEventArgs<TData>> Retrieving;
+
         public event EventHandler<DataRetrievedEventArgs<TData>> Retrieved;
+
         public event EventHandler<QueryRequestEventArgs<TData>> Querying;
+
         public event EventHandler<QueryResultEventArgs<TData>> Queried;
 
         /// <summary>
@@ -203,7 +212,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     using (IDbTransaction tx = connection.BeginTransaction())
                         try
                         {
-
                             // Disable inserting duplicate classified objects
                             connection.EstablishProvenance(overrideAuthContext, (data as BaseEntityData)?.CreatedByKey);
                             var existing = data.TryGetExisting(connection, true);
@@ -231,24 +239,22 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
                                 foreach (var itm in connection.CacheOnCommit)
                                 {
-                                    cacheService?.Remove(itm.Key.Value);
+                                    cacheService?.Remove(itm);
                                 }
                             }
                             else
                                 tx.Rollback();
 
-                            var args = new DataPersistedEventArgs<TData>(data,mode, overrideAuthContext);
+                            var args = new DataPersistedEventArgs<TData>(data, mode, overrideAuthContext);
 
                             this.Inserted?.Invoke(this, args);
 
                             return data;
-
                         }
                         catch (DbException e)
                         {
-
 #if DEBUG
-                            this.m_tracer.TraceEvent(EventLevel.Error,  "Error : {0} -- {1}", e, this.ObjectToString(data));
+                            this.m_tracer.TraceEvent(EventLevel.Error, "Error : {0} -- {1}", e, this.ObjectToString(data));
 #else
                             this.m_tracer.TraceEvent(EventLevel.Error,  "Error : {0}", e.Message);
 #endif
@@ -256,13 +262,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                             throw new DataPersistenceException($"Error inserting {data}", this.TranslateDbException(e));
                         }
-                        catch(DataPersistenceException)
+                        catch (DataPersistenceException)
                         {
                             throw;
                         }
                         catch (Exception e)
                         {
-                            this.m_tracer.TraceEvent(EventLevel.Error,  "Error : {0} -- {1}", e, this.ObjectToString(data));
+                            this.m_tracer.TraceEvent(EventLevel.Error, "Error : {0} -- {1}", e, this.ObjectToString(data));
 
                             tx?.Rollback();
                             throw new DataPersistenceException(e.Message, e);
@@ -336,10 +342,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 tx.Commit();
                                 var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
                                 foreach (var itm in connection.CacheOnCommit)
-                                {   
-                                    cacheService?.Remove(itm.Key.Value);
+                                {
+                                    cacheService?.Remove(itm);
                                 }
-
                             }
                             else
                                 tx.Rollback();
@@ -352,9 +357,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         }
                         catch (DbException e)
                         {
-
 #if DEBUG
-                            this.m_tracer.TraceEvent(EventLevel.Error,  "Error : {0} -- {1}", e, this.ObjectToString(data));
+                            this.m_tracer.TraceEvent(EventLevel.Error, "Error : {0} -- {1}", e, this.ObjectToString(data));
 #else
                             this.m_tracer.TraceEvent(EventLevel.Error,  "Error : {0}", e.Message);
 #endif
@@ -364,9 +368,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         }
                         catch (Exception e)
                         {
-
 #if DEBUG
-                            this.m_tracer.TraceEvent(EventLevel.Error,  "Error : {0} -- {1}", e, this.ObjectToString(data));
+                            this.m_tracer.TraceEvent(EventLevel.Error, "Error : {0} -- {1}", e, this.ObjectToString(data));
 #else
                         this.m_tracer.TraceEvent(EventLevel.Error,  "Error : {0}", e.Message);
 #endif
@@ -381,7 +384,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                             // if the exception is anything else, we want to throw a data persistence exception
                             throw new DataPersistenceException($"Error updating {data}", e);
-
                         }
                         finally
                         {
@@ -394,7 +396,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
         }
 
-        
         /// <summary>
         /// Translates a DB exception to an appropriate SanteDB exception
         /// </summary>
@@ -408,29 +409,35 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     case "O9001": // SanteDB => Data Validation Error
                         return new DetectedIssueException(
                             new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.InvalidDataIssue), e);
+
                     case "O9002": // SanteDB => Codification error
                         return new DetectedIssueException(new List<DetectedIssue>() {
                                         new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(),  e.Message, DetectedIssueKeys.CodificationIssue),
                                         new DetectedIssue(DetectedIssuePriorityType.Information, e.Data["SqlState"].ToString(), "HINT: Select a code that is from the correct concept set or add the selected code to the concept set", DetectedIssueKeys.CodificationIssue)
                                     }, e);
-                    case "23502": // PGSQL - NOT NULL 
+
+                    case "23502": // PGSQL - NOT NULL
                         return new DetectedIssueException(
-                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.InvalidDataIssue),e
+                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.InvalidDataIssue), e
                                     );
+
                     case "23503": // PGSQL - FK VIOLATION
                         return new DetectedIssueException(
                                         new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.FormalConstraintIssue), e
                                     );
+
                     case "23505": // PGSQL - UQ VIOLATION
                         return new DetectedIssueException(
                                         new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.AlreadyDoneIssue), e
                                     );
+
                     case "23514": // PGSQL - CK VIOLATION
                         return new DetectedIssueException(new List<DetectedIssue>()
                         {
                             new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.FormalConstraintIssue),
                             new DetectedIssue(DetectedIssuePriorityType.Information, e.Data["SqlState"].ToString(), "HINT: The code you're using may be incorrect for the given context", DetectedIssueKeys.CodificationIssue)
                         }, e);
+
                     default:
                         return new DataPersistenceException(e.Message, e);
                 }
@@ -449,7 +456,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             try
             {
                 if (data == null) return "null";
-               
+
                 XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(data.GetType());
                 using (MemoryStream ms = new MemoryStream())
                 {
@@ -457,7 +464,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     return Encoding.UTF8.GetString(ms.ToArray());
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return e.Message;
             }
@@ -504,12 +511,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
                                 foreach (var itm in connection.CacheOnCommit)
                                 {
-                                    if (itm is ITargetedAssociation tgrt)
-                                    {
-                                        cacheService?.Remove(tgrt.TargetEntityKey.GetValueOrDefault());
-                                        cacheService?.Remove(tgrt.SourceEntityKey.GetValueOrDefault());
-                                    }
-                                    cacheService?.Remove(itm.Key.GetValueOrDefault());
+                                    cacheService?.Remove(itm);
                                 }
                             }
                             else
@@ -523,7 +525,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         }
                         catch (Exception e)
                         {
-                            this.m_tracer.TraceEvent(EventLevel.Error,  "Error : {0}", e);
+                            this.m_tracer.TraceEvent(EventLevel.Error, "Error : {0}", e);
                             tx?.Rollback();
                             throw new DataPersistenceException(e.Message, e);
                         }
@@ -543,16 +545,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public virtual TData Get(Guid containerId, Guid? versionId, bool loadFast, IPrincipal overrideAuthContext)
         {
-
             var cacheItem = ApplicationServiceContext.Current.GetService<IDataCachingService>()?.GetCacheItem<TData>(containerId) as TData;
-            if (loadFast && cacheItem != null && 
+            if (loadFast && cacheItem != null &&
                 versionId == Guid.Empty)
             {
                 return cacheItem;
             }
             else
             {
-
 #if DEBUG
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
@@ -592,7 +592,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(itm);
 
                         return result;
-
                     }
                     catch (NotSupportedException e)
                     {
@@ -600,7 +599,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     }
                     catch (Exception e)
                     {
-                        this.m_tracer.TraceEvent(EventLevel.Error,  "Error : {0}", e);
+                        this.m_tracer.TraceEvent(EventLevel.Error, "Error : {0}", e);
                         throw new DataPersistenceException($"General error retrieving {containerId}", e);
                     }
                     finally
@@ -631,7 +630,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
         {
             var tr = 0;
             return this.QueryInternal(query, Guid.Empty, 0, null, out tr, true, overrideAuthContext, null, null);
-
         }
 
         /// <summary>
@@ -643,7 +641,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         }
 
         /// <summary>
-        /// Instructs the service 
+        /// Instructs the service
         /// </summary>
         protected virtual IEnumerable<TData> QueryInternal(Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalCount, bool fastQuery, IPrincipal overrideAuthContext, ModelSort<TData>[] orderBy, Expression<Func<TData, bool>>[] unionWith)
         {
@@ -664,7 +662,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 totalCount = preArgs.TotalResults;
                 return preArgs.Results;
             }
-            
+
             // Query object
             using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetReadonlyConnection())
                 try
@@ -706,7 +704,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     this.m_tracer.TraceEvent(EventLevel.Verbose, "Returning {0}..{1} or {2} results", offset, offset + (count ?? 1000), totalCount);
 
                     return retVal;
-
                 }
                 catch (NotSupportedException e)
                 {
@@ -714,7 +711,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(EventLevel.Error,  "Error : {0}", e);
+                    this.m_tracer.TraceEvent(EventLevel.Error, "Error : {0}", e);
                     throw new DataPersistenceException($"Error performing query {query}", e);
                 }
                 finally
@@ -726,7 +723,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     Interlocked.Decrement(ref m_currentRequests);
                 }
         }
-
 
         /// <summary>
         /// Performthe actual insert.
@@ -740,6 +736,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             context.AddCacheCommit(retVal);
             return retVal;
         }
+
         /// <summary>
         /// Perform the actual update.
         /// </summary>
@@ -762,8 +759,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
             //if (retVal != data) System.Diagnostics.Debugger.Break();
             context.AddCacheCommit(retVal);
             return retVal;
-
         }
+
         /// <summary>
         /// Performs the actual obsoletion
         /// </summary>
@@ -776,6 +773,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             context.AddCacheCommit(retVal);
             return retVal;
         }
+
         /// <summary>
         /// Performs the actual query
         /// </summary>
@@ -868,7 +866,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
             return this.Query((Expression<Func<TData, bool>>)query, offset, count, out totalResults, AuthenticationContext.Current.Principal);
         }
 
-
         #region Event Handler Helpers
 
         /// <summary>
@@ -884,7 +881,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         protected void FireRetrieved(DataRetrievedEventArgs<TData> e)
         {
-            if(e.Data != null)
+            if (e.Data != null)
                 this.Retrieved?.Invoke(this, e);
         }
 
@@ -894,7 +891,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
         public IEnumerable<TData> Query(Expression<Func<TData, bool>> query, Guid queryId, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext, params ModelSort<TData>[] orderBy)
         {
             return this.QueryInternal(query, queryId, offset, count, out totalCount, false, overrideAuthContext, orderBy, null);
-
         }
 
         /// <summary>
@@ -913,8 +909,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
             return this.QueryInternal(queries.First(), queryId, offset, count, out totalCount, false, overrideAuthContext, orderBy, queries.Skip(1).ToArray());
         }
 
-        #endregion
-
+        #endregion Event Handler Helpers
     }
 }
-

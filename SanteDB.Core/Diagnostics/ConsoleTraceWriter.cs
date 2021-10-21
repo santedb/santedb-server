@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Diagnostics;
 using System;
 using System.Collections.Concurrent;
@@ -43,7 +44,6 @@ namespace SanteDB.Server.Core.Diagnostics
         // True when disposing
         private bool m_disposing = false;
 
-
         // The log backlog
         private ConcurrentQueue<KeyValuePair<ConsoleColor, String>> m_logBacklog = new ConcurrentQueue<KeyValuePair<ConsoleColor, string>>();
 
@@ -59,7 +59,6 @@ namespace SanteDB.Server.Core.Diagnostics
             this.m_dispatchThread = new Thread(this.LogDispatcherLoop);
             this.m_dispatchThread.IsBackground = true;
             this.m_dispatchThread.Start();
-
         }
 
         /// <summary>
@@ -76,15 +75,19 @@ namespace SanteDB.Server.Core.Diagnostics
                     else
                         color = ConsoleColor.Magenta;
                     break;
+
                 case EventLevel.Informational:
                     color = ConsoleColor.Cyan;
                     break;
+
                 case EventLevel.Warning:
                     color = ConsoleColor.Yellow;
                     break;
+
                 case EventLevel.Error:
                     color = ConsoleColor.Red;
                     break;
+
                 case EventLevel.Critical:
                     color = ConsoleColor.White;
                     Console.BackgroundColor = ConsoleColor.DarkRed;
@@ -99,7 +102,6 @@ namespace SanteDB.Server.Core.Diagnostics
         {
             while (true)
             {
-
                 while (this.m_logBacklog.IsEmpty && !this.m_disposing)
                 {
                     this.m_resetEvent.Wait();
@@ -117,7 +119,6 @@ namespace SanteDB.Server.Core.Diagnostics
                         Console.ResetColor();
                     }
                 }
-
             }
         }
 
@@ -132,6 +133,7 @@ namespace SanteDB.Server.Core.Diagnostics
                 this.m_resetEvent.Set();
                 this.m_dispatchThread = null;
             }
+            Console.ResetColor();
         }
     }
 }

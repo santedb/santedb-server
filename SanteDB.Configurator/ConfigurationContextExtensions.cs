@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Configuration;
 using SanteDB.Configurator.Tasks;
 using SanteDB.Core.Diagnostics;
@@ -38,20 +39,18 @@ namespace SanteDB.Configurator
     /// </summary>
     public static class ConfigurationContextExtensions
     {
-
         /// <summary>
         /// Apply the tasks specified in the current task queue
         /// </summary>
         public static void Apply(this ConfigurationContext me)
         {
-
             var tracer = new Tracer("Configuration Context");
 
             if (me.ConfigurationTasks.Count == 0)
                 return;
 
             // Add the save task
-            if(!me.ConfigurationTasks.OfType<SaveConfigurationTask>().Any())
+            if (!me.ConfigurationTasks.OfType<SaveConfigurationTask>().Any())
                 me.ConfigurationTasks.Add(new SaveConfigurationTask());
             // Is the WindowsService installed?
             var rstr = new RestartServiceTask();
@@ -60,51 +59,51 @@ namespace SanteDB.Configurator
 
             var confirmDlg = new frmTaskList();
             if (confirmDlg.ShowDialog() != DialogResult.OK)
+            {
+                me.ConfigurationTasks.Clear();
                 return;
+            }
 
             var progress = new frmProgress();
             progress.Show();
 
             try
             {
-
                 // Do work in background thread here
                 bool complete = false;
                 Exception errCode = null;
                 var exeThd = new Thread(() =>
                 {
-                    
-                        try
+                    try
+                    {
+                        int i = 0, t = me.ConfigurationTasks.Count;
+                        var tasks = me.ConfigurationTasks.ToArray();
+                        foreach (var ct in tasks)
                         {
-                            int i = 0, t = me.ConfigurationTasks.Count;
-                            var tasks = me.ConfigurationTasks.ToArray();
-                            foreach (var ct in tasks)
+                            ct.ProgressChanged += (o, e) =>
                             {
-                                ct.ProgressChanged += (o, e) =>
-                                {
-                                    progress.ActionStatusText = e.State?.ToString() ?? "...";
-                                    progress.ActionStatus = (int)(e.Progress * 100);
-                                    progress.OverallStatus = (int)((((float)i / t) + (e.Progress * 1.0f / t)) * 100);
-                                };
+                                progress.ActionStatusText = e.State?.ToString() ?? "...";
+                                progress.ActionStatus = (int)(e.Progress * 100);
+                                progress.OverallStatus = (int)((((float)i / t) + (e.Progress * 1.0f / t)) * 100);
+                            };
 
-                                progress.OverallStatusText = $"Applying {ct.Feature.Name}";
-                                if (ct.VerifyState(me.Configuration) && !ct.Execute(me.Configuration))
-                                    tracer.TraceWarning("Configuration task {0} reported unsuccessful deployment", ct.Name);
-                                me.ConfigurationTasks.Remove(ct);
-                                progress.OverallStatus = (int)(((float)++i / t) * 100.0);
-                            }
+                            progress.OverallStatusText = $"Applying {ct.Feature.Name}";
+                            if (ct.VerifyState(me.Configuration) && !ct.Execute(me.Configuration))
+                                tracer.TraceWarning("Configuration task {0} reported unsuccessful deployment", ct.Name);
+                            me.ConfigurationTasks.Remove(ct);
+                            progress.OverallStatus = (int)(((float)++i / t) * 100.0);
                         }
-                        catch (Exception e)
-                        {
-                            tracer.TraceError("Error deploying configuration - {0}", e.Message);
-                            Trace.TraceError($"Error on component: {e}");
-                            errCode = e;
-                        }
-                        finally
-                        {
-                            complete = true;
-                        }
-                    
+                    }
+                    catch (Exception e)
+                    {
+                        tracer.TraceError("Error deploying configuration - {0}", e.Message);
+                        Trace.TraceError($"Error on component: {e}");
+                        errCode = e;
+                    }
+                    finally
+                    {
+                        complete = true;
+                    }
                 });
 
                 exeThd.Start();
@@ -131,6 +130,5 @@ namespace SanteDB.Configurator
                 progress.Close();
             }
         }
-
     }
 }

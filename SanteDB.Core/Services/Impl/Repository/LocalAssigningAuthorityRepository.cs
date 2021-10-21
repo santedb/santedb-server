@@ -38,7 +38,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Local AA 
         /// </summary>
-        public LocalAssigningAuthorityRepository(IPolicyEnforcementService policyService, IPrivacyEnforcementService privacyService = null) : base(policyService, privacyService)
+        public LocalAssigningAuthorityRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
         {
 
         }
