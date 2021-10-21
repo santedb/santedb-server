@@ -56,6 +56,9 @@ namespace SanteDB.Server.Core.Services.Impl
         // Tracer for this service
         private Tracer m_traceSource = new Tracer(SanteDBConstants.ServiceTraceSourceName);
 
+        // Localization Service
+        private readonly ILocalizationService m_localizationService;
+
         // User repo
         private IRepositoryService<SecurityUser> m_userRepository;
         // App repo
@@ -93,7 +96,8 @@ namespace SanteDB.Server.Core.Services.Impl
             IRoleProviderService roleProviderService,
             IIdentityProviderService identityProviderService,
             IApplicationIdentityProviderService applicationIdentityProvider,
-            IDeviceIdentityProviderService deviceIdentityProvider)
+            IDeviceIdentityProviderService deviceIdentityProvider,
+            ILocalizationService localizationService)
         {
             this.m_userRepository = userRepository;
             this.m_applicationIdentityProvider = applicationIdentityProvider;
@@ -106,6 +110,7 @@ namespace SanteDB.Server.Core.Services.Impl
             this.m_roleRepository = roleRepository;
             this.m_userEntityRepository = userEntityRepository;
             this.m_roleProvider = roleProviderService;
+            this.m_localizationService = localizationService;
         }
 
         /// <summary>
@@ -119,7 +124,10 @@ namespace SanteDB.Server.Core.Services.Impl
             this.m_traceSource.TraceEvent(EventLevel.Verbose, "Changing user password");
             var securityUser = this.m_userRepository?.Get(userId);
             if (securityUser == null)
-                throw new KeyNotFoundException("Cannot locate security user");
+            {
+                this.m_traceSource.TraceError("Cannot locate security user");
+                throw new KeyNotFoundException(this.m_localizationService.GetString("error.server.core.securityUser"));
+            }
             this.m_identityProviderService.ChangePassword(securityUser.UserName, password, AuthenticationContext.Current.Principal);
             return securityUser;
         }
@@ -216,7 +224,10 @@ namespace SanteDB.Server.Core.Services.Impl
 
             var securityUser = this.m_userRepository.Get(userId);
             if (securityUser == null)
-                throw new KeyNotFoundException(userId.ToString());
+            {
+                this.m_traceSource.TraceError("The record you're attempting to load does not exist, or you may not have permission to view it");
+                throw new KeyNotFoundException(this.m_localizationService.GetString("error.type.KeyNotFoundException.userMessage"));
+            }
             this.m_identityProviderService.SetLockout(securityUser.UserName, true, AuthenticationContext.Current.Principal);
         }
 
@@ -232,7 +243,10 @@ namespace SanteDB.Server.Core.Services.Impl
 
             var securityUser = this.m_userRepository?.Get(userId);
             if (securityUser == null)
-                throw new KeyNotFoundException(userId.ToString());
+            {
+                this.m_traceSource.TraceError("The record you're attempting to load does not exist, or you may not have permission to view it");
+                throw new KeyNotFoundException(this.m_localizationService.GetString("error.type.KeyNotFoundException.userMessage"));
+            }
             this.m_identityProviderService.SetLockout(securityUser.UserName, false, AuthenticationContext.Current.Principal);
 
         }
@@ -271,8 +285,10 @@ namespace SanteDB.Server.Core.Services.Impl
 
             var securityDevice = this.m_deviceRepository?.Get(key);
             if (securityDevice == null)
-                throw new KeyNotFoundException(key.ToString());
-
+            {
+                this.m_traceSource.TraceError("The record you're attempting to load does not exist, or you may not have permission to view it");
+                throw new KeyNotFoundException(this.m_localizationService.GetString("error.type.KeyNotFoundException.userMessage"));
+            }
             this.m_deviceIdentityProvider.SetLockout(securityDevice.Name, true, AuthenticationContext.Current.Principal);
         }
 
@@ -285,8 +301,10 @@ namespace SanteDB.Server.Core.Services.Impl
             this.m_traceSource.TraceWarning("Locking application {0}", key);
             var securityApplication = this.m_applicationRepository?.Get(key);
             if (securityApplication == null)
-                throw new KeyNotFoundException(key.ToString());
-
+            {
+                this.m_traceSource.TraceError("The record you're attempting to load does not exist, or you may not have permission to view it");
+                throw new KeyNotFoundException(this.m_localizationService.GetString("error.type.KeyNotFoundException.userMessage"));
+            }
             this.m_applicationIdentityProvider.SetLockout(securityApplication.Name, true, AuthenticationContext.Current.Principal);
         }
 
@@ -300,8 +318,10 @@ namespace SanteDB.Server.Core.Services.Impl
 
             var securityDevice = this.m_deviceRepository?.Get(key);
             if (securityDevice == null)
-                throw new KeyNotFoundException(key.ToString());
-
+            {
+                this.m_traceSource.TraceError("The record you're attempting to load does not exist, or you may not have permission to view it");
+                throw new KeyNotFoundException(this.m_localizationService.GetString("error.type.KeyNotFoundException.userMessage"));
+            }
             this.m_deviceIdentityProvider.SetLockout(securityDevice.Name, false, AuthenticationContext.Current.Principal);
         }
 
@@ -315,8 +335,10 @@ namespace SanteDB.Server.Core.Services.Impl
 
             var securityApplication = this.m_applicationRepository?.Get(key);
             if (securityApplication == null)
-                throw new KeyNotFoundException(key.ToString());
-
+            {
+                this.m_traceSource.TraceError("The record you're attempting to load does not exist, or you may not have permission to view it");
+                throw new KeyNotFoundException(this.m_localizationService.GetString("error.type.KeyNotFoundException.userMessage"));
+            }
             this.m_applicationIdentityProvider.SetLockout(securityApplication.Name, false, AuthenticationContext.Current.Principal);
         }
 
@@ -360,7 +382,11 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             if (String.IsNullOrEmpty(deviceName))
             {
-                throw new ArgumentNullException(nameof(deviceName));
+                this.m_traceSource.TraceError($"{nameof(deviceName)} cannot be null");
+                throw new ArgumentNullException(this.m_localizationService.FormatString("error.type.ArgumentNullException.param", new
+                {
+                    param = nameof(deviceName)
+                }));
             }
             return this.m_deviceRepository.Find(o => o.Name == deviceName, 0, 1, out int _).FirstOrDefault();
         }
@@ -373,7 +399,11 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             if (String.IsNullOrEmpty(applicationName))
             {
-                throw new ArgumentNullException(nameof(applicationName));
+                this.m_traceSource.TraceError($"{nameof(applicationName)} cannot be null");
+                throw new ArgumentNullException(this.m_localizationService.FormatString("error.type.ArgumentNullException.param", new
+                {
+                    param = nameof(applicationName)
+                }));
             }
 
             return this.m_applicationRepository.Find(o => o.Name == applicationName, 0, 1, out int _).FirstOrDefault();
@@ -387,7 +417,11 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             if(identity == null)
             {
-                throw new ArgumentNullException(nameof(identity));
+                this.m_traceSource.TraceError($"{nameof(identity)} cannot be null");
+                throw new ArgumentNullException(this.m_localizationService.FormatString("error.type.ArgumentNullException.param", new
+                {
+                    param = nameof(identity)
+                }));
             }
 
             return this.GetDevice(identity.Name);
@@ -401,7 +435,12 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             if (identity == null)
             {
-                throw new ArgumentNullException(nameof(identity));
+                this.m_traceSource.TraceError($"{nameof(identity)} cannot be null");
+                throw new ArgumentNullException(this.m_localizationService.FormatString("error.type.ArgumentNullException.param", new
+                {
+                    param = nameof(identity)
+                }));
+
             }
 
             return this.GetApplication(identity.Name);
