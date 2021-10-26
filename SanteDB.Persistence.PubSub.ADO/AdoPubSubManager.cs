@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
@@ -90,7 +91,6 @@ namespace SanteDB.Persistence.PubSub.ADO
             this.m_policyEnforcementService = policyEnforcementService;
             this.m_securityRepository = securityRepository;
             this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.PubSub.ADO");
-
         }
 
         // Ado Pub Sub Manager Tracer source
@@ -100,14 +100,17 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// Fired when subscribing is about to occur
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<PubSubSubscriptionDefinition>> Subscribing;
+
         /// <summary>
         /// Fired after subscription has occurred
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<PubSubSubscriptionDefinition>> Subscribed;
+
         /// <summary>
         /// Fired when subscription is removing
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<PubSubSubscriptionDefinition>> UnSubscribing;
+
         /// <summary>
         /// Fired after subscription has been removed
         /// </summary>
@@ -117,6 +120,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// Fired before activating
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<PubSubSubscriptionDefinition>> Activating;
+
         /// <summary>
         /// Fired before de-activating
         /// </summary>
@@ -185,7 +189,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         {
             var retVal = this.m_mapper.MapDomainInstance<DbChannel, PubSubChannelDefinition>(domainInstance, true);
             retVal.DispatcherFactoryTypeXml = domainInstance.DispatchFactoryType; // TODO: Refactor this mapping to a fn
-            retVal.Endpoint = new Uri(domainInstance.Endpoint);
+            retVal.Endpoint = domainInstance.Endpoint;
             retVal.Settings = context.Query<DbChannelSetting>(r => r.ChannelKey == retVal.Key).ToList().Select(r => new PubSubChannelSetting() { Name = r.Name, Value = r.Value }).ToList();
             return retVal;
         }
@@ -195,15 +199,15 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// </summary>
         public PubSubChannelDefinition RegisterChannel(string name, Type dispatcherFactory, Uri endpoint, IDictionary<string, string> settings)
         {
-            if(String.IsNullOrEmpty(name))
+            if (String.IsNullOrEmpty(name))
             {
                 throw new ArgumentNullException(nameof(name));
             }
-            else if(dispatcherFactory == null)
+            else if (dispatcherFactory == null)
             {
                 throw new ArgumentNullException(nameof(dispatcherFactory));
             }
-            else if(endpoint == null)
+            else if (endpoint == null)
             {
                 throw new ArgumentNullException(nameof(endpoint));
             }
@@ -217,7 +221,7 @@ namespace SanteDB.Persistence.PubSub.ADO
             {
                 Name = name,
                 DispatcherFactoryTypeXml = dispatcherFactory.AssemblyQualifiedName,
-                Endpoint = endpoint,
+                Endpoint = endpoint.ToString(),
                 IsActive = false,
                 Settings = settings.Select(o => new PubSubChannelSetting() { Name = o.Key, Value = o.Value }).ToList()
             };
@@ -234,7 +238,7 @@ namespace SanteDB.Persistence.PubSub.ADO
 
                         // Get the authorship
                         var se = this.m_securityRepository.GetSecurityEntity(AuthenticationContext.Current.Principal);
-                        if(se == null)
+                        if (se == null)
                         {
                             throw new KeyNotFoundException($"Unable to determine structure data for {AuthenticationContext.Current.Principal.Identity.Name}");
                         }
@@ -455,7 +459,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// Update the specified channel
         /// </summary>
         /// <remarks>
-        /// Channel updates are restricted in that the scheme / dispatcher type cannot be changed , attempting to change the scheme 
+        /// Channel updates are restricted in that the scheme / dispatcher type cannot be changed , attempting to change the scheme
         /// (like from sms to http) will result in an error
         /// </remarks>
         public PubSubChannelDefinition UpdateChannel(Guid key, string name, Uri endpoint, IDictionary<string, string> settings)
@@ -520,7 +524,6 @@ namespace SanteDB.Persistence.PubSub.ADO
             }
         }
 
-
         /// <summary>
         /// Register a subscription for <paramref name="modelType"/>
         /// </summary>
@@ -557,8 +560,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                     conn.Open();
                     using (var tx = conn.BeginTransaction())
                     {
-
-                        // First construct db instance 
+                        // First construct db instance
                         var dbSubscription = this.m_mapper.MapModelInstance<PubSubSubscriptionDefinition, DbSubscription>(subscription);
 
                         // Get the authorship
@@ -654,7 +656,6 @@ namespace SanteDB.Persistence.PubSub.ADO
                     throw new Exception($"Error updating subscription {key}", e);
                 }
             }
-
         }
 
         /// <summary>
@@ -692,7 +693,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                     }
 
                     var se = this.m_securityRepository.GetSecurityEntity(AuthenticationContext.Current.Principal);
-                    if(se == null)
+                    if (se == null)
                     {
                         throw new SecurityException($"Cannot determine SID for {AuthenticationContext.Current.Principal.Identity.Name}");
                     }

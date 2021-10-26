@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using RestSrvr;
 using RestSrvr.Attributes;
 using RestSrvr.Bindings;
@@ -43,11 +44,10 @@ namespace SanteDB.Server.Core.Rest
     /// </summary>
     public class RestServiceFactory : IRestServiceFactory
     {
-
         // Configuration
         private SanteDB.Rest.Common.Configuration.RestConfigurationSection m_configuration;
 
-        // Service manager instance 
+        // Service manager instance
         private IServiceManager m_serviceManager;
 
         /// <summary>
@@ -59,7 +59,6 @@ namespace SanteDB.Server.Core.Rest
             RemoteEndpointUtil.Current.AddEndpointProvider(this.GetRemoteEndpointInfo);
             this.m_configuration = configurationManager.GetSection<SanteDB.Rest.Common.Configuration.RestConfigurationSection>();
             this.m_serviceManager = serviceManager;
-
         }
 
         /// <summary>
@@ -72,10 +71,12 @@ namespace SanteDB.Server.Core.Rest
             else
             {
                 var fwdHeader = RestOperationContext.Current?.IncomingRequest.Headers["X-Forwarded-For"];
+                var realIp = RestOperationContext.Current.IncomingRequest.Headers["X-Real-IP"];
                 return new RemoteEndpointInfo()
                 {
                     OriginalRequestUrl = RestOperationContext.Current?.IncomingRequest.Url.ToString(),
-                    RemoteAddress = fwdHeader ?? RestOperationContext.Current?.IncomingRequest.RemoteEndPoint.Address.ToString(),
+                    RemoteAddress = realIp ?? RestOperationContext.Current?.IncomingRequest.RemoteEndPoint.Address.ToString(),
+                    ForwardInformation = fwdHeader,
                     CorrelationToken = RestOperationContext.Current?.Data["uuid"]?.ToString()
                 };
             }
@@ -99,7 +100,6 @@ namespace SanteDB.Server.Core.Rest
             if (me.Endpoints.Any(e => e.Behaviors.OfType<MessageDispatchFormatterBehavior>().Any()))
                 retVal |= ServiceEndpointCapabilities.ViewModel;
             return (int)retVal;
-
         }
 
         /// <summary>
@@ -143,12 +143,11 @@ namespace SanteDB.Server.Core.Rest
                 }
                 return retVal;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Tracer.GetTracer(typeof(RestServiceFactory)).TraceError("Could not start {0} : {1}", serviceType.FullName, e);
                 throw new Exception($"Could not start {serviceType.FullName}", e);
             }
-
         }
     }
 }
