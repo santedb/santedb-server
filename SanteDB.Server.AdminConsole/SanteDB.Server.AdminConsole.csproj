@@ -132,6 +132,18 @@
       <Project>{39e61451-f4fe-493d-b754-5f06eb284aac}</Project>
       <Name>SanteDB.Core.Applets</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-client\SanteDB.Messaging.AMI.Client\SanteDB.Messaging.AMI.Client.csproj">
+      <Project>{a5aeb9a8-5e50-49c9-94d7-ae0b2d46c5d9}</Project>
+      <Name>SanteDB.Messaging.AMI.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-client\SanteDB.Messaging.HDSI.Client\SanteDB.Messaging.HDSI.Client.csproj">
+      <Project>{a5a42bfd-1d1d-430f-bf8a-b0e62f06bb1e}</Project>
+      <Name>SanteDB.Messaging.HDSI.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Core.Model.AMI\SanteDB.Core.Model.AMI.csproj">
+      <Project>{65ef51c6-5cb8-43b8-ae65-4a68f0b44ad2}</Project>
+      <Name>SanteDB.Core.Model.AMI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Server.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
       <Name>SanteDB.Server.Core</Name>
@@ -142,12 +154,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="SanteDB.Messaging.AMI.Client">
-      <Version>$(VersionNumber)</Version>
-    </PackageReference>
-    <PackageReference Include="SanteDB.Messaging.HDSI.Client">
-      <Version>$(VersionNumber)</Version>
-    </PackageReference>
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
       <Version>5.0.0</Version>
     </PackageReference>

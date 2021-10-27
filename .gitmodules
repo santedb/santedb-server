@@ -60,3 +60,6 @@
 [submodule "santedb-i18n"]
 	path = santedb-i18n
 	url = https://github.com/santedb/santedb-i18n
+[submodule "santedb-client"]
+	path = santedb-client
+	url = https://github.com/santedb/santedb-client

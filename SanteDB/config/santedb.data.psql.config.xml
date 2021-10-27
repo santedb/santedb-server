@@ -28,8 +28,8 @@
   </sections>
   <section xsi:type="DataConfigurationSection">
     <connectionStrings>
-      <add name="PSQL" value="server=localhost;port=5432; database=santedb; user id=postgres; password=postgres; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql"/>
-      <add name="AUDIT" value="server=localhost;port=5432; database=santedb_audit; user id=postgres; password=postgres; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql"/>
+      <add name="PSQL" value="server=localhost;port=5432; database=santedb; user id=santedb; password=SanteDB123; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql" />
+      <add name="AUDIT" value="server=localhost;port=5432; database=santedb_audit; user id=santedb; password=SanteDB123; pooling=true; MinPoolSize=5; MaxPoolSize=15; Timeout=60; " provider="Npgsql" />
     </connectionStrings>
   </section>
   <section xsi:type="OrmConfigurationSection">
@@ -38,7 +38,7 @@
       <add type="SanteDB.OrmLite.Providers.Firebird.FirebirdSQLProvider, SanteDB.OrmLite" invariant="FirebirdSQL" />
     </providers>
     <dbProviderFactories>
-      <add name="PostgreSQL Data Provider" invariant="Npgsql" description=".Net Framework Data Provider for PostgreSQL" type="Npgsql.NpgsqlFactory, Npgsql, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7"/>
+      <add name="PostgreSQL Data Provider" invariant="Npgsql" description=".Net Framework Data Provider for PostgreSQL" type="Npgsql.NpgsqlFactory, Npgsql, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7" />
       <add name="Firebird Data Provider" invariant="FirebirdSQL" description="Firebird" type="FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient, Culture=neutral, PublicKeyToken=3750abcc3150b00c" />
     </dbProviderFactories>
   </section>
@@ -55,7 +55,7 @@
     autoUpdateExisting="true"
     autoInsertChildren="true"
     prepareStatements="true"
-      validationLevel="Warning"/>
+      validationLevel="Warning" />
   <section xsi:type="AdoPersistenceConfigurationSection"
            readWriteConnectionString="PSQL"
            readOnlyConnectionString="PSQL"
@@ -67,7 +67,7 @@
            autoInsertChildren="true"
            prepareStatements="true"
       validationLevel="Warning">
-    <!-- Any corrective handlers should be added here 
+    <!-- Any corrective handlers should be added here
     <corrections>
       <add>value</add>
     </corrections>
@@ -76,7 +76,5 @@
       <add>value</add>
     </resources>
     -->
-
   </section>
-  
 </SanteDBConfiguration>
