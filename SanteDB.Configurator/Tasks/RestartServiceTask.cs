@@ -18,12 +18,14 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Configuration;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Services;
 using SanteDB.Server.Core.Configuration.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -39,6 +41,7 @@ namespace SanteDB.Configurator.Tasks
     {
         // Feature reference
         private WindowsServiceFeature m_feature;
+
         // Configuration references
         private WindowsServiceFeature.Options m_configuration;
 
@@ -76,21 +79,23 @@ namespace SanteDB.Configurator.Tasks
         /// </summary>
         public bool Execute(SanteDBConfiguration configuration)
         {
-
-            this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(0.0f, $"Stopping {this.m_configuration.ServiceName}"));
             ServiceTools.ServiceInstaller.StopService(this.m_configuration.ServiceName);
-            while(ServiceTools.ServiceInstaller.GetServiceStatus(this.m_configuration.ServiceName) != ServiceTools.ServiceState.Stop)
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000 && ServiceTools.ServiceInstaller.GetServiceStatus(this.m_configuration.ServiceName) != ServiceTools.ServiceState.Stop)
             {
                 Application.DoEvents();
                 Thread.Sleep(1000);
-            } // HACK: wait for stop 
+                this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)sw.ElapsedMilliseconds / 10000f, $"Stopping {this.m_configuration.ServiceName}"));
+            } // HACK: wait for stop
             this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(0.5f, $"Starting {this.m_configuration.ServiceName}"));
             ServiceTools.ServiceInstaller.StartService(this.m_configuration.ServiceName);
-            while (ServiceTools.ServiceInstaller.GetServiceStatus(this.m_configuration.ServiceName) != ServiceTools.ServiceState.Run)
+            while (sw.ElapsedMilliseconds < 20000 && ServiceTools.ServiceInstaller.GetServiceStatus(this.m_configuration.ServiceName) == ServiceTools.ServiceState.Starting)
             {
                 Application.DoEvents();
                 Thread.Sleep(1000);
-            } // HACK: wait for stop 
+                this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(0.5f + ((float)sw.ElapsedMilliseconds / 20000f), $"Starting {this.m_configuration.ServiceName}"));
+            } // HACK: wait for stop
             this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(1.0f, null));
             return true;
         }

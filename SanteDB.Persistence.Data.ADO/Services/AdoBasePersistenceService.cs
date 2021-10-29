@@ -206,8 +206,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
             {
                 try
                 {
-                    this.ThrowIfExceeded();
-
                     connection.Open();
                     using (IDbTransaction tx = connection.BeginTransaction())
                         try
@@ -279,21 +277,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 finally
                 {
-                    Interlocked.Decrement(ref m_currentRequests);
                 }
             }
-        }
-
-        /// <summary>
-        /// Throw if requests are greater than maximum allowed
-        /// </summary>
-        private void ThrowIfExceeded()
-        {
-            if (this.m_settingsProvider.GetConfiguration().MaxRequests == 0 ||
-                Interlocked.Read(ref m_currentRequests) < this.m_settingsProvider.GetConfiguration().MaxRequests)
-                Interlocked.Increment(ref m_currentRequests);
-            else
-                throw new LimitExceededException("Data layer restricted maximum system requests");
         }
 
         /// <summary>
@@ -323,8 +308,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
             {
                 try
                 {
-                    this.ThrowIfExceeded();
-
                     connection.Open();
                     using (IDbTransaction tx = connection.BeginTransaction())
                         try
@@ -391,7 +374,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 finally
                 {
-                    Interlocked.Decrement(ref m_currentRequests);
                 }
             }
         }
@@ -493,8 +475,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
             {
                 try
                 {
-                    this.ThrowIfExceeded();
-
                     connection.Open();
                     using (IDbTransaction tx = connection.BeginTransaction())
                         try
@@ -535,7 +515,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 }
                 finally
                 {
-                    Interlocked.Decrement(ref m_currentRequests);
                 }
             }
         }
@@ -570,7 +549,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetReadonlyConnection())
                     try
                     {
-                        this.ThrowIfExceeded();
                         connection.Open();
                         this.m_tracer.TraceEvent(EventLevel.Verbose, "GET {0}", containerId);
 
@@ -608,7 +586,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         sw.Stop();
                         this.m_tracer.TraceEvent(EventLevel.Verbose, "Retrieve took {0} ms", sw.ElapsedMilliseconds);
 #endif
-                        Interlocked.Decrement(ref m_currentRequests);
                     }
             }
         }
@@ -667,7 +644,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
             using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetReadonlyConnection())
                 try
                 {
-                    this.ThrowIfExceeded();
                     connection.Open();
 
                     this.m_tracer.TraceEvent(EventLevel.Verbose, "QUERY {0}", query);
@@ -720,7 +696,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     sw.Stop();
                     this.m_tracer.TraceEvent(EventLevel.Verbose, "Query {0} took {1} ms", query, sw.ElapsedMilliseconds);
 #endif
-                    Interlocked.Decrement(ref m_currentRequests);
                 }
         }
 
