@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
@@ -30,43 +31,18 @@ namespace SanteDB.Server.Core.Security
     /// SHA256 password generator service
     /// </summary>
     [ServiceProvider("SHA256 Password Encoding Service")]
-    public class SHA256PasswordHashingService : IPasswordHashingService
+    [Obsolete("Use SanteDB.Core.Security.SHA256PasswordHashingService")]
+    public class SHA256PasswordHashingService : SanteDB.Core.Security.SHA256PasswordHashingService
     {
-        /// <summary>
-        /// Gets the service name
-        /// </summary>
-        public String ServiceName => "SHA256 Password Encoding Service";
-
-        /// <summary>
-        /// Encode a password using the SHA256 encoding
-        /// </summary>
-        public string ComputeHash(string password)
-        {
-            SHA256 hasher = SHA256.Create();
-            return BitConverter.ToString(hasher.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-","").ToLower();
-        }
     }
 
     /// <summary>
     /// SHA1 password generator service
     /// </summary>
     [ServiceProvider("SHA1 Password Encoding Service")]
-    public class SHA1PasswordHashingService : IPasswordHashingService
+    [Obsolete("Use SanteDB.Core.Security.SHA1PasswordHashingService")]
+    public class SHA1PasswordHashingService : SanteDB.Core.Security.SHA1PasswordHashingService
     {
-
-        /// <summary>
-        /// Gets the service name
-        /// </summary>
-        public String ServiceName => "SHA1 Password Encoding Service";
-
-        /// <summary>
-        /// Encode a password using the SHA256 encoding
-        /// </summary>
-        public string ComputeHash(string password)
-        {
-            SHA1 hasher = SHA1.Create();
-            return BitConverter.ToString(hasher.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-","").ToLower();
-        }
     }
 
     /// <summary>
@@ -75,7 +51,6 @@ namespace SanteDB.Server.Core.Security
     [ServiceProvider("MD5 Password Encoding Service")]
     public class MD5PasswordHashingService : IPasswordHashingService
     {
-
         /// <summary>
         /// Gets the service name
         /// </summary>
@@ -87,7 +62,7 @@ namespace SanteDB.Server.Core.Security
         public string ComputeHash(string password)
         {
             MD5 hasher = MD5.Create();
-            return BitConverter.ToString(hasher.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-","").ToLower();
+            return BitConverter.ToString(hasher.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-", "").ToLower();
         }
     }
 
@@ -97,7 +72,6 @@ namespace SanteDB.Server.Core.Security
     [ServiceProvider("Plaintext Password Encode")]
     public class PlainPasswordHashingService : IPasswordHashingService
     {
-
         /// <summary>
         /// Gets the service name
         /// </summary>
