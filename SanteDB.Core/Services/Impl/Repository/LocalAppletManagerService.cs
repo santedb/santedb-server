@@ -389,7 +389,12 @@ namespace SanteDB.Server.Core.Services.Impl
                 // Load packages from applets/ filesystem directory
                 var appletDir = this.m_configuration.AppletDirectory;
                 if (!Path.IsPathRooted(appletDir))
-                    appletDir = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), this.m_configuration.AppletDirectory);
+                {
+                    var location = Assembly.GetEntryAssembly()?.Location ?? Assembly.GetExecutingAssembly().Location;
+
+                    appletDir = Path.Combine(Path.GetDirectoryName(location), this.m_configuration.AppletDirectory);
+                }
+                    
 
                 if (!Directory.Exists(appletDir))
                     this.m_tracer.TraceWarning("Applet directory {0} doesn't exist, no applets will be loaded", appletDir);
