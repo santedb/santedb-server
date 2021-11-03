@@ -15,8 +15,8 @@
     <ProjectGuid>{11407ADB-E336-4C0C-AF8E-EA6B601BA69E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SanteDB.Messaging.FHIR.Test</RootNamespace>
-    <AssemblyName>SanteDB.Messaging.FHIR.Test</AssemblyName>
+    <RootNamespace>SanteDB.Persistence.Data.ADO.Test</RootNamespace>
+    <AssemblyName>SanteDB.Persistence.Data.ADO.Test</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

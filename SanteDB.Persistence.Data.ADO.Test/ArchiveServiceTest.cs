@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -31,7 +32,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Core.TestFramework;
 
-namespace SanteDB.Persistence.Data.ADO.Tests
+namespace SanteDB.Persistence.Data.ADO.Test
 {
 
     /// <summary>
