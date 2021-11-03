@@ -198,7 +198,6 @@ namespace SanteDB.Server.Core.Services.Impl
                 if (serviceType.IsGenericType)
                 {
                     var wrappedType = serviceType.GenericTypeArguments[0];
-                    var irst = typeof(IRepositoryService<>).MakeGenericType(wrappedType);
                     if (typeof(Act).IsAssignableFrom(wrappedType))
                     {
                         this.m_tracer.TraceInfo("Adding Act repository service for {0}...", wrappedType.Name);
@@ -214,13 +213,11 @@ namespace SanteDB.Server.Core.Services.Impl
                         this.m_tracer.TraceInfo("Adding generic repository service for {0}...", wrappedType);
                         st = typeof(GenericLocalRepository<>).MakeGenericType(wrappedType);
                     }
-
                 }
                 else
                 {
                     st = serviceType;
                 }
-
             }
             else if (st == null)
             {

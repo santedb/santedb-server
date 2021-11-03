@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Data;
@@ -44,7 +45,6 @@ namespace SanteDB.Core.TestFramework
     /// </summary>
     public class TestApplicationContext : IServiceProvider, IDisposable, IApplicationServiceContext
     {
-
         // Tracer
         private Tracer m_tracer = Tracer.GetTracer(typeof(TestApplicationContext));
 
@@ -96,7 +96,9 @@ namespace SanteDB.Core.TestFramework
             this.m_serviceProvider.AddServiceProvider(this);
             this.m_serviceProvider.AddServiceProvider(typeof(TestConfigurationService));
             this.m_serviceProvider.AddServiceProvider(typeof(DefaultThreadPoolService));
-            this.m_serviceProvider.AddServiceProvider(typeof(DefaultPolicyEnforcementService));
+            this.m_serviceProvider.AddServiceProvider(typeof(SanteDB.Core.Security.SHA256PasswordHashingService));
+            this.m_serviceProvider.AddServiceProvider(typeof(SanteDB.Core.Security.DefaultPolicyDecisionService));
+            this.m_serviceProvider.AddServiceProvider(typeof(SanteDB.Core.Security.DefaultPolicyEnforcementService));
             this.m_serviceProvider.AddServiceProvider(typeof(DefaultOperatingSystemInfoService));
         }
 
@@ -125,7 +127,6 @@ namespace SanteDB.Core.TestFramework
         /// <param name="deploymentDirectory"></param>
         public static void Initialize(String deploymentDirectory)
         {
-
             if (ApplicationServiceContext.Current != null) return;
 
             AppDomain.CurrentDomain.SetData(
@@ -145,19 +146,21 @@ namespace SanteDB.Core.TestFramework
             }
         }
 
-
         /// <summary>
         /// Fired when the application context starting
         /// </summary>
         public event EventHandler Starting;
+
         /// <summary>
         /// Fired after application startup is complete
         /// </summary>
         public event EventHandler Started;
+
         /// <summary>
         /// Fired wehn the application context commences stop
         /// </summary>
         public event EventHandler Stopping;
+
         /// <summary>
         /// Fired after the appplication context is stopped
         /// </summary>
@@ -187,7 +190,7 @@ namespace SanteDB.Core.TestFramework
 
                     if (config != null)
                         foreach (var writer in config.TraceWriter)
-                            Tracer.AddWriter(Activator.CreateInstance(writer.TraceWriter, writer.Filter, writer.InitializationData, config.Sources.ToDictionary(o=>o.SourceName, o=>o.Filter)) as TraceWriter, writer.Filter);
+                            Tracer.AddWriter(Activator.CreateInstance(writer.TraceWriter, writer.Filter, writer.InitializationData, config.Sources.ToDictionary(o => o.SourceName, o => o.Filter)) as TraceWriter, writer.Filter);
 #if DEBUG
                     else
                         Tracer.AddWriter(new SystemDiagnosticsTraceWriter(), System.Diagnostics.Tracing.EventLevel.LogAlways);
@@ -200,15 +203,12 @@ namespace SanteDB.Core.TestFramework
                     this.m_tracer.TraceInfo("STAGE2 START: Notify start");
                     this.Started?.Invoke(this, EventArgs.Empty);
                     this.StartTime = DateTime.Now;
-
-
                 }
                 finally
                 {
                     startWatch.Stop();
                 }
                 this.IsRunning = true;
-
             }
 
             return true;
@@ -219,13 +219,11 @@ namespace SanteDB.Core.TestFramework
         /// </summary>
         public void Stop()
         {
-
             if (this.Stopping != null)
                 this.Stopping(this, null);
 
             this.IsRunning = false;
             this.m_serviceProvider.Stop();
-
 
             if (this.Stopped != null)
                 this.Stopped(this, null);
@@ -240,15 +238,11 @@ namespace SanteDB.Core.TestFramework
         {
             this.m_serviceProvider.Dispose();
             Tracer.DisposeWriters();
-
         }
-
-
 
         /// <summary>
         /// Get a service from this host context
         /// </summary>
         public object GetService(Type serviceType) => this.m_serviceProvider.GetService(serviceType);
-
     }
 }

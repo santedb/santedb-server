@@ -121,6 +121,10 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <ProjectReference Include="..\santedb-cache-memory\SanteDB.Caching.Memory\SanteDB.Caching.Memory.csproj">
+      <Project>{8553abc7-abfa-4a21-b0e8-68b7de76129d}</Project>
+      <Name>SanteDB.Caching.Memory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core.TestFramework\SanteDB.Core.TestFramework.csproj">
       <Project>{ad73db46-cbb3-4746-b406-40fc435ab3db}</Project>
       <Name>SanteDB.Core.TestFramework</Name>

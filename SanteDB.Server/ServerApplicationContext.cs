@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using System;
 using System.Collections.Generic;
@@ -44,13 +45,12 @@ using SanteDB.Server.Core.Diagnostics;
 namespace SanteDB.Server
 {
     /// <summary>
-    /// Provides a context for components. 
+    /// Provides a context for components.
     /// </summary>
     /// <remarks>Allows components to be communicate with each other via a loosely coupled
     /// broker system.</remarks>
     internal class ServerApplicationContext : IServiceProvider, IDisposable, IApplicationServiceContext
     {
-
         // Tracer
         private Tracer m_tracer = Tracer.GetTracer(typeof(ServerApplicationContext));
 
@@ -97,7 +97,6 @@ namespace SanteDB.Server
         /// </summary>
         public bool IsRunning { get; private set; }
 
-        
         /// <summary>
         /// Gets the host type
         /// </summary>
@@ -107,6 +106,7 @@ namespace SanteDB.Server
         /// Gets the service name
         /// </summary>
         public string ServiceName => "SanteDB Service Context";
+
         /// <summary>
         /// Get the version
         /// </summary>
@@ -136,14 +136,17 @@ namespace SanteDB.Server
         /// Fired when the application context starting
         /// </summary>
         public event EventHandler Starting;
+
         /// <summary>
         /// Fired after application startup is complete
         /// </summary>
         public event EventHandler Started;
+
         /// <summary>
         /// Fired wehn the application context commences stop
         /// </summary>
         public event EventHandler Stopping;
+
         /// <summary>
         /// Fired after the appplication context is stopped
         /// </summary>
@@ -190,11 +193,11 @@ namespace SanteDB.Server
                         this.StartTime = DateTime.Now;
 
                         Trace.TraceInformation("SanteDB startup completed successfully in {0} ms...", startWatch.ElapsedMilliseconds);
-
                     }
                     catch (Exception e)
                     {
                         m_tracer.TraceError("Error starting up context: {0}", e);
+                        this.IsRunning = false;
                         Trace.TraceWarning("Server is running in Maintenance Mode due to error {0}...", e.Message);
                     }
                     finally
@@ -204,7 +207,6 @@ namespace SanteDB.Server
                     }
                 }
                 this.IsRunning = true;
-
             }
 
             return true;
@@ -215,7 +217,6 @@ namespace SanteDB.Server
         /// </summary>
         public void Stop()
         {
-
             if (this.Stopping != null)
                 this.Stopping(this, null);
 
@@ -233,14 +234,12 @@ namespace SanteDB.Server
             this.Dispose();
         }
 
-        
         /// <summary>
         /// Get a service from this host context
         /// </summary>
         public object GetService(Type serviceType) => this.m_serviceProvider.GetService(serviceType);
 
-        #endregion
-
+        #endregion IServiceProvider Members
 
         #region IDisposable Members
 
@@ -252,8 +251,6 @@ namespace SanteDB.Server
             this.m_serviceProvider.Dispose();
         }
 
-       
-        #endregion
-
+        #endregion IDisposable Members
     }
 }
