@@ -30,6 +30,7 @@ using SanteDB.Core.Services;
 using SanteDB.Core.TestFramework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Principal;
 
@@ -38,6 +39,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
     /// <summary>
     /// Test persistence of entities
     /// </summary>
+    [ExcludeFromCodeCoverage]
     [TestFixture(Category = "Persistence")]
     public class EntityPersistenceServiceTest : PersistenceTest<Entity>
     {

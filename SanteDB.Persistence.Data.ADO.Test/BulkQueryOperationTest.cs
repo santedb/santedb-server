@@ -19,6 +19,7 @@
  * Date: 2021-8-27
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using NUnit.Framework;
 using SanteDB.Core;
@@ -33,6 +34,7 @@ using SanteDB.Core.Model.Entities;
 
 namespace SanteDB.Persistence.Data.ADO.Tests
 {
+    [ExcludeFromCodeCoverage]
     [TestFixture(Category = "Persistence")]
     public class BulkQueryOperationTest :  DataTest
     {

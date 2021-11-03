@@ -29,10 +29,12 @@ using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
 using SanteDB.Persistence.Data.ADO.Services;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Tests
 {
+    [ExcludeFromCodeCoverage]
     [TestFixture(Category = "Persistence")]
     public class QueryExpressionWriterTest
     {

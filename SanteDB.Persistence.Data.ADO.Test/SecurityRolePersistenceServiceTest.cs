@@ -166,6 +166,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
         /// <summary>
         /// Test querying of role
         /// </summary>
+        [Test]
         public void TestQueryRole()
         {
             var roleUnderTest = new SecurityRole()

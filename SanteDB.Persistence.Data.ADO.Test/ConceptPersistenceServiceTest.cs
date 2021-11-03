@@ -18,6 +18,8 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
+using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
 using SanteDB.Core;
 using SanteDB.Core.Model;
@@ -35,6 +37,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
     /// <summary>
     /// Concept persistence service test
     /// </summary>
+    [ExcludeFromCodeCoverage]
     [TestFixture(Category = "Persistence")]
     public class ConceptPersistenceServiceTest : PersistenceTest<Concept>
     {

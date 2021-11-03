@@ -26,9 +26,11 @@ using SanteDB.Core.Security;
 using SanteDB.Core.TestFramework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Persistence.Data.ADO.Tests
 {
+    [ExcludeFromCodeCoverage]
     [TestFixture(Category = "Persistence")]
     public class ManufacturedMaterialPersistenceTest : PersistenceTest<ManufacturedMaterial>
     {

@@ -19,6 +19,7 @@
  * Date: 2021-8-27
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using NUnit.Framework;
@@ -35,7 +36,8 @@ namespace SanteDB.Persistence.Data.ADO.Tests
 
     /// <summary>
     /// 
-    /// </summary>
+    /// </summary
+    [ExcludeFromCodeCoverage]
     [TestFixture(Category = "Persistence")]
     public class ArchiveServiceTest : DataTest
     {

@@ -26,6 +26,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.TestFramework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.ADO.Tests
@@ -33,6 +34,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
     /// <summary>
     /// Person persistence test
     /// </summary>
+    [ExcludeFromCodeCoverage]
     [TestFixture(Category = "Persistence")]
     public class PersonPersistenceServiceTest : PersistenceTest<Person>
     {

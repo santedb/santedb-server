@@ -18,6 +18,8 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
+using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
 using SanteDB.Core;
 using SanteDB.Core.Model.Security;
@@ -29,6 +31,7 @@ using System.Security.Authentication;
 
 namespace SanteDB.Persistence.Data.ADO.Tests
 {
+    [ExcludeFromCodeCoverage]
     [TestFixture(Category = "Persistence")]
     public class AdoIdentityProviderTest : DataTest
     {
