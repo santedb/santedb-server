@@ -18,6 +18,11 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
+using System;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using NUnit.Framework;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
@@ -27,12 +32,10 @@ using SanteDB.OrmLite;
 using SanteDB.OrmLite.Providers.Postgres;
 using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
 using SanteDB.Persistence.Data.ADO.Services;
-using System;
-using System.Diagnostics;
-using System.Linq;
 
-namespace SanteDB.Persistence.Data.ADO.Tests
+namespace SanteDB.Persistence.Data.ADO.Test
 {
+    [ExcludeFromCodeCoverage]
     [TestFixture(Category = "Persistence")]
     public class QueryExpressionWriterTest
     {
@@ -122,7 +125,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
         public void TestModelQueryShouldJoin()
         {
 
-            var query = m_builder.CreateQuery<Patient>(o => o.DeterminerConceptKey == DeterminerKeys.Specific).Build();
+            var query = this.m_builder.CreateQuery<Patient>(o => o.DeterminerConceptKey == DeterminerKeys.Specific).Build();
             Assert.IsTrue(query.SQL.Contains("pat_tbl.ent_vrsn_id"));
             Assert.IsTrue(query.SQL.Contains("INNER JOIN ent_vrsn_tbl"));
 
@@ -136,7 +139,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            var query = m_builder.CreateQuery<Patient>(o => o.DeterminerConcept.Mnemonic == "Instance").Build();
+            var query = this.m_builder.CreateQuery<Patient>(o => o.DeterminerConcept.Mnemonic == "Instance").Build();
             sw.Stop();
 
             Assert.IsTrue(query.SQL.Contains("pat_tbl.ent_vrsn_id"));
@@ -153,7 +156,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            var query = m_builder.CreateQuery<Entity>(o => o.Identifiers.Any(i => i.Value == "123" && i.Authority.Oid == "1.2.3.4.6.7.8.9" || i.Value == "321" && i.Authority.Oid == "1.2.3.4.5.6.7.8") && o.ClassConceptKey == EntityClassKeys.Organization).Build();
+            var query = this.m_builder.CreateQuery<Entity>(o => o.Identifiers.Any(i => i.Value == "123" && i.Authority.Oid == "1.2.3.4.6.7.8.9" || i.Value == "321" && i.Authority.Oid == "1.2.3.4.5.6.7.8") && o.ClassConceptKey == EntityClassKeys.Organization).Build();
             sw.Stop();
 
             Assert.IsTrue(query.SQL.Contains("SELECT ent_vrsn_tbl.ent_id,ent_vrsn_tbl.sts_cd_id,ent_vrsn_tbl.typ_cd_id,ent_vrsn_tbl.ent_vrsn_id,ent_vrsn_tbl.crt_act_id,ent_vrsn_tbl.vrsn_seq_id,ent_vrsn_tbl.rplc_vrsn_id,ent_vrsn_tbl.crt_prov_id,ent_vrsn_tbl.obslt_prov_id,ent_vrsn_tbl.crt_utc,ent_vrsn_tbl.obslt_utc,ent_tbl.tpl_id,ent_tbl.cls_cd_id,ent_tbl.dtr_cd_id  FROM ent_vrsn_tbl"));
@@ -170,7 +173,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            var query = m_builder.CreateQuery<Patient>(o => o.Participations.Where(guard => guard.ParticipationRole.Mnemonic == "RecordTarget").Any(sub => sub.PlayerEntity.ObsoletionTime == null)).Build();
+            var query = this.m_builder.CreateQuery<Patient>(o => o.Participations.Where(guard => guard.ParticipationRole.Mnemonic == "RecordTarget").Any(sub => sub.PlayerEntity.ObsoletionTime == null)).Build();
             sw.Stop();
 
             Assert.IsTrue(query.SQL.Contains("pat_tbl.ent_vrsn_id"));
@@ -187,8 +190,8 @@ namespace SanteDB.Persistence.Data.ADO.Tests
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            var query = m_builder.CreateQuery<Entity>(o => o.Names.Where(guard => guard.NameUse.Mnemonic == "Legal").Any(v => v.Component.Where(b => b.ComponentType.Mnemonic == "Family").Any(n => n.Value == "Smith")) &&
-                o.Names.Where(guard => guard.NameUse.Mnemonic == "Legal").Any(v => v.Component.Where(b => b.ComponentType.Mnemonic == "Given").Any(n => n.Value == "John" || n.Value == "Jacob"))).Build();
+            var query = this.m_builder.CreateQuery<Entity>(o => o.Names.Where(guard => guard.NameUse.Mnemonic == "Legal").Any(v => v.Component.Where(b => b.ComponentType.Mnemonic == "Family").Any(n => n.Value == "Smith")) &&
+                                                                o.Names.Where(guard => guard.NameUse.Mnemonic == "Legal").Any(v => v.Component.Where(b => b.ComponentType.Mnemonic == "Given").Any(n => n.Value == "John" || n.Value == "Jacob"))).Build();
             sw.Stop();
 
             Assert.IsTrue(query.SQL.Contains("SELECT ent_vrsn_tbl.ent_id,ent_vrsn_tbl.sts_cd_id,ent_vrsn_tbl.typ_cd_id,ent_vrsn_tbl.ent_vrsn_id,ent_vrsn_tbl.crt_act_id,ent_vrsn_tbl.vrsn_seq_id,ent_vrsn_tbl.rplc_vrsn_id,ent_vrsn_tbl.crt_prov_id,ent_vrsn_tbl.obslt_prov_id,ent_vrsn_tbl.crt_utc,ent_vrsn_tbl.obslt_utc,ent_tbl.tpl_id,ent_tbl.cls_cd_id,ent_tbl.dtr_cd_id  FROM ent_vrsn_tbl"));
@@ -204,7 +207,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
         [Test]
         public void TestModelQueryShouldUseNonSerialized()
         {
-            var query = m_builder.CreateQuery<Entity>(o => o.Extensions.Any(e => e.ExtensionDisplay == "1")).Build();
+            var query = this.m_builder.CreateQuery<Entity>(o => o.Extensions.Any(e => e.ExtensionDisplay == "1")).Build();
             Assert.IsTrue(query.SQL.Contains("SELECT ent_vrsn_tbl.ent_id,ent_vrsn_tbl.sts_cd_id,ent_vrsn_tbl.typ_cd_id,ent_vrsn_tbl.ent_vrsn_id,ent_vrsn_tbl.crt_act_id,ent_vrsn_tbl.vrsn_seq_id,ent_vrsn_tbl.rplc_vrsn_id,ent_vrsn_tbl.crt_prov_id,ent_vrsn_tbl.obslt_prov_id,ent_vrsn_tbl.crt_utc,ent_vrsn_tbl.obslt_utc,ent_tbl.tpl_id,ent_tbl.cls_cd_id,ent_tbl.dtr_cd_id  FROM ent_vrsn_tbl"));
             Assert.IsTrue(query.SQL.Contains("INNER JOIN ent_tbl"));
             Assert.IsTrue(query.SQL.Contains("IN"));

@@ -18,18 +18,17 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
+using System.Linq;
+using System.Security.Principal;
 using NUnit.Framework;
 using SanteDB.Core;
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
-using SanteDB.Core.TestFramework;
-using System.Linq;
-using System.Security.Principal;
 
-namespace SanteDB.Persistence.Data.ADO.Tests
+namespace SanteDB.Persistence.Data.ADO.Test
 {
     /// <summary>
     /// Summary description for SecurityRolePersistenceServiceTest
@@ -166,6 +165,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
         /// <summary>
         /// Test querying of role
         /// </summary>
+        [Test]
         public void TestQueryRole()
         {
             var roleUnderTest = new SecurityRole()

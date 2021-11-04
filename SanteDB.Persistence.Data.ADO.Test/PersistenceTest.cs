@@ -18,6 +18,13 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Security.Principal;
 using NUnit.Framework;
 using SanteDB.Core;
 using SanteDB.Core.Model;
@@ -25,17 +32,13 @@ using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Core.TestFramework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Security.Principal;
 
-namespace SanteDB.Persistence.Data.ADO.Tests
+namespace SanteDB.Persistence.Data.ADO.Test
 {
     /// <summary>
     /// Persistence test
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class PersistenceTest<TModel> : DataTest where TModel : IdentifiedData
     {
 

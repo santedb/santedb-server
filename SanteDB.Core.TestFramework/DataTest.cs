@@ -18,16 +18,12 @@
  * User: fyfej
  * Date: 2021-8-27
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Core.TestFramework
 {
     /// <summary>
-    /// Represents an abstract data test tool
+    /// Represents an abstract data test tool.
     /// </summary>
     //[DeploymentItem(@"santedb_test.fdb")]
     //[DeploymentItem(@"fbclient.dll")]
@@ -40,13 +36,14 @@ namespace SanteDB.Core.TestFramework
     //[DeploymentItem(@"icuuc52.dll")]
     //[DeploymentItem(@"plugins\engine12.dll", "plugins")]
     //[DeploymentItem(@"FirebirdSql.Data.FirebirdClient.dll")]
+    [ExcludeFromCodeCoverage]
     public abstract class DataTest
     {
 
         /// <summary>
         /// Starts the data test 
         /// </summary>
-        public DataTest()
+        protected DataTest()
         {
         }
     }
