@@ -18,18 +18,18 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
+using System;
+using System.Linq;
 using NUnit.Framework;
 using SanteDB.Core;
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
-using SanteDB.Core.TestFramework;
-using System;
-using System.Linq;
-using SanteDB.Core.Model;
 
-namespace SanteDB.Persistence.Data.ADO.Tests
+namespace SanteDB.Persistence.Data.ADO.Test
 {
     /// <summary>
     /// Summary description for SecurityUserPersistenceServiceTest
@@ -151,6 +151,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
 
             // Allow login
             roleProvider.AddUsersToRoles(new string[] { "delayLoadTest" },  new string[] { "USERS" },  AuthenticationContext.Current.Principal);
+            roleProvider.AddUsersToRoles(new string[] { "delayLoadTest" },  new string[] { "ADMINISTRATORS" },  AuthenticationContext.Current.Principal);
 
             var auth = identityProvider.Authenticate("delayLoadTest", "password");
             roleProvider.CreateRole("TestDelayLoadUserPropertiesGroup", auth);
@@ -158,7 +159,7 @@ namespace SanteDB.Persistence.Data.ADO.Tests
 
             // Now trigger a delay load
             var userForTest = base.DoTestQuery(u => u.UserName == "delayLoadTest", userAfterInsert.Key, auth).First();
-            Assert.AreEqual(2, userForTest.Roles.Count);
+            Assert.AreEqual(3, userForTest.Roles.Count);
             Assert.IsTrue(userForTest.Roles.Exists(o=>o.Name == "TestDelayLoadUserPropertiesGroup"));
 
 

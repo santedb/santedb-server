@@ -20,12 +20,14 @@
  */
 using MohawkCollege.Util.Console.Parameters;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB
 {
     /// <summary>
     /// Console parameters for startup
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class ConsoleParameters
     {
 

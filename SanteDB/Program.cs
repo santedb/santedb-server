@@ -21,36 +21,31 @@
 using MohawkCollege.Util.Console.Parameters;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
-using SanteDB.Core.Data;
-using SanteDB.Core.Interfaces;
-using SanteDB.Core.Model.EntityLoader;
+using SanteDB.Core.Model;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
-using SanteDB.Core.Services.Impl;
+using SanteDB.Server;
+using SanteDB.Server.Core.Services.Impl;
 using System;
+using System.Collections;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.ServiceProcess;
-using System.Xml.Serialization;
-using SanteDB.Core.Model;
-using System.Collections;
-using SanteDB.Core.Model.Attributes;
-using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
-using System.Text;
+using System.Security.Cryptography.X509Certificates;
+using System.ServiceProcess;
 using System.Threading;
-using SanteDB.Core.Diagnostics;
-using SanteDB.Server;
-using SanteDB.Server.Core.Services.Impl;
-using SanteDB.Core.Security;
+using System.Xml.Serialization;
 
 namespace SanteDB
 {
     /// <summary>
     /// Guid for the service
     /// </summary>
+    [ExcludeFromCodeCoverage]
     [Guid("21F35B18-E417-4F8E-B9C7-73E98B7C71B8")]
     static class Program
     {

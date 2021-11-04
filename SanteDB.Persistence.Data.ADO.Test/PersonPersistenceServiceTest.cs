@@ -18,21 +18,23 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Security.Principal;
 using NUnit.Framework;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
-using SanteDB.Core.TestFramework;
-using System;
-using System.Collections.Generic;
-using System.Security.Principal;
 
-namespace SanteDB.Persistence.Data.ADO.Tests
+namespace SanteDB.Persistence.Data.ADO.Test
 {
     /// <summary>
     /// Person persistence test
     /// </summary>
+    [ExcludeFromCodeCoverage]
     [TestFixture(Category = "Persistence")]
     public class PersonPersistenceServiceTest : PersistenceTest<Person>
     {

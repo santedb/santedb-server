@@ -18,21 +18,24 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Linq.Expressions;
 using NUnit.Framework;
 using SanteDB.Core;
+using SanteDB.Core.Model;
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Core.TestFramework;
-using SanteDB.Core.Model;
-using System.Linq;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Model.Entities;
 
-namespace SanteDB.Persistence.Data.ADO.Tests
+namespace SanteDB.Persistence.Data.ADO.Test
 {
+    [ExcludeFromCodeCoverage]
     [TestFixture(Category = "Persistence")]
     public class BulkQueryOperationTest :  DataTest
     {
