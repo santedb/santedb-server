@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Attributes;
 using SanteDB.Core.Configuration;
 using System.Reflection;
@@ -52,8 +53,7 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("2.1.3.*")][assembly: AssemblyInformationalVersion("Paris")]
-[assembly: AssemblyInformationalVersion("Paris")]
-
+// [assembly: AssemblyVersion("2.1.3.*")][assembly: AssemblyInformationalVersion("Queenston")]
+[assembly: AssemblyInformationalVersion("Queenston")]
 [assembly: Plugin(EnableByDefault = false, Environment = PluginEnvironment.Server, Group = FeatureGroup.Security)]
 [assembly: PluginTraceSource("SanteDB.Core.Security.Tfa.Twilio")]
