@@ -259,7 +259,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
                         retVal.AuditableObjects.Add(ao);
 
-                        foreach(var dat in context.Query<DbAuditObjectData>(o=>o.ObjectId == itm.Object1.Key))
+                        foreach (var dat in context.Query<DbAuditObjectData>(o => o.ObjectId == itm.Object1.Key))
                         {
                             ao.ObjectData.Add(new ObjectDataExtension(dat.Name, dat.Value));
                         }
@@ -424,7 +424,8 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             if (kv == null)
                                 kv = context.Insert(new DbAuditMetadataValue()
                                 {
-                                    Value = meta.Value
+                                    // TODO: Make this a common extension function (to trim)
+                                    Value = meta.Value.Substring(0, meta.Value.Length > 256 ? 256 : meta.Value.Length)
                                 });
 
                             context.Insert(new DbAuditMetadata()

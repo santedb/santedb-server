@@ -94,6 +94,7 @@ namespace SanteDB.Core.TestFramework
         {
             this.ContextId = Guid.NewGuid();
             this.m_serviceProvider.AddServiceProvider(this);
+            this.m_serviceProvider.AddServiceProvider(typeof(TestLocalizationService));
             this.m_serviceProvider.AddServiceProvider(typeof(TestConfigurationService));
             this.m_serviceProvider.AddServiceProvider(typeof(DefaultThreadPoolService));
             this.m_serviceProvider.AddServiceProvider(typeof(SanteDB.Core.Security.SHA256PasswordHashingService));
