@@ -304,5 +304,12 @@ namespace SanteDB.Server.AdminConsole.Shell
             this.m_restClients.TryGetValue(type, out retVal);
             return retVal;
         }
+
+        /// <summary>
+        /// Stop the service context
+        /// </summary>
+        public void Stop()
+        {
+        }
     }
 }
