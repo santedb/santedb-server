@@ -208,7 +208,6 @@ namespace SanteDB.Server
                 }
                 this.IsRunning = true;
             }
-
             return true;
         }
 
