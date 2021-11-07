@@ -95,6 +95,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             // Ensure exists
             if (data.NameUse != null) data.NameUse = data.NameUse?.EnsureExists(context) as Concept;
+            if (!data.EffectiveVersionSequenceId.HasValue)
+            {
+                // Lookup current version
+                data.EffectiveVersionSequenceId = context.Query<DbEntityVersion>(o => o.Key == data.SourceEntityKey && !o.ObsoletionTime.HasValue).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionSequenceId).First();
+            }
             data.NameUseKey = data.NameUse?.Key ?? data.NameUseKey;
             var retVal = base.InsertInternal(context, data);
 
@@ -116,6 +121,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Ensure exists
             if (data.NameUse != null) data.NameUse = data.NameUse?.EnsureExists(context) as Concept;
 
+            if(!data.EffectiveVersionSequenceId.HasValue)
+            {
+                // Lookup current version
+                data.EffectiveVersionSequenceId = context.Query<DbEntityVersion>(o => o.Key == data.SourceEntityKey && !o.ObsoletionTime.HasValue).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionSequenceId).First();
+            }
             data.NameUseKey = data.NameUse?.Key ?? data.NameUseKey;
 
             var retVal = base.UpdateInternal(context, data);
