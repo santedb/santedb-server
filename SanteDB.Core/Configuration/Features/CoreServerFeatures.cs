@@ -50,7 +50,7 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// </summary>
         internal static readonly Type[] SERVICE_TYPES =
         {
-            typeof(DefaultPolicyEnforcementService),
+            typeof(SanteDB.Core.Security.DefaultPolicyEnforcementService),
             typeof(DefaultOperatingSystemInfoService),
             typeof(DefaultThreadPoolService),
             typeof(DefaultNetworkInformationService),

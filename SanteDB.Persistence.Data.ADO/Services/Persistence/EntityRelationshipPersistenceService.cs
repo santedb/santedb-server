@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.OrmLite;
@@ -39,7 +40,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class EntityRelationshipPersistenceService : IdentifiedPersistenceService<EntityRelationship, DbEntityRelationship>, IAdoAssociativePersistenceService
     {
-
         public EntityRelationshipPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
         {
         }
@@ -51,7 +51,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             int tr = 0;
             return this.QueryInternal(context, base.BuildSourceQuery<EntityRelationship>(id, versionSequenceId), Guid.Empty, 0, null, out tr, null, false).ToList();
-
         }
 
         /// <summary>
@@ -85,7 +84,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override EntityRelationship InsertInternal(DataContext context, EntityRelationship data)
         {
-
             // Ensure we haven't already persisted this
             if (data.InversionIndicator)
                 return data; // don't persist inverted
@@ -94,13 +92,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (data.RelationshipType != null) data.RelationshipType = data.RelationshipType.EnsureExists(context, false) as Concept;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
             data.EffectiveVersionSequenceId = data.EffectiveVersionSequenceId ?? data.SourceEntity?.VersionSequence;
-            // Lookup the original 
+            // Lookup the original
             if (!data.EffectiveVersionSequenceId.HasValue)
-                data.EffectiveVersionSequenceId = context.FirstOrDefault<DbEntityVersion>(o => o.Key == data.SourceEntityKey)?.VersionSequenceId;
+                data.EffectiveVersionSequenceId = context.Query<DbEntityVersion>(o => o.Key == data.SourceEntityKey && !o.ObsoletionTime.HasValue).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionSequenceId).FirstOrDefault();
             else if (data.ObsoleteVersionSequenceId.HasValue) // No sense in inserting an obsolete object
                 return data;
 
-            // Duplicate check  
+            // Duplicate check
             var existing = context.FirstOrDefault<DbEntityRelationship>(r => r.SourceKey == data.SourceEntityKey && r.TargetKey == data.TargetEntityKey && r.RelationshipTypeKey == data.RelationshipTypeKey && !r.ObsoleteVersionSequenceId.HasValue);
             if (existing == null)
                 return base.InsertInternal(context, data);
@@ -131,12 +129,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (data.RelationshipType != null) data.RelationshipType = data.RelationshipType.EnsureExists(context, false) as Concept;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;
 
-            if (data.ObsoleteVersionSequenceId == Int32.MaxValue)
-                data.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence ?? context.FirstOrDefault<DbEntityVersion>(o => o.Key == data.SourceEntityKey && o.ObsoletionTime == null)?.VersionSequenceId;
+            if (!data.EffectiveVersionSequenceId.HasValue)
+                data.EffectiveVersionSequenceId = context.Query<DbEntityVersion>(o => o.Key == data.SourceEntityKey && !o.ObsoletionTime.HasValue).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionSequenceId).FirstOrDefault();
 
-            // Duplicate check 
+            if (data.ObsoleteVersionSequenceId == Int32.MaxValue || data.BatchOperation == BatchOperationType.Obsolete)
+                data.ObsoleteVersionSequenceId = context.Query<DbEntityVersion>(o => o.Key == data.SourceEntityKey && !o.ObsoletionTime.HasValue).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionSequenceId).FirstOrDefault();
+
+            // Duplicate check
             var existing = context.FirstOrDefault<DbEntityRelationship>(r => r.SourceKey == data.SourceEntityKey && r.TargetKey == data.TargetEntityKey && r.RelationshipTypeKey == data.RelationshipTypeKey && !r.ObsoleteVersionSequenceId.HasValue);
-            if (existing != null && existing.Key != data.Key) // There is an existing relationship which isn't this one, obsolete it 
+            if (existing != null && existing.Key != data.Key) // There is an existing relationship which isn't this one, obsolete it
             {
                 existing.ObsoleteVersionSequenceId = data.SourceEntity?.VersionSequence;
                 if (existing.ObsoleteVersionSequenceId.HasValue)

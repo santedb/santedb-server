@@ -47,7 +47,7 @@ namespace SanteDB.Server.Core.Configuration
         /// </summary>
         public AppletConfigurationSection()
         {
-            this.AppletDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "applets");
+            this.AppletDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location ?? Assembly.GetExecutingAssembly().Location), "applets");
 
 #if DEBUG
             this.AllowUnsignedApplets = true;

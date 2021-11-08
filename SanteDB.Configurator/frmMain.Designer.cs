@@ -66,13 +66,13 @@ namespace SanteDB.Configurator
             this.lblApplication = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pnlFeature = new System.Windows.Forms.Panel();
-            this.tcSettings = new System.Windows.Forms.TabControl();
-            this.tpSetting = new System.Windows.Forms.TabPage();
-            this.pgConfiguration = new SanteDB.Configuration.Controls.PropertyGridEx();
             this.lblDescription = new System.Windows.Forms.Label();
             this.lblNoInstall = new System.Windows.Forms.Label();
             this.btnDisable = new System.Windows.Forms.LinkLabel();
             this.btnEnable = new System.Windows.Forms.LinkLabel();
+            this.tcSettings = new System.Windows.Forms.TabControl();
+            this.tpSetting = new System.Windows.Forms.TabPage();
+            this.pgConfiguration = new SanteDB.Configuration.Controls.PropertyGridEx();
             this.lblDisabled = new System.Windows.Forms.Label();
             this.lblEnabled = new System.Windows.Forms.Label();
             this.lblSelectedOption = new System.Windows.Forms.Label();
@@ -320,40 +320,6 @@ namespace SanteDB.Configurator
             this.pnlFeature.Size = new System.Drawing.Size(775, 348);
             this.pnlFeature.TabIndex = 0;
             // 
-            // tcSettings
-            // 
-            this.tcSettings.Alignment = System.Windows.Forms.TabAlignment.Bottom;
-            this.tcSettings.Controls.Add(this.tpSetting);
-            this.tcSettings.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tcSettings.ImageList = this.imlMain;
-            this.tcSettings.Location = new System.Drawing.Point(0, 126);
-            this.tcSettings.Name = "tcSettings";
-            this.tcSettings.SelectedIndex = 0;
-            this.tcSettings.Size = new System.Drawing.Size(775, 222);
-            this.tcSettings.TabIndex = 8;
-            // 
-            // tpSetting
-            // 
-            this.tpSetting.Controls.Add(this.pgConfiguration);
-            this.tpSetting.ImageIndex = 11;
-            this.tpSetting.Location = new System.Drawing.Point(4, 4);
-            this.tpSetting.Name = "tpSetting";
-            this.tpSetting.Padding = new System.Windows.Forms.Padding(3);
-            this.tpSetting.Size = new System.Drawing.Size(767, 195);
-            this.tpSetting.TabIndex = 0;
-            this.tpSetting.Text = "Configuration";
-            this.tpSetting.UseVisualStyleBackColor = true;
-            // 
-            // pgConfiguration
-            // 
-            this.pgConfiguration.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pgConfiguration.Location = new System.Drawing.Point(3, 3);
-            this.pgConfiguration.Name = "pgConfiguration";
-            this.pgConfiguration.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.pgConfiguration.Size = new System.Drawing.Size(761, 189);
-            this.pgConfiguration.TabIndex = 1;
-            this.pgConfiguration.ToolbarVisible = false;
-            // 
             // lblDescription
             // 
             this.lblDescription.BackColor = System.Drawing.SystemColors.Control;
@@ -410,6 +376,41 @@ namespace SanteDB.Configurator
             this.btnEnable.TabStop = true;
             this.btnEnable.Text = "Enable";
             this.btnEnable.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.btnEnable_LinkClicked);
+            // 
+            // tcSettings
+            // 
+            this.tcSettings.Alignment = System.Windows.Forms.TabAlignment.Bottom;
+            this.tcSettings.Controls.Add(this.tpSetting);
+            this.tcSettings.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tcSettings.ImageList = this.imlMain;
+            this.tcSettings.Location = new System.Drawing.Point(0, 126);
+            this.tcSettings.Name = "tcSettings";
+            this.tcSettings.SelectedIndex = 0;
+            this.tcSettings.Size = new System.Drawing.Size(775, 222);
+            this.tcSettings.TabIndex = 8;
+            // 
+            // tpSetting
+            // 
+            this.tpSetting.Controls.Add(this.pgConfiguration);
+            this.tpSetting.ImageIndex = 11;
+            this.tpSetting.Location = new System.Drawing.Point(4, 4);
+            this.tpSetting.Name = "tpSetting";
+            this.tpSetting.Padding = new System.Windows.Forms.Padding(3);
+            this.tpSetting.Size = new System.Drawing.Size(767, 195);
+            this.tpSetting.TabIndex = 0;
+            this.tpSetting.Text = "Configuration";
+            this.tpSetting.UseVisualStyleBackColor = true;
+            // 
+            // pgConfiguration
+            // 
+            this.pgConfiguration.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pgConfiguration.Location = new System.Drawing.Point(3, 3);
+            this.pgConfiguration.Name = "pgConfiguration";
+            this.pgConfiguration.PropertySort = System.Windows.Forms.PropertySort.Categorized;
+            this.pgConfiguration.Size = new System.Drawing.Size(761, 189);
+            this.pgConfiguration.TabIndex = 1;
+            this.pgConfiguration.ToolbarVisible = false;
+            this.pgConfiguration.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.pgConfiguration_PropertyValueChanged);
             // 
             // lblDisabled
             // 

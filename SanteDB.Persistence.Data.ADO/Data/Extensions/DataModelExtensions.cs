@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
@@ -49,14 +50,11 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Data.ADO.Data
 {
-
-
     /// <summary>
     /// Model extension methods
     /// </summary>
     public static class DataModelExtensions
     {
-
         // Trace source
         private static Tracer s_traceSource = new Tracer(AdoDataConstants.TraceSourceName);
 
@@ -84,7 +82,6 @@ namespace SanteDB.Persistence.Data.ADO.Data
         /// </summary>
         private static FieldInfo[] GetFields(Type type)
         {
-
             FieldInfo[] retVal = null;
             if (!s_fieldCache.TryGetValue(type, out retVal))
             {
@@ -94,13 +91,11 @@ namespace SanteDB.Persistence.Data.ADO.Data
             return retVal;
         }
 
-
         /// <summary>
         /// Try get by classifier
         /// </summary>
         public static bool CheckExists(this IIdentifiedEntity me, DataContext context)
         {
-
             // Is there a classifier?
             var serviceInstance = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
             var idpInstance = serviceInstance.GetPersister(me.GetType()) as IAdoPersistenceService;
@@ -116,7 +111,6 @@ namespace SanteDB.Persistence.Data.ADO.Data
         /// </summary>
         public static IIdentifiedEntity TryGetExisting(this IIdentifiedEntity me, DataContext context, bool forceDatabase = false)
         {
-
             // Is there a classifier?
             var serviceInstance = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
             var idpInstance = serviceInstance.GetPersister(me.GetType()) as IAdoPersistenceService;
@@ -143,7 +137,6 @@ namespace SanteDB.Persistence.Data.ADO.Data
             var classAtt = me.GetType().GetCustomAttribute<KeyLookupAttribute>();
             if (classAtt != null && existing == null)
             {
-
                 // Get the domain type
                 var dataType = serviceInstance.GetMapper().MapModelType(me.GetType());
                 var tableMap = TableMapping.Get(dataType);
@@ -159,9 +152,9 @@ namespace SanteDB.Persistence.Data.ADO.Data
                     classProperty = me.GetType().GetProperty(classProperty.GetCustomAttribute<SerializationReferenceAttribute>()?.RedirectProperty ?? classProperty.Name);
                 }
 
-                // Column 
+                // Column
                 var column = tableMap.GetColumn(serviceInstance.GetMapper().MapModelProperty(me.GetType(), dataType, classProperty));
-                // Now we want to query 
+                // Now we want to query
                 SqlStatement stmt = context.CreateSqlStatement().SelectFrom(dataType)
                     .Where($"{column.Name} = ?", classifierValue);
 
@@ -189,9 +182,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
             }
 
             return existing;
-
         }
-
 
         /// <summary>
         /// Updates a keyed delay load field if needed
@@ -214,7 +205,6 @@ namespace SanteDB.Persistence.Data.ADO.Data
         /// </summary>
         public static IIdentifiedEntity EnsureExists(this IIdentifiedEntity me, DataContext context, bool createIfNotExists = true)
         {
-
             if (me == null) return null;
 
             // Me
@@ -280,7 +270,6 @@ namespace SanteDB.Persistence.Data.ADO.Data
                     otherValue = pi.GetValue(other);
 
                 retVal &= meValue != null ? meValue.Equals(otherValue) : otherValue == null;// Case null
-
             }
             return retVal;
         }
@@ -293,7 +282,6 @@ namespace SanteDB.Persistence.Data.ADO.Data
         /// <returns>The UUID of the user which the authorization context subject represents</returns>
         public static Guid? GetKey(this IIdentity me, DataContext dataContext)
         {
-
             Guid retVal = Guid.Empty;
             IDbIdentified loaded = null;
             if (me is DeviceIdentity && !m_deviceIdCache.TryGetValue(me.Name.ToLower(), out retVal))
@@ -318,7 +306,6 @@ namespace SanteDB.Persistence.Data.ADO.Data
             }
 
             return retVal;
-
         }
 
         /// <summary>
@@ -375,7 +362,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
             // Load fast or lean mode only root associations which will appear on the wire
             if (context.LoadState == LoadState.PartialLoad)
             {
-                if (me.LoadState == LoadState.PartialLoad) // already partially loaded :/ 
+                if (me.LoadState == LoadState.PartialLoad) // already partially loaded :/
                     return;
                 else
                 {
@@ -450,7 +437,6 @@ namespace SanteDB.Persistence.Data.ADO.Data
                     }
                     pid.SetValue(me, value);
                 }
-
             }
 #if DEBUG
             sw.Stop();
@@ -478,7 +464,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
             };
 
             // Identities
-            if (cprincipal != null) // claims principal? 
+            if (cprincipal != null) // claims principal?
             {
                 foreach (var ident in cprincipal.Identities)
                 {
@@ -489,19 +475,18 @@ namespace SanteDB.Persistence.Data.ADO.Data
                     else
                         retVal.UserKey = ident.GetKey(me);
                 }
-                // Session identifier 
+                // Session identifier
                 var sidClaim = cprincipal?.FindFirst(SanteDBClaimTypes.SanteDBSessionIdClaim)?.Value;
                 Guid sid = Guid.Empty;
                 if (Guid.TryParse(sidClaim, out sid))
                     retVal.SessionKey = sid;
-
             }
             else if (principal.Identity.Name == AuthenticationContext.SystemPrincipal.Identity.Name)
                 retVal.UserKey = Guid.Parse(AuthenticationContext.SystemUserSid);
             else if (principal.Identity.Name == AuthenticationContext.AnonymousPrincipal.Identity.Name)
                 retVal.UserKey = Guid.Parse(AuthenticationContext.AnonymousUserSid);
 
-            // Context 
+            // Context
             try
             {
                 if (retVal.UserKey.ToString() == AuthenticationContext.SystemUserSid ||
@@ -509,7 +494,6 @@ namespace SanteDB.Persistence.Data.ADO.Data
                     retVal.Key = me.ContextId = retVal.UserKey.Value;
                 else
                     retVal = me.Insert(retVal);
-
             }
             catch (Exception e)
             {
@@ -518,6 +502,5 @@ namespace SanteDB.Persistence.Data.ADO.Data
             }
             return retVal.Key;
         }
-
     }
 }

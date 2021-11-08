@@ -131,7 +131,7 @@ namespace SanteDB.Server.Core.Configuration.Features
                 pip = appServices.FirstOrDefault(t => typeof(IPolicyInformationService).IsAssignableFrom(t.Type))?.Type,
                 pdp = appServices.FirstOrDefault(t => typeof(IPolicyDecisionService).IsAssignableFrom(t.Type))?.Type;
 
-            config.Values.Add("PasswordHasher", hasher ?? typeof(SHA256PasswordHashingService));
+            config.Values.Add("PasswordHasher", hasher ?? typeof(SanteDB.Core.Security.SHA256PasswordHashingService));
             config.Values.Add("PasswordValidator", validator ?? typeof(DefaultPasswordValidationService));
             config.Values.Add("PolicyDecisionProvider", pdp ?? typeof(DefaultPolicyDecisionService));
             config.Values.Add("PolicyInformationProvider", pip ?? (config.Options["PolicyInformationProvider"]() as IEnumerable<Type>).FirstOrDefault());

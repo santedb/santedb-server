@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.OrmLite;
@@ -27,7 +28,6 @@ using System;
 using System.Collections;
 using System.Linq;
 
-
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
     /// <summary>
@@ -35,7 +35,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class EntityAddressPersistenceService : IdentifiedPersistenceService<Core.Model.Entities.EntityAddress, DbEntityAddress>, IAdoAssociativePersistenceService
     {
-
         public EntityAddressPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
         {
         }
@@ -54,13 +53,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public IEnumerable GetFromSource(DataContext context, Guid id, decimal? versionSequenceId)
         {
             var addrLookupQuery = context.CreateSqlStatement<DbEntityAddressComponent>().SelectFrom(typeof(DbEntityAddressComponent), typeof(DbEntityAddress), typeof(DbEntityAddressComponentValue))
-                .InnerJoin<DbEntityAddress>(o=>o.SourceKey, o=>o.Key)
-                .InnerJoin<DbEntityAddressComponentValue>(o=>o.ValueSequenceId, o=>o.SequenceId)
-                .Where<DbEntityAddress>(o=>o.SourceKey == id && o.ObsoleteVersionSequenceId == null);
+                .InnerJoin<DbEntityAddress>(o => o.SourceKey, o => o.Key)
+                .InnerJoin<DbEntityAddressComponentValue>(o => o.ValueSequenceId, o => o.SequenceId)
+                .Where<DbEntityAddress>(o => o.SourceKey == id && o.ObsoleteVersionSequenceId == null);
 
-            /// Yowza! But it appears to be faster than the other way 
+            /// Yowza! But it appears to be faster than the other way
             return this.DomainQueryInternal<CompositeResult<DbEntityAddressComponent, DbEntityAddress, DbEntityAddressComponentValue>>(context, addrLookupQuery)
-                .GroupBy(o=>o.Object2.Key)
+                .GroupBy(o => o.Object2.Key)
                 .Select(o =>
                     new EntityAddress()
                     {
@@ -70,7 +69,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         LoadState = Core.Model.LoadState.PartialLoad,
                         ObsoleteVersionSequenceId = o.FirstOrDefault().Object2.ObsoleteVersionSequenceId,
                         SourceEntityKey = o.FirstOrDefault().Object2.SourceKey,
-                        Component = o.Select(c=>new EntityAddressComponent()
+                        Component = o.Select(c => new EntityAddressComponent()
                         {
                             ComponentTypeKey = c.Object1.ComponentTypeKey,
                             Key = c.Object1.Key,
@@ -79,7 +78,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                             Value = c.Object3.Value
                         }).ToList()
                     });
-
         }
 
         /// <summary>
@@ -87,10 +85,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Core.Model.Entities.EntityAddress InsertInternal(DataContext context, EntityAddress data)
         {
-
             // Ensure exists
             if (data.AddressUse != null) data.AddressUse = data.AddressUse?.EnsureExists(context) as Concept;
             data.AddressUseKey = data.AddressUse?.Key ?? data.AddressUseKey;
+
+            if (!data.EffectiveVersionSequenceId.HasValue)
+            {
+                // Lookup current version
+                data.EffectiveVersionSequenceId = context.Query<DbEntityVersion>(o => o.Key == data.SourceEntityKey && !o.ObsoletionTime.HasValue).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionSequenceId).First();
+            }
 
             var retVal = base.InsertInternal(context, data);
 
@@ -109,10 +112,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Core.Model.Entities.EntityAddress UpdateInternal(DataContext context, Core.Model.Entities.EntityAddress data)
         {
-
             // Ensure exists
             if (data.AddressUse != null) data.AddressUse = data.AddressUse?.EnsureExists(context) as Concept;
             data.AddressUseKey = data.AddressUse?.Key ?? data.AddressUseKey;
+            if (!data.EffectiveVersionSequenceId.HasValue)
+            {
+                // Lookup current version
+                data.EffectiveVersionSequenceId = context.Query<DbEntityVersion>(o => o.Key == data.SourceEntityKey && !o.ObsoletionTime.HasValue).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionSequenceId).First();
+            }
 
             var retVal = base.UpdateInternal(context, data);
 
@@ -127,8 +134,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             return retVal;
         }
-
-
     }
 
     /// <summary>
@@ -191,7 +196,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         }
 
         /// <summary>
-        /// Update 
+        /// Update
         /// </summary>
         public override Core.Model.Entities.EntityAddressComponent UpdateInternal(DataContext context, Core.Model.Entities.EntityAddressComponent data)
         {
@@ -209,6 +214,5 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             int tr = 0;
             return this.QueryInternal(context, base.BuildSourceQuery<EntityAddressComponent>(id), Guid.Empty, 0, null, out tr, null, false).ToList();
         }
-
     }
 }

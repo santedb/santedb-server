@@ -18,24 +18,25 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Attributes;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-// General Information about an assembly is controlled through the following 
+// General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("SanteDB Server")]
-[assembly: AssemblyDescription("SanteDB Server Core Executable")]
+[assembly: AssemblyDescription("SanteDB iCDR Server Core Executable")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("SanteSuite Contributors")]
-[assembly: AssemblyProduct("SanteDB Server")]
-[assembly: AssemblyCopyright("Copyright (C) 2015-2020, Fyfe Software Inc. and the SanteSuite Contributors")]
+[assembly: AssemblyProduct("SanteDB iCDR Server")]
+[assembly: AssemblyCopyright("Copyright (C) 2021 SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md)")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-// Setting ComVisible to false makes the types in this assembly not visible 
-// to COM components.  If you need to access a type in this assembly from 
+// Setting ComVisible to false makes the types in this assembly not visible
+// to COM components.  If you need to access a type in this assembly from
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
@@ -45,11 +46,11 @@ using System.Runtime.InteropServices;
 // Version information for an assembly consists of the following four values:
 //
 //      Major Version
-//      Minor Version 
+//      Minor Version
 //      Build Number
 //      Revision
 //
-// You can specify all the values or you can default the Build and Revision Numbers 
+// You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.128.0.*")][assembly: AssemblyInformationalVersion("2.0.12")]
-[assembly: AssemblyInformationalVersion("Paris")]
+[assembly: AssemblyInformationalVersion("Queenston")]

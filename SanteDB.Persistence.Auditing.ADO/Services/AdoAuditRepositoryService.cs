@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using RestSrvr;
 using SanteDB.Core.Model;
 using SanteDB.Core;
@@ -163,7 +164,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         }
 
         /// <summary>
-        /// Resolve code
+        /// Resolve code from central code repository
         /// </summary>
         private AuditCode ResolveCode(Guid key, String code, String codeSystem)
         {
@@ -228,18 +229,33 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                         });
 
                     // Objects
-                    foreach (var itm in context.Query<DbAuditObject>(o => o.AuditId == res.Object1.Key))
+                    sql = context.CreateSqlStatement<DbAuditObject>().SelectFrom(typeof(DbAuditObject), typeof(DbAuditCode))
+                        .Join<DbAuditObject, DbAuditCode>("LEFT", o => o.CustomIdType, o => o.Key)
+                        .Where<DbAuditObject>(o => o.AuditId == res.Object1.Key);
+                    foreach (var itm in context.Query<CompositeResult<DbAuditObject, DbAuditCode>>(sql).ToArray())
                     {
-                        retVal.AuditableObjects.Add(new AuditableObject()
+                        var ao = new AuditableObject()
                         {
-                            IDTypeCode = (AuditableObjectIdType?)itm.IDTypeCode,
-                            LifecycleType = (AuditableObjectLifecycle?)itm.LifecycleType,
-                            NameData = itm.NameData,
-                            ObjectId = itm.ObjectId,
-                            QueryData = itm.QueryData,
-                            Role = (AuditableObjectRole?)itm.Role,
-                            Type = (AuditableObjectType)itm.Type
-                        });
+                            IDTypeCode = (AuditableObjectIdType?)itm.Object1.IDTypeCode,
+                            LifecycleType = (AuditableObjectLifecycle?)itm.Object1.LifecycleType,
+                            NameData = itm.Object1.NameData,
+                            ObjectId = itm.Object1.ObjectId,
+                            QueryData = itm.Object1.QueryData,
+                            Role = (AuditableObjectRole?)itm.Object1.Role,
+                            Type = (AuditableObjectType)itm.Object1.Type
+                        };
+
+                        if (itm.Object1.CustomIdType.HasValue)
+                        {
+                            ao.CustomIdTypeCode = new AuditCode(itm.Object2.Code, itm.Object2.CodeSystem);
+                        }
+
+                        retVal.AuditableObjects.Add(ao);
+
+                        foreach (var dat in context.Query<DbAuditObjectData>(o => o.ObjectId == itm.Object1.Key))
+                        {
+                            ao.ObjectData.Add(new ObjectDataExtension(dat.Name, dat.Value));
+                        }
                     }
 
                     // Metadata
@@ -366,7 +382,27 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             dbAo.Role = (int)(ao.Role ?? 0);
                             dbAo.Type = (int)(ao.Type);
                             dbAo.AuditId = dbAudit.Key;
-                            context.Insert(dbAo);
+
+                            if (ao.CustomIdTypeCode != null)
+                            {
+                                var code = this.GetOrCreateAuditCode(context, ao.CustomIdTypeCode);
+                                dbAo.CustomIdType = code.Key;
+                            }
+
+                            dbAo = context.Insert(dbAo);
+
+                            if (ao.ObjectData?.Count > 0)
+                            {
+                                foreach (var od in ao.ObjectData)
+                                {
+                                    context.Insert(new DbAuditObjectData()
+                                    {
+                                        Name = od.Key,
+                                        Value = od.Value,
+                                        ObjectId = dbAo.Key
+                                    });
+                                }
+                            }
                         }
 
                     // metadata
@@ -377,7 +413,8 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             if (kv == null)
                                 kv = context.Insert(new DbAuditMetadataValue()
                                 {
-                                    Value = meta.Value
+                                    // TODO: Make this a common extension function (to trim)
+                                    Value = meta.Value.Substring(0, meta.Value.Length > 256 ? 256 : meta.Value.Length)
                                 });
 
                             context.Insert(new DbAuditMetadata()
@@ -545,5 +582,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             throw new NotSupportedException();
         }
     }
+
 #pragma warning restore CS0067
 }

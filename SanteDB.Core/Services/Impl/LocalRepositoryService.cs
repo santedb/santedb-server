@@ -195,25 +195,29 @@ namespace SanteDB.Server.Core.Services.Impl
             var st = r_repositoryServices.FirstOrDefault(s => s == serviceType || serviceType.IsAssignableFrom(s));
             if (st == null && (typeof(IRepositoryService).IsAssignableFrom(serviceType) || serviceType.IsGenericType && serviceType.GetGenericTypeDefinition() == typeof(IRepositoryService<>)))
             {
-                var wrappedType = serviceType.GenericTypeArguments[0];
-                var irst = typeof(IRepositoryService<>).MakeGenericType(wrappedType);
-
-                if (typeof(Act).IsAssignableFrom(wrappedType))
+                if (serviceType.IsGenericType)
                 {
-                    this.m_tracer.TraceInfo("Adding Act repository service for {0}...", wrappedType.Name);
-                    st = typeof(GenericLocalActRepository<>).MakeGenericType(wrappedType);
-                }
-                else if (typeof(Entity).IsAssignableFrom(wrappedType))
-                {
-                    this.m_tracer.TraceInfo("Adding Entity repository service for {0}...", wrappedType);
-                    st = typeof(GenericLocalClinicalDataRepository<>).MakeGenericType(wrappedType);
+                    var wrappedType = serviceType.GenericTypeArguments[0];
+                    if (typeof(Act).IsAssignableFrom(wrappedType))
+                    {
+                        this.m_tracer.TraceInfo("Adding Act repository service for {0}...", wrappedType.Name);
+                        st = typeof(GenericLocalActRepository<>).MakeGenericType(wrappedType);
+                    }
+                    else if (typeof(Entity).IsAssignableFrom(wrappedType))
+                    {
+                        this.m_tracer.TraceInfo("Adding Entity repository service for {0}...", wrappedType);
+                        st = typeof(GenericLocalClinicalDataRepository<>).MakeGenericType(wrappedType);
+                    }
+                    else
+                    {
+                        this.m_tracer.TraceInfo("Adding generic repository service for {0}...", wrappedType);
+                        st = typeof(GenericLocalRepository<>).MakeGenericType(wrappedType);
+                    }
                 }
                 else
                 {
-                    this.m_tracer.TraceInfo("Adding generic repository service for {0}...", wrappedType);
-                    st = typeof(GenericLocalRepository<>).MakeGenericType(wrappedType);
+                    st = serviceType;
                 }
-
             }
             else if (st == null)
             {

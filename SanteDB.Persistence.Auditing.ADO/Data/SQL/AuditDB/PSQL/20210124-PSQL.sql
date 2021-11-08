@@ -52,4 +52,19 @@ alter table aud_obj_tbl drop constraint pk_aud_obj_tbl;
 alter table aud_obj_tbl add constraint pk_aud_obj_tbl primary key (id_new);
 alter table aud_obj_tbl drop column id;
 alter table aud_obj_tbl rename column id_new to id;
+alter table aud_obj_tbl add cst_id_typ uuid;
+alter table aud_obj_tbl add constraint fk_aud_obj_cst_id foreign key (cst_id_typ) references aud_cd_tbl(id);
 
+CREATE SEQUENCE aud_obj_dat_seq START WITH 1 INCREMENT BY 1;
+
+ -- TABLE FOR STORAGE OF AUDIT OBJECTS
+ CREATE TABLE aud_obj_dat_tbl (
+	id	bigint not null default nextval('aud_obj_dat_seq'),
+	obj_id bigint NOT NULL, -- OBJECT TO WHICH THE DATA BELONGS
+	key VARCHAR(256), -- THE KEY OBJECT IDENTIFIER
+	val BYTEA, -- ADDITIONAL NAME DATA ASSIGNED TO THE OBJECT
+	CONSTRAINT pk_aud_obj_dat_tbl PRIMARY KEY (id),
+	CONSTRAINT fk_aud_obj_dat_obj_tbl FOREIGN KEY (obj_id) REFERENCES aud_obj_tbl(id)
+);
+
+CREATE INDEX aud_obj_obj_dat_id_idx ON aud_obj_dat_tbl(obj_id);
