@@ -10,6 +10,7 @@ using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model;
@@ -32,7 +33,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         IDataPersistenceService<TModel>,
         IStoredQueryDataPersistenceService<TModel>,
         IAdoPersistenceProvider<TModel>,
-        IAdoQueryProvider<TModel>,
+        IMappedQueryProvider<TModel>,
         IDataPersistenceService
         where TModel : IdentifiedData, new()
         where TDbModel : class, IDbIdentified, new()
@@ -197,7 +198,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected virtual IQueryResultSet<TModel> DoQueryModel(DataContext context, Expression<Func<TModel, bool>> query)
         {
-            return new AdoQueryResultSet<TModel>(this).Where(query);
+            return new MappedQueryResultSet<TModel>(this).Where(query);
         }
 
         /// <summary>

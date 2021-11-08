@@ -6,8 +6,10 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.DataType;
 using System;
@@ -455,6 +457,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 this.m_tracer.TraceVerbose("Obsoletion of {0} took {1} ms", key, sw.ElapsedMilliseconds);
             }
 #endif
+        }
+
+        /// <summary>
+        /// Perform a query on the model
+        /// </summary>
+        protected override IQueryResultSet<TModel> DoQueryModel(DataContext context, Expression<Func<TModel, bool>> query)
+        {
+            return new MappedQueryResultSet<TModel>(this, nameof(IDbVersionedData.Key)).Where(query);
         }
 
         /// <summary>
