@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using RestSrvr;
 using RestSrvr.Message;
 using SanteDB.Core;
@@ -44,12 +45,11 @@ namespace SanteDB.Authentication.OAuth2.Wcf
     [DisplayName("OAUTH: HTTP BASIC Client-Credentials")]
     public class ClientAuthorizationAccessBehavior : IServicePolicy, IServiceBehavior
     {
-
         // Configuration from main SanteDB
         private ApplicationServiceContextConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<ApplicationServiceContextConfigurationSection>();
 
         // Trace source
-        private Tracer m_traceSource = new Tracer(OAuthConstants.TraceSourceName);
+        private readonly Tracer m_traceSource = new Tracer(OAuthConstants.TraceSourceName);
 
         /// <summary>
         /// Apply the policy to the request
@@ -66,7 +66,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                 var httpRequest = RestOperationContext.Current.IncomingRequest;
 
                 var authHeader = httpRequest.Headers["Authorization"];
-                if(String.IsNullOrEmpty(authHeader) ||
+                if (String.IsNullOrEmpty(authHeader) ||
                     !authHeader.ToLowerInvariant().StartsWith("basic"))
                     throw new AuthenticationException("Invalid authentication scheme");
                 authHeader = authHeader.Substring(6);
@@ -82,7 +82,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                 RestOperationContext.Current.Data.Add("symm_secret", b64Data[1]);
 
                 // If the current principal is set-up then add the identity if not then don't
-                if(AuthenticationContext.Current.Principal == AuthenticationContext.AnonymousPrincipal)
+                if (AuthenticationContext.Current.Principal == AuthenticationContext.AnonymousPrincipal)
                 {
                     var contextToken = AuthenticationContext.EnterContext(principal);
                     RestOperationContext.Current.Disposed += (o, e) => contextToken.Dispose();
@@ -96,7 +96,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error, e.ToString());
             }
         }
 

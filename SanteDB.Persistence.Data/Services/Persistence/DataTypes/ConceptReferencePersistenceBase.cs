@@ -18,11 +18,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         where TModel : VersionedAssociation<Concept>, new()
         where TDbModel : DbIdentified, IDbVersionedAssociation, new()
     {
-
         /// <summary>
         /// Creates a DI
         /// </summary>
-        public ConceptReferencePersistenceBase(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public ConceptReferencePersistenceBase(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 
@@ -34,10 +33,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             var source = context.Query<DbConceptVersion>(o => o.Key == sourceKey).OrderByDescending(o => o.VersionSequenceId).FirstOrDefault();
             if (source == null)
             {
-                throw new KeyNotFoundException(ErrorMessages.ERR_NOT_FOUND.Format(sourceKey));
+                throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = sourceKey, type = "ConceptReference" }));
             }
             return source.VersionSequenceId.GetValueOrDefault();
         }
-
     }
 }

@@ -30,11 +30,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <summary>
         /// Creates a dependency injected
         /// </summary>
-        /// <param name="configurationManager"></param>
-        /// <param name="adhocCacheService"></param>
-        /// <param name="dataCachingService"></param>
-        /// <param name="queryPersistence"></param>
-        public EntityPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public EntityPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 

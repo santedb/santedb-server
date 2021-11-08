@@ -33,27 +33,31 @@ namespace SanteDB.Persistence.Data.Services
         public string ServiceName => "ADO Policy Information";
 
         // PEP
-        private IPolicyEnforcementService m_policyEnforcement;
+        private readonly IPolicyEnforcementService m_policyEnforcement;
 
-        // Configuration 
-        private AdoPersistenceConfigurationSection m_configuration;
+        // Configuration
+        private readonly AdoPersistenceConfigurationSection m_configuration;
 
         // Adhoc
-        private IAdhocCacheService m_adhocCache;
+        private readonly IAdhocCacheService m_adhocCache;
+
+        // Localization service
+        private readonly ILocalizationService m_localizationService;
 
         /// <summary>
         /// Trace source
         /// </summary>
-        private Tracer m_traceSource = Tracer.GetTracer(typeof(AdoPolicyInformationService));
+        private readonly Tracer m_traceSource = Tracer.GetTracer(typeof(AdoPolicyInformationService));
 
         /// <summary>
         /// Create new policy info service
         /// </summary>
-        public AdoPolicyInformationService(IConfigurationManager configurationManager, IPolicyEnforcementService pepService, IAdhocCacheService adhocCache = null)
+        public AdoPolicyInformationService(IConfigurationManager configurationManager, IPolicyEnforcementService pepService, ILocalizationService localizationService, IAdhocCacheService adhocCache = null)
         {
             this.m_policyEnforcement = pepService;
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_adhocCache = adhocCache;
+            this.m_localizationService = localizationService;
         }
 
         /// <summary>
@@ -67,11 +71,11 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (securable == null)
             {
-                throw new ArgumentNullException(nameof(securable), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(securable), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             if (principal == null)
             {
-                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
@@ -81,7 +85,6 @@ namespace SanteDB.Persistence.Data.Services
                     context.Open();
                     using (var tx = context.BeginTransaction())
                     {
-
                         var policies = context.Query<DbSecurityPolicy>(o => policyOids.Contains(o.Oid)).Select(o => o.Key).ToArray();
 
                         this.Demand(securable, principal);
@@ -138,7 +141,7 @@ namespace SanteDB.Persistence.Data.Services
                         }
                         else
                         {
-                            throw new NotSupportedException(ErrorMessages.ERR_SEC_NON_POLICY);
+                            throw new NotSupportedException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_NOT_SUPPORTED));
                         }
                         tx.Commit();
 
@@ -151,7 +154,7 @@ namespace SanteDB.Persistence.Data.Services
                 catch (Exception e)
                 {
                     this.m_traceSource.TraceError("Error padding policies to {0} : {1}", securable, e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_SEC_POL_ASSIGN.Format(securable), e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_ASSIGN, new { target = securable, policyOids = String.Join(",", policyOids) }), e);
                 }
             }
         }
@@ -176,6 +179,7 @@ namespace SanteDB.Persistence.Data.Services
                     case "Provider":
                         this.m_policyEnforcement.Demand(PermissionPolicyIdentifiers.WriteClinicalData, principal);
                         break;
+
                     case "Place":
                     case "State":
                     case "County":
@@ -183,6 +187,7 @@ namespace SanteDB.Persistence.Data.Services
                     case "Organization":
                         this.m_policyEnforcement.Demand(PermissionPolicyIdentifiers.WritePlacesAndOrgs, principal);
                         break;
+
                     case "ManufacturedMaterial":
                     case "Material":
                         this.m_policyEnforcement.Demand(PermissionPolicyIdentifiers.WriteMaterials, principal);
@@ -204,13 +209,12 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (securable == null)
             {
-                throw new ArgumentNullException(nameof(securable), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(securable), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             if (String.IsNullOrEmpty(policyId))
             {
-                throw new ArgumentNullException(nameof(policyId), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(policyId), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
-
 
             using (var context = this.m_configuration.Provider.GetReadonlyConnection())
             {
@@ -261,13 +265,13 @@ namespace SanteDB.Persistence.Data.Services
                     }
                     else
                     {
-                        throw new ArgumentOutOfRangeException(nameof(securable), ErrorMessages.ERR_ARGUMENT_INCOMPATIBLE_TYPE);
+                        throw new ArgumentOutOfRangeException(nameof(securable), this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_NOT_SUPPORTED));
                     }
                 }
                 catch (Exception e)
                 {
                     this.m_traceSource.TraceError("Error getting active policies for {0} : {1}", securable, e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_SEC_POL_GEN, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_GEN), e);
                 }
             }
         }
@@ -281,7 +285,7 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (securable == null)
             {
-                throw new ArgumentNullException(nameof(securable), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(securable), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             IEnumerable<AdoSecurityPolicyInstance> results = null;
@@ -318,7 +322,6 @@ namespace SanteDB.Persistence.Data.Services
                                 .Where<DbSecurityApplicationPolicy>(o => o.SourceKey == sa.Key))
                                 .ToArray()
                                 .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
-
                         }
                         else if (securable is SecurityRole sr)
                         {
@@ -329,7 +332,6 @@ namespace SanteDB.Persistence.Data.Services
                                 .Where<DbSecurityRolePolicy>(o => o.SourceKey == sr.Key))
                                 .ToArray()
                                 .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
-
                         }
                         else if (securable is IIdentity identity)
                         {
@@ -349,7 +351,6 @@ namespace SanteDB.Persistence.Data.Services
                                     results = results.Union(this.GetIdentityPolicies(context, subId, results.Select(o => o.Policy.Oid))).ToArray();
                                 }
                             }
-
                         }
                         else if (securable is Entity entity)
                         {
@@ -384,7 +385,7 @@ namespace SanteDB.Persistence.Data.Services
                     catch (Exception e)
                     {
                         this.m_traceSource.TraceError("Error getting active policies for {0} : {1}", securable, e);
-                        throw new DataPersistenceException(ErrorMessages.ERR_SEC_POL_GEN, e);
+                        throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_GEN), e);
                     }
                 }
             }
@@ -453,7 +454,7 @@ namespace SanteDB.Persistence.Data.Services
                 catch (Exception e)
                 {
                     this.m_traceSource.TraceError("Error getting policies: {0}", e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_SEC_POL_GEN, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_GEN), e);
                 }
             }
         }
@@ -465,7 +466,7 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (String.IsNullOrEmpty(policyOid))
             {
-                throw new ArgumentNullException(nameof(policyOid), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(policyOid), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             // Cache hit
@@ -485,7 +486,7 @@ namespace SanteDB.Persistence.Data.Services
                 catch (Exception e)
                 {
                     this.m_traceSource.TraceError("Error fetching {0} : {1}", policyOid, e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_SEC_POL_GEN, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_GEN), e);
                 }
             }
 
@@ -517,11 +518,11 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (securable == null)
             {
-                throw new ArgumentNullException(nameof(securable), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(securable), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             if (principal == null)
             {
-                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
@@ -531,7 +532,6 @@ namespace SanteDB.Persistence.Data.Services
                     context.Open();
                     using (var tx = context.BeginTransaction())
                     {
-
                         var policies = context.Query<DbSecurityPolicy>(o => oid.Contains(o.Oid)).Select(o => o.Key).ToArray();
 
                         this.Demand(securable, principal);
@@ -558,7 +558,7 @@ namespace SanteDB.Persistence.Data.Services
                         }
                         else
                         {
-                            throw new NotSupportedException(ErrorMessages.ERR_SEC_NON_POLICY);
+                            throw new NotSupportedException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_NOT_SUPPORTED));
                         }
                         tx.Commit();
 
@@ -571,7 +571,7 @@ namespace SanteDB.Persistence.Data.Services
                 catch (Exception e)
                 {
                     this.m_traceSource.TraceError("Error padding policies to {0} : {1}", securable, e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_SEC_POL_ASSIGN.Format(securable), e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_ASSIGN, new { securable = securable, policyOids = String.Join(";", oid) }), e);
                 }
             }
         }

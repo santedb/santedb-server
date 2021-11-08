@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using Newtonsoft.Json;
 using RestSrvr;
 using RestSrvr.Message;
@@ -36,8 +37,7 @@ namespace SanteDB.Authentication.OAuth2
     /// </summary>
     internal class OAuthErrorBehavior : IServiceBehavior, IServiceErrorHandler
     {
-
-        private Tracer m_tracer = new Tracer(OAuthConstants.TraceSourceName);
+        private readonly Tracer m_tracer = new Tracer(OAuthConstants.TraceSourceName);
 
         /// <summary>
         /// Apply the service behavior
@@ -61,7 +61,6 @@ namespace SanteDB.Authentication.OAuth2
         /// </summary>
         public bool ProvideFault(Exception error, RestResponseMessage response)
         {
-
             this.m_tracer.TraceEvent(EventLevel.Error, "Error on OAUTH Pipeline: {0}", error);
 
             // Error

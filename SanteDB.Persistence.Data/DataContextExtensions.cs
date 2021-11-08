@@ -45,6 +45,9 @@ namespace SanteDB.Persistence.Data
     /// </summary>
     internal static class DataContextExtensions
     {
+        // Localization service
+        private static readonly ILocalizationService s_localizationService = ApplicationServiceContext.Current.GetService<ILocalizationService>();
+
         /// <summary>
         /// Convert validation enforcement to priority
         /// </summary>
@@ -174,7 +177,7 @@ namespace SanteDB.Persistence.Data
                     }
                     else
                     {
-                        throw new SecurityException(ErrorMessages.ERR_SEC_PROVENANCE_UNK_ID);
+                        throw new SecurityException(s_localizationService.GetString(ErrorMessageStrings.SEC_PROVENANCE_UNK_ID));
                     }
 
                     // Set apporopriate property
@@ -212,7 +215,7 @@ namespace SanteDB.Persistence.Data
 
                 if (!retVal.UserKey.HasValue)
                 {
-                    throw new SecurityException(ErrorMessages.ERR_SEC_PROVENANCE_UNK_ID);
+                    throw new SecurityException(s_localizationService.GetString(ErrorMessageStrings.SEC_PROVENANCE_UNK_ID));
                 }
             }
 
@@ -235,7 +238,7 @@ namespace SanteDB.Persistence.Data
             }
             catch (Exception e)
             {
-                throw new SecurityException(ErrorMessages.ERR_SEC_PROVENANCE_GEN_ERR, e);
+                throw new SecurityException(s_localizationService.GetString(ErrorMessageStrings.SEC_PROVENANCE_GEN_ERR), e);
             }
         }
     }

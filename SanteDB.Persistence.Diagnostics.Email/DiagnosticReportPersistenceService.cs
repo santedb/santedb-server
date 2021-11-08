@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Event;
 using SanteDB.Core.Model;
@@ -45,6 +46,7 @@ using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
 using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Notifications;
+
 using SanteDB.Server.Core.Security.Attribute;
 
 namespace SanteDB.Persistence.Diagnostics.Email
@@ -53,17 +55,17 @@ namespace SanteDB.Persistence.Diagnostics.Email
     /// Persistence service for diagnostics
     /// </summary>
 #pragma warning disable CS0067
+
     [ServiceProvider("E-Mail Diagnostic (Bug) Report Submission")]
     public class DiagnosticReportPersistenceService : IDataPersistenceService<DiagnosticReport>
     {
-
         /// <summary>
         /// Gets the service name
         /// </summary>
         public string ServiceName => "E-Mail Diagnostic Report Submission";
 
         // Trace source
-        private Tracer m_traceSource = new Tracer("SanteDB.Persistence.Diagnostics.Email");
+        private readonly Tracer m_traceSource = new Tracer("SanteDB.Persistence.Diagnostics.Email");
 
         // Configuration
         private DiagnosticEmailServiceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<DiagnosticEmailServiceConfigurationSection>();
@@ -71,38 +73,47 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// Fired when an issue is being inserted
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Inserted;
+
         /// <summary>
         /// Fired when the issue is being inserted
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<DiagnosticReport>> Inserting;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Obsoleted;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<DiagnosticReport>> Obsoleting;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<QueryResultEventArgs<DiagnosticReport>> Queried;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<QueryRequestEventArgs<DiagnosticReport>> Querying;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataRetrievedEventArgs<DiagnosticReport>> Retrieved;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataRetrievingEventArgs<DiagnosticReport>> Retrieving;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Updated;
+
         /// <summary>
         /// Not supported
         /// </summary>
@@ -164,7 +175,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
 
                 var notificationService = ApplicationServiceContext.Current.GetService<INotificationService>();
                 var recipients = this.m_configuration?.Recipients.Select(o => o.StartsWith("mailto:") ? o : $"mailto:{o}").ToArray();
-                notificationService?.Send(recipients, subject, body, null,  true, attachments.ToArray());
+                notificationService?.Send(recipients, subject, body, null, true, attachments.ToArray());
 
                 // Invoke
                 this.Inserted?.Invoke(this, new DataPersistedEventArgs<DiagnosticReport>(storageData, mode, overrideAuthContext));
@@ -174,10 +185,9 @@ namespace SanteDB.Persistence.Diagnostics.Email
             }
             catch (Exception ex)
             {
-                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error sending to JIRA: {0}", ex);
+                this.m_traceSource.TraceEvent(EventLevel.Error, "Error sending to JIRA: {0}", ex);
                 throw;
             }
-
         }
 
         /// <summary>
@@ -220,6 +230,6 @@ namespace SanteDB.Persistence.Diagnostics.Email
             throw new NotImplementedException();
         }
     }
-    #pragma warning restore CS0067
 
+#pragma warning restore CS0067
 }

@@ -15,11 +15,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     /// </summary>
     public class EntityNotePersistenceService : EntityAssociationPersistenceService<EntityNote, DbEntityNote>
     {
-
         /// <summary>
         /// Note persistence service DI constructor
         /// </summary>
-        public EntityNotePersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public EntityNotePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 

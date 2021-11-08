@@ -52,7 +52,7 @@ namespace SanteDB.Rest.Common.Serialization
     public class RestErrorHandler : IServiceErrorHandler
     {
         // Error tracer
-        private Tracer m_traceSource = Tracer.GetTracer(typeof(RestErrorHandler));
+        private readonly Tracer m_traceSource = Tracer.GetTracer(typeof(RestErrorHandler));
 
         /// <summary>
         /// Handle error

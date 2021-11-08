@@ -81,7 +81,7 @@ namespace SanteDB.Server.Core.Services.Impl
         public string ServiceName => "Local (database) repository service";
 
         // Trace source
-        private Tracer m_tracer = new Tracer(SanteDBConstants.DataTraceSourceName);
+        private readonly Tracer m_tracer = new Tracer(SanteDBConstants.DataTraceSourceName);
 
         private IServiceManager m_serviceManager;
 

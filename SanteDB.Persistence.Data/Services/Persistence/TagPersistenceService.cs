@@ -15,18 +15,23 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     /// <summary>
     /// Tag persistence service
     /// </summary>
-    public class TagPersistenceService : ITagPersistenceService
+    public sealed class TagPersistenceService : ITagPersistenceService
     {
-
         // Configuration
-        private AdoPersistenceConfigurationSection m_configuration;
+        private readonly AdoPersistenceConfigurationSection m_configuration;
 
         /// <summary>
-        /// Creates a new tag persistence service 
+        /// Localization service
         /// </summary>
-        public TagPersistenceService(IConfigurationManager configurationManager)
+        private readonly ILocalizationService m_localizationService;
+
+        /// <summary>
+        /// Creates a new tag persistence service
+        /// </summary>
+        public TagPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService)
         {
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
+            this.m_localizationService = localizationService;
         }
 
         /// <summary>
@@ -39,17 +44,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public void Save(Guid sourceKey, ITag tag)
         {
-
-            if(tag == null)
+            if (tag == null)
             {
-                throw new ArgumentNullException(nameof(tag), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(tag), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
-            else if(tag.TagKey.StartsWith("$")) // transient tag don't save
+            else if (tag.TagKey.StartsWith("$")) // transient tag don't save
             {
                 return;
             }
 
-            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
                 try
                 {
@@ -57,10 +61,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                     var provenanceId = context.EstablishProvenance(AuthenticationContext.Current.Principal, null);
                     // Persist act tags
-                    if(tag is ActTag actTag)
+                    if (tag is ActTag actTag)
                     {
                         var existingTag = context.FirstOrDefault<DbActTag>(o => o.SourceKey == sourceKey && o.TagKey == tag.TagKey && o.ObsoletionTime == null);
-                        if(existingTag != null)
+                        if (existingTag != null)
                         {
                             // Update?
                             if (String.IsNullOrEmpty(tag.Value))
@@ -86,7 +90,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             });
                         }
                     }
-                    else if(tag is EntityTag entityTag)
+                    else if (tag is EntityTag entityTag)
                     {
                         var existingTag = context.FirstOrDefault<DbEntityTag>(o => o.SourceKey == sourceKey && o.TagKey == tag.TagKey && o.ObsoletionTime == null);
                         if (existingTag != null)
@@ -114,9 +118,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                                 Value = tag.Value
                             });
                         }
-                    } 
+                    }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     throw new DataPersistenceException($"Error adding tag to {sourceKey}", e);
                 }

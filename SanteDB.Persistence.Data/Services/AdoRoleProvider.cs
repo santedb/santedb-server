@@ -25,21 +25,25 @@ namespace SanteDB.Persistence.Data.Services
         public string ServiceName => "ADO.NET Role Provider Service";
 
         // Tracer
-        private Tracer m_tracer = Tracer.GetTracer(typeof(AdoRoleProvider));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoRoleProvider));
 
         // Policy enforcement
-        private IPolicyEnforcementService m_policyEnforcement;
+        private readonly IPolicyEnforcementService m_policyEnforcement;
 
         // Configuration
-        private AdoPersistenceConfigurationSection m_configuration;
+        private readonly AdoPersistenceConfigurationSection m_configuration;
+
+        // Localization service
+        private readonly ILocalizationService m_localizationService;
 
         /// <summary>
         /// ADO Role Provider
         /// </summary>
-        public AdoRoleProvider(IPolicyEnforcementService policyEnforcementService, IConfigurationManager configuration)
+        public AdoRoleProvider(IPolicyEnforcementService policyEnforcementService, IConfigurationManager configuration, ILocalizationService localizationService)
         {
             this.m_policyEnforcement = policyEnforcementService;
             this.m_configuration = configuration.GetSection<AdoPersistenceConfigurationSection>();
+            this.m_localizationService = localizationService;
         }
 
         /// <summary>
@@ -47,35 +51,35 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public void AddUsersToRoles(string[] users, string[] roles, IPrincipal principal)
         {
-            if(users == null)
+            if (users == null)
             {
-                throw new ArgumentNullException(nameof(users), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(users), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
-            else if(roles == null)
+            else if (roles == null)
             {
-                throw new ArgumentNullException(nameof(roles), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(roles), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
-            else if(principal == null)
+            else if (principal == null)
             {
-                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             this.m_policyEnforcement.Demand(PermissionPolicyIdentifiers.AlterRoles, principal);
 
-            using(var context= this.m_configuration.Provider.GetWriteConnection())
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
                 try
                 {
                     context.Open();
-                    using(var tx = context.BeginTransaction())
+                    using (var tx = context.BeginTransaction())
                     {
                         string[] lroles = roles.Select(o => o.ToLowerInvariant()).ToArray(), lusers = users.Select(o => o.ToLowerInvariant()).ToArray();
 
-                        var roleIds = context.Query<DbSecurityRole>(o => lroles.Contains(o.Name.ToLowerInvariant())).Select(o=>o.Key);
+                        var roleIds = context.Query<DbSecurityRole>(o => lroles.Contains(o.Name.ToLowerInvariant())).Select(o => o.Key);
                         var userIds = context.Query<DbSecurityUser>(o => lusers.Contains(o.UserName.ToLowerInvariant())).Select(o => o.Key);
 
-                        // Add 
-                        foreach(var rol in roleIds.SelectMany(r=>userIds.ToArray().Select(u=>new { U = u, R = r })))
+                        // Add
+                        foreach (var rol in roleIds.SelectMany(r => userIds.ToArray().Select(u => new { U = u, R = r })))
                         {
                             if (!context.Any<DbSecurityUserRole>(r => r.RoleKey == rol.R && r.UserKey == rol.U))
                                 context.Insert(new DbSecurityUserRole()
@@ -91,7 +95,7 @@ namespace SanteDB.Persistence.Data.Services
                 catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error assigning users to roles: {0}", e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_SEC_ROL_ASSIGN, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_ROL_ASSIGN), e);
                 }
             }
         }
@@ -101,18 +105,18 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public void CreateRole(string roleName, IPrincipal principal)
         {
-            if(String.IsNullOrEmpty(roleName))
+            if (String.IsNullOrEmpty(roleName))
             {
-                throw new ArgumentNullException(nameof(roleName), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(roleName), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
-            else if(principal == null)
+            else if (principal == null)
             {
-                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             this.m_policyEnforcement.Demand(PermissionPolicyIdentifiers.CreateRoles, principal);
 
-            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
                 try
                 {
@@ -126,27 +130,26 @@ namespace SanteDB.Persistence.Data.Services
                     };
 
                     dbRole = context.Insert(dbRole);
-
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error creating role: {0}", e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_ROL_CREATE_GEN, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.ROL_CREATE_GEN), e);
                 }
             }
         }
-        
+
         /// <summary>
         /// Finds a list of all users in the role
         /// </summary>
         public string[] FindUsersInRole(string role)
         {
-            if(String.IsNullOrEmpty(role))
+            if (String.IsNullOrEmpty(role))
             {
-                throw new ArgumentException(nameof(role), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentException(nameof(role), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
             {
                 try
                 {
@@ -157,12 +160,12 @@ namespace SanteDB.Persistence.Data.Services
                         .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.UserKey)
                         .InnerJoin<DbSecurityUserRole, DbSecurityRole>(o => o.RoleKey, o => o.Key)
                         .Where<DbSecurityRole>(o => o.Name.ToLowerInvariant() == role.ToLowerInvariant())
-                        ).Select(o=>o.UserName).ToArray();
+                        ).Select(o => o.UserName).ToArray();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error querying users in role: {0}", e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_ROL_QUERY, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.ROL_QUERY), e);
                 }
             }
         }
@@ -172,7 +175,7 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public string[] GetAllRoles()
         {
-            using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
             {
                 try
                 {
@@ -180,10 +183,10 @@ namespace SanteDB.Persistence.Data.Services
 
                     return context.Query<DbSecurityRole>(o => o.ObsoletionTime == null).Select(o => o.Name).ToArray();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error quering roles : {0}", e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_ROL_QUERY, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.ROL_QUERY), e);
                 }
             }
         }
@@ -195,10 +198,10 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (String.IsNullOrEmpty(userName))
             {
-                throw new ArgumentNullException(nameof(userName), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(userName), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
             {
                 try
                 {
@@ -211,12 +214,12 @@ namespace SanteDB.Persistence.Data.Services
                         .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null)
                         ).Select(o => o.Name).ToArray();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error getting roles for user: {0}", e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_ROL_QUERY, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.ROL_QUERY), e);
                 }
-            } 
+            }
         }
 
         /// <summary>
@@ -224,16 +227,16 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public bool IsUserInRole(string userName, string roleName)
         {
-            if(String.IsNullOrEmpty(userName))
+            if (String.IsNullOrEmpty(userName))
             {
-                throw new ArgumentNullException(nameof(userName), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(userName), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
-            else if(String.IsNullOrEmpty(roleName))
+            else if (String.IsNullOrEmpty(roleName))
             {
-                throw new ArgumentNullException(nameof(roleName), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(roleName), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
             {
                 try
                 {
@@ -247,10 +250,10 @@ namespace SanteDB.Persistence.Data.Services
                         .And<DbSecurityRole>(o => o.Name.ToLowerInvariant() == roleName.ToLowerInvariant())
                         );
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error fetching roles: {0}", e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_ROL_QUERY, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.ROL_QUERY), e);
                 }
             }
         }
@@ -260,34 +263,33 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public void RemoveUsersFromRoles(string[] users, string[] roles, IPrincipal principal)
         {
-            
-            if(users == null)
+            if (users == null)
             {
-                throw new ArgumentNullException(nameof(users), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(users), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
-            else if(roles == null)
+            else if (roles == null)
             {
-                throw new ArgumentNullException(nameof(roles), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(roles), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
-            else if(principal == null)
+            else if (principal == null)
             {
-                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
                 try
                 {
                     context.Open();
 
-                    using (var tx = context.BeginTransaction()) {
-
+                    using (var tx = context.BeginTransaction())
+                    {
                         string[] lroles = roles.Select(o => o.ToLowerInvariant()).ToArray(), lusers = users.Select(o => o.ToLowerInvariant()).ToArray();
 
                         var roleIds = context.Query<DbSecurityRole>(o => lroles.Contains(o.Name.ToLowerInvariant())).Select(o => o.Key);
                         var userIds = context.Query<DbSecurityUser>(o => lusers.Contains(o.UserName.ToLowerInvariant())).Select(o => o.Key);
 
-                        // Add 
+                        // Add
                         foreach (var rol in roleIds.SelectMany(r => userIds.ToArray().Select(u => new { U = u, R = r })))
                         {
                             context.Delete<DbSecurityUserRole>(o => o.UserKey == rol.U && o.RoleKey == rol.R);
@@ -296,9 +298,9 @@ namespace SanteDB.Persistence.Data.Services
                         tx.Commit();
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
-                    throw new DataPersistenceException(ErrorMessages.ERR_ROL_UNASSOC, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.ROL_UNASSOC), e);
                 }
             }
         }

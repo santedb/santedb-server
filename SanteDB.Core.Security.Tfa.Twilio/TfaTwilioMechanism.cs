@@ -46,8 +46,7 @@ namespace SanteDB.Core.Security.Tfa.Twilio
         // Configuration
         private TwilioTfaMechanismConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<TwilioTfaMechanismConfigurationSection>();
 
-        private Tracer m_tracer = new Tracer("SanteDB.Core.Security.Tfa.Twilio");
-
+        private readonly Tracer m_tracer = new Tracer("SanteDB.Core.Security.Tfa.Twilio");
 
         /// <summary>
         /// Identifier of the mechanism
@@ -78,8 +77,6 @@ namespace SanteDB.Core.Security.Tfa.Twilio
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
-
-           
 
             try
             {

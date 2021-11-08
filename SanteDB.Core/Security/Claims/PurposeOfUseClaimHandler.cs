@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security.Claims;
@@ -34,8 +35,7 @@ namespace SanteDB.Server.Core.Security.Claims
     /// </summary>
     public class PurposeOfUseClaimHandler : IClaimTypeHandler
     {
-
-        private Tracer m_traceSource = new Tracer(SanteDBConstants.SecurityTraceSourceName);
+        private readonly Tracer m_traceSource = new Tracer(SanteDBConstants.SecurityTraceSourceName);
 
         /// <summary>
         /// Gets the name of the claim being validated
@@ -57,14 +57,13 @@ namespace SanteDB.Server.Core.Security.Claims
 
             try
             {
-
                 // TODO: Validate that the "value" comes from the configured POU domain
 
                 return true;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error, e.ToString());
                 throw;
             }
         }

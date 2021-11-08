@@ -15,11 +15,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
     /// </summary>
     public class ActNotePersistenceService : ActAssociationPersistenceService<ActNote, DbActNote>
     {
-
         /// <summary>
         /// Note persistence service DI constructor
         /// </summary>
-        public ActNotePersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public ActNotePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 
@@ -38,7 +37,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override ActNote DoConvertToInformationModel(DataContext context, DbActNote dbModel, params IDbIdentified[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            if(this.m_configuration.LoadStrategy == Configuration.LoadStrategyType.FullLoad)
+            if (this.m_configuration.LoadStrategy == Configuration.LoadStrategyType.FullLoad)
             {
                 retVal.Author = base.GetRelatedPersistenceService<Entity>().Get(context, dbModel.AuthorKey, null);
             }

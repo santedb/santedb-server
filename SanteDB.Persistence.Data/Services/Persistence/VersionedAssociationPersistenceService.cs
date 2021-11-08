@@ -23,7 +23,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Creates a DI instance of hte persistence layer
         /// </summary>
-        public VersionedAssociationPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public VersionedAssociationPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 
@@ -39,13 +39,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             if (expression == null)
             {
-                throw new ArgumentException(nameof(expression), ErrorMessages.ERR_ARGUMENT_RANGE);
+                throw new ArgumentException(nameof(expression), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_RANGE));
             }
-
 
 #if DEBUG
             var sw = new Stopwatch();
@@ -53,14 +52,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             try
             {
 #endif
-                
+
                 if (!expression.ToString().Contains(nameof(IVersionedAssociation.ObsoleteVersionSequenceId)))
                 {
                     var obsoletionVersionSequenceClause = Expression.MakeMemberAccess(expression.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedAssociation.ObsoleteVersionSequenceId)));
                     expression = Expression.Lambda<Func<TModel, bool>>(Expression.And(expression.Body, Expression.MakeBinary(ExpressionType.Equal, obsoletionVersionSequenceClause, Expression.Constant(null))), expression.Parameters);
                 }
 
-                // Convert the query to a domain query so that the object persistence layer can turn the 
+                // Convert the query to a domain query so that the object persistence layer can turn the
                 // structured LINQ query into a SQL statement
                 var domainQuery = context.CreateSqlStatement().SelectFrom(typeof(TDbModel));
                 var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
@@ -98,14 +97,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected override TDbModel DoObsoleteInternal(DataContext context, Guid key)
         {
-
-            if(context == null)
+            if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
-            else if(key == default(Guid))
+            else if (key == default(Guid))
             {
-                throw new ArgumentException(ErrorMessages.ERR_ARGUMENT_RANGE, nameof(key));
+                throw new ArgumentException(this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_RANGE, nameof(key)));
             }
 
             // Versioning in place? if so obsolete is update
@@ -128,17 +126,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected override TDbModel DoInsertInternal(DataContext context, TDbModel dbModel)
         {
-            if(context == null)
+            if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (dbModel == null)
             {
-                throw new ArgumentNullException(nameof(dbModel), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(dbModel), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             // Effective seq set?
-            if(dbModel.EffectiveVersionSequenceId == default(int))
+            if (dbModel.EffectiveVersionSequenceId == default(int))
             {
                 dbModel.EffectiveVersionSequenceId = this.GetCurrentVersionSequenceForSource(context, dbModel.SourceKey);
             }
@@ -151,18 +149,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected override OrmResultSet<TDbModel> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, bool allowCache = false)
         {
-
-            if(context == null)
+            if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (query == null)
             {
-                throw new ArgumentNullException(nameof(query), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             // TODO: Write a utility function that looks for this
-            if(!query.ToString().Contains(nameof(IVersionedAssociation.ObsoleteVersionSequenceId)))
+            if (!query.ToString().Contains(nameof(IVersionedAssociation.ObsoleteVersionSequenceId)))
             {
                 var obsoletionVersionSequenceClause = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedAssociation.ObsoleteVersionSequenceId)));
                 query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, Expression.MakeBinary(ExpressionType.Equal, obsoletionVersionSequenceClause, Expression.Constant(null))), query.Parameters);

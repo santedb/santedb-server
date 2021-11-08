@@ -52,7 +52,7 @@ namespace SanteDB.Server
     internal class ServerApplicationContext : IServiceProvider, IDisposable, IApplicationServiceContext
     {
         // Tracer
-        private Tracer m_tracer = Tracer.GetTracer(typeof(ServerApplicationContext));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(ServerApplicationContext));
 
         // Lock object
         private static Object s_lockObject = new object();

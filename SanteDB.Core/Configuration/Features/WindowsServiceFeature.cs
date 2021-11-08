@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -34,7 +35,6 @@ using ServiceTools;
 
 namespace SanteDB.Server.Core.Configuration.Tasks
 {
-
     /// <summary>
     /// Represents a feature which is a windows service installer
     /// </summary>
@@ -102,7 +102,6 @@ namespace SanteDB.Server.Core.Configuration.Tasks
         /// </summary>
         public FeatureInstallState QueryState(SanteDBConfiguration configuration)
         {
-
             var options = this.Configuration as Options;
             options.ServiceName = configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.FirstOrDefault(o => o.Key == "w32instance.name")?.Value ?? options.ServiceName;
             var config = ServiceTools.ServiceInstaller.GetServiceConfig(options.ServiceName);
@@ -115,7 +114,6 @@ namespace SanteDB.Server.Core.Configuration.Tasks
         /// </summary>
         public class Options
         {
-
             /// <summary>
             /// Options
             /// </summary>
@@ -156,9 +154,8 @@ namespace SanteDB.Server.Core.Configuration.Tasks
         /// </summary>
         public class InstallTask : IConfigurationTask
         {
-
             // Tracer
-            private Tracer m_tracer = new Tracer("Windows Service Installer");
+            private readonly Tracer m_tracer = new Tracer("Windows Service Installer");
 
             /// <summary>
             /// Get the name
@@ -214,7 +211,7 @@ namespace SanteDB.Server.Core.Configuration.Tasks
                     this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, null));
                     return true;
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_tracer.TraceError("Could not install Windows Service {0} => {1}", this.m_options.ServiceName, e.Message);
                     return false;
@@ -222,7 +219,7 @@ namespace SanteDB.Server.Core.Configuration.Tasks
             }
 
             /// <summary>
-            /// Rollback 
+            /// Rollback
             /// </summary>
             public bool Rollback(SanteDBConfiguration configuration)
             {
@@ -238,7 +235,8 @@ namespace SanteDB.Server.Core.Configuration.Tasks
             /// <summary>
             /// Verify state
             /// </summary>
-            public bool VerifyState(SanteDBConfiguration configuration) {
+            public bool VerifyState(SanteDBConfiguration configuration)
+            {
                 WindowsIdentity identity = WindowsIdentity.GetCurrent();
                 WindowsPrincipal principal = new WindowsPrincipal(identity);
                 if (Environment.OSVersion.Platform == PlatformID.Win32NT)
@@ -252,9 +250,8 @@ namespace SanteDB.Server.Core.Configuration.Tasks
         /// </summary>
         public class UninstallTask : IConfigurationTask
         {
-
             // Tracer
-            private Tracer m_tracer = new Tracer("Windows Service Installer");
+            private readonly Tracer m_tracer = new Tracer("Windows Service Installer");
 
             /// <summary>
             /// Get the name
@@ -307,7 +304,7 @@ namespace SanteDB.Server.Core.Configuration.Tasks
                     this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, null));
                     return true;
                 }
-                catch(Exception e )
+                catch (Exception e)
                 {
                     this.m_tracer.TraceError("Could not uninstall Windows Service {0} - {1}", this.m_options.ServiceName, e.Message);
                     return false;
@@ -315,7 +312,7 @@ namespace SanteDB.Server.Core.Configuration.Tasks
             }
 
             /// <summary>
-            /// Rollback 
+            /// Rollback
             /// </summary>
             public bool Rollback(SanteDBConfiguration configuration)
             {
@@ -326,7 +323,6 @@ namespace SanteDB.Server.Core.Configuration.Tasks
             /// Verify state
             /// </summary>
             public bool VerifyState(SanteDBConfiguration configuration) => ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName);
-
         }
     }
 }

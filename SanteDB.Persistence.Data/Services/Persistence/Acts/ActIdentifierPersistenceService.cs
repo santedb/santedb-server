@@ -17,7 +17,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <summary>
         /// Dependency injection of configuration
         /// </summary>
-        public ActIdentifierPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public ActIdentifierPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 
@@ -37,7 +37,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override ActIdentifier DoConvertToInformationModel(DataContext context, DbActIdentifier dbModel, params IDbIdentified[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            switch(this.m_configuration.LoadStrategy)
+            switch (this.m_configuration.LoadStrategy)
             {
                 case Configuration.LoadStrategyType.SyncLoad:
                     retVal.Authority = this.GetRelatedPersistenceService<AssigningAuthority>().Get(context, dbModel.AuthorityKey, null);

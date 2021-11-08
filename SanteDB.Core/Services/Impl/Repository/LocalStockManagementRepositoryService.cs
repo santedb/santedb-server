@@ -97,7 +97,7 @@ namespace SanteDB.Server.Core.Services.Impl
 
 	        if (persistenceService == null)
 	        {
-				throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
+				throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.servicePersistence", new
                 {
                     param = nameof(IDataPersistenceService<Act>)
                 }));
@@ -116,7 +116,7 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ActParticipation>>();
             if (persistenceService == null)
-                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
+                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.servicePersistence", new
                 {
                     param = nameof(IDataPersistenceService<ActParticipation>)
                 }));

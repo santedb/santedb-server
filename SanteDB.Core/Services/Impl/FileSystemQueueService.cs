@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model.Serialization;
@@ -128,7 +129,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Queue file
         /// </summary>
-        private Tracer m_tracer = new Tracer(SanteDBConstants.QueueTraceSourceName);
+        private readonly Tracer m_tracer = new Tracer(SanteDBConstants.QueueTraceSourceName);
 
         /// <summary>
         /// Initializes the file system queue
@@ -150,7 +151,6 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public object Dequeue(string queueName)
         {
-
             if (String.IsNullOrEmpty(queueName))
                 throw new ArgumentNullException(nameof(queueName));
 
@@ -172,7 +172,6 @@ namespace SanteDB.Server.Core.Services.Impl
             File.Delete(queueFile);
             return retVal;
         }
-
 
         /// <summary>
         /// Queue an item to the queue
@@ -233,9 +232,8 @@ namespace SanteDB.Server.Core.Services.Impl
                     }
                     catch (Exception ex)
                     {
-                        this.m_tracer.TraceEvent(EventLevel.Error,  "FileSystem Watcher reported error on queue (Changed) -> {0}", ex);
+                        this.m_tracer.TraceEvent(EventLevel.Error, "FileSystem Watcher reported error on queue (Changed) -> {0}", ex);
                     }
-
                 };
                 fsWatch.Changed += (o, e) =>
                 {
@@ -245,7 +243,7 @@ namespace SanteDB.Server.Core.Services.Impl
                     }
                     catch (Exception ex)
                     {
-                        this.m_tracer.TraceEvent(EventLevel.Error,  "FileSystem Watcher reported error on queue (Changed) -> {0}", ex);
+                        this.m_tracer.TraceEvent(EventLevel.Error, "FileSystem Watcher reported error on queue (Changed) -> {0}", ex);
                     }
                 };
                 fsWatch.EnableRaisingEvents = true;
@@ -258,8 +256,6 @@ namespace SanteDB.Server.Core.Services.Impl
                 this.m_tracer.TraceInfo(">>++>> {0}", Path.GetFileNameWithoutExtension(itm));
                 this.Queued?.Invoke(this, new PersistentQueueEventArgs(queueName, Path.GetFileNameWithoutExtension(itm)));
             }
-
-
         }
 
         /// <summary>

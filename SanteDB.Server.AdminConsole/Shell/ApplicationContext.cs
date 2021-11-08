@@ -48,7 +48,7 @@ namespace SanteDB.Server.AdminConsole.Shell
     public class ApplicationContext : IServiceProvider, IApplicationServiceContext
     {
         // Tracer
-        private Tracer m_tracer = Tracer.GetTracer(typeof(ApplicationServiceContext));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(ApplicationServiceContext));
 
         /// <summary>
         /// The configuration
@@ -129,7 +129,8 @@ namespace SanteDB.Server.AdminConsole.Shell
         /// <summary>
         /// Get realm identifier
         /// </summary>
-        public string RealmId { get { return this.m_configuration.RealmId; } }
+        public string RealmId
+        { get { return this.m_configuration.RealmId; } }
 
         public bool IsRunning => true;
 

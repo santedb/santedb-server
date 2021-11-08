@@ -2,6 +2,7 @@
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
+using SanteDB.Persistence.Data.Exceptions;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,6 @@ namespace SanteDB.Persistence.Data.Security
     /// </summary>
     internal sealed class AdoUserIdentity : AdoIdentity
     {
-
         // The user which is stored in this identity
         private readonly DbSecurityUser m_securityUser;
 
@@ -31,11 +31,11 @@ namespace SanteDB.Persistence.Data.Security
             // Has the user been locked since the session was established?
             if (userData.Lockout > DateTimeOffset.Now)
             {
-                throw new SecurityException(ErrorMessages.ERR_AUTH_USR_LOCKED);
+                throw new LockedIdentityAuthenticationException();
             }
             else if (userData.ObsoletionTime.HasValue)
             {
-                throw new SecurityException(ErrorMessages.ERR_AUTH_USR_INVALID);
+                throw new InvalidIdentityAuthenticationException();
             }
 
             this.m_securityUser = userData;
@@ -60,10 +60,12 @@ namespace SanteDB.Persistence.Data.Security
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Name, this.m_securityUser.UserName));
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Sid, this.m_securityUser.Key.ToString()));
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Actor, this.m_securityUser.UserClass.ToString()));
-            if (!String.IsNullOrEmpty(this.m_securityUser.Email)) {
+            if (!String.IsNullOrEmpty(this.m_securityUser.Email))
+            {
                 this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Email, this.m_securityUser.Email));
             }
-            if (!String.IsNullOrEmpty(this.m_securityUser.PhoneNumber)) {
+            if (!String.IsNullOrEmpty(this.m_securityUser.PhoneNumber))
+            {
                 this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Telephone, this.m_securityUser.PhoneNumber));
             }
         }
@@ -73,13 +75,12 @@ namespace SanteDB.Persistence.Data.Security
         /// </summary>
         internal void AddRoleClaims(IEnumerable<String> roleNames)
         {
-            this.AddClaims(roleNames.Select(o=>new SanteDBClaim(SanteDBClaimTypes.DefaultRoleClaimType, o)));
+            this.AddClaims(roleNames.Select(o => new SanteDBClaim(SanteDBClaimTypes.DefaultRoleClaimType, o)));
         }
 
         /// <summary>
         /// Get the SID of this object
         /// </summary>
         internal override Guid Sid => this.m_securityUser.Key;
-
     }
 }

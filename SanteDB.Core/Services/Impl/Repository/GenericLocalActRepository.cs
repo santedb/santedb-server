@@ -146,7 +146,7 @@ namespace SanteDB.Server.Core.Services.Impl
         public override TAct Validate(TAct data)
         {
             if (data == null)
-                throw new ArgumentNullException(this.m_localizationService.FormatString("error.type.ArgumentNullException.param", new
+                throw new ArgumentNullException(this.m_localizationService.GetString("error.type.ArgumentNullException.param", new
                     {
                         param = nameof(data)
                     }));

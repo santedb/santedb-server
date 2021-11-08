@@ -41,32 +41,37 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Get tracer for the specified persistence class
         /// </summary>
-        protected Tracer m_tracer = Tracer.GetTracer(typeof(BasePersistenceService<TModel, TDbModel>));
+        protected readonly Tracer m_tracer = Tracer.GetTracer(typeof(BasePersistenceService<TModel, TDbModel>));
 
         /// <summary>
         /// Data caching service
         /// </summary>
-        protected IDataCachingService m_dataCacheService;
+        protected readonly IDataCachingService m_dataCacheService;
 
         /// <summary>
         /// Query persistence service
         /// </summary>
-        protected IQueryPersistenceService m_queryPersistence;
+        protected readonly IQueryPersistenceService m_queryPersistence;
 
         /// <summary>
         /// Ad-hoc caching service
         /// </summary>
-        protected IAdhocCacheService m_adhocCache;
+        protected readonly IAdhocCacheService m_adhocCache;
 
         /// <summary>
         /// Model mapper
         /// </summary>
-        protected ModelMapper m_modelMapper;
+        protected readonly ModelMapper m_modelMapper;
 
         /// <summary>
         /// Configuration reference
         /// </summary>
-        protected AdoPersistenceConfigurationSection m_configuration;
+        protected readonly AdoPersistenceConfigurationSection m_configuration;
+
+        /// <summary>
+        /// Localization service
+        /// </summary>
+        protected readonly ILocalizationService m_localizationService;
 
         /// <summary>
         /// Providers
@@ -76,12 +81,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Base persistence service
         /// </summary>
-        public BasePersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCaching = null, IQueryPersistenceService queryPersistence = null)
+        public BasePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCaching = null, IQueryPersistenceService queryPersistence = null)
         {
             this.m_dataCacheService = dataCaching;
             this.m_queryPersistence = queryPersistence;
             this.m_adhocCache = adhocCacheService;
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
+            this.m_localizationService = localizationService;
             this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
         }
 
@@ -229,11 +235,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (data == default(TModel))
             {
-                throw new ArgumentNullException(nameof(data), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(data), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             data = this.PrepareReferences(context, data);
@@ -265,11 +271,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (data == default(TModel))
             {
-                throw new ArgumentNullException(nameof(data), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(data), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             data = this.PrepareReferences(context, data);
@@ -302,11 +308,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (expression == null)
             {
-                throw new ArgumentNullException(nameof(expression), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(expression), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
 #if PERFMON
@@ -333,7 +339,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
 #if PERFMON
@@ -362,7 +368,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (key == Guid.Empty) // empty get
             {
@@ -416,7 +422,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (query == null)
             {
-                throw new ArgumentNullException(nameof(query), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             using (var context = this.Provider.GetReadonlyConnection())
@@ -434,7 +440,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 catch (Exception e)
                 {
                     this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing count operation", query, e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_DATA_GENERAL, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
                 }
             }
         }
@@ -446,7 +452,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             bool retVal = false;
@@ -483,7 +489,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (principal == null)
             {
-                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             // Pre-persistence object argument
@@ -517,7 +523,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     catch (Exception e)
                     {
                         this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing get operation", key, e);
-                        throw new DataPersistenceException(ErrorMessages.ERR_DATA_GENERAL, e);
+                        throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
                     }
                 }
             }
@@ -537,7 +543,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             else
             {
-                throw new ArgumentException(nameof(data), ErrorMessages.ERR_ARGUMENT_INCOMPATIBLE_TYPE.Format(typeof(TModel)));
+                throw new ArgumentException(nameof(data), String.Format(ErrorMessages.ARGUMENT_INVALID_TYPE, typeof(TModel), data.GetType()));
             }
         }
 
@@ -552,11 +558,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (data == default(TModel))
             {
-                throw new ArgumentNullException(nameof(data), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(data), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (principal == null)
             {
-                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             // Fire pre-event
@@ -621,7 +627,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 catch (Exception e)
                 {
                     this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing insert operation", data, e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_DATA_GENERAL, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
                 }
             }
         }
@@ -641,11 +647,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (expression == null)
             {
-                throw new ArgumentNullException(nameof(expression), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(expression), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             if (principal == null)
             {
-                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             using (var context = this.Provider.GetWriteConnection())
@@ -675,7 +681,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 catch (Exception e)
                 {
                     this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing obsolete all operation", expression, e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_DATA_GENERAL, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
                 }
             }
         }
@@ -691,7 +697,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (principal == null)
             {
-                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             var preEvent = new DataPersistingEventArgs<TModel>(new TModel() { Key = id }, mode, principal);
@@ -738,7 +744,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 catch (Exception e)
                 {
                     this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing obsolete operation", id, e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_DATA_GENERAL, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
                 }
             }
         }
@@ -756,7 +762,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             else
             {
-                throw new ArgumentException(nameof(query), ErrorMessages.ERR_ARGUMENT_INCOMPATIBLE_TYPE.Format(typeof(Expression<Func<TModel, bool>>)));
+                throw new ArgumentException(nameof(query), String.Format(ErrorMessages.ARGUMENT_INVALID_TYPE, typeof(Expression<Func<TModel, bool>>), query.GetType()));
             }
         }
 
@@ -771,7 +777,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             else
             {
-                throw new ArgumentException(nameof(query), ErrorMessages.ERR_ARGUMENT_INCOMPATIBLE_TYPE.Format(typeof(Expression<Func<TModel, bool>>)));
+                throw new ArgumentException(nameof(query), String.Format(ErrorMessages.ARGUMENT_INVALID_TYPE, typeof(Expression<Func<TModel, bool>>), query.GetType()));
             }
         }
 
@@ -782,11 +788,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (query == null)
             {
-                throw new ArgumentNullException(nameof(query), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             if (principal == null)
             {
-                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             var preEvt = new QueryRequestEventArgs<TModel>(query, principal);
@@ -815,7 +821,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 catch (Exception e)
                 {
                     this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing query operation", query, e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_DATA_GENERAL, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
                 }
             }
         }
@@ -869,7 +875,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             else if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             if (domainInstance is TDbModel dbModel)
             {
@@ -877,7 +883,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             else
             {
-                throw new ArgumentOutOfRangeException(nameof(domainInstance), ErrorMessages.ERR_ARGUMENT_INCOMPATIBLE_TYPE.Format(typeof(TDbModel)));
+                throw new ArgumentException(nameof(domainInstance), String.Format(ErrorMessages.ARGUMENT_INVALID_TYPE, typeof(TDbModel), domainInstance.GetType()));
             }
         }
 
@@ -892,7 +898,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             else
             {
-                throw new ArgumentException(nameof(data), ErrorMessages.ERR_ARGUMENT_INCOMPATIBLE_TYPE.Format(typeof(TModel)));
+                throw new ArgumentException(nameof(data), String.Format(ErrorMessages.ARGUMENT_INVALID_TYPE, typeof(TModel), data.GetType()));
             }
         }
 
@@ -907,11 +913,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (data == default(TModel))
             {
-                throw new ArgumentNullException(nameof(data), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(data), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (principal == null)
             {
-                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             var preEvt = new DataPersistingEventArgs<TModel>(data, mode, principal);
@@ -966,7 +972,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 catch (Exception e)
                 {
                     this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing update operation", data, e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_DATA_GENERAL, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
                 }
             }
         }
@@ -1048,7 +1054,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (result == null)
             {
@@ -1061,7 +1067,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             else
             {
-                throw new ArgumentException(nameof(result), ErrorMessages.ERR_ARGUMENT_INCOMPATIBLE_TYPE);
+                throw new ArgumentException(nameof(result), String.Format(ErrorMessages.ARGUMENT_INVALID_TYPE, typeof(TDbModel), result.GetType()));
             }
         }
 
@@ -1080,7 +1086,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (sortExpression == null)
             {
-                throw new ArgumentNullException(nameof(sortExpression), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(sortExpression), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             return this.m_modelMapper.MapModelExpression<TModel, TDbModel, dynamic>(sortExpression);
         }
@@ -1118,7 +1124,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (data == default(TData))
             {
@@ -1134,7 +1140,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
                 else
                 {
-                    throw new KeyNotFoundException(ErrorMessages.ERR_RELATED_OBJECT_NOT_FOUND.Format(typeof(TData).Name, data.Key));
+                    throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.RELATED_OBJECT_NOT_FOUND, new { name = typeof(TData).Name, source = data.Key }));
                 }
             }
             else

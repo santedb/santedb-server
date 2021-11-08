@@ -15,9 +15,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <summary>
         /// Persist the template definition to the database
         /// </summary>
-        public TemplateDefinitionPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public TemplateDefinitionPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
-
     }
 }

@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Security;
@@ -44,7 +45,6 @@ namespace SanteDB.Server.Security.Tfa.Email
     /// </summary>
     public class TfaEmailMechanism : ITfaMechanism
     {
-
         private ITwoFactorSecretGenerator m_twoFactorSecretGenerator;
 
         private IIdentityProviderService m_identityProvider;
@@ -62,7 +62,7 @@ namespace SanteDB.Server.Security.Tfa.Email
         }
 
         // Tracer
-        private Tracer m_tracer = Tracer.GetTracer(typeof(TfaEmailMechanism));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(TfaEmailMechanism));
 
         /// <summary>
         /// Get the identifier for the challenge
@@ -107,7 +107,6 @@ namespace SanteDB.Server.Security.Tfa.Email
 
             if (user is IClaimsIdentity ci)
             {
-
                 // Get user's e-mail
                 var email = ci.FindFirst(SanteDBClaimTypes.Email)?.Value;
                 if (email == null)
@@ -117,7 +116,7 @@ namespace SanteDB.Server.Security.Tfa.Email
 
                 // Save secret
                 this.m_identityProvider.AddClaim(user.Name, new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, this.m_hashingProvider.ComputeHash(secret)), AuthenticationContext.SystemPrincipal, new TimeSpan(0, 5, 0));
-                // Send 
+                // Send
                 var template = filler.FillTemplate("tfa.email", language, new
                 {
                     user = user,

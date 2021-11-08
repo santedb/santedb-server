@@ -33,7 +33,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Generate the specified constructor
         /// </summary>
-        public VersionedDataPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public VersionedDataPersistenceService(IConfigurationManager configurationManager,
+            ILocalizationService localizationService,
+            IAdhocCacheService adhocCacheService = null,
+            IDataCachingService dataCachingService = null,
+            IQueryPersistenceService queryPersistence = null
+            ) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 
@@ -164,7 +169,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             TDbModel retVal = default(TDbModel);
@@ -219,11 +224,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (dbModel == null)
             {
-                throw new ArgumentNullException(nameof(dbModel), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(dbModel), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
 #if DEBUG
@@ -266,11 +271,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (model == null)
             {
-                throw new ArgumentNullException(nameof(model), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(model), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
 #if DEBUG
@@ -285,7 +290,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                 if (!existing.Any())
                 {
-                    throw new KeyNotFoundException(ErrorMessages.ERR_NOT_FOUND.Format(model));
+                    throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { type = typeof(TModel).Name, id = model.Key }));
                 }
 
                 // Are we creating a new verison? or no?
@@ -335,11 +340,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             if (expression == null)
             {
-                throw new ArgumentException(nameof(expression), ErrorMessages.ERR_ARGUMENT_RANGE);
+                throw new ArgumentException(nameof(expression), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_RANGE));
             }
 
 #if DEBUG
@@ -409,11 +414,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (key == Guid.Empty)
             {
-                throw new ArgumentException(ErrorMessages.ERR_MISSING_ARGUMENT, nameof(key));
+                throw new ArgumentException(this.m_localizationService.GetString(ErrorMessageStrings.MISSING_ARGUMENT, nameof(key)));
             }
 
             // Perform the obsoletion
@@ -431,7 +436,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     var existing = context.Query<TDbModel>(o => o.Key == key).OrderByDescending(o => o.VersionSequenceId).FirstOrDefault();
                     if (existing == null)
                     {
-                        throw new KeyNotFoundException(ErrorMessages.ERR_NOT_FOUND.Format(key));
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { type = typeof(TModel).Name, id = key }));
                     }
 
                     // Set status to obsolete and create a new version (redirect to update)
@@ -474,11 +479,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (query == null)
             {
-                throw new ArgumentNullException(nameof(query), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             // First - we determine if the query has an explicit status concept set
@@ -519,7 +524,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             var persistenceService = base.GetRelatedPersistenceService<TModelAssociation>();
             if (persistenceService == null)
             {
-                throw new DataPersistenceException(ErrorMessages.ERR_ARGUMENT_INCOMPATIBLE_TYPE.Format(typeof(IAdoPersistenceProvider<TModelAssociation>), typeof(IDataPersistenceService<TModelAssociation>)));
+                throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.RELATED_OBJECT_NOT_AVAILABLE, new { related = typeof(TModelAssociation), source = typeof(TModel) }));
             }
 
             // Next we want to perform a relationship query to establish what is being loaded and what is being persisted

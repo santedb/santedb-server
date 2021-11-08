@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
@@ -36,12 +37,12 @@ using System.Text;
 namespace SanteDB.Server.Core.Security.Attribute
 {
     /// <summary>
-    /// Represents a security attribute which requires that a user be in the possession of a 
+    /// Represents a security attribute which requires that a user be in the possession of a
     /// particular claim
     /// </summary>
     public class PolicyPermissionAttribute : CodeAccessSecurityAttribute
     {
-        private Tracer m_traceSource = new Tracer(SanteDBConstants.SecurityTraceSourceName);
+        private readonly Tracer m_traceSource = new Tracer(SanteDBConstants.SecurityTraceSourceName);
 
         /// <summary>
         /// Creates a policy permission attribute
@@ -59,12 +60,12 @@ namespace SanteDB.Server.Core.Security.Attribute
         }
 
         /// <summary>
-        /// The claim type which the user must 
+        /// The claim type which the user must
         /// </summary>
         public String PolicyId { get; set; }
 
         /// <summary>
-        /// Permission 
+        /// Permission
         /// </summary>
         public override System.Security.IPermission CreatePermission()
         {
@@ -79,14 +80,14 @@ namespace SanteDB.Server.Core.Security.Attribute
     [Serializable, Obsolete("Use IPolicyEnforcementService", true)]
     public class PolicyPermission : System.Security.IPermission, IUnrestrictedPermission
     {
-
         // True if unrestricted
         private bool m_isUnrestricted;
+
         private String m_policyId;
         private IPrincipal m_principal;
 
         // Security
-        private Tracer m_traceSource = new Tracer(SanteDBConstants.SecurityTraceSourceName);
+        private readonly Tracer m_traceSource = new Tracer(SanteDBConstants.SecurityTraceSourceName);
 
         /// <summary>
         /// Policy permission
@@ -130,7 +131,6 @@ namespace SanteDB.Server.Core.Security.Attribute
             }
         }
 
-
         /// <summary>
         /// Demand softly (dont' throw)
         /// </summary>
@@ -148,7 +148,7 @@ namespace SanteDB.Server.Core.Security.Attribute
                 return PolicyGrantType.Deny;
             else
             {
-                if (pdp == null) // No way to verify 
+                if (pdp == null) // No way to verify
                     action = PolicyGrantType.Deny;
                 else if (pdp != null)
                     action = pdp.GetPolicyOutcome(principal, this.m_policyId);
@@ -156,9 +156,9 @@ namespace SanteDB.Server.Core.Security.Attribute
 
             this.m_traceSource.TraceVerbose("Policy Enforce: {0}({1}) = {2}", principal?.Identity?.Name, this.m_policyId, action);
 
-            
             return action;
         }
+
         /// <summary>
         /// From XML
         /// </summary>
@@ -228,7 +228,6 @@ namespace SanteDB.Server.Core.Security.Attribute
             element.AddAttribute("Policy", this.m_policyId);
             element.AddAttribute("Principal", this.m_principal.Identity.Name);
             return element;
-
         }
 
         public System.Security.IPermission Union(System.Security.IPermission target)

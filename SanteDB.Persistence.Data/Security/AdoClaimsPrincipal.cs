@@ -13,7 +13,6 @@ namespace SanteDB.Persistence.Data.Security
     /// </summary>
     internal class AdoClaimsPrincipal : IClaimsPrincipal
     {
-
         // The identity of the principal
         private AdoIdentity m_identity;
 
@@ -21,13 +20,13 @@ namespace SanteDB.Persistence.Data.Security
         /// Create a claims principal
         /// </summary>
         /// <param name="focalIdentity">The focal identity (the primary identity)</param>
-        internal AdoClaimsPrincipal(AdoIdentity focalIdentity) 
+        internal AdoClaimsPrincipal(AdoIdentity focalIdentity)
         {
             this.m_identity = focalIdentity;
         }
 
         /// <summary>
-        /// Get claims 
+        /// Get claims
         /// </summary>
         public IEnumerable<IClaim> Claims => this.m_identity.Claims;
 
@@ -72,9 +71,9 @@ namespace SanteDB.Persistence.Data.Security
         /// </summary>
         public bool IsInRole(string role)
         {
-            if(String.IsNullOrEmpty(role))
+            if (String.IsNullOrEmpty(role))
             {
-                throw new ArgumentNullException(nameof(role), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(role));
             }
             return this.Claims.Any(c => c.Type == SanteDBClaimTypes.DefaultRoleClaimType && c.Value.Equals(role, StringComparison.OrdinalIgnoreCase));
         }

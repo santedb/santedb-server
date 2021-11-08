@@ -20,30 +20,27 @@ namespace SanteDB.Persistence.Data.Test
     [TestFixture(Category = "Persistence", TestName = "ADO Dev Identity Provider")]
     public class AdoDeviceIdentityProviderTest : DataPersistenceTest
     {
-
         /// <summary>
         /// Verifies that a device entity can be persisted properly
         /// </summary>
         [Test]
         public void TestCreateDeviceIdentity()
         {
-
             var serviceProvider = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>();
             // Pre-Condition
             Assert.IsNull(serviceProvider.GetIdentity("TEST_DEV_001"));
 
-            // Create the device identity 
+            // Create the device identity
             var appIdentity = serviceProvider.CreateIdentity("TEST_DEV_001", "THIS_IS_A_SECRET", AuthenticationContext.SystemPrincipal);
             Assert.IsNotNull(appIdentity);
             Assert.AreEqual("TEST_DEV_001", appIdentity.Name);
             Assert.IsFalse(appIdentity.IsAuthenticated);
 
             // When creating an identity the policies in group DeviceS are automatically applied to the client
-
         }
 
         /// <summary>
-        /// Tests that a regular principal cannot create 
+        /// Tests that a regular principal cannot create
         /// </summary>
         [Test]
         public void TestNonPrivCannotCreate()
@@ -52,7 +49,7 @@ namespace SanteDB.Persistence.Data.Test
             // Pre-Condition
             Assert.IsNull(serviceProvider.GetIdentity("TEST_DEV_002"));
 
-            // Create the device identity 
+            // Create the device identity
             try
             {
                 var appIdentity = serviceProvider.CreateIdentity("TEST_DEV_002", "THIS_IS_A_SECRET", AuthenticationContext.AnonymousPrincipal);
@@ -61,7 +58,6 @@ namespace SanteDB.Persistence.Data.Test
             catch (PolicyViolationException e)
             {
                 Assert.AreEqual(PermissionPolicyIdentifiers.CreateDevice, e.PolicyId);
-
             }
             catch (Exception)
             {
@@ -81,7 +77,7 @@ namespace SanteDB.Persistence.Data.Test
             // Pre-Condition
             Assert.IsNull(serviceProvider.GetIdentity("TEST_DEV_003"));
 
-            // Create the device identity 
+            // Create the device identity
             var appIdentity = serviceProvider.CreateIdentity("TEST_DEV_003", "THIS_IS_A_SECRET", AuthenticationContext.SystemPrincipal);
             Assert.IsNotNull(appIdentity);
             Assert.AreEqual("TEST_DEV_003", appIdentity.Name);
@@ -99,12 +95,11 @@ namespace SanteDB.Persistence.Data.Test
         [Test]
         public void TestAuthenticateSuccess()
         {
-
             var serviceProvider = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>();
             // Pre-Condition
             Assert.IsNull(serviceProvider.GetIdentity("TEST_DEV_004"));
 
-            // Create the device identity 
+            // Create the device identity
             serviceProvider.CreateIdentity("TEST_DEV_004", "THIS_IS_A_SECRET", AuthenticationContext.SystemPrincipal);
 
             // Authenticate
@@ -130,7 +125,7 @@ namespace SanteDB.Persistence.Data.Test
             // Pre-Condition
             Assert.IsNull(serviceProvider.GetIdentity("TEST_DEV_005"));
 
-            // Create the device identity 
+            // Create the device identity
             serviceProvider.CreateIdentity("TEST_DEV_005", "THIS_IS_A_SECRET", AuthenticationContext.SystemPrincipal);
 
             // Authenticate
@@ -152,7 +147,7 @@ namespace SanteDB.Persistence.Data.Test
                 serviceProvider.Authenticate("TEST_DEV_005", "THIS_IS_A_SECRET");
                 Assert.Fail("Authentication should have failed");
             }
-            catch (AuthenticationException e) when (e.Message == ErrorMessages.ERR_AUTH_DEV_LOCKED)
+            catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_DEV_LOCKED))
             {
             }
             catch
@@ -167,12 +162,11 @@ namespace SanteDB.Persistence.Data.Test
         [Test]
         public void TestChangeOwnPass()
         {
-
             var serviceProvider = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>();
             // Pre-Condition
             Assert.IsNull(serviceProvider.GetIdentity("TEST_DEV_006"));
 
-            // Create the device identity 
+            // Create the device identity
             serviceProvider.CreateIdentity("TEST_DEV_006", "THIS_IS_A_SECRET", AuthenticationContext.SystemPrincipal);
 
             // Authenticate
@@ -196,7 +190,6 @@ namespace SanteDB.Persistence.Data.Test
                 }
                 catch
                 {
-
                 }
             }
             catch
@@ -204,7 +197,6 @@ namespace SanteDB.Persistence.Data.Test
                 Assert.Fail("Authentication failed");
             }
         }
-
 
         /// <summary>
         /// Tests that the lockout is set and cleared
@@ -216,12 +208,11 @@ namespace SanteDB.Persistence.Data.Test
             // Pre-Condition
             Assert.IsNull(serviceProvider.GetIdentity("TEST_DEV_008"));
 
-            // Create the device identity 
+            // Create the device identity
             serviceProvider.CreateIdentity("TEST_DEV_008", "THIS_IS_A_SECRET", AuthenticationContext.SystemPrincipal);
 
             try
             {
-
                 serviceProvider.Authenticate("TEST_DEV_008", "THIS_IS_A_SECRET");
             }
             catch
@@ -236,9 +227,8 @@ namespace SanteDB.Persistence.Data.Test
                 serviceProvider.Authenticate("TEST_DEV_008", "THIS_IS_A_SECRET");
                 Assert.Fail("Lockout should be active");
             }
-            catch (AuthenticationException e) when (e.Message == ErrorMessages.ERR_AUTH_DEV_LOCKED)
+            catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_DEV_LOCKED))
             {
-
             }
             catch
             {
@@ -251,7 +241,7 @@ namespace SanteDB.Persistence.Data.Test
             {
                 serviceProvider.Authenticate("TEST_DEV_008", "THIS_IS_A_SECRET");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Assert.Fail("Should have authenticated");
             }
@@ -263,12 +253,11 @@ namespace SanteDB.Persistence.Data.Test
         [Test]
         public void TestShouldNotAllowUnauthenticatedIdentity()
         {
-
             var serviceProvider = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>();
             // Pre-Condition
             Assert.IsNull(serviceProvider.GetIdentity("TEST_DEV_012"));
 
-            // Create the device identity 
+            // Create the device identity
             serviceProvider.CreateIdentity("TEST_DEV_012", "THIS_IS_A_SECRET", AuthenticationContext.SystemPrincipal);
             var identity = serviceProvider.GetIdentity("TEST_DEV_012");
             var principal = new GenericPrincipal(identity, new string[] { "ADMINISTRATORS" });
@@ -280,7 +269,6 @@ namespace SanteDB.Persistence.Data.Test
             }
             catch
             {
-
             }
 
             try
@@ -290,7 +278,6 @@ namespace SanteDB.Persistence.Data.Test
             }
             catch
             {
-
             }
         }
 
@@ -300,8 +287,7 @@ namespace SanteDB.Persistence.Data.Test
         [Test]
         public void TestShouldPreventAuthentication()
         {
-
-            // Create the device identity 
+            // Create the device identity
             var serviceProvider = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>();
             serviceProvider.CreateIdentity("TEST_DEV_013", "THIS_IS_A_SECRET", AuthenticationContext.SystemPrincipal);
 
@@ -316,15 +302,13 @@ namespace SanteDB.Persistence.Data.Test
                 serviceProvider.Authenticate("TEST_DEV_013", "THIS_IS_A_SECRET");
                 Assert.Fail("Should have cancelled authentication");
             }
-            catch(AuthenticationException e) when (e.Message == ErrorMessages.ERR_AUTH_CANCELLED)
+            catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_CANCELLED))
             {
-
             }
             catch
             {
                 Assert.Fail("Incorrect exception thrown");
             }
         }
-    
     }
 }

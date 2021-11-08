@@ -9,6 +9,7 @@ using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Configuration;
+using SanteDB.Persistence.Data.Exceptions;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Security;
 using System;
@@ -41,27 +42,31 @@ namespace SanteDB.Persistence.Data.Services
         public event EventHandler<AuthenticatingEventArgs> Authenticating;
 
         // Tracer
-        private Tracer m_tracer = Tracer.GetTracer(typeof(AdoApplicationIdentityProvider));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoApplicationIdentityProvider));
 
         // Configuration
-        private AdoPersistenceConfigurationSection m_configuration;
+        private readonly AdoPersistenceConfigurationSection m_configuration;
 
-        // Security configuration 
-        private SecurityConfigurationSection m_securityConfiguration;
+        // Security configuration
+        private readonly SecurityConfigurationSection m_securityConfiguration;
 
         // Pep service
-        private IPolicyEnforcementService m_pepService;
+        private readonly IPolicyEnforcementService m_pepService;
 
         // Symm provider
-        private ISymmetricCryptographicProvider m_symmetricCryptographicProvider;
+        private readonly ISymmetricCryptographicProvider m_symmetricCryptographicProvider;
+
+        // Localization service
+        private readonly ILocalizationService m_localizationService;
 
         // Hasher
-        private IPasswordHashingService m_hasher;
+        private readonly IPasswordHashingService m_hasher;
 
         /// <summary>
         /// Creates a new application identity provider
         /// </summary>
         public AdoApplicationIdentityProvider(IConfigurationManager configurationManager,
+            ILocalizationService localizationService,
             IPasswordHashingService hashingService,
             IPolicyEnforcementService pepService,
             ISymmetricCryptographicProvider symmetricCryptographicProvider)
@@ -71,10 +76,11 @@ namespace SanteDB.Persistence.Data.Services
             this.m_hasher = hashingService;
             this.m_pepService = pepService;
             this.m_symmetricCryptographicProvider = symmetricCryptographicProvider;
+            this.m_localizationService = localizationService;
         }
 
         /// <summary>
-        /// Authenticates the specified application using the application id an secret 
+        /// Authenticates the specified application using the application id an secret
         /// </summary>
         /// <param name="applicationId">The application public id</param>
         /// <param name="applicationSecret">The secret passphrase for the application</param>
@@ -84,11 +90,11 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (String.IsNullOrEmpty(applicationId))
             {
-                throw new ArgumentNullException(nameof(applicationId), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(applicationId), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             if (String.IsNullOrEmpty(applicationSecret))
             {
-                throw new ArgumentNullException(nameof(applicationSecret), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(applicationSecret), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             // Notify login
@@ -103,7 +109,7 @@ namespace SanteDB.Persistence.Data.Services
                 }
                 else
                 {
-                    throw new AuthenticationException(ErrorMessages.ERR_AUTH_CANCELLED);
+                    throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_CANCELLED));
                 }
             }
 
@@ -118,18 +124,18 @@ namespace SanteDB.Persistence.Data.Services
                     var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationId.ToLowerInvariant() && o.ObsoletionTime == null);
                     if (app == null)
                     {
-                        throw new AuthenticationException(ErrorMessages.ERR_AUTH_APP_INVALID);
+                        throw new InvalidIdentityAuthenticationException();
                     }
 
                     // Locked?
                     if (app.Lockout.GetValueOrDefault() > DateTimeOffset.Now)
                     {
-                        throw new AuthenticationException(ErrorMessages.ERR_AUTH_APP_LOCKED);
+                        throw new LockedIdentityAuthenticationException();
                     }
 
                     var pepperSecret = this.m_configuration.GetPepperCombos(applicationSecret).Select(o => this.m_hasher.ComputeHash(o));
                     // Pepper authentication
-                    if (!context.Any<DbSecurityApplication>(a=>a.PublicId.ToLowerInvariant() == applicationId.ToLower() && pepperSecret.Contains(a.Secret)))
+                    if (!context.Any<DbSecurityApplication>(a => a.PublicId.ToLowerInvariant() == applicationId.ToLower() && pepperSecret.Contains(a.Secret)))
                     {
                         app.InvalidAuthAttempts = app.InvalidAuthAttempts.GetValueOrDefault() + 1;
 
@@ -142,18 +148,17 @@ namespace SanteDB.Persistence.Data.Services
                             }
                         }
                         context.Update(app);
-                        throw new AuthenticationException(ErrorMessages.ERR_AUTH_APP_INVALID);
+                        throw new InvalidIdentityAuthenticationException();
                     }
 
-                    // Re-pepper the password 
+                    // Re-pepper the password
                     app.LastAuthentication = DateTimeOffset.Now;
-                    app.Secret = this.m_hasher.ComputeHash( this.m_configuration.AddPepper(applicationSecret));
-
+                    app.Secret = this.m_hasher.ComputeHash(this.m_configuration.AddPepper(applicationSecret));
 
                     // Construct an identity and login
                     var retVal = new AdoClaimsPrincipal(new AdoApplicationIdentity(app, "LOCAL"));
 
-                    // Demand login as a service 
+                    // Demand login as a service
                     this.m_pepService.Demand(PermissionPolicyIdentifiers.LoginAsService, retVal);
 
                     context.Update(app);
@@ -161,6 +166,16 @@ namespace SanteDB.Persistence.Data.Services
                     this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(applicationId, retVal, true));
 
                     return retVal;
+                }
+                catch (LockedIdentityAuthenticationException)
+                {
+                    this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(applicationId, null, false));
+                    throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_LOCKED));
+                }
+                catch (InvalidIdentityAuthenticationException)
+                {
+                    this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(applicationId, null, false));
+                    throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_INVALID));
                 }
                 catch (AuthenticationException)
                 {
@@ -171,7 +186,7 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(applicationId, null, false));
                     this.m_tracer.TraceError("Could not authenticate application {0} - {1}", applicationId, e);
-                    throw new AuthenticationException(ErrorMessages.ERR_AUTH_APP_GENERAL, e);
+                    throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_GENERAL), e);
                 }
             }
         }
@@ -186,15 +201,15 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (String.IsNullOrEmpty(name))
             {
-                throw new ArgumentNullException(nameof(name), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(name), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (String.IsNullOrEmpty(secret))
             {
-                throw new ArgumentNullException(nameof(secret), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(secret), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (principal == null)
             {
-                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             // Rule - Application can change its own password or ALTER_IDENTITY
@@ -213,7 +228,7 @@ namespace SanteDB.Persistence.Data.Services
                     var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
                     if (app == null)
                     {
-                        throw new KeyNotFoundException(ErrorMessages.ERR_NOT_FOUND);
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND));
                     }
 
                     app.Secret = this.m_hasher.ComputeHash(this.m_configuration.AddPepper(secret));
@@ -225,13 +240,13 @@ namespace SanteDB.Persistence.Data.Services
                 catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error updating secret for {0} - {1}", name, e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_UPDATE_SECRET, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.UPDATE_SECRET), e);
                 }
             }
         }
 
         /// <summary>
-        /// Get the specified identity 
+        /// Get the specified identity
         /// </summary>
         /// <param name="name">The name of the identity to retrieve</param>
         /// <returns>The constructed, unauthenticated identity</returns>
@@ -239,7 +254,7 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (String.IsNullOrEmpty(name))
             {
-                throw new ArgumentNullException(nameof(name), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(name), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             using (var context = this.m_configuration.Provider.GetReadonlyConnection())
@@ -257,7 +272,7 @@ namespace SanteDB.Persistence.Data.Services
                 catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error fetching identity for {0}", name);
-                    throw new DataPersistenceException(ErrorMessages.ERR_FETCH_APPLICATION, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.FETCH_APPLICATION), e);
                 }
             }
         }
@@ -272,7 +287,7 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (String.IsNullOrEmpty(name))
             {
-                throw new ArgumentNullException(nameof(name), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(name), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             // Get key
@@ -284,7 +299,7 @@ namespace SanteDB.Persistence.Data.Services
                     var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant());
                     if (app == null)
                     {
-                        throw new KeyNotFoundException(ErrorMessages.ERR_NOT_FOUND);
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND));
                     }
 
                     // Key is null
@@ -302,7 +317,7 @@ namespace SanteDB.Persistence.Data.Services
                 catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error fetching security information for {0}", name);
-                    throw new DataPersistenceException(ErrorMessages.ERR_FETCH_APPLICATION_KEY, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.FETCH_APPLICATION_KEY), e);
                 }
             }
         }
@@ -317,11 +332,11 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (String.IsNullOrEmpty(name))
             {
-                throw new ArgumentNullException(nameof(name), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(name), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (principal == null)
             {
-                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             if (!principal.Identity.IsAuthenticated || principal != AuthenticationContext.SystemPrincipal)
@@ -339,7 +354,7 @@ namespace SanteDB.Persistence.Data.Services
                     var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
                     if (app == null)
                     {
-                        throw new KeyNotFoundException(ErrorMessages.ERR_NOT_FOUND);
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND));
                     }
 
                     if (lockoutState)
@@ -357,25 +372,24 @@ namespace SanteDB.Persistence.Data.Services
                 catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error updating lockout state for {0}", name);
-                    throw new DataPersistenceException(ErrorMessages.ERR_SET_LOCKOUT, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SET_LOCKOUT), e);
                 }
             }
-
         }
 
         /// <summary>
         /// Create the specified identity
         /// </summary>
-        
+
         public IApplicationIdentity CreateIdentity(string applicationName, string password, IPrincipal principal)
         {
-            if(String.IsNullOrEmpty(applicationName))
+            if (String.IsNullOrEmpty(applicationName))
             {
-                throw new ArgumentNullException(nameof(applicationName), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(applicationName), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
-            if(principal == null)
+            if (principal == null)
             {
-                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateApplication, principal);
@@ -388,7 +402,7 @@ namespace SanteDB.Persistence.Data.Services
 
                     using (var tx = context.BeginTransaction())
                     {
-                        // Is password null? If so generate new 
+                        // Is password null? If so generate new
                         if (String.IsNullOrEmpty(password))
                         {
                             password = BitConverter.ToString(Guid.NewGuid().ToByteArray()).Replace("-", "");
@@ -427,7 +441,7 @@ namespace SanteDB.Persistence.Data.Services
                 catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error creating identity {0}", applicationName);
-                    throw new DataPersistenceException(ErrorMessages.ERR_AUTH_APP_CREATE, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_CREATE), e);
                 }
             }
         }
@@ -437,26 +451,26 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public Guid GetSid(string name)
         {
-            if(String.IsNullOrEmpty(name))
+            if (String.IsNullOrEmpty(name))
             {
-                throw new ArgumentNullException(nameof(name), ErrorMessages.ERR_ARGUMENT_NULL);
-            }    
-            using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+                throw new ArgumentNullException(nameof(name), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
             {
                 try
                 {
                     context.Open();
                     var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null)?.Key;
-                    if(!app.HasValue)
+                    if (!app.HasValue)
                     {
-                        throw new KeyNotFoundException(ErrorMessages.ERR_NOT_FOUND);
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND));
                     }
                     return app.Value;
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error fetching SID for {0}", name);
-                    throw new DataPersistenceException(ErrorMessages.ERR_DATA_GENERAL, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
                 }
             }
         }
@@ -466,31 +480,31 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public void SetPublicKey(string name, byte[] key, IPrincipal principal)
         {
-            if(String.IsNullOrEmpty(name))
+            if (String.IsNullOrEmpty(name))
             {
-                throw new ArgumentNullException(nameof(name), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(name), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
-            if(key == null || key.Length == 0)
+            if (key == null || key.Length == 0)
             {
-                throw new ArgumentException(nameof(key), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentException(nameof(key), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            // Must be self or have unrestricted 
+            // Must be self or have unrestricted
             if (!principal.Identity.IsAuthenticated || !principal.Identity.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
             {
                 this.m_pepService.Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration, principal);
             }
 
-            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
                 try
                 {
                     context.Open();
 
                     var dbApp = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
-                    if(dbApp == null)
+                    if (dbApp == null)
                     {
-                        throw new KeyNotFoundException(ErrorMessages.ERR_FETCH_APPLICATION_KEY);
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.FETCH_APPLICATION_KEY));
                     }
 
                     var iv = this.m_symmetricCryptographicProvider.GenerateIV();
@@ -505,13 +519,12 @@ namespace SanteDB.Persistence.Data.Services
 
                     context.Update(dbApp);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error updating application key: {0}", e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_APP_UPDATE_ERROR, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.APP_UPDATE_ERROR), e);
                 }
             }
-
         }
 
         /// <summary>
@@ -521,11 +534,11 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (String.IsNullOrEmpty(name))
             {
-                throw new ArgumentNullException(nameof(name), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(name), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (principal == null)
             {
-                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateDevice, principal);
@@ -537,18 +550,18 @@ namespace SanteDB.Persistence.Data.Services
                     context.Open();
 
                     var dbApp = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
-                    if(dbApp == null)
+                    if (dbApp == null)
                     {
-                        throw new KeyNotFoundException(ErrorMessages.ERR_FETCH_APPLICATION_KEY);
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.FETCH_APPLICATION_KEY));
                     }
 
                     dbApp.ObsoletedByKey = context.EstablishProvenance(principal, null);
                     dbApp.ObsoletionTime = DateTimeOffset.Now;
                     context.Update(dbApp);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
-                    throw new DataPersistenceException(ErrorMessages.ERR_APP_DELETE_ERROR, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.APP_DELETE_ERROR), e);
                 }
             }
         }

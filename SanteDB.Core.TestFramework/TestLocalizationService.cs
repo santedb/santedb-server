@@ -37,7 +37,7 @@ namespace SanteDB.Core.TestFramework
         /// <summary>
         /// Format string
         /// </summary>
-        public string FormatString(string stringKey, dynamic parameters)
+        public string GetString(string stringKey, dynamic parameters)
         {
             return stringKey;
         }
@@ -45,7 +45,7 @@ namespace SanteDB.Core.TestFramework
         /// <summary>
         /// Format string
         /// </summary>
-        public string FormatString(string locale, string stringKey, dynamic parameters)
+        public string GetString(string locale, string stringKey, dynamic parameters)
         {
             return stringKey;
         }

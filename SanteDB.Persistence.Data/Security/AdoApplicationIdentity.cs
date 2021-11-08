@@ -1,6 +1,7 @@
 ﻿using SanteDB.Core.i18n;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
+using SanteDB.Persistence.Data.Exceptions;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,6 @@ namespace SanteDB.Persistence.Data.Security
     /// </summary>
     internal sealed class AdoApplicationIdentity : AdoIdentity, IApplicationIdentity, IClaimsIdentity
     {
-
         // Application
         private readonly DbSecurityApplication m_application;
 
@@ -27,11 +27,11 @@ namespace SanteDB.Persistence.Data.Security
             // Has the user been locked since the session was established?
             if (application.Lockout > DateTimeOffset.Now)
             {
-                throw new SecurityException(ErrorMessages.ERR_AUTH_APP_LOCKED);
+                throw new LockedIdentityAuthenticationException();
             }
             else if (application.ObsoletionTime.HasValue)
             {
-                throw new SecurityException(ErrorMessages.ERR_AUTH_APP_INVALID);
+                throw new InvalidIdentityAuthenticationException();
             }
 
             this.m_application = application;

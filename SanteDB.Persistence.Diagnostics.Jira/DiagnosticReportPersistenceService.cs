@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Event;
 using SanteDB.Core.Http;
@@ -50,6 +51,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira
     /// Diagnostic report persistence service.
     /// </summary>
 #pragma warning disable CS0067
+
     [ServiceProvider("JIRA Based Diagnostic (Bug) Report Submissions")]
     public class DiagnosticReportPersistenceService : IDataPersistenceService<DiagnosticReport>
     {
@@ -59,15 +61,15 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         public string ServiceName => "JIRA Diagnostic Report Submission";
 
         // Trace source
-        private Tracer m_traceSource = new Tracer("SanteDB.Persistence.Diagnostics.Jira");
+        private readonly Tracer m_traceSource = new Tracer("SanteDB.Persistence.Diagnostics.Jira");
 
         // Configuration
         private JiraServiceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<JiraServiceConfigurationSection>();
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="DiagnosticReportPersistenceService"/> class.
-		/// </summary>
-		public DiagnosticReportPersistenceService()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiagnosticReportPersistenceService"/> class.
+        /// </summary>
+        public DiagnosticReportPersistenceService()
         {
         }
 
@@ -75,38 +77,47 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         /// Fired when an issue is being inserted
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Inserted;
+
         /// <summary>
         /// Fired when the issue is being inserted
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<DiagnosticReport>> Inserting;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Obsoleted;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<DiagnosticReport>> Obsoleting;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<QueryResultEventArgs<DiagnosticReport>> Queried;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<QueryRequestEventArgs<DiagnosticReport>> Querying;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataRetrievedEventArgs<DiagnosticReport>> Retrieved;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataRetrievingEventArgs<DiagnosticReport>> Retrieving;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Updated;
+
         /// <summary>
         /// Not supported
         /// </summary>
@@ -144,7 +155,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira
 
             try
             {
-                // Send 
+                // Send
                 var serviceClient = new JiraServiceClient(new RestClient(this.m_configuration));
 
                 serviceClient.Authenticate(new Model.JiraAuthenticationRequest(this.m_configuration.UserName, this.m_configuration.Password));
@@ -183,7 +194,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira
                 }
 
                 // Attach the application information
-                using(var ms = new MemoryStream())
+                using (var ms = new MemoryStream())
                 {
                     XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(typeof(DiagnosticApplicationInfo));
                     xsz.Serialize(ms, storageData.ApplicationInfo);
@@ -200,10 +211,9 @@ namespace SanteDB.Persistence.Diagnostics.Jira
             }
             catch (Exception ex)
             {
-                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error sending to JIRA: {0}", ex);
+                this.m_traceSource.TraceEvent(EventLevel.Error, "Error sending to JIRA: {0}", ex);
                 throw;
             }
-
         }
 
         /// <summary>
@@ -246,6 +256,6 @@ namespace SanteDB.Persistence.Diagnostics.Jira
             throw new NotSupportedException();
         }
     }
-#pragma warning restore CS0067
 
+#pragma warning restore CS0067
 }

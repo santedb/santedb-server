@@ -1,6 +1,8 @@
 ﻿using SanteDB.Core.i18n;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
+using SanteDB.Core.Services;
+using SanteDB.Persistence.Data.Exceptions;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
@@ -14,8 +16,6 @@ namespace SanteDB.Persistence.Data.Security
     /// </summary>
     internal class AdoDeviceIdentity : AdoIdentity, IDeviceIdentity
     {
-
-
         // Application
         private readonly DbSecurityDevice m_device;
 
@@ -27,11 +27,11 @@ namespace SanteDB.Persistence.Data.Security
             // Has the user been locked since the session was established?
             if (device.Lockout > DateTimeOffset.Now)
             {
-                throw new SecurityException(ErrorMessages.ERR_AUTH_DEV_LOCKED);
+                throw new LockedIdentityAuthenticationException();
             }
             else if (device.ObsoletionTime.HasValue)
             {
-                throw new SecurityException(ErrorMessages.ERR_AUTH_DEV_INVALID);
+                throw new InvalidIdentityAuthenticationException();
             }
 
             this.m_device = device;
@@ -61,6 +61,5 @@ namespace SanteDB.Persistence.Data.Security
         /// Get the SID of this object
         /// </summary>
         internal override Guid Sid => this.m_device.Key;
-
     }
 }

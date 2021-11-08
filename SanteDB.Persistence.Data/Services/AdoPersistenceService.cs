@@ -16,16 +16,15 @@ using System.Text;
 namespace SanteDB.Persistence.Data.Services
 {
     /// <summary>
-    /// A daemon service which registers the other persistence services 
+    /// A daemon service which registers the other persistence services
     /// </summary>
     public class AdoPersistenceService : ISqlDataPersistenceService
     {
-
         // Gets the configuration
         private AdoPersistenceConfigurationSection m_configuration;
 
         // Trace source for the service
-        private Tracer m_tracer = Tracer.GetTracer(typeof(AdoPersistenceService));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoPersistenceService));
 
         // The query builder for this service
         private QueryBuilder m_queryBuilder;
@@ -46,7 +45,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Data");
 
             // Iterate and register ADO data persistence services
-            foreach(var pservice in serviceManager.CreateInjectedOfAll<IAdoPersistenceProvider>())
+            foreach (var pservice in serviceManager.CreateInjectedOfAll<IAdoPersistenceProvider>())
             {
                 pservice.Provider = this.m_configuration.Provider;
                 serviceManager.AddServiceProvider(pservice);
@@ -66,16 +65,16 @@ namespace SanteDB.Persistence.Data.Services
         public string ServiceName => "ADO Persistence Service";
 
         /// <summary>
-        /// Execute a non-query SQL script 
+        /// Execute a non-query SQL script
         /// </summary>
         public void ExecuteNonQuery(string sql)
         {
-            if(String.IsNullOrEmpty(sql))
+            if (String.IsNullOrEmpty(sql))
             {
-                throw new ArgumentNullException(ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(sql));
             }
 
-            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
                 try
                 {
@@ -87,13 +86,12 @@ namespace SanteDB.Persistence.Data.Services
                         tx.Commit();
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error executing SQL statement {0} - {1}", sql, e.Message);
                     throw new DataPersistenceException("Error executing raw SQL", e);
                 }
             }
         }
-    
     }
 }

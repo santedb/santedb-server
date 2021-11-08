@@ -19,7 +19,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <summary>
         /// Reference term persistence service
         /// </summary>
-        public ReferenceTermPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public ReferenceTermPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 
@@ -39,7 +39,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            switch(this.m_configuration.LoadStrategy)
+            switch (this.m_configuration.LoadStrategy)
             {
                 case Configuration.LoadStrategyType.FullLoad:
                     retVal.CodeSystem = base.GetRelatedPersistenceService<CodeSystem>().Get(context, dbModel.CodeSystemKey, null);
@@ -61,7 +61,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         {
             var retVal = base.DoInsertModel(context, data);
 
-            if(data.DisplayNames != null)
+            if (data.DisplayNames != null)
             {
                 retVal.DisplayNames = base.UpdateModelAssociations(context, retVal, data.DisplayNames).ToList();
             }

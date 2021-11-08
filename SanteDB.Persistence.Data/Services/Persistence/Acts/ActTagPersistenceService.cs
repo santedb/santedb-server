@@ -15,10 +15,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <summary>
         /// Create a DI injected instance of the act tag persistence service
         /// </summary>
-        public ActTagPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCaching = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCaching, queryPersistence)
+        public ActTagPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCaching = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCaching, queryPersistence)
         {
         }
-
-
     }
 }

@@ -24,14 +24,12 @@ namespace SanteDB.Persistence.Data.Test
     [TestFixture(Category = "Persistence", TestName = "ADO Session Provider Test")]
     public class AdoSessionProviderTest : DataPersistenceTest
     {
-
         /// <summary>
         /// Test the establishing of a session
         /// </summary>
         [Test]
         public void TestEstablishSession()
         {
-
             var identityService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
             var appService = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
             var devService = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>();
@@ -43,7 +41,7 @@ namespace SanteDB.Persistence.Data.Test
             devService.CreateIdentity("TEST_DEV_SES_01", "TEST_DEV_SECRET", AuthenticationContext.SystemPrincipal);
 
             // Authentication
-            var userPrincipal = identityService.Authenticate("TEST_USER_SES_01", "@P4SSW0r$") ;
+            var userPrincipal = identityService.Authenticate("TEST_USER_SES_01", "@P4SSW0r$");
             var appPrincipal = appService.Authenticate("TEST_APP_SES_01", "TEST_APP_SECRET");
             var devPrincipal = devService.Authenticate("TEST_DEV_SES_01", "TEST_DEV_SECRET");
 
@@ -53,8 +51,6 @@ namespace SanteDB.Persistence.Data.Test
             Assert.IsNotNull(session.RefreshToken);
             Assert.IsNotNull(session.Id);
             Assert.IsTrue(session.Claims.Count(o => o.Type == SanteDBClaimTypes.SanteDBScopeClaim) > 2);
-
-           
         }
 
         /// <summary>
@@ -63,7 +59,6 @@ namespace SanteDB.Persistence.Data.Test
         [Test]
         public void TestAuthenticateSession()
         {
-
             var identityService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
             var appService = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
             var devService = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>();
@@ -75,9 +70,9 @@ namespace SanteDB.Persistence.Data.Test
             devService.CreateIdentity("TEST_DEV_SES_02", "TEST_DEV_SECRET", AuthenticationContext.SystemPrincipal);
 
             // Authentication
-            var userPrincipal = identityService.Authenticate("TEST_USER_SES_02", "@P4SSW0r$") ;
-            var appPrincipal = appService.Authenticate("TEST_APP_SES_02", "TEST_APP_SECRET") ;
-            var devPrincipal = devService.Authenticate("TEST_DEV_SES_02", "TEST_DEV_SECRET") ;
+            var userPrincipal = identityService.Authenticate("TEST_USER_SES_02", "@P4SSW0r$");
+            var appPrincipal = appService.Authenticate("TEST_APP_SES_02", "TEST_APP_SECRET");
+            var devPrincipal = devService.Authenticate("TEST_DEV_SES_02", "TEST_DEV_SECRET");
 
             // Combo principal
             var tPrincipal = new SanteDBClaimsPrincipal(new IIdentity[] { userPrincipal.Identity, appPrincipal.Identity, devPrincipal.Identity });
@@ -101,7 +96,6 @@ namespace SanteDB.Persistence.Data.Test
         [Test]
         public void TestExtendSession()
         {
-
             var identityService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
             var appService = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
             var devService = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>();
@@ -139,7 +133,6 @@ namespace SanteDB.Persistence.Data.Test
         [Test]
         public void TestAbandonSession()
         {
-
             var identityService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
             var appService = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
             var devService = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>();
@@ -170,13 +163,11 @@ namespace SanteDB.Persistence.Data.Test
                 sesIdService.Authenticate(session);
                 Assert.Fail("Should not allow auth on abandoned session");
             }
-            catch(AuthenticationException e) when (e.Message == ErrorMessages.ERR_SESSION_EXPIRE)
+            catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.SESSION_EXPIRE))
             {
-
             }
-            catch(SecuritySessionException e) when (e.Type == SessionExceptionType.Expired)
+            catch (SecuritySessionException e) when (e.Type == SessionExceptionType.Expired)
             {
-
             }
             catch
             {
@@ -190,7 +181,6 @@ namespace SanteDB.Persistence.Data.Test
         [Test]
         public void TestGetSession()
         {
-
             var identityService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
             var appService = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
             var devService = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>();
@@ -215,14 +205,12 @@ namespace SanteDB.Persistence.Data.Test
             Assert.IsNull(rSession.RefreshToken); // refresh not shown
         }
 
-
         /// <summary>
         /// Test the retrieval of a session identities by id
         /// </summary>
         [Test]
         public void TestGetSessionIdentity()
         {
-
             var identityService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
             var appService = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
             var devService = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>();

@@ -48,7 +48,7 @@ namespace SanteDB.Tools.Debug.BI
         private Timer m_scanTimer;
 
         // Tracer for logs
-        private Tracer m_tracer = Tracer.GetTracer(typeof(FileMetadataRepository));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(FileMetadataRepository));
 
         // Asset dictionary
         private ConcurrentDictionary<String, String> m_assetDictionary = new ConcurrentDictionary<string, string>();

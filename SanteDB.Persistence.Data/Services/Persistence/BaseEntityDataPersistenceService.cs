@@ -24,10 +24,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Creates a new base entity data with the specified data classes injected
         /// </summary>
-        public BaseEntityDataPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public BaseEntityDataPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
-
 
         /// <summary>
         /// Perform an insert on the specified object
@@ -37,9 +36,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <returns>The inserted object with any key data</returns>
         protected override TDbModel DoInsertInternal(DataContext context, TDbModel dbModel)
         {
-            if(dbModel == null)
+            if (dbModel == null)
             {
-                throw new ArgumentNullException(nameof(dbModel), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(dbModel), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             // Set the creation time and provenance data
@@ -57,15 +56,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <returns>The updated object</returns>
         protected override TDbModel DoUpdateInternal(DataContext context, TDbModel model)
         {
-            if(model == null)
+            if (model == null)
             {
-                throw new ArgumentNullException(nameof(model), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(model), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             var existing = context.FirstOrDefault<TDbModel>(o => o.Key == model.Key);
-            if(existing == null)
+            if (existing == null)
             {
-                throw new KeyNotFoundException(ErrorMessages.ERR_NOT_FOUND.Format(model));
+                throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { type = typeof(TModel).Name, id = model.Key }));
             }
 
             // Un-delete the object
@@ -75,7 +74,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             existing.ObsoletionTimeSpecified = existing.ObsoletedByKeySpecified = true;
 
             return base.DoUpdateInternal(context, existing);
-
         }
 
         /// <summary>
@@ -85,13 +83,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (context == null)
             {
-                throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             if (expression == null)
             {
-                throw new ArgumentException(nameof(expression), ErrorMessages.ERR_ARGUMENT_RANGE);
+                throw new ArgumentException(nameof(expression), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_RANGE));
             }
-
 
 #if DEBUG
             var sw = new Stopwatch();
@@ -107,12 +104,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     expression = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, expression.Body), expression.Parameters);
                 }
 
-                // Convert the query to a domain query so that the object persistence layer can turn the 
+                // Convert the query to a domain query so that the object persistence layer can turn the
                 // structured LINQ query into a SQL statement
                 var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
                 if (domainExpression != null)
                 {
-                    context.UpdateAll(domainExpression, o=> o.ObsoletionTime == DateTimeOffset.Now, o=> o.ObsoletedByKey == context.ContextId);
+                    context.UpdateAll(domainExpression, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == context.ContextId);
                 }
                 else
                 {
@@ -145,13 +142,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <returns>A delay-load result set which contains the results of <paramref name="query"/></returns>
         protected override OrmResultSet<TDbModel> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, bool allowCache = false)
         {
-            if(query == null)
+            if (query == null)
             {
-                throw new ArgumentNullException(nameof(query), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             // If the user has not explicitly set the obsoletion time parameter then we will add it
-            if(!query.ToString().Contains(nameof(BaseEntityData.ObsoletionTime)))
+            if (!query.ToString().Contains(nameof(BaseEntityData.ObsoletionTime)))
             {
                 var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
                 query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
@@ -173,11 +170,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 if (context == null)
                 {
-                    throw new ArgumentNullException(nameof(context), ErrorMessages.ERR_ARGUMENT_NULL);
+                    throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
                 }
                 if (key == Guid.Empty)
                 {
-                    throw new ArgumentException(nameof(key), ErrorMessages.ERR_ARGUMENT_RANGE);
+                    throw new ArgumentException(nameof(key), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_RANGE));
                 }
 
 #if DEBUG
@@ -191,9 +188,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     var dbData = context.FirstOrDefault<TDbModel>(o => o.Key == key);
                     if (dbData == null)
                     {
-                        throw new KeyNotFoundException(ErrorMessages.ERR_NOT_FOUND.Format(key));
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = key, type = typeof(TModel).Name }));
                     }
-                    
+
                     dbData.ObsoletedByKey = context.ContextId;
                     dbData.ObsoletionTime = DateTimeOffset.Now;
 
@@ -221,7 +218,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            switch(this.m_configuration.LoadStrategy)
+            switch (this.m_configuration.LoadStrategy)
             {
                 case Configuration.LoadStrategyType.FullLoad:
                     retVal.CreatedBy = base.GetRelatedPersistenceService<SecurityProvenance>().Get(context, dbModel.CreatedByKey, null);

@@ -42,7 +42,7 @@ namespace SanteDB.Tools.Debug
         public string ServiceName => "Debug Environment UI";
 
         // HDSI Trace host
-        private Tracer m_traceSource = new Tracer("SanteDB.Tools.DataSandbox");
+        private readonly Tracer m_traceSource = new Tracer("SanteDB.Tools.DataSandbox");
 
         // web host
         private RestService m_webHost;
@@ -50,7 +50,8 @@ namespace SanteDB.Tools.Debug
         /// <summary>
         /// Returns true if the service is running
         /// </summary>
-        public bool IsRunning { get { return this.m_webHost != null; } }
+        public bool IsRunning
+        { get { return this.m_webHost != null; } }
 
         /// <summary>
         /// Fired when service has started

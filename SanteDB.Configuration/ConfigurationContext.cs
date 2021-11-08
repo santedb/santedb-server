@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Data;
@@ -51,24 +52,23 @@ namespace SanteDB.Configuration
     /// </summary>
     public class ConfigurationContext : INotifyPropertyChanged
     {
-
-
         // Configuration
         private SanteDBConfiguration m_configuration;
+
         // Current context
         private static ConfigurationContext m_current;
+
         // Providers
         private IEnumerable<IDataConfigurationProvider> m_providers;
 
         // Tracer provider
-        private Tracer m_tracer = Tracer.GetTracer(typeof(ConfigurationContext));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(ConfigurationContext));
 
 #if DEBUG
         private string m_configurationFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.config.debug.xml");
 #else
         private string m_configurationFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.config.xml");
-#endif 
-
+#endif
 
         /// <summary>
         /// Gets the configuration file name
@@ -77,6 +77,7 @@ namespace SanteDB.Configuration
         {
             get => this.m_configurationFile;
         }
+
         /// <summary>
         /// Gets the plugin assemblies
         /// </summary>
@@ -142,7 +143,7 @@ namespace SanteDB.Configuration
         /// </summary>
         public string GetAppSetting(string key)
         {
-            // Use configuration setting 
+            // Use configuration setting
             String retVal = null;
             try
             {
@@ -153,7 +154,6 @@ namespace SanteDB.Configuration
             }
 
             return retVal;
-
         }
 
         /// <summary>
@@ -161,10 +161,9 @@ namespace SanteDB.Configuration
         /// </summary>
         public void InitialStart()
         {
-
             // Default configuration
             this.Configuration = new SanteDBConfiguration();
-            // Initial settings for initial 
+            // Initial settings for initial
             this.Configuration.AddSection(new OrmConfigurationSection()
             {
                 AdoProvider = this.GetAllTypes().Where(t => typeof(DbProviderFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).Select(t => new ProviderRegistrationConfiguration(t.Namespace.StartsWith("System") ? t.Name : t.Namespace.Split('.')[0], t)).ToList(),
@@ -184,7 +183,6 @@ namespace SanteDB.Configuration
                 .SelectMany(a => { try { return a.ExportedTypes; } catch { return new List<Type>(); } });
         }
 
-
         /// <summary>
         /// Get the configuration tasks
         /// </summary>
@@ -203,14 +201,17 @@ namespace SanteDB.Configuration
         /// Firedwhenstarting
         /// </summary>
         public event EventHandler Starting;
+
         /// <summary>
         /// Fired when started
         /// </summary>
         public event EventHandler Started;
+
         /// <summary>
         /// Fired when stopping
         /// </summary>
         public event EventHandler Stopping;
+
         /// <summary>
         /// Fired when stopped
         /// </summary>
@@ -224,11 +225,10 @@ namespace SanteDB.Configuration
             this.PluginAssemblies = new ObservableCollection<Assembly>();
             this.ConfigurationTasks = new ObservableCollection<IConfigurationTask>();
             this.Features = new List<IFeature>();
-
         }
 
         /// <summary>
-        /// Get the data providers 
+        /// Get the data providers
         /// </summary>
         public IEnumerable<IDataConfigurationProvider> DataProviders
         {
@@ -242,7 +242,6 @@ namespace SanteDB.Configuration
                         .Select(i => Activator.CreateInstance(i) as IDataConfigurationProvider)
                         .ToArray();
                 return this.m_providers;
-
             }
         }
 
@@ -301,8 +300,5 @@ namespace SanteDB.Configuration
                 return false;
             }
         }
-
-
-
     }
 }

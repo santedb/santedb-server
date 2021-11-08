@@ -15,11 +15,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
     /// </summary>
     public class ConceptRelationshipPersistenceService : ConceptReferencePersistenceBase<ConceptRelationship, DbConceptRelationship>
     {
-
         /// <summary>
         /// Concept relationship persistence service
         /// </summary>
-        public ConceptRelationshipPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public ConceptRelationshipPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 
@@ -39,7 +38,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         protected override ConceptRelationship DoConvertToInformationModel(DataContext context, DbConceptRelationship dbModel, params IDbIdentified[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            switch(this.m_configuration.LoadStrategy)
+            switch (this.m_configuration.LoadStrategy)
             {
                 case Configuration.LoadStrategyType.FullLoad:
                     retVal.RelationshipType = base.GetRelatedPersistenceService<ConceptRelationshipType>().Get(context, dbModel.RelationshipTypeKey, null);
@@ -49,7 +48,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                     break;
             }
             return retVal;
-
         }
     }
 }

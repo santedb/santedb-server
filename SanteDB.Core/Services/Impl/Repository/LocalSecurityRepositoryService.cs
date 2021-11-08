@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
@@ -48,38 +49,47 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalSecurityRepositoryService : ISecurityRepositoryService
     {
-
         /// <summary>
         /// Gets the service name
         /// </summary>
         public string ServiceName => "Local Security Repository Service";
 
         // Tracer for this service
-        private Tracer m_traceSource = new Tracer(SanteDBConstants.ServiceTraceSourceName);
+        private readonly Tracer m_traceSource = new Tracer(SanteDBConstants.ServiceTraceSourceName);
 
         // Localization Service
         private readonly ILocalizationService m_localizationService;
 
         // User repo
         private IRepositoryService<SecurityUser> m_userRepository;
+
         // App repo
         private IRepositoryService<SecurityApplication> m_applicationRepository;
+
         // Device repo
         private IRepositoryService<SecurityDevice> m_deviceRepository;
+
         // Policy repo
         private IRepositoryService<SecurityPolicy> m_policyRepository;
+
         // Role repository
         private IRepositoryService<SecurityRole> m_roleRepository;
+
         // User Entity repository
         private IRepositoryService<UserEntity> m_userEntityRepository;
-        // Provenance 
+
+        // Provenance
         private IDataPersistenceService<SecurityProvenance> m_provenancePersistence;
+
         // IdP
         private IIdentityProviderService m_identityProviderService;
+
         // App IdP
         private IApplicationIdentityProviderService m_applicationIdentityProvider;
+
         // Dev IdP
         private IDeviceIdentityProviderService m_deviceIdentityProvider;
+
         // Role provider
         private IRoleProviderService m_roleProvider;
 
@@ -164,9 +174,8 @@ namespace SanteDB.Server.Core.Services.Impl
             return this.m_policyRepository.Find(o => o.Oid == policyOid, 0, 1, out tr).SingleOrDefault();
         }
 
-
         /// <summary>
-        /// Get the security provenance 
+        /// Get the security provenance
         /// </summary>
         public SecurityProvenance GetProvenance(Guid provenanceId)
         {
@@ -174,7 +183,7 @@ namespace SanteDB.Server.Core.Services.Impl
         }
 
         /// <summary>
-        /// Get the specified role 
+        /// Get the specified role
         /// </summary>
         public SecurityRole GetRole(string roleName)
         {
@@ -213,7 +222,6 @@ namespace SanteDB.Server.Core.Services.Impl
             return this.m_userEntityRepository?.Find(o => o.SecurityUser.UserName == identity.Name, 0, 1, out t).FirstOrDefault();
         }
 
-
         /// <summary>
         /// Locks a specific user.
         /// </summary>
@@ -232,7 +240,6 @@ namespace SanteDB.Server.Core.Services.Impl
             this.m_identityProviderService.SetLockout(securityUser.UserName, true, AuthenticationContext.Current.Principal);
         }
 
-
         /// <summary>
         /// Unlocks a specific user.
         /// </summary>
@@ -249,7 +256,6 @@ namespace SanteDB.Server.Core.Services.Impl
                 throw new KeyNotFoundException(this.m_localizationService.GetString("error.type.KeyNotFoundException.userMessage"));
             }
             this.m_identityProviderService.SetLockout(securityUser.UserName, false, AuthenticationContext.Current.Principal);
-
         }
 
         /// <summary>
@@ -268,13 +274,11 @@ namespace SanteDB.Server.Core.Services.Impl
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AlterRoles)]
         public void SetUserRoles(SecurityUser user, string[] roles)
         {
-            
             if (!user.Key.HasValue)
                 user = this.GetUser(user.UserName);
             this.m_roleProvider.RemoveUsersFromRoles(new String[] { user.UserName }, this.m_roleProvider.GetAllRoles().Where(o => !roles.Contains(o)).ToArray(), AuthenticationContext.Current.Principal);
             this.m_roleProvider.AddUsersToRoles(new string[] { user.UserName }, roles, AuthenticationContext.Current.Principal);
         }
-
 
         /// <summary>
         /// Lock a device
@@ -361,7 +365,7 @@ namespace SanteDB.Server.Core.Services.Impl
 		[PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         public IdentifiedData GetSecurityEntity(IPrincipal principal)
         {
-            if (principal.Identity is DeviceIdentity deviceIdentity) // Device credential 
+            if (principal.Identity is DeviceIdentity deviceIdentity) // Device credential
             {
                 return this.GetDevice(deviceIdentity);
             }
@@ -384,7 +388,7 @@ namespace SanteDB.Server.Core.Services.Impl
             if (String.IsNullOrEmpty(deviceName))
             {
                 this.m_traceSource.TraceError($"{nameof(deviceName)} cannot be null");
-                throw new ArgumentNullException(this.m_localizationService.FormatString("error.type.ArgumentNullException.param", new
+                throw new ArgumentNullException(this.m_localizationService.GetString("error.type.ArgumentNullException.param", new
                 {
                     param = nameof(deviceName)
                 }));
@@ -401,7 +405,7 @@ namespace SanteDB.Server.Core.Services.Impl
             if (String.IsNullOrEmpty(applicationName))
             {
                 this.m_traceSource.TraceError($"{nameof(applicationName)} cannot be null");
-                throw new ArgumentNullException(this.m_localizationService.FormatString("error.type.ArgumentNullException.param", new
+                throw new ArgumentNullException(this.m_localizationService.GetString("error.type.ArgumentNullException.param", new
                 {
                     param = nameof(applicationName)
                 }));
@@ -411,15 +415,15 @@ namespace SanteDB.Server.Core.Services.Impl
         }
 
         /// <summary>
-        /// Get device 
+        /// Get device
         /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         public SecurityDevice GetDevice(IIdentity identity)
         {
-            if(identity == null)
+            if (identity == null)
             {
                 this.m_traceSource.TraceError($"{nameof(identity)} cannot be null");
-                throw new ArgumentNullException(this.m_localizationService.FormatString("error.type.ArgumentNullException.param", new
+                throw new ArgumentNullException(this.m_localizationService.GetString("error.type.ArgumentNullException.param", new
                 {
                     param = nameof(identity)
                 }));
@@ -437,11 +441,10 @@ namespace SanteDB.Server.Core.Services.Impl
             if (identity == null)
             {
                 this.m_traceSource.TraceError($"{nameof(identity)} cannot be null");
-                throw new ArgumentNullException(this.m_localizationService.FormatString("error.type.ArgumentNullException.param", new
+                throw new ArgumentNullException(this.m_localizationService.GetString("error.type.ArgumentNullException.param", new
                 {
                     param = nameof(identity)
                 }));
-
             }
 
             return this.GetApplication(identity.Name);

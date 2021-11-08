@@ -26,22 +26,25 @@ namespace SanteDB.Persistence.Data.Test
         // Application ID service
         protected IServiceManager m_serviceManager;
 
+        // Locale service
+        protected ILocalizationService m_localizationService;
+
         // Ignore property
         private string[] IGNORE = new string[] {
             "PreviousVersionKey",
-            "Tag", 
-            "VersionSequence", 
-            "ModifiedOn", 
+            "Tag",
+            "VersionSequence",
+            "ModifiedOn",
             "CreationTimeXml",
             "UpdatedTimeXml",
             "ObsoletedTimeXml",
-            "VersionKey", 
-            "Key", 
-            "CreationTime", 
-            "CreatedBy", 
-            "UpdatedBy", 
-            "UpdatedTime", 
-            "ObsoletedBy", 
+            "VersionKey",
+            "Key",
+            "CreationTime",
+            "CreatedBy",
+            "UpdatedBy",
+            "UpdatedTime",
+            "ObsoletedBy",
             "ObsoletionTime" ,
             "StatusConceptKey"
         };
@@ -63,7 +66,7 @@ namespace SanteDB.Persistence.Data.Test
             this.m_serviceManager.AddServiceProvider(typeof(AdoIdentityProvider));
             this.m_serviceManager.AddServiceProvider(typeof(AdoSessionProvider));
             this.m_serviceManager.AddServiceProvider(typeof(AdoPersistenceService));
-
+            this.m_localizationService = new TestLocalizationService();
         }
 
         /// <summary>

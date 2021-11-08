@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model;
@@ -41,7 +42,6 @@ namespace SanteDB.Server.Core.Persistence
     /// Data initialization service
     /// </summary>
     [ServiceProvider("Dataset Installation Service")]
-    #pragma warning disable CS0067
     public class DataInitializationService : IDaemonService, IReportProgressChanged
     {
         /// <summary>
@@ -50,7 +50,7 @@ namespace SanteDB.Server.Core.Persistence
         public string ServiceName => "DataSet Initialization Service";
 
         // Trace source
-        private Tracer m_traceSource = new Tracer(SanteDBConstants.DatasetInstallSourceName);
+        private readonly Tracer m_traceSource = new Tracer(SanteDBConstants.DatasetInstallSourceName);
 
         /// <summary>
         /// True when the service is running
@@ -67,18 +67,22 @@ namespace SanteDB.Server.Core.Persistence
         /// Fired when the service has started
         /// </summary>
         public event EventHandler Started;
+
         /// <summary>
         /// Fired when the service is starting
         /// </summary>
         public event EventHandler Starting;
+
         /// <summary>
         /// Fired when the service has stopped
         /// </summary>
         public event EventHandler Stopped;
+
         /// <summary>
         /// Fired when the service is stopping
         /// </summary>
         public event EventHandler Stopping;
+
         /// <summary>
         /// Fired when progress changes
         /// </summary>
@@ -96,12 +100,11 @@ namespace SanteDB.Server.Core.Persistence
         {
             try
             {
-
                 this.m_traceSource.TraceInfo("Applying {0} ({1} objects)...", ds.Id, ds.Action.Count);
 
                 int i = 0;
                 // Can this dataset be installed as a bundle?
-                if(ds.Action.All(o=>o is DataUpdate && (o as DataUpdate).InsertIfNotExists && !(o.Element is IVersionedAssociation)) && ds.Action.Count < 1000)
+                if (ds.Action.All(o => o is DataUpdate && (o as DataUpdate).InsertIfNotExists && !(o.Element is IVersionedAssociation)) && ds.Action.Count < 1000)
                 {
                     this.m_traceSource.TraceVerbose("Will install as a bundle");
                     var bundle = new Bundle()
@@ -116,8 +119,8 @@ namespace SanteDB.Server.Core.Persistence
                     if (progress != null)
                         progress.ProgressChanged -= this.ProgressChanged;
                 }
-                else 
-                    foreach (var itm in ds.Action.Where(o=>o.Element != null))
+                else
+                    foreach (var itm in ds.Action.Where(o => o.Element != null))
                     {
                         try
                         {
@@ -173,7 +176,7 @@ namespace SanteDB.Server.Core.Persistence
                             // old
                             // we want to insert reference terms and concepts so we can find an associated concept
                             // for a given reference term and code system
-                            // 
+                            //
                             // Code System Contact Point Use has the following codes:
                             // home
                             // work
@@ -208,7 +211,7 @@ namespace SanteDB.Server.Core.Persistence
                             else if (existing != null && itm is DataObsolete obsolete)
                                 idpInstance.Obsolete(obsolete.Element.Key.Value);
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             this.m_traceSource.TraceEvent(EventLevel.Verbose, "There was an issue in the dataset file {0} : {1} @ {2} ", ds.Id, e, itm.Element);
                             if (!itm.IgnoreErrors)
@@ -224,11 +227,10 @@ namespace SanteDB.Server.Core.Persistence
                     isqlp.ExecuteNonQuery(de.QueryText);
                 }
                 this.m_traceSource.TraceInfo("Applied {0} changes", ds.Action.Count);
-
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error applying dataset {0}: {1}", ds.Id, e);
+                this.m_traceSource.TraceEvent(EventLevel.Error, "Error applying dataset {0}: {1}", ds.Id, e);
                 throw;
             }
         }
@@ -238,9 +240,9 @@ namespace SanteDB.Server.Core.Persistence
         /// </summary>
         public DataInitializationService()
         {
-            if(ApplicationServiceContext.Current.HostType == SanteDBHostType.Server)
-                this.m_persistenceHandler = (o, e) => {
-
+            if (ApplicationServiceContext.Current.HostType == SanteDBHostType.Server)
+                this.m_persistenceHandler = (o, e) =>
+                {
                     this.InstallDataDirectory();
                 };
         }
@@ -254,7 +256,6 @@ namespace SanteDB.Server.Core.Persistence
             {
                 try
                 {
-
                     String dataDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "data");
                     this.m_traceSource.TraceEvent(EventLevel.Verbose, "Scanning Directory {0} for datasets", dataDirectory);
 
@@ -265,10 +266,8 @@ namespace SanteDB.Server.Core.Persistence
                     // Perform migrations
                     foreach (var f in datasetFiles)
                     {
-
                         try
                         {
-
                             var logFile = Path.ChangeExtension(f, "completed");
                             if (File.Exists(logFile))
                                 continue; // skip
@@ -280,7 +279,6 @@ namespace SanteDB.Server.Core.Persistence
                                 this.m_traceSource.TraceEvent(EventLevel.Informational, "Installing {0}...", Path.GetFileName(f));
                                 this.InstallDataset(ds);
                             }
-
 
                             File.Move(f, logFile);
                         }
@@ -319,6 +317,5 @@ namespace SanteDB.Server.Core.Persistence
         }
     }
 
-    #pragma warning enable CS0067
-
+#pragma warning enable CS0067
 }

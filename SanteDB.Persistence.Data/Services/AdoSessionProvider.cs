@@ -11,6 +11,7 @@ using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Configuration;
+using SanteDB.Persistence.Data.Exceptions;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Security;
 using System;
@@ -29,30 +30,33 @@ namespace SanteDB.Persistence.Data.Services
     public class AdoSessionProvider : ISessionIdentityProviderService, ISessionProviderService
     {
         // Tracer
-        private Tracer m_tracer = Tracer.GetTracer(typeof(AdoSessionProvider));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoSessionProvider));
 
         // Session configuration
-        private AdoPersistenceConfigurationSection m_configuration;
+        private readonly AdoPersistenceConfigurationSection m_configuration;
 
         // Data signing service
-        private IDataSigningService m_dataSigningService;
+        private readonly IDataSigningService m_dataSigningService;
 
         // Hashing service
-        private IPasswordHashingService m_passwordHashingService;
+        private readonly IPasswordHashingService m_passwordHashingService;
 
         // Security configuration
-        private SecurityConfigurationSection m_securityConfiguration;
+        private readonly SecurityConfigurationSection m_securityConfiguration;
 
         // PDP
-        private IPolicyDecisionService m_pdpService;
+        private readonly IPolicyDecisionService m_pdpService;
 
         // PIP
-        private IPolicyInformationService m_pipService;
+        private readonly IPolicyInformationService m_pipService;
+
+        // Locale service
+        private readonly ILocalizationService m_localizationService;
 
         // PEP
-        private IPolicyEnforcementService m_pepService;
+        private readonly IPolicyEnforcementService m_pepService;
 
-        // TODO: Session caching in a memory cache 
+        // TODO: Session caching in a memory cache
 
         /// <summary>
         /// Claims which are not to be stored or set in the session
@@ -83,6 +87,7 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public AdoSessionProvider(IConfigurationManager configuration,
             IDataSigningService dataSigning,
+            ILocalizationService localizationService,
             IPasswordHashingService passwordHashingService,
             IPolicyDecisionService policyDecisionService,
             IPolicyInformationService policyInformationService,
@@ -95,6 +100,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_pdpService = policyDecisionService;
             this.m_pepService = policyEnforcementService;
             this.m_pipService = policyInformationService;
+            this.m_localizationService = localizationService;
         }
 
         /// <summary>
@@ -106,10 +112,12 @@ namespace SanteDB.Persistence.Data.Services
         /// Fired when a new session is established
         /// </summary>
         public event EventHandler<SessionEstablishedEventArgs> Established;
+
         /// <summary>
         /// Fired when a session is abandoned
         /// </summary>
         public event EventHandler<SessionEstablishedEventArgs> Abandoned;
+
         /// <summary>
         /// Fired when a session is abandoned
         /// </summary>
@@ -134,13 +142,13 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (session == null)
             {
-                throw new ArgumentNullException(nameof(session), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(session), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             // Validate tamper check
             if (!this.ExtractValidateSessionKey(session.Id, out Guid sessionId))
             {
-                throw new SecuritySessionException(SessionExceptionType.SignatureFailure, ErrorMessages.ERR_SESSION_TAMPER, null);
+                throw new SecuritySessionException(SessionExceptionType.SignatureFailure, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_TAMPER), null);
             }
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
@@ -151,7 +159,6 @@ namespace SanteDB.Persistence.Data.Services
 
                     using (var tx = context.BeginTransaction())
                     {
-
                         var dbSession = context.FirstOrDefault<DbSession>(o => o.Key == sessionId && o.NotAfter > DateTimeOffset.Now);
                         if (dbSession == null)
                         {
@@ -173,7 +180,7 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     this.m_tracer.TraceError("Cannot abandon session {0} - {1}", BitConverter.ToString(session.Id), e);
                     this.Abandoned?.Invoke(this, new SessionEstablishedEventArgs(null, session, false, false, null, null));
-                    throw new SecuritySessionException(SessionExceptionType.Other, ErrorMessages.ERR_SESSION_ABANDON, e);
+                    throw new SecuritySessionException(SessionExceptionType.Other, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_ABANDON), e);
                 }
             }
         }
@@ -194,29 +201,29 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (principal == null)
             {
-                throw new ArgumentNullException(nameof(principal), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (!principal.Identity.IsAuthenticated)
             {
-                throw new SecurityException(ErrorMessages.ERR_SESSION_NOT_AUTH_PRINCIPAL);
+                throw new SecurityException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_NOT_AUTH_PRINCIPAL));
             }
             else if (isOverride && (String.IsNullOrEmpty(purpose) || scope == null || scope.Length == 0))
             {
-                throw new InvalidOperationException(ErrorMessages.ERR_SESSION_OVERRIDE_WITH_INSUFFICIENT_DATA);
+                throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_OVERRIDE_WITH_INSUFFICIENT_DATA));
             }
 
             // Must be claims principal
             if (!(principal is IClaimsPrincipal claimsPrincipal))
             {
-                throw new SecurityException(ErrorMessages.ERR_SESSION_NOT_CLAIMS_PRINCIPAL);
+                throw new SecurityException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_NOT_CLAIMS_PRINCIPAL));
             }
 
             // Claims principals may set override and scope which trumps the user provided ones
-            if(claimsPrincipal.HasClaim(o=>o.Type == SanteDBClaimTypes.SanteDBScopeClaim))
+            if (claimsPrincipal.HasClaim(o => o.Type == SanteDBClaimTypes.SanteDBScopeClaim))
             {
                 scope = claimsPrincipal.FindAll(SanteDBClaimTypes.SanteDBScopeClaim).Select(o => o.Value).ToArray();
             }
-            if(claimsPrincipal.HasClaim(o=>o.Type == SanteDBClaimTypes.PurposeOfUse))
+            if (claimsPrincipal.HasClaim(o => o.Type == SanteDBClaimTypes.PurposeOfUse))
             {
                 purpose = claimsPrincipal.FindFirst(SanteDBClaimTypes.PurposeOfUse).Value;
             }
@@ -226,7 +233,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 this.m_pepService.Demand(PermissionPolicyIdentifiers.OverridePolicyPermission, principal);
             }
-            
+
             // Validate scopes are valid or can be overridden
             if (scope != null && !scope.Contains("*"))
             {
@@ -254,7 +261,6 @@ namespace SanteDB.Persistence.Data.Services
                     context.Open();
                     using (var tx = context.BeginTransaction())
                     {
-
                         // Generate refresh token
                         IIdentity applicationId = claimsPrincipal.Identities.OfType<IApplicationIdentity>().FirstOrDefault(),
                             deviceId = claimsPrincipal.Identities.OfType<IDeviceIdentity>().FirstOrDefault(),
@@ -262,10 +268,10 @@ namespace SanteDB.Persistence.Data.Services
 
                         if (applicationId == null)
                         {
-                            throw new InvalidOperationException(ErrorMessages.ERR_SESSION_NO_APPLICATION_ID);
+                            throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_NO_APPLICATION_ID));
                         }
 
-                        // Fetch the keys for the identities 
+                        // Fetch the keys for the identities
                         Guid? applicationKey = null, deviceKey = null, userKey = null;
 
                         // Application
@@ -350,7 +356,7 @@ namespace SanteDB.Persistence.Data.Services
                         // Add claims
                         claims.AddRange(sessionScopes.Distinct().Select(o => new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, o)));
 
-                        // Override? 
+                        // Override?
                         if (isOverride)
                         {
                             claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBOverrideClaim, "true"));
@@ -389,16 +395,15 @@ namespace SanteDB.Persistence.Data.Services
                 catch (NullReferenceException e)
                 {
                     this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, null, false, isOverride, purpose, scope));
-                    throw new SecuritySessionException(SessionExceptionType.NotEstablished, ErrorMessages.ERR_SESSION_MISSING_IDENTITY_DATA, e);
+                    throw new SecuritySessionException(SessionExceptionType.NotEstablished, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_MISSING_IDENTITY_DATA), e);
                 }
                 catch (Exception e)
                 {
                     this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, null, false, isOverride, purpose, scope));
-                    throw new SecuritySessionException(SessionExceptionType.NotEstablished, ErrorMessages.ERR_SESSION_GEN_ERR, e);
+                    throw new SecuritySessionException(SessionExceptionType.NotEstablished, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_GEN_ERR), e);
                 }
             }
         }
-
 
         /// <summary>
         /// Extend the provided session with the refresh token provided
@@ -407,13 +412,13 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (refreshToken == null)
             {
-                throw new ArgumentNullException(nameof(refreshToken), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(refreshToken), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             // Validate tamper check
             if (!this.ExtractValidateSessionKey(refreshToken, out Guid refreshTokenId))
             {
-                throw new SecuritySessionException(SessionExceptionType.SignatureFailure, ErrorMessages.ERR_SESSION_TAMPER, null);
+                throw new SecuritySessionException(SessionExceptionType.SignatureFailure, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_TAMPER), null);
             }
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
@@ -429,11 +434,11 @@ namespace SanteDB.Persistence.Data.Services
 
                         if (dbSession == null)
                         {
-                            throw new KeyNotFoundException(ErrorMessages.ERR_SESSION_TOKEN_INVALID);
+                            throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_TOKEN_INVALID));
                         }
                         else if (dbSession.NotAfter < DateTimeOffset.Now)
                         {
-                            throw new SecuritySessionException(SessionExceptionType.Expired, ErrorMessages.ERR_SESSION_REFRESH_EXPIRE, null);
+                            throw new SecuritySessionException(SessionExceptionType.Expired, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_REFRESH_EXPIRE), null);
                         }
 
                         var dbClaims = context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Key).ToList();
@@ -441,10 +446,10 @@ namespace SanteDB.Persistence.Data.Services
                         // Validate - Override sessions cannot be extended
                         if (dbClaims.Any(c => c.ClaimType == SanteDBClaimTypes.SanteDBOverrideClaim && c.ClaimValue == "true"))
                         {
-                            throw new SecurityException(ErrorMessages.ERR_ELEVATED_SESSION_NO_EXTENSION);
+                            throw new SecurityException(this.m_localizationService.GetString(ErrorMessageStrings.ELEVATED_SESSION_NO_EXTENSION));
                         }
 
-                        // Generate a new session for this 
+                        // Generate a new session for this
                         refreshTokenId = Guid.NewGuid();
                         dbSession.RefreshToken = this.m_passwordHashingService.ComputeHash(refreshTokenId.ToString());
                         dbSession.RefreshExpiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.RefreshLength, new TimeSpan(1, 0, 0)));
@@ -463,14 +468,14 @@ namespace SanteDB.Persistence.Data.Services
                         return session;
                     }
                 }
-                catch(SecuritySessionException)
+                catch (SecuritySessionException)
                 {
                     throw;
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error extending session: {0}", e);
-                    throw new SecuritySessionException(SessionExceptionType.Other, ErrorMessages.ERR_SESSION_GEN_ERR, e);
+                    throw new SecuritySessionException(SessionExceptionType.Other, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_GEN_ERR), e);
                 }
             }
         }
@@ -480,24 +485,24 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public ISession Get(byte[] sessionToken, bool allowExpired = false)
         {
-            if(sessionToken == null)
+            if (sessionToken == null)
             {
-                throw new ArgumentNullException(nameof(sessionToken), ErrorMessages.ERR_ARGUMENT_NULL);
-            }
-            
-            if(!this.ExtractValidateSessionKey(sessionToken, out Guid sessionId))
-            {
-                throw new SecuritySessionException(SessionExceptionType.SignatureFailure, ErrorMessages.ERR_SESSION_TAMPER, null);
+                throw new ArgumentNullException(nameof(sessionToken), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+            if (!this.ExtractValidateSessionKey(sessionToken, out Guid sessionId))
+            {
+                throw new SecuritySessionException(SessionExceptionType.SignatureFailure, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_TAMPER), null);
+            }
+
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
             {
                 try
                 {
                     context.Open();
 
                     var dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionId);
-                    if(dbSession == null || !allowExpired && dbSession.NotAfter < DateTimeOffset.Now)
+                    if (dbSession == null || !allowExpired && dbSession.NotAfter < DateTimeOffset.Now)
                     {
                         return null;
                     }
@@ -506,10 +511,10 @@ namespace SanteDB.Persistence.Data.Services
                         return new AdoSecuritySession(sessionToken, null, dbSession, context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Key));
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error getting session data {0}", e);
-                    throw new DataPersistenceException(ErrorMessages.ERR_SESSION_GEN_ERR, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_GEN_ERR), e);
                 }
             }
         }
@@ -526,20 +531,19 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (session == null)
             {
-                throw new ArgumentNullException(nameof(session), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(session), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             // Validate tamper check
             if (!this.ExtractValidateSessionKey(session.Id, out Guid sessionId))
             {
-                throw new SecuritySessionException(SessionExceptionType.SignatureFailure, ErrorMessages.ERR_SESSION_TAMPER, null);
+                throw new SecuritySessionException(SessionExceptionType.SignatureFailure, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_TAMPER), null);
             }
 
             using (var context = this.m_configuration.Provider.GetReadonlyConnection())
             {
                 try
                 {
-
                     context.Open();
                     var sql = context.CreateSqlStatement<DbSession>()
                         .SelectFrom(typeof(DbSession), typeof(DbSecurityApplication), typeof(DbSecurityUser), typeof(DbSecurityDevice))
@@ -549,13 +553,13 @@ namespace SanteDB.Persistence.Data.Services
                         .Where<DbSession>(o => o.Key == sessionId);
                     var dbSession = context.FirstOrDefault<CompositeResult<DbSession, DbSecurityApplication, DbSecurityUser, DbSecurityDevice>>(sql);
 
-                    if(dbSession == null)
+                    if (dbSession == null)
                     {
-                        throw new KeyNotFoundException(ErrorMessages.ERR_SESSION_TOKEN_INVALID);
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_TOKEN_INVALID));
                     }
-                    else if(authenticated && dbSession.Object1.NotAfter < DateTimeOffset.Now)
+                    else if (authenticated && dbSession.Object1.NotAfter < DateTimeOffset.Now)
                     {
-                        throw new SecuritySessionException(SessionExceptionType.Expired, ErrorMessages.ERR_SESSION_EXPIRE, null);
+                        throw new SecuritySessionException(SessionExceptionType.Expired, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_EXPIRE), null);
                     }
 
                     adoSession = new AdoSecuritySession(session.Id, null, dbSession.Object1, context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Object1.Key));
@@ -598,14 +602,22 @@ namespace SanteDB.Persistence.Data.Services
 
                     return identities.OfType<IIdentity>().ToArray();
                 }
-                catch(SecuritySessionException)
+                catch (InvalidIdentityAuthenticationException)
+                {
+                    throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_IDENTITY_INVALID));
+                }
+                catch (LockedIdentityAuthenticationException)
+                {
+                    throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_IDENTITY_LOCKED));
+                }
+                catch (SecuritySessionException)
                 {
                     throw;
                 }
                 catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error authenticating based on session data - {0}", e);
-                    throw new SecuritySessionException(SessionExceptionType.NotEstablished, ErrorMessages.ERR_SESSION_GEN_ERR, e);
+                    throw new SecuritySessionException(SessionExceptionType.NotEstablished, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_GEN_ERR), e);
                 }
             }
         }

@@ -17,7 +17,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <summary>
         /// Creates a DI instance of the identifier type
         /// </summary>
-        public IdentifierTypePersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public IdentifierTypePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 
@@ -37,7 +37,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         protected override IdentifierType DoConvertToInformationModel(DataContext context, DbIdentifierType dbModel, params IDbIdentified[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            if(this.m_configuration.LoadStrategy == Configuration.LoadStrategyType.FullLoad)
+            if (this.m_configuration.LoadStrategy == Configuration.LoadStrategyType.FullLoad)
             {
                 retVal.TypeConcept = base.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey, null);
                 retVal.ScopeConcept = base.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ScopeConceptKey.GetValueOrDefault(), null);

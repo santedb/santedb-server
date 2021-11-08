@@ -94,7 +94,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         }
 
         // Ado Pub Sub Manager Tracer source
-        private Tracer m_tracer = Tracer.GetTracer(typeof(AdoPubSubManager));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoPubSubManager));
 
         /// <summary>
         /// Fired when subscribing is about to occur

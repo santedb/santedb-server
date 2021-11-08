@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
@@ -42,9 +43,8 @@ namespace SanteDB.Server.Core.Services.Impl
     [ServiceProvider("File System based Notification Template Repository", configurationType: typeof(FileSystemNotificationTemplateConfigurationSection))]
     public class FileNotificationTemplateRepository : INotificationTemplateRepository
     {
-
         // Tracer
-        private Tracer m_tracer = Tracer.GetTracer(typeof(FileNotificationTemplateRepository));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(FileNotificationTemplateRepository));
 
         // Configuration
         private FileSystemNotificationTemplateConfigurationSection m_configuration;
@@ -69,7 +69,7 @@ namespace SanteDB.Server.Core.Services.Impl
         private List<NotificationTemplate> m_repository = new List<NotificationTemplate>();
 
         /// <summary>
-        /// Initialize 
+        /// Initialize
         /// </summary>
         public FileNotificationTemplateRepository()
         {
@@ -87,7 +87,7 @@ namespace SanteDB.Server.Core.Services.Impl
                             try
                             {
                                 lock (this.m_lock)
-                                    using(var fs = File.OpenRead(f))
+                                    using (var fs = File.OpenRead(f))
                                         this.m_repository.Add(NotificationTemplate.Load(fs));
                             }
                             catch (Exception ex)
@@ -108,7 +108,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public IEnumerable<NotificationTemplate> Find(Expression<Func<NotificationTemplate, bool>> filter)
         {
-            lock(this.m_lock)
+            lock (this.m_lock)
                 return this.m_repository.Where(filter.Compile()).ToList();
         }
 
@@ -117,7 +117,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public NotificationTemplate Get(string id, string lang)
         {
-            lock(this.m_lock)
+            lock (this.m_lock)
                 return this.m_repository.FirstOrDefault(o => o.Id == id && o.Language == lang);
         }
 
@@ -139,7 +139,7 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             try
             {
-                lock(this.m_lock)
+                lock (this.m_lock)
                 {
                     this.m_repository.RemoveAll(o => o.Id == template.Id && o.Language == template.Language);
                     this.m_repository.Add(template);

@@ -46,7 +46,7 @@ namespace SanteDB.Core.TestFramework
     public class TestApplicationContext : IServiceProvider, IDisposable, IApplicationServiceContext
     {
         // Tracer
-        private Tracer m_tracer = Tracer.GetTracer(typeof(TestApplicationContext));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(TestApplicationContext));
 
         // Lock object
         private static Object s_lockObject = new object();
@@ -140,7 +140,6 @@ namespace SanteDB.Core.TestFramework
 
             // Start the daemon services
             var adoPersistenceService = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
-            
         }
 
         /// <summary>

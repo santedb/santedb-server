@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using AtnaApi.Model;
 using AtnaApi.Transport;
 using SanteDB.Core;
@@ -35,7 +36,9 @@ using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using SdbAudit = SanteDB.Core.Model.Audit;
 using SanteDB.Core.Exceptions;
+
 using SanteDB.Core.Model.Audit;
+
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Diagnostics;
 
@@ -48,9 +51,8 @@ namespace SanteDB.Messaging.Atna
     [ServiceProvider("IHE ATNA Audit Dispatcher")]
     public class AtnaAuditService : IAuditDispatchService
     {
-
         // Tracer
-        private Tracer m_tracer = Tracer.GetTracer(typeof(AtnaAuditService));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AtnaAuditService));
 
         /// <summary>
         /// Gets the service name
@@ -74,8 +76,8 @@ namespace SanteDB.Messaging.Atna
         public AtnaAuditService()
         {
             this.m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AtnaConfigurationSection>();
-            
-            switch(this.m_configuration.Transport)
+
+            switch (this.m_configuration.Transport)
             {
                 case AtnaTransportType.File:
                     this.m_transporter = new FileSyslogTransport()
@@ -84,6 +86,7 @@ namespace SanteDB.Messaging.Atna
                         MessageFormat = this.m_configuration.Format
                     };
                     break;
+
                 case AtnaTransportType.Stcp:
                     this.m_transporter = new STcpSyslogTransport()
                     {
@@ -93,6 +96,7 @@ namespace SanteDB.Messaging.Atna
                         ServerCertificate = this.m_configuration?.ServerCertificate?.Certificate
                     };
                     break;
+
                 case AtnaTransportType.Tcp:
                     this.m_transporter = new TcpSyslogTransport()
                     {
@@ -100,6 +104,7 @@ namespace SanteDB.Messaging.Atna
                         MessageFormat = this.m_configuration.Format,
                     };
                     break;
+
                 case AtnaTransportType.Udp:
                     this.m_transporter = new UdpSyslogTransport()
                     {
@@ -107,11 +112,10 @@ namespace SanteDB.Messaging.Atna
                         MessageFormat = this.m_configuration.Format,
                     };
                     break;
+
                 default:
                     throw new InvalidOperationException($"Invalid transport type {this.m_configuration.Transport}");
             }
-
-
         }
 
         #region IAuditorService Members
@@ -122,7 +126,6 @@ namespace SanteDB.Messaging.Atna
         /// <param name="state"></param>
         private void SendAuditAsync(object state)
         {
-
             using (AuthenticationContext.EnterSystemContext())
             {
                 try
@@ -143,7 +146,6 @@ namespace SanteDB.Messaging.Atna
                                 ad.EventTypeCode.DisplayName = concept.LoadCollection<ConceptName>("ConceptNames").FirstOrDefault()?.Name;
                         }
                         this.m_tracer.TraceVerbose("Mapped Audit Type Code - {0}-{1}-{2}", ad.EventTypeCode.CodeSystem, ad.EventTypeCode.Code, ad.EventTypeCode.DisplayName);
-
                     }
 
                     // Create the audit basic
@@ -193,7 +195,6 @@ namespace SanteDB.Messaging.Atna
                                 });
                         am.Actors.Add(act);
                     }
-
 
                     foreach (var aoPtctpt in ad.AuditableObjects)
                     {
@@ -253,7 +254,6 @@ namespace SanteDB.Messaging.Atna
                 SendAuditAsync(ad);
         }
 
-        #endregion
-
+        #endregion IAuditorService Members
     }
 }

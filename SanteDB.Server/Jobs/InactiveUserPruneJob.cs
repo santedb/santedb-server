@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Jobs;
@@ -38,15 +39,14 @@ using System.Threading.Tasks;
 namespace SanteDB.Server.Jobs
 {
     /// <summary>
-    /// A job which prunes old users from the system 
+    /// A job which prunes old users from the system
     /// </summary>
     public class InactiveUserPruneJob : IReportProgressJob
     {
-
         /// <summary>
         /// Tracer for inactivity
         /// </summary>
-        private Tracer m_tracer = Tracer.GetTracer(typeof(InactiveUserPruneJob));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(InactiveUserPruneJob));
 
         // Cancel flag
         private bool m_cancelFlag = false;
@@ -137,7 +137,7 @@ namespace SanteDB.Server.Jobs
                         this.Progress = (float)offset / (float)totalResults;
                         List<SecurityUser> actionedUser = new List<SecurityUser>(10);
 
-                        // Users who haven't logged in 
+                        // Users who haven't logged in
                         foreach (var usr in userRepository.Find(o => o.UserClass == UserClassKeys.HumanUser && o.LastLoginTime < cutoff, offset, 100, out totalResults))
                         {
                             // Cancel request?

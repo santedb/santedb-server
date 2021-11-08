@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using RestSrvr;
 using SanteDB.Authentication.OAuth2.Rest;
 using SanteDB.Authentication.OAuth2.Wcf;
@@ -46,7 +47,7 @@ namespace SanteDB.Authentication.OAuth2
         public string ServiceName => "OAuth 2.0 Token Service";
 
         // Trace source
-        private Tracer m_traceSource = new Tracer(OAuthConstants.TraceSourceName);
+        private readonly Tracer m_traceSource = new Tracer(OAuthConstants.TraceSourceName);
 
         // Service host
         private RestService m_serviceHost;
@@ -77,7 +78,6 @@ namespace SanteDB.Authentication.OAuth2
                 return ServiceEndpointType.AuthenticationService;
             }
         }
-        
 
         /// <summary>
         /// Access control
@@ -109,14 +109,17 @@ namespace SanteDB.Authentication.OAuth2
         /// Fired when the service is starting
         /// </summary>
         public event EventHandler Started;
+
         /// <summary>
         /// Fired when the service is stopping
         /// </summary>
         public event EventHandler Starting;
+
         /// <summary>
         /// Fired when the service has stopped
         /// </summary>
         public event EventHandler Stopped;
+
         /// <summary>
         /// Fired when the service is stopping
         /// </summary>
@@ -144,7 +147,7 @@ namespace SanteDB.Authentication.OAuth2
                 this.Started?.Invoke(this, EventArgs.Empty);
                 return true;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_traceSource.TraceEvent(EventLevel.Error, e.ToString());
                 return false;

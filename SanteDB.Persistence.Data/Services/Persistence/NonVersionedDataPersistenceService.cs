@@ -19,11 +19,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         where TModel : NonVersionedEntityData, new()
         where TDbModel : DbNonVersionedBaseData, new()
     {
-
         /// <summary>
         /// Creates a new instance of the non-versioned persistence service with specified DI services
         /// </summary>
-        public NonVersionedDataPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public NonVersionedDataPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 
@@ -35,9 +34,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <returns>The updated object as reflected in the database</returns>
         protected override TDbModel DoUpdateInternal(DataContext context, TDbModel model)
         {
-            if(model == null)
+            if (model == null)
             {
-                throw new ArgumentNullException(nameof(model), ErrorMessages.ERR_ARGUMENT_NULL);
+                throw new ArgumentNullException(nameof(model), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
             model.UpdatedByKey = context.ContextId;
@@ -54,7 +53,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
             // Load strategy
-            switch(this.m_configuration.LoadStrategy)
+            switch (this.m_configuration.LoadStrategy)
             {
                 case Configuration.LoadStrategyType.FullLoad:
                     retVal.UpdatedBy = base.GetRelatedPersistenceService<SecurityProvenance>().Get(context, dbModel.UpdatedByKey.GetValueOrDefault(), null);
@@ -64,6 +63,5 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             return retVal;
         }
-
     }
 }

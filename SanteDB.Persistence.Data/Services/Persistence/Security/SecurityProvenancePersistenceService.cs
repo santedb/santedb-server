@@ -17,7 +17,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Security
         /// <summary>
         /// Creates a new persistence service for security provenance
         /// </summary>
-        public SecurityProvenancePersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public SecurityProvenancePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 
@@ -26,7 +26,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Security
         /// </summary>
         protected override DbSecurityProvenance DoUpdateInternal(DataContext context, DbSecurityProvenance model)
         {
-            throw new NotSupportedException(ErrorMessages.ERR_NOT_PERMITTED);
+            throw new NotSupportedException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_PERMITTED));
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Security
         /// </summary>
         protected override DbSecurityProvenance DoObsoleteInternal(DataContext context, Guid key)
         {
-            throw new NotSupportedException(ErrorMessages.ERR_NOT_PERMITTED);
+            throw new NotSupportedException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_PERMITTED));
         }
     }
 }

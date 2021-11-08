@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
@@ -41,7 +42,7 @@ namespace SanteDB.Server.Core.Services.Impl
     [ServiceProvider("Local Mail Message")]
     public class LocalMailMessageRepository : IMailMessageRepositoryService,
         IRepositoryService<MailMessage>
-	{
+    {
         // Localization Service
         private readonly ILocalizationService m_localizationService;
 
@@ -53,36 +54,40 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// The internal reference to the <see cref="TraceSource"/> instance.
         /// </summary>
-        private Tracer traceSource = new Tracer(SanteDBConstants.ServiceTraceSourceName);
+        private readonly Tracer traceSource = new Tracer(SanteDBConstants.ServiceTraceSourceName);
 
-		/// <summary>
-		/// Fired when an alert was raised and is being processed.
-		/// </summary>
-		public event EventHandler<MailMessageEventArgs> Committed;
+        /// <summary>
+        /// Fired when an alert was raised and is being processed.
+        /// </summary>
+        public event EventHandler<MailMessageEventArgs> Committed;
 
-		/// <summary>
-		/// Fired when an alert is received.
-		/// </summary>
-		public event EventHandler<MailMessageEventArgs> Received;
+        /// <summary>
+        /// Fired when an alert is received.
+        /// </summary>
+        public event EventHandler<MailMessageEventArgs> Received;
+
         /// <summary>
         /// Inserted
         /// </summary>
         public event EventHandler<RepositoryEventArgs<MailMessage>> Inserted;
+
         /// <summary>
         /// Saved
         /// </summary>
         public event EventHandler<RepositoryEventArgs<MailMessage>> Saved;
+
         /// <summary>
         /// Retrieved
         /// </summary>
         public event EventHandler<RepositoryEventArgs<MailMessage>> Retrieved;
+
         /// <summary>
         /// Queried
         /// </summary>
         public event EventHandler<RepositoryEventArgs<IEnumerable<MailMessage>>> Queried;
 
         /// <summary>
-        /// Initialize the instance variable 
+        /// Initialize the instance variable
         /// </summary>
         /// <param name="localizationService"></param>
         public LocalMailMessageRepository(ILocalizationService localizationService)
@@ -95,7 +100,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         /// <param name="message">The alert message to be broadcast.</param>
         public void Broadcast(MailMessage message)
-		{
+        {
             try
             {
                 this.traceSource.TraceVerbose("Broadcasting alert {0}", message);
@@ -119,22 +124,22 @@ namespace SanteDB.Server.Core.Services.Impl
             }
         }
 
-		/// <summary>
-		/// Searches for alerts.
-		/// </summary>
-		/// <param name="predicate">The predicate to use to search for alerts.</param>
-		/// <param name="offset">The offset of the search.</param>
-		/// <param name="count">The count of the search results.</param>
-		/// <param name="totalCount">The total count of the alerts.</param>
-		/// <returns>Returns a list of alerts.</returns>
-		public IEnumerable<MailMessage> Find(Expression<Func<MailMessage, bool>> predicate, int offset, int? count, out int totalCount, params ModelSort<MailMessage>[] orderBy)
-		{
-			var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<MailMessage>>();
+        /// <summary>
+        /// Searches for alerts.
+        /// </summary>
+        /// <param name="predicate">The predicate to use to search for alerts.</param>
+        /// <param name="offset">The offset of the search.</param>
+        /// <param name="count">The count of the search results.</param>
+        /// <param name="totalCount">The total count of the alerts.</param>
+        /// <returns>Returns a list of alerts.</returns>
+        public IEnumerable<MailMessage> Find(Expression<Func<MailMessage, bool>> predicate, int offset, int? count, out int totalCount, params ModelSort<MailMessage>[] orderBy)
+        {
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<MailMessage>>();
 
-			if (persistenceService == null)
-			{
+            if (persistenceService == null)
+            {
                 this.traceSource.TraceError($"{nameof(IDataPersistenceService<MailMessage>)} not found");
-                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.persistenceService", new
+                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.persistenceService", new
                 {
                     param = nameof(IDataPersistenceService<MailMessage>)
                 }));
@@ -144,42 +149,42 @@ namespace SanteDB.Server.Core.Services.Impl
             var qry = new NameValueCollection(QueryExpressionBuilder.BuildQuery(predicate).ToArray());
             if (!qry.ContainsKey("flags"))
                 qry.Add("flags", $"!{(int)MailMessageFlags.Archived}");
-			var retVal =  persistenceService.Query(QueryExpressionParser.BuildLinqExpression<MailMessage>(qry), offset, count,  out totalCount, AuthenticationContext.Current.Principal, orderBy);
+            var retVal = persistenceService.Query(QueryExpressionParser.BuildLinqExpression<MailMessage>(qry), offset, count, out totalCount, AuthenticationContext.Current.Principal, orderBy);
             this.Queried?.Invoke(this, new RepositoryEventArgs<IEnumerable<MailMessage>>(retVal));
             return retVal;
-		}
+        }
 
-		/// <summary>
-		/// Gets an alert.
-		/// </summary>
-		/// <param name="id">The id of the alert to be retrieved.</param>
-		/// <returns>Returns an alert.</returns>
-		public MailMessage Get(Guid id)
-		{
-			var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<MailMessage>>();
+        /// <summary>
+        /// Gets an alert.
+        /// </summary>
+        /// <param name="id">The id of the alert to be retrieved.</param>
+        /// <returns>Returns an alert.</returns>
+        public MailMessage Get(Guid id)
+        {
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<MailMessage>>();
 
-			if (persistenceService == null)
-			{
+            if (persistenceService == null)
+            {
                 this.traceSource.TraceError($"{nameof(IDataPersistenceService<MailMessage>)} not found");
-                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.persistenceService", new
+                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.persistenceService", new
                 {
                     param = nameof(IDataPersistenceService<MailMessage>)
                 }));
             }
 
-			var retVal = persistenceService.Get(id, null, AuthenticationContext.Current.Principal);
+            var retVal = persistenceService.Get(id, null, AuthenticationContext.Current.Principal);
             this.Retrieved?.Invoke(this, new RepositoryEventArgs<MailMessage>(retVal));
             return retVal;
-		}
+        }
 
-		/// <summary>
-		/// Inserts an alert message.
-		/// </summary>
-		/// <param name="message">The alert message to be inserted.</param>
-		/// <returns>Returns the inserted alert.</returns>
-		public MailMessage Insert(MailMessage message)
-		{
-			var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<MailMessage>>();
+        /// <summary>
+        /// Inserts an alert message.
+        /// </summary>
+        /// <param name="message">The alert message to be inserted.</param>
+        /// <returns>Returns the inserted alert.</returns>
+        public MailMessage Insert(MailMessage message)
+        {
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<MailMessage>>();
             var securityService = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>();
             var roleService = ApplicationServiceContext.Current.GetService<IRoleProviderService>();
 
@@ -189,21 +194,21 @@ namespace SanteDB.Server.Core.Services.Impl
                 throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.mailMessage"));
             }
             if (persistenceService == null)
-			{
+            {
                 this.traceSource.TraceError($"{nameof(IDataPersistenceService<MailMessage>)} not found");
-                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.persistenceService", new
+                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.persistenceService", new
                 {
                     param = nameof(IDataPersistenceService<MailMessage>)
                 }));
             }
 
-			MailMessage alert;
+            MailMessage alert;
 
-			try
-			{
+            try
+            {
                 // Clear the RCPT TO and set via TO
                 message.RcptTo.Clear();
-                foreach(var rcp in message.To.Split(';').Select(o=>o.ToLower()).Distinct())
+                foreach (var rcp in message.To.Split(';').Select(o => o.ToLower()).Distinct())
                 {
                     var usr = securityService.GetUser(rcp);
                     if (usr == null) // Group?
@@ -222,61 +227,61 @@ namespace SanteDB.Server.Core.Services.Impl
                 if (message.TimeStamp == default(DateTimeOffset))
                     message.TimeStamp = DateTimeOffset.Now;
 
-				alert = persistenceService.Insert(message, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-				this.Received?.Invoke(this, new MailMessageEventArgs(alert));
+                alert = persistenceService.Insert(message, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                this.Received?.Invoke(this, new MailMessageEventArgs(alert));
                 this.Inserted?.Invoke(this, new RepositoryEventArgs<MailMessage>(alert));
-			}
-			catch (Exception e)
-			{
+            }
+            catch (Exception e)
+            {
 #if DEBUG
-				this.traceSource.TraceEvent(EventLevel.Error,  e.StackTrace);
+                this.traceSource.TraceEvent(EventLevel.Error, e.StackTrace);
 #endif
-				this.traceSource.TraceEvent(EventLevel.Error,  e.Message);
+                this.traceSource.TraceEvent(EventLevel.Error, e.Message);
 
-				throw;
-			}
+                throw;
+            }
 
-			return alert;
-		}
+            return alert;
+        }
 
-		/// <summary>
-		/// Saves an alert.
-		/// </summary>
-		/// <param name="message">The alert message to be saved.</param>
-		public MailMessage Save(MailMessage message)
-		{
-			var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<MailMessage>>();
+        /// <summary>
+        /// Saves an alert.
+        /// </summary>
+        /// <param name="message">The alert message to be saved.</param>
+        public MailMessage Save(MailMessage message)
+        {
+            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<MailMessage>>();
 
-			if (persistenceService == null)
-			{
+            if (persistenceService == null)
+            {
                 this.traceSource.TraceError($"{nameof(IDataPersistenceService<MailMessage>)} not found");
-                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.persistenceService", new
+                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.persistenceService", new
                 {
                     param = nameof(IDataPersistenceService<MailMessage>)
                 }));
             }
 
-			MailMessage alert;
+            MailMessage alert;
 
-			try
-			{
-				// obsolete the alert
-				alert = message.ObsoletionTime.HasValue ? 
-					persistenceService.Obsolete(message.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal) : 
-					persistenceService.Update(message, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+            try
+            {
+                // obsolete the alert
+                alert = message.ObsoletionTime.HasValue ?
+                    persistenceService.Obsolete(message.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal) :
+                    persistenceService.Update(message, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
-				this.Received?.Invoke(this, new MailMessageEventArgs(alert));
+                this.Received?.Invoke(this, new MailMessageEventArgs(alert));
                 this.Saved?.Invoke(this, new RepositoryEventArgs<MailMessage>(alert));
-			}
-			catch (DataPersistenceException)
-			{
-				alert = persistenceService.Insert(message, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-				this.Received?.Invoke(this, new MailMessageEventArgs(alert));
+            }
+            catch (DataPersistenceException)
+            {
+                alert = persistenceService.Insert(message, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                this.Received?.Invoke(this, new MailMessageEventArgs(alert));
                 this.Saved?.Invoke(this, new RepositoryEventArgs<MailMessage>(alert));
             }
 
             return alert;
-		}
+        }
 
         /// <summary>
         /// Find the specified mail message

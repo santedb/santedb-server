@@ -7,7 +7,6 @@ using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 {
-
     /// <summary>
     /// Concept class persistence services
     /// </summary>
@@ -16,7 +15,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <summary>
         /// Creates a dependency injected instance of the concept class perssitence service
         /// </summary>
-        public ConceptClassPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public ConceptClassPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
     }

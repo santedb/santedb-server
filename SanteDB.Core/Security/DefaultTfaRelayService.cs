@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interfaces;
@@ -34,14 +35,13 @@ using System.Security.Principal;
 namespace SanteDB.Server.Core.Security
 {
     /// <summary>
-    /// Represents a default implementation of a TFA relay service which scans the entire application domain for 
+    /// Represents a default implementation of a TFA relay service which scans the entire application domain for
     /// mechanisms and allows calling of them all
     /// </summary>
     [ServiceProvider("Default TFA Relay Provider")]
     public class DefaultTfaRelayService : ITfaRelayService
     {
-
-        private Tracer m_tracer = Tracer.GetTracer(typeof(DefaultTfaRelayService));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(DefaultTfaRelayService));
 
         /// <summary>
         /// Gets the service name

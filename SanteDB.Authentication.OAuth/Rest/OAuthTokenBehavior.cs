@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Security.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -78,10 +79,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
     [ServiceBehavior(Name = "OAuth2", InstanceMode = ServiceInstanceMode.Singleton)]
     public class OAuthTokenBehavior : IOAuthTokenContract
     {
-
-
         // Trace source name
-        private Tracer m_traceSource = new Tracer(OAuthConstants.TraceSourceName);
+        private readonly Tracer m_traceSource = new Tracer(OAuthConstants.TraceSourceName);
 
         // Policy Enforcement service
         private IPolicyEnforcementService m_policyEnforcementService;
@@ -91,7 +90,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
         // Master configuration
         private SecurityConfigurationSection m_masterConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
-        
+
         // XHTML
         private const string XS_HTML = "http://www.w3.org/1999/xhtml";
 
@@ -108,8 +107,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         public object Token(NameValueCollection tokenRequest)
         {
-
-            // Get the client application 
+            // Get the client application
             IApplicationIdentityProviderService clientIdentityService = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
             IIdentityProviderService identityProvider = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
 
@@ -161,7 +159,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 {
                     var authHead = RestOperationContext.Current.IncomingRequest.Headers["X-Device-Authorization"];
 
-                    // TODO: X509 Authentication 
+                    // TODO: X509 Authentication
                     //if (RestOperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets != null)
                     //{
                     //    var claimSet = OperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets.OfType<System.IdentityModel.Claims.X509CertificateClaimSet>().FirstOrDefault();
@@ -198,7 +196,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         if (devicePrincipal != null)
                             this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthResetFlowPolicy, devicePrincipal);
 
-                        // Validate 
+                        // Validate
                         if (String.IsNullOrWhiteSpace(tokenRequest["username"]) || String.IsNullOrWhiteSpace(tokenRequest["challenge"]) || String.IsNullOrWhiteSpace(tokenRequest["response"]))
                             return this.CreateErrorCondition(OAuthErrorType.invalid_request, "Invalid client grant message");
 
@@ -206,6 +204,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         var tfa = RestOperationContext.Current.IncomingRequest.Headers[OAuthConstants.TfaHeaderName];
                         principal = ApplicationServiceContext.Current.GetService<ISecurityChallengeIdentityService>().Authenticate(tokenRequest["username"], Guid.Parse(tokenRequest["challenge"]), tokenRequest["response"], tfa);
                         break;
+
                     case OAuthConstants.GrantNameClientCredentials:
                         this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthClientCredentialFlowPolicy, clientPrincipal);
                         if (devicePrincipal != null)
@@ -221,6 +220,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         principal = devicePrincipal ?? clientPrincipal;
                         // Demand "Login As Service" permission
                         break;
+
                     case OAuthConstants.GrantNamePassword:
 
                         // Password grants allowed for this application?
@@ -228,7 +228,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         if (devicePrincipal != null)
                             this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal);
 
-                        // Validate 
+                        // Validate
                         if (String.IsNullOrWhiteSpace(tokenRequest["username"]) && String.IsNullOrWhiteSpace(tokenRequest["refresh_token"]))
                             return this.CreateErrorCondition(OAuthErrorType.invalid_request, "Invalid client grant message");
 
@@ -237,6 +237,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         else
                             principal = identityProvider.Authenticate(tokenRequest["username"], tokenRequest["password"]);
                         break;
+
                     case OAuthConstants.GrantNameRefresh:
                         var refreshToken = tokenRequest["refresh_token"];
                         var secret = Enumerable.Range(0, refreshToken.Length)
@@ -245,6 +246,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                                     .ToArray();
                         principal = (identityProvider as ISessionIdentityProviderService).Authenticate(ApplicationServiceContext.Current.GetService<ISessionProviderService>().Extend(secret));
                         break;
+
                     case OAuthConstants.GrantNameAuthorizationCode:
 
                         // First, ensure the authenticated application has permission to use this grant
@@ -269,7 +271,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         var dsig = token.Skip(72 + 2 * (scopeLength + claimLength)).Take(32).ToArray();
                         var expiry = new DateTime(BitConverter.ToInt64(token, 104 + 2 * (scopeLength + claimLength)));
 
-                        // Verify 
+                        // Verify
                         if (!ApplicationServiceContext.Current.GetService<IDataSigningService>().Verify(token.Take(token.Length - 40).ToArray(), dsig))
                             throw new SecurityTokenValidationException("Authorization code failed signature verification");
 
@@ -300,10 +302,10 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         // TODO: Claims
 
                         break;
+
                     default:
                         throw new InvalidOperationException("Invalid grant type");
                 }
-
 
                 if (principal == null)
                     return this.CreateErrorCondition(OAuthErrorType.invalid_grant, "Invalid username or password");
@@ -332,14 +334,12 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         private IEnumerable<IClaim> ValidateClaims(IPrincipal userPrincipal, params IClaim[] claims)
         {
-
             List<IClaim> retVal = new List<IClaim>();
 
             // HACK: Find a better way to make claims
             // Claims are stored as X-SanteDBACS-Claim headers
             foreach (var itm in claims)
             {
-
                 // Claim allowed
                 if (this.m_configuration.AllowedClientClaims == null ||
                     !this.m_configuration.AllowedClientClaims.Contains(itm.Type))
@@ -365,7 +365,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
         {
             this.m_traceSource.TraceInfo("Will create new ClaimsPrincipal based on existing principal");
 
-
             // System claims
             List<IClaim> claims = session.Claims.ToList();
 
@@ -385,15 +384,14 @@ namespace SanteDB.Authentication.OAuth2.Rest
             var signingCredentials = SecurityUtils.CreateSigningCredentials($"SA.{appid}");
 
             // Was there a signing credentials provided for this application? If so, then create for default
-            if(signingCredentials == null)
+            if (signingCredentials == null)
                 signingCredentials = SecurityUtils.CreateSigningCredentials(this.m_configuration.JwtSigningKey); // attempt to get default
 
-            // Is the default an HMAC256 key? 
+            // Is the default an HMAC256 key?
             if ((signingCredentials == null ||
                 signingCredentials.SignatureAlgorithm == "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256") &&
                 RestOperationContext.Current.Data.TryGetValue("symm_secret", out object clientSecret)) // OPENID States we should use the application client secret to sign the result , we can only do this if we actually have a symm_secret set
             {
-
                 var secret = Encoding.UTF8.GetBytes(clientSecret.ToString());
                 while (secret.Length < 16)
                     secret = secret.Concat(secret).ToArray();
@@ -405,7 +403,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     );
             }
 
-            // Generate security token            
+            // Generate security token
             var jwt = new JwtSecurityToken(
                 signingCredentials: signingCredentials,
                 claims: claims.Select(o => new System.Security.Claims.Claim(o.Type, o.Value)),
@@ -415,7 +413,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
            );
 
             return jwt;
-
         }
 
         /// <summary>
@@ -433,15 +430,14 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 RestOperationContext.Current.IncomingRequest.Headers["X-Forwarded-For"] ??
                 RestOperationContext.Current.IncomingRequest.RemoteEndPoint.Address.ToString();
 
-          
             // Establish the session
             ISessionProviderService isp = ApplicationServiceContext.Current.GetService<ISessionProviderService>();
             var scopeList = scope == "*" || String.IsNullOrEmpty(scope) ? null : scope.Split(' ');
             string purposeOfUse = additionalClaims?.FirstOrDefault(o => o.Type == SanteDBClaimTypes.PurposeOfUse)?.Value;
             bool isOverride = additionalClaims?.Any(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim) == true || scopeList?.Any(o => o == PermissionPolicyIdentifiers.OverridePolicyPermission) == true;
 
-            var session = isp.Establish(new SanteDBClaimsPrincipal(claimsPrincipal.Identities), remoteIp, isOverride, purposeOfUse, scopeList, additionalClaims.FirstOrDefault(o=>o.Type == SanteDBClaimTypes.Language)?.Value);
-            
+            var session = isp.Establish(new SanteDBClaimsPrincipal(claimsPrincipal.Identities), remoteIp, isOverride, purposeOfUse, scopeList, additionalClaims.FirstOrDefault(o => o.Type == SanteDBClaimTypes.Language)?.Value);
+
             string refreshToken = null, sessionId = null;
             if (session != null)
             {
@@ -464,7 +460,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     AccessToken = sessionId,
                     IdentityToken = handler.WriteToken(jwt),
                     ExpiresIn = (int)(session.NotAfter.Subtract(DateTime.Now)).TotalMilliseconds,
-                    RefreshToken = refreshToken // TODO: Need to write a SessionProvider for this so we can keep track of refresh tokens 
+                    RefreshToken = refreshToken // TODO: Need to write a SessionProvider for this so we can keep track of refresh tokens
                 };
             else
                 response = new OAuthTokenResponse()
@@ -472,7 +468,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     TokenType = OAuthConstants.JwtTokenType,
                     AccessToken = handler.WriteToken(jwt),
                     ExpiresIn = (int)(session.NotAfter.Subtract(DateTime.Now)).TotalMilliseconds,
-                    RefreshToken = refreshToken // TODO: Need to write a SessionProvider for this so we can keep track of refresh tokens 
+                    RefreshToken = refreshToken // TODO: Need to write a SessionProvider for this so we can keep track of refresh tokens
                 };
 
             return response;
@@ -502,7 +498,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             if (principal != null)
             {
-
                 if (principal.Identity.Name == Core.Security.AuthenticationContext.AnonymousPrincipal.Identity.Name)
                     return new OAuthError()
                     {
@@ -588,7 +583,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
                     AuditUtil.AddUserActor(audit, principal);
 
-                    // Generate the token 
+                    // Generate the token
                     // Token format is :
                     // SID w/SALT . AID w/SALT . SIG
                     byte[] authCode = new byte[112 + scopeData.Length * 2 + claimData.Length * 2];
@@ -627,7 +622,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     var claimList = claims?.Select(o => new SanteDBClaim(o.Split('=')[0], o.Split('=')[1])).ToList() ?? new List<SanteDBClaim>();
                     if (!String.IsNullOrEmpty(nonce)) // append nonce
                         claimList.Add(new SanteDBClaim("nonce", nonce));
-                    var response = this.EstablishSession(principal, new SanteDBClaimsPrincipal(clientIdentity), null, String.Join(" ", scope.Where(o=>!o.Equals("openid"))), claimList);
+                    var response = this.EstablishSession(principal, new SanteDBClaimsPrincipal(clientIdentity), null, String.Join(" ", scope.Where(o => !o.Equals("openid"))), claimList);
                     // Return id token?
                     String redirectString = "";
                     if (responseType.Split(' ').Contains("token"))
@@ -636,12 +631,10 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         redirectString += $"id_token={response.IdentityToken}&";
                     redirectString += $"state={state}";
 
-
                     if (responseMode == "form_post")
                         return this.RenderOAuthAutoPost(redirectUrl, redirectString);
                     else
                         RestOperationContext.Current.OutgoingResponse.Redirect($"{redirectUrl}?{redirectString}");
-
                 }
                 return null;
             }
@@ -662,7 +655,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
             {
                 AuditUtil.SendAudit(audit);
             }
-
         }
 
         /// <summary>
@@ -717,7 +709,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <returns>A stream of the rendered login asset</returns>
         public Stream RenderAsset(string content)
         {
-
             var client = RestOperationContext.Current.IncomingRequest.QueryString["client_id"];
             var redirectUri = RestOperationContext.Current.IncomingRequest.QueryString["redirect_uri"];
             var responseType = RestOperationContext.Current.IncomingRequest.QueryString["response_type"];
@@ -726,7 +717,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
             // Now time to resolve the asset
             if (String.IsNullOrEmpty(content) || content == "index.html")
             {
-
                 // Rule: scope, response_type and client_id and redirect_uri must be provided
                 if (String.IsNullOrEmpty(redirectUri) ||
                     String.IsNullOrEmpty(client) ||
@@ -744,7 +734,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     // TODO: Get claim for application redirect URL
                     var signature = ApplicationServiceContext.Current.GetService<IDataSigningService>().SignData(Encoding.UTF8.GetBytes(client + redirectUri));
                     bindingParms.Add("dsig", BitConverter.ToString(signature));
-
                 }
             }
             bindingParms.Add("auth_error", "&nbsp;");
@@ -843,7 +832,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
             }
         }
 
-
         /// <summary>
         /// Get the specified session information
         /// </summary>
@@ -865,8 +853,5 @@ namespace SanteDB.Authentication.OAuth2.Rest
             else
                 throw new SecurityException("No Such Session");
         }
-
-
     }
-
 }

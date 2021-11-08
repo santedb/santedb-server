@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Http;
 using SanteDB.Core.Http.Description;
@@ -45,18 +46,20 @@ namespace SanteDB.Server.AdminConsole.Security
         public String ServiceName => "OAUTH 2.0 Identity Provider";
 
         // Tracer
-        private Tracer m_tracer = Tracer.GetTracer(typeof(OAuthIdentityProvider));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(OAuthIdentityProvider));
 
         #region IIdentityProviderService implementation
+
         /// <summary>
         /// Occurs when authenticating.
         /// </summary>
         public event EventHandler<AuthenticatingEventArgs> Authenticating;
+
         /// <summary>
         /// Occurs when a principal has authenticated.
         /// </summary>
         public event EventHandler<AuthenticatedEventArgs> Authenticated;
-        
+
         /// <summary>
         /// Authenticate the user
         /// </summary>
@@ -64,7 +67,7 @@ namespace SanteDB.Server.AdminConsole.Security
         /// <param name="password">Password.</param>
         public System.Security.Principal.IPrincipal Authenticate(string userName, string password)
         {
-            if(String.IsNullOrEmpty(userName))
+            if (String.IsNullOrEmpty(userName))
                 return this.Authenticate(AuthenticationContext.Current.Principal, password);
             else
                 return this.Authenticate(new GenericPrincipal(new GenericIdentity(userName), null), password);
@@ -85,7 +88,6 @@ namespace SanteDB.Server.AdminConsole.Security
         /// <param name="password">Password.</param>
         public System.Security.Principal.IPrincipal Authenticate(System.Security.Principal.IPrincipal principal, string password, String tfaSecret)
         {
-
             AuthenticatingEventArgs e = new AuthenticatingEventArgs(principal.Identity.Name);
             this.Authenticating?.Invoke(this, e);
             if (e.Cancel)
@@ -104,7 +106,6 @@ namespace SanteDB.Server.AdminConsole.Security
             {
                 using (IRestClient restClient = ApplicationContext.Current.GetRestClient(ServiceEndpointType.AuthenticationService))
                 {
-
                     // Set credentials
                     restClient.Credentials = new OAuthTokenServiceCredentials(principal);
 
@@ -137,17 +138,14 @@ namespace SanteDB.Server.AdminConsole.Security
                         OAuthTokenResponse response = restClient.Post<OAuthTokenRequest, OAuthTokenResponse>("oauth2_token", "application/x-www-form-urlencoded", request);
                         retVal = new TokenClaimsPrincipal(response.AccessToken, response.IdToken, response.TokenType, response.RefreshToken);
                         this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(principal.Identity.Name, retVal, true));
-
                     }
-                    catch(RestClientException<OAuthTokenResponse> ex)
+                    catch (RestClientException<OAuthTokenResponse> ex)
                     {
                         this.m_tracer.TraceWarning("OAUTH Server Responded: {0}", ex.Result.ErrorDescription);
                     }
                     catch (WebException ex) // Raw level web exception
                     {
-
                         this.m_tracer.TraceError("Error authenticating: {0}", ex.Message);
-
                     }
                     catch (SecurityException ex)
                     {
@@ -168,8 +166,6 @@ namespace SanteDB.Server.AdminConsole.Security
 
             return retVal;
         }
-
-  
 
         /// <summary>
         /// Gets the specified identity
@@ -205,11 +201,11 @@ namespace SanteDB.Server.AdminConsole.Security
         {
             throw new NotImplementedException();
         }
-        
+
         /// <summary>
         /// Creates an identity
         /// </summary>
-        public IIdentity CreateIdentity(string userName,  string password, IPrincipal principal)
+        public IIdentity CreateIdentity(string userName, string password, IPrincipal principal)
         {
             throw new NotImplementedException();
         }
@@ -230,17 +226,16 @@ namespace SanteDB.Server.AdminConsole.Security
             throw new NotImplementedException();
         }
 
-        public IIdentity CreateIdentity(Guid sid, string userName,  string password, IPrincipal auth)
+        public IIdentity CreateIdentity(Guid sid, string userName, string password, IPrincipal auth)
         {
             throw new NotImplementedException();
         }
-        
 
         public string GenerateTfaSecret(string userName)
         {
             throw new NotImplementedException();
         }
-        
+
         public void AddClaim(string userName, IClaim claim, IPrincipal principal, TimeSpan? expiry = null)
         {
             throw new NotImplementedException();
@@ -261,7 +256,6 @@ namespace SanteDB.Server.AdminConsole.Security
             throw new NotImplementedException();
         }
 
-        #endregion
+        #endregion IIdentityProviderService implementation
     }
 }
-

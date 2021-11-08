@@ -20,7 +20,6 @@ namespace SanteDB.Persistence.Data.Test
     [TestFixture(Category = "Persistence", TestName = "ADO User Identity Provider")]
     public class AdoIdentityProviderTest : DataPersistenceTest
     {
-
         /// <summary>
         /// Ensures that we can reate an identity
         /// </summary>
@@ -62,7 +61,7 @@ namespace SanteDB.Persistence.Data.Test
             var adminPrincipal = service.Authenticate("administrator", "Mohawk123");
             var identity = service.CreateIdentity("TEST_03", "@TESTPa$$w0rd", adminPrincipal);
 
-            for(int i = 0; i < 10; i++)
+            for (int i = 0; i < 10; i++)
             {
                 try
                 {
@@ -77,7 +76,7 @@ namespace SanteDB.Persistence.Data.Test
                 var pcpl = service.Authenticate("TEST_03", "@TESTPa$$w0rd");
                 Assert.Fail("Should not authenticate");
             }
-            catch (AuthenticationException e) when (e.Message == ErrorMessages.ERR_AUTH_USR_LOCKED)
+            catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_LOCKED))
             { }
             catch
             {
@@ -104,9 +103,8 @@ namespace SanteDB.Persistence.Data.Test
             {
                 service.Authenticate("TEST_04", "@TESTPa$$w0rd");
             }
-            catch(AuthenticationException e) when (e.Message == ErrorMessages.ERR_AUTH_USR_LOCKED)
+            catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_LOCKED))
             {
-
             }
             catch
             {
@@ -137,9 +135,8 @@ namespace SanteDB.Persistence.Data.Test
                 principal = service.Authenticate("TEST_05", "@TESTPa$$w0rd");
                 Assert.Fail("Should not login");
             }
-            catch(AuthenticationException e)  when (e.Message == ErrorMessages.ERR_AUTH_USR_INVALID)
+            catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_INVALID))
             {
-
             }
             catch
             {
@@ -147,7 +144,6 @@ namespace SanteDB.Persistence.Data.Test
             }
         }
 
-        
         /// <summary>
         /// Test changing of own password
         /// </summary>
@@ -168,13 +164,11 @@ namespace SanteDB.Persistence.Data.Test
                 principal = service.Authenticate("TEST_06", "@TESTPa$$w0rd");
                 Assert.Fail("Should not have logged in");
             }
-            catch(AuthenticationException e) when (e.Message == ErrorMessages.ERR_AUTH_USR_INVALID)
+            catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_INVALID))
             { }
-            catch { Assert.Fail("Invalid exception thrown");  }
+            catch { Assert.Fail("Invalid exception thrown"); }
 
             principal = service.Authenticate("TEST_06", "4$1mpl3P4wrE");
-
-
         }
 
         /// <summary>
@@ -195,9 +189,8 @@ namespace SanteDB.Persistence.Data.Test
                 service.ChangePassword("TEST_07B", "4$1mpl3P4wrE", principal);
                 Assert.Fail("Should have thrown exception");
             }
-            catch(PolicyViolationException e) when (e.PolicyId == PermissionPolicyIdentifiers.ChangePassword)
+            catch (PolicyViolationException e) when (e.PolicyId == PermissionPolicyIdentifiers.ChangePassword)
             {
-
             }
             catch
             {
@@ -205,7 +198,6 @@ namespace SanteDB.Persistence.Data.Test
             }
 
             principal = service.Authenticate("TEST_07B", "@TESTPa$$w0rd");
-
         }
 
         /// <summary>
@@ -218,12 +210,11 @@ namespace SanteDB.Persistence.Data.Test
             Assert.IsNull(service.GetIdentity("TEST_08"));
             var adminPrincipal = service.Authenticate("administrator", "Mohawk123");
             var identity = service.CreateIdentity("TEST_08", "@TESTPa$$w0rd", adminPrincipal);
-            
+
             // Add a claim
             service.AddClaim("TEST_08", new SanteDBClaim("test", "TEST"), adminPrincipal);
             var claimsIdentity = service.GetIdentity("TEST_08") as IClaimsIdentity;
             Assert.AreEqual("TEST", claimsIdentity.FindFirst("test")?.Value);
-
         }
 
         /// <summary>
@@ -267,6 +258,5 @@ namespace SanteDB.Persistence.Data.Test
             Assert.IsFalse(service.GetIdentity("SYSTEM").IsAuthenticated);
             Assert.AreEqual("SYSTEM", service.GetIdentity(Guid.Parse(AuthenticationContext.SystemUserSid)).Name);
         }
-
     }
 }

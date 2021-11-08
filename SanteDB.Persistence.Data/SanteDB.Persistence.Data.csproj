@@ -47,11 +47,12 @@
           <Project>{030666AA-FC71-449E-9DFC-270F1C23C5DA}</Project>
           <Name>SanteDB.BI</Name>
         </ProjectReference>
-        <ProjectReference Include="..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj" />
         <ProjectReference Include="..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj">
           <Project>{284CE885-78E0-48EA-A2E4-6957AD66EAB5}</Project>
           <Name>SanteDB.Docker.Core</Name>
         </ProjectReference>
+        <ProjectReference Include="..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj" />
+        
       </ItemGroup>
     </When>
     <Otherwise>
@@ -62,6 +63,7 @@
         <PackageReference Include="SanteDB.BI" Version="$(VersionNumber)" />
         <PackageReference Include="SanteDB.Core.i18n" Version="$(VersionNumber)" />
         <PackageReference Include="SanteDB.Docker.Core" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.i18n" Version="$(VersionNumber)" />
       </ItemGroup>
     </Otherwise>
   </Choose>

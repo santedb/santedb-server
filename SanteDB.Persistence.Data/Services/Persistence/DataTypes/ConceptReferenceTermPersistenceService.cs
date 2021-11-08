@@ -16,9 +16,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
     public class ConceptReferenceTermPersistenceService : ConceptReferencePersistenceBase<ConceptReferenceTerm, DbConceptReferenceTerm>
     {
         /// <summary>
-        /// Concept reference term persistence 
+        /// Concept reference term persistence
         /// </summary>
-        public ConceptReferenceTermPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public ConceptReferenceTermPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 
@@ -39,16 +39,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            switch(this.m_configuration.LoadStrategy)
+            switch (this.m_configuration.LoadStrategy)
             {
                 case Configuration.LoadStrategyType.FullLoad:
                     retVal.RelationshipType = base.GetRelatedPersistenceService<ConceptRelationshipType>().Get(context, dbModel.RelationshipTypeKey, null);
                     retVal.SetLoadIndicator(nameof(ConceptReferenceTerm.RelationshipType));
                     break;
-
             }
             return retVal;
         }
-
     }
 }

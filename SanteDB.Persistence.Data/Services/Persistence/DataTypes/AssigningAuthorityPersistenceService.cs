@@ -15,16 +15,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
     /// </summary>
     public class AssigningAuthorityPersistenceService : NonVersionedDataPersistenceService<AssigningAuthority, DbAssigningAuthority>
     {
-
         /// <summary>
         /// Assigning authority configuration manager
         /// </summary>
-        public AssigningAuthorityPersistenceService(IConfigurationManager configurationManager, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, adhocCacheService, dataCachingService, queryPersistence)
+        public AssigningAuthorityPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 
         /// <summary>
-        /// Convert the database representation of the assigning authority 
+        /// Convert the database representation of the assigning authority
         /// </summary>
         protected override AssigningAuthority DoConvertToInformationModel(DataContext context, DbAssigningAuthority dbModel, params IDbIdentified[] referenceObjects)
         {
@@ -34,7 +33,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         }
 
         /// <summary>
-        /// Perform an insert model 
+        /// Perform an insert model
         /// </summary>
         /// <param name="context">The context to be use for insertion</param>
         /// <param name="data">The data to be inserted</param>
@@ -42,12 +41,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         protected override AssigningAuthority DoInsertModel(DataContext context, AssigningAuthority data)
         {
             var retVal = base.DoInsertModel(context, data);
-            if(data.AuthorityScopeXml?.Any() == true)
+            if (data.AuthorityScopeXml?.Any() == true)
             {
-                retVal.AuthorityScopeXml = base.UpdateInternalAssociations(context, retVal.Key.Value, data.AuthorityScopeXml.Select(o=>new DbAuthorityScope()
+                retVal.AuthorityScopeXml = base.UpdateInternalAssociations(context, retVal.Key.Value, data.AuthorityScopeXml.Select(o => new DbAuthorityScope()
                 {
                     ScopeConceptKey = o
-                })).Select(o=>o.ScopeConceptKey).ToList();
+                })).Select(o => o.ScopeConceptKey).ToList();
             }
             return retVal;
         }
@@ -60,14 +59,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <returns>The updated assigning authority</returns>
         protected override AssigningAuthority DoUpdateModel(DataContext context, AssigningAuthority data)
         {
-
             var retVal = base.DoUpdateModel(context, data); // updates the core properties
             retVal.AuthorityScopeXml = base.UpdateInternalAssociations(context, retVal.Key.Value, data.AuthorityScopeXml?.Select(o => new DbAuthorityScope()
             {
                 ScopeConceptKey = o
-            })).Select(o=>o.ScopeConceptKey).ToList();
+            })).Select(o => o.ScopeConceptKey).ToList();
             return retVal;
-
         }
 
         /// <summary>

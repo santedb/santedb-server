@@ -54,7 +54,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
     /// Represents a service which is responsible for the storage of audits
     /// </summary>
     [ServiceProvider("ADO.NET Audit Repository")]
-#pragma warning disable CS0067
     public class AdoAuditRepositoryService : IDataPersistenceService<AuditEventData>
     {
         /// <summary>
@@ -72,7 +71,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         private QueryBuilder m_builder;
 
         // Trace source name
-        private Tracer m_traceSource = Tracer.GetTracer(typeof(AdoAuditRepositoryService));
+        private readonly Tracer m_traceSource = Tracer.GetTracer(typeof(AdoAuditRepositoryService));
 
         /// <summary>
         /// Fired when data is being inserted
@@ -83,34 +82,42 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// Fired when data is has been inserted
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<AuditEventData>> Inserted;
+
         /// <summary>
         /// Fired when data is being updated
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<AuditEventData>> Updating;
+
         /// <summary>
         /// Fired when data is has been inserted
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<AuditEventData>> Updated;
+
         /// <summary>
         /// Fired when data is being obsoleted
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<AuditEventData>> Obsoleting;
+
         /// <summary>
         /// Fired when data is has been inserted
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<AuditEventData>> Obsoleted;
+
         /// <summary>
         /// Fired when data is being retrieved
         /// </summary>
         public event EventHandler<DataRetrievingEventArgs<AuditEventData>> Retrieving;
+
         /// <summary>
         /// Fired when data is has been retrieved
         /// </summary>
         public event EventHandler<DataRetrievedEventArgs<AuditEventData>> Retrieved;
+
         /// <summary>
         /// Fired when data is being queryed
         /// </summary>
         public event EventHandler<QueryRequestEventArgs<AuditEventData>> Querying;
+
         /// <summary>
         /// Fired when data is has been queried
         /// </summary>

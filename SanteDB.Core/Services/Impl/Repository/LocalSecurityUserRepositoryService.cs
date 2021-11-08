@@ -71,7 +71,7 @@ namespace SanteDB.Server.Core.Services.Impl
 
             // Verify password meets requirements
             if (ApplicationServiceContext.Current.GetService<IPasswordValidatorService>()?.Validate(data.Password) == false)
-                throw new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, "err.password", this.m_localizationService.FormatString("error.server.core.validationFail", new
+                throw new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, "err.password", this.m_localizationService.GetString("error.server.core.validationFail", new
                 {
                     param = "Password"
                 }), DetectedIssueKeys.SecurityIssue));

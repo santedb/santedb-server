@@ -43,7 +43,7 @@ namespace SanteDB.Tools.Debug.Wcf
     [ServiceBehavior(Name = "HDSI_Sandbox")]
     public class DataSandboxTool : IDataSandboxTool
     {
-        private Tracer m_traceSource = new Tracer("SanteDB.Tools.Debug");
+        private readonly Tracer m_traceSource = new Tracer("SanteDB.Tools.Debug");
 
         /// <summary>
         /// Create dataset

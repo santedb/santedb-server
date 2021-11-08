@@ -72,7 +72,7 @@ namespace SanteDB.Server.Core.Services.Impl
         private AppletConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AppletConfigurationSection>();
 
         // Tracer
-        private Tracer m_tracer = new Tracer(SanteDBConstants.ServiceTraceSourceName + ".AppletManager");
+        private readonly Tracer m_tracer = new Tracer(SanteDBConstants.ServiceTraceSourceName + ".AppletManager");
 
         /// <summary>
         /// Indicates whether the service is running
@@ -394,7 +394,6 @@ namespace SanteDB.Server.Core.Services.Impl
 
                     appletDir = Path.Combine(Path.GetDirectoryName(location), this.m_configuration.AppletDirectory);
                 }
-                    
 
                 if (!Directory.Exists(appletDir))
                     this.m_tracer.TraceWarning("Applet directory {0} doesn't exist, no applets will be loaded", appletDir);

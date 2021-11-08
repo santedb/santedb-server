@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Model.Audit;
 using SanteDB.Core.Interfaces;
@@ -29,6 +30,7 @@ using SanteDB.Server.Core.Security.Attribute;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using SanteDB.Core.Diagnostics;
 
 namespace SanteDB.Server.Core.Services.Impl
 {
@@ -42,8 +44,7 @@ namespace SanteDB.Server.Core.Services.Impl
         private readonly ILocalizationService m_localizationService;
 
         // Tracer
-
-        private Tracer m_tracer = Tracer.GetTracer(typeof(LocalAuditRepository));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(LocalAuditRepository));
 
         /// <summary>
         /// Construct instance of LocalAuditRepository
@@ -161,7 +162,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 this.m_tracer.TraceError("Cannot find the data persistence service for audits");
                 throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.auditPersistenceService"));
             }
-            var existing = service.Get(data.Key.Value, AuthenticationContext.Current.Principal);
+            var existing = service.Get(data.Key.Value, null, AuthenticationContext.Current.Principal);
             if (existing == null)
             {
                 data = service.Update(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
