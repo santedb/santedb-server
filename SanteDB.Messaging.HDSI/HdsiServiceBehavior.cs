@@ -165,15 +165,6 @@ namespace SanteDB.Messaging.HDSI.Wcf
         }
 
         /// <summary>
-        /// Gets the specifieed patch id
-        /// </summary>
-        public override Patch GetPatch(string resourceType, string id)
-        {
-            this.ThrowIfNotReady();
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         /// Get options
         /// </summary>
         public override ServiceOptions Options()

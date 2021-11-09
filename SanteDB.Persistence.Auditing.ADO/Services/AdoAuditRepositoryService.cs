@@ -53,7 +53,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
     /// Represents a service which is responsible for the storage of audits
     /// </summary>
     [ServiceProvider("ADO.NET Audit Repository")]
-#pragma warning disable CS0067
     public class AdoAuditRepositoryService : IDataPersistenceService<AuditData>
     {
         /// <summary>
@@ -62,13 +61,21 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         public string ServiceName => "ADO.NET Audit Repository";
 
         // Confiugration
-        private AdoAuditConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoAuditConfigurationSection>();
+        private readonly AdoAuditConfigurationSection m_configuration;
+
+        // Data caching service
+        private readonly IDataCachingService m_dataCachingService;
+
+        // Concept repository
+        private readonly IConceptRepositoryService m_conceptRepository;
 
         // Model map
         private ModelMapper m_mapper = null;
 
         // Query builder
         private QueryBuilder m_builder;
+
+        private readonly IAdhocCacheService m_adhocCache;
 
         // Trace source name
         private Tracer m_traceSource = Tracer.GetTracer(typeof(AdoAuditRepositoryService));
@@ -126,8 +133,17 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Create new audit repository service
         /// </summary>
-        public AdoAuditRepositoryService()
+        public AdoAuditRepositoryService(IConfigurationManager configurationManager,
+            IDataCachingService dataCachingService,
+            IBiMetadataRepository biMetadataRepository,
+            IConceptRepositoryService conceptRepository,
+            IAdhocCacheService adhocCacheService = null)
         {
+            this.m_configuration = configurationManager.GetSection<AdoAuditConfigurationSection>();
+            this.m_adhocCache = adhocCacheService;
+            this.m_dataCachingService = dataCachingService;
+            this.m_conceptRepository = conceptRepository;
+
             try
             {
                 this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Audit.ADO");
@@ -137,7 +153,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     using (AuthenticationContext.EnterSystemContext())
                     {
                         // Add audits as a BI data source
-                        ApplicationServiceContext.Current.GetService<IBiMetadataRepository>()
+                        biMetadataRepository
                             .Insert(new BiDataSourceDefinition()
                             {
                                 IsSystemObject = true,
@@ -176,17 +192,16 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         private AuditCode ResolveCode(Guid key, String code, String codeSystem)
         {
             if (key == Guid.Empty) return null;
-            var cache = ApplicationServiceContext.Current.GetService<IDataCachingService>();
 
-            var cacheItem = cache.GetCacheItem<Concept>(key);
+            var cacheItem = this.m_dataCachingService.GetCacheItem<Concept>(key);
             if (cacheItem == null)
             {
                 if (!String.IsNullOrEmpty(codeSystem))
-                    cacheItem = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConceptByReferenceTerm(code, codeSystem);
+                    cacheItem = this.m_conceptRepository.GetConceptByReferenceTerm(code, codeSystem);
                 if (cacheItem == null)
-                    cacheItem = ApplicationServiceContext.Current.GetService<IConceptRepositoryService>().GetConcept(code);
+                    cacheItem = this.m_conceptRepository.GetConcept(code);
                 if (cacheItem != null)
-                    cache.Add(cacheItem);
+                    this.m_dataCachingService.Add(cacheItem);
             }
             return new AuditCode(code, codeSystem)
             {
@@ -199,7 +214,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// </summary>
         private AuditData ToModelInstance(DataContext context, CompositeResult<DbAuditData, DbAuditCode> res, bool summary = true)
         {
-            var retVal = ApplicationServiceContext.Current.GetService<IDataCachingService>()?.GetCacheItem<AuditData>(res.Object1.Key);
+            var retVal = this.m_dataCachingService.GetCacheItem<AuditData>(res.Object1.Key);
             if (retVal == null ||
                 !summary && retVal.LoadState < Core.Model.LoadState.FullLoad)
             {
@@ -300,7 +315,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     retVal.LoadState = Core.Model.LoadState.PartialLoad;
                 }
 
-                ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(retVal);
+                this.m_dataCachingService.Add(retVal);
             }
             return retVal;
         }
@@ -311,14 +326,24 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         private DbAuditCode GetOrCreateAuditCode(DataContext context, AuditCode messageCode)
         {
             if (messageCode == null) return null;
-            var existing = context.FirstOrDefault<DbAuditCode>(o => o.Code == messageCode.Code && o.CodeSystem == messageCode.CodeSystem);
+
+            var codeKey = $"{messageCode.CodeSystem}#{messageCode.Code}";
+
+            var existing = this.m_adhocCache?.Get<DbAuditCode>(codeKey);
+
+            if (existing == null) // try from db
+            {
+                existing = context.FirstOrDefault<DbAuditCode>(o => o.Code == messageCode.Code && o.CodeSystem == messageCode.CodeSystem);
+            }
+
             if (existing == null)
             {
                 Guid codeId = Guid.NewGuid();
-                return context.Insert(new DbAuditCode() { Code = messageCode.Code, CodeSystem = messageCode.CodeSystem, Key = codeId });
+                existing = context.Insert(new DbAuditCode() { Code = messageCode.Code, CodeSystem = messageCode.CodeSystem, Key = codeId });
             }
-            else
-                return existing;
+
+            this.m_adhocCache?.Add(codeKey, existing);
+            return existing;
         }
 
         /// <summary>
