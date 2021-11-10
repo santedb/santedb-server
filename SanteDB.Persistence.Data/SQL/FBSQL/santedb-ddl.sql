@@ -2161,9 +2161,9 @@ INSERT INTO SEC_ROL_POL_ASSOC_TBL (SEC_POL_INST_ID, POL_ID, ROL_ID, POL_ACT)  VA
 -- DEFAULT PHONETIC ALGORITHMS
 INSERT INTO PHON_ALG_TBL (ALG_ID, ALG_NAME, HDLR_CLS, CRT_PROV_ID)  VALUES (char_to_uuid('402cd339-d0e4-46ce-8fc2-12a4b0e17226'), 'NONE', NULL, char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 --#!
-INSERT INTO PHON_ALG_TBL (ALG_ID, ALG_NAME, HDLR_CLS, CRT_PROV_ID)  VALUES (char_to_uuid('3352a79a-d2e0-4e0c-9b48-6fd2a202c681'), 'SOUNDEX', 'SanteDB.Core.Services.Impl.PhoneticAlgorithms.SoundexPhoneticAlgorithmHandler, SanteDB.Core, Version=0.6.0.0', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+INSERT INTO PHON_ALG_TBL (ALG_ID, ALG_NAME, HDLR_CLS, CRT_PROV_ID)  VALUES (char_to_uuid('3352a79a-d2e0-4e0c-9b48-6fd2a202c681'), 'SOUNDEX', 'SanteDB.Core.Services.Impl.PhoneticAlgorithms.SoundexPhoneticAlgorithmHandler, SanteDB.Core', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 --#!
-INSERT INTO PHON_ALG_TBL (ALG_ID, ALG_NAME, HDLR_CLS, CRT_PROV_ID)  VALUES (char_to_uuid('d79a4dc6-66a6-4602-8fcb-7dc09a895793'), 'METAPHONE', 'SanteDB.Core.Services.Impl.PhoneticAlgorithms.MetaphonePhoneticAlgorithmHandler, SanteDB.Core, Version=0.6.0.0', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
+INSERT INTO PHON_ALG_TBL (ALG_ID, ALG_NAME, HDLR_CLS, CRT_PROV_ID)  VALUES (char_to_uuid('d79a4dc6-66a6-4602-8fcb-7dc09a895793'), 'METAPHONE', 'SanteDB.Core.Services.Impl.PhoneticAlgorithms.MetaphonePhoneticAlgorithmHandler, SanteDB.Core', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));
 --#!
 
 INSERT INTO CD_REL_TYP_CDTBL (REL_TYP_ID, REL_NAME, MNEMONIC, CRT_PROV_ID) VALUES (char_to_uuid('2c4dafc2-566a-41ae-9ebc-3097d7d22f4a'), 'Same as', 'SameAs', char_to_uuid('fadca076-3690-4a6e-af9e-f1cd68e8c7e8'));

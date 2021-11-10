@@ -85,7 +85,7 @@
       <add type="SanteDB.Caching.Redis.RedisQueryPersistenceService, SanteDB.Caching.Redis" />
       <add type="SanteDB.Caching.Redis.RedisAdhocCache, SanteDB.Caching.Redis" />-->
       <add type="SanteDB.Persistence.Auditing.ADO.Services.AdoAuditRepositoryService, SanteDB.Persistence.Auditing.ADO" />
-      <add type="SanteDB.Server.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Server.Core, Version=2.1.0.0" />
+      <add type="SanteDB.Server.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Server.Core" />
 
       <!-- Repository Services -->
       <add type="SanteDB.BusinessRules.JavaScript.AppletDataReferenceResolver, SanteDB.BusinessRules.JavaScript" />

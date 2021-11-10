@@ -340,29 +340,27 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 
             // Next we want to perform a relationship query to establish what is being loaded and what is being persisted
-            var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key).ToArray();
+            var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key).Select(o => o.Key).ToArray();
 
             // Which are new and which are not?
-            var removedRelationships = existing.Where(o => !associations.Any(a => a.Key == o.Key)).Select(a =>
+            var removedRelationships = existing.Where(o => !associations.Any(a => a.Key == o)).Select(a =>
             {
-                persistenceService.Obsolete(context, a.Key.Value);
-                a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Obsolete;
-                return a;
+                return persistenceService.Obsolete(context, a.Value);
             });
-            var addedRelationships = associations.Where(o => !o.Key.HasValue || !existing.Any(a => a.Key == o.Key)).Select(a =>
+            var addedRelationships = associations.Where(o => !o.Key.HasValue || !existing.Any(a => a == o.Key)).Select(a =>
             {
                 persistenceService.Insert(context, a);
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
                 return a;
             });
-            var updatedRelationships = associations.Where(o => o.Key.HasValue && existing.Any(a => a.Key == o.Key && !o.SemanticEquals(a))).Select(a =>
+            var updatedRelationships = associations.Where(o => o.Key.HasValue && existing.Any(a => a == o.Key)).Select(a =>
             {
                 persistenceService.Update(context, a);
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
                 return a;
             });
 
-            return existing.Where(e => !removedRelationships.Any(r => r.Key == e.Key)).Union(addedRelationships).ToArray();
+            return addedRelationships.Union(updatedRelationships).Except(removedRelationships).ToArray();
         }
 
         /// <summary>

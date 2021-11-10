@@ -528,51 +528,29 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 
             // Next we want to perform a relationship query to establish what is being loaded and what is being persisted
-            var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key && !o.ObsoleteVersionSequenceId.HasValue).ToArray();
+            // TODO: Determine if this line performs better than selecting the entire object (I suspect it would - but need to check)
+            var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => o.Key).ToArray();
 
             // Which are new and which are not?
-            var removedRelationships = existing.Where(o => !associations.Any(a => a.Key == o.Key)).Select(a =>
+            var removedRelationships = existing.Where(o => !associations.Any(a => a.Key == o)).Select(a =>
             {
-                if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.AssociationVersioning))
-                {
-                    a.ObsoleteVersionSequenceId = data.VersionSequence;
-                    a = persistenceService.Update(context, a);
-                }
-                else
-                {
-                    a = persistenceService.Obsolete(context, a.Key.Value);
-                }
-                a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Obsolete;
-                return a;
+                return persistenceService.Obsolete(context, a.Value);
             });
-            var addedRelationships = associations.Where(o => !o.Key.HasValue || !existing.Any(a => a.Key == o.Key)).Select(a =>
+            var addedRelationships = associations.Where(o => !o.Key.HasValue || !existing.Any(a => a == o.Key)).Select(a =>
             {
                 a.EffectiveVersionSequenceId = data.VersionSequence;
                 a = persistenceService.Insert(context, a);
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
                 return a;
             });
-            var updatedRelationships = associations.Where(o => o.Key.HasValue && existing.Any(a => a.Key == o.Key && !a.SemanticEquals(o))).Select(a =>
+            var updatedRelationships = associations.Where(o => o.Key.HasValue && existing.Any(a => a == o.Key)).Select(a =>
             {
-                // We are versioning so obsolete existing and then create new
-                if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.AssociationVersioning))
-                {
-                    a.ObsoleteVersionSequenceId = data.VersionSequence;
-                    persistenceService.Update(context, a);
-                    a.Key = null;
-                    a.ObsoleteVersionSequenceId = null;
-                    a.EffectiveVersionSequenceId = data.VersionSequence;
-                    a = persistenceService.Insert(context, a);
-                }
-                else // We just update the existing
-                {
-                    a = persistenceService.Update(context, a);
-                }
+                a = persistenceService.Update(context, a);
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
                 return a;
             });
 
-            return existing.Where(e => !removedRelationships.Any(r => r.Key == e.Key)).Union(addedRelationships).ToArray();
+            return addedRelationships.Union(updatedRelationships).Except(removedRelationships).ToArray();
         }
 
         /// <summary>

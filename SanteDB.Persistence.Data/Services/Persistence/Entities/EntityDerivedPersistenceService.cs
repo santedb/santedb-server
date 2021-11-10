@@ -25,12 +25,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     /// <summary>
     /// Persistence service that is responsible for storing and retrieving entities
     /// </summary>
-    public class EntityPersistenceService : VersionedDataPersistenceService<Entity, DbEntityVersion, DbEntity>
+    public class EntityDerivedPersistenceService : VersionedDataPersistenceService<Entity, DbEntityVersion, DbEntity>
     {
         /// <summary>
         /// Creates a dependency injected
         /// </summary>
-        public EntityPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
+        public EntityDerivedPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
 
@@ -110,7 +110,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             return retVal;
         }
 
-        // TODO: Implement Insert with relations
+        /// <summary>
+        /// Insert the model object (in this case an entity)
+        /// </summary>
+        /// <param name="context">The data context on which the data is to be inserted</param>
+        /// <param name="data">The data which is to be inserted</param>
+        /// <returns>The inserted entity</returns>
+        protected override Entity DoInsertModel(DataContext context, Entity data)
+        {
+            var retVal = base.DoInsertModel(context, data);
+            return retVal;
+        }
+
         // TODO: Implement Update with relations
         // TODO: Implement Obsolete with relations
     }

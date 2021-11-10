@@ -87,12 +87,14 @@
       <Project>{0cec131c-dfa0-43c3-9612-3f7d36086633}</Project>
       <Name>SanteDB.Persistence.Data</Name>
     </ProjectReference>
-	<ProjectReference Include="..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj" />
+    <ProjectReference Include="..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TestConfig.xml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Persistence\Entity\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

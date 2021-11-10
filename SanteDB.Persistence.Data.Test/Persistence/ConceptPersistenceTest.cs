@@ -18,14 +18,12 @@ namespace SanteDB.Persistence.Data.Test.Persistence
     [TestFixture(Category = "Persistence", TestName = "ADO Concepts")]
     public class ConceptPersistenceTest : DataPersistenceTest
     {
-
         /// <summary>
         /// Tests that the persistence layer can store data related to a simple concept with no extended props
         /// </summary>
         [Test]
         public void TestInsertConcept()
         {
-
             using (AuthenticationContext.EnterSystemContext())
             {
                 var concept = new Concept()
@@ -122,7 +120,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual(ConceptClassKeys.Other, afterInsert.ClassKey);
                 Assert.AreEqual(1, afterInsert.ConceptNames.Count);
                 Assert.AreEqual(1, afterInsert.ReferenceTerms.Count);
-                Assert.AreEqual("032XX", afterInsert.ReferenceTerms.First().LoadProperty(o=>o.ReferenceTerm).Mnemonic);
+                Assert.AreEqual("032XX", afterInsert.ReferenceTerms.First().LoadProperty(o => o.ReferenceTerm).Mnemonic);
                 Assert.AreEqual(ConceptRelationshipTypeKeys.SameAs, afterInsert.ReferenceTerms.First().RelationshipTypeKey);
 
                 // Fetch
@@ -216,7 +214,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual(0, afterQuery.ReferenceTerms.Count);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
 
-                // Concept sets are not a delay loadable property 
+                // Concept sets are not a delay loadable property
                 Assert.AreEqual(1, afterQuery.ConceptSetKeys.Count);
             }
         }
@@ -266,7 +264,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.IsNotNull(queryConcept.GetPreviousVersion());
                 Assert.AreEqual("TEST-05B", queryConcept.Mnemonic);
                 Assert.AreEqual("TEST-05", queryConcept.GetPreviousVersion().Mnemonic);
-
             }
         }
 
@@ -325,7 +322,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual("fr", afterQuery.ConceptNames[1].Language);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
 
-                // Next, we'll add something that never existed before 
+                // Next, we'll add something that never existed before
                 afterUpdate = base.TestUpdate(afterQuery, (o) =>
                 {
                     o.Relationship.Add(new ConceptRelationship(ConceptRelationshipTypeKeys.SameAs, NullReasonKeys.NoInformation));
@@ -343,7 +340,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual("en", afterQuery.ConceptNames[0].Language);
                 Assert.AreEqual("fr", afterQuery.ConceptNames[1].Language);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
-
 
                 // Next, we'll update a few properties
                 afterUpdate = base.TestUpdate(afterQuery, (o) =>
@@ -373,7 +369,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual("en", afterQuery.ConceptNames[0].Language);
                 Assert.AreEqual(2, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
                 Assert.AreEqual(0, afterQuery.ConceptSetKeys.Count);
-
             }
         }
 
@@ -385,7 +380,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
         {
             using (AuthenticationContext.EnterSystemContext())
             {
-
                 var concept1 = new Concept()
                 {
                     Mnemonic = "TEST-07A",
@@ -436,7 +430,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 var after1 = base.TestInsert(concept1);
                 var after2 = base.TestInsert(concept2);
 
-                Assert.IsTrue(after1.VersionSequence<after2.VersionSequence);
+                Assert.IsTrue(after1.VersionSequence < after2.VersionSequence);
 
                 // Query filter on mnemonic (simple)
                 base.TestQuery<Concept>(o => o.Mnemonic == "TEST-07A" || o.Mnemonic == "TEST-07B", 2);
@@ -462,8 +456,11 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 var stateful = result.OrderBy(o => o.VersionSequence).AsStateful(queryId);
 
                 Assert.AreEqual(2, stateful.Count());
-                Assert.AreEqual("TEST-07A", stateful.First().Mnemonic);
 
+                // Test that nested selectors work
+                var uuids = result.Select(o => o.Key);
+                Assert.AreEqual(after1.Key, uuids.First());
+                Assert.AreEqual(after2.Key, uuids.Last());
             }
         }
 
@@ -473,8 +470,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
         [Test]
         public void TestObsoleteConcept()
         {
-
-            using(AuthenticationContext.EnterSystemContext())
+            using (AuthenticationContext.EnterSystemContext())
             {
                 var concept = new Concept()
                 {
@@ -518,10 +514,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual("TEST-08", afterQuery.Mnemonic);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ConceptNames).Count);
-
-                
             }
-
         }
     }
 }

@@ -375,8 +375,8 @@ CREATE TABLE PHON_ALG_TBL (
 CREATE INDEX PHON_ALG_NAME_IDX ON PHON_ALG_TBL(ALG_NAME);
 
 INSERT INTO PHON_ALG_TBL (ALG_ID, ALG_NAME, HDLR_CLS, CRT_PROV_ID)  VALUES ('402cd339-d0e4-46ce-8fc2-12a4b0e17226', 'NONE', NULL, 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
-INSERT INTO PHON_ALG_TBL (ALG_ID, ALG_NAME, HDLR_CLS, CRT_PROV_ID)  VALUES ('3352a79a-d2e0-4e0c-9b48-6fd2a202c681', 'SOUNDEX', 'SanteDB.Core.Services.Impl.PhoneticAlgorithms.SoundexPhoneticAlgorithmHandler, SanteDB.Core, Version=0.6.0.0', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
-INSERT INTO PHON_ALG_TBL (ALG_ID, ALG_NAME, HDLR_CLS, CRT_PROV_ID)  VALUES ('d79a4dc6-66a6-4602-8fcb-7dc09a895793', 'METAPHONE', 'SanteDB.Core.Services.Impl.PhoneticAlgorithms.MetaphonePhoneticAlgorithmHandler, SanteDB.Core, Version=0.6.0.0', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO PHON_ALG_TBL (ALG_ID, ALG_NAME, HDLR_CLS, CRT_PROV_ID)  VALUES ('3352a79a-d2e0-4e0c-9b48-6fd2a202c681', 'SOUNDEX', 'SanteDB.Core.Services.Impl.PhoneticAlgorithms.SoundexPhoneticAlgorithmHandler, SanteDB.Core', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO PHON_ALG_TBL (ALG_ID, ALG_NAME, HDLR_CLS, CRT_PROV_ID)  VALUES ('d79a4dc6-66a6-4602-8fcb-7dc09a895793', 'METAPHONE', 'SanteDB.Core.Services.Impl.PhoneticAlgorithms.MetaphonePhoneticAlgorithmHandler, SanteDB.Core', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
 
 -- PHONETIC VALUES TABLE ASSOCIATES STRINGS WITH VALUES
 CREATE TABLE PHON_VAL_TBL (

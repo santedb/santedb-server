@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!--
  - Portions Copyright (C) 2019 - 2020, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE.md)
- - 
- - 
- - Licensed under the Apache License, Version 2.0 (the "License"); you 
- - may not use this file except in compliance with the License. You may 
- - obtain a copy of the License at 
- - 
- - http://www.apache.org/licenses/LICENSE-2.0 
- - 
+ -
+ -
+ - Licensed under the Apache License, Version 2.0 (the "License"); you
+ - may not use this file except in compliance with the License. You may
+ - obtain a copy of the License at
+ -
+ - http://www.apache.org/licenses/LICENSE-2.0
+ -
  - Unless required by applicable law or agreed to in writing, software
  - distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- - License for the specific language governing permissions and limitations under 
+ - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ - License for the specific language governing permissions and limitations under
  - the License.
- - 
+ -
  - User: fyfej (Justin Fyfe)
  - Date: 2019-11-27
  -->
@@ -23,10 +23,10 @@
     <add type="SanteDB.Core.Security.Configuration.SecurityConfigurationSection, SanteDB.Core.Api" />
     <add type="SanteDB.Core.Configuration.ApplicationServiceContextConfigurationSection, SanteDB.Core.Api" />
     <add type="SanteDB.Core.Configuration.DiagnosticsConfigurationSection, SanteDB.Core.Api" />
-    <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api"/>
+    <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api" />
     <add type="SanteDB.Persistence.Data.Configuration.AdoPersistenceConfigurationSection, SanteDB.Persistence.Data" />
     <add type="SanteDB.OrmLite.Configuration.OrmConfigurationSection, SanteDB.OrmLite" />
-    <add type="SanteDB.Core.Configuration.Data.DataConfigurationSection, SanteDB.Core.Api"/>
+    <add type="SanteDB.Core.Configuration.Data.DataConfigurationSection, SanteDB.Core.Api" />
   </sections>
   <section xsi:type="DiagnosticsConfigurationSection">
     <sources>
@@ -40,7 +40,7 @@
   </section>
   <section xsi:type="DataConfigurationSection">
     <connectionStrings>
-      <add name="TEST_CONNECTION" value="initial catalog=|DataDirectory|\santedb_test.fdb;server type=Embedded;user id=sysdba" provider="FirebirdSQL"/>
+      <add name="TEST_CONNECTION" value="initial catalog=|DataDirectory|\santedb_test.fdb;server type=Embedded;user id=sysdba" provider="FirebirdSQL" />
     </connectionStrings>
   </section>
   <section xsi:type="OrmConfigurationSection">
@@ -48,7 +48,7 @@
       <add type="SanteDB.OrmLite.Providers.Firebird.FirebirdSQLProvider, SanteDB.OrmLite" invariant="FirebirdSQL" />
     </providers>
     <dbProviderFactories>
-      <add name="PostgreSQL Data Provider" invariant="Npgsql" description=".Net Framework Data Provider for PostgreSQL" type="Npgsql.NpgsqlFactory, Npgsql, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7"/>
+      <add name="PostgreSQL Data Provider" invariant="Npgsql" description=".Net Framework Data Provider for PostgreSQL" type="Npgsql.NpgsqlFactory, Npgsql, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7" />
       <add name="Firebird Data Provider" invariant="FirebirdSQL" description="Firebird" type="FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient, Culture=neutral, PublicKeyToken=3750abcc3150b00c" />
     </dbProviderFactories>
   </section>
@@ -82,7 +82,7 @@
     <!-- SanteDB signs a lot of data when communicating it, this is used for configuring how this server signs data -->
     <signingKeys>
       <add id="jwsdefault" alg="hmac" hmacSecret="@SanteDBDefault$$$409" />
-      <add id="default" alg="hmac" hmacSecret="@SanteDBDefault$$$409"/>
+      <add id="default" alg="hmac" hmacSecret="@SanteDBDefault$$$409" />
     </signingKeys>
     <!-- To Configure X509 Signatures -->
     <!--<signing alg="rsa" findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="value" />-->
@@ -99,7 +99,7 @@
            autoUpdateExisting="true"
            autoInsertChildren="true"
            prepareStatements="true">
-    <!-- Any corrective handlers should be added here 
+    <!-- Any corrective handlers should be added here
     <corrections>
       <add>value</add>
     </corrections>
@@ -111,28 +111,26 @@
   </section>
   <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="4">
     <serviceProviders>
-      <add type="SanteDB.Persistence.Data.Test.TestQueryPersistenceService, SanteDB.Persistence.Data.Test"/>
-      <add type="SanteDB.Persistence.Data.Services.AdoApplicationIdentityProvider, SanteDB.Persistence.Data, Version=2.1.0.0" />
-      <add type="SanteDB.Persistence.Data.Services.AdoDeviceIdentityProvider, SanteDB.Persistence.Data, Version=2.1.0.0" />
-      <add type="SanteDB.Persistence.Data.Services.AdoIdentityProvider, SanteDB.Persistence.Data, Version=2.1.0.0" />
-      <add type="SanteDB.Persistence.Data.Services.AdoPolicyInformationService, SanteDB.Persistence.Data, Version=2.1.0.0" />
-      <add type="SanteDB.Persistence.Data.Services.AdoRoleProvider, SanteDB.Persistence.Data, Version=2.1.0.0" />
-      <add type="SanteDB.Persistence.Data.Services.AdoSessionProvider, SanteDB.Persistence.Data, Version=2.1.0.0" />
-      <add type="SanteDB.Persistence.Data.Services.AdoPersistenceService, SanteDB.Persistence.Data, Version=2.1.0.0" />
-      <add type="SanteDB.Persistence.Data.Services.AdoPersistenceService, SanteDB.Persistence.Data, Version=2.1.0.0" />
-      <add type="SanteDB.Core.Security.HmacDataSigningService, SanteDB.Core.Api, Version=2.1.0.0" />
-      <add type="SanteDB.Core.Security.SimpleTfaSecretGenerator, SanteDB.Core.Api, Version=2.1.0.0" />
-      <add type="SanteDB.Server.Core.Security.SHA256PasswordHashingService, SanteDB.Server.Core,Version=0.6.0.0" />
-      <add type="SanteDB.Server.Core.Security.SHA256PasswordHashingService, SanteDB.Server.Core,Version=0.6.0.0" />
-      <add type="SanteDB.Core.Security.RegexPasswordValidator, SanteDB.Core.Api, Version=2.1.0.0"/>
+      <add type="SanteDB.Persistence.Data.Test.TestQueryPersistenceService, SanteDB.Persistence.Data.Test" />
+      <add type="SanteDB.Persistence.Data.Services.AdoApplicationIdentityProvider, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Persistence.Data.Services.AdoDeviceIdentityProvider, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Persistence.Data.Services.AdoIdentityProvider, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Persistence.Data.Services.AdoPolicyInformationService, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Persistence.Data.Services.AdoRoleProvider, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Persistence.Data.Services.AdoSessionProvider, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Persistence.Data.Services.AdoPersistenceService, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Persistence.Data.Services.AdoPersistenceService, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Core.Security.DefaultDataSigningService, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Security.SimpleTfaSecretGenerator, SanteDB.Core.Api" />
+      <add type="SanteDB.Server.Core.Security.SHA256PasswordHashingService, SanteDB.Server.Core" />
+      <add type="SanteDB.Server.Core.Security.SHA256PasswordHashingService, SanteDB.Server.Core" />
+      <add type="SanteDB.Core.Security.RegexPasswordValidator, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Services.Impl.DefaultThreadPoolService, SanteDB.Core.Api" />
-      <add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryFactoryService, SanteDB.Server.Core" />
       <add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryService, SanteDB.Server.Core" />
       <add type="SanteDB.Core.Security.Privacy.DataPolicyFilterService, SanteDB.Core.Api" />
-      <add type="SanteDB.Server.Core.Services.Impl.DefaultNetworkInformationService, SanteDB.Server.Core"/>
-      <add type="SanteDB.Server.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Server.Core, Version=2.1.0.0" />
-
+      <add type="SanteDB.Server.Core.Services.Impl.DefaultNetworkInformationService, SanteDB.Server.Core" />
+      <add type="SanteDB.Server.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Server.Core" />
     </serviceProviders>
   </section>
 </SanteDBConfiguration>

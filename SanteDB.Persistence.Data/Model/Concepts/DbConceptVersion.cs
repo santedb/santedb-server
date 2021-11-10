@@ -25,6 +25,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
     /// Physical data layer implemntation of concept
     /// </summary>
     [Table("cd_vrsn_tbl")]
+    [AssociativeTable(typeof(DbConceptSet), typeof(DbConceptSetConceptAssociation))]
 	public class DbConceptVersion : DbVersionedData, IDbHasStatus
 	{
 

@@ -1082,13 +1082,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Map the sorting expression
         /// </summary>
-        public Expression MapSortExpression(Expression<Func<TModel, dynamic>> sortExpression)
+        public Expression MapPropertyExpression<TResult>(Expression<Func<TModel, TResult>> sortExpression)
         {
             if (sortExpression == null)
             {
                 throw new ArgumentNullException(nameof(sortExpression), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
-            return this.m_modelMapper.MapModelExpression<TModel, TDbModel, dynamic>(sortExpression);
+            return this.m_modelMapper.MapModelExpression<TModel, TDbModel, TResult>(sortExpression);
         }
 
         /// <summary>
