@@ -25,6 +25,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
     /// Represents concept relationships
     /// </summary>
     [Table("cd_rel_assoc_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbConceptRelationship : DbVersionedAssociation
 	{
         /// <summary>

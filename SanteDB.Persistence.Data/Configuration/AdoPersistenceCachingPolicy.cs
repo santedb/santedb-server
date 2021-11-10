@@ -19,6 +19,7 @@
  * Date: 2021-8-27
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Data.Configuration
@@ -48,6 +49,7 @@ namespace SanteDB.Persistence.Data.Configuration
     /// <summary>
     /// Data caching policy
     /// </summary>
+    [ExcludeFromCodeCoverage]
     [XmlType(nameof(AdoPersistenceCachingPolicy), Namespace = "http://santedb.org/configuration")]
     public class AdoPersistenceCachingPolicy
     {

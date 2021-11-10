@@ -26,6 +26,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
     /// Represents an entity which is used to represent an application
     /// </summary>
     [Table("app_ent_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbApplicationEntity : DbEntitySubTable
     {
 		/// <summary>

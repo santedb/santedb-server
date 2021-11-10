@@ -27,6 +27,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
     /// Concept relationship type.
     /// </summary>
     [Table("cd_rel_typ_cdtbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbConceptRelationshipType: DbNonVersionedBaseData
 	{
 

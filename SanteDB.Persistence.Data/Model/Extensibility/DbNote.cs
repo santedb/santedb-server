@@ -28,6 +28,7 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
     /// <summary>
     /// Represents note storage
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbNote : DbVersionedAssociation
 	{
         /// <summary>

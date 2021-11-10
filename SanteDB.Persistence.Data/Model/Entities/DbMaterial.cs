@@ -29,6 +29,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
     /// Represents a material in the database
     /// </summary>
     [Table("mat_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbMaterial : DbEntitySubTable
     {
 

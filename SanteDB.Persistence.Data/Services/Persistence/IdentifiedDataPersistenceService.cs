@@ -321,6 +321,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<TModelAssociation> UpdateModelAssociations<TModelAssociation>(DataContext context, TModel data, IEnumerable<TModelAssociation> associations)
             where TModelAssociation : IdentifiedData, ISimpleAssociation, new()
         {
+            if (data == null || data.Key.GetValueOrDefault() == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(IdentifiedData.Key), ErrorMessages.ARGUMENT_NULL);
+            }
+
             // Ensure either the relationship points to (key) (either source or target)
             associations = associations.Select(a =>
             {
@@ -373,6 +378,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<TAssociativeTable> UpdateInternalAssociations<TAssociativeTable>(DataContext context, Guid sourceKey, IEnumerable<TAssociativeTable> associations, Expression<Func<TAssociativeTable, bool>> existingExpression = null)
             where TAssociativeTable : IDbAssociation, new()
         {
+            if (sourceKey == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(sourceKey), ErrorMessages.ARGUMENT_NULL);
+            }
+
             // Ensure the source by locking the IEnumerable
             associations = associations.Select(a =>
             {

@@ -27,6 +27,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
     /// Represents a procedure in the data model
     /// </summary>
     [Table("proc_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbProcedure : DbActSubTable
     {
 

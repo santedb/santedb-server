@@ -25,6 +25,7 @@ namespace SanteDB.Persistence.Data.Model.Security
     /// Represents a security role
     /// </summary>
     [Table("sec_rol_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbSecurityRole : DbNonVersionedBaseData
 	{
 

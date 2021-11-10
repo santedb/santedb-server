@@ -27,6 +27,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
     /// Represents storage entity for concept class
     /// </summary>
     [Table("cd_cls_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbConceptClass : DbNonVersionedBaseData
 	{
 

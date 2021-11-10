@@ -56,7 +56,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             switch (this.m_configuration.LoadStrategy)
             {
                 case Configuration.LoadStrategyType.FullLoad:
-                    retVal.UpdatedBy = base.GetRelatedPersistenceService<SecurityProvenance>().Get(context, dbModel.UpdatedByKey.GetValueOrDefault(), null);
+                    retVal.UpdatedBy = base.GetRelatedPersistenceService<SecurityProvenance>().Get(context, dbModel.UpdatedByKey.GetValueOrDefault());
                     retVal.SetLoadIndicator(nameof(NonVersionedEntityData.UpdatedBy));
                     break;
             }

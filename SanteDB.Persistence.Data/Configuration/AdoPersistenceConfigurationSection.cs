@@ -26,6 +26,7 @@ using SanteDB.OrmLite.Providers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Xml.Serialization;
 
@@ -104,6 +105,7 @@ namespace SanteDB.Persistence.Data.Configuration
     /// Configuration section handler
     /// </summary>
     [XmlType(nameof(AdoPersistenceConfigurationSection), Namespace = "http://santedb.org/configuration")]
+    [ExcludeFromCodeCoverage]
     public class AdoPersistenceConfigurationSection : OrmConfigurationBase, IConfigurationSection
     {
         // Random
@@ -210,6 +212,12 @@ namespace SanteDB.Persistence.Data.Configuration
         /// </summary>
         [XmlAttribute("loadStrategy"), Category("performance"), DisplayName("Load Strategy"), Description("Sets the loading strategy - Quick = No extended loading of properties , Sync = Only synchornization/serialization properties are deep loaded, Full = All properties are loaded")]
         public LoadStrategyType LoadStrategy { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether public keys should be encrypted
+        /// </summary>
+        [XmlAttribute("encryptPublicKeys"), Category("Security"), DisplayName("Encrypt Public Keys"), Description("When true, public keys on applications should be encrypted")]
+        public bool EncryptPublicKeys { get; set; }
 
         /// <summary>
         /// Get all peppered combinations of the specified secret

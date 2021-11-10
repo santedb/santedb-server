@@ -21,6 +21,7 @@ using SanteDB.Persistence.Data.Model.Concepts;
 using SanteDB.Persistence.Data.Model.DataType;
 using SanteDB.Persistence.Data.Model.Extensibility;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Persistence.Data.Model.Acts
 {
@@ -28,6 +29,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
     /// Represents a table which can store act data
     /// </summary>
     [Table("act_vrsn_tbl")]
+    [ExcludeFromCodeCoverage]
     public class DbActVersion : DbVersionedData, IDbHasStatus
     {
 

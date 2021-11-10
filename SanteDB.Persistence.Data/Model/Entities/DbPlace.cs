@@ -28,6 +28,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
     /// Represents a place in the local database
     /// </summary>
     [Table("plc_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbPlace : DbEntitySubTable
     {
 

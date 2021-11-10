@@ -27,6 +27,7 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
     /// Extension types
     /// </summary>
     [Table("ext_typ_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbExtensionType: DbNonVersionedBaseData
 	{
 

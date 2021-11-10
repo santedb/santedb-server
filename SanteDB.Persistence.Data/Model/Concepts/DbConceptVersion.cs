@@ -26,6 +26,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
     /// </summary>
     [Table("cd_vrsn_tbl")]
     [AssociativeTable(typeof(DbConceptSet), typeof(DbConceptSetConceptAssociation))]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbConceptVersion : DbVersionedData, IDbHasStatus
 	{
 

@@ -1,7 +1,9 @@
 ﻿using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Extensions;
+using SanteDB.Core.i18n;
 using SanteDB.Core.Interfaces;
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
@@ -25,7 +27,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     /// <summary>
     /// Persistence service that is responsible for storing and retrieving entities
     /// </summary>
-    public class EntityDerivedPersistenceService : VersionedDataPersistenceService<Entity, DbEntityVersion, DbEntity>
+    public class EntityDerivedPersistenceService<TEntity> : VersionedDataPersistenceService<TEntity, DbEntityVersion, DbEntity>
+        where TEntity : Entity, IVersionedEntity, new()
     {
         /// <summary>
         /// Creates a dependency injected
@@ -37,8 +40,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <summary>
         /// Prepare references
         /// </summary>
-        protected override Entity PrepareReferences(DataContext context, Entity data)
+        protected override TEntity PrepareReferences(DataContext context, TEntity data)
         {
+            if (!data.StatusConceptKey.HasValue)
+            {
+                data.StatusConceptKey = StatusKeys.New;
+            }
+
             data.ClassConceptKey = this.EnsureExists(context, data.ClassConcept)?.Key ?? data.ClassConceptKey;
             data.CreationActKey = this.EnsureExists(context, data.CreationAct)?.Key ?? data.CreationActKey;
             data.DeterminerConceptKey = this.EnsureExists(context, data.DeterminerConcept)?.Key ?? data.DeterminerConceptKey;
@@ -73,28 +81,41 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <summary>
         /// Convert the data model back to information model
         /// </summary>
-        protected override Entity DoConvertToInformationModel(DataContext context, DbEntityVersion dbModel, params IDbIdentified[] referenceObjects)
+        protected override TEntity DoConvertToInformationModel(DataContext context, DbEntityVersion dbModel, params IDbIdentified[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
             switch (this.m_configuration.LoadStrategy)
             {
                 case Configuration.LoadStrategyType.FullLoad:
-                    retVal.ClassConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ClassConceptKey, null);
-                    retVal.CreationAct = this.GetRelatedPersistenceService<Act>().Get(context, dbModel.CreationActKey.GetValueOrDefault(), null);
-                    retVal.DeterminerConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.DeterminerConceptKey, null);
-                    retVal.StatusConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.StatusConceptKey, null);
-                    retVal.TypeConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey.GetValueOrDefault(), null);
+                    retVal.ClassConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ClassConceptKey);
+                    retVal.SetLoadIndicator(nameof(Entity.ClassConcept));
+                    retVal.CreationAct = this.GetRelatedPersistenceService<Act>().Get(context, dbModel.CreationActKey.GetValueOrDefault());
+                    retVal.SetLoadIndicator(nameof(Entity.CreationAct));
+                    retVal.DeterminerConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.DeterminerConceptKey);
+                    retVal.SetLoadIndicator(nameof(Entity.DeterminerConcept));
+                    retVal.StatusConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.StatusConceptKey);
+                    retVal.SetLoadIndicator(nameof(Entity.StatusConcept));
+                    retVal.TypeConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey.GetValueOrDefault());
+                    retVal.SetLoadIndicator(nameof(Entity.TypeConcept));
                     goto case Configuration.LoadStrategyType.SyncLoad;
                 case Configuration.LoadStrategyType.SyncLoad:
                     retVal.Addresses = this.GetRelatedPersistenceService<EntityAddress>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                    retVal.SetLoadIndicator(nameof(Entity.Addresses));
                     retVal.Extensions = this.GetRelatedPersistenceService<EntityExtension>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                    retVal.SetLoadIndicator(nameof(Entity.Extensions));
                     retVal.Identifiers = this.GetRelatedPersistenceService<EntityIdentifier>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                    retVal.SetLoadIndicator(nameof(Entity.Identifiers));
                     retVal.Names = this.GetRelatedPersistenceService<EntityName>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                    retVal.SetLoadIndicator(nameof(Entity.Names));
                     retVal.Notes = this.GetRelatedPersistenceService<EntityNote>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                    retVal.SetLoadIndicator(nameof(Entity.Notes));
                     retVal.Relationships = this.GetRelatedPersistenceService<EntityRelationship>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                    retVal.SetLoadIndicator(nameof(Entity.Relationships));
                     retVal.Tags = this.GetRelatedPersistenceService<EntityTag>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                    retVal.SetLoadIndicator(nameof(Entity.Tags));
                     retVal.Telecoms = this.GetRelatedPersistenceService<EntityTelecomAddress>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                    retVal.SetLoadIndicator(nameof(Entity.Telecoms));
                     goto case Configuration.LoadStrategyType.QuickLoad;
                 case Configuration.LoadStrategyType.QuickLoad:
                     var query = context.CreateSqlStatement<DbEntitySecurityPolicy>().SelectFrom(typeof(DbEntitySecurityPolicy), typeof(DbSecurityPolicy))
@@ -104,6 +125,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                         .ToList()
                         .Select(o => new SecurityPolicyInstance(new SecurityPolicy(o.Object2.Name, o.Object2.Oid, o.Object2.IsPublic, o.Object2.CanOverride), PolicyGrantType.Grant))
                         .ToList();
+                    retVal.SetLoadIndicator(nameof(Entity.Policies));
                     break;
             }
 
@@ -116,13 +138,117 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <param name="context">The data context on which the data is to be inserted</param>
         /// <param name="data">The data which is to be inserted</param>
         /// <returns>The inserted entity</returns>
-        protected override Entity DoInsertModel(DataContext context, Entity data)
+        protected override TEntity DoInsertModel(DataContext context, TEntity data)
         {
             var retVal = base.DoInsertModel(context, data);
+
+            if (data.Addresses != null)
+            {
+                retVal.Addresses = this.UpdateModelVersionedAssociations(context, retVal, data.Addresses).ToList();
+            }
+
+            if (data.Extensions != null)
+            {
+                retVal.Extensions = this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
+            }
+
+            if (data.Identifiers != null)
+            {
+                retVal.Identifiers = this.UpdateModelVersionedAssociations(context, retVal, data.Identifiers).ToList();
+            }
+
+            if (data.Names != null)
+            {
+                retVal.Names = this.UpdateModelVersionedAssociations(context, retVal, data.Names).ToList();
+            }
+
+            if (data.Notes != null)
+            {
+                retVal.Notes = this.UpdateModelVersionedAssociations(context, retVal, data.Notes).ToList();
+            }
+
+            if (data.Policies != null)
+            {
+                retVal.Policies = this.UpdateInternalAssociations(context, retVal.Key.Value, data.Policies.Select(o => new DbEntitySecurityPolicy()
+                {
+                    PolicyKey = o.PolicyKey.Value
+                }), o => o.SourceKey == retVal.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
+            }
+
+            if (data.Relationships != null)
+            {
+                retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
+            }
+
+            if (data.Tags != null)
+            {
+                retVal.Tags = this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
+            }
+
+            if (data.Telecoms != null)
+            {
+                retVal.Telecoms = this.UpdateModelVersionedAssociations(context, retVal, data.Telecoms).ToList();
+            }
+
             return retVal;
         }
 
-        // TODO: Implement Update with relations
-        // TODO: Implement Obsolete with relations
+        /// <summary>
+        /// Perform an update on the model
+        /// </summary>
+        protected override TEntity DoUpdateModel(DataContext context, TEntity data)
+        {
+            var retVal = base.DoUpdateModel(context, data);
+
+            if (data.Addresses != null)
+            {
+                retVal.Addresses = this.UpdateModelVersionedAssociations(context, retVal, data.Addresses).ToList();
+            }
+
+            if (data.Extensions != null)
+            {
+                retVal.Extensions = this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
+            }
+
+            if (data.Identifiers != null)
+            {
+                retVal.Identifiers = this.UpdateModelVersionedAssociations(context, retVal, data.Identifiers).ToList();
+            }
+
+            if (data.Names != null)
+            {
+                retVal.Names = this.UpdateModelVersionedAssociations(context, retVal, data.Names).ToList();
+            }
+
+            if (data.Notes != null)
+            {
+                retVal.Notes = this.UpdateModelVersionedAssociations(context, retVal, data.Notes).ToList();
+            }
+
+            if (data.Policies != null)
+            {
+                retVal.Policies = this.UpdateInternalAssociations(context, retVal.Key.Value, data.Policies.Select(o => new DbEntitySecurityPolicy()
+                {
+                    PolicyKey = o.PolicyKey.Value
+                }), o => o.SourceKey == retVal.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
+            }
+
+            if (data.Relationships != null)
+            {
+                retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
+            }
+
+            if (data.Tags != null)
+            {
+                retVal.Tags = this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
+            }
+
+            if (data.Telecoms != null)
+            {
+                retVal.Telecoms = this.UpdateModelVersionedAssociations(context, retVal, data.Telecoms).ToList();
+            }
+
+            return retVal;
+        }
     }
 }

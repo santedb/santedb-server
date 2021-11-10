@@ -25,6 +25,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
     /// Concept reference term link
     /// </summary>
     [Table("cd_ref_term_assoc_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbConceptReferenceTerm : DbConceptVersionedAssociation
     {
         /// <summary>

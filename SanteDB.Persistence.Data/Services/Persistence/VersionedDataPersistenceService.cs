@@ -26,7 +26,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     /// Persistence service which handles versioned objects
     /// </summary>
     public abstract class VersionedDataPersistenceService<TModel, TDbModel, TDbKeyModel> : BaseEntityDataPersistenceService<TModel, TDbModel>
-        where TModel : VersionedEntityData<TModel>, new()
+        where TModel : BaseEntityData, IVersionedEntity, new()
         where TDbModel : DbVersionedData, new()
         where TDbKeyModel : DbIdentified, new()
     {
@@ -509,6 +509,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<TModelAssociation> UpdateModelVersionedAssociations<TModelAssociation>(DataContext context, TModel data, IEnumerable<TModelAssociation> associations)
             where TModelAssociation : IdentifiedData, IVersionedAssociation, new()
         {
+            if (data == null || data.Key.GetValueOrDefault() == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(IdentifiedData.Key), ErrorMessages.ARGUMENT_NULL);
+            }
+
             // Ensure either the relationship points to (key) (either source or target)
             associations = associations.Select(a =>
             {
@@ -529,6 +534,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             // Next we want to perform a relationship query to establish what is being loaded and what is being persisted
             // TODO: Determine if this line performs better than selecting the entire object (I suspect it would - but need to check)
+
             var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => o.Key).ToArray();
 
             // Which are new and which are not?
@@ -559,6 +565,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<TAssociativeTable> UpdateInternalVersoinedAssociations<TAssociativeTable>(DataContext context, Guid sourceKey, int versionSequence, IEnumerable<TAssociativeTable> associations)
             where TAssociativeTable : IDbVersionedAssociation, new()
         {
+            if (sourceKey == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(sourceKey), ErrorMessages.ARGUMENT_NULL);
+            }
+
             // Ensure the source by locking the IEnumerable
             associations = associations.Select(a =>
             {

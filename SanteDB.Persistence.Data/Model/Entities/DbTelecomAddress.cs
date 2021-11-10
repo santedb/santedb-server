@@ -28,6 +28,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
     /// Represents a telecommunications address
     /// </summary>
     [Table("ent_tel_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbTelecomAddress : DbEntityVersionedAssociation
     {
         /// <summary>

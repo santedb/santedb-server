@@ -29,6 +29,7 @@ namespace SanteDB.Persistence.Data.Model.Security
     /// Defines a security challenge question for the user
     /// </summary>
     [Table("sec_chl_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbSecurityChallenge : DbNonVersionedBaseData
     {
         /// <summary>

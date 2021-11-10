@@ -42,7 +42,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             switch (this.m_configuration.LoadStrategy)
             {
                 case Configuration.LoadStrategyType.FullLoad:
-                    retVal.RelationshipType = base.GetRelatedPersistenceService<ConceptRelationshipType>().Get(context, dbModel.RelationshipTypeKey, null);
+                    retVal.RelationshipType = base.GetRelatedPersistenceService<ConceptRelationshipType>().Get(context, dbModel.RelationshipTypeKey);
                     retVal.SetLoadIndicator(nameof(ConceptReferenceTerm.RelationshipType));
                     break;
             }

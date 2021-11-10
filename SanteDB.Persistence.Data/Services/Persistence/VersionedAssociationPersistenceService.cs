@@ -30,7 +30,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Get the current version sequence for the source key
         /// </summary>
-        protected abstract int GetCurrentVersionSequenceForSource(DataContext context, Guid sourceKey);
+        protected abstract long GetCurrentVersionSequenceForSource(DataContext context, Guid sourceKey);
 
         /// <summary>
         /// Obsolete all objects

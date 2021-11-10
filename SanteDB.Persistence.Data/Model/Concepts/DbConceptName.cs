@@ -27,6 +27,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
     /// Represents a concept name
     /// </summary>
     [Table("cd_name_tbl")]
+	[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbConceptName : DbConceptVersionedAssociation
 	{
 	

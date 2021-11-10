@@ -27,6 +27,7 @@ namespace SanteDB.Persistence.Data.Model.Security
     /// Represents a single security policy
     /// </summary>
     [Table("sec_pol_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbSecurityPolicy : DbBaseData
 	{
 

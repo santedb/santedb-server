@@ -76,6 +76,7 @@ namespace SanteDB.Persistence.Data.Model
     /// <summary>
     /// Represents base data
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbBaseData : DbIdentified, IDbBaseData
     {
         /// <summary>
@@ -112,6 +113,7 @@ namespace SanteDB.Persistence.Data.Model
     /// <summary>
     /// Non-versioned base data
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbNonVersionedBaseData : DbBaseData, IDbNonVersionedBaseData
     {
 

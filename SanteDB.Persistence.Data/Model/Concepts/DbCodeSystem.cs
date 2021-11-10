@@ -25,6 +25,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
     /// Represents a code system 
     /// </summary>
     [Table("cd_sys_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbCodeSystem : DbNonVersionedBaseData
     {
         /// <summary>

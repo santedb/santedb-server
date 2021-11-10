@@ -28,6 +28,7 @@ namespace SanteDB.Persistence.Data.Model.Roles
     /// Represents a patient in the SQLite store
     /// </summary>
     [Table("pat_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbPatient : DbPersonSubTable
 	{
 

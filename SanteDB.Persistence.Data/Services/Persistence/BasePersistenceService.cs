@@ -79,6 +79,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         private static IDictionary<Type, IAdoPersistenceProvider> s_providers = new ConcurrentDictionary<Type, IAdoPersistenceProvider>();
 
         /// <summary>
+        /// Providers for mapping
+        /// </summary>
+        private static IDictionary<Type, object> s_mapProviders = new ConcurrentDictionary<Type, object>();
+
+        /// <summary>
         /// Base persistence service
         /// </summary>
         public BasePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCaching = null, IQueryPersistenceService queryPersistence = null)
@@ -211,6 +216,27 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Prepare all references
         /// </summary>
         protected abstract TModel PrepareReferences(DataContext context, TModel data);
+
+        /// <summary>
+        /// Get related mapping provider
+        /// </summary>
+        /// <typeparam name="TRelated">The model type for which the provider should be returned</typeparam>
+        protected IMappedQueryProvider<TRelated> GetRelatedMappingProvider<TRelated>()
+        {
+            if (!s_mapProviders.TryGetValue(typeof(TRelated), out object provider))
+            {
+                provider = ApplicationServiceContext.Current.GetService<IMappedQueryProvider<TRelated>>();
+                if (provider != null)
+                {
+                    s_mapProviders.Add(typeof(TRelated), provider);
+                }
+                else
+                {
+                    throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.MISSING_SERVICE, new { service = typeof(IMappedQueryProvider<TRelated>) }));
+                }
+            }
+            return provider as IMappedQueryProvider<TRelated>;
+        }
 
         /// <summary>
         /// Load a model object
@@ -1035,11 +1061,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected string GetAdHocCacheKey(Guid id) => $"{typeof(TModel).Name}.{id}";
 
         /// <summary>
-        /// Get the ad-hoc cache key
-        /// </summary>
-        protected string GetAdHocCacheKey(IDbIdentified internalData) => $"{internalData.GetType().Name}.{internalData.Key}";
-
-        /// <summary>
         /// Execute the specified query on the specified object
         /// </summary>
         public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<TModel, bool>> query)
@@ -1112,10 +1133,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         TModel IAdoPersistenceProvider<TModel>.Obsolete(DataContext context, Guid key) => this.DoObsoleteModel(context, key);
 
         /// <summary>
-        /// ADO persistence get
-        /// </summary>
-        TModel IAdoPersistenceProvider<TModel>.Get(DataContext context, Guid key, Guid? versionKey) => this.DoGetModel(context, key, versionKey, false);
-
         /// <summary>
         /// Ensure that the object exists in the database
         /// </summary>

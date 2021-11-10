@@ -26,6 +26,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
     /// Physical data layer implemntation of concept
     /// </summary>
     [Table("cd_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbConcept : DbIdentified
     {
         /// <summary>

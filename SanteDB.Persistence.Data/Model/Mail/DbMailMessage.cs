@@ -27,6 +27,7 @@ namespace SanteDB.Persistence.Data.Model.Mail
     /// </summary>
     [Table("mail_msg_tbl")]
     [AssociativeTable(typeof(DbSecurityUser), typeof(DbMailMessageRcptTo))]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbMailMessage : DbNonVersionedBaseData
 	{
 		/// <summary>

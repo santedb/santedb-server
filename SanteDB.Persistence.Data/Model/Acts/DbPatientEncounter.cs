@@ -27,6 +27,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
     /// Represents storage class for a patient encounter
     /// </summary>
     [Table("pat_enc_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbPatientEncounter : DbActSubTable
     {
 

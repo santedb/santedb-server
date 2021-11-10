@@ -127,7 +127,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             switch (this.m_configuration.LoadStrategy)
             {
                 case Configuration.LoadStrategyType.FullLoad:
-                    retVal.Class = base.GetRelatedPersistenceService<ConceptClass>().Get(context, dbModel.ClassKey, null);
+                    retVal.Class = base.GetRelatedPersistenceService<ConceptClass>().Get(context, dbModel.ClassKey);
                     retVal.SetLoadIndicator(nameof(Concept.Class));
                     goto case Configuration.LoadStrategyType.SyncLoad; // special case - FullLoad implies SyncLoad so we want a fallthrough - the only way to do this in C# is with this messy GOTO stuff
                 case Configuration.LoadStrategyType.SyncLoad:

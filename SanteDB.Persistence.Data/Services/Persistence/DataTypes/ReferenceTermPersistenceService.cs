@@ -42,7 +42,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             switch (this.m_configuration.LoadStrategy)
             {
                 case Configuration.LoadStrategyType.FullLoad:
-                    retVal.CodeSystem = base.GetRelatedPersistenceService<CodeSystem>().Get(context, dbModel.CodeSystemKey, null);
+                    retVal.CodeSystem = base.GetRelatedPersistenceService<CodeSystem>().Get(context, dbModel.CodeSystemKey);
                     retVal.SetLoadIndicator(nameof(ReferenceTerm.CodeSystem));
                     goto case Configuration.LoadStrategyType.SyncLoad;
                 case Configuration.LoadStrategyType.SyncLoad:

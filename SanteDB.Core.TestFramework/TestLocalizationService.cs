@@ -20,7 +20,10 @@
  */
 
 using SanteDB.Core.Services;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 
 namespace SanteDB.Core.TestFramework
 {
@@ -39,7 +42,7 @@ namespace SanteDB.Core.TestFramework
         /// </summary>
         public string GetString(string stringKey, dynamic parameters)
         {
-            return stringKey;
+            return this.GetString(null, stringKey, parameters);
         }
 
         /// <summary>
@@ -47,7 +50,8 @@ namespace SanteDB.Core.TestFramework
         /// </summary>
         public string GetString(string locale, string stringKey, dynamic parameters)
         {
-            return stringKey;
+            var values = (TypeDescriptor.GetProperties(parameters) as PropertyDescriptorCollection).OfType<PropertyDescriptor>().Select(o => $"{o.Name} = {o.GetValue(parameters)}");
+            return $"{stringKey} ({String.Join(";", values)})";
         }
 
         /// <summary>

@@ -26,6 +26,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
     /// Represents the orm class for place service
     /// </summary>
     [Table("plc_svc_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbPlaceService : DbEntityVersionedAssociation
     {
 

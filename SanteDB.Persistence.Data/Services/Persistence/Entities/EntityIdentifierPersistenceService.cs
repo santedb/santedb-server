@@ -1,4 +1,5 @@
-﻿using SanteDB.Core.Model.DataTypes;
+﻿using SanteDB.Core.Model;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
@@ -39,11 +40,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
             switch (this.m_configuration.LoadStrategy)
             {
-                case Configuration.LoadStrategyType.SyncLoad:
-                    retVal.Authority = this.GetRelatedPersistenceService<AssigningAuthority>().Get(context, dbModel.AuthorityKey, null);
-                    goto case Configuration.LoadStrategyType.FullLoad;
                 case Configuration.LoadStrategyType.FullLoad:
-                    retVal.IdentifierType = this.GetRelatedPersistenceService<IdentifierType>().Get(context, dbModel.TypeKey.GetValueOrDefault(), null);
+                    retVal.IdentifierType = this.GetRelatedPersistenceService<IdentifierType>().Get(context, dbModel.TypeKey.GetValueOrDefault());
+                    retVal.SetLoadIndicator(nameof(EntityIdentifier.IdentifierType));
+                    goto case Configuration.LoadStrategyType.SyncLoad;
+                case Configuration.LoadStrategyType.SyncLoad:
+                    retVal.Authority = this.GetRelatedPersistenceService<AssigningAuthority>().Get(context, dbModel.AuthorityKey);
+                    retVal.SetLoadIndicator(nameof(EntityIdentifier.Authority));
                     break;
             }
             return retVal;

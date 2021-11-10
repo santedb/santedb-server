@@ -27,6 +27,7 @@ namespace SanteDB.Persistence.Data.Model.DataType
     /// Represents an assigning authority
     /// </summary>
     [Table("asgn_aut_tbl"), AssociativeTable(typeof(DbConceptVersion), typeof(DbAuthorityScope))]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbAssigningAuthority : DbNonVersionedBaseData
     {
 

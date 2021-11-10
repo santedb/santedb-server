@@ -26,6 +26,7 @@ namespace SanteDB.Persistence.Data.Model
     /// <summary>
     /// Gets or sets the derived parent class
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbSubTable 
     {
 
@@ -40,6 +41,7 @@ namespace SanteDB.Persistence.Data.Model
     /// <summary>
     /// Act based sub-table
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbActSubTable : DbSubTable
     {
         /// <summary>
@@ -52,6 +54,7 @@ namespace SanteDB.Persistence.Data.Model
     /// <summary>
     /// Act based sub-table
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbObsSubTable : DbActSubTable
     {
         /// <summary>
@@ -64,6 +67,7 @@ namespace SanteDB.Persistence.Data.Model
     /// <summary>
     /// Entity based sub-table
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbEntitySubTable : DbSubTable
     {
         /// <summary>
@@ -76,6 +80,7 @@ namespace SanteDB.Persistence.Data.Model
     /// <summary>
     /// Represents a person based sub-table
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbPersonSubTable : DbEntitySubTable
     {
         /// <summary>

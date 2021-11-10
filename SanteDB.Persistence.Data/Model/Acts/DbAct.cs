@@ -20,6 +20,7 @@ using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Concepts;
 using SanteDB.Persistence.Data.Model.Extensibility;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Persistence.Data.Model.Acts
 {
@@ -27,6 +28,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
     /// Represents a table which can store act data
     /// </summary>
     [Table("act_tbl")]
+    [ExcludeFromCodeCoverage]
     public class DbAct : DbIdentified
     {
 

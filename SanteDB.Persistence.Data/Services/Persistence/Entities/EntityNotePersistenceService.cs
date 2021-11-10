@@ -1,4 +1,5 @@
-﻿using SanteDB.Core.Model.DataTypes;
+﻿using SanteDB.Core.Model;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -39,7 +40,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
             if (this.m_configuration.LoadStrategy == Configuration.LoadStrategyType.FullLoad)
             {
-                retVal.Author = base.GetRelatedPersistenceService<Entity>().Get(context, dbModel.AuthorKey, null);
+                retVal.Author = base.GetRelatedPersistenceService<Entity>().Get(context, dbModel.AuthorKey);
+                retVal.SetLoadIndicator(nameof(EntityNote.Author));
             }
             return retVal;
         }

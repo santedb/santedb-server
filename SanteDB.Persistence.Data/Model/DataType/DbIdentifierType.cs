@@ -26,6 +26,7 @@ namespace SanteDB.Persistence.Data.Model.DataType
     /// Identifier type table.
     /// </summary>
     [Table("id_typ_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbIdentifierType : DbBaseData
 	{
         /// <summary>

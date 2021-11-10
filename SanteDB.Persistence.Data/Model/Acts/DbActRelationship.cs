@@ -19,6 +19,7 @@
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Persistence.Data.Model.Acts
 {
@@ -26,6 +27,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
     /// Identifies relationships between acts
     /// </summary>
     [Table("act_rel_tbl")]
+    [ExcludeFromCodeCoverage]
     public class DbActRelationship : DbVersionedAssociation
     {
 

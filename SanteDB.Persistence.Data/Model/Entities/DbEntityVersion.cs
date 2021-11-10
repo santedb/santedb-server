@@ -28,6 +28,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
     /// Represents an entity in the database
     /// </summary>
     [Table("ent_vrsn_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbEntityVersion : DbVersionedData, IDbHasStatus
     {
         /// <summary>

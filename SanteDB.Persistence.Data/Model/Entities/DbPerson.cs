@@ -27,6 +27,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
     /// Represents a person
     /// </summary>
     [Table("psn_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbPerson : DbEntitySubTable
 	{
         /// <summary>

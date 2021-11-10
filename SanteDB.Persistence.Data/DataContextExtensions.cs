@@ -2,6 +2,7 @@
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
@@ -47,6 +48,29 @@ namespace SanteDB.Persistence.Data
     {
         // Localization service
         private static readonly ILocalizationService s_localizationService = ApplicationServiceContext.Current.GetService<ILocalizationService>();
+
+        // Adhoc cache
+        private static readonly IAdhocCacheService s_adhocCache = ApplicationServiceContext.Current.GetService<IAdhocCacheService>();
+
+        /// <summary>
+        /// Convert to security policy instance
+        /// </summary>
+        internal static SecurityPolicyInstance ToSecurityPolicyInstance(this DbSecurityPolicyInstance me, DataContext context)
+        {
+            var policy = s_adhocCache?.Get<DbSecurityPolicy>($"pol.{me.PolicyKey}");
+            if (policy == null)
+            {
+                policy = context.FirstOrDefault<DbSecurityPolicy>(o => o.Key == me.PolicyKey);
+                s_adhocCache?.Add($"pol.{me.PolicyKey}", policy);
+            }
+
+            if (policy == null)
+            {
+                throw new InvalidOperationException(s_localizationService.GetString(ErrorMessageStrings.RELATED_OBJECT_NOT_FOUND));
+            }
+
+            return new SecurityPolicyInstance(new SecurityPolicy(policy.Name, policy.Oid, policy.IsPublic, policy.CanOverride) { Key = me.PolicyKey }, PolicyGrantType.Grant);
+        }
 
         /// <summary>
         /// Convert validation enforcement to priority
@@ -140,7 +164,7 @@ namespace SanteDB.Persistence.Data
             else
             {
                 var retVal = me.FirstOrDefault<DbSecurityProvenance>(o => o.Key == me.ContextId);
-                me.AddData("provenance", retVal);
+                me.Data.Add("provenance", retVal);
                 return retVal;
             }
         }
@@ -233,7 +257,7 @@ namespace SanteDB.Persistence.Data
                     me.ContextId = retVal.Key;
                 }
 
-                me.AddData("provenance", retVal);
+                me.Data.Add("provenance", retVal);
                 return retVal.Key;
             }
             catch (Exception e)

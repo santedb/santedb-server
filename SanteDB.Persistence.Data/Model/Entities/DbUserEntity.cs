@@ -26,6 +26,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
     /// User entity ORM
     /// </summary>
     [Table("usr_ent_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbUserEntity : DbPersonSubTable
     {
 

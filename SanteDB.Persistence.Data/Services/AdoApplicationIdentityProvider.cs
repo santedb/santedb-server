@@ -309,10 +309,17 @@ namespace SanteDB.Persistence.Data.Services
                     }
 
                     // First 16 bytes are IV
-                    var ivLength = app.SigningKey[0];
-                    var iv = app.SigningKey.Skip(1).Take(ivLength).ToArray();
-                    var data = app.SigningKey.Skip(1 + ivLength).ToArray();
-                    return this.m_symmetricCryptographicProvider.Decrypt(data, this.m_symmetricCryptographicProvider.GetContextKey(), iv);
+                    if (this.m_configuration.EncryptPublicKeys)
+                    {
+                        var ivLength = app.SigningKey[0];
+                        var iv = app.SigningKey.Skip(1).Take(ivLength).ToArray();
+                        var data = app.SigningKey.Skip(1 + ivLength).ToArray();
+                        return this.m_symmetricCryptographicProvider.Decrypt(data, this.m_symmetricCryptographicProvider.GetContextKey(), iv);
+                    }
+                    else
+                    {
+                        return app.SigningKey;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -460,12 +467,12 @@ namespace SanteDB.Persistence.Data.Services
                 try
                 {
                     context.Open();
-                    var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null)?.Key;
-                    if (!app.HasValue)
+                    var app = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
+                    if (app == Guid.Empty)
                     {
                         throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND));
                     }
-                    return app.Value;
+                    return app;
                 }
                 catch (Exception e)
                 {
@@ -507,13 +514,20 @@ namespace SanteDB.Persistence.Data.Services
                         throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.FETCH_APPLICATION_KEY));
                     }
 
-                    var iv = this.m_symmetricCryptographicProvider.GenerateIV();
-                    var encData = this.m_symmetricCryptographicProvider.Encrypt(key, this.m_symmetricCryptographicProvider.GetContextKey(), iv);
-                    byte[] storeData = new byte[iv.Length + encData.Length + 1];
-                    storeData[0] = (byte)iv.Length;
-                    Array.Copy(iv, 0, storeData, 1, iv.Length);
-                    Array.Copy(encData, 0, storeData, 1 + iv.Length, encData.Length);
-                    dbApp.SigningKey = storeData;
+                    if (this.m_configuration.EncryptPublicKeys)
+                    {
+                        var iv = this.m_symmetricCryptographicProvider.GenerateIV();
+                        var encData = this.m_symmetricCryptographicProvider.Encrypt(key, this.m_symmetricCryptographicProvider.GetContextKey(), iv);
+                        byte[] storeData = new byte[iv.Length + encData.Length + 1];
+                        storeData[0] = (byte)iv.Length;
+                        Array.Copy(iv, 0, storeData, 1, iv.Length);
+                        Array.Copy(encData, 0, storeData, 1 + iv.Length, encData.Length);
+                        dbApp.SigningKey = storeData;
+                    }
+                    else
+                    {
+                        dbApp.SigningKey = key;
+                    }
                     dbApp.UpdatedByKey = context.EstablishProvenance(principal, null);
                     dbApp.UpdatedTime = DateTimeOffset.Now;
 

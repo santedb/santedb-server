@@ -29,6 +29,7 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
     /// <summary>
     /// Represents a simpe tag (version independent)
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbTag : DbAssociation, IDbBaseData
 	{
         /// <summary>

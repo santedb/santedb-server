@@ -27,6 +27,7 @@ namespace SanteDB.Persistence.Data.Model.Security
     /// Security applicationDb Should only be one entry here as well
     /// </summary>
     [Table("sec_app_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbSecurityApplication : DbNonVersionedBaseData
     {
 

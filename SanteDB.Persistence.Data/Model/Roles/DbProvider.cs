@@ -28,6 +28,7 @@ namespace SanteDB.Persistence.Data.Model.Roles
     /// Represents a health care provider in the database
     /// </summary>
     [Table("pvdr_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbProvider : DbPersonSubTable
     {
 

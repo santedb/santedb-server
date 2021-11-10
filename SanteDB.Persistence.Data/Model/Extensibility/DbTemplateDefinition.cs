@@ -25,6 +25,7 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
     /// Represents a database template definition
     /// </summary>
     [Table("tpl_def_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbTemplateDefinition : DbNonVersionedBaseData
     {
         /// <summary>

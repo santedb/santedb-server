@@ -25,6 +25,7 @@ namespace SanteDB.Persistence.Data.Model.Security
     /// Represents a claim on a table
     /// </summary>
     [Table("sec_ses_clm_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbSessionClaim : DbIdentified
     {
 

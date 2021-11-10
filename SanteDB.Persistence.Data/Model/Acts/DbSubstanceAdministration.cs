@@ -27,6 +27,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
     /// Represents storage class for a substance administration
     /// </summary>
     [Table("sub_adm_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbSubstanceAdministration : DbActSubTable
     {
 

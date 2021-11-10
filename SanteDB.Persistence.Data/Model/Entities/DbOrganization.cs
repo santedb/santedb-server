@@ -26,6 +26,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
     /// Represents an organization in the data store
     /// </summary>
     [Table("org_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbOrganization : DbEntitySubTable
 	{
 		/// <summary>

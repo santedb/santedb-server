@@ -28,6 +28,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
     /// Stores data related to an observation act
     /// </summary>
     [Table("obs_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbObservation : DbActSubTable
     {
 

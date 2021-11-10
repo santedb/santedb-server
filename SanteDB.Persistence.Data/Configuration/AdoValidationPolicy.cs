@@ -21,6 +21,7 @@
 
 using SanteDB.Core.Configuration;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Data.Configuration
@@ -54,6 +55,7 @@ namespace SanteDB.Persistence.Data.Configuration
     /// Data caching policy
     /// </summary>
     [XmlType(nameof(AdoValidationPolicy), Namespace = "http://santedb.org/configuration")]
+    [ExcludeFromCodeCoverage]
     public class AdoValidationPolicy
     {
         /// <summary>

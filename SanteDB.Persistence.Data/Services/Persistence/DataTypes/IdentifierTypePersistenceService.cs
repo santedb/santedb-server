@@ -1,4 +1,5 @@
-﻿using SanteDB.Core.Model.DataTypes;
+﻿using SanteDB.Core.Model;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
@@ -39,8 +40,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
             if (this.m_configuration.LoadStrategy == Configuration.LoadStrategyType.FullLoad)
             {
-                retVal.TypeConcept = base.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey, null);
-                retVal.ScopeConcept = base.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ScopeConceptKey.GetValueOrDefault(), null);
+                retVal.TypeConcept = base.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey);
+                retVal.SetLoadIndicator(nameof(IdentifierType.TypeConcept));
+                retVal.ScopeConcept = base.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ScopeConceptKey.GetValueOrDefault());
+                retVal.SetLoadIndicator(nameof(IdentifierType.ScopeConcept));
             }
             return retVal;
         }

@@ -25,6 +25,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
     /// Represents a person's languages of communication
     /// </summary>
     [Table("psn_lng_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbPersonLanguageCommunication : DbEntityVersionedAssociation
     {
         /// <summary>

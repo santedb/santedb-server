@@ -9,6 +9,7 @@ namespace SanteDB.Persistence.Data.Model.DataType
     /// A geo-tag
     /// </summary>
     [Table("geo_tag")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbGeoTag : DbIdentified
     {
         /// <summary>

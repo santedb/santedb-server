@@ -53,6 +53,7 @@
     <Compile Include="Persistence\ConceptClassPersistenceTest.cs" />
     <Compile Include="Persistence\ConceptPersistenceTest.cs" />
     <Compile Include="Persistence\ConceptSetPersistenceServiceTest.cs" />
+    <Compile Include="Persistence\Entities\EntityPersistenceTest.cs" />
     <Compile Include="Persistence\IdentifierTypePersistenceServiceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ModelMapTest.cs" />
@@ -92,9 +93,7 @@
   <ItemGroup>
     <EmbeddedResource Include="TestConfig.xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Persistence\Entity\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

@@ -261,7 +261,7 @@ namespace SanteDB.Persistence.Data.Test
         /// Tests that we can add and remove a signing key
         /// </summary>
         [Test]
-        public void TestAddRetrieveSigningKey()
+        public void TestSigningKey()
         {
             var serviceProvider = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
             // Pre-Condition

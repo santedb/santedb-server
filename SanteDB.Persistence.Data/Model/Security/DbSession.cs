@@ -25,6 +25,7 @@ namespace SanteDB.Persistence.Data.Model.Security
     /// Represents a session in the database
     /// </summary>
     [Table("sec_ses_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbSession : DbIdentified
     {
         /// <summary>

@@ -25,6 +25,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
     /// Reference term table
     /// </summary>
     [Table("ref_term_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbReferenceTerm : DbNonVersionedBaseData
     {
         /// <summary>

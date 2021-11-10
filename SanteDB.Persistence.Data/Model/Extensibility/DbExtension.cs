@@ -28,6 +28,7 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
     /// <summary>
     /// Extension.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbExtension : DbVersionedAssociation
 	{
 

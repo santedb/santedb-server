@@ -124,20 +124,20 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
 
-                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null);
-                    if (dbUser == null)
+                    var dbUser = context.Query<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
+                    if (dbUser == Guid.Empty)
                     {
                         throw new KeyNotFoundException(String.Format(this.m_localizationService.GetString(ErrorMessageStrings.USR_INVALID, userName)));
                     }
 
-                    var dbClaim = context.FirstOrDefault<DbUserClaim>(o => o.SourceKey == dbUser.Key);
+                    var dbClaim = context.FirstOrDefault<DbUserClaim>(o => o.SourceKey == dbUser);
 
                     // Current claim in DB? Update
                     if (dbClaim == null)
                     {
                         dbClaim = new DbUserClaim()
                         {
-                            SourceKey = dbUser.Key
+                            SourceKey = dbUser
                         };
                     }
                     dbClaim.ClaimType = claim.Type;
@@ -716,13 +716,13 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
 
-                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null);
-                    if (dbUser == null)
+                    var dbUser = context.Query<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
+                    if (dbUser == Guid.Empty)
                     {
                         throw new KeyNotFoundException(String.Format(this.m_localizationService.GetString(ErrorMessageStrings.USR_INVALID, userName)));
                     }
 
-                    context.Delete<DbUserClaim>(o => o.SourceKey == dbUser.Key && o.ClaimType.ToLowerInvariant() == claimType.ToLowerInvariant());
+                    context.Delete<DbUserClaim>(o => o.SourceKey == dbUser && o.ClaimType.ToLowerInvariant() == claimType.ToLowerInvariant());
                 }
                 catch (Exception e)
                 {

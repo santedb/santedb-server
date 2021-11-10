@@ -27,6 +27,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
     /// Concept set
     /// </summary>
     [Table("cd_set_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbConceptSet : DbNonVersionedBaseData
 	{
 		/// <summary>

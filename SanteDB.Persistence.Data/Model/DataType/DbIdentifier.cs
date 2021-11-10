@@ -28,6 +28,7 @@ namespace SanteDB.Persistence.Data.Model.DataType
     /// <summary>
     /// Represents an identifier
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbIdentifier : DbVersionedAssociation
     {
 

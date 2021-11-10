@@ -26,6 +26,7 @@ namespace SanteDB.Persistence.Data.Model.Mail
     /// Represents an alert recipient.
     /// </summary>
     [Table("mail_msg_rcpt_to_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbMailMessageRcptTo : DbAssociation
 	{
 		/// <summary>

@@ -24,6 +24,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
     /// Represents controlling actions
     /// </summary>
     [Table("cntrl_act_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbControlAct : DbActSubTable
     {
 

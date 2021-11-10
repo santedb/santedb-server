@@ -119,7 +119,7 @@ namespace SanteDB.Persistence.Data.Test
             Assert.IsTrue(session.Claims.Count(o => o.Type == SanteDBClaimTypes.SanteDBScopeClaim) > 2);
 
             // Extend
-            Thread.Sleep(5000); // Wait 2 seconds
+            Thread.Sleep(200); // Wait 1 seconds
             var extendedSession = sesService.Extend(session.RefreshToken);
             Assert.Greater(extendedSession.NotBefore, session.NotBefore);
             Assert.Greater(extendedSession.NotAfter, session.NotAfter);

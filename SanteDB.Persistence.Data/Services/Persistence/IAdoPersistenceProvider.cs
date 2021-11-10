@@ -6,18 +6,15 @@ using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
 {
-
     /// <summary>
     /// non-generic version of ADO persistence provider
     /// </summary>
     public interface IAdoPersistenceProvider
     {
-
         /// <summary>
         /// Get the provider that this instance of the provider uses
         /// </summary>
         IDbProvider Provider { get; set; }
-
     }
 
     /// <summary>
@@ -25,7 +22,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     /// </summary>
     public interface IAdoPersistenceProvider<TModel> : IAdoPersistenceProvider
     {
-
         /// <summary>
         /// Query for <paramref name="filter"/> on <paramref name="context"/>
         /// </summary>
@@ -49,6 +45,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Perform a get on the context
         /// </summary>
-        TModel Get(DataContext context, Guid key, Guid? versionKey);
+        TModel Get(DataContext context, Guid key);
     }
 }

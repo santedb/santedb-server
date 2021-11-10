@@ -37,6 +37,7 @@ namespace SanteDB.Persistence.Data.Model
     /// <summary>
     /// Gets or sets the identified data
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbIdentified : IDbIdentified
     {
      

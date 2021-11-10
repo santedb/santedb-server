@@ -28,14 +28,22 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <summary>
         /// Get the most current version sequence from the database
         /// </summary>
-        protected override int GetCurrentVersionSequenceForSource(DataContext context, Guid sourceKey)
+        protected override long GetCurrentVersionSequenceForSource(DataContext context, Guid sourceKey)
         {
-            var source = context.Query<DbConceptVersion>(o => o.Key == sourceKey).OrderByDescending(o => o.VersionSequenceId).FirstOrDefault();
-            if (source == null)
+            if (context.Data.TryGetValue($"Concept{sourceKey}Version", out object versionSequenceObject) && versionSequenceObject is long versionSequence)
             {
-                throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = sourceKey, type = "ConceptReference" }));
+                return versionSequence;
             }
-            return source.VersionSequenceId.GetValueOrDefault();
+            else
+            {
+                versionSequence = context.Query<DbConceptVersion>(o => o.Key == sourceKey && !o.ObsoletionTime.HasValue).OrderByDescending(o => o.VersionSequenceId).FirstOrDefault()?.VersionSequenceId ?? -1;
+                if (versionSequence == -1)
+                {
+                    throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = sourceKey, type = "Entity" }));
+                }
+                context.Data.Add($"Concept{sourceKey}Version", versionSequence);
+                return versionSequence;
+            }
         }
     }
 }

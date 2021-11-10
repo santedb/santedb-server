@@ -25,6 +25,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
     /// Table which stores clinical protocols
     /// </summary>
     [Table("proto_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbProtocol : DbBaseData
     {
         /// <summary>

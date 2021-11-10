@@ -28,6 +28,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
     /// Represents the entity representation of an object
     /// </summary>
     [Table("dev_ent_tbl")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbDeviceEntity : DbEntitySubTable
     {
 

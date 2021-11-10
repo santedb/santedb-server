@@ -27,7 +27,8 @@ namespace SanteDB.Persistence.Data.Model.Security
     /// </summary>
     [Table("sec_usr_tbl")]
     [AssociativeTable(typeof(DbSecurityRole), typeof(DbSecurityUserRole))]
-	public class DbSecurityUser : DbNonVersionedBaseData
+	    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+public class DbSecurityUser : DbNonVersionedBaseData
 	{
 
 		/// <summary>

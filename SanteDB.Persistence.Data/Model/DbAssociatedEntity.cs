@@ -45,13 +45,13 @@ namespace SanteDB.Persistence.Data.Model
         /// Gets or sets the version when the relationship is effective
         /// </summary>
         [Column("efft_vrsn_seq_id")]
-        Int32 EffectiveVersionSequenceId { get; set; }
+        Int64 EffectiveVersionSequenceId { get; set; }
 
         /// <summary>
         /// Gets or sets the verson when the relationship is not effecitve
         /// </summary>
         [Column("obslt_vrsn_seq_id")]
-        Int32? ObsoleteVersionSequenceId { get; set; }
+        Int64? ObsoleteVersionSequenceId { get; set; }
 
         /// <summary>
         /// Idetifies whether the obsoletion time is specifically set
@@ -73,19 +73,20 @@ namespace SanteDB.Persistence.Data.Model
     /// <summary>
     /// Represents the versioned copy of an association
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbVersionedAssociation : DbAssociation, IDbVersionedAssociation
     {
         /// <summary>
         /// Gets or sets the version when the relationship is effective
         /// </summary>
         [Column("efft_vrsn_seq_id")]
-        public Int32 EffectiveVersionSequenceId { get; set; }
+        public Int64 EffectiveVersionSequenceId { get; set; }
 
         /// <summary>
         /// Gets or sets the verson when the relationship is not effecitve
         /// </summary>
         [Column("obslt_vrsn_seq_id")]
-        public Int32? ObsoleteVersionSequenceId { get; set; }
+        public Int64? ObsoleteVersionSequenceId { get; set; }
 
         /// <summary>
         /// Gets whether the obsoletion id is specified
@@ -96,6 +97,7 @@ namespace SanteDB.Persistence.Data.Model
     /// <summary>
     /// Represents an act association
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbActAssociation : DbAssociation
     {
         /// <summary>
@@ -108,6 +110,7 @@ namespace SanteDB.Persistence.Data.Model
     /// <summary>
     /// Represents an act association
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbActVersionedAssociation : DbVersionedAssociation
     {
         /// <summary>
@@ -120,6 +123,7 @@ namespace SanteDB.Persistence.Data.Model
     /// <summary>
     /// Represents an act association
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbEntityAssociation : DbAssociation
     {
         /// <summary>
@@ -132,6 +136,7 @@ namespace SanteDB.Persistence.Data.Model
     /// <summary>
     /// Represents an act association
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbEntityVersionedAssociation : DbVersionedAssociation
     {
         /// <summary>
@@ -144,6 +149,7 @@ namespace SanteDB.Persistence.Data.Model
     /// <summary>
     /// Represents an concept association
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbConceptVersionedAssociation : DbVersionedAssociation
     {
         /// <summary>
