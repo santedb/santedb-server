@@ -6,6 +6,8 @@ using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.DataType;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
@@ -33,6 +35,22 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <summary>
+        /// Special ORM query provider that uses a composite result
+        /// </summary>
+        public override IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<EntityIdentifier, bool>> query)
+        {
+            return this.DoQueryInternalAs<CompositeResult<DbEntityIdentifier, DbAssigningAuthority>>(context, query,
+                (o) =>
+                {
+                    var columns = TableMapping.Get(typeof(DbEntityIdentifier)).Columns.Union(
+                        TableMapping.Get(typeof(DbAssigningAuthority)).Columns, new ColumnMapping.ColumnComparer());
+                    var retVal = context.CreateSqlStatement().SelectFrom(typeof(DbEntityIdentifier), columns.ToArray())
+                        .InnerJoin<DbEntityIdentifier, DbAssigningAuthority>(q => q.AuthorityKey, q => q.Key);
+                    return retVal;
+                });
+        }
+
+        /// <summary>
         /// Convert from db model to information model
         /// </summary>
         protected override EntityIdentifier DoConvertToInformationModel(DataContext context, DbEntityIdentifier dbModel, params IDbIdentified[] referenceObjects)
@@ -42,11 +60,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 case Configuration.LoadStrategyType.FullLoad:
                     retVal.IdentifierType = this.GetRelatedPersistenceService<IdentifierType>().Get(context, dbModel.TypeKey.GetValueOrDefault());
-                    retVal.SetLoadIndicator(nameof(EntityIdentifier.IdentifierType));
+                    retVal.SetLoaded(nameof(EntityIdentifier.IdentifierType));
                     goto case Configuration.LoadStrategyType.SyncLoad;
                 case Configuration.LoadStrategyType.SyncLoad:
-                    retVal.Authority = this.GetRelatedPersistenceService<AssigningAuthority>().Get(context, dbModel.AuthorityKey);
-                    retVal.SetLoadIndicator(nameof(EntityIdentifier.Authority));
+                    retVal.Authority = this.GetRelatedMappingProvider<AssigningAuthority>().ToModelInstance(context, referenceObjects.OfType<DbAssigningAuthority>().FirstOrDefault()) ?? this.GetRelatedPersistenceService<AssigningAuthority>().Get(context, dbModel.AuthorityKey);
+                    retVal.SetLoaded(nameof(EntityIdentifier.Authority));
+                    break;
+
+                case Configuration.LoadStrategyType.QuickLoad:
+                    retVal.Authority = this.GetRelatedMappingProvider<AssigningAuthority>().ToModelInstance(context, referenceObjects.OfType<DbAssigningAuthority>().FirstOrDefault());
+                    if (retVal.Authority != null)
+                    {
+                        retVal.SetLoaded(o => o.Authority);
+                    }
                     break;
             }
             return retVal;

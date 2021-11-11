@@ -41,9 +41,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             if (this.m_configuration.LoadStrategy == Configuration.LoadStrategyType.FullLoad)
             {
                 retVal.TypeConcept = base.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey);
-                retVal.SetLoadIndicator(nameof(IdentifierType.TypeConcept));
+                retVal.SetLoaded(nameof(IdentifierType.TypeConcept));
                 retVal.ScopeConcept = base.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ScopeConceptKey.GetValueOrDefault());
-                retVal.SetLoadIndicator(nameof(IdentifierType.ScopeConcept));
+                retVal.SetLoaded(nameof(IdentifierType.ScopeConcept));
             }
             return retVal;
         }

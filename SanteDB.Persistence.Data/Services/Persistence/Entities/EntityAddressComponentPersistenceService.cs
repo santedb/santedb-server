@@ -42,7 +42,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             if (this.m_configuration.LoadStrategy == Configuration.LoadStrategyType.FullLoad)
             {
                 retVal.ComponentType = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ComponentTypeKey.GetValueOrDefault());
-                retVal.SetLoadIndicator(nameof(EntityAddressComponent.ComponentType));
+                retVal.SetLoaded(nameof(EntityAddressComponent.ComponentType));
             }
 
             return retVal;

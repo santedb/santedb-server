@@ -42,11 +42,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             {
                 case Configuration.LoadStrategyType.SyncLoad:
                     retVal.Authority = this.GetRelatedPersistenceService<AssigningAuthority>().Get(context, dbModel.AuthorityKey);
-                    retVal.SetLoadIndicator(nameof(ActIdentifier.Authority));
+                    retVal.SetLoaded(nameof(ActIdentifier.Authority));
                     goto case Configuration.LoadStrategyType.FullLoad;
                 case Configuration.LoadStrategyType.FullLoad:
                     retVal.IdentifierType = this.GetRelatedPersistenceService<IdentifierType>().Get(context, dbModel.TypeKey.GetValueOrDefault());
-                    retVal.SetLoadIndicator(nameof(ActIdentifier.IdentifierType));
+                    retVal.SetLoaded(nameof(ActIdentifier.IdentifierType));
                     break;
             }
             return retVal;

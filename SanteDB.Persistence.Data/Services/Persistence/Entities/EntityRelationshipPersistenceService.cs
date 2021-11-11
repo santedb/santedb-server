@@ -47,9 +47,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 case Configuration.LoadStrategyType.FullLoad:
                     retVal.TargetEntity = this.GetRelatedPersistenceService<Entity>().Get(context, dbModel.TargetKey);
-                    retVal.SetLoadIndicator(nameof(EntityRelationship.TargetEntity));
+                    retVal.SetLoaded(nameof(EntityRelationship.TargetEntity));
                     retVal.Classification = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ClassificationKey.GetValueOrDefault());
-                    retVal.SetLoadIndicator(nameof(EntityRelationship.Classification));
+                    retVal.SetLoaded(nameof(EntityRelationship.Classification));
                     retVal.RelationshipRole = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.RelationshipRoleKey.GetValueOrDefault());
                     break;
             }

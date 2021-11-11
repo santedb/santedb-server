@@ -128,19 +128,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             {
                 case Configuration.LoadStrategyType.FullLoad:
                     retVal.Class = base.GetRelatedPersistenceService<ConceptClass>().Get(context, dbModel.ClassKey);
-                    retVal.SetLoadIndicator(nameof(Concept.Class));
+                    retVal.SetLoaded(nameof(Concept.Class));
                     goto case Configuration.LoadStrategyType.SyncLoad; // special case - FullLoad implies SyncLoad so we want a fallthrough - the only way to do this in C# is with this messy GOTO stuff
                 case Configuration.LoadStrategyType.SyncLoad:
                     retVal.ConceptNames = base.GetRelatedPersistenceService<ConceptName>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoadIndicator(nameof(Concept.ConceptNames));
+                    retVal.SetLoaded(nameof(Concept.ConceptNames));
                     retVal.Relationship = base.GetRelatedPersistenceService<ConceptRelationship>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoadIndicator(nameof(Concept.Relationship));
+                    retVal.SetLoaded(nameof(Concept.Relationship));
                     retVal.ReferenceTerms = this.GetRelatedPersistenceService<ConceptReferenceTerm>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoadIndicator(nameof(Concept.ReferenceTerms));
+                    retVal.SetLoaded(nameof(Concept.ReferenceTerms));
                     goto case Configuration.LoadStrategyType.QuickLoad;
                 case Configuration.LoadStrategyType.QuickLoad:
                     retVal.ConceptSetKeys = context.Query<DbConceptSetConceptAssociation>(o => o.ConceptKey == dbModel.Key).Select(o => o.SourceKey).ToList();
-                    retVal.SetLoadIndicator(nameof(Concept.ConceptSets));
+                    retVal.SetLoaded(nameof(Concept.ConceptSets));
                     break;
             }
 

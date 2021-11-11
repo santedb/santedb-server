@@ -73,11 +73,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 case Configuration.LoadStrategyType.FullLoad:
                     retVal.AddressUse = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.UseConceptKey);
-                    retVal.SetLoadIndicator(nameof(EntityAddress.AddressUse));
+                    retVal.SetLoaded(nameof(EntityAddress.AddressUse));
                     goto case Configuration.LoadStrategyType.SyncLoad;
                 case Configuration.LoadStrategyType.SyncLoad:
                     retVal.Component = this.GetRelatedPersistenceService<EntityAddressComponent>().Query(context, o => o.SourceEntityKey == dbModel.Key).OrderBy(o => o.OrderSequence).ToList();
-                    retVal.SetLoadIndicator(nameof(EntityAddress.Component));
+                    retVal.SetLoaded(nameof(EntityAddress.Component));
                     break;
                 case Configuration.LoadStrategyType.QuickLoad:
                     retVal.Component = null;

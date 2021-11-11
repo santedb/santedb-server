@@ -65,7 +65,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         /// <param name="context">The data context which is being converted on</param>
         /// <param name="dbModel">The database model to be converted</param>
-        /// <param name="referenceObjects">The reference objects for lookup</param>
+        /// <param name="referenceObjects">If this method is called from a <see cref="CompositeResult"/> then the other data in the composite result</param>
         /// <returns>The converted model</returns>
         protected override TModel DoConvertToInformationModel(DataContext context, TDbModel dbModel, params IDbIdentified[] referenceObjects)
         {
@@ -238,6 +238,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <returns>The delay executed result set which represents the query</returns>
         protected override OrmResultSet<TDbModel> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, bool allowCache = false)
         {
+            return this.DoQueryInternalAs<TDbModel>(context, query);
+        }
+
+        /// <summary>
+        /// Perform the query however return a custom <typeparamref name="TReturn"/>. This function allows you
+        /// to modify the query instructions before sending query to the database
+        /// </summary>
+        protected OrmResultSet<TReturn> DoQueryInternalAs<TReturn>(DataContext context, Expression<Func<TModel, bool>> query, Func<SqlStatement, SqlStatement> queryModifier = null)
+        {
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
@@ -249,7 +258,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             // Convert the query to a domain query so that the object persistence layer can turn the
             // structured LINQ query into a SQL statement
-            var domainQuery = context.CreateSqlStatement().SelectFrom(typeof(TDbModel));
+            var domainQuery = context.CreateSqlStatement().SelectFrom(typeof(TDbModel), TableMapping.Get(typeof(TDbModel)).Columns.ToArray());
+            if (queryModifier != null)
+            {
+                domainQuery = queryModifier(domainQuery);
+            }
+
             var expression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(query, false);
             if (expression != null)
             {
@@ -261,7 +275,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateQuery(query);
             }
 
-            return context.Query<TDbModel>(domainQuery.Build());
+            return context.Query<TReturn>(domainQuery.Build());
         }
 
         /// <summary>

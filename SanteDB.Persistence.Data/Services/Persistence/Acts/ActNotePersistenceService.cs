@@ -41,7 +41,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             if (this.m_configuration.LoadStrategy == Configuration.LoadStrategyType.FullLoad)
             {
                 retVal.Author = base.GetRelatedPersistenceService<Entity>().Get(context, dbModel.AuthorKey);
-                retVal.SetLoadIndicator(nameof(ActNote.Author));
+                retVal.SetLoaded(nameof(ActNote.Author));
             }
             return retVal;
         }

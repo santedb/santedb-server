@@ -20,6 +20,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Principal;
 using System.Text;
@@ -270,22 +271,22 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             data = this.PrepareReferences(context, data);
 
-#if PERFMON
+#if DEBUG
             Stopwatch sw = new Stopwatch();
             try
             {
                 sw.Start();
 #endif
-            var dbInstance = this.DoConvertToDataModel(context, data);
-            dbInstance = this.DoInsertInternal(context, dbInstance);
-            var retVal = this.DoConvertToInformationModel(context, dbInstance);
-            return retVal;
-#if PERFMON
+                var dbInstance = this.DoConvertToDataModel(context, data);
+                dbInstance = this.DoInsertInternal(context, dbInstance);
+                var retVal = this.DoConvertToInformationModel(context, dbInstance);
+                return retVal;
+#if DEBUG
             }
             finally
             {
                 sw.Stop();
-                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoInsertModel - {sw.EllapsedMilliseconds}ms", data, new StackTrace());
+                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoInsertModel - {sw.ElapsedMilliseconds}ms", data, new StackTrace());
             }
 #endif
         }
@@ -306,23 +307,23 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             data = this.PrepareReferences(context, data);
 
-#if PERFMON
+#if DEBUG
             Stopwatch sw = new Stopwatch();
             try
             {
                 sw.Start();
 #endif
-            var dbInstance = this.DoConvertToDataModel(context, data);
-            dbInstance = this.DoUpdateInternal(context, dbInstance);
-            var retVal = this.DoConvertToInformationModel(context, dbInstance);
-            return retVal;
+                var dbInstance = this.DoConvertToDataModel(context, data);
+                dbInstance = this.DoUpdateInternal(context, dbInstance);
+                var retVal = this.DoConvertToInformationModel(context, dbInstance);
+                return retVal;
 
-#if PERFMON
+#if DEBUG
             }
             finally
             {
                 sw.Stop();
-                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoUpdateModel - {sw.EllapsedMilliseconds}ms", data, new StackTrace());
+                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoUpdateModel - {sw.ElapsedMilliseconds}ms", data, new StackTrace());
             }
 #endif
         }
@@ -341,19 +342,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 throw new ArgumentNullException(nameof(expression), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-#if PERFMON
+#if DEBUG
             Stopwatch sw = new Stopwatch();
             try
             {
                 sw.Start();
 #endif
-            this.DoObsoleteAllInternal(context, expression);
-#if PERFMON
+                this.DoObsoleteAllInternal(context, expression);
+#if DEBUG
             }
             finally
             {
                 sw.Stop();
-                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoObsoleteModel - {sw.EllapsedMilliseconds}ms", data, new StackTrace());
+                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoObsoleteModel - {sw.ElapsedMilliseconds}ms", expression, new StackTrace());
             }
 #endif
         }
@@ -368,21 +369,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-#if PERFMON
+#if DEBUG
             Stopwatch sw = new Stopwatch();
             try
             {
                 sw.Start();
 #endif
-            var dbInstance = this.DoObsoleteInternal(context, key);
-            var retVal = this.DoConvertToInformationModel(context, dbInstance);
-            return retVal;
-#if PERFMON
+                var dbInstance = this.DoObsoleteInternal(context, key);
+                var retVal = this.DoConvertToInformationModel(context, dbInstance);
+                return retVal;
+#if DEBUG
             }
             finally
             {
                 sw.Stop();
-                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoObsoleteModel - {sw.EllapsedMilliseconds}ms", data, new StackTrace());
+                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoObsoleteModel - {sw.ElapsedMilliseconds}ms", key, new StackTrace());
             }
 #endif
         }
@@ -400,40 +401,40 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 return null;
             }
-#if PERFMON
+#if DEBUG
             Stopwatch sw = new Stopwatch();
             try
             {
                 sw.Start();
 #endif
-            // Attempt fetch from master cache
-            TModel retVal = null;
-            if (allowCached && (this.m_configuration.CachingPolicy?.Targets & AdoDataCachingPolicyTarget.ModelObjects) == AdoDataCachingPolicyTarget.ModelObjects)
-            {
-                retVal = this.m_dataCacheService?.GetCacheItem<TModel>(key);
-            }
-
-            // Fetch from database
-            if (retVal == null || versionKey.HasValue)
-            {
-                var dbInstance = this.DoGetInternal(context, key, versionKey, allowCached);
-                if (dbInstance == null) // not found
+                // Attempt fetch from master cache
+                TModel retVal = null;
+                if (allowCached && (this.m_configuration.CachingPolicy?.Targets & AdoDataCachingPolicyTarget.ModelObjects) == AdoDataCachingPolicyTarget.ModelObjects)
                 {
-                    retVal = null;
+                    retVal = this.m_dataCacheService?.GetCacheItem<TModel>(key);
                 }
-                else
-                {
-                    retVal = this.DoConvertToInformationModel(context, dbInstance);
-                }
-            }
 
-            return retVal;
-#if PERFMON
+                // Fetch from database
+                if (retVal == null || versionKey.HasValue)
+                {
+                    var dbInstance = this.DoGetInternal(context, key, versionKey, allowCached);
+                    if (dbInstance == null) // not found
+                    {
+                        retVal = null;
+                    }
+                    else
+                    {
+                        retVal = this.DoConvertToInformationModel(context, dbInstance);
+                    }
+                }
+
+                return retVal;
+#if DEBUG
             }
             finally
             {
                 sw.Stop();
-                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoGetModel - {sw.EllapsedMilliseconds}ms", data, new StackTrace());
+                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoGetModel - {sw.ElapsedMilliseconds}ms", key, new StackTrace());
             }
 #endif
         }
@@ -1063,7 +1064,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Execute the specified query on the specified object
         /// </summary>
-        public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<TModel, bool>> query)
+        public virtual IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<TModel, bool>> query)
         {
             return this.DoQueryInternal(context, query, true);
         }
@@ -1071,7 +1072,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Convert the specified object to model
         /// </summary>
-        public TModel ToModelInstance(DataContext context, object result)
+        public virtual TModel ToModelInstance(DataContext context, object result)
         {
             if (context == null)
             {
@@ -1084,6 +1085,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             else if (result is TDbModel dbModel)
             {
                 var retVal = this.DoConvertToInformationModel(context, dbModel);
+                return retVal;
+            }
+            else if (result is CompositeResult composite)
+            {
+                var retVal = this.DoConvertToInformationModel(context, composite.Values.OfType<TDbModel>().First(), composite.Values.OfType<IDbIdentified>().ToArray());
                 return retVal;
             }
             else

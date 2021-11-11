@@ -73,11 +73,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 case Configuration.LoadStrategyType.FullLoad:
                     retVal.NameUse = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.UseConceptKey);
-                    retVal.SetLoadIndicator(nameof(EntityName.NameUse));
+                    retVal.SetLoaded(nameof(EntityName.NameUse));
                     goto case Configuration.LoadStrategyType.SyncLoad;
                 case Configuration.LoadStrategyType.SyncLoad:
                     retVal.Component = this.GetRelatedPersistenceService<EntityNameComponent>().Query(context, o => o.SourceEntityKey == dbModel.Key).OrderBy(o => o.OrderSequence).ToList();
-                    retVal.SetLoadIndicator(nameof(EntityName.Component));
+                    retVal.SetLoaded(nameof(EntityName.Component));
                     break;
             }
             return retVal;

@@ -222,9 +222,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 case Configuration.LoadStrategyType.FullLoad:
                     retVal.CreatedBy = base.GetRelatedPersistenceService<SecurityProvenance>().Get(context, dbModel.CreatedByKey);
-                    retVal.SetLoadIndicator(nameof(BaseEntityData.CreatedBy));
+                    retVal.SetLoaded(nameof(BaseEntityData.CreatedBy));
                     retVal.ObsoletedBy = base.GetRelatedPersistenceService<SecurityProvenance>().Get(context, dbModel.ObsoletedByKey.GetValueOrDefault());
-                    retVal.SetLoadIndicator(nameof(BaseEntityData.ObsoletedBy));
+                    retVal.SetLoaded(nameof(BaseEntityData.ObsoletedBy));
                     break;
             }
 

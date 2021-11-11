@@ -89,33 +89,33 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 case Configuration.LoadStrategyType.FullLoad:
                     retVal.ClassConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ClassConceptKey);
-                    retVal.SetLoadIndicator(nameof(Entity.ClassConcept));
+                    retVal.SetLoaded(nameof(Entity.ClassConcept));
                     retVal.CreationAct = this.GetRelatedPersistenceService<Act>().Get(context, dbModel.CreationActKey.GetValueOrDefault());
-                    retVal.SetLoadIndicator(nameof(Entity.CreationAct));
+                    retVal.SetLoaded(nameof(Entity.CreationAct));
                     retVal.DeterminerConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.DeterminerConceptKey);
-                    retVal.SetLoadIndicator(nameof(Entity.DeterminerConcept));
+                    retVal.SetLoaded(nameof(Entity.DeterminerConcept));
                     retVal.StatusConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.StatusConceptKey);
-                    retVal.SetLoadIndicator(nameof(Entity.StatusConcept));
+                    retVal.SetLoaded(nameof(Entity.StatusConcept));
                     retVal.TypeConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey.GetValueOrDefault());
-                    retVal.SetLoadIndicator(nameof(Entity.TypeConcept));
+                    retVal.SetLoaded(nameof(Entity.TypeConcept));
                     goto case Configuration.LoadStrategyType.SyncLoad;
                 case Configuration.LoadStrategyType.SyncLoad:
                     retVal.Addresses = this.GetRelatedPersistenceService<EntityAddress>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoadIndicator(nameof(Entity.Addresses));
+                    retVal.SetLoaded(nameof(Entity.Addresses));
                     retVal.Extensions = this.GetRelatedPersistenceService<EntityExtension>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoadIndicator(nameof(Entity.Extensions));
+                    retVal.SetLoaded(nameof(Entity.Extensions));
                     retVal.Identifiers = this.GetRelatedPersistenceService<EntityIdentifier>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoadIndicator(nameof(Entity.Identifiers));
+                    retVal.SetLoaded(nameof(Entity.Identifiers));
                     retVal.Names = this.GetRelatedPersistenceService<EntityName>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoadIndicator(nameof(Entity.Names));
+                    retVal.SetLoaded(nameof(Entity.Names));
                     retVal.Notes = this.GetRelatedPersistenceService<EntityNote>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoadIndicator(nameof(Entity.Notes));
+                    retVal.SetLoaded(nameof(Entity.Notes));
                     retVal.Relationships = this.GetRelatedPersistenceService<EntityRelationship>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoadIndicator(nameof(Entity.Relationships));
+                    retVal.SetLoaded(nameof(Entity.Relationships));
                     retVal.Tags = this.GetRelatedPersistenceService<EntityTag>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-                    retVal.SetLoadIndicator(nameof(Entity.Tags));
+                    retVal.SetLoaded(nameof(Entity.Tags));
                     retVal.Telecoms = this.GetRelatedPersistenceService<EntityTelecomAddress>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-                    retVal.SetLoadIndicator(nameof(Entity.Telecoms));
+                    retVal.SetLoaded(nameof(Entity.Telecoms));
                     goto case Configuration.LoadStrategyType.QuickLoad;
                 case Configuration.LoadStrategyType.QuickLoad:
                     var query = context.CreateSqlStatement<DbEntitySecurityPolicy>().SelectFrom(typeof(DbEntitySecurityPolicy), typeof(DbSecurityPolicy))
@@ -125,7 +125,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                         .ToList()
                         .Select(o => new SecurityPolicyInstance(new SecurityPolicy(o.Object2.Name, o.Object2.Oid, o.Object2.IsPublic, o.Object2.CanOverride), PolicyGrantType.Grant))
                         .ToList();
-                    retVal.SetLoadIndicator(nameof(Entity.Policies));
+                    retVal.SetLoaded(nameof(Entity.Policies));
                     break;
             }
 

@@ -43,11 +43,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             {
                 case Configuration.LoadStrategyType.FullLoad:
                     retVal.CodeSystem = base.GetRelatedPersistenceService<CodeSystem>().Get(context, dbModel.CodeSystemKey);
-                    retVal.SetLoadIndicator(nameof(ReferenceTerm.CodeSystem));
+                    retVal.SetLoaded(nameof(ReferenceTerm.CodeSystem));
                     goto case Configuration.LoadStrategyType.SyncLoad;
                 case Configuration.LoadStrategyType.SyncLoad:
                     retVal.DisplayNames = base.GetRelatedPersistenceService<ReferenceTermName>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-                    retVal.SetLoadIndicator(nameof(ReferenceTerm.DisplayNames));
+                    retVal.SetLoaded(nameof(ReferenceTerm.DisplayNames));
                     break;
             }
 
