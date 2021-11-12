@@ -27,6 +27,7 @@ using SanteDB.Server.AdminConsole.Util;
 using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
@@ -36,6 +37,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
     /// Applet commands
     /// </summary>
     [AdminCommandlet]
+    [ExcludeFromCodeCoverage]
     public static class AppletCmdlet
     {
 

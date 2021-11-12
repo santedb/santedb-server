@@ -34,6 +34,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using SanteDB.Core.Interop;
 
@@ -43,6 +44,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
     /// Commandlet for user commands
     /// </summary>
     [AdminCommandlet]
+    [ExcludeFromCodeCoverage]
     public static class UserCmdlet
     {
         /// <summary>

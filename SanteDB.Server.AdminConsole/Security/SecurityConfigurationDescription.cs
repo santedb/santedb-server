@@ -23,12 +23,14 @@ using SanteDB.Core.Http.Description;
 using SanteDB.Server.AdminConsole.Shell;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Server.AdminConsole.Security
 {
     /// <summary>
     /// Rest Client Security Description
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class SecurityConfigurationDescription : IRestClientSecurityDescription
     {
 
@@ -96,6 +98,7 @@ namespace SanteDB.Server.AdminConsole.Security
     /// <summary>
     /// Certificate validator
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal class ConsoleCertificateValidator : ICertificateValidator
     {
 

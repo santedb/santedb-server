@@ -21,12 +21,14 @@
 using MohawkCollege.Util.Console.Parameters;
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Server.AdminConsole.Parameters
 {
     /// <summary>
     /// Console parameters
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class ConsoleParameters
     {
 

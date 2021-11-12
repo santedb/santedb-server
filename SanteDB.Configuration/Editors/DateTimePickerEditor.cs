@@ -18,13 +18,11 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Design;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 
@@ -33,27 +31,18 @@ namespace SanteDB.Configuration.Editors
     /// <summary>
     /// Date time picker
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class DateTimePickerEditor : UITypeEditor
     {
-
-        IWindowsFormsEditorService editorService;
-        DateTimePicker picker = new DateTimePicker();
+        private IWindowsFormsEditorService editorService;
+        private readonly DateTimePicker picker = new DateTimePicker();
 
         public DateTimePickerEditor()
         {
-            picker.Format = DateTimePickerFormat.Custom;
-            picker.CustomFormat = "dd/MM/yyyy HH:mm:ss";
-            picker.MinDate = DateTime.MinValue;
-            picker.MaxDate = DateTime.MaxValue;
-            
-        }
-
-        /// <summary>
-        /// Get the edit style
-        /// </summary>
-        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
-        {
-            return UITypeEditorEditStyle.DropDown;
+            this.picker.Format = DateTimePickerFormat.Custom;
+            this.picker.CustomFormat = "dd/MM/yyyy HH:mm:ss";
+            this.picker.MinDate = DateTime.MinValue;
+            this.picker.MaxDate = DateTime.MaxValue;
         }
 
         /// <summary>
@@ -66,19 +55,27 @@ namespace SanteDB.Configuration.Editors
                 this.editorService = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
             }
 
-            if((DateTime)value == DateTime.MinValue)
+            if ((DateTime) value == DateTime.MinValue)
             {
                 value = DateTime.Now;
             }
 
             if (this.editorService != null)
             {
-                picker.Value = (DateTime)value;
-                this.editorService.DropDownControl(picker);
-                value = picker.Value;
+                this.picker.Value = (DateTime) value;
+                this.editorService.DropDownControl(this.picker);
+                value = this.picker.Value;
             }
 
             return value;
+        }
+
+        /// <summary>
+        /// Get the edit style
+        /// </summary>
+        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
+        {
+            return UITypeEditorEditStyle.DropDown;
         }
     }
 }

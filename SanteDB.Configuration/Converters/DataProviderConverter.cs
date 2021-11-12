@@ -18,29 +18,28 @@
  * User: fyfej
  * Date: 2021-8-27
  */
-using SanteDB.Configuration.Editors;
+
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SanteDB.Configuration.Editors;
 
 namespace SanteDB.Configuration.Converters
 {
     /// <summary>
     /// Represents a type converter for the provider type
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class DataProviderConverter : TypeConverter
     {
-
         /// <summary>
         /// Can convert
         /// </summary>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            return sourceType == typeof(String);
+            return sourceType == typeof(string);
         }
 
         /// <summary>
@@ -49,10 +48,11 @@ namespace SanteDB.Configuration.Converters
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
             if (value is string)
+            {
                 return new DataProviderWrapper(ConfigurationContext.Current.DataProviders.FirstOrDefault(o => o.Invariant.Equals(value.ToString(), StringComparison.OrdinalIgnoreCase)))?.Provider.Name;
-            else
-                return value;
-        }
+            }
 
+            return value;
+        }
     }
 }

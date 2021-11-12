@@ -24,11 +24,13 @@ using SanteDB.Server.AdminConsole.Parameters;
 using SanteDB.Server.AdminConsole.Shell;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.Reflection;
 
 namespace SanteDB.Server.AdminConsole
 {
+    [ExcludeFromCodeCoverage]
     class Program
     {
         /// <summary>

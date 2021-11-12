@@ -20,6 +20,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.Globalization;
 using System.IO;
@@ -31,6 +32,7 @@ namespace SanteDB.Server.AdminConsole.Util
     /// <summary>
     /// Represents a log event
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class LogEvent
     {
         /// <summary>

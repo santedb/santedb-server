@@ -33,6 +33,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using SanteDB.Core.Interop;
 
@@ -42,6 +43,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
     /// Represents an Device commandlet for adding/removing/updating devices
     /// </summary>
     [AdminCommandlet]
+    [ExcludeFromCodeCoverage]
     public static class DeviceCmdlet
     {
         /// <summary>

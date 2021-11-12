@@ -21,6 +21,7 @@
 using Newtonsoft.Json;
 using SanteDB.Core.Http;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Server.AdminConsole.Security
 {
@@ -28,6 +29,7 @@ namespace SanteDB.Server.AdminConsole.Security
     /// OAuth token response.
     /// </summary>
     [JsonObject, Serializable]
+    [ExcludeFromCodeCoverage]
     public class OAuthTokenResponse
     {
 
@@ -85,6 +87,7 @@ namespace SanteDB.Server.AdminConsole.Security
     /// <summary>
     /// OAuth token request.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class OAuthTokenRequest
     {
 

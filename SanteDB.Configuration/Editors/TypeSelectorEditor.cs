@@ -16,35 +16,30 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2021-8-27
  */
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Windows.Forms.Design;
+
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Services;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Drawing.Design;
+using System.Linq;
+using System.Reflection;
+using System.Windows.Forms;
+using System.Windows.Forms.Design;
 
 namespace SanteDB.Configuration.Editors
 {
-
     /// <summary>
     /// Type selection wrapper
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class TypeSelectionWrapper
     {
-        /// <summary>
-        /// Gets the type
-        /// </summary>
-        public Type Type { get; set; }
-
         /// <summary>
         /// Creates a new wrapper
         /// </summary>
@@ -54,9 +49,17 @@ namespace SanteDB.Configuration.Editors
         }
 
         /// <summary>
+        /// Gets the type
+        /// </summary>
+        public Type Type { get; set; }
+
+        /// <summary>
         /// Name of the type
         /// </summary>
-        public override string ToString() => this.Type.GetCustomAttribute<ServiceProviderAttribute>()?.Name ?? this.Type.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? this.Type.Name;
+        public override string ToString()
+        {
+            return this.Type.GetCustomAttribute<ServiceProviderAttribute>()?.Name ?? this.Type.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? this.Type.Name;
+        }
     }
 
     /// <summary>
@@ -71,13 +74,12 @@ namespace SanteDB.Configuration.Editors
         {
             if (provider != null)
             {
-                var winService = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
+                var winService = (IWindowsFormsEditorService) provider.GetService(typeof(IWindowsFormsEditorService));
 
                 if (typeof(IList).IsAssignableFrom(context.PropertyDescriptor.PropertyType)) // multi-select
                 {
-
                     var itemType = context.PropertyDescriptor.PropertyType.GetGenericArguments()[0];
-                    var list = new ListView()
+                    var list = new ListView
                     {
                         View = View.Details,
                         FullRowSelect = true,
@@ -91,18 +93,20 @@ namespace SanteDB.Configuration.Editors
                     // Get the types
                     try
                     {
-
                         var bind = context.PropertyDescriptor.Attributes.OfType<BindingAttribute>().FirstOrDefault();
                         if (bind != null)
+                        {
                             list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes()
                                 .Where(t => bind.Binding.IsAssignableFrom(t) && !t.IsInterface && !t.IsGenericTypeDefinition && t.GetCustomAttribute<ObsoleteAttribute>() == null && !t.IsAbstract)
                                 .Select(o => new ListViewItem(new TypeSelectionWrapper(o).ToString())
                                 {
-                                    Checked = listValue?.Any(v=>v.Type == o) == true,
+                                    Checked = listValue?.Any(v => v.Type == o) == true,
                                     Tag = new TypeReferenceConfiguration(o)
                                 })
                                 .ToArray());
+                        }
                         else
+                        {
                             list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes()
                                 .Where(t => context.PropertyDescriptor.PropertyType.StripGeneric().IsAssignableFrom(t) && !t.IsGenericTypeDefinition && !t.IsInterface && t.GetCustomAttribute<ObsoleteAttribute>() == null && !t.IsAbstract)
                                 .Select(o => new ListViewItem(new TypeSelectionWrapper(o).ToString())
@@ -111,7 +115,7 @@ namespace SanteDB.Configuration.Editors
                                     Tag = new TypeReferenceConfiguration(o)
                                 })
                                 .ToArray());
-
+                        }
                     }
                     catch (Exception e)
                     {
@@ -134,15 +138,19 @@ namespace SanteDB.Configuration.Editors
                     {
                         var bind = context.PropertyDescriptor.Attributes.OfType<BindingAttribute>().FirstOrDefault();
                         if (bind != null)
+                        {
                             list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes()
                                 .Where(t => bind.Binding.IsAssignableFrom(t) && !t.IsInterface && !t.IsGenericTypeDefinition && t.GetCustomAttribute<ObsoleteAttribute>() == null && !t.IsAbstract)
                                 .Select(o => new TypeSelectionWrapper(o))
                                 .ToArray());
+                        }
                         else
+                        {
                             list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes()
                                 .Where(t => context.PropertyDescriptor.PropertyType.IsAssignableFrom(t) && !t.IsGenericTypeDefinition && !t.IsInterface && t.GetCustomAttribute<ObsoleteAttribute>() == null && !t.IsAbstract)
                                 .Select(o => new TypeSelectionWrapper(o))
                                 .ToArray());
+                        }
                     }
                     catch (Exception e)
                     {
@@ -155,14 +163,16 @@ namespace SanteDB.Configuration.Editors
                     if (list.SelectedItem != null)
                     {
                         if (context.PropertyDescriptor.PropertyType == typeof(TypeReferenceConfiguration))
+                        {
                             return new TypeReferenceConfiguration((list.SelectedItem as TypeSelectionWrapper)?.Type);
-                        else
-                            return (list.SelectedItem as TypeSelectionWrapper)?.Type;
+                        }
+
+                        return (list.SelectedItem as TypeSelectionWrapper)?.Type;
                     }
                 }
             }
-            return value;
 
+            return value;
         }
 
         /// <summary>

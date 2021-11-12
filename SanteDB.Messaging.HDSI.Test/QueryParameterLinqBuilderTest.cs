@@ -18,6 +18,11 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Linq.Expressions;
 using NUnit.Framework;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
@@ -26,14 +31,12 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Model.Security;
-using System;
-using System.Linq;
-using System.Linq.Expressions;
 
-namespace SanteDB.Messaging.HDSI.Tests
+namespace SanteDB.Messaging.IMSI.Test
 {
 
-    [TestFixture(Category = "REST API")]
+    [ExcludeFromCodeCoverage]
+	[TestFixture(Category = "REST API")]
 	public class QueryParameterLinqBuilderTest
 	{
 		/// <summary>

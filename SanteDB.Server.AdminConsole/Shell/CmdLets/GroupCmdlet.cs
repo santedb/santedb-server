@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using SanteDB.Core.Interop;
 
@@ -40,6 +41,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
     /// Commandlets for roles
     /// </summary>
     [AdminCommandlet]
+    [ExcludeFromCodeCoverage]
     public static class RoleCmdlet
     {
 

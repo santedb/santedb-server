@@ -18,16 +18,19 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
+using System.Diagnostics.CodeAnalysis;
 using SanteDB.Core.Http;
 using SanteDB.Core.Security;
 using System.Security.Principal;
 
 namespace SanteDB.Server.AdminConsole.Security
 {
-    /// <summary>
-    /// Credential providerwhich will identify this application
-    /// </summary>
-    public class OAuth2CredentialProvider : ICredentialProvider
+	/// <summary>
+	/// Credential providerwhich will identify this application
+	/// </summary>
+	[ExcludeFromCodeCoverage]
+	public class OAuth2CredentialProvider : ICredentialProvider
 	{
 		#region ICredentialProvider implementation
 		/// <summary>

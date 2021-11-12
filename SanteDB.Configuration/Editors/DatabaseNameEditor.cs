@@ -18,8 +18,10 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Design;
 using System.Linq;
 using System.Reflection;
@@ -29,18 +31,12 @@ using SanteDB.Core.Configuration.Data;
 
 namespace SanteDB.Configuration.Editors
 {
-
     /// <summary>
     /// Provider wrapper
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class DataProviderWrapper
     {
-
-        /// <summary>
-        /// Gets the provider
-        /// </summary>
-        public IDataConfigurationProvider Provider { get; }
-
         /// <summary>
         /// Creates a new provider wrapper
         /// </summary>
@@ -48,6 +44,11 @@ namespace SanteDB.Configuration.Editors
         {
             this.Provider = p;
         }
+
+        /// <summary>
+        /// Gets the provider
+        /// </summary>
+        public IDataConfigurationProvider Provider { get; }
 
         /// <summary>
         /// Represent the provider as a string
@@ -63,15 +64,15 @@ namespace SanteDB.Configuration.Editors
     /// </summary>
     public class DatabaseNameEditor : UITypeEditor
     {
-
         /// <summary>
         /// Reference to current connection string
         /// </summary>
-        private ConnectionString m_connectionString;
+        private readonly ConnectionString m_connectionString;
+
         /// <summary>
         /// Reference to current data provider
         /// </summary>
-        private IDataConfigurationProvider m_provider;
+        private readonly IDataConfigurationProvider m_provider;
 
         /// <summary>
         /// Represents the database name editor
@@ -87,19 +88,19 @@ namespace SanteDB.Configuration.Editors
         /// </summary>
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            if(provider != null)
+            if (provider != null)
             {
-                var winService = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
+                var winService = (IWindowsFormsEditorService) provider.GetService(typeof(IWindowsFormsEditorService));
                 var list = new ListBox();
                 list.Click += (o, e) => winService.CloseDropDown();
 
                 // Get the databases
                 try
                 {
-                    list.Items.AddRange(this.m_provider.GetDatabases(this.m_connectionString).OfType<Object>().ToArray());
+                    list.Items.AddRange(this.m_provider.GetDatabases(this.m_connectionString).OfType<object>().ToArray());
                     list.Items.Add("New...");
                 }
-                catch(TargetInvocationException e)
+                catch (TargetInvocationException e)
                 {
                     MessageBox.Show($"Error retrieving databases: {e.InnerException?.Message}");
                     return value;
@@ -118,16 +119,18 @@ namespace SanteDB.Configuration.Editors
                     {
                         var frmNewDatabase = new frmNewDatabase(this.m_connectionString, this.m_provider);
                         if (frmNewDatabase.ShowDialog() == DialogResult.OK)
+                        {
                             return frmNewDatabase.ConnectionString.GetComponent("database") ?? frmNewDatabase.ConnectionString.GetComponent("initial catalog");
-                        else
-                            return value;
+                        }
+
+                        return value;
                     }
-                    else
-                        return list.SelectedItem;
+
+                    return list.SelectedItem;
                 }
             }
-            return value;
 
+            return value;
         }
 
         /// <summary>

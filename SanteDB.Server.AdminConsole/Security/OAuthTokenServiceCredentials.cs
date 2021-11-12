@@ -23,16 +23,17 @@ using SanteDB.Core.Security.Claims;
 using SanteDB.Server.AdminConsole.Shell;
 using System;
 using System.Collections.Generic;
-
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Principal;
 using System.Text;
 
 namespace SanteDB.Server.AdminConsole.Security
 {
-    /// <summary>
-    /// Represents credentials for this android application on all requests going to the OAuth service
-    /// </summary>
-    public class OAuthTokenServiceCredentials : Credentials
+	/// <summary>
+	/// Represents credentials for this android application on all requests going to the OAuth service
+	/// </summary>
+	[ExcludeFromCodeCoverage]
+	public class OAuthTokenServiceCredentials : Credentials
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SanteDB.Server.AdminConsole.Security.OAuthTokenServiceCredentials"/> class.

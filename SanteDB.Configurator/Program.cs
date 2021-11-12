@@ -19,23 +19,19 @@
  * Date: 2021-8-27
  */
 using SanteDB.Configuration;
-using SanteDB.Core;
 using SanteDB.Core.Attributes;
 using SanteDB.Core.Configuration;
-using SanteDB.Core.Security;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security.Principal;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SanteDB.Configurator
 {
+    [ExcludeFromCodeCoverage]
     static class Program
     {
         /// <summary>

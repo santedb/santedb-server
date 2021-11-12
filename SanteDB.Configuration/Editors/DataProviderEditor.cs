@@ -18,13 +18,12 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Design;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 
@@ -33,6 +32,7 @@ namespace SanteDB.Configuration.Editors
     /// <summary>
     /// Data provider editor that provides a list of active registered data providers
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class DataProviderEditor : UITypeEditor
     {
         /// <summary>
@@ -42,14 +42,14 @@ namespace SanteDB.Configuration.Editors
         {
             if (provider != null)
             {
-                var winService = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
+                var winService = (IWindowsFormsEditorService) provider.GetService(typeof(IWindowsFormsEditorService));
                 var list = new ListBox();
                 list.Click += (o, e) => winService.CloseDropDown();
 
                 // Get the databases
                 try
                 {
-                    list.Items.AddRange(ConfigurationContext.Current.DataProviders.Select(o=>new DataProviderWrapper(o)).OfType<Object>().ToArray());
+                    list.Items.AddRange(ConfigurationContext.Current.DataProviders.Select(o => new DataProviderWrapper(o)).OfType<object>().ToArray());
                 }
                 catch (Exception e)
                 {
@@ -60,10 +60,12 @@ namespace SanteDB.Configuration.Editors
                 winService.DropDownControl(list);
 
                 if (list.SelectedItem != null)
+                {
                     return (list.SelectedItem as DataProviderWrapper)?.Provider.DbProviderType.AssemblyQualifiedName;
+                }
             }
-            return value;
 
+            return value;
         }
 
         /// <summary>

@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,6 +44,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
     /// Administrative commandlet for assigning authorities
     /// </summary>
     [AdminCommandlet]
+    [ExcludeFromCodeCoverage]
     public static class AssigningAuthorityCmdlet
     {
         // Ami client

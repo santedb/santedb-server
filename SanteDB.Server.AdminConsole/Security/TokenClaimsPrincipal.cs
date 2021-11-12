@@ -24,6 +24,7 @@ using SanteDB.Core.Security.Claims;
 using SanteDB.Server.Core.Security;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens;
 
 using System.Security.Cryptography.X509Certificates;
@@ -35,6 +36,7 @@ namespace SanteDB.Server.AdminConsole.Security
     /// <summary>
     /// Token claims principal.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class TokenClaimsPrincipal : SanteDBClaimsPrincipal
 	{
 
@@ -62,7 +64,7 @@ namespace SanteDB.Server.AdminConsole.Security
         public String RefreshToken { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SanteDB.DisconnectedClient.Xamarin.Security.TokenClaimsPrincipal"/> class.
+        /// Initializes a new instance of the <see cref="TokenClaimsPrincipal"/> class.
         /// </summary>
         /// <param name="idToken">Token.</param>
         /// <param name="tokenType">Token type.</param>

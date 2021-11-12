@@ -7,6 +7,7 @@ using SanteDB.Tools.Debug.BI;
 using SanteDB.Tools.Debug.Wcf;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ namespace SanteDB.Tools.Debug.Configuration.Features
     /// <summary>
     /// Debugging and hacks feature
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class DebugHacksFeature : IFeature
     {
         private const string BiFileRepositorySetting = "Debug Options";

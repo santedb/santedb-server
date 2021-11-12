@@ -18,11 +18,15 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
+using System.Diagnostics.CodeAnalysis;
+
 namespace SanteDB.Server.AdminConsole.Attributes
 {
     /// <summary>
     /// Identifies a class as containing commandlet
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class AdminCommandletAttribute : System.Attribute
     {
     }

@@ -22,7 +22,7 @@ using SanteDB.Core.Http;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using System;
-
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Principal;
 
 namespace SanteDB.Server.AdminConsole.Security
@@ -30,6 +30,7 @@ namespace SanteDB.Server.AdminConsole.Security
     /// <summary>
     /// Represents a basic token crendtial provider
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class HttpBasicTokenCredentialProvider : ICredentialProvider
     {
         #region ICredentialProvider implementation
