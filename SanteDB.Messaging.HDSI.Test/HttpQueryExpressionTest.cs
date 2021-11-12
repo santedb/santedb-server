@@ -30,7 +30,7 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Roles;
 
-namespace SanteDB.Messaging.IMSI.Test
+namespace SanteDB.Messaging.HDSI.Test
 {
     /// <summary>
     /// Tests for the HTTP expression writer

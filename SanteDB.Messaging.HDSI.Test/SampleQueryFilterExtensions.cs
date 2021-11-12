@@ -26,7 +26,7 @@ using System.Reflection;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Query;
 
-namespace SanteDB.Messaging.IMSI.Test
+namespace SanteDB.Messaging.HDSI.Test
 {
     /// <summary>
     /// Simple extension methods
