@@ -170,8 +170,7 @@ namespace SanteDB.Server.Core.Services.Impl
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         public SecurityPolicy GetPolicy(string policyOid)
         {
-            int tr = 0;
-            return this.m_policyRepository.Find(o => o.Oid == policyOid, 0, 1, out tr).SingleOrDefault();
+            return this.m_policyRepository.Find(o => o.Oid == policyOid).SingleOrDefault();
         }
 
         /// <summary>
@@ -187,8 +186,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public SecurityRole GetRole(string roleName)
         {
-            int tr = 0;
-            return this.m_roleRepository?.Find(o => o.Name == roleName, 0, 1, out tr).SingleOrDefault();
+            return this.m_roleRepository?.Find(o => o.Name == roleName).SingleOrDefault();
         }
 
         /// <summary>
@@ -199,9 +197,8 @@ namespace SanteDB.Server.Core.Services.Impl
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         public SecurityUser GetUser(String userName)
         {
-            int tr = 0;
             // As the identity service may be LDAP, best to call it to get an identity name
-            return this.m_userRepository.Find(u => u.UserName == userName, 0, 1, out tr).FirstOrDefault();
+            return this.m_userRepository.Find(u => u.UserName == userName).FirstOrDefault();
         }
 
         /// <summary>
@@ -218,8 +215,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public UserEntity GetUserEntity(IIdentity identity)
         {
-            int t = 0;
-            return this.m_userEntityRepository?.Find(o => o.SecurityUser.UserName == identity.Name, 0, 1, out t).FirstOrDefault();
+            return this.m_userEntityRepository?.Find(o => o.SecurityUser.UserName == identity.Name).FirstOrDefault();
         }
 
         /// <summary>
@@ -263,9 +259,8 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public Provider GetProviderEntity(IIdentity identity)
         {
-            int t;
             return ApplicationServiceContext.Current.GetService<IRepositoryService<Provider>>()
-                .Find(o => o.Relationships.Where(r => r.RelationshipType.Mnemonic == "AssignedEntity").Any(r => (r.SourceEntity as UserEntity).SecurityUser.UserName == identity.Name), 0, 1, out t).FirstOrDefault();
+                .Find(o => o.Relationships.Where(r => r.RelationshipType.Mnemonic == "AssignedEntity").Any(r => (r.SourceEntity as UserEntity).SecurityUser.UserName == identity.Name)).FirstOrDefault();
         }
 
         /// <summary>
@@ -350,12 +345,9 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Find provenance
         /// </summary>
-        public IEnumerable<SecurityProvenance> FindProvenance(Expression<Func<SecurityProvenance, bool>> query, int offset, int? count, out int totalResults, Guid queryId, params ModelSort<SecurityProvenance>[] orderBy)
+        public IQueryResultSet<SecurityProvenance> FindProvenance(Expression<Func<SecurityProvenance, bool>> query)
         {
-            if (this.m_provenancePersistence is IStoredQueryDataPersistenceService<SecurityProvenance> isq)
-                return isq.Query(query, queryId, offset, count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
-            else
-                return this.m_provenancePersistence.Query(query, offset, count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
+            return this.m_provenancePersistence.Query(query, AuthenticationContext.Current.Principal);
         }
 
         /// <summary>
@@ -393,7 +385,7 @@ namespace SanteDB.Server.Core.Services.Impl
                     param = nameof(deviceName)
                 }));
             }
-            return this.m_deviceRepository.Find(o => o.Name == deviceName, 0, 1, out int _).FirstOrDefault();
+            return this.m_deviceRepository.Find(o => o.Name == deviceName).FirstOrDefault();
         }
 
         /// <summary>
@@ -411,7 +403,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 }));
             }
 
-            return this.m_applicationRepository.Find(o => o.Name == applicationName, 0, 1, out int _).FirstOrDefault();
+            return this.m_applicationRepository.Find(o => o.Name == applicationName).FirstOrDefault();
         }
 
         /// <summary>

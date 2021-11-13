@@ -38,6 +38,7 @@ using System.Linq.Expressions;
 using SanteDB.Server.Core;
 using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Core.Security.Services;
+using SanteDB.Core.i18n;
 
 namespace SanteDB.Server.Core.Services.Impl
 {
@@ -49,7 +50,6 @@ namespace SanteDB.Server.Core.Services.Impl
         IRepositoryService,
         IValidatingRepositoryService<TEntity>,
         IRepositoryService<TEntity>,
-        IPersistableQueryRepositoryService<TEntity>,
         INotifyRepositoryService<TEntity>,
         ISecuredRepositoryService
         where TEntity : IdentifiedData
@@ -148,67 +148,18 @@ namespace SanteDB.Server.Core.Services.Impl
         // Policy enforcement
         protected IPolicyEnforcementService m_policyService;
 
+        // Data persistence service
+        protected IDataPersistenceService<TEntity> m_dataPersistenceService;
+
         /// <summary>
         /// Creates a new generic local repository with specified privacy service
         /// </summary>
-        public GenericLocalRepository(IPrivacyEnforcementService privacyService, IPolicyEnforcementService policyService, ILocalizationService localizationService)
+        public GenericLocalRepository(IPrivacyEnforcementService privacyService, IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<TEntity> dataPersistence)
         {
             this.m_privacyService = privacyService;
             this.m_policyService = policyService;
             this.m_localizationService = localizationService;
-        }
-
-        /// <summary>
-        /// Find with stored query parameters
-        /// </summary>
-        public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> query, int offset, int? count, out int totalResults, Guid queryId, params ModelSort<TEntity>[] orderBy)
-        {
-            // Demand permission
-            this.DemandQuery();
-
-            var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TEntity>>();
-
-            if (persistenceService == null)
-            {
-                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.servicePersistence", new
-                {
-                    param = typeof(IDataPersistenceService<TEntity>).FullName
-                }));
-            }
-            var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
-
-            // Notify query
-            var preQueryEventArgs = new QueryRequestEventArgs<TEntity>(query, AuthenticationContext.Current.Principal);
-            this.Querying?.Invoke(this, preQueryEventArgs);
-            IEnumerable<TEntity> results = null;
-            if (preQueryEventArgs.Cancel) /// Cancel the request
-            {
-                results = preQueryEventArgs.Results;
-                totalResults = results.Count();
-            }
-            else
-            {
-                var resultSet = persistenceService.Query(preQueryEventArgs.Query, AuthenticationContext.Current.Principal).AsResultSet();
-
-                if (queryId != Guid.Empty)
-                {
-                    resultSet = resultSet.AsStateful(queryId);
-                }
-                totalResults = resultSet.Count();
-                results = resultSet.Skip(offset).Take(count ?? 25);
-            }
-
-            // 1. Let the BRE run
-            var retVal = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
-
-            // 2. Broadcast query performed
-            var postEvt = new QueryResultEventArgs<TEntity>(query, retVal, AuthenticationContext.AnonymousPrincipal);
-            this.Queried?.Invoke(this, postEvt);
-
-            // 2. Apply Filters if needed
-            retVal = this.m_privacyService?.Apply(retVal, AuthenticationContext.Current.Principal) ?? retVal;
-
-            return retVal;
+            this.m_dataPersistenceService = dataPersistence;
         }
 
         /// <summary>
@@ -308,7 +259,7 @@ namespace SanteDB.Server.Core.Services.Impl
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
             entity = businessRulesService?.BeforeObsolete(entity) ?? entity;
-            entity = persistenceService.Obsolete(entity.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+            entity = persistenceService.Delete(entity.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal, DeleteMode.LogicalDelete);
             entity = businessRulesService?.AfterObsolete(entity) ?? entity;
 
             this.Obsoleted?.Invoke(this, new DataPersistedEventArgs<TEntity>(entity, TransactionMode.Commit, AuthenticationContext.Current.Principal));
@@ -458,10 +409,37 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Perform a simple find
         /// </summary>
-        public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> query)
+        public virtual IQueryResultSet<TEntity> Find(Expression<Func<TEntity, bool>> query)
         {
-            int t = 0;
-            return this.Find(query, 0, null, out t, Guid.Empty);
+            // Demand permission
+            this.DemandQuery();
+
+            var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
+
+            // Notify query
+            var preQueryEventArgs = new QueryRequestEventArgs<TEntity>(query, AuthenticationContext.Current.Principal);
+            this.Querying?.Invoke(this, preQueryEventArgs);
+            IQueryResultSet<TEntity> results = null;
+            if (preQueryEventArgs.Cancel) /// Cancel the request
+            {
+                results = preQueryEventArgs.Results;
+            }
+            else
+            {
+                results = this.m_dataPersistenceService.Query(preQueryEventArgs.Query, AuthenticationContext.Current.Principal);
+            }
+
+            // 1. Let the BRE run
+            var retVal = businessRulesService != null ? businessRulesService.AfterQuery(results) : results;
+
+            // 2. Broadcast query performed
+            var postEvt = new QueryResultEventArgs<TEntity>(query, retVal, AuthenticationContext.AnonymousPrincipal);
+            this.Queried?.Invoke(this, postEvt);
+
+            // 2. Apply Filters if needed
+            retVal = this.m_privacyService?.Apply(retVal, AuthenticationContext.Current.Principal) ?? retVal;
+
+            return retVal;
         }
 
         /// <summary>
@@ -469,7 +447,25 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> query, int offset, int? count, out int totalResults, params ModelSort<TEntity>[] orderBy)
         {
-            return this.Find(query, offset, count, out totalResults, Guid.Empty, orderBy);
+            var results = this.Find(query);
+            totalResults = results.Count();
+
+            if (results is IOrderableQueryResultSet<TEntity> orderable)
+            {
+                foreach (var itm in orderBy)
+                {
+                    if (itm.SortOrder == SanteDB.Core.Model.Map.SortOrderType.OrderBy)
+                    {
+                        results = orderable.OrderBy(itm.SortProperty);
+                    }
+                    else
+                    {
+                        results = orderable.OrderByDescending(itm.SortProperty);
+                    }
+                }
+            }
+
+            return results;
         }
 
         /// <summary>
@@ -524,9 +520,16 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Find specified data
         /// </summary>
-        IEnumerable<IdentifiedData> IRepositoryService.Find(Expression query)
+        IQueryResultSet IRepositoryService.Find(Expression query)
         {
-            return this.Find((Expression<Func<TEntity, bool>>)query).OfType<IdentifiedData>();
+            if (query is Expression<Func<TEntity, bool>> qe)
+            {
+                return this.Find(qe);
+            }
+            else
+            {
+                throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.INVALID_EXPRESSION_TYPE, new { expected = typeof(Expression<Func<TEntity, bool>>), actual = query.GetType() }));
+            }
         }
 
         /// <summary>

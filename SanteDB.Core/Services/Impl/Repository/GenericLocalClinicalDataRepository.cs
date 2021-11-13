@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
@@ -31,11 +32,10 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class GenericLocalClinicalDataRepository<TModel> : GenericLocalRepositoryEx<TModel> where TModel : IdentifiedData, IHasState
     {
-
         /// <summary>
         /// Creates anew generic local clinic data repo
         /// </summary>
-        public GenericLocalClinicalDataRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
+        public GenericLocalClinicalDataRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<TModel> dataPersistence, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, dataPersistence, privacyService)
         {
         }
 
@@ -43,18 +43,22 @@ namespace SanteDB.Server.Core.Services.Impl
         /// The query policy for generic clinical data
         /// </summary>
         protected override string QueryPolicy => PermissionPolicyIdentifiers.QueryClinicalData;
+
         /// <summary>
         /// The read policy for a single piece of clinical data
         /// </summary>
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadClinicalData;
+
         /// <summary>
         /// The write policy for clinical data
         /// </summary>
         protected override string WritePolicy => PermissionPolicyIdentifiers.WriteClinicalData;
+
         /// <summary>
         /// The delete policy for clinical data
         /// </summary>
         protected override string DeletePolicy => PermissionPolicyIdentifiers.DeleteClinicalData;
+
         /// <summary>
         /// Alter policy for clinical data
         /// </summary>

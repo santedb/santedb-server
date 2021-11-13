@@ -13,8 +13,6 @@ namespace SanteDB.Persistence.Data.Test
     /// </summary>
     public class TestQueryPersistenceService : IQueryPersistenceService
     {
-
-
         private Guid m_expectedQueryId;
 
         private int m_expectedResults;
@@ -40,7 +38,7 @@ namespace SanteDB.Persistence.Data.Test
         /// </summary>
         public void AddResults(Guid queryId, IEnumerable<Guid> results, int totalResults)
         {
-            if(this.m_queryResults.TryGetValue(queryId, out List<Guid> res))
+            if (this.m_queryResults.TryGetValue(queryId, out List<Guid> res))
             {
                 res.AddRange(results);
             }
@@ -59,7 +57,7 @@ namespace SanteDB.Persistence.Data.Test
         /// </summary>
         public IEnumerable<Guid> GetQueryResults(Guid queryId, int offset, int count)
         {
-            if(this.m_queryResults.TryGetValue(queryId, out List<Guid> res))
+            if (this.m_queryResults.TryGetValue(queryId, out List<Guid> res))
             {
                 return res.Skip(offset).Take(count);
             }
@@ -87,7 +85,7 @@ namespace SanteDB.Persistence.Data.Test
         /// </summary>
         public long QueryResultTotalQuantity(Guid queryId)
         {
-            if(this.m_queryResults.TryGetValue(queryId, out List<Guid> res))
+            if (this.m_queryResults.TryGetValue(queryId, out List<Guid> res))
             {
                 return res.LongCount();
             }
@@ -99,12 +97,12 @@ namespace SanteDB.Persistence.Data.Test
         /// </summary>
         public bool RegisterQuerySet(Guid queryId, IEnumerable<Guid> results, object tag, int totalResults)
         {
-            if(this.m_expectedQueryId != Guid.Empty)
+            if (this.m_expectedQueryId != Guid.Empty)
             {
                 Assert.AreEqual(this.m_expectedQueryId, queryId);
                 this.m_expectedQueryId = Guid.Empty;
             }
-            if(this.m_expectedResults != default(int))
+            if (this.m_expectedResults != default(int))
             {
                 Assert.AreEqual(this.m_expectedResults, totalResults);
                 this.m_expectedResults = 0;
@@ -116,6 +114,12 @@ namespace SanteDB.Persistence.Data.Test
         /// <summary>
         /// Set query tag
         /// </summary>
-        public void SetQueryTag(Guid queryId, object value) { }
+        public void SetQueryTag(Guid queryId, object value)
+        { }
+
+        public void AbortQuerySet(Guid queryId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

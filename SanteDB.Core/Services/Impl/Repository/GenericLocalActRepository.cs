@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
@@ -32,7 +33,6 @@ using System.Linq.Expressions;
 
 namespace SanteDB.Server.Core.Services.Impl
 {
-
     /// <summary>
     /// Represents an act repository service.
     /// </summary>
@@ -49,7 +49,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// DI constructor
         /// </summary>
-        public GenericLocalActRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
+        public GenericLocalActRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<TAct> dataPersistenceService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, dataPersistenceService, privacyService)
         {
         }
 
@@ -64,78 +64,6 @@ namespace SanteDB.Server.Core.Services.Impl
         }
 
         /// <summary>
-        /// Find the specified act
-        /// </summary>
-        public override IEnumerable<TAct> Find(Expression<Func<TAct, bool>> query, int offset, int? count, out int totalResults, Guid queryId, params ModelSort<TAct>[] orderBy)
-        {
-            return base.Find(query, offset, count, out totalResults, queryId, orderBy);
-        }
-
-        /// <summary>
-        /// Find the specified act
-        /// </summary>
-        public override IEnumerable<TAct> Find(Expression<Func<TAct, bool>> query)
-        {
-            return base.Find(query);
-        }
-
-        /// <summary>
-        /// Find the specified act
-        /// </summary>
-        public override IEnumerable<TAct> Find(Expression<Func<TAct, bool>> query, int offset, int? count, out int totalResults, params ModelSort<TAct>[] orderBy)
-        {
-            return base.Find(query, offset, count, out totalResults, orderBy);
-        }
-
-        /// <summary>
-        /// Get the specified act
-        /// </summary>
-        public override TAct Get(Guid key)
-        {
-            return base.Get(key);
-        }
-
-        /// <summary>
-        /// Get the specified act
-        /// </summary>
-        public override TAct Get(Guid key, Guid versionKey)
-        {
-            return base.Get(key, versionKey);
-        }
-
-        /// <summary>
-        /// Insert the specified act
-        /// </summary>
-        public override TAct Insert(TAct entity)
-        {
-            return base.Insert(entity);
-        }
-
-        /// <summary>
-        /// Nullify (invalidate or mark entered in error) the clinical act
-        /// </summary>
-        public override TAct Nullify(Guid id)
-        {
-            return base.Nullify(id);
-        }
-
-        /// <summary>
-        /// Obsolete (mark as no longer valid) the specified act
-        /// </summary> 
-        public override TAct Obsolete(Guid key)
-        {
-            return base.Obsolete(key);
-        }
-
-        /// <summary>
-        /// Update clinical act
-        /// </summary>
-        public override TAct Save(TAct data)
-        {
-            return base.Save(data);
-        }
-
-        /// <summary>
         /// Validates an act.
         /// </summary>
         /// <typeparam name="TAct">The type of the act.</typeparam>
@@ -147,9 +75,9 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             if (data == null)
                 throw new ArgumentNullException(this.m_localizationService.GetString("error.type.ArgumentNullException.param", new
-                    {
-                        param = nameof(data)
-                    }));
+                {
+                    param = nameof(data)
+                }));
             base.Validate(data);
 
             var userService = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>();
@@ -159,6 +87,5 @@ namespace SanteDB.Server.Core.Services.Impl
 
             return data;
         }
-
     }
 }

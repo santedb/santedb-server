@@ -135,12 +135,34 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Fired after obsoletion occurs
         /// </summary>
-        public event EventHandler<DataPersistedEventArgs<TModel>> Obsoleted;
+        [Obsolete("Use Deleted", true)]
+        public event EventHandler<DataPersistedEventArgs<TModel>> Obsoleted
+        {
+            add
+            {
+                this.Deleted += value;
+            }
+            remove
+            {
+                this.Deleted -= value;
+            }
+        }
 
         /// <summary>
         /// Fired after obsoleting
         /// </summary>
-        public event EventHandler<DataPersistingEventArgs<TModel>> Obsoleting;
+        [Obsolete("Use Deleting", true)]
+        public event EventHandler<DataPersistingEventArgs<TModel>> Obsoleting
+        {
+            add
+            {
+                this.Deleting += value;
+            }
+            remove
+            {
+                this.Deleting -= value;
+            }
+        }
 
         /// <summary>
         /// Fired after data has been queried
@@ -161,6 +183,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Fired after data is retrieved
         /// </summary>
         public event EventHandler<DataRetrievedEventArgs<TModel>> Retrieved;
+
+        /// <summary>
+        /// Fired after deleted
+        /// </summary>
+        public event EventHandler<DataPersistedEventArgs<TModel>> Deleted;
+
+        /// <summary>
+        /// Fired before delete
+        /// </summary>
+        public event EventHandler<DataPersistingEventArgs<TModel>> Deleting;
 
         /// <summary>
         /// Perform the query operation
@@ -198,12 +230,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Perform an obsoletion of the specified object
         /// </summary>
-        protected abstract TDbModel DoObsoleteInternal(DataContext context, Guid key);
+        protected abstract TDbModel DoDeleteInternal(DataContext context, Guid key, DeleteMode deletionMode);
 
         /// <summary>
         /// Perform an obsoletion for all objects matching <paramref name="expression"/>
         /// </summary>
-        protected abstract void DoObsoleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression);
+        protected abstract void DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode);
 
         /// <summary>
         /// Perform a query on the model
@@ -331,7 +363,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Do the obsoletion all model objects which match
         /// </summary>
-        protected virtual void DoObsoleteAllModel(DataContext context, Expression<Func<TModel, bool>> expression)
+        protected virtual void DoDeleteAllModel(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode)
         {
             if (context == null)
             {
@@ -348,7 +380,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 sw.Start();
 #endif
-                this.DoObsoleteAllInternal(context, expression);
+                this.DoDeleteAllInternal(context, expression, deletionMode);
 #if DEBUG
             }
             finally
@@ -362,7 +394,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Perform the actual obsolete of a model object
         /// </summary>
-        protected virtual TModel DoObsoleteModel(DataContext context, Guid key)
+        protected virtual TModel DoDeleteModel(DataContext context, Guid key, DeleteMode deletionMode)
         {
             if (context == null)
             {
@@ -375,7 +407,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 sw.Start();
 #endif
-                var dbInstance = this.DoObsoleteInternal(context, key);
+                var dbInstance = this.DoDeleteInternal(context, key, deletionMode);
                 var retVal = this.DoConvertToInformationModel(context, dbInstance);
                 return retVal;
 #if DEBUG
@@ -672,45 +704,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public void ObsoleteAll(Expression<Func<TModel, bool>> expression, TransactionMode mode, IPrincipal principal)
         {
-            if (expression == null)
-            {
-                throw new ArgumentNullException(nameof(expression), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
-            }
-            if (principal == null)
-            {
-                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
-            }
-
-            using (var context = this.Provider.GetWriteConnection())
-            {
-                try
-                {
-                    context.Open();
-
-                    using (var tx = context.BeginTransaction())
-                    {
-                        // Establish provenance object
-                        context.EstablishProvenance(principal, null);
-
-                        this.DoObsoleteAllModel(context, expression);
-
-                        if (mode == TransactionMode.Commit)
-                        {
-                            tx.Commit();
-                        }
-                    }
-                }
-                catch (DbException e)
-                {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing obsolete all operation", expression, e);
-                    throw this.TranslateDbException(e);
-                }
-                catch (Exception e)
-                {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing obsolete all operation", expression, e);
-                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
-                }
-            }
+            this.DeleteAll(expression, mode, principal, DeleteMode.ObsoleteDelete);
         }
 
         /// <summary>
@@ -722,58 +716,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <returns>The obsoleted data</returns>
         public TModel Obsolete(Guid id, TransactionMode mode, IPrincipal principal)
         {
-            if (principal == null)
-            {
-                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
-            }
-
-            var preEvent = new DataPersistingEventArgs<TModel>(new TModel() { Key = id }, mode, principal);
-            this.Obsoleting?.Invoke(this, preEvent);
-            if (preEvent.Cancel)
-            {
-                this.m_tracer.TraceVerbose("Pre-Persistence event indicates cancel on Obsolete for {0}", id);
-                return preEvent.Data;
-            }
-
-            using (var context = this.Provider.GetWriteConnection())
-            {
-                try
-                {
-                    context.Open();
-
-                    TModel retVal = default(TModel);
-                    using (var tx = context.BeginTransaction())
-                    {
-                        // Establish provenance object
-                        context.EstablishProvenance(principal, null);
-
-                        retVal = this.DoObsoleteModel(context, id);
-
-                        if (mode == TransactionMode.Commit)
-                        {
-                            tx.Commit();
-                            // Cache
-                            this.m_dataCacheService?.Remove(id);
-                        }
-                    }
-
-                    // Post event
-                    var postEvt = new DataPersistedEventArgs<TModel>(retVal, mode, principal);
-                    this.Obsoleted?.Invoke(this, postEvt);
-
-                    return postEvt.Data;
-                }
-                catch (DbException e)
-                {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing obsolete operation", id, e);
-                    throw this.TranslateDbException(e);
-                }
-                catch (Exception e)
-                {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing obsolete operation", id, e);
-                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
-                }
-            }
+            return this.Delete(id, mode, principal, DeleteMode.ObsoleteDelete);
         }
 
         /// <summary>
@@ -783,7 +726,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             if (query is Expression<Func<TModel, bool>> expr)
             {
-                var retVal = this.Query(expr, AuthenticationContext.Current.Principal).AsResultSet<TModel>();
+                var retVal = this.Query(expr, AuthenticationContext.Current.Principal);
                 totalResults = retVal.Count();
                 return retVal.Skip(offset).Take(count ?? 100);
             }
@@ -827,7 +770,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             if (preEvt.Cancel)
             {
                 this.m_tracer.TraceVerbose("Pre-Query Event Signalled Cancel: {0}", query);
-                return preEvt.Results.AsResultSet<TModel>();
+                return preEvt.Results;
             }
 
             using (var context = this.Provider.GetReadonlyConnection())
@@ -838,7 +781,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                     var postEvt = new QueryResultEventArgs<TModel>(query, results, principal);
                     this.Queried?.Invoke(this, postEvt);
-                    return postEvt.Results.AsResultSet<TModel>();
+                    return postEvt.Results;
                 }
                 catch (DbException e)
                 {
@@ -858,7 +801,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public IEnumerable<TModel> Query(Expression<Func<TModel, bool>> query, int offset, int? count, out int totalResults, IPrincipal principal, params ModelSort<TModel>[] orderBy)
         {
-            var retVal = this.Query(query, principal).AsResultSet<TModel>();
+            var retVal = this.Query(query, principal);
             totalResults = retVal.Count(); // perform fast count
             return retVal.Skip(offset).Take(count ?? 100);
         }
@@ -868,17 +811,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public IEnumerable<TModel> Query(Expression<Func<TModel, bool>> query, Guid queryId, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext, params ModelSort<TModel>[] orderBy)
         {
-            var retVal = this.Query(query, overrideAuthContext).AsResultSet<TModel>();
+            var retVal = this.Query(query, overrideAuthContext);
 
-            foreach (var s in orderBy)
+            if (retVal is IOrderableQueryResultSet<TModel> orderable)
             {
-                if (s.SortOrder == SortOrderType.OrderBy)
+                foreach (var s in orderBy)
                 {
-                    retVal = retVal.OrderBy(s.SortProperty);
-                }
-                else
-                {
-                    retVal = retVal.OrderByDescending(s.SortProperty);
+                    if (s.SortOrder == SortOrderType.OrderBy)
+                    {
+                        retVal = orderable.OrderBy(s.SortProperty);
+                    }
+                    else
+                    {
+                        retVal = orderable.OrderByDescending(s.SortProperty);
+                    }
                 }
             }
 
@@ -1134,9 +1080,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         TModel IAdoPersistenceProvider<TModel>.Update(DataContext context, TModel data) => this.DoUpdateModel(context, data);
 
         /// <summary>
-        /// ADO persistence obsolete
+        /// ADO persistence delete
         /// </summary>
-        TModel IAdoPersistenceProvider<TModel>.Obsolete(DataContext context, Guid key) => this.DoObsoleteModel(context, key);
+        TModel IAdoPersistenceProvider<TModel>.Delete(DataContext context, Guid key, DeleteMode deletionMode) => this.DoDeleteModel(context, key, deletionMode);
 
         /// <summary>
         /// <summary>
@@ -1170,6 +1116,125 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 return data;
             }
+        }
+
+        /// <summary>
+        /// Delete the specified object
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="mode"></param>
+        /// <param name="principal"></param>
+        /// <param name="deletionMode"></param>
+        /// <returns></returns>
+        public TModel Delete(Guid key, TransactionMode mode, IPrincipal principal, DeleteMode deletionMode)
+        {
+            if (principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+
+            var preEvent = new DataPersistingEventArgs<TModel>(new TModel() { Key = key }, mode, principal);
+            this.Deleting?.Invoke(this, preEvent);
+            if (preEvent.Cancel)
+            {
+                this.m_tracer.TraceVerbose("Pre-Persistence event indicates cancel on Delete for {0}", key);
+                return preEvent.Data;
+            }
+
+            using (var context = this.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    TModel retVal = default(TModel);
+                    using (var tx = context.BeginTransaction())
+                    {
+                        // Establish provenance object
+                        context.EstablishProvenance(principal, null);
+
+                        retVal = this.DoDeleteModel(context, key, deletionMode);
+
+                        if (mode == TransactionMode.Commit)
+                        {
+                            tx.Commit();
+                            // Cache
+                            this.m_dataCacheService?.Remove(key);
+                        }
+                    }
+
+                    // Post event
+                    var postEvt = new DataPersistedEventArgs<TModel>(retVal, mode, principal);
+                    this.Deleted?.Invoke(this, postEvt);
+
+                    return postEvt.Data;
+                }
+                catch (DbException e)
+                {
+                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing delete operation", key, e);
+                    throw this.TranslateDbException(e);
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing delete operation", key, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Delete all objects according to <paramref name="deletionMode"/>
+        /// </summary>
+        /// <param name="expression">The records which should be deleted</param>
+        /// <param name="mode">The transaction mode</param>
+        /// <param name="principal">The principal</param>
+        /// <param name="deletionMode">The method of deletion</param>
+        public void DeleteAll(Expression<Func<TModel, bool>> expression, TransactionMode mode, IPrincipal principal, DeleteMode deletionMode)
+        {
+            if (expression == null)
+            {
+                throw new ArgumentNullException(nameof(expression), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+            if (principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+
+            using (var context = this.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    using (var tx = context.BeginTransaction())
+                    {
+                        // Establish provenance object
+                        context.EstablishProvenance(principal, null);
+
+                        this.DoDeleteAllModel(context, expression, deletionMode);
+
+                        if (mode == TransactionMode.Commit)
+                        {
+                            tx.Commit();
+                        }
+                    }
+                }
+                catch (DbException e)
+                {
+                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing delete all operation", expression, e);
+                    throw this.TranslateDbException(e);
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing delete all operation", expression, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
+                }
+            }
+        }
+
+        public void Touch(Guid key, TransactionMode mode, IPrincipal principal)
+        {
+            throw new NotImplementedException();
         }
     }
 }

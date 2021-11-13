@@ -1,4 +1,5 @@
 ﻿using SanteDB.Core.Model.Query;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.Providers;
 using System;
@@ -40,7 +41,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Do an obsolete of the model
         /// </summary>
-        TModel Obsolete(DataContext context, Guid key);
+        TModel Delete(DataContext context, Guid key, DeleteMode deletionMode);
 
         /// <summary>
         /// Perform a get on the context

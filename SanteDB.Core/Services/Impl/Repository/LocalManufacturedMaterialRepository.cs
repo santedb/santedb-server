@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
@@ -33,7 +34,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// DI constructor
         /// </summary>
-        public LocalManufacturedMaterialRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
+        public LocalManufacturedMaterialRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<ManufacturedMaterial> persistenceService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, persistenceService, privacyService)
         {
         }
 

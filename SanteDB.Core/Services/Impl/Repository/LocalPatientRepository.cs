@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
@@ -31,13 +32,11 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalPatientRepository : GenericLocalRepositoryEx<Patient>
     {
-
         /// <summary>
         /// Create a new patient repository
         /// </summary>
-        public LocalPatientRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
+        public LocalPatientRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<Patient> persistenceService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, persistenceService, privacyService)
         {
-
         }
 
         protected override string QueryPolicy => PermissionPolicyIdentifiers.QueryClinicalData;
@@ -46,6 +45,4 @@ namespace SanteDB.Server.Core.Services.Impl
         protected override string DeletePolicy => PermissionPolicyIdentifiers.DeleteClinicalData;
         protected override string AlterPolicy => PermissionPolicyIdentifiers.WriteClinicalData;
     }
-
-   
 }

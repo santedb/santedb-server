@@ -209,6 +209,10 @@
       <Project>{030666AA-FC71-449E-9DFC-270F1C23C5DA}</Project>
       <Name>SanteDB.BI</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj">
+      <Project>{41948F21-91D1-4D35-901F-362751EAECF5}</Project>
+      <Name>SanteDB.Core.i18n</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Configuration\SanteDB.Configuration.csproj">
       <Project>{032ABF00-6C76-47C7-9ECA-A840915A17EA}</Project>
       <Name>SanteDB.Configuration</Name>

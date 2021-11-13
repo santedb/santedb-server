@@ -53,7 +53,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira
 #pragma warning disable CS0067
 
     [ServiceProvider("JIRA Based Diagnostic (Bug) Report Submissions")]
-    public class DiagnosticReportPersistenceService : IDataPersistenceService<DiagnosticReport>
+    public class JiraDiagnosticReportPersistenceService : IDataPersistenceService<DiagnosticReport>
     {
         /// <summary>
         /// Gets the service name
@@ -67,9 +67,9 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         private JiraServiceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<JiraServiceConfigurationSection>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DiagnosticReportPersistenceService"/> class.
+        /// Initializes a new instance of the <see cref="JiraDiagnosticReportPersistenceService"/> class.
         /// </summary>
-        public DiagnosticReportPersistenceService()
+        public JiraDiagnosticReportPersistenceService()
         {
         }
 
@@ -122,6 +122,16 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         /// Not supported
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<DiagnosticReport>> Updating;
+
+        /// <summary>
+        /// Fired after report is deleted (not used)
+        /// </summary>
+        public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Deleted;
+
+        /// <summary>
+        /// Fired when report is deleting
+        /// </summary>
+        public event EventHandler<DataPersistingEventArgs<DiagnosticReport>> Deleting;
 
         /// <summary>
         /// Not supported
@@ -249,11 +259,11 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         }
 
         /// <summary>
-        /// Not supported = deletion
+        /// Deleting from JIRA not supported
         /// </summary>
-        public void ObsoleteAll(Expression<Func<DiagnosticReport, bool>> matching, TransactionMode mode, IPrincipal principal)
+        public DiagnosticReport Delete(Guid key, TransactionMode mode, IPrincipal principal, DeleteMode deletionMode)
         {
-            throw new NotSupportedException();
+            throw new NotImplementedException();
         }
     }
 

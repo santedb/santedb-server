@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
@@ -29,12 +30,11 @@ namespace SanteDB.Server.Core.Services.Impl
     /// Place repository that uses local persistence
     /// </summary>
     public class LocalPlaceRepository : GenericLocalRepositoryEx<Place>
-	{
-
+    {
         /// <summary>
         /// Privacy enforcement service
         /// </summary>
-        public LocalPlaceRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
+        public LocalPlaceRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<Place> dataPersistence, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, dataPersistence, privacyService)
         {
         }
 

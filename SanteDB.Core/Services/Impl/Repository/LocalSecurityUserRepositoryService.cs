@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
@@ -38,15 +39,21 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalSecurityUserRepositoryService : GenericLocalSecurityRepository<SecurityUser>
     {
-
         /// <summary>
         /// Creates a DI security user repository
         /// </summary>
-        public LocalSecurityUserRepositoryService(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
+        public LocalSecurityUserRepositoryService(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<SecurityUser> dataPersistenceService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, dataPersistenceService, privacyService)
         {
         }
 
+        /// <summary>
+        /// Gets the write policy
+        /// </summary>
         protected override string WritePolicy => PermissionPolicyIdentifiers.CreateIdentity;
+
+        /// <summary>
+        /// Get the delete policy
+        /// </summary>
         protected override string DeletePolicy => PermissionPolicyIdentifiers.AlterIdentity;
 
         /// <summary>
@@ -77,11 +84,11 @@ namespace SanteDB.Server.Core.Services.Impl
                 }), DetectedIssueKeys.SecurityIssue));
 
             // Create the identity
-            var id = iids.CreateIdentity(data.UserName,  data.Password, AuthenticationContext.Current.Principal);
+            var id = iids.CreateIdentity(data.UserName, data.Password, AuthenticationContext.Current.Principal);
 
             // Now ensure local db record exists
             int tr = 0;
-            var retVal = this.Find(o => o.UserName == data.UserName, 0, 1, out tr, Guid.Empty).FirstOrDefault();
+            var retVal = this.Find(o => o.UserName == data.UserName).FirstOrDefault();
             if (retVal == null)
             {
                 throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.userCreated"));
@@ -102,7 +109,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 retVal.UserClass = data.UserClass;
                 base.Save(retVal);
             }
-            
+
             return retVal;
         }
 

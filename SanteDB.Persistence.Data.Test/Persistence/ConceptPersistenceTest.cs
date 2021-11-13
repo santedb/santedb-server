@@ -211,7 +211,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ConceptNames).Count);
 
                 // Ensure reference terms are 0 until loaded
-                Assert.IsNull( afterQuery.ReferenceTerms);
+                Assert.IsNull(afterQuery.ReferenceTerms);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
 
                 // Concept sets are not a delay loadable property
@@ -316,7 +316,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
 
                 // Query to ensure the name is not being loaded
                 var afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-06", 1).FirstOrDefault();
-                Assert.IsNull( afterQuery.ConceptNames);
+                Assert.IsNull(afterQuery.ConceptNames);
                 Assert.AreEqual(2, afterQuery.LoadProperty(o => o.ConceptNames).Count);
                 Assert.AreEqual("en", afterQuery.ConceptNames[0].Language);
                 Assert.AreEqual("fr", afterQuery.ConceptNames[1].Language);
@@ -325,7 +325,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 // Next, we'll add something that never existed before
                 afterUpdate = base.TestUpdate(afterQuery, (o) =>
                 {
-                    o.LoadProperty(r=>r.Relationship).Add(new ConceptRelationship(ConceptRelationshipTypeKeys.SameAs, NullReasonKeys.NoInformation));
+                    o.LoadProperty(r => r.Relationship).Add(new ConceptRelationship(ConceptRelationshipTypeKeys.SameAs, NullReasonKeys.NoInformation));
                     return o;
                 });
                 Assert.AreEqual(1, afterUpdate.Relationship.Count);
@@ -333,9 +333,9 @@ namespace SanteDB.Persistence.Data.Test.Persistence
 
                 // Ensure the query returns the same
                 afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-06", 1).FirstOrDefault();
-                Assert.IsNull( afterQuery.ConceptNames);
+                Assert.IsNull(afterQuery.ConceptNames);
                 Assert.AreEqual(2, afterQuery.LoadProperty(o => o.ConceptNames).Count);
-                Assert.IsNull( afterQuery.Relationship);
+                Assert.IsNull(afterQuery.Relationship);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Relationship).Count);
                 Assert.AreEqual("en", afterQuery.ConceptNames[0].Language);
                 Assert.AreEqual("fr", afterQuery.ConceptNames[1].Language);
@@ -362,9 +362,9 @@ namespace SanteDB.Persistence.Data.Test.Persistence
 
                 // Now re-query
                 afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-06", 1).FirstOrDefault();
-                Assert.IsNull( afterQuery.ConceptNames);
+                Assert.IsNull(afterQuery.ConceptNames);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ConceptNames).Count);
-                Assert.IsNull( afterQuery.Relationship);
+                Assert.IsNull(afterQuery.Relationship);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Relationship).Count);
                 Assert.AreEqual("en", afterQuery.ConceptNames[0].Language);
                 Assert.AreEqual(2, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
@@ -444,7 +444,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 base.TestQuery<Concept>(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == "TEST07A"), 1);
 
                 // Test ordering
-                var result = base.TestQuery<Concept>(o => o.Mnemonic.StartsWith("TEST-07"), 2).AsResultSet();
+                var result = base.TestQuery<Concept>(o => o.Mnemonic.StartsWith("TEST-07"), 2);
                 var queryId = Guid.NewGuid();
 
                 // Ordering
@@ -453,7 +453,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
 
                 // Stateful queries
                 ApplicationServiceContext.Current.GetService<TestQueryPersistenceService>().SetExpectedQueryStats(queryId, 2);
-                var stateful = result.OrderBy(o => o.VersionSequence).AsStateful(queryId);
+                var stateful = result.OrderBy(o => o.VersionSequence).AsResultSet().AsStateful(queryId);
 
                 Assert.AreEqual(2, stateful.Count());
 

@@ -46,13 +46,17 @@ namespace SanteDB.Server.Core.Services.Impl
         // Tracer
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(LocalAuditRepository));
 
+        // Persistence service
+        private readonly IDataPersistenceService<AuditEventData> m_persistenceService;
+
         /// <summary>
         /// Construct instance of LocalAuditRepository
         /// </summary>
         /// <param name="localizationService"></param>
-        public LocalAuditRepository(ILocalizationService localizationService)
+        public LocalAuditRepository(ILocalizationService localizationService, IDataPersistenceService<AuditEventData> persistenceService)
         {
             this.m_localizationService = localizationService;
+            this.m_persistenceService = persistenceService;
         }
 
         /// <summary>
@@ -65,17 +69,8 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public IEnumerable<AuditEventData> Find(Expression<Func<AuditEventData, bool>> query)
-        {
-            var tr = 0;
-            return this.Find(query, 0, null, out tr);
-        }
-
-        /// <summary>
-        /// Find with query controls
-        /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AccessAuditLog)]
-        public IEnumerable<AuditEventData> Find(Expression<Func<AuditEventData, bool>> query, int offset, int? count, out int totalResults, params ModelSort<AuditEventData>[] orderBy)
+        public IQueryResultSet<AuditEventData> Find(Expression<Func<AuditEventData, bool>> query)
         {
             var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditEventData>>();
             if (service == null)
@@ -83,8 +78,36 @@ namespace SanteDB.Server.Core.Services.Impl
                 this.m_tracer.TraceError("Cannot find the data persistence service for audits");
                 throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.auditPersistenceService"));
             }
-            var results = service.Query(query, offset, count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
-            return results;
+            return service.Query(query, AuthenticationContext.Current.Principal);
+        }
+
+        /// <summary>
+        /// Find with query controls
+        /// </summary>
+        [Obsolete("Use Find(Expression<Func<AuditEventData, bool>>)", true)]
+        public IEnumerable<AuditEventData> Find(Expression<Func<AuditEventData, bool>> query, int offset, int? count, out int totalResults, params ModelSort<AuditEventData>[] orderBy)
+        {
+            var results = this.Find(query);
+
+            if (results is IOrderableQueryResultSet<AuditEventData> orderable)
+            {
+                foreach (var itm in orderBy)
+                {
+                    switch (itm.SortOrder)
+                    {
+                        case SanteDB.Core.Model.Map.SortOrderType.OrderBy:
+                            results = orderable.OrderBy(itm.SortProperty);
+                            break;
+
+                        case SanteDB.Core.Model.Map.SortOrderType.OrderByDescending:
+                            results = orderable.OrderByDescending(itm.SortProperty);
+                            break;
+                    }
+                }
+            }
+
+            totalResults = results.Count();
+            return results.Skip(offset).Take(count ?? 100);
         }
 
         /// <summary>
@@ -146,7 +169,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 this.m_tracer.TraceError("Cannot find the data persistence service for audits");
                 throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.auditPersistenceService"));
             }
-            var result = service.Obsolete(key, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+            var result = service.Delete(key, TransactionMode.Commit, AuthenticationContext.Current.Principal, DeleteMode.LogicalDelete);
             return result;
         }
 

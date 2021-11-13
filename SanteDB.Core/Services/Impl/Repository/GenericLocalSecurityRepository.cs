@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
 using SanteDB.Core.Security;
@@ -33,11 +34,10 @@ namespace SanteDB.Server.Core.Services.Impl
     public abstract class GenericLocalSecurityRepository<TSecurityEntity> : GenericLocalMetadataRepository<TSecurityEntity>
         where TSecurityEntity : IdentifiedData
     {
-
         /// <summary>
         /// Create new local security repository
         /// </summary>
-        public GenericLocalSecurityRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
+        public GenericLocalSecurityRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<TSecurityEntity> dataPersistence, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, dataPersistence, privacyService)
         {
         }
 

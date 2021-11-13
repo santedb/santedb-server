@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
@@ -29,6 +30,7 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
@@ -67,18 +69,19 @@ namespace SanteDB.Server.Core.Security.Privacy
         /// <summary>
         /// Handle post query event
         /// </summary>
-        public override IEnumerable<TData> Apply<TData>(IEnumerable<TData> results, IPrincipal principal)
+        public override IQueryResultSet<TData> Apply<TData>(IQueryResultSet<TData> results, IPrincipal principal)
         {
-                
             // If the current authentication context is a device (not a user) then we should allow the data to flow to the device
-            switch(this.m_configuration.PepExemptionPolicy)
+            switch (this.m_configuration.PepExemptionPolicy)
             {
                 case PolicyEnforcementExemptionPolicy.AllExempt:
                     return results;
+
                 case PolicyEnforcementExemptionPolicy.DevicePrincipalsExempt:
                     if (principal.Identity is DeviceIdentity || principal.Identity is ApplicationIdentity)
                         return results;
                     break;
+
                 case PolicyEnforcementExemptionPolicy.UserPrincipalsExempt:
                     if (!(principal.Identity is DeviceIdentity || principal.Identity is ApplicationIdentity))
                         return results;
@@ -87,11 +90,10 @@ namespace SanteDB.Server.Core.Security.Privacy
             return base.Apply(results, principal);
         }
 
-
         /// <summary>
         /// Handle post query event
         /// </summary>
-        /// 
+        ///
         public override TData Apply<TData>(TData result, IPrincipal principal)
         {
             if (result == null) // no result
@@ -102,10 +104,12 @@ namespace SanteDB.Server.Core.Security.Privacy
             {
                 case PolicyEnforcementExemptionPolicy.AllExempt:
                     return result;
+
                 case PolicyEnforcementExemptionPolicy.DevicePrincipalsExempt:
                     if (principal.Identity is DeviceIdentity || principal.Identity is ApplicationIdentity)
                         return result;
                     break;
+
                 case PolicyEnforcementExemptionPolicy.UserPrincipalsExempt:
                     if (!(principal.Identity is DeviceIdentity || principal.Identity is ApplicationIdentity))
                         return result;
@@ -113,7 +117,5 @@ namespace SanteDB.Server.Core.Security.Privacy
             }
             return base.Apply(result, principal);
         }
-        
-
     }
 }

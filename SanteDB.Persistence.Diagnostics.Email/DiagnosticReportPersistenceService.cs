@@ -92,6 +92,16 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// <summary>
         /// Not supported
         /// </summary>
+        public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Deleted;
+
+        /// <summary>
+        /// Not supported
+        /// </summary>
+        public event EventHandler<DataPersistingEventArgs<DiagnosticReport>> Deleting;
+
+        /// <summary>
+        /// Not supported
+        /// </summary>
         public event EventHandler<QueryResultEventArgs<DiagnosticReport>> Queried;
 
         /// <summary>
@@ -201,6 +211,14 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// <summary>
         /// Not supported
         /// </summary>
+        public DiagnosticReport Delete(Guid storageData, TransactionMode mode, IPrincipal overrideAuthContext, DeleteMode deletionMode)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Not supported
+        /// </summary>
         public IQueryResultSet<DiagnosticReport> Query(Expression<Func<DiagnosticReport, bool>> query, IPrincipal overrideAuthContext = null)
         {
             throw new NotImplementedException();
@@ -226,6 +244,14 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// Not supported - obsoleting DX reports
         /// </summary>
         public void ObsoleteAll(Expression<Func<DiagnosticReport, bool>> matching, TransactionMode mode, IPrincipal principal)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Not supported - obsoleting DX reports
+        /// </summary>
+        public void DeleteAll(Expression<Func<DiagnosticReport, bool>> matching, TransactionMode mode, IPrincipal principal, DeleteMode deletionMode)
         {
             throw new NotImplementedException();
         }

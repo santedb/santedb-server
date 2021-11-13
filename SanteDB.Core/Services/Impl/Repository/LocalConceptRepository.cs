@@ -54,7 +54,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// Privacy enforcement service
         /// </summary>
         public LocalConceptRepository(IDataPersistenceService<Concept> conceptService, IDataPersistenceService<ConceptSet> conceptSetService, IDataPersistenceService<ConceptReferenceTerm> conceptRefTermService, IPolicyEnforcementService policyService, ILocalizationService localizationService,
-            IPrivacyEnforcementService privacyService = null, IAdhocCacheService adhocCacheService = null) : base(policyService, localizationService, privacyService)
+            IPrivacyEnforcementService privacyService = null, IAdhocCacheService adhocCacheService = null) : base(policyService, localizationService, conceptService, privacyService)
         {
             this.m_conceptService = conceptService;
             this.m_referenceTermService = conceptRefTermService;

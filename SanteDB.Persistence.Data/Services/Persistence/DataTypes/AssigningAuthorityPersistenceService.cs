@@ -66,16 +66,5 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             })).Select(o => o.ScopeConceptKey).ToList();
             return retVal;
         }
-
-        /// <summary>
-        /// Obsolete the specified assigning authority
-        /// </summary>
-        /// <param name="context">The context on which the model should be obsoleted</param>
-        /// <param name="key">The key to be obsoleted</param>
-        /// <returns>The obsoleted model</returns>
-        protected override AssigningAuthority DoObsoleteModel(DataContext context, Guid key)
-        {
-            return base.DoObsoleteModel(context, key); // Delete model
-        }
     }
 }

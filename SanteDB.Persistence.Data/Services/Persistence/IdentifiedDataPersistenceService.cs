@@ -147,7 +147,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Obsolete all objects
         /// </summary>
-        protected override void DoObsoleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression)
+        protected override void DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deleteMode)
         {
             if (context == null)
             {
@@ -193,7 +193,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         /// <param name="context">The context on which the obsoletion should occur</param>
         /// <param name="key">The key of the object to delete</param>
-        protected override TDbModel DoObsoleteInternal(DataContext context, Guid key)
+        protected override TDbModel DoDeleteInternal(DataContext context, Guid key, DeleteMode deletionMode)
         {
             if (context == null)
             {
@@ -364,7 +364,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // Which are new and which are not?
             var removedRelationships = existing.Where(o => !associations.Any(a => a.Key == o)).Select(a =>
             {
-                return persistenceService.Obsolete(context, a.Value);
+                return persistenceService.Delete(context, a.Value, DeleteMode.LogicalDelete);
             });
             var addedRelationships = associations.Where(o => !o.Key.HasValue || !existing.Any(a => a == o.Key)).Select(a =>
             {

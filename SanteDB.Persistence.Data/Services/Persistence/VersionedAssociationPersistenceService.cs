@@ -35,7 +35,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Obsolete all objects
         /// </summary>
-        protected override void DoObsoleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression)
+        protected override void DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode)
         {
             if (context == null)
             {
@@ -77,11 +77,22 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var sourceKey = context.Query<TDbModel>(domainQuery).OrderByDescending(o => o.EffectiveVersionSequenceId).Select(o => o.SourceKey).FirstOrDefault();
                 var sourceSequence = this.GetCurrentVersionSequenceForSource(context, sourceKey);
 
-                context.UpdateAll(context.Query<TDbModel>(domainQuery), o =>
+                switch (deletionMode)
                 {
-                    o.ObsoleteVersionSequenceId = sourceSequence;
-                    return o;
-                });
+                    case DeleteMode.NullifyDelete:
+                    case DeleteMode.LogicalDelete:
+                    case DeleteMode.ObsoleteDelete:
+                        context.UpdateAll(context.Query<TDbModel>(domainQuery), o =>
+                        {
+                            o.ObsoleteVersionSequenceId = sourceSequence;
+                            return o;
+                        });
+                        break;
+
+                    default:
+                        context.Delete(domainQuery);
+                        break;
+                }
 #if DEBUG
             }
             finally
@@ -95,7 +106,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Perform an obsoletion of the association
         /// </summary>
-        protected override TDbModel DoObsoleteInternal(DataContext context, Guid key)
+        protected override TDbModel DoDeleteInternal(DataContext context, Guid key, DeleteMode deletionMode)
         {
             if (context == null)
             {
@@ -112,12 +123,22 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var existing = context.FirstOrDefault<TDbModel>(o => o.Key == key);
 
                 // Get the source table
-                existing.ObsoleteVersionSequenceId = this.GetCurrentVersionSequenceForSource(context, existing.SourceKey);
-                return this.DoUpdateInternal(context, existing);
+                switch (deletionMode)
+                {
+                    case DeleteMode.LogicalDelete:
+                    case DeleteMode.NullifyDelete:
+                    case DeleteMode.ObsoleteDelete:
+                        existing.ObsoleteVersionSequenceId = this.GetCurrentVersionSequenceForSource(context, existing.SourceKey);
+                        return this.DoUpdateInternal(context, existing);
+
+                    default:
+                        context.Delete(existing);
+                        return existing;
+                }
             }
             else
             {
-                return base.DoObsoleteInternal(context, key);
+                return base.DoDeleteInternal(context, key, deletionMode);
             }
         }
 

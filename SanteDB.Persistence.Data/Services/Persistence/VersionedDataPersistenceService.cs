@@ -26,8 +26,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     /// Persistence service which handles versioned objects
     /// </summary>
     public abstract class VersionedDataPersistenceService<TModel, TDbModel, TDbKeyModel> : BaseEntityDataPersistenceService<TModel, TDbModel>
-        where TModel : BaseEntityData, IVersionedEntity, new()
-        where TDbModel : DbVersionedData, new()
+        where TModel : BaseEntityData, IVersionedEntity, IHasState, new()
+        where TDbModel : DbVersionedData, IDbHasStatus, new()
         where TDbKeyModel : DbIdentified, new()
     {
         /// <summary>
@@ -336,7 +336,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Obsolete all objects
         /// </summary>
-        protected override void DoObsoleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression)
+        protected override void DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode)
         {
             if (context == null)
             {
@@ -365,36 +365,30 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     // Convert the query to a domain query so that the object persistence layer can turn the
                     // structured LINQ query into a SQL statement
-                    var domainQuery = context.CreateSqlStatement().SelectFrom(typeof(TDbModel));
-                    var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
-                    if (domainExpression != null)
-                    {
-                        domainQuery = domainQuery.Where(domainExpression);
-                    }
-                    else
-                    {
-                        this.m_tracer.TraceVerbose("Will use slow query construction due to complex mapped fields");
-                        domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateWhere(expression);
-                    }
+                    var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, true);
 
-                    // Now we want to update each
-                    foreach (var obj in context.Query<TDbModel>(domainQuery))
+                    // determine our deletion mode
+                    switch (deletionMode)
                     {
-                        if (obj is IDbHasStatus state) // set status to obsolete
-                        {
-                            state.StatusConceptKey = StatusKeys.Obsolete;
-                            this.DoUpdateInternal(context, obj);
-                        }
-                        else // remove the object
-                        {
-                            obj.ObsoletionTime = DateTimeOffset.Now;
-                            obj.ObsoletedByKey = context.ContextId;
-                            context.Update(obj);
-                        }
+                        case DeleteMode.NullifyDelete:
+                            context.UpdateAll<TDbModel>(domainExpression, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == context.ContextId, o => o.StatusConceptKey == StatusKeys.Nullified);
+                            break;
+
+                        case DeleteMode.ObsoleteDelete:
+                            context.UpdateAll<TDbModel>(domainExpression, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == context.ContextId, o => o.StatusConceptKey == StatusKeys.Obsolete);
+                            break;
+
+                        case DeleteMode.LogicalDelete:
+                            context.UpdateAll<TDbModel>(domainExpression, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == context.ContextId, o => o.StatusConceptKey == StatusKeys.Inactive);
+                            break;
+
+                        case DeleteMode.PermanentDelete:
+                            context.Delete(domainExpression);
+                            break;
                     }
                 }
                 else
-                    base.DoObsoleteAllInternal(context, expression);
+                    base.DoDeleteAllInternal(context, expression, DeleteMode.PermanentDelete);
 #if DEBUG
             }
             finally
@@ -410,7 +404,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         /// <param name="context">The context in which the obsoletion is occurring</param>
         /// <param name="key">The key of the object which is to be obsoleted</param>
-        protected override TDbModel DoObsoleteInternal(DataContext context, Guid key)
+        /// <param name="deletionMode">The mode of deletion</param>
+        protected override TDbModel DoDeleteInternal(DataContext context, Guid key, DeleteMode deletionMode)
         {
             if (context == null)
             {
@@ -439,20 +434,31 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { type = typeof(TModel).Name, id = key }));
                     }
 
-                    // Set status to obsolete and create a new version (redirect to update)
-                    if (existing is IDbHasStatus status)
+                    switch (deletionMode)
                     {
-                        status.StatusConceptKey = StatusKeys.Obsolete;
-                        return this.DoUpdateInternal(context, existing);
-                    }
-                    else
-                    {
-                        return base.DoObsoleteInternal(context, key);
+                        case DeleteMode.ObsoleteDelete:
+                            existing.StatusConceptKey = StatusKeys.Obsolete;
+                            return this.DoUpdateInternal(context, existing);
+
+                        case DeleteMode.NullifyDelete:
+                            existing.StatusConceptKey = StatusKeys.Nullified;
+                            return this.DoUpdateInternal(context, existing);
+
+                        case DeleteMode.LogicalDelete:
+                            existing.StatusConceptKey = StatusKeys.Inactive;
+                            return this.DoUpdateInternal(context, existing);
+
+                        case DeleteMode.PermanentDelete:
+                            context.Delete(existing);
+                            return existing;
+
+                        default:
+                            throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_DELETE_MODE_SUPPORT, new { mode = deletionMode }));
                     }
                 }
                 else
                 {
-                    return base.DoObsoleteInternal(context, key);
+                    return base.DoDeleteInternal(context, key, deletionMode);
                 }
 #if DEBUG
             }
@@ -540,7 +546,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // Which are new and which are not?
             var removedRelationships = existing.Where(o => !associations.Any(a => a.Key == o)).Select(a =>
             {
-                return persistenceService.Obsolete(context, a.Value);
+                return persistenceService.Delete(context, a.Value, DeleteMode.LogicalDelete);
             });
             var addedRelationships = associations.Where(o => !o.Key.HasValue || !existing.Any(a => a == o.Key)).Select(a =>
             {

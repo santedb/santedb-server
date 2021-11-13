@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
@@ -35,13 +36,11 @@ namespace SanteDB.Server.Core.Services.Impl
     public abstract class GenericLocalRepositoryEx<TModel> : GenericLocalRepository<TModel>, IRepositoryServiceEx<TModel>
         where TModel : IdentifiedData, IHasState
     {
-
         /// <summary>
         /// Create a new privacy service
         /// </summary>
-        public GenericLocalRepositoryEx(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService, localizationService)
+        public GenericLocalRepositoryEx(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<TModel> dataPersistenceService, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService, localizationService, dataPersistenceService)
         {
-            
         }
 
         /// <summary>

@@ -96,12 +96,20 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Fired when data is being obsoleted
         /// </summary>
-        public event EventHandler<DataPersistingEventArgs<AuditEventData>> Obsoleting;
+        public event EventHandler<DataPersistingEventArgs<AuditEventData>> Obsoleting
+        {
+            add { this.Deleting += value; }
+            remove { this.Deleting -= value; }
+        }
 
         /// <summary>
         /// Fired when data is has been inserted
         /// </summary>
-        public event EventHandler<DataPersistedEventArgs<AuditEventData>> Obsoleted;
+        public event EventHandler<DataPersistedEventArgs<AuditEventData>> Obsoleted
+        {
+            add { this.Deleted += value; }
+            remove { this.Deleted -= value; }
+        }
 
         /// <summary>
         /// Fired when data is being retrieved
@@ -122,6 +130,10 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// Fired when data is has been queried
         /// </summary>
         public event EventHandler<QueryResultEventArgs<AuditEventData>> Queried;
+
+        public event EventHandler<DataPersistedEventArgs<AuditEventData>> Deleted;
+
+        public event EventHandler<DataPersistingEventArgs<AuditEventData>> Deleting;
 
         /// <summary>
         /// Create new audit repository service
@@ -468,6 +480,14 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         }
 
         /// <summary>
+        /// Obsolete the audit - Not supported
+        /// </summary>
+        public AuditEventData Delete(Guid storageData, TransactionMode mode, IPrincipal overrideAuthContext, DeleteMode deletionMode)
+        {
+            throw new NotSupportedException("Delete of audits not permitted");
+        }
+
+        /// <summary>
         /// Gets the specified object by identifier
         /// </summary>
         public AuditEventData Get(Guid containerId, Guid? versionId, IPrincipal overrideAuthContext = null)
@@ -565,7 +585,9 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     sql = sql.Build();
                     var itm = context.Query<CompositeResult<DbAuditEventData, DbAuditCode>>(sql).ToList();
                     AuditUtil.AuditAuditLogUsed(ActionType.Read, OutcomeIndicator.Success, sql.ToString(), itm.Select(o => o.Object1.Key).ToArray());
-                    var results = itm.Select(o => this.ToModelInstance(context, o)).ToList().AsQueryable();
+
+                    // TODO: Create a IMappedResultSetProvider for this.
+                    var results = itm.Select(o => this.ToModelInstance(context, o)).ToList().AsResultSet();
 
                     // Event args
                     var postEvtArgs = new QueryResultEventArgs<AuditEventData>(query, results, overrideAuthContext);
@@ -581,14 +603,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             }
         }
 
-        /// <summary>
-        /// Obsolete all data matching <paramref name="matching"/>
-        /// </summary>
-        public void ObsoleteAll(Expression<Func<AuditEventData, bool>> matching, TransactionMode mode, IPrincipal principal)
-        {
-            throw new NotSupportedException();
-        }
-    }
-
 #pragma warning restore CS0067
+    }
 }

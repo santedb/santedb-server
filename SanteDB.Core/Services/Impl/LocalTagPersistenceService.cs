@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.DataTypes;
@@ -61,13 +62,12 @@ namespace SanteDB.Server.Core.Services.Impl
             if (tag is EntityTag)
             {
                 var idp = ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityTag>>();
-                int tr = 0;
-                var existing = idp.Query(o => o.SourceEntityKey == sourceKey && o.TagKey == tag.TagKey, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
+                var existing = idp.Query(o => o.SourceEntityKey == sourceKey && o.TagKey == tag.TagKey, AuthenticationContext.Current.Principal).FirstOrDefault();
                 if (existing != null)
                 {
                     existing.Value = tag.Value;
                     if (existing.Value == null)
-                        idp.Obsolete(existing.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                        idp.Delete(existing.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal, DeleteMode.PermanentDelete);
                     else
                         idp.Update(existing as EntityTag, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                 }
@@ -82,13 +82,13 @@ namespace SanteDB.Server.Core.Services.Impl
             {
                 var idp = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ActTag>>();
                 int tr = 0;
-                var existing = idp.Query(o => o.SourceEntityKey == sourceKey && o.TagKey == tag.TagKey, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
+                var existing = idp.Query(o => o.SourceEntityKey == sourceKey && o.TagKey == tag.TagKey, AuthenticationContext.Current.Principal).FirstOrDefault();
                 tag.SourceEntityKey = tag.SourceEntityKey ?? sourceKey;
                 if (existing != null)
                 {
                     existing.Value = tag.Value;
                     if (existing.Value == null)
-                        idp.Obsolete(existing.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                        idp.Delete(existing.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal, DeleteMode.PermanentDelete);
                     else
                         idp.Update(existing as ActTag, TransactionMode.Commit, AuthenticationContext.Current.Principal);
                 }
@@ -101,9 +101,6 @@ namespace SanteDB.Server.Core.Services.Impl
             }
 
             this.m_cacheService?.Remove(sourceKey);
-            
         }
     }
-
-
 }

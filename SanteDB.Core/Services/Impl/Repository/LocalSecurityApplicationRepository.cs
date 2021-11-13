@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
@@ -39,7 +40,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// DI constructor
         /// </summary>
-        public LocalSecurityApplicationRepository(IApplicationIdentityProviderService identityProvider, IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
+        public LocalSecurityApplicationRepository(IApplicationIdentityProviderService identityProvider, IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<SecurityApplication> persistenceService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, persistenceService, privacyService)
         {
             this.m_identityProvider = identityProvider;
         }

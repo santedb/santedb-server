@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
@@ -34,14 +35,13 @@ namespace SanteDB.Server.Core.Services.Impl
         GenericLocalMetadataRepository<AssigningAuthority>,
         IAssigningAuthorityRepositoryService
     {
-
         /// <summary>
-        /// Local AA 
+        /// Local AA
         /// </summary>
-        public LocalAssigningAuthorityRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
+        public LocalAssigningAuthorityRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<AssigningAuthority> dataPersistence, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, dataPersistence, privacyService)
         {
-
         }
+
         /// <summary>
         /// Get the specified assigning authority
         /// </summary>
@@ -52,15 +52,14 @@ namespace SanteDB.Server.Core.Services.Impl
             if (assigningAutUri.Scheme == "urn" && assigningAutUri.LocalPath.StartsWith("oid:"))
             {
                 var aaOid = assigningAutUri.LocalPath.Substring(4);
-                return base.Find(o => o.Oid == aaOid, 0, 1, out tr, Guid.Empty).FirstOrDefault();
+                return base.Find(o => o.Oid == aaOid).FirstOrDefault();
             }
 
-            return base.Find(o => o.Url == assigningAutUri.OriginalString, 0, 1, out tr, Guid.Empty).FirstOrDefault();
-
+            return base.Find(o => o.Url == assigningAutUri.OriginalString).FirstOrDefault();
         }
 
         /// <summary>
-        /// Get assigning authority 
+        /// Get assigning authority
         /// </summary>
         public AssigningAuthority Get(string domain)
         {

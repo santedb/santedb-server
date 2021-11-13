@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
@@ -32,11 +33,10 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalEntityRelationshipRepository : GenericLocalRepository<EntityRelationship>
     {
-
         /// <summary>
         /// Entity relationship repository
         /// </summary>
-        public LocalEntityRelationshipRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService, localizationService)
+        public LocalEntityRelationshipRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<EntityRelationship> dataPersistence, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService, localizationService, dataPersistence)
         {
         }
 
@@ -44,18 +44,22 @@ namespace SanteDB.Server.Core.Services.Impl
         /// Query policy for entities
         /// </summary>
         protected override string QueryPolicy => PermissionPolicyIdentifiers.QueryClinicalData;
+
         /// <summary>
         /// Read policy for entities
         /// </summary>
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadClinicalData;
+
         /// <summary>
         /// Write policy for entities
         /// </summary>
         protected override string WritePolicy => PermissionPolicyIdentifiers.WriteClinicalData;
+
         /// <summary>
         /// Delete policy for entities
         /// </summary>
         protected override string DeletePolicy => PermissionPolicyIdentifiers.DeleteClinicalData;
+
         /// <summary>
         /// Alter policy for entities
         /// </summary>
@@ -87,6 +91,5 @@ namespace SanteDB.Server.Core.Services.Impl
 
             return base.Save(data);
         }
-
     }
 }

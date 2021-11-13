@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.Query;
@@ -35,27 +36,18 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalBatchRepository :
         GenericLocalRepository<Bundle>
-	{
-
+    {
         /// <summary>
         /// Creates a new batch repository
         /// </summary>
-        public LocalBatchRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService, localizationService)
+        public LocalBatchRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<Bundle> dataPersistenceService, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService, localizationService, dataPersistenceService)
         {
         }
 
         /// <summary>
         /// Find the specified bundle (Not supported)
         /// </summary>
-        public override IEnumerable<Bundle> Find(Expression<Func<Bundle, bool>> query)
-        {
-            throw new NotSupportedException(this.m_localizationService.GetString("error.type.NotSupportedException"));
-        }
-
-        /// <summary>
-        /// Find the specfied bundle (not supported)
-        /// </summary>
-        public override IEnumerable<Bundle> Find(Expression<Func<Bundle, bool>> query, int offset, int? count, out int totalResults, params ModelSort<Bundle>[] orderBy)
+        public override IQueryResultSet<Bundle> Find(Expression<Func<Bundle, bool>> query)
         {
             throw new NotSupportedException(this.m_localizationService.GetString("error.type.NotSupportedException"));
         }
@@ -82,7 +74,7 @@ namespace SanteDB.Server.Core.Services.Impl
         public override Bundle Insert(Bundle data)
         {
             // We need permission to insert all of the objects
-            foreach(var itm in data.Item)
+            foreach (var itm in data.Item)
             {
                 var irst = typeof(IRepositoryService<>).MakeGenericType(itm.GetType());
                 var irsi = ApplicationServiceContext.Current.GetService(irst);

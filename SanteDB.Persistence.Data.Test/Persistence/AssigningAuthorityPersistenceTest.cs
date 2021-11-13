@@ -12,22 +12,19 @@ using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.Test.Persistence
 {
-
     /// <summary>
     /// Tests the assigning authority persistence service
     /// </summary>
     [TestFixture(Category = "Persistence", TestName = "ADO AssigningAuthority")]
     public class AssigningAuthorityPersistenceTest : DataPersistenceTest
     {
-
         /// <summary>
-        /// Tests that a simple assigning authority can be inserted 
+        /// Tests that a simple assigning authority can be inserted
         /// and then retrieved
         /// </summary>
         [Test]
         public void TestInsertAssigningAuthority()
         {
-
             var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>();
             Assert.IsNotNull(persistenceService);
 
@@ -61,11 +58,10 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             var aa3 = persistenceService.Query(o => o.Url == "http://google.com/test1", AuthenticationContext.SystemPrincipal);
             Assert.AreEqual(1, aa3.Count());
             Assert.AreEqual(aa.Key, aa3.First().Key);
-
         }
 
         /// <summary>
-        /// Test the insert of an assigning authority with extended attributes 
+        /// Test the insert of an assigning authority with extended attributes
         /// </summary>
         [Test]
         public void TestInsertExtendedAssigningAuthority()
@@ -110,7 +106,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             Assert.AreEqual(1, aa3.Count());
             Assert.AreEqual(aa.Key, aa3.First().Key);
             Assert.AreEqual(1, aa3.Single().AuthorityScopeXml.Count);
-
         }
 
         /// <summary>
@@ -140,7 +135,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             Assert.AreEqual(AuthenticationContext.SystemUserSid, aa.CreatedByKey.ToString());
             Assert.IsNotNull(aa.CreationTime);
 
-            // Next update 
+            // Next update
             aa.Oid = "3.3.2.1";
             var aa2 = persistenceService.Update(aa, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
 
@@ -193,7 +188,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             var aa4 = persistenceService.Update(aa3, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
             Assert.AreEqual(1, aa4.AuthorityScopeXml.Count);
             Assert.AreEqual(EntityClassKeys.Material, aa4.AuthorityScopeXml.Single());
-
         }
 
         /// <summary>
@@ -223,7 +217,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             Assert.AreEqual(AuthenticationContext.SystemUserSid, aa.CreatedByKey.ToString());
             Assert.IsNotNull(aa.CreationTime);
 
-            var aa2 = persistenceService.Obsolete(aa.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+            var aa2 = persistenceService.Delete(aa.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.LogicalDelete);
             Assert.IsNotNull(aa2.ObsoletionTime);
             Assert.IsNotNull(aa2.ObsoletedByKey);
             Assert.AreEqual(AuthenticationContext.SystemUserSid, aa2.ObsoletedByKey.ToString());
@@ -236,7 +230,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             var aa4 = persistenceService.Query(o => o.Url == "http://google.com/test5", AuthenticationContext.SystemPrincipal);
             Assert.AreEqual(0, aa4.Count());
 
-            // Validate that AA can be found when explicitly querying for obsoleted 
+            // Validate that AA can be found when explicitly querying for obsoleted
             var aa5 = persistenceService.Query(o => o.Url == "http://google.com/test5" && o.ObsoletionTime != null, AuthenticationContext.SystemPrincipal);
             Assert.AreEqual(1, aa5.Count());
         }
@@ -273,11 +267,10 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             Assert.IsNotNull(aa.CreationTime);
             Assert.AreEqual(1, aa.AuthorityScope.Count);
 
-            var aa2 = persistenceService.Obsolete(aa.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+            var aa2 = persistenceService.Delete(aa.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.LogicalDelete);
             Assert.IsNotNull(aa2.ObsoletionTime);
             Assert.IsNotNull(aa2.ObsoletedByKey);
             Assert.AreEqual(AuthenticationContext.SystemUserSid, aa2.ObsoletedByKey.ToString());
-
         }
 
         /// <summary>
@@ -312,7 +305,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             Assert.IsNotNull(aa.CreationTime);
             Assert.AreEqual(1, aa.AuthorityScope.Count);
 
-            var aa2 = persistenceService.Obsolete(aa.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+            var aa2 = persistenceService.Delete(aa.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.LogicalDelete);
             Assert.IsNotNull(aa2.ObsoletionTime);
             Assert.IsNotNull(aa2.ObsoletedByKey);
             Assert.AreEqual(AuthenticationContext.SystemUserSid, aa2.ObsoletedByKey.ToString());
@@ -330,8 +323,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             // Validate that AA is now found via the query method
             var aa5 = persistenceService.Query(o => o.Url == "http://google.com/test7", AuthenticationContext.SystemPrincipal);
             Assert.AreEqual(1, aa5.Count());
-
         }
-
     }
 }

@@ -138,7 +138,7 @@ namespace SanteDB.Server.Jobs
                         List<SecurityUser> actionedUser = new List<SecurityUser>(10);
 
                         // Users who haven't logged in
-                        foreach (var usr in userRepository.Find(o => o.UserClass == UserClassKeys.HumanUser && o.LastLoginTime < cutoff, offset, 100, out totalResults))
+                        foreach (var usr in userRepository.Find(o => o.UserClass == UserClassKeys.HumanUser && o.LastLoginTime < cutoff))
                         {
                             // Cancel request?
                             if (this.m_cancelFlag) break;
@@ -168,7 +168,7 @@ namespace SanteDB.Server.Jobs
                             else
                                 templateId = "org.santedb.notification.security.user.inactiveWarned";
 
-                            var entity = entityRepository.Find(o => o.SecurityUserKey == usr.Key, 0, 1, out int _).FirstOrDefault();
+                            var entity = entityRepository.Find(o => o.SecurityUserKey == usr.Key).FirstOrDefault();
                             var lang = entity?.GetPersonLanguages()?.FirstOrDefault(o => o.IsPreferred)?.LanguageCode;
 
                             var template = templateService.FillTemplate(templateId, lang, new

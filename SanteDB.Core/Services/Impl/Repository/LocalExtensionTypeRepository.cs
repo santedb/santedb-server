@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
@@ -35,7 +36,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Local extension type repository
         /// </summary>
-        public LocalExtensionTypeRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
+        public LocalExtensionTypeRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<ExtensionType> dataPersistence, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, dataPersistence, privacyService)
         {
         }
 

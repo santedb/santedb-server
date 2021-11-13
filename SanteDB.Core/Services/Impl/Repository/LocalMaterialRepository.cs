@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
@@ -33,7 +34,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// DI constructor
         /// </summary>
-        public LocalMaterialRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
+        public LocalMaterialRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<Material> persistenceService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, persistenceService, privacyService)
         {
         }
 
@@ -43,6 +44,4 @@ namespace SanteDB.Server.Core.Services.Impl
         protected override string DeletePolicy => PermissionPolicyIdentifiers.DeleteMaterials;
         protected override string AlterPolicy => PermissionPolicyIdentifiers.WriteMaterials;
     }
-
-   
 }

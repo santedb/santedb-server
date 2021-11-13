@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
@@ -33,13 +34,12 @@ namespace SanteDB.Server.Core.Services.Impl
     /// </summary>
     public class LocalUserEntityRepository : GenericLocalMetadataRepository<UserEntity>
     {
-
         /// <summary>
         /// Privacy for a user entity
         /// </summary>
         /// <param name="privacyService"></param>
         /// <param name="policyService"></param>
-        public LocalUserEntityRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
+        public LocalUserEntityRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<UserEntity> userEntity, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, userEntity, privacyService)
         {
         }
 
@@ -58,7 +58,7 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             this.ValidateWritePermission(data as UserEntity);
         }
-        
+
         /// <summary>
         /// Validate that the user has write permission
         /// </summary>
@@ -78,7 +78,7 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             return base.Insert(entity);
         }
-        
+
         /// <summary>
         /// Obsolete the user entity
         /// </summary>

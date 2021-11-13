@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
@@ -35,11 +36,10 @@ namespace SanteDB.Server.Core.Services.Impl
     public class GenericLocalMetadataRepository<TMetadata> : GenericLocalRepository<TMetadata>
         where TMetadata : IdentifiedData
     {
-
         /// <summary>
         /// Create a new local metadata repository
         /// </summary>
-        public GenericLocalMetadataRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService, localizationService) // No need for privacy on metadata
+        public GenericLocalMetadataRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<TMetadata> dataPersistence, IPrivacyEnforcementService privacyService = null) : base(privacyService, policyService, localizationService, dataPersistence) // No need for privacy on metadata
         {
         }
 
@@ -47,86 +47,25 @@ namespace SanteDB.Server.Core.Services.Impl
         /// The query policy for metadata
         /// </summary>
         protected override string QueryPolicy => PermissionPolicyIdentifiers.ReadMetadata;
+
         /// <summary>
         /// The read policy for metadata
         /// </summary>
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadMetadata;
+
         /// <summary>
         /// The write policy for metadata
         /// </summary>
         protected override string WritePolicy => PermissionPolicyIdentifiers.UnrestrictedMetadata;
+
         /// <summary>
         /// The delete policy for metadata
         /// </summary>
         protected override string DeletePolicy => PermissionPolicyIdentifiers.UnrestrictedMetadata;
+
         /// <summary>
         /// The alter policy for metadata
         /// </summary>
         protected override string AlterPolicy => PermissionPolicyIdentifiers.UnrestrictedMetadata;
-
-        /// <summary>
-        /// Finds the specified metadata
-        /// </summary>
-        public override IEnumerable<TMetadata> Find(Expression<Func<TMetadata, bool>> query, int offset, int? count, out int totalResults, Guid queryId, params ModelSort<TMetadata>[] orderBy)
-        {
-            return base.Find(query, offset, count, out totalResults, queryId, orderBy);
-        }
-
-        /// <summary>
-        /// Finds the specified metadata
-        /// </summary>
-        public override IEnumerable<TMetadata> Find(Expression<Func<TMetadata, bool>> query)
-        {
-            return base.Find(query);
-        }
-
-        /// <summary>
-        /// Finds the specified metadata
-        /// </summary>
-        public override IEnumerable<TMetadata> Find(Expression<Func<TMetadata, bool>> query, int offset, int? count, out int totalResults, params ModelSort<TMetadata>[] orderBy)
-        {
-            return base.Find(query, offset, count, out totalResults, orderBy);
-        }
-
-       
-        /// <summary>
-        /// Gets the specified metadata
-        /// </summary>
-        public override TMetadata Get(Guid key)
-        {
-            return base.Get(key);
-        }
-
-        /// <summary>
-        /// Gets the specified metadata
-        /// </summary>
-        public override TMetadata Get(Guid key, Guid versionKey)
-        {
-            return base.Get(key, versionKey);
-        }
-
-        /// <summary>
-        /// Inserts the specified metadata
-        /// </summary>
-        public override TMetadata Insert(TMetadata data)
-        {
-            return base.Insert(data);
-        }
-
-        /// <summary>
-        /// obsoletes the specified metadata
-        /// </summary>
-        public override TMetadata Obsolete(Guid key)
-        {
-            return base.Obsolete(key);
-        }
-
-        /// <summary>
-        /// Saves the specified metadata
-        /// </summary>
-        public override TMetadata Save(TMetadata data)
-        {
-            return base.Save(data);
-        }
     }
 }

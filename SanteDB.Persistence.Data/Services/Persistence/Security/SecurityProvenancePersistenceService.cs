@@ -5,6 +5,7 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Security
@@ -32,9 +33,25 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Security
         /// <summary>
         /// Obsoletion of provenance not supported
         /// </summary>
-        protected override DbSecurityProvenance DoObsoleteInternal(DataContext context, Guid key)
+        protected override DbSecurityProvenance DoDeleteInternal(DataContext context, Guid key, DeleteMode deletionMode)
         {
             throw new NotSupportedException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_PERMITTED));
+        }
+
+        /// <summary>
+        /// Obsoletion of provenance not supported
+        /// </summary>
+        protected override void DoDeleteAllInternal(DataContext context, Expression<Func<SecurityProvenance, bool>> expression, DeleteMode deleteMode)
+        {
+            // The user may be trying to purge old provenance objects
+            if (deleteMode == DeleteMode.PermanentDelete) // this statement will fail due to RI in the database anyways - so just send it
+            {
+                base.DoDeleteAllInternal(context, expression, deleteMode);
+            }
+            else
+            {
+                throw new NotSupportedException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_PERMITTED));
+            }
         }
     }
 }

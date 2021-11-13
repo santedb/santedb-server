@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
@@ -38,9 +39,8 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Local provider repository
         /// </summary>
-        public LocalProviderRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
+        public LocalProviderRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<Provider> persistenceService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, persistenceService, privacyService)
         {
-
         }
 
         protected override string QueryPolicy => PermissionPolicyIdentifiers.ReadMetadata;
@@ -48,6 +48,5 @@ namespace SanteDB.Server.Core.Services.Impl
         protected override string WritePolicy => PermissionPolicyIdentifiers.UnrestrictedMetadata;
         protected override string DeletePolicy => PermissionPolicyIdentifiers.UnrestrictedMetadata;
         protected override string AlterPolicy => PermissionPolicyIdentifiers.UnrestrictedMetadata;
-
     }
 }

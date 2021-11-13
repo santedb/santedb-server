@@ -160,7 +160,7 @@ namespace SanteDB.Persistence.Data.Test
             var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TData>>();
             Assert.IsNotNull(persistenceService);
 
-            var afterObsolete = persistenceService.Obsolete(objectToTest.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+            var afterObsolete = persistenceService.Delete(objectToTest.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal, DeleteMode.LogicalDelete);
 
             // Assert core properties are inserted
             Assert.IsNotNull(afterObsolete.Key);

@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
@@ -37,7 +38,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Creates a new template repository
         /// </summary>
-        public LocalTemplateDefinitionRepositoryService(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
+        public LocalTemplateDefinitionRepositoryService(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<TemplateDefinition> dataPersistence, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, dataPersistence, privacyService)
         {
         }
 
@@ -46,9 +47,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public TemplateDefinition GetTemplateDefinition(string mnemonic)
         {
-            int t = 0;
-            return base.Find(o => o.Mnemonic == mnemonic, 0, 1, out t, Guid.Empty).FirstOrDefault();
+            return base.Find(o => o.Mnemonic == mnemonic).FirstOrDefault();
         }
-        
     }
 }

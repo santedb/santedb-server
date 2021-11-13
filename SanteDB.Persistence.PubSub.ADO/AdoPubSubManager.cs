@@ -31,7 +31,9 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.OrmLite.Migration;
+using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.PubSub.ADO.Configuration;
 using SanteDB.Persistence.PubSub.ADO.Data.Model;
 using System;
@@ -46,12 +48,22 @@ namespace SanteDB.Persistence.PubSub.ADO
     /// Represents a pub/sub manager which stores definitions in a database
     /// </summary>
     [ServiceProvider("ADO.NET Pub/Sub Subscription Manager")]
-    public class AdoPubSubManager : IPubSubManagerService
+    public class AdoPubSubManager : IPubSubManagerService, IMappedQueryProvider<PubSubChannelDefinition>, IMappedQueryProvider<PubSubSubscriptionDefinition>
     {
         /// <summary>
         /// Gets the service name for this service
         /// </summary>
         public string ServiceName => "ADO.NET PubSub Manager";
+
+        /// <summary>
+        /// Gets the provider for this
+        /// </summary>
+        public IDbProvider Provider => this.m_configuration.Provider;
+
+        /// <summary>
+        /// Gets the query persistence service
+        /// </summary>
+        public IQueryPersistenceService QueryPersistence => throw new NotSupportedException();
 
         // Load mapper
         private ModelMapper m_mapper = new ModelMapper(typeof(AdoPubSubManager).Assembly.GetManifestResourceStream("SanteDB.Persistence.PubSub.ADO.Data.Map.ModelMap.xml"), "PubSubModelMap");
@@ -135,22 +147,6 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// Fired after deactivation
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<PubSubSubscriptionDefinition>> DeActivated;
-
-        /// <summary>
-        /// Find the specified channel
-        /// </summary>
-        public IEnumerable<PubSubChannelDefinition> FindChannel(Expression<Func<PubSubChannelDefinition, bool>> filter)
-        {
-            return this.FindChannel(filter, 0, 100, out int _);
-        }
-
-        /// <summary>
-        /// Find all subscriptions
-        /// </summary>
-        public IEnumerable<PubSubSubscriptionDefinition> FindSubscription(Expression<Func<PubSubSubscriptionDefinition, bool>> filter)
-        {
-            return this.FindSubscription(filter, 0, 100, out int _);
-        }
 
         /// <summary>
         /// Retrieve the specified channel by ID
@@ -386,72 +382,34 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// <summary>
         /// Find the channels matching <paramref name="filter"/>
         /// </summary>
-        public IEnumerable<PubSubChannelDefinition> FindChannel(Expression<Func<PubSubChannelDefinition, bool>> filter, int offset, int count, out int totalResults)
+        public IQueryResultSet<PubSubChannelDefinition> FindChannel(Expression<Func<PubSubChannelDefinition, bool>> filter)
         {
             this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.ReadPubSubSubscription);
-
-            using (var conn = this.m_configuration.Provider.GetReadonlyConnection())
+            try
             {
-                try
-                {
-                    conn.Open();
-                    var domainFilter = this.m_mapper.MapModelExpression<PubSubChannelDefinition, DbChannel, bool>(filter, true);
-                    var retVal = conn.Query(domainFilter);
-                    totalResults = retVal.Count();
-                    return retVal.Skip(offset).Take(count).ToList().Select(o =>
-                    {
-                        var cv = this.m_cache?.GetCacheItem<PubSubChannelDefinition>(o.Key.Value);
-                        if (cv != null)
-                            return cv;
-                        else
-                        {
-                            var rv = this.MapInstance(conn, o);
-                            this.m_cache?.Add(rv);
-                            return rv;
-                        }
-                    });
-                }
-                catch (Exception e)
-                {
-                    throw new Exception($"Error querying for channels {filter}", e);
-                }
+                var domainFilter = this.m_mapper.MapModelExpression<PubSubChannelDefinition, DbChannel, bool>(filter, true);
+                return new MappedQueryResultSet<PubSubChannelDefinition>(this);
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error querying for channels {filter}", e);
             }
         }
 
         /// <summary>
         /// Find subscription based on the specified filter
         /// </summary>
-        public IEnumerable<PubSubSubscriptionDefinition> FindSubscription(Expression<Func<PubSubSubscriptionDefinition, bool>> filter, int offset, int count, out int totalResults)
+        public IQueryResultSet<PubSubSubscriptionDefinition> FindSubscription(Expression<Func<PubSubSubscriptionDefinition, bool>> filter)
         {
             this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.ReadPubSubSubscription);
 
-            using (var conn = this.m_configuration.Provider.GetReadonlyConnection())
+            try
             {
-                try
-                {
-                    conn.Open();
-                    var domainFilter = this.m_mapper.MapModelExpression<PubSubSubscriptionDefinition, DbSubscription, bool>(filter, true);
-                    var retVal = conn.Query(domainFilter);
-
-                    totalResults = retVal.Count();
-
-                    return retVal.Skip(offset).Take(count).ToList().Select(o =>
-                    {
-                        var rv = this.m_cache?.GetCacheItem<PubSubSubscriptionDefinition>(o.Key.Value);
-                        if (rv != null)
-                            return rv;
-                        else
-                        {
-                            rv = this.MapInstance(conn, o);
-                            this.m_cache?.Add(rv);
-                            return rv;
-                        }
-                    }).ToList();
-                }
-                catch (Exception e)
-                {
-                    throw new Exception($"Error querying for subscriptions {filter}", e);
-                }
+                return new MappedQueryResultSet<PubSubSubscriptionDefinition>(this);
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error querying for subscriptions {filter}", e);
             }
         }
 
@@ -732,7 +690,7 @@ namespace SanteDB.Persistence.PubSub.ADO
             if (cache != null)
                 return cache;
             else
-                return this.FindSubscription(o => o.Key == key, 0, 1, out int _).FirstOrDefault();
+                return this.FindSubscription(o => o.Key == key).FirstOrDefault();
         }
 
         /// <summary>
@@ -740,7 +698,103 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// </summary>
         public PubSubSubscriptionDefinition GetSubscriptionByName(string name)
         {
-            return this.FindSubscription(o => o.Name == name && o.ObsoletionTime == null, 0, 1, out int _).FirstOrDefault();
+            return this.FindSubscription(o => o.Name == name && o.ObsoletionTime == null).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Execute a query query via the ORM for the PubSubSubscription definition
+        /// </summary>
+        public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<PubSubSubscriptionDefinition, bool>> query)
+        {
+            var domainQuery = this.m_mapper.MapModelExpression<PubSubSubscriptionDefinition, DbSubscription, bool>(query, true);
+            return context.Query<DbSubscription>(domainQuery);
+        }
+
+        /// <summary>
+        /// Get the specified pub-sub subscription definition
+        /// </summary>
+        public PubSubSubscriptionDefinition Get(DataContext context, Guid key)
+        {
+            return this.MapInstance(context, context.FirstOrDefault<DbSubscription>(o => o.Key == key && o.ObsoletionTime == null));
+        }
+
+        /// <summary>
+        /// Map this to model instance
+        /// </summary>
+        public PubSubSubscriptionDefinition ToModelInstance(DataContext context, object result)
+        {
+            if (result is DbSubscription dbs)
+            {
+                return this.MapInstance(context, dbs);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Map property expression
+        /// </summary>
+        public Expression MapPropertyExpression<TReturn>(Expression<Func<PubSubSubscriptionDefinition, TReturn>> sortExpression)
+        {
+            return this.m_mapper.MapModelExpression<PubSubSubscriptionDefinition, DbSubscription, TReturn>(sortExpression, true);
+        }
+
+        /// <summary>
+        /// Execute a query query via the ORM for the PubSubSubscription definition
+        /// </summary>
+        public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<PubSubChannelDefinition, bool>> query)
+        {
+            var domainQuery = this.m_mapper.MapModelExpression<PubSubChannelDefinition, DbChannel, bool>(query, true);
+            return context.Query<DbChannel>(domainQuery);
+        }
+
+        /// <summary>
+        /// Get the specified pub-sub subscription definition
+        /// </summary>
+        PubSubChannelDefinition IMappedQueryProvider<PubSubChannelDefinition>.Get(DataContext context, Guid key)
+        {
+            return this.MapInstance(context, context.FirstOrDefault<DbChannel>(o => o.Key == key && o.ObsoletionTime == null));
+        }
+
+        /// <summary>
+        /// Map this to model instance
+        /// </summary>
+        PubSubChannelDefinition IMappedQueryProvider<PubSubChannelDefinition>.ToModelInstance(DataContext context, object result)
+        {
+            if (result is DbChannel dbs)
+            {
+                return this.MapInstance(context, dbs);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Map property expression
+        /// </summary>
+        public Expression MapPropertyExpression<TReturn>(Expression<Func<PubSubChannelDefinition, TReturn>> sortExpression)
+        {
+            return this.m_mapper.MapModelExpression<PubSubChannelDefinition, DbChannel, TReturn>(sortExpression, true);
+        }
+
+        /// <summary>
+        /// Find channel - obsolete
+        /// </summary>
+        [Obsolete("Find(filter)", true)]
+        public IEnumerable<PubSubChannelDefinition> FindChannel(Expression<Func<PubSubChannelDefinition, bool>> filter, int offset, int count, out int totalResults)
+        {
+            var results = this.FindChannel(filter);
+            totalResults = results.Count();
+            return results.Skip(offset).Take(count);
+        }
+
+        /// <summary>
+        /// Find subscription obsolete
+        /// </summary>
+        [Obsolete("Find(filter)", true)]
+        public IEnumerable<PubSubSubscriptionDefinition> FindSubscription(Expression<Func<PubSubSubscriptionDefinition, bool>> filter, int offset, int count, out int totalResults)
+        {
+            var results = this.FindSubscription(filter);
+            totalResults = results.Count();
+            return results.Skip(offset).Take(count);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -79,7 +80,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Obsolete all objects
         /// </summary>
-        protected override void DoObsoleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression)
+        protected override void DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode)
         {
             if (context == null)
             {
@@ -109,18 +110,54 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
                 if (domainExpression != null)
                 {
-                    context.UpdateAll(domainExpression, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == context.ContextId);
+                    switch (deletionMode)
+                    {
+                        case DeleteMode.NullifyDelete:
+                            context.UpdateAll<TDbModel, IDbHasStatus>(domainExpression, o => o.StatusConceptKey == StatusKeys.Nullified);
+                            goto case DeleteMode.LogicalDelete;
+                        case DeleteMode.ObsoleteDelete:
+                            context.UpdateAll<TDbModel, IDbHasStatus>(domainExpression, o => o.StatusConceptKey == StatusKeys.Obsolete);
+                            goto case DeleteMode.LogicalDelete;
+                        case DeleteMode.LogicalDelete:
+                            context.UpdateAll(domainExpression, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == context.ContextId);
+                            break;
+
+                        case DeleteMode.PermanentDelete:
+                            context.Delete(domainExpression);
+                            break;
+                    }
                 }
                 else
                 {
                     this.m_tracer.TraceVerbose("Will use slow query construction due to complex mapped fields");
                     var domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateQuery(expression);
-                    context.UpdateAll<TDbModel>(context.Query<TDbModel>(domainQuery), o =>
+
+                    if (deletionMode == DeleteMode.PermanentDelete)
                     {
-                        o.ObsoletedByKey = context.ContextId;
-                        o.ObsoletionTime = DateTimeOffset.Now;
-                        return o;
-                    });
+                        context.Delete(domainQuery);
+                    }
+                    else
+                    {
+                        context.UpdateAll<TDbModel>(context.Query<TDbModel>(domainQuery), o =>
+                        {
+                            if (o is IDbHasStatus hasStatus)
+                            {
+                                switch (deletionMode)
+                                {
+                                    case DeleteMode.NullifyDelete:
+                                        hasStatus.StatusConceptKey = StatusKeys.Nullified;
+                                        break;
+
+                                    case DeleteMode.ObsoleteDelete:
+                                        hasStatus.StatusConceptKey = StatusKeys.Obsolete;
+                                        break;
+                                }
+                            }
+                            o.ObsoletedByKey = context.ContextId;
+                            o.ObsoletionTime = DateTimeOffset.Now;
+                            return o;
+                        });
+                    }
                 }
 
 #if DEBUG
@@ -163,7 +200,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <param name="context">The context on which the delete should be performed</param>
         /// <param name="key">The key of the object to be deleted</param>
         /// <returns>The deleted/obsoleted object</returns>
-        protected override TDbModel DoObsoleteInternal(DataContext context, Guid key)
+        protected override TDbModel DoDeleteInternal(DataContext context, Guid key, DeleteMode deletionMode)
         {
             // Logical deletion is enabled? Then the obsolete is an update
             if (this.m_configuration.VersioningPolicy.HasFlag(Data.Configuration.AdoVersioningPolicyFlags.LogicalDeletion))
@@ -191,10 +228,31 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = key, type = typeof(TModel).Name }));
                     }
 
-                    dbData.ObsoletedByKey = context.ContextId;
-                    dbData.ObsoletionTime = DateTimeOffset.Now;
+                    switch (deletionMode)
+                    {
+                        case DeleteMode.ObsoleteDelete:
+                            if (dbData is IDbHasStatus obsoleteState)
+                            {
+                                obsoleteState.StatusConceptKey = StatusKeys.Obsolete;
+                            }
+                            goto case DeleteMode.LogicalDelete; // fallthrough hack for C#
+                        case DeleteMode.NullifyDelete:
+                            if (dbData is IDbHasStatus deleteState)
+                            {
+                                deleteState.StatusConceptKey = StatusKeys.Nullified;
+                            }
+                            goto case DeleteMode.LogicalDelete; // fallthrough case hack for C#
+                        case DeleteMode.LogicalDelete:
+                            dbData.ObsoletedByKey = context.ContextId;
+                            dbData.ObsoletionTime = DateTimeOffset.Now;
+                            dbData = context.Update(dbData);
+                            break;
 
-                    context.Update(dbData);
+                        case DeleteMode.PermanentDelete:
+                            context.Delete(dbData);
+                            break;
+                    }
+
                     return dbData;
 #if DEBUG
                 }
@@ -207,7 +265,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             else
             {
-                return base.DoObsoleteInternal(context, key);
+                return base.DoDeleteInternal(context, key, deletionMode);
             }
         }
 

@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
@@ -31,15 +32,14 @@ namespace SanteDB.Server.Core.Services.Impl
     public class LocalSecurityPolicyRepository : GenericLocalSecurityRepository<SecurityPolicy>
     {
         /// <summary>
-        /// DI constructor 
+        /// DI constructor
         /// </summary>
-        public LocalSecurityPolicyRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, privacyService)
+        public LocalSecurityPolicyRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<SecurityPolicy> dataPersistence, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, dataPersistence, privacyService)
         {
         }
 
         protected override string WritePolicy => PermissionPolicyIdentifiers.AlterPolicy;
         protected override string DeletePolicy => PermissionPolicyIdentifiers.AlterPolicy;
         protected override string AlterPolicy => PermissionPolicyIdentifiers.AlterPolicy;
-
     }
 }
