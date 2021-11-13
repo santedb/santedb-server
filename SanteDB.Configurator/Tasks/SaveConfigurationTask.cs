@@ -24,6 +24,7 @@ using SanteDB.Core.Configuration.Features;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -34,6 +35,7 @@ namespace SanteDB.Configurator.Tasks
     /// <summary>
     /// Represents a configuration task
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class SaveConfigurationTask : IConfigurationTask
     {
 

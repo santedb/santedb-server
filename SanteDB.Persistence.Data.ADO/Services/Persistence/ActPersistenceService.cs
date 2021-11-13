@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
@@ -48,7 +49,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class ActPersistenceService : VersionedDataPersistenceService<Core.Model.Acts.Act, DbActVersion, DbAct>
     {
-
         public ActPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
         {
         }
@@ -58,7 +58,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public virtual TActType ToModelInstance<TActType>(DbActVersion dbInstance, DbAct actInstance, DataContext context) where TActType : Core.Model.Acts.Act, new()
         {
-
             var retVal = this.m_settingsProvider.GetMapper().MapDomainInstance<DbActVersion, TActType>(dbInstance);
             if (retVal == null) return null;
 
@@ -81,7 +80,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             DbAct dbAct = (dataInstance as CompositeResult)?.Values.OfType<DbAct>().FirstOrDefault() ?? context.FirstOrDefault<DbAct>(o => o.Key == dbActVersion.Key);
             Act retVal = null;
 
-            // 
+            //
             switch (dbAct.ClassConceptKey.ToString().ToLowerInvariant())
             {
                 case ActClassKeyStrings.ControlAct:
@@ -91,6 +90,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 dbAct,
                                 context);
                     break;
+
                 case ActClassKeyStrings.SubstanceAdministration:
                     retVal = new SubstanceAdministrationPersistenceService(this.m_settingsProvider).ToModelInstance(
                                 (dataInstance as CompositeResult)?.Values.OfType<DbSubstanceAdministration>().FirstOrDefault() ?? context.FirstOrDefault<DbSubstanceAdministration>(o => o.ParentKey == dbActVersion.VersionKey),
@@ -98,6 +98,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 dbAct,
                                 context);
                     break;
+
                 case ActClassKeyStrings.Observation:
                     var dbObs = (dataInstance as CompositeResult)?.Values.OfType<DbObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbObservation>(o => o.ParentKey == dbActVersion.VersionKey);
                     if (dbObs == null)
@@ -116,6 +117,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                     dbAct,
                                     context);
                                 break;
+
                             case "CD":
                                 retVal = new CodedObservationPersistenceService(this.m_settingsProvider).ToModelInstance(
                                     (dataInstance as CompositeResult)?.Values.OfType<DbCodedObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbCodedObservation>(o => o.ParentKey == dbObs.ParentKey),
@@ -124,6 +126,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                     dbAct,
                                     context);
                                 break;
+
                             case "PQ":
                                 retVal = new QuantityObservationPersistenceService(this.m_settingsProvider).ToModelInstance(
                                     (dataInstance as CompositeResult)?.Values.OfType<DbQuantityObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbQuantityObservation>(o => o.ParentKey == dbObs.ParentKey),
@@ -132,6 +135,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                     dbAct,
                                     context);
                                 break;
+
                             default:
                                 retVal = new ObservationPersistenceService(this.m_settingsProvider).ToModelInstance(
                                     dbObs,
@@ -141,6 +145,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 break;
                         }
                     break;
+
                 case ActClassKeyStrings.Encounter:
                     retVal = new EncounterPersistenceService(this.m_settingsProvider).ToModelInstance(
                                 (dataInstance as CompositeResult)?.Values.OfType<DbPatientEncounter>().FirstOrDefault() ?? context.FirstOrDefault<DbPatientEncounter>(o => o.ParentKey == dbActVersion.VersionKey),
@@ -148,6 +153,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 dbAct,
                                 context);
                     break;
+
                 case ActClassKeyStrings.Condition:
                 default:
                     retVal = this.ToModelInstance<Core.Model.Acts.Act>(dbActVersion, dbAct, context);
@@ -175,9 +181,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     case ActClassKeyStrings.ControlAct:
                         retVal = cache?.GetCacheItem<ControlAct>(dbAct.Key);
                         break;
+
                     case ActClassKeyStrings.SubstanceAdministration:
                         retVal = cache?.GetCacheItem<SubstanceAdministration>(dbAct.Key);
                         break;
+
                     case ActClassKeyStrings.Observation:
                         var dbObs = (dataInstance as CompositeResult)?.Values.OfType<DbObservation>().FirstOrDefault() ?? context.FirstOrDefault<DbObservation>(o => o.ParentKey == dbActVersion.VersionKey);
                         if (dbObs != null)
@@ -186,17 +194,21 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 case "ST":
                                     retVal = cache?.GetCacheItem<TextObservation>(dbAct.Key);
                                     break;
+
                                 case "CD":
                                     retVal = cache?.GetCacheItem<CodedObservation>(dbAct.Key);
                                     break;
+
                                 case "PQ":
                                     retVal = cache?.GetCacheItem<QuantityObservation>(dbAct.Key);
                                     break;
                             }
                         break;
+
                     case ActClassKeyStrings.Encounter:
                         retVal = cache?.GetCacheItem<PatientEncounter>(dbAct.Key);
                         break;
+
                     case ActClassKeyStrings.Condition:
                     default:
                         retVal = cache?.GetCacheItem<Act>(dbAct.Key);
@@ -283,7 +295,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                             proto = ApplicationServiceContext.Current.GetService<IClinicalProtocolRepositoryService>().FindProtocol(o => o.Key == p.ProtocolKey, 0, 1, out t).FirstOrDefault();
                             proto = proto.EnsureExists(context);
                         }
-
                     }
                     catch (Exception e)
                     {
@@ -389,7 +400,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     // Now we want to re-point to correct the issue
                     foreach (var itm in context.Query<DbActParticipation>(o => o.SourceKey == retVal.Key && o.ParticipationRoleKey == ActParticipationKey.Consumable && o.ObsoleteVersionSequenceId == retVal.VersionSequence))
                     {
-
                         var dItm = data.Participations.Find(o => o.Key == itm.Key);
                         if (dItm != null)
                             itm.TargetKey = dItm.PlayerEntityKey.Value;
@@ -403,8 +413,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                       data.Participations.Where(o => o != null && !o.IsEmpty()),
                         retVal,
                         context);
-
-
             }
 
             if (data.Relationships != null)
@@ -441,26 +449,31 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
                 case ActClassKeyStrings.ControlAct:
                     return new ControlActPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<ControlAct>());
+
                 case ActClassKeyStrings.SubstanceAdministration:
                     return new SubstanceAdministrationPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<SubstanceAdministration>());
+
                 case ActClassKeyStrings.Observation:
                     switch (data.GetType().Name)
                     {
                         case "TextObservation":
                             return new TextObservationPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<TextObservation>());
+
                         case "CodedObservation":
                             return new CodedObservationPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<CodedObservation>());
+
                         case "QuantityObservation":
                             return new QuantityObservationPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<QuantityObservation>());
+
                         default:
                             return this.InsertCoreProperties(context, data);
                     }
                 case ActClassKeyStrings.Encounter:
                     return new EncounterPersistenceService(this.m_settingsProvider).InsertInternal(context, data.Convert<PatientEncounter>());
+
                 case ActClassKeyStrings.Condition:
                 default:
                     return this.InsertCoreProperties(context, data);
-
             }
         }
 
@@ -473,26 +486,31 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
                 case ActClassKeyStrings.ControlAct:
                     return new ControlActPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<ControlAct>());
+
                 case ActClassKeyStrings.SubstanceAdministration:
                     return new SubstanceAdministrationPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<SubstanceAdministration>());
+
                 case ActClassKeyStrings.Observation:
                     switch (data.GetType().Name)
                     {
                         case "TextObservation":
                             return new TextObservationPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<TextObservation>());
+
                         case "CodedObservation":
                             return new CodedObservationPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<CodedObservation>());
+
                         case "QuantityObservation":
                             return new QuantityObservationPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<QuantityObservation>());
+
                         default:
                             return this.UpdateCoreProperties(context, data);
                     }
                 case ActClassKeyStrings.Encounter:
                     return new EncounterPersistenceService(this.m_settingsProvider).UpdateInternal(context, data.Convert<PatientEncounter>());
+
                 case ActClassKeyStrings.Condition:
                 default:
                     return this.UpdateCoreProperties(context, data);
-
             }
         }
 
@@ -503,7 +521,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         protected override void BulkPurgeInternal(DataContext connection, Expression<Func<Act, bool>> expression)
         {
             int offset = 0, totalResults = 1;
-            while (offset < totalResults) {
+            while (offset < totalResults)
+            {
                 var k = this.QueryKeysInternal(connection, expression, offset, 1000, out totalResults).ToArray();
                 this.BulkPurgeInternal(connection, k);
                 offset += k.Length;
@@ -535,7 +554,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                 // TODO: Other acts
 
-
                 // Purge the related fields
                 context.Delete<DbActIdentifier>(o => batchKeys.Contains(o.SourceKey));
                 context.Delete<DbActExtension>(o => batchKeys.Contains(o.SourceKey));
@@ -560,7 +578,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 // Purge the core entity data
                 context.Delete<DbActVersion>(o => batchKeys.Contains(o.Key));
 
-
                 // Create a version which indicates this is PURGED
                 context.Insert(context.Query<DbAct>(o => batchKeys.Contains(o.Key))
                     .Select(o => o.Key)
@@ -573,16 +590,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         Key = o,
                         StatusConceptKey = StatusKeys.Purged
                     }));
-
             }
 
             context.ResetSequence("ACT_VRSN_SEQ",
                 context.Query<DbActVersion>(o => true).Max(o => o.VersionSequenceId));
-
         }
 
         /// <summary>
-        /// Copy the specified ACT data 
+        /// Copy the specified ACT data
         /// </summary>
         public override void Copy(Guid[] keysToCopy, DataContext fromContext, DataContext toContext)
         {
@@ -805,6 +820,5 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             toContext.ResetSequence("ACT_VRSN_SEQ", toContext.Query<DbActVersion>(o => true).Max(o => o.VersionSequenceId));
         }
-
     }
 }

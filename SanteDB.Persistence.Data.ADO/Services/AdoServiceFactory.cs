@@ -167,6 +167,46 @@ namespace SanteDB.Persistence.Data.ADO.Services
             }
 
             /// <summary>
+            /// Insert internal
+            /// </summary>
+            public override TModel InsertInternal(DataContext context, TModel data)
+            {
+                if(!data.EffectiveVersionSequenceId.HasValue)
+                {
+                    var dbSourceType = this.m_settingsProvider.GetMapper().MapModelType(data.SourceType);
+                    var tableMap = TableMapping.Get(dbSourceType);
+                    var sql = context.CreateSqlStatement()
+                        .SelectFrom(dbSourceType, tableMap.GetColumn(nameof(IDbVersionedData.VersionSequenceId)))
+                        .Where($"{tableMap.GetColumn(nameof(IDbVersionedData.Key)).Name} = ?", data.SourceEntityKey)
+                        .And($"{tableMap.GetColumn(nameof(IDbVersionedData.ObsoletionTime)).Name} IS NOT NULL")
+                        .Append($"ORDER BY {tableMap.GetColumn(nameof(IDbVersionedData.VersionSequenceId))} DESC");
+
+                    data.EffectiveVersionSequenceId = context.FirstOrDefault<Int32>(sql);
+                }
+                return base.InsertInternal(context, data);
+            }
+
+            /// <summary>
+            /// Ensure the effective version sequence is set
+            /// </summary>
+            public override TModel UpdateInternal(DataContext context, TModel data)
+            {
+                if (!data.EffectiveVersionSequenceId.HasValue)
+                {
+                    var dbSourceType = this.m_settingsProvider.GetMapper().MapModelType(data.SourceType);
+                    var tableMap = TableMapping.Get(dbSourceType);
+                    var sql = context.CreateSqlStatement()
+                        .SelectFrom(dbSourceType, tableMap.GetColumn(nameof(IDbVersionedData.VersionSequenceId)))
+                        .Where($"{tableMap.GetColumn(nameof(IDbVersionedData.Key)).Name} = ?", data.SourceEntityKey)
+                        .And($"{tableMap.GetColumn(nameof(IDbVersionedData.ObsoletionTime)).Name} IS NOT NULL")
+                        .Append($"ORDER BY {tableMap.GetColumn(nameof(IDbVersionedData.VersionSequenceId))} DESC");
+
+                    data.EffectiveVersionSequenceId = context.FirstOrDefault<Int32>(sql);
+                }
+                return base.UpdateInternal(context, data);
+            }
+
+            /// <summary>
             /// Get all the matching TModel object from source
             /// </summary>
             public IEnumerable GetFromSource(DataContext context, Guid sourceId, decimal? versionSequenceId)

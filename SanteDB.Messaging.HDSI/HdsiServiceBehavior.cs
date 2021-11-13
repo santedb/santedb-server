@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
@@ -31,6 +32,7 @@ using SanteDB.Rest.HDSI;
 using System;
 using System.Diagnostics;
 using System.Security.Permissions;
+using SanteDB.Core.Services;
 
 namespace SanteDB.Messaging.HDSI.Wcf
 {
@@ -40,6 +42,20 @@ namespace SanteDB.Messaging.HDSI.Wcf
     /// <remarks>Represents SanteDB Server implementation of the the Health Data Service Interface (HDSI) contract</remarks>
     public class HdsiServiceBehavior : HdsiServiceBehaviorBase
     {
+        /// <summary>
+        /// RestSrvr doesn't support DI
+        /// </summary>
+        public HdsiServiceBehavior() : this(ApplicationServiceContext.Current.GetService<IDataCachingService>())
+        {
+        }
+
+        /// <summary>
+        /// DI ctor
+        /// </summary>
+        /// <param name="dataCache"></param>
+        public HdsiServiceBehavior(IDataCachingService dataCache) : base(dataCache)
+        {
+        }
 
         /// <summary>
         /// Get resource handler
@@ -149,15 +165,6 @@ namespace SanteDB.Messaging.HDSI.Wcf
         }
 
         /// <summary>
-        /// Gets the specifieed patch id
-        /// </summary>
-        public override Patch GetPatch(string resourceType, string id)
-        {
-            this.ThrowIfNotReady();
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         /// Get options
         /// </summary>
         public override ServiceOptions Options()
@@ -190,7 +197,5 @@ namespace SanteDB.Messaging.HDSI.Wcf
         {
             throw new NotSupportedException("Copy from upstream not supported on iCDR");
         }
-
     }
-
 }

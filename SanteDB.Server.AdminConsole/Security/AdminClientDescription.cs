@@ -22,12 +22,14 @@
 using SanteDB.Core.Http;
 using SanteDB.Core.Http.Description;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Server.AdminConsole.Security
 {
     /// <summary>
     /// Administrative client description
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class AdminClientDescription : IRestClientDescription
     {
         // Endpoints

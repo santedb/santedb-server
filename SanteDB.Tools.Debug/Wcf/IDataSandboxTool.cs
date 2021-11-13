@@ -19,6 +19,7 @@
  * Date: 2021-8-27
  */
 
+using System.Diagnostics.CodeAnalysis;
 using RestSrvr.Attributes;
 using System.IO;
 

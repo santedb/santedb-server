@@ -27,6 +27,7 @@ using SanteDB.Server.AdminConsole.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -37,6 +38,7 @@ namespace SanteDB.Server.AdminConsole.Shell
     /// Represents a base class for interactive shells
     /// </summary>
     [AdminCommandlet]
+    [ExcludeFromCodeCoverage]
     public class InteractiveShell
     {
         // Exit debugger

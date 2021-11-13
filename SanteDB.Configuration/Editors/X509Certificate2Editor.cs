@@ -16,52 +16,40 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2021-8-27
  */
+
+using SanteDB.Core.Security.Configuration;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Design;
-using System.Linq;
-using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
-using System.Windows.Forms.Design;
-using SanteDB.Core.Configuration.Data;
-using SanteDB.Core.Security.Configuration;
 
 namespace SanteDB.Configuration.Editors
 {
-
-
     /// <summary>
     /// Creates a database name editor
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class X509Certificate2Editor : UITypeEditor
     {
-
-        /// <summary>
-        /// Needs a private key?
-        /// </summary>
-        public X509Certificate2Editor()
-        {
-
-        }
-
         /// <summary>
         /// Edit the value
         /// </summary>
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            if(provider != null)
+            if (provider != null)
             {
                 var instanceType = context.Instance.GetType();
-                var findStore = (StoreName)instanceType.GetProperty("StoreName").GetValue(context.Instance, null);
-                var findLocation = (StoreLocation)instanceType.GetProperty("StoreLocation").GetValue(context.Instance, null);
-                X509Store store = new X509Store(findStore, findLocation);
+                var findStore = (StoreName) instanceType.GetProperty("StoreName").GetValue(context.Instance, null);
+                var findLocation = (StoreLocation) instanceType.GetProperty("StoreLocation").GetValue(context.Instance, null);
+                var store = new X509Store(findStore, findLocation);
                 try
                 {
-                    bool needsPrivateKey = true;
+                    var needsPrivateKey = true;
                     // X509 Config element
-                    if(context.Instance is X509ConfigurationElement x509)
+                    if (context.Instance is X509ConfigurationElement x509)
                     {
                         needsPrivateKey = !x509.ValidationOnly;
                     }
@@ -75,15 +63,20 @@ namespace SanteDB.Configuration.Editors
                             coll.Add(c);
                         }
                     }
+
                     store.Close();
 
                     var cert = X509Certificate2UI.SelectFromCollection(coll, "Select Certificate", "Please select the X.509 certificate for this configuration option", X509SelectionFlag.SingleSelection);
                     if (cert.Count > 0)
+                    {
                         value = cert[0];
+                    }
                     else
+                    {
                         value = null;
+                    }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     MessageBox.Show($"Error getting certificate list: {e.Message}");
                     Trace.TraceError($"Error getting certificate list: {e}");
@@ -93,8 +86,8 @@ namespace SanteDB.Configuration.Editors
                     store.Close();
                 }
             }
-            return value;
 
+            return value;
         }
 
         /// <summary>

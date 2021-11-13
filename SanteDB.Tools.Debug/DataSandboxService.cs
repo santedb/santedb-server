@@ -25,6 +25,7 @@ using SanteDB.Core;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Tools.Debug.Wcf;
 
@@ -33,6 +34,7 @@ namespace SanteDB.Tools.Debug
     /// <summary>
     /// Represents a daemon service that exports Swagger documentation
     /// </summary>
+    [ExcludeFromCodeCoverage]
     [ServiceProvider("Debugger: Data Sandbox UI")]
     public class DataSandboxService : IDaemonService
     {

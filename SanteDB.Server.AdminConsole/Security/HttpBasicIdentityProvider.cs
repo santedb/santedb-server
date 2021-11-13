@@ -22,7 +22,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using System;
-
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Principal;
 
 namespace SanteDB.Server.AdminConsole.Security
@@ -31,6 +31,7 @@ namespace SanteDB.Server.AdminConsole.Security
     /// Represents an HTTP BASIC identity provider
     /// </summary>
     /// <remarks>This is used when no local storage is in the application context and identity must be used with HTTP basic server</remarks>
+    [ExcludeFromCodeCoverage]
     public class HttpBasicIdentityProvider : IIdentityProviderService
     {
         /// <summary>

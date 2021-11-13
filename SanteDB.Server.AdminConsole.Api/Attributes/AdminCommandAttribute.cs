@@ -19,12 +19,14 @@
  * Date: 2021-8-27
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Server.AdminConsole.Attributes
 {
     /// <summary>
     /// Identifies the method can be invoked from the admin console
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class AdminCommandAttribute : System.Attribute
     {
 

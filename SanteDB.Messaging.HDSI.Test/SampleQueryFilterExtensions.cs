@@ -18,19 +18,20 @@
  * User: fyfej
  * Date: 2021-8-27
  */
-using SanteDB.Core.Model;
 
-using SanteDB.Core.Model.Query;
 using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
+using SanteDB.Core.Model;
+using SanteDB.Core.Model.Query;
 
-namespace SanteDB.Messaging.HDSI.Tests
+namespace SanteDB.Messaging.HDSI.Test
 {
     /// <summary>
     /// Simple extension methods
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class SimpleQueryExtensionMethods
     {
         /// <summary>

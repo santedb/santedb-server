@@ -19,6 +19,7 @@
  * Date: 2021-8-27
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Server.AdminConsole.Security
 {
@@ -31,6 +32,7 @@ namespace SanteDB.Server.AdminConsole.Security
     /// <summary>
     /// Symmetric key validation manager
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class TokenValidationManager
     {
 

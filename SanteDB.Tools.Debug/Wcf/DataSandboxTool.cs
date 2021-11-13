@@ -29,6 +29,7 @@ using SanteDB.Core.Model.Export;
 using SanteDB.Core.Model.Serialization;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
@@ -40,6 +41,7 @@ namespace SanteDB.Tools.Debug.Wcf
     /// <summary>
     /// Query tool behavior
     /// </summary>
+    [ExcludeFromCodeCoverage]
     [ServiceBehavior(Name = "HDSI_Sandbox")]
     public class DataSandboxTool : IDataSandboxTool
     {

@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,7 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data.Model;
 using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
+
 namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 {
     /// <summary>
@@ -39,11 +41,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         where TModel : Core.Model.Acts.Act, new()
         where TData : DbActSubTable, new()
     {
-
         public ActDerivedPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
         {
         }
-
     }
 
     /// <summary>
@@ -54,7 +54,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         where TData : DbActSubTable, new()
         where TQueryReturn : CompositeResult
     {
-
         public ActDerivedPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
         {
             this.m_actPersister = new ActPersistenceService(settingsProvider);
@@ -130,7 +129,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         }
 
         /// <summary>
-        /// Bulk obsolete 
+        /// Bulk obsolete
         /// </summary>
         protected override void BulkObsoleteInternal(DataContext context, Guid[] keysToObsolete)
         {
@@ -142,7 +141,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 var newVersion = new DbActVersion();
                 newVersion.CopyObjectData(currentVersion);
 
-                // Create a new version which has a status of obsolete
+                // Create a new version which has a status of inactive
                 newVersion.StatusConceptKey = StatusKeys.Obsolete;
                 // Update the old version
                 currentVersion.ObsoletedByKey = context.ContextId;
@@ -162,7 +161,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 newSubVersion.CopyObjectData(cversion);
                 newSubVersion.ParentKey = newVersion.VersionKey;
                 context.Insert(newSubVersion);
-
             }
         }
 
@@ -191,7 +189,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         }
 
         /// <summary>
-        /// Query keys 
+        /// Query keys
         /// </summary>
         protected override IEnumerable<Guid> QueryKeysInternal(DataContext context, Expression<Func<TModel, bool>> query, int offset, int? count, out int totalResults)
         {

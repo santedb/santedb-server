@@ -131,31 +131,31 @@ namespace SanteDB.Server.Core.Services.Impl
                 this.m_serviceManager.AddServiceProvider(t);
             }
 
-            ApplicationServiceContext.Current.Started += (o, e) =>
-            {
-                var types = this.m_serviceManager.GetAllTypes();
+            //ApplicationServiceContext.Current.Started += (o, e) =>
+            //{
+            //    var types = this.m_serviceManager.GetAllTypes();
 
-                foreach (var t in types.Where(t => typeof(IdentifiedData).IsAssignableFrom(t) && !t.IsAbstract && t.GetCustomAttribute<XmlRootAttribute>() != null && !t.ContainsGenericParameters))
-                {
-                    var irst = typeof(IRepositoryService<>).MakeGenericType(t);
-                    var irsi = ApplicationServiceContext.Current.GetService(irst);
-                    if (irsi == null)
-                    {
-                        if (typeof(Act).IsAssignableFrom(t))
-                        {
-                            this.m_tracer.TraceInfo("Adding Act repository service for {0}...", t.Name);
-                            var mrst = typeof(GenericLocalActRepository<>).MakeGenericType(t);
-                            this.m_serviceManager.AddServiceProvider(mrst);
-                        }
-                        else if (typeof(Entity).IsAssignableFrom(t))
-                        {
-                            this.m_tracer.TraceInfo("Adding Entity repository service for {0}...", t.Name);
-                            var mrst = typeof(GenericLocalClinicalDataRepository<>).MakeGenericType(t);
-                            this.m_serviceManager.AddServiceProvider(mrst);
-                        }
-                    }
-                }
-            };
+            //    foreach (var t in types.Where(t => typeof(IdentifiedData).IsAssignableFrom(t) && !t.IsAbstract && t.GetCustomAttribute<XmlRootAttribute>() != null && !t.ContainsGenericParameters))
+            //    {
+            //        var irst = typeof(IRepositoryService<>).MakeGenericType(t);
+            //        var irsi = ApplicationServiceContext.Current.GetService(irst);
+            //        if (irsi == null)
+            //        {
+            //            if (typeof(Act).IsAssignableFrom(t))
+            //            {
+            //                this.m_tracer.TraceInfo("Adding Act repository service for {0}...", t.Name);
+            //                var mrst = typeof(GenericLocalActRepository<>).MakeGenericType(t);
+            //                this.m_serviceManager.AddServiceProvider(mrst);
+            //            }
+            //            else if (typeof(Entity).IsAssignableFrom(t))
+            //            {
+            //                this.m_tracer.TraceInfo("Adding Entity repository service for {0}...", t.Name);
+            //                var mrst = typeof(GenericLocalClinicalDataRepository<>).MakeGenericType(t);
+            //                this.m_serviceManager.AddServiceProvider(mrst);
+            //            }
+            //        }
+            //    }
+            //};
 
             this.Started?.Invoke(this, EventArgs.Empty);
             return true;

@@ -21,6 +21,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Design;
 using System.Windows.Forms.Design;
 using System.Xml.Serialization;
@@ -30,6 +31,7 @@ namespace SanteDB.Tools.Debug.Configuration
     /// <summary>
     /// File based metadata repository configuration
     /// </summary>
+    [ExcludeFromCodeCoverage]
     [XmlType(nameof(FileMetaDataRepositoryConfiguration), Namespace = "http://santedb.org/configuration")]
     public class FileMetaDataRepositoryConfiguration
     {

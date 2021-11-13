@@ -28,6 +28,7 @@ using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using SanteDB.Server.AdminConsole.Shell;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Security;
 using System.Security.Principal;
@@ -37,6 +38,7 @@ namespace SanteDB.Server.AdminConsole.Security
     /// <summary>
     /// Represents an OAuthIdentity provider
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class OAuthIdentityProvider : IIdentityProviderService
     {
         /// <summary>

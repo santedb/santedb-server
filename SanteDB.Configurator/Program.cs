@@ -18,37 +18,35 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Configuration;
-using SanteDB.Core;
 using SanteDB.Core.Attributes;
 using SanteDB.Core.Configuration;
-using SanteDB.Core.Security;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Principal;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SanteDB.Configurator
 {
-    static class Program
+    [ExcludeFromCodeCoverage]
+    internal static class Program
     {
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        private static void Main()
         {
             // Check whether the user is in Windows Admin mode
+            WindowsIdentity identity = WindowsIdentity.GetCurrent();
+            WindowsPrincipal principal = new WindowsPrincipal(identity);
 #if !DEBUG
-                WindowsIdentity identity = WindowsIdentity.GetCurrent();
-                WindowsPrincipal principal = new WindowsPrincipal(identity);
-                if (Environment.OSVersion.Platform == PlatformID.Win32NT && 
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT &&
                     !principal.IsInRole(WindowsBuiltInRole.Administrator))
                 {
                     string cmdLine = Environment.CommandLine.Substring(Environment.CommandLine.IndexOf(".exe") + 4);
@@ -69,79 +67,75 @@ namespace SanteDB.Configurator
                "DataDirectory",
                Path.GetDirectoryName(typeof(Program).Assembly.Location));
 
-            
-                // Current dir
-                var cwd = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                // Load assembly
-                var splash = new frmSplash();
-                splash.Show();
+            // Current dir
+            var cwd = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            // Load assembly
+            var splash = new frmSplash();
+            splash.Show();
 
-                // Load assemblies
-                var fileList = Directory.GetFiles(cwd, "*.dll");
-                int i = 0;
-                foreach (var file in fileList)
-                {
-                    try
-                    {
-                        splash.NotifyStatus($"Loading {Path.GetFileNameWithoutExtension(file)}...", ((float)(i++) / fileList.Length) * 0.5f);
-                        var asm = Assembly.LoadFile(file);
-                        // Now load all plugins on the assembly
-                        var pluginInfo = asm.GetCustomAttribute<PluginAttribute>();
-                        if (pluginInfo != null)
-                            ConfigurationContext.Current.PluginAssemblies.Add(asm);
-                    }
-                    catch (Exception e)
-                    {
-                        Trace.TraceError("Unable to load {0}: {1}", file, e);
-                    }
-                }
-
-                ConfigurationContext.Current.InitializeFeatures();
-
-                // Load the current configuration
+            // Load assemblies
+            var fileList = Directory.GetFiles(cwd, "*.dll");
+            int i = 0;
+            foreach (var file in fileList)
+            {
                 try
                 {
-                    AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
-                    splash.NotifyStatus("Loading Configuration....", 0.6f);
-                    if (!File.Exists(ConfigurationContext.Current.ConfigurationFile))
-                    {
-                        splash.NotifyStatus("Preparing initial configuration...", 1f); // TODO: Launch initial configuration
-                        splash.Close();
-                        ConfigurationContext.Current.InitialStart();
-
-
-                        var init = new frmInitialConfig();
-                        if (init.ShowDialog() == DialogResult.Cancel)
-                            return;
-                    }
-                    else if (!ConfigurationContext.Current.LoadConfiguration(ConfigurationContext.Current.ConfigurationFile))
-                    {
-                        splash.Close();
-                        return;
-                    }
-                    else
-                    {
-                        splash.NotifyStatus("Loading Configuration...", -1f);
-                        splash.Close();
-                    }
-
-                    var frmMain = new frmMain();
-                    // Check for updates
-                    foreach (var t in ConfigurationContext.Current.Features
-                        .Where(o => o.Flags.HasFlag(FeatureFlags.AlwaysConfigure) && !o.Flags.HasFlag(FeatureFlags.SystemFeature))
-                        .SelectMany(o => o.CreateInstallTasks())
-                        .Where(o => o.VerifyState(ConfigurationContext.Current.Configuration)))
-                        ConfigurationContext.Current.ConfigurationTasks.Add(t);
-                    ConfigurationContext.Current.Apply();
-
-                    Application.Run(frmMain);
+                    splash.NotifyStatus($"Loading {Path.GetFileNameWithoutExtension(file)}...", ((float)(i++) / fileList.Length) * 0.5f);
+                    var asm = Assembly.LoadFile(file);
+                    // Now load all plugins on the assembly
+                    var pluginInfo = asm.GetCustomAttribute<PluginAttribute>();
+                    if (pluginInfo != null)
+                        ConfigurationContext.Current.PluginAssemblies.Add(asm);
                 }
-                finally
+                catch (Exception e)
                 {
-                    Environment.Exit(0);
+                    Trace.TraceError("Unable to load {0}: {1}", file, e);
                 }
-            
+            }
 
+            ConfigurationContext.Current.InitializeFeatures();
+
+            // Load the current configuration
+            try
+            {
+                AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+                splash.NotifyStatus("Loading Configuration....", 0.6f);
+                if (!File.Exists(ConfigurationContext.Current.ConfigurationFile))
+                {
+                    splash.NotifyStatus("Preparing initial configuration...", 1f); // TODO: Launch initial configuration
+                    splash.Close();
+                    ConfigurationContext.Current.InitialStart();
+
+                    var init = new frmInitialConfig();
+                    if (init.ShowDialog() == DialogResult.Cancel)
+                        return;
+                }
+                else if (!ConfigurationContext.Current.LoadConfiguration(ConfigurationContext.Current.ConfigurationFile))
+                {
+                    splash.Close();
+                    return;
+                }
+                else
+                {
+                    splash.NotifyStatus("Loading Configuration...", -1f);
+                    splash.Close();
+                }
+
+                var frmMain = new frmMain();
+                // Check for updates
+                foreach (var t in ConfigurationContext.Current.Features
+                    .Where(o => o.Flags.HasFlag(FeatureFlags.AlwaysConfigure) && !o.Flags.HasFlag(FeatureFlags.SystemFeature))
+                    .SelectMany(o => o.CreateInstallTasks())
+                    .Where(o => o.VerifyState(ConfigurationContext.Current.Configuration)))
+                    ConfigurationContext.Current.ConfigurationTasks.Add(t);
+                ConfigurationContext.Current.Apply();
+
+                Application.Run(frmMain);
+            }
+            finally
+            {
+                Environment.Exit(0);
+            }
         }
 
         /// <summary>

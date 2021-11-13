@@ -24,6 +24,7 @@ using SanteDB.Server.AdminConsole.Attributes;
 using SanteDB.Server.AdminConsole.Util;
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 {
@@ -31,6 +32,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
     /// Represents the server information commandlet
     /// </summary>
     [AdminCommandlet]
+    [ExcludeFromCodeCoverage]
     public static class ServerInfoCmdlet
     {
 
