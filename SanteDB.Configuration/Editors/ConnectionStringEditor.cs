@@ -18,17 +18,12 @@
  * User: fyfej
  * Date: 2021-8-27
  */
-using SanteDB.Configuration.Controls;
-using SanteDB.Core;
 using SanteDB.Core.Configuration.Data;
-using SanteDB.Core.Services;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Design;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 
@@ -38,6 +33,7 @@ namespace SanteDB.Configuration.Editors
     /// <summary>
     /// Creates a database name editor
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class ConnectionStringEditor : UITypeEditor
     {
 

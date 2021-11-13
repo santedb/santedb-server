@@ -34,6 +34,7 @@ using SanteDB.Server.AdminConsole.Util;
 using SanteDB.Server.Core.Http;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 
@@ -45,6 +46,7 @@ namespace SanteDB.Server.AdminConsole.Shell
     /// <summary>
     /// Represents a basic application context based on configuration
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class ApplicationContext : IServiceProvider, IApplicationServiceContext
     {
         // Tracer

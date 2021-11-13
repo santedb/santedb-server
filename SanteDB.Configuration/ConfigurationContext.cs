@@ -35,21 +35,24 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data.Common;
-using System.Diagnostics;
-using System.Diagnostics.Tracing;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+
+using SanteDB.Core;
+using SanteDB.Core.Configuration;
+using SanteDB.Core.Configuration.Data;
+using SanteDB.Core.Diagnostics;
+using SanteDB.OrmLite.Configuration;
+using SanteDB.OrmLite.Providers;
 
 namespace SanteDB.Configuration
 {
     /// <summary>
     /// Configuration Context
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class ConfigurationContext : INotifyPropertyChanged
     {
         // Configuration
@@ -65,7 +68,6 @@ namespace SanteDB.Configuration
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(ConfigurationContext));
 
 #if DEBUG
-        private string m_configurationFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.config.debug.xml");
 #else
         private string m_configurationFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.config.xml");
 #endif
@@ -75,7 +77,7 @@ namespace SanteDB.Configuration
         /// </summary>
         public String ConfigurationFile
         {
-            get => this.m_configurationFile;
+            get; private set;
         }
 
         /// <summary>
@@ -97,18 +99,14 @@ namespace SanteDB.Configuration
             set
             {
                 this.m_configuration = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Configuration)));
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Configuration)));
             }
         }
 
         /// <summary>
         /// Gets the features available in the current version of the object
         /// </summary>
-        public List<IFeature> Features
-        {
-            get;
-            private set;
-        }
+        public List<IFeature> Features { get; }
 
         /// <summary>
         /// Initialize features
@@ -116,26 +114,37 @@ namespace SanteDB.Configuration
         public void InitializeFeatures()
         {
             this.Features.AddRange(AppDomain.CurrentDomain.GetAssemblies()
-                       .Where(o => !o.IsDynamic)
-                       .SelectMany(a => { try { return a.ExportedTypes; } catch { return new List<Type>(); } })
-                       .Where(t => typeof(IFeature).IsAssignableFrom(t) && !t.ContainsGenericParameters && !t.IsAbstract && !t.IsInterface)
-                       .Select(i =>
-                       {
-                           try
-                           {
-                               var feature = Activator.CreateInstance(i) as IFeature;
-                               if (feature.Flags == FeatureFlags.NonPublic)
-                               {
-                                   return null;
-                               }
-                               return feature;
-                           }
-                           catch (Exception e)
-                           {
-                               return null;
-                           }
-                       })
-                       .OfType<IFeature>());
+                .Where(o => !o.IsDynamic)
+                .SelectMany(a =>
+                {
+                    try
+                    {
+                        return a.ExportedTypes;
+                    }
+                    catch
+                    {
+                        return new List<Type>();
+                    }
+                })
+                .Where(t => typeof(IFeature).IsAssignableFrom(t) && !t.ContainsGenericParameters && !t.IsAbstract && !t.IsInterface)
+                .Select(i =>
+                {
+                    try
+                    {
+                        var feature = Activator.CreateInstance(i) as IFeature;
+                        if (feature.Flags == FeatureFlags.NonPublic)
+                        {
+                            return null;
+                        }
+
+                        return feature;
+                    }
+                    catch (Exception e)
+                    {
+                        return null;
+                    }
+                })
+                .OfType<IFeature>());
         }
 
         /// <summary>
@@ -180,17 +189,23 @@ namespace SanteDB.Configuration
             // HACK: The weird TRY/CATCH in select many is to prevent mono from throwning a fit
             return AppDomain.CurrentDomain.GetAssemblies()
                 .Where(a => !a.IsDynamic)
-                .SelectMany(a => { try { return a.ExportedTypes; } catch { return new List<Type>(); } });
+                .SelectMany(a =>
+                {
+                    try
+                    {
+                        return a.ExportedTypes;
+                    }
+                    catch
+                    {
+                        return new List<Type>();
+                    }
+                });
         }
 
         /// <summary>
         /// Get the configuration tasks
         /// </summary>
-        public ObservableCollection<IConfigurationTask> ConfigurationTasks
-        {
-            get;
-            private set;
-        }
+        public ObservableCollection<IConfigurationTask> ConfigurationTasks { get; }
 
         /// <summary>
         /// Property has changed
@@ -235,12 +250,25 @@ namespace SanteDB.Configuration
             get
             {
                 if (this.m_providers == null)
+                {
                     this.m_providers = AppDomain.CurrentDomain.GetAssemblies()
                         .Where(o => !o.IsDynamic)
-                        .SelectMany(a => { try { return a.ExportedTypes; } catch { return new List<Type>(); } })
+                        .SelectMany(a =>
+                        {
+                            try
+                            {
+                                return a.ExportedTypes;
+                            }
+                            catch
+                            {
+                                return new List<Type>();
+                            }
+                        })
                         .Where(t => t != null && typeof(IDataConfigurationProvider).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface)
                         .Select(i => Activator.CreateInstance(i) as IDataConfigurationProvider)
                         .ToArray();
+                }
+
                 return this.m_providers;
             }
         }
@@ -253,7 +281,10 @@ namespace SanteDB.Configuration
             get
             {
                 if (m_current == null)
+                {
                     m_current = new ConfigurationContext();
+                }
+
                 return m_current;
             }
         }
@@ -290,8 +321,9 @@ namespace SanteDB.Configuration
                     this.Configuration = SanteDBConfiguration.Load(s);
                     this.Features.Clear();
                     this.InitializeFeatures();
-                    this.m_configurationFile = filename;
+                    this.ConfigurationFile = filename;
                 }
+
                 return true;
             }
             catch (Exception e)

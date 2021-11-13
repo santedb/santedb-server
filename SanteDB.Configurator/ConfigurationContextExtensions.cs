@@ -26,6 +26,7 @@ using SanteDB.Core.Security;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -37,6 +38,7 @@ namespace SanteDB.Configurator
     /// <summary>
     /// Extensions to the configuration context
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class ConfigurationContextExtensions
     {
         /// <summary>

@@ -16,27 +16,28 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2021-8-27
  */
-using SanteDB.Core.Configuration;
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.Serialization;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Design;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using System.Xml.Serialization;
+using SanteDB.Core.Configuration;
+using SanteDB.Core.Model;
+using SanteDB.Core.Model.Serialization;
 
 namespace SanteDB.Configuration.Editors
 {
     /// <summary>
     /// Resource collection editor
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class ResourceCollectionEditor : UITypeEditor
     {
         /// <summary>
@@ -48,13 +49,12 @@ namespace SanteDB.Configuration.Editors
 
             if (provider != null)
             {
-                var winService = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
+                var winService = (IWindowsFormsEditorService) provider.GetService(typeof(IWindowsFormsEditorService));
 
                 if (typeof(IList).IsAssignableFrom(context.PropertyDescriptor.PropertyType)) // multi-select
                 {
-
                     var itemType = context.PropertyDescriptor.PropertyType.GetGenericArguments()[0];
-                    var list = new ListView()
+                    var list = new ListView
                     {
                         View = View.Details,
                         FullRowSelect = true,
@@ -68,20 +68,19 @@ namespace SanteDB.Configuration.Editors
                     // Get the types
                     try
                     {
-
                         list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes()
                             .Where(t => typeof(IdentifiedData).IsAssignableFrom(t) && t.GetCustomAttribute<XmlRootAttribute>() != null && !t.IsGenericTypeDefinition && !t.IsInterface && t.GetCustomAttribute<ObsoleteAttribute>() == null && !t.IsAbstract)
                             .Select(o =>
                             {
-                                msb.BindToName(o, out string asm, out string type);
+                                msb.BindToName(o, out var asm, out var type);
                                 return new ListViewItem(type)
                                 {
                                     Checked = listValue?.Any(v => v.TypeXml == type) == true,
-                                    Tag = new ResourceTypeReferenceConfiguration() { TypeXml = type }
+                                    Tag = new ResourceTypeReferenceConfiguration
+                                        {TypeXml = type}
                                 };
                             })
                             .ToArray());
-
                     }
                     catch (Exception e)
                     {
@@ -102,13 +101,13 @@ namespace SanteDB.Configuration.Editors
                     // Get the databases
                     try
                     {
-
                         list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes()
                             .Where(t => typeof(IdentifiedData).IsAssignableFrom(t) && t.GetCustomAttribute<XmlRootAttribute>() != null && !t.IsGenericTypeDefinition && !t.IsInterface && t.GetCustomAttribute<ObsoleteAttribute>() == null && !t.IsAbstract)
                             .Select(o =>
                             {
-                                msb.BindToName(o, out string asm, out string type);
-                                return new ResourceTypeReferenceConfiguration() { TypeXml = type };
+                                msb.BindToName(o, out var asm, out var type);
+                                return new ResourceTypeReferenceConfiguration
+                                    {TypeXml = type};
                             })
                             .ToArray());
                     }
@@ -126,8 +125,8 @@ namespace SanteDB.Configuration.Editors
                     }
                 }
             }
-            return value;
 
+            return value;
         }
 
         /// <summary>

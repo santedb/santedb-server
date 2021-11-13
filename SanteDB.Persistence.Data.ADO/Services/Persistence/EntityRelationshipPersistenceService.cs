@@ -94,7 +94,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             data.EffectiveVersionSequenceId = data.EffectiveVersionSequenceId ?? data.SourceEntity?.VersionSequence;
             // Lookup the original
             if (!data.EffectiveVersionSequenceId.HasValue)
-                data.EffectiveVersionSequenceId = context.Query<DbEntityVersion>(o => o.Key == data.SourceEntityKey && !o.ObsoletionTime.HasValue).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionSequenceId).FirstOrDefault();
+                data.EffectiveVersionSequenceId = context.Query<DbEntityVersion>(o => o.Key == data.SourceEntityKey && !o.ObsoletionTime.HasValue).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionSequenceId).ToArray().FirstOrDefault();
             else if (data.ObsoleteVersionSequenceId.HasValue) // No sense in inserting an obsolete object
                 return data;
 
@@ -132,7 +132,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (!data.EffectiveVersionSequenceId.HasValue)
                 data.EffectiveVersionSequenceId = context.Query<DbEntityVersion>(o => o.Key == data.SourceEntityKey && !o.ObsoletionTime.HasValue).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionSequenceId).FirstOrDefault();
 
-            if (data.ObsoleteVersionSequenceId == Int32.MaxValue || data.BatchOperation == BatchOperationType.Obsolete)
+            if (data.ObsoleteVersionSequenceId == Int32.MaxValue || data.BatchOperation == BatchOperationType.Delete)
                 data.ObsoleteVersionSequenceId = context.Query<DbEntityVersion>(o => o.Key == data.SourceEntityKey && !o.ObsoletionTime.HasValue).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionSequenceId).FirstOrDefault();
 
             // Duplicate check

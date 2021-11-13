@@ -689,7 +689,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Core.Model.Entities.Entity ObsoleteInternal(DataContext context, Core.Model.Entities.Entity data)
         {
-            data.StatusConceptKey = StatusKeys.Obsolete;
+            if (!data.StatusConceptKey.HasValue ||
+                StatusKeys.ActiveStates.Contains(data.StatusConceptKey.Value))
+            {
+                data.StatusConceptKey = StatusKeys.Obsolete;
+            }
             return base.UpdateInternal(context, data);
         }
 

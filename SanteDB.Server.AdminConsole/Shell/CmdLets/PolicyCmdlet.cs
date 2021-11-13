@@ -30,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace SanteDB.Server.AdminConsole.Shell.CmdLets
@@ -38,6 +39,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
     /// Policy commandlet
     /// </summary>
     [AdminCommandlet]
+    [ExcludeFromCodeCoverage]
     public static class PolicyCmdlet
     {
         private static AmiServiceClient m_client = new AmiServiceClient(ApplicationContext.Current.GetRestClient(ServiceEndpointType.AdministrationIntegrationService));

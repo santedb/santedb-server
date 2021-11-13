@@ -18,21 +18,24 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using NUnit.Framework;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Roles;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using NUnit.Framework;
 
-namespace SanteDB.Messaging.HDSI.Tests
+namespace SanteDB.Messaging.HDSI.Test
 {
     /// <summary>
     /// Tests for the HTTP expression writer
     /// </summary>
+    [ExcludeFromCodeCoverage]
     [TestFixture(Category = "REST API")]
     public class HttpQueryExpressionTest
     {

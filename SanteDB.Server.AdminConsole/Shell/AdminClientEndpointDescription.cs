@@ -20,9 +20,11 @@
  */
 using SanteDB.Core.Http.Description;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Server.AdminConsole.Shell
 {
+    [ExcludeFromCodeCoverage]
     internal class AdminClientEndpointDescription : IRestClientEndpointDescription
     {
 

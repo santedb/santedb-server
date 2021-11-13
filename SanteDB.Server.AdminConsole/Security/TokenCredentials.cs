@@ -20,14 +20,16 @@
  */
 using SanteDB.Core.Http;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Principal;
 
 namespace SanteDB.Server.AdminConsole.Security
 {
-    /// <summary>
-    /// Represents a Credential which is a token credential
-    /// </summary>
-    public class TokenCredentials : Credentials
+	/// <summary>
+	/// Represents a Credential which is a token credential
+	/// </summary>
+	[ExcludeFromCodeCoverage]
+	public class TokenCredentials : Credentials
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SanteDB.Server.AdminConsole.Security.TokenCredentials"/> class.

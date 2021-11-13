@@ -21,6 +21,7 @@
 using SanteDB.Core.Diagnostics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 
 namespace SanteDB.Server.AdminConsole.Shell
@@ -28,6 +29,7 @@ namespace SanteDB.Server.AdminConsole.Shell
     /// <summary>
     /// Represents the console trace writer
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal class ConsoleTraceWriter : TraceWriter
     {
         /// <summary>

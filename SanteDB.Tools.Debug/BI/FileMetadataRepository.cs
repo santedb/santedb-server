@@ -29,6 +29,7 @@ using SanteDB.Tools.Debug.Configuration;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -41,6 +42,7 @@ namespace SanteDB.Tools.Debug.BI
     /// <summary>
     /// Represents a BI repository service which uses the file system
     /// </summary>
+    [ExcludeFromCodeCoverage]
     [ServiceProvider("File Based BI Repository")]
     public class FileMetadataRepository : IBiMetadataRepository, IDaemonService
     {

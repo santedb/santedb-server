@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
@@ -54,7 +55,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         where TModel : VersionedEntityData<TModel>, new()
         where TDomainKey : IDbIdentified, new()
     {
-
         public VersionedDataPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
         {
         }
@@ -112,7 +112,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             data.Key = domainObject.Key;
             data.CreationTime = (DateTimeOffset)domainObject.CreationTime;
             return data;
-
         }
 
         /// <summary>
@@ -123,7 +122,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (data.Key == Guid.Empty)
                 throw new AdoFormalConstraintException(AdoFormalConstraintType.NonIdentityUpdate);
 
-            var existingObject = context.Query<TDomain>(o=>o.Key == data.Key && !o.ObsoletionTime.HasValue).OrderByDescending(o=>o.VersionSequenceId).FirstOrDefault(); // Get the last version (current)
+            var existingObject = context.Query<TDomain>(o => o.Key == data.Key && !o.ObsoletionTime.HasValue).OrderByDescending(o => o.VersionSequenceId).FirstOrDefault(); // Get the last version (current)
             var nonVersionedObect = context.FirstOrDefault<TDomainKey>(o => o.Key == data.Key);
 
             if (existingObject == null)
@@ -135,8 +134,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             else if (existingObject.ObsoletionTime.HasValue)
                 this.m_tracer.TraceWarning("Current object {0} had no active versions - Will un-delete it", data);
 
-                // Are we re-classing this object?
-                nonVersionedObect.CopyObjectData((object)data, false, true);
+            // Are we re-classing this object?
+            nonVersionedObect.CopyObjectData((object)data, false, true);
 
             // Map existing
             var storageInstance = this.FromModelInstance(data, context);
@@ -155,7 +154,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             newEntityVersion.Key = data.Key.Value;
             data.PreviousVersionKey = newEntityVersion.ReplacesVersionKey = existingObject.VersionKey;
             data.CreatedByKey = newEntityVersion.CreatedByKey = context.ContextId;
-            // Obsolete the old version 
+            // Obsolete the old version
             existingObject.ObsoletedByKey = context.ContextId;
             existingObject.ObsoletionTime = DateTimeOffset.Now;
             newEntityVersion.CreationTime = DateTimeOffset.Now;
@@ -170,7 +169,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             newEntityVersion = context.Insert<TDomain>(newEntityVersion);
             nonVersionedObect = context.Update<TDomainKey>(nonVersionedObect);
 
-
             // Pull database generated fields
             data.VersionSequence = newEntityVersion.VersionSequenceId;
             data.CreationTime = newEntityVersion.CreationTime;
@@ -178,7 +176,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             return data;
             //return base.Update(context, data);
         }
-
 
         /// <summary>
         /// Order by
@@ -196,7 +193,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         protected override IEnumerable<Object> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> primaryQuery, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TModel>[] orderBy, bool countResults = true, bool overrideFuzzyTotalSetting = false)
         {
-
 #if DEBUG
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -205,7 +201,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Query has been registered?
             if (queryId != Guid.Empty && this.m_queryPersistence?.IsRegistered(queryId) == true)
                 return this.GetStoredQueryResults(queryId, offset, count, out totalResults);
-
 
             // Queries to be performed
             IOrmResultSet retVal = null;
@@ -230,7 +225,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
                         query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
                     }
-                    
+
                     SqlStatement domainQuery = null;
                     var expr = this.m_settingsProvider.GetMapper().MapModelExpression<TModel, TDomain, bool>(query, false);
 
@@ -267,8 +262,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         else
                             retVal = retVal.Union(this.DomainQueryInternal<Guid>(context, domainQuery));
                     }
-
-                    
                 }
 
                 // HACK: More than one query which indicates union was used, we need to wrap in a select statement to be adherent to SQL standard on Firebird and PSQL
@@ -290,8 +283,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
                 else
                 {
-
-                    if(context.Data.TryGetValue("principal", out object pRaw))
+                    if (context.Data.TryGetValue("principal", out object pRaw))
                     {
                         var currentPrincipal = pRaw as IPrincipal;
                         countResults = countResults && currentPrincipal != AuthenticationContext.SystemPrincipal;
@@ -315,7 +307,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                                 // Get the rest of the keys
                                 Guid[] sk = null;
-                                if(type == typeof(OrmResultSet<Guid>))
+                                if (type == typeof(OrmResultSet<Guid>))
                                     sk = subContext.Query<Guid>(statement).ToArray();
                                 else
                                     sk = subContext.Query<CompositeResult<TDomain, TDomainKey>>(statement).Keys<Guid>(false).ToArray();
@@ -351,16 +343,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     this.m_tracer.TraceEvent(EventLevel.Error, context.GetQueryLiteral(retVal.ToSqlStatement()));
                 context.Dispose(); // No longer important
 
-                throw new DataPersistenceException("Error executing query" , ex);
+                throw new DataPersistenceException("Error executing query", ex);
             }
             finally
             {
 #if DEBUG
                 sw.Stop();
-              //  this.m_tracer.TraceVerbose("Query {0} in {1} ms", context.GetQueryLiteral(retVal.ToSqlStatement()), sw.ElapsedMilliseconds);
+                //  this.m_tracer.TraceVerbose("Query {0} in {1} ms", context.GetQueryLiteral(retVal.ToSqlStatement()), sw.ElapsedMilliseconds);
 #endif
             }
-
         }
 
         /// <summary>
@@ -405,7 +396,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             if (containerId != Guid.Empty)
             {
-
                 var cacheItem = ApplicationServiceContext.Current.GetService<IDataCachingService>()?.GetCacheItem<TModel>(containerId) as TModel;
                 if (cacheItem != null && (cacheItem.VersionKey.HasValue && versionId == cacheItem.VersionKey.Value || versionId.GetValueOrDefault() == Guid.Empty) &&
                     (loadFast && cacheItem.LoadState >= LoadState.PartialLoad || !loadFast && cacheItem.LoadState == LoadState.FullLoad))
@@ -451,7 +441,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     foreach (var d in connection.CacheOnCommit)
                         ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(d);
                     return retVal;
-
                 }
                 catch (NotSupportedException e)
                 {
@@ -469,7 +458,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     this.m_tracer.TraceEvent(EventLevel.Verbose, "Retrieve took {0} ms", sw.ElapsedMilliseconds);
 #endif
                 }
-
         }
 
         /// <summary>
@@ -495,12 +483,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     itm.SourceEntityKey = source.Key;
                 else if (itm.SourceEntityKey != source.Key && !sourceVersionMaps.ContainsKey(itm.SourceEntityKey ?? Guid.Empty)) // The source comes from somewhere else
                 {
-
                     SqlStatement versionQuery = null;
-                    // Get the current tuple 
+                    // Get the current tuple
                     IDbVersionedData currentVersion = null;
 
-                    // We need to figure out what the current version of the source item is ... 
+                    // We need to figure out what the current version of the source item is ...
                     // Since this is a versioned association an a versioned association only exists between Concept, Act, or Entity
                     if (itm is VersionedAssociation<Concept>)
                     {
@@ -524,7 +511,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             // Get existing
             // TODO: What happens which this is reverse?
-            var existing = context.Query<TDomainAssociation>(o => o.SourceKey == source.Key).ToList();
+            var existing = context.Query<TDomainAssociation>(o => o.SourceKey == source.Key && !o.ObsoleteVersionSequenceId.HasValue).ToList();
 
             // Remove old
             var obsoleteRecords = existing.Where(o => !storage.Any(ecn => ecn.Key == o.Key));
@@ -546,7 +533,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             foreach (var upd in updateRecords)
             {
                 // Update by key, these lines make no sense we just update the existing versioned association
-                //upd.store.EffectiveVersionSequenceId = upd.existing.EffectiveVersionSequenceId;
+                upd.store.EffectiveVersionSequenceId = upd.existing.EffectiveVersionSequenceId;
                 //upd.store.ObsoleteVersionSequenceId = upd.existing.EffectiveVersionSequenceId;
                 persistenceService.UpdateInternal(context, upd.store as TAssociation);
             }
@@ -565,12 +552,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Remove any duplicated relationships
             if (storage is IList<TAssociation> listStore)
             {
-                for(int i = listStore.Count - 1; i >= 0; i--) // Remove dups
-                    if(listStore.Count(o=> o.Key == listStore[i].Key) > 1)
+                for (int i = listStore.Count - 1; i >= 0; i--) // Remove dups
+                    if (listStore.Count(o => o.Key == listStore[i].Key) > 1)
                         listStore.RemoveAt(i);
             }
         }
-
 
         /// <summary>
         /// Touch the specified versioned object (update time without creating new version
@@ -581,7 +567,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             Stopwatch sw = new Stopwatch();
             sw.Start();
 #endif
-
 
             // Query object
             using (var connection = this.m_settingsProvider.GetConfiguration().Provider.GetWriteConnection())
@@ -601,7 +586,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         currentData.CreatedByKey = provenance;
                         connection.Update(currentData);
                     }
-
                 }
                 catch (NotSupportedException e)
                 {
@@ -619,11 +603,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     this.m_tracer.TraceEvent(EventLevel.Verbose, "Retrieve took {0} ms", sw.ElapsedMilliseconds);
 #endif
                 }
-
         }
 
         /// <summary>
-        /// Query keys for versioned objects 
+        /// Query keys for versioned objects
         /// </summary>
         /// <remarks>This redirects the query from the primary key (on TDomain) into the primary key on the base object</remarks>
         protected override IEnumerable<Guid> QueryKeysInternal(DataContext context, Expression<Func<TModel, bool>> query, int offset, int? count, out int totalResults)
@@ -659,11 +642,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <summary>
         /// Obsolete the specified keys
         /// </summary>
-        protected sealed override void BulkObsoleteInternal(DataContext context, Guid[] keysToObsolete)
+        protected override sealed void BulkObsoleteInternal(DataContext context, Guid[] keysToObsolete)
         {
             foreach (var k in keysToObsolete)
             {
-                
                 // Get the current version
                 var currentVersion = context.SingleOrDefault<TDomain>(o => o.ObsoletionTime == null && o.Key == k);
                 // Create a new version
@@ -685,7 +667,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     newVersion.CreationTime = DateTimeOffset.Now;
                     newVersion.VersionKey = Guid.Empty;
                     context.Insert(newVersion);
-
                 }
                 else // Just remove the version
                 {
@@ -696,6 +677,5 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
             }
         }
-
     }
 }

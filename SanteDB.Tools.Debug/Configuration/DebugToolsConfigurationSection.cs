@@ -23,6 +23,7 @@ using SanteDB.Core.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,6 +34,7 @@ namespace SanteDB.Tools.Debug.Configuration
     /// <summary>
     /// Represents debug tooling configuration
     /// </summary>
+    [ExcludeFromCodeCoverage]
     [XmlType(nameof(DebugToolsConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class DebugToolsConfigurationSection : IConfigurationSection
     {

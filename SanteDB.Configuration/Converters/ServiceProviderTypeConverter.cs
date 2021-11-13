@@ -18,30 +18,28 @@
  * User: fyfej
  * Date: 2021-8-27
  */
-using SanteDB.Core.Services;
+
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using SanteDB.Core.Services;
 
 namespace SanteDB.Configuration.Converters
 {
     /// <summary>
     /// Service provider type converter
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class ServiceProviderTypeConverter : TypeConverter
     {
-
         /// <summary>
         /// Can convert from
         /// </summary>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            return sourceType == typeof(String) || sourceType == typeof(Type);
+            return sourceType == typeof(string) || sourceType == typeof(Type);
         }
 
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
@@ -55,12 +53,16 @@ namespace SanteDB.Configuration.Converters
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
             if (value is Type)
+            {
                 return (value as Type)?.GetCustomAttribute<ServiceProviderAttribute>()?.Name ?? (value as Type)?.Name;
-            else if(value is String)
+            }
+
+            if (value is string)
             {
                 var t = Type.GetType(value.ToString());
                 return t?.GetCustomAttribute<ServiceProviderAttribute>()?.Name ?? t?.Name;
             }
+
             return base.ConvertTo(context, culture, value, destinationType);
         }
     }

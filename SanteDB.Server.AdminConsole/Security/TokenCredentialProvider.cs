@@ -24,6 +24,7 @@ using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using SanteDB.Server.AdminConsole.Shell;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Security;
 
 using System.Security.Principal;
@@ -33,6 +34,7 @@ namespace SanteDB.Server.AdminConsole.Security
     /// <summary>
     /// Represents a credential provider which provides a token
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class TokenCredentialProvider : ICredentialProvider, IDisposable
 	{
 

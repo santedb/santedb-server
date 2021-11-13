@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
@@ -39,6 +40,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
     /// Represents a commandlet that deals with log files
     /// </summary>
     [AdminCommandlet]
+    [ExcludeFromCodeCoverage]
     public static class LogCmdlet
     {
 

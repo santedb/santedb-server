@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Diagnostics;
@@ -71,7 +72,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             return this.m_settingsProvider.GetMapper().MapModelInstance<Bundle, Object>(modelInstance);
         }
 
-
         /// <summary>
         /// Reorganize all the major items for insert
         /// </summary>
@@ -84,7 +84,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             Bundle retVal = new Bundle() { Item = new List<IdentifiedData>() };
             foreach (var itm in bundle.Item.Where(o => o != null).Distinct())
             {
-
                 this.m_tracer.TraceVerbose("Reorganizing {0}..", itm.Key);
                 var idx = retVal.Item.FindIndex(o => o.Key == itm.Key);
 
@@ -97,7 +96,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                         // Get the target that this rel points to
                         var targetEntity = bundle.Item.FirstOrDefault(o => o.Key == rel.TargetEntityKey);
-                        if (targetEntity == null) 
+                        if (targetEntity == null)
                             continue;
 
                         if (retVal.Item.Any(o => o.Key == rel.TargetEntityKey))
@@ -113,7 +112,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                             retVal.Item.Add(targetEntity); // Add the target entity first
                         }
                     }
-
                 }
                 else if (itm is Act act)
                 {
@@ -131,7 +129,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                             retVal.Item.Insert(idx, bitm); // make sure it gets inserted first
                         else
                             retVal.Item.Add(bitm);
-
                     }
 
                     foreach (var rel in act.Participations)
@@ -148,10 +145,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                             retVal.Item.Insert(idx, bitm); // make sure it gets inserted first
                         else
                             retVal.Item.Add(bitm);
-
                     }
                 }
-                else if (itm is Concept concept) {
+                else if (itm is Concept concept)
+                {
                     foreach (var rel in concept.ReferenceTerms)
                     {
                         this.m_tracer.TraceVerbose("Processing {0} / referenceTerm / {1} ..", itm.Key, rel.ReferenceTermKey);
@@ -268,7 +265,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <returns></returns>
         public override Bundle InsertInternal(DataContext context, Bundle data)
         {
-
             this.m_tracer.TraceVerbose("Bundle has {0} objects...", data.Item.Count);
             var reorganized = this.ReorganizeForInsert(data);
             this.m_tracer.TraceVerbose("After reorganization has {0} objects...", reorganized.Item.Count);
@@ -292,20 +288,23 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     if (svc == null)
                         throw new InvalidOperationException($"Cannot find persister for {itm.GetType()}");
 
-                    switch(itm.BatchOperation)
+                    switch (itm.BatchOperation)
                     {
                         case BatchOperationType.Update:
                             this.m_tracer.TraceVerbose("Will update {0} object from bundle...", itm);
                             reorganized.Item[i] = svc.Update(context, itm) as IdentifiedData;
                             break;
+
                         case BatchOperationType.Insert:
                             this.m_tracer.TraceVerbose("Will insert {0} object from bundle...", itm);
                             reorganized.Item[i] = svc.Insert(context, itm) as IdentifiedData;
                             break;
-                        case BatchOperationType.Obsolete:
+
+                        case BatchOperationType.Delete:
                             this.m_tracer.TraceVerbose("Will obsolete {0} object from bundle...", itm);
                             reorganized.Item[i] = svc.Obsolete(context, itm) as IdentifiedData;
                             break;
+
                         default:
                             if (itm.CheckExists(context))
                             {
@@ -321,7 +320,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                             }
                             break;
                     }
-                    
                 }
                 catch (TargetInvocationException e)
                 {
@@ -330,7 +328,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
                 catch (DetectedIssueException e)
                 {
-                    this.m_tracer.TraceError("### Error Inserting Bundle[{0} / {1}]:", i, data.Item.FindIndex(o=>o.Key == itm.Key));
+                    this.m_tracer.TraceError("### Error Inserting Bundle[{0} / {1}]:", i, data.Item.FindIndex(o => o.Key == itm.Key));
                     foreach (var iss in e.Issues)
                         this.m_tracer.TraceError("\t{0}: {1}", iss.Priority, iss.Text);
                     throw new DetectedIssueException(e.Issues, $"Could not insert bundle due to sub-object persistence (at item {i})", e);
@@ -343,7 +341,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 {
                     throw new Exception($"Could not insert bundle due to sub-object persistence (bundle item {i})", e);
                 }
-
             }
 
             // Cache items
@@ -360,7 +357,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Bundle ObsoleteInternal(DataContext context, Bundle data)
         {
-
             foreach (var itm in data.Item)
             {
                 var idp = typeof(IDataPersistenceService<>).MakeGenericType(new Type[] { itm.GetType() });
@@ -382,12 +378,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         }
 
         /// <summary>
-        /// Model instance 
+        /// Model instance
         /// </summary>
         public override Bundle ToModelInstance(object dataInstance, DataContext context)
         {
             return this.m_settingsProvider.GetMapper().MapModelInstance<Object, Bundle>(dataInstance);
-
         }
 
         /// <summary>
@@ -401,6 +396,5 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             return this.InsertInternal(context, data);
         }
-
     }
 }

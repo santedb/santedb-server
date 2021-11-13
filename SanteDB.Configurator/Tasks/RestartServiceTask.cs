@@ -26,6 +26,7 @@ using SanteDB.Server.Core.Configuration.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -37,6 +38,7 @@ namespace SanteDB.Configurator.Tasks
     /// <summary>
     /// Represents a task that restarts the SanteDB configured service
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class RestartServiceTask : IConfigurationTask
     {
         // Feature reference
