@@ -4,9 +4,13 @@ using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
+using SanteDB.Persistence.Data.Model.DataType;
 using SanteDB.Persistence.Data.Model.Entities;
+using SanteDB.Persistence.Data.Model.Extensibility;
+using SanteDB.Persistence.Data.Model.Roles;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
@@ -21,6 +25,37 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         public EntityPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
+        }
+
+        /// <summary>
+        /// Perform a delete references
+        /// </summary>
+        protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
+        {
+            context.Delete<DbEntityRelationship>(o => o.SourceKey == key);
+            var addressIds = context.Query<DbEntityAddress>(o => o.SourceKey == key).Select(o => o.Key).ToArray();
+            context.Delete<DbEntityAddressComponent>(o => addressIds.Contains(o.SourceKey));
+            context.Delete<DbEntityAddress>(o => addressIds.Contains(o.Key));
+            var nameIds = context.Query<DbEntityName>(o => o.SourceKey == key).Select(o => o.Key).ToArray();
+            context.Delete<DbEntityNameComponent>(o => nameIds.Contains(o.SourceKey));
+            context.Delete<DbEntityName>(o => nameIds.Contains(o.Key));
+            context.Delete<DbEntityIdentifier>(o => o.SourceKey == key);
+            context.Delete<DbEntityRelationship>(o => o.SourceKey == key);
+            context.Delete<DbApplicationEntity>(o => o.ParentKey == key);
+            context.Delete<DbEntityTag>(o => o.SourceKey == key);
+            context.Delete<DbEntityExtension>(o => o.SourceKey == key);
+            context.Delete<DbEntityNote>(o => o.SourceKey == key);
+            context.Delete<DbTelecomAddress>(o => o.SourceKey == key);
+            context.Delete<DbDeviceEntity>(o => o.ParentKey == key);
+            context.Delete<DbPatient>(o => o.ParentKey == key);
+            context.Delete<DbProvider>(o => o.ParentKey == key);
+            context.Delete<DbUserEntity>(o => o.ParentKey == key);
+            context.Delete<DbPerson>(o => o.ParentKey == key);
+            context.Delete<DbOrganization>(o => o.ParentKey == key);
+            context.Delete<DbPlaceService>(o => o.SourceKey == key);
+            context.Delete<DbPlace>(o => o.ParentKey == key);
+
+            base.DoDeleteReferencesInternal(context, key);
         }
 
         /// <summary>

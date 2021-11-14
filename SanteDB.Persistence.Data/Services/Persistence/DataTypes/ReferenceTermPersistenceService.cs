@@ -24,12 +24,23 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         }
 
         /// <summary>
+        /// Delete references
+        /// </summary>
+        protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
+        {
+            context.Delete<DbReferenceTermName>(o => o.SourceKey == key);
+            context.Delete<DbConceptReferenceTerm>(o => o.TargetKey == key);
+
+            base.DoDeleteReferencesInternal(context, key);
+        }
+
+        /// <summary>
         /// Prepare references for persistence
         /// </summary>
-        protected override ReferenceTerm PrepareReferences(DataContext context, ReferenceTerm data)
+        protected override ReferenceTerm BeforePersisting(DataContext context, ReferenceTerm data)
         {
             data.CodeSystemKey = this.EnsureExists(context, data.CodeSystem)?.Key ?? data.CodeSystemKey;
-            return base.PrepareReferences(context, data);
+            return base.BeforePersisting(context, data);
         }
 
         /// <summary>

@@ -27,10 +27,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <summary>
         /// Prepare referenced objects
         /// </summary>
-        protected override EntityName PrepareReferences(DataContext context, EntityName data)
+        protected override EntityName BeforePersisting(DataContext context, EntityName data)
         {
             data.NameUseKey = this.EnsureExists(context, data.NameUse)?.Key ?? data.NameUseKey;
-            return base.PrepareReferences(context, data);
+            return base.BeforePersisting(context, data);
         }
 
         /// <summary>

@@ -37,7 +37,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Prepare references
         /// </summary>
-        protected override TModel PrepareReferences(DataContext context, TModel data) => data;
+        protected override TModel BeforePersisting(DataContext context, TModel data) => data;
+
+        /// <summary>
+        /// After the object is persisted
+        /// </summary>
+        protected override TModel AfterPersisted(DataContext context, TModel data) => data;
+
+        /// <summary>
+        /// The object <paramref name="key"/> is being purged - delete all references for the object
+        /// </summary>
+        protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
+        { }
 
         /// <summary>
         /// Convert <paramref name="model" /> to a <typeparamref name="TDbModel"/>

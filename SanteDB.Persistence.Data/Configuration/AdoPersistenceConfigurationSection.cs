@@ -73,7 +73,13 @@ namespace SanteDB.Persistence.Data.Configuration
         /// Lean policy
         /// </summary>
         [XmlEnum("lean")]
-        Lean = None | LogicalDeletion
+        Lean = None | LogicalDeletion,
+
+        /// <summary>
+        /// Keep purged records with a single state of PURGED
+        /// </summary>
+        [XmlEnum("keep-purged")]
+        KeepPurged = 8
     }
 
     /// <summary>

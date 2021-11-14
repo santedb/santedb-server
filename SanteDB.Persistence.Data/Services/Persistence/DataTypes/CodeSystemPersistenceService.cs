@@ -19,5 +19,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         public CodeSystemPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
+
+        /// <summary>
+        /// Delete references
+        /// </summary>
+        protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
+        {
+            context.Delete<DbReferenceTerm>(o => o.CodeSystemKey == key);
+            base.DoDeleteReferencesInternal(context, key);
+        }
     }
 }

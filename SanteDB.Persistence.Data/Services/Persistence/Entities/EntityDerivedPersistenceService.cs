@@ -40,7 +40,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <summary>
         /// Prepare references
         /// </summary>
-        protected override TEntity PrepareReferences(DataContext context, TEntity data)
+        protected override TEntity BeforePersisting(DataContext context, TEntity data)
         {
             if (!data.StatusConceptKey.HasValue)
             {
@@ -75,7 +75,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 }
             }
 
-            return base.PrepareReferences(context, data);
+            return base.BeforePersisting(context, data);
         }
 
         /// <summary>

@@ -59,7 +59,7 @@ namespace SanteDB.Persistence.Data.Test
             {
                 Assert.AreEqual(PermissionPolicyIdentifiers.CreateApplication, e.PolicyId);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 Assert.Fail("Should throw a policy violation exception");
             }

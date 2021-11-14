@@ -155,12 +155,12 @@ namespace SanteDB.Persistence.Data.Test
         /// <summary>
         /// Test that the data is obsoleted
         /// </summary>
-        protected TData TestObsolete<TData>(TData objectToTest) where TData : BaseEntityData
+        protected TData TestDelete<TData>(TData objectToTest, DeleteMode deleteMode) where TData : BaseEntityData
         {
             var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TData>>();
             Assert.IsNotNull(persistenceService);
 
-            var afterObsolete = persistenceService.Delete(objectToTest.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal, DeleteMode.LogicalDelete);
+            var afterObsolete = persistenceService.Delete(objectToTest.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal, deleteMode);
 
             // Assert core properties are inserted
             Assert.IsNotNull(afterObsolete.Key);
@@ -169,7 +169,24 @@ namespace SanteDB.Persistence.Data.Test
 
             if (afterObsolete is IHasState state)
             {
-                Assert.AreEqual(StatusKeys.Obsolete, state.StatusConceptKey);
+                switch (deleteMode)
+                {
+                    case DeleteMode.LogicalDelete:
+                        Assert.AreEqual(StatusKeys.Inactive, state.StatusConceptKey);
+                        break;
+
+                    case DeleteMode.ObsoleteDelete:
+                        Assert.AreEqual(StatusKeys.Obsolete, state.StatusConceptKey);
+                        break;
+
+                    case DeleteMode.NullifyDelete:
+                        Assert.AreEqual(StatusKeys.Nullified, state.StatusConceptKey);
+                        break;
+
+                    case DeleteMode.PermanentDelete:
+                        Assert.AreEqual(StatusKeys.Purged, state.StatusConceptKey);
+                        break;
+                }
             }
             else
             {

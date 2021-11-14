@@ -26,14 +26,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <summary>
         /// Prepare references
         /// </summary>
-        protected override EntityRelationship PrepareReferences(DataContext context, EntityRelationship data)
+        protected override EntityRelationship BeforePersisting(DataContext context, EntityRelationship data)
         {
             data.ClassificationKey = this.EnsureExists(context, data.Classification)?.Key ?? data.ClassificationKey;
             data.RelationshipRoleKey = this.EnsureExists(context, data.RelationshipRole)?.Key ?? data.RelationshipRoleKey;
             data.RelationshipTypeKey = this.EnsureExists(context, data.RelationshipType)?.Key ?? data.RelationshipTypeKey;
             data.TargetEntityKey = this.EnsureExists(context, data.TargetEntity)?.Key ?? data.TargetEntityKey;
             data.HolderKey = this.EnsureExists(context, data.Holder)?.Key ?? data.HolderKey;
-            return base.PrepareReferences(context, data);
+            return base.BeforePersisting(context, data);
         }
 
         /// <summary>

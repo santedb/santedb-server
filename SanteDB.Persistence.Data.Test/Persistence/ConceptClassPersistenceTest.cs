@@ -17,7 +17,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
     [TestFixture(Category = "Persistence", TestName = "ADO ConceptClass")]
     public class ConceptClassPersistenceTest : DataPersistenceTest
     {
-
         /// <summary>
         /// Tests that class can be inserted
         /// </summary>
@@ -35,7 +34,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
 
                 var after = base.TestInsert(conceptClass);
             }
-
         }
 
         /// <summary>
@@ -64,7 +62,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
         [Test]
         public void TestObsoleteConceptClass()
         {
-            using(AuthenticationContext.EnterSystemContext())
+            using (AuthenticationContext.EnterSystemContext())
             {
                 var conceptClass = new ConceptClass()
                 {
@@ -74,7 +72,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 };
 
                 var afterInsert = base.TestInsert(conceptClass);
-                var afterObsolete = base.TestObsolete(afterInsert);
+                var afterObsolete = base.TestDelete(afterInsert, Core.Services.DeleteMode.LogicalDelete);
             }
         }
 
@@ -97,15 +95,15 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                     base.TestInsert(conceptClass);
                 }
 
-                var afterQuery = base.TestQuery<ConceptClass>(o=>o.Mnemonic.StartsWith("TEST_04_"), 10).AsResultSet();
+                var afterQuery = base.TestQuery<ConceptClass>(o => o.Mnemonic.StartsWith("TEST_04_"), 10).AsResultSet();
                 // In Debugging mode verify that the count() operation is executed on demand
                 var first = afterQuery.First();
                 Assert.AreEqual("TEST_04_0", first.Mnemonic);
 
-                var last = afterQuery.OrderByDescending(o=>o.Mnemonic).First();
+                var last = afterQuery.OrderByDescending(o => o.Mnemonic).First();
                 Assert.AreEqual("TEST_04_9", last.Mnemonic);
 
-                // Verify the persistence query stuff 
+                // Verify the persistence query stuff
                 var queryService = ApplicationServiceContext.Current.GetService<TestQueryPersistenceService>();
                 var qid = Guid.NewGuid();
                 queryService.SetExpectedQueryStats(qid, 10);
@@ -113,7 +111,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
 
                 // Verify that the stateful query doesn't actually call query
                 Assert.AreEqual(5, asState.Skip(1).Take(5).Count());
-
             }
         }
     }

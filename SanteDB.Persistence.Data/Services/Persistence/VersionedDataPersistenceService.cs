@@ -449,7 +449,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             return this.DoUpdateInternal(context, existing);
 
                         case DeleteMode.PermanentDelete:
-                            context.Delete(existing);
+                            existing.StatusConceptKey = StatusKeys.Purged;
+                            this.DoDeleteReferencesInternal(context, existing.Key);
+                            this.DoDeleteReferencesInternal(context, existing.VersionKey);
+                            context.Delete<TDbModel>(o => o.VersionKey == existing.VersionKey);
+                            // Reverse the history
+                            foreach (var ver in context.Query<TDbModel>(o => o.Key == existing.Key).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionKey))
+                            {
+                                context.Delete<TDbModel>(o => o.VersionKey == ver);
+                            }
+
+                            if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.KeepPurged))
+                            {
+                                existing.VersionKey = Guid.Empty;
+                                context.Insert(existing);
+                            }
                             return existing;
 
                         default:
@@ -497,7 +511,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 var statusKeyProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IHasState.StatusConceptKey)));
                 statusKeyProperty = Expression.MakeMemberAccess(statusKeyProperty, statusKeyProperty.Type.GetProperty("Value"));
-                query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, Expression.MakeBinary(ExpressionType.NotEqual, statusKeyProperty, Expression.Constant(StatusKeys.Obsolete))), query.Parameters);
+
+                Expression obsoleteFilter = null;
+                foreach (var itm in StatusKeys.InactiveStates)
+                {
+                    var condition = Expression.MakeBinary(ExpressionType.NotEqual, statusKeyProperty, Expression.Constant(itm));
+                    if (obsoleteFilter == null)
+                    {
+                        obsoleteFilter = condition;
+                    }
+                    else
+                    {
+                        obsoleteFilter = Expression.AndAlso(condition, obsoleteFilter);
+                    }
+                }
+                query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, obsoleteFilter), query.Parameters);
             }
 
             // pass control to sub group

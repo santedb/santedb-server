@@ -25,9 +25,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         }
 
         /// <summary>
+        /// The object <paramref name="key"/> is being purged - delete all references for the object
+        /// </summary>
+        protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
+        {
+            // Delete other objects
+            context.Delete<DbConceptName>(o => o.SourceKey == key);
+            context.Delete<DbConceptRelationship>(o => o.SourceKey == key);
+            context.Delete<DbConceptReferenceTerm>(o => o.SourceKey == key);
+            base.DoDeleteReferencesInternal(context, key);
+        }
+
+        /// <summary>
         /// Prepare references
         /// </summary>
-        protected override Concept PrepareReferences(DataContext context, Concept data)
+        protected override Concept BeforePersisting(DataContext context, Concept data)
         {
             if (!data.StatusConceptKey.HasValue)
             {

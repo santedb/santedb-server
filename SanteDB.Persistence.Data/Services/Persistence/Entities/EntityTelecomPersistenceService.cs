@@ -26,12 +26,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <summary>
         /// Prepare references for the insertion/update
         /// </summary>
-        protected override EntityTelecomAddress PrepareReferences(DataContext context, EntityTelecomAddress data)
+        protected override EntityTelecomAddress BeforePersisting(DataContext context, EntityTelecomAddress data)
         {
             data.AddressUseKey = this.EnsureExists(context, data.AddressUse)?.Key ?? data.AddressUseKey;
             data.TypeConceptKey = this.EnsureExists(context, data.TypeConcept)?.Key ?? data.TypeConceptKey;
 
-            return base.PrepareReferences(context, data);
+            return base.BeforePersisting(context, data);
         }
 
         /// <summary>

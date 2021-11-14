@@ -499,8 +499,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 afterQuery = base.TestQuery<Concept>(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == "TEST08"), 1).FirstOrDefault();
 
                 // Now obsolete
-                var afterObsolete = base.TestObsolete(afterInsert);
-                Assert.AreEqual(StatusKeys.Obsolete, afterObsolete.StatusConceptKey); // should be obsolete
+                var afterObsolete = base.TestDelete(afterInsert, Core.Services.DeleteMode.LogicalDelete);
+                Assert.AreEqual(StatusKeys.Inactive, afterObsolete.StatusConceptKey); // should be obsolete
 
                 // Should not be returned in query results
                 afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08", 0).FirstOrDefault();
@@ -509,11 +509,52 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.IsNull(afterQuery);
 
                 // Should return if Obsolete is specifically set
-                afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08" && o.StatusConceptKey == StatusKeys.Obsolete, 1).FirstOrDefault();
-                Assert.AreEqual(StatusKeys.Obsolete, afterQuery.StatusConceptKey);
+                afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08" && StatusKeys.InactiveStates.Contains(o.StatusConceptKey.Value), 1).FirstOrDefault();
+                Assert.AreEqual(StatusKeys.Inactive, afterQuery.StatusConceptKey);
                 Assert.AreEqual("TEST-08", afterQuery.Mnemonic);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ConceptNames).Count);
+
+                // Should un-delete
+                var afterRestore = base.TestUpdate(afterInsert, (o) =>
+                {
+                    o.StatusConceptKey = StatusKeys.Active;
+                    return o;
+                });
+
+                // Should now be returned in query results since it is restored
+                afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08", 1).FirstOrDefault();
+                Assert.IsNotNull(afterQuery);
+                afterQuery = base.TestQuery<Concept>(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == "TEST08"), 1).FirstOrDefault();
+                Assert.IsNotNull(afterQuery);
+
+                // Test Nullify
+                var afterNullify = base.TestDelete(afterRestore, Core.Services.DeleteMode.NullifyDelete);
+                // Should not be returned in query results since it is restored
+                afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08", 0).FirstOrDefault();
+                Assert.IsNull(afterQuery);
+                afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08" && o.StatusConceptKey == StatusKeys.Nullified, 1).FirstOrDefault();
+                Assert.IsNotNull(afterQuery);
+
+                // Now test purge
+                var afterPurge = base.TestDelete(afterRestore, Core.Services.DeleteMode.PermanentDelete);
+                // Should not be returned in query results since it is restored
+                afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08", 0).FirstOrDefault();
+                Assert.IsNull(afterQuery);
+
+                try
+                {
+                    // Should not be able to restore
+                    afterPurge = base.TestUpdate(afterInsert, (o) =>
+                    {
+                        o.StatusConceptKey = StatusKeys.Active;
+                        return o;
+                    });
+                    Assert.Fail("Should have failed");
+                }
+                catch
+                {
+                }
             }
         }
     }

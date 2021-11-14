@@ -246,9 +246,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
-        /// Prepare all references
+        /// Called before the object is persisted - this allows implementations to change the object before being persisted
         /// </summary>
-        protected abstract TModel PrepareReferences(DataContext context, TModel data);
+        protected abstract TModel BeforePersisting(DataContext context, TModel data);
+
+        /// <summary>
+        /// Called after the object is persisted - this allows implementations to change the object before it is returned
+        /// </summary>
+        protected abstract TModel AfterPersisted(DataContext context, TModel data);
 
         /// <summary>
         /// Get related mapping provider
@@ -301,7 +306,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 throw new ArgumentNullException(nameof(data), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            data = this.PrepareReferences(context, data);
+            data = this.BeforePersisting(context, data);
 
 #if DEBUG
             Stopwatch sw = new Stopwatch();
@@ -312,7 +317,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var dbInstance = this.DoConvertToDataModel(context, data);
                 dbInstance = this.DoInsertInternal(context, dbInstance);
                 var retVal = this.DoConvertToInformationModel(context, dbInstance);
-                return retVal;
+                return this.AfterPersisted(context, retVal);
 #if DEBUG
             }
             finally
@@ -337,7 +342,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 throw new ArgumentNullException(nameof(data), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            data = this.PrepareReferences(context, data);
+            data = this.BeforePersisting(context, data);
 
 #if DEBUG
             Stopwatch sw = new Stopwatch();
@@ -348,7 +353,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var dbInstance = this.DoConvertToDataModel(context, data);
                 dbInstance = this.DoUpdateInternal(context, dbInstance);
                 var retVal = this.DoConvertToInformationModel(context, dbInstance);
-                return retVal;
+                return this.AfterPersisted(context, retVal);
 
 #if DEBUG
             }
@@ -407,6 +412,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 sw.Start();
 #endif
+                if (deletionMode == DeleteMode.PermanentDelete)
+                {
+                    this.DoDeleteReferencesInternal(context, key);
+                }
                 var dbInstance = this.DoDeleteInternal(context, key, deletionMode);
                 var retVal = this.DoConvertToInformationModel(context, dbInstance);
                 return retVal;
@@ -419,6 +428,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 #endif
         }
+
+        /// <summary>
+        /// The object <paramref name="key"/> is being purged - delete all references for the object
+        /// </summary>
+        protected abstract void DoDeleteReferencesInternal(DataContext context, Guid key);
 
         /// <summary>
         /// Perform a get operation returning a model

@@ -25,6 +25,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         }
 
         /// <summary>
+        /// The object <paramref name="key"/> is being purged - delete all references for the object
+        /// </summary>
+        protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
+        { }
+
+        /// <summary>
         /// Get current version sequence
         /// </summary>
         /// <returns></returns>

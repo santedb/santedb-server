@@ -25,11 +25,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <summary>
         /// Prepare references
         /// </summary>
-        protected override ActIdentifier PrepareReferences(DataContext context, ActIdentifier data)
+        protected override ActIdentifier BeforePersisting(DataContext context, ActIdentifier data)
         {
             data.AuthorityKey = this.EnsureExists(context, data.Authority)?.Key ?? data.AuthorityKey;
             data.IdentifierTypeKey = this.EnsureExists(context, data.IdentifierType)?.Key ?? data.IdentifierTypeKey;
-            return base.PrepareReferences(context, data);
+            return base.BeforePersisting(context, data);
         }
 
         /// <summary>

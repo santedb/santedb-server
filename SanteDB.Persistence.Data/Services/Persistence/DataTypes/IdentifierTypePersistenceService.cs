@@ -25,11 +25,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <summary>
         /// Prepare all references
         /// </summary>
-        protected override IdentifierType PrepareReferences(DataContext context, IdentifierType data)
+        protected override IdentifierType BeforePersisting(DataContext context, IdentifierType data)
         {
             data.ScopeConceptKey = this.EnsureExists(context, data.ScopeConcept)?.Key ?? data.ScopeConceptKey;
             data.TypeConceptKey = this.EnsureExists(context, data.TypeConcept)?.Key ?? data.TypeConceptKey;
-            return base.PrepareReferences(context, data);
+            return base.BeforePersisting(context, data);
         }
 
         /// <summary>

@@ -25,7 +25,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <summary>
         /// Prepare references for this object
         /// </summary>
-        protected override ConceptReferenceTerm PrepareReferences(DataContext context, ConceptReferenceTerm data)
+        protected override ConceptReferenceTerm BeforePersisting(DataContext context, ConceptReferenceTerm data)
         {
             data.RelationshipTypeKey = this.EnsureExists(context, data.RelationshipType)?.Key ?? data.RelationshipTypeKey;
             data.ReferenceTermKey = this.EnsureExists(context, data.ReferenceTerm)?.Key ?? data.ReferenceTermKey;
