@@ -56,20 +56,15 @@ namespace SanteDB.Configuration
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(ConfigurationContext));
 
 #if DEBUG
+        private const string InitialConfigurationFile = "santedb.config.debug.xml";
 #else
-        private string m_configurationFile
+        private const string InitialConfigurationFile = "santedb.config.xml";
 #endif
 
         /// <summary>
         /// Gets the configuration file name
         /// </summary>
-        public string ConfigurationFile { get; private set; }
-#if DEBUG
-            = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.config.debug.xml");
-
-#else
-            = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.config.xml");
-#endif
+        public string ConfigurationFile { get; private set; } = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), InitialConfigurationFile);
 
         /// <summary>
         /// Gets the plugin assemblies
