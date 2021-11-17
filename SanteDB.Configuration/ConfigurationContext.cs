@@ -68,17 +68,15 @@ namespace SanteDB.Configuration
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(ConfigurationContext));
 
 #if DEBUG
+        private const string InitialConfigurationFile = "santedb.config.debug.xml";
 #else
-        private string m_configurationFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.config.xml");
+        private const string InitialConfigurationFile = "santedb.config.xml";
 #endif
 
         /// <summary>
         /// Gets the configuration file name
         /// </summary>
-        public String ConfigurationFile
-        {
-            get; private set;
-        }
+        public string ConfigurationFile { get; private set; } = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), InitialConfigurationFile);
 
         /// <summary>
         /// Gets the plugin assemblies
@@ -153,7 +151,7 @@ namespace SanteDB.Configuration
         public string GetAppSetting(string key)
         {
             // Use configuration setting
-            String retVal = null;
+            string retVal = null;
             try
             {
                 retVal = this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>()?.AppSettings.Find(o => o.Key == key)?.Value;
@@ -173,7 +171,7 @@ namespace SanteDB.Configuration
             // Default configuration
             this.Configuration = new SanteDBConfiguration();
             // Initial settings for initial
-            this.Configuration.AddSection(new OrmConfigurationSection()
+            this.Configuration.AddSection(new OrmConfigurationSection
             {
                 AdoProvider = this.GetAllTypes().Where(t => typeof(DbProviderFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).Select(t => new ProviderRegistrationConfiguration(t.Namespace.StartsWith("System") ? t.Name : t.Namespace.Split('.')[0], t)).ToList(),
                 Providers = this.GetAllTypes().Where(t => typeof(IDbProvider).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).Select(t => new ProviderRegistrationConfiguration((Activator.CreateInstance(t) as IDbProvider).Invariant, t)).ToList()

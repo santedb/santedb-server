@@ -58,13 +58,13 @@ namespace SanteDB.Persistence.Auditing.ADO.Data.Model
         /// The time of the event
         /// </summary>
         [Column("evt_utc")]
-        public DateTime Timestamp { get; set; }
+        public DateTimeOffset Timestamp { get; set; }
 
         /// <summary>
         /// The time the data was created
         /// </summary>
         [Column("crt_utc")]
-        public DateTime CreationTime { get; set; }
+        public DateTimeOffset CreationTime { get; set; }
 
         /// <summary>
         /// The event type identifier

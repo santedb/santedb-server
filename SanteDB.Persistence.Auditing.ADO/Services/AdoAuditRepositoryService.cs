@@ -236,7 +236,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     ActionCode = (ActionType)res.Object1.ActionCode,
                     EventIdentifier = (EventIdentifierType)res.Object1.EventIdentifier,
                     Outcome = (OutcomeIndicator)res.Object1.Outcome,
-                    Timestamp = res.Object1.Timestamp,
+                    Timestamp = res.Object1.Timestamp.DateTime,
                     Key = res.Object1.Key
                 };
 
