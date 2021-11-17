@@ -41,10 +41,10 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FirebirdSql.Data.FirebirdClient">
-      <Version>7.5.0</Version>
+      <Version>8.5.4</Version>
     </PackageReference>
     <PackageReference Include="Npgsql">
-      <Version>5.0.7</Version>
+      <Version>5.0.11</Version>
     </PackageReference>
     <PackageReference Include="System.IdentityModel.Tokens.Jwt">
       <Version>4.0.4.403061554</Version>

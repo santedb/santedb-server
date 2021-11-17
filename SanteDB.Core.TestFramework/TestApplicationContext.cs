@@ -194,7 +194,7 @@ namespace SanteDB.Core.TestFramework
                             Tracer.AddWriter(Activator.CreateInstance(writer.TraceWriter, writer.Filter, writer.InitializationData, config.Sources.ToDictionary(o => o.SourceName, o => o.Filter)) as TraceWriter, writer.Filter);
 #if DEBUG
                     else
-                        Tracer.AddWriter(new SystemDiagnosticsTraceWriter(), System.Diagnostics.Tracing.EventLevel.LogAlways);
+                        Tracer.AddWriter(new SanteDB.Core.Diagnostics.Tracing.SystemDiagnosticsTraceWriter(), System.Diagnostics.Tracing.EventLevel.LogAlways);
 #endif
 
                     this.m_tracer.TraceInfo("STAGE1 START: Start Dependency Injection Manager");

@@ -18,7 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
-using Microsoft.Diagnostics.Runtime;
+
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Applets.Services;
@@ -60,12 +60,10 @@ namespace SanteDB.Messaging.AMI.Wcf
     /// <remarks>Represents the SanteDB Server implementation of the Administrative Management Interface (AMI) contract</remarks>
     public class AmiServiceBehavior : AmiServiceBehaviorBase
     {
-
         /// <summary>
         /// Get resource handler
         /// </summary>
         protected override ResourceHandlerTool GetResourceHandler() => AmiMessageHandler.ResourceHandler;
-
 
         /// <summary>
         /// Get a list of TFA mechanisms
@@ -120,8 +118,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             if (offset > fi.Length || count > fi.Length) throw new ArgumentOutOfRangeException($"Log file {logId} is {fi.Length} but offset is greater at {offset}");
             using (var fs = File.OpenRead(logFile))
             {
-
-                // Is count specified 
+                // Is count specified
                 byte[] buffer;
                 if (offset + count > fi.Length)
                     buffer = new byte[fi.Length - offset];
@@ -179,7 +176,6 @@ namespace SanteDB.Messaging.AMI.Wcf
             return retVal;
         }
 
-
         /// <summary>
         /// Gets options for the AMI service.
         /// </summary>
@@ -196,7 +192,7 @@ namespace SanteDB.Messaging.AMI.Wcf
             // mex configuration
             var mexConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SanteDB.Rest.Common.Configuration.RestConfigurationSection>();
             String boundHostPort = $"{RestOperationContext.Current.IncomingRequest.Url.Scheme}://{RestOperationContext.Current.IncomingRequest.Url.Host}:{RestOperationContext.Current.IncomingRequest.Url.Port}";
-            if(!String.IsNullOrEmpty(mexConfig.ExternalHostPort))
+            if (!String.IsNullOrEmpty(mexConfig.ExternalHostPort))
             {
                 var tUrl = new Uri(mexConfig.ExternalHostPort);
                 boundHostPort = $"{tUrl.Scheme}://{tUrl.Host}:{tUrl.Port}";
@@ -208,7 +204,8 @@ namespace SanteDB.Messaging.AMI.Wcf
                 Endpoints = ApplicationServiceContext.Current.GetService<IServiceManager>().GetServices().OfType<IApiEndpointProvider>().Select(o =>
                     new ServiceEndpointOptions(o)
                     {
-                        BaseUrl = o.Url.Select(url => {
+                        BaseUrl = o.Url.Select(url =>
+                        {
                             var turi = new Uri(url);
                             return $"{boundHostPort}{turi.AbsolutePath}";
                         }).ToArray()
@@ -249,8 +246,8 @@ namespace SanteDB.Messaging.AMI.Wcf
             {
                 if (Process.GetCurrentProcess()?.Threads == null)
                     this.m_traceSource.TraceEvent(EventLevel.Warning, "Threading information is not available for this instance");
-                else 
-                    foreach (ProcessThread thd in Process.GetCurrentProcess().Threads.OfType<ProcessThread>().Where(o=>o != null))
+                else
+                    foreach (ProcessThread thd in Process.GetCurrentProcess().Threads.OfType<ProcessThread>().Where(o => o != null))
                         retVal.Threads.Add(new DiagnosticThreadInfo()
                         {
                             Name = thd.Id.ToString(),
@@ -260,9 +257,9 @@ namespace SanteDB.Messaging.AMI.Wcf
                             TaskInfo = thd.ThreadState == ThreadState.Wait ? thd.WaitReason.ToString() : "N/A"
                         });
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error gathering thread information: {0}", e);
+                this.m_traceSource.TraceEvent(EventLevel.Error, "Error gathering thread information: {0}", e);
             }
 
             retVal.ApplicationInfo.Assemblies = AppDomain.CurrentDomain.GetAssemblies().Select(o => new DiagnosticVersionInfo(o)).ToList();
@@ -279,9 +276,8 @@ namespace SanteDB.Messaging.AMI.Wcf
             return retVal;
         }
 
-
         /// <summary>
-        /// Creates the specified resource for the AMI service 
+        /// Creates the specified resource for the AMI service
         /// </summary>
         /// <param name="resourceType">The type of resource being created</param>
         /// <param name="data">The resource data being created</param>
@@ -316,7 +312,7 @@ namespace SanteDB.Messaging.AMI.Wcf
         }
 
         /// <summary>
-        /// Get a specific version of the resource 
+        /// Get a specific version of the resource
         /// </summary>
         public override Object GetVersion(string resourceType, string key, string versionKey)
         {
@@ -324,7 +320,7 @@ namespace SanteDB.Messaging.AMI.Wcf
         }
 
         /// <summary>
-        /// Get the complete history of a resource 
+        /// Get the complete history of a resource
         /// </summary>
         public override AmiCollection History(string resourceType, string key)
         {
@@ -389,7 +385,5 @@ namespace SanteDB.Messaging.AMI.Wcf
         {
             return base.UnLock(resourceType, key);
         }
-
-       
     }
 }
