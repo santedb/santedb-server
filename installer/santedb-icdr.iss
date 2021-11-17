@@ -273,7 +273,6 @@ Source: ..\bin\Release\SanteDB.Rest.HDSI.dll; DestDir: {app}; Components: msg\hd
 
 ; Common .NET Standard
 Source: ..\bin\Release\Microsoft.Bcl.AsyncInterfaces.dll; DestDir: {app}; 
-Source: ..\bin\Release\Microsoft.Diagnostics.Runtime.dll; DestDir: {app}; 
 Source: ..\bin\Release\Microsoft.Win32.Primitives.dll; DestDir: {app}; 
 Source: ..\bin\Release\netstandard.dll; DestDir: {app}; Components: core server
 Source: ..\bin\Release\System.*.dll; DestDir: {app}; 

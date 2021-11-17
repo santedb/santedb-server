@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
@@ -40,7 +41,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class ConceptPersistenceService : VersionedDataPersistenceService<Core.Model.DataTypes.Concept, DbConceptVersion, DbConcept>
     {
-
         // Status set keys
         private static readonly Guid[] s_statusSets = new Guid[]
         {
@@ -79,17 +79,16 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
                 retVal.LoadState = Core.Model.LoadState.PartialLoad;
                 retVal.ReferenceTerms = context.Query<DbConceptReferenceTerm>(o => o.SourceKey == retVal.Key && o.ObsoleteVersionSequenceId == null).ToArray().Select(o => new ConceptReferenceTerm(o.TargetKey, o.RelationshipTypeKey)).ToList();
-                
             }
 
-            if(retVal.ConceptNames == null || retVal.ConceptNames.Count == 0)
+            if (retVal.ConceptNames == null || retVal.ConceptNames.Count == 0)
                 retVal.ConceptNames = context.Query<DbConceptName>(o => o.SourceKey == retVal.Key && o.ObsoleteVersionSequenceId == null).ToArray().Select(o => new ConceptName(o.Language, o.Name)).ToList();
 
             return retVal;
         }
 
         /// <summary>
-        /// Insert concept 
+        /// Insert concept
         /// </summary>
         public override Core.Model.DataTypes.Concept InsertInternal(DataContext context, Core.Model.DataTypes.Concept data)
         {
@@ -97,8 +96,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             data.ClassKey = data.ClassKey ?? ConceptClassKeys.Other;
 
             // Ensure exists
-            if(data.Class != null) data.Class = data.Class?.EnsureExists(context) as ConceptClass;
-            if(data.StatusConcept != null) data.StatusConcept = data.StatusConcept?.EnsureExists(context) as Concept;
+            if (data.Class != null) data.Class = data.Class?.EnsureExists(context) as ConceptClass;
+            if (data.StatusConcept != null) data.StatusConcept = data.StatusConcept?.EnsureExists(context) as Concept;
             data.ClassKey = data.Class?.Key ?? data.ClassKey;
             data.StatusConceptKey = data.StatusConcept?.Key ?? data.StatusConceptKey;
 
@@ -162,12 +161,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                      context
                  );
 
-            // Concept sets 
+            // Concept sets
             if (retVal.ConceptSetsXml != null)
             {
                 // Special case m2m
-                var existingConceptSets = context.Query<DbConceptSetConceptAssociation>(o => o.ConceptKey == retVal.Key).Select(o=>o.ConceptSetKey);
-                
+                var existingConceptSets = context.Query<DbConceptSetConceptAssociation>(o => o.ConceptKey == retVal.Key).Select(o => o.ConceptSetKey);
+
                 // Any new?
                 var newConcepts = data.ConceptSetsXml.Where(o => !existingConceptSets.Contains(o));
                 foreach (var i in newConcepts)
@@ -213,7 +212,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         protected override void BulkPurgeInternal(DataContext context, Guid[] keysToPurge)
         {
-
             // Purge the related fields
             int ofs = 0;
             while (ofs < keysToPurge.Length)
@@ -261,6 +259,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Copy all code systems
             toContext.InsertOrUpdateAll(fromContext.Query<DbCodeSystem>(o => o.ObsoletionTime == null));
 
+            // Ensure the "TO" code system version sequence is set to accurate number
+            var maxVersionSequence = toContext.Query<DbConceptVersion>(o => true).OrderByDescending(o => o.VersionSequenceId).FirstOrDefault().VersionSequenceId;
+            toContext.ResetSequence("CD_VRSN_SEQ", maxVersionSequence);
+
             // Purge the related fields
             int ofs = 0;
             while (ofs < keysToCopy.Length)
@@ -280,14 +282,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         .Select(o => o.RelationshipTypeKey)
                         .Distinct()
                     ).Union(
-                        fromContext.Query<DbConceptRelationship>(o=>batchKeys.Contains(o.SourceKey))
-                        .Select(o=>o.TargetKey)
+                        fromContext.Query<DbConceptRelationship>(o => batchKeys.Contains(o.SourceKey))
+                        .Select(o => o.TargetKey)
                         .Distinct()
                     )
                     .ToArray();
                 toContext.InsertOrUpdateAll(fromContext.Query<DbConcept>(o => extraKeys.Contains(o.Key)));
 
-                // Users 
+                // Users
                 extraKeys = fromContext.Query<DbConceptVersion>(o => batchKeys.Contains(o.Key))
                     .Select(o => o.CreatedByKey)
                     .Distinct()
@@ -297,7 +299,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         .Distinct()
                         .ToArray()
                         .Where(o => o.HasValue)
-                        .Select(o=>o.Value)
+                        .Select(o => o.Value)
                     )
                     .ToArray();
                 toContext.InsertOrUpdateAll(fromContext.Query<DbSecurityUser>(o => extraKeys.Contains(o.Key)));
@@ -328,12 +330,10 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     .ToArray();
                 toContext.InsertOrUpdateAll(fromContext.Query<DbConceptSet>(o => extraKeys.Contains(o.Key)));
                 toContext.InsertOrUpdateAll(fromContext.Query<DbConceptSetConceptAssociation>(o => batchKeys.Contains(o.ConceptKey)));
-
             }
 
             toContext.ResetSequence("CD_VRSN_SEQ",
                 toContext.Query<DbConceptVersion>(o => true).Max(o => o.VersionSequenceId));
-
         }
     }
 
@@ -342,7 +342,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class ConceptNamePersistenceService : IdentifiedPersistenceService<Core.Model.DataTypes.ConceptName, DbConceptName>, IAdoAssociativePersistenceService
     {
-
         public ConceptNamePersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
         {
         }
@@ -366,7 +365,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override ConceptName InsertInternal(DataContext context, ConceptName data)
         {
-            
             // Remove concept from cache and create a new version
             ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(data.SourceEntityKey.Value);
             if (!data.EffectiveVersionSequenceId.HasValue)
@@ -375,7 +373,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 data.EffectiveVersionSequenceId = conceptVersion.VersionSequenceId;
             }
             return base.InsertInternal(context, data);
-
         }
     }
 }

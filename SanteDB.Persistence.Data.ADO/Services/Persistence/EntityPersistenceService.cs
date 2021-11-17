@@ -978,7 +978,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         .Select(o => o.Value)
                     ).Union(
                         fromContext.Query<DbPerson>(o => o.ParentKey != null)
-                        .Select(o => o.GenderConceptKey.GetValueOrDefault())
+                        .Select(o => o.GenderConceptKey.Value)
                         .Distinct()
                     )
                    .ToArray();
