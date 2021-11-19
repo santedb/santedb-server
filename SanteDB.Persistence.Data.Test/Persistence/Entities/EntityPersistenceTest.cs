@@ -9,6 +9,7 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Extensions;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 {
@@ -265,38 +266,349 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
             }
         }
 
+        /// <summary>
+        /// Test insertion of entity data with a telecom address
+        /// </summary>
+        [Test]
         public void TestInsertEntityTelecom()
         {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                var entity = new Entity()
+                {
+                    ClassConceptKey = EntityClassKeys.LivingSubject,
+                    DeterminerConceptKey = DeterminerKeys.Specific,
+                    TypeConceptKey = EntityClassKeys.Place,
+                    Names = new List<EntityName>()
+                {
+                    new EntityName(NameUseKeys.Assigned, "Justin3"),
+                    new EntityName(NameUseKeys.Legal, "Smith", "Justin3", "T", "E")
+                },
+                    Addresses = new List<EntityAddress>()
+                {
+                    new EntityAddress(AddressUseKeys.Direct, "123 Test1 Street West", "Hamilton3", "ON", "CA", "L8K5N2")
+                },
+                    Telecoms = new List<EntityTelecomAddress>()
+                    {
+                        new EntityTelecomAddress(TelecomAddressUseKeys.Public, "mailto:justin@fyfesoftware.ca")
+                        {
+                            TypeConceptKey = TelecomAddressTypeKeys.Internet
+                        }
+                    }
+                };
+
+                var afterInsert = base.TestInsert(entity);
+                Assert.IsNotNull(afterInsert.CreationTime);
+                Assert.AreEqual(1, afterInsert.Telecoms.Count);
+
+                var fetch = base.TestQuery<Entity>(o => o.Telecoms.Any(t => t.Value == "mailto:justin@fyfesoftware.ca"), 1).AsResultSet();
+                fetch = base.TestQuery<Entity>(o => o.Key == afterInsert.Key, 1).AsResultSet();
+                var afterFetch = fetch.First();
+                Assert.IsNull(afterFetch.Telecoms);
+                Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Telecoms).Count);
+                Assert.AreEqual(TelecomAddressTypeKeys.Internet, afterFetch.Telecoms[0].TypeConceptKey);
+                Assert.AreEqual(TelecomAddressUseKeys.Public, afterFetch.Telecoms[0].AddressUseKey);
+                Assert.AreEqual("mailto:justin@fyfesoftware.ca", afterFetch.Telecoms[0].Value);
+
+                // Update
+                var afterUpdate = base.TestUpdate(afterFetch, (o) =>
+                {
+                    o.Telecoms.Add(new EntityTelecomAddress(TelecomAddressUseKeys.Pager, "394-304-3045"));
+                    return o;
+                });
+                afterFetch = fetch.First();
+                Assert.IsNull(afterFetch.Telecoms);
+                Assert.AreEqual(2, afterFetch.LoadProperty(o => o.Telecoms).Count);
+
+                afterUpdate = base.TestUpdate(afterFetch, (o) =>
+                {
+                    o.Telecoms.RemoveAt(1);
+                    return o;
+                });
+                afterFetch = fetch.First();
+                Assert.IsNull(afterFetch.Telecoms);
+                Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Telecoms).Count);
+
+                afterUpdate = base.TestUpdate(afterFetch, (o) =>
+                {
+                    o.Telecoms[0].Value = "mailto:justin@fyfesoftware.com";
+                    return o;
+                });
+                afterFetch = fetch.First();
+                Assert.IsNull(afterFetch.Telecoms);
+                Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Telecoms).Count);
+                Assert.AreEqual("mailto:justin@fyfesoftware.com", afterFetch.Telecoms[0].Value);
+            }
         }
 
+        /// <summary>
+        /// Tests the insert of a full entity
+        /// </summary>
+        [Test]
         public void TestInsertEntityFull()
         {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                var entity = new Entity()
+                {
+                    ClassConceptKey = EntityClassKeys.LivingSubject,
+                    DeterminerConceptKey = DeterminerKeys.Specific,
+                    TypeConcept = new Concept() { Key = EntityClassKeys.Place },
+                    Names = new List<EntityName>()
+                    {
+                        new EntityName(NameUseKeys.Assigned, "Justin8")
+                    },
+                    Addresses = new List<EntityAddress>()
+                {
+                    new EntityAddress(AddressUseKeys.Direct, "123 Test8 Street West", "Hamilton8", "ON", "CA", "L8K5N2")
+                },
+                    Identifiers = new List<EntityIdentifier>()
+                    {
+                        new EntityIdentifier(new AssigningAuthority("TEST8", "TEST8", "2.25.438792"), "TEST_8")
+                    },
+                    Telecoms = new List<EntityTelecomAddress>()
+                    {
+                        new EntityTelecomAddress(TelecomAddressUseKeys.Public, "mailto:justin2@fyfesoftware.ca")
+                        {
+                            TypeConceptKey = TelecomAddressTypeKeys.Internet
+                        }
+                    },
+                    Relationships = new List<EntityRelationship>()
+                    {
+                        new EntityRelationship(EntityRelationshipTypeKeys.Replaces, new Entity() {
+                                ClassConceptKey = EntityClassKeys.LivingSubject,
+                                DeterminerConceptKey = DeterminerKeys.Specific,
+                            Names = new List<EntityName>()
+                            {
+                                new EntityName(NameUseKeys.Legal, "A name of a parent")
+                            }
+                        })
+                    },
+                    Extensions = new List<EntityExtension>()
+                    {
+                        new EntityExtension(ExtensionTypeKeys.DataQualityExtension, typeof(DictionaryExtensionHandler), new
+                        {
+                            foo = "bar"
+                        })
+                    },
+                    Template = new TemplateDefinition()
+                    {
+                        Mnemonic = "a template",
+                        Name = "A template",
+                        Oid = "2.25.349329849823",
+                        Description = "Just a test"
+                    },
+                    Notes = new List<EntityNote>()
+                    {
+                        new EntityNote()
+                        {
+                            Author = new Entity()
+                            {
+                                ClassConceptKey = EntityClassKeys.Entity,
+                                DeterminerConceptKey = DeterminerKeys.Specific,
+                                Names = new List<EntityName>()
+                                {
+                                    new EntityName(NameUseKeys.Legal, "Testing Author")
+                                }
+                            },
+                            Text = "This is a test note"
+                        }
+                    },
+                    Tags = new List<EntityTag>()
+                    {
+                        new EntityTag("foo","bar")
+                    }
+                };
+
+                var afterInsert = base.TestInsert(entity);
+                Assert.IsNotNull(afterInsert.CreationTime);
+                Assert.AreEqual(1, afterInsert.Telecoms.Count);
+
+                var fetch = base.TestQuery<Entity>(o => o.Key == afterInsert.Key, 1).AsResultSet();
+                var afterFetch = fetch.First();
+
+                Assert.AreEqual(EntityClassKeys.Place, afterFetch.TypeConceptKey);
+                Assert.AreEqual("Place", afterFetch.LoadProperty(o => o.TypeConcept).Mnemonic);
+
+                Assert.IsNull(afterFetch.Names);
+                Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Names).Count);
+                Assert.AreEqual("Justin8", afterFetch.Names[0].LoadProperty(o => o.Component)[0].Value);
+
+                Assert.IsNull(afterFetch.Addresses);
+                Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Addresses).Count);
+
+                Assert.IsNull(afterFetch.Identifiers);
+                Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Identifiers).Count);
+                Assert.AreEqual("TEST_8", afterFetch.Identifiers[0].Value);
+                Assert.AreEqual("TEST8", afterFetch.Identifiers[0].LoadProperty(o => o.Authority).DomainName);
+
+                Assert.IsNull(afterFetch.Telecoms);
+                Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Telecoms).Count);
+                Assert.AreEqual("mailto:justin2@fyfesoftware.ca", afterFetch.Telecoms[0].Value);
+
+                Assert.IsNull(afterFetch.Relationships);
+                Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Relationships).Count);
+                Assert.AreEqual(EntityRelationshipTypeKeys.Replaces, afterFetch.Relationships[0].RelationshipTypeKey);
+                Assert.IsNull(afterFetch.Relationships[0].TargetEntity);
+                Assert.AreEqual("A name of a parent", afterFetch.Relationships[0].LoadProperty(o => o.TargetEntity).LoadProperty(o => o.Names)[0].LoadProperty(o => o.Component)[0].Value);
+
+                Assert.IsNull(afterFetch.Tags);
+                Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Tags).Count);
+                Assert.AreEqual("foo", afterFetch.Tags[0].TagKey);
+                Assert.AreEqual("bar", afterFetch.Tags[0].Value);
+
+                Assert.IsNull(afterFetch.Extensions);
+                Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Extensions).Count);
+                Assert.AreEqual(ExtensionTypeKeys.DataQualityExtension, afterFetch.Extensions[0].ExtensionTypeKey);
+                Assert.IsNotNull(afterFetch.Extensions[0].ExtensionValue);
+
+                Assert.IsNull(afterFetch.Template);
+                Assert.IsNotNull(afterFetch.LoadProperty(o => o.Template));
+                Assert.AreEqual("A template", afterFetch.Template.Name);
+            }
         }
 
-        public void TestUpdateEntityBasic()
-        {
-        }
-
-        public void TestUpdateEntityRemoveAssociated()
-        {
-        }
-
+        /// <summary>
+        /// Verifies the changing of an entity's classification code
+        /// </summary>
+        [Test]
         public void TestUpdateEntityChangeClassCode()
         {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                var entity = new Entity()
+                {
+                    ClassConceptKey = EntityClassKeys.LivingSubject,
+                    DeterminerConceptKey = DeterminerKeys.Specific,
+                    TypeConceptKey = EntityClassKeys.Place
+                };
+
+                var afterInsert = base.TestInsert(entity);
+                Assert.IsNotNull(afterInsert.CreationTime);
+
+                var fetch = base.TestQuery<Entity>(o => o.Key == afterInsert.Key, 1).AsResultSet();
+                var afterFetch = fetch.First();
+                Assert.AreEqual(EntityClassKeys.LivingSubject, afterFetch.ClassConceptKey);
+
+                var afterUpdate = base.TestUpdate(afterFetch, (o) =>
+                {
+                    o.ClassConceptKey = EntityClassKeys.NonLivingSubject;
+                    return o;
+                });
+                Assert.AreEqual(EntityClassKeys.NonLivingSubject, afterUpdate.ClassConceptKey);
+
+                afterFetch = fetch.First();
+                Assert.AreEqual(EntityClassKeys.NonLivingSubject, afterFetch.ClassConceptKey);
+            }
         }
 
+        /// <summary>
+        /// Test the various modes of obsoleting an entity
+        /// </summary>
+        [Test]
         public void TestObsoleteEntity()
         {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                var entity = new Entity()
+                {
+                    ClassConceptKey = EntityClassKeys.LivingSubject,
+                    DeterminerConceptKey = DeterminerKeys.Specific,
+                    TypeConceptKey = EntityClassKeys.Place
+                };
+
+                var afterInsert = base.TestInsert(entity);
+                Assert.IsNotNull(afterInsert.CreationTime);
+
+                var fetch = base.TestQuery<Entity>(o => o.Key == afterInsert.Key, 1).AsResultSet();
+                var afterFetch = fetch.First();
+                Assert.AreEqual(StatusKeys.New, afterFetch.StatusConceptKey);
+
+                var afterDelete = base.TestDelete(afterFetch, Core.Services.DeleteMode.LogicalDelete);
+                base.TestQuery<Entity>(o => o.Key == afterInsert.Key, 0);
+                base.TestQuery<Entity>(o => o.Key == afterInsert.Key && StatusKeys.InactiveStates.Contains(o.StatusConceptKey.Value), 1);
+
+                // Now perma-delete
+                afterDelete = base.TestDelete(afterDelete, Core.Services.DeleteMode.PermanentDelete);
+                base.TestQuery<Entity>(o => o.Key == afterInsert.Key, 0);
+                base.TestQuery<Entity>(o => o.Key == afterInsert.Key && StatusKeys.InactiveStates.Contains(o.StatusConceptKey.Value), 0);
+            }
         }
 
+        /// <summary>
+        /// Tests various queries against the database
+        /// </summary>
+        [Test]
         public void TestQueryEntity()
         {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                Guid aaUuid = Guid.NewGuid();
+                var aa = base.TestInsert<AssigningAuthority>(new AssigningAuthority()
+                {
+                    Key = aaUuid,
+                    DomainName = "TESTSTRESS",
+                    Oid = "2.25.030404",
+                    Url = "http://google.test",
+                    Description = "A test thing",
+                    Name = "TEST_STRESS"
+                });
+
+                Enumerable.Range(0, 9).AsParallel().ForAll(i =>
+                {
+                    using (AuthenticationContext.EnterSystemContext())
+                    {
+                        var entity = new Entity()
+                        {
+                            ClassConceptKey = EntityClassKeys.LivingSubject,
+                            DeterminerConceptKey = DeterminerKeys.Specific,
+                            TypeConceptKey = EntityClassKeys.Place,
+                            Identifiers = new List<EntityIdentifier>()
+                        {
+                            new EntityIdentifier(aa, $"TEST_STRESS_{i}")
+                        },
+                            Names = new List<EntityName>()
+                        {
+                            new EntityName(NameUseKeys.Legal, $"Name_TEST{i}")
+                        },
+                            Addresses = new List<EntityAddress>()
+                        {
+                            new EntityAddress(AddressUseKeys.HomeAddress, "123 Main Street", $"TestCity{i}", "ON", "CA", "L8K5N2")
+                        },
+                            Relationships = new List<EntityRelationship>()
+                        {
+                            new EntityRelationship(EntityRelationshipTypeKeys.Replaces, new Entity()
+                            {
+                                ClassConceptKey = EntityClassKeys.LivingSubject,
+                                DeterminerConceptKey = DeterminerKeys.Specific,
+                                Names= new List<EntityName>()
+                                {
+                                    new EntityName(NameUseKeys.Legal, $"ReplacedEntity{i}")
+                                }
+                            })
+                        }
+                        };
+
+                        base.TestInsert(entity);
+                    }
+                });
+
+                Enumerable.Range(0, 9).AsParallel().ForAll(f =>
+                {
+                    var name = $"Name_TEST{f}";
+                    var id = $"TEST_STRESS_{f}";
+                    var afterQuery = base.TestQuery<Entity>(o => o.Identifiers.Any(i => i.Value == id), 1);
+                    afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == name)), 1);
+                });
+            }
         }
 
+        [Test]
         public void TestQueryEntityOrdering()
         {
         }
 
+        [Test]
         public void TestQueryEntityNested()
         {
         }

@@ -293,3 +293,4 @@ SanteDB.sln.GhostDoc.xml
 Help/
 /SanteDB/santedb.config.user.*.xml
 **/Version.cs
+Directory.Build.props
