@@ -56,20 +56,20 @@ namespace SanteDB.Persistence.PubSub.ADO
         // Load mapper
         private ModelMapper m_mapper = new ModelMapper(typeof(AdoPubSubManager).Assembly.GetManifestResourceStream("SanteDB.Persistence.PubSub.ADO.Data.Map.ModelMap.xml"));
 
+        // Cached factories
+        private IDictionary<String, IPubSubDispatcherFactory> m_factories;
+
         // Configuration section
         private AdoPubSubConfigurationSection m_configuration;
+
+        // Service manager
+        private IServiceManager m_serviceManager;
 
         // Security repository
         private ISecurityRepositoryService m_securityRepository;
 
         // Cache
         private IDataCachingService m_cache;
-
-        // Service manager
-        private IServiceManager m_serviceManager;
-
-        // Broker
-        private IPubSubBroker m_broker;
 
         // Policy enforcement
         private IPolicyEnforcementService m_policyEnforcementService;
@@ -81,15 +81,13 @@ namespace SanteDB.Persistence.PubSub.ADO
             IPolicyEnforcementService policyEnforcementService,
             IConfigurationManager configurationManager,
             ISecurityRepositoryService securityRepository,
-            IDataCachingService cachingService,
-            IPubSubBroker broker)
+            IDataCachingService cachingService)
         {
             this.m_cache = cachingService;
-            this.m_serviceManager = serviceManager;
-            this.m_broker = broker;
             this.m_configuration = configurationManager.GetSection<AdoPubSubConfigurationSection>();
             this.m_policyEnforcementService = policyEnforcementService;
             this.m_securityRepository = securityRepository;
+            this.m_serviceManager = serviceManager;
             this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.PubSub.ADO");
         }
 
@@ -380,7 +378,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// </summary>
         public PubSubChannelDefinition RegisterChannel(string name, Uri endpoint, IDictionary<string, string> settings)
         {
-            return this.RegisterChannel(name, this.m_broker.FindDispatcherFactory(endpoint).GetType(), endpoint, settings);
+            return this.RegisterChannel(name, this.FindDispatcherFactory(endpoint).GetType(), endpoint, settings);
         }
 
         /// <summary>
@@ -741,6 +739,42 @@ namespace SanteDB.Persistence.PubSub.ADO
         public PubSubSubscriptionDefinition GetSubscriptionByName(string name)
         {
             return this.FindSubscription(o => o.Name == name && o.ObsoletionTime == null, 0, 1, out int _).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Get all factories
+        /// </summary>
+        private IDictionary<String, IPubSubDispatcherFactory> GetFactories()
+        {
+            if (this.m_factories == null)
+            {
+                this.m_factories = this.m_serviceManager.GetAllTypes()
+                    .Where(t => typeof(IPubSubDispatcherFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsAbstract)
+                    .Select(t => this.m_serviceManager.CreateInjected(t))
+                    .OfType<IPubSubDispatcherFactory>()
+                    .SelectMany(f => f.Schemes.Select(s => new { Scheme = s, Factory = f }))
+                    .ToDictionary(k => k.Scheme, f => f.Factory);
+            }
+            return this.m_factories;
+        }
+
+        /// <summary>
+        /// Finds an implementation of the IDisptacherFactory which works for the specified URI
+        /// </summary>
+        public IPubSubDispatcherFactory FindDispatcherFactory(Uri targetUri)
+        {
+            this.GetFactories().TryGetValue(targetUri.Scheme, out IPubSubDispatcherFactory retVal);
+            return retVal;
+        }
+
+        /// <summary>
+        /// Get dispatcher factory by type
+        /// </summary>
+        public IPubSubDispatcherFactory GetDispatcherFactory(Type factoryType)
+        {
+            // TODO: Optimize this , basically this ensures that the factory type is not
+            // initialized more than once.
+            return this.GetFactories().Values.FirstOrDefault(o => o.GetType() == factoryType);
         }
     }
 }
