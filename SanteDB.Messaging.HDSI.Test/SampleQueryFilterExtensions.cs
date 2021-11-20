@@ -62,6 +62,7 @@ namespace SanteDB.Messaging.HDSI.Test
     /// <summary>
     /// Represents a simple query extension
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class SimpleQueryExtension : IQueryFilterExtension
     {
         /// <summary>
@@ -91,6 +92,7 @@ namespace SanteDB.Messaging.HDSI.Test
     /// <summary>
     /// A boolean query extension
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class BoolQueryExtension : IQueryFilterExtension
     {
         /// <summary>
@@ -123,6 +125,7 @@ namespace SanteDB.Messaging.HDSI.Test
     /// <summary>
     /// An extended query extension
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class SimpleQueryExtensionEx : IQueryFilterExtension
     {
 
