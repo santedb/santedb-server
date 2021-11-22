@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Configuration;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Features;
@@ -45,7 +46,6 @@ namespace SanteDB.Server.Core.Configuration.Features
     /// </summary>
     public class RestServiceFeature : IFeature
     {
-
         // Tracer
         internal readonly Tracer m_tracer;
 
@@ -57,6 +57,7 @@ namespace SanteDB.Server.Core.Configuration.Features
 
         // Contract type
         private Type m_behaviorType = null;
+
         private Type m_contractType = null;
 
         // Configuration type
@@ -65,13 +66,11 @@ namespace SanteDB.Server.Core.Configuration.Features
         // Service type
         private Type m_serviceType = null;
 
-
         /// <summary>
         /// REST service configuration
         /// </summary>
         public RestServiceFeature()
         {
-
             foreach (var feature in AppDomain.CurrentDomain.GetAssemblies()
                 .Where(a => !a.IsDynamic)
                 .SelectMany(t => { try { return t.ExportedTypes; } catch { return Type.EmptyTypes; } })
@@ -151,7 +150,6 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// </summary>
         public IEnumerable<IConfigurationTask> CreateInstallTasks()
         {
-
             var retVal = new List<IConfigurationTask>();
 
             if (this.m_oldConfiguration != null) // There is an old configuration
@@ -163,7 +161,7 @@ namespace SanteDB.Server.Core.Configuration.Features
                 }
             }
 
-            // Add configuration 
+            // Add configuration
             retVal.AddRange(new IConfigurationTask[] {
                 new RestMessageDaemonInstallTask(this, this.m_serviceType),
                 new RestEndpointInstallTask(this, this.m_configuration.Values["REST API"] as RestServiceConfiguration),
@@ -190,7 +188,6 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// </summary>
         public FeatureInstallState QueryState(SanteDBConfiguration configuration)
         {
-
             // First, is the REST service enabled?
             if (!configuration.SectionTypes.Any(o => typeof(SanteDB.Rest.Common.Configuration.RestConfigurationSection).IsAssignableFrom(o.Type)))
                 configuration.AddSection(new SanteDB.Rest.Common.Configuration.RestConfigurationSection());
@@ -257,7 +254,7 @@ namespace SanteDB.Server.Core.Configuration.Features
     internal class RestServiceConfigurationUninstallTask : IConfigurationTask
     {
         /// <summary>
-        /// Configuration section 
+        /// Configuration section
         /// </summary>
         private object m_configurationSection;
 
@@ -340,7 +337,7 @@ namespace SanteDB.Server.Core.Configuration.Features
         public string Description => $"Removes the HTTP binding for {this.Feature.Name} service";
 
         /// <summary>
-        /// Gets the feature 
+        /// Gets the feature
         /// </summary>
         public IFeature Feature { get; }
 
@@ -551,7 +548,6 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// Verify this task can be executed
         /// </summary>
         public bool VerifyState(SanteDBConfiguration configuration) => true;
-
     }
 
     /// <summary>
@@ -559,7 +555,6 @@ namespace SanteDB.Server.Core.Configuration.Features
     /// </summary>
     internal class RestEndpointInstallTask : IConfigurationTask
     {
-
         // The feature
         private readonly RestServiceFeature m_feature;
 
@@ -706,7 +701,7 @@ namespace SanteDB.Server.Core.Configuration.Features
         public event EventHandler<SanteDB.Core.Services.ProgressChangedEventArgs> ProgressChanged;
 
         /// <summary>
-        /// Execute the feature install 
+        /// Execute the feature install
         /// </summary>
         public bool Execute(SanteDBConfiguration configuration)
         {
