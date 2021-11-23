@@ -170,7 +170,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                     {
                                         ctx.Open();
                                         ctx.LoadState = LoadState.FullLoad;
-                                        retVal = persistenceInstance.Get(ctx, o);
+                                        retVal = persistenceInstance.Get(ctx, o) as IdentifiedData;
                                         cacheService?.Add(retVal as IdentifiedData);
                                     }
                                 return retVal;
@@ -296,7 +296,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                             if (retVal == null)
                                                 using (var subConn = connection.OpenClonedContext())
                                                 {
-                                                    retVal = persistenceInstance.Get(subConn, (Guid)o);
+                                                    retVal = persistenceInstance.Get(subConn, (Guid)o) as IdentifiedData;
                                                     cacheService?.Add(retVal as IdentifiedData);
                                                 }
                                             return retVal;
@@ -309,7 +309,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                             if (retVal == null)
                                                 using (var subConn = connection.OpenClonedContext())
                                                 {
-                                                    retVal = persistenceInstance.ToModelInstance(o, subConn);
+                                                    retVal = persistenceInstance.ToModelInstance(o, subConn) as IdentifiedData;
                                                     cacheService?.Add(retVal as IdentifiedData);
                                                 }
                                             return retVal;
