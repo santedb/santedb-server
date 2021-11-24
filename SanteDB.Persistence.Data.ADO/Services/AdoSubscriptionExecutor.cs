@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,7 +56,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
     [ServiceProvider("ADO.NET Subscription Executor", Dependencies = new Type[] { typeof(ISqlDataPersistenceService) })]
     public class AdoSubscriptionExecutor : ISubscriptionExecutor
     {
-
         // Parameter regex
         private readonly Regex m_parmRegex = new Regex(@"(.*?)(\$\w*?\$)", RegexOptions.Multiline);
 
@@ -78,7 +78,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public AdoSubscriptionExecutor()
         {
-
             var adoService = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
             if (adoService == null)
                 throw new InvalidOperationException("AdoSubscriptionExector requires the AdoPersistenceService to be registered");
@@ -153,7 +152,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     new Type[] { typeof(NameValueCollection) }
                 ).Invoke(null, new object[] { parameters });
 
-
                 // Query has been registered?
                 IEnumerable<IdentifiedData> result = null;
                 if (queryId != Guid.Empty && queryService?.IsRegistered(queryId) == true)
@@ -170,11 +168,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                     {
                                         ctx.Open();
                                         ctx.LoadState = LoadState.FullLoad;
-                                        retVal = persistenceInstance.Get(ctx, o);
-                                        cacheService?.Add(retVal as IdentifiedData);
+                                        retVal = persistenceInstance.Get(ctx, o) as IdentifiedData;
+                                        cacheService?.Add(retVal);
                                     }
                                 return retVal;
-
                             }
                             catch (Exception e)
                             {
@@ -220,7 +217,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             {
                                 if (parameters.TryGetValue("_" + o.Groups[2].Value.Substring(1, o.Groups[2].Value.Length - 2), out List<String> qValue))
                                 {
-
                                     Guid uuid = Guid.Empty;
                                     if (Guid.TryParse(qValue.First(), out uuid))
                                         values.AddRange(qValue.Select(v => Guid.Parse(v)).OfType<Object>());
@@ -231,7 +227,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 return "NULL";
                             });
 
-                            // Now we want to append 
+                            // Now we want to append
                             domainQuery.Append(" FROM (").Append(definitionQuery, values.ToArray()).Append($") AS {tableMapping.TableName} ");
                             domainQuery.Append(query.SQL.Substring(query.SQL.IndexOf("WHERE ")), query.Arguments.ToArray());
 
@@ -296,8 +292,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                             if (retVal == null)
                                                 using (var subConn = connection.OpenClonedContext())
                                                 {
-                                                    retVal = persistenceInstance.Get(subConn, (Guid)o);
-                                                    cacheService?.Add(retVal as IdentifiedData);
+                                                    retVal = persistenceInstance.Get(subConn, (Guid)o) as IdentifiedData;
+                                                    cacheService?.Add(retVal);
                                                 }
                                             return retVal;
                                         }
@@ -309,8 +305,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                             if (retVal == null)
                                                 using (var subConn = connection.OpenClonedContext())
                                                 {
-                                                    retVal = persistenceInstance.ToModelInstance(o, subConn);
-                                                    cacheService?.Add(retVal as IdentifiedData);
+                                                    retVal = persistenceInstance.ToModelInstance(o, subConn) as IdentifiedData;
+                                                    cacheService?.Add(retVal);
                                                 }
                                             return retVal;
                                         }
@@ -321,13 +317,10 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                         throw;
                                     }
                                 }).OfType<IdentifiedData>().ToList();
-
                             }
-
                         }
                         catch (Exception e)
                         {
-
 #if DEBUG
                             this.m_tracer.TraceError("Error executing subscription: {0}", e);
 #else

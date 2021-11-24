@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Query;
@@ -36,7 +37,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class ObservationPersistenceService : ActDerivedPersistenceService<Observation, DbObservation>
     {
-
         public ObservationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
         {
         }
@@ -64,7 +64,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             return this.ToModelInstance<Observation>(dataInstance, actVersionInstance, actInstance, context);
         }
 
-
         /// <summary>
         /// Convert a data act and observation instance to an observation
         /// </summary>
@@ -85,9 +84,32 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Observation InsertInternal(DataContext context, Observation data)
         {
-            if(data.InterpretationConcept != null) data.InterpretationConcept = data.InterpretationConcept?.EnsureExists(context) as Concept;
+            if (data.InterpretationConcept != null) data.InterpretationConcept = data.InterpretationConcept?.EnsureExists(context) as Concept;
+
             data.InterpretationConceptKey = data.InterpretationConcept?.Key ?? data.InterpretationConceptKey;
-            return base.InsertInternal(context, data);
+
+            return this.InsertData(context, data);
+        }
+
+        /// <summary>
+        /// Save value data
+        /// </summary>
+        private Observation InsertData(DataContext context, Observation data)
+        {
+            switch (data)
+            {
+                case QuantityObservation qobs: // insert the qty obs
+                    return new QuantityObservationPersistenceService(this.m_settingsProvider).Insert(context, qobs);
+
+                case TextObservation tobs:
+                    return new TextObservationPersistenceService(this.m_settingsProvider).Insert(context, tobs);
+
+                case CodedObservation cobs:
+                    return new CodedObservationPersistenceService(this.m_settingsProvider).Insert(context, cobs);
+
+                default:
+                    return base.Insert(context, data);
+            }
         }
 
         /// <summary>
@@ -97,8 +119,28 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             if (data.InterpretationConcept != null) data.InterpretationConcept = data.InterpretationConcept?.EnsureExists(context) as Concept;
             data.InterpretationConceptKey = data.InterpretationConcept?.Key ?? data.InterpretationConceptKey;
+            return this.UpdateData(context, data);
+        }
 
-            return base.UpdateInternal(context, data);
+        /// <summary>
+        /// Update data
+        /// </summary>
+        private Observation UpdateData(DataContext context, Observation data)
+        {
+            switch (data)
+            {
+                case QuantityObservation qobs: // insert the qty obs
+                    return new QuantityObservationPersistenceService(this.m_settingsProvider).Update(context, qobs);
+
+                case TextObservation tobs:
+                    return new TextObservationPersistenceService(this.m_settingsProvider).Update(context, tobs);
+
+                case CodedObservation cobs:
+                    return new CodedObservationPersistenceService(this.m_settingsProvider).Update(context, cobs);
+
+                default:
+                    return base.Insert(context, data);
+            }
         }
 
         /// <summary>
@@ -118,7 +160,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class TextObservationPersistenceService : ActDerivedPersistenceService<Core.Model.Acts.TextObservation, DbTextObservation, CompositeResult<DbTextObservation, DbObservation, DbActVersion, DbAct>>
     {
-
         public TextObservationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
         {
             this.m_observationPersistence = new ObservationPersistenceService(settingsProvider);
@@ -195,13 +236,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class CodedObservationPersistenceService : ActDerivedPersistenceService<Core.Model.Acts.CodedObservation, DbCodedObservation, CompositeResult<DbCodedObservation, DbObservation, DbActVersion, DbAct>>
     {
-
         public CodedObservationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
         {
             this.m_observationPersistence = new ObservationPersistenceService(settingsProvider);
         }
 
         private ObservationPersistenceService m_observationPersistence;
+
         /// <summary>
         /// Query internal
         /// </summary>
@@ -229,7 +270,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Core.Model.Acts.CodedObservation InsertInternal(DataContext context, Core.Model.Acts.CodedObservation data)
         {
-            if(data.Value != null) data.Value =data.Value?.EnsureExists(context) as Concept;
+            if (data.Value != null) data.Value = data.Value?.EnsureExists(context) as Concept;
             data.ValueKey = data.Value?.Key ?? data.ValueKey;
             var obsData = this.m_observationPersistence.InsertInternal(context, data);
             context.Insert(new DbCodedObservation()
@@ -254,7 +295,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 Value = data.ValueKey
             });
             return data;
-
         }
 
         /// <summary>
@@ -271,7 +311,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 Value = data.ValueKey
             });
             return data;
-
         }
     }
 
@@ -280,13 +319,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class QuantityObservationPersistenceService : ActDerivedPersistenceService<Core.Model.Acts.QuantityObservation, DbQuantityObservation, CompositeResult<DbQuantityObservation, DbObservation, DbActVersion, DbAct>>
     {
-
         public QuantityObservationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
         {
             this.m_observationPersistence = new ObservationPersistenceService(settingsProvider);
         }
 
-        private ObservationPersistenceService m_observationPersistence ;
+        private ObservationPersistenceService m_observationPersistence;
 
         /// <summary>
         /// Query internal
@@ -297,7 +335,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             query = Expression.Lambda<Func<QuantityObservation, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, query.Body, Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(parm, typeof(Observation).GetProperty(nameof(Observation.ValueType))), Expression.Constant("PQ"))), parm);
             return base.QueryInternal(context, query, queryId, offset, count, out totalResults, orderBy, countResults);
         }
-
 
         /// <summary>
         /// Convert the specified object to a model instance
@@ -311,13 +348,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             retVal.Value = dataInstance.Value;
             return retVal;
         }
-        
+
         /// <summary>
         /// Insert the observation
         /// </summary>
         public override Core.Model.Acts.QuantityObservation InsertInternal(DataContext context, Core.Model.Acts.QuantityObservation data)
         {
-            if(data.UnitOfMeasure != null) data.UnitOfMeasure = data.UnitOfMeasure?.EnsureExists(context) as Concept;
+            if (data.UnitOfMeasure != null) data.UnitOfMeasure = data.UnitOfMeasure?.EnsureExists(context) as Concept;
             data.UnitOfMeasureKey = data.UnitOfMeasure?.Key ?? data.UnitOfMeasureKey;
             var retVal = this.m_observationPersistence.InsertInternal(context, data);
             context.Insert(new DbQuantityObservation()
@@ -325,7 +362,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 ParentKey = data.VersionKey.Value,
                 UnitOfMeasureKey = data.UnitOfMeasureKey.Value,
                 Value = data.Value
-
             });
             return data;
         }
@@ -335,7 +371,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Core.Model.Acts.QuantityObservation UpdateInternal(DataContext context, Core.Model.Acts.QuantityObservation data)
         {
-            if(data.UnitOfMeasure != null) data.UnitOfMeasure = data.UnitOfMeasure?.EnsureExists(context) as Concept;
+            if (data.UnitOfMeasure != null) data.UnitOfMeasure = data.UnitOfMeasure?.EnsureExists(context) as Concept;
             data.UnitOfMeasureKey = data.UnitOfMeasure?.Key ?? data.UnitOfMeasureKey;
             this.m_observationPersistence.UpdateInternal(context, data);
             context.Insert(new DbQuantityObservation()
@@ -343,7 +379,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 ParentKey = data.VersionKey.Value,
                 UnitOfMeasureKey = data.UnitOfMeasureKey.Value,
                 Value = data.Value
-
             });
             return data;
         }
@@ -361,7 +396,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 ParentKey = data.VersionKey.Value,
                 UnitOfMeasureKey = data.UnitOfMeasureKey.Value,
                 Value = data.Value
-
             });
             return data;
         }
