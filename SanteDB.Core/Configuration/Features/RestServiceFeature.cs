@@ -225,24 +225,14 @@ namespace SanteDB.Server.Core.Configuration.Features
             if (serviceConfiguration == null)
                 serviceConfiguration = Activator.CreateInstance(this.m_configurationType);
 
-            // Construct the configuraiton
-            this.Configuration = new GenericFeatureConfiguration()
-            {
-                Categories = new Dictionary<string, string[]>()
-                {
-                    { "Misc", new string[] { "REST API", "Service" } }
-                },
-                Options = new Dictionary<string, Func<object>>()
-                {
-                    { "REST API", () => ConfigurationOptionType.Object },
-                    { "Service", () => ConfigurationOptionType.Object }
-                },
-                Values = new Dictionary<string, object>()
-                {
-                    { "REST API", restConfiguration },
-                    { "Service", serviceConfiguration }
-                }
-            };
+            // Construct the
+            GenericFeatureConfiguration genericConfig = new GenericFeatureConfiguration();
+            this.Configuration = genericConfig;
+            genericConfig.Categories.Add("Misc", new string[] { "REST API", "Service" });
+            genericConfig.Options.Add("REST API", () => ConfigurationOptionType.Object);
+            genericConfig.Options.Add("Service", () => ConfigurationOptionType.Object);
+            genericConfig.Values.Add("REST API", restConfiguration);
+            genericConfig.Values.Add("Service", serviceConfiguration);
 
             return featureState;
         }
