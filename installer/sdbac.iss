@@ -48,28 +48,28 @@ SignTool=default sign /a /n $qFyfe Software$q /d $qSanteDB iCDR Admin Console$q 
 ; Microsoft .NET Framework 4.5 Installation
 Source: .\netfx.exe; DestDir: {tmp} ; Flags: dontcopy
 
-Source: .\bin\Release\MohawkCollege.Util.Console.Parameters.dll  ; DestDir: {app}
-Source: .\bin\Release\Newtonsoft.Json.dll; DestDir: {app}
-Source: .\bin\Release\RestSrvr.dll; DestDir: {app}
-Source: .\bin\Release\SanteDB.Configuration.dll; DestDir: {app}
-Source: .\bin\Release\SanteDB.Core.Api.dll; DestDir: {app}
-Source: .\bin\Release\SanteDB.Core.Applets.dll; DestDir: {app}
-Source: .\bin\Release\SanteDB.Core.Model.AMI.dll; DestDir: {app}
-Source: .\bin\Release\SanteDB.Core.Model.dll; DestDir: {app}
-Source: .\bin\Release\SanteDB.Docker.Core.dll; DestDir: {app}
-Source: .\bin\Release\SanteDB.Messaging.AMI.Client.dll; DestDir: {app}
-Source: .\bin\Release\SanteDB.Messaging.HDSI.Client.dll; DestDir: {app}
-Source: .\bin\Release\SanteDB.Rest.Common.dll; DestDir: {app}
-Source: .\bin\Release\SanteDB.Server.AdminConsole.Api.dll; DestDir: {app}
-Source: .\bin\Release\SanteDB.Server.Core.dll; DestDir: {app}
-Source: .\bin\Release\sdbac.exe; DestDir: {app}
-Source: .\bin\Release\sdbac.exe.config; DestDir: {app}
-Source: .\bin\Release\SharpCompress.dll; DestDir: {app}
-Source: .\bin\Release\System.Buffers.dll; DestDir: {app}
-Source: .\bin\Release\System.Collections.Concurrent.dll; DestDir: {app}
-Source: .\bin\Release\System.Collections.dll; DestDir: {app}
-Source: .\bin\Release\System.Memory.dll; DestDir: {app}
-Source: .\bin\Release\System.Runtime.CompilerServices.Unsafe.dll; DestDir: {app}
+Source: ..\bin\Release\MohawkCollege.Util.Console.Parameters.dll  ; DestDir: {app}
+Source: ..\bin\Release\Newtonsoft.Json.dll; DestDir: {app}
+Source: ..\bin\Release\RestSrvr.dll; DestDir: {app}
+Source: ..\bin\Release\SanteDB.Configuration.dll; DestDir: {app}
+Source: ..\bin\Release\SanteDB.Core.Api.dll; DestDir: {app}
+Source: ..\bin\Release\SanteDB.Core.Applets.dll; DestDir: {app}
+Source: ..\bin\Release\SanteDB.Core.Model.AMI.dll; DestDir: {app}
+Source: ..\bin\Release\SanteDB.Core.Model.dll; DestDir: {app}
+Source: ..\bin\Release\SanteDB.Docker.Core.dll; DestDir: {app}
+Source: ..\bin\Release\SanteDB.Messaging.AMI.Client.dll; DestDir: {app}
+Source: ..\bin\Release\SanteDB.Messaging.HDSI.Client.dll; DestDir: {app}
+Source: ..\bin\Release\SanteDB.Rest.Common.dll; DestDir: {app}
+Source: ..\bin\Release\SanteDB.Server.AdminConsole.Api.dll; DestDir: {app}
+Source: ..\bin\Release\SanteDB.Server.Core.dll; DestDir: {app}
+Source: ..\bin\Release\sdbac.exe; DestDir: {app}
+Source: ..\bin\Release\sdbac.exe.config; DestDir: {app}
+Source: ..\bin\Release\SharpCompress.dll; DestDir: {app}
+Source: ..\bin\Release\System.Buffers.dll; DestDir: {app}
+Source: ..\bin\Release\System.Collections.Concurrent.dll; DestDir: {app}
+Source: ..\bin\Release\System.Collections.dll; DestDir: {app}
+Source: ..\bin\Release\System.Memory.dll; DestDir: {app}
+Source: ..\bin\Release\System.Runtime.CompilerServices.Unsafe.dll; DestDir: {app}
 
 
 [Languages]
