@@ -39,6 +39,7 @@ using SanteDB.Core.Exceptions;
 
 using SanteDB.Core.Model.Audit;
 
+
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Diagnostics;
 
@@ -200,7 +201,7 @@ namespace SanteDB.Messaging.Atna
                     {
                         var atnaAo = new AtnaApi.Model.AuditableObject()
                         {
-                            IDTypeCode = aoPtctpt.IDTypeCode.HasValue ?
+                            IDTypeCode = aoPtctpt.IDTypeCode.HasValue && aoPtctpt.IDTypeCode != SdbAudit.AuditableObjectIdType.NotSpecified ?
                                 aoPtctpt.IDTypeCode.Value != SdbAudit.AuditableObjectIdType.Custom ?
                                     new CodeValue<AtnaApi.Model.AuditableObjectIdType>((AtnaApi.Model.AuditableObjectIdType)Enum.Parse(typeof(AtnaApi.Model.AuditableObjectIdType), aoPtctpt?.IDTypeCode?.ToString())) :
                                     (aoPtctpt.CustomIdTypeCode != null ?

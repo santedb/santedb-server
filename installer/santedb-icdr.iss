@@ -68,6 +68,7 @@ Name: interop\fhir; Description: HL7 Fast Health Integration Resources; Types: f
 Name: interop\hl7; Description: HL7v2 Messaging; Types: full demo
 Name: interop\gs1; Description: GS1 BMS Messaging; Types: full demo
 Name: interop\jira; Description: JIRA Integration; Types: full
+Name: interop\msmq; Description: Microsoft Message Queue (MSMQ); Types: full
 Name: interop\atna; Description: ATNA & DICOM Auditing; Types: full
 Name: interop\openapi; Description: OpenAPI; Types: full demo
 Name: reporting; Description: Reporting Services; Types: full
@@ -107,6 +108,9 @@ Source: ..\bin\Release\firebird.conf; DestDir: {app}; Components: db\fbsql
 Source: ..\bin\Release\firebird.msg; DestDir: {app}; Components: db\fbsql
 ;Source: ..\bin\Release\fbembed.dll; DestDir: {app}; Components: db\fbsql
 Source: ..\bin\Release\fbclient.dll; DestDir: {app}; Components: db\fbsql
+
+; MSMQ Support
+Source: ..\bin\Release\SanteDB.Queue.Msmq.dll; DestDir: {app}; Components: interop\msmq
 
 ; Demo Data
 Source: ..\SanteDB\Data\Demo\*.dataset; DestDir: {app}\data; Components: demo
@@ -273,7 +277,6 @@ Source: ..\bin\Release\SanteDB.Rest.HDSI.dll; DestDir: {app}; Components: msg\hd
 
 ; Common .NET Standard
 Source: ..\bin\Release\Microsoft.Bcl.AsyncInterfaces.dll; DestDir: {app}; 
-Source: ..\bin\Release\Microsoft.Diagnostics.Runtime.dll; DestDir: {app}; 
 Source: ..\bin\Release\Microsoft.Win32.Primitives.dll; DestDir: {app}; 
 Source: ..\bin\Release\netstandard.dll; DestDir: {app}; Components: core server
 Source: ..\bin\Release\System.*.dll; DestDir: {app}; 

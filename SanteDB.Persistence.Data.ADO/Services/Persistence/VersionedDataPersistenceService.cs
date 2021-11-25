@@ -546,7 +546,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 if (!sourceVersionMaps.TryGetValue(ins.SourceEntityKey.Value, out eftVersion))
                     eftVersion = source.VersionSequence.GetValueOrDefault();
                 ins.EffectiveVersionSequenceId = eftVersion;
-                persistenceService.InsertInternal(context, ins);
+
+                if (ins.Key.HasValue && context.Any<TDomainAssociation>(o => o.Key == ins.Key && o.SourceKey == ins.SourceEntityKey))
+                {
+                    persistenceService.UpdateInternal(context, ins);
+                }
+                else
+                {
+                    persistenceService.InsertInternal(context, ins);
+                }
             }
 
             // Remove any duplicated relationships

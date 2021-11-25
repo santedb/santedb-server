@@ -52,6 +52,7 @@ using System.Security.Permissions;
 using SanteDB.Server.Core.Services;
 using SanteDB.Server.Core.Configuration;
 using SanteDB.Core.Security.Services;
+using SanteDB.Core.Diagnostics.Tracing;
 
 namespace SanteDB.Messaging.AMI.Wcf
 {
@@ -109,7 +110,15 @@ namespace SanteDB.Messaging.AMI.Wcf
         [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public override LogFileInfo GetLog(string logId)
         {
-            var logFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), logId + ".log");
+            // Get the file trace writer
+            var tracerPath = Tracer.GetWriter<RolloverTextWriterTraceWriter>()?.FileName;
+
+            if (tracerPath == null)
+            {
+                throw new InvalidOperationException("No file-based trace writer was found");
+            }
+
+            var logFile = Path.Combine(Path.GetDirectoryName(tracerPath), logId + ".log");
             var retVal = new AmiCollection();
             var fi = new FileInfo(logFile);
 
@@ -148,7 +157,15 @@ namespace SanteDB.Messaging.AMI.Wcf
         [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public override Stream DownloadLog(string logId)
         {
-            var logFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), logId + ".log");
+            // Get the file trace writer
+            var tracerPath = Tracer.GetWriter<RolloverTextWriterTraceWriter>()?.FileName;
+
+            if (tracerPath == null)
+            {
+                throw new InvalidOperationException("No file-based trace writer was found");
+            }
+
+            var logFile = Path.Combine(Path.GetDirectoryName(tracerPath), logId + ".log");
             RestOperationContext.Current.OutgoingResponse.AddHeader("Content-Disposition", $"attachment; filename={Path.GetFileName(logFile)}");
             RestOperationContext.Current.OutgoingResponse.ContentType = "text/plain";
             return File.OpenRead(logFile);
@@ -162,7 +179,15 @@ namespace SanteDB.Messaging.AMI.Wcf
         [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public override AmiCollection GetLogs()
         {
-            var logDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            // Get the file trace writer
+            var tracerPath = Tracer.GetWriter<RolloverTextWriterTraceWriter>()?.FileName;
+
+            if (tracerPath == null)
+            {
+                throw new InvalidOperationException("No file-based trace writer was found");
+            }
+
+            var logDirectory = Path.GetDirectoryName(tracerPath);
             var retVal = new AmiCollection();
             foreach (var itm in Directory.GetFiles(logDirectory, "*.log"))
             {

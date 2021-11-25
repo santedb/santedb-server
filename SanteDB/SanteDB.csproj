@@ -196,6 +196,9 @@
     <None Include="data\000-ConfigurationPolicies.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="data\000-QueuePolicies.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="data\000-PubSubPolicies.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -462,6 +465,8 @@
         <ProjectReference Include="..\santedb-restsvc\SanteDB.Core.Model.ViewModelSerializers\SanteDB.Core.Model.ViewModelSerializers.csproj">
           <Project>{ece9b280-9647-4092-babf-eb2e25084670}</Project>
           <Name>SanteDB.Core.Model.ViewModelSerializers</Name>
+        </ProjectReference>
+		 <ProjectReference Include="..\santedb-msmq\SanteDB.Queue.Msmq\SanteDB.Queue.Msmq.csproj">
         </ProjectReference>
       </ItemGroup>
     </When>

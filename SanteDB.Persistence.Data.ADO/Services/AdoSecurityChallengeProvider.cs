@@ -261,10 +261,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         {
             if (!userName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase)
                 || !principal.Identity.IsAuthenticated)
-                throw new SecurityException($"Users may only modify their own security challenges");
-
-            // Ensure that the user has been explicitly granted the special security policy
-            this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.AlterSecurityChallenge);
+                this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.AlterSecurityChallenge);
 
             try
             {
@@ -293,12 +290,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
         {
             if (!userName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase)
                 || !principal.Identity.IsAuthenticated)
-                throw new SecurityException($"Users may only modify their own security challenges");
+                this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.AlterSecurityChallenge);
             else if (String.IsNullOrEmpty(response))
                 throw new ArgumentNullException(nameof(response), "Response to challenge must be provided");
 
             // Ensure that the user has been explicitly granted the special security policy
-            this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.AlterSecurityChallenge);
+
 
             try
             {
