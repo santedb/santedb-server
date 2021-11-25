@@ -83,14 +83,8 @@ namespace SanteDB.Persistence.PubSub.ADO
         // Cache
         private IDataCachingService m_cache;
 
-        // Service manager
-        private IServiceManager m_serviceManager;
-
         // Policy enforcement
         private IPolicyEnforcementService m_policyEnforcementService;
-
-        // Cached factories
-        private IDictionary<String, IPubSubDispatcherFactory> m_factories;
 
         /// <summary>
         /// Creates a new instance of this pub-sub manager
@@ -800,42 +794,6 @@ namespace SanteDB.Persistence.PubSub.ADO
             var results = this.FindSubscription(filter);
             totalResults = results.Count();
             return results.Skip(offset).Take(count);
-        }
-
-        /// <summary>
-        /// Get all factories
-        /// </summary>
-        private IDictionary<String, IPubSubDispatcherFactory> GetFactories()
-        {
-            if (this.m_factories == null)
-            {
-                this.m_factories = this.m_serviceManager.GetAllTypes()
-                    .Where(t => typeof(IPubSubDispatcherFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsAbstract)
-                    .Select(t => this.m_serviceManager.CreateInjected(t))
-                    .OfType<IPubSubDispatcherFactory>()
-                    .SelectMany(f => f.Schemes.Select(s => new { Scheme = s, Factory = f }))
-                    .ToDictionary(k => k.Scheme, f => f.Factory);
-            }
-            return this.m_factories;
-        }
-
-        /// <summary>
-        /// Finds an implementation of the IDisptacherFactory which works for the specified URI
-        /// </summary>
-        public IPubSubDispatcherFactory FindDispatcherFactory(Uri targetUri)
-        {
-            this.GetFactories().TryGetValue(targetUri.Scheme, out IPubSubDispatcherFactory retVal);
-            return retVal;
-        }
-
-        /// <summary>
-        /// Get dispatcher factory by type
-        /// </summary>
-        public IPubSubDispatcherFactory GetDispatcherFactory(Type factoryType)
-        {
-            // TODO: Optimize this , basically this ensures that the factory type is not
-            // initialized more than once.
-            return this.GetFactories().Values.FirstOrDefault(o => o.GetType() == factoryType);
         }
 
         /// <summary>
