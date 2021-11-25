@@ -39,7 +39,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <summary>
         /// Convert to information model
         /// </summary>
-        protected override EntityRelationship DoConvertToInformationModel(DataContext context, DbEntityRelationship dbModel, params IDbIdentified[] referenceObjects)
+        protected override EntityRelationship DoConvertToInformationModel(DataContext context, DbEntityRelationship dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 

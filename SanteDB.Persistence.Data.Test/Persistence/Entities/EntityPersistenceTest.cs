@@ -10,6 +10,10 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Extensions;
+using SanteDB.Core.Model.Query;
+using System.Threading;
+using System.Diagnostics.CodeAnalysis;
+using SanteDB.Core;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 {
@@ -17,6 +21,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
     /// Tests for entities
     /// </summary>
     [TestFixture(Category = "Persistence", TestName = "ADO Entity")]
+    [ExcludeFromCodeCoverage]
     public class EntityPersistenceTest : DataPersistenceTest
     {
         /// <summary>
@@ -565,7 +570,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                             TypeConceptKey = EntityClassKeys.Place,
                             Identifiers = new List<EntityIdentifier>()
                         {
-                            new EntityIdentifier(aa, $"TEST_STRESS_{i}")
+                            new EntityIdentifier(aa, $"TEST_STRESS2_{i}")
                         },
                             Names = new List<EntityName>()
                         {
@@ -596,21 +601,115 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Enumerable.Range(0, 9).AsParallel().ForAll(f =>
                 {
                     var name = $"Name_TEST{f}";
-                    var id = $"TEST_STRESS_{f}";
+                    var id = $"TEST_STRESS2_{f}";
                     var afterQuery = base.TestQuery<Entity>(o => o.Identifiers.Any(i => i.Value == id), 1);
                     afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == name)), 1);
                 });
             }
         }
 
+        /// <summary>
+        /// Tests the querying of entities with sorting
+        /// </summary>
         [Test]
         public void TestQueryEntityOrdering()
         {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                Guid aaUuid = Guid.NewGuid();
+                var aa = base.TestInsert<AssigningAuthority>(new AssigningAuthority()
+                {
+                    Key = aaUuid,
+                    DomainName = "TESTSTRESS3",
+                    Oid = "2.25.030406",
+                    Url = "http://google.test3",
+                    Description = "A test thing",
+                    Name = "TEST_STRESS_3"
+                });
+
+                Enumerable.Range(0, 3).ToList().ForEach(i =>
+                {
+                    var entity = new Entity()
+                    {
+                        ClassConceptKey = EntityClassKeys.LivingSubject,
+                        DeterminerConceptKey = DeterminerKeys.Specific,
+                        TypeConceptKey = EntityClassKeys.Place,
+                        Identifiers = new List<EntityIdentifier>()
+                            {
+                                new EntityIdentifier(aaUuid, $"TEST_CASE3_{i}")
+                            }
+                    };
+
+                    base.TestInsert(entity);
+                    Thread.Sleep(1000); // forces the creation time to be edited
+                });
+
+                var afterQuery = base.TestQuery<Entity>(o => o.Identifiers.Any(i => i.Value.Contains("TEST_CASE3_%")), 3).AsResultSet() as IOrderableQueryResultSet<Entity>;
+                // Ordering should be newest first
+                var sorted = afterQuery.OrderByDescending(o => o.VersionSequence);
+                Assert.Greater(sorted.First().VersionSequence, sorted.Skip(1).First().VersionSequence);
+                sorted = afterQuery.OrderBy(o => o.VersionSequence);
+                // Ordering should be oldest first
+                Assert.Less(sorted.First().VersionSequence, sorted.Skip(1).First().VersionSequence);
+
+                // Order by date
+                sorted = afterQuery.OrderByDescending(o => o.CreationTime);
+                Assert.Greater(sorted.First().CreationTime, sorted.Skip(1).First().CreationTime);
+            }
         }
 
+        /// <summary>
+        /// Test stateful queries of entites
+        /// </summary>
         [Test]
-        public void TestQueryEntityNested()
+        public void TestStatefulQuery()
         {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                Guid aaUuid = Guid.NewGuid();
+                var aa = base.TestInsert<AssigningAuthority>(new AssigningAuthority()
+                {
+                    Key = aaUuid,
+                    DomainName = "TESTSTRESS4",
+                    Oid = "2.25.030406888",
+                    Url = "http://google.test4",
+                    Description = "A test thing",
+                    Name = "TEST_STRESS_4"
+                });
+
+                Enumerable.Range(0, 3).ToList().ForEach(i =>
+                {
+                    var entity = new Entity()
+                    {
+                        ClassConceptKey = EntityClassKeys.LivingSubject,
+                        DeterminerConceptKey = DeterminerKeys.Specific,
+                        TypeConceptKey = EntityClassKeys.Place,
+                        Identifiers = new List<EntityIdentifier>()
+                            {
+                                new EntityIdentifier(aaUuid, $"TEST_CASE4_{i}")
+                            }
+                    };
+
+                    base.TestInsert(entity);
+                });
+
+                var afterQuery = base.TestQuery<Entity>(o => o.Identifiers.Any(i => i.Value.Contains("TEST_CASE4_%")), 3).AsResultSet() as IOrderableQueryResultSet<Entity>;
+
+                // Ordering should be newest first
+                var queryService = ApplicationServiceContext.Current.GetService<TestQueryPersistenceService>();
+                var qid = Guid.NewGuid();
+                queryService.SetExpectedQueryStats(qid, 3);
+                var stateful = afterQuery.OrderByDescending(o => o.VersionSequence).AsStateful(qid);
+                Assert.Greater(stateful.First().VersionSequence, stateful.Skip(1).First().VersionSequence);
+
+                qid = Guid.NewGuid();
+                queryService.SetExpectedQueryStats(qid, 3);
+                var stateful2 = afterQuery.OrderBy(o => o.VersionSequence).AsStateful(qid);
+                Assert.Less(stateful2.First().VersionSequence, stateful2.Skip(1).First().VersionSequence);
+
+                // Union should return 3
+                Assert.AreEqual(3, stateful2.Union(stateful).Count());
+            }
         }
     }
 }

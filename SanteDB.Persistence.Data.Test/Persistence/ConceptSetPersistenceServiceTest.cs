@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SanteDB.Core.Model;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Persistence.Data.Test.Persistence
 {
@@ -14,20 +15,19 @@ namespace SanteDB.Persistence.Data.Test.Persistence
     /// Test fixture
     /// </summary>
     [TestFixture(Category = "Persistence", TestName = "ADO Concept Set")]
+    [ExcludeFromCodeCoverage]
     public class ConceptSetPersistenceServiceTest : DataPersistenceTest
     {
-
         /// <summary>
         /// Test query concept
         /// </summary>
         [Test]
         public void TestQueryConcept()
         {
-            using(AuthenticationContext.EnterSystemContext())
+            using (AuthenticationContext.EnterSystemContext())
             {
                 var conceptSet = base.TestQuery<ConceptSet>(o => o.Mnemonic == "NullReason", 1).AsResultSet();
                 Assert.AreEqual(15, conceptSet.First().ConceptKeys.Count);
-
             }
         }
 
@@ -37,7 +37,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
         [Test]
         public void TestQueryConceptLoadConcept()
         {
-            using(AuthenticationContext.EnterSystemContext())
+            using (AuthenticationContext.EnterSystemContext())
             {
                 var conceptSet = base.TestQuery<ConceptSet>(o => o.Mnemonic == "NullReason", 1).AsResultSet();
                 Assert.AreEqual(15, conceptSet.First().ConceptKeys.Count);

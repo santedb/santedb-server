@@ -59,9 +59,99 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <summary>
+        /// Insert the model using the proper type of persistence
+        /// </summary>
+        /// <param name="context">The context where the data should be inserted</param>
+        /// <param name="data">The data to be inserted</param>
+        /// <returns>The inserted entity</returns>
+        protected override Entity DoInsertModel(DataContext context, Entity data)
+        {
+            switch (data)
+            {
+                case Place place:
+                    return this.GetRelatedPersistenceService<Place>().Insert(context, place);
+
+                case Organization organization:
+                    return this.GetRelatedPersistenceService<Organization>().Insert(context, organization);
+
+                case Patient patient:
+                    return this.GetRelatedPersistenceService<Patient>().Insert(context, patient);
+
+                case Provider provider:
+                    return this.GetRelatedPersistenceService<Provider>().Insert(context, provider);
+
+                case UserEntity userEntity:
+                    return this.GetRelatedPersistenceService<UserEntity>().Insert(context, userEntity);
+
+                case DeviceEntity deviceEntity:
+                    return this.GetRelatedPersistenceService<DeviceEntity>().Insert(context, deviceEntity);
+
+                case ApplicationEntity applicationEntity:
+                    return this.GetRelatedPersistenceService<ApplicationEntity>().Insert(context, applicationEntity);
+
+                case Person person:
+                    return this.GetRelatedPersistenceService<Person>().Insert(context, person);
+
+                case ManufacturedMaterial manufacturedMaterial:
+                    return this.GetRelatedPersistenceService<ManufacturedMaterial>().Insert(context, manufacturedMaterial);
+
+                case Material material:
+                    return this.GetRelatedPersistenceService<Material>().Insert(context, material);
+
+                default:
+                    return base.DoInsertModel(context, data);
+            }
+        }
+
+        /// <summary>
+        /// update the model using the proper type of persistence
+        /// </summary>
+        /// <param name="context">The context where the data should be updated</param>
+        /// <param name="data">The data to be updated</param>
+        /// <returns>The updated entity</returns>
+        protected override Entity DoUpdateModel(DataContext context, Entity data)
+        {
+            switch (data)
+            {
+                case Place place:
+                    return this.GetRelatedPersistenceService<Place>().Update(context, place);
+
+                case Organization organization:
+                    return this.GetRelatedPersistenceService<Organization>().Update(context, organization);
+
+                case Patient patient:
+                    return this.GetRelatedPersistenceService<Patient>().Update(context, patient);
+
+                case Provider provider:
+                    return this.GetRelatedPersistenceService<Provider>().Update(context, provider);
+
+                case UserEntity userEntity:
+                    return this.GetRelatedPersistenceService<UserEntity>().Update(context, userEntity);
+
+                case DeviceEntity deviceEntity:
+                    return this.GetRelatedPersistenceService<DeviceEntity>().Update(context, deviceEntity);
+
+                case ApplicationEntity applicationEntity:
+                    return this.GetRelatedPersistenceService<ApplicationEntity>().Update(context, applicationEntity);
+
+                case Person person:
+                    return this.GetRelatedPersistenceService<Person>().Update(context, person);
+
+                case ManufacturedMaterial manufacturedMaterial:
+                    return this.GetRelatedPersistenceService<ManufacturedMaterial>().Update(context, manufacturedMaterial);
+
+                case Material material:
+                    return this.GetRelatedPersistenceService<Material>().Update(context, material);
+
+                default:
+                    return base.DoUpdateModel(context, data);
+            }
+        }
+
+        /// <summary>
         /// Convert data to information model
         /// </summary>
-        protected override Entity DoConvertToInformationModel(DataContext context, DbEntityVersion dbModel, params IDbIdentified[] referenceObjects)
+        protected override Entity DoConvertToInformationModel(DataContext context, DbEntityVersion dbModel, params Object[] referenceObjects)
         {
             switch (dbModel.ClassConceptKey.ToString().ToLowerInvariant())
             {

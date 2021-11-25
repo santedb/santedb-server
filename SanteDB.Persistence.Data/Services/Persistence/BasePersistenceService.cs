@@ -77,12 +77,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Providers
         /// </summary>
-        private static IDictionary<Type, IAdoPersistenceProvider> s_providers = new ConcurrentDictionary<Type, IAdoPersistenceProvider>();
+        private static ConcurrentDictionary<Type, IAdoPersistenceProvider> s_providers = new ConcurrentDictionary<Type, IAdoPersistenceProvider>();
 
         /// <summary>
         /// Providers for mapping
         /// </summary>
-        private static IDictionary<Type, object> s_mapProviders = new ConcurrentDictionary<Type, object>();
+        private static ConcurrentDictionary<Type, object> s_mapProviders = new ConcurrentDictionary<Type, object>();
 
         /// <summary>
         /// Base persistence service
@@ -209,13 +209,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         /// <param name="context">The data context to fetch additional data from</param>
         /// <param name="dbModel">The model to be converted</param>
-        /// <param name="referenceObjects">Any other ojects (via reference or joins) which may be of use</param>
-        protected abstract TModel DoConvertToInformationModel(DataContext context, TDbModel dbModel, params IDbIdentified[] referenceObjects);
+        /// <param name="referenceObjects">Any other objects (via reference or joins) which may be of use</param>
+        protected abstract TModel DoConvertToInformationModel(DataContext context, TDbModel dbModel, params Object[] referenceObjects);
 
         /// <summary>
         /// Convert to data model
         /// </summary>
-        protected abstract TDbModel DoConvertToDataModel(DataContext context, TModel model, params IDbIdentified[] referenceObjects);
+        protected abstract TDbModel DoConvertToDataModel(DataContext context, TModel model, params Object[] referenceObjects);
 
         /// <summary>
         /// Perform the insertion of the <paramref name="model"/>
@@ -266,7 +266,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 provider = ApplicationServiceContext.Current.GetService<IMappedQueryProvider<TRelated>>();
                 if (provider != null)
                 {
-                    s_mapProviders.Add(typeof(TRelated), provider);
+                    s_mapProviders.TryAdd(typeof(TRelated), provider);
                 }
                 else
                 {
@@ -286,7 +286,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 provider = ApplicationServiceContext.Current.GetService<IAdoPersistenceProvider<TRelated>>();
                 if (provider != null)
                 {
-                    s_providers.Add(typeof(TRelated), provider);
+                    s_providers.TryAdd(typeof(TRelated), provider);
                 }
             }
             return provider as IAdoPersistenceProvider<TRelated>;
@@ -316,8 +316,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 #endif
                 var dbInstance = this.DoConvertToDataModel(context, data);
                 dbInstance = this.DoInsertInternal(context, dbInstance);
-                var retVal = this.DoConvertToInformationModel(context, dbInstance);
-                return this.AfterPersisted(context, retVal);
+                var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
+                return this.AfterPersisted(context, retVal); // TODO: Perhaps
 #if DEBUG
             }
             finally
@@ -352,7 +352,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 #endif
                 var dbInstance = this.DoConvertToDataModel(context, data);
                 dbInstance = this.DoUpdateInternal(context, dbInstance);
-                var retVal = this.DoConvertToInformationModel(context, dbInstance);
+                var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
                 return this.AfterPersisted(context, retVal);
 
 #if DEBUG
@@ -417,7 +417,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     this.DoDeleteReferencesInternal(context, key);
                 }
                 var dbInstance = this.DoDeleteInternal(context, key, deletionMode);
-                var retVal = this.DoConvertToInformationModel(context, dbInstance);
+                var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
                 return retVal;
 #if DEBUG
             }
@@ -665,7 +665,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             context.EstablishProvenance(principal, null);
                         }
 
-                        data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty);
+                        data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty);
                         // Is this an update or insert?
                         if (this.m_configuration.AutoUpdateExisting && data.Key.HasValue && this.Exists(context, data.Key.Value))
                         {
@@ -676,7 +676,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         {
                             data = this.DoInsertModel(context, data);
                         }
-                        data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
+                        data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
 
                         if (mode == TransactionMode.Commit)
                         {
@@ -933,9 +933,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             context.EstablishProvenance(principal, null);
                         }
 
-                        data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty);
+                        data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty);
                         data = this.DoUpdateModel(context, data);
-                        data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
+                        data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
                         if (mode == TransactionMode.Commit)
                         {
                             tx.Commit();
@@ -1049,7 +1049,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             else if (result is CompositeResult composite)
             {
-                var retVal = this.DoConvertToInformationModel(context, composite.Values.OfType<TDbModel>().First(), composite.Values.OfType<IDbIdentified>().ToArray());
+                var retVal = this.DoConvertToInformationModel(context, composite.Values.OfType<TDbModel>().First(), composite.Values.ToArray());
                 return retVal;
             }
             else

@@ -25,7 +25,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <summary>
         /// Convert the database representation of the assigning authority
         /// </summary>
-        protected override AssigningAuthority DoConvertToInformationModel(DataContext context, DbAssigningAuthority dbModel, params IDbIdentified[] referenceObjects)
+        protected override AssigningAuthority DoConvertToInformationModel(DataContext context, DbAssigningAuthority dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
             retVal.AuthorityScopeXml = context.Query<DbAuthorityScope>(s => s.SourceKey == retVal.Key).Select(o => o.ScopeConceptKey).ToList();
@@ -60,10 +60,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         protected override AssigningAuthority DoUpdateModel(DataContext context, AssigningAuthority data)
         {
             var retVal = base.DoUpdateModel(context, data); // updates the core properties
-            retVal.AuthorityScopeXml = base.UpdateInternalAssociations(context, retVal.Key.Value, data.AuthorityScopeXml?.Select(o => new DbAuthorityScope()
+            if (data.AuthorityScopeXml != null)
             {
-                ScopeConceptKey = o
-            })).Select(o => o.ScopeConceptKey).ToList();
+                retVal.AuthorityScopeXml = base.UpdateInternalAssociations(context, retVal.Key.Value,
+                    data.AuthorityScopeXml?.Select(o => new DbAuthorityScope()
+                    {
+                        ScopeConceptKey = o
+                    })).Select(o => o.ScopeConceptKey).ToList();
+            }
+
             return retVal;
         }
     }

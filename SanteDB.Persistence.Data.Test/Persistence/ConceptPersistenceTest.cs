@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SanteDB.Core.Model;
 using SanteDB.Core;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Persistence.Data.Test.Persistence
 {
@@ -16,6 +17,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
     /// Concept persistence service test
     /// </summary>
     [TestFixture(Category = "Persistence", TestName = "ADO Concepts")]
+    [ExcludeFromCodeCoverage]
     public class ConceptPersistenceTest : DataPersistenceTest
     {
         /// <summary>

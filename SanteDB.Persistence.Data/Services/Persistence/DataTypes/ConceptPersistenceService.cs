@@ -132,7 +132,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <summary>
         /// Convert the <paramref name="dbModel"/> to <typeparamref name="TModel"/>
         /// </summary>
-        protected override Concept DoConvertToInformationModel(DataContext context, DbConceptVersion dbModel, params IDbIdentified[] referenceObjects)
+        protected override Concept DoConvertToInformationModel(DataContext context, DbConceptVersion dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 

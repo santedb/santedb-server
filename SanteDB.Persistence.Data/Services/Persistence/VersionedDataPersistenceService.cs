@@ -493,19 +493,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
-        /// Perform an internal query - adding appropriate status code and obsoletion time filters
+        /// Perform a query internal as another
         /// </summary>
-        protected override OrmResultSet<TDbModel> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, bool allowCache = false)
+        protected override OrmResultSet<TReturn> DoQueryInternalAs<TReturn>(DataContext context, Expression<Func<TModel, bool>> query, Func<SqlStatement, SqlStatement> queryModifier = null)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
-            }
-            else if (query == null)
-            {
-                throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
-            }
-
             // First - we determine if the query has an explicit status concept set
             if (typeof(IHasState).IsAssignableFrom(typeof(TModel)) && !query.ToString().Contains(nameof(IHasState.StatusConceptKey)))
             {
@@ -528,8 +519,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, obsoleteFilter), query.Parameters);
             }
 
-            // pass control to sub group
-            return base.DoQueryInternal(context, query, allowCache);
+            return base.DoQueryInternalAs<TReturn>(context, query, queryModifier);
         }
 
         /// <summary>

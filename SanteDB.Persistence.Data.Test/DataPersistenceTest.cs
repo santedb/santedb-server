@@ -12,6 +12,7 @@ using SanteDB.Persistence.Data.Services;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -21,6 +22,7 @@ namespace SanteDB.Persistence.Data.Test
     /// <summary>
     /// An abstract test fixture which handles the initialization of data tests
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public abstract class DataPersistenceTest : DataTest
     {
         // Application ID service

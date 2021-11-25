@@ -54,6 +54,8 @@
     <Compile Include="Persistence\ConceptPersistenceTest.cs" />
     <Compile Include="Persistence\ConceptSetPersistenceServiceTest.cs" />
     <Compile Include="Persistence\Entities\EntityPersistenceTest.cs" />
+    <Compile Include="Persistence\Entities\ApplicationEntityPersistenceTest.cs" />
+    <Compile Include="Persistence\Entities\OrganizationPersistenceTest.cs" />
     <Compile Include="Persistence\IdentifierTypePersistenceServiceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ModelMapTest.cs" />

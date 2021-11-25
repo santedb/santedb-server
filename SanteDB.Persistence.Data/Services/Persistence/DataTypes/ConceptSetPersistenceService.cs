@@ -25,7 +25,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <summary>
         /// Perform the conversion of this concept set to a relationship model
         /// </summary>
-        protected override ConceptSet DoConvertToInformationModel(DataContext context, DbConceptSet dbModel, params IDbIdentified[] referenceObjects)
+        protected override ConceptSet DoConvertToInformationModel(DataContext context, DbConceptSet dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
             retVal.ConceptKeys = context.Query<DbConceptSetConceptAssociation>(o => o.SourceKey == dbModel.Key).Select(o => o.ConceptKey).ToList();

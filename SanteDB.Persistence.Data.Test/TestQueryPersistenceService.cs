@@ -2,6 +2,7 @@
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ namespace SanteDB.Persistence.Data.Test
     /// <summary>
     /// Implement query persistence serivce
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class TestQueryPersistenceService : IQueryPersistenceService
     {
         private Guid m_expectedQueryId;
@@ -119,7 +121,6 @@ namespace SanteDB.Persistence.Data.Test
 
         public void AbortQuerySet(Guid queryId)
         {
-            throw new NotImplementedException();
         }
     }
 }

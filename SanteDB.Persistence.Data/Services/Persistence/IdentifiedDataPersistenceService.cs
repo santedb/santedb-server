@@ -57,7 +57,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <param name="model">The model to be converted</param>
         /// <param name="referenceObjects">The referenced objects (for reference)</param>
         /// <returns>The <typeparamref name="TDbModel"/> instance</returns>
-        protected override TDbModel DoConvertToDataModel(DataContext context, TModel model, params IDbIdentified[] referenceObjects)
+        protected override TDbModel DoConvertToDataModel(DataContext context, TModel model, params Object[] referenceObjects)
         {
             if (context == null)
             {
@@ -78,7 +78,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <param name="dbModel">The database model to be converted</param>
         /// <param name="referenceObjects">If this method is called from a <see cref="CompositeResult"/> then the other data in the composite result</param>
         /// <returns>The converted model</returns>
-        protected override TModel DoConvertToInformationModel(DataContext context, TDbModel dbModel, params IDbIdentified[] referenceObjects)
+        protected override TModel DoConvertToInformationModel(DataContext context, TDbModel dbModel, params Object[] referenceObjects)
         {
             if (context == null)
             {
@@ -256,7 +256,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Perform the query however return a custom <typeparamref name="TReturn"/>. This function allows you
         /// to modify the query instructions before sending query to the database
         /// </summary>
-        protected OrmResultSet<TReturn> DoQueryInternalAs<TReturn>(DataContext context, Expression<Func<TModel, bool>> query, Func<SqlStatement, SqlStatement> queryModifier = null)
+        protected virtual OrmResultSet<TReturn> DoQueryInternalAs<TReturn>(DataContext context, Expression<Func<TModel, bool>> query, Func<SqlStatement, SqlStatement> queryModifier = null)
         {
             if (context == null)
             {

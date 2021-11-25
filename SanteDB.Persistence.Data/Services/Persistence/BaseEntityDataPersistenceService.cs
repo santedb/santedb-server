@@ -171,18 +171,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
-        /// Performs the specified query on the <paramref name="context"/>
+        /// Perform query and return the specified result set type
         /// </summary>
-        /// <param name="context">The context on which the query should be executed</param>
-        /// <param name="query">The query which is to be executed</param>
-        /// <param name="allowCache">True if caching should be used</param>
-        /// <returns>A delay-load result set which contains the results of <paramref name="query"/></returns>
-        protected override OrmResultSet<TDbModel> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, bool allowCache = false)
+        protected override OrmResultSet<TReturn> DoQueryInternalAs<TReturn>(DataContext context, Expression<Func<TModel, bool>> query, Func<SqlStatement, SqlStatement> queryModifier = null)
         {
-            if (query == null)
-            {
-                throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
-            }
 
             // If the user has not explicitly set the obsoletion time parameter then we will add it
             if (!query.ToString().Contains(nameof(BaseEntityData.ObsoletionTime)))
@@ -191,7 +183,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
             }
 
-            return base.DoQueryInternal(context, query, allowCache);
+            return base.DoQueryInternalAs<TReturn>(context, query, queryModifier);
         }
 
         /// <summary>
@@ -272,7 +264,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Convert the data model to the information model
         /// </summary>
-        protected override TModel DoConvertToInformationModel(DataContext context, TDbModel dbModel, params IDbIdentified[] referenceObjects)
+        protected override TModel DoConvertToInformationModel(DataContext context, TDbModel dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 

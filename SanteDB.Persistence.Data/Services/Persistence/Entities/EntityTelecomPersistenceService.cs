@@ -37,7 +37,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <summary>
         /// Convert the telecom address
         /// </summary>
-        protected override EntityTelecomAddress DoConvertToInformationModel(DataContext context, DbTelecomAddress dbModel, params IDbIdentified[] referenceObjects)
+        protected override EntityTelecomAddress DoConvertToInformationModel(DataContext context, DbTelecomAddress dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 

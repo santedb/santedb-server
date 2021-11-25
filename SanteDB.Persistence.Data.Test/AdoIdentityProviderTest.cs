@@ -7,6 +7,7 @@ using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Authentication;
 using System.Text;
@@ -18,6 +19,7 @@ namespace SanteDB.Persistence.Data.Test
     /// ADO identity provider
     /// </summary>
     [TestFixture(Category = "Persistence", TestName = "ADO User Identity Provider")]
+    [ExcludeFromCodeCoverage]
     public class AdoIdentityProviderTest : DataPersistenceTest
     {
         /// <summary>

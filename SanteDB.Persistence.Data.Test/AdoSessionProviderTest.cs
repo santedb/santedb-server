@@ -8,6 +8,7 @@ using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Authentication;
 using System.Security.Claims;
@@ -22,6 +23,7 @@ namespace SanteDB.Persistence.Data.Test
     /// ADO Policy Information Service Test Suite
     /// </summary>
     [TestFixture(Category = "Persistence", TestName = "ADO Session Provider Test")]
+    [ExcludeFromCodeCoverage]
     public class AdoSessionProviderTest : DataPersistenceTest
     {
         /// <summary>

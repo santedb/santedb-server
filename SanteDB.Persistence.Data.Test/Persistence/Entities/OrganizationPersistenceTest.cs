@@ -1,0 +1,121 @@
+﻿using NUnit.Framework;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Security;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using SanteDB.Core.Model;
+
+namespace SanteDB.Persistence.Data.Test.Persistence.Entities
+{
+    /// <summary>
+    /// Tests for Organization
+    /// </summary>
+    [TestFixture(Category = "Persistence", TestName = "ADO Organization")]
+    [ExcludeFromCodeCoverage]
+    public class OrganizationPersistenceTest : DataPersistenceTest
+    {
+        /// <summary>
+        /// Test insertion with the proper persistence layer
+        /// </summary>
+        [Test]
+        public void TestInsertWithProper()
+        {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                var organization = new Organization()
+                {
+                    DeterminerConceptKey = DeterminerKeys.Specific,
+                    Names = new List<EntityName>()
+                    {
+                        new EntityName(NameUseKeys.OfficialRecord, "123 Organization Inc.")
+                    },
+                    IndustryConceptKey = IndustryTypeKeys.Manufacturing
+                };
+
+                // Perform the insert
+                var afterInsert = base.TestInsert(organization);
+                Assert.AreEqual(IndustryTypeKeys.Manufacturing, afterInsert.IndustryConceptKey);
+
+                // Now we want to query
+                var afterQuery = base.TestQuery<Organization>(o => o.IndustryConceptKey == IndustryTypeKeys.Manufacturing && o.Names.Any(n=>n.Component.Any((c => c.Value == "123 Organization Inc."))), 1).AsResultSet().First();
+                Assert.IsNull(afterQuery.Names);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
+                Assert.IsNull(afterQuery.IndustryConcept);
+                Assert.AreEqual(IndustryTypeKeys.Manufacturing, afterQuery.IndustryConceptKey);
+                Assert.AreEqual("Industry-Manufacturing", afterQuery.LoadProperty(o => o.IndustryConcept).Mnemonic);
+
+                // Update the key
+                var afterUpdate = base.TestUpdate(afterQuery, (o) =>
+                {
+                    o.IndustryConceptKey = IndustryTypeKeys.HealthDelivery;
+                    return o;
+                });
+                Assert.AreEqual(IndustryTypeKeys.HealthDelivery, afterUpdate.IndustryConceptKey);
+
+                afterQuery = base.TestQuery<Organization>(o => o.IndustryConceptKey == IndustryTypeKeys.HealthDelivery && o.Names.Any(n=>n.Component.Any(c=>c.Value == "123 Organization Inc.")), 1).AsResultSet().First();
+                Assert.IsNull(afterQuery.Names);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
+                Assert.IsNull(afterQuery.IndustryConcept);
+                Assert.AreEqual(IndustryTypeKeys.HealthDelivery, afterQuery.IndustryConceptKey);
+                Assert.AreEqual("Industry-HealthDelivery", afterQuery.LoadProperty(o => o.IndustryConcept).Mnemonic);
+            }
+        }
+
+        /// <summary>
+        /// Ensures that the generic Entity persistence service inserts the appropriate organization data (i.e.
+        /// it detects the presence of an organization and inserts it)
+        /// </summary>
+        [Test]
+        public void TestInsertWithImproper()
+        {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                var organization = new Organization()
+                {
+                    DeterminerConceptKey = DeterminerKeys.Specific,
+                    Names = new List<EntityName>()
+                    {
+                        new EntityName(NameUseKeys.OfficialRecord, "324 Organization Inc.")
+                    },
+                    IndustryConceptKey = IndustryTypeKeys.Manufacturing
+                };
+
+                // Perform the insert
+                var afterInsert = base.TestInsert<Entity>(organization) as Organization;
+                Assert.IsNotNull(afterInsert);
+                Assert.AreEqual(IndustryTypeKeys.Manufacturing, afterInsert.IndustryConceptKey);
+
+                // Now we want to query
+                var existingOrgIds = new Guid[]
+                {
+                    Guid.Parse("ee4029cd-479b-43c5-ab96-183b9236d47b")
+                };
+                var afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "324 Organization Inc.")), 1).AsResultSet().First();
+                Assert.IsInstanceOf<Organization>(afterQuery);
+                Assert.IsNull(afterQuery.Names);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
+                Assert.IsNull((afterQuery as Organization).IndustryConcept);
+                Assert.AreEqual(IndustryTypeKeys.Manufacturing, (afterQuery as Organization).IndustryConceptKey);
+
+                // Update the key
+                var afterUpdate = base.TestUpdate<Entity>(afterQuery, (o) =>
+                {
+                    (o as Organization).IndustryConceptKey = IndustryTypeKeys.HealthDelivery;
+                    return o;
+                }) as Organization;
+                Assert.IsNotNull(afterUpdate);
+                Assert.AreEqual(IndustryTypeKeys.HealthDelivery, afterUpdate.IndustryConceptKey);
+
+                afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "324 Organization Inc.")), 1).AsResultSet().First();
+                Assert.IsNull(afterQuery.Names);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
+                Assert.AreEqual(IndustryTypeKeys.HealthDelivery, (afterQuery as Organization).IndustryConceptKey);
+            }
+        }
+    }
+}

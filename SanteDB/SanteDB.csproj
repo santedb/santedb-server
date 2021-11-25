@@ -398,6 +398,7 @@
           <Project>{16ef1840-0361-439d-806c-92d0411122eb}</Project>
           <Name>RestSrvr</Name>
         </ProjectReference>
+		<ProjectReference Include="..\santedb-msmq\SanteDB.Queue.Msmq.csproj"/>
         <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
           <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
           <Name>SanteDB.Core.Api</Name>
@@ -483,6 +484,7 @@
         <PackageReference Include="SanteDB.Rest.AMI" Version="$(VersionNumber)" />
         <PackageReference Include="SanteDB.Rest.HDSI" Version="$(VersionNumber)" />
         <PackageReference Include="SanteDB.Core.Model.ViewModelSerializers" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Queue.Msmq" Version="$(VersionNumber)" />
       </ItemGroup>
     </Otherwise>
   </Choose>

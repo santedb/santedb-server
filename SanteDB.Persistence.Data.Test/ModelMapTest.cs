@@ -6,11 +6,15 @@ using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Roles;
 using SanteDB.Persistence.Data.Services;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Persistence.Data.Test
 {
-
+    /// <summary>
+    /// Model mapping test
+    /// </summary>
     [TestFixture]
+    [ExcludeFromCodeCoverage]
     public class ModelMapTest
     {
         /// <summary>
@@ -19,7 +23,6 @@ namespace SanteDB.Persistence.Data.Test
         [Test]
         public void TestProcessModelMap()
         {
-
             var mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream("SanteDB.Persistence.Data.Map.ModelMap.xml"), "AdoModelMap");
 
             var patient = new Patient()
@@ -34,7 +37,6 @@ namespace SanteDB.Persistence.Data.Test
                 DeceasedDate = DateTime.Now
             };
 
-            
             var dbPatient = mapper.MapModelInstance<Patient, DbPatient>(patient);
             Assert.AreEqual(patient.DeceasedDate, dbPatient.DeceasedDate);
 
@@ -57,7 +59,6 @@ namespace SanteDB.Persistence.Data.Test
             var revEntity = mapper.MapDomainInstance<DbEntityVersion, Entity>(dbEntity);
             Assert.AreEqual(patient.Key, revEntity.Key);
             Assert.AreEqual(patient.VersionKey, revEntity.VersionKey);
-
         }
 
         /// <summary>
@@ -66,7 +67,6 @@ namespace SanteDB.Persistence.Data.Test
         [Test]
         public void TestProcessModelMapReflector()
         {
-
             var mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream("SanteDB.Persistence.Data.Map.ModelMap.xml"), "AdoModelMapRef", true);
 
             var patient = new Patient()
@@ -81,7 +81,6 @@ namespace SanteDB.Persistence.Data.Test
                 DeceasedDate = DateTime.Now
             };
 
-
             var dbPatient = mapper.MapModelInstance<Patient, DbPatient>(patient);
             Assert.AreEqual(patient.DeceasedDate, dbPatient.DeceasedDate);
 
@@ -104,8 +103,6 @@ namespace SanteDB.Persistence.Data.Test
             var revEntity = mapper.MapDomainInstance<DbEntityVersion, Entity>(dbEntity);
             Assert.AreEqual(patient.Key, revEntity.Key);
             Assert.AreEqual(patient.VersionKey, revEntity.VersionKey);
-
         }
-
     }
 }

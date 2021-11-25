@@ -1,5 +1,6 @@
 ﻿using SanteDB.Core.Model;
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
@@ -53,9 +54,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <summary>
         /// Convert from db model to information model
         /// </summary>
-        protected override EntityIdentifier DoConvertToInformationModel(DataContext context, DbEntityIdentifier dbModel, params IDbIdentified[] referenceObjects)
+        protected override EntityIdentifier DoConvertToInformationModel(DataContext context, DbEntityIdentifier dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+            var aaPersistence = this.GetRelatedPersistenceService<AssigningAuthority>();
             switch (this.m_configuration.LoadStrategy)
             {
                 case Configuration.LoadStrategyType.FullLoad:
@@ -63,7 +65,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     retVal.SetLoaded(nameof(EntityIdentifier.IdentifierType));
                     goto case Configuration.LoadStrategyType.SyncLoad;
                 case Configuration.LoadStrategyType.SyncLoad:
-                    retVal.Authority = this.GetRelatedMappingProvider<AssigningAuthority>().ToModelInstance(context, referenceObjects.OfType<DbAssigningAuthority>().FirstOrDefault()) ?? this.GetRelatedPersistenceService<AssigningAuthority>().Get(context, dbModel.AuthorityKey);
+                    retVal.Authority = this.GetRelatedMappingProvider<AssigningAuthority>().ToModelInstance(context, referenceObjects.OfType<DbAssigningAuthority>().FirstOrDefault()) ?? aaPersistence.Get(context, dbModel.AuthorityKey);
                     retVal.SetLoaded(nameof(EntityIdentifier.Authority));
                     break;
 

@@ -5,6 +5,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,10 +16,9 @@ namespace SanteDB.Persistence.Data.Test
     /// Test ADO policy information service.
     /// </summary>
     [TestFixture(Category = "Persistence", TestName = "ADO Policy Provider")]
-
+    [ExcludeFromCodeCoverage]
     public class AdoPolicyInformationTest : DataPersistenceTest
     {
-
         /// <summary>
         /// tests that the PIP can get call policies
         /// </summary>
@@ -45,7 +45,6 @@ namespace SanteDB.Persistence.Data.Test
             var principal = authService.Authenticate("Administrator", "Mohawk123");
             var principalPolicies = pipService.GetPolicies(principal);
             Assert.IsTrue(principalPolicies.Where(o => o.Policy.Oid == PermissionPolicyIdentifiers.UnrestrictedClinicalData).Any(r => r.Rule == Core.Model.Security.PolicyGrantType.Deny));
-
         }
 
         /// <summary>
@@ -60,12 +59,11 @@ namespace SanteDB.Persistence.Data.Test
             var principal = authService.Authenticate("Administrator", "Mohawk123");
             var principalPolicies = pipService.GetPolicyInstance(principal, PermissionPolicyIdentifiers.UnrestrictedClinicalData);
             Assert.AreEqual(PolicyGrantType.Deny, principalPolicies.Rule);
-
         }
 
         // TODO: Add policies to a security device
 
-        // TODO: Remove policies from object 
+        // TODO: Remove policies from object
 
         // TODO: Other get policies for ACT and ENTITY
 

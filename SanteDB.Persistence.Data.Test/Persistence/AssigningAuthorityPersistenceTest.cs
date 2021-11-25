@@ -6,6 +6,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
     /// Tests the assigning authority persistence service
     /// </summary>
     [TestFixture(Category = "Persistence", TestName = "ADO AssigningAuthority")]
+    [ExcludeFromCodeCoverage]
     public class AssigningAuthorityPersistenceTest : DataPersistenceTest
     {
         /// <summary>

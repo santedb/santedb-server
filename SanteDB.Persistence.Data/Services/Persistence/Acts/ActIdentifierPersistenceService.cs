@@ -35,7 +35,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <summary>
         /// Convert from db model to information model
         /// </summary>
-        protected override ActIdentifier DoConvertToInformationModel(DataContext context, DbActIdentifier dbModel, params IDbIdentified[] referenceObjects)
+        protected override ActIdentifier DoConvertToInformationModel(DataContext context, DbActIdentifier dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
             switch (this.m_configuration.LoadStrategy)

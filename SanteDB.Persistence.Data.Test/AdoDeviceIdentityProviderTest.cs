@@ -7,6 +7,7 @@ using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Security.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Authentication;
 using System.Security.Principal;
@@ -18,6 +19,7 @@ namespace SanteDB.Persistence.Data.Test
     /// Device identity provider test
     /// </summary>
     [TestFixture(Category = "Persistence", TestName = "ADO Dev Identity Provider")]
+    [ExcludeFromCodeCoverage]
     public class AdoDeviceIdentityProviderTest : DataPersistenceTest
     {
         /// <summary>

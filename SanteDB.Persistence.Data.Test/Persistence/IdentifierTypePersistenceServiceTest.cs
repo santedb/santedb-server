@@ -8,24 +8,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SanteDB.Core.Model;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Persistence.Data.Test.Persistence
 {
-
     /// <summary>
     /// Identifier type persistence
     /// </summary>
     [TestFixture(Category = "Persistence", TestName = "ADO Identifier Types")]
+    [ExcludeFromCodeCoverage]
     public class IdentifierTypePersistenceServiceTest : DataPersistenceTest
     {
-
         /// <summary>
         /// Test insertion of the identiifer type
         /// </summary>
         [Test]
         public void TestInsertIdentifierType()
         {
-            using(AuthenticationContext.EnterSystemContext())
+            using (AuthenticationContext.EnterSystemContext())
             {
                 var identifierType = new IdentifierType()
                 {
@@ -53,9 +53,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 afterInsert = base.TestInsert(identifierType);
                 Assert.IsNull(afterInsert.ScopeConcept);
                 Assert.IsNotNull(afterInsert.LoadProperty(o => o.ScopeConcept));
-
             }
         }
-
     }
 }

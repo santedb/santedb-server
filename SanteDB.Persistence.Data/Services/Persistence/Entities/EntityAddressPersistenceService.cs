@@ -66,7 +66,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <summary>
         /// Convert back to information model
         /// </summary>
-        protected override EntityAddress DoConvertToInformationModel(DataContext context, DbEntityAddress dbModel, params IDbIdentified[] referenceObjects)
+        protected override EntityAddress DoConvertToInformationModel(DataContext context, DbEntityAddress dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
             switch (this.m_configuration.LoadStrategy)
@@ -79,6 +79,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     retVal.Component = this.GetRelatedPersistenceService<EntityAddressComponent>().Query(context, o => o.SourceEntityKey == dbModel.Key).OrderBy(o => o.OrderSequence).ToList();
                     retVal.SetLoaded(nameof(EntityAddress.Component));
                     break;
+
                 case Configuration.LoadStrategyType.QuickLoad:
                     retVal.Component = null;
                     break;

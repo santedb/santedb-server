@@ -46,7 +46,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <summary>
         /// Convert the refeence term to reference model
         /// </summary>
-        protected override ReferenceTerm DoConvertToInformationModel(DataContext context, DbReferenceTerm dbModel, params IDbIdentified[] referenceObjects)
+        protected override ReferenceTerm DoConvertToInformationModel(DataContext context, DbReferenceTerm dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
