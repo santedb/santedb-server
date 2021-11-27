@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Services;
@@ -35,8 +36,6 @@ namespace SanteDB.Server.Diagnostics.Performance
     /// </summary>
     public class WindowsPerformanceCounterProbe : DiagnosticsProbeBase<float>, IDisposable
     {
-
-
         // Windows counter
         private PerformanceCounter m_windowsCounter = null;
 
@@ -45,7 +44,8 @@ namespace SanteDB.Server.Diagnostics.Performance
         /// </summary>
         public WindowsPerformanceCounterProbe(Guid uuid, String name, String description, String category, String measure, String value) : base(name, description)
         {
-            if (ApplicationServiceContext.Current.GetService<IOperatingSystemInfoService>().OperatingSystem == OperatingSystemID.Win32)
+            var osiService = ApplicationServiceContext.Current.GetService<IOperatingSystemInfoService>();
+            if (osiService.OperatingSystem == OperatingSystemID.Win32)
             {
                 this.m_windowsCounter = new PerformanceCounter(category, measure, value, true);
             }
@@ -59,7 +59,14 @@ namespace SanteDB.Server.Diagnostics.Performance
         {
             get
             {
-                return this.m_windowsCounter?.NextValue() ?? 0;
+                if (this.m_windowsCounter != null)
+                {
+                    return this.m_windowsCounter.NextValue();
+                }
+                else
+                {
+                    return 0;
+                }
             }
         }
 
