@@ -167,6 +167,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 case EntityClassKeyStrings.Container:
                     return this.GetRelatedMappingProvider<Container>().ToModelInstance(context, dbModel);
 
+                case EntityClassKeyStrings.NonLivingSubject:
+                    return this.GetRelatedMappingProvider<ApplicationEntity>().ToModelInstance(context, dbModel);
+
                 case EntityClassKeyStrings.Device:
                     return this.GetRelatedMappingProvider<DeviceEntity>().ToModelInstance(context, dbModel);
 

@@ -14,6 +14,7 @@ using SanteDB.Core.Model.Query;
 using System.Threading;
 using System.Diagnostics.CodeAnalysis;
 using SanteDB.Core;
+using SanteDB.Core.Services;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 {
@@ -641,7 +642,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     };
 
                     base.TestInsert(entity);
-                    Thread.Sleep(1000); // forces the creation time to be edited
+                    Thread.Sleep(250); // forces the creation time to be edited
                 });
 
                 var afterQuery = base.TestQuery<Entity>(o => o.Identifiers.Any(i => i.Value.Contains("TEST_CASE3_%")), 3).AsResultSet() as IOrderableQueryResultSet<Entity>;
@@ -709,6 +710,105 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 // Union should return 3
                 Assert.AreEqual(3, stateful2.Union(stateful).Count());
+            }
+        }
+
+        /// <summary>
+        /// Test query hax
+        /// </summary>
+        [Test]
+        public void TestQueryHax()
+        {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                var entity = new Entity()
+                {
+                    ClassConceptKey = EntityClassKeys.LivingSubject,
+                    DeterminerConceptKey = DeterminerKeys.Specific,
+                    TypeConceptKey = EntityClassKeys.Place,
+                    Names = new List<EntityName>()
+                    {
+                        new EntityName(NameUseKeys.Assigned, "Some Crazy Name"),
+                        new EntityName(NameUseKeys.Legal, "Smithy", "John", "E", "T")
+                    },
+                    Addresses = new List<EntityAddress>()
+                    {
+                        new EntityAddress(AddressUseKeys.Direct, "123 Test8 Street West", "Hamilton9", "ON", "CA", "L8K5N2"),
+                        new EntityAddress(AddressUseKeys.HomeAddress, "123 Home Street West", "Hometown", "ON", "CA", "L8K5N2"),
+                    }
+                };
+
+                var afterInsert = this.TestInsert(entity);
+                var checkConcept = afterInsert.LoadProperty(o => o.TypeConcept).Mnemonic;
+
+                // Test that the query hax works
+                var afterQuery = this.TestQuery<Entity>(o => o.Names.Where(g => g.NameUseKey == NameUseKeys.Legal).Any(n => n.Component.Where(c => c.ComponentTypeKey == NameComponentKeys.Family).Any(c => c.Value == "Smithy")), 1);
+                afterQuery = this.TestQuery<Entity>(o => o.TypeConcept.Mnemonic == checkConcept && o.Names.Where(g => g.NameUseKey == NameUseKeys.Legal).Any(n => n.Component.Where(c => c.ComponentTypeKey == NameComponentKeys.Family).Any(c => c.Value == "Smithy")), 1);
+                afterQuery = this.TestQuery<Entity>(o => o.Names.Where(g => g.NameUseKey == NameUseKeys.Legal).Any(n => n.Component.Where(c => c.ComponentTypeKey == NameComponentKeys.Family).Any(c => c.Value == "John")), 0);
+                afterQuery = this.TestQuery<Entity>(o => o.Names.Where(g => g.NameUseKey == NameUseKeys.Legal).Any(n => n.Component.Where(c => c.ComponentTypeKey == NameComponentKeys.Given).Any(c => c.Value == "John")), 1);
+                afterQuery = this.TestQuery<Entity>(o => o.Addresses.Where(g => g.AddressUseKey == AddressUseKeys.HomeAddress).Any(n => n.Component.Where(c => c.ComponentTypeKey == AddressComponentKeys.City).Any(c => c.Value == "Hometown")), 1);
+                afterQuery = this.TestQuery<Entity>(o => o.Addresses.Where(g => g.AddressUseKey == AddressUseKeys.HomeAddress).Any(n => n.Component.Where(c => c.ComponentTypeKey == AddressComponentKeys.State).Any(c => c.Value == "Hometown")), 0);
+                afterQuery = this.TestQuery<Entity>(o => o.Addresses.Where(g => g.AddressUseKey == AddressUseKeys.HomeAddress).Any(n => n.AddressUseKey == AddressUseKeys.HomeAddress && n.Component.Where(c => c.ComponentTypeKey == AddressComponentKeys.State).Any(c => c.Value == "Hometown")), 0);
+                afterQuery = this.TestQuery<Entity>(o => o.Addresses.Where(g => g.AddressUseKey == AddressUseKeys.HomeAddress).Any(n => n.AddressUseKey == AddressUseKeys.HomeAddress && n.Component.Where(c => c.ComponentTypeKey == AddressComponentKeys.City).Any(c => c.Value == "Hometown")), 1);
+                afterQuery = this.TestQuery<Entity>(o => o.Addresses.Where(g => g.AddressUseKey == AddressUseKeys.HomeAddress).Any(n => n.Component.Where(c => c.ComponentTypeKey == AddressComponentKeys.City).Any(c => c.Value == "Hometown"))
+                && o.Names.Where(g => g.NameUseKey == NameUseKeys.Legal).Any(n => n.Component.Where(g => g.ComponentTypeKey == NameComponentKeys.Given).Any(c => c.Value == "John")), 1);
+            }
+        }
+
+        /// <summary>
+        /// Tests the delete all functions
+        /// </summary>
+        [Test]
+        public void TestDeleteAll()
+        {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                for (var i = 0; i < 10; i++)
+                {
+                    var entity = new Entity()
+                    {
+                        ClassConceptKey = EntityClassKeys.LivingSubject,
+                        DeterminerConceptKey = DeterminerKeys.Specific,
+                        TypeConceptKey = EntityClassKeys.Place,
+                        Names = new List<EntityName>()
+                    {
+                        new EntityName(NameUseKeys.Assigned, "Delete All")
+                    }
+                    };
+
+                    this.TestInsert(entity);
+                }
+
+                var afterQuery = this.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Delete All")), 10);
+
+                // Delete all
+                var dpe = ApplicationServiceContext.Current.GetService<IDataPersistenceServiceEx<Entity>>();
+                dpe.DeleteAll(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Delete All")), TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.LogicalDelete);
+
+                // Ensure no results on regular query
+                afterQuery = this.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Delete All")), 0);
+                // Ensure 10 results on inactive query
+                afterQuery = this.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Delete All")) && StatusKeys.InactiveStates.Contains(o.StatusConceptKey.Value), 10);
+
+                // Restore all
+                var oldData = afterQuery.ToList().Select(q =>
+                {
+                    return this.TestUpdate(q, (r) =>
+                    {
+                        r.StatusConceptKey = StatusKeys.Active;
+                        return r;
+                    });
+                }).ToList();
+
+                // Ensure 10 now results
+                afterQuery = this.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Delete All")), 10);
+
+                // Now erase
+                dpe.DeleteAll(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Delete All")), TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.PermanentDelete);
+                // Ensure 0 now results
+                afterQuery = this.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Delete All")), 0);
+                // Ensure 0 results on inactive query
+                afterQuery = this.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Delete All")) && StatusKeys.InactiveStates.Contains(o.StatusConceptKey.Value), 0);
             }
         }
     }

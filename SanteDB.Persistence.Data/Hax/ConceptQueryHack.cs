@@ -1,26 +1,30 @@
 ﻿/*
  * Portions Copyright 2019-2020, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE)
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you 
- * may not use this file except in compliance with the License. You may 
- * obtain a copy of the License at 
- * 
- * http://www.apache.org/licenses/LICENSE-2.0 
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations under 
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
  * the License.
- * 
+ *
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+
+using SanteDB.Core;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Map;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -32,6 +36,8 @@ namespace SanteDB.Persistence.Data.Hax
     /// </summary>
     public class ConceptQueryHack : IQueryBuilderHack
     {
+        // Adhoc cache
+        private IAdhocCacheService m_adhocCache;
 
         // The mapper to be used
         private ModelMapper m_mapper;
@@ -49,12 +55,10 @@ namespace SanteDB.Persistence.Data.Hax
         /// </summary>
         public bool HackQuery(QueryBuilder builder, SqlStatement sqlStatement, SqlStatement whereClause, Type tmodel, PropertyInfo property, String queryPrefix, QueryPredicate predicate, object values, IEnumerable<TableMapping> scopedTables, params KeyValuePair<String, object>[] queryFilter)
         {
-
             // Hack mnemonic queries
             if (typeof(Concept).IsAssignableFrom(property.PropertyType) && predicate.SubPath == "mnemonic")
             {
-
-                // Has this already been joined? 
+                // Has this already been joined?
                 var mapType = property.DeclaringType;
                 if (mapType.IsAbstract)
                     mapType = tmodel;
@@ -68,7 +72,7 @@ namespace SanteDB.Persistence.Data.Hax
                 string directFkName = $"{queryPrefix}{fkTbl.TableName}";
 
                 // We have to join to the FK table
-                if (!declProp.IsAlwaysJoin) 
+                if (!declProp.IsAlwaysJoin)
                 {
                     var fkColumn = fkTbl.GetColumn(declProp.ForeignKey.Column);
                     sqlStatement.Append($" INNER JOIN {fkTbl.TableName} AS {directFkName}_{declProp.Name} ON ({queryPrefix}{declType.TableName}.{declProp.Name} = {directFkName}_{declProp.Name}.{fkColumn.Name})");
@@ -76,10 +80,10 @@ namespace SanteDB.Persistence.Data.Hax
                 }
 
                 // We aren't yet joined to our table, we need to join to our table though!!!!
-                if (declProp.ForeignKey.Table != tblMap.OrmType) 
+                if (declProp.ForeignKey.Table != tblMap.OrmType)
                 {
                     var fkKeyColumn = fkTbl.Columns.FirstOrDefault(o => o.ForeignKey?.Table == tblMap.OrmType && o.Name == tblMap.PrimaryKey.First().Name) ??
-                        tblMap.Columns.FirstOrDefault(o=>o.ForeignKey?.Table == fkTbl.OrmType && o.Name == fkTbl.PrimaryKey.First().Name);
+                        tblMap.Columns.FirstOrDefault(o => o.ForeignKey?.Table == fkTbl.OrmType && o.Name == fkTbl.PrimaryKey.First().Name);
                     if (fkKeyColumn == null) return false; // couldn't find the FK link
 
                     // Now we want to filter our FK
@@ -93,12 +97,11 @@ namespace SanteDB.Persistence.Data.Hax
                     if (typeof(IDbBaseData).IsAssignableFrom(tblMap.OrmType))
                         whereClause.And($"{tblName}.{tblMap.GetColumn(nameof(IDbBaseData.ObsoletionTime)).Name} IS NULL");
                 }
-               
+
                 return true;
             }
             else
                 return false;
-
         }
     }
 }

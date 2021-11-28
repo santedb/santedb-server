@@ -26,9 +26,6 @@ namespace SanteDB.Persistence.Data.Services
         // Trace source for the service
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoPersistenceService));
 
-        // The query builder for this service
-        private QueryBuilder m_queryBuilder;
-
         // Mapper for this service
         private ModelMapper m_mapper;
 
@@ -39,7 +36,7 @@ namespace SanteDB.Persistence.Data.Services
         {
             this.m_configuration = configManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
-            this.m_queryBuilder = new QueryBuilder(this.m_mapper, this.m_configuration.Provider, serviceManager.CreateAll<IQueryBuilderHack>(this.m_mapper).ToArray());
+            QueryBuilder.AddQueryHacks(serviceManager.CreateAll<IQueryBuilderHack>(this.m_mapper));
 
             // Upgrade the schema
             this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Data");

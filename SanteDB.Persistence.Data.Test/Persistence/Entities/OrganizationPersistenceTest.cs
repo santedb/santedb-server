@@ -42,7 +42,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(IndustryTypeKeys.Manufacturing, afterInsert.IndustryConceptKey);
 
                 // Now we want to query
-                var afterQuery = base.TestQuery<Organization>(o => o.IndustryConceptKey == IndustryTypeKeys.Manufacturing && o.Names.Any(n=>n.Component.Any((c => c.Value == "123 Organization Inc."))), 1).AsResultSet().First();
+                var afterQuery = base.TestQuery<Organization>(o => o.IndustryConceptKey == IndustryTypeKeys.Manufacturing && o.Names.Any(n => n.Component.Any((c => c.Value == "123 Organization Inc."))), 1).AsResultSet().First();
                 Assert.IsNull(afterQuery.Names);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
                 Assert.IsNull(afterQuery.IndustryConcept);
@@ -57,7 +57,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 });
                 Assert.AreEqual(IndustryTypeKeys.HealthDelivery, afterUpdate.IndustryConceptKey);
 
-                afterQuery = base.TestQuery<Organization>(o => o.IndustryConceptKey == IndustryTypeKeys.HealthDelivery && o.Names.Any(n=>n.Component.Any(c=>c.Value == "123 Organization Inc.")), 1).AsResultSet().First();
+                afterQuery = base.TestQuery<Organization>(o => o.IndustryConceptKey == IndustryTypeKeys.HealthDelivery && o.Names.Any(n => n.Component.Any(c => c.Value == "123 Organization Inc.")), 1).AsResultSet().First();
                 Assert.IsNull(afterQuery.Names);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
                 Assert.IsNull(afterQuery.IndustryConcept);
@@ -115,6 +115,34 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.IsNull(afterQuery.Names);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
                 Assert.AreEqual(IndustryTypeKeys.HealthDelivery, (afterQuery as Organization).IndustryConceptKey);
+            }
+        }
+
+        /// <summary>
+        /// Test retrieve with improper provider
+        /// </summary>
+        [Test]
+        public void TestRetreiveImproper()
+        {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                var organization = new Organization()
+                {
+                    DeterminerConceptKey = DeterminerKeys.Specific,
+                    Names = new List<EntityName>()
+                    {
+                        new EntityName(NameUseKeys.OfficialRecord, "999 Organization Inc.")
+                    },
+                    IndustryConceptKey = IndustryTypeKeys.Manufacturing
+                };
+
+                // Perform the insert
+                var afterInsert = base.TestInsert<Entity>(organization) as Organization;
+                Assert.AreEqual(IndustryTypeKeys.Manufacturing, afterInsert.IndustryConceptKey);
+
+                var afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "999 Organization Inc.")), 1);
+                Assert.IsInstanceOf<Organization>(afterQuery.First());
+                Assert.AreEqual(IndustryTypeKeys.Manufacturing, afterQuery.OfType<Organization>().First().IndustryConceptKey);
             }
         }
     }

@@ -7,6 +7,7 @@ using SanteDB.Persistence.Data.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -61,20 +62,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                 // Convert the query to a domain query so that the object persistence layer can turn the
                 // structured LINQ query into a SQL statement
-                var domainQuery = context.CreateSqlStatement().SelectFrom(typeof(TDbModel));
                 var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
-                if (domainExpression != null)
+                if (domainExpression == null)
                 {
-                    domainQuery = domainQuery.Where(domainExpression);
-                }
-                else
-                {
-                    this.m_tracer.TraceVerbose("Will use slow query construction due to complex mapped fields");
-                    domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateWhere(expression);
+                    this.m_tracer.TraceWarning("WARNING: Using very slow DeleteAll() method - consider using only primary properties for delete all");
+                    var columnKey = TableMapping.Get(typeof(TDbModel)).GetColumn(nameof(DbVersionedData.Key));
+                    var keyQuery = context.GetQueryBuilder(this.m_modelMapper).CreateQuery(expression, columnKey);
+                    var keys = context.Query<TDbModel>(keyQuery).Select(o => o.Key);
+                    domainExpression = o => keys.Contains(o.Key);
                 }
 
                 // Get maximum source key
-                var sourceKey = context.Query<TDbModel>(domainQuery).OrderByDescending(o => o.EffectiveVersionSequenceId).Select(o => o.SourceKey).FirstOrDefault();
+                var sourceKey = context.Query<TDbModel>(domainExpression).OrderByDescending(o => o.EffectiveVersionSequenceId).Select(o => o.SourceKey).FirstOrDefault();
                 var sourceSequence = this.GetCurrentVersionSequenceForSource(context, sourceKey);
 
                 switch (deletionMode)
@@ -82,15 +81,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     case DeleteMode.NullifyDelete:
                     case DeleteMode.LogicalDelete:
                     case DeleteMode.ObsoleteDelete:
-                        context.UpdateAll(context.Query<TDbModel>(domainQuery), o =>
-                        {
-                            o.ObsoleteVersionSequenceId = sourceSequence;
-                            return o;
-                        });
+                        context.UpdateAll(domainExpression, o => o.ObsoleteVersionSequenceId == sourceSequence);
                         break;
 
                     default:
-                        context.Delete(domainQuery);
+                        context.Delete(domainExpression);
                         break;
                 }
 #if DEBUG

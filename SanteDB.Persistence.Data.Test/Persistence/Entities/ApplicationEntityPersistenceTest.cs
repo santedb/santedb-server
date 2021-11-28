@@ -69,5 +69,90 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
             }
         }
+
+        /// <summary>
+        /// Ensures that the generic Entity persistence service inserts the appropriate organization data (i.e.
+        /// it detects the presence of an organization and inserts it)
+        /// </summary>
+        [Test]
+        public void TestInsertWithImproper()
+        {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                var appentity = new ApplicationEntity()
+                {
+                    DeterminerConceptKey = DeterminerKeys.Specific,
+                    Names = new List<EntityName>()
+                    {
+                        new EntityName(NameUseKeys.OfficialRecord, "Some Application 2")
+                    },
+                    SecurityApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid),
+                    SoftwareName = "Test Software 99",
+                    VendorName = "Test Software Inc. 99",
+                    VersionName = "2.1.3"
+                };
+
+                // Perform the insert
+                var afterInsert = base.TestInsert<Entity>(appentity) as ApplicationEntity;
+                Assert.IsNotNull(afterInsert);
+                Assert.AreEqual("Test Software 99", afterInsert.SoftwareName);
+                Assert.AreEqual("Test Software Inc. 99", afterInsert.VendorName);
+                Assert.AreEqual("2.1.3", afterInsert.VersionName);
+
+                // Query using entity
+                var afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Some Application 2")), 1).AsResultSet().First();
+                Assert.IsInstanceOf<ApplicationEntity>(afterQuery);
+                Assert.IsNull(afterQuery.Names);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
+                Assert.AreEqual("Test Software 99", (afterQuery as ApplicationEntity).SoftwareName);
+                Assert.AreEqual("Test Software Inc. 99", (afterQuery as ApplicationEntity).VendorName);
+                Assert.AreEqual("2.1.3", (afterQuery as ApplicationEntity).VersionName);
+
+                // Update the key
+                var afterUpdate = base.TestUpdate<Entity>(afterQuery, (o) =>
+                {
+                    (o as ApplicationEntity).SoftwareName = "Test Software 2";
+                    return o;
+                }) as ApplicationEntity;
+                Assert.IsNotNull(afterUpdate);
+                Assert.AreEqual("Test Software 2", afterUpdate.SoftwareName);
+
+                afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Some Application 2")), 1).AsResultSet().First();
+                Assert.IsNull(afterQuery.Names);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
+                Assert.AreEqual("Test Software 2", (afterQuery as ApplicationEntity).SoftwareName);
+            }
+        }
+
+        /// <summary>
+        /// Test retrieve with improper provider
+        /// </summary>
+        [Test]
+        public void TestRetreiveImproper()
+        {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                var appentity = new ApplicationEntity()
+                {
+                    DeterminerConceptKey = DeterminerKeys.Specific,
+                    Names = new List<EntityName>()
+                    {
+                        new EntityName(NameUseKeys.OfficialRecord, "Some Application 3")
+                    },
+                    SecurityApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid),
+                    SoftwareName = "Test Software 22",
+                    VendorName = "Test Software Inc. 22",
+                    VersionName = "2.1.5"
+                };
+
+                // Perform the insert
+                var afterInsert = base.TestInsert<Entity>(appentity) as ApplicationEntity;
+                Assert.IsNotNull(afterInsert);
+
+                var afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Some Application 3")), 1);
+                Assert.IsInstanceOf<ApplicationEntity>(afterQuery.First());
+                Assert.AreEqual("Test Software 22", afterQuery.OfType<ApplicationEntity>().First().SoftwareName);
+            }
+        }
     }
 }

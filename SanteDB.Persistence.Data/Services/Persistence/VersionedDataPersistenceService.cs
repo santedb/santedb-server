@@ -365,25 +365,70 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     // Convert the query to a domain query so that the object persistence layer can turn the
                     // structured LINQ query into a SQL statement
-                    var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, true);
+                    var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
+                    if (domainExpression == null)
+                    {
+                        this.m_tracer.TraceWarning("WARNING: Using very slow DeleteAll() method - consider using only primary properties for delete all");
+                        var columnKey = TableMapping.Get(typeof(TDbModel)).GetColumn(nameof(DbVersionedData.Key));
+                        var keyQuery = context.GetQueryBuilder(this.m_modelMapper).CreateQuery(expression, columnKey);
+                        var keys = context.Query<TDbModel>(keyQuery).Select(o => o.Key);
+                        domainExpression = o => keys.Contains(o.Key);
+                    }
+
+                    // Add obsolete filter - only apply this to current versions
+                    var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(domainExpression.Parameters[0], typeof(TDbModel).GetProperty(nameof(DbVersionedData.ObsoletionTime))), Expression.Constant(null));
+                    domainExpression = Expression.Lambda<Func<TDbModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, domainExpression.Body), domainExpression.Parameters);
 
                     // determine our deletion mode
                     switch (deletionMode)
                     {
                         case DeleteMode.NullifyDelete:
-                            context.UpdateAll<TDbModel>(domainExpression, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == context.ContextId, o => o.StatusConceptKey == StatusKeys.Nullified);
-                            break;
-
                         case DeleteMode.ObsoleteDelete:
-                            context.UpdateAll<TDbModel>(domainExpression, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == context.ContextId, o => o.StatusConceptKey == StatusKeys.Obsolete);
-                            break;
-
                         case DeleteMode.LogicalDelete:
-                            context.UpdateAll<TDbModel>(domainExpression, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == context.ContextId, o => o.StatusConceptKey == StatusKeys.Inactive);
+                            context.InsertAll(
+                                context.UpdateAll<TDbModel>(context.Query<TDbModel>(domainExpression), o =>
+                                {
+                                    o.ObsoletionTime = DateTimeOffset.Now;
+                                    o.ObsoletedByKey = context.ContextId;
+                                    return o;
+                                }).Select(o =>
+                                {
+                                    o.VersionSequenceId = null;
+                                    o.ReplacesVersionKey = o.VersionKey;
+                                    o.ObsoletedByKey = null;
+                                    o.ObsoletionTime = null;
+                                    o.VersionKey = Guid.NewGuid();
+                                    o.StatusConceptKey = deletionMode == DeleteMode.NullifyDelete ? StatusKeys.Nullified :
+                                        deletionMode == DeleteMode.ObsoleteDelete ? StatusKeys.Obsolete : StatusKeys.Inactive;
+                                    return o;
+                                })
+                            );
                             break;
 
                         case DeleteMode.PermanentDelete:
-                            context.Delete(domainExpression);
+                            foreach (var existing in context.Query<TDbModel>(domainExpression))
+                            {
+                                existing.StatusConceptKey = StatusKeys.Purged;
+                                this.DoDeleteReferencesInternal(context, existing.Key);
+                                this.DoDeleteReferencesInternal(context, existing.VersionKey);
+                                context.Delete<TDbModel>(o => o.VersionKey == existing.VersionKey);
+
+                                // Reverse the history
+                                foreach (var ver in context.Query<TDbModel>(o => o.Key == existing.Key).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionKey))
+                                {
+                                    context.Delete<TDbModel>(o => o.VersionKey == ver);
+                                }
+
+                                if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.KeepPurged))
+                                {
+                                    existing.VersionKey = Guid.Empty;
+                                    context.Insert(existing);
+                                }
+                                else
+                                {
+                                    context.Delete<TDbKeyModel>(o => o.Key == existing.Key);
+                                }
+                            }
                             break;
                     }
                 }
@@ -463,6 +508,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             {
                                 existing.VersionKey = Guid.Empty;
                                 context.Insert(existing);
+                            }
+                            else
+                            {
+                                context.Delete<TDbKeyModel>(o => o.Key == existing.Key);
                             }
                             return existing;
 
