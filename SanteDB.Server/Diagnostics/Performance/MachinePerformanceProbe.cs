@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Server.Core;
@@ -34,13 +35,12 @@ namespace SanteDB.Server.Diagnostics.Performance
     /// </summary>
     public class MachinePerformanceProbe : ICompositeDiagnosticsProbe
     {
-
         private IDiagnosticsProbe[] m_values =
         {
-            new WindowsPerformanceCounterProbe(SanteDBConstants.ProcessorUseCounter, "Machine: CPU Utilization", "Shows the % of active time for CPU", "Processor Information", "% Processor Time", "_Total"),
-            new WindowsPerformanceCounterProbe(SanteDBConstants.MemoryUseCounter, "Machine: Memory Use", "Shows the amount of memory used", "Memory", "% Committed Bytes In Use", null)
-        };
-
+            new WindowsPerformanceCounterProbe(SanteDBConstants.ProcessorUseCounter, "CPU Utilization", "Shows the % of active time for CPU", "Processor Information", "% Processor Time", "_Total"),
+            new WindowsPerformanceCounterProbe(SanteDBConstants.MemoryUseCounter, "Memory Use", "Shows the amount of memory used", "Memory", "% Committed Bytes In Use", null),
+            new WindowsPerformanceCounterProbe(SanteDBConstants.DiskUseCounter, "Disk Use", "Shows server % active disk time", "LogicalDisk", "% Disk Time", "_Total")
+    };
 
         /// <summary>
         /// Gets the value of this probe

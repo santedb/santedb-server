@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using System;
 
 namespace SanteDB.Server.Core
@@ -27,8 +28,6 @@ namespace SanteDB.Server.Core
     /// </summary>
     public static class SanteDBConstants
     {
-
-
         // Configuration name
         internal const string SanteDBConfigurationName = "santedb.core";
 
@@ -36,19 +35,19 @@ namespace SanteDB.Server.Core
         internal const string SecurityTraceSourceName = "SanteDB.Core.Security";
 
         // Map trace source
-        internal const string MapTraceSourceName= "SanteDB.Core.Map";
+        internal const string MapTraceSourceName = "SanteDB.Core.Map";
 
         /// <summary>
         /// SanteDB dataset installation source name
         /// </summary>
         internal const string DatasetInstallSourceName = "SanteDB.Core.DataSet";
 
-
         // WCF trace source
         internal const string WcfTraceSourceName = "SanteDB.Core.HttpRest";
 
         // Panic error code
         internal const string GeneralPanicErrorCode = "01189998819991197253";
+
         // General panic error text
         internal const string GeneralPanicErrorText = "0118 999 881 999 119 7253 - FATAL ERROR: {0}";
 
@@ -56,6 +55,7 @@ namespace SanteDB.Server.Core
         /// Service trace source name
         /// </summary>
         public const string ServiceTraceSourceName = "SanteDB.Core";
+
         /// <summary>
         /// Data source name
         /// </summary>
@@ -106,6 +106,9 @@ namespace SanteDB.Server.Core
         /// </summary>
         public static readonly Guid MemoryUseCounter = new Guid("9E77D692-1F71-4442-BDA1-056D3DB1A487");
 
-
+        /// <summary>
+        /// Gets the thread pooling performance counter
+        /// </summary>
+        public static readonly Guid DiskUseCounter = new Guid("9E77D692-1F71-4442-BDA1-056D3DB1A488");
     }
 }

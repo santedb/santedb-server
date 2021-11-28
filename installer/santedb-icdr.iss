@@ -190,7 +190,7 @@ Source: ..\bin\Release\RazorTemplates.Core.dll; DestDir: {app}; Components: serv
 
 ; Common BRE
 Source: ..\bin\Release\Antlr3.Runtime.dll; DestDir: {app}; Components: core\bre core\protocol core
-Source: ..\bin\Release\ExpressionEvaluator.dll; DestDir: {app}; Components: core\bre core\protocol                              
+Source: ..\bin\Release\DynamicExpresso.Core.dll; DestDir: {app}; Components: core\bre core\protocol                              
 Source: ..\bin\Release\Jint.dll; DestDir: {app}; Components: core\bre
 Source: ..\bin\Release\Esprima.dll; DestDir: {app}; Components: core\bre
 Source: ..\bin\Release\SanteDB.BusinessRules.JavaScript.dll; DestDir: {app}; Components: core\bre
