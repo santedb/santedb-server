@@ -471,6 +471,13 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.IsNull(afterFetch.Template);
                 Assert.IsNotNull(afterFetch.LoadProperty(o => o.Template));
                 Assert.AreEqual("A template", afterFetch.Template.Name);
+
+                // Note
+                Assert.IsNull(afterFetch.Notes);
+                Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Notes).Count);
+                Assert.AreEqual("This is a test note", afterFetch.Notes.First().Text);
+                Assert.IsNull(afterFetch.Notes.First().Author);
+                Assert.AreEqual("Testing Author", afterFetch.Notes.First().LoadProperty(o => o.Author).LoadProperty(o => o.Names).First().LoadProperty(o => o.Component).First().Value);
             }
         }
 
@@ -498,13 +505,13 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 var afterUpdate = base.TestUpdate(afterFetch, (o) =>
                 {
-                    o.ClassConceptKey = EntityClassKeys.NonLivingSubject;
+                    o.ClassConceptKey = EntityClassKeys.Food;
                     return o;
                 });
-                Assert.AreEqual(EntityClassKeys.NonLivingSubject, afterUpdate.ClassConceptKey);
+                Assert.AreEqual(EntityClassKeys.Food, afterUpdate.ClassConceptKey);
 
                 afterFetch = fetch.First();
-                Assert.AreEqual(EntityClassKeys.NonLivingSubject, afterFetch.ClassConceptKey);
+                Assert.AreEqual(EntityClassKeys.Food, afterFetch.ClassConceptKey);
             }
         }
 

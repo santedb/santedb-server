@@ -102,9 +102,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 retVal.SecurityApplicationKey = dbApplication.SecurityApplicationKey;
             }
 
-            retVal.SoftwareName = dbApplication.SoftwareName;
-            retVal.VendorName = dbApplication.VendorName;
-            retVal.VersionName = dbApplication.VersionName;
+            retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbApplicationEntity, ApplicationEntity>(dbApplication));
             return retVal;
         }
     }

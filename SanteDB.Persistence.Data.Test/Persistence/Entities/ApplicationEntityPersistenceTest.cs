@@ -98,6 +98,9 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual("Test Software 99", afterInsert.SoftwareName);
                 Assert.AreEqual("Test Software Inc. 99", afterInsert.VendorName);
                 Assert.AreEqual("2.1.3", afterInsert.VersionName);
+                Assert.IsNull(afterInsert.SecurityApplication);
+                Assert.IsNotNull(afterInsert.LoadProperty(o => o.SecurityApplication));
+                Assert.AreEqual("SYSTEM", afterInsert.SecurityApplication.Name);
 
                 // Query using entity
                 var afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Some Application 2")), 1).AsResultSet().First();

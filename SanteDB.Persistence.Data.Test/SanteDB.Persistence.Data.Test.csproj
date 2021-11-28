@@ -53,6 +53,7 @@
     <Compile Include="Persistence\ConceptClassPersistenceTest.cs" />
     <Compile Include="Persistence\ConceptPersistenceTest.cs" />
     <Compile Include="Persistence\ConceptSetPersistenceServiceTest.cs" />
+    <Compile Include="Persistence\Entities\DeviceEntityPersistenceTest.cs" />
     <Compile Include="Persistence\Entities\EntityPersistenceTest.cs" />
     <Compile Include="Persistence\Entities\ApplicationEntityPersistenceTest.cs" />
     <Compile Include="Persistence\Entities\OrganizationPersistenceTest.cs" />
