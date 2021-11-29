@@ -150,7 +150,7 @@
       <add type="SanteDB.Core.PubSub.Broker.PubSubBroker, SanteDB.Core.Api, Version=2.1.0" />
       <add type="SanteDB.Persistence.PubSub.ADO.AdoPubSubManager, SanteDB.Persistence.PubSub.ADO, Version=2.1.0" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoServiceFactory, SanteDB.Persistence.Data.ADO, Version=2.1.91.0, Culture=neutral, PublicKeyToken=null" />
-      <add type="SanteDB.Core.Applets.Services.Impl.AppletLocalizationService, SanteDB.Core.Applets"/>
+      <add type="SanteDB.Core.Applets.Services.Impl.AppletLocalizationService, SanteDB.Core.Applets" />
     </serviceProviders>
   </section>
 </SanteDBConfiguration>
