@@ -172,9 +172,9 @@ namespace SanteDB.Server.Core.Services.Impl
             if (persistenceService == null)
             {
                 throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
-                    {
-                        param = typeof(IDataPersistenceService<TEntity>).FullName
-                    }));
+                {
+                    param = typeof(IDataPersistenceService<TEntity>).FullName
+                }));
             }
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
@@ -256,10 +256,10 @@ namespace SanteDB.Server.Core.Services.Impl
         private void ThrowPrivacyValidationException(TEntity data)
         {
             throw new DetectedIssueException(
-                new DetectedIssue(DetectedIssuePriorityType.Error, "privacy", this.m_localizationService.FormatString("error.server.core.validationFail", new
+                new DetectedIssue(DetectedIssuePriorityType.Error, "privacy", this.m_localizationService.FormatString("error.server.core.privacyControlFailure", new
                 {
                     param = "Privacy"
-                }), DetectedIssueKeys.AlreadyDoneIssue)
+                }), DetectedIssueKeys.PrivacyIssue)
             );
         }
 
@@ -276,16 +276,15 @@ namespace SanteDB.Server.Core.Services.Impl
             if (persistenceService == null)
             {
                 throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
-                    {
-                        param = nameof(IDataPersistenceService<TEntity>)
-
-                    }));
+                {
+                    param = nameof(IDataPersistenceService<TEntity>)
+                }));
             }
 
             var entity = persistenceService.Get(key, null, true, AuthenticationContext.Current.Principal);
 
             if (entity == null)
-                throw new KeyNotFoundException(this.m_localizationService.FormatString("error.type.KeyNotFoundException.notFound",new
+                throw new KeyNotFoundException(this.m_localizationService.FormatString("error.type.KeyNotFoundException.notFound", new
                 {
                     param = $"Entity {key}"
                 }));
@@ -335,9 +334,9 @@ namespace SanteDB.Server.Core.Services.Impl
             if (persistenceService == null)
             {
                 throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
-                    {
-                        param = nameof(IDataPersistenceService<TEntity>)
-                    }));
+                {
+                    param = nameof(IDataPersistenceService<TEntity>)
+                }));
             }
 
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
@@ -372,9 +371,9 @@ namespace SanteDB.Server.Core.Services.Impl
             if (persistenceService == null)
             {
                 throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
-                    {
-                        param = nameof(IDataPersistenceService<TEntity>)
-                    }));
+                {
+                    param = nameof(IDataPersistenceService<TEntity>)
+                }));
             }
 
             data = this.Validate(data);
