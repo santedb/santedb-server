@@ -60,7 +60,10 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// </summary>
         public string ServiceName => "ADO.NET Audit Repository";
 
-        // Confiugration
+        // Lock object
+        private object m_lockBox = new object();
+
+        // Configuration
         private readonly AdoAuditConfigurationSection m_configuration;
 
         // Data caching service
@@ -330,19 +333,22 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             var codeKey = $"{messageCode.CodeSystem}#{messageCode.Code}";
 
             var existing = this.m_adhocCache?.Get<DbAuditCode>(codeKey);
+            if (existing != null)
+            {
+                return existing;
+            }
 
-            if (existing == null) // try from db
+            // Try to get from database
+            lock (this.m_lockBox)
             {
                 existing = context.FirstOrDefault<DbAuditCode>(o => o.Code == messageCode.Code && o.CodeSystem == messageCode.CodeSystem);
+                if (existing == null)
+                {
+                    Guid codeId = Guid.NewGuid();
+                    existing = context.Insert(new DbAuditCode() { Code = messageCode.Code, CodeSystem = messageCode.CodeSystem, Key = codeId });
+                }
+                this.m_adhocCache?.Add(codeKey, existing);
             }
-
-            if (existing == null)
-            {
-                Guid codeId = Guid.NewGuid();
-                existing = context.Insert(new DbAuditCode() { Code = messageCode.Code, CodeSystem = messageCode.CodeSystem, Key = codeId });
-            }
-
-            this.m_adhocCache?.Add(codeKey, existing);
             return existing;
         }
 
