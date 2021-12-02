@@ -28,6 +28,7 @@ using SanteDB.Rest.Common.Configuration;
 using SanteDB.Server.Core.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,6 +38,7 @@ namespace SanteDB.Authentication.OAuth2.Docker
     /// <summary>
     /// OAUTH feature for docker
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class OauthDockerFeature : IDockerFeature
     {
         /// <summary>

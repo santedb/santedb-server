@@ -21,12 +21,14 @@
 
 using SanteDB.Core.Services;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Core.TestFramework
 {
     /// <summary>
     /// Test contexts don't really have applet configurations
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class TestLocalizationService : ILocalizationService
     {
         /// <summary>

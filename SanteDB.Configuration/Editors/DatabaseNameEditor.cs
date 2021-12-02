@@ -62,6 +62,7 @@ namespace SanteDB.Configuration.Editors
     /// <summary>
     /// Creates a database name editor
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class DatabaseNameEditor : UITypeEditor
     {
         /// <summary>

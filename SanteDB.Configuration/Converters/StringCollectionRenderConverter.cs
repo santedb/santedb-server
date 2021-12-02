@@ -22,6 +22,7 @@ using SanteDB.Configuration.Editors;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -32,6 +33,7 @@ namespace SanteDB.Configuration.Converters
     /// <summary>
     /// Represents a type converter for the provider type
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class StringCollectionRenderConverter : TypeConverter
     {
 

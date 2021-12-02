@@ -32,6 +32,7 @@ using SanteDB.Server.Core.Services.Impl;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -43,6 +44,7 @@ namespace SanteDB.Core.TestFramework
     /// <summary>
     /// Represents the test context
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class TestApplicationContext : IServiceProvider, IDisposable, IApplicationServiceContext
     {
         // Tracer
