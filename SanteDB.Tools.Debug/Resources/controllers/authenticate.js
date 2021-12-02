@@ -54,7 +54,7 @@ angular.module('layout').controller('AuthenticationController', ['$scope', '$roo
                     try {
                         $rootScope.$apply();
                     }
-                    catch {}
+                    catch (err) {}
                 },
                 onException: function (e) {
                     alert(e.message || e);
