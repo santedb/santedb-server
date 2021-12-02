@@ -36,6 +36,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.Drawing;
 using System.Drawing.Design;
@@ -51,6 +52,7 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Configurator
 {
+    [ExcludeFromCodeCoverage]
     public partial class frmMain : Form
     {
 
