@@ -111,6 +111,11 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Roles
         [Column("vip_sts_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid? VipStatusKey { get; set; }
 
+        /// <summary>
+        /// Gets or sets the ethnic group code id
+        /// </summary>
+        [Column("rlgn_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        public Guid? ReligiousAffiliationKey { get; set; }
     }
 }
 
