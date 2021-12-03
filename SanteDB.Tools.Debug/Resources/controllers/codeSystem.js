@@ -74,7 +74,7 @@ angular.module('layout').controller('CodeSystemCreatorController', ['$scope', '$
                                         mnemonic: c.mnemonic
                                     }
                                 });
-                                try { $scope.$apply(); } catch { }
+                                try { $scope.$apply(); } catch (err) { }
                             }
                         })
                     }
@@ -138,7 +138,7 @@ angular.module('layout').controller('CodeSystemCreatorController', ['$scope', '$
                             if (d.resource && d.resource.length == 1) {
                                 retVal.concept.id = d.resource[0].id;
                                 retVal.concept.mnemonic = d.resource[0].mnemonic;
-                                try { $scope.$apply(); } catch { }
+                                try { $scope.$apply(); } catch (err) { }
                             }
                         }
                     });

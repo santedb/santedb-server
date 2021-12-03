@@ -19,6 +19,7 @@
  * Date: 2021-8-27
  */
 
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Principal;
 using NUnit.Framework;
@@ -33,6 +34,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
     /// <summary>
     /// Summary description for SecurityRolePersistenceServiceTest
     /// </summary>
+    [ExcludeFromCodeCoverage]
     [TestFixture(Category = "Persistence")]
     public class SecurityRolePersistenceServiceTest : PersistenceTest<SecurityRole>
     {

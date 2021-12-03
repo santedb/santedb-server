@@ -20,6 +20,7 @@
  */
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using NUnit.Framework;
 using SanteDB.Core;
@@ -34,6 +35,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
     /// <summary>
     /// Summary description for SecurityUserPersistenceServiceTest
     /// </summary>
+    [ExcludeFromCodeCoverage]
     [TestFixture(Category = "Persistence")]
     public class SecurityUserPersistenceServiceTest : PersistenceTest<SecurityUser>
     {

@@ -17,6 +17,7 @@
  * Date: 2021-8-27
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace ServiceTools
@@ -248,6 +249,7 @@ namespace ServiceTools
         Critical = 0x00000003
     }
 
+    [ExcludeFromCodeCoverage]
     [StructLayout(LayoutKind.Sequential)]
     public class ServiceConfigInformation
     {
@@ -274,6 +276,7 @@ namespace ServiceTools
     /// <summary>
     /// Installs and provides functionality for handling windows services
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class ServiceInstaller
     {
         private const int STANDARD_RIGHTS_REQUIRED = 0xF0000;

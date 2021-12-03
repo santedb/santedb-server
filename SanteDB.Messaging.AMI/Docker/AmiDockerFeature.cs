@@ -27,6 +27,7 @@ using SanteDB.Rest.Common.Configuration;
 using SanteDB.Rest.Common.Security;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,6 +37,7 @@ namespace SanteDB.Messaging.AMI.Docker
     /// <summary>
     /// A docker feature for the AMI
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class AmiDockerFeature : IDockerFeature
     {
 

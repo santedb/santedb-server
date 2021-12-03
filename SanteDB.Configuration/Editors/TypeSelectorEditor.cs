@@ -65,6 +65,7 @@ namespace SanteDB.Configuration.Editors
     /// <summary>
     /// Represents a type selector type editor
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class TypeSelectorEditor : UITypeEditor
     {
         /// <summary>

@@ -24,6 +24,7 @@ using SanteDB.Docker.Core;
 using SanteDB.Persistence.Data.ADO.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,6 +34,7 @@ namespace SanteDB.Persistence.Data.ADO.Docker
     /// <summary>
     /// ADO.NET Database Feature
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class AdoDataDockerFeature : IDockerFeature
     {
         /// <summary>
