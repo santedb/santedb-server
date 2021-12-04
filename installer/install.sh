@@ -124,7 +124,7 @@ then
     WantedBy=multi-user.target
 EOF
 
-    $SUDO cp /tmp/santedb.service /etc/systemd/system/santedb.service
+    $SUDO mv /tmp/santedb.service /etc/systemd/system/santedb.service
 
     read_yesno "Do you want SanteDB to start when the system starts?" autostart
     if [[ "$autostart" =~ ^[Yy]$ ]]
