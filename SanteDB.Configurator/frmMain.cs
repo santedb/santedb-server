@@ -135,78 +135,102 @@ namespace SanteDB.Configurator
         private void PopulateConfiguration()
         {
 
-            this.Text = $"SanteDB Confgiuration Tool ({Path.GetFileName(ConfigurationContext.Current.ConfigurationFile)})";
-            using (var ms = new MemoryStream())
+            using (frmWait.ShowWait())
             {
-                ConfigurationContext.Current.Configuration.Save(ms);
-                this.m_configHash = MD5.Create().ComputeHash(ms.ToArray());
-            }
+                this.Hide();
+                this.Text = $"SanteDB Confgiuration Tool ({Path.GetFileName(ConfigurationContext.Current.ConfigurationFile)})";
+                using (var ms = new MemoryStream())
+                {
+                    Application.DoEvents();
 
-            Tracer tracer = new Tracer("Configuration Tool");
-            // Load the license
-            try
-            {
-                using (var ms = typeof(frmMain).Assembly.GetManifestResourceStream("SanteDB.Configurator.License.rtf"))
-                    rtbLicense.LoadFile(ms, RichTextBoxStreamType.RichText);
-            }
-            catch(Exception e) // common on Linux systems in Mono
-            {
-                tracer.TraceError("Could not load license file: {0}", e.Message);
-            }
-            var asm = Assembly.LoadFile(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.exe"));
-            lblVersion.Text = $"{asm.GetName().Version} ({asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
-            lblCopyright.Text = $"{asm.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright}";
-            lblInstanceName.Text = $"{ConfigurationContext.Current.GetAppSetting("w32instance.name") ?? "DEFAULT"}";
+                    ConfigurationContext.Current.Configuration.Save(ms);
+                    this.m_configHash = MD5.Create().ComputeHash(ms.ToArray());
+                }
 
-            // Load advanced view
-            lsvConfigSections.Items.Clear();
-            btnRestartService.Enabled = ConfigurationContext.Current.Features.OfType<WindowsServiceFeature>().FirstOrDefault()?.QueryState(ConfigurationContext.Current.Configuration) == Core.Configuration.FeatureInstallState.Installed;
-
-            foreach (var sect in ConfigurationContext.Current.Configuration.Sections)
-            {
-                var lvi = lsvConfigSections.Items.Add(sect.GetType().FullName, sect.GetType().GetCustomAttribute<XmlTypeAttribute>()?.TypeName, 3);
-                lvi.Tag = sect;
-            }
-
-            // Now load all features from the application domain
-            trvFeatures.Nodes.Clear();
-            foreach (var ftr in ConfigurationContext.Current.Features)
-            {
+                Tracer tracer = new Tracer("Configuration Tool");
+                // Load the license
                 try
                 {
-                    if (ftr.ConfigurationType == null) continue;
-                    // Add the features
-                    var trvParent = trvFeatures.Nodes.Find(ftr.Group, false).FirstOrDefault();
-                    if (trvParent == null)
-                    {
-                        trvParent = trvFeatures.Nodes.Add(ftr.Group, ftr.Group, 6);
-                        trvParent.SelectedImageIndex = 6;
-                    }
+                    Application.DoEvents();
 
-                    // Create node for the object
-                    var node = trvParent.Nodes.Add($"{ftr.Group}\\{ftr.Name}", ftr.Name, 0);
-                    switch (ftr.QueryState(ConfigurationContext.Current.Configuration))
-                    {
-                        case Core.Configuration.FeatureInstallState.NotInstalled:
-                            node.ImageIndex = 8;
-                            break;
-                        case Core.Configuration.FeatureInstallState.Installed:
-                            node.ImageIndex = 9;
-                            break;
-                        case Core.Configuration.FeatureInstallState.PartiallyInstalled:
-                            node.ImageIndex = 10;
-                            break;
-                        case FeatureInstallState.CantInstall:
-                            node.ImageIndex = 12;
-                            break;
-                    }
-                    node.SelectedImageIndex = node.ImageIndex;
-                    node.Tag = ftr;
+                    using (var ms = typeof(frmMain).Assembly.GetManifestResourceStream("SanteDB.Configurator.License.rtf"))
+                        rtbLicense.LoadFile(ms, RichTextBoxStreamType.RichText);
                 }
-                catch (Exception e)
+                catch (Exception e) // common on Linux systems in Mono
                 {
-                    tracer.TraceError("Could not load feature {0} - {1}", ftr.Name, e.Message);
+                    tracer.TraceError("Could not load license file: {0}", e.Message);
                 }
+                var asm = Assembly.LoadFile(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.exe"));
+                lblVersion.Text = $"{asm.GetName().Version} ({asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
+                lblCopyright.Text = $"{asm.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright}";
+                lblInstanceName.Text = $"{ConfigurationContext.Current.GetAppSetting("w32instance.name") ?? "DEFAULT"}";
+
+                // Load advanced view
+                lsvConfigSections.Items.Clear();
+                btnRestartService.Enabled = ConfigurationContext.Current.Features.OfType<WindowsServiceFeature>().FirstOrDefault()?.QueryState(ConfigurationContext.Current.Configuration) == Core.Configuration.FeatureInstallState.Installed;
+
+                foreach (var sect in ConfigurationContext.Current.Configuration.Sections)
+                {
+                    Application.DoEvents();
+                    var lvi = lsvConfigSections.Items.Add(sect.GetType().FullName, sect.GetType().GetCustomAttribute<XmlTypeAttribute>()?.TypeName, 3);
+                    lvi.Tag = sect;
+                }
+
+                // Now load all features from the application domain
+                trvFeatures.Nodes.Clear();
+                foreach (var ftr in ConfigurationContext.Current.Features)
+                {
+                    try
+                    {
+                        if (ftr.ConfigurationType == null) continue;
+                        // Add the features
+                        var trvParent = trvFeatures.Nodes.Find(ftr.Group, false).FirstOrDefault();
+                        if (trvParent == null)
+                        {
+                            trvParent = trvFeatures.Nodes.Add(ftr.Group, ftr.Group, 6);
+                            trvParent.SelectedImageIndex = 6;
+                        }
+
+                        // Create node for the object
+                        var node = trvParent.Nodes.Add($"{ftr.Group}\\{ftr.Name}", ftr.Name, 0);
+
+
+                        var mre = new ManualResetEvent(false);
+                        Core.Configuration.FeatureInstallState state = FeatureInstallState.NotInstalled;
+                        ThreadPool.QueueUserWorkItem((o) =>
+                        {
+                            state = ftr.QueryState(ConfigurationContext.Current.Configuration);
+                            mre.Set();
+                        });
+
+                        while (!mre.WaitOne(100))
+                            Application.DoEvents();
+
+                        switch (state)
+                        {
+                            case Core.Configuration.FeatureInstallState.NotInstalled:
+                                node.ImageIndex = 8;
+                                break;
+                            case Core.Configuration.FeatureInstallState.Installed:
+                                node.ImageIndex = 9;
+                                break;
+                            case Core.Configuration.FeatureInstallState.PartiallyInstalled:
+                                node.ImageIndex = 10;
+                                break;
+                            case FeatureInstallState.CantInstall:
+                                node.ImageIndex = 12;
+                                break;
+                        }
+                        node.SelectedImageIndex = node.ImageIndex;
+                        node.Tag = ftr;
+                    }
+                    catch (Exception e)
+                    {
+                        tracer.TraceError("Could not load feature {0} - {1}", ftr.Name, e.Message);
+                    }
+                }
+
+                this.Show();
             }
         }
 

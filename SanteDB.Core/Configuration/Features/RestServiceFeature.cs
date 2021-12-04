@@ -520,7 +520,7 @@ namespace SanteDB.Server.Core.Configuration.Features
         /// </summary>
         public bool Execute(SanteDBConfiguration configuration)
         {
-            configuration.Sections.RemoveAll(o => o.GetType() == this.m_serviceConfigurationObject.GetType());
+            configuration.Sections.RemoveAll(o => o is IConfigurationSection && o.GetType() == this.m_serviceConfigurationObject.GetType());
             configuration.AddSection(this.m_serviceConfigurationObject);
             return true;
         }

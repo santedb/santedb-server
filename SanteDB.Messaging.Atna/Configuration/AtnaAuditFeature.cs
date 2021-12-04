@@ -76,7 +76,7 @@ namespace SanteDB.Messaging.Atna.Configuration
             var auditConfiguration = this.m_configuration = configuration.GetSection<AtnaConfigurationSection>();
             if (auditConfiguration == null)
             {
-                this.m_configuration = new AtnaConfigurationSection();
+                auditConfiguration= this.m_configuration = new AtnaConfigurationSection();
                 configuration.AddSection(auditConfiguration);
             }
 
