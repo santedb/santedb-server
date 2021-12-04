@@ -43,9 +43,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            switch (this.m_configuration.LoadStrategy)
+            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
-                case Configuration.LoadStrategyType.FullLoad:
+                case LoadMode.FullLoad:
                     retVal.TargetEntity = this.GetRelatedPersistenceService<Entity>().Get(context, dbModel.TargetKey);
                     retVal.SetLoaded(nameof(EntityRelationship.TargetEntity));
                     retVal.Classification = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ClassificationKey.GetValueOrDefault());

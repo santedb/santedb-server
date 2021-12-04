@@ -58,18 +58,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
             var aaPersistence = this.GetRelatedPersistenceService<AssigningAuthority>();
-            switch (this.m_configuration.LoadStrategy)
+            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
-                case Configuration.LoadStrategyType.FullLoad:
+                case LoadMode.FullLoad:
                     retVal.IdentifierType = this.GetRelatedPersistenceService<IdentifierType>().Get(context, dbModel.TypeKey.GetValueOrDefault());
                     retVal.SetLoaded(nameof(EntityIdentifier.IdentifierType));
-                    goto case Configuration.LoadStrategyType.SyncLoad;
-                case Configuration.LoadStrategyType.SyncLoad:
+                    goto case LoadMode.SyncLoad;
+                case LoadMode.SyncLoad:
                     retVal.Authority = this.GetRelatedMappingProvider<AssigningAuthority>().ToModelInstance(context, referenceObjects.OfType<DbAssigningAuthority>().FirstOrDefault()) ?? aaPersistence.Get(context, dbModel.AuthorityKey);
                     retVal.SetLoaded(nameof(EntityIdentifier.Authority));
                     break;
 
-                case Configuration.LoadStrategyType.QuickLoad:
+                case LoadMode.QuickLoad:
                     retVal.Authority = this.GetRelatedMappingProvider<AssigningAuthority>().ToModelInstance(context, referenceObjects.OfType<DbAssigningAuthority>().FirstOrDefault());
                     if (retVal.Authority != null)
                     {

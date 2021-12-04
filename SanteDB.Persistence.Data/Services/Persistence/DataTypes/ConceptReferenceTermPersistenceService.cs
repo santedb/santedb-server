@@ -39,9 +39,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            switch (this.m_configuration.LoadStrategy)
+            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
-                case Configuration.LoadStrategyType.FullLoad:
+                case LoadMode.FullLoad:
                     retVal.RelationshipType = base.GetRelatedPersistenceService<ConceptRelationshipType>().Get(context, dbModel.RelationshipTypeKey);
                     retVal.SetLoaded(nameof(ConceptReferenceTerm.RelationshipType));
                     break;

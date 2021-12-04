@@ -83,31 +83,6 @@ namespace SanteDB.Persistence.Data.Configuration
     }
 
     /// <summary>
-    /// Load strategy
-    /// </summary>
-    [XmlType(nameof(LoadStrategyType), Namespace = "http://santedb.org/configuration"), Flags]
-    public enum LoadStrategyType
-    {
-        /// <summary>
-        /// Quick loading - No properties are loaded and the caller must load
-        /// </summary>
-        [XmlEnum("quick")]
-        QuickLoad,
-
-        /// <summary>
-        /// Sync loading - only properties which are necessary for synchronization
-        /// </summary>
-        [XmlEnum("sync")]
-        SyncLoad,
-
-        /// <summary>
-        /// Full loading - load all properties
-        /// </summary>
-        [XmlEnum("full")]
-        FullLoad
-    }
-
-    /// <summary>
     /// Configuration section handler
     /// </summary>
     [XmlType(nameof(AdoPersistenceConfigurationSection), Namespace = "http://santedb.org/configuration")]
@@ -217,7 +192,7 @@ namespace SanteDB.Persistence.Data.Configuration
         /// Gets or sets the loading strategy
         /// </summary>
         [XmlAttribute("loadStrategy"), Category("performance"), DisplayName("Load Strategy"), Description("Sets the loading strategy - Quick = No extended loading of properties , Sync = Only synchornization/serialization properties are deep loaded, Full = All properties are loaded")]
-        public LoadStrategyType LoadStrategy { get; set; }
+        public LoadMode LoadStrategy { get; set; }
 
         /// <summary>
         /// Gets or sets whether public keys should be encrypted

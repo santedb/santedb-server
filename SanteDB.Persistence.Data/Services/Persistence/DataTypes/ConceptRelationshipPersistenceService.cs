@@ -38,9 +38,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         protected override ConceptRelationship DoConvertToInformationModel(DataContext context, DbConceptRelationship dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            switch (this.m_configuration.LoadStrategy)
+            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
-                case Configuration.LoadStrategyType.FullLoad:
+                case LoadMode.FullLoad:
                     retVal.RelationshipType = base.GetRelatedPersistenceService<ConceptRelationshipType>().Get(context, dbModel.RelationshipTypeKey);
                     retVal.SetLoaded(nameof(ConceptRelationship.RelationshipType));
                     retVal.TargetConcept = base.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TargetKey);

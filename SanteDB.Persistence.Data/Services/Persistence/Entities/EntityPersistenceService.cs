@@ -28,37 +28,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <summary>
-        /// Perform a delete references
-        /// </summary>
-        protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
-        {
-            context.Delete<DbEntityRelationship>(o => o.SourceKey == key);
-            var addressIds = context.Query<DbEntityAddress>(o => o.SourceKey == key).Select(o => o.Key).ToArray();
-            context.Delete<DbEntityAddressComponent>(o => addressIds.Contains(o.SourceKey));
-            context.Delete<DbEntityAddress>(o => addressIds.Contains(o.Key));
-            var nameIds = context.Query<DbEntityName>(o => o.SourceKey == key).Select(o => o.Key).ToArray();
-            context.Delete<DbEntityNameComponent>(o => nameIds.Contains(o.SourceKey));
-            context.Delete<DbEntityName>(o => nameIds.Contains(o.Key));
-            context.Delete<DbEntityIdentifier>(o => o.SourceKey == key);
-            context.Delete<DbEntityRelationship>(o => o.SourceKey == key);
-            context.Delete<DbApplicationEntity>(o => o.ParentKey == key);
-            context.Delete<DbEntityTag>(o => o.SourceKey == key);
-            context.Delete<DbEntityExtension>(o => o.SourceKey == key);
-            context.Delete<DbEntityNote>(o => o.SourceKey == key);
-            context.Delete<DbTelecomAddress>(o => o.SourceKey == key);
-            context.Delete<DbDeviceEntity>(o => o.ParentKey == key);
-            context.Delete<DbPatient>(o => o.ParentKey == key);
-            context.Delete<DbProvider>(o => o.ParentKey == key);
-            context.Delete<DbUserEntity>(o => o.ParentKey == key);
-            context.Delete<DbPerson>(o => o.ParentKey == key);
-            context.Delete<DbOrganization>(o => o.ParentKey == key);
-            context.Delete<DbPlaceService>(o => o.SourceKey == key);
-            context.Delete<DbPlace>(o => o.ParentKey == key);
-
-            base.DoDeleteReferencesInternal(context, key);
-        }
-
-        /// <summary>
         /// Insert the model using the proper type of persistence
         /// </summary>
         /// <param name="context">The context where the data should be inserted</param>

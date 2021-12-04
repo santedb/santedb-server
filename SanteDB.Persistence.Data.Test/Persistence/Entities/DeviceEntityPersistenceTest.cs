@@ -40,7 +40,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     },
                     SecurityDeviceKey = deviceService.GetSid("SOME_DEVICE_ID"),
                     ManufacturerModelName = "Test Manufacturer",
-                    OperatingSystemName = "Operating System Inc. OS 4"
+                    OperatingSystemName = "Operating System Inc. OS 4",
+                    GeoTag = new Core.Model.DataTypes.GeoTag(12, 13, false)
                 };
 
                 // Perform the insert
@@ -50,6 +51,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.IsNull(afterInsert.SecurityDevice);
                 Assert.IsNotNull(afterInsert.LoadProperty(o => o.SecurityDevice));
                 Assert.AreEqual("SOME_DEVICE_ID", afterInsert.SecurityDevice.Name);
+                Assert.IsNull(afterInsert.GeoTag);
+                Assert.IsNotNull(afterInsert.LoadProperty(o => o.GeoTag));
 
                 // Now we want to query
                 var afterQuery = base.TestQuery<DeviceEntity>(o => o.ManufacturerModelName == "Test Manufacturer" && o.OperatingSystemName == "Operating System Inc. OS 4", 1).AsResultSet().First();
@@ -57,7 +60,10 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
                 Assert.AreEqual("Test Manufacturer", afterQuery.ManufacturerModelName);
                 Assert.AreEqual("Operating System Inc. OS 4", afterQuery.OperatingSystemName);
-
+                Assert.IsNull(afterQuery.GeoTag);
+                Assert.IsNotNull(afterQuery.GeoTagKey);
+                Assert.IsNotNull(afterQuery.LoadProperty(o => o.GeoTag));
+                Assert.AreEqual(12.0f, afterQuery.GeoTag.Lat);
                 // Update the key
                 var afterUpdate = base.TestUpdate(afterQuery, (o) =>
                 {

@@ -38,13 +38,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override ActIdentifier DoConvertToInformationModel(DataContext context, DbActIdentifier dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            switch (this.m_configuration.LoadStrategy)
+            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
-                case Configuration.LoadStrategyType.SyncLoad:
+                case LoadMode.SyncLoad:
                     retVal.Authority = this.GetRelatedPersistenceService<AssigningAuthority>().Get(context, dbModel.AuthorityKey);
                     retVal.SetLoaded(nameof(ActIdentifier.Authority));
-                    goto case Configuration.LoadStrategyType.FullLoad;
-                case Configuration.LoadStrategyType.FullLoad:
+                    goto case LoadMode.FullLoad;
+                case LoadMode.FullLoad:
                     retVal.IdentifierType = this.GetRelatedPersistenceService<IdentifierType>().Get(context, dbModel.TypeKey.GetValueOrDefault());
                     retVal.SetLoaded(nameof(ActIdentifier.IdentifierType));
                     break;

@@ -1,5 +1,7 @@
 ﻿using NUnit.Framework;
 using SanteDB.Core;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
@@ -9,6 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SanteDB.Core.Model;
 
 namespace SanteDB.Persistence.Data.Test
 {
@@ -59,6 +62,43 @@ namespace SanteDB.Persistence.Data.Test
             var principal = authService.Authenticate("Administrator", "Mohawk123");
             var principalPolicies = pipService.GetPolicyInstance(principal, PermissionPolicyIdentifiers.UnrestrictedClinicalData);
             Assert.AreEqual(PolicyGrantType.Deny, principalPolicies.Rule);
+        }
+
+        /// <summary>
+        /// Test adding a policy to an entity
+        /// </summary>
+        [Test]
+        public void TestAddPolicyToEntity()
+        {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                var entity = new Entity()
+                {
+                    ClassConceptKey = EntityClassKeys.Food,
+                    DeterminerConceptKey = DeterminerKeys.Specific,
+                    Names = new List<EntityName>()
+                    {
+                        new EntityName(NameUseKeys.OfficialRecord, "TEST")
+                    }
+                };
+
+                var afterInsert = base.TestInsert(entity);
+                // Add a policy
+                var pipService = ApplicationServiceContext.Current.GetService<IPolicyInformationService>();
+                var pdpService = ApplicationServiceContext.Current.GetService<IPolicyDecisionService>();
+                var authService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
+
+                pipService.AddPolicies(afterInsert, PolicyGrantType.Grant, AuthenticationContext.SystemPrincipal, PermissionPolicyIdentifiers.UnrestrictedClinicalData);
+
+                // Re-fetch and check policy count
+                Assert.AreEqual(1, pipService.GetPolicies(afterInsert).Count());
+                var afterQuery = base.TestQuery<Entity>(o => o.Key == afterInsert.Key, 1).AsResultSet().First();
+                Assert.AreEqual(1, afterQuery.Policies.Count);
+
+                // Attempt to access ?
+                var principal = authService.Authenticate("Administrator", "Mohawk123");
+                pdpService.GetPolicyDecision(principal, afterQuery);
+            }
         }
 
         // TODO: Add policies to a security device

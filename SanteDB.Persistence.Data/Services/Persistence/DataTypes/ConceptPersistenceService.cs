@@ -136,21 +136,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            switch (this.m_configuration.LoadStrategy)
+            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
-                case Configuration.LoadStrategyType.FullLoad:
+                case LoadMode.FullLoad:
                     retVal.Class = base.GetRelatedPersistenceService<ConceptClass>().Get(context, dbModel.ClassKey);
                     retVal.SetLoaded(nameof(Concept.Class));
-                    goto case Configuration.LoadStrategyType.SyncLoad; // special case - FullLoad implies SyncLoad so we want a fallthrough - the only way to do this in C# is with this messy GOTO stuff
-                case Configuration.LoadStrategyType.SyncLoad:
+                    goto case LoadMode.SyncLoad; // special case - FullLoad implies SyncLoad so we want a fallthrough - the only way to do this in C# is with this messy GOTO stuff
+                case LoadMode.SyncLoad:
                     retVal.ConceptNames = base.GetRelatedPersistenceService<ConceptName>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
                     retVal.SetLoaded(nameof(Concept.ConceptNames));
                     retVal.Relationship = base.GetRelatedPersistenceService<ConceptRelationship>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
                     retVal.SetLoaded(nameof(Concept.Relationship));
                     retVal.ReferenceTerms = this.GetRelatedPersistenceService<ConceptReferenceTerm>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
                     retVal.SetLoaded(nameof(Concept.ReferenceTerms));
-                    goto case Configuration.LoadStrategyType.QuickLoad;
-                case Configuration.LoadStrategyType.QuickLoad:
+                    goto case LoadMode.QuickLoad;
+                case LoadMode.QuickLoad:
                     retVal.ConceptSetKeys = context.Query<DbConceptSetConceptAssociation>(o => o.ConceptKey == dbModel.Key).Select(o => o.SourceKey).ToList();
                     retVal.SetLoaded(nameof(Concept.ConceptSets));
                     break;

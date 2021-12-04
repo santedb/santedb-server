@@ -69,13 +69,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         protected override EntityName DoConvertToInformationModel(DataContext context, DbEntityName dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            switch (this.m_configuration.LoadStrategy)
+            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
-                case Configuration.LoadStrategyType.FullLoad:
+                case LoadMode.FullLoad:
                     retVal.NameUse = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.UseConceptKey);
                     retVal.SetLoaded(nameof(EntityName.NameUse));
-                    goto case Configuration.LoadStrategyType.SyncLoad;
-                case Configuration.LoadStrategyType.SyncLoad:
+                    goto case LoadMode.SyncLoad;
+                case LoadMode.SyncLoad:
                     retVal.Component = this.GetRelatedPersistenceService<EntityNameComponent>().Query(context, o => o.SourceEntityKey == dbModel.Key).OrderBy(o => o.OrderSequence).ToList();
                     retVal.SetLoaded(nameof(EntityName.Component));
                     break;

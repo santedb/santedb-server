@@ -39,10 +39,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            if (this.m_configuration.LoadStrategy == Configuration.LoadStrategyType.FullLoad)
+            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
-                retVal.ComponentType = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ComponentTypeKey.GetValueOrDefault());
-                retVal.SetLoaded(nameof(EntityAddressComponent.ComponentType));
+                case LoadMode.FullLoad:
+                    retVal.ComponentType = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ComponentTypeKey.GetValueOrDefault());
+                    retVal.SetLoaded(nameof(EntityAddressComponent.ComponentType));
+                    break;
             }
 
             return retVal;

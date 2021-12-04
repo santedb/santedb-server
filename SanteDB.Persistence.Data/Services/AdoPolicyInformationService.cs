@@ -89,59 +89,67 @@ namespace SanteDB.Persistence.Data.Services
 
                         this.Demand(securable, principal);
 
-                        if (securable is SecurityRole sr)
+                        switch (securable)
                         {
-                            context.Delete<DbSecurityRolePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sr.Key && policies.Contains(o.PolicyKey));
-                            context.Insert(policies.Select(o => new DbSecurityRolePolicy()
-                            {
-                                GrantType = (int)rule,
-                                SourceKey = sr.Key.Value,
-                                PolicyKey = o
-                            }));
-                        }
-                        else if (securable is SecurityApplication sa)
-                        {
-                            context.Delete<DbSecurityApplicationPolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sa.Key && policies.Contains(o.PolicyKey));
-                            context.Insert(policies.Select(o => new DbSecurityApplicationPolicy()
-                            {
-                                GrantType = (int)rule,
-                                SourceKey = sa.Key.Value,
-                                PolicyKey = o
-                            }));
-                        }
-                        else if (securable is SecurityDevice sd)
-                        {
-                            context.Delete<DbSecurityDevicePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sd.Key && policies.Contains(o.PolicyKey));
-                            context.Insert(policies.Select(o => new DbSecurityDevicePolicy()
-                            {
-                                GrantType = (int)rule,
-                                SourceKey = sd.Key.Value,
-                                PolicyKey = o
-                            }));
-                        }
-                        else if (securable is Entity entity)
-                        {
-                            context.Delete<DbEntitySecurityPolicy>(o => o.SourceKey == entity.Key && policies.Contains(o.PolicyKey));
-                            context.Insert(policies.Select(o => new DbEntitySecurityPolicy()
-                            {
-                                EffectiveVersionSequenceId = entity.VersionSequence.Value,
-                                PolicyKey = o,
-                                SourceKey = entity.Key.Value
-                            }));
-                        }
-                        else if (securable is Act act)
-                        {
-                            context.Delete<DbActSecurityPolicy>(o => o.SourceKey == act.Key && policies.Contains(o.PolicyKey));
-                            context.Insert(policies.Select(o => new DbActSecurityPolicy()
-                            {
-                                SourceKey = act.Key.Value,
-                                EffectiveVersionSequenceId = act.VersionSequence.Value,
-                                PolicyKey = o
-                            }));
-                        }
-                        else
-                        {
-                            throw new NotSupportedException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_NOT_SUPPORTED));
+                            case SecurityRole sr:
+                                {
+                                    context.Delete<DbSecurityRolePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sr.Key && policies.Contains(o.PolicyKey));
+                                    context.InsertAll(policies.Select(o => new DbSecurityRolePolicy()
+                                    {
+                                        GrantType = (int)rule,
+                                        SourceKey = sr.Key.Value,
+                                        PolicyKey = o
+                                    }));
+                                    break;
+                                }
+                            case SecurityApplication sa:
+                                {
+                                    context.Delete<DbSecurityApplicationPolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sa.Key && policies.Contains(o.PolicyKey));
+                                    context.InsertAll(policies.Select(o => new DbSecurityApplicationPolicy()
+                                    {
+                                        GrantType = (int)rule,
+                                        SourceKey = sa.Key.Value,
+                                        PolicyKey = o
+                                    }));
+                                    break;
+                                }
+                            case SecurityDevice sd:
+                                {
+                                    context.Delete<DbSecurityDevicePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sd.Key && policies.Contains(o.PolicyKey));
+                                    context.InsertAll(policies.Select(o => new DbSecurityDevicePolicy()
+                                    {
+                                        GrantType = (int)rule,
+                                        SourceKey = sd.Key.Value,
+                                        PolicyKey = o
+                                    }));
+                                    break;
+                                }
+                            case Entity entity:
+                                {
+                                    context.Delete<DbEntitySecurityPolicy>(o => o.SourceKey == entity.Key && policies.Contains(o.PolicyKey));
+                                    context.InsertAll(policies.Select(o => new DbEntitySecurityPolicy()
+                                    {
+                                        EffectiveVersionSequenceId = entity.VersionSequence.Value,
+                                        PolicyKey = o,
+                                        SourceKey = entity.Key.Value
+                                    }));
+                                    break;
+                                }
+                            case Act act:
+                                {
+                                    context.Delete<DbActSecurityPolicy>(o => o.SourceKey == act.Key && policies.Contains(o.PolicyKey));
+                                    context.InsertAll(policies.Select(o => new DbActSecurityPolicy()
+                                    {
+                                        SourceKey = act.Key.Value,
+                                        EffectiveVersionSequenceId = act.VersionSequence.Value,
+                                        PolicyKey = o
+                                    }));
+                                    break;
+                                }
+                            default:
+                                {
+                                    throw new NotSupportedException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_NOT_SUPPORTED));
+                                }
                         }
                         tx.Commit();
 
@@ -303,78 +311,89 @@ namespace SanteDB.Persistence.Data.Services
                         context.Open();
 
                         // Security Device
-                        if (securable is SecurityDevice sd)
+                        switch (securable)
                         {
-                            results = context.Query<CompositeResult<DbSecurityDevicePolicy, DbSecurityPolicy>>(
-                                context.CreateSqlStatement<DbSecurityDevicePolicy>()
-                                    .SelectFrom(typeof(DbSecurityDevicePolicy), typeof(DbSecurityPolicy))
-                                .InnerJoin<DbSecurityPolicy, DbSecurityDevicePolicy>(o => o.Key, o => o.PolicyKey)
-                                .Where<DbSecurityDevicePolicy>(o => o.SourceKey == sd.Key))
-                                .ToArray()
-                                .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
-                        }
-                        else if (securable is SecurityApplication sa)
-                        {
-                            results = context.Query<CompositeResult<DbSecurityApplicationPolicy, DbSecurityPolicy>>(
-                                context.CreateSqlStatement<DbSecurityApplicationPolicy>()
-                                    .SelectFrom(typeof(DbSecurityApplicationPolicy), typeof(DbSecurityPolicy))
-                                .InnerJoin<DbSecurityPolicy, DbSecurityApplicationPolicy>(o => o.Key, o => o.PolicyKey)
-                                .Where<DbSecurityApplicationPolicy>(o => o.SourceKey == sa.Key))
-                                .ToArray()
-                                .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
-                        }
-                        else if (securable is SecurityRole sr)
-                        {
-                            results = context.Query<CompositeResult<DbSecurityRolePolicy, DbSecurityPolicy>>(
-                                context.CreateSqlStatement<DbSecurityRolePolicy>()
-                                    .SelectFrom(typeof(DbSecurityRolePolicy), typeof(DbSecurityPolicy))
-                                .InnerJoin<DbSecurityPolicy, DbSecurityRolePolicy>(o => o.Key, o => o.PolicyKey)
-                                .Where<DbSecurityRolePolicy>(o => o.SourceKey == sr.Key))
-                                .ToArray()
-                                .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
-                        }
-                        else if (securable is IIdentity identity)
-                        {
-                            results = this.GetIdentityPolicies(context, identity, new String[0]).ToArray();
-                        }
-                        else if (securable is IPrincipal principal)
-                        {
-                            var primaryId = principal.Identity;
-
-                            results = this.GetIdentityPolicies(context, primaryId, new String[0]).ToArray();
-
-                            // Secondary identities
-                            if (principal is IClaimsPrincipal claimsPrincipal)
-                            {
-                                foreach (var subId in claimsPrincipal.Identities.Where(o => o != primaryId))
+                            case SecurityDevice sd:
                                 {
-                                    results = results.Union(this.GetIdentityPolicies(context, subId, results.Select(o => o.Policy.Oid))).ToArray();
+                                    results = context.Query<CompositeResult<DbSecurityDevicePolicy, DbSecurityPolicy>>(
+                                        context.CreateSqlStatement<DbSecurityDevicePolicy>()
+                                            .SelectFrom(typeof(DbSecurityDevicePolicy), typeof(DbSecurityPolicy))
+                                        .InnerJoin<DbSecurityDevicePolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
+                                        .Where<DbSecurityDevicePolicy>(o => o.SourceKey == sd.Key))
+                                        .ToArray()
+                                        .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
+                                    break;
                                 }
-                            }
-                        }
-                        else if (securable is Entity entity)
-                        {
-                            results = context.Query<CompositeResult<DbEntitySecurityPolicy, DbSecurityPolicy>>(
-                                context.CreateSqlStatement<DbEntitySecurityPolicy>()
-                                    .SelectFrom(typeof(DbEntitySecurityPolicy), typeof(DbSecurityPolicy))
-                                .InnerJoin<DbSecurityPolicy, DbEntitySecurityPolicy>(o => o.Key, o => o.PolicyKey)
-                                    .Where<DbEntitySecurityPolicy>(o => o.SourceKey == entity.Key && o.ObsoleteVersionSequenceId == null))
-                                .ToArray()
-                                .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, entity));
-                        }
-                        else if (securable is Act act)
-                        {
-                            results = context.Query<CompositeResult<DbActSecurityPolicy, DbSecurityPolicy>>(
-                                context.CreateSqlStatement<DbActSecurityPolicy>()
-                                    .SelectFrom(typeof(DbActSecurityPolicy), typeof(DbSecurityPolicy))
-                                .InnerJoin<DbSecurityPolicy, DbActSecurityPolicy>(o => o.Key, o => o.PolicyKey)
-                                    .Where<DbActSecurityPolicy>(o => o.SourceKey == act.Key && o.ObsoleteVersionSequenceId == null))
-                                .ToArray()
-                                .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, act));
-                        }
-                        else
-                        {
-                            results = new List<AdoSecurityPolicyInstance>();
+                            case SecurityApplication sa:
+                                {
+                                    results = context.Query<CompositeResult<DbSecurityApplicationPolicy, DbSecurityPolicy>>(
+                                        context.CreateSqlStatement<DbSecurityApplicationPolicy>()
+                                            .SelectFrom(typeof(DbSecurityApplicationPolicy), typeof(DbSecurityPolicy))
+                                        .InnerJoin<DbSecurityApplicationPolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
+                                        .Where<DbSecurityApplicationPolicy>(o => o.SourceKey == sa.Key))
+                                        .ToArray()
+                                        .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
+                                    break;
+                                }
+                            case SecurityRole sr:
+                                {
+                                    results = context.Query<CompositeResult<DbSecurityRolePolicy, DbSecurityPolicy>>(
+                                        context.CreateSqlStatement<DbSecurityRolePolicy>()
+                                            .SelectFrom(typeof(DbSecurityRolePolicy), typeof(DbSecurityPolicy))
+                                        .InnerJoin<DbSecurityRolePolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
+                                        .Where<DbSecurityRolePolicy>(o => o.SourceKey == sr.Key))
+                                        .ToArray()
+                                        .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
+                                    break;
+                                }
+                            case IIdentity identity:
+                                {
+                                    results = this.GetIdentityPolicies(context, identity, new String[0]).ToArray();
+                                    break;
+                                }
+                            case IPrincipal principal:
+                                {
+                                    var primaryId = principal.Identity;
+
+                                    results = this.GetIdentityPolicies(context, primaryId, new String[0]).ToArray();
+
+                                    // Secondary identities
+                                    if (principal is IClaimsPrincipal claimsPrincipal)
+                                    {
+                                        foreach (var subId in claimsPrincipal.Identities.Where(o => o != primaryId))
+                                        {
+                                            results = results.Union(this.GetIdentityPolicies(context, subId, results.Select(o => o.Policy.Oid))).ToArray();
+                                        }
+                                    }
+                                    break;
+                                }
+                            case Entity entity:
+                                {
+                                    results = context.Query<CompositeResult<DbEntitySecurityPolicy, DbSecurityPolicy>>(
+                                        context.CreateSqlStatement<DbEntitySecurityPolicy>()
+                                            .SelectFrom(typeof(DbEntitySecurityPolicy), typeof(DbSecurityPolicy))
+                                        .InnerJoin<DbEntitySecurityPolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
+                                            .Where<DbEntitySecurityPolicy>(o => o.SourceKey == entity.Key && o.ObsoleteVersionSequenceId == null))
+                                        .ToArray()
+                                        .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, entity));
+                                    break;
+                                }
+                            case Act act:
+                                {
+                                    results = context.Query<CompositeResult<DbActSecurityPolicy, DbSecurityPolicy>>(
+                                        context.CreateSqlStatement<DbActSecurityPolicy>()
+                                            .SelectFrom(typeof(DbActSecurityPolicy), typeof(DbSecurityPolicy))
+                                        .InnerJoin<DbActSecurityPolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
+                                            .Where<DbActSecurityPolicy>(o => o.SourceKey == act.Key && o.ObsoleteVersionSequenceId == null))
+                                        .ToArray()
+                                        .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, act));
+                                    break;
+                                }
+                            default:
+                                {
+                                    results = new List<AdoSecurityPolicyInstance>();
+                                    break;
+                                }
                         }
 
                         if (securable is IdentifiedData id1)

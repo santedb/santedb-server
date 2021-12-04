@@ -175,7 +175,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected override OrmResultSet<TReturn> DoQueryInternalAs<TReturn>(DataContext context, Expression<Func<TModel, bool>> query, Func<SqlStatement, SqlStatement> queryModifier = null)
         {
-
             // If the user has not explicitly set the obsoletion time parameter then we will add it
             if (!query.ToString().Contains(nameof(BaseEntityData.ObsoletionTime)))
             {
@@ -268,9 +267,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            switch (this.m_configuration.LoadStrategy)
+            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
-                case Configuration.LoadStrategyType.FullLoad:
+                case LoadMode.FullLoad:
                     retVal.CreatedBy = base.GetRelatedPersistenceService<SecurityProvenance>().Get(context, dbModel.CreatedByKey);
                     retVal.SetLoaded(nameof(BaseEntityData.CreatedBy));
                     retVal.ObsoletedBy = base.GetRelatedPersistenceService<SecurityProvenance>().Get(context, dbModel.ObsoletedByKey.GetValueOrDefault());

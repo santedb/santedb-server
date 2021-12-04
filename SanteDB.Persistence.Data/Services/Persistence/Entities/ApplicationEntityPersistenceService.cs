@@ -15,7 +15,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     /// <summary>
     /// Application entity persistence serivce for application entities
     /// </summary>
-    public class ApplicationEntityPersistenceService : EntityDerivedPersistenceService<ApplicationEntity>
+    public class ApplicationEntityPersistenceService : EntityDerivedPersistenceService<ApplicationEntity, DbApplicationEntity>
     {
         /// <summary>
         /// DI constructor
@@ -33,52 +33,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             return base.BeforePersisting(context, data);
         }
 
-        /// <inheritdoc/>
-        protected override ApplicationEntity DoInsertModel(DataContext context, ApplicationEntity data)
-        {
-            var retVal = base.DoInsertModel(context, data);
-            var dbApp = this.m_modelMapper.MapModelInstance<ApplicationEntity, DbApplicationEntity>(data);
-            dbApp.ParentKey = retVal.VersionKey.Value;
-            dbApp = context.Insert(dbApp);
-            retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbApplicationEntity, ApplicationEntity>(dbApp));
-            return retVal;
-        }
-
-        /// <summary>
-        /// Update model
-        /// </summary>
-        protected override ApplicationEntity DoUpdateModel(DataContext context, ApplicationEntity data)
-        {
-            var retVal = base.DoUpdateModel(context, data);
-            var dbApp = this.m_modelMapper.MapModelInstance<ApplicationEntity, DbApplicationEntity>(data);
-            dbApp.ParentKey = retVal.VersionKey.Value;
-            if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
-            {
-                dbApp = context.Insert(dbApp);
-            }
-            else
-            {
-                dbApp = context.Update(dbApp);
-            }
-            retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbApplicationEntity, ApplicationEntity>(dbApp));
-            return retVal;
-        }
-
-        /// <summary>
-        /// Joins with <see cref="DbOrganization"/>
-        /// </summary>
-        public override IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<ApplicationEntity, bool>> query)
-        {
-            return base.DoQueryInternalAs<CompositeResult<DbEntityVersion, DbApplicationEntity>>(context, query, (o) =>
-            {
-                var columns = TableMapping.Get(typeof(DbApplicationEntity)).Columns.Union(
-                        TableMapping.Get(typeof(DbEntityVersion)).Columns, new ColumnMapping.ColumnComparer());
-                var retVal = context.CreateSqlStatement().SelectFrom(typeof(DbEntityVersion), columns.ToArray())
-                    .InnerJoin<DbEntityVersion, DbApplicationEntity>(q => q.VersionKey, q => q.ParentKey);
-                return retVal;
-            });
-        }
-
         /// <summary>
         /// Convert to information model
         /// </summary>
@@ -92,14 +46,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 dbApplication = context.FirstOrDefault<DbApplicationEntity>(o => o.ParentKey == dbModel.VersionKey);
             }
 
-            if (this.m_configuration.LoadStrategy == Configuration.LoadStrategyType.FullLoad)
+            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
-                retVal.SecurityApplication = this.GetRelatedPersistenceService<SecurityApplication>().Get(context, dbApplication.SecurityApplicationKey);
-                retVal.SetLoaded(nameof(ApplicationEntity.SecurityApplication));
-            }
-            else
-            {
-                retVal.SecurityApplicationKey = dbApplication.SecurityApplicationKey;
+                case LoadMode.FullLoad:
+                    retVal.SecurityApplication = this.GetRelatedPersistenceService<SecurityApplication>().Get(context, dbApplication.SecurityApplicationKey);
+                    retVal.SetLoaded(nameof(ApplicationEntity.SecurityApplication));
+                    break;
             }
 
             retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbApplicationEntity, ApplicationEntity>(dbApplication));

@@ -38,12 +38,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         protected override IdentifierType DoConvertToInformationModel(DataContext context, DbIdentifierType dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            if (this.m_configuration.LoadStrategy == Configuration.LoadStrategyType.FullLoad)
+            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
-                retVal.TypeConcept = base.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey);
-                retVal.SetLoaded(nameof(IdentifierType.TypeConcept));
-                retVal.ScopeConcept = base.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ScopeConceptKey.GetValueOrDefault());
-                retVal.SetLoaded(nameof(IdentifierType.ScopeConcept));
+                case LoadMode.FullLoad:
+                    retVal.TypeConcept = base.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey);
+                    retVal.SetLoaded(nameof(IdentifierType.TypeConcept));
+                    retVal.ScopeConcept = base.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ScopeConceptKey.GetValueOrDefault());
+                    retVal.SetLoaded(nameof(IdentifierType.ScopeConcept));
+                    break;
             }
             return retVal;
         }

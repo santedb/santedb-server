@@ -15,15 +15,96 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.DataType;
 using SanteDB.Persistence.Data.Model.Entities;
+using SanteDB.Persistence.Data.Model.Extensibility;
+using SanteDB.Persistence.Data.Model.Roles;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
+    /// <summary>
+    /// Entity derived persistence service with one sub entity table
+    /// </summary>
+    /// <typeparam name="TEntity">The model type of entity</typeparam>
+    /// <typeparam name="TDbEntitySubTable">The sub table instance</typeparam>
+    public class EntityDerivedPersistenceService<TEntity, TDbEntitySubTable> : EntityDerivedPersistenceService<TEntity>
+        where TEntity : Entity, IVersionedEntity, new()
+        where TDbEntitySubTable : DbEntitySubTable, new()
+    {
+        /// <summary>
+        /// Creates a dependency injected
+        /// </summary>
+        public EntityDerivedPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
+        {
+        }
+
+        /// <summary>
+        /// Perform a delete of references
+        /// </summary>
+        protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
+        {
+            base.DoDeleteReferencesInternal(context, key);
+        }
+
+        /// <inheritdoc/>
+        public override IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<TEntity, bool>> query)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+            else if (query == null)
+            {
+                throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+
+            // Perform sub query
+            return base.DoQueryInternalAs<CompositeResult<DbEntityVersion, TDbEntitySubTable>>(context, query, (o) =>
+            {
+                var columns = TableMapping.Get(typeof(TDbEntitySubTable)).Columns.Union(
+                        TableMapping.Get(typeof(DbEntityVersion)).Columns, new ColumnMapping.ColumnComparer());
+                var retVal = context.CreateSqlStatement().SelectFrom(typeof(DbEntityVersion), columns.ToArray())
+                    .InnerJoin<DbEntityVersion, TDbEntitySubTable>(q => q.VersionKey, q => q.ParentKey);
+                return retVal;
+            });
+        }
+
+        /// <inheritdoc/>
+        protected override TEntity DoInsertModel(DataContext context, TEntity data)
+        {
+            var retVal = base.DoInsertModel(context, data);
+            var dbSubInstance = this.m_modelMapper.MapModelInstance<TEntity, TDbEntitySubTable>(data);
+            dbSubInstance.ParentKey = retVal.VersionKey.Value;
+            dbSubInstance = context.Insert(dbSubInstance);
+            retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<TDbEntitySubTable, TEntity>(dbSubInstance));
+            return retVal;
+        }
+
+        /// <inheritdoc/>
+        protected override TEntity DoUpdateModel(DataContext context, TEntity data)
+        {
+            var retVal = base.DoUpdateModel(context, data);
+            // Update sub entity table
+            var dbSubEntity = this.m_modelMapper.MapModelInstance<TEntity, TDbEntitySubTable>(data);
+            dbSubEntity.ParentKey = retVal.VersionKey.Value;
+            if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
+            {
+                dbSubEntity = context.Insert(dbSubEntity);
+            }
+            else
+            {
+                dbSubEntity = context.Update(dbSubEntity);
+            }
+            retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<TDbEntitySubTable, TEntity>(dbSubEntity));
+            return retVal;
+        }
+    }
+
     /// <summary>
     /// Persistence service that is responsible for storing and retrieving entities
     /// </summary>
@@ -35,6 +116,37 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         public EntityDerivedPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
+        }
+
+        /// <summary>
+        /// Perform a delete references
+        /// </summary>
+        protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
+        {
+            context.Delete<DbEntityRelationship>(o => o.SourceKey == key);
+            var addressIds = context.Query<DbEntityAddress>(o => o.SourceKey == key).Select(o => o.Key).ToArray();
+            context.Delete<DbEntityAddressComponent>(o => addressIds.Contains(o.SourceKey));
+            context.Delete<DbEntityAddress>(o => addressIds.Contains(o.Key));
+            var nameIds = context.Query<DbEntityName>(o => o.SourceKey == key).Select(o => o.Key).ToArray();
+            context.Delete<DbEntityNameComponent>(o => nameIds.Contains(o.SourceKey));
+            context.Delete<DbEntityName>(o => nameIds.Contains(o.Key));
+            context.Delete<DbEntityIdentifier>(o => o.SourceKey == key);
+            context.Delete<DbEntityRelationship>(o => o.SourceKey == key);
+            context.Delete<DbApplicationEntity>(o => o.ParentKey == key);
+            context.Delete<DbEntityTag>(o => o.SourceKey == key);
+            context.Delete<DbEntityExtension>(o => o.SourceKey == key);
+            context.Delete<DbEntityNote>(o => o.SourceKey == key);
+            context.Delete<DbTelecomAddress>(o => o.SourceKey == key);
+            context.Delete<DbDeviceEntity>(o => o.ParentKey == key);
+            context.Delete<DbPatient>(o => o.ParentKey == key);
+            context.Delete<DbProvider>(o => o.ParentKey == key);
+            context.Delete<DbUserEntity>(o => o.ParentKey == key);
+            context.Delete<DbPerson>(o => o.ParentKey == key);
+            context.Delete<DbOrganization>(o => o.ParentKey == key);
+            context.Delete<DbPlaceService>(o => o.SourceKey == key);
+            context.Delete<DbPlace>(o => o.ParentKey == key);
+
+            base.DoDeleteReferencesInternal(context, key);
         }
 
         /// <summary>
@@ -85,9 +197,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            switch (this.m_configuration.LoadStrategy)
+            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
-                case Configuration.LoadStrategyType.FullLoad:
+                case LoadMode.FullLoad:
                     retVal.ClassConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ClassConceptKey);
                     retVal.SetLoaded(nameof(Entity.ClassConcept));
                     retVal.CreationAct = this.GetRelatedPersistenceService<Act>().Get(context, dbModel.CreationActKey.GetValueOrDefault());
@@ -98,8 +210,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     retVal.SetLoaded(nameof(Entity.StatusConcept));
                     retVal.TypeConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey.GetValueOrDefault());
                     retVal.SetLoaded(nameof(Entity.TypeConcept));
-                    goto case Configuration.LoadStrategyType.SyncLoad;
-                case Configuration.LoadStrategyType.SyncLoad:
+                    goto case LoadMode.SyncLoad;
+                case LoadMode.SyncLoad:
                     retVal.Addresses = this.GetRelatedPersistenceService<EntityAddress>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
                     retVal.SetLoaded(nameof(Entity.Addresses));
                     retVal.Extensions = this.GetRelatedPersistenceService<EntityExtension>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
@@ -116,8 +228,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     retVal.SetLoaded(nameof(Entity.Tags));
                     retVal.Telecoms = this.GetRelatedPersistenceService<EntityTelecomAddress>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
                     retVal.SetLoaded(nameof(Entity.Telecoms));
-                    goto case Configuration.LoadStrategyType.QuickLoad;
-                case Configuration.LoadStrategyType.QuickLoad:
+                    goto case LoadMode.QuickLoad;
+                case LoadMode.QuickLoad:
                     var query = context.CreateSqlStatement<DbEntitySecurityPolicy>().SelectFrom(typeof(DbEntitySecurityPolicy), typeof(DbSecurityPolicy))
                         .InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
                         .Where(o => o.SourceKey == dbModel.Key);

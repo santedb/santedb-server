@@ -38,11 +38,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override ActNote DoConvertToInformationModel(DataContext context, DbActNote dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            if (this.m_configuration.LoadStrategy == Configuration.LoadStrategyType.FullLoad)
+            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
-                retVal.Author = base.GetRelatedPersistenceService<Entity>().Get(context, dbModel.AuthorKey);
-                retVal.SetLoaded(nameof(ActNote.Author));
+                case LoadMode.FullLoad:
+                    retVal.Author = base.GetRelatedPersistenceService<Entity>().Get(context, dbModel.AuthorKey);
+                    retVal.SetLoaded(nameof(ActNote.Author));
+                    break;
             }
+
             return retVal;
         }
     }

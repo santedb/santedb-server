@@ -41,12 +41,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            if (this.m_configuration.LoadStrategy == Configuration.LoadStrategyType.FullLoad)
+            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
-                retVal.AddressUse = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TelecomUseKey);
-                retVal.SetLoaded(nameof(EntityTelecomAddress.AddressUse));
-                retVal.TypeConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey.GetValueOrDefault());
-                retVal.SetLoaded(nameof(EntityTelecomAddress.TypeConcept));
+                case LoadMode.FullLoad:
+                    retVal.AddressUse = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TelecomUseKey);
+                    retVal.SetLoaded(nameof(EntityTelecomAddress.AddressUse));
+                    retVal.TypeConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey.GetValueOrDefault());
+                    retVal.SetLoaded(nameof(EntityTelecomAddress.TypeConcept));
+                    break;
             }
 
             return retVal;
