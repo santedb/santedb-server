@@ -144,9 +144,15 @@ namespace SanteDB.Configurator
 
             Tracer tracer = new Tracer("Configuration Tool");
             // Load the license
-            using (var ms = typeof(frmMain).Assembly.GetManifestResourceStream("SanteDB.Configurator.License.rtf"))
-                rtbLicense.LoadFile(ms, RichTextBoxStreamType.RichText);
-
+            try
+            {
+                using (var ms = typeof(frmMain).Assembly.GetManifestResourceStream("SanteDB.Configurator.License.rtf"))
+                    rtbLicense.LoadFile(ms, RichTextBoxStreamType.RichText);
+            }
+            catch(Exception e) // common on Linux systems in Mono
+            {
+                tracer.TraceError("Could not load license file: {0}", e.Message);
+            }
             var asm = Assembly.LoadFile(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.exe"));
             lblVersion.Text = $"{asm.GetName().Version} ({asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
             lblCopyright.Text = $"{asm.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright}";
