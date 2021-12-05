@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 declare INSTALL_ROOT='/opt/santesuite/santedb/server'
 declare SUDO=''
 
@@ -158,9 +159,10 @@ else
 fi
 
 
-read_yesno "Do you want to configure your SanteDB instance? " config
- 
-if [[ "$config" =~ ^[yY]$ ]] 
-then 
-	$SUDO mono $INSTALL_ROOT/ConfigTool.exe
-fi;
+#
+# read_yesno "Do you want to configure your SanteDB instance? " config
+# 
+# if [[ "$config" =~ ^[yY]$ ]] 
+# then 
+# 	$SUDO mono $INSTALL_ROOT/ConfigTool.exe
+# fi;
