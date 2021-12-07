@@ -51,55 +51,65 @@ namespace SanteDB.Configuration.Controls
             this.label5 = new System.Windows.Forms.Label();
             this.cbxProviderType = new System.Windows.Forms.ComboBox();
             this.pgProperties = new SanteDB.Configuration.Controls.PropertyGridEx();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // label5
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(5, 6);
+            this.label5.Dock = System.Windows.Forms.DockStyle.Left;
+            this.label5.Location = new System.Drawing.Point(0, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(98, 13);
+            this.label5.Size = new System.Drawing.Size(98, 22);
             this.label5.TabIndex = 31;
             this.label5.Text = "Database Software";
+            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // cbxProviderType
             // 
-            this.cbxProviderType.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbxProviderType.Dock = System.Windows.Forms.DockStyle.Right;
             this.cbxProviderType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxProviderType.FormattingEnabled = true;
-            this.cbxProviderType.Location = new System.Drawing.Point(109, 3);
+            this.cbxProviderType.Location = new System.Drawing.Point(104, 0);
+            this.cbxProviderType.Margin = new System.Windows.Forms.Padding(3, 10, 3, 3);
             this.cbxProviderType.Name = "cbxProviderType";
-            this.cbxProviderType.Size = new System.Drawing.Size(287, 21);
+            this.cbxProviderType.Size = new System.Drawing.Size(295, 21);
             this.cbxProviderType.TabIndex = 30;
             this.cbxProviderType.DropDown += new System.EventHandler(this.cbxProviderType_DropDown);
             this.cbxProviderType.SelectedIndexChanged += new System.EventHandler(this.cbxProviderType_SelectedIndexChanged);
             // 
             // pgProperties
             // 
-            this.pgProperties.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.pgProperties.CommandsVisibleIfAvailable = false;
-            this.pgProperties.Location = new System.Drawing.Point(8, 30);
+            this.pgProperties.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pgProperties.Location = new System.Drawing.Point(0, 22);
             this.pgProperties.Name = "pgProperties";
             this.pgProperties.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.pgProperties.Size = new System.Drawing.Size(387, 234);
+            this.pgProperties.Size = new System.Drawing.Size(399, 245);
             this.pgProperties.TabIndex = 32;
             this.pgProperties.ToolbarVisible = false;
             this.pgProperties.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.pgProperties_PropertyValueChanged);
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.label5);
+            this.panel1.Controls.Add(this.cbxProviderType);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(399, 22);
+            this.panel1.TabIndex = 33;
             // 
             // ucDatabaseSelector
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.pgProperties);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.cbxProviderType);
+            this.Controls.Add(this.panel1);
             this.Name = "ucDatabaseSelector";
             this.Size = new System.Drawing.Size(399, 267);
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -108,5 +118,6 @@ namespace SanteDB.Configuration.Controls
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ComboBox cbxProviderType;
         private PropertyGridEx pgProperties;
+        private System.Windows.Forms.Panel panel1;
     }
 }
