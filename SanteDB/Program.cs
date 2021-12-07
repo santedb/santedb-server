@@ -20,6 +20,7 @@
  */
 
 using MohawkCollege.Util.Console.Parameters;
+using Mono.Unix;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Model;
@@ -166,16 +167,40 @@ namespace SanteDB
                             Console.ResetColor();
                         }
 
-                        ManualResetEvent quitEvent = new ManualResetEvent(false);
-                        Console.CancelKeyPress += (o, e) =>
+                        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                         {
-                            Console.WriteLine("Service shutting down...");
-                            ServiceUtil.Stop();
-                            quitEvent.Set();
-                        };
+                            ManualResetEvent quitEvent = new ManualResetEvent(false);
 
-                        Console.WriteLine("Service started (CTRL+C to stop)...");
-                        quitEvent.WaitOne();
+                            Console.CancelKeyPress += (o, e) =>
+                            {
+                                Console.WriteLine("Service shutting down...");
+                                ServiceUtil.Stop();
+                                quitEvent.Set();
+                            };
+
+                            Console.WriteLine("Service started (CTRL+C to stop)...");
+                            quitEvent.WaitOne();
+                        }
+                        else
+                        {
+                            // Now wait until the service is exiting va SIGTERM or SIGSTOP
+                            UnixSignal[] signals = new UnixSignal[]
+                            {
+                                new UnixSignal(Mono.Unix.Native.Signum.SIGINT),
+                                new UnixSignal(Mono.Unix.Native.Signum.SIGTERM),
+                                new UnixSignal(Mono.Unix.Native.Signum.SIGQUIT),
+                                new UnixSignal(Mono.Unix.Native.Signum.SIGHUP)
+                            };
+                            int signal = UnixSignal.WaitAny(signals);
+                            // Gracefully shutdown
+                            ServiceUtil.Stop();
+
+                            try // remove the lock file
+                            {
+                                File.Delete("/tmp/SanteDB.exe.lock");
+                            }
+                            catch { }
+                        }
                     }
                 }
                 else
@@ -189,14 +214,15 @@ namespace SanteDB
             {
 #if DEBUG
                 Trace.TraceError("011 899 981 199 911 9725 3!!! {0}", e.ToString());
-                if (hasConsole)
-                    Console.WriteLine("011 899 981 199 911 9725 3!!! {0}", e.ToString());
+               
 
                 EventLog.WriteEntry("SanteDB Host Process", $"011 899 981 199 911 9725 3!!! {e}", EventLogEntryType.Error, 911);
 
 #else
                 Trace.TraceError("Error encountered: {0}. Will terminate", e);
 #endif
+                if (hasConsole)
+                    Console.WriteLine("011 899 981 199 911 9725 3!!! {0}", e.ToString());
                 try
                 {
                     EventLog.WriteEntry("SanteDB Host Process", $"011 899 981 199 911 9725 3!!! {e}", EventLogEntryType.Error, 911);

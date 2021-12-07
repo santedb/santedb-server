@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 declare INSTALL_ROOT='/opt/santesuite/santedb/server'
 declare SUDO=''
 
@@ -111,17 +112,17 @@ read_yesno "Do you want me to install SanteDB as a daemon?" daemon
 if [[ "$daemon" =~ ^[yY]$ ]]
 then 
     cat > /tmp/santedb.service <<EOF
-    [Unit]
-    Description=SanteDB iCDR Server
+[Unit]
+Description=SanteDB iCDR Server
 
-    [Service]
-    Type=Simple
-    RemainAfterExit=yes
-    ExecStart=/usr/bin/mono-service -d:$INSTALL_ROOT $INSTALL_ROOT/SanteDB.exe --console 
-    ExecStop=kill \`cat /tmp/SanteDB.exe.lock\`
+[Service]
+Type=simple
+RemainAfterExit=yes
+ExecStart=/usr/bin/mono-service -d:$INSTALL_ROOT $INSTALL_ROOT/SanteDB.exe --console 
+ExecStop=kill \`cat /tmp/SanteDB.exe.lock\`
 
-    [Install]
-    WantedBy=multi-user.target
+[Install]
+WantedBy=multi-user.target
 EOF
 
     $SUDO mv /tmp/santedb.service /etc/systemd/system/santedb.service
@@ -158,9 +159,10 @@ else
 fi
 
 
-read_yesno "Do you want to configure your SanteDB instance? " config
- 
-if [[ "$config" =~ ^[yY]$ ]] 
-then 
-	$SUDO mono $INSTALL_ROOT/ConfigTool.exe
-fi;
+#
+# read_yesno "Do you want to configure your SanteDB instance? " config
+# 
+# if [[ "$config" =~ ^[yY]$ ]] 
+# then 
+# 	$SUDO mono $INSTALL_ROOT/ConfigTool.exe
+# fi;

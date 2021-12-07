@@ -131,6 +131,10 @@ namespace SanteDB.Configurator
                 ConfigurationContext.Current.Apply();
                 Application.Run(frmMain);
             }
+            catch(Exception e)
+            {
+                Console.WriteLine("Configuration Tooling Fatal Error: {0}", e);
+            }
             finally
             {
                 Environment.Exit(0);

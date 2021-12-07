@@ -113,7 +113,7 @@
     <host>http://external_access_url</host>
   </section>
   <!-- If using File-System Persistent Queueing (like for outbound GS1 and HL7 messages) -->
-  <section xsi:type="FileSystemQueueConfigurationSection" queueRoot=".\queue" />
+  <section xsi:type="FileSystemQueueConfigurationSection" queueRoot="queue" />
   <!-- Database Configuration -->
   <section xsi:type="DataConfigurationSection">
     <connectionStrings>
@@ -148,7 +148,7 @@
 	    perpareStatements="false" />
    -->
   <!-- Configuraiton for AppletLoader -->
-  <section xsi:type="AppletConfigurationSection" appletDirectory=".\applets" allowUnsignedApplets="true">
+  <section xsi:type="AppletConfigurationSection" appletDirectory="applets" allowUnsignedApplets="true">
     <!-- Digital Signing Thumbprints of Trusted Publishers -->
     <trustedPublishers>
       <add>82C63E1E9B87578D0727E871D7613F2F0FAF683B</add>
