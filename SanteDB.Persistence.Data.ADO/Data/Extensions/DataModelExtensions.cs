@@ -210,10 +210,9 @@ namespace SanteDB.Persistence.Data.ADO.Data
             // Me
             var serviceInstance = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
             var vMe = me as IVersionedEntity;
-            String dkey = String.Format("{0}.{1}", me.GetType().FullName, me.Key);
 
-            IIdentifiedEntity existing = me.TryGetExisting(context);
             var idpInstance = serviceInstance.GetPersister(me.GetType());
+            IIdentifiedEntity existing = me.TryGetExisting(context) ?? idpInstance.Get(me.Key.GetValueOrDefault()) as IIdentifiedEntity;
 
             // Don't touch the child just return reference
             if (!serviceInstance.GetConfiguration().AutoInsertChildren || !createIfNotExists)
