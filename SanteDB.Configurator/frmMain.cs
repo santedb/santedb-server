@@ -157,6 +157,7 @@ namespace SanteDB.Configurator
                     {
                         tracer.TraceError("Could not load license file: {0}", e.Message);
                     }
+
                     var asm = Assembly.LoadFile(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "SanteDB.exe"));
                     lblVersion.Text = $"{asm.GetName().Version} ({asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
                     lblCopyright.Text = $"{asm.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright}";

@@ -405,7 +405,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                             this.m_cache?.Add(rv);
                             return rv;
                         }
-                    });
+                    }).ToList();
                 }
                 catch (Exception e)
                 {
