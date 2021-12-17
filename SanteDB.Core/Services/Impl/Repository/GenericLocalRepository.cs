@@ -167,6 +167,10 @@ namespace SanteDB.Server.Core.Services.Impl
             // Demand permission
             this.DemandQuery();
 
+            // Call privacy hook
+            if (this.m_privacyService?.ValidateQuery(query, AuthenticationContext.Current.Principal) == false)
+                this.ThrowPrivacyValidationException(query);
+
             var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TEntity>>();
 
             if (persistenceService == null)
@@ -256,9 +260,22 @@ namespace SanteDB.Server.Core.Services.Impl
         private void ThrowPrivacyValidationException(TEntity data)
         {
             throw new DetectedIssueException(
-                new DetectedIssue(DetectedIssuePriorityType.Error, "privacy", this.m_localizationService.FormatString("error.server.core.privacyControlFailure", new
+                new DetectedIssue(DetectedIssuePriorityType.Error, "privacy", this.m_localizationService.FormatString("error.server.core.privateWriteProtectionFailure", new
                 {
-                    param = "Privacy"
+                    param = data
+                }), DetectedIssueKeys.PrivacyIssue)
+            );
+        }
+
+        /// <summary>
+        /// Throw a privacy validation exception
+        /// </summary>
+        private void ThrowPrivacyValidationException(Expression<Func<TEntity, bool>> data)
+        {
+            throw new DetectedIssueException(
+                new DetectedIssue(DetectedIssuePriorityType.Error, "privacy", this.m_localizationService.FormatString("error.server.core.privacyQueryProtectionFailure", new
+                {
+                    param = "QueryExecutionFail"
                 }), DetectedIssueKeys.PrivacyIssue)
             );
         }
@@ -460,6 +477,10 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             // Demand permission
             this.DemandQuery();
+
+            // Call privacy hook
+            if (this.m_privacyService?.ValidateQuery(query, AuthenticationContext.Current.Principal) == false)
+                this.ThrowPrivacyValidationException(query);
 
             var persistenceService = ApplicationServiceContext.Current.GetService<IFastQueryDataPersistenceService<TEntity>>();
 

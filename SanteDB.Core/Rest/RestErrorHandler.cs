@@ -73,7 +73,8 @@ namespace SanteDB.Rest.Common.Serialization
                 error = error.InnerException;
 
             var fault = new RestServiceFault(error);
-
+            var authScheme = RestOperationContext.Current.AppliedPolicies.OfType<BasicAuthorizationAccessBehavior>().Any() ? "Basic" : "Bearer";
+            var authRealm = RestOperationContext.Current.IncomingRequest.Url.Host;
             // Formulate appropriate response
             if (error is DomainStateException)
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.ServiceUnavailable;
@@ -89,8 +90,7 @@ namespace SanteDB.Rest.Common.Serialization
                 {
                     // Ask the user to elevate themselves
                     faultMessage.StatusCode = 401;
-                    var authHeader = $"{(RestOperationContext.Current.AppliedPolicies.OfType<BasicAuthorizationAccessBehavior>().Any() ? "Basic" : "Bearer")} realm=\"{RestOperationContext.Current.IncomingRequest.Url.Host}\" error=\"insufficient_scope\" scope=\"{pve.PolicyId}\"  error_description=\"{error.Message}\"";
-                    RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", authHeader);
+                    faultMessage.AddAuthenticateHeader(authScheme, authRealm, "insufficient_scope", pve.PolicyId, error.Message);
                 }
                 else
                 {
@@ -106,7 +106,7 @@ namespace SanteDB.Rest.Common.Serialization
                 // TODO: Audit this
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
                 var authHeader = $"Bearer realm=\"{RestOperationContext.Current.IncomingRequest.Url.Host}\" error=\"invalid_token\" error_description=\"{error.Message}\"";
-                RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", authHeader);
+                faultMessage.AddAuthenticateHeader(authScheme, authRealm, error: "invalid_token", description: error.Message);
             }
             else if (error is LimitExceededException)
             {
@@ -116,9 +116,8 @@ namespace SanteDB.Rest.Common.Serialization
             }
             else if (error is AuthenticationException)
             {
-                var authHeader = $"{(RestOperationContext.Current.AppliedPolicies.OfType<BasicAuthorizationAccessBehavior>().Any() ? "Basic" : "Bearer")} realm=\"{RestOperationContext.Current.IncomingRequest.Url.Host}\" error=\"invalid_token\" error_description=\"{error.Message}\"";
                 faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
-                RestOperationContext.Current.OutgoingResponse.AddHeader("WWW-Authenticate", authHeader);
+                faultMessage.AddAuthenticateHeader(authScheme, authRealm, "invalid_token", description: error.Message);
             }
             else if (error is UnauthorizedAccessException)
             {
@@ -132,7 +131,7 @@ namespace SanteDB.Rest.Common.Serialization
                     case SessionExceptionType.NotYetValid:
                     case SessionExceptionType.NotEstablished:
                         faultMessage.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
-                        faultMessage.Headers.Add("WWW-Authenticate", $"Bearer");
+                        faultMessage.AddAuthenticateHeader(authScheme, authRealm, error: "unauthorized");
                         break;
 
                     default:

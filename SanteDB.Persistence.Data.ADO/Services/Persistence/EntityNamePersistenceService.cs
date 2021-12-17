@@ -134,10 +134,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             // Data component
             if (data.Component != null)
+            {
                 base.UpdateAssociatedItems<Core.Model.Entities.EntityNameComponent, DbEntityNameComponent>(
                    data.Component,
                     data,
                     context);
+            }
 
             return retVal;
         }
